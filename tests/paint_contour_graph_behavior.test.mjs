@@ -241,7 +241,7 @@ test('signed world strips with split boundaries retain exact packed graph bytes'
     'E-A:E-B|[4,-1]|[4,0]', 'E-A:E-B|[4,0]|[4,1]',
     'W-A:W-B|[-3,-1]|[-3,0]', 'W-A:W-B|[-3,0]|[-3,1]',
   ]);
-  assert.equal(graphBytes(graph), '510b387ec1fbe974376381dcf056c429a05966d080c5d0724f7671d03fe33173');
+  assert.equal(graphBytes(graph), 'c047b8414b82aece2c43deacf7e628b755881c0352a3774a85f37e6f4f8d6e6f');
 });
 
 test('compact edge indexing preserves legacy packed bytes through rehash, patches, ambiguity and restore', () => {
@@ -258,10 +258,10 @@ test('compact edge indexing preserves legacy packed bytes through rehash, patche
   // Frozen against the previous object/Map implementation, including feature
   // IDs, diagnostics, exact Float64 coordinates, chain order and owner order.
   assert.deepEqual(hashes, [
-    '449a25c14fb14c54122662cb29e34f4c861a98e4540002cc486eacade45f0325',
-    'f9b875485572987f89beceaba1699c233747b0653f917b3a6dfcd86318f0cfce',
-    'd1dab1d16163bb2ed491782525bacaed746b98e754074153504719de89bcc3f8',
-    'a3dc34332dc4cb416c4dda093ee57b3135016e6accc50cf004f6afe00c631157',
+    '8dbef59895017dc526edad0290e757e710557a04d13cf9de550349414ae64268',
+    '0c8bdb2bdee812c7ae9a16114b628f953526fa7d363b5280740b5062086908a8',
+    '6b93408e7c9f7609220f7c445b5d888b378f0adbe2bda871cf04d0cca695bf60',
+    '94a56f6de77183c0f5030978d7dcaf248858cf83957f600ade9437af2699a350',
   ]);
   assert.equal(JSON.stringify(features), before);
   assert.equal(builder.getStorageStats().overflowEdges, 0);

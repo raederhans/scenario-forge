@@ -25,6 +25,9 @@ import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
+import { pushRecentColorState, selectInspectorCountryState } from "./state/actions/editor_input_actions.js";
+import { commitChange } from "./state/changes.js";
+import { scheduleAfterPaint } from "./after_paint.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
@@ -10283,11 +10286,7 @@ function cancelPendingSidebarRefresh() {
     pendingSidebarRefreshState = null;
     return;
   }
-  if (typeof globalThis.cancelAnimationFrame === "function") {
-    globalThis.cancelAnimationFrame(pendingSidebarRefreshHandle);
-  } else {
-    globalThis.clearTimeout(pendingSidebarRefreshHandle);
-  }
+  pendingSidebarRefreshHandle();
   pendingSidebarRefreshHandle = null;
   pendingSidebarRefreshState = null;
 }
@@ -10414,12 +10413,8 @@ function scheduleSidebarRefresh({
   if (pendingSidebarRefreshHandle !== null && pendingSidebarRefreshHandle !== undefined) {
     return;
   }
-  const callback = () => {
-    flushPendingSidebarRefresh();
-  };
-  pendingSidebarRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
-    ? globalThis.requestAnimationFrame(callback)
-    : globalThis.setTimeout(callback, 0);
+  // Row refreshes run after the paint click's frame is on screen.
+  pendingSidebarRefreshHandle = scheduleAfterPaint(flushPendingSidebarRefresh, { withoutFrame: "timer" });
 }
 
 function setInteractionInfrastructureState(
@@ -15064,15 +15059,8 @@ function handleMouseMove(event) {
 }
 
 function addRecentColor(color) {
-  if (!color || runtimeState.recentColors[0] === color) return;
-  runtimeState.recentColors = runtimeState.recentColors.filter((value) => value !== color);
-  runtimeState.recentColors.unshift(color);
-  if (runtimeState.recentColors.length > 4) {
-    runtimeState.recentColors = runtimeState.recentColors.slice(0, 4);
-  }
-  if (typeof runtimeState.updateRecentUI === "function") {
-    runtimeState.updateRecentUI();
-  }
+  if (!pushRecentColorState(runtimeState, color)) return;
+  commitChange({ domains: ["recentColors"], reason: "recent-color" });
 }
 
 function commitHistoryEntry({ kind, before, after, affectsSovereignty = false, gesture = null } = {}) {
@@ -15249,22 +15237,12 @@ function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
   if (!nextCode) return false;
 
   const previousCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
-  runtimeState.selectedInspectorCountryCode = nextCode;
-  runtimeState.inspectorHighlightCountryCode = nextCode;
-  runtimeState.inspectorHighlightFeatureIds = [];
-  runtimeState.inspectorHighlightGroupMode = false;
-  runtimeState.inspectorHighlightLabel = "";
-  runtimeState.inspectorOverlayDirty = true;
-
-  if (typeof runtimeState.refreshCountryListRowsFn === "function") {
-    runtimeState.refreshCountryListRowsFn({
-      countryCodes: Array.from(new Set([previousCode, nextCode].filter(Boolean))),
-      refreshInspector: true,
-      refreshPresetTree: true,
-    });
-  } else if (typeof runtimeState.renderPresetTreeFn === "function") {
-    runtimeState.renderPresetTreeFn();
-  }
+  selectInspectorCountryState(runtimeState, nextCode);
+  // The inspector, its rows and the preset tree follow after the click's frame is painted.
+  scheduleSidebarRefresh({
+    ownerCodes: [previousCode, nextCode].filter(Boolean),
+    refreshPresetTree: true,
+  });
   return nextCode !== previousCode;
 }
 

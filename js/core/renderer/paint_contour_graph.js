@@ -4,6 +4,12 @@ import { packContourPolygons, createContourPolygonQuery, createContourWaterQuery
 // ownership, palette, projection or viewport state participates in adjacency.
 // Coordinates are snapped to 1e-7 degrees for identity, not for rendering.
 const SCALE = 1e7;
+const INCREMENTAL_FEATURE_RATIO = 0.2;
+// A closure that widens the context past this share of all features falls
+// back to a full finish, which then costs about the same.
+const INCREMENTAL_CONTEXT_RATIO = 0.5;
+// Small graphs finish fast either way; the fallback only guards large ones.
+const INCREMENTAL_CONTEXT_MINIMUM = 1000;
 const keyOf = ([x, y]) => `${x},${y}`;
 const compare = (a, b) => a[0] - b[0] || a[1] - b[1];
 const coordinate = (point) => {
@@ -23,18 +29,24 @@ const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b,
 const EDGE_SHIFT = 12, EDGE_CHUNK = 1 << EDGE_SHIFT, EDGE_MASK = EDGE_CHUNK - 1;
 const TOMBSTONE = 0xffffffff;
 class ContourEdgeView {
-  constructor(store, index) { this.store = store; this.index = index; }
+  constructor(store, index) {
+    const storage = store.storage(index);
+    this.index = index; this.at = (index & EDGE_MASK) * 4;
+    this.snapped = storage.snapped; this.original = storage.original;
+    const members = store.members(index);
+    this.members = members.length > 2 ? [...members] : members;
+    this.cachedA = null; this.cachedB = null; this.pair = null; this.lineKey = null; this.stale = false;
+  }
   get key() { return this.index + 1; }
-  get a() { return this.store.point(this.index, false, false); }
-  get b() { return this.store.point(this.index, true, false); }
-  get start() { return this.store.point(this.index, false, true); }
-  get end() { return this.store.point(this.index, true, true); }
-  get members() { return this.store.members(this.index); }
+  get a() { return this.cachedA ||= [this.snapped[this.at], this.snapped[this.at + 1]]; }
+  get b() { return this.cachedB ||= [this.snapped[this.at + 2], this.snapped[this.at + 3]]; }
+  get start() { return [this.original[this.at], this.original[this.at + 1]]; }
+  get end() { return [this.original[this.at + 2], this.original[this.at + 3]]; }
 }
 // Scalar queries must not materialize a point Array on each sort comparison.
 // Temporary split edges retain their ordinary point arrays and exact values.
 function edgeCoordinate(edge, second, axis, original = false) {
-  return edge instanceof ContourEdgeView ? edge.store.scalar(edge.index, second, axis, original)
+  return edge instanceof ContourEdgeView ? (original ? edge.original : edge.snapped)[edge.at + (second ? 2 : 0) + axis]
     : edge[original ? (second ? 'end' : 'start') : (second ? 'b' : 'a')][axis];
 }
 function copyEdge(edge, overrides) {
@@ -44,10 +56,23 @@ function copyEdge(edge, overrides) {
 }
 
 function createCompactEdges() {
-  const chunks = [], overflow = new Map();
+  const chunks = [], overflow = new Map(), sources = new Map();
   let table = new Uint32Array(2048), used = 0, size = 0, allocated = 0;
   let head = 0, tail = 0, free = 0, views = null;
+  const retainedViews = [];
+  function markStale(index) {
+    // The retained view stays as the edge's line bookkeeping (lineKey and the
+    // members cached at construction) from the last finish; a later read
+    // replaces it with a fresh view. Cached groups that hold it involve an
+    // owner adjacent to this edit, so they are recomputed, never re-read.
+    const view = retainedViews.length ? retainedViews[index] : undefined;
+    if (view) view.stale = true;
+  }
   const chunk = index => chunks[index >>> EDGE_SHIFT];
+  function fresh(index) {
+    const view = views[index];
+    return view && !view.stale ? view : (views[index] = new ContourEdgeView(store, index));
+  }
   const offset = index => index & EDGE_MASK;
   function hash(ax, ay, bx, by) {
     let value = Math.imul(ax ^ 0x9e3779b9, 0x85ebca6b);
@@ -89,11 +114,13 @@ function createCompactEdges() {
       if (allocated >= TOMBSTONE - 1) throw new RangeError('Contour edge index capacity exceeded.');
       index = allocated++;
       if (!(index & EDGE_MASK)) chunks.push({ snapped: new Int32Array(EDGE_CHUNK * 4),
-        original: new Float64Array(EDGE_CHUNK * 4), owners: new Int32Array(EDGE_CHUNK * 2), links: new Uint32Array(EDGE_CHUNK * 2) });
+        original: new Float64Array(EDGE_CHUNK * 4), owners: new Int32Array(EDGE_CHUNK * 2), links: new Uint32Array(EDGE_CHUNK * 2), marks: null, picks: null, varied: null });
     }
     const storage = chunk(index), at = offset(index) * 4, link = offset(index) * 2;
-    storage.snapped.set([a[0], a[1], b[0], b[1]], at);
-    storage.original.set([start[0], start[1], end[0], end[1]], at);
+    storage.snapped[at] = a[0]; storage.snapped[at + 1] = a[1];
+    storage.snapped[at + 2] = b[0]; storage.snapped[at + 3] = b[1];
+    storage.original[at] = start[0]; storage.original[at + 1] = start[1];
+    storage.original[at + 2] = end[0]; storage.original[at + 3] = end[1];
     storage.links[link] = tail; storage.links[link + 1] = 0;
     if (tail) chunk(tail - 1).links[offset(tail - 1) * 2 + 1] = index + 1;
     else head = index + 1;
@@ -106,19 +133,51 @@ function createCompactEdges() {
     const values = chunk(index).owners, at = offset(index) * 2;
     return overflow.get(index) || (values[at + 1] ? [values[at], values[at + 1]] : [values[at]]);
   }
-  function addMember(index, member) {
+  function addMember(index, member, start, end) {
     const values = chunk(index).owners, at = offset(index) * 2, extra = overflow.get(index);
-    if (extra) { if (extra.includes(member)) return false; extra.push(member); return true; }
-    if (values[at] === member || values[at + 1] === member) return false;
+    if (extra ? extra.includes(member) : values[at] === member || values[at + 1] === member) return false;
+    markStale(index);
+    if (start && values[at]) joinSource(index, member, start, end);
+    if (extra) { extra.push(member); return true; }
     if (!values[at]) values[at] = member;
     else if (!values[at + 1]) values[at + 1] = member;
     else overflow.set(index, [values[at], values[at + 1], member]);
     return true;
   }
+  // Owners of one snapped edge can carry different Float64 inputs. Keep every
+  // variant only when they differ, and store the lowest owner's, so the edge
+  // does not depend on which owner happened to be added first.
+  function joinSource(index, member, start, end) {
+    const storage = chunk(index), original = storage.original, position = offset(index) * 4;
+    const varied = storage.varied?.[offset(index)];
+    if (!varied && original[position] === start[0] && original[position + 1] === start[1]
+      && original[position + 2] === end[0] && original[position + 3] === end[1]) return;
+    let variants = varied ? sources.get(index) : undefined;
+    if (!variants) {
+      variants = [];
+      for (const owner of members(index)) variants.push(Math.abs(owner), original[position], original[position + 1], original[position + 2], original[position + 3]);
+      sources.set(index, variants);
+      (storage.varied ||= new Uint8Array(EDGE_CHUNK))[offset(index)] = 1;
+    }
+    variants.push(Math.abs(member), start[0], start[1], end[0], end[1]);
+    restoreSource(original, position, variants);
+  }
+  function restoreSource(original, position, variants) {
+    let first = 0;
+    for (let i = 5; i < variants.length; i += 5) if (variants[i] < variants[first]) first = i;
+    for (let i = 0; i < 4; i++) original[position + i] = variants[first + i + 1];
+  }
   function removeMember(index, owner) {
     const storage = chunk(index), at = offset(index) * 2, values = storage.owners;
     if (!values[at]) return;
+    markStale(index);
     const next = members(index).filter(member => Math.abs(member) !== owner);
+    if (storage.varied?.[offset(index)]) {
+      const variants = sources.get(index);
+      for (let i = 0; i < variants.length; i += 5) if (variants[i] === owner) { variants.splice(i, 5); break; }
+      if (variants.length) restoreSource(storage.original, offset(index) * 4, variants);
+      if (variants.length <= 5) { sources.delete(index); storage.varied[offset(index)] = 0; }
+    }
     values[at] = next[0] || 0; values[at + 1] = next[1] || 0;
     if (next.length > 2) overflow.set(index, next); else overflow.delete(index);
     if (next.length) return;
@@ -129,26 +188,45 @@ function createCompactEdges() {
     if (after) chunk(after - 1).links[offset(after - 1) * 2] = before; else tail = before;
     storage.links[at] = free; free = index + 1; size--;
   }
-  return {
+  const store = {
     get size() { return size; }, getOrAdd, addMember, removeMember, members,
-    point(index, second, original) {
-      const values = chunk(index)[original ? 'original' : 'snapped'], at = offset(index) * 4 + (second ? 2 : 0);
-      return [values[at], values[at + 1]];
+    storage: chunk,
+    beginRead() { views = retainedViews; }, endRead() { views = null; },
+    // The given edges in list (insertion) order, which is the order a full
+    // finish visits them in. One walk of the links; no per-edge sequence.
+    inListOrder(lists, cycle) {
+      for (const list of lists) for (const index of list) {
+        const storage = chunk(index);
+        (storage.picks ||= new Uint32Array(EDGE_CHUNK))[offset(index)] = cycle;
+      }
+      const result = [];
+      for (let token = head; token; token = chunk(token - 1).links[offset(token - 1) * 2 + 1]) {
+        const picks = chunk(token - 1).picks;
+        if (picks && picks[offset(token - 1)] === cycle) result.push(fresh(token - 1));
+      }
+      return result;
     },
-    scalar(index, second, axis, original) {
-      return chunk(index)[original ? 'original' : 'snapped'][offset(index) * 4 + (second ? 2 : 0) + axis];
+    // One stamp per edge and finish cycle: a typed-array test, not a Map entry.
+    mark(index, cycle) {
+      const storage = chunk(index), at = offset(index);
+      const marks = storage.marks ||= new Uint32Array(EDGE_CHUNK);
+      if (marks[at] === cycle) return false;
+      marks[at] = cycle; return true;
     },
-    beginRead() { views = []; }, endRead() { views = null; },
+    view(index) { return views ? fresh(index) : new ContourEdgeView(this, index); },
+    retained(index) { return retainedViews[index]; },
+    dropViews() { retainedViews.length = 0; },
     *values() {
       for (let token = head; token; token = chunk(token - 1).links[offset(token - 1) * 2 + 1]) {
         const index = token - 1;
-        yield views ? views[index] ||= new ContourEdgeView(this, index) : new ContourEdgeView(this, index);
+        yield views ? fresh(index) : new ContourEdgeView(this, index);
       }
     },
     stats() { return { compactEdgeBytes: table.byteLength + chunks.reduce((sum, item) => sum + item.snapped.byteLength
-      + item.original.byteLength + item.owners.byteLength + item.links.byteLength, 0),
-      edgeCapacity: chunks.length * EDGE_CHUNK, overflowEdges: overflow.size }; },
+      + item.original.byteLength + item.owners.byteLength + item.links.byteLength + (item.marks?.byteLength || 0) + (item.picks?.byteLength || 0) + (item.varied?.byteLength || 0), 0),
+      edgeCapacity: chunks.length * EDGE_CHUNK, overflowEdges: overflow.size, sourceVariantEdges: sources.size }; },
   };
+  return store;
 }
 
 function ringSide(ring, hole) {
@@ -173,7 +251,39 @@ function pairFor(members) {
   return left < 0 || right < 0 || left === right ? null : [Math.min(left, right), Math.max(left, right)];
 }
 
-function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedSharedSegments') {
+function exactLineKey(edge) {
+  const dx = edge.b[0] - edge.a[0], dy = edge.b[1] - edge.a[1];
+  if (Math.abs(dx) > 180 * SCALE) return null;
+  const divisor = gcd(dx, dy);
+  if (!divisor) return null;
+  const ux = dx / divisor, uy = dy / divisor;
+  return `${ux},${uy},${BigInt(ux) * BigInt(edge.a[1]) - BigInt(uy) * BigInt(edge.a[0])}`;
+}
+
+function quantizedLine(edge) {
+  let ax = Math.round(edge.a[0] / 1000), ay = Math.round(edge.a[1] / 1000);
+  let bx = Math.round(edge.b[0] / 1000), by = Math.round(edge.b[1] / 1000);
+  if (ax > bx || (ax === bx && ay > by)) { [ax, bx] = [bx, ax]; [ay, by] = [by, ay]; }
+  const dx = bx - ax, dy = by - ay, divisor = gcd(dx, dy);
+  if (!divisor || Math.abs(dx) > 1800000) return null;
+  const ux = dx / divisor, uy = dy / divisor;
+  return { key: `${ux},${uy},${ux * ay - uy * ax}`, segment: `${ax},${ay},${bx},${by},${Math.sign(edge.members[0])}` };
+}
+
+const lineCount = (line, side) => line instanceof ContourEdgeView
+  ? Number((line.members[0] > 0 ? 0 : 1) === side) : line?.[side] || 0;
+
+// Several sources can meet at one snapped vertex with sub-1e-7 differences in
+// their Float64 input. Keep the lexicographically smallest one, so the emitted
+// coordinates depend on the set of edges rather than on their insertion order.
+function eventAt(events, t, point, original) {
+  let entry = events.get(t);
+  if (!entry) events.set(t, entry = { point, original, add: [], remove: [] });
+  else if (original[0] < entry.original[0] || (original[0] === entry.original[0] && original[1] < entry.original[1])) entry.original = original;
+  return entry;
+}
+
+function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedSharedSegments', lineSides = null, registerLine = null) {
   // Exact line sweep also handles unequal segmentation. No distance search.
   const shared = [], lines = new Map(), repaired = new Set(), remaining = [];
   for (const edge of unmatched) {
@@ -184,15 +294,18 @@ function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedS
     const ux = dx / divisor, uy = dy / divisor;
     const offset = BigInt(ux) * BigInt(edge.a[1]) - BigInt(uy) * BigInt(edge.a[0]);
     const key = `${ux},${uy},${offset}`;
+    if (registerLine) registerLine(edge, key);
     const previous = lines.get(key);
     // Most coast segments are unique. Avoid allocating an Array per coastline.
     if (!previous) lines.set(key, edge);
     else if (Array.isArray(previous)) previous.push(edge);
     else lines.set(key, [previous, edge]);
   }
-  for (const group of lines.values()) {
+  for (const [key, group] of lines) {
     if (!Array.isArray(group)) { remaining.push(group); continue; }
-    if (!accept(group) || !group.some(e => e.members[0] > 0) || !group.some(e => e.members[0] < 0)) {
+    const sides = lineSides?.get(key);
+    if (!accept(group) || !(sides ? lineCount(sides, 0) : group.some(e => e.members[0] > 0))
+      || !(sides ? lineCount(sides, 1) : group.some(e => e.members[0] < 0))) {
       for (const edge of group) remaining.push(edge);
       continue;
     }
@@ -200,8 +313,7 @@ function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedS
     const events = new Map();
     const event = (point, original) => {
       const t = point[useX ? 0 : 1];
-      if (!events.has(t)) events.set(t, { point, original, add: [], remove: [] });
-      return events.get(t);
+      return eventAt(events, t, point, original);
     };
     for (const edge of group) {
       event(edge.a, edge.start).add.push(edge);
@@ -315,16 +427,24 @@ function sourceEdgeQuery(edges, occupied) {
   maxima = canRadixSort
     ? new Int32Array(size * 2).fill(int32Min)
     : new Float64Array(size * 2).fill(-Infinity);
-  ordered.forEach((edge, index) => { maxima[size + index] = edgeCoordinate(edge, true, 0); });
-  for (let index = size - 1; index > 0; index -= 1) maxima[index] = Math.max(maxima[index * 2], maxima[index * 2 + 1]);
+  const minimaY = new Float64Array(size * 2).fill(Infinity), maximaY = new Float64Array(size * 2).fill(-Infinity);
+  ordered.forEach((edge, index) => {
+    const ay = edgeCoordinate(edge, false, 1), by = edgeCoordinate(edge, true, 1);
+    maxima[size + index] = edgeCoordinate(edge, true, 0);
+    minimaY[size + index] = Math.min(ay, by); maximaY[size + index] = Math.max(ay, by);
+  });
+  for (let index = size - 1; index > 0; index -= 1) {
+    maxima[index] = Math.max(maxima[index * 2], maxima[index * 2 + 1]);
+    minimaY[index] = Math.min(minimaY[index * 2], minimaY[index * 2 + 1]);
+    maximaY[index] = Math.max(maximaY[index * 2], maximaY[index * 2 + 1]);
+  }
   return (x0, y0, x1, y1) => {
     const result = [];
     function visit(node, lo, hi) {
-      if (lo >= ordered.length || (sortedX0 ? sortedX0[lo] : edgeCoordinate(ordered[lo], false, 0)) > x1 || maxima[node] < x0) return;
+      if (lo >= ordered.length || (sortedX0 ? sortedX0[lo] : edgeCoordinate(ordered[lo], false, 0)) > x1 || maxima[node] < x0
+        || minimaY[node] > y1 || maximaY[node] < y0) return;
       if (hi - lo === 1) {
-        const edge = ordered[lo];
-        const ay = edgeCoordinate(edge, false, 1), by = edgeCoordinate(edge, true, 1);
-        if (Math.min(ay, by) <= y1 && Math.max(ay, by) >= y0) result.push(edge);
+        if (minimaY[node] <= y1 && maximaY[node] >= y0) result.push(ordered[lo]);
         return;
       }
       const mid = (lo + hi) >>> 1;
@@ -335,7 +455,7 @@ function sourceEdgeQuery(edges, occupied) {
   };
 }
 
-function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occupiedSegments) {
+function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occupiedSegments, onGroup = null) {
   // Exceeding this bounded fallback work leaves the original graph unchanged.
   // It is not an input rejection or a relaxed geometric acceptance threshold.
   const maxComparisonsPerGroup = 4096;
@@ -373,6 +493,13 @@ function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occu
     if (!group) groups.set(root, group = []);
     group.push(edge);
   });
+  // Report every connected group. One over the comparison budget is decisive:
+  // any larger group containing it is skipped too, so its extent cannot change
+  // the result. (An incompatible group is as well; treating it as undecided
+  // only widens a local finish, so it is not checked twice.)
+  if (onGroup) for (const group of groups.values()) {
+    if (group.length > 1) onGroup(group, group.length * (group.length - 1) / 2 > maxComparisonsPerGroup);
+  }
   const shared = [], remaining = [], occupied = new Set(occupiedSegments);
   let query = null;
   for (const group of groups.values()) {
@@ -394,11 +521,7 @@ function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occu
     const candidates = new Set(group);
     const useX = group[0].b[0] !== group[0].a[0], axis = useX ? 0 : 1;
     const events = new Map();
-    const event = (point, original) => {
-      const t = point[axis];
-      if (!events.has(t)) events.set(t, { point, original, add: [], remove: [] });
-      return events.get(t);
-    };
+    const event = (point, original) => eventAt(events, point[axis], point, original);
     for (const edge of new Set([...group, ...blockers])) {
       event(edge.a, edge.start).add.push(edge);
       event(edge.b, edge.end).remove.push(edge);
@@ -749,7 +872,7 @@ function politicalCoverageQuery(polygons) {
   };
 }
 
-function sharedSegments(edges, diagnostics, precisions, options, polygons) {
+function geometrySegments(edges, diagnostics, precisions, lineSides, registerLine, onSourceGroup = null) {
   const shared = [], unmatched = [];
   for (const edge of edges.values()) {
     const pair = pairFor(edge.members);
@@ -758,17 +881,22 @@ function sharedSegments(edges, diagnostics, precisions, options, polygons) {
     else if (edge.members.some(member => Math.abs(member) !== Math.abs(edge.members[0]))) diagnostics.ambiguousSegments += 1;
   }
   diagnostics.exactSharedSegments = shared.length;
-  const exact = nodeEdges(unmatched, diagnostics);
+  const exact = nodeEdges(unmatched, diagnostics, undefined, undefined, lineSides, registerLine);
   for (const edge of exact.shared) shared.push(edge);
-  const source = nodeSourceEdges(exact.remaining, diagnostics, precisions, edges, shared);
+  const source = nodeSourceEdges(exact.remaining, diagnostics, precisions, edges, shared, onSourceGroup);
   for (const edge of source.shared) shared.push(edge);
+  return { shared, remaining: source.remaining };
+}
 
+function quantizedSegments(geometry, diagnostics, precisions) {
   // Cross-LOD joins are allowed ONLY by the actual coarse source's declared
   // coordinate grid. Fine/fine boundaries retain 1e-7 identity, even if close.
   // Compare unresolved edges at that grid, require two unique opposite sides,
   // and render the coarser line. Ambiguous overlaps are never welded.
-  let remaining = source.remaining;
+  let remaining = geometry.remaining;
   const coarseEdges = remaining.filter(edge => precisions.get(Math.abs(edge.members[0]) - 1) === 4);
+  if (!coarseEdges.length) return geometry;
+  const shared = [...geometry.shared];
   if (coarseEdges.length) {
     const grid = 1000;
     const snap = point => point.map(n => Math.round(n / grid) * grid);
@@ -806,19 +934,32 @@ function sharedSegments(edges, diagnostics, precisions, options, polygons) {
     const quantized = nodeEdges(leftover, diagnostics, validMixed, 'quantizedSharedSegments');
     for (const edge of quantized.shared) shared.push(edge);
     remaining = unquantized;
+    const untouched = new Set(leftover);
     for (const edge of quantized.remaining) {
+      // A leftover edge that no mixed-precision sweep split is still exactly its
+      // source edge. Re-interpolating it would round a + (b - a) and could flip
+      // its orientation, so a coarse feature anywhere on the map would perturb
+      // every unrelated fine coast: a global dependency no neighbourhood covers.
+      if (untouched.has(edge)) { remaining.push(edge.source); continue; }
       const original = edge.source, q = quantize(original);
       const axis = Math.abs(q.b[0] - q.a[0]) >= Math.abs(q.b[1] - q.a[1]) ? 0 : 1;
       const forward = q.members[0] === original.members[0];
       const first = forward ? original.start : original.end, last = forward ? original.end : original.start;
       const interpolate = point => {
         const t = (point[axis] - q.a[axis]) / (q.b[axis] - q.a[axis]);
-        return first.map((value, i) => value + (last[i] - value) * t);
+        if (t === 0) return [first[0], first[1]];
+        if (t === 1) return [last[0], last[1]];
+        return [first[0] + (last[0] - first[0]) * t, first[1] + (last[1] - first[1]) * t];
       };
       const start = interpolate(edge.a), end = interpolate(edge.b);
       remaining.push(copyEdge(original, { start, end, a: coordinate(start), b: coordinate(end), members: q.members }));
     }
   }
+  return { shared, remaining };
+}
+
+function sharedSegments(geometry, diagnostics, options, polygons) {
+  const shared = [...geometry.shared], remaining = geometry.remaining;
   diagnostics.oneSidedSegments = remaining.length;
   const consumed = options.land ? new Map() : null;
   for (const edge of nearSeamSegments(remaining, shared, diagnostics, options.nearSeamTolerance, options.land, polygons, consumed)) shared.push(edge);
@@ -839,7 +980,7 @@ function sharedSegments(edges, diagnostics, precisions, options, polygons) {
       x = ((x + 180) % 360 + 360) % 360 - 180;
       if (covered(x, start[1] + dy * t - sign * dx / length * 1e-5)) return;
       const a = point(lo), b = point(hi);
-      coast.push({ start: a, end: b, a: coordinate(a), b: coordinate(b) });
+      coast.push({ start: a, end: b, a: coordinate(a), b: coordinate(b), owner: Math.abs(edge.members[0]) - 1 });
     };
     let cursor = 0;
     for (const [lo, hi] of (consumed.get(edge) || []).sort((a, b) => a[0] - b[0])) {
@@ -850,61 +991,82 @@ function sharedSegments(edges, diagnostics, precisions, options, polygons) {
   return { shared, coast: options.land ? coast : null };
 }
 
-function packChains(segments, featureIds, diagnostics, coast = false) {
-  const groups = new Map();
-  for (const edge of segments) {
-    const key = coast ? '' : edge.pair.join(':');
-    let group = groups.get(key);
-    if (!group) groups.set(key, group = { pair: edge.pair, edges: [] });
-    group.edges.push(edge);
-  }
+function packChains(groups, featureIds, diagnostics, coast) {
   const paths = [];
   let pointCount = 0;
-  for (const { pair, edges } of groups.values()) {
-    const nodes = new Map(), used = new Set();
+  const orderedGroups = [...groups.values()].sort((a, b) => coast ? a[0].owner - b[0].owner
+    : a[0].pair[0] - b[0].pair[0] || a[0].pair[1] - b[0].pair[1]);
+  const compareEdges = (a, b) => edgeCoordinate(a, false, 0) - edgeCoordinate(b, false, 0)
+    || edgeCoordinate(a, false, 1) - edgeCoordinate(b, false, 1)
+    || edgeCoordinate(a, true, 0) - edgeCoordinate(b, true, 0)
+    || edgeCoordinate(a, true, 1) - edgeCoordinate(b, true, 1)
+    || edgeCoordinate(a, false, 0, true) - edgeCoordinate(b, false, 0, true)
+    || edgeCoordinate(a, false, 1, true) - edgeCoordinate(b, false, 1, true)
+    || edgeCoordinate(a, true, 0, true) - edgeCoordinate(b, true, 0, true)
+    || edgeCoordinate(a, true, 1, true) - edgeCoordinate(b, true, 1, true);
+  for (const originalEdges of orderedGroups) {
+    // Walked chains live on their group array: a replaced group takes them
+    // along, with no WeakMap for the collector to trace.
+    const cached = originalEdges.paths;
+    if (cached) {
+      for (const path of cached) { paths.push(path); pointCount += path.steps.length + 1; }
+      continue;
+    }
+    const pair = originalEdges[0].pair, groupPaths = [];
+    let edges = originalEdges;
+    for (let i = 1; i < edges.length; i++) if (compareEdges(edges[i - 1], edges[i]) > 0) {
+      edges = [...originalEdges].sort(compareEdges); break;
+    }
+    const nodes = new Map(), used = new Uint8Array(edges.length), ends = new Array(edges.length * 2);
     edges.forEach((edge, index) => {
-      for (const p of [edge.a, edge.b]) {
-        const key = keyOf(p);
-        if (!nodes.has(key)) nodes.set(key, []);
-        nodes.get(key).push(index);
+      for (let end = 0; end < 2; end++) {
+        const key = `${edgeCoordinate(edge, !!end, 0)},${edgeCoordinate(edge, !!end, 1)}`;
+        let adjacent = nodes.get(key);
+        if (!adjacent) nodes.set(key, adjacent = []);
+        adjacent.push(index); ends[index * 2 + end] = adjacent;
       }
     });
     function walk(start, firstIndex) {
       const steps = [];
       let vertex = start, index = firstIndex;
-      while (!used.has(index)) {
-        used.add(index);
-        const edge = edges[index], forward = keyOf(edge.a) === vertex;
+      while (!used[index]) {
+        used[index] = 1;
+        const forward = ends[index * 2] === vertex;
         steps.push((index + 1) * (forward ? 1 : -1));
-        vertex = keyOf(forward ? edge.b : edge.a);
-        const adjacent = nodes.get(vertex);
+        vertex = ends[index * 2 + (forward ? 1 : 0)];
+        const adjacent = vertex;
         if (adjacent.length !== 2) break;
-        const next = adjacent.find(candidate => !used.has(candidate));
-        if (next === undefined) break;
+        const next = adjacent[0] === index ? adjacent[1] : adjacent[0];
+        if (used[next]) break;
         index = next;
       }
-      if (steps.length) { paths.push({ edges, steps: Int32Array.from(steps), pair }); pointCount += steps.length + 1; }
+      if (steps.length) {
+        const path = { edges, steps: Int32Array.from(steps), pair };
+        paths.push(path); groupPaths.push(path); pointCount += steps.length + 1;
+      }
     }
-    for (const [vertex, adjacent] of nodes) {
+    for (const adjacent of nodes.values()) {
       if (adjacent.length === 2) continue;
-      for (const index of adjacent) if (!used.has(index)) walk(vertex, index);
+      for (const index of adjacent) if (!used[index]) walk(adjacent, index);
     }
-    edges.forEach((edge, index) => { if (!used.has(index)) walk(keyOf(edge.a), index); });
+    for (let index = 0; index < edges.length; index++) if (!used[index]) walk(ends[index * 2], index);
+    originalEdges.paths = groupPaths;
   }
   const coordinates = new Float64Array(pointCount * 2);
   const offsets = new Uint32Array(paths.length + 1);
   const owners = new Uint32Array(coast ? 0 : paths.length * 2);
   let position = 0;
-  const writePoint = point => {
-    coordinates[position * 2] = point[0]; coordinates[position * 2 + 1] = point[1]; position++;
+  const writePoint = (edge, second) => {
+    coordinates[position * 2] = edgeCoordinate(edge, second, 0, true);
+    coordinates[position * 2 + 1] = edgeCoordinate(edge, second, 1, true); position++;
   };
   paths.forEach(({ edges, steps, pair }, index) => {
     offsets[index] = position;
     if (!coast) { owners[index * 2] = pair[0]; owners[index * 2 + 1] = pair[1]; }
     for (let step = 0; step < steps.length; step++) {
       const token = steps[step], edge = edges[Math.abs(token) - 1], forward = token > 0;
-      if (!step) writePoint(forward ? edge.start : edge.end);
-      writePoint(forward ? edge.end : edge.start);
+      if (!step) writePoint(edge, !forward);
+      writePoint(edge, forward);
     }
   });
   offsets[paths.length] = position;
@@ -917,13 +1079,247 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
   const edges = createCompactEdges(), idToIndex = new Map(), featureIds = [], featureEdges = new Map();
   const invalidRingsById = new Map(), precisions = new Map();
   const polygons = new Map();
+  const bounds = new Map(), dirty = new Set(), dirtyBounds = [];
+  const boundaryBounds = new Map(), boundaryCells = new Map();
+  const dirtyEdges = [], lineSides = new Map();
+  const pendingBounds = [];
+  // Edge index -> owners of its source-collinear group at the last finish that
+  // computed it, for groups within the comparison budget: the extent bound a
+  // local finish widens to.
+  const sourceOwners = new Map();
+  // Only undecided groups spanning several owners are read back: a decisive
+  // group stays unmatched whatever its extent, and a single owner adds nothing.
+  function recordSourceGroup(group, decisive) {
+    if (decisive) return;
+    const first = Math.abs(group[0].members[0]) - 1;
+    if (group.every(edge => Math.abs(edge.members[0]) - 1 === first)) return;
+    const owners = new Set();
+    for (const edge of group) owners.add(Math.abs(edge.members[0]) - 1);
+    for (const edge of group) if (edge.key) sourceOwners.set(edge.key - 1, owners);
+  }
+  let cycle = 1, liveEntries = 0, deadEntries = 0;
+  const quantizedLines = new Map(), quantizedOwners = new Map();
+  let geometryCache = null, segmentCache = null, quantizedInput = null, waterChanged = false;
   let land = createContourWaterQuery(waterMask);
+  function registerLine(edge, key) {
+    const side = edge.members[0] > 0 ? 0 : 1;
+    let sides = lineSides.get(key);
+    if (!sides) lineSides.set(key, edge);
+    else {
+      if (sides instanceof ContourEdgeView) {
+        const previous = sides;
+        sides = [lineCount(previous, 0), lineCount(previous, 1)];
+        sides.indices = new Set([previous.index]); lineSides.set(key, sides);
+      }
+      sides.indices.add(edge.index); sides[side]++;
+    }
+    edge.lineKey = key;
+  }
+  function updateLines() {
+    const before = new Map();
+    for (const list of dirtyEdges) for (const index of list) {
+      if (!edges.mark(index, cycle)) continue;
+      const previous = edges.retained(index), edge = edges.view(index);
+      if (previous?.lineKey) {
+        const key = previous.lineKey, sides = lineSides.get(key);
+        if (!before.has(key)) before.set(key, !!(lineCount(sides, 0) && lineCount(sides, 1)));
+        if (sides instanceof ContourEdgeView) lineSides.delete(key);
+        else {
+          sides[previous.members[0] > 0 ? 0 : 1]--;
+          sides.indices.delete(edge.index);
+          if (!sides[0] && !sides[1]) lineSides.delete(key);
+        }
+      }
+      const members = edge.members;
+      if (members.length !== 1 || !members[0]) continue;
+      const key = exactLineKey(edge);
+      if (key === null) continue;
+      const sides = lineSides.get(key);
+      if (!before.has(key)) before.set(key, !!(lineCount(sides, 0) && lineCount(sides, 1)));
+      registerLine(edge, key);
+    }
+    const changed = new Set();
+    for (const [key, active] of before) {
+      const sides = lineSides.get(key);
+      if (active === !!(lineCount(sides, 0) && lineCount(sides, 1))) continue;
+      if (sides instanceof ContourEdgeView) changed.add(Math.abs(sides.members[0]) - 1);
+      else for (const index of sides?.indices || []) changed.add(Math.abs(edges.members(index)[0]) - 1);
+    }
+    return changed;
+  }
+  // featureIds never shrinks and bounds every later feature count, so once the
+  // dirty set exceeds the ratio of it, this finish is certainly a full build.
+  // Dropping the incremental state then keeps a bulk patch as cheap as a
+  // first build; the full finish rebuilds every cache from scratch.
+  function dropIncrementalState() {
+    geometryCache = null; segmentCache = null; quantizedInput = null;
+    bounds.clear(); boundaryBounds.clear(); boundaryCells.clear(); liveEntries = 0; deadEntries = 0;
+    dirty.clear(); dirtyEdges.length = 0; dirtyBounds.length = 0; pendingBounds.length = 0; cycle++;
+    lineSides.clear(); quantizedLines.clear(); quantizedOwners.clear(); sourceOwners.clear();
+    edges.dropViews();
+  }
+  function markDirty(id) {
+    if (!geometryCache) return;
+    dirty.add(id);
+    if (dirty.size > featureIds.length * INCREMENTAL_FEATURE_RATIO) { dropIncrementalState(); return; }
+    for (const box of bounds.get(id) || []) dirtyBounds.push(box);
+  }
+  function visitCells(box, padding, visit) {
+    const x0 = Math.floor((box[0] - padding) / 4), x1 = Math.min(x0 + 89, Math.floor((box[2] + padding) / 4));
+    for (let x = x0; x <= x1; x++) for (let y = Math.floor((box[1] - padding) / 4); y <= Math.floor((box[3] + padding) / 4); y++) {
+      visit(((x % 90 + 90) % 90) * 64 + y + 24);
+    }
+  }
+  function indexEntry(entry) {
+    liveEntries++;
+    visitCells(entry.box, 0, key => {
+      let bucket = boundaryCells.get(key);
+      if (!bucket) boundaryCells.set(key, bucket = []);
+      bucket.push(entry);
+    });
+  }
+  function compactBoundaryCells() {
+    if (deadEntries <= liveEntries) return;
+    boundaryCells.clear(); liveEntries = 0; deadEntries = 0;
+    for (const entries of boundaryBounds.values()) for (const entry of entries) indexEntry(entry);
+  }
+  function indexBounds(id, packed) {
+    const areas = [], entries = [], c = packed.coordinates, rings = packed.ringOffsets, polys = packed.polygonOffsets;
+    for (let p = 0; p < polys.length - 1; p++) {
+      const area = [Infinity, Infinity, -Infinity, -Infinity];
+      for (let r = polys[p]; r < polys[p + 1]; r++) {
+        for (let begin = rings[r]; begin < rings[r + 1] - 1; begin += 64) {
+          const box = [Infinity, Infinity, -Infinity, -Infinity];
+          for (let i = begin, end = Math.min(begin + 65, rings[r + 1]); i < end; i++) {
+            box[0] = Math.min(box[0], c[i * 2]); box[2] = Math.max(box[2], c[i * 2]);
+            box[1] = Math.min(box[1], c[i * 2 + 1]); box[3] = Math.max(box[3], c[i * 2 + 1]);
+          }
+          area[0] = Math.min(area[0], box[0]); area[2] = Math.max(area[2], box[2]);
+          area[1] = Math.min(area[1], box[1]); area[3] = Math.max(area[3], box[3]);
+          const entry = { id, box }; entries.push(entry);
+          indexEntry(entry);
+        }
+      }
+      areas.push(area);
+    }
+    bounds.set(id, areas); boundaryBounds.set(id, entries);
+    if (geometryCache) for (const box of areas) dirtyBounds.push(box);
+  }
+  function neighbors(boxes) {
+    const result = new Set(), padding = Math.max(nearSeamTolerance, 1e-4) + 1e-7;
+    for (const a of boxes) visitCells(a, padding, key => {
+      for (const { id, box: b, dead } of boundaryCells.get(key) || []) {
+        if (dead || result.has(id)) continue;
+        const shift = 360 * Math.round(((a[0] + a[2]) - (b[0] + b[2])) / 720);
+        if (a[1] - padding <= b[3] && a[3] + padding >= b[1]
+          && a[0] - padding <= b[2] + shift && a[2] + padding >= b[0] + shift) result.add(id);
+      }
+    });
+    return result;
+  }
+  function indexSegments(segments, key) {
+    const groups = new Map();
+    for (const edge of segments) {
+      const id = key(edge);
+      let group = groups.get(id);
+      if (!group) groups.set(id, group = []);
+      group.push(edge);
+    }
+    return groups;
+  }
+  const pairKey = edge => edge.pair.join(':');
+  const ownerKey = edge => Math.abs(edge.members[0]) - 1;
+  function quantizedRecords(remaining, fineOnly = false) {
+    const records = new Map();
+    for (const edge of remaining) {
+      const line = quantizedLine(edge);
+      if (!line) continue;
+      const id = ownerKey(edge);
+      let record = records.get(id);
+      if (!record) records.set(id, record = { coarse: !fineOnly && precisions.get(id) === 4, lines: new Map() });
+      let segments = record.lines.get(line.key);
+      if (!segments) record.lines.set(line.key, segments = []);
+      segments.push(line.segment);
+    }
+    for (const record of records.values()) for (const segments of record.lines.values()) segments.sort();
+    return records;
+  }
+  function replaceQuantizedOwner(id, record) {
+    const previous = quantizedOwners.get(id);
+    if (previous) for (const [key, segments] of previous.lines) {
+      const line = quantizedLines.get(key);
+      line[previous.coarse ? 'coarse' : 'fine'] -= segments.length;
+      line.owners.delete(id);
+      if (!line.owners.size) quantizedLines.delete(key);
+    }
+    quantizedOwners.delete(id);
+    if (record) {
+      quantizedOwners.set(id, record);
+      for (const [key, segments] of record.lines) {
+        let line = quantizedLines.get(key);
+        if (!line) quantizedLines.set(key, line = { coarse: 0, fine: 0, owners: new Set() });
+        line[record.coarse ? 'coarse' : 'fine'] += segments.length;
+        line.owners.add(id);
+      }
+    }
+  }
+  function quantizedChanges(records, affected) {
+    const changes = new Map(), owners = new Set();
+    for (const id of affected) {
+      const previous = quantizedOwners.get(id), next = records.get(id);
+      for (const key of new Set([...(previous?.lines.keys() || []), ...(next?.lines.keys() || [])])) {
+        const a = previous?.lines.get(key), b = next?.lines.get(key);
+        if (previous?.coarse === next?.coarse && a?.length === b?.length && a?.every((value, i) => value === b[i])) continue;
+        if (!changes.has(key)) {
+          const line = quantizedLines.get(key);
+          changes.set(key, { coarse: line?.coarse || 0, fine: line?.fine || 0 });
+          if (line?.coarse && line.fine) for (const owner of line.owners) owners.add(owner);
+        }
+        const counts = changes.get(key);
+        if (a) counts[previous.coarse ? 'coarse' : 'fine'] -= a.length;
+        if (b) counts[next.coarse ? 'coarse' : 'fine'] += b.length;
+      }
+    }
+    for (const [key, counts] of changes) if (counts.coarse && counts.fine) {
+      for (const owner of quantizedLines.get(key)?.owners || []) owners.add(owner);
+    }
+    return owners;
+  }
+  function cacheGeometry(geometry) {
+    return { shared: indexSegments(geometry.shared, pairKey), remaining: indexSegments(geometry.remaining, ownerKey) };
+  }
+  function cacheSegments(segments) {
+    const shared = indexSegments(segments.shared, pairKey);
+    for (const [key, group] of shared) {
+      const previous = segmentCache?.shared.get(key);
+      if (previous?.length === group.length && group.every((edge, i) => edge === previous[i])) shared.set(key, previous);
+    }
+    return { shared, coast: segments.coast && indexSegments(segments.coast, edge => edge.owner) };
+  }
+  function mergeGroups(previous, next, affected, paired) {
+    for (const [key, group] of previous) {
+      if (paired ? group[0].pair.some(id => affected.has(id)) : affected.has(key)) previous.delete(key);
+    }
+    for (const [key, group] of next) {
+      if (paired ? group[0].pair.some(id => affected.has(id)) : affected.has(key)) previous.set(key, group);
+    }
+  }
   function remove(featureId) {
     const id = idToIndex.get(String(featureId));
     if (id === undefined) return;
-    for (const edge of featureEdges.get(id) || []) edges.removeMember(edge, id + 1);
+    markDirty(id);
+    // Only the edge lists are recorded here; finish() dedupes them and reads
+    // each retained view, which modifications mark stale but keep.
+    const owned = featureEdges.get(id);
+    if (geometryCache && owned) dirtyEdges.push(owned);
+    for (const edge of owned || []) edges.removeMember(edge, id + 1);
     featureEdges.delete(id); invalidRingsById.delete(id); precisions.delete(id);
     polygons.delete(id);
+    bounds.delete(id);
+    // Tombstone the cell entries; neighbors() skips them and they are dropped
+    // with the whole index when the state is reset or rebuilt.
+    for (const entry of boundaryBounds.get(id) || []) { entry.dead = true; liveEntries--; deadEntries++; }
+    boundaryBounds.delete(id);
   }
   function add({ id: rawId, geometry, coordinatePrecision = 7 }) {
     const featureId = String(rawId || '').trim();
@@ -931,6 +1327,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
     remove(featureId);
     let id = idToIndex.get(featureId);
     if (id === undefined) { id = featureIds.length; featureIds.push(featureId); idToIndex.set(featureId, id); }
+    markDirty(id);
     precisions.set(id, coordinatePrecision === 4 ? 4 : 7);
     const touched = [];
     const containmentPolygons = [];
@@ -959,7 +1356,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
           const a = snapped[forward ? i : i + 1], b = snapped[forward ? i + 1 : i];
           const edge = edges.getOrAdd(a, b, ring[forward ? i : i + 1], ring[forward ? i + 1 : i]);
           const member = (id + 1) * side * (forward ? 1 : -1);
-          if (edges.addMember(edge, member)) touched.push(edge);
+          if (edges.addMember(edge, member, ring[forward ? i : i + 1], ring[forward ? i + 1 : i])) touched.push(edge);
         }
       });
       if (validRings.length) containmentPolygons.push(validRings);
@@ -970,25 +1367,209 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
       else if (value?.type === 'GeometryCollection') (value.geometries || []).forEach(visit);
     }
     visit(geometry);
-    polygons.set(id, packContourPolygons({ type: 'MultiPolygon', coordinates: containmentPolygons }));
-    featureEdges.set(id, Uint32Array.from(touched));
+    const packed = packContourPolygons({ type: 'MultiPolygon', coordinates: containmentPolygons });
+    polygons.set(id, packed);
+    // Indexed when an incremental finish needs it; a bulk patch never does.
+    if (geometryCache) pendingBounds.push(id);
+    const owned = Uint32Array.from(touched);
+    featureEdges.set(id, owned);
+    if (geometryCache) dirtyEdges.push(owned);
     invalidRingsById.set(id, invalidRings);
   }
   return Object.freeze({
-    setWaterMask(mask) { waterMask = mask; land = createContourWaterQuery(mask); },
-    patch(features = [], removedIds = []) { removedIds.forEach(remove); features.forEach(add); },
+    setWaterMask(mask) { waterMask = mask; land = createContourWaterQuery(mask); waterChanged = true; },
+    patch(features = [], removedIds = []) {
+      // Decide a bulk patch up front, so none of it pays for incremental
+      // bookkeeping that the following full finish would discard.
+      if (geometryCache) {
+        const ids = new Set();
+        let added = 0;
+        for (const raw of removedIds) { const id = idToIndex.get(String(raw)); if (id !== undefined && !dirty.has(id)) ids.add(id); }
+        for (const feature of features) {
+          const key = String(feature?.id || '').trim();
+          if (!key) continue;
+          const id = idToIndex.get(key);
+          if (id === undefined) { if (!ids.has(key)) { ids.add(key); added++; } }
+          else if (!dirty.has(id)) ids.add(id);
+        }
+        if (dirty.size + ids.size > (featureIds.length + added) * INCREMENTAL_FEATURE_RATIO) dropIncrementalState();
+      }
+      removedIds.forEach(remove); features.forEach(add);
+    },
     finish() {
       const diagnostics = { featureCount: featureEdges.size, segmentCount: edges.size, invalidRings: [...invalidRingsById.values()].reduce((sum, count) => sum + count, 0),
         ambiguousSegments: 0, exactSharedSegments: 0, nodedSharedSegments: 0, sourceNodedSharedSegments: 0,
         sourceLineComparisons: 0, sourceLineMaxBucket: 0, sourceLineSkippedBuckets: 0, sourceLineSkippedGroups: 0,
         quantizedSharedSegments: 0, ambiguousQuantizedSegments: 0, oneSidedSegments: 0,
-        nearSeamSegments: 0, nearSeamRejectedWater: 0, nearSeamMaskMissing: !waterMask, nearSeamMs: 0 };
+        nearSeamSegments: 0, nearSeamRejectedWater: 0, nearSeamMaskMissing: !waterMask, nearSeamMs: 0,
+        incremental: false, incrementalFeatureCount: 0 };
       edges.beginRead();
-      let segments;
-      try { segments = sharedSegments(edges, diagnostics, precisions, { nearSeamTolerance, land }, polygons); }
+      let segments, neighborMs = 0;
+      const options = { nearSeamTolerance, land };
+      try {
+        let fullFallback = !(geometryCache && dirty.size && dirty.size <= featureEdges.size * INCREMENTAL_FEATURE_RATIO && !waterChanged);
+        if (!fullFallback) local: {
+          for (const id of pendingBounds) if (polygons.has(id) && !bounds.has(id)) indexBounds(id, polygons.get(id));
+          const lineChanges = updateLines();
+          let neighborStart = performance.now();
+          const affected = neighbors([...dirtyBounds, ...[...lineChanges].flatMap(id => bounds.get(id))]);
+          for (const id of dirty) affected.add(id);
+          neighborMs += performance.now() - neighborStart;
+          const quantization = quantizedOwners.size || [...precisions.values()].includes(4);
+          if (quantization && !quantizedOwners.size) {
+            quantizedInput ||= { shared: new Map(geometryCache.shared), remaining: new Map(geometryCache.remaining) };
+            // No coarse source existed at the last finish, so no quantized line
+            // was mixed. Edges this patch modified are recomputed below; their
+            // stale views would read slots the patch may already have reused.
+            const before = [];
+            for (const group of quantizedInput.remaining.values()) for (const edge of group) if (!edge.stale) before.push(edge);
+            for (const [id, record] of quantizedRecords(before, true)) replaceQuantizedOwner(id, record);
+          }
+          // A source-collinear group joins edges through shared vertices and is
+          // accepted or skipped as a whole, so it can reach past any fixed
+          // neighbourhood. Every owner of a group that touches an affected owner
+          // becomes affected too (with its neighbours as context) until the
+          // groups close; one that grows too far falls back to a full build.
+          // A source-collinear group joins edges through shared vertices and is
+          // accepted or skipped as a whole, so it can reach past any fixed
+          // neighbourhood. The owners each edge's group had at its last finish
+          // bound the group's current extent: edges nobody changed connect as
+          // before, and every new connection runs through an affected edge.
+          // Those owners (and their neighbours, for blockers) join the context
+          // in one step; only affected owners' results are merged, so the
+          // closure does not cascade. A closure that grows too far falls back.
+          // base: owners whose source-stage input may have changed. A group that
+          // touches one may change its decision, so all its owners are merged
+          // (unless it was and still is decisive). A group that touches only
+          // later-merged owners is unchanged and need only be complete. Each
+          // group's remembered owners bound its current extent; they and their
+          // neighbours join the context, so blockers are present too.
+          const counters = { ...diagnostics }, base = new Set(affected), complete = new Set(affected);
+          const remembered = edge => sourceOwners.get(edge.key - 1);
+          const owned = id => featureEdges.has(id);
+          for (const id of base) for (const index of featureEdges.get(id) || []) {
+            for (const owner of sourceOwners.get(index) || []) if (owned(owner)) { affected.add(owner); complete.add(owner); }
+          }
+          let context, geometry = null, expanded = false, touching = null;
+          for (;;) {
+            neighborStart = performance.now();
+            context = neighbors([...complete].flatMap(id => (boundaryBounds.get(id) || []).map(entry => entry.box)));
+            for (const id of complete) context.add(id);
+            neighborMs += performance.now() - neighborStart;
+            if (expanded && context.size > Math.max(featureEdges.size * INCREMENTAL_CONTEXT_RATIO, INCREMENTAL_CONTEXT_MINIMUM)) break;
+            const lists = [];
+            for (const id of context) { const list = featureEdges.get(id); if (list) lists.push(list); }
+            // List order, as a full finish would visit them; near-seam ties and
+            // join toggles are resolved by visiting order.
+            const subset = edges.inListOrder(lists, cycle);
+            diagnostics.incrementalSubsetFeatureCount = context.size;
+            diagnostics.incrementalSubsetEdgeCount = subset.length;
+            let grown = false;
+            touching = [];
+            geometry = geometrySegments(subset, diagnostics, precisions, lineSides, null, (group, decisive) => {
+              const ownerOf = edge => Math.abs(edge.members[0]) - 1;
+              if (!group.some(edge => affected.has(ownerOf(edge)))) return;
+              const changes = group.some(edge => base.has(ownerOf(edge)));
+              touching.push([group, decisive]);
+              const add = id => {
+                if (!owned(id)) return;
+                if (!complete.has(id)) { complete.add(id); grown = true; }
+                if (changes && !affected.has(id)) { affected.add(id); grown = true; }
+              };
+              // A remembered group that was matched (within budget) had at most
+              // 91 edges: all its owners join at once, and when it may change
+              // they are merged, since its decision may now differ for them.
+              for (const edge of group) {
+                if (changes || !decisive) for (const id of remembered(edge) || []) add(id);
+              }
+              // Any larger group containing a decisive one is decisive too, so
+              // it needs no more context. Otherwise its own owners become
+              // complete, which brings every edge at its vertices in next time;
+              // once all of them are complete the group is closed.
+              if (!decisive) for (const edge of group) add(ownerOf(edge));
+            });
+            if (!grown) break;
+            expanded = true;
+            Object.assign(diagnostics, counters); geometry = null;
+          }
+          if (!geometry) { Object.assign(diagnostics, counters, { incrementalFallback: true }); fullFallback = true; break local; }
+          for (const id of affected) for (const index of featureEdges.get(id) || []) sourceOwners.delete(index);
+          for (const [group, decisive] of touching) recordSourceGroup(group, decisive);
+          if (quantization) {
+            // Owners whose quantized lines change mixed status are added after
+            // the merge and read from quantizedInput. Their source intervals are
+            // current: an owner's source result changes only next to an edit, on
+            // a changed exact line, or in a changed source group, and all those
+            // owners are already affected (merged) above.
+            const records = quantizedRecords(geometry.remaining), changed = quantizedChanges(records, affected);
+            for (const id of affected) replaceQuantizedOwner(id, records.get(id));
+            const source = cacheGeometry(geometry);
+            mergeGroups(quantizedInput.shared, source.shared, affected, true);
+            mergeGroups(quantizedInput.remaining, source.remaining, affected, false);
+            for (const id of neighbors([...changed].flatMap(id => (boundaryBounds.get(id) || []).map(entry => entry.box)))) affected.add(id);
+            for (const id of changed) affected.add(id);
+            context = neighbors([...affected].flatMap(id => (boundaryBounds.get(id) || []).map(entry => entry.box)));
+            for (const id of affected) context.add(id);
+            neighborStart = performance.now();
+            for (const id of [...context]) for (const key of quantizedOwners.get(id)?.lines.keys() || []) {
+              const line = quantizedLines.get(key);
+              if (line.coarse && line.fine) for (const owner of line.owners) context.add(owner);
+            }
+            neighborMs += performance.now() - neighborStart;
+            geometry = { shared: [...quantizedInput.shared.values()].filter(group => group[0].pair.some(id => context.has(id))).flat(),
+              remaining: [...context].flatMap(id => quantizedInput.remaining.get(id) || []) };
+          }
+          geometry = quantizedSegments(geometry, diagnostics, precisions);
+          const local = cacheSegments(sharedSegments(geometry, diagnostics, options, polygons));
+          const cached = cacheGeometry(geometry);
+          mergeGroups(geometryCache.shared, cached.shared, affected, true);
+          mergeGroups(geometryCache.remaining, cached.remaining, affected, false);
+          mergeGroups(segmentCache.shared, local.shared, affected, true);
+          if (local.coast) mergeGroups(segmentCache.coast, local.coast, affected, false);
+          diagnostics.incremental = true; diagnostics.incrementalFeatureCount = dirty.size;
+        }
+        if (!fullFallback) {
+          // The local finish above has merged its results into the caches.
+        } else if (geometryCache && !dirty.size && !waterChanged) {
+          diagnostics.incremental = true;
+          diagnostics.incrementalSubsetFeatureCount = 0; diagnostics.incrementalSubsetEdgeCount = 0;
+        } else {
+          let geometry;
+          if (geometryCache && !dirty.size && waterChanged) {
+            geometry = { shared: [...geometryCache.shared.values()].flat(), remaining: [...geometryCache.remaining.values()].flat() };
+            diagnostics.incremental = true;
+            diagnostics.incrementalSubsetFeatureCount = 0; diagnostics.incrementalSubsetEdgeCount = 0;
+          } else {
+            for (const [id, packed] of polygons) if (!bounds.has(id)) indexBounds(id, packed);
+            // A full rebuild re-registers every live edge. Views of slots freed
+            // since the last finish would keep a lineKey no index holds any more,
+            // and a later reuse of the slot would unregister it a second time.
+            edges.dropViews(); lineSides.clear();
+            sourceOwners.clear();
+            geometry = geometrySegments(edges, diagnostics, precisions, null, registerLine, recordSourceGroup);
+            quantizedInput = null;
+            quantizedLines.clear(); quantizedOwners.clear();
+            if ([...precisions.values()].includes(4)) {
+              quantizedInput = cacheGeometry(geometry);
+              for (const [id, record] of quantizedRecords(geometry.remaining)) replaceQuantizedOwner(id, record);
+            }
+            geometry = quantizedSegments(geometry, diagnostics, precisions);
+            geometryCache = cacheGeometry(geometry);
+          }
+          segments = sharedSegments(geometry, diagnostics, options, polygons);
+          segmentCache = cacheSegments(segments);
+        }
+      }
       finally { edges.endRead(); }
-      const graph = packChains(segments.shared, featureIds, diagnostics);
-      graph.coast = segments.coast ? packChains(segments.coast, featureIds, diagnostics, true) : null;
+      const graph = packChains(segmentCache.shared, featureIds, diagnostics, false);
+      const coastStart = performance.now();
+      graph.coast = segmentCache.coast ? packChains(segmentCache.coast, featureIds, diagnostics, true) : null;
+      if (diagnostics.incremental) Object.defineProperties(graph.diagnostics, {
+        incrementalNeighborMs: { value: neighborMs },
+        incrementalCoastPackMs: { value: performance.now() - coastStart },
+      });
+      dirty.clear(); dirtyEdges.length = 0; dirtyBounds.length = 0; pendingBounds.length = 0; waterChanged = false; cycle++;
+      if (geometryCache) compactBoundaryCells();
       return graph;
     },
     getStorageStats() { return { ...edges.stats(), segmentCount: edges.size,
