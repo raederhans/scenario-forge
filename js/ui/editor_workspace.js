@@ -350,7 +350,10 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       if (key !== "display" && !panel) continue;
       const label = extras[key]?.[0] || btn.dataset.i18n || btn.textContent.trim();
       const propertyKey = extras[key] ? key : `${panelAttribute}-${key}`;
-      const nodes = key === "display" ? [get("displayQuality")?.closest(".border-control-row"), get("politicalRenderMode")?.closest("details")] : [panel];
+      // 显示与性能把两块现有控件整块搬进一个容器：直接挂在属性页下的 details 会被当成外壳隐藏标题。
+      const displayStack = key === "display" ? make("section", "editor-display-stack") : null;
+      if (displayStack) displayStack.append(...[get("displayQuality")?.closest(".border-control-row"), get("politicalRenderMode")?.closest("details")].filter(Boolean));
+      const nodes = displayStack ? [displayStack] : [panel];
       const host = addProperty(propertyKey, label, nodes, "layers");
       if (key === "reference") {
         panel.classList.remove("hidden", "sidebar-tool-popover");

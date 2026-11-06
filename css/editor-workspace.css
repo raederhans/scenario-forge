@@ -571,3 +571,6 @@
 .editor-workspace #leftSidebar .editor-layer-secondary { margin: var(--space-1) 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
 .editor-layer-secondary > summary, .editor-layer-secondary > .sidebar-section-description { display: none; }
 .editor-workspace #leftSidebar .editor-layer-secondary .inspector-panel-body { padding: 0 var(--space-2); }
+.editor-layer-name { font-weight: 500; }
+.editor-layer-trigger.is-active .editor-layer-name { font-weight: 600; }
+.editor-display-stack > .border-control-row { padding-bottom: var(--space-3); }
