@@ -1,4 +1,5 @@
 from copy import deepcopy
+import json
 from pathlib import Path
 
 import pytest
@@ -8,6 +9,7 @@ from shapely.geometry import box, mapping
 from map_builder.regional_geometry import _encode_exact_coverage, _decode_geometry
 from tools.apply_hoi4_geometry_splits import split_topology, arc_ids
 import tools.apply_hoi4_geometry_splits as geometry_splits
+import tools.rebind_city_hosts as city_hosts
 
 
 def fixture():
@@ -51,28 +53,33 @@ def test_incomplete_prior_split_is_rejected():
         split_topology(topology, rules)
 
 
-def test_saved_parent_mapping_and_inherited_assignments(monkeypatch):
+def test_saved_parent_mapping_and_inherited_assignments(tmp_path, monkeypatch):
     topology, rules = fixture()
-    directory = Path(".runtime/tmp/synthetic-geometry-scenario")
+    directory = tmp_path / "data/scenarios/fixture"
+    directory.mkdir(parents=True)
     files = {
         "runtime_topology.topo.json": topology,
         "manifest.json": {"hierarchy_overrides": {"feature_merges": {"unrelated": ["a", "b"]}}},
         "owners.by_feature.json": {"owners": {"original": "JAP", "neighbor": "SOV"}},
         "cores.by_feature.json": {"cores": {"original": ["SOV", "JAP"], "neighbor": ["SOV"]}},
         "geo_locale_patch.json": {"geo": {"id::original": {"en": "Original", "zh": "原块"}}},
-        "locales.json": {"geo": {}},
+        "city_overrides.json": {"version": 1, "cities": {}},
     }
-    monkeypatch.setattr(geometry_splits, "read", lambda path: deepcopy(files[path.name]))
-    monkeypatch.setattr(Path, "exists", lambda path: path.name in files)
-    def write(path, payload):
-        files[path.name] = deepcopy(payload)
-    monkeypatch.setattr(geometry_splits, "write", write)
-    monkeypatch.setattr(geometry_splits, "write_json", write)
+    for name, payload in files.items():
+        (directory / name).write_text(json.dumps(payload), encoding="utf-8")
+    (tmp_path / "data/locales.json").write_text(json.dumps({"geo": {}}), encoding="utf-8")
+    (tmp_path / "data/world_cities.geojson").write_text(json.dumps({"features": [{
+        "type": "Feature", "geometry": {"type": "Point", "coordinates": [0.5, 0.5]},
+        "properties": {"id": "city", "stable_key": "id::city", "lon": 0.5, "lat": 0.5,
+                       "host_feature_id": "original"},
+    }]}), encoding="utf-8")
+    monkeypatch.setattr(geometry_splits, "ROOT", tmp_path)
+    monkeypatch.setattr(city_hosts, "ROOT", tmp_path)
     calls = []
     monkeypatch.setattr(geometry_splits, "refresh_scenario", lambda directory, assignments, removed_ids:
                         calls.append((assignments, removed_ids)))
     assert geometry_splits.run_scenario(directory, rules)["changed"] == 1
-    manifest = files["manifest.json"]
+    manifest = geometry_splits.read(directory / "manifest.json")
     assert manifest["hierarchy_overrides"]["feature_merges"] == {"unrelated": ["a", "b"]}
     children = manifest["hierarchy_overrides"]["feature_splits"]["original"]
     assert children == ["original__SPLIT_SOUTH", "original__SPLIT_NORTH"]
@@ -80,8 +87,11 @@ def test_saved_parent_mapping_and_inherited_assignments(monkeypatch):
     assert removed == ["original"]
     assert all(assignments[child] == {"parent_id": "original", "owner": "JAP", "controller": "JAP", "cores": ["SOV", "JAP"]}
                for child in children)
-    patch = files["geo_locale_patch.json"]
+    patch = geometry_splits.read(directory / "geo_locale_patch.json")
     assert patch["geo"]["id::original__SPLIT_SOUTH"] == {"en": "Original · South", "zh": "原块 · 南"}
+    assert geometry_splits.read(directory / "city_overrides.json")["cities"]["city"] == {
+        "city_id": "city", "stable_key": "id::city", "host_feature_id": "original__SPLIT_SOUTH",
+    }
     assert geometry_splits.run_scenario(directory, rules)["changed"] == 0
     assert len(calls) == 1
 
