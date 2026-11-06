@@ -63,6 +63,7 @@ def test_saved_parent_mapping_and_inherited_assignments(monkeypatch):
         "locales.json": {"geo": {}},
     }
     monkeypatch.setattr(geometry_splits, "read", lambda path: deepcopy(files[path.name]))
+    monkeypatch.setattr(Path, "exists", lambda path: path.name in files)
     def write(path, payload):
         files[path.name] = deepcopy(payload)
     monkeypatch.setattr(geometry_splits, "write", write)
@@ -214,3 +215,43 @@ def test_main_uses_requested_rules_scenarios_and_migration_output(monkeypatch):
     assert str(writes[0][0]) == "tno.migration.json"
     assert writes[0][1]["scenarios"] == ["tno_1962"]
     assert [path.name for path, _ in runs] == ["tno_1962"]
+
+
+import json
+import tempfile
+import unittest
+from shapely.geometry import Polygon, MultiPolygon
+
+
+class ExternalGeometryTests(unittest.TestCase):
+    def test_local_units_holes_multipolygons_and_missing_units(self):
+        geometry = MultiPolygon([Polygon([(0,0),(2,0),(2,2),(0,2)], [[(.5,.5),(.5,1),(1,1),(1,.5)]]), box(3,0,4,1)])
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "cut.json").write_text(json.dumps({"features": [{"properties": {"unit": "a"}, "geometry": mapping(geometry)}]}))
+            spec = {"polygon_source": {"path": "cut.json", "property": "unit", "values": ["a"]}}
+            self.assertTrue(geometry_splits.load_cut_geometry(spec, directory).equals(geometry))
+            with self.assertRaises(ValueError):
+                geometry_splits.load_cut_geometry({**spec, "polygon": mapping(box(0,0,1,1))}, directory)
+            spec["polygon_source"]["values"].append("missing")
+            with self.assertRaisesRegex(ValueError, "Missing cut units"):
+                geometry_splits.load_cut_geometry(spec, directory)
+
+    def test_compile_empty_parts_remainder_and_replay(self):
+        topology, rules = multipart_fixture()
+        rules["entries"][0]["parts"][1]["polygon"] = mapping(box(-1,.5,4,3))
+        plan = geometry_splits.compile_external_parts(rules, ".", topology)
+        self.assertNotIn("remainder", plan["entries"][0])
+        result, splits, measurements = split_topology(topology, plan)
+        replay = geometry_splits.compile_external_parts(rules, ".", result, splits)
+        self.assertEqual(split_topology(result, replay), (result, {}, []))
+        self.assertAlmostEqual(sum(m["area_degrees2"] for m in measurements), 4)
+
+    def test_duplicate_parent_and_suffix(self):
+        topology, rules = multipart_fixture()
+        rules["entries"].append(deepcopy(rules["entries"][0]))
+        with self.assertRaisesRegex(ValueError, "Duplicate parent"):
+            split_topology(topology, rules)
+        rules["entries"].pop()
+        rules["entries"][0]["parts"][1]["suffix"] = "SOUTH"
+        with self.assertRaisesRegex(ValueError, "Duplicate suffix"):
+            split_topology(topology, rules)

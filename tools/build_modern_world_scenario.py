@@ -312,6 +312,23 @@ def update_capitals(hints, overrides, countries, features, city_collection):
     return hints, overrides
 
 
+def resolve_rebuild_lineage(previous_ids, manifest):
+    previous = set(previous_ids)
+    mapping = {fid: fid for fid in previous}
+    splits = manifest.get("hierarchy_overrides", {}).get("feature_splits", {})
+    seen = set()
+    for parent, children in splits.items():
+        if not children or len(children) != len(set(children)) or seen.intersection(children):
+            raise ValueError(f"Duplicate or empty split children: {parent}")
+        if parent in previous or parent in seen or set(children).intersection(splits):
+            raise ValueError(f"Invalid single-level split lineage: {parent}")
+        if not set(children).issubset(previous):
+            raise ValueError(f"Incomplete split children: {parent}")
+        seen.update(children)
+        mapping.update({child: parent for child in children})
+    return mapping
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "data/scenarios/modern_world")
@@ -330,13 +347,19 @@ def main():
     # from their owner; only untouched canonical parcels constrain the rebuild.
     previous_cores = read(baseline / "cores.by_feature.json")["cores"]
     previous_owners = read(baseline / "owners.by_feature.json")["owners"]
-    canonical_owners = {fid: owner for fid, owner in previous_owners.items()
-                        if owner in canonical_tags and previous_cores.get(fid) == [owner]}
+    lineage = resolve_rebuild_lineage(previous_owners, manifest)
+    canonical_owners = {}
+    for fid, owner in previous_owners.items():
+        if owner in canonical_tags and previous_cores.get(fid) == [owner]:
+            parent = lineage[fid]
+            if parent in canonical_owners and canonical_owners[parent] != owner:
+                raise ValueError(f"Conflicting canonical owners: {parent}")
+            canonical_owners[parent] = owner
     runtime, primary = read(runtime_path), read(primary_path)
     print("Restore canonical detail and detached primary islands", flush=True)
     country_sources = load_country_sources(countries_path)
     island_sources = load_country_sources(island_source_path)
-    features, report = rebuild_features(runtime, primary, country_sources, previous_owners, island_sources)
+    features, report = rebuild_features(runtime, primary, country_sources, set(lineage.values()), island_sources)
     print(f"Encode and validate {len(features)} features without quantization", flush=True)
     topology = encode_features(features)
     countries = update_country_records(countries, features, primary, read(ROOT / "data/hierarchy.json"),
@@ -352,6 +375,7 @@ def main():
             raise ValueError("Staging output must not already exist")
         shutil.copytree(baseline, output)
     generated = datetime.now(timezone.utc).isoformat()
+    manifest.get("hierarchy_overrides", {}).pop("feature_splits", None)
     countries["generated_at"] = manifest["generated_at"] = generated
     hints["generated_at"] = overrides["generated_at"] = generated
     write(output / "runtime_topology.topo.json", topology, compact=True)

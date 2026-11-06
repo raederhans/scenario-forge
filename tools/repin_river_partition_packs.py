@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -84,6 +85,19 @@ def repin_baseline(pack_path: Path) -> tuple[dict, dict]:
     return old, new
 
 
+def sync_approved_identity(text, scene_id, scenario_manifest):
+    def update(match):
+        block = match.group(0)
+        scene = re.search(r'''["']?sceneId["']?\s*:\s*["']([^"']+)["']''', block)
+        if scene and scene.group(1) == scene_id:
+            block = re.sub(r'''(["']?scenarioVersion["']?\s*:\s*)\d+''',
+                           lambda m: m.group(1) + str(scenario_manifest["version"]), block)
+            block = re.sub(r'''(["']?scenarioGeneratedAt["']?\s*:\s*)["'][^"']*["']''',
+                           lambda m: m.group(1) + json.dumps(scenario_manifest["generated_at"]), block)
+        return block
+    return re.sub(r"Object\.freeze\(\{[^}]*\}\)", update, text)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-commit", default="", help="Provenance commit (default: HEAD).")
@@ -119,6 +133,8 @@ def main() -> None:
                     raise SystemExit(f"{pack_path.name}: {before} is not pinned exactly once in {MANIFEST.name}")
                 manifest_text = manifest_text.replace(before, after)
         report[pack_path.stem] = new["packId"][7:19]
+        scenario_manifest = json.loads((ROOT / f"data/scenarios/{new['sceneId']}/manifest.json").read_text(encoding="utf-8"))
+        manifest_text = sync_approved_identity(manifest_text, new["sceneId"], scenario_manifest)
     MANIFEST.write_bytes(manifest_text.encode("utf-8"))
     if mirror_in_sync:
         MANIFEST_MIRROR.write_bytes(MANIFEST.read_bytes())

@@ -614,5 +614,39 @@
     "status": "frozen_verified",
     "local_presence": "required",
     "description": "Provenance mirror; original source raster is an optional .runtime cache, not a browser asset."
+  },
+  {
+    "source_id": "natural_earth_disputed_v5_1_2",
+    "local_path": "data/scenario-rules/modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_disputed_areas.geojson",
+    "immutable_ref": "v5.1.2",
+    "current_local_sha256": "9cafef8b7dfb6b164dc58f218f981f4ace9f716f6c03795d4c62d1ac9f3d50f5",
+    "license": "Public Domain",
+    "citation": "Natural Earth",
+    "consumers": [
+      "data/scenario-rules/modern_world.geometry_splits.json"
+    ],
+    "rebuild_command": "python tools/apply_hoi4_geometry_splits.py --rules data/scenario-rules/modern_world.geometry_splits.json --scenarios modern_world",
+    "provenance_sidecar": "data/scenario-rules/modern_world.sources/regions/provenance.json",
+    "status": "frozen_local_only",
+    "local_presence": "required"
+  },
+  {
+    "source_id": "geoboundaries_mmr_adm3_9469f09",
+    "local_path": "data/scenario-rules/modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MMR/ADM3/geoBoundaries-MMR-ADM3.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "072df2522f0b9b3678a327f4b685c2683df64e17e68c5cca96331a18d3287b44",
+    "license": "CC BY 4.0",
+    "citation": "The Myanmar Analytics Project / USAID; geoBoundaries gbOpen",
+    "consumers": [
+      "data/scenario-rules/modern_world.myanmar.geometry_splits.json"
+    ],
+    "rebuild_command": "python tools/apply_hoi4_geometry_splits.py --rules data/scenario-rules/modern_world.myanmar.geometry_splits.json --scenarios modern_world",
+    "provenance_sidecar": "data/scenario-rules/modern_world.sources/myanmar/provenance.json",
+    "status": "frozen_local_only",
+    "local_presence": "required"
   }
 ]

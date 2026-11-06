@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/modern_world/audit.json",
-  "baseline_hash": "5f6282e5372e38a6536cecf5a30b93d0f620be09f56556bfc441d57235d002fe",
+  "baseline_hash": "f739af85b8d5c89635f1009513a22ee71b2b6d0a5929d1ac7653cde7b416931a",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Modern-world baseline with matched The Fire Rises country colors.",
   "bookmark_name": "Modern World",
@@ -2394,6 +2394,91 @@
         "RU_RAY_50074027B84968233393875",
         "RU_MRG_7fa31900ba72"
       ]
+    },
+    "feature_splits": {
+      "CD_ADM1_COD-1894": [
+        "CD_ADM1_COD-1894__SPLIT_KALEHE_BUKAVU_UVIRA",
+        "CD_ADM1_COD-1894__SPLIT_REMAINDER"
+      ],
+      "CD_ADM1_COD-1898": [
+        "CD_ADM1_COD-1898__SPLIT_RUTSHURU_MASISI_GOMA",
+        "CD_ADM1_COD-1898__SPLIT_REMAINDER"
+      ],
+      "CY000": [
+        "CY000__SPLIT_NORTHERN_CYPRUS",
+        "CY000__SPLIT_REMAINDER"
+      ],
+      "GEO-3030": [
+        "GEO-3030__SPLIT_SOUTH_OSSETIA",
+        "GEO-3030__SPLIT_REMAINDER"
+      ],
+      "GEO-3034": [
+        "GEO-3034__SPLIT_SOUTH_OSSETIA",
+        "GEO-3034__SPLIT_REMAINDER"
+      ],
+      "GEO-3035": [
+        "GEO-3035__SPLIT_SOUTH_OSSETIA",
+        "GEO-3035__SPLIT_REMAINDER"
+      ],
+      "GEO-3039": [
+        "GEO-3039__SPLIT_SOUTH_OSSETIA",
+        "GEO-3039__SPLIT_REMAINDER"
+      ],
+      "ISR-3056": [
+        "ISR-3056__SPLIT_GOLAN_HEIGHTS",
+        "ISR-3056__SPLIT_REMAINDER"
+      ],
+      "MMR-3273": [
+        "MMR-3273__SPLIT_SITTWE",
+        "MMR-3273__SPLIT_KYAUKPYU",
+        "MMR-3273__SPLIT_MUNAUNG",
+        "MMR-3273__SPLIT_REMAINDER"
+      ],
+      "MMR-3274": [
+        "MMR-3274__SPLIT_HAKHA",
+        "MMR-3274__SPLIT_TEDIM",
+        "MMR-3274__SPLIT_PALETWA",
+        "MMR-3274__SPLIT_FALAM",
+        "MMR-3274__SPLIT_MINDAT",
+        "MMR-3274__SPLIT_MATUPI",
+        "MMR-3274__SPLIT_KANPETLET",
+        "MMR-3274__SPLIT_TONZANG",
+        "MMR-3274__SPLIT_THANTLANG",
+        "MMR-3274__SPLIT_REMAINDER"
+      ],
+      "MMR-3277": [
+        "MMR-3277__SPLIT_PANGSANG",
+        "MMR-3277__SPLIT_MONGMAO",
+        "MMR-3277__SPLIT_PANGWAUN",
+        "MMR-3277__SPLIT_NARPHAN",
+        "MMR-3277__SPLIT_HOPANG",
+        "MMR-3277__SPLIT_LAUKKAING",
+        "MMR-3277__SPLIT_KONKYAN",
+        "MMR-3277__SPLIT_REMAINDER"
+      ],
+      "MMR-3296": [
+        "MMR-3296__SPLIT_MYITKYINA",
+        "MMR-3296__SPLIT_WAINGMAW",
+        "MMR-3296__SPLIT_BHAMO_GARRISON",
+        "MMR-3296__SPLIT_PUTAO",
+        "MMR-3296__SPLIT_MACHANBAW",
+        "MMR-3296__SPLIT_NAWNGMUN",
+        "MMR-3296__SPLIT_KHAUNGLANHPU",
+        "MMR-3296__SPLIT_TANAI",
+        "MMR-3296__SPLIT_MOHNYIN",
+        "MMR-3296__SPLIT_MOGAUNG",
+        "MMR-3296__SPLIT_REMAINDER"
+      ],
+      "SYR-137": [
+        "SYR-137__SPLIT_KOBANI",
+        "SYR-137__SPLIT_DEIR_HAFIR_MASKANAH",
+        "SYR-137__SPLIT_ALEPPO_NEIGHBORHOODS",
+        "SYR-137__SPLIT_REMAINDER"
+      ],
+      "SYR-5261": [
+        "SYR-5261__SPLIT_GOLAN_HEIGHTS",
+        "SYR-5261__SPLIT_REMAINDER"
+      ]
     }
   },
   "map_mode": "political",
@@ -2409,12 +2494,12 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "cf560e54c902189e257c06930456aefefed0812b20d56fc6c12d17c28bfe585a",
+  "snapshot_fingerprint": "e5d3d710e4ce706c48e877df8dc78efb4c03cbf3107c67880028d6cb589ca94d",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "3e07018b9b97b9a06b378be8034dc992a4b0742ae799896d276bea45a2baf213",
+    "runtime_topology_sha256": "48215cc527e437d17634e994c5698b5706f9166cee9b59b90dc370b0367aee3b",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "special_zone_layers_url": "data/scenarios/modern_world/special_zone_layers.json",
@@ -2427,25 +2512,25 @@
     "approximate_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 0,
-    "controller_count": 251,
+    "controller_count": 259,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 20596,
+    "feature_count": 20637,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 251,
+    "owner_count": 259,
     "quality_counts": {
-      "direct_country_copy": 19063,
-      "manual_reviewed": 1533
+      "direct_country_copy": 19077,
+      "manual_reviewed": 1560
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 19063,
-      "manual_rule": 1533
+      "canonical_baseline": 19077,
+      "manual_rule": 1560
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

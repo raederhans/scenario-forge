@@ -2,7 +2,7 @@
 
 - generated_at: 2026-10-01T02:49:46.447775+00:00
 - version: 1
-- entries: 1371
+- entries: 1373
 
 ## Counts by role
 
@@ -54,7 +54,7 @@
 | runtime_asset_registry | 1 |
 | runtime_political_topology | 1 |
 | scenario_registry | 1 |
-| source_ledger_asset | 4 |
+| source_ledger_asset | 6 |
 | special_zones | 1 |
 | terrain_contours_major_topology | 1 |
 | terrain_contours_minor_topology | 1 |
@@ -146,6 +146,8 @@
 | river_partitions:modern_world_wave7 | data/river_partitions/modern_world_wave7.transport.json | river_partitions | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.river_partitions:modern_world_wave7 |  |
 | ru_city_overrides | data/ru_city_overrides.geojson | city_overrides | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.ru_city_overrides |  |
 | manifest_output:runtime_asset_registry.json | data/runtime_asset_registry.json | runtime_asset_registry | json | json | schema://json/object/v1 | data/manifest.json::outputs::runtime_asset_registry.json::sha256 | default | data/runtime_asset_registry.json |  |
+| source:geoboundaries_mmr_adm3_9469f09 | data/scenario-rules/modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::geoboundaries_mmr_adm3_9469f09::current_local_sha256 | default | source_ledger | geoboundaries_mmr_adm3_9469f09 |
+| source:natural_earth_disputed_v5_1_2 | data/scenario-rules/modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::natural_earth_disputed_v5_1_2::current_local_sha256 | default | source_ledger | natural_earth_disputed_v5_1_2 |
 | political_id_raster:hoi4_1936 | data/scenarios/hoi4_1936/political_id_raster/manifest.json | political_id_raster_manifest | json | json | schema://political-id-raster/manifest/v1 |  | no-cache | runtime_asset_registry.assets.political_id_raster:hoi4_1936 |  |
 | political_id_raster:hoi4_1939 | data/scenarios/hoi4_1939/political_id_raster/manifest.json | political_id_raster_manifest | json | json | schema://political-id-raster/manifest/v1 |  | no-cache | runtime_asset_registry.assets.political_id_raster:hoi4_1939 |  |
 | scenario_registry | data/scenarios/index.json | scenario_registry | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.scenario_registry |  |

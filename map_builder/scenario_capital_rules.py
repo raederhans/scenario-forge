@@ -37,10 +37,20 @@ MODERN_CAPITALS = {
 # seats inside each faction's own parcels. YE keeps Ma'rib once Sanaa is Houthi-held.
 # Scoped to modern_world only: blank_base shares MODERN_CAPITALS and has no factions.
 MODERN_FACTION_CAPITALS = {
+    "CY": ("CITY::scenario::south_nicosia", "Nicosia", "尼科西亚"),
+    'NCY': ('CITY::scenario::north_nicosia', 'Lefkoşa', '北尼科西亚'),
+    'SOS': ('CITY::ne::1159130711', 'Tskhinvali', '茨欣瓦利'),
+    'M23': ('CITY::ne::1159149989', 'Goma', '戈马'),
+    'WAS': ('CITY::scenario::pangkham', 'Pangkham', '邦康'),
+    'KOK': ('CITY::gn::13494766', 'Laukkai', '老街'),
+    'ACE': ('CITY::ne::1159149763', 'Banda Aceh', '班达亚齐'),
+    'ADJ': ('CITY::ne::1159147265', 'Batumi', '巴统'),
+    'NUN': ('CITY::ne::1159150241', 'Iqaluit', '伊魁特'),
+
     "ABK": ("CITY::ne::1159148621", "Sukhumi", "苏呼米"),
     "AJK": ("CITY::gn::1169607", "Muzaffarabad", "穆扎法拉巴德"),
     "AMB": ("CITY::ne::1159150315", "Bamenda", "巴门达"),
-    "ARK": ("CITY::ne::1159150425", "Sittwe", "实兑"),
+    "ARK": ("CITY::scenario::mrauk_u", "Mrauk-U", "妙乌"),
     "BAL": ("CITY::ne::1159149471", "Quetta", "奎达"),
     "BAR": ("CITY::ne::1159148189", "Cotabato City", "哥打巴托"),
     "BAS": ("CITY::ne::1159150699", "Ufa", "乌法"),
@@ -49,7 +59,7 @@ MODERN_FACTION_CAPITALS = {
     "CAB": ("CITY::ne::1159144723", "Cabinda", "卡宾达"),
     "CAT": ("CITY::ne::1159151261", "Barcelona", "巴塞罗那"),
     "CEC": ("CITY::ne::1159149587", "Grozny", "格罗兹尼"),
-    "CHR": ("CITY::ne::1159121785", "Hakha", "哈卡"),
+    "CHR": ("CITY::scenario::falam", "Falam", "法兰"),
     "COR": ("CITY::ne::1159141961", "Ajaccio", "阿雅克肖"),
     "DAG": ("CITY::ne::1159146589", "Makhachkala", "马哈奇卡拉"),
     "EUS": ("CITY::ne::1159127229", "Vitoria-Gasteiz", "维多利亚"),
@@ -60,7 +70,7 @@ MODERN_FACTION_CAPITALS = {
     "ING": ("CITY::ne::1159122297", "Nazran", "纳兹兰"),
     "JNK": ("CITY::ne::1159150001", "Srinagar", "斯利那加"),
     "JUB": ("CITY::ne::1159148197", "Kismayo", "基斯马尤"),
-    "KIO": ("CITY::ne::1159147861", "Myitkyina", "密支那"),
+    "KIO": ("CITY::scenario::laiza", "Laiza", "拉咱"),
     "KRG": ("CITY::ne::1159147267", "Erbil", "埃尔比勒"),
     "LDK": ("CITY::ne::1730025033", "Leh", "列城"),
     "LNA": ("CITY::ne::1159150953", "Benghazi", "班加西"),
@@ -571,6 +581,12 @@ REVIEWED_CITY_NAMES = {
 # Small settlements absent from the population-filtered world layer. Coordinates
 # are sourced, not territory centroids; see the evidence document.
 ADDITIONAL_CAPITAL_CITIES = {
+    "CITY::scenario::south_nicosia": {'id': 'CITY::scenario::south_nicosia', 'name': 'Nicosia', 'name_en': 'Nicosia', 'name_zh': '尼科西亚', 'lon': 33.36, 'lat': 35.16, 'country_code': 'CY', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'country_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::north_nicosia': {'id': 'CITY::scenario::north_nicosia', 'name': 'Lefkoşa', 'name_en': 'Lefkoşa', 'name_zh': '北尼科西亚', 'lon': 33.36, 'lat': 35.19, 'country_code': 'CY', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::pangkham': {'id': 'CITY::scenario::pangkham', 'name': 'Pangkham', 'name_en': 'Pangkham', 'name_zh': '邦康', 'lon': 99.17198322391816, 'lat': 22.175230046839637, 'country_code': 'MM', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement', 'notes': '就近吸附到底图', 'source_coordinates': [99.18, 22.17]},
+    'CITY::scenario::laiza': {'id': 'CITY::scenario::laiza', 'name': 'Laiza', 'name_en': 'Laiza', 'name_zh': '拉咱', 'lon': 97.55557934498178, 'lat': 24.767972349816564, 'country_code': 'MM', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement', 'notes': '就近吸附到底图', 'source_coordinates': [97.56, 24.76]},
+    'CITY::scenario::mrauk_u': {'id': 'CITY::scenario::mrauk_u', 'name': 'Mrauk-U', 'name_en': 'Mrauk-U', 'name_zh': '妙乌', 'lon': 93.194, 'lat': 20.596, 'country_code': 'MM', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::falam': {'id': 'CITY::scenario::falam', 'name': 'Falam', 'name_en': 'Falam', 'name_zh': '法兰', 'lon': 93.68, 'lat': 22.91, 'country_code': 'MM', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
     'CITY::scenario::derge': {'id': 'CITY::scenario::derge', 'name': 'Derge', 'name_en': 'Derge', 'name_zh': '更庆', 'lon': 98.58, 'lat': 31.807, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
     'CITY::scenario::garze': {'id': 'CITY::scenario::garze', 'name': 'Garze', 'name_en': 'Garze', 'name_zh': '甘孜', 'lon': 99.993, 'lat': 31.627, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
     'CITY::scenario::nayun': {'id': 'CITY::scenario::nayun', 'name': 'Nayun', 'name_en': 'Nayun', 'name_zh': '娜允', 'lon': 99.386, 'lat': 22.326, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},

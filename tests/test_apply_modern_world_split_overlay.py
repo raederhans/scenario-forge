@@ -81,3 +81,56 @@ class ModernWorldOverlayTests(unittest.TestCase):
         summary = self.read("manifest.json")["summary"]
         self.assertEqual(summary["quality_counts"], {"direct_country_copy": 2})
         self.assertEqual(summary["source_counts"], {"canonical_baseline": 2})
+
+
+class ModernBatchTwoIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.root = Path(__file__).resolve().parents[1]
+        cls.directory = cls.root / 'data/scenarios/modern_world'
+        cls.owners = json.loads((cls.directory/'owners.by_feature.json').read_text())['owners']
+        cls.cores = json.loads((cls.directory/'cores.by_feature.json').read_text())['cores']
+        cls.countries = json.loads((cls.directory/'countries.json').read_text())['countries']
+
+    def test_owners_cores_and_autonomy(self):
+        samples = {
+            'CY000__SPLIT_NORTHERN_CYPRUS':('NCY','CY'),
+            'CY000__SPLIT_REMAINDER':('CY','CY'),
+            'GEO-3039__SPLIT_SOUTH_OSSETIA':('SOS','GE'),
+            'GEO-3039__SPLIT_REMAINDER':('GE','GE'),
+            'ISR-3056__SPLIT_GOLAN_HEIGHTS':('IL','SY'),
+            'ISR-3056__SPLIT_REMAINDER':('IL','IL'),
+            'SYR-137__SPLIT_KOBANI':('SDF','SY'),
+            'SYR-137__SPLIT_DEIR_HAFIR_MASKANAH':('SDF','SY'),
+            'SYR-137__SPLIT_ALEPPO_NEIGHBORHOODS':('SDF','SY'),
+            'SYR-137__SPLIT_REMAINDER':('SY','SY'),
+            'CD_ADM1_COD-1898__SPLIT_RUTSHURU_MASISI_GOMA':('M23','CD'),
+            'CD_ADM1_COD-1894__SPLIT_KALEHE_BUKAVU_UVIRA':('M23','CD'),
+            'CD_ADM1_COD-1894__SPLIT_REMAINDER':('CD','CD'),
+            'MMR-3277__SPLIT_PANGSANG':('WAS','MM'),
+            'MMR-3277__SPLIT_LAUKKAING':('KOK','MM'),
+            'MMR-3277__SPLIT_REMAINDER':('MM','MM'),
+            'MMR-3273__SPLIT_SITTWE':('MM','MM'),
+            'MMR-3274__SPLIT_HAKHA':('MM','MM'),
+            'MMR-3274__SPLIT_PALETWA':('ARK','MM'),
+            'MMR-3274__SPLIT_FALAM':('CHR','MM'),
+            'MMR-3296__SPLIT_MYITKYINA':('MM','MM'),
+            'MMR-3296__SPLIT_REMAINDER':('KIO','MM'),
+        }
+        for fid,(owner,core) in samples.items():
+            with self.subTest(feature=fid):
+                self.assertEqual(self.owners[fid],owner)
+                self.assertEqual(self.cores[fid],[core])
+        for tag,parent in [('ACE','ID'),('ADJ','GE'),('NUN','CA')]:
+            self.assertEqual(self.countries[tag]['presentation'],'parent_merged')
+            self.assertEqual(self.countries[tag]['parent_owner_tag'],parent)
+            self.assertEqual(self.countries[tag]['color_hex'],self.countries[parent]['color_hex'])
+        for tag in ['NCY','SOS','WAS','KOK','M23']:
+            self.assertFalse(self.countries[tag].get('parent_owner_tag'))
+            self.assertNotEqual(self.countries[tag].get('presentation'),'parent_merged')
+
+    def test_overlay_replay_has_no_assignments(self):
+        rules = json.loads((self.root/'data/scenario-rules/modern_world.split_overlay.json').read_text())
+        report = overlay.run_scenario(rules,dry_run=True)
+        self.assertEqual(report['changed_count'],0)
+        self.assertTrue(all(row['changed_count']==0 for row in report['entries']))
