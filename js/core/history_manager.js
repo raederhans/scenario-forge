@@ -24,7 +24,8 @@ import {
 import { restoreSpecialZoneSnapshotState } from "./state/actions/special_zone_actions.js";
 import { markDirty } from "./dirty_state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
-import { callRuntimeHook, requestRuntimeHookAfterPaint } from "./state/index.js";
+import { callRuntimeHook } from "./state/index.js";
+import { commitChange } from "./state/changes.js";
 const state = runtimeState;
 
 function uniqueKeys(values) {
@@ -216,7 +217,7 @@ function pushHistoryEntry(entry) {
     runtimeState.historyPast = runtimeState.historyPast.slice(runtimeState.historyPast.length - max);
   }
 
-  callRuntimeHook(state, "updateHistoryUIFn");
+  commitChange({ domains: ["history"], reason: "history-push" });
   return true;
 }
 
@@ -266,7 +267,6 @@ function canRefreshWaterColorHistoryLocally(ids) {
   });
 }
 
-const AFTER_PAINT_HISTORY_UI_HOOKS = new Set(["updateSwatchUIFn", "updateToolbarInputsFn", "updateStrategicOverlayUIFn"]);
 
 function refreshUiAfterHistory(direction, entry) {
   // undo/redo 之后统一从这里补 UI 和 render side effects，
@@ -280,45 +280,26 @@ function refreshUiAfterHistory(direction, entry) {
     ...(scopedWaterUi ? { waterRegionIds, inputLabel: `history-${direction}` } : {}),
   });
   // Feature-only visual history does not change ownership, region lists,
-  // appearance controls, legend configuration, or strategic overlays. Keep
-  // its UI work local to the color/tool/selection surfaces; broader history
-  // domains still use the complete refresh set below.
-  // The idle renderer refreshes both the map legend and its editor from the
-  // restored colors, so no separate legend refresh is needed here.
-  const uiHooks = featureIds
-    ? [
-      "updateToolUIFn",
-      "updateSwatchUIFn",
-      "updatePaintModeUIFn",
-      "updateActiveSovereignUIFn",
-      "refreshCountryInspectorDetailFn",
-    ]
+  // appearance controls, legend configuration, or strategic overlays, so its
+  // panel refresh stays local to the color/tool/selection surfaces. The idle
+  // renderer refreshes the map legend from the restored colors by itself.
+  // Panels refresh after the restored map is painted (see state/changes.js).
+  const domains = featureIds
+    ? ["tool", "activeSovereign", "inspector"]
     : scopedWaterUi
-      ? [
-        "updateToolUIFn",
-        "updateSwatchUIFn",
-        "updatePaintModeUIFn",
-        "updateToolbarInputsFn",
-        "renderWaterRegionListFn",
-      ]
+      ? ["tool", "appearance", "waterRegionList"]
       : [
-      "updateToolUIFn",
-      "updateSwatchUIFn",
-      "updatePaintModeUIFn",
-      "updateToolbarInputsFn",
-      "updateActiveSovereignUIFn",
-      "renderCountryListFn",
-      "renderWaterRegionListFn",
-      "renderSpecialRegionListFn",
-      "renderPresetTreeFn",
-      "updateLegendUI",
-      "updateStrategicOverlayUIFn",
-    ];
-  // 色板、工具栏输入和战略标注面板重建较重，等撤销后的地图先上屏。
-  uiHooks.forEach((hookName) => {
-    if (AFTER_PAINT_HISTORY_UI_HOOKS.has(hookName)) requestRuntimeHookAfterPaint(state, hookName);
-    else callRuntimeHook(state, hookName);
-  });
+        "tool",
+        "appearance",
+        "activeSovereign",
+        "countryList",
+        "waterRegionList",
+        "specialRegionList",
+        "presetTree",
+        "legend",
+        "strategicOverlays",
+      ];
+  commitChange({ domains, reason: `history-${direction}` });
   flushHistoryRender(`history-${direction}`);
 }
 
@@ -395,7 +376,7 @@ function undoHistory() {
   runtimeState.historyFuture = Array.isArray(runtimeState.historyFuture) ? runtimeState.historyFuture : [];
   runtimeState.historyFuture.push(entry);
   applyHistorySnapshot(entry.before, "undo", entry);
-  callRuntimeHook(state, "updateHistoryUIFn");
+  commitChange({ domains: ["history"], reason: "history-undo" });
   return true;
 }
 
@@ -405,14 +386,14 @@ function redoHistory() {
   runtimeState.historyPast = Array.isArray(runtimeState.historyPast) ? runtimeState.historyPast : [];
   runtimeState.historyPast.push(entry);
   applyHistorySnapshot(entry.after, "redo", entry);
-  callRuntimeHook(state, "updateHistoryUIFn");
+  commitChange({ domains: ["history"], reason: "history-redo" });
   return true;
 }
 
 function clearHistory() {
   runtimeState.historyPast = [];
   runtimeState.historyFuture = [];
-  callRuntimeHook(state, "updateHistoryUIFn");
+  commitChange({ domains: ["history"], reason: "history-clear" });
 }
 
 export {
