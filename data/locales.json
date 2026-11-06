@@ -303777,6 +303777,46 @@
     "Open Workspace": {
       "en": "Open Workspace",
       "zh": "打开工作区"
+    },
+    "Data & annotations": {
+      "en": "Data & annotations",
+      "zh": "专题与标注"
+    },
+    "Display & performance": {
+      "en": "Display & performance",
+      "zh": "显示与性能"
+    },
+    "Geography": {
+      "en": "Geography",
+      "zh": "地理"
+    },
+    "Hide {name}": {
+      "en": "Hide {name}",
+      "zh": "隐藏 {name}"
+    },
+    "Map appearance": {
+      "en": "Map appearance",
+      "zh": "地图外观"
+    },
+    "No matching layers": {
+      "en": "No matching layers",
+      "zh": "没有匹配的图层"
+    },
+    "Search layers": {
+      "en": "Search layers",
+      "zh": "搜索图层"
+    },
+    "Settlements & transport": {
+      "en": "Settlements & transport",
+      "zh": "聚落与交通"
+    },
+    "Show {name}": {
+      "en": "Show {name}",
+      "zh": "显示 {name}"
+    },
+    "Political & borders": {
+      "en": "Political & borders",
+      "zh": "政治与边界"
     }
   }
 }

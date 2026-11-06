@@ -1,4 +1,4 @@
-import { setUiIcon } from "./ui_icons.js";
+import { createUiIcon, setUiIcon } from "./ui_icons.js";
 
 // The workspace moves existing controls so their business owners keep their
 // element references, event handlers, and native form contracts.
@@ -148,13 +148,9 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       const selected = item.propertyKey === key;
       if (item.btn.classList.contains("is-active") !== selected) item.btn.classList.toggle("is-active", selected);
       setAttribute(item.btn, "aria-selected", selected);
+      if (!item.btn.dataset.appearanceTab && !item.btn.dataset.mapContentTab) setAttribute(item.btn, "aria-pressed", selected);
     }
-    for (const group of layerHost?.querySelectorAll('[role="tablist"]') || []) {
-      const selected = group.querySelector('[aria-selected="true"]');
-      if (selected) {
-        for (const btn of group.querySelectorAll('[role="tab"]')) setAttribute(btn, "tabindex", btn === selected ? 0 : -1);
-      }
-    }
+    filterLayers();
     for (const [id, item] of propertyEntries) {
       if (item.trigger && item.trigger.getAttribute("role") !== "tab" && !objectEntries.some((object) => object.button === item.trigger)) {
         setAttribute(item.trigger, "aria-pressed", id === key);
@@ -190,6 +186,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       currentTask = key;
       taskBody.scrollTop = taskScroll.get(key) || 0;
     }
+    if (key === "layers") refreshLayerVisibility();
     // Internal selection only changes the task surface. User task clicks also
     // restore its context, while keeping a narrow-screen task drawer open.
     if (!restoreProperty) return;
@@ -299,16 +296,44 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   }
 
   const layerHost = tasks.get("layers").host;
-  for (const [selector, panelAttribute, heading, headingId] of [
-    ["[data-appearance-tab]", "data-appearance-panel", "Map style", "appearanceSectionHeading"],
-    ["[data-map-content-tab]", "data-map-content-panel", "Map content", "mapContentSectionHeading"],
+  const layerGroups = [];
+  const visibilityIds = {
+    physical: "togglePhysical", urban: "toggleUrban", citypoints: "toggleCityPoints",
+    rivers: "toggleRivers", daynight: "dayNightEnabled", transport: "transportAppearanceMasterToggle",
+    "special-zones": "scenarioSpecialRegionVisibilityToggle",
+  };
+  const refreshLayerVisibility = () => {
+    for (const { toggle, checkbox, row, label } of layerEntries) {
+      if (!toggle) continue;
+      setAttribute(toggle, "aria-pressed", checkbox.checked);
+      setAttribute(toggle, "aria-label", t(checkbox.checked ? "Hide {name}" : "Show {name}", "ui").replace("{name}", t(label, "ui")));
+      setUiIcon(toggle, checkbox.checked ? "eye" : "eye-off", { doc: documentRef });
+      row.classList.toggle("is-layer-off", !checkbox.checked);
+    }
+  };
+  const search = make("input", "input editor-layer-search", "", "editorLayerSearch");
+  search.type = "search";
+  search.placeholder = t("Search layers", "ui");
+  search.dataset.i18nPlaceholder = "Search layers";
+  search.setAttribute("aria-label", t("Search layers", "ui"));
+  search.dataset.i18nAriaLabel = "Search layers";
+  layerHost.append(search);
+  const extras = {
+    "special-zones": ["Special Zones", "specialZonePopover"],
+    legend: ["Legend", "legendProjectSection"],
+    annotations: ["Frontlines & Annotations", "frontlineProjectSection"],
+    reference: ["Reference map", "dockReferencePopover"],
+    display: ["Display & performance"],
+  };
+  for (const [heading, keys] of [
+    ["Political & borders", ["borders", "special-zones"]],
+    ["Geography", ["ocean", "physical", "rivers"]],
+    ["Settlements & transport", ["urban", "citypoints", "transport"]],
+    ["Data & annotations", ["thematic", "annotations", "legend"]],
+    ["Map appearance", ["presets", "daynight", "texture", "reference", "display"]],
   ]) {
     const group = make("div", "editor-layer-group");
-    const groupHeading = get(headingId) || make("h3", "editor-group-heading");
-    groupHeading.className = "editor-group-heading";
-    groupHeading.dataset.i18n = heading;
-    groupHeading.textContent = t(heading, "ui");
-    group.append(groupHeading);
+    group.append(make("h3", "editor-group-heading", heading));
     const tabs = make("div", "editor-layer-list");
     tabs.setAttribute("role", "tablist");
     tabs.setAttribute("aria-orientation", "vertical");
@@ -316,63 +341,137 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     tabs.dataset.i18nAriaLabel = heading;
     group.append(tabs);
     layerHost.append(group);
-    for (const btn of documentRef.querySelectorAll(selector)) {
-      const key = btn.getAttribute(selector.slice(1, -1));
-      const panel = documentRef.querySelector(`[${panelAttribute}="${key}"]`);
-      if (!panel) continue;
-      const label = btn.dataset.i18n || btn.textContent.trim();
-      const propertyKey = `${panelAttribute}-${key}`;
-      const host = addProperty(propertyKey, label, [panel], "layers");
+    const entries = [];
+    for (const key of keys) {
+      let btn = documentRef.querySelector(`[data-appearance-tab="${key}"]`);
+      const panelAttribute = btn ? "data-appearance-panel" : "data-map-content-panel";
+      btn ||= documentRef.querySelector(`[data-map-content-tab="${key}"]`);
+      const panel = extras[key] ? get(extras[key][1]) : documentRef.querySelector(`[${panelAttribute}="${key}"]`);
+      if (key !== "display" && !panel) continue;
+      const label = extras[key]?.[0] || btn.dataset.i18n || btn.textContent.trim();
+      const propertyKey = extras[key] ? key : `${panelAttribute}-${key}`;
+      // 显示与性能把两块现有控件整块搬进一个容器：直接挂在属性页下的 details 会被当成外壳隐藏标题。
+      const displayStack = key === "display" ? make("section", "editor-display-stack") : null;
+      if (displayStack) displayStack.append(...[get("displayQuality")?.closest(".border-control-row"), get("politicalRenderMode")?.closest("details")].filter(Boolean));
+      const nodes = displayStack ? [displayStack] : [panel];
+      const host = addProperty(propertyKey, label, nodes, "layers");
+      if (key === "reference") {
+        panel.classList.remove("hidden", "sidebar-tool-popover");
+        panel.removeAttribute("role");
+        panel.removeAttribute("aria-hidden");
+      }
+      if (!btn) {
+        btn = make("button", "editor-nav-button", "", `editorLayer-${key}`);
+        btn.type = "button";
+      }
       propertyEntries.get(propertyKey).trigger = btn;
-      tabs.append(btn);
-      layerEntries.push({ btn, host, panel, propertyKey });
-      const activate = () => {
-        selectTask("layers");
-        // Native owners update the selected panel's contents and state.
-        panel.hidden = false;
-        panel.classList.remove("hidden");
-        if (panel.tagName === "DETAILS") panel.open = true;
-        showProperty(propertyKey, { reveal: true });
+      btn.removeAttribute("data-i18n");
+      delete btn.dataset.i18n;
+      btn.classList.add("editor-layer-trigger");
+      btn.setAttribute("role", "tab");
+      btn.setAttribute("tabindex", entries.length ? "-1" : "0");
+      btn.setAttribute("aria-controls", host.id);
+      const name = make("span", "editor-layer-name", label);
+      const dot = make("span", "editor-layer-status");
+      dot.hidden = true;
+      btn.replaceChildren(createUiIcon(key, { doc: documentRef }), name, dot);
+      const syncStatus = () => {
+        const strip = host.querySelector(".layer-status-strip");
+        dot.hidden = !strip;
+        if (strip) {
+          dot.dataset.statusTone = strip.dataset.statusTone;
+          dot.title = strip.textContent.trim();
+        }
       };
-      btn.addEventListener("click", activate);
+      new MutationObserver(syncStatus).observe(host, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["data-status-tone"] });
+      syncStatus();
+      const row = make("div", "editor-layer-row");
+      row.dataset.layerKey = key;
+      row.append(btn);
+      tabs.append(row);
+      const checkbox = get(visibilityIds[key]);
+      let toggle;
+      if (checkbox) {
+        toggle = make("button", "editor-layer-visibility");
+        toggle.type = "button";
+        toggle.addEventListener("click", () => {
+          checkbox.checked = !checkbox.checked;
+          checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+          refreshLayerVisibility();
+        });
+        checkbox.addEventListener("change", refreshLayerVisibility);
+        row.append(toggle);
+      }
+      const entry = { key, label, name, row, btn, host, panel, propertyKey, checkbox, toggle };
+      entries.push(entry);
+      layerEntries.push(entry);
+      btn.addEventListener("click", () => {
+        selectTask("layers");
+        if (key === "special-zones") get("appearanceSpecialZoneBtn")?.click();
+        if (panel) {
+          panel.hidden = false;
+          panel.classList.remove("hidden");
+          if (panel.tagName === "DETAILS") panel.open = true;
+        }
+        showProperty(propertyKey, { reveal: true });
+      });
     }
-  }
-  const extraLayers = make("div", "editor-layer-list");
-  layerHost.append(extraLayers);
-  for (const [key, label, id] of [
-    ["special-zones", "Special Zones", "specialZonePopover"],
-    ["legend", "Legend", "legendProjectSection"],
-    ["annotations", "Frontlines & Annotations", "frontlineProjectSection"],
-    ["reference", "Reference map", "dockReferencePopover"],
-  ]) {
-    const node = get(id);
-    if (!node) continue;
-    addProperty(key, label, [node], "layers");
-    if (key === "reference") {
-      node.classList.remove("hidden", "sidebar-tool-popover");
-      node.removeAttribute("role");
-      node.removeAttribute("aria-hidden");
+    tabs.addEventListener("keydown", (event) => {
+      const buttons = entries.filter(({ row, btn }) => !row.hidden && !btn.disabled).map(({ btn }) => btn);
+      const index = buttons.indexOf(event.target);
+      if (index < 0) return;
+      let next;
+      if (event.key === "ArrowDown") next = (index + 1) % buttons.length;
+      else if (event.key === "ArrowUp") next = (index - 1 + buttons.length) % buttons.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = buttons.length - 1;
+      else return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      buttons[next].click();
+      buttons[next].focus();
+    }, true);
+    let secondary;
+    if (keys.includes("transport")) {
+      secondary = move("transportProjectSection", group);
+      if (secondary) {
+        secondary.open = true;
+        secondary.classList.add("editor-layer-secondary");
+      }
     }
-    const btn = button(label, `editorLayer-${key}`, () => {
-      selectTask("layers");
-      if (key === "special-zones") get("appearanceSpecialZoneBtn")?.click();
-      node.classList.remove("hidden");
-      node.hidden = false;
-      if (node.tagName === "DETAILS") node.open = true;
-      showProperty(key, { reveal: true });
-    });
-    propertyEntries.get(key).trigger = btn;
-    btn.setAttribute("aria-controls", `editorProperty-${key}`);
-    extraLayers.append(btn);
+    layerGroups.push({ group, entries, secondary });
   }
+  const empty = make("p", "editor-empty-hint", "No matching layers", "editorLayersEmpty");
+  layerHost.append(empty);
+  const filterLayers = () => {
+    const query = search.value.trim().toLocaleLowerCase();
+    for (const { group, entries, secondary } of layerGroups) {
+      for (const entry of entries) entry.row.hidden = !`${entry.name.textContent} ${entry.label} ${entry.key}`.toLocaleLowerCase().includes(query);
+      group.hidden = entries.every(({ row }) => row.hidden);
+      if (secondary) secondary.hidden = !!query && !entries.some(({ key, row }) => key === "transport" && !row.hidden);
+      const visible = entries.filter(({ row }) => !row.hidden);
+      const selected = visible.find(({ btn }) => btn.getAttribute("aria-selected") === "true") || visible[0];
+      for (const entry of entries) setAttribute(entry.btn, "tabindex", entry === selected ? 0 : -1);
+    }
+    empty.hidden = layerGroups.some(({ group }) => !group.hidden);
+  };
+  search.addEventListener("input", filterLayers);
+  search.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      search.value = "";
+      filterLayers();
+    }
+  });
+  new MutationObserver(() => { filterLayers(); refreshLayerVisibility(); }).observe(layerHost, { childList: true, subtree: true, characterData: true });
+  filterLayers();
+  refreshLayerVisibility();
   const palette = left.querySelector(".color-library-card");
   if (palette) { palette.open = true; tasks.get("palette").host.append(palette); }
   for (const id of ["inspectorUtilitiesSection", "utilitiesGuideBtn", "dockReferenceBtn"]) {
     if (get(id)) get(id).hidden = true;
   }
   get("dockReferenceBtn")?.addEventListener("click", () => get("editorLayer-reference")?.click());
-  const transportEntry = move("transportProjectSection", layerHost);
-  if (transportEntry) transportEntry.open = true;
 
   const projectPanel = get("projectSidebarPanel");
   addProperty("project", "Project", [projectPanel]);
