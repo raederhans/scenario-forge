@@ -846,6 +846,9 @@ add("batch7_falkland_dependencies", B, "FLK", None, None,
     FI("AQ_PEN_EAST", "AQ_PEN_OVERLAP_CORE", "AQ_PEN_OVERLAP_EAST", "AQ_PEN_OVERLAP_WEST"),
     only=["ENG"], cores="keep", notes="Includes Falkland Islands Dependencies Antarctic claims, approximated by existing sectors; not a statement of international recognition.")
 
+# Generated family-colour entries select by owner, so they must run after every
+# entry that creates territory (e.g. PCZ is assigned after harmonize_family_colors).
+E.sort(key=lambda e: "_family_colour_" in e["id"])
 ids = [e["id"] for e in E]
 assert len(ids) == len(set(ids)), "duplicate ids"
 out = {"version": 1,

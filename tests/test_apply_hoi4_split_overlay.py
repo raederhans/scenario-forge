@@ -580,3 +580,21 @@ def test_landless_parent_container_metadata_survives_replay(inputs, scenario):
     assert assignments == {}
     assert report["changed_count"] == 0
     assert report["retired_tags"] == []
+
+
+def test_owner_selected_colour_entries_follow_the_entries_that_create_their_territory():
+    # A colour-only entry selects its tag by owner; on a fresh build the tag owns
+    # nothing until its territory entry (e.g. panama_canal_zone -> PCZ) has run.
+    overlay = json.loads((Path(__file__).resolve().parents[1] / "data/scenario-rules/hoi4_split_overlay.json").read_text(encoding="utf-8"))
+    first_creator = {}
+    for index, entry in enumerate(overlay["entries"]):
+        tag, select = entry.get("tag"), entry.get("select", {})
+        if tag and select.get("owners") != [tag]:
+            for scenario in entry["scenarios"]:
+                first_creator.setdefault((tag, scenario), index)
+    for index, entry in enumerate(overlay["entries"]):
+        tag = entry.get("tag")
+        if "_family_colour_" in entry["id"]:
+            for scenario in entry["scenarios"]:
+                creator = first_creator.get((tag, scenario))
+                assert creator is None or creator < index, (entry["id"], scenario)

@@ -8897,6 +8897,814 @@
       "color_hex": "#e3b750"
     },
     {
+      "id": "julian_march",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ITA",
+      "select": {
+        "feature_ids": [
+          "HR036",
+          "SI044",
+          "SI043",
+          "SI038"
+        ]
+      },
+      "only_from_owners": [
+        "YUG"
+      ]
+    },
+    {
+      "id": "southern_dobruja",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ROM",
+      "select": {
+        "feature_ids": [
+          "BG332",
+          "BG325"
+        ]
+      },
+      "only_from_owners": [
+        "BUL"
+      ]
+    },
+    {
+      "id": "panama_canal_zone",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "PCZ",
+      "name_en": "Panama Canal Zone",
+      "name_zh": "巴拿马运河区",
+      "parent_owner_tag": "USA",
+      "subject_kind": "territory",
+      "select": {
+        "feature_ids": [
+          "PA_ADM1_PAN-1337__SPLIT_PCZ",
+          "PA_ADM1_PAN-1340__SPLIT_PCZ"
+        ]
+      },
+      "only_from_owners": [
+        "PAN"
+      ],
+      "cores": "keep",
+      "notes": "Colón city is included in the Canal Zone at parcel scale."
+    },
+    {
+      "id": "china_enclaves_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "smooth_enclaves": {
+        "tags": [
+          "CHI",
+          "SHX",
+          "PRC",
+          "NCP",
+          "CNZ",
+          "JBZ",
+          "MEN",
+          "RGC",
+          "JCC",
+          "JSC",
+          "JCJ",
+          "THG"
+        ],
+        "max_area_km2": 3000
+      }
+    },
+    {
+      "id": "batch7_dee",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "DEE",
+      "name_en": "Derge Chiefdom",
+      "name_zh": "德格土司",
+      "parent_owner_tag": "SIC",
+      "subject_kind": "tusi",
+      "color_hex": "#405a89",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B74822957782790"
+        ]
+      },
+      "only_from_owners": [
+        "SIC"
+      ],
+      "cores": "keep",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
+    },
+    {
+      "id": "batch7_trh",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TRH",
+      "name_en": "Hor Chiefdoms Debug Region",
+      "name_zh": "霍尔诸部调试区",
+      "parent_owner_tag": "SIC",
+      "subject_kind": "tusi",
+      "color_hex": "#607aa4",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B41775887521063",
+          "CN_CITY_17275852B11052099771689",
+          "CN_CITY_17275852B35412891437316"
+        ]
+      },
+      "only_from_owners": [
+        "SIC"
+      ],
+      "cores": "keep",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
+    },
+    {
+      "id": "batch7_cih",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CIH",
+      "name_en": "Cheli Pacification Commission",
+      "name_zh": "车里宣慰司",
+      "parent_owner_tag": "YUN",
+      "subject_kind": "tusi",
+      "color_hex": "#445183",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B39835801597087",
+          "CN_CITY_17275852B3387618125304",
+          "CN_CITY_17275852B56639900099930"
+        ]
+      },
+      "only_from_owners": [
+        "YUN"
+      ],
+      "cores": "keep",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
+    },
+    {
+      "id": "batch7_mln",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MLN",
+      "name_en": "Menglian Pacification Commission",
+      "name_zh": "孟连宣抚司",
+      "parent_owner_tag": "YUN",
+      "subject_kind": "tusi",
+      "color_hex": "#6976a5",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B37558107040134"
+        ]
+      },
+      "only_from_owners": [
+        "YUN"
+      ],
+      "cores": "keep",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
+    },
+    {
+      "id": "batch7_gem",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GEM",
+      "name_en": "Gengma Pacification Commission",
+      "name_zh": "耿马宣抚司",
+      "parent_owner_tag": "YUN",
+      "subject_kind": "tusi",
+      "color_hex": "#71638f",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B8449177634457"
+        ]
+      },
+      "only_from_owners": [
+        "YUN"
+      ],
+      "cores": "keep",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
+    },
+    {
+      "id": "batch7_glg",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GLG",
+      "name_en": "Golok Tribes Debug Region",
+      "name_zh": "果洛诸部调试区",
+      "parent_owner_tag": "QMA",
+      "subject_kind": "autonomous_region",
+      "color_hex": "#82894b",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B82919928587081",
+          "CN_CITY_17275852B66695118162266",
+          "CN_CITY_17275852B1787117911325",
+          "CN_CITY_17275852B28481452848090",
+          "CN_CITY_17275852B2182407224263",
+          "CN_CITY_17275852B52151949988531"
+        ]
+      },
+      "only_from_owners": [
+        "QMA"
+      ],
+      "cores": "keep",
+      "notes": "Modern county boundaries approximate the regional grouping. Maqin/Dawu is a debug anchor, not the historical capital of a unified polity; the parent denotes regional organization, not complete control."
+    },
+    {
+      "id": "batch7_ysh",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "YSH",
+      "name_en": "Yushu Tribes Debug Region",
+      "name_zh": "玉树诸部调试区",
+      "parent_owner_tag": "QMA",
+      "subject_kind": "autonomous_region",
+      "color_hex": "#a1a969",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B66736115774382",
+          "CN_CITY_17275852B19636254999944",
+          "CN_CITY_17275852B27939254726366",
+          "CN_CITY_17275852B13951895453383",
+          "CN_CITY_17275852B24277287807877",
+          "CN_CITY_17275852B94078824919955"
+        ]
+      },
+      "only_from_owners": [
+        "QMA"
+      ],
+      "cores": "keep",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
+    },
+    {
+      "id": "batch7_lhj",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "LHJ",
+      "name_en": "Lahij and Western States",
+      "name_zh": "拉赫季及西部诸邦",
+      "parent_owner_tag": "WDN",
+      "subject_kind": "protectorate",
+      "color_hex": "#bd536a",
+      "select": {
+        "feature_ids": [
+          "YEM-157"
+        ]
+      },
+      "only_from_owners": [
+        "WDN"
+      ],
+      "cores": "keep",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
+    },
+    {
+      "id": "batch7_aby",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ABY",
+      "name_en": "Abyan States Debug Region",
+      "name_zh": "阿比扬诸邦调试区",
+      "parent_owner_tag": "WDN",
+      "subject_kind": "protectorate",
+      "color_hex": "#ce7185",
+      "select": {
+        "feature_ids": [
+          "YEM-3511"
+        ]
+      },
+      "only_from_owners": [
+        "WDN"
+      ],
+      "cores": "keep",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
+    },
+    {
+      "id": "batch7_shw",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SHW",
+      "name_en": "Shabwah States Debug Region",
+      "name_zh": "沙卜瓦诸邦调试区",
+      "parent_owner_tag": "WDN",
+      "subject_kind": "protectorate",
+      "color_hex": "#a84161",
+      "select": {
+        "feature_ids": [
+          "YEM-336"
+        ]
+      },
+      "only_from_owners": [
+        "WDN"
+      ],
+      "cores": "keep",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
+    },
+    {
+      "id": "batch7_hdm",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "HDM",
+      "name_en": "Hadramawt States Debug Region",
+      "name_zh": "哈德拉毛诸邦调试区",
+      "parent_owner_tag": "EDN",
+      "subject_kind": "protectorate",
+      "color_hex": "#d88b9d",
+      "select": {
+        "feature_ids": [
+          "YEM-3497"
+        ]
+      },
+      "only_from_owners": [
+        "EDN"
+      ],
+      "cores": "keep",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
+    },
+    {
+      "id": "batch7_mha",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MHA",
+      "name_en": "Mahra Sultanate",
+      "name_zh": "马赫拉苏丹国",
+      "parent_owner_tag": "EDN",
+      "subject_kind": "protectorate",
+      "color_hex": "#b7617c",
+      "select": {
+        "feature_ids": [
+          "YEM-332"
+        ]
+      },
+      "only_from_owners": [
+        "EDN"
+      ],
+      "cores": "keep",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
+    },
+    {
+      "id": "batch7_yuk",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "YUK",
+      "name_en": "Yukon Territory",
+      "name_zh": "育空领地",
+      "parent_owner_tag": "CAN",
+      "subject_kind": "territory",
+      "color_hex": "#c96a79",
+      "select": {
+        "feature_ids": [
+          "CA_FED_60001"
+        ]
+      },
+      "only_from_owners": [
+        "CAN"
+      ],
+      "cores": "keep",
+      "notes": "Dawson is the territorial capital."
+    },
+    {
+      "id": "batch7_nwt",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NWT",
+      "name_en": "Northwest Territories",
+      "name_zh": "西北领地",
+      "parent_owner_tag": "CAN",
+      "subject_kind": "territory",
+      "color_hex": "#a44b62",
+      "select": {
+        "feature_ids": [
+          "CA_FED_61001",
+          "CA_FED_62001"
+        ]
+      },
+      "only_from_owners": [
+        "CAN"
+      ],
+      "cores": "keep",
+      "notes": "Administered from Ottawa, outside the territory; no in-territory capital. Includes modern Nunavut."
+    },
+    {
+      "id": "batch7_ggy",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GGY",
+      "name_en": "Bailiwick of Guernsey",
+      "name_zh": "根西王室属地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "crown_dependency",
+      "color_hex": "#ce6379",
+      "select": {
+        "feature_ids": [
+          "GG"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_jey",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "JEY",
+      "name_en": "Bailiwick of Jersey",
+      "name_zh": "泽西王室属地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "crown_dependency",
+      "color_hex": "#b94a68",
+      "select": {
+        "feature_ids": [
+          "JE"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_iom",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "IOM",
+      "name_en": "Isle of Man",
+      "name_zh": "马恩岛王室属地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "crown_dependency",
+      "color_hex": "#de8b9d",
+      "select": {
+        "feature_ids": [
+          "IM"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_hrd",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "HRD",
+      "name_en": "Heard Island and McDonald Islands",
+      "name_zh": "赫德岛与麦克唐纳群岛",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "territory",
+      "color_hex": "#aa526a",
+      "select": {
+        "feature_ids": [
+          "HM"
+        ]
+      },
+      "only_from_owners": [
+        "AST"
+      ],
+      "cores": "keep",
+      "notes": "British dependency before transfer to Australia; uninhabited, no capital."
+    },
+    {
+      "id": "batch7_sub",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SUB",
+      "name_en": "Subic Naval Reservation",
+      "name_zh": "苏比克海军保留地",
+      "parent_owner_tag": "USA",
+      "subject_kind": "military_administration",
+      "color_hex": "#657fa9",
+      "select": {
+        "feature_ids": [
+          "PHL-5540"
+        ]
+      },
+      "only_from_owners": [
+        "USA"
+      ],
+      "cores": "keep",
+      "notes": "Olongapo is the naval administration anchor."
+    },
+    {
+      "id": "batch7_ntr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NTR",
+      "name_en": "Northern Territory",
+      "name_zh": "北领地",
+      "parent_owner_tag": "AST",
+      "subject_kind": "territory",
+      "color_hex": "#b88269",
+      "select": {
+        "feature_ids": [
+          "AU_ADM1_AUS-2650"
+        ]
+      },
+      "only_from_owners": [
+        "AST"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_alk",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ALK",
+      "parent_owner_tag": "USA",
+      "subject_kind": "territory",
+      "select": {
+        "owners": [
+          "ALK"
+        ]
+      },
+      "only_from_owners": [
+        "ALK"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_haw",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "HAW",
+      "parent_owner_tag": "USA",
+      "subject_kind": "territory",
+      "select": {
+        "owners": [
+          "HAW"
+        ]
+      },
+      "only_from_owners": [
+        "HAW"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_cam",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CAM",
+      "name_en": "Protectorate of Cambodia",
+      "name_zh": "柬埔寨保护国",
+      "parent_owner_tag": "VIN",
+      "subject_kind": "protectorate",
+      "color_hex": "#687caf",
+      "select": {
+        "country_codes": [
+          "KH"
+        ]
+      },
+      "only_from_owners": [
+        "VIN"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_lao",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "LAO",
+      "name_en": "Protectorate of Laos",
+      "name_zh": "老挝保护国",
+      "parent_owner_tag": "VIN",
+      "subject_kind": "protectorate",
+      "color_hex": "#8596c4",
+      "select": {
+        "country_codes": [
+          "LA"
+        ]
+      },
+      "only_from_owners": [
+        "VIN"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "batch7_aat_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "AAT",
+      "name_en": "Australian Antarctic Territory",
+      "name_zh": "澳大利亚南极领地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "territory",
+      "color_hex": "#c68b91",
+      "select": {
+        "feature_ids": [
+          "AQ_AAT_EAST",
+          "AQ_AAT_WEST"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "Claim/administrative approximation; Australian transfer effective 24 August 1936. No permanent capital."
+    },
+    {
+      "id": "batch7_aat_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "AAT",
+      "name_en": "Australian Antarctic Territory",
+      "name_zh": "澳大利亚南极领地",
+      "parent_owner_tag": "AST",
+      "subject_kind": "territory",
+      "color_hex": "#c68b91",
+      "select": {
+        "feature_ids": [
+          "AQ_AAT_EAST",
+          "AQ_AAT_WEST"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "Claim/administrative approximation; Australian transfer effective 24 August 1936. No permanent capital."
+    },
+    {
+      "id": "batch7_ros",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ROS",
+      "name_en": "Ross Dependency",
+      "name_zh": "罗斯属地",
+      "parent_owner_tag": "NZL",
+      "subject_kind": "territory",
+      "color_hex": "#b98a95",
+      "select": {
+        "feature_ids": [
+          "AQ_ROSS"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "New Zealand-administered claim since 1923; no permanent capital."
+    },
+    {
+      "id": "batch7_adelie",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MAD",
+      "select": {
+        "feature_ids": [
+          "AQ_ADELIE"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "Includes Adelie Land, administered through Madagascar; Antarctic claim approximation."
+    },
+    {
+      "id": "batch7_qml",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "QML",
+      "name_en": "Queen Maud Land",
+      "name_zh": "毛德皇后地",
+      "parent_owner_tag": "NOR",
+      "subject_kind": "territory",
+      "color_hex": "#b57779",
+      "select": {
+        "feature_ids": [
+          "AQ_QML"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "Norwegian claim from 14 January 1939; no permanent capital."
+    },
+    {
+      "id": "batch7_ata_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "ATA",
+      "name_en": "Unclaimed Antarctic Debug Region",
+      "name_zh": "南极未主张调试区",
+      "color_hex": "#b9c2cc",
+      "select": {
+        "feature_ids": [
+          "AQ_QML",
+          "AQ_MARIE_BYRD",
+          "AQ_PEN_WEST"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "Neutral debug grouping; no parent or permanent capital."
+    },
+    {
+      "id": "batch7_ata_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "ATA",
+      "name_en": "Unclaimed Antarctic Debug Region",
+      "name_zh": "南极未主张调试区",
+      "color_hex": "#b9c2cc",
+      "select": {
+        "feature_ids": [
+          "AQ_MARIE_BYRD",
+          "AQ_PEN_WEST"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "Neutral debug grouping; no parent or permanent capital."
+    },
+    {
+      "id": "batch7_falkland_dependencies",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FLK",
+      "select": {
+        "feature_ids": [
+          "AQ_PEN_EAST",
+          "AQ_PEN_OVERLAP_CORE",
+          "AQ_PEN_OVERLAP_EAST",
+          "AQ_PEN_OVERLAP_WEST"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "cores": "keep",
+      "notes": "Includes Falkland Islands Dependencies Antarctic claims, approximated by existing sectors; not a statement of international recognition."
+    },
+    {
       "id": "ang_family_colour_hoi4_1936",
       "scenarios": [
         "hoi4_1936"
@@ -9762,814 +10570,6 @@
       ],
       "cores": "keep",
       "color_hex": "#3657c4"
-    },
-    {
-      "id": "julian_march",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "ITA",
-      "select": {
-        "feature_ids": [
-          "HR036",
-          "SI044",
-          "SI043",
-          "SI038"
-        ]
-      },
-      "only_from_owners": [
-        "YUG"
-      ]
-    },
-    {
-      "id": "southern_dobruja",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "ROM",
-      "select": {
-        "feature_ids": [
-          "BG332",
-          "BG325"
-        ]
-      },
-      "only_from_owners": [
-        "BUL"
-      ]
-    },
-    {
-      "id": "panama_canal_zone",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "PCZ",
-      "name_en": "Panama Canal Zone",
-      "name_zh": "巴拿马运河区",
-      "parent_owner_tag": "USA",
-      "subject_kind": "territory",
-      "select": {
-        "feature_ids": [
-          "PA_ADM1_PAN-1337__SPLIT_PCZ",
-          "PA_ADM1_PAN-1340__SPLIT_PCZ"
-        ]
-      },
-      "only_from_owners": [
-        "PAN"
-      ],
-      "cores": "keep",
-      "notes": "Colón city is included in the Canal Zone at parcel scale."
-    },
-    {
-      "id": "china_enclaves_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "smooth_enclaves": {
-        "tags": [
-          "CHI",
-          "SHX",
-          "PRC",
-          "NCP",
-          "CNZ",
-          "JBZ",
-          "MEN",
-          "RGC",
-          "JCC",
-          "JSC",
-          "JCJ",
-          "THG"
-        ],
-        "max_area_km2": 3000
-      }
-    },
-    {
-      "id": "batch7_dee",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "DEE",
-      "name_en": "Derge Chiefdom",
-      "name_zh": "德格土司",
-      "parent_owner_tag": "SIC",
-      "subject_kind": "tusi",
-      "color_hex": "#405a89",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B74822957782790"
-        ]
-      },
-      "only_from_owners": [
-        "SIC"
-      ],
-      "cores": "keep",
-      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
-    },
-    {
-      "id": "batch7_trh",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "TRH",
-      "name_en": "Hor Chiefdoms Debug Region",
-      "name_zh": "霍尔诸部调试区",
-      "parent_owner_tag": "SIC",
-      "subject_kind": "tusi",
-      "color_hex": "#607aa4",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B41775887521063",
-          "CN_CITY_17275852B11052099771689",
-          "CN_CITY_17275852B35412891437316"
-        ]
-      },
-      "only_from_owners": [
-        "SIC"
-      ],
-      "cores": "keep",
-      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
-    },
-    {
-      "id": "batch7_cih",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CIH",
-      "name_en": "Cheli Pacification Commission",
-      "name_zh": "车里宣慰司",
-      "parent_owner_tag": "YUN",
-      "subject_kind": "tusi",
-      "color_hex": "#445183",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B39835801597087",
-          "CN_CITY_17275852B3387618125304",
-          "CN_CITY_17275852B56639900099930"
-        ]
-      },
-      "only_from_owners": [
-        "YUN"
-      ],
-      "cores": "keep",
-      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
-    },
-    {
-      "id": "batch7_mln",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "MLN",
-      "name_en": "Menglian Pacification Commission",
-      "name_zh": "孟连宣抚司",
-      "parent_owner_tag": "YUN",
-      "subject_kind": "tusi",
-      "color_hex": "#6976a5",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B37558107040134"
-        ]
-      },
-      "only_from_owners": [
-        "YUN"
-      ],
-      "cores": "keep",
-      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
-    },
-    {
-      "id": "batch7_gem",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "GEM",
-      "name_en": "Gengma Pacification Commission",
-      "name_zh": "耿马宣抚司",
-      "parent_owner_tag": "YUN",
-      "subject_kind": "tusi",
-      "color_hex": "#71638f",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B8449177634457"
-        ]
-      },
-      "only_from_owners": [
-        "YUN"
-      ],
-      "cores": "keep",
-      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
-    },
-    {
-      "id": "batch7_glg",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "GLG",
-      "name_en": "Golok Tribes Debug Region",
-      "name_zh": "果洛诸部调试区",
-      "parent_owner_tag": "QMA",
-      "subject_kind": "autonomous_region",
-      "color_hex": "#82894b",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B82919928587081",
-          "CN_CITY_17275852B66695118162266",
-          "CN_CITY_17275852B1787117911325",
-          "CN_CITY_17275852B28481452848090",
-          "CN_CITY_17275852B2182407224263",
-          "CN_CITY_17275852B52151949988531"
-        ]
-      },
-      "only_from_owners": [
-        "QMA"
-      ],
-      "cores": "keep",
-      "notes": "Modern county boundaries approximate the regional grouping. Maqin/Dawu is a debug anchor, not the historical capital of a unified polity; the parent denotes regional organization, not complete control."
-    },
-    {
-      "id": "batch7_ysh",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "YSH",
-      "name_en": "Yushu Tribes Debug Region",
-      "name_zh": "玉树诸部调试区",
-      "parent_owner_tag": "QMA",
-      "subject_kind": "autonomous_region",
-      "color_hex": "#a1a969",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B66736115774382",
-          "CN_CITY_17275852B19636254999944",
-          "CN_CITY_17275852B27939254726366",
-          "CN_CITY_17275852B13951895453383",
-          "CN_CITY_17275852B24277287807877",
-          "CN_CITY_17275852B94078824919955"
-        ]
-      },
-      "only_from_owners": [
-        "QMA"
-      ],
-      "cores": "keep",
-      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor."
-    },
-    {
-      "id": "batch7_lhj",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "LHJ",
-      "name_en": "Lahij and Western States",
-      "name_zh": "拉赫季及西部诸邦",
-      "parent_owner_tag": "WDN",
-      "subject_kind": "protectorate",
-      "color_hex": "#bd536a",
-      "select": {
-        "feature_ids": [
-          "YEM-157"
-        ]
-      },
-      "only_from_owners": [
-        "WDN"
-      ],
-      "cores": "keep",
-      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
-    },
-    {
-      "id": "batch7_aby",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "ABY",
-      "name_en": "Abyan States Debug Region",
-      "name_zh": "阿比扬诸邦调试区",
-      "parent_owner_tag": "WDN",
-      "subject_kind": "protectorate",
-      "color_hex": "#ce7185",
-      "select": {
-        "feature_ids": [
-          "YEM-3511"
-        ]
-      },
-      "only_from_owners": [
-        "WDN"
-      ],
-      "cores": "keep",
-      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
-    },
-    {
-      "id": "batch7_shw",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "SHW",
-      "name_en": "Shabwah States Debug Region",
-      "name_zh": "沙卜瓦诸邦调试区",
-      "parent_owner_tag": "WDN",
-      "subject_kind": "protectorate",
-      "color_hex": "#a84161",
-      "select": {
-        "feature_ids": [
-          "YEM-336"
-        ]
-      },
-      "only_from_owners": [
-        "WDN"
-      ],
-      "cores": "keep",
-      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
-    },
-    {
-      "id": "batch7_hdm",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "HDM",
-      "name_en": "Hadramawt States Debug Region",
-      "name_zh": "哈德拉毛诸邦调试区",
-      "parent_owner_tag": "EDN",
-      "subject_kind": "protectorate",
-      "color_hex": "#d88b9d",
-      "select": {
-        "feature_ids": [
-          "YEM-3497"
-        ]
-      },
-      "only_from_owners": [
-        "EDN"
-      ],
-      "cores": "keep",
-      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
-    },
-    {
-      "id": "batch7_mha",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "MHA",
-      "name_en": "Mahra Sultanate",
-      "name_zh": "马赫拉苏丹国",
-      "parent_owner_tag": "EDN",
-      "subject_kind": "protectorate",
-      "color_hex": "#b7617c",
-      "select": {
-        "feature_ids": [
-          "YEM-332"
-        ]
-      },
-      "only_from_owners": [
-        "EDN"
-      ],
-      "cores": "keep",
-      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel."
-    },
-    {
-      "id": "batch7_yuk",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "YUK",
-      "name_en": "Yukon Territory",
-      "name_zh": "育空领地",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "territory",
-      "color_hex": "#c96a79",
-      "select": {
-        "feature_ids": [
-          "CA_FED_60001"
-        ]
-      },
-      "only_from_owners": [
-        "CAN"
-      ],
-      "cores": "keep",
-      "notes": "Dawson is the territorial capital."
-    },
-    {
-      "id": "batch7_nwt",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "NWT",
-      "name_en": "Northwest Territories",
-      "name_zh": "西北领地",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "territory",
-      "color_hex": "#a44b62",
-      "select": {
-        "feature_ids": [
-          "CA_FED_61001",
-          "CA_FED_62001"
-        ]
-      },
-      "only_from_owners": [
-        "CAN"
-      ],
-      "cores": "keep",
-      "notes": "Administered from Ottawa, outside the territory; no in-territory capital. Includes modern Nunavut."
-    },
-    {
-      "id": "batch7_ggy",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "GGY",
-      "name_en": "Bailiwick of Guernsey",
-      "name_zh": "根西王室属地",
-      "parent_owner_tag": "ENG",
-      "subject_kind": "crown_dependency",
-      "color_hex": "#ce6379",
-      "select": {
-        "feature_ids": [
-          "GG"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_jey",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "JEY",
-      "name_en": "Bailiwick of Jersey",
-      "name_zh": "泽西王室属地",
-      "parent_owner_tag": "ENG",
-      "subject_kind": "crown_dependency",
-      "color_hex": "#b94a68",
-      "select": {
-        "feature_ids": [
-          "JE"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_iom",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "IOM",
-      "name_en": "Isle of Man",
-      "name_zh": "马恩岛王室属地",
-      "parent_owner_tag": "ENG",
-      "subject_kind": "crown_dependency",
-      "color_hex": "#de8b9d",
-      "select": {
-        "feature_ids": [
-          "IM"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_hrd",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "HRD",
-      "name_en": "Heard Island and McDonald Islands",
-      "name_zh": "赫德岛与麦克唐纳群岛",
-      "parent_owner_tag": "ENG",
-      "subject_kind": "territory",
-      "color_hex": "#aa526a",
-      "select": {
-        "feature_ids": [
-          "HM"
-        ]
-      },
-      "only_from_owners": [
-        "AST"
-      ],
-      "cores": "keep",
-      "notes": "British dependency before transfer to Australia; uninhabited, no capital."
-    },
-    {
-      "id": "batch7_sub",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "SUB",
-      "name_en": "Subic Naval Reservation",
-      "name_zh": "苏比克海军保留地",
-      "parent_owner_tag": "USA",
-      "subject_kind": "military_administration",
-      "color_hex": "#657fa9",
-      "select": {
-        "feature_ids": [
-          "PHL-5540"
-        ]
-      },
-      "only_from_owners": [
-        "USA"
-      ],
-      "cores": "keep",
-      "notes": "Olongapo is the naval administration anchor."
-    },
-    {
-      "id": "batch7_ntr",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "NTR",
-      "name_en": "Northern Territory",
-      "name_zh": "北领地",
-      "parent_owner_tag": "AST",
-      "subject_kind": "territory",
-      "color_hex": "#b88269",
-      "select": {
-        "feature_ids": [
-          "AU_ADM1_AUS-2650"
-        ]
-      },
-      "only_from_owners": [
-        "AST"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_alk",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "ALK",
-      "parent_owner_tag": "USA",
-      "subject_kind": "territory",
-      "select": {
-        "owners": [
-          "ALK"
-        ]
-      },
-      "only_from_owners": [
-        "ALK"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_haw",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "HAW",
-      "parent_owner_tag": "USA",
-      "subject_kind": "territory",
-      "select": {
-        "owners": [
-          "HAW"
-        ]
-      },
-      "only_from_owners": [
-        "HAW"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_cam",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CAM",
-      "name_en": "Protectorate of Cambodia",
-      "name_zh": "柬埔寨保护国",
-      "parent_owner_tag": "VIN",
-      "subject_kind": "protectorate",
-      "color_hex": "#687caf",
-      "select": {
-        "country_codes": [
-          "KH"
-        ]
-      },
-      "only_from_owners": [
-        "VIN"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_lao",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "LAO",
-      "name_en": "Protectorate of Laos",
-      "name_zh": "老挝保护国",
-      "parent_owner_tag": "VIN",
-      "subject_kind": "protectorate",
-      "color_hex": "#8596c4",
-      "select": {
-        "country_codes": [
-          "LA"
-        ]
-      },
-      "only_from_owners": [
-        "VIN"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "batch7_aat_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "AAT",
-      "name_en": "Australian Antarctic Territory",
-      "name_zh": "澳大利亚南极领地",
-      "parent_owner_tag": "ENG",
-      "subject_kind": "territory",
-      "color_hex": "#c68b91",
-      "select": {
-        "feature_ids": [
-          "AQ_AAT_EAST",
-          "AQ_AAT_WEST"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "Claim/administrative approximation; Australian transfer effective 24 August 1936. No permanent capital."
-    },
-    {
-      "id": "batch7_aat_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "AAT",
-      "name_en": "Australian Antarctic Territory",
-      "name_zh": "澳大利亚南极领地",
-      "parent_owner_tag": "AST",
-      "subject_kind": "territory",
-      "color_hex": "#c68b91",
-      "select": {
-        "feature_ids": [
-          "AQ_AAT_EAST",
-          "AQ_AAT_WEST"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "Claim/administrative approximation; Australian transfer effective 24 August 1936. No permanent capital."
-    },
-    {
-      "id": "batch7_ros",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "ROS",
-      "name_en": "Ross Dependency",
-      "name_zh": "罗斯属地",
-      "parent_owner_tag": "NZL",
-      "subject_kind": "territory",
-      "color_hex": "#b98a95",
-      "select": {
-        "feature_ids": [
-          "AQ_ROSS"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "New Zealand-administered claim since 1923; no permanent capital."
-    },
-    {
-      "id": "batch7_adelie",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "MAD",
-      "select": {
-        "feature_ids": [
-          "AQ_ADELIE"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "Includes Adelie Land, administered through Madagascar; Antarctic claim approximation."
-    },
-    {
-      "id": "batch7_qml",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "QML",
-      "name_en": "Queen Maud Land",
-      "name_zh": "毛德皇后地",
-      "parent_owner_tag": "NOR",
-      "subject_kind": "territory",
-      "color_hex": "#b57779",
-      "select": {
-        "feature_ids": [
-          "AQ_QML"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "Norwegian claim from 14 January 1939; no permanent capital."
-    },
-    {
-      "id": "batch7_ata_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "ATA",
-      "name_en": "Unclaimed Antarctic Debug Region",
-      "name_zh": "南极未主张调试区",
-      "color_hex": "#b9c2cc",
-      "select": {
-        "feature_ids": [
-          "AQ_QML",
-          "AQ_MARIE_BYRD",
-          "AQ_PEN_WEST"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "Neutral debug grouping; no parent or permanent capital."
-    },
-    {
-      "id": "batch7_ata_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "ATA",
-      "name_en": "Unclaimed Antarctic Debug Region",
-      "name_zh": "南极未主张调试区",
-      "color_hex": "#b9c2cc",
-      "select": {
-        "feature_ids": [
-          "AQ_MARIE_BYRD",
-          "AQ_PEN_WEST"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "Neutral debug grouping; no parent or permanent capital."
-    },
-    {
-      "id": "batch7_falkland_dependencies",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "FLK",
-      "select": {
-        "feature_ids": [
-          "AQ_PEN_EAST",
-          "AQ_PEN_OVERLAP_CORE",
-          "AQ_PEN_OVERLAP_EAST",
-          "AQ_PEN_OVERLAP_WEST"
-        ]
-      },
-      "only_from_owners": [
-        "ENG"
-      ],
-      "cores": "keep",
-      "notes": "Includes Falkland Islands Dependencies Antarctic claims, approximated by existing sectors; not a statement of international recognition."
     }
   ]
 }
