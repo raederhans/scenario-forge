@@ -343,7 +343,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     ["special-zones", "Special Zones", "specialZonePopover"],
     ["legend", "Legend", "legendProjectSection"],
     ["annotations", "Frontlines & Annotations", "frontlineProjectSection"],
-    ["reference", "Reference image", "dockReferencePopover"],
+    ["reference", "Reference map", "dockReferencePopover"],
   ]) {
     const node = get(id);
     if (!node) continue;

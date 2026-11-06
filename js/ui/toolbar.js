@@ -60,7 +60,7 @@ import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { createToolGuidance } from "./toolbar/tool_guidance.js";
 import { createMobileEditingHintController } from "./toolbar/mobile_editing_hint_controller.js";
-import { createUiIcon } from "./ui_icons.js";
+import { createUiIcon, setUiIcon } from "./ui_icons.js";
 import { showAppDialog } from "./app_dialog.js";
 import { createUiSurfaceUrlState } from "./ui_surface_url_state.js";
 import { loadPublicSampleProjectIntoRuntime } from "../core/sample_project_import_workflow.js";
@@ -1234,7 +1234,7 @@ function initToolbar({ render } = {}) {
       dockCollapseBtn.setAttribute("title", runtimeState.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui"));
     }
     if (dockHandleChevron) {
-      dockHandleChevron.textContent = runtimeState.ui.dockCollapsed ? "^" : "v";
+      setUiIcon(dockHandleChevron, runtimeState.ui.dockCollapsed ? "chevron-up" : "chevron-down");
     }
     if (dockHandleLabel) {
       dockHandleLabel.textContent = runtimeState.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");

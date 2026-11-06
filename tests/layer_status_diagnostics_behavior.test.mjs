@@ -53,7 +53,8 @@ test("physical atlas status ignores skipped contours and dormant contour failure
   const physical = buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
   assert.equal(physical.loadedCount, 3);
   assert.equal(physical.visibleCount, 2);
-  assert.equal(physical.summary, "Visible · 2 visible · 3 loaded");
+  assert.equal(physical.summary, "Visible");
+  assert.equal(physical.detail, "2 visible · 3 loaded");
 });
 
 test("contours-only status uses the requested LOD and excludes dormant atlas data", () => {
@@ -68,9 +69,10 @@ test("contours-only status uses the requested LOD and excludes dormant atlas dat
     renderPerfMetrics: { drawPhysicalContourLayer: { renderedCount: 0 } },
   });
   const physical = buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
-  assert.equal(physical.summary, "Loaded · 0 visible · 2 loaded");
+  assert.equal(physical.summary, "Not in current view");
+  assert.equal(physical.detail, "0 visible · 2 loaded");
   state.contextLayerLoadStateByName.physical_contours_low_major = "loading";
-  assert.equal(buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical").summary, "Loading/settling");
+  assert.equal(buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical").summary, "Loading…");
 });
 
 test("physical status exposes requested detail failures while preserving overview availability", () => {
@@ -82,10 +84,12 @@ test("physical status exposes requested detail failures while preserving overvie
   });
   const diagnostic = () => buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
   assert.equal(diagnostic().severity, "warning");
-  assert.equal(diagnostic().summary, "Visible · 1 visible · 1 loaded · Regional detail: Load error");
+  assert.equal(diagnostic().summary, "Visible · Regional detail: Load error");
+  assert.equal(diagnostic().detail, "1 visible · 1 loaded");
   state.zoomTransform.k = 1;
   assert.equal(diagnostic().severity, "active");
-  assert.equal(diagnostic().summary, "Visible · 1 visible · 1 loaded");
+  assert.equal(diagnostic().summary, "Visible");
+  assert.equal(diagnostic().detail, "1 visible · 1 loaded");
 });
 
 test("physical status reports requested names and shade independently and ignores dormant failures", () => {
@@ -100,10 +104,11 @@ test("physical status reports requested names and shade independently and ignore
   const diagnostic = () => buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
   assert.equal(diagnostic().severity, "warning");
   assert.match(diagnostic().summary, /Physical region names: Load error/);
-  assert.match(diagnostic().summary, /Terrain shading: Loading\/settling/);
+  assert.match(diagnostic().summary, /Terrain shading: Loading…/);
   state.styleConfig.physical.showRegionLabels = false;
   state.styleConfig.physical.hillshadeOpacity = 0;
-  assert.equal(diagnostic().summary, "Loaded · 1 loaded");
+  assert.equal(diagnostic().summary, "Ready");
+  assert.equal(diagnostic().detail, "1 loaded");
   state.styleConfig.physical.mode = "contours_only";
   state.styleConfig.physical.showRegionLabels = true;
   state.styleConfig.physical.hillshadeOpacity = 0.1;
@@ -136,7 +141,8 @@ test("layer diagnostics report loaded and visible counts from existing metrics",
   const diagnostics = buildLayerStatusDiagnostics(state, { translate: (key) => key });
   const urban = diagnostics.find((entry) => entry.id === "urban");
 
-  assert.equal(urban.summary, "Visible · 2 visible · 3 loaded");
+  assert.equal(urban.summary, "Visible");
+  assert.equal(urban.detail, "2 visible · 3 loaded");
   assert.equal(urban.severity, "active");
 });
 
@@ -154,7 +160,8 @@ test("city status uses the latest settled marker count over a stale interactive 
   const city = buildLayerStatusDiagnostics(state, { translate: (key) => key })
     .find((entry) => entry.id === "city-points");
   assert.equal(city.visibleCount, 2);
-  assert.equal(city.summary, "Visible · 2 visible · 3 loaded");
+  assert.equal(city.summary, "Visible");
+  assert.equal(city.detail, "2 visible · 3 loaded");
 });
 
 test("city status respects a newer interactive zero and does not invent zero without a measurement", () => {
@@ -167,11 +174,13 @@ test("city status respects a newer interactive zero and does not invent zero wit
   });
   const status = () => buildLayerStatusDiagnostics(state, { translate: (key) => key })
     .find((entry) => entry.id === "city-points");
-  assert.equal(status().summary, "Loaded · 0 visible · 3 loaded");
+  assert.equal(status().summary, "Not in current view");
+  assert.equal(status().detail, "0 visible · 3 loaded");
 
   state.renderPerfMetrics = { drawLabelsPass: { recordedAt: 300, skipped: true, reason: "staged-apply" } };
   assert.equal(status().visibleCount, null);
-  assert.equal(status().summary, "Loaded · 3 loaded");
+  assert.equal(status().summary, "Ready");
+  assert.equal(status().detail, "3 loaded");
 });
 
 test("city status uses metric sequence when settled and interactive draws share a timestamp", () => {
@@ -222,7 +231,7 @@ test("transport family diagnostics expose workbench-only disabled reasons", () =
 
 test("bathymetry diagnostic explains disabled and pending data states", () => {
   const disabled = buildBathymetryDiagnostic(createState({ styleConfig: { ocean: { experimentalAdvancedStyles: false, preset: "flat" } } }), { translate: (key) => key });
-  assert.equal(disabled.summary, "Off");
+  assert.equal(disabled.summary, "Hidden");
   assert.equal(disabled.severity, "muted");
   assert.equal(resolveLayerStatusTone(disabled), "off");
 
@@ -236,7 +245,8 @@ test("bathymetry diagnostic explains disabled and pending data states", () => {
       },
     },
   }), { translate: (key) => key });
-  assert.equal(pending.summary, "Bathymetry data pending for selected style");
+  assert.equal(pending.summary, "Waiting for data");
+  assert.equal(pending.detail, "");
   assert.equal(pending.severity, "warning");
   assert.equal(resolveLayerStatusTone(pending), "warning");
 });
@@ -255,21 +265,25 @@ test("bathymetry diagnostic separates loaded data from current view and reports 
   const diagnostic = () => buildBathymetryDiagnostic(state, { translate: (key) => key });
   assert.equal(diagnostic().loadedCount, 3);
   assert.equal(diagnostic().visibleCount, 0);
-  assert.equal(diagnostic().summary, "No bathymetry coverage in this view");
+  assert.equal(diagnostic().summary, "Not in current view");
 
   state.renderPerfMetrics.bathymetryVisibility = { status: "ready", globalVisibleCount: 2, scenarioVisibleCount: 1, visibleCount: 3 };
-  assert.equal(diagnostic().summary, "2 raster-derived visible · 1 schematic visible");
+  assert.equal(diagnostic().summary, "Visible");
+  assert.equal(diagnostic().detail, "2 raster-derived visible · 1 schematic visible · 3 loaded");
   assert.equal(diagnostic().visibleCount, 3);
 
   state.renderPerfMetrics.bathymetryLoad = { status: "partial", failedSources: ["regional source"] };
   assert.equal(diagnostic().severity, "warning");
-  assert.match(diagnostic().summary, /Some bathymetry sources failed to load · regional source/);
+  assert.equal(diagnostic().summary, "Visible · Some data failed to load");
+  assert.equal(diagnostic().detail, "2 raster-derived visible · 1 schematic visible · regional source");
 
   state.renderPerfMetrics.bathymetryLoad = { status: "error", failedSources: ["regional source"] };
-  assert.equal(diagnostic().summary, "Bathymetry data failed to load · regional source");
+  assert.equal(diagnostic().summary, "Load error");
+  assert.equal(diagnostic().detail, "3 visible · regional source");
   state.renderPerfMetrics.bathymetryLoad = { status: "partial", failedSources: ["regional source"] };
   state.renderPerfMetrics.bathymetryVisibility = { status: "off" };
-  assert.equal(diagnostic().summary, "Some bathymetry sources failed to load · regional source");
+  assert.equal(diagnostic().summary, "Some data failed to load");
+  assert.equal(diagnostic().detail, "regional source");
   state.renderPerfMetrics.bathymetryLoad = { status: "ready", failedSources: [] };
   state.renderPerfMetrics.bathymetryVisibility = { status: "hidden", visibleCount: 0 };
   assert.equal(diagnostic().summary, "Bathymetry opacity is zero");
@@ -383,14 +397,15 @@ test("bathymetry diagnostic uses texture loading and projection status without v
     activeBathymetrySource: "global",
     renderPerfMetrics: { bathymetryLoad: { status: "loading" } } });
   const diagnostic = () => buildBathymetryDiagnostic(state);
-  assert.equal(diagnostic().summary, "Bathymetry loading");
+  assert.equal(diagnostic().summary, "Loading…");
   assert.equal(diagnostic().loadedCount, 0);
   state.renderPerfMetrics.bathymetryLoad = { status: "ready", loadedTileCount: 4 };
-  assert.equal(diagnostic().summary, "Bathymetry available · source global");
+  assert.equal(diagnostic().summary, "Ready");
+  assert.equal(diagnostic().detail, "source global · 4 loaded");
   assert.equal(diagnostic().loadedCount, 4);
   state.renderPerfMetrics.bathymetryVisibility = { status: "unsupported" };
   assert.equal(diagnostic().summary, "Bathymetry is unavailable for this projection");
   assert.equal(diagnostic().severity, "warning");
   state.renderPerfMetrics.bathymetryVisibility = { status: "error" };
-  assert.equal(diagnostic().summary, "Bathymetry data failed to load");
+  assert.equal(diagnostic().summary, "Load error");
 });

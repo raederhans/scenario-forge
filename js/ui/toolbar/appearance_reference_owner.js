@@ -12,6 +12,7 @@ function clampNumber(value, min, max) {
 function collectReferenceNodes(documentRef) {
   return {
     imageInput: documentRef.getElementById("referenceImageInput"),
+    imageFileName: documentRef.getElementById("referenceImageFileName"),
     image: documentRef.getElementById("referenceImage"),
     opacity: documentRef.getElementById("referenceOpacity"),
     scale: documentRef.getElementById("referenceScale"),
@@ -86,6 +87,7 @@ export function createAppearanceReferenceOwner({
   const clearReferenceImage = ({ markDirty: shouldMarkDirty = true } = {}) => {
     revokeReferenceUrl();
     if (nodes.imageInput) nodes.imageInput.value = "";
+    if (nodes.imageFileName) nodes.imageFileName.textContent = "";
     if (nodes.image) {
       nodes.image.src = "";
       nodes.image.style.opacity = "0";
@@ -124,6 +126,7 @@ export function createAppearanceReferenceOwner({
           return;
         }
         revokeReferenceUrl();
+        if (nodes.imageFileName) nodes.imageFileName.textContent = file.name || "";
         setReferenceImageUrlState(runtimeState, typeof urlApi?.createObjectURL === "function"
           ? urlApi.createObjectURL(file)
           : "");

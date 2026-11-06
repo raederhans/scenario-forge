@@ -167,25 +167,14 @@ function buildEnabledSummary({
   translate,
 }) {
   if (!enabled) return translateUi(translate, "Hidden");
-  if (loadStatus === "loading") return translateUi(translate, "Loading/settling");
+  if (loadStatus === "loading") return translateUi(translate, "Loading…");
   if (loadStatus === "error") return translateUi(translate, "Load error");
   const visible = normalizeFiniteCount(visibleCount);
   const loaded = normalizeFiniteCount(loadedCount);
-  if (visible && visible > 0) {
-    return joinStatusParts(
-      translateUi(translate, "Visible"),
-      formatCount(visible, "visible", translate),
-      loaded != null ? formatCount(loaded, "loaded", translate) : "",
-    );
-  }
-  if (loaded != null && loaded > 0 && visible === 0) {
-    return joinStatusParts(
-      translateUi(translate, "Loaded · 0 visible"),
-      formatCount(loaded, "loaded", translate),
-    );
-  }
-  if (loaded != null && loaded > 0) return joinStatusParts(translateUi(translate, "Loaded"), formatCount(loaded, "loaded", translate));
-  return translateUi(translate, "Enabled · waiting for data");
+  if (visible != null && visible > 0) return translateUi(translate, "Visible");
+  if (visible === 0) return translateUi(translate, "Not in current view");
+  if (loaded != null && loaded > 0) return translateUi(translate, "Ready");
+  return translateUi(translate, "Waiting for data");
 }
 
 function getPhysicalStatusInputs(state) {
@@ -263,7 +252,7 @@ function createLayerDiagnostic(definition, state, translate) {
     enabled, loadedCount, visibleCount, loadStatus: baseLoadStatus, translate,
   });
   const resourceSummaries = !enabled ? [] : resourceIssues.map((issue) => (
-    `${translateUi(translate, issue.label)}: ${translateUi(translate, issue.loadStatus === "error" ? "Load error" : "Loading/settling")}`
+    `${translateUi(translate, issue.label)}: ${translateUi(translate, issue.loadStatus === "error" ? "Load error" : "Loading…")}`
   ));
   return {
     id: definition.id,
@@ -274,6 +263,10 @@ function createLayerDiagnostic(definition, state, translate) {
     loadStatus,
     severity,
     summary: sanitizeLayerStatusText(joinStatusParts(summary, ...resourceSummaries)),
+    detail: joinStatusParts(
+      formatCount(visibleCount, "visible", translate),
+      formatCount(loadedCount, "loaded", translate),
+    ),
   };
 }
 
@@ -298,10 +291,10 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     ? load.failedSources.filter((item) => typeof item === "string" && item.trim())
     : [];
   let summary = "";
+  let detail = "";
   let severity = STATUS_SEVERITY.ACTIVE;
   if (!enabled) {
-    summary = getLayerPanelDisabledReason(contract, { translate })
-      || translateUi(translate, "Off");
+    summary = translateUi(translate, "Hidden");
     severity = STATUS_SEVERITY.MUTED;
   } else if (preset === "flat") {
     summary = translateUi(translate, "Bathymetry enabled · flat style selected");
@@ -313,49 +306,47 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     summary = translateUi(translate, "Bathymetry is unavailable for this projection");
     severity = STATUS_SEVERITY.WARNING;
   } else if (load.status === "error" || visibility.status === "error") {
-    summary = joinStatusParts(
-      translateUi(translate, "Bathymetry data failed to load"),
-      failedSources.join(", "),
-    );
+    summary = translateUi(translate, "Load error");
     severity = STATUS_SEVERITY.WARNING;
   } else if (load.status === "loading" || visibility.status === "loading") {
-    summary = translateUi(translate, "Bathymetry loading");
+    summary = translateUi(translate, "Loading…");
     severity = STATUS_SEVERITY.MUTED;
   } else if (visibility.status === "ready" && visibleCount === 0) {
     summary = joinStatusParts(
-      translateUi(translate, "No bathymetry coverage in this view"),
-      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
-      load.status === "partial" ? failedSources.join(", ") : "",
+      translateUi(translate, "Not in current view"),
+      load.status === "partial" ? translateUi(translate, "Some data failed to load") : "",
     );
     severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.MUTED;
   } else if (visibility.status === "ready" && visibleCount > 0) {
     summary = joinStatusParts(
+      translateUi(translate, "Visible"),
+      load.status === "partial" ? translateUi(translate, "Some data failed to load") : "",
+    );
+    detail = joinStatusParts(
       globalVisibleCount > 0
         ? `${globalVisibleCount} ${translateUi(translate, "raster-derived visible")}` : "",
       scenarioVisibleCount > 0
         ? `${scenarioVisibleCount} ${translateUi(translate, "schematic visible")}` : "",
       globalVisibleCount + scenarioVisibleCount === 0
-        ? `${visibleCount} ${translateUi(translate, "visible")}` : "",
-      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
-      load.status === "partial" ? failedSources.join(", ") : "",
+        ? formatCount(visibleCount, "visible", translate) : "",
     );
     severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.ACTIVE;
   } else if (load.status === "ready") {
-    summary = joinStatusParts(
-      translateUi(translate, "Bathymetry available"),
-      `${translateUi(translate, "source")} ${source}`,
-    );
+    summary = translateUi(translate, "Ready");
+    detail = `${translateUi(translate, "source")} ${source}`;
     severity = STATUS_SEVERITY.ACTIVE;
   } else if (load.status === "partial") {
-    summary = joinStatusParts(
-      translateUi(translate, "Some bathymetry sources failed to load"),
-      failedSources.join(", "),
-    );
+    summary = translateUi(translate, "Some data failed to load");
     severity = STATUS_SEVERITY.WARNING;
   } else {
-    summary = translateUi(translate, "Bathymetry data pending for selected style");
+    summary = translateUi(translate, "Waiting for data");
     severity = STATUS_SEVERITY.WARNING;
   }
+  detail = joinStatusParts(
+    detail || formatCount(visibleCount, "visible", translate),
+    formatCount(load.loadedTileCount ?? visibility.loadedTileCount, "loaded", translate),
+    failedSources.join(", "),
+  );
   return {
     id: "bathymetry",
     label: contract?.label || "Bathymetry",
@@ -364,6 +355,7 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     visibleCount,
     severity,
     summary: sanitizeLayerStatusText(summary),
+    detail,
   };
 }
 
