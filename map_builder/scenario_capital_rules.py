@@ -123,6 +123,27 @@ HOI4_CAPITALS = {
 # Capitals of the post-build HOI4 split overlay (data/scenario-rules/hoi4_split_overlay.json).
 # Debug-oriented seats inside each split's current territory, not historical claims.
 HOI4_SPLIT_CAPITALS = {
+    'DEE': ('CITY::scenario::derge', 'Derge', '更庆'),
+    'TRH': ('CITY::scenario::garze', 'Garze', '甘孜'),
+    'CIH': ('CITY::gn::1785710', 'Jinghong', '景洪'),
+    'MLN': ('CITY::scenario::nayun', 'Nayun', '娜允'),
+    'GEM': ('CITY::scenario::gengma', 'Gengma', '耿马'),
+    'GLG': ('CITY::gn::7931312', 'Maqin / Dawu (debug anchor)', '玛沁／大武（调试锚点）'),
+    'YSH': ('CITY::ne::1159146877', 'Jiegu', '结古'),
+    'LHJ': ('1159133947', 'Lahij', '拉赫季'),
+    'ABY': ('CITY::scenario::shuqra', 'Shuqra', '舒格拉'),
+    'SHW': ('CITY::scenario::habban', 'Habban', '哈班'),
+    'HDM': ('1159147531', 'Mukalla', '穆卡拉'),
+    'MHA': ('CITY::scenario::qishn', 'Qishn', '基什恩'),
+    'YUK': ('1159150255', 'Dawson City', '道森'),
+    'GGY': ('CITY::gn::3042287', 'Saint Peter Port', '圣彼得港'),
+    'JEY': ('CITY::gn::3042091', 'Saint Helier', '圣赫利尔'),
+    'IOM': ('1159146037', 'Douglas', '道格拉斯'),
+    'SUB': ('1159137959', 'Olongapo', '奥隆阿波'),
+    'NTR': ('1159151155', 'Darwin', '达尔文'),
+    'CAM': ('1159151127', 'Phnom Penh', '金边'),
+    'LAO': ('1159139147', 'Luang Prabang', '琅勃拉邦'),
+
     "SSH": ("1159149741", "El Aaiún", "阿尤恩"),
     'NNI': ('1159149705', 'Kaduna', '卡杜纳'),
     'SNI': ('1159150771', 'Enugu', '埃努古'),
@@ -488,8 +509,8 @@ REVIEWED_CAPITALS = {
     "tno_1962": TNO_CAPITALS,
 }
 NO_CAPITAL_TAGS = {
-    "hoi4_1936": {"DMC", "CDE", "TRU"},
-    "hoi4_1939": {"JCJ", "THG", "TRU"},
+    "hoi4_1936": {"DMC", "CDE", "TRU", "WDN", "EDN", "NWT", "HRD", "AAT", "ROS", "QML", "ATA"},
+    "hoi4_1939": {"JCJ", "THG", "TRU", "WDN", "EDN", "NWT", "HRD", "AAT", "ROS", "QML", "ATA"},
     "tno_1962": {"AFA", "RFA", "ATL", "AQ", "SPR", "RKO", "AOI"},
     # Neutral/uninhabited regions or administrations seated outside the mapped
     # territory have no in-territory civilian capital marker.
@@ -566,6 +587,13 @@ ADDITIONAL_CAPITAL_CITIES = {
     'CITY::scenario::laiza': {'id': 'CITY::scenario::laiza', 'name': 'Laiza', 'name_en': 'Laiza', 'name_zh': '拉咱', 'lon': 97.55557934498178, 'lat': 24.767972349816564, 'country_code': 'MM', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement', 'notes': '就近吸附到底图', 'source_coordinates': [97.56, 24.76]},
     'CITY::scenario::mrauk_u': {'id': 'CITY::scenario::mrauk_u', 'name': 'Mrauk-U', 'name_en': 'Mrauk-U', 'name_zh': '妙乌', 'lon': 93.194, 'lat': 20.596, 'country_code': 'MM', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
     'CITY::scenario::falam': {'id': 'CITY::scenario::falam', 'name': 'Falam', 'name_en': 'Falam', 'name_zh': '法兰', 'lon': 93.68, 'lat': 22.91, 'country_code': 'MM', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::derge': {'id': 'CITY::scenario::derge', 'name': 'Derge', 'name_en': 'Derge', 'name_zh': '更庆', 'lon': 98.58, 'lat': 31.807, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::garze': {'id': 'CITY::scenario::garze', 'name': 'Garze', 'name_en': 'Garze', 'name_zh': '甘孜', 'lon': 99.993, 'lat': 31.627, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::nayun': {'id': 'CITY::scenario::nayun', 'name': 'Nayun', 'name_en': 'Nayun', 'name_zh': '娜允', 'lon': 99.386, 'lat': 22.326, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::gengma': {'id': 'CITY::scenario::gengma', 'name': 'Gengma', 'name_en': 'Gengma', 'name_zh': '耿马', 'lon': 99.397, 'lat': 23.538, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::shuqra': {'id': 'CITY::scenario::shuqra', 'name': 'Shuqra', 'name_en': 'Shuqra', 'name_zh': '舒格拉', 'lon': 45.706, 'lat': 13.358, 'country_code': 'YE', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::habban': {'id': 'CITY::scenario::habban', 'name': 'Habban', 'name_en': 'Habban', 'name_zh': '哈班', 'lon': 47.075, 'lat': 14.354, 'country_code': 'YE', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::qishn': {'id': 'CITY::scenario::qishn', 'name': 'Qishn', 'name_en': 'Qishn', 'name_zh': '基什恩', 'lon': 51.681, 'lat': 15.422, 'country_code': 'YE', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
 
     "CITY::scenario::agwanit": {
         "id": "CITY::scenario::agwanit", "name": "Agwanit", "name_en": "Agwanit", "name_zh": "阿格瓦尼特",

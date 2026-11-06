@@ -263,12 +263,422 @@
       "tag": "MTQ",
       "field": "feature_count",
       "equals": 1
+    },
+    {
+      "tag": "DEE",
+      "field": "parent_owner_tag",
+      "equals": "SIC"
+    },
+    {
+      "tag": "DEE",
+      "field": "subject_kind",
+      "equals": "tusi"
+    },
+    {
+      "tag": "TRH",
+      "field": "parent_owner_tag",
+      "equals": "SIC"
+    },
+    {
+      "tag": "TRH",
+      "field": "subject_kind",
+      "equals": "tusi"
+    },
+    {
+      "tag": "CIH",
+      "field": "parent_owner_tag",
+      "equals": "YUN"
+    },
+    {
+      "tag": "CIH",
+      "field": "subject_kind",
+      "equals": "tusi"
+    },
+    {
+      "tag": "MLN",
+      "field": "parent_owner_tag",
+      "equals": "YUN"
+    },
+    {
+      "tag": "MLN",
+      "field": "subject_kind",
+      "equals": "tusi"
+    },
+    {
+      "tag": "GEM",
+      "field": "parent_owner_tag",
+      "equals": "YUN"
+    },
+    {
+      "tag": "GEM",
+      "field": "subject_kind",
+      "equals": "tusi"
+    },
+    {
+      "tag": "GLG",
+      "field": "parent_owner_tag",
+      "equals": "QMA"
+    },
+    {
+      "tag": "GLG",
+      "field": "subject_kind",
+      "equals": "autonomous_region"
+    },
+    {
+      "tag": "YSH",
+      "field": "parent_owner_tag",
+      "equals": "QMA"
+    },
+    {
+      "tag": "YSH",
+      "field": "subject_kind",
+      "equals": "autonomous_region"
+    },
+    {
+      "tag": "LHJ",
+      "field": "parent_owner_tag",
+      "equals": "WDN"
+    },
+    {
+      "tag": "LHJ",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "ABY",
+      "field": "parent_owner_tag",
+      "equals": "WDN"
+    },
+    {
+      "tag": "ABY",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "SHW",
+      "field": "parent_owner_tag",
+      "equals": "WDN"
+    },
+    {
+      "tag": "SHW",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "HDM",
+      "field": "parent_owner_tag",
+      "equals": "EDN"
+    },
+    {
+      "tag": "HDM",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "MHA",
+      "field": "parent_owner_tag",
+      "equals": "EDN"
+    },
+    {
+      "tag": "MHA",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "YUK",
+      "field": "parent_owner_tag",
+      "equals": "CAN"
+    },
+    {
+      "tag": "YUK",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "NWT",
+      "field": "parent_owner_tag",
+      "equals": "CAN"
+    },
+    {
+      "tag": "NWT",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "GGY",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "GGY",
+      "field": "subject_kind",
+      "equals": "crown_dependency"
+    },
+    {
+      "tag": "JEY",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "JEY",
+      "field": "subject_kind",
+      "equals": "crown_dependency"
+    },
+    {
+      "tag": "IOM",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "IOM",
+      "field": "subject_kind",
+      "equals": "crown_dependency"
+    },
+    {
+      "tag": "HRD",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "HRD",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "SUB",
+      "field": "parent_owner_tag",
+      "equals": "USA"
+    },
+    {
+      "tag": "SUB",
+      "field": "subject_kind",
+      "equals": "military_administration"
+    },
+    {
+      "tag": "NTR",
+      "field": "parent_owner_tag",
+      "equals": "AST"
+    },
+    {
+      "tag": "NTR",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "ALK",
+      "field": "parent_owner_tag",
+      "equals": "USA"
+    },
+    {
+      "tag": "ALK",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "HAW",
+      "field": "parent_owner_tag",
+      "equals": "USA"
+    },
+    {
+      "tag": "HAW",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "CAM",
+      "field": "parent_owner_tag",
+      "equals": "VIN"
+    },
+    {
+      "tag": "CAM",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "LAO",
+      "field": "parent_owner_tag",
+      "equals": "VIN"
+    },
+    {
+      "tag": "LAO",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "AAT",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "AAT",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "ROS",
+      "field": "parent_owner_tag",
+      "equals": "NZL"
+    },
+    {
+      "tag": "ROS",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "DEE",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "TRH",
+      "field": "feature_count",
+      "equals": 3
+    },
+    {
+      "tag": "CIH",
+      "field": "feature_count",
+      "equals": 3
+    },
+    {
+      "tag": "MLN",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "GEM",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "GLG",
+      "field": "feature_count",
+      "equals": 6
+    },
+    {
+      "tag": "YSH",
+      "field": "feature_count",
+      "equals": 6
+    },
+    {
+      "tag": "LHJ",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "ABY",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "SHW",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "HDM",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "MHA",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "WDN",
+      "field": "feature_count",
+      "equals": 0
+    },
+    {
+      "tag": "EDN",
+      "field": "feature_count",
+      "equals": 0
+    },
+    {
+      "tag": "YUK",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "NWT",
+      "field": "feature_count",
+      "equals": 2
+    },
+    {
+      "tag": "GGY",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "JEY",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "IOM",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "HRD",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "SUB",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "NTR",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "CAM",
+      "field": "feature_count",
+      "equals": 24
+    },
+    {
+      "tag": "LAO",
+      "field": "feature_count",
+      "equals": 17
+    },
+    {
+      "tag": "VIN",
+      "field": "feature_count",
+      "equals": 63
+    },
+    {
+      "tag": "AAT",
+      "field": "feature_count",
+      "equals": 2
+    },
+    {
+      "tag": "ROS",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "ATA",
+      "field": "feature_count",
+      "equals": 3
+    },
+    {
+      "tag": "WDN",
+      "field": "entry_kind",
+      "equals": "scenario_container"
+    },
+    {
+      "tag": "EDN",
+      "field": "entry_kind",
+      "equals": "scenario_container"
     }
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "owner_count": 300,
-    "controller_count": 300,
+    "owner_count": 323,
+    "controller_count": 323,
     "feature_count": 21100
   },
   "summary_min": {
@@ -707,7 +1117,7 @@
     },
     {
       "name": "city_Olongapo",
-      "expected_owner_tag": "USA",
+      "expected_owner_tag": "SUB",
       "feature_ids": [
         "PHL-5540"
       ]
@@ -819,14 +1229,14 @@
     },
     {
       "name": "city_Lahij",
-      "expected_owner_tag": "WDN",
+      "expected_owner_tag": "LHJ",
       "feature_ids": [
         "YEM-157"
       ]
     },
     {
       "name": "city_Mukalla",
-      "expected_owner_tag": "EDN",
+      "expected_owner_tag": "HDM",
       "feature_ids": [
         "YEM-3497"
       ]
@@ -1043,6 +1453,209 @@
       "expected_owner_tag": "CAY",
       "feature_ids": [
         "GF_PRIMARY"
+      ]
+    },
+    {
+      "name": "batch7_dee",
+      "expected_owner_tag": "DEE",
+      "feature_ids": [
+        "CN_CITY_17275852B74822957782790"
+      ]
+    },
+    {
+      "name": "batch7_trh",
+      "expected_owner_tag": "TRH",
+      "feature_ids": [
+        "CN_CITY_17275852B41775887521063",
+        "CN_CITY_17275852B11052099771689",
+        "CN_CITY_17275852B35412891437316"
+      ]
+    },
+    {
+      "name": "batch7_cih",
+      "expected_owner_tag": "CIH",
+      "feature_ids": [
+        "CN_CITY_17275852B39835801597087",
+        "CN_CITY_17275852B3387618125304",
+        "CN_CITY_17275852B56639900099930"
+      ]
+    },
+    {
+      "name": "batch7_mln",
+      "expected_owner_tag": "MLN",
+      "feature_ids": [
+        "CN_CITY_17275852B37558107040134"
+      ]
+    },
+    {
+      "name": "batch7_gem",
+      "expected_owner_tag": "GEM",
+      "feature_ids": [
+        "CN_CITY_17275852B8449177634457"
+      ]
+    },
+    {
+      "name": "batch7_glg",
+      "expected_owner_tag": "GLG",
+      "feature_ids": [
+        "CN_CITY_17275852B82919928587081",
+        "CN_CITY_17275852B66695118162266",
+        "CN_CITY_17275852B1787117911325",
+        "CN_CITY_17275852B28481452848090",
+        "CN_CITY_17275852B2182407224263",
+        "CN_CITY_17275852B52151949988531"
+      ]
+    },
+    {
+      "name": "batch7_ysh",
+      "expected_owner_tag": "YSH",
+      "feature_ids": [
+        "CN_CITY_17275852B66736115774382",
+        "CN_CITY_17275852B19636254999944",
+        "CN_CITY_17275852B27939254726366",
+        "CN_CITY_17275852B13951895453383",
+        "CN_CITY_17275852B24277287807877",
+        "CN_CITY_17275852B94078824919955"
+      ]
+    },
+    {
+      "name": "batch7_lhj",
+      "expected_owner_tag": "LHJ",
+      "feature_ids": [
+        "YEM-157"
+      ]
+    },
+    {
+      "name": "batch7_aby",
+      "expected_owner_tag": "ABY",
+      "feature_ids": [
+        "YEM-3511"
+      ]
+    },
+    {
+      "name": "batch7_shw",
+      "expected_owner_tag": "SHW",
+      "feature_ids": [
+        "YEM-336"
+      ]
+    },
+    {
+      "name": "batch7_hdm",
+      "expected_owner_tag": "HDM",
+      "feature_ids": [
+        "YEM-3497"
+      ]
+    },
+    {
+      "name": "batch7_mha",
+      "expected_owner_tag": "MHA",
+      "feature_ids": [
+        "YEM-332"
+      ]
+    },
+    {
+      "name": "batch7_yuk",
+      "expected_owner_tag": "YUK",
+      "feature_ids": [
+        "CA_FED_60001"
+      ]
+    },
+    {
+      "name": "batch7_nwt",
+      "expected_owner_tag": "NWT",
+      "feature_ids": [
+        "CA_FED_61001",
+        "CA_FED_62001"
+      ]
+    },
+    {
+      "name": "batch7_ggy",
+      "expected_owner_tag": "GGY",
+      "feature_ids": [
+        "GG"
+      ]
+    },
+    {
+      "name": "batch7_jey",
+      "expected_owner_tag": "JEY",
+      "feature_ids": [
+        "JE"
+      ]
+    },
+    {
+      "name": "batch7_iom",
+      "expected_owner_tag": "IOM",
+      "feature_ids": [
+        "IM"
+      ]
+    },
+    {
+      "name": "batch7_hrd",
+      "expected_owner_tag": "HRD",
+      "feature_ids": [
+        "HM"
+      ]
+    },
+    {
+      "name": "batch7_sub",
+      "expected_owner_tag": "SUB",
+      "feature_ids": [
+        "PHL-5540"
+      ]
+    },
+    {
+      "name": "batch7_ntr",
+      "expected_owner_tag": "NTR",
+      "feature_ids": [
+        "AU_ADM1_AUS-2650"
+      ]
+    },
+    {
+      "name": "batch7_aat_hoi4_1936",
+      "expected_owner_tag": "AAT",
+      "feature_ids": [
+        "AQ_AAT_EAST",
+        "AQ_AAT_WEST"
+      ]
+    },
+    {
+      "name": "batch7_ros",
+      "expected_owner_tag": "ROS",
+      "feature_ids": [
+        "AQ_ROSS"
+      ]
+    },
+    {
+      "name": "batch7_adelie",
+      "expected_owner_tag": "MAD",
+      "feature_ids": [
+        "AQ_ADELIE"
+      ]
+    },
+    {
+      "name": "batch7_ata_hoi4_1936",
+      "expected_owner_tag": "ATA",
+      "feature_ids": [
+        "AQ_QML",
+        "AQ_MARIE_BYRD",
+        "AQ_PEN_WEST"
+      ]
+    },
+    {
+      "name": "batch7_falkland_dependencies",
+      "expected_owner_tag": "FLK",
+      "feature_ids": [
+        "AQ_PEN_EAST",
+        "AQ_PEN_OVERLAP_CORE",
+        "AQ_PEN_OVERLAP_EAST",
+        "AQ_PEN_OVERLAP_WEST"
+      ]
+    },
+    {
+      "name": "act_retained_in_australia",
+      "expected_owner_tag": "AST",
+      "feature_ids": [
+        "AU_ADM1_AUS-2653"
       ]
     }
   ],
