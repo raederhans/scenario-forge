@@ -2,9 +2,17 @@
   "version": 1,
   "description": "Bilingual full country names for checked-in HOI4 1936 and 1939 scenario country tags.",
   "tags": {
+    "AAT": {
+      "en": "Australian Antarctic Territory",
+      "zh": "澳大利亚南极领地"
+    },
     "ABD": {
       "en": "Sheikhdom of Abu Dhabi",
       "zh": "阿布扎比酋长国"
+    },
+    "ABY": {
+      "en": "Abyan States Debug Region",
+      "zh": "阿比扬诸邦调试区"
     },
     "ADN": {
       "en": "Aden Colony",
@@ -77,6 +85,10 @@
     "AST": {
       "en": "Commonwealth of Australia",
       "zh": "澳大利亚联邦"
+    },
+    "ATA": {
+      "en": "Unclaimed Antarctic Debug Region",
+      "zh": "南极未主张调试区"
     },
     "AUS": {
       "en": "Federal State of Austria",
@@ -182,6 +194,10 @@
       "en": "Portuguese Cabinda District",
       "zh": "葡属卡宾达区"
     },
+    "CAM": {
+      "en": "Protectorate of Cambodia",
+      "zh": "柬埔寨保护国"
+    },
     "CAN": {
       "en": "Dominion of Canada",
       "zh": "加拿大自治领"
@@ -233,6 +249,10 @@
     "CHU": {
       "en": "Sichuan Administration - Liu Xiang Faction",
       "zh": "四川军政区（刘湘系）"
+    },
+    "CIH": {
+      "en": "Cheli Pacification Commission",
+      "zh": "车里宣慰司"
     },
     "CNZ": {
       "en": "South Chahar Administration",
@@ -289,6 +309,10 @@
     "DAG": {
       "en": "Dagestan ASSR",
       "zh": "达吉斯坦自治共和国"
+    },
+    "DEE": {
+      "en": "Derge Chiefdom",
+      "zh": "德格土司"
     },
     "DEN": {
       "en": "Kingdom of Denmark",
@@ -394,6 +418,10 @@
       "en": "Colony of Guadeloupe",
       "zh": "瓜德罗普殖民地"
     },
+    "GEM": {
+      "en": "Gengma Pacification Commission",
+      "zh": "耿马宣抚司"
+    },
     "GEO": {
       "en": "Georgian SSR",
       "zh": "格鲁吉亚苏维埃社会主义共和国"
@@ -402,9 +430,17 @@
       "en": "German Reich",
       "zh": "德意志国"
     },
+    "GGY": {
+      "en": "Bailiwick of Guernsey",
+      "zh": "根西王室属地"
+    },
     "GLD": {
       "en": "Gold Coast Colony",
       "zh": "黄金海岸殖民地"
+    },
+    "GLG": {
+      "en": "Golok Tribes Debug Region",
+      "zh": "果洛诸部调试区"
     },
     "GMA": {
       "en": "Hexi Ma Clique",
@@ -462,6 +498,10 @@
       "en": "Hebei-Chahar Political Council",
       "zh": "冀察政务委员会"
     },
+    "HDM": {
+      "en": "Hadramawt States Debug Region",
+      "zh": "哈德拉毛诸邦调试区"
+    },
     "HKG": {
       "en": "Hong Kong",
       "zh": "香港"
@@ -477,6 +517,10 @@
     "HON": {
       "en": "Republic of Honduras",
       "zh": "洪都拉斯共和国"
+    },
+    "HRD": {
+      "en": "Heard Island and McDonald Islands",
+      "zh": "赫德岛与麦克唐纳群岛"
     },
     "HRR": {
       "en": "Harar Governorate",
@@ -542,6 +586,10 @@
       "en": "Dutch East Indies",
       "zh": "荷属东印度"
     },
+    "IOM": {
+      "en": "Isle of Man",
+      "zh": "马恩岛王室属地"
+    },
     "IPA": {
       "en": "Punjab States",
       "zh": "旁遮普诸邦"
@@ -593,6 +641,10 @@
     "JEB": {
       "en": "Autonomous Government of Jabal Druze",
       "zh": "德鲁兹山自治政府"
+    },
+    "JEY": {
+      "en": "Bailiwick of Jersey",
+      "zh": "泽西王室属地"
     },
     "JOH": {
       "en": "Sultanate of Johor",
@@ -702,6 +754,10 @@
       "en": "Kirghiz ASSR",
       "zh": "吉尔吉斯自治苏维埃社会主义共和国"
     },
+    "LAO": {
+      "en": "Protectorate of Laos",
+      "zh": "老挝保护国"
+    },
     "LAT": {
       "en": "Republic of Latvia",
       "zh": "拉脱维亚共和国"
@@ -713,6 +769,10 @@
     "LEB": {
       "en": "French Mandate for Lebanon",
       "zh": "法属黎巴嫩托管地"
+    },
+    "LHJ": {
+      "en": "Lahij and Western States",
+      "zh": "拉赫季及西部诸邦"
     },
     "LIB": {
       "en": "Republic of Liberia",
@@ -774,6 +834,10 @@
       "en": "United Mexican States",
       "zh": "墨西哥合众国"
     },
+    "MHA": {
+      "en": "Mahra Sultanate",
+      "zh": "马赫拉苏丹国"
+    },
     "MLD": {
       "en": "Sultanate of the Maldives",
       "zh": "马尔代夫苏丹国"
@@ -781,6 +845,10 @@
     "MLK": {
       "en": "Moluccas Debug Region",
       "zh": "马鲁古调试大区"
+    },
+    "MLN": {
+      "en": "Menglian Pacification Commission",
+      "zh": "孟连宣抚司"
     },
     "MLT": {
       "en": "Malta",
@@ -878,6 +946,10 @@
       "en": "Northern Rhodesia",
       "zh": "北罗得西亚"
     },
+    "NTR": {
+      "en": "Northern Territory",
+      "zh": "北领地"
+    },
     "NWA": {
       "en": "Northwestern Army Administration",
       "zh": "西北军（杨虎城）"
@@ -885,6 +957,10 @@
     "NWI": {
       "en": "Western Provinces of Nigeria",
       "zh": "尼日利亚西部省区"
+    },
+    "NWT": {
+      "en": "Northwest Territories",
+      "zh": "西北领地"
     },
     "NYS": {
       "en": "Nyasaland",
@@ -962,6 +1038,10 @@
       "en": "Qinghai Ma Clique",
       "zh": "青海马家军"
     },
+    "QML": {
+      "en": "Queen Maud Land",
+      "zh": "毛德皇后地"
+    },
     "RAJ": {
       "en": "British Indian Empire",
       "zh": "英属印度帝国"
@@ -998,6 +1078,10 @@
       "en": "Kingdom of Romania",
       "zh": "罗马尼亚王国"
     },
+    "ROS": {
+      "en": "Ross Dependency",
+      "zh": "罗斯属地"
+    },
     "RUA": {
       "en": "Ruanda-Urundi",
       "zh": "卢安达-乌隆迪"
@@ -1033,6 +1117,10 @@
     "SHM": {
       "en": "Saguia el-Hamra",
       "zh": "萨基亚哈姆拉"
+    },
+    "SHW": {
+      "en": "Shabwah States Debug Region",
+      "zh": "沙卜瓦诸邦调试区"
     },
     "SHX": {
       "en": "Shanxi Clique",
@@ -1118,6 +1206,10 @@
       "en": "Straits Settlements",
       "zh": "海峡殖民地"
     },
+    "SUB": {
+      "en": "Subic Naval Reservation",
+      "zh": "苏比克海军保留地"
+    },
     "SUD": {
       "en": "Anglo-Egyptian Sudan",
       "zh": "英埃苏丹"
@@ -1201,6 +1293,10 @@
     "TPA": {
       "en": "Tripura",
       "zh": "特里普拉"
+    },
+    "TRH": {
+      "en": "Hor Chiefdoms Debug Region",
+      "zh": "霍尔诸部调试区"
     },
     "TRI": {
       "en": "Trinidad and Tobago",
@@ -1290,6 +1386,10 @@
       "en": "Sultanate of Yogyakarta",
       "zh": "日惹苏丹国"
     },
+    "YSH": {
+      "en": "Yushu Tribes Debug Region",
+      "zh": "玉树诸部调试区"
+    },
     "YT": {
       "en": "Colony of Mayotte",
       "zh": "马约特殖民地"
@@ -1301,6 +1401,10 @@
     "YUG": {
       "en": "Kingdom of Yugoslavia",
       "zh": "南斯拉夫王国"
+    },
+    "YUK": {
+      "en": "Yukon Territory",
+      "zh": "育空领地"
     },
     "YUN": {
       "en": "Yunnan Provincial Government - Long Yun",

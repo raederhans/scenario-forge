@@ -7,6 +7,7 @@
 
 import { state } from "./state.js";
 import { getPoliticalIdRasterDiagnostics } from "./map_renderer/public.js";
+import { hasPendingPanelRefresh } from "./state/changes.js";
 
 const API_VERSION = 2;
 
@@ -78,7 +79,8 @@ function status() {
       viewportBounds: loadState.lastSelection?.viewportBbox || null,
     },
     // Everything that affects pixels has settled: data, chunks, render passes and GPU presentation.
-    settled: pipelineIdle && rasterPresented(),
+    // Panels refresh after paint; they are part of the settled UI too.
+    settled: pipelineIdle && rasterPresented() && !hasPendingPanelRefresh(),
   };
 }
 

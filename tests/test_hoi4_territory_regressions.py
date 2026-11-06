@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 
@@ -68,6 +69,43 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
             assignments=self.assignments_for("hoi4_1936"),
         )
         self.assertEqual(checks["china_manchukuo_frontier"]["status"], "pass")
+
+
+    def test_batch7_bundle_territories_and_capitals(self):
+        for scenario in ("hoi4_1936", "hoi4_1939"):
+            with self.subTest(scenario=scenario):
+                directory = PROJECT_ROOT / "data/scenarios" / scenario
+                owners = json.loads((directory / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
+                countries = json.loads((directory / "countries.json").read_text(encoding="utf-8"))["countries"]
+                cities = json.loads((directory / "city_overrides.json").read_text(encoding="utf-8"))
+                self.assertEqual(len(owners), 21100)
+                self.assertEqual(owners["AU_ADM1_AUS-2653"], "AST")
+                self.assertEqual(owners["AU_ADM1_AUS-2650"], "NTR")
+                self.assertEqual(owners["CN_CITY_17275852B99290886399570"], "QMA")
+                self.assertEqual(owners["CN_CITY_17275852B51096101365561"], "MAN")
+                self.assertEqual(owners["YEM-334"], "YEM")
+                self.assertEqual(owners["YEM-3510"], "RAJ" if scenario == "hoi4_1936" else "ADN")
+                self.assertEqual(owners["GF_PRIMARY"], "CAY")
+                for tag, count in {"DEE": 1, "TRH": 3, "CIH": 3, "MLN": 1, "GEM": 1,
+                                   "GLG": 6, "YSH": 6, "CAM": 24, "LAO": 17, "VIN": 63,
+                                   "LHJ": 1, "ABY": 1, "SHW": 1, "HDM": 1, "MHA": 1,
+                                   "WDN": 0, "EDN": 0, "YUK": 1, "NWT": 2}.items():
+                    self.assertEqual(sum(owner == tag for owner in owners.values()), count, tag)
+                for tag in ("DEE", "TRH", "CIH", "MLN", "GEM", "GLG", "YSH", "LHJ", "ABY",
+                            "SHW", "HDM", "MHA", "YUK", "GGY", "JEY", "IOM", "SUB", "NTR", "CAM", "LAO"):
+                    hint = cities["capital_city_hints"][tag]
+                    self.assertEqual(owners[hint["host_feature_id"]], tag)
+                    self.assertEqual(cities["capitals_by_tag"][tag], hint["city_id"])
+                for tag in ("WDN", "EDN", "NWT", "HRD", "AAT", "ROS", "QML", "ATA"):
+                    self.assertNotIn(tag, cities["capitals_by_tag"])
+                    if tag in countries:
+                        self.assertEqual(cities["capital_city_hints"][tag]["resolution_method"], "no_capital")
+                        self.assertFalse(cities["capital_city_hints"][tag]["city_id"])
+                self.assertEqual(cities["capital_city_hints"]["AST"]["host_feature_id"], "AU_ADM1_AUS-2653")
+                self.assertEqual(countries["AAT"]["parent_owner_tag"], "ENG" if scenario == "hoi4_1936" else "AST")
+                self.assertEqual(owners["AQ_QML"], "ATA" if scenario == "hoi4_1936" else "QML")
+                self.assertEqual(countries["ALK"]["subject_kind"], "territory")
+                self.assertEqual(countries["HAW"]["subject_kind"], "territory")
 
 
 if __name__ == "__main__":

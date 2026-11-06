@@ -1,5 +1,46 @@
 {
   "countries": {
+    "AAT": {
+      "base_iso2": "AQ",
+      "capital_state_id": null,
+      "color_hex": "#c68b91",
+      "continent_id": "continent_antarctica",
+      "continent_label": "Antarctica",
+      "controller_feature_count": 2,
+      "display_name": "Australian Antarctic Territory",
+      "display_name_en": "Australian Antarctic Territory",
+      "display_name_zh": "澳大利亚南极领地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AQ",
+      "notes": "Claim/administrative approximation; Australian transfer effective 24 August 1936. No permanent capital.",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "batch7_aat_hoi4_1936",
+      "provenance_iso2": "AQ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_aat_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_antarctica",
+      "subregion_label": "Antarctica",
+      "synthetic_owner": false,
+      "tag": "AAT"
+    },
     "ABD": {
       "base_iso2": "AE",
       "capital_state_id": null,
@@ -40,6 +81,47 @@
       "subregion_label": "Western Asia",
       "synthetic_owner": false,
       "tag": "ABD"
+    },
+    "ABY": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#ce7185",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Abyan States Debug Region",
+      "display_name_en": "Abyan States Debug Region",
+      "display_name_zh": "阿比扬诸邦调试区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel.",
+      "parent_owner_tag": "WDN",
+      "parent_owner_tags": [
+        "WDN"
+      ],
+      "primary_rule_source": "batch7_aby",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_aby"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "ABY"
     },
     "AEF": {
       "base_iso2": "TD",
@@ -347,7 +429,8 @@
       "provenance_iso2": "US",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "alaska"
+        "alaska",
+        "batch7_alk"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -355,7 +438,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "colony",
+      "subject_kind": "territory",
       "subregion_id": "subregion_northern_america",
       "subregion_label": "Northern America",
       "synthetic_owner": false,
@@ -567,12 +650,12 @@
       "color_hex": "#de4563",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
-      "controller_feature_count": 12,
+      "controller_feature_count": 10,
       "display_name": "Commonwealth of Australia",
       "display_name_en": "Commonwealth of Australia",
       "display_name_zh": "澳大利亚联邦",
       "entry_kind": "scenario_subject",
-      "feature_count": 12,
+      "feature_count": 10,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -602,6 +685,45 @@
       "subregion_label": "Melanesia",
       "synthetic_owner": false,
       "tag": "AST"
+    },
+    "ATA": {
+      "base_iso2": "AQ",
+      "capital_state_id": null,
+      "color_hex": "#b9c2cc",
+      "continent_id": "continent_antarctica",
+      "continent_label": "Antarctica",
+      "controller_feature_count": 3,
+      "display_name": "Unclaimed Antarctic Debug Region",
+      "display_name_en": "Unclaimed Antarctic Debug Region",
+      "display_name_zh": "南极未主张调试区",
+      "entry_kind": "",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AQ",
+      "notes": "Neutral debug grouping; no parent or permanent capital.",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "batch7_ata_hoi4_1936",
+      "provenance_iso2": "AQ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_ata_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_antarctica",
+      "subregion_label": "Antarctica",
+      "synthetic_owner": false,
+      "tag": "ATA"
     },
     "AUS": {
       "base_iso2": "AT",
@@ -1528,18 +1650,59 @@
       "synthetic_owner": false,
       "tag": "CAB"
     },
+    "CAM": {
+      "base_iso2": "KH",
+      "capital_state_id": null,
+      "color_hex": "#687caf",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 24,
+      "display_name": "Protectorate of Cambodia",
+      "display_name_en": "Protectorate of Cambodia",
+      "display_name_zh": "柬埔寨保护国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 24,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "KH",
+      "notes": "",
+      "parent_owner_tag": "VIN",
+      "parent_owner_tags": [
+        "VIN"
+      ],
+      "primary_rule_source": "batch7_cam",
+      "provenance_iso2": "KH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_cam"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CAM"
+    },
     "CAN": {
       "base_iso2": "CA",
       "capital_state_id": 276,
       "color_hex": "#e93b3b",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 273,
+      "controller_feature_count": 270,
       "display_name": "Dominion of Canada",
       "display_name_en": "Dominion of Canada",
       "display_name_zh": "加拿大自治领",
       "entry_kind": "",
-      "feature_count": 273,
+      "feature_count": 270,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -1592,7 +1755,8 @@
       "provenance_iso2": "GF",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "cay_colony"
+        "cay_colony",
+        "cay_family_colour_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -1975,6 +2139,47 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "CHU"
+    },
+    "CIH": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#445183",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Cheli Pacification Commission",
+      "display_name_en": "Cheli Pacification Commission",
+      "display_name_zh": "车里宣慰司",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor.",
+      "parent_owner_tag": "YUN",
+      "parent_owner_tags": [
+        "YUN"
+      ],
+      "primary_rule_source": "batch7_cih",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_cih"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "tusi",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CIH"
     },
     "COC": {
       "base_iso2": "IN",
@@ -2496,6 +2701,47 @@
       "synthetic_owner": false,
       "tag": "DAG"
     },
+    "DEE": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#405a89",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Derge Chiefdom",
+      "display_name_en": "Derge Chiefdom",
+      "display_name_zh": "德格土司",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor.",
+      "parent_owner_tag": "SIC",
+      "parent_owner_tags": [
+        "SIC"
+      ],
+      "primary_rule_source": "batch7_dee",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_dee"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "tusi",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "DEE"
+    },
     "DEN": {
       "base_iso2": "DK",
       "capital_state_id": 37,
@@ -2816,12 +3062,12 @@
       "color_hex": "#e3576b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 2,
+      "controller_feature_count": 0,
       "display_name": "Eastern Aden Protectorate Debug Region",
       "display_name_en": "Eastern Aden Protectorate Debug Region",
       "display_name_zh": "东亚丁保护地调试分区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 2,
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -2978,12 +3224,12 @@
       "color_hex": "#c9385d",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 507,
+      "controller_feature_count": 493,
       "display_name": "United Kingdom of Great Britain and Northern Ireland",
       "display_name_en": "United Kingdom of Great Britain and Northern Ireland",
       "display_name_zh": "大不列颠及北爱尔兰联合王国",
       "entry_kind": "",
-      "feature_count": 507,
+      "feature_count": 493,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3215,19 +3461,19 @@
       "color_hex": "#d4405a",
       "continent_id": "continent_south_america",
       "continent_label": "South America",
-      "controller_feature_count": 2,
+      "controller_feature_count": 6,
       "display_name": "Falkland Islands",
       "display_name_en": "Falkland Islands",
       "display_name_zh": "福克兰群岛",
       "entry_kind": "scenario_subject",
-      "feature_count": 2,
+      "feature_count": 6,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "FK",
-      "notes": "",
+      "notes": "Includes Falkland Islands Dependencies Antarctic claims, approximated by existing sectors; not a statement of international recognition.",
       "parent_owner_tag": "ENG",
       "parent_owner_tags": [
         "ENG"
@@ -3236,7 +3482,8 @@
       "provenance_iso2": "FK",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "falklands_hoi4_1936"
+        "falklands_hoi4_1936",
+        "batch7_falkland_dependencies"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3480,7 +3727,8 @@
       "provenance_iso2": "GP",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "gdl_colony"
+        "gdl_colony",
+        "gdl_family_colour_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3493,6 +3741,47 @@
       "subregion_label": "",
       "synthetic_owner": false,
       "tag": "GDL"
+    },
+    "GEM": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#71638f",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Gengma Pacification Commission",
+      "display_name_en": "Gengma Pacification Commission",
+      "display_name_zh": "耿马宣抚司",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor.",
+      "parent_owner_tag": "YUN",
+      "parent_owner_tags": [
+        "YUN"
+      ],
+      "primary_rule_source": "batch7_gem",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_gem"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "tusi",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "GEM"
     },
     "GER": {
       "base_iso2": "DE",
@@ -3532,6 +3821,47 @@
       "subregion_label": "Western Europe",
       "synthetic_owner": false,
       "tag": "GER"
+    },
+    "GGY": {
+      "base_iso2": "GG",
+      "capital_state_id": null,
+      "color_hex": "#ce6379",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 1,
+      "display_name": "Bailiwick of Guernsey",
+      "display_name_en": "Bailiwick of Guernsey",
+      "display_name_zh": "根西王室属地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GG",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "batch7_ggy",
+      "provenance_iso2": "GG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_ggy"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "crown_dependency",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "GGY"
     },
     "GLD": {
       "base_iso2": "GH",
@@ -3574,6 +3904,47 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "GLD"
+    },
+    "GLG": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#82894b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 6,
+      "display_name": "Golok Tribes Debug Region",
+      "display_name_en": "Golok Tribes Debug Region",
+      "display_name_zh": "果洛诸部调试区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Modern county boundaries approximate the regional grouping. Maqin/Dawu is a debug anchor, not the historical capital of a unified polity; the parent denotes regional organization, not complete control.",
+      "parent_owner_tag": "QMA",
+      "parent_owner_tags": [
+        "QMA"
+      ],
+      "primary_rule_source": "batch7_glg",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_glg"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "GLG"
     },
     "GMA": {
       "base_iso2": "CN",
@@ -4038,7 +4409,8 @@
       "provenance_iso2": "US",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "hawaii"
+        "hawaii",
+        "batch7_haw"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -4046,7 +4418,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "colony",
+      "subject_kind": "territory",
       "subregion_id": "subregion_northern_america",
       "subregion_label": "Northern America",
       "synthetic_owner": false,
@@ -4090,6 +4462,47 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "HBC"
+    },
+    "HDM": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#d88b9d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Hadramawt States Debug Region",
+      "display_name_en": "Hadramawt States Debug Region",
+      "display_name_zh": "哈德拉毛诸邦调试区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel.",
+      "parent_owner_tag": "EDN",
+      "parent_owner_tags": [
+        "EDN"
+      ],
+      "primary_rule_source": "batch7_hdm",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_hdm"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "HDM"
     },
     "HKG": {
       "base_iso2": "HK",
@@ -4246,6 +4659,47 @@
       "subregion_label": "Central America",
       "synthetic_owner": false,
       "tag": "HON"
+    },
+    "HRD": {
+      "base_iso2": "HM",
+      "capital_state_id": null,
+      "color_hex": "#aa526a",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Heard Island and McDonald Islands",
+      "display_name_en": "Heard Island and McDonald Islands",
+      "display_name_zh": "赫德岛与麦克唐纳群岛",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "HM",
+      "notes": "British dependency before transfer to Australia; uninhabited, no capital.",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "batch7_hrd",
+      "provenance_iso2": "HM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_hrd"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "synthetic_owner": false,
+      "tag": "HRD"
     },
     "HSL": {
       "base_iso2": "SL",
@@ -4860,6 +5314,47 @@
       "synthetic_owner": false,
       "tag": "INS"
     },
+    "IOM": {
+      "base_iso2": "IM",
+      "capital_state_id": null,
+      "color_hex": "#de8b9d",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 1,
+      "display_name": "Isle of Man",
+      "display_name_en": "Isle of Man",
+      "display_name_zh": "马恩岛王室属地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IM",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "batch7_iom",
+      "provenance_iso2": "IM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_iom"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "crown_dependency",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "IOM"
+    },
     "IPA": {
       "base_iso2": "IN",
       "capital_state_id": null,
@@ -5219,6 +5714,47 @@
       "subregion_label": "Western Asia",
       "synthetic_owner": false,
       "tag": "JEB"
+    },
+    "JEY": {
+      "base_iso2": "JE",
+      "capital_state_id": null,
+      "color_hex": "#b94a68",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 1,
+      "display_name": "Bailiwick of Jersey",
+      "display_name_en": "Bailiwick of Jersey",
+      "display_name_zh": "泽西王室属地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "JE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "batch7_jey",
+      "provenance_iso2": "JE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_jey"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "crown_dependency",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "JEY"
     },
     "JOH": {
       "base_iso2": "MY",
@@ -6247,6 +6783,47 @@
       "synthetic_owner": false,
       "tag": "KYR"
     },
+    "LAO": {
+      "base_iso2": "LA",
+      "capital_state_id": null,
+      "color_hex": "#8596c4",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 17,
+      "display_name": "Protectorate of Laos",
+      "display_name_en": "Protectorate of Laos",
+      "display_name_zh": "老挝保护国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 17,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "LA",
+      "notes": "",
+      "parent_owner_tag": "VIN",
+      "parent_owner_tags": [
+        "VIN"
+      ],
+      "primary_rule_source": "batch7_lao",
+      "provenance_iso2": "LA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_lao"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "LAO"
+    },
     "LAT": {
       "base_iso2": "LV",
       "capital_state_id": 808,
@@ -6367,6 +6944,47 @@
       "subregion_label": "Western Asia",
       "synthetic_owner": false,
       "tag": "LEB"
+    },
+    "LHJ": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#bd536a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Lahij and Western States",
+      "display_name_en": "Lahij and Western States",
+      "display_name_zh": "拉赫季及西部诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel.",
+      "parent_owner_tag": "WDN",
+      "parent_owner_tags": [
+        "WDN"
+      ],
+      "primary_rule_source": "batch7_lhj",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_lhj"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "LHJ"
     },
     "LIB": {
       "base_iso2": "LR",
@@ -6688,19 +7306,19 @@
       "color_hex": "#3887fb",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 27,
+      "controller_feature_count": 28,
       "display_name": "Colony of Madagascar and Dependencies",
       "display_name_en": "Colony of Madagascar and Dependencies",
       "display_name_zh": "马达加斯加及附属地殖民地",
       "entry_kind": "scenario_subject",
-      "feature_count": 27,
+      "feature_count": 28,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "MG",
-      "notes": "Madagascar represented as a separate French colony.",
+      "notes": "Includes Adelie Land, administered through Madagascar; Antarctic claim approximation.",
       "parent_owner_tag": "FRA",
       "parent_owner_tags": [
         "FRA"
@@ -6711,7 +7329,8 @@
       "rule_sources": [
         "madagascar_colony",
         "madagascar_dependencies",
-        "mayotte_madagascar_dependency"
+        "mayotte_madagascar_dependency",
+        "batch7_adelie"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -6968,6 +7587,47 @@
       "synthetic_owner": false,
       "tag": "MEX"
     },
+    "MHA": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#b7617c",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Mahra Sultanate",
+      "display_name_en": "Mahra Sultanate",
+      "display_name_zh": "马赫拉苏丹国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel.",
+      "parent_owner_tag": "EDN",
+      "parent_owner_tags": [
+        "EDN"
+      ],
+      "primary_rule_source": "batch7_mha",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_mha"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
       "base_iso2": "MV",
       "capital_state_id": 281,
@@ -7045,6 +7705,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "MLK"
+    },
+    "MLN": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#6976a5",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Menglian Pacification Commission",
+      "display_name_en": "Menglian Pacification Commission",
+      "display_name_zh": "孟连宣抚司",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor.",
+      "parent_owner_tag": "YUN",
+      "parent_owner_tags": [
+        "YUN"
+      ],
+      "primary_rule_source": "batch7_mln",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_mln"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "tusi",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "MLN"
     },
     "MLT": {
       "base_iso2": "MT",
@@ -7317,7 +8018,8 @@
       "provenance_iso2": "MQ",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "mtq_colony"
+        "mtq_colony",
+        "mtq_family_colour_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -7937,6 +8639,47 @@
       "synthetic_owner": false,
       "tag": "NRH"
     },
+    "NTR": {
+      "base_iso2": "AU",
+      "capital_state_id": null,
+      "color_hex": "#b88269",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 1,
+      "display_name": "Northern Territory",
+      "display_name_en": "Northern Territory",
+      "display_name_zh": "北领地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AU",
+      "notes": "",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "batch7_ntr",
+      "provenance_iso2": "AU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_ntr"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "synthetic_owner": false,
+      "tag": "NTR"
+    },
     "NWA": {
       "base_iso2": "CN",
       "capital_state_id": null,
@@ -7977,6 +8720,47 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "NWA"
+    },
+    "NWT": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#a44b62",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 2,
+      "display_name": "Northwest Territories",
+      "display_name_en": "Northwest Territories",
+      "display_name_zh": "西北领地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "Administered from Ottawa, outside the territory; no in-territory capital. Includes modern Nunavut.",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "batch7_nwt",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_nwt"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "NWT"
     },
     "NYS": {
       "base_iso2": "MW",
@@ -8279,7 +9063,8 @@
       "provenance_iso2": "PA",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "panama_canal_zone"
+        "panama_canal_zone",
+        "pcz_family_colour_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -8700,12 +9485,12 @@
       "color_hex": "#6f8e4a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 41,
+      "controller_feature_count": 29,
       "display_name": "Qinghai Ma Clique",
       "display_name_en": "Qinghai Ma Clique",
       "display_name_zh": "青海马家军",
       "entry_kind": "",
-      "feature_count": 41,
+      "feature_count": 29,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -9062,6 +9847,47 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "ROM"
+    },
+    "ROS": {
+      "base_iso2": "AQ",
+      "capital_state_id": null,
+      "color_hex": "#b98a95",
+      "continent_id": "continent_antarctica",
+      "continent_label": "Antarctica",
+      "controller_feature_count": 1,
+      "display_name": "Ross Dependency",
+      "display_name_en": "Ross Dependency",
+      "display_name_zh": "罗斯属地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AQ",
+      "notes": "New Zealand-administered claim since 1923; no permanent capital.",
+      "parent_owner_tag": "NZL",
+      "parent_owner_tags": [
+        "NZL"
+      ],
+      "primary_rule_source": "batch7_ros",
+      "provenance_iso2": "AQ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_ros"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_antarctica",
+      "subregion_label": "Antarctica",
+      "synthetic_owner": false,
+      "tag": "ROS"
     },
     "RUA": {
       "base_iso2": "BI",
@@ -9430,6 +10256,47 @@
       "synthetic_owner": false,
       "tag": "SHM"
     },
+    "SHW": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#a84161",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Shabwah States Debug Region",
+      "display_name_en": "Shabwah States Debug Region",
+      "display_name_zh": "沙卜瓦诸邦调试区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel.",
+      "parent_owner_tag": "WDN",
+      "parent_owner_tags": [
+        "WDN"
+      ],
+      "primary_rule_source": "batch7_shw",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_shw"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "SHW"
+    },
     "SHX": {
       "base_iso2": "CN",
       "capital_state_id": 615,
@@ -9513,12 +10380,12 @@
       "color_hex": "#2f42a9",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 17,
+      "controller_feature_count": 13,
       "display_name": "Xikang Provincial Preparatory Committee",
       "display_name_en": "Xikang Provincial Preparatory Committee",
       "display_name_zh": "西康建省委员会",
       "entry_kind": "scenario_subject",
-      "feature_count": 17,
+      "feature_count": 13,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -10243,6 +11110,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "STR"
+    },
+    "SUB": {
+      "base_iso2": "PH",
+      "capital_state_id": null,
+      "color_hex": "#657fa9",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Subic Naval Reservation",
+      "display_name_en": "Subic Naval Reservation",
+      "display_name_zh": "苏比克海军保留地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PH",
+      "notes": "Olongapo is the naval administration anchor.",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "batch7_sub",
+      "provenance_iso2": "PH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_sub"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "SUB"
     },
     "SUD": {
       "base_iso2": "SD",
@@ -11056,6 +11964,47 @@
       "synthetic_owner": false,
       "tag": "TPA"
     },
+    "TRH": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#607aa4",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Hor Chiefdoms Debug Region",
+      "display_name_en": "Hor Chiefdoms Debug Region",
+      "display_name_zh": "霍尔诸部调试区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor.",
+      "parent_owner_tag": "SIC",
+      "parent_owner_tags": [
+        "SIC"
+      ],
+      "primary_rule_source": "batch7_trh",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_trh"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "tusi",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "TRH"
+    },
     "TRI": {
       "base_iso2": "TT",
       "capital_state_id": null,
@@ -11506,12 +12455,12 @@
       "color_hex": "#1485ed",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 818,
+      "controller_feature_count": 817,
       "display_name": "United States of America",
       "display_name_en": "United States of America",
       "display_name_zh": "美利坚合众国",
       "entry_kind": "",
-      "feature_count": 818,
+      "feature_count": 817,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -11623,12 +12572,12 @@
       "color_hex": "#1a5fd4",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 104,
+      "controller_feature_count": 63,
       "display_name": "French Indochina",
       "display_name_en": "French Indochina",
       "display_name_zh": "法属印度支那联邦",
       "entry_kind": "scenario_subject",
-      "feature_count": 104,
+      "feature_count": 63,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -11664,12 +12613,12 @@
       "color_hex": "#c42a5e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 3,
+      "controller_feature_count": 0,
       "display_name": "Western Aden Protectorate Debug Region",
       "display_name_en": "Western Aden Protectorate Debug Region",
       "display_name_zh": "西亚丁保护地调试分区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 3,
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -11939,6 +12888,47 @@
       "synthetic_owner": false,
       "tag": "YOG"
     },
+    "YSH": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#a1a969",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 6,
+      "display_name": "Yushu Tribes Debug Region",
+      "display_name_en": "Yushu Tribes Debug Region",
+      "display_name_zh": "玉树诸部调试区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Modern county boundaries approximate the regional grouping. The marked seat is a reviewed administrative/debug anchor.",
+      "parent_owner_tag": "QMA",
+      "parent_owner_tags": [
+        "QMA"
+      ],
+      "primary_rule_source": "batch7_ysh",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_ysh"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "YSH"
+    },
     "YUE": {
       "base_iso2": "CN",
       "capital_state_id": null,
@@ -12018,18 +13008,59 @@
       "synthetic_owner": false,
       "tag": "YUG"
     },
+    "YUK": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#c96a79",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Yukon Territory",
+      "display_name_en": "Yukon Territory",
+      "display_name_zh": "育空领地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "Dawson is the territorial capital.",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "batch7_yuk",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "batch7_yuk"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "YUK"
+    },
     "YUN": {
       "base_iso2": "CN",
       "capital_state_id": 325,
       "color_hex": "#2a267a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 126,
+      "controller_feature_count": 121,
       "display_name": "Yunnan Provincial Government - Long Yun",
       "display_name_en": "Yunnan Provincial Government - Long Yun",
       "display_name_zh": "云南省政府（龙云）",
       "entry_kind": "scenario_subject",
-      "feature_count": 126,
+      "feature_count": 121,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [

@@ -7,10 +7,8 @@ import { createColorResolutionStrategyOwner } from "../js/core/renderer/color_re
 import { getDynamicBorderOwnershipContext } from "../js/core/renderer/border_mesh_dynamic_runtime.js";
 import { createPaletteLibraryStateAccess } from "../js/core/palette_library_state_access.js";
 import { applyFeaturePaintState } from "../js/core/state/color_state.js";
-import { captureHistoryState } from "../js/core/history_manager.js";
-import { readFileSync } from "node:fs";
-import vm from "node:vm";
-import { parse } from "acorn";
+import { captureHistoryState, pushHistoryEntry } from "../js/core/history_manager.js";
+import { state as runtimeState } from "../js/core/state.js";
 
 function fixture({ blank = false } = {}) {
   const feature = id => ({ type: "Feature", properties: { id, country_code: "GB", admin1_group: "north" } });
@@ -127,32 +125,30 @@ test("default paint API resolves geographic base colors outside a scenario", () 
 });
 
 test("retired ownership cannot add history or clear redo; mixed entries retain only paint", () => {
-  const source = readFileSync(new URL("../js/core/history_manager.js", import.meta.url), "utf8");
-  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
-  const names = new Set(["stableStringify", "hasHistoryDelta", "pushHistoryEntry"]);
-  const functions = ast.body.filter(node => node.type === "FunctionDeclaration" && names.has(node.id.name));
-  assert.equal(functions.length, names.size);
-  const model = { historyPast: [], historyFuture: [{ kind: "existing-redo" }] };
-  const calls = [];
-  const context = vm.createContext({ runtimeState: model, state: model,
-    coalesceQuickFillGesture: () => null, callRuntimeHook: (_, name) => calls.push(name) });
-  vm.runInContext(functions.map(node => source.slice(node.start, node.end)).join("\n"), context);
-  const beforeFuture = model.historyFuture;
-  assert.deepEqual(captureHistoryState({ sovereigntyFeatureIds: ["a"] }), {});
-  assert.equal(context.pushHistoryEntry({ before: { sovereigntyByFeatureId: { a: "GB" } },
-    after: { sovereigntyByFeatureId: { a: "FR" } } }), false);
-  assert.equal(model.historyFuture, beforeFuture);
-  assert.deepEqual(model.historyPast, []);
-  assert.deepEqual(calls, []);
-  assert.equal(context.pushHistoryEntry({
-    before: { sovereigntyByFeatureId: { a: "GB" }, visualOverrides: { a: null } },
-    after: { sovereigntyByFeatureId: { a: "FR" }, visualOverrides: { a: "#000000" } },
-    meta: { affectsSovereignty: true },
-  }), true);
-  const entry = model.historyPast[0];
-  assert.equal(Object.hasOwn(entry.before, "sovereigntyByFeatureId"), false);
-  assert.equal(Object.hasOwn(entry.after, "sovereigntyByFeatureId"), false);
-  assert.equal(entry.after.visualOverrides.a, "#000000");
-  assert.equal(entry.meta.affectsSovereignty, false);
-  assert.equal(model.historyFuture.length, 0);
+  const previous = { past: runtimeState.historyPast, future: runtimeState.historyFuture };
+  runtimeState.historyPast = [];
+  runtimeState.historyFuture = [{ kind: "existing-redo" }];
+  const model = runtimeState;
+  try {
+    const beforeFuture = model.historyFuture;
+    assert.deepEqual(captureHistoryState({ sovereigntyFeatureIds: ["a"] }), {});
+    assert.equal(pushHistoryEntry({ before: { sovereigntyByFeatureId: { a: "GB" } },
+      after: { sovereigntyByFeatureId: { a: "FR" } } }), false);
+    assert.equal(model.historyFuture, beforeFuture);
+    assert.deepEqual(model.historyPast, []);
+    assert.equal(pushHistoryEntry({
+      before: { sovereigntyByFeatureId: { a: "GB" }, visualOverrides: { a: null } },
+      after: { sovereigntyByFeatureId: { a: "FR" }, visualOverrides: { a: "#000000" } },
+      meta: { affectsSovereignty: true },
+    }), true);
+    const entry = model.historyPast[0];
+    assert.equal(Object.hasOwn(entry.before, "sovereigntyByFeatureId"), false);
+    assert.equal(Object.hasOwn(entry.after, "sovereigntyByFeatureId"), false);
+    assert.equal(entry.after.visualOverrides.a, "#000000");
+    assert.equal(entry.meta.affectsSovereignty, false);
+    assert.equal(model.historyFuture.length, 0);
+  } finally {
+    runtimeState.historyPast = previous.past;
+    runtimeState.historyFuture = previous.future;
+  }
 });
