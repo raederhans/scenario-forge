@@ -421,10 +421,11 @@ test("help menu retains actions, supports arrows and Escape, and opens shortcuts
   trigger.click();
   assert.equal(menu.hidden, false);
   assert.equal(trigger.getAttribute("aria-expanded"), "true");
-  assert.equal(h.documentRef.activeElement, h.get("scenarioGuideBtn"));
+  assert.equal(h.documentRef.activeElement, h.get("editorKeyboardShortcutsBtn"));
+  assert.notEqual(h.get("scenarioGuideBtn").parentNode, menu);
   const press = (key) => trigger.parentNode.dispatchEvent({ type: "keydown", key, preventDefault() {}, stopPropagation() {} });
   press("ArrowDown");
-  assert.equal(h.documentRef.activeElement, h.get("editorKeyboardShortcutsBtn"));
+  assert.equal(h.documentRef.activeElement, h.get("editorCommandPaletteBtn"));
   press("Escape");
   assert.equal(menu.hidden, true);
   assert.equal(h.documentRef.activeElement, trigger);

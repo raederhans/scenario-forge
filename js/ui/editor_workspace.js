@@ -588,12 +588,11 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   const helpPath = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
   for (const [name, value] of Object.entries({ d: "M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0ZM9 9a3 3 0 0 1 6 0c0 2-3 2-3 5m0 3v.1", stroke: "currentColor", "stroke-width": "1.6", "stroke-linecap": "round", "stroke-linejoin": "round" })) helpPath.setAttribute(name, value);
   helpIcon.append(helpPath);
-  helpButton.append(helpIcon, make("span", "", "Help"));
-  const guide = move("scenarioGuideBtn", helpMenu);
-  if (guide) {
-    guide.dataset.i18n = "User guide";
-    guide.textContent = t("User guide", "ui");
-  }
+  helpButton.append(helpIcon);
+  // 指南仍是顶栏上可见的独立按钮（指南弹层关闭时焦点要回到它）；帮助菜单只放快捷键、命令面板和 GitHub。
+  helpButton.setAttribute("aria-label", t("Help", "ui"));
+  helpButton.dataset.i18nAriaLabel = "Help";
+  helpButton.title = t("Help", "ui");
   const openPalette = (query) => { closeHelp(true); commandPalette.open(query); };
   helpMenu.append(button("Keyboard shortcuts", "editorKeyboardShortcutsBtn", () => openPalette("?")));
   const paletteButton = button("", "editorCommandPaletteBtn", () => openPalette(""));
@@ -632,6 +631,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   });
   documentRef.addEventListener("click", (event) => { if (!help.contains(event.target)) closeHelp(); });
   help.append(helpButton, helpMenu);
+  move("scenarioGuideBtn", topActions);
   topActions.append(help);
   for (const id of ["btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
   const strategyBtn = button("Edit annotations", "editorStrategicModeBtn", () => {
