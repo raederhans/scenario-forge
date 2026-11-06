@@ -15,6 +15,7 @@ class Element {
     this.hidden = false;
     this.scrollTop = 0;
     this.textContent = "";
+    this.value = "";
     this.classList = {
       contains: (name) => this.className.split(/\s+/).includes(name),
       add: (name) => { if (!this.classList.contains(name)) this.className += ` ${name}`; },
@@ -49,6 +50,12 @@ class Element {
     if (!this.listeners.has(name)) this.listeners.set(name, []);
     this.listeners.get(name).push(callback);
   }
+  closest(selector) { return this.matches(selector) ? this : this.parentNode?.closest(selector) || null; }
+  dispatchEvent(event) {
+    for (const callback of this.listeners.get(event.type) || []) callback(event);
+    if (event.bubbles) this.parentNode?.dispatchEvent(event);
+    return true;
+  }
   click() { for (const callback of this.listeners.get("click") || []) callback({ target: this }); }
   focus(options) { this.ownerDocument.activeElement = this; this.focusOptions = options; }
   matches(selector) {
@@ -81,6 +88,7 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   const add = (id, parent = documentRef.body, tag = "div") => {
     const node = new Element(tag);
     node.id = id;
+    node.ownerDocument = documentRef;
     parent.append(node);
     return node;
   };
@@ -98,17 +106,29 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
     if (sectionId === "countryInspectorSection") add("countryList", section);
   }
   const panels = [];
-  for (const key of ["borders", "cities"]) {
+  for (const key of ["borders", "physical", "urban", "citypoints", "transport", "presets", "ocean", "thematic", "daynight", "texture", "rivers"]) {
     const trigger = add(`layer-${key}`, left, "button");
-    trigger.setAttribute("data-appearance-tab", key);
+    const content = ["ocean", "thematic", "daynight", "texture", "rivers"].includes(key);
+    trigger.setAttribute(content ? "data-map-content-tab" : "data-appearance-tab", key);
     trigger.setAttribute("role", "tab");
     trigger.textContent = key;
     const panel = add(`panel-${key}`, right);
-    panel.setAttribute("data-appearance-panel", key);
+    panel.setAttribute(content ? "data-map-content-panel" : "data-appearance-panel", key);
     panels.push(panel);
     trigger.addEventListener("click", () => {
       for (const item of panels) item.hidden = item !== panel;
     });
+  }
+  const qualityRow = add("qualityRow", documentRef.getElementById("panel-borders"));
+  qualityRow.className = "border-control-row";
+  add("displayQuality", qualityRow, "select");
+  const experiment = add("experiment", documentRef.getElementById("panel-borders"), "details");
+  add("politicalRenderMode", experiment, "select");
+  add("specialZonePopover", right);
+  add("legendProjectSection", right, "details");
+  add("transportProjectSection", left, "details");
+  for (const id of ["togglePhysical", "toggleUrban", "toggleCityPoints", "toggleRivers", "dayNightEnabled", "transportAppearanceMasterToggle", "scenarioSpecialRegionVisibilityToggle"]) {
+    add(id, right, "input").checked = true;
   }
   add("projectSidebarPanel", right);
   add("frontlineProjectSection", right, "details");
@@ -243,14 +263,14 @@ test("segment clicks start at the first property and restore each segment's last
   const countryDetail = h.get("countryInspectorDetail");
   h.get("editorSegmentLayers").click();
   expectProperty(h, "data-appearance-panel-borders", "Layers");
-  h.get("layer-cities").click();
+  h.get("layer-citypoints").click();
   h.get("editorSegmentInspector").click();
   expectProperty(h, "countries", "Inspector");
   assert.equal(h.get("countryInspectorDetail"), countryDetail);
   h.workspace.showProperty("water");
   h.get("editorSegmentLayers").click();
-  expectProperty(h, "data-appearance-panel-cities", "Layers");
-  assert.equal(h.get("panel-cities").hidden, false);
+  expectProperty(h, "data-appearance-panel-citypoints", "Layers");
+  assert.equal(h.get("panel-citypoints").hidden, false);
   h.get("editorSegmentInspector").click();
   expectProperty(h, "water", "Inspector");
   h.workspace.showProperty("project");
@@ -261,8 +281,8 @@ test("segment clicks start at the first property and restore each segment's last
 
 for (const [section, key, segment] of [
   ["countries", "countries", "Inspector"],
-  ["data-appearance-panel-cities", "data-appearance-panel-cities", "Layers"],
-  ["panel-cities", "data-appearance-panel-cities", "Layers"],
+  ["data-appearance-panel-citypoints", "data-appearance-panel-citypoints", "Layers"],
+  ["panel-citypoints", "data-appearance-panel-citypoints", "Layers"],
   ["project", "project", null],
 ]) {
   test(`section deep link ${section} opens the matching property and segment`, (context) => {
@@ -326,4 +346,64 @@ test("reference deep link selects Layers and reference settings", (context) => {
   expectProperty(h, "reference", "Layers");
   assert.equal(h.get("leftSidebarContent").dataset.editorTask, "layers");
   assert.equal(h.get("editorLayer-reference").getAttribute("aria-pressed"), "true");
+});
+
+
+test("layer groups follow map order and display moves existing controls", (context) => {
+  const h = mount(context);
+  const groups = h.get("editorTask-layers").querySelectorAll(".editor-layer-group");
+  assert.deepEqual(groups.map((g) => g.querySelector(".editor-group-heading").textContent), ["Political & borders", "Geography", "Settlements & transport", "Data & annotations", "Map appearance"]);
+  assert.deepEqual(groups.map((g) => g.querySelectorAll(".editor-layer-row").map((r) => r.dataset.layerKey)), [
+    ["borders", "special-zones"], ["ocean", "physical", "rivers"], ["urban", "citypoints", "transport"],
+    ["thematic", "annotations", "legend"], ["presets", "daynight", "texture", "reference", "display"],
+  ]);
+  assert.equal(h.get("transportProjectSection").parentNode, groups[2]);
+  h.get("editorLayer-display").click();
+  expectProperty(h, "display", "Layers");
+  assert.equal(h.get("displayQuality").parentNode, h.get("qualityRow"));
+  // 两块控件放在同一个容器里，再挂到显示与性能属性页下。
+  const displayStack = h.get("qualityRow").parentNode;
+  assert.equal(displayStack.parentNode, h.get("editorProperty-display"));
+  assert.equal(h.get("experiment").parentNode, displayStack);
+});
+
+test("visibility switches dispatch change and synchronize without navigating", (context) => {
+  const h = mount(context);
+  for (const [key, id] of Object.entries({ physical: "togglePhysical", urban: "toggleUrban", citypoints: "toggleCityPoints", rivers: "toggleRivers", daynight: "dayNightEnabled", transport: "transportAppearanceMasterToggle", "special-zones": "scenarioSpecialRegionVisibilityToggle" })) {
+    const row = h.get("editorTask-layers").querySelectorAll(".editor-layer-row").find((r) => r.dataset.layerKey === key);
+    const toggle = row.querySelector(".editor-layer-visibility");
+    const checkbox = h.get(id);
+    let changes = 0;
+    checkbox.addEventListener("change", (event) => { changes++; assert.equal(event.bubbles, true); });
+    toggle.click();
+    assert.equal(checkbox.checked, false);
+    assert.equal(changes, 1);
+    assert.equal(toggle.getAttribute("aria-pressed"), "false");
+    assert.equal(toggle.dataset.uiIcon, "eye-off");
+    assert.equal(h.right.dataset.editorContext, "countries");
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+    assert.equal(toggle.getAttribute("aria-pressed"), "true");
+    checkbox.checked = false;
+    h.workspace.selectTask("layers");
+    assert.equal(toggle.getAttribute("aria-pressed"), "false");
+  }
+});
+
+test("layer search filters groups, shows empty state, and Escape clears it", (context) => {
+  const h = mount(context);
+  const search = h.get("editorLayerSearch");
+  const rows = h.get("editorTask-layers").querySelectorAll(".editor-layer-row");
+  search.value = "physical";
+  search.dispatchEvent(new Event("input"));
+  assert.deepEqual(rows.filter((r) => !r.hidden).map((r) => r.dataset.layerKey), ["physical"]);
+  assert.equal(h.get("togglePhysical").checked, true);
+  search.value = "no matching entry";
+  search.dispatchEvent(new Event("input"));
+  assert.equal(h.get("editorLayersEmpty").hidden, false);
+  assert.equal(h.get("editorTask-layers").querySelectorAll(".editor-layer-group").every((g) => g.hidden), true);
+  for (const callback of search.listeners.get("keydown")) callback({ key: "Escape", preventDefault() {} });
+  assert.equal(search.value, "");
+  assert.equal(rows.every((r) => !r.hidden), true);
+  assert.equal(h.get("editorLayersEmpty").hidden, true);
 });

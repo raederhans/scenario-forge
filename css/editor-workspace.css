@@ -110,7 +110,7 @@
 .editor-workspace .sidebar-empty-state > button { margin-top: 12px; white-space: normal; }
 .editor-workspace .city-hierarchy-help { margin-top: 10px; font-size: var(--fs-xs); color: var(--text-secondary); }
 .editor-workspace .city-hierarchy-help > summary { cursor: pointer; min-height: 28px; align-content: center; }
-.editor-workspace details.city-hierarchy-help > summary::after { content: "▸"; transform: none; transition: none; }
+.editor-workspace details.city-hierarchy-help > summary::after { content: ""; display: inline-block; vertical-align: -2px; width: 12px; height: 12px; margin-left: 4px; background-color: currentColor; -webkit-mask: var(--icon-chevron-right) center / 12px 12px no-repeat; mask: var(--icon-chevron-right) center / 12px 12px no-repeat; transform: none; transition: none; }
 .editor-workspace details.city-hierarchy-help[open] > summary::after { transform: rotate(90deg); }
 .editor-workspace .city-hierarchy-help .city-symbol-legend { margin: 8px 0; }
 .editor-workspace .preset-library-actions { display: flex; align-items: center; gap: 12px; }
@@ -457,3 +457,120 @@
 @media (pointer: coarse) {
   .region-search-results [role="option"] { min-height: 44px; }
 }
+
+/* ── 属性页三级层级（W1）────────────────────────────────────────────
+   页标题 16/600 → 分组 13/600 墨色 + 上分隔线 → 字段 13/400 次级墨色 → 说明 12/400。
+   控件从左栏搬进右栏后，旧规则按"所在侧栏"生效；这里按层级重新定义，
+   用 #rightSidebar 前缀压过 #appearancePanelBorders、#legendProjectSection 等旧 ID 规则。 */
+.editor-workspace .editor-properties-title { font-size: var(--fs-lg); }
+
+/* 旧 ID 卡片外壳在属性页里去框，和其他属性页一样是连续纸面。 */
+#rightSidebar .editor-property-panel > :is(#legendProjectSection, #frontlineProjectSection, #transportProjectSection, #exportProjectSection) {
+  padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+
+/* 分组（静态）：上分隔线 + 标题。 */
+#rightSidebar .editor-property-panel .appearance-control-card { padding: 16px 0 20px; }
+#rightSidebar .editor-property-panel :is(.appearance-control-card-title, .appearance-prop-heading) {
+  margin: 0 0 12px; font-size: var(--fs-sm); font-weight: 600; line-height: 1.4; color: var(--ink-900);
+  letter-spacing: 0; text-transform: none;
+}
+
+/* 分组（可折叠）：去掉白框，变成带分隔线的整行，标题与静态分组同级。 */
+#rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) {
+  margin: 0; padding: 0; border: 0; border-top: 1px solid var(--line-1); border-radius: 0;
+  background: transparent; box-shadow: none; overflow: visible;
+}
+#rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  min-height: 40px; margin: 0; padding: 8px 0; border: 0; background: transparent;
+  font-size: var(--fs-sm); font-weight: 600; line-height: 1.4; color: var(--ink-900); letter-spacing: 0;
+}
+#rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) > summary:hover { color: var(--accent); }
+#rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) > summary::after { color: var(--ink-500); }
+#rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) > :not(summary) { padding: 0 0 16px; }
+
+/* 二级折叠（分组内的"高级""说明"等）：小一号、灰色、左侧缩进竖线，读得出是上一级的下属。 */
+#rightSidebar .editor-property-panel :is(details:not([data-promoted-layer-panel]), .appearance-control-card) details:not([data-promoted-layer-panel]) {
+  margin: 8px 0 0; border-top: 0; border-left: 2px solid var(--line-1); padding-left: 12px;
+}
+#rightSidebar .editor-property-panel :is(details:not([data-promoted-layer-panel]), .appearance-control-card) details:not([data-promoted-layer-panel]) > summary {
+  min-height: 32px; padding: 4px 0; font-size: var(--fs-xs); color: var(--ink-500); justify-content: flex-start;
+}
+#rightSidebar .editor-property-panel :is(details:not([data-promoted-layer-panel]), .appearance-control-card) details:not([data-promoted-layer-panel]) > summary::after { order: -1; float: none; margin: 0; }
+#rightSidebar .editor-property-panel :is(details:not([data-promoted-layer-panel]), .appearance-control-card) details:not([data-promoted-layer-panel]) > :not(summary) { padding: 4px 0 8px; }
+
+/* 字段：标签统一常规字重、次级墨色，和分组标题拉开。 */
+#rightSidebar .editor-property-panel :is(.range-label, .toggle-label, .sidebar-group-label) {
+  font-size: var(--fs-sm); font-weight: 400; line-height: 1.45; color: var(--ink-700);
+}
+#rightSidebar .editor-property-panel :is(.hint-text, .body-text, .panel-hint, .sidebar-tool-hint, .sidebar-help-copy) {
+  font-size: var(--fs-xs); font-weight: 400; line-height: 1.5; color: var(--ink-500);
+}
+
+/* 交通四族的标题行：名称 + 状态两行，与其他折叠分组同级。 */
+#rightSidebar .editor-property-panel .transport-family-summary-title { font-size: var(--fs-sm); font-weight: 600; }
+#rightSidebar .editor-property-panel .transport-family-summary-meta { font-size: var(--fs-xs); font-weight: 400; }
+
+/* 文件上传：整块可点、可拖入；原生 input 透明铺满，点击和拖放都走浏览器原生行为。 */
+.file-dropzone {
+  position: relative; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 12px 14px;
+  border: 1px dashed var(--line-2); border-radius: var(--radius-sm); background: var(--surface-raised);
+  color: var(--ink-700); font-size: var(--fs-sm); transition: border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+}
+.file-dropzone:hover, .file-dropzone:focus-within { border-color: var(--accent); background: var(--accent-soft); }
+.file-dropzone:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.file-dropzone-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.file-dropzone-icon { flex: 0 0 auto; color: var(--ink-500); }
+.file-dropzone-name { min-width: 0; color: var(--ink-900); font-weight: 500; }
+.file-dropzone:has(.file-dropzone-name:not(:empty)) .file-dropzone-prompt { display: none; }
+
+/* 行内"标签 + 控件"：标签不换行，控件吃剩余宽度。 */
+#rightSidebar .editor-property-panel .border-control-row > .range-label { flex: 0 0 auto; white-space: nowrap; }
+/* 总开关：复选框和文字贴在一起，不再被推到两端。 */
+#rightSidebar .editor-property-panel .transport-master-toggle-card { justify-content: flex-start; padding: 0; border: 0; background: none; box-shadow: none; }
+
+/* 前线标注的自定义折叠：与其他可折叠分组同一画法。 */
+#rightSidebar .editor-property-panel .strategic-accordion-section {
+  margin: 0; border: 0; border-top: 1px solid var(--line-1); border-radius: 0; background: none; box-shadow: none; overflow: visible;
+}
+#rightSidebar .editor-property-panel .strategic-accordion-header {
+  min-height: 40px; padding: 8px 0; background: none; box-shadow: none; color: var(--ink-900);
+}
+#rightSidebar .editor-property-panel .strategic-accordion-header:hover { background: none; box-shadow: none; color: var(--accent); }
+#rightSidebar .editor-property-panel .strategic-accordion-title { font-size: var(--fs-sm); font-weight: 600; }
+#rightSidebar .editor-property-panel .strategic-accordion-arrow { display: inline-flex; color: var(--ink-500); font-size: 0; }
+
+
+/* Layer navigation */
+.editor-layer-search { width: 100%; margin-bottom: var(--space-4); }
+.editor-layer-group + .editor-layer-group { margin-top: var(--space-4); }
+.editor-layer-row { display: flex; align-items: center; min-height: 36px; gap: var(--space-1); }
+.editor-layer-row[hidden], .editor-layer-group[hidden], .editor-layer-status[hidden] { display: none; }
+.editor-workspace #leftSidebar .editor-layer-trigger {
+  display: flex; align-items: center; gap: var(--space-2); flex: 1; min-width: 0;
+  height: 36px; padding: 0 var(--space-2); border: 0; border-radius: 8px;
+  background: transparent; color: var(--ink-900); text-align: left;
+  font-size: var(--fs-sm); letter-spacing: 0; box-shadow: none;
+}
+.editor-layer-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.editor-layer-trigger .ui-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--ink-500); }
+.editor-workspace #leftSidebar .editor-layer-trigger:hover { background: var(--surface-sunken); }
+.editor-workspace #leftSidebar .editor-layer-trigger.is-active { background: var(--accent-soft); color: var(--accent); }
+.editor-layer-trigger.is-active .ui-icon { color: var(--accent); }
+.editor-workspace #leftSidebar .is-layer-off .editor-layer-name { color: var(--ink-500); }
+.editor-workspace #leftSidebar .editor-layer-visibility {
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px;
+  width: 28px; height: 28px; min-height: 28px; padding: 0; border: 0;
+  border-radius: 8px; background: transparent; color: var(--ink-500); box-shadow: none;
+}
+.editor-workspace #leftSidebar .editor-layer-visibility:hover { background: var(--surface-sunken); }
+.editor-layer-status { width: 6px; height: 6px; flex-shrink: 0; border-radius: var(--radius-pill); background: var(--ink-400); }
+.editor-layer-status[data-status-tone="active"] { background: var(--success); }
+.editor-layer-status[data-status-tone="warning"] { background: var(--warning); }
+.editor-workspace #leftSidebar .editor-layer-secondary { margin: var(--space-1) 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.editor-layer-secondary > summary, .editor-layer-secondary > .sidebar-section-description { display: none; }
+.editor-workspace #leftSidebar .editor-layer-secondary .inspector-panel-body { padding: 0 var(--space-2); }
+.editor-layer-name { font-weight: 500; }
+.editor-layer-trigger.is-active .editor-layer-name { font-weight: 600; }
+.editor-display-stack > .border-control-row { padding-bottom: var(--space-3); }

@@ -18,11 +18,20 @@ from shapely.geometry.polygon import orient
 
 from tools import patch_tno_1962_bundle as b
 from tools import extract_scenario_atlantropa as extract
+from tools.atlantropa_precision import absorb_enclosed_island_holes, smooth_atlantropa_land
 
 
 STABLE_PREFIXES = ("ATLPRV_", "ATLISL_")
 IDENTITY_GUARDED_HELPER_PREFIXES = ("ATLSHL_", "ATLWLD_")
 WATER_CLIP_GEOMETRY_EPSILON = 1e-12
+
+
+class NamedWaterClipError(ValueError):
+    """Newly added land cannot be clipped from this named water."""
+
+    def __init__(self, message, feature_id):
+        super().__init__(message)
+        self.feature_id = feature_id
 
 
 def reconcile_feature_map(payload, key, old_ids, features, identity_map=None, merged_lineage=None,
@@ -275,7 +284,7 @@ def clip_new_atlantropa_land_from_named_water(topology, water_payload, old_atl, 
             raise ValueError(f"Source and runtime scenario_water differ before clipping: {feature_id}")
         spec = allowed.get(feature_id)
         if spec is None or not spec.get("clip_against_land_mask", True):
-            raise ValueError(f"Unsupported scenario_water overlaps newly added Atlantropa land: {feature_id}")
+            raise NamedWaterClipError(f"Unsupported scenario_water overlaps newly added Atlantropa land: {feature_id}", feature_id)
         clipped = b.clip_named_water_features_to_land_mask([feature], added)[0]
         compiled = b.compile_named_water_regions({"type": "FeatureCollection", "features": [clipped]})["features"][0]
         expected = original.difference(added)
@@ -291,7 +300,7 @@ def clip_new_atlantropa_land_from_named_water(topology, water_payload, old_atl, 
         if (not actual.is_valid or actual.is_empty
                 or expected.symmetric_difference(actual).area > WATER_CLIP_GEOMETRY_EPSILON
                 or any(part.intersection(actual).area <= 0 for part in b.iter_polygon_parts(expected))):
-            raise ValueError(f"Named-water D3 compilation changed more than the new land cut: {feature_id}")
+            raise NamedWaterClipError(f"Named-water D3 compilation changed more than the new land cut: {feature_id}", feature_id)
         if compiled["properties"] != feature["properties"]:
             raise ValueError(f"Named-water metadata changed during clipping: {feature_id}")
         replacements[feature_id] = compiled["geometry"]
@@ -433,6 +442,7 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
         b.write_json(diagnostic_dir / "failure.json", {"error": str(error), "diagnostics": getattr(error, "diagnostics", None)})
         raise
     restored_weld_ids = restore_published_land_welds(old_atl, land)
+    land, absorbed_island_holes = absorb_enclosed_island_holes(land)
     water_snapshot = b.load_json(source_dir / b.MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME)
     water = b.topology_object_to_gdf(topology, "scenario_water")
     congo = b.safe_unary_union(water.loc[water["id"] == "congo_lake"].geometry)
@@ -443,14 +453,42 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
         donor, baseline, regions, land_reference=reference, replacement_specs=replacements,
         other_water_geom=b.build_mediterranean_other_water_geom(water_snapshot),
     )
-    sea, sea_quality = b.exclude_land_from_sea(sea, land)
-    sea_diagnostics["geometry_quality"] = sea_quality
-    sea_union = b.safe_unary_union([shape(feature["geometry"]) for feature in sea])
-    all_features = [*land, *sea]
-    helper_renames = {}
-    helper_reallocations = {}
-    identical_helper_ids = preserve_identical_atl_helper_assignments(
-        old_atl, all_features, renamed_ids=helper_renames, reallocated_ids=helper_reallocations)
+    # Smoothing may not swallow sea that the unsmoothed land leaves open.
+    unsmoothed_sea, _ = b.exclude_land_from_sea(sea, land)
+    unsmoothed_land, raw_sea = land, sea
+    # Smoothed land may grow into named water that can be clipped; water that
+    # cannot take the clip is closed to it and smoothing is redone.
+    # Narrow passages keep their shape; land never grows into them.
+    narrow = water["water_type"].isin(("strait", "channel", "chokepoint")) | water["is_chokepoint"].fillna(False).astype(bool)
+    blocked_water_ids = set(water.loc[narrow, "id"].astype(str))
+    while True:
+        blocked = water.loc[water["id"].isin(blocked_water_ids)].geometry.make_valid()
+        land, smoothing = smooth_atlantropa_land(
+            unsmoothed_land, fixed_geometry=reference, max_shift=0.08,
+            forbidden=b.safe_unary_union(list(blocked)) if len(blocked) else None,
+            protected=[shape(feature["geometry"]) for feature in unsmoothed_sea])
+        smoothing["blocked_water_ids"] = sorted(blocked_water_ids)
+        smoothing["absorbed_island_holes"] = absorbed_island_holes
+        sea, sea_quality = b.exclude_land_from_sea(raw_sea, land)
+        sea_diagnostics["geometry_quality"] = sea_quality
+        sea_union = b.safe_unary_union([shape(feature["geometry"]) for feature in sea])
+        all_features = [*land, *sea]
+        helper_renames = {}
+        helper_reallocations = {}
+        identical_helper_ids = preserve_identical_atl_helper_assignments(
+            old_atl, all_features, renamed_ids=helper_renames, reallocated_ids=helper_reallocations)
+        classified = b.apply_atlantropa_runtime_fields(b.geopandas_from_features(all_features))
+        try:
+            updated_water, water_clip_diagnostics = clip_new_atlantropa_land_from_named_water(
+                topology, b.load_json(source_dir / "water_regions.geojson"), old_atl,
+                b.gdf_to_feature_collection(classified)["features"],
+            )
+        except NamedWaterClipError as error:
+            if error.feature_id in blocked_water_ids:
+                raise
+            blocked_water_ids.add(error.feature_id)
+            continue
+        break
     b.write_json(diagnostic_dir / "normalized-atlantropa.geojson", {
         "type": "FeatureCollection", "features": all_features,
     })
@@ -459,11 +497,6 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
         "restored_published_land_weld_ids": restored_weld_ids,
     })
     print(f"Strict geometry prepared: {len(land)} land/shoal, {len(sea)} sea features", flush=True)
-    classified = b.apply_atlantropa_runtime_fields(b.geopandas_from_features(all_features))
-    updated_water, water_clip_diagnostics = clip_new_atlantropa_land_from_named_water(
-        topology, b.load_json(source_dir / "water_regions.geojson"), old_atl,
-        b.gdf_to_feature_collection(classified)["features"],
-    )
     # Existing lake boundaries continue to own their mask cutouts.
     base_water = b.build_tno_base_geography_water_clone_union([
         feature for feature in b.gdf_to_feature_collection(water)["features"]
@@ -549,6 +582,7 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
                                   or stats.get("controller_feature_count") != entry.get("controller_feature_count")):
             audit["owner_stats"][tag] = b.build_owner_stats_entry(entry)
     audit.setdefault("diagnostics", {}).update({
+        "atlantropa_edge_smoothing": smoothing,
         "atlantropa_region_stats": land_diagnostics, "mediterranean_water_region_stats": sea_diagnostics,
         "atlantropa_island_replacement_stats": replacement_diagnostics,
         "context_land_mask_tolerance": tolerance, "context_land_mask_area_delta_ratio": area_delta,

@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 256,
-    "feature_count": 9957,
+    "feature_count": 9958,
     "water_count": 285
   },
   "controller_changes": [
@@ -4338,7 +4338,109 @@
     "active_owner_tag_count": 133,
     "as_of_date": "1962.1.1.12",
     "atl_feature_count": 240,
-    "atl_sea_feature_count": 486,
+    "atl_sea_feature_count": 487,
+    "atlantropa_edge_smoothing": {
+      "absorbed_island_holes": [
+        {
+          "area": 0.00010201207783697443,
+          "from_id": "ATLPRV_18208",
+          "island_id": "ATLISL_adriatica_corfu"
+        }
+      ],
+      "blocked_water_ids": [
+        "tno_bass_strait",
+        "tno_bering_strait",
+        "tno_blackwater_estuary",
+        "tno_bosporus_dardanelles",
+        "tno_bransfield_strait",
+        "tno_bristol_channel",
+        "tno_davis_strait",
+        "tno_dornoch_firth",
+        "tno_drake_passage",
+        "tno_english_channel",
+        "tno_firth_of_clyde",
+        "tno_firth_of_forth",
+        "tno_firth_of_lorn",
+        "tno_firth_of_tay",
+        "tno_florida_strait",
+        "tno_fram_strait",
+        "tno_hudson_strait",
+        "tno_humber_estuary",
+        "tno_kilbrannan_sound",
+        "tno_lillebaelt",
+        "tno_little_minch",
+        "tno_makassar_strait",
+        "tno_malacca_strait",
+        "tno_menai_strait",
+        "tno_moray_firth",
+        "tno_mozambique_channel",
+        "tno_north_channel",
+        "tno_northeast_atlantic_ocean",
+        "tno_northern_minch",
+        "tno_palk_strait_and_palk_bay",
+        "tno_pentland_firth",
+        "tno_sea_of_marmara",
+        "tno_severn_estuary",
+        "tno_singapore_strait",
+        "tno_solent",
+        "tno_solway_firth",
+        "tno_sound_of_jura",
+        "tno_st_georges_channel",
+        "tno_storebaelt",
+        "tno_strait_of_dover",
+        "tno_strait_of_hormuz",
+        "tno_stronsay_firth",
+        "tno_sumba_strait",
+        "tno_sunda_strait",
+        "tno_taiwan_strait",
+        "tno_tatarskiy_proliv",
+        "tno_thames_estuary",
+        "tno_the_sound",
+        "tno_torres_strait",
+        "tno_westray_firth",
+        "tno_yell_sound"
+      ],
+      "locally_reverted_feature_ids": [
+        "ATLISL_adriatica_corfu",
+        "ATLISL_aegean_chios",
+        "ATLISL_aegean_crete",
+        "ATLISL_aegean_lesvos",
+        "ATLISL_aegean_rhodes",
+        "ATLISL_sicily_tunis_malta",
+        "ATLISL_tyrrhenian_corsica",
+        "ATLISL_tyrrhenian_sardinia",
+        "ATLISL_west_med_balearics",
+        "ATLPRV_18139",
+        "ATLPRV_18171",
+        "ATLPRV_18179",
+        "ATLPRV_18181",
+        "ATLPRV_18201",
+        "ATLPRV_18220",
+        "ATLPRV_18230",
+        "ATLPRV_18247"
+      ],
+      "max_shift_degrees": 0.08000000000000158,
+      "moved_vertex_count": 9309,
+      "reverted_feature_ids": [
+        "ATLISL_adriatica_CRO_3",
+        "ATLISL_adriatica_source_a0eedb2a11dd70d7457c077c692b02548258e559ccc58cf8ab19b2c7144dc7cf",
+        "ATLISL_aegean_GRE_24",
+        "ATLISL_aegean_limnos",
+        "ATLISL_levant_cyprus",
+        "ATLISL_sicily_tunis_sicily",
+        "ATLPRV_18160",
+        "ATLPRV_18182",
+        "ATLPRV_18223",
+        "ATLPRV_18246",
+        "ATLPRV_18252",
+        "ATLPRV_18253",
+        "ATLPRV_18254",
+        "ATLPRV_18349",
+        "ATLSHL_adriatica_6",
+        "ATLSHL_aegean_1"
+      ],
+      "skipped_short_chain_count": 388
+    },
     "atlantropa_geometry_source": "hgo_donor_provinces",
     "atlantropa_island_replacement_stats": {
       "adriatica": {
@@ -4434,9 +4536,9 @@
           46.2
         ],
         "assigned_owner_counts": {
-          "ATL": 1,
-          "CRO": 2,
-          "ITA": 54
+          "ALB": 9,
+          "CRO": 7,
+          "ITA": 41
         },
         "bounds": [
           12.156263,
@@ -4906,7 +5008,7 @@
               "overlap_areas": {
                 "ATLISL_adriatica_source_a282019b69d82d874a525940168b347a2dc3c6b6a7b41a7c5c332b0b8e21d09d": 0.0003900508622916741
               },
-              "owner": "ITA",
+              "owner": "CRO",
               "source_row_id": "ATLISL_adriatica_CRO_3"
             },
             {
@@ -4937,7 +5039,7 @@
                 "ATLISL_adriatica_CRO_9"
               ],
               "overlap_areas": {
-                "ATLISL_adriatica_CRO_9": 1.012648810035189
+                "ATLISL_adriatica_CRO_9": 1.0126488100351898
               },
               "owner": "ITA",
               "source_row_id": "ATLISL_adriatica_CRO_5__published_ITA"
@@ -4950,7 +5052,7 @@
               "overlap_areas": {
                 "ATLISL_adriatica_source_7fba784b3f440f9c3fe16eb804d519630d6c42c1c3fe5d3be9b862186315907f": 0.0038796164062719586
               },
-              "owner": "ITA",
+              "owner": "CRO",
               "source_row_id": "ATLISL_adriatica_CRO_6"
             },
             {
@@ -4961,7 +5063,7 @@
               "overlap_areas": {
                 "ATLISL_adriatica_source_6f08765428359e34bbe6ee4bd2408e4f873f99f1d1af174794864a959e53d944": 0.011991975984877277
               },
-              "owner": "ITA",
+              "owner": "CRO",
               "source_row_id": "ATLISL_adriatica_CRO_7"
             },
             {
@@ -4972,7 +5074,7 @@
               "overlap_areas": {
                 "ATLISL_adriatica_source_6a9986e29faf7cb22d4301d7445f86e4fa61560d2751849c61dbc37751fb30d9": 0.0005923683357625158
               },
-              "owner": "ITA",
+              "owner": "CRO",
               "source_row_id": "ATLISL_adriatica_CRO_8"
             },
             {
@@ -4983,7 +5085,7 @@
               "overlap_areas": {
                 "ATLISL_adriatica_source_1af38019baedda5939dd391c62a69c3e4687fd812f5f841ddea7617a27cd5329": 0.001975226652524476
               },
-              "owner": "ITA",
+              "owner": "CRO",
               "source_row_id": "ATLISL_adriatica_CRO_9"
             },
             {
@@ -4994,7 +5096,7 @@
               "overlap_areas": {
                 "ATLISL_adriatica_ITA_1": 0.06994387718981895
               },
-              "owner": "ITA",
+              "owner": "ALB",
               "source_row_id": "ATLISL_adriatica_ITA_1"
             }
           ],
@@ -5035,7 +5137,7 @@
         },
         "overlap_with_baseline_land_area": 0.076375,
         "pixel_fragment_area_threshold": 0.0032,
-        "pixel_fragment_count": 36,
+        "pixel_fragment_count": 37,
         "post_clip_area": 8.810615,
         "postprocess_precision": [
           {
@@ -5483,8 +5585,9 @@
         ],
         "assigned_owner_counts": {
           "BUL": 3,
-          "GRE": 58,
-          "TUR": 23
+          "GRE": 51,
+          "ITA": 8,
+          "TUR": 22
         },
         "bounds": [
           20.002311,
@@ -5493,8 +5596,8 @@
           40.923187
         ],
         "centroid": [
-          25.10547,
-          37.722282
+          25.106032,
+          37.722652
         ],
         "control_points": [
           {
@@ -6403,7 +6506,7 @@
                 "ATLISL_aegean_source_748112bfba8ebbb5f1bcca1e82260b07f95dd163e1e4640e70d55a9531bf0248"
               ],
               "overlap_areas": {
-                "ATLISL_aegean_source_748112bfba8ebbb5f1bcca1e82260b07f95dd163e1e4640e70d55a9531bf0248": 0.3119320810266159
+                "ATLISL_aegean_source_748112bfba8ebbb5f1bcca1e82260b07f95dd163e1e4640e70d55a9531bf0248": 0.28774019059665146
               },
               "owner": "GRE",
               "source_row_id": "ATLISL_aegean_GRE_1"
@@ -6414,7 +6517,7 @@
                 "ATLISL_aegean_GRE_14"
               ],
               "overlap_areas": {
-                "ATLISL_aegean_GRE_14": 0.46553207259931123
+                "ATLISL_aegean_GRE_14": 0.4655320725993109
               },
               "owner": "GRE",
               "source_row_id": "ATLISL_aegean_GRE_10"
@@ -6425,7 +6528,7 @@
                 "ATLISL_aegean_GRE_17"
               ],
               "overlap_areas": {
-                "ATLISL_aegean_GRE_17": 0.00012988999150344814
+                "ATLISL_aegean_GRE_17": 0.0001298899915034015
               },
               "owner": "GRE",
               "source_row_id": "ATLISL_aegean_GRE_11"
@@ -6469,7 +6572,7 @@
                 "ATLISL_aegean_source_760fd1a6b6168360a5d277f9b5c81226189651a497eb6f8625a63af13278f0fc"
               ],
               "overlap_areas": {
-                "ATLISL_aegean_source_760fd1a6b6168360a5d277f9b5c81226189651a497eb6f8625a63af13278f0fc": 0.0025876878804494555
+                "ATLISL_aegean_source_760fd1a6b6168360a5d277f9b5c81226189651a497eb6f8625a63af13278f0fc": 0.002587687880448568
               },
               "owner": "GRE",
               "source_row_id": "ATLISL_aegean_GRE_15"
@@ -6515,7 +6618,7 @@
               "overlap_areas": {
                 "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f": 0.00010060814557170912
               },
-              "owner": "GRE",
+              "owner": "ITA",
               "source_row_id": "ATLISL_aegean_GRE_19"
             },
             {
@@ -6537,7 +6640,7 @@
               "overlap_areas": {
                 "ATLISL_aegean_GRE_23": 0.003192940709004767
               },
-              "owner": "GRE",
+              "owner": "ITA",
               "source_row_id": "ATLISL_aegean_GRE_20"
             },
             {
@@ -6559,7 +6662,7 @@
               "overlap_areas": {
                 "ATLISL_aegean_GRE_25": 0.027664008577448326
               },
-              "owner": "GRE",
+              "owner": "ITA",
               "source_row_id": "ATLISL_aegean_GRE_22"
             },
             {
@@ -6570,7 +6673,7 @@
               "overlap_areas": {
                 "ATLISL_aegean_GRE_26": 0.031718872831583006
               },
-              "owner": "GRE",
+              "owner": "ITA",
               "source_row_id": "ATLISL_aegean_GRE_23"
             },
             {
@@ -6581,7 +6684,7 @@
               "overlap_areas": {
                 "ATLISL_aegean_GRE_27": 0.10272958184569303
               },
-              "owner": "GRE",
+              "owner": "ITA",
               "source_row_id": "ATLISL_aegean_GRE_24"
             },
             {
@@ -6592,7 +6695,7 @@
               "overlap_areas": {
                 "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8": 0.0033430200892435227
               },
-              "owner": "GRE",
+              "owner": "ITA",
               "source_row_id": "ATLISL_aegean_GRE_25"
             },
             {
@@ -6603,7 +6706,7 @@
               "overlap_areas": {
                 "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968": 0.07412480860064648
               },
-              "owner": "GRE",
+              "owner": "ITA",
               "source_row_id": "ATLISL_aegean_GRE_26"
             },
             {
@@ -6678,7 +6781,7 @@
                 "ATLISL_aegean_GRE_15"
               ],
               "overlap_areas": {
-                "ATLISL_aegean_GRE_15": 0.002294999069767761
+                "ATLISL_aegean_GRE_15": 0.0022949990697677114
               },
               "owner": "GRE",
               "source_row_id": "ATLISL_aegean_GRE_9"
@@ -6726,8 +6829,8 @@
         },
         "overlap_with_baseline_land_area": 1.477143,
         "pixel_fragment_area_threshold": 0.0024,
-        "pixel_fragment_count": 42,
-        "post_clip_area": 7.86298,
+        "pixel_fragment_count": 43,
+        "post_clip_area": 7.860869,
         "postprocess_precision": [
           {
             "boundary_vertex_hausdorff_degrees": 0.0,
@@ -7244,14 +7347,14 @@
           }
         ],
         "province_feature_count": 84,
-        "restored_source_coast_contact_count": 49,
+        "restored_source_coast_contact_count": 48,
         "sea_completion_bbox": [
           22.0,
           34.4,
           31.7,
           42.55
         ],
-        "verified_final_coastal_components": 47
+        "verified_final_coastal_components": 46
       },
       "gabes": {
         "affine_coeffs": [
@@ -7433,30 +7536,30 @@
       "geometry_quality": {
         "components": [
           {
-            "area": 0.1517673780641551,
+            "area": 0.1517678900937678,
             "centroid": [
-              14.76212115090413,
-              44.374861157767604
+              14.762119712726536,
+              44.37486172038757
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
             "feature_id": "ATLISL_adriatica_CRO_3"
           },
           {
-            "area": 1.0030734710987015,
+            "area": 1.0029493265832186,
             "centroid": [
-              16.509538795432622,
-              42.84609871022894
+              16.509288496792227,
+              42.846191694727125
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
             "feature_id": "ATLISL_adriatica_CRO_9"
           },
           {
-            "area": 0.009575338936488974,
+            "area": 0.009575338936488972,
             "centroid": [
               17.39679420429144,
-              42.847274609249816
+              42.84727460924981
             ],
             "component_index": 1,
             "distance_to_largest": 0.05709529696877931,
@@ -7473,10 +7576,10 @@
             "feature_id": "ATLISL_adriatica_ITA_1"
           },
           {
-            "area": 0.5126738779668475,
+            "area": 0.512381770905219,
             "centroid": [
-              19.51558150062756,
-              39.85711952199677
+              19.51577736402416,
+              39.85685928382925
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -7573,9 +7676,9 @@
             "feature_id": "ATLISL_adriatica_source_a0eedb2a11dd70d7457c077c692b02548258e559ccc58cf8ab19b2c7144dc7cf"
           },
           {
-            "area": 0.0017996481856394398,
+            "area": 0.0017996481856394407,
             "centroid": [
-              16.257894223969057,
+              16.257894223969043,
               43.29389961678684
             ],
             "component_index": 4,
@@ -7703,20 +7806,20 @@
             "feature_id": "ATLISL_aegean_GRE_12"
           },
           {
-            "area": 0.46553207259931123,
+            "area": 0.4655320725993119,
             "centroid": [
-              25.38599771095597,
-              37.10827507054963
+              25.385997710955994,
+              37.10827507054965
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
             "feature_id": "ATLISL_aegean_GRE_14"
           },
           {
-            "area": 0.0022949990697677604,
+            "area": 0.0022949990697677825,
             "centroid": [
-              25.347289247362646,
-              36.40247763606349
+              25.347289247362653,
+              36.40247763606348
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -7733,10 +7836,10 @@
             "feature_id": "ATLISL_aegean_GRE_16"
           },
           {
-            "area": 0.00012988999150344817,
+            "area": 0.00012988999150349967,
             "centroid": [
-              25.395640835770386,
-              36.315028201769636
+              25.395640835770383,
+              36.31502820176964
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -8153,9 +8256,9 @@
             "feature_id": "ATLISL_aegean_source_748112bfba8ebbb5f1bcca1e82260b07f95dd163e1e4640e70d55a9531bf0248"
           },
           {
-            "area": 0.002587687880449455,
+            "area": 0.0025876878804485673,
             "centroid": [
-              26.02862681969021,
+              26.028626819690228,
               36.82038704704799
             ],
             "component_index": 0,
@@ -8653,10 +8756,10 @@
             "feature_id": "ATLPRV_18137"
           },
           {
-            "area": 0.02558452342912807,
+            "area": 0.025584523429128044,
             "centroid": [
-              25.384243943627222,
-              31.636638476580078
+              25.384243943627226,
+              31.636638476580085
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -8813,33 +8916,33 @@
             "feature_id": "ATLPRV_18164"
           },
           {
-            "area": 0.07095786125962682,
+            "area": 0.07095786125962683,
             "centroid": [
-              22.746220485735726,
-              36.3885195340016
+              22.74622048573575,
+              36.388519534001624
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
             "feature_id": "ATLPRV_18165"
           },
           {
-            "area": 0.028206565639069734,
+            "area": 0.02820656563906973,
             "centroid": [
-              22.707418017360673,
-              36.68409827070013
+              22.70741801736067,
+              36.684098270700126
             ],
             "component_index": 1,
             "distance_to_largest": 0.0,
             "feature_id": "ATLPRV_18165"
           },
           {
-            "area": 0.002760998465176796,
+            "area": 0.0006494664620608939,
             "centroid": [
-              23.01832093886121,
-              36.35018910104031
+              23.035149896471456,
+              36.36144053413003
             ],
             "component_index": 2,
-            "distance_to_largest": 0.054232494409487075,
+            "distance_to_largest": 0.09603218666803581,
             "feature_id": "ATLPRV_18165"
           },
           {
@@ -9043,10 +9146,10 @@
             "feature_id": "ATLPRV_18178"
           },
           {
-            "area": 0.13040006898495263,
+            "area": 0.1304117034025025,
             "centroid": [
-              5.017443697621165,
-              37.03198476619128
+              5.017408137701718,
+              37.03197465084763
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -9123,10 +9226,10 @@
             "feature_id": "ATLPRV_18182"
           },
           {
-            "area": 0.053949111535468844,
+            "area": 0.05394911153546881,
             "centroid": [
               23.31117559857468,
-              37.85852114963439
+              37.8585211496344
             ],
             "component_index": 2,
             "distance_to_largest": 0.02078816213827368,
@@ -9173,10 +9276,10 @@
             "feature_id": "ATLPRV_18183"
           },
           {
-            "area": 0.06861829794131641,
+            "area": 0.06861829794131637,
             "centroid": [
               24.495115315185632,
-              37.43131173464709
+              37.431311734647096
             ],
             "component_index": 1,
             "distance_to_largest": 0.009225617239873418,
@@ -9243,10 +9346,10 @@
             "feature_id": "ATLPRV_18185"
           },
           {
-            "area": 0.0942793844517864,
+            "area": 0.09427938445178613,
             "centroid": [
-              20.783256687239337,
-              37.91000660097602
+              20.78325668723934,
+              37.910006600976025
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -9443,13 +9546,23 @@
             "feature_id": "ATLPRV_18205"
           },
           {
-            "area": 0.03944104277778457,
+            "area": 0.03963113776157671,
             "centroid": [
-              19.134525081929674,
-              40.41739376277813
+              19.13418089584317,
+              40.417037012093026
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
+            "feature_id": "ATLPRV_18208"
+          },
+          {
+            "area": 0.00010201207783701542,
+            "centroid": [
+              19.37560362389218,
+              40.25878182351737
+            ],
+            "component_index": 1,
+            "distance_to_largest": 0.04165662390777227,
             "feature_id": "ATLPRV_18208"
           },
           {
@@ -9523,9 +9636,9 @@
             "feature_id": "ATLPRV_18216"
           },
           {
-            "area": 0.566767137773529,
+            "area": 0.5667671377735289,
             "centroid": [
-              25.421914233600916,
+              25.42191423360091,
               40.58846594465373
             ],
             "component_index": 0,
@@ -9603,10 +9716,10 @@
             "feature_id": "ATLPRV_18230"
           },
           {
-            "area": 0.3566365770819296,
+            "area": 0.3567607215974123,
             "centroid": [
-              19.02730807899836,
-              41.708049632117465
+              19.027135609353333,
+              41.70818424282004
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -9663,10 +9776,10 @@
             "feature_id": "ATLPRV_18249"
           },
           {
-            "area": 1.2274047099047594,
+            "area": 1.227404197875147,
             "centroid": [
-              13.858245805722422,
-              44.453228112718904
+              13.858245606487515,
+              44.45322807584318
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
@@ -10255,7 +10368,7 @@
             "trimmed_feature_id": "ATLISL_tyrrhenian_sardinia"
           },
           {
-            "area": 0.027802435932718222,
+            "area": 0.027802435932717987,
             "kept_feature_id": "ATLISL_aegean_samos",
             "owners": [
               "TUR",
@@ -10263,16 +10376,6 @@
             ],
             "priority_source": "same_owner_stable_id",
             "trimmed_feature_id": "ATLPRV_18181"
-          },
-          {
-            "area": 0.00029210706162903147,
-            "kept_feature_id": "ATLISL_adriatica_corfu",
-            "owners": [
-              "ITA",
-              "ITA"
-            ],
-            "priority_source": "same_owner_stable_id",
-            "trimmed_feature_id": "ATLPRV_18208"
           },
           {
             "area": 4.1144228987251935e-05,
@@ -10305,16 +10408,6 @@
             "trimmed_feature_id": "ATLPRV_18226"
           },
           {
-            "area": 0.00012414451548196448,
-            "kept_feature_id": "ATLISL_adriatica_CRO_9",
-            "owners": [
-              "ITA",
-              "ITA"
-            ],
-            "priority_source": "same_owner_stable_id",
-            "trimmed_feature_id": "ATLPRV_18235"
-          },
-          {
             "area": 9.993707478385833e-05,
             "kept_feature_id": "ATLISL_tyrrhenian_ITA_1",
             "owners": [
@@ -10333,6 +10426,16 @@
             ],
             "priority_source": "same_owner_stable_id",
             "trimmed_feature_id": "ATLPRV_18249"
+          },
+          {
+            "area": 5.120296127234447e-07,
+            "kept_feature_id": "ATLISL_adriatica_CRO_3",
+            "owners": [
+              "ITA",
+              "ITA"
+            ],
+            "priority_source": "same_owner_stable_id",
+            "trimmed_feature_id": "ATLPRV_18252"
           },
           {
             "area": 1.6521525941425034e-05,
@@ -10436,10 +10539,11 @@
         ],
         "assigned_owner_counts": {
           "EGY": 4,
+          "GRE": 1,
+          "IME": 5,
           "LEB": 2,
-          "PAL": 5,
-          "SYR": 1,
-          "TUR": 4
+          "SNS": 1,
+          "TUR": 3
         },
         "bounds": [
           32.094064,
@@ -11267,11 +11371,20 @@
         "missing_source_features": [],
         "processing_encroachments": [
           {
-            "feature_id": "ATLISL_adriatica_CRO_3",
+            "feature_id": "ATLISL_adriatica_CRO_9",
             "owner": "ITA",
-            "removed_area": 5.120296126324148e-07,
+            "removed_area": 0.00012414451548196456,
             "source_owners": [
-              "ATL"
+              "ALB"
+            ],
+            "source_policy": "other_owner_exclusive_pre_snap_source"
+          },
+          {
+            "feature_id": "ATLISL_adriatica_corfu",
+            "owner": "ITA",
+            "removed_area": 0.00029210706162880785,
+            "source_owners": [
+              "ALB"
             ],
             "source_policy": "other_owner_exclusive_pre_snap_source"
           },
@@ -12313,7 +12426,7 @@
             "fallback_reason": null,
             "max_postprocess_degrees": 0.0025,
             "province_id": 18249,
-            "snap_attempt_boundary_vertex_hausdorff_degrees": 0.4264831726684606,
+            "snap_attempt_boundary_vertex_hausdorff_degrees": 0.3784588515825863,
             "snap_fallback_reason": "snap_displacement_exceeds_tolerance",
             "snap_tolerance_degrees": 0.12
           },
@@ -12533,8 +12646,8 @@
           43.538982
         ],
         "centroid": [
-          1.982626,
-          39.261567
+          1.982632,
+          39.261561
         ],
         "control_points": [
           {
@@ -13015,7 +13128,7 @@
         "overlap_with_baseline_land_area": 0.549443,
         "pixel_fragment_area_threshold": 0.0028,
         "pixel_fragment_count": 2,
-        "post_clip_area": 4.931726,
+        "post_clip_area": 4.931737,
         "postprocess_precision": [
           {
             "boundary_vertex_hausdorff_degrees": 0.0,
@@ -13461,8 +13574,8 @@
       }
     },
     "congo_lake_topology_mode": "true_water_preserved",
-    "context_land_mask_arc_refs": 40379,
-    "context_land_mask_area_delta_ratio": 0.004654260775389111,
+    "context_land_mask_arc_refs": 40356,
+    "context_land_mask_area_delta_ratio": 0.004637361359801563,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.08,
     "controller_rule_count": 8,
@@ -14923,6 +15036,7 @@
       "ATLSHL_aegean_3",
       "ATLSHL_aegean_31",
       "ATLSHL_aegean_32",
+      "ATLSHL_aegean_33",
       "ATLSHL_aegean_4",
       "ATLSHL_aegean_5",
       "ATLSHL_aegean_6",
@@ -14938,6 +15052,7 @@
       "ATLSHL_levant_9",
       "ATLSHL_libya_suez_1",
       "ATLSHL_libya_suez_2",
+      "ATLSHL_sicily_tunis_1",
       "ATLSHL_sicily_tunis_2",
       "ATLSHL_sicily_tunis_3",
       "ATLSHL_tyrrhenian_1",
@@ -14983,6 +15098,7 @@
       "ATLSHL_aegean_29": "ATLSHL_aegean_31",
       "ATLSHL_aegean_3": "ATLSHL_aegean_1",
       "ATLSHL_aegean_30": "ATLSHL_aegean_5",
+      "ATLSHL_aegean_31": "ATLSHL_aegean_33",
       "ATLSHL_aegean_4": "ATLSHL_aegean_2",
       "ATLSHL_aegean_5": "ATLSHL_aegean_3",
       "ATLSHL_aegean_6": "ATLSHL_aegean_4",
@@ -14999,53 +15115,64 @@
     },
     "identity_preserved_political_chunk_ids": [
       "political.coarse.r0c0",
-      "political.detail.country.afa",
       "political.detail.country.afg",
-      "political.detail.country.alc",
+      "political.detail.country.alb",
       "political.detail.country.alt",
-      "political.detail.country.aof",
-      "political.detail.country.aoi",
+      "political.detail.country.amr",
+      "political.detail.country.ang",
       "political.detail.country.aq",
       "political.detail.country.are",
       "political.detail.country.arg",
       "political.detail.country.arm",
       "political.detail.country.ast",
+      "political.detail.country.ayr",
+      "political.detail.country.azh",
+      "political.detail.country.azw",
+      "political.detail.country.bah",
       "political.detail.country.bhr",
       "political.detail.country.bhu",
+      "political.detail.country.bkf",
       "political.detail.country.bkr",
+      "political.detail.country.bku",
+      "political.detail.country.blz",
       "political.detail.country.bol",
       "political.detail.country.bop",
       "political.detail.country.bra",
       "political.detail.country.brg",
-      "political.detail.country.brm",
       "political.detail.country.bry",
+      "political.detail.country.bts",
       "political.detail.country.bul",
-      "political.detail.country.bwa",
-      "political.detail.country.bz",
+      "political.detail.country.bur",
       "political.detail.country.cam",
       "political.detail.country.can",
+      "political.detail.country.cao",
       "political.detail.country.cey",
+      "political.detail.country.chd",
       "political.detail.country.chi",
       "political.detail.country.chl",
       "political.detail.country.cht",
+      "political.detail.country.clc",
+      "political.detail.country.cll",
       "political.detail.country.col",
       "political.detail.country.cos",
+      "political.detail.country.cri",
       "political.detail.country.cro",
       "political.detail.country.cub",
+      "political.detail.country.dah",
       "political.detail.country.den",
       "political.detail.country.dom",
       "political.detail.country.ecu",
       "political.detail.country.egy",
       "political.detail.country.els",
       "political.detail.country.eng",
+      "political.detail.country.fav",
       "political.detail.country.ffr",
-      "political.detail.country.fic",
       "political.detail.country.fin",
       "political.detail.country.fra.part.0",
       "political.detail.country.fra.part.1",
       "political.detail.country.fra.part.2",
       "political.detail.country.fra.part.3",
-      "political.detail.country.fri",
+      "political.detail.country.gay",
       "political.detail.country.gce",
       "political.detail.country.gco",
       "political.detail.country.gea",
@@ -15053,128 +15180,164 @@
       "political.detail.country.ger.part.1",
       "political.detail.country.ger.part.2",
       "political.detail.country.ger.part.3",
-      "political.detail.country.ger.part.4",
-      "political.detail.country.ger.part.5",
+      "political.detail.country.gha",
       "political.detail.country.gma",
       "political.detail.country.gng",
       "political.detail.country.gor",
       "political.detail.country.gre",
       "political.detail.country.grn",
-      "political.detail.country.gsw",
       "political.detail.country.gua",
+      "political.detail.country.guc",
       "political.detail.country.gui",
+      "political.detail.country.guy",
+      "political.detail.country.guz",
       "political.detail.country.gxc",
-      "political.detail.country.gy",
       "political.detail.country.hai",
-      "political.detail.country.hol",
+      "political.detail.country.hau",
       "political.detail.country.hon",
       "political.detail.country.hun",
       "political.detail.country.ial",
       "political.detail.country.ibr",
       "political.detail.country.ice",
+      "political.detail.country.icve",
+      "political.detail.country.idji",
+      "political.detail.country.ieri",
+      "political.detail.country.ieth",
+      "political.detail.country.igui",
+      "political.detail.country.iken",
+      "political.detail.country.ime",
       "political.detail.country.ins",
       "political.detail.country.ire",
       "political.detail.country.irk",
       "political.detail.country.irq",
+      "political.detail.country.isom",
+      "political.detail.country.istp",
+      "political.detail.country.isue",
       "political.detail.country.ita",
+      "political.detail.country.itim",
+      "political.detail.country.jam",
       "political.detail.country.jap",
+      "political.detail.country.jhaw",
       "political.detail.country.jor",
+      "political.detail.country.jtwn",
       "political.detail.country.kaz",
       "political.detail.country.kgz",
+      "political.detail.country.klt",
       "political.detail.country.kom",
       "political.detail.country.kor",
+      "political.detail.country.krk",
       "political.detail.country.krs",
-      "political.detail.country.kur",
       "political.detail.country.kuw",
       "political.detail.country.lao",
       "political.detail.country.lba",
       "political.detail.country.leb",
       "political.detail.country.lib",
+      "political.detail.country.lth",
       "political.detail.country.mad",
       "political.detail.country.mag",
       "political.detail.country.mal",
       "political.detail.country.man",
+      "political.detail.country.mau",
       "political.detail.country.mc",
       "political.detail.country.men",
       "political.detail.country.mex",
+      "political.detail.country.mgn",
       "political.detail.country.mld",
+      "political.detail.country.mli",
+      "political.detail.country.mly",
       "political.detail.country.mnt",
       "political.detail.country.mon",
+      "political.detail.country.mor",
       "political.detail.country.ncp",
       "political.detail.country.nep",
       "political.detail.country.nic",
       "political.detail.country.nie",
       "political.detail.country.nov",
+      "political.detail.country.nrb",
+      "political.detail.country.nrl",
       "political.detail.country.nzl",
+      "political.detail.country.oe00",
+      "political.detail.country.oe01",
+      "political.detail.country.oe02",
+      "political.detail.country.oe03",
       "political.detail.country.oma",
+      "political.detail.country.omo.part.0",
+      "political.detail.country.omo.part.1",
       "political.detail.country.oms",
       "political.detail.country.ong",
       "political.detail.country.orn",
       "political.detail.country.ors",
       "political.detail.country.our",
+      "political.detail.country.pad",
       "political.detail.country.pak",
-      "political.detail.country.pal",
       "political.detail.country.pan",
       "political.detail.country.par",
+      "political.detail.country.pcz",
       "political.detail.country.per",
       "political.detail.country.pfc",
       "political.detail.country.phi",
+      "political.detail.country.prc",
       "political.detail.country.prm",
       "political.detail.country.pru",
       "political.detail.country.pue",
       "political.detail.country.qat",
       "political.detail.country.qma",
       "political.detail.country.raj",
-      "political.detail.country.rfa.part.0",
-      "political.detail.country.rfa.part.1",
+      "political.detail.country.rfa",
       "political.detail.country.rgc",
-      "political.detail.country.rkk.part.0",
-      "political.detail.country.rkk.part.1",
-      "political.detail.country.rkk.part.2",
+      "political.detail.country.rkk",
       "political.detail.country.rkm.part.0",
       "political.detail.country.rkm.part.1",
       "political.detail.country.rkm.part.2",
       "political.detail.country.rkm.part.3",
       "political.detail.country.rkm.part.4",
       "political.detail.country.rkm.part.5",
-      "political.detail.country.rkm.part.6",
-      "political.detail.country.rkm.part.7",
-      "political.detail.country.rkm.part.8",
       "political.detail.country.rkn",
       "political.detail.country.rkno",
-      "political.detail.country.rko",
       "political.detail.country.rkp",
       "political.detail.country.rku",
       "political.detail.country.rom",
-      "political.detail.country.rsf",
       "political.detail.country.rur",
       "political.detail.country.saf",
       "political.detail.country.sam",
       "political.detail.country.sau",
       "political.detail.country.sba",
       "political.detail.country.sco",
+      "political.detail.country.sen",
       "political.detail.country.ser",
       "political.detail.country.sgn",
+      "political.detail.country.sho",
       "political.detail.country.shx",
       "political.detail.country.sia",
+      "political.detail.country.sie",
+      "political.detail.country.slg",
       "political.detail.country.slo",
+      "political.detail.country.snm",
+      "political.detail.country.sns",
+      "political.detail.country.sph",
+      "political.detail.country.stc",
+      "political.detail.country.sur",
       "political.detail.country.svr",
       "political.detail.country.swe",
       "political.detail.country.swi",
-      "political.detail.country.syr",
-      "political.detail.country.tan",
+      "political.detail.country.swz",
       "political.detail.country.tat",
       "political.detail.country.tib",
       "political.detail.country.tjk",
       "political.detail.country.tkm",
+      "political.detail.country.tns",
       "political.detail.country.tom",
+      "political.detail.country.tri",
       "political.detail.country.tun",
       "political.detail.country.tur",
       "political.detail.country.tym",
+      "political.detail.country.uph",
       "political.detail.country.ura",
       "political.detail.country.urg",
+      "political.detail.country.url",
       "political.detail.country.usa.part.0",
       "political.detail.country.usa.part.1",
+      "political.detail.country.utl",
       "political.detail.country.uzb",
       "political.detail.country.ven",
       "political.detail.country.vin",
@@ -15188,6 +15351,7 @@
       "political.detail.country.xin",
       "political.detail.country.yak",
       "political.detail.country.yem",
+      "political.detail.country.yor",
       "political.detail.country.yun",
       "political.detail.country.zlt"
     ],
@@ -15221,7 +15385,7 @@
     "mediterranean_water_mode": "atl_sea_tiles_from_hgo_donor",
     "mediterranean_water_region_stats": {
       "adriatica": {
-        "area": 20.051801,
+        "area": 20.051741,
         "bounds": [
           10.900002,
           38.8,
@@ -15229,16 +15393,16 @@
           45.752828
         ],
         "centroid": [
-          14.944103,
-          40.482744
+          14.944134,
+          40.482714
         ],
-        "completion_area": 14.490914,
+        "completion_area": 14.490853,
         "completion_feature_count": 73,
         "expected_completion_area": 20.056528,
         "feature_count": 83,
         "group_label": "Adriatica Salt Basin",
-        "remaining_hole_area": 0.014415,
-        "remaining_hole_count": 24,
+        "remaining_hole_area": 0.014483,
+        "remaining_hole_count": 25,
         "template_feature_count": 3,
         "water_state_feature_counts": {
           "8597": 1,
@@ -15254,7 +15418,7 @@
         ]
       },
       "aegean": {
-        "area": 20.237211,
+        "area": 20.237113,
         "bounds": [
           22.0,
           34.4,
@@ -15262,16 +15426,16 @@
           41.048032
         ],
         "centroid": [
-          26.252799,
-          36.723331
+          26.252773,
+          36.723272
         ],
-        "completion_area": 12.19865,
+        "completion_area": 12.198553,
         "completion_feature_count": 55,
-        "expected_completion_area": 22.183899,
+        "expected_completion_area": 22.184079,
         "feature_count": 70,
         "group_label": "Aegean and Greek Islands",
-        "remaining_hole_area": 0.039293,
-        "remaining_hole_count": 91,
+        "remaining_hole_area": 0.039512,
+        "remaining_hole_count": 92,
         "template_feature_count": 5,
         "water_state_feature_counts": {
           "8608": 3,
@@ -15324,15 +15488,15 @@
       "geometry_quality": {
         "land_sea_overlaps": [
           {
-            "area": 4.724983420033487e-06,
+            "area": 0.00815158989994475,
             "feature_id": "ATLSEA_FILL_adriatica_10"
           },
           {
-            "area": 8.078611495469614e-06,
+            "area": 0.009285954566697402,
             "feature_id": "ATLSEA_FILL_adriatica_11"
           },
           {
-            "area": 1.0796560084990679e-06,
+            "area": 0.007871529588296984,
             "feature_id": "ATLSEA_FILL_adriatica_12"
           },
           {
@@ -15348,7 +15512,7 @@
             "feature_id": "ATLSEA_FILL_adriatica_20"
           },
           {
-            "area": 4.2855983279707044e-07,
+            "area": 0.0006596760152561894,
             "feature_id": "ATLSEA_FILL_adriatica_24"
           },
           {
@@ -15360,6 +15524,10 @@
             "feature_id": "ATLSEA_FILL_adriatica_29"
           },
           {
+            "area": 0.0011287204786410174,
+            "feature_id": "ATLSEA_FILL_adriatica_3"
+          },
+          {
             "area": 2.900039583074044e-10,
             "feature_id": "ATLSEA_FILL_adriatica_31"
           },
@@ -15368,35 +15536,71 @@
             "feature_id": "ATLSEA_FILL_adriatica_32"
           },
           {
-            "area": 1.3787963009472572e-06,
+            "area": 1.2546132996331509e-06,
             "feature_id": "ATLSEA_FILL_adriatica_36"
           },
           {
-            "area": 1.4394026980797632e-08,
+            "area": 2.435034606764508e-06,
+            "feature_id": "ATLSEA_FILL_adriatica_37"
+          },
+          {
+            "area": 1.0141619166087965e-05,
             "feature_id": "ATLSEA_FILL_adriatica_38"
           },
           {
-            "area": 4.3180804048593156e-07,
+            "area": 6.7446675652000535e-09,
+            "feature_id": "ATLSEA_FILL_adriatica_40"
+          },
+          {
+            "area": 0.0012171020624708062,
             "feature_id": "ATLSEA_FILL_adriatica_42"
           },
           {
-            "area": 1.4306297226042087e-06,
+            "area": 0.0030486700719162063,
             "feature_id": "ATLSEA_FILL_adriatica_43"
           },
           {
-            "area": 4.403547643475934e-07,
+            "area": 0.004150854497253785,
+            "feature_id": "ATLSEA_FILL_adriatica_45"
+          },
+          {
+            "area": 0.0003282606240764676,
+            "feature_id": "ATLSEA_FILL_adriatica_46"
+          },
+          {
+            "area": 0.000139060619509683,
+            "feature_id": "ATLSEA_FILL_adriatica_48"
+          },
+          {
+            "area": 7.339333854684471e-05,
             "feature_id": "ATLSEA_FILL_adriatica_49"
           },
           {
-            "area": 8.367003233019485e-05,
+            "area": 1.3454018653800766e-06,
+            "feature_id": "ATLSEA_FILL_adriatica_51"
+          },
+          {
+            "area": 0.018534724512329466,
             "feature_id": "ATLSEA_FILL_adriatica_54"
           },
           {
-            "area": 6.823568927516162e-09,
+            "area": 7.894538769237863e-06,
+            "feature_id": "ATLSEA_FILL_adriatica_56"
+          },
+          {
+            "area": 1.1872797105698363e-05,
             "feature_id": "ATLSEA_FILL_adriatica_60"
           },
           {
-            "area": 4.752909478436039e-06,
+            "area": 1.464656171593428e-06,
+            "feature_id": "ATLSEA_FILL_adriatica_62"
+          },
+          {
+            "area": 3.758348116077971e-07,
+            "feature_id": "ATLSEA_FILL_adriatica_63"
+          },
+          {
+            "area": 0.010401903342329981,
             "feature_id": "ATLSEA_FILL_adriatica_65"
           },
           {
@@ -15412,31 +15616,75 @@
             "feature_id": "ATLSEA_FILL_adriatica_69"
           },
           {
-            "area": 2.9000767374293347e-10,
+            "area": 0.0007584738167541552,
             "feature_id": "ATLSEA_FILL_adriatica_7"
           },
           {
-            "area": 5.004322642211169e-05,
+            "area": 0.0003794252771902235,
+            "feature_id": "ATLSEA_FILL_adriatica_8"
+          },
+          {
+            "area": 0.0005684747458863346,
             "feature_id": "ATLSEA_FILL_adriatica_9"
           },
           {
-            "area": 0.002435128796484234,
+            "area": 0.00029595223230378774,
+            "feature_id": "ATLSEA_FILL_aegean_10"
+          },
+          {
+            "area": 0.00012860166338551104,
+            "feature_id": "ATLSEA_FILL_aegean_14"
+          },
+          {
+            "area": 0.003289613014216505,
+            "feature_id": "ATLSEA_FILL_aegean_15"
+          },
+          {
+            "area": 0.07814122174244846,
             "feature_id": "ATLSEA_FILL_aegean_19"
           },
           {
-            "area": 0.00014680226419197257,
+            "area": 0.0009233546907006255,
             "feature_id": "ATLSEA_FILL_aegean_22"
           },
           {
-            "area": 1.4041053669644135e-06,
+            "area": 0.0022017438666945737,
             "feature_id": "ATLSEA_FILL_aegean_27"
+          },
+          {
+            "area": 0.0007552928833466412,
+            "feature_id": "ATLSEA_FILL_aegean_29"
+          },
+          {
+            "area": 5.325132254451443e-05,
+            "feature_id": "ATLSEA_FILL_aegean_3"
+          },
+          {
+            "area": 0.006517658203109295,
+            "feature_id": "ATLSEA_FILL_aegean_30"
+          },
+          {
+            "area": 0.00020414229038336016,
+            "feature_id": "ATLSEA_FILL_aegean_31"
+          },
+          {
+            "area": 0.0026308843024782907,
+            "feature_id": "ATLSEA_FILL_aegean_32"
+          },
+          {
+            "area": 0.01021074516458536,
+            "feature_id": "ATLSEA_FILL_aegean_34"
           },
           {
             "area": 1.4749078373729304e-05,
             "feature_id": "ATLSEA_FILL_aegean_36"
           },
           {
-            "area": 0.0001189411811449487,
+            "area": 0.00013392479631061996,
+            "feature_id": "ATLSEA_FILL_aegean_38"
+          },
+          {
+            "area": 0.0001489879138816635,
             "feature_id": "ATLSEA_FILL_aegean_39"
           },
           {
@@ -15448,39 +15696,91 @@
             "feature_id": "ATLSEA_FILL_aegean_5"
           },
           {
-            "area": 0.0002050344144019751,
+            "area": 0.0021540668907173758,
+            "feature_id": "ATLSEA_FILL_aegean_50"
+          },
+          {
+            "area": 0.00021228768313376884,
             "feature_id": "ATLSEA_FILL_aegean_54"
           },
           {
-            "area": 3.029778163099307e-06,
+            "area": 2.0337727375474832e-05,
             "feature_id": "ATLSEA_FILL_aegean_55"
           },
           {
-            "area": 2.880044623156113e-05,
-            "feature_id": "ATLSEA_FILL_aegean_6"
-          },
-          {
-            "area": 0.0006884926123789216,
+            "area": 0.0032749719852548753,
             "feature_id": "ATLSEA_FILL_aegean_9"
           },
           {
-            "area": 0.006635837250826665,
+            "area": 0.0001171686000225348,
+            "feature_id": "ATLSEA_FILL_gabes_8"
+          },
+          {
+            "area": 0.0017669828765083326,
+            "feature_id": "ATLSEA_FILL_levant_11"
+          },
+          {
+            "area": 0.002280423834653009,
+            "feature_id": "ATLSEA_FILL_levant_12"
+          },
+          {
+            "area": 0.0014561383364713068,
+            "feature_id": "ATLSEA_FILL_levant_13"
+          },
+          {
+            "area": 0.018587969234285417,
+            "feature_id": "ATLSEA_FILL_levant_5"
+          },
+          {
+            "area": 0.005718130487514265,
             "feature_id": "ATLSEA_FILL_libya_suez_1"
           },
           {
-            "area": 8.797274870366188e-05,
+            "area": 0.0001297194195329523,
+            "feature_id": "ATLSEA_FILL_libya_suez_18"
+          },
+          {
+            "area": 6.946516121907086e-05,
+            "feature_id": "ATLSEA_FILL_libya_suez_32"
+          },
+          {
+            "area": 5.364393273873458e-05,
             "feature_id": "ATLSEA_FILL_libya_suez_35"
           },
           {
-            "area": 0.0003419278624556459,
+            "area": 4.760564869300044e-05,
             "feature_id": "ATLSEA_FILL_libya_suez_6"
           },
           {
-            "area": 0.0003651220110134354,
+            "area": 7.172986783718336e-05,
+            "feature_id": "ATLSEA_FILL_libya_suez_7"
+          },
+          {
+            "area": 5.7703226893738274e-05,
+            "feature_id": "ATLSEA_FILL_libya_suez_8"
+          },
+          {
+            "area": 4.8231758116955944e-05,
+            "feature_id": "ATLSEA_FILL_libya_suez_9"
+          },
+          {
+            "area": 0.022295003374889672,
+            "feature_id": "ATLSEA_FILL_mediterranean_1"
+          },
+          {
+            "area": 0.0011149317563322089,
             "feature_id": "ATLSEA_FILL_sicily_tunis_1"
           },
           {
-            "area": 3.2295036273617363e-06,
+            "area": 0.0010776247012547506,
+            "feature_id": "ATLSEA_FILL_sicily_tunis_10"
+          },
+          {
+            "area": 0.004391361281385479,
+            "feature_id": "ATLSEA_FILL_sicily_tunis_13"
+          },
+          {
+            "area": 0.0007066465142548914,
             "feature_id": "ATLSEA_FILL_sicily_tunis_15"
           },
           {
@@ -15488,91 +15788,223 @@
             "feature_id": "ATLSEA_FILL_sicily_tunis_4"
           },
           {
-            "area": 0.0001024947863346942,
+            "area": 0.0046113997651526335,
             "feature_id": "ATLSEA_FILL_tyrrhenian_1"
           },
           {
-            "area": 0.00014780829853777678,
+            "area": 0.012009210312605784,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_15"
+          },
+          {
+            "area": 0.0003239933980710565,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_16"
+          },
+          {
+            "area": 0.005710549748434107,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_17"
+          },
+          {
+            "area": 0.0011844565406281412,
             "feature_id": "ATLSEA_FILL_tyrrhenian_19"
           },
           {
-            "area": 1.2683281139746583e-07,
-            "feature_id": "ATLSEA_FILL_tyrrhenian_26"
+            "area": 0.002893956456809161,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_2"
           },
           {
-            "area": 1.192638849676317e-05,
+            "area": 0.00036746766550934957,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_24"
+          },
+          {
+            "area": 0.006213288391874283,
             "feature_id": "ATLSEA_FILL_tyrrhenian_27"
+          },
+          {
+            "area": 0.0018267459462621449,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_28"
+          },
+          {
+            "area": 0.011584986039897133,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_31"
+          },
+          {
+            "area": 0.005098957039993582,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_33"
+          },
+          {
+            "area": 0.0016586554699406669,
+            "feature_id": "ATLSEA_FILL_tyrrhenian_6"
+          },
+          {
+            "area": 1.3395669905048455e-09,
+            "feature_id": "ATLSEA_FILL_west_med_15"
+          },
+          {
+            "area": 5.7748284376603195e-05,
+            "feature_id": "ATLSEA_FILL_west_med_16"
+          },
+          {
+            "area": 2.6603290177521818e-05,
+            "feature_id": "ATLSEA_FILL_west_med_18"
+          },
+          {
+            "area": 0.0002098000268019491,
+            "feature_id": "ATLSEA_FILL_west_med_19"
+          },
+          {
+            "area": 3.000167128320341e-05,
+            "feature_id": "ATLSEA_FILL_west_med_23"
+          },
+          {
+            "area": 0.0010815388498706625,
+            "feature_id": "ATLSEA_FILL_west_med_25"
+          },
+          {
+            "area": 0.0019314290815539805,
+            "feature_id": "ATLSEA_FILL_west_med_30"
+          },
+          {
+            "area": 0.0017159223105241961,
+            "feature_id": "ATLSEA_FILL_west_med_32"
           },
           {
             "area": 3.565881047705673e-06,
             "feature_id": "ATLSEA_FILL_west_med_39"
           },
           {
-            "area": 2.6070933154383273e-05,
+            "area": 2.778158496486316e-05,
             "feature_id": "ATLSEA_FILL_west_med_40"
           },
           {
-            "area": 3.0272237529090446e-05,
+            "area": 5.4988565635391426e-05,
             "feature_id": "ATLSEA_FILL_west_med_41"
           },
           {
-            "area": 0.00022684755477721228,
+            "area": 0.000252751926420047,
             "feature_id": "ATLSEA_FILL_west_med_42"
           },
           {
-            "area": 4.629720883712684e-06,
+            "area": 5.4847259162351544e-05,
+            "feature_id": "ATLSEA_FILL_west_med_45"
+          },
+          {
+            "area": 5.531628733718457e-07,
+            "feature_id": "ATLSEA_FILL_west_med_70"
+          },
+          {
+            "area": 0.0006526423768588198,
+            "feature_id": "ATLSEA_FILL_west_med_76"
+          },
+          {
+            "area": 0.0037887238617197658,
+            "feature_id": "ATLSEA_FILL_west_med_77"
+          },
+          {
+            "area": 0.006225236258426116,
+            "feature_id": "ATLSEA_FILL_west_med_78"
+          },
+          {
+            "area": 0.00013679032977049772,
+            "feature_id": "ATLSEA_FILL_west_med_79"
+          },
+          {
+            "area": 0.001127998224283076,
+            "feature_id": "ATLSEA_FILL_west_med_80"
+          },
+          {
+            "area": 7.675133011573633e-05,
+            "feature_id": "ATLSEA_FILL_west_med_84"
+          },
+          {
+            "area": 0.014577628822284036,
             "feature_id": "ATLSEA_adriatica_8597_5838_0"
           },
           {
-            "area": 7.1575364872456594e-06,
+            "area": 0.0008909365226502764,
+            "feature_id": "ATLSEA_adriatica_8601_5913_0"
+          },
+          {
+            "area": 0.007544742583905183,
             "feature_id": "ATLSEA_adriatica_8602_5864_0"
           },
           {
-            "area": 0.00019228435971222803,
+            "area": 0.0007531261835942649,
+            "feature_id": "ATLSEA_adriatica_8602_5864_1"
+          },
+          {
+            "area": 0.0007376554113443076,
+            "feature_id": "ATLSEA_adriatica_8602_5864_2"
+          },
+          {
+            "area": 0.01315055363159574,
+            "feature_id": "ATLSEA_adriatica_8604_5890_0"
+          },
+          {
+            "area": 0.011694846682413381,
+            "feature_id": "ATLSEA_adriatica_8604_5890_1"
+          },
+          {
+            "area": 0.0009081251271783961,
+            "feature_id": "ATLSEA_adriatica_8604_5890_4"
+          },
+          {
+            "area": 0.002193324678221629,
+            "feature_id": "ATLSEA_aegean_8608_6608_2"
+          },
+          {
+            "area": 0.009716533701321908,
             "feature_id": "ATLSEA_aegean_8610_225_0"
           },
           {
-            "area": 8.976915930439684e-05,
+            "area": 0.0013828989070280217,
             "feature_id": "ATLSEA_aegean_8619_428_0"
           },
           {
-            "area": 0.00013903776640227265,
+            "area": 0.0010687302949165343,
             "feature_id": "ATLSEA_gabes_8598_9013_2"
           },
           {
-            "area": 3.3785842199515676e-05,
+            "area": 0.007001816944341867,
             "feature_id": "ATLSEA_levant_8609_7002_0"
           },
           {
-            "area": 0.00011097420935212517,
+            "area": 0.00021000917366904696,
             "feature_id": "ATLSEA_levant_8611_609_0"
           },
           {
-            "area": 0.0009765953043963061,
+            "area": 0.004261216267747928,
+            "feature_id": "ATLSEA_levant_8612_6219_0"
+          },
+          {
+            "area": 0.0029597216886318506,
+            "feature_id": "ATLSEA_levant_8613_803_0"
+          },
+          {
+            "area": 0.002410157282285245,
             "feature_id": "ATLSEA_libya_suez_8605_9049_0"
           },
           {
-            "area": 0.00033205364784707467,
+            "area": 0.0006464160126624603,
             "feature_id": "ATLSEA_libya_suez_8614_6011_0"
           },
           {
-            "area": 0.00028996354835276604,
+            "area": 0.00027928578994429725,
             "feature_id": "ATLSEA_libya_suez_8615_5985_1"
           },
           {
-            "area": 0.0001750898106422253,
+            "area": 0.000816629755510725,
             "feature_id": "ATLSEA_sicily_tunis_8591_8965_0"
           },
           {
-            "area": 0.00037220204612012256,
+            "area": 0.006143790892609904,
             "feature_id": "ATLSEA_sicily_tunis_8592_5605_0"
           },
           {
-            "area": 1.1673507170303468e-07,
+            "area": 0.001121961929423319,
             "feature_id": "ATLSEA_sicily_tunis_8598_9013_0"
           },
           {
-            "area": 9.054135497846957e-07,
+            "area": 0.002399751722660086,
             "feature_id": "ATLSEA_sicily_tunis_8600_5733_0"
           },
           {
@@ -15580,16 +16012,88 @@
             "feature_id": "ATLSEA_sicily_tunis_8603_5707_0"
           },
           {
-            "area": 0.00027527397175216596,
+            "area": 0.0016704204766467454,
+            "feature_id": "ATLSEA_tyrrhenian_8578_5579_0"
+          },
+          {
+            "area": 0.03300608075008945,
             "feature_id": "ATLSEA_tyrrhenian_8579_5555_0"
           },
           {
-            "area": 0.00022284329892273375,
+            "area": 3.706556501975447e-07,
+            "feature_id": "ATLSEA_tyrrhenian_8588_5681_12"
+          },
+          {
+            "area": 1.600833561361197e-06,
+            "feature_id": "ATLSEA_tyrrhenian_8588_5681_13"
+          },
+          {
+            "area": 4.460864167153792e-06,
+            "feature_id": "ATLSEA_tyrrhenian_8588_5681_4"
+          },
+          {
+            "area": 1.4979135041888008e-06,
+            "feature_id": "ATLSEA_tyrrhenian_8588_5681_8"
+          },
+          {
+            "area": 0.009564369801546303,
             "feature_id": "ATLSEA_tyrrhenian_8590_5656_0"
           },
           {
-            "area": 9.684155727087692e-05,
+            "area": 0.007791567469537884,
+            "feature_id": "ATLSEA_tyrrhenian_8593_8895_0"
+          },
+          {
+            "area": 0.00902496506682282,
+            "feature_id": "ATLSEA_west_med_8577_5407_0"
+          },
+          {
+            "area": 4.116887981327185e-06,
+            "feature_id": "ATLSEA_west_med_8581_5505_0"
+          },
+          {
+            "area": 0.0014877668623849666,
+            "feature_id": "ATLSEA_west_med_8582_5454_0"
+          },
+          {
+            "area": 0.005771312425591187,
+            "feature_id": "ATLSEA_west_med_8583_8793_0"
+          },
+          {
+            "area": 0.00211029031568731,
+            "feature_id": "ATLSEA_west_med_8584_5431_0"
+          },
+          {
+            "area": 0.017117518222157346,
+            "feature_id": "ATLSEA_west_med_8586_8871_0"
+          },
+          {
+            "area": 0.004661615296228514,
+            "feature_id": "ATLSEA_west_med_8586_8871_1"
+          },
+          {
+            "area": 0.0011005796365803275,
+            "feature_id": "ATLSEA_west_med_8587_8819_0"
+          },
+          {
+            "area": 0.010749513725474918,
             "feature_id": "ATLSEA_west_med_8594_5479_0"
+          },
+          {
+            "area": 0.006242914403699772,
+            "feature_id": "ATLSEA_west_med_8595_5531_0"
+          },
+          {
+            "area": 0.0003149651841039782,
+            "feature_id": "ATLSEA_west_med_8595_5531_1"
+          },
+          {
+            "area": 0.00020915259778315045,
+            "feature_id": "ATLSEA_west_med_8596_8941_0"
+          },
+          {
+            "area": 0.0018487200475133388,
+            "feature_id": "ATLSEA_west_med_8596_8941_1"
           }
         ]
       },
@@ -15669,7 +16173,7 @@
         ]
       },
       "mediterranean_closure": {
-        "completion_area": 12.832341932961917,
+        "completion_area": 12.832341932961919,
         "completion_feature_count": 1,
         "remaining_hole_area": 0.0,
         "remaining_hole_count": 0
@@ -15711,7 +16215,7 @@
         ]
       },
       "tyrrhenian": {
-        "area": 27.526229,
+        "area": 27.526277,
         "bounds": [
           5.0,
           37.0,
@@ -15719,13 +16223,13 @@
           45.744039
         ],
         "centroid": [
-          9.093969,
-          40.405152
+          9.093959,
+          40.405171
         ],
-        "completion_area": 15.759758,
-        "completion_feature_count": 54,
+        "completion_area": 15.759807,
+        "completion_feature_count": 55,
         "expected_completion_area": 60.380627,
-        "feature_count": 97,
+        "feature_count": 98,
         "group_label": "Tyrrhenian and West Italian Coast",
         "remaining_hole_area": 0.005715,
         "remaining_hole_count": 14,
@@ -15748,7 +16252,7 @@
         ]
       },
       "west_med": {
-        "area": 29.902658,
+        "area": 29.902654,
         "bounds": [
           -5.859888,
           33.300002,
@@ -15761,7 +16265,7 @@
         ],
         "completion_area": 4.016066,
         "completion_feature_count": 92,
-        "expected_completion_area": 65.570381,
+        "expected_completion_area": 65.570377,
         "feature_count": 119,
         "group_label": "West Mediterranean and Iberia-Algeria",
         "remaining_hole_area": 0.010529,
@@ -15800,16 +16304,8 @@
       }
     },
     "named_water_new_atl_land_clip": {
-      "changed_water_ids": [
-        "tno_bosporus_dardanelles"
-      ],
-      "features": [
-        {
-          "id": "tno_bosporus_dardanelles",
-          "removed_area_degrees2": 0.012458756631422738
-        }
-      ],
-      "removed_area_degrees2": 0.012458756631422738
+      "changed_water_ids": [],
+      "removed_area_degrees2": 0.0
     },
     "named_water_snapshot_path": "data/scenarios/tno_1962/derived/marine_regions_named_waters.snapshot.geojson",
     "named_water_source_diagnostics": {
@@ -21879,9 +22375,7 @@
         "supplement_bboxes": []
       }
     },
-    "new_atl_helper_reallocations": {
-      "ATLSHL_aegean_31": "ATLSHL_aegean_33"
-    },
+    "new_atl_helper_reallocations": {},
     "owner_only_backfill_diagnostics": {
       "by_tag": {
         "AFA": [
@@ -23300,7 +23794,7 @@
       ]
     },
     "romania_transnistria_applied": true,
-    "runtime_feature_count": 12697,
+    "runtime_feature_count": 9958,
     "runtime_topology_objects": [
       "political",
       "land_mask",
@@ -112341,7 +112835,7 @@
       "controller_feature_count": 488,
       "display_name": "Atlantropa Reclamation Zone",
       "entry_kind": "",
-      "feature_count": 488,
+      "feature_count": 489,
       "hidden_from_country_list": true,
       "historical_fidelity": "alternate_history",
       "historical_fidelity_summary": [
@@ -118196,13 +118690,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "51a3b6e72882d1e1804738fdec04189d4b93619ea8ae2fded14be6464732d661",
+  "snapshot_fingerprint": "4e2aaebcc26091b18ce744af29d489f06c2f563621a1717f4cd22639e5ab841e",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "f43a1e55f71f74a9a4c1750bdf2a1f849e31bea685a7a78098c910c633d37e76",
-    "detail_chunk_manifest_sha256": "374c9ad2210b9503dceb51f109d0931089c3255c3a2820d42e77e1356f5f68c9",
-    "runtime_bootstrap_topology_sha256": "a2863d77e286c75740b339b03c60dbd49a1ab4a4428f255b43f95189a842e7ba",
-    "runtime_topology_sha256": "2b7b6c24161bbe21e20d0b16843b07ee1245b89dca4b2467dda62647110c7cf6"
+    "build_snapshot_sha256": "2c59586df6d1bb0cf108f4127f7487e7c3ced2e3047b950244cb047fc28d2c97",
+    "detail_chunk_manifest_sha256": "5433a525c3fabe1581dd1b1baf26cc7b3be76207fb868cfff237b9b53cc91263",
+    "runtime_bootstrap_topology_sha256": "33b995621fa5433a46398c1e3786925d391f057aeda29c472b9ee4bc04eba6aa",
+    "runtime_topology_sha256": "2f15c4b5ac44871b5294f3dff9148963bb531df889808940a2c98fd4ee8a793d"
   },
   "summary": {
     "approximate_count": 973,
@@ -118218,7 +118712,7 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 9957,
+    "feature_count": 9958,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 10432,
     "manual_reviewed_region_count": 0,
@@ -118229,7 +118723,7 @@
       "direct_country_copy": 2702,
       "manual_reviewed": 10432
     },
-    "scenario_atlantropa_feature_count": 726,
+    "scenario_atlantropa_feature_count": 727,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {

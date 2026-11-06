@@ -145,25 +145,25 @@ test("vertical layer tabs switch properties with arrows and Home and End", async
   await openWorkspace(page);
   await page.locator("#editorTaskLayersBtn").click();
   const groups = page.locator('#editorTask-layers [role="tablist"]');
-  await expect(groups).toHaveCount(2);
+  await expect(groups).toHaveCount(5);
   const borders = page.locator("#appearanceTabBorders");
+  const special = page.locator("#editorLayer-special-zones");
   await borders.click();
-  await expect(borders.locator('xpath=..')).toHaveAttribute("aria-orientation", "vertical");
+  await expect(borders.locator('xpath=../..')).toHaveAttribute("aria-orientation", "vertical");
   await borders.press("ArrowDown");
-  await expect(page.locator("#appearanceTabPhysical")).toBeFocused();
-  await expect(page.locator("#appearanceTabPhysical")).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("#editorProperty-data-appearance-panel-physical")).toBeVisible();
+  await expect(special).toBeFocused();
+  await expect(special).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#editorProperty-special-zones")).toBeVisible();
   await expect(page.locator("#editorProperty-data-appearance-panel-borders")).toBeHidden();
-  await page.keyboard.press("End");
-  await expect(page.locator("#appearanceTabPresets")).toBeFocused();
-  await expect(page.locator("#appearanceTabPresets")).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("#editorProperty-data-appearance-panel-presets")).toBeVisible();
-  await expect(page.locator("#editorProperty-data-appearance-panel-physical")).toBeHidden();
   await page.keyboard.press("Home");
+  await expect(borders).toBeFocused();
+  await page.keyboard.press("End");
+  await expect(special).toBeFocused();
+  await page.keyboard.press("ArrowDown");
   await expect(borders).toBeFocused();
   await expect(borders).toHaveAttribute("aria-selected", "true");
   await expect(page.locator("#editorProperty-data-appearance-panel-borders")).toBeVisible();
-  await expect(page.locator("#editorProperty-data-appearance-panel-presets")).toBeHidden();
+  await expect(page.locator("#editorProperty-special-zones")).toBeHidden();
   for (const group of await groups.all()) {
     await expect(group).toHaveAttribute("aria-orientation", "vertical");
     expect(await group.locator('[role="tab"][tabindex="0"]').count()).toBeGreaterThanOrEqual(1);
@@ -612,4 +612,47 @@ test("workspace widths and mobile drawer have no horizontal page overflow", asyn
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(769);
   await page.keyboard.press("Escape");
   await expect(page.locator("#leftPanelToggle")).toBeFocused();
+});
+
+
+test("layer search, visibility and display preserve control ownership", async ({ page }) => {
+  await openWorkspace(page);
+  await page.locator("#editorTaskLayersBtn").click();
+  const physical = page.locator('[data-layer-key="physical"]');
+  const toggle = physical.locator(".editor-layer-visibility");
+  const checked = await page.locator("#togglePhysical").isChecked();
+  const property = await page.locator("#rightSidebarContent").getAttribute("data-editor-context");
+  await toggle.click();
+  await expect(page.locator("#togglePhysical")).toBeChecked({ checked: !checked });
+  await expect(toggle).toHaveAttribute("aria-pressed", String(!checked));
+  await expect(page.locator("#rightSidebarContent")).toHaveAttribute("data-editor-context", property);
+  const search = page.locator("#editorLayerSearch");
+  await search.fill("physical");
+  await expect(page.locator(".editor-layer-row:visible")).toHaveCount(1);
+  await expect(physical).toBeVisible();
+  await search.fill("unmatched-layer-name");
+  await expect(page.locator("#editorLayersEmpty")).toBeVisible();
+  await search.press("Escape");
+  await expect(page.locator(".editor-layer-row:visible")).toHaveCount(16);
+  await page.locator("#editorLayer-display").click();
+  await expect(page.locator("#editorProperty-display #displayQuality")).toBeVisible();
+  await expect(page.locator("#editorProperty-display #politicalRenderMode")).toHaveCount(1);
+  await page.evaluate(() => {
+    const host = document.getElementById("editorProperty-display");
+    const strip = document.createElement("div");
+    strip.className = "layer-status-strip";
+    strip.dataset.statusTone = "active";
+    strip.textContent = "Ready";
+    host.append(strip);
+  });
+  const dot = page.locator('[data-layer-key="display"] .editor-layer-status');
+  await expect(dot).toBeVisible();
+  await expect(dot).toHaveAttribute("data-status-tone", "active");
+  await expect(dot).toHaveAttribute("title", "Ready");
+  await page.locator("#editorProperty-display .layer-status-strip").evaluate((strip) => {
+    strip.dataset.statusTone = "warning";
+    strip.textContent = "Unavailable";
+  });
+  await expect(dot).toHaveAttribute("data-status-tone", "warning");
+  await expect(dot).toHaveAttribute("title", "Unavailable");
 });

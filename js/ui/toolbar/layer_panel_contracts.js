@@ -106,7 +106,8 @@ const BASE_LAYER_PANEL_CONTRACTS = Object.freeze([
     defaultVisibilityField: "parentBordersVisible",
     requiredRuntimeKeys: ["parentBordersVisible", "landData"],
     dataKeys: ["landData"],
-    enabled: (state) => state.parentBordersVisible !== false,
+    // 国家与内部边界总在绘制；上级单元边界只是其中一组开关，不能代表整页状态。
+    enabled: () => true,
   }),
   createLayerPanelContract({
     id: "physical",

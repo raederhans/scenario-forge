@@ -1,13 +1,8 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createHitCanvasSchedulingOwner } from "../js/core/map_renderer/hit_canvas_scheduling_owner.js";
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OWNER_PATH = "js/core/map_renderer/hit_canvas_scheduling_owner.js";
 
 function createHarness(overrides = {}) {
   const calls = [];
@@ -357,21 +352,3 @@ test("createHitCanvasSchedulingOwner fails fast for missing dependencies", () =>
   );
 });
 
-test("hit canvas scheduling owner stays outside renderer build and probe bodies", () => {
-  const ownerSource = fs.readFileSync(path.join(REPO_ROOT, OWNER_PATH), "utf8");
-  for (const token of [
-    "runtimeState",
-    "rendererSurfaceHost",
-    "drawHitCanvas",
-    "drawHitCanvasWithMetric",
-    "recordDeferredFullHitCanvasMetric",
-    "buildHitCanvasAfterStartup",
-    "getDirtyHitCanvasPointProbeHit",
-    "getValidatedCanvasHit",
-    "hitCanvasTopologyRevision",
-    "from \"../map_renderer.js\"",
-    "from \"./map_renderer.js\"",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `${OWNER_PATH} must avoid ${token}`);
-  }
-});

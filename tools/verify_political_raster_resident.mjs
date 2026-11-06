@@ -47,7 +47,7 @@ async function settle(page) {
 async function setMode(page, mode) {
   if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
   await page.locator("#editorTaskLayersBtn").click();
-  await page.locator("#appearanceTabBorders").click();
+  await page.locator("#editorLayer-display").click();
   await page.locator("#politicalRenderMode").evaluate(element => {
     for (let parent = element.parentElement; parent; parent = parent.parentElement) if (parent.tagName === "DETAILS") parent.open = true;
   });

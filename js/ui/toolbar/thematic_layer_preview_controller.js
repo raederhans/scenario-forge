@@ -126,6 +126,7 @@ export function createThematicLayerPreviewController({
       thematicCatalogPreview: preview,
     }, { translate: t });
     const summary = sanitizeLayerStatusText(diagnostic.summary || THEMATIC_CATALOG_PENDING_SUMMARY);
+    statusNode.title = diagnostic.detail ? sanitizeLayerStatusText(diagnostic.detail) : "";
     statusNode.textContent = summary;
     statusNode.dataset.statusSummary = summary;
     setStatusSeverity(statusNode, diagnostic);
