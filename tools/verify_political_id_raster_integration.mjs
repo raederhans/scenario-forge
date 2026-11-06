@@ -90,7 +90,7 @@ async function toggle(page, enabled) {
   if (wasCollapsed) await page.locator("#leftSidebarCollapseBtn").click();
   if (!(await page.locator("#politicalRasterTrial").isVisible())) {
     await page.locator("#editorTaskLayersBtn").click();
-    await page.locator("#appearanceTabBorders").click();
+    await page.locator("#editorLayer-display").click();
   }
   const control = page.locator("#politicalRasterTrial");
   await control.evaluate(element => {
