@@ -15,7 +15,7 @@ npm run test:e2e:golden  # 黄金用户流程（约 10 分钟）
 
 `dist/` 不签入。Pages 产物由 CI 用 `tools/build_pages_dist.py` 从源码构建，其中编辑器 JS 由 `tools/build_editor_bundle.mjs`（esbuild）打包到 `app/js/bundle/`；本地需要时运行 `npm run verify:pages-dist`。
 
-`tests/quarantine.json` 是 PR 上唯一的跳过清单，每一项都必须写明原因，修好或删掉后立即移除。nightly 用 `--all` 运行全部测试，包括隔离项和慢测试。
+`tests/quarantine.json` 是 PR 上唯一的跳过清单，每一项都必须写明原因，修好或删掉后立即移除。nightly 用 `--with-slow` 额外运行慢测试，但仍跳过隔离项，只在出现新的破坏时报红；需要完整审计时手动用 `--all`（连隔离项一起跑）。perf-pr-gate 不再定时运行，只在 PR 和手动触发时测量。
 
 | 阶段 | 使用方式 |
 | --- | --- |

@@ -212,7 +212,7 @@ import {
 } from "./state/actions/renderer_cache_actions.js";
 import {
   captureRenderPerfContextBreakdownState,
-  captureRenderPerfMetricEntryState, captureRenderPerfMetricsState, captureRenderSnapshotState,
+  captureRenderSnapshotState,
   commitRenderPerfMetricState, ensureRenderPerfMetricsState,
   setDebugCountryCoverageState,
   setProjectedBoundsDiagnosticsState as commitProjectedBoundsDiagnosticsState,
@@ -795,7 +795,21 @@ let cachedPassCompositorOwner = null;
 let exactCompositeReuseOwner = null;
 let transformedFrameCompositorOwner = null;
 let renderPerfMetricsRuntimeOwner = null;
-const renderPerfMetricsMirrorRuntime = { snapshot: null };
+Object.defineProperty(globalThis, "__renderPerfMetrics", {
+  configurable: true,
+  enumerable: true,
+  get() { return runtimeState.renderPerfMetrics || {}; },
+  set(value) {
+    // Assigning the live state object keeps the accessor, so later state replacement still shows.
+    if (value === runtimeState.renderPerfMetrics) return;
+    Object.defineProperty(globalThis, "__renderPerfMetrics", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value,
+    });
+  },
+});
 let renderPassCacheHostOwner = null;
 let renderPassCommitAccountingOwner = null;
 let drawCanvasOrchestrationOwner = null;
@@ -4731,7 +4745,6 @@ function getRenderPerfMetricsRuntimeOwner() {
       ensureRenderPerfMetricsState: () => ensureRenderPerfMetricsState(runtimeState),
       commitRenderPerfMetricState: (payload) => commitRenderPerfMetricState(runtimeState, payload),
       setRenderPerfContextBreakdownState: (breakdown) => setRenderPerfContextBreakdownState(runtimeState, breakdown),
-      mirrorRenderPerfMetrics: mirrorRenderPerfMetricSnapshot,
     },
   });
   return renderPerfMetricsRuntimeOwner;
@@ -4746,23 +4759,6 @@ function collectContextMetric(name, durationMs, details = {}) { return getRender
 function endContextMetricSession() { return getRenderPerfMetricsRuntimeOwner().endContextMetricSession(); }
 
 function resetContextBreakdownForExactFrame() { return getRenderPerfMetricsRuntimeOwner().resetContextBreakdownForExactFrame(); }
-
-function mirrorRenderPerfMetricSnapshot(name) {
-  const normalizedName = String(name || "").trim();
-  if (!normalizedName) return false;
-  if (
-    !renderPerfMetricsMirrorRuntime.snapshot
-    || globalThis.__renderPerfMetrics !== renderPerfMetricsMirrorRuntime.snapshot
-  ) {
-    renderPerfMetricsMirrorRuntime.snapshot = captureRenderPerfMetricsState(runtimeState) || {};
-  } else {
-    const entry = captureRenderPerfMetricEntryState(runtimeState, normalizedName);
-    if (entry === undefined) delete renderPerfMetricsMirrorRuntime.snapshot[normalizedName];
-    else renderPerfMetricsMirrorRuntime.snapshot[normalizedName] = entry;
-  }
-  globalThis.__renderPerfMetrics = renderPerfMetricsMirrorRuntime.snapshot;
-  return true;
-}
 
 function incrementPerfCounter(counterName, amount = 1) {
   const cache = getRenderPassCacheState();
@@ -4862,7 +4858,6 @@ function resetScenarioWaterCacheAdaptiveState(reason = "water-adaptive-state-res
       recordedAt: Date.now(),
     },
   });
-  mirrorRenderPerfMetricSnapshot("waterAdaptiveStateResetCount");
 }
 
 function stableJson(value) {

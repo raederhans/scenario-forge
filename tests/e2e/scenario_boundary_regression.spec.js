@@ -34,14 +34,10 @@ async function ensureScenario(page, scenarioId) {
   const scenarioReady = await page.evaluate(async (expectedScenarioId) => {
     const { state } = await import("/js/core/state.js");
     const openingOwnerMesh = state.activeScenarioMeshPack?.meshes?.opening_owner_borders;
-    const cachedOpeningOwnerMesh = state.cachedScenarioOpeningOwnerBorders;
     return state.activeScenarioId === expectedScenarioId
       && !state.scenarioApplyInFlight
       && Array.isArray(openingOwnerMesh?.coordinates)
-      && openingOwnerMesh.coordinates.length > 0
-      && cachedOpeningOwnerMesh === openingOwnerMesh
-      && Array.isArray(cachedOpeningOwnerMesh?.coordinates)
-      && cachedOpeningOwnerMesh.coordinates.length > 0;
+      && openingOwnerMesh.coordinates.length > 0;
   }, scenarioId);
   if (!scenarioReady) {
     const initialScenarioId = await page.evaluate(async () => {
@@ -53,14 +49,10 @@ async function ensureScenario(page, scenarioId) {
         await page.waitForFunction((expectedScenarioId) => {
           const state = globalThis.__playwrightStateRef || null;
           const openingOwnerMesh = state?.activeScenarioMeshPack?.meshes?.opening_owner_borders;
-          const cachedOpeningOwnerMesh = state?.cachedScenarioOpeningOwnerBorders;
           return state.activeScenarioId === expectedScenarioId
             && !state.scenarioApplyInFlight
             && Array.isArray(openingOwnerMesh?.coordinates)
-            && openingOwnerMesh.coordinates.length > 0
-            && cachedOpeningOwnerMesh === openingOwnerMesh
-            && Array.isArray(cachedOpeningOwnerMesh?.coordinates)
-            && cachedOpeningOwnerMesh.coordinates.length > 0;
+            && openingOwnerMesh.coordinates.length > 0;
         }, scenarioId, { timeout: 20000 });
         return;
       } catch (_error) {
@@ -94,14 +86,10 @@ async function ensureScenario(page, scenarioId) {
   await page.waitForFunction((expectedScenarioId) => {
     const state = globalThis.__playwrightStateRef || null;
     const openingOwnerMesh = state?.activeScenarioMeshPack?.meshes?.opening_owner_borders;
-    const cachedOpeningOwnerMesh = state?.cachedScenarioOpeningOwnerBorders;
     return state.activeScenarioId === expectedScenarioId
       && !state.scenarioApplyInFlight
       && Array.isArray(openingOwnerMesh?.coordinates)
-      && openingOwnerMesh.coordinates.length > 0
-      && cachedOpeningOwnerMesh === openingOwnerMesh
-      && Array.isArray(cachedOpeningOwnerMesh?.coordinates)
-      && cachedOpeningOwnerMesh.coordinates.length > 0;
+      && openingOwnerMesh.coordinates.length > 0;
   }, scenarioId, { timeout: 120000 });
   await page.waitForTimeout(1500);
 }
@@ -161,9 +149,6 @@ async function readBoundaryRuntime(page) {
       fullHelperCount: countHelpers(state.landDataFull),
       chunkFeatureCount: Array.isArray(state.scenarioPoliticalChunkData?.features) ? state.scenarioPoliticalChunkData.features.length : 0,
       coastlineMeshCount: Array.isArray(state.cachedCoastlines) ? state.cachedCoastlines.length : 0,
-      openingOwnerSegmentCount: Array.isArray(state.cachedScenarioOpeningOwnerBorders?.coordinates)
-        ? state.cachedScenarioOpeningOwnerBorders.coordinates.length
-        : 0,
       meshPackOpeningOwnerSegmentCount: Array.isArray(state.activeScenarioMeshPack?.meshes?.opening_owner_borders?.coordinates)
         ? state.activeScenarioMeshPack.meshes.opening_owner_borders.coordinates.length
         : 0,
@@ -221,7 +206,6 @@ test("scenario boundary regressions stay fixed", async ({ page }) => {
   expect(runtimeBefore.scenarioBorderMode).toBe("scenario_owner_only");
   expect(runtimeBefore.interactiveHelperCount).toBe(0);
   expect(runtimeBefore.localOnlyCountryCount).toBeGreaterThan(0);
-  expect(runtimeBefore.openingOwnerSegmentCount).toBeGreaterThan(0);
   expect(runtimeBefore.coastlineMeshCount).toBeGreaterThan(0);
   expect(runtimeBefore.coastlineSource).not.toBe("scenario_political_outline");
 
@@ -229,7 +213,6 @@ test("scenario boundary regressions stay fixed", async ({ page }) => {
     const { state } = await import("/js/core/state.js");
     const { refreshMapDataForScenarioChunkPromotion } = await import("/js/core/map_renderer.js");
     const { loadScenarioBundle } = await import("/js/core/scenario_resources.js");
-    const beforeMesh = state.cachedScenarioOpeningOwnerBorders;
     const beforeRevision = Number(state.topologyRevision || 0);
     const bundle = await loadScenarioBundle("tno_1962", { bundleLevel: "full", forceReload: true });
     state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
@@ -246,7 +229,6 @@ test("scenario boundary regressions stay fixed", async ({ page }) => {
       return response.json();
     });
     state.scenarioPoliticalChunkData = payload;
-    state.cachedScenarioOpeningOwnerBorders = null;
     refreshMapDataForScenarioChunkPromotion({
       suppressRender: true,
       hasPoliticalPayloadChange: true,
@@ -254,22 +236,13 @@ test("scenario boundary regressions stay fixed", async ({ page }) => {
     return {
       beforeRevision,
       afterRevision: Number(state.topologyRevision || 0),
-      meshRebuilt: beforeMesh !== state.cachedScenarioOpeningOwnerBorders,
-      openingOwnerSegmentCount: Array.isArray(state.cachedScenarioOpeningOwnerBorders?.coordinates)
-        ? state.cachedScenarioOpeningOwnerBorders.coordinates.length
-        : 0,
       meshPackSegmentCount: Array.isArray(bundle?.meshPackPayload?.meshes?.opening_owner_borders?.coordinates)
         ? bundle.meshPackPayload.meshes.opening_owner_borders.coordinates.length
         : 0,
-      openingOwnerMatchesMeshPack:
-        state.cachedScenarioOpeningOwnerBorders === bundle?.meshPackPayload?.meshes?.opening_owner_borders,
     };
   });
   expect(chunkPromotionRuntime.afterRevision).toBeGreaterThan(chunkPromotionRuntime.beforeRevision);
   expect(chunkPromotionRuntime.meshPackSegmentCount).toBeGreaterThan(0);
-  expect(chunkPromotionRuntime.meshRebuilt).toBe(true);
-  expect(chunkPromotionRuntime.openingOwnerSegmentCount).toBeGreaterThan(0);
-  expect(chunkPromotionRuntime.openingOwnerMatchesMeshPack).toBe(true);
 
   expect(networkFailures).toEqual([]);
   expect(pageErrors).toEqual([]);

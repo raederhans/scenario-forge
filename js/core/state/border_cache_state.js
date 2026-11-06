@@ -6,8 +6,6 @@ export function createDefaultBorderCacheState() {
   return {
     cachedBorders: null,
     cachedCountryBorders: null,
-    cachedDynamicOwnerBorders: null,
-    cachedScenarioOpeningOwnerBorders: null,
     cachedFrontlineMesh: null,
     cachedFrontlineMeshHash: "",
     cachedFrontlineLabelAnchors: [],
