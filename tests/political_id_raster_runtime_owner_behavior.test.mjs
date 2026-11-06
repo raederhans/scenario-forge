@@ -1547,6 +1547,28 @@ test("overview colors match their own initial palette after a newer primary publ
   assert.equal(f.owner.matchesPublishedColor("missing", { overview: true }), false);
 });
 
+test("a same-view republish after a geometry change replaces the overview and its feature IDs", async t => {
+  const f = overviewColorFixture();
+  t.after(() => f.owner.dispose());
+  f.identity.geometryContentVersion = "coarse";
+  f.owner.draw(); await resolveAll(f); f.owner.draw(); f.owner.publishDirectFrame();
+  const coarse = f.owner.getOverviewFrame();
+  assert.ok(coarse);
+  assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), true);
+  // Startup-like swap: the same scene and view now publish detailed features
+  // with other IDs and colors in place of the coarse collection.
+  f.setFeatures([feature("detail", { minX: -160, minY: -160, maxX: -140, maxY: -140 }, "#4a6346")]);
+  f.identity.geometryContentVersion = "detail"; f.identity.version++;
+  f.owner.draw(); await resolveAll(f, "detail"); f.owner.draw(); f.owner.publishDirectFrame();
+  const detailed = f.owner.getOverviewFrame();
+  assert.ok(detailed);
+  assert.notEqual(detailed, coarse, "an overview of replaced geometry cannot stand in for the new frame");
+  assert.equal(detailed.sourceFrame, f.owner.getDirectFrame());
+  assert.equal(f.owner.matchesPublishedColor("detail", { overview: true }), true);
+  assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), false);
+  assert.deepEqual([...detailed.gpu.palettes.at(-1).bytes.subarray(-4)], [0x4a, 0x63, 0x46, 255]);
+});
+
 for (const [reason, invalidate] of [
   ["scene", f => { f.identity.sceneKey = "scene-next"; }],
   ["DPR", f => { f.state.dpr++; }],
