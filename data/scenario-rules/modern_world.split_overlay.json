@@ -2,6 +2,40 @@
   "version": 1,
   "entries": [
     {
+      "id": "mw_myanmar_military_enclaves",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "MM",
+      "cores": [
+        "MM"
+      ],
+      "only_from_owners": [
+        "ARK",
+        "CHR",
+        "KIO"
+      ],
+      "select": {
+        "feature_ids": [
+          "MMR-3273__SPLIT_SITTWE",
+          "MMR-3273__SPLIT_KYAUKPYU",
+          "MMR-3273__SPLIT_MUNAUNG",
+          "MMR-3274__SPLIT_HAKHA",
+          "MMR-3274__SPLIT_TEDIM",
+          "MMR-3296__SPLIT_MYITKYINA",
+          "MMR-3296__SPLIT_WAINGMAW",
+          "MMR-3296__SPLIT_BHAMO_GARRISON",
+          "MMR-3296__SPLIT_PUTAO",
+          "MMR-3296__SPLIT_MACHANBAW",
+          "MMR-3296__SPLIT_NAWNGMUN",
+          "MMR-3296__SPLIT_KHAUNGLANHPU",
+          "MMR-3296__SPLIT_TANAI",
+          "MMR-3296__SPLIT_MOHNYIN",
+          "MMR-3296__SPLIT_MOGAUNG"
+        ]
+      }
+    },
+    {
       "id": "mw_abkhazia",
       "scenarios": [
         "modern_world"
@@ -2413,11 +2447,44 @@
         "SY"
       ],
       "select": {
-        "feature_ids": [
-          "SYR-5261"
+        "country_codes": [
+          "IL",
+          "SY"
+        ],
+        "polygons": [
+          [
+            [
+              35.5,
+              32.5
+            ],
+            [
+              36.1,
+              32.5
+            ],
+            [
+              36.1,
+              33.6
+            ],
+            [
+              35.5,
+              33.6
+            ],
+            [
+              35.5,
+              32.5
+            ]
+          ]
         ]
       },
-      "comment": "以色列占领的叙利亚隔离带（Israeli-occupied Syrian buffer zone）；A 类占领实控：2024-12 起以色列占领 1974 年 UNDOF 隔离带与黑门山叙方主峰，地块 SYR-5261（name=UNDOF）正好对应，owner 改 IL、cores 记 SY。戈兰主体已并在 ISR-3056 里并归 IL，无单独地块，见 deferred。选中 1 块，把握高。（核对修正：A 类沿用已有 tag IL，去掉 name/notes/subject_kind，避免 update_country 覆盖以色列本身的元数据）"
+      "comment": "UNDOF 缓冲区余块单列；戈兰主体另按 Natural Earth 边界记录。",
+      "exclude": {
+        "feature_ids": [
+          "ISR-3056__SPLIT_REMAINDER",
+          "ISR-3056__SPLIT_GOLAN_HEIGHTS",
+          "SYR-5261__SPLIT_GOLAN_HEIGHTS",
+          "SYR-145"
+        ]
+      }
     },
     {
       "id": "mw_iraq_kurdistan",
@@ -2504,10 +2571,13 @@
         "feature_ids": [
           "SYR-141",
           "SYR-136",
-          "SYR-142"
+          "SYR-142",
+          "SYR-137__SPLIT_KOBANI",
+          "SYR-137__SPLIT_DEIR_HAFIR_MASKANAH",
+          "SYR-137__SPLIT_ALEPPO_NEIGHBORHOODS"
         ]
       },
-      "notes": "书签日取 2026-01 冲突前的最大范围，整省粗版：哈塞克（拉斯艾因一带除外，按多数）、拉卡（泰勒阿布亚德一带除外，按多数）、代尔祖尔（叙利亚只有整省地块，用近似幼发拉底河线切算东岸约占该省 51%，代表点在东岸，按多数整省归入，把握低）。阿勒颇省的科巴尼、代尔哈菲尔因地块是阿勒颇整省而未表达。选中 3 块。",
+      "notes": "2026-01-01：原哈塞克、拉卡、代尔祖尔粗分保持；新增科巴尼、代尔哈菲尔—马斯卡纳、谢赫马克苏德及阿什拉菲耶的人工近似。排除阿勒颇主体、阿夫林、曼比季、杰拉布卢斯；乡村接触线低置信。",
       "inspector_group_id": "syria_factions",
       "inspector_group_label": "叙利亚各方"
     },
@@ -2900,15 +2970,18 @@
         "MM"
       ],
       "only_from_owners": [
-        "MM"
+        "MM",
+        "CHR",
+        "ARK"
       ],
       "select": {
         "feature_ids": [
-          "MMR-3273",
+          "MMR-3273__SPLIT_REMAINDER",
+          "MMR-3274__SPLIT_PALETWA",
           "MM_PRIMARY_GAP_10"
         ]
       },
-      "notes": "D 类。若开邦整块归若开军（AA/ULA）：书签日 AA 控制若开 17 个镇区中的 14 个，军政府只剩实兑、皎漂、曼昂，按多数整块归入；MM_PRIMARY_GAP_10 是实兑以南的补缝碎片（约 92.9–93.0E、19.8–20.1N），一并归入以免留下飞地。把握较高；实兑、皎漂、曼昂被错划给 AA 属已知近似。选中 2 块。",
+      "notes": "2026-01-01：若开除实兑、皎漂、曼昂镇区外及钦邦 Paletwa。三处军方镇区整体保留是行政近似。补缝块经 ADM3 相交核对属于 Pauktaw。代表驻地妙乌。",
       "scenarios": [
         "modern_world"
       ],
@@ -3008,10 +3081,16 @@
       ],
       "select": {
         "feature_ids": [
-          "MMR-3274"
+          "MMR-3274__SPLIT_FALAM",
+          "MMR-3274__SPLIT_MINDAT",
+          "MMR-3274__SPLIT_MATUPI",
+          "MMR-3274__SPLIT_KANPETLET",
+          "MMR-3274__SPLIT_TONZANG",
+          "MMR-3274__SPLIT_THANTLANG",
+          "MMR-3274__SPLIT_REMAINDER"
         ]
       },
-      "notes": "D 类。钦邦整块归钦族抵抗力量（Chin Brotherhood 与钦兰委员会合为一个实体）：9 个镇区中 Mindat、Matupi、Kanpetlet、Tonzang、Thantlang、Falam（2026-01 仍在抵抗方手中，2026-04 才被军方夺回）由抵抗方控制，Paletwa 归 AA，军政府只剩 Hakha、Tedim，按多数整块归入。Paletwa 应属 AA、Hakha/Tedim 应属 MM，属已知近似。把握中等。选中 1 块。（核对修正：颜色 #3f6fb5→#5b4fc4，与其他新势力 RGB 距离不足 40）",
+      "notes": "2026-01-01：六镇区与边界余区合并表达钦族抵抗力量；Hakha、Tedim 留 MM，Paletwa 归 ARK。混合控制按多数近似，法兰为合并势力代表驻地。",
       "scenarios": [
         "modern_world"
       ],
@@ -3088,10 +3167,10 @@
       ],
       "select": {
         "feature_ids": [
-          "MMR-3296"
+          "MMR-3296__SPLIT_REMAINDER"
         ]
       },
-      "notes": "D 类。克钦邦整块归 KIO/KIA：2024 年攻势后 KIA 称控制 18 个镇区中的 14 个，并掌握中缅边境稀土带和帕敢玉石区大部；密支那、八莫（被围）、Waingmaw 仍在军政府手里。镇区数是 KIA 一方说法，按大致近似口径整块归入。把握中等，波动大。选中 1 块。（核对修正：颜色 #2f9d6a→#1fb3a0，与其他新势力 RGB 距离不足 40）",
+      "notes": "2026-01-01：城市及驻军据点留 MM，其余延续第一批乡村多数近似，低置信，不代表完整前线。八莫仅切残存军方据点。首都拉咱。",
       "scenarios": [
         "modern_world"
       ],
@@ -3150,6 +3229,258 @@
       },
       "notes": "B 类。那加兰邦，宪法第 371A 条特殊地位，NSCN-IM 'Nagalim' 和谈未结。用层级组 IN_Nagaland（含 2 块合并地块，叶子 100% 落入）。曼尼普尔的那加族山区不并入。把握高。选中 6 块。",
       "color_hex": "#fea906"
+    },
+    {
+      "id": "mw_northern_cyprus",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "NCY",
+      "name_en": "Turkish Republic of Northern Cyprus",
+      "name_zh": "北塞浦路斯土耳其共和国",
+      "cores": [
+        "CY"
+      ],
+      "only_from_owners": [
+        "CY"
+      ],
+      "select": {
+        "feature_ids": [
+          "CY000__SPLIT_NORTHERN_CYPRUS"
+        ]
+      },
+      "subject_kind": "de_facto_state",
+      "color_hex": "#b84b5f",
+      "inspector_group_id": "cyprus_dispute",
+      "inspector_group_label": "塞浦路斯争端"
+    },
+    {
+      "id": "mw_south_ossetia",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SOS",
+      "name_en": "Republic of South Ossetia",
+      "name_zh": "南奥塞梯共和国",
+      "cores": [
+        "GE"
+      ],
+      "only_from_owners": [
+        "GE"
+      ],
+      "select": {
+        "feature_ids": [
+          "GEO-3030__SPLIT_SOUTH_OSSETIA",
+          "GEO-3034__SPLIT_SOUTH_OSSETIA",
+          "GEO-3035__SPLIT_SOUTH_OSSETIA",
+          "GEO-3039__SPLIT_SOUTH_OSSETIA"
+        ]
+      },
+      "subject_kind": "de_facto_state",
+      "color_hex": "#7656a8",
+      "inspector_group_id": "post_soviet_frozen_conflicts",
+      "inspector_group_label": "后苏联冻结冲突"
+    },
+    {
+      "id": "mw_m23",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "M23",
+      "name_en": "Congo River Alliance / M23",
+      "name_zh": "刚果河联盟／M23",
+      "cores": [
+        "CD"
+      ],
+      "only_from_owners": [
+        "CD"
+      ],
+      "select": {
+        "feature_ids": [
+          "CD_ADM1_COD-1898__SPLIT_RUTSHURU_MASISI_GOMA",
+          "CD_ADM1_COD-1894__SPLIT_KALEHE_BUKAVU_UVIRA"
+        ]
+      },
+      "subject_kind": "civil_war_faction",
+      "color_hex": "#8a5a22",
+      "inspector_group_id": "congo_conflict",
+      "inspector_group_label": "刚果冲突"
+    },
+    {
+      "id": "mw_wa",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "WAS",
+      "name_en": "Wa State",
+      "name_zh": "佤邦",
+      "cores": [
+        "MM"
+      ],
+      "only_from_owners": [
+        "MM"
+      ],
+      "select": {
+        "feature_ids": [
+          "MMR-3277__SPLIT_PANGSANG",
+          "MMR-3277__SPLIT_MONGMAO",
+          "MMR-3277__SPLIT_PANGWAUN",
+          "MMR-3277__SPLIT_NARPHAN",
+          "MMR-3277__SPLIT_HOPANG"
+        ]
+      },
+      "subject_kind": "de_facto_state",
+      "color_hex": "#7c3752",
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战"
+    },
+    {
+      "id": "mw_kokang",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "KOK",
+      "name_en": "Kokang Administration",
+      "name_zh": "果敢行政当局",
+      "cores": [
+        "MM"
+      ],
+      "only_from_owners": [
+        "MM"
+      ],
+      "select": {
+        "feature_ids": [
+          "MMR-3277__SPLIT_LAUKKAING",
+          "MMR-3277__SPLIT_KONKYAN"
+        ]
+      },
+      "subject_kind": "civil_war_faction",
+      "color_hex": "#cf6c3e",
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战"
+    },
+    {
+      "id": "mw_ace",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "ACE",
+      "name_en": "Aceh Special Region",
+      "name_zh": "亚齐特别地区",
+      "cores": [
+        "ID"
+      ],
+      "only_from_owners": [
+        "ID"
+      ],
+      "select": {
+        "feature_ids": [
+          "ID_ADM1_65028918B93184959873838"
+        ]
+      },
+      "subject_kind": "autonomous_region",
+      "parent_owner_tag": "ID",
+      "presentation": "parent_merged",
+      "color_hex": "#585bb1"
+    },
+    {
+      "id": "mw_adj",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "ADJ",
+      "name_en": "Autonomous Republic of Adjara",
+      "name_zh": "阿扎尔自治共和国",
+      "cores": [
+        "GE"
+      ],
+      "only_from_owners": [
+        "GE"
+      ],
+      "select": {
+        "feature_ids": [
+          "GEO-3027"
+        ]
+      },
+      "subject_kind": "autonomous_region",
+      "parent_owner_tag": "GE",
+      "presentation": "parent_merged",
+      "color_hex": "#b32851"
+    },
+    {
+      "id": "mw_nun",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "NUN",
+      "name_en": "Government of Nunavut",
+      "name_zh": "努纳武特地区政府",
+      "cores": [
+        "CA"
+      ],
+      "only_from_owners": [
+        "CA"
+      ],
+      "select": {
+        "feature_ids": [
+          "CA_FED_62001"
+        ]
+      },
+      "subject_kind": "autonomous_region",
+      "parent_owner_tag": "CA",
+      "presentation": "parent_merged",
+      "color_hex": "#773027"
+    },
+    {
+      "id": "mw_golan_heights",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "IL",
+      "cores": [
+        "SY"
+      ],
+      "only_from_owners": [
+        "IL",
+        "SY"
+      ],
+      "select": {
+        "country_codes": [
+          "IL",
+          "SY"
+        ],
+        "polygons": [
+          [
+            [
+              35.58,
+              32.67
+            ],
+            [
+              35.9,
+              32.67
+            ],
+            [
+              35.9,
+              33.42
+            ],
+            [
+              35.58,
+              33.42
+            ],
+            [
+              35.58,
+              32.67
+            ]
+          ]
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "ISR-3056__SPLIT_REMAINDER",
+          "SYR-5261__SPLIT_REMAINDER",
+          "SYR-145"
+        ]
+      }
     }
   ]
 }

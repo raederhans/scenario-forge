@@ -1,0 +1,701 @@
+{
+  "version": 1,
+  "scenarios": [
+    "modern_world"
+  ],
+  "area_tolerance_degrees2": 1e-08,
+  "entries": [
+    {
+      "id": "shan_townships",
+      "feature_ids": [
+        "MMR-3277"
+      ],
+      "parts": [
+        {
+          "suffix": "PANGSANG",
+          "name_en": "Township Pangsang",
+          "name_zh": "Pangsang镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B22679639113229"
+            ]
+          }
+        },
+        {
+          "suffix": "MONGMAO",
+          "name_en": "Township Mongmao",
+          "name_zh": "Mongmao镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B47048273457297"
+            ]
+          }
+        },
+        {
+          "suffix": "PANGWAUN",
+          "name_en": "Township Pangwaun",
+          "name_zh": "Pangwaun镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B60976321477453"
+            ]
+          }
+        },
+        {
+          "suffix": "NARPHAN",
+          "name_en": "Township Narphan",
+          "name_zh": "Narphan镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B20724664356365"
+            ]
+          }
+        },
+        {
+          "suffix": "HOPANG",
+          "name_en": "Township Hopang",
+          "name_zh": "Hopang镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B72712470803341"
+            ]
+          }
+        },
+        {
+          "suffix": "LAUKKAING",
+          "name_en": "Township Laukkaing",
+          "name_zh": "Laukkaing镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B13890402968202"
+            ]
+          }
+        },
+        {
+          "suffix": "KONKYAN",
+          "name_en": "Township Konkyan",
+          "name_zh": "Konkyan镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B9190211902717"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "geoboundaries_mmr_adm3_9469f09"
+      ]
+    },
+    {
+      "id": "rakhine_townships",
+      "feature_ids": [
+        "MMR-3273"
+      ],
+      "parts": [
+        {
+          "suffix": "SITTWE",
+          "name_en": "Township Sittwe",
+          "name_zh": "Sittwe镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B64895356281796"
+            ]
+          }
+        },
+        {
+          "suffix": "KYAUKPYU",
+          "name_en": "Township Kyaukpyu",
+          "name_zh": "Kyaukpyu镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B17691670471295"
+            ]
+          }
+        },
+        {
+          "suffix": "MUNAUNG",
+          "name_en": "Township Munaung",
+          "name_zh": "Munaung镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B12562394642113"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "geoboundaries_mmr_adm3_9469f09"
+      ]
+    },
+    {
+      "id": "chin_townships",
+      "feature_ids": [
+        "MMR-3274"
+      ],
+      "parts": [
+        {
+          "suffix": "HAKHA",
+          "name_en": "Township Hakha",
+          "name_zh": "Hakha镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B89367867823284"
+            ]
+          }
+        },
+        {
+          "suffix": "TEDIM",
+          "name_en": "Township Tedim",
+          "name_zh": "Tedim镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B6984635080223"
+            ]
+          }
+        },
+        {
+          "suffix": "PALETWA",
+          "name_en": "Township Paletwa",
+          "name_zh": "Paletwa镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B10368150445219"
+            ]
+          }
+        },
+        {
+          "suffix": "FALAM",
+          "name_en": "Township Falam",
+          "name_zh": "Falam镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B80362939759062"
+            ]
+          }
+        },
+        {
+          "suffix": "MINDAT",
+          "name_en": "Township Mindat",
+          "name_zh": "Mindat镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B86048721832096"
+            ]
+          }
+        },
+        {
+          "suffix": "MATUPI",
+          "name_en": "Township Matupi",
+          "name_zh": "Matupi镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B44324373263157"
+            ]
+          }
+        },
+        {
+          "suffix": "KANPETLET",
+          "name_en": "Township Kanpetlet",
+          "name_zh": "Kanpetlet镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B63813007351538"
+            ]
+          }
+        },
+        {
+          "suffix": "TONZANG",
+          "name_en": "Township Tonzang",
+          "name_zh": "Tonzang镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B34348354141761"
+            ]
+          }
+        },
+        {
+          "suffix": "THANTLANG",
+          "name_en": "Township Thantlang",
+          "name_zh": "Thantlang镇区",
+          "polygon_source": {
+            "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+            "property": "shapeID",
+            "values": [
+              "66882298B29817786092146"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "geoboundaries_mmr_adm3_9469f09"
+      ]
+    },
+    {
+      "id": "kachin_strongpoints",
+      "feature_ids": [
+        "MMR-3296"
+      ],
+      "parts": [
+        {
+          "suffix": "MYITKYINA",
+          "name_en": "Myitkyina strongpoint",
+          "name_zh": "Myitkyina据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  97.348,
+                  25.386
+                ],
+                [
+                  97.3705,
+                  25.340999999999998
+                ],
+                [
+                  97.4155,
+                  25.340999999999998
+                ],
+                [
+                  97.438,
+                  25.386
+                ],
+                [
+                  97.4155,
+                  25.431
+                ],
+                [
+                  97.3705,
+                  25.431
+                ],
+                [
+                  97.348,
+                  25.386
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "WAINGMAW",
+          "name_en": "Waingmaw strongpoint",
+          "name_zh": "Waingmaw据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  97.417,
+                  25.35
+                ],
+                [
+                  97.426,
+                  25.328000000000003
+                ],
+                [
+                  97.444,
+                  25.328000000000003
+                ],
+                [
+                  97.453,
+                  25.35
+                ],
+                [
+                  97.444,
+                  25.372
+                ],
+                [
+                  97.426,
+                  25.372
+                ],
+                [
+                  97.417,
+                  25.35
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "BHAMO_GARRISON",
+          "name_en": "Bhamo_Garrison strongpoint",
+          "name_zh": "Bhamo_Garrison据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  97.227,
+                  24.285
+                ],
+                [
+                  97.231,
+                  24.277
+                ],
+                [
+                  97.239,
+                  24.277
+                ],
+                [
+                  97.243,
+                  24.285
+                ],
+                [
+                  97.239,
+                  24.293
+                ],
+                [
+                  97.231,
+                  24.293
+                ],
+                [
+                  97.227,
+                  24.285
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "PUTAO",
+          "name_en": "Putao strongpoint",
+          "name_zh": "Putao据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  97.383,
+                  27.33
+                ],
+                [
+                  97.394,
+                  27.31
+                ],
+                [
+                  97.416,
+                  27.31
+                ],
+                [
+                  97.427,
+                  27.33
+                ],
+                [
+                  97.416,
+                  27.349999999999998
+                ],
+                [
+                  97.394,
+                  27.349999999999998
+                ],
+                [
+                  97.383,
+                  27.33
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "MACHANBAW",
+          "name_en": "Machanbaw strongpoint",
+          "name_zh": "Machanbaw据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  97.567,
+                  27.3
+                ],
+                [
+                  97.5735,
+                  27.287
+                ],
+                [
+                  97.5865,
+                  27.287
+                ],
+                [
+                  97.593,
+                  27.3
+                ],
+                [
+                  97.5865,
+                  27.313000000000002
+                ],
+                [
+                  97.5735,
+                  27.313000000000002
+                ],
+                [
+                  97.567,
+                  27.3
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "NAWNGMUN",
+          "name_en": "Nawngmun strongpoint",
+          "name_zh": "Nawngmun据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  97.80799999999999,
+                  27.5
+                ],
+                [
+                  97.814,
+                  27.488
+                ],
+                [
+                  97.826,
+                  27.488
+                ],
+                [
+                  97.832,
+                  27.5
+                ],
+                [
+                  97.826,
+                  27.512
+                ],
+                [
+                  97.814,
+                  27.512
+                ],
+                [
+                  97.80799999999999,
+                  27.5
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "KHAUNGLANHPU",
+          "name_en": "Khaunglanhpu strongpoint",
+          "name_zh": "Khaunglanhpu据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  98.088,
+                  26.9
+                ],
+                [
+                  98.094,
+                  26.887999999999998
+                ],
+                [
+                  98.106,
+                  26.887999999999998
+                ],
+                [
+                  98.112,
+                  26.9
+                ],
+                [
+                  98.106,
+                  26.912
+                ],
+                [
+                  98.094,
+                  26.912
+                ],
+                [
+                  98.088,
+                  26.9
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "TANAI",
+          "name_en": "Tanai strongpoint",
+          "name_zh": "Tanai据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  96.70599999999999,
+                  26.35
+                ],
+                [
+                  96.717,
+                  26.330000000000002
+                ],
+                [
+                  96.73899999999999,
+                  26.330000000000002
+                ],
+                [
+                  96.75,
+                  26.35
+                ],
+                [
+                  96.73899999999999,
+                  26.37
+                ],
+                [
+                  96.717,
+                  26.37
+                ],
+                [
+                  96.70599999999999,
+                  26.35
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "MOHNYIN",
+          "name_en": "Mohnyin strongpoint",
+          "name_zh": "Mohnyin据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  96.347,
+                  24.777
+                ],
+                [
+                  96.358,
+                  24.757
+                ],
+                [
+                  96.38,
+                  24.757
+                ],
+                [
+                  96.391,
+                  24.777
+                ],
+                [
+                  96.38,
+                  24.797
+                ],
+                [
+                  96.358,
+                  24.797
+                ],
+                [
+                  96.347,
+                  24.777
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "MOGAUNG",
+          "name_en": "Mogaung strongpoint",
+          "name_zh": "Mogaung据点",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  96.919,
+                  25.301
+                ],
+                [
+                  96.93,
+                  25.281
+                ],
+                [
+                  96.952,
+                  25.281
+                ],
+                [
+                  96.96300000000001,
+                  25.301
+                ],
+                [
+                  96.952,
+                  25.320999999999998
+                ],
+                [
+                  96.93,
+                  25.320999999999998
+                ],
+                [
+                  96.919,
+                  25.301
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "kachin_2026_01_01_manual"
+      ]
+    }
+  ]
+}

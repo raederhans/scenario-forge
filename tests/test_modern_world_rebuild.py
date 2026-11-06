@@ -287,3 +287,14 @@ class ModernWorldRebuildTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RebuildLineageTests(unittest.TestCase):
+    def test_complete_and_unknown_ids(self):
+        manifest = {"hierarchy_overrides": {"feature_splits": {"p": ["a", "b"]}}}
+        self.assertEqual(rebuild.resolve_rebuild_lineage(["a", "b", "unknown"], manifest), {"a": "p", "b": "p", "unknown": "unknown"})
+
+    def test_incomplete_duplicate_and_nested_children(self):
+        for splits, ids in [({"p": ["a", "b"]}, ["a"]), ({"p": ["a", "a"]}, ["a"]), ({"p": ["a"], "q": ["a"]}, ["a"]), ({"p": ["q"], "q": ["a"]}, ["a", "q"])]:
+            with self.assertRaises(ValueError):
+                rebuild.resolve_rebuild_lineage(ids, {"hierarchy_overrides": {"feature_splits": splits}})

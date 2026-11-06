@@ -1,0 +1,20 @@
+{
+  "source_id": "geoboundaries_mmr_adm3_9469f09",
+  "local_path": "data/scenario-rules/modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+  "origin_kind": "download",
+  "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MMR/ADM3/geoBoundaries-MMR-ADM3.geojson",
+  "immutable_ref": "9469f09",
+  "current_local_sha256": "072df2522f0b9b3678a327f4b685c2683df64e17e68c5cca96331a18d3287b44",
+  "license": "CC BY 4.0",
+  "citation": "The Myanmar Analytics Project / USAID; geoBoundaries gbOpen",
+  "consumers": [
+    "data/scenario-rules/modern_world.myanmar.geometry_splits.json"
+  ],
+  "rebuild_command": "python tools/apply_hoi4_geometry_splits.py --rules data/scenario-rules/modern_world.myanmar.geometry_splits.json --scenarios modern_world",
+  "provenance_sidecar": "data/scenario-rules/modern_world.sources/myanmar/provenance.json",
+  "status": "frozen_local_only",
+  "local_presence": "required",
+  "original_file_sha256": "072df2522f0b9b3678a327f4b685c2683df64e17e68c5cca96331a18d3287b44",
+  "snapshot_processing": "完整原始快照，未裁剪。",
+  "bookmark": "2026-01-01"
+}

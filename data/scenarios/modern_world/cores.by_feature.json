@@ -2292,7 +2292,10 @@
     "CD_ADM1_COD-1884": [
       "CD"
     ],
-    "CD_ADM1_COD-1894": [
+    "CD_ADM1_COD-1894__SPLIT_KALEHE_BUKAVU_UVIRA": [
+      "CD"
+    ],
+    "CD_ADM1_COD-1894__SPLIT_REMAINDER": [
       "CD"
     ],
     "CD_ADM1_COD-1895": [
@@ -2304,7 +2307,10 @@
     "CD_ADM1_COD-1897": [
       "CD"
     ],
-    "CD_ADM1_COD-1898": [
+    "CD_ADM1_COD-1898__SPLIT_REMAINDER": [
+      "CD"
+    ],
+    "CD_ADM1_COD-1898__SPLIT_RUTSHURU_MASISI_GOMA": [
       "CD"
     ],
     "CF_ADM1_CAF-1460": [
@@ -9270,7 +9276,10 @@
     "CV_ADM1_CPV-5062": [
       "CV"
     ],
-    "CY000": [
+    "CY000__SPLIT_NORTHERN_CYPRUS": [
+      "CY"
+    ],
+    "CY000__SPLIT_REMAINDER": [
       "CY"
     ],
     "CZ_ADM2_57006924B13474079400168": [
@@ -13860,16 +13869,25 @@
     "GEO-3029": [
       "GE"
     ],
-    "GEO-3030": [
+    "GEO-3030__SPLIT_REMAINDER": [
+      "GE"
+    ],
+    "GEO-3030__SPLIT_SOUTH_OSSETIA": [
       "GE"
     ],
     "GEO-3033": [
       "GE"
     ],
-    "GEO-3034": [
+    "GEO-3034__SPLIT_REMAINDER": [
       "GE"
     ],
-    "GEO-3035": [
+    "GEO-3034__SPLIT_SOUTH_OSSETIA": [
+      "GE"
+    ],
+    "GEO-3035__SPLIT_REMAINDER": [
+      "GE"
+    ],
+    "GEO-3035__SPLIT_SOUTH_OSSETIA": [
       "GE"
     ],
     "GEO-3036": [
@@ -13881,7 +13899,10 @@
     "GEO-3038": [
       "GE"
     ],
-    "GEO-3039": [
+    "GEO-3039__SPLIT_REMAINDER": [
+      "GE"
+    ],
+    "GEO-3039__SPLIT_SOUTH_OSSETIA": [
       "GE"
     ],
     "GF_PRIMARY": [
@@ -15891,7 +15912,10 @@
     "ISR-3055": [
       "IL"
     ],
-    "ISR-3056": [
+    "ISR-3056__SPLIT_GOLAN_HEIGHTS": [
+      "SY"
+    ],
+    "ISR-3056__SPLIT_REMAINDER": [
       "IL"
     ],
     "ISR-3057": [
@@ -17406,10 +17430,46 @@
     "MMR-3270": [
       "MM"
     ],
-    "MMR-3273": [
+    "MMR-3273__SPLIT_KYAUKPYU": [
       "MM"
     ],
-    "MMR-3274": [
+    "MMR-3273__SPLIT_MUNAUNG": [
+      "MM"
+    ],
+    "MMR-3273__SPLIT_REMAINDER": [
+      "MM"
+    ],
+    "MMR-3273__SPLIT_SITTWE": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_FALAM": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_HAKHA": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_KANPETLET": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_MATUPI": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_MINDAT": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_PALETWA": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_REMAINDER": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_TEDIM": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_THANTLANG": [
+      "MM"
+    ],
+    "MMR-3274__SPLIT_TONZANG": [
       "MM"
     ],
     "MMR-3275": [
@@ -17418,13 +17478,64 @@
     "MMR-3276": [
       "MM"
     ],
-    "MMR-3277": [
+    "MMR-3277__SPLIT_HOPANG": [
+      "MM"
+    ],
+    "MMR-3277__SPLIT_KONKYAN": [
+      "MM"
+    ],
+    "MMR-3277__SPLIT_LAUKKAING": [
+      "MM"
+    ],
+    "MMR-3277__SPLIT_MONGMAO": [
+      "MM"
+    ],
+    "MMR-3277__SPLIT_NARPHAN": [
+      "MM"
+    ],
+    "MMR-3277__SPLIT_PANGSANG": [
+      "MM"
+    ],
+    "MMR-3277__SPLIT_PANGWAUN": [
+      "MM"
+    ],
+    "MMR-3277__SPLIT_REMAINDER": [
       "MM"
     ],
     "MMR-3279": [
       "MM"
     ],
-    "MMR-3296": [
+    "MMR-3296__SPLIT_BHAMO_GARRISON": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_KHAUNGLANHPU": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_MACHANBAW": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_MOGAUNG": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_MOHNYIN": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_MYITKYINA": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_NAWNGMUN": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_PUTAO": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_REMAINDER": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_TANAI": [
+      "MM"
+    ],
+    "MMR-3296__SPLIT_WAINGMAW": [
       "MM"
     ],
     "MMR-3302": [
@@ -54468,7 +54579,16 @@
     "SYR-136": [
       "SY"
     ],
-    "SYR-137": [
+    "SYR-137__SPLIT_ALEPPO_NEIGHBORHOODS": [
+      "SY"
+    ],
+    "SYR-137__SPLIT_DEIR_HAFIR_MASKANAH": [
+      "SY"
+    ],
+    "SYR-137__SPLIT_KOBANI": [
+      "SY"
+    ],
+    "SYR-137__SPLIT_REMAINDER": [
       "SY"
     ],
     "SYR-138": [
@@ -54501,7 +54621,10 @@
     "SYR-4843": [
       "SY"
     ],
-    "SYR-5261": [
+    "SYR-5261__SPLIT_GOLAN_HEIGHTS": [
+      "SY"
+    ],
+    "SYR-5261__SPLIT_REMAINDER": [
       "SY"
     ],
     "SZ_ADM1_SWZ-534": [

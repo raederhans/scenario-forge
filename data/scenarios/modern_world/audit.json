@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 0,
-    "feature_count": 20596,
+    "feature_count": 20637,
     "water_count": 0
   },
   "diagnostics": {
@@ -645,38 +645,38 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "cf560e54c902189e257c06930456aefefed0812b20d56fc6c12d17c28bfe585a",
+  "snapshot_fingerprint": "e5d3d710e4ce706c48e877df8dc78efb4c03cbf3107c67880028d6cb589ca94d",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "e4e6c9e485261b4fcc5a21ef95d66a2807fd910cc3fd0ce949daa74f9de77ae5",
+    "build_snapshot_sha256": "62db84c2436e07dcaefba53f338c011a4bba7031bbb676afca7341ee53e977c7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "3e07018b9b97b9a06b378be8034dc992a4b0742ae799896d276bea45a2baf213",
+    "runtime_topology_sha256": "48215cc527e437d17634e994c5698b5706f9166cee9b59b90dc370b0367aee3b",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "summary": {
     "approximate_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 0,
-    "controller_count": 251,
+    "controller_count": 259,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 20596,
+    "feature_count": 20637,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 251,
+    "owner_count": 259,
     "quality_counts": {
-      "direct_country_copy": 19063,
-      "manual_reviewed": 1533
+      "direct_country_copy": 19077,
+      "manual_reviewed": 1560
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 19063,
-      "manual_rule": 1533
+      "canonical_baseline": 19077,
+      "manual_rule": 1560
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

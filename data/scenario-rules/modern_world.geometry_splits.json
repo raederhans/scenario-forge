@@ -1,0 +1,377 @@
+{
+  "version": 1,
+  "scenarios": [
+    "modern_world"
+  ],
+  "area_tolerance_degrees2": 1e-08,
+  "entries": [
+    {
+      "id": "north_cyprus",
+      "feature_ids": [
+        "CY000"
+      ],
+      "parts": [
+        {
+          "suffix": "NORTHERN_CYPRUS",
+          "name_en": "Northern Cyprus",
+          "name_zh": "北塞浦路斯",
+          "polygon_source": {
+            "path": "modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson",
+            "property": "NE_ID",
+            "values": [
+              1159320531
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "natural_earth_disputed_v5_1_2"
+      ]
+    },
+    {
+      "id": "south_ossetia",
+      "feature_ids": [
+        "GEO-3030",
+        "GEO-3034",
+        "GEO-3035",
+        "GEO-3039"
+      ],
+      "parts": [
+        {
+          "suffix": "SOUTH_OSSETIA",
+          "name_en": "South Ossetia",
+          "name_zh": "南奥塞梯",
+          "polygon_source": {
+            "path": "modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson",
+            "property": "NE_ID",
+            "values": [
+              1159320787
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "natural_earth_disputed_v5_1_2"
+      ]
+    },
+    {
+      "id": "golan_heights",
+      "feature_ids": [
+        "ISR-3056",
+        "SYR-5261"
+      ],
+      "parts": [
+        {
+          "suffix": "GOLAN_HEIGHTS",
+          "name_en": "Golan Heights",
+          "name_zh": "戈兰高地",
+          "polygon_source": {
+            "path": "modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson",
+            "property": "NE_ID",
+            "values": [
+              1159320905
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "natural_earth_disputed_v5_1_2"
+      ]
+    },
+    {
+      "id": "aleppo_control",
+      "feature_ids": [
+        "SYR-137"
+      ],
+      "parts": [
+        {
+          "suffix": "KOBANI",
+          "name_en": "Kobani countryside",
+          "name_zh": "科巴尼乡村",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  38.15,
+                  36.9
+                ],
+                [
+                  38.25,
+                  36.63
+                ],
+                [
+                  38.55,
+                  36.49
+                ],
+                [
+                  38.88,
+                  36.55
+                ],
+                [
+                  39.1,
+                  36.8
+                ],
+                [
+                  39.1,
+                  37.2
+                ],
+                [
+                  38.15,
+                  37.2
+                ],
+                [
+                  38.15,
+                  36.9
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "DEIR_HAFIR_MASKANAH",
+          "name_en": "Deir Hafir and Maskanah",
+          "name_zh": "代尔哈菲尔—马斯卡纳",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  37.65,
+                  36.03
+                ],
+                [
+                  37.65,
+                  36.23
+                ],
+                [
+                  38.02,
+                  36.24
+                ],
+                [
+                  38.25,
+                  36.05
+                ],
+                [
+                  38.22,
+                  35.87
+                ],
+                [
+                  38.02,
+                  35.9
+                ],
+                [
+                  37.85,
+                  35.99
+                ],
+                [
+                  37.65,
+                  36.03
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "suffix": "ALEPPO_NEIGHBORHOODS",
+          "name_en": "Sheikh Maqsoud and Ashrafieh",
+          "name_zh": "谢赫马克苏德及阿什拉菲耶",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  37.125,
+                  36.218
+                ],
+                [
+                  37.125,
+                  36.239
+                ],
+                [
+                  37.145,
+                  36.248
+                ],
+                [
+                  37.164,
+                  36.24
+                ],
+                [
+                  37.166,
+                  36.227
+                ],
+                [
+                  37.151,
+                  36.22
+                ],
+                [
+                  37.14,
+                  36.213
+                ],
+                [
+                  37.125,
+                  36.218
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "aleppo_2026_01_01_manual"
+      ]
+    },
+    {
+      "id": "north_kivu_control",
+      "feature_ids": [
+        "CD_ADM1_COD-1898"
+      ],
+      "parts": [
+        {
+          "suffix": "RUTSHURU_MASISI_GOMA",
+          "name_en": "Rutshuru, Masisi and Goma",
+          "name_zh": "鲁丘鲁—马西西—戈马",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  28.65,
+                  -1.65
+                ],
+                [
+                  28.72,
+                  -1.25
+                ],
+                [
+                  29.08,
+                  -0.9
+                ],
+                [
+                  29.43,
+                  -0.75
+                ],
+                [
+                  29.65,
+                  -0.85
+                ],
+                [
+                  29.72,
+                  -1.5
+                ],
+                [
+                  29.55,
+                  -1.82
+                ],
+                [
+                  28.95,
+                  -1.9
+                ],
+                [
+                  28.65,
+                  -1.65
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "m23_2026_01_01_manual"
+      ]
+    },
+    {
+      "id": "south_kivu_control",
+      "feature_ids": [
+        "CD_ADM1_COD-1894"
+      ],
+      "parts": [
+        {
+          "suffix": "KALEHE_BUKAVU_UVIRA",
+          "name_en": "Kalehe, Bukavu and Uvira",
+          "name_zh": "卡莱亥—布卡武—乌维拉",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  28.72,
+                  -1.82
+                ],
+                [
+                  29.12,
+                  -1.82
+                ],
+                [
+                  29.2,
+                  -2.6
+                ],
+                [
+                  29.22,
+                  -3.5
+                ],
+                [
+                  29.08,
+                  -3.5
+                ],
+                [
+                  28.98,
+                  -3.03
+                ],
+                [
+                  28.86,
+                  -2.85
+                ],
+                [
+                  28.65,
+                  -2.6
+                ],
+                [
+                  28.58,
+                  -2.22
+                ],
+                [
+                  28.72,
+                  -1.82
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REMAINDER",
+        "name_en": "Remainder",
+        "name_zh": "余区"
+      },
+      "sources": [
+        "m23_2026_01_01_manual"
+      ]
+    }
+  ]
+}

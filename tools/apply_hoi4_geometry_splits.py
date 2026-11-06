@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 
 import shapely
 from pyproj import Geod
-from shapely.geometry import LineString, shape
+from shapely.geometry import LineString, shape, mapping
 from shapely.geometry.polygon import orient
 
 from map_builder.regional_geometry import (
@@ -22,7 +22,7 @@ from map_builder.regional_geometry import (
 )
 from tools.rebuild_polar_assets import read, write, refresh_neighbors
 from tools.materialize_polar_scenarios import refresh_scenario
-from tools.check_scenario_contracts import write_json
+from tools.check_scenario_contracts import write_json, _minimal_geo_locale_patch_payload
 
 
 def area_km2(geometry):
@@ -96,7 +96,97 @@ def entry_child_ids(entry, parent):
     return [parent + "__SPLIT_" + part["suffix"] for part in entry_parts(entry)]
 
 
+def load_cut_geometry(spec, rules_dir):
+    if ("polygon" in spec) == ("polygon_source" in spec):
+        raise ValueError("Exactly one of polygon and polygon_source is required")
+    if "polygon" in spec:
+        geometry = shape(spec["polygon"])
+    else:
+        source = spec["polygon_source"]
+        collection = read(Path(rules_dir) / source["path"])
+        crs = collection.get("crs", {}).get("properties", {}).get("name", "")
+        if crs and crs not in {"urn:ogc:def:crs:OGC:1.3:CRS84", "EPSG:4326", "urn:ogc:def:crs:EPSG::4326"}:
+            raise ValueError(f"Unsupported cut CRS: {crs}")
+        values = set(source["values"])
+        selected = [f for f in collection["features"] if f["properties"].get(source["property"]) in values]
+        missing = values - {f["properties"][source["property"]] for f in selected}
+        if missing:
+            raise ValueError(f"Missing cut units: {sorted(missing)}")
+        geometries = [shape(f["geometry"]) for f in selected]
+        if any(g.is_empty or not g.is_valid or g.geom_type not in {"Polygon", "MultiPolygon"} for g in geometries):
+            raise ValueError("Invalid source cut geometry")
+        geometry = shapely.union_all(geometries)
+    if geometry.is_empty or not geometry.is_valid or geometry.geom_type not in {"Polygon", "MultiPolygon"}:
+        raise ValueError("Invalid cut geometry")
+    xmin, ymin, xmax, ymax = geometry.bounds
+    if xmin < -180 or xmax > 180 or ymin < -90 or ymax > 90:
+        raise ValueError("Cut coordinates must be longitude/latitude")
+    return geometry
+
+
+def validate_partition_plan(rules):
+    parents, children = set(), set()
+    for entry in rules["entries"]:
+        definitions = entry_parts(entry)
+        suffixes = [part["suffix"] for part in definitions]
+        if len(suffixes) != len(set(suffixes)):
+            raise ValueError(f"Duplicate suffix: {entry['id']}")
+        for parent in entry["feature_ids"]:
+            if parent in parents:
+                raise ValueError(f"Duplicate parent: {parent}")
+            parents.add(parent)
+            ids = set(entry_child_ids(entry, parent))
+            if children & ids:
+                raise ValueError(f"Conflicting children: {parent}")
+            children.update(ids)
+    if parents & children:
+        raise ValueError("Nested split parents are not allowed")
+
+
+def compile_external_parts(rules, rules_dir, topology, lineage=None):
+    validate_partition_plan(rules)
+    result = deepcopy(rules)
+    result["entries"] = []
+    absolute = _absolute_topology(topology)
+    rows = {r["properties"]["id"]: r for r in absolute["objects"]["political"]["geometries"]}
+    for entry in rules["entries"]:
+        if "parts" not in entry:
+            result["entries"].append(deepcopy(entry))
+            continue
+        masks = [load_cut_geometry(p, rules_dir) for p in entry["parts"]]
+        for parent in entry["feature_ids"]:
+            if parent in rows:
+                if any(child in rows for child in entry_child_ids(entry, parent)):
+                    raise ValueError(f"Existing split child conflicts with parent: {parent}")
+                original = _decode_geometry(absolute, rows[parent])
+            else:
+                children = (lineage or {}).get(parent, entry_child_ids(entry, parent))
+                if not children or any(child not in rows for child in children):
+                    raise ValueError(f"Missing split parent or children: {parent}")
+                original = shapely.union_all([_decode_geometry(absolute, rows[child]) for child in children])
+            compiled = deepcopy(entry)
+            compiled["feature_ids"], compiled["parts"] = [parent], []
+            remaining = original
+            for part, mask in zip(entry["parts"], masks):
+                clipped = remaining.intersection(mask)
+                if clipped.area == 0:
+                    continue
+                if clipped.geom_type == "GeometryCollection":
+                    clipped = shapely.union_all([g for g in clipped.geoms if g.geom_type in {"Polygon", "MultiPolygon"}])
+                definition = {k: v for k, v in part.items() if k not in {"polygon", "polygon_source"}}
+                compiled["parts"].append({**definition, "polygon": mapping(clipped)})
+                remaining = remaining.difference(mask)
+            if not compiled["parts"]:
+                continue
+            if remaining.is_empty:
+                compiled.pop("remainder", None)
+            result["entries"].append(compiled)
+    validate_partition_plan(result)
+    return result
+
+
 def split_topology(topology, rules):
+    validate_partition_plan(rules)
     result = _absolute_topology(topology)
     rows = result["objects"]["political"]["geometries"]
     by_id = {row["properties"]["id"]: row for row in rows}
@@ -114,14 +204,21 @@ def split_topology(topology, rules):
                 if all(child in by_id for child in children):
                     continue
                 raise ValueError(f"Missing split parent or children: {parent}")
+            if any(child in by_id for child in children):
+                raise ValueError(f"Existing split child conflicts with parent: {parent}")
             row = by_id[parent]
             original = _decode_geometry(result, row)
             remaining = original
             parts = []
             for polygon in polygons:
-                parts.append(remaining.intersection(polygon))
+                clipped = remaining.intersection(polygon)
+                if clipped.geom_type == "GeometryCollection":
+                    clipped = shapely.union_all([g for g in clipped.geoms if g.geom_type in {"Polygon", "MultiPolygon"}])
+                parts.append(clipped)
                 remaining = remaining.difference(polygon)
             if "polygon" in entry or "remainder" in entry:
+                if remaining.geom_type == "GeometryCollection":
+                    remaining = shapely.union_all([g for g in remaining.geoms if g.geom_type in {"Polygon", "MultiPolygon"}])
                 parts.append(remaining)
             elif not remaining.is_empty:
                 raise ValueError(f"Split without remainder must cover parent: {entry['id']}: {parent}")
@@ -179,7 +276,9 @@ def run_scenario(scenario_dir, rules):
                    for parent, children in splits.items() for child in children}
     manifest = read(scenario_dir / "manifest.json")
     manifest.setdefault("hierarchy_overrides", {}).setdefault("feature_splits", {}).update(splits)
-    patch = read(scenario_dir / "geo_locale_patch.json")
+    patch_path = scenario_dir / "geo_locale_patch.json"
+    patch = (read(patch_path) if patch_path.exists() else
+             _minimal_geo_locale_patch_payload(scenario_dir.name, manifest.get("generated_at", "")))
     shared_names = read(ROOT / "data/locales.json")["geo"]
     for row in after["objects"]["political"]["geometries"]:
         props = row["properties"]
@@ -206,15 +305,29 @@ def main(argv=None):
     parser.add_argument("--migration-output", type=Path, default=ROOT / "data/feature-migrations/hoi4_feature_splits.v1.json")
     args = parser.parse_args(argv)
     rules = read(args.rules)
+    validate_partition_plan(rules)
     scenarios = args.scenarios or rules["scenarios"]
+    compiled = []
+    external = any("polygon_source" in part for entry in rules["entries"] for part in entry.get("parts", []))
+    for scenario in scenarios:
+        if external:
+            directory = ROOT / "data/scenarios" / scenario
+            compiled.append(compile_external_parts(rules, args.rules.parent,
+                            read(directory / "runtime_topology.topo.json"),
+                            read(directory / "manifest.json").get("hierarchy_overrides", {}).get("feature_splits", {})))
+        else:
+            compiled.append(rules)
+    migration = {}
+    for plan in compiled or [rules]:
+        migration.update({parent: entry_child_ids(entry, parent)
+                          for entry in plan["entries"] for parent in entry["feature_ids"]})
     write_json(args.migration_output, {
         "version": 1, "scenarios": scenarios,
-        "feature_splits": {parent: entry_child_ids(entry, parent)
-                           for entry in rules["entries"] for parent in entry["feature_ids"]},
+        "feature_splits": migration,
         "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
     })
-    for scenario in scenarios:
-        report = run_scenario(ROOT / "data/scenarios" / scenario, rules)
+    for scenario, plan in zip(scenarios, compiled):
+        report = run_scenario(ROOT / "data/scenarios" / scenario, plan)
         if report["changed"]:
             write_json(ROOT / ".runtime/reports/generated" / f"{scenario}.geometry-splits.json", report)
         print(json.dumps({"scenario": scenario, **report}, ensure_ascii=False), flush=True)

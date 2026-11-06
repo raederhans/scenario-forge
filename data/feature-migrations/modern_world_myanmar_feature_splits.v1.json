@@ -1,0 +1,50 @@
+{
+  "feature_splits": {
+    "MMR-3273": [
+      "MMR-3273__SPLIT_SITTWE",
+      "MMR-3273__SPLIT_KYAUKPYU",
+      "MMR-3273__SPLIT_MUNAUNG",
+      "MMR-3273__SPLIT_REMAINDER"
+    ],
+    "MMR-3274": [
+      "MMR-3274__SPLIT_HAKHA",
+      "MMR-3274__SPLIT_TEDIM",
+      "MMR-3274__SPLIT_PALETWA",
+      "MMR-3274__SPLIT_FALAM",
+      "MMR-3274__SPLIT_MINDAT",
+      "MMR-3274__SPLIT_MATUPI",
+      "MMR-3274__SPLIT_KANPETLET",
+      "MMR-3274__SPLIT_TONZANG",
+      "MMR-3274__SPLIT_THANTLANG",
+      "MMR-3274__SPLIT_REMAINDER"
+    ],
+    "MMR-3277": [
+      "MMR-3277__SPLIT_PANGSANG",
+      "MMR-3277__SPLIT_MONGMAO",
+      "MMR-3277__SPLIT_PANGWAUN",
+      "MMR-3277__SPLIT_NARPHAN",
+      "MMR-3277__SPLIT_HOPANG",
+      "MMR-3277__SPLIT_LAUKKAING",
+      "MMR-3277__SPLIT_KONKYAN",
+      "MMR-3277__SPLIT_REMAINDER"
+    ],
+    "MMR-3296": [
+      "MMR-3296__SPLIT_MYITKYINA",
+      "MMR-3296__SPLIT_WAINGMAW",
+      "MMR-3296__SPLIT_BHAMO_GARRISON",
+      "MMR-3296__SPLIT_PUTAO",
+      "MMR-3296__SPLIT_MACHANBAW",
+      "MMR-3296__SPLIT_NAWNGMUN",
+      "MMR-3296__SPLIT_KHAUNGLANHPU",
+      "MMR-3296__SPLIT_TANAI",
+      "MMR-3296__SPLIT_MOHNYIN",
+      "MMR-3296__SPLIT_MOGAUNG",
+      "MMR-3296__SPLIT_REMAINDER"
+    ]
+  },
+  "scenarios": [
+    "modern_world"
+  ],
+  "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
+  "version": 1
+}
