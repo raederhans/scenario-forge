@@ -253,8 +253,18 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     if (key === "countries") {
       const hint = make("div", "editor-empty-hint editor-country-empty");
       const searchCountry = button("Search countries", "editorSearchCountriesBtn", () => {
+        // 左栏收起或窄屏抽屉关着时，搜索框不可聚焦：先经各自的现有开关把左栏亮出来。
+        const body = documentRef.body;
+        if (globalThis.matchMedia?.("(max-width: 1023px)").matches) {
+          if (!body.classList.contains("left-drawer-open")) get("leftPanelToggle")?.click();
+        } else if (body.classList.contains("left-sidebar-collapsed")) {
+          get("leftSidebarCollapseBtn")?.click();
+        }
         selectObject("countries");
-        get("countrySearch")?.focus();
+        const focusSearch = () => get("countrySearch")?.focus();
+        focusSearch();
+        // 抽屉打开时会把焦点交给抽屉起点，下一帧再落到搜索框。
+        globalThis.requestAnimationFrame?.(focusSearch);
       });
       searchCountry.className = "btn-secondary";
       hint.append(
@@ -309,20 +319,32 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
 
   const layerHost = tasks.get("layers").host;
   const layerGroups = [];
-  const visibilityIds = {
-    physical: "togglePhysical", urban: "toggleUrban", citypoints: "toggleCityPoints",
-    rivers: "toggleRivers", daynight: "dayNightEnabled", transport: "transportAppearanceMasterToggle",
-    "special-zones": "scenarioSpecialRegionVisibilityToggle",
+  // 眼睛开关代理属性页里该图层自己的总开关。按需解析：特殊区域的叠加层开关由工作台运行时创建。
+  const visibilityControls = {
+    physical: () => get("togglePhysical"), urban: () => get("toggleUrban"), citypoints: () => get("toggleCityPoints"),
+    rivers: () => get("toggleRivers"), daynight: () => get("dayNightEnabled"), transport: () => get("transportAppearanceMasterToggle"),
+    "special-zones": () => documentRef.querySelector("[data-special-zone-overlay-toggle]"),
   };
   const refreshLayerVisibility = () => {
-    for (const { toggle, checkbox, row, label } of layerEntries) {
+    for (const { toggle, getCheckbox, row, label } of layerEntries) {
       if (!toggle) continue;
+      const checkbox = getCheckbox();
+      setHidden(toggle, !checkbox);
+      if (!checkbox) continue;
       setAttribute(toggle, "aria-pressed", checkbox.checked);
       setAttribute(toggle, "aria-label", t(checkbox.checked ? "Hide {name}" : "Show {name}", "ui").replace("{name}", t(label, "ui")));
       setUiIcon(toggle, checkbox.checked ? "eye" : "eye-off", { doc: documentRef });
       row.classList.toggle("is-layer-off", !checkbox.checked);
     }
   };
+  let visibilityRefreshQueued = false;
+  const scheduleVisibilityRefresh = () => {
+    if (visibilityRefreshQueued) return;
+    visibilityRefreshQueued = true;
+    queueMicrotask(() => { visibilityRefreshQueued = false; refreshLayerVisibility(); });
+  };
+  // 任何 change 都同步一次：只有几个开关，开销可以忽略，也不依赖总开关节点是否被重建。
+  documentRef.addEventListener("change", refreshLayerVisibility, true);
   const search = make("input", "input editor-layer-search", "", "editorLayerSearch");
   search.type = "search";
   search.placeholder = t("Search layers", "ui");
@@ -395,26 +417,28 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
           dot.title = strip.textContent.trim();
         }
       };
-      new MutationObserver(syncStatus).observe(host, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["data-status-tone"] });
+      // 预设、项目加载等会直接改复选框的 checked 而不派发 change；它们都会刷新属性页里的状态条，借这里同步眼睛开关。
+      new MutationObserver(() => { syncStatus(); scheduleVisibilityRefresh(); }).observe(host, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["data-status-tone"] });
       syncStatus();
       const row = make("div", "editor-layer-row");
       row.dataset.layerKey = key;
       row.append(btn);
       tabs.append(row);
-      const checkbox = get(visibilityIds[key]);
+      const getCheckbox = visibilityControls[key] || (() => null);
       let toggle;
-      if (checkbox) {
+      if (visibilityControls[key]) {
         toggle = make("button", "editor-layer-visibility");
         toggle.type = "button";
         toggle.addEventListener("click", () => {
+          const checkbox = getCheckbox();
+          if (!checkbox) return;
           checkbox.checked = !checkbox.checked;
           checkbox.dispatchEvent(new Event("change", { bubbles: true }));
           refreshLayerVisibility();
         });
-        checkbox.addEventListener("change", refreshLayerVisibility);
         row.append(toggle);
       }
-      const entry = { key, label, name, row, btn, host, panel, propertyKey, checkbox, toggle };
+      const entry = { key, label, name, row, btn, host, panel, propertyKey, getCheckbox, toggle };
       entries.push(entry);
       layerEntries.push(entry);
       btn.addEventListener("click", () => {

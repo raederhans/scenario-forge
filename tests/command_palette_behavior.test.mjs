@@ -45,6 +45,7 @@ class Element {
     if (name.startsWith("data-")) this.dataset[name.slice(5).replace(/-([a-z])/g, (_, char) => char.toUpperCase())] = String(value);
   }
   getAttribute(name) { return this.attributes.get(name) ?? null; }
+  hasAttribute(name) { return this.attributes.has(name); }
   removeAttribute(name) { this.attributes.delete(name); }
   addEventListener(name, callback) {
     if (!this.listeners.has(name)) this.listeners.set(name, []);
@@ -56,7 +57,11 @@ class Element {
     if (event.bubbles) this.parentNode?.dispatchEvent(event);
     return true;
   }
-  click() { for (const callback of this.listeners.get("click") || []) callback({ target: this }); }
+  click() {
+    const event = { target: this, propagationStopped: false, stopPropagation() { this.propagationStopped = true; } };
+    for (const callback of this.listeners.get("click") || []) callback(event);
+    this.lastClickEvent = event;
+  }
   scrollIntoView() {}
   focus(options) { this.ownerDocument.activeElement = this; this.focusOptions = options; }
   matches(selector) {
@@ -142,8 +147,11 @@ test("arrows select options and Enter and mouse clicks proxy existing buttons", 
   h.press("Enter");
   assert.deepEqual(h.clicks, ["fill", "save"]);
   h.palette.open();
-  h.options()[0].click();
+  const option = h.options()[0];
+  option.click();
   assert.deepEqual(h.clicks, ["fill", "save", "select"]);
+  // 选项点击不能冒泡到文档，否则刚打开的弹层会把它当成"点外部"立即关掉。
+  assert.equal(option.lastClickEvent.propagationStopped, true);
 });
 
 test("disabled and missing buttons are omitted and ? lists shortcuts", () => {
@@ -162,4 +170,27 @@ test("results are capped at fifty", () => {
   h.commands.push(...Array.from({ length: 60 }, (_, i) => ({ ...h.commands[0], key: `tool-${i}` })));
   h.palette.open();
   assert.equal(h.options().length, 50);
+});
+
+test("IME composition keys stay with the input method", () => {
+  const h = mount();
+  h.palette.open();
+  h.press("Enter", { isComposing: true });
+  h.press("Escape", { keyCode: 229 });
+  assert.deepEqual(h.clicks, []);
+  assert.equal(h.get("editorCommandPalette").hidden, false);
+  h.press("Enter");
+  assert.equal(h.clicks.length, 1);
+});
+
+test("does not open underneath another visible modal", () => {
+  const h = mount();
+  const workbench = h.doc.createElement("div");
+  workbench.setAttribute("aria-modal", "true");
+  h.doc.body.append(workbench);
+  h.press("k", { ctrlKey: true });
+  assert.equal(h.get("editorCommandPalette").hidden, true);
+  workbench.hidden = true;
+  h.press("k", { ctrlKey: true });
+  assert.equal(h.get("editorCommandPalette").hidden, false);
 });

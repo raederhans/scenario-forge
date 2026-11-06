@@ -1,3 +1,5 @@
+import { getActiveModal } from "./ui_contract.js";
+
 export function initCommandPalette({ documentRef = document, t, getCommands }) {
   const make = (tag, className, id = "") => {
     const node = documentRef.createElement(tag);
@@ -72,7 +74,11 @@ export function initCommandPalette({ documentRef = document, t, getCommands }) {
           shortcut.textContent = command.shortcut;
           option.append(shortcut);
         }
-        option.addEventListener("click", () => execute(command));
+        option.addEventListener("click", (event) => {
+          // 原始点击若继续冒泡，会被刚打开的弹层（如指南）当成"点外部"而立即关掉。
+          event.stopPropagation();
+          execute(command);
+        });
         section.append(option);
         options.push(option);
       }
@@ -84,6 +90,9 @@ export function initCommandPalette({ documentRef = document, t, getCommands }) {
     select(0);
   };
   const open = (query = "") => {
+    // 导出、交通等工作台是更高层的模态，面板开在它们下面会在看不见的情况下吃掉按键。
+    const activeModal = getActiveModal(documentRef);
+    if (activeModal && activeModal !== dialog) return;
     if (overlay.hidden) previousFocus = documentRef.activeElement;
     overlay.hidden = false;
     dialog.setAttribute("aria-label", t("Command palette", "ui"));
@@ -105,6 +114,8 @@ export function initCommandPalette({ documentRef = document, t, getCommands }) {
       return;
     }
     if (overlay.hidden) return;
+    // 输入法组字时的回车、方向键和 Esc 属于输入法，不能拿来执行或关闭命令。
+    if (event.isComposing || event.keyCode === 229) return;
     event.stopPropagation();
     if (event.key === "Escape") { event.preventDefault(); close(); }
     else if (event.key === "Tab") { event.preventDefault(); input.focus(); }
