@@ -75199,6 +75199,46 @@
       "en": "Roma",
       "zh": "罗马"
     },
+    "id::CN_MRG_20fbce9fead7__SPLIT_CHI": {
+      "en": "Chengguxian · CHI",
+      "zh": "城固县 · CHI"
+    },
+    "id::CN_MRG_20fbce9fead7__SPLIT_REST": {
+      "en": "Chengguxian · SHX",
+      "zh": "城固县 · SHX"
+    },
+    "id::CN_MRG_3811ff27587a__SPLIT_CHI": {
+      "en": "Nanzhengxian · CHI",
+      "zh": "南郑县 · CHI"
+    },
+    "id::CN_MRG_3811ff27587a__SPLIT_REST": {
+      "en": "Nanzhengxian · SHX",
+      "zh": "南郑县 · SHX"
+    },
+    "id::CN_MRG_b59c07833274__SPLIT_CHI": {
+      "en": "Luonanxian · CHI",
+      "zh": "洛南县 · CHI"
+    },
+    "id::CN_MRG_b59c07833274__SPLIT_REST": {
+      "en": "Luonanxian · SHX",
+      "zh": "洛南县 · SHX"
+    },
+    "id::IRQ-3243__SPLIT_BKU": {
+      "en": "Diyala · BKU",
+      "zh": "迪亚拉 · BKU"
+    },
+    "id::IRQ-3243__SPLIT_REST": {
+      "en": "Diyala · KUR",
+      "zh": "迪亚拉 · KUR"
+    },
+    "id::PAK-1108__SPLIT_KLT": {
+      "en": "Baluchistan · KLT",
+      "zh": "俾路支省 · KLT"
+    },
+    "id::PAK-1108__SPLIT_REST": {
+      "en": "Baluchistan · PAK",
+      "zh": "俾路支省 · PAK"
+    },
     "id::PA_ADM1_PAN-1337__SPLIT_PCZ": {
       "en": "Colón · Panama Canal Zone",
       "zh": "冒号 · 巴拿马运河区"
@@ -75214,6 +75254,14 @@
     "id::PA_ADM1_PAN-1340__SPLIT_REST": {
       "en": "Panamá · Panama",
       "zh": "巴拿马 · 巴拿马"
+    },
+    "id::TKM-359__SPLIT_REST": {
+      "en": "Chardzhou · TKM",
+      "zh": "查德周 · TKM"
+    },
+    "id::TKM-359__SPLIT_UTL": {
+      "en": "Chardzhou · UTL",
+      "zh": "查德周 · UTL"
     },
     "mediterranean_sea": {
       "en": "Mediterranean Sea",

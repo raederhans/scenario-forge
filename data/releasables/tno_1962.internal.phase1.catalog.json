@@ -890,50 +890,6 @@
     {
       "allow_manual_overlay": true,
       "boundary_variants": [],
-      "capital_state_id": 454,
-      "color_hex": "#557d47",
-      "companion_actions": [],
-      "core_state_ids": [
-        454
-      ],
-      "default_boundary_variant_id": "",
-      "display_name": "Italian Palestine",
-      "entry_kind": "releasable",
-      "notes": "Italy releasable for the Italian Palestine settlement.",
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "PAL"
-      ],
-      "preset_source": {
-        "exclude_feature_ids": [],
-        "exclude_group_ids": [],
-        "feature_ids": [
-          "GAZ+00?",
-          "ISR-3053",
-          "ISR-3054",
-          "ISR-3055",
-          "ISR-3056",
-          "ISR-3057",
-          "ISR-3058",
-          "WEB+00?"
-        ],
-        "group_ids": [],
-        "name": "",
-        "type": "feature_ids"
-      },
-      "release_lookup_iso2": "IL",
-      "resolved_feature_count_hint": 8,
-      "scenario_ids": [
-        "tno_1962"
-      ],
-      "scenario_only": true,
-      "tag": "PAL",
-      "validation_errors": [],
-      "validation_status": "ok"
-    },
-    {
-      "allow_manual_overlay": true,
-      "boundary_variants": [],
       "capital_state_id": 455,
       "color_hex": "#486b3a",
       "companion_actions": [],
@@ -1036,59 +992,6 @@
       ],
       "scenario_only": true,
       "tag": "TUN",
-      "validation_errors": [],
-      "validation_status": "ok"
-    },
-    {
-      "allow_manual_overlay": true,
-      "boundary_variants": [],
-      "capital_state_id": 554,
-      "color_hex": "#58724b",
-      "companion_actions": [],
-      "core_state_ids": [
-        554,
-        677,
-        680,
-        799
-      ],
-      "default_boundary_variant_id": "",
-      "display_name": "Syrian Protectorate",
-      "entry_kind": "releasable",
-      "notes": "Italy releasable for the Syrian protectorate settlement.",
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "SYR"
-      ],
-      "preset_source": {
-        "exclude_feature_ids": [],
-        "exclude_group_ids": [],
-        "feature_ids": [
-          "SYR-135",
-          "SYR-136",
-          "SYR-137",
-          "SYR-138",
-          "SYR-139",
-          "SYR-140",
-          "SYR-141",
-          "SYR-142",
-          "SYR-143",
-          "SYR-144",
-          "SYR-145",
-          "SYR-146",
-          "SYR-4843",
-          "SYR-5261"
-        ],
-        "group_ids": [],
-        "name": "",
-        "type": "feature_ids"
-      },
-      "release_lookup_iso2": "SY",
-      "resolved_feature_count_hint": 14,
-      "scenario_ids": [
-        "tno_1962"
-      ],
-      "scenario_only": true,
-      "tag": "SYR",
       "validation_errors": [],
       "validation_status": "ok"
     },
@@ -4577,7 +4480,7 @@
     "hoi4_1939"
   ],
   "summary": {
-    "entry_count": 72,
+    "entry_count": 70,
     "excluded_count": 0,
     "validation_error_count": 0
   },

@@ -16,6 +16,64 @@ from tools import materialize_polar_scenarios
 from tools import build_tno_split_overlay as builder
 
 
+def test_batch3_materialized_owners_controllers_and_exceptions():
+    scenario = Path(__file__).resolve().parents[1] / "data/scenarios/tno_1962"
+    owners = read(scenario / "owners.by_feature.json")["owners"]
+    controllers = {**owners, **{fid: row["controller"] for fid, row in
+                   read(scenario / "scenario_mutations.json")["assignments_by_feature_id"].items()
+                   if "controller" in row}}
+    expected = {
+        "CN_CITY_17275852B86000242921086": "GXC",
+        "CN_CITY_17275852B79223379777667": "CHI",
+        "CN_CITY_17275852B65169663803205": "CHI",
+        "CN_CITY_17275852B50863739077021": "CHI",
+        "CN_CITY_17275852B92159102315867": "XIK",
+        "CN_CITY_17275852B35342422356290": "XIK",
+        "CN_CITY_17275852B62552484302053": "GUZ",
+        "CN_MRG_25e49cf89270": "CHI",
+        "UA_RAY_74538382B34820599431847": "ROM",
+        "UA_RAY_74538382B4607226007855": "TNS",
+        "MDA-1637": "TNS", "MDA-1650": "ROM",
+        "MU": "MAD", "KM_ADM1_COM-4934": "GEA",
+        "KM_ADM1_COM-4935": "GEA", "KM_ADM1_COM-4936": "GEA",
+        "UZB-356": "KRK", "UZB-361": "UTL",
+        "TKM-359__SPLIT_UTL": "UTL", "TKM-359__SPLIT_REST": "TKM",
+        "PAK-1108__SPLIT_KLT": "KLT", "PAK-1108__SPLIT_REST": "PAK",
+        "MAR-1451": "MOR", "MAR-1445": "MOR", "ES630": "IBR", "ES640": "IBR",
+        "DZA-2145": "SLG", "DZA-2143": "IAL", "IRQ-3051": "BKU",
+        "IRQ-3243__SPLIT_BKU": "BKU", "IRQ-3243__SPLIT_REST": "IRQ",
+        "ISR-3058": "IME", "SYR-4843": "SNS", "SYR-137": "TUR",
+    }
+    for fid, tag in expected.items():
+        assert owners[fid] == tag, fid
+        assert controllers[fid] == tag, fid
+    countries = read(scenario / "countries.json")["countries"]
+    assert [countries["KLT"][key] for key in ("base_iso2", "lookup_iso2", "provenance_iso2")] == ["PK"] * 3
+    for tag, parent, kind in [("SLG", "IBR", ""), ("IME", "ITA", "mandate"), ("SNS", "ITA", "mandate")]:
+        assert countries[tag]["parent_owner_tag"] == parent
+        assert countries[tag]["subject_kind"] == kind
+    cores = read(scenario / "cores.by_feature.json")["cores"]
+    assert cores["DZA-2143"] == ["SLG"]
+    for tag in ("ALC", "PAL", "SYR", "KUR"):
+        assert tag not in countries
+        assert tag not in owners.values()
+        assert all(tag not in values for values in cores.values())
+
+
+def test_batch3_overlay_rules_replay_without_changes():
+    scenario = Path(__file__).resolve().parents[1] / "data/scenarios/tno_1962"
+    owners = read(scenario / "owners.by_feature.json")["owners"]
+    countries = read(scenario / "countries.json")["countries"]
+    cores = read(scenario / "cores.by_feature.json")["cores"]
+    features = {fid: {"cntr_code": countries[tag].get("base_iso2", "")} for fid, tag in owners.items()}
+    _, assignments, report = apply_overlay(
+        {"version": 1, "entries": [{"scenarios": ["tno_1962"], **entry} for entry in builder.BATCH3]}, "tno_1962",
+        features=features, owners=owners, cores=cores, countries=countries,
+        default_country="GER", hierarchy_groups={}, country_meta={}, prefectures={}, bucket_by_feature={}, plans=[])
+    assert assignments == {}
+    assert report["changed_count"] == 0
+
+
 @pytest.fixture
 def scenario_dir():
     parent = Path(__file__).resolve().parents[1] / ".runtime/tmp" / f"tno-overlay-{uuid4().hex}"
@@ -207,19 +265,30 @@ def test_batch_two_published_ownership_and_relationships():
     corrected["ATLISL_adriatica_corfu"] = "ITA"
     corrected.update({fid: entry["tag"] for entry in overlay["entries"] if entry["id"].startswith("tno_user2_")
                       for fid in entry["select"]["feature_ids"]})
+    corrected.update({fid: entry["tag"] for entry in overlay["entries"] if entry["id"].startswith("tno_batch3_")
+                      for fid in entry["select"]["feature_ids"]})
+    corrected_cores = {fid: [entry["tag"]] if entry["cores"] == "owner" else entry["cores"]
+                       for entry in overlay["entries"] if entry["id"].startswith("tno_batch3_") and entry["cores"] != "keep"
+                       for fid in entry["select"]["feature_ids"]}
+    splits = read(directory / "manifest.json")["hierarchy_overrides"]["feature_splits"]
+    superseded = {old for entry in overlay["entries"] for old in entry.get("supersedes", [])}
     for entry in overlay["entries"][3:]:
         tag = entry["tag"]
         if entry["id"] in {"tno_idal", "tno_oe04", "tno_vic"}:
             assert tag not in countries
+            continue
+        if entry["id"] in superseded:
             continue
         country = countries[tag]
         if "parent_owner_tag" in entry:
             assert country["parent_owner_tag"] == entry["parent_owner_tag"]
             assert country["subject_kind"] == entry["subject_kind"]
         for fid in entry["select"]["feature_ids"]:
-            assert owners[fid] == corrected.get(fid, tag)
-            if entry["cores"] == "owner":
-                assert cores[fid] == [tag]
+            for child in splits.get(fid, [fid]):
+                expected = corrected.get(child, corrected.get(fid, tag))
+                assert owners[child] == expected
+                if entry["cores"] == "owner":
+                    assert cores[child] == corrected_cores.get(child, [tag])
     assert owners["MYS-1139"] == "MLY"
     assert owners["MYS-4833"] == "MAL"
     assert owners["BN_ADM1_BRN-1184"] == "MAL"

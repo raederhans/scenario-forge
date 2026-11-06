@@ -424,6 +424,27 @@
       ],
       "owner": "ALB"
     },
+    "ATLPRV_18137": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ATLPRV_18139": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ATLPRV_18149": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
     "ATLPRV_18160": {
       "cores": [
         "IBR"
@@ -616,6 +637,27 @@
         "ITA"
       ],
       "owner": "ITA"
+    },
+    "ATLSHL_levant_3": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ATLSHL_levant_4": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ATLSHL_levant_5": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
     },
     "ATLSHL_west_med_5": {
       "cores": [
@@ -2831,6 +2873,13 @@
       ],
       "owner": "GCO"
     },
+    "CN_CITY_17275852B10243812034258": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
     "CN_CITY_17275852B11052099771689": {
       "controller": "XIK",
       "cores": [
@@ -2838,10 +2887,66 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B13491036968650": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_CITY_17275852B16521843045020": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_CITY_17275852B17138311811008": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B17632126042959": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B18343080596072": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B20040471591761": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
     "CN_CITY_17275852B22120662831852": {
       "controller": "XIK",
       "cores": [
         "CHI"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B22487922789088": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B22517944121367": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
       ],
       "owner": "XIK"
     },
@@ -2852,10 +2957,52 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B23024603415445": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B23326850448082": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B26108585816208": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
     "CN_CITY_17275852B31291032699823": {
       "controller": "XIK",
       "cores": [
         "CHI"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B31877610446386": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B34523810528391": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_CITY_17275852B35342422356290": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
       ],
       "owner": "XIK"
     },
@@ -2866,10 +3013,38 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B36550991536450": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B37882683065696": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B39380894050966": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
     "CN_CITY_17275852B40415823663758": {
       "controller": "XIK",
       "cores": [
         "TIB"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B41708679829209": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
       ],
       "owner": "XIK"
     },
@@ -2894,6 +3069,41 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B47707436055731": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B47800079203289": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B47950992751133": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B48079321876635": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B50863739077021": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
     "CN_CITY_17275852B52005472318098": {
       "controller": "XIK",
       "cores": [
@@ -2901,10 +3111,24 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B52132557540167": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
     "CN_CITY_17275852B55184179127017": {
       "controller": "XIK",
       "cores": [
         "CHI"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B56145168746123": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
       ],
       "owner": "XIK"
     },
@@ -2929,6 +3153,34 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B62552484302053": {
+      "controller": "GUZ",
+      "cores": [
+        "GUZ"
+      ],
+      "owner": "GUZ"
+    },
+    "CN_CITY_17275852B63005050969974": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B65169663803205": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_CITY_17275852B65904297882283": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
     "CN_CITY_17275852B66113099800997": {
       "controller": "XIK",
       "cores": [
@@ -2936,7 +3188,42 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B67382669517001": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B67896385958718": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B73600363846260": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B74261219630317": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
     "CN_CITY_17275852B74822957782790": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B75735248015336": {
       "controller": "XIK",
       "cores": [
         "XIK"
@@ -2950,7 +3237,168 @@
       ],
       "owner": "XIK"
     },
+    "CN_CITY_17275852B77966044233531": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B78456779133513": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B78838385533977": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_CITY_17275852B78973254528560": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_CITY_17275852B79223379777667": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_CITY_17275852B80219081988604": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B82571536959459": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B85360434089813": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B86000242921086": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_CITY_17275852B86681645698322": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_CITY_17275852B86706643635807": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B87133434189568": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B8760593978321": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B89468905887192": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_CITY_17275852B90257281612339": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B90470795224142": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_CITY_17275852B91446059581465": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_CITY_17275852B92159102315867": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
     "CN_CITY_17275852B93800386737284": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B94288996311479": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B94628873791223": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B97954418237605": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B99222209572409": {
+      "controller": "XIK",
+      "cores": [
+        "XIK"
+      ],
+      "owner": "XIK"
+    },
+    "CN_CITY_17275852B99847595379698": {
       "controller": "XIK",
       "cores": [
         "XIK"
@@ -3090,7 +3538,14 @@
       ],
       "owner": "CHI"
     },
-    "CN_MRG_20fbce9fead7": {
+    "CN_MRG_20fbce9fead7__SPLIT_CHI": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_20fbce9fead7__SPLIT_REST": {
       "controller": "SHX",
       "cores": [
         "CHI"
@@ -3161,11 +3616,11 @@
       "owner": "SHX"
     },
     "CN_MRG_323d6e10e986": {
-      "controller": "SHX",
+      "controller": "CHI",
       "cores": [
         "CHI"
       ],
-      "owner": "SHX"
+      "owner": "CHI"
     },
     "CN_MRG_33a2768f5b98": {
       "controller": "CHI",
@@ -3195,7 +3650,14 @@
       ],
       "owner": "SHX"
     },
-    "CN_MRG_3811ff27587a": {
+    "CN_MRG_3811ff27587a__SPLIT_CHI": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_3811ff27587a__SPLIT_REST": {
       "controller": "SHX",
       "cores": [
         "CHI"
@@ -3511,11 +3973,11 @@
       "owner": "NCP"
     },
     "CN_MRG_7e34a2c431cf": {
-      "controller": "SHX",
+      "controller": "CHI",
       "cores": [
         "CHI"
       ],
-      "owner": "SHX"
+      "owner": "CHI"
     },
     "CN_MRG_8028022022b6": {
       "controller": "CHI",
@@ -3699,7 +4161,14 @@
       ],
       "owner": "NCP"
     },
-    "CN_MRG_b59c07833274": {
+    "CN_MRG_b59c07833274__SPLIT_CHI": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_b59c07833274__SPLIT_REST": {
       "controller": "SHX",
       "cores": [
         "CHI"
@@ -3847,11 +4316,11 @@
       "owner": "GXC"
     },
     "CN_MRG_e4d1257a0bd1": {
-      "controller": "SHX",
+      "controller": "CHI",
       "cores": [
         "CHI"
       ],
-      "owner": "SHX"
+      "owner": "CHI"
     },
     "CN_MRG_e76984eed8fb": {
       "controller": "CHI",
@@ -4592,9 +5061,121 @@
     "DZA-2143": {
       "controller": "IAL",
       "cores": [
-        "ALC"
+        "SLG"
       ],
       "owner": "IAL"
+    },
+    "DZA-2144": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2145": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2146": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2147": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2148": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2149": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2150": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2190": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2199": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2200": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2201": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2202": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2203": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2204": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2205": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
+    },
+    "DZA-2206": {
+      "controller": "SLG",
+      "cores": [
+        "SLG"
+      ],
+      "owner": "SLG"
     },
     "EE001": {
       "controller": "OE01",
@@ -4959,6 +5540,13 @@
         "FRA"
       ],
       "owner": "FRA"
+    },
+    "GAZ+00?": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
     },
     "GA_ADM1_GAB-2168": {
       "controller": "GCO",
@@ -6201,6 +6789,104 @@
       ],
       "owner": "AZH"
     },
+    "IRQ-3046": {
+      "controller": "BKU",
+      "cores": [
+        "BKU"
+      ],
+      "owner": "BKU"
+    },
+    "IRQ-3049": {
+      "controller": "BKU",
+      "cores": [
+        "BKU"
+      ],
+      "owner": "BKU"
+    },
+    "IRQ-3050": {
+      "controller": "BKU",
+      "cores": [
+        "BKU"
+      ],
+      "owner": "BKU"
+    },
+    "IRQ-3051": {
+      "controller": "BKU",
+      "cores": [
+        "BKU"
+      ],
+      "owner": "BKU"
+    },
+    "IRQ-3052": {
+      "controller": "BKU",
+      "cores": [
+        "BKU"
+      ],
+      "owner": "BKU"
+    },
+    "IRQ-3242": {
+      "controller": "BKU",
+      "cores": [
+        "BKU"
+      ],
+      "owner": "BKU"
+    },
+    "IRQ-3243__SPLIT_BKU": {
+      "controller": "BKU",
+      "cores": [
+        "BKU"
+      ],
+      "owner": "BKU"
+    },
+    "IRQ-3243__SPLIT_REST": {
+      "controller": "IRQ",
+      "cores": [
+        "IRQ"
+      ],
+      "owner": "IRQ"
+    },
+    "ISR-3053": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ISR-3054": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ISR-3055": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ISR-3056": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ISR-3057": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
+    "ISR-3058": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
+    },
     "JM": {
       "controller": "JAM",
       "cores": [
@@ -6263,6 +6949,27 @@
         "AOI"
       ],
       "owner": "IKEN"
+    },
+    "KM_ADM1_COM-4934": {
+      "controller": "GEA",
+      "cores": [
+        "GEA"
+      ],
+      "owner": "GEA"
+    },
+    "KM_ADM1_COM-4935": {
+      "controller": "GEA",
+      "cores": [
+        "GEA"
+      ],
+      "owner": "GEA"
+    },
+    "KM_ADM1_COM-4936": {
+      "controller": "GEA",
+      "cores": [
+        "GEA"
+      ],
+      "owner": "GEA"
     },
     "LBY-2964": {
       "controller": "LBA",
@@ -6495,6 +7202,125 @@
         "RKO"
       ],
       "owner": "OE00"
+    },
+    "MAR-1445": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1446": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1447": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1448": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1449": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1450": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1451": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1452": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1453": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1455": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1456": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MAR-1457": {
+      "controller": "MOR",
+      "cores": [
+        "MOR"
+      ],
+      "owner": "MOR"
+    },
+    "MDA-1628": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "MDA-1637": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "MDA-1638": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "MDA-1645": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "MDA-1652": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
     },
     "ME_ADM1_MNE-1496": {
       "controller": "ITA",
@@ -6810,6 +7636,13 @@
         "MAU"
       ],
       "owner": "IBR"
+    },
+    "MU": {
+      "controller": "MAD",
+      "cores": [
+        "MAD"
+      ],
+      "owner": "MAD"
     },
     "MW_ADM1_82672581B12520625652479": {
       "controller": "GEA",
@@ -7450,7 +8283,14 @@
       ],
       "owner": "RKNO"
     },
-    "PAK-1108": {
+    "PAK-1108__SPLIT_KLT": {
+      "controller": "KLT",
+      "cores": [
+        "KLT"
+      ],
+      "owner": "KLT"
+    },
+    "PAK-1108__SPLIT_REST": {
       "controller": "PAK",
       "cores": [
         "AFG"
@@ -13479,6 +14319,76 @@
       ],
       "owner": "ISTP"
     },
+    "SYR-135": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-138": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-139": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-142": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-143": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-144": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-145": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-146": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-4843": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
+    "SYR-5261": {
+      "controller": "SNS",
+      "cores": [
+        "SNS"
+      ],
+      "owner": "SNS"
+    },
     "SZ_ADM1_SWZ-534": {
       "controller": "SWZ",
       "cores": [
@@ -13695,6 +14605,20 @@
         "DAH"
       ],
       "owner": "DAH"
+    },
+    "TKM-359__SPLIT_REST": {
+      "controller": "TKM",
+      "cores": [
+        "TKM"
+      ],
+      "owner": "TKM"
+    },
+    "TKM-359__SPLIT_UTL": {
+      "controller": "UTL",
+      "cores": [
+        "UTL"
+      ],
+      "owner": "UTL"
     },
     "TL_ADM1_TLS-541": {
       "controller": "ITIM",
@@ -15055,6 +15979,13 @@
       ],
       "owner": "RKU"
     },
+    "UA_RAY_74538382B21863106612225": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
     "UA_RAY_74538382B21914315222818": {
       "controller": "RKU",
       "cores": [
@@ -15131,6 +16062,13 @@
         "RKU"
       ],
       "owner": "RKU"
+    },
+    "UA_RAY_74538382B26202854770966": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
     },
     "UA_RAY_74538382B2732576684893": {
       "controller": "RKU",
@@ -15433,6 +16371,13 @@
       ],
       "owner": "RKP"
     },
+    "UA_RAY_74538382B42144983760497": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
     "UA_RAY_74538382B42205538030067": {
       "controller": "RKU",
       "cores": [
@@ -15510,12 +16455,26 @@
       ],
       "owner": "RKM"
     },
+    "UA_RAY_74538382B4607226007855": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
     "UA_RAY_74538382B46392233077619": {
       "controller": "RKU",
       "cores": [
         "RKU"
       ],
       "owner": "RKU"
+    },
+    "UA_RAY_74538382B46561623007945": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
     },
     "UA_RAY_74538382B46710488362187": {
       "controller": "RKU",
@@ -15691,6 +16650,13 @@
         "RKU"
       ],
       "owner": "RKU"
+    },
+    "UA_RAY_74538382B54958880930265": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
     },
     "UA_RAY_74538382B55212312657182": {
       "controller": "RKU",
@@ -16056,6 +17022,13 @@
       ],
       "owner": "RKU"
     },
+    "UA_RAY_74538382B73630411968214": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
     "UA_RAY_74538382B7363516927626": {
       "controller": "RKU",
       "cores": [
@@ -16217,6 +17190,13 @@
       ],
       "owner": "RKP"
     },
+    "UA_RAY_74538382B85654458417277": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
     "UA_RAY_74538382B85739457006484": {
       "controller": "RKU",
       "cores": [
@@ -16230,6 +17210,13 @@
         "GER"
       ],
       "owner": "CRI"
+    },
+    "UA_RAY_74538382B86026417899488": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
     },
     "UA_RAY_74538382B86462977342473": {
       "controller": "RKU",
@@ -16447,6 +17434,13 @@
         "RKP"
       ],
       "owner": "RKP"
+    },
+    "UA_RAY_74538382B97286599584108": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
     },
     "UA_RAY_74538382B97324557643268": {
       "controller": "RKU",
@@ -17166,6 +18160,27 @@
       ],
       "owner": "USA"
     },
+    "UZB-356": {
+      "controller": "KRK",
+      "cores": [
+        "KRK"
+      ],
+      "owner": "KRK"
+    },
+    "UZB-361": {
+      "controller": "UTL",
+      "cores": [
+        "UTL"
+      ],
+      "owner": "UTL"
+    },
+    "UZB-362": {
+      "controller": "UTL",
+      "cores": [
+        "UTL"
+      ],
+      "owner": "UTL"
+    },
     "UZB-363": {
       "controller": "KGZ",
       "cores": [
@@ -17200,6 +18215,13 @@
         "VMT"
       ],
       "owner": "VMT"
+    },
+    "WEB+00?": {
+      "controller": "IME",
+      "cores": [
+        "IME"
+      ],
+      "owner": "IME"
     },
     "XK_ADM1_KOS-5886": {
       "controller": "ALB",
@@ -17573,15 +18595,6 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "ALB"
-    },
-    "ALC": {
-      "color_hex": "#d1c094",
-      "color_policy": "locked",
-      "display_name": "Algerian Military Command",
-      "display_name_en": "Algerian Military Command",
-      "display_name_zh": "阿尔及利亚军事指挥部",
-      "mode": "override",
-      "parent_owner_tag": "IBR"
     },
     "ALT": {
       "display_name": "Oirotia",
@@ -17967,6 +18980,46 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "BKU": {
+      "base_iso2": "IQ",
+      "capital_state_id": null,
+      "color_hex": "#9e977a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 7,
+      "display_name": "Mosul and Kirkuk",
+      "display_name_en": "Mosul and Kirkuk",
+      "display_name_zh": "摩苏尔与基尔库克",
+      "entry_kind": "",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IQ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_bku",
+      "provenance_iso2": "IQ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_bku",
+        "tno_batch3_irq-3243"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "BKU"
+    },
     "BLZ": {
       "base_iso2": "BZ",
       "capital_state_id": null,
@@ -18260,9 +19313,56 @@
       "tag": "CHD"
     },
     "CHI": {
+      "base_iso2": "CN",
+      "capital_state_id": 1035,
       "color_hex": "#943161",
       "color_policy": "locked",
-      "mode": "override"
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 647,
+      "display_name": "Republic of China",
+      "display_name_en": "Republic of China",
+      "display_name_zh": "中华民国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 647,
+      "featured": true,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_anchor_id": "continent_asia",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "lookup_iso2": "CN",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "japan_nanjing_china_client_1962",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "japan_nanjing_china_client_1962",
+        "tno_batch3_chi",
+        "tno_batch3_cn_mrg_20fbce9fead7",
+        "tno_batch3_cn_mrg_323d6e10e986",
+        "tno_batch3_cn_mrg_3811ff27587a",
+        "tno_batch3_cn_mrg_7e34a2c431cf",
+        "tno_batch3_cn_mrg_b59c07833274",
+        "tno_batch3_cn_mrg_e4d1257a0bd1"
+      ],
+      "scenario_only": false,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CHI"
     },
     "CHL": {
       "color_hex": "#9b5833",
@@ -18749,18 +19849,18 @@
       "color_policy": "locked",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 90,
+      "controller_feature_count": 93,
       "display_name": "German East Africa",
       "display_name_en": "German East Africa",
       "display_name_zh": "东非专员辖区",
-      "feature_count": 90,
+      "feature_count": 93,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "TZ",
-      "notes": "German East Africa colonial government in tno_1962, combining Mozambique, Malawi, Zambia, Zimbabwe, Tanzania, Uganda, Rwanda, and Burundi while preserving local releasables.",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "GER",
       "parent_owner_tags": [
         "GER"
@@ -18777,7 +19877,8 @@
         "tno_reclaim_geas_keep",
         "tno_reclaim_geat_keep",
         "tno_reclaim_geau_keep",
-        "tno_reclaim_geaz_keep"
+        "tno_reclaim_geaz_keep",
+        "tno_batch3_gea"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -18798,7 +19899,7 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 521,
+      "controller_feature_count": 518,
       "disabled_regional_preset_names": [
         "Bavaria",
         "Saxony",
@@ -18813,7 +19914,7 @@
       "display_name_en": "Germany",
       "display_name_zh": "大日耳曼国",
       "entry_kind": "",
-      "feature_count": 521,
+      "feature_count": 518,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -19356,14 +20457,96 @@
       "tag": "GUY"
     },
     "GUZ": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
       "color_hex": "#96637a",
       "color_policy": "locked",
-      "mode": "override"
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 53,
+      "display_name": "Guizhou Clique",
+      "display_name_en": "Guizhou Clique",
+      "display_name_zh": "贵州军阀",
+      "entry_kind": "scenario_subject",
+      "feature_count": 53,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_anchor_id": "continent_asia",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "lookup_iso2": "CN",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "japan_guizhou_clique_client_1962",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "japan_guizhou_clique_client_1962",
+        "tno_batch3_guz"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "GUZ"
     },
     "GXC": {
+      "base_iso2": "CN",
+      "capital_state_id": 594,
       "color_hex": "#845955",
       "color_policy": "locked",
-      "mode": "override"
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 65,
+      "display_name": "Guangxi Clique",
+      "display_name_en": "Guangxi Clique",
+      "display_name_zh": "桂系",
+      "entry_kind": "scenario_subject",
+      "feature_count": 65,
+      "featured": true,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_anchor_id": "continent_asia",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "lookup_iso2": "CN",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "japan_guangxi_client_1962",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "japan_guangxi_client_1962",
+        "tno_batch3_gxc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "GXC"
     },
     "HAI": {
       "display_name": "Haiti",
@@ -19495,7 +20678,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "tno_1962_ial_manual_override",
-        "tno_user2_alc_to_ial"
+        "tno_user2_alc_to_ial",
+        "tno_batch3_ial_core"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -19516,12 +20700,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 107,
+      "controller_feature_count": 95,
       "display_name": "Iberian Union",
       "display_name_en": "Iberian Union",
       "display_name_zh": "伊比利亚联盟",
       "entry_kind": "scenario_country",
-      "feature_count": 107,
+      "feature_count": 95,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -19797,6 +20981,47 @@
       "synthetic_owner": false,
       "tag": "IKEN"
     },
+    "IME": {
+      "base_iso2": "IL",
+      "capital_state_id": null,
+      "color_hex": "#5e8053",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 13,
+      "display_name": "Italian Middle East",
+      "display_name_en": "Italian Middle East",
+      "display_name_zh": "意属中东",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IL",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_batch3_ime",
+      "provenance_iso2": "IL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_ime"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "IME"
+    },
     "INS": {
       "display_name": "Indonesia",
       "display_name_en": "Indonesia",
@@ -19810,6 +21035,46 @@
       "display_name_zh": "爱尔兰共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "IRQ": {
+      "base_iso2": "IQ",
+      "capital_state_id": 291,
+      "color_hex": "#89778e",
+      "color_policy": "palette",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 12,
+      "display_name": "Iraq",
+      "display_name_en": "Iraq",
+      "display_name_zh": "伊拉克共和国",
+      "entry_kind": "",
+      "feature_count": 12,
+      "featured": true,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "IQ",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "",
+      "provenance_iso2": "IQ",
+      "quality": "direct_country_copy",
+      "rule_sources": [
+        "tno_batch3_diyala_irq"
+      ],
+      "scenario_only": false,
+      "source": "direct_active_owner",
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "IRQ"
     },
     "ISOM": {
       "base_iso2": "SO",
@@ -20172,6 +21437,45 @@
       "color_policy": "locked",
       "mode": "override"
     },
+    "KLT": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#a48258",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Kalat and Makran",
+      "display_name_en": "Kalat and Makran",
+      "display_name_zh": "卡拉特与马克兰",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_pak-1108",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_pak-1108"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "KLT"
+    },
     "KOR": {
       "base_iso2": "KR",
       "capital_state_id": 525,
@@ -20212,6 +21516,45 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "KOR"
+    },
+    "KRK": {
+      "base_iso2": "UZ",
+      "capital_state_id": null,
+      "color_hex": "#987e50",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Karakalpakstan",
+      "display_name_en": "Karakalpakstan",
+      "display_name_zh": "卡拉卡尔帕克斯坦",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UZ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_krk",
+      "provenance_iso2": "UZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_krk"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "synthetic_owner": false,
+      "tag": "KRK"
     },
     "KRS": {
       "base_iso2": "RU",
@@ -20341,11 +21684,47 @@
       "tag": "LTH"
     },
     "MAD": {
+      "base_iso2": "MG",
+      "capital_state_id": 543,
+      "color_hex": "#3d5069",
+      "color_policy": "palette",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 23,
       "display_name": "Madagascar",
       "display_name_en": "Madagascar",
       "display_name_zh": "法属马达加斯加",
-      "mode": "override",
-      "parent_owner_tag": "FRA"
+      "entry_kind": "scenario_subject",
+      "feature_count": 23,
+      "featured": false,
+      "historical_fidelity": "vanilla",
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "lookup_iso2": "MG",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "madagascar_colony",
+      "provenance_iso2": "MG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "madagascar_colony",
+        "tno_batch3_mad"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "MAD"
     },
     "MAL": {
       "display_name": "Malaya",
@@ -20580,6 +21959,50 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "MNT"
+    },
+    "MOR": {
+      "base_iso2": "MA",
+      "capital_state_id": 461,
+      "color_hex": "#9b503e",
+      "color_policy": "palette",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 12,
+      "display_name": "Morocco",
+      "display_name_en": "Morocco",
+      "display_name_zh": "摩洛哥",
+      "entry_kind": "",
+      "feature_count": 12,
+      "featured": false,
+      "historical_fidelity": "vanilla",
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "lookup_iso2": "MA",
+      "notes": "州 290 Tangier；MAR-1445 与保留 IBR 的 ES630 Ceuta 几何交集面积为零。",
+      "parent_owner_tag": "IBR",
+      "parent_owner_tags": [
+        "IBR"
+      ],
+      "primary_rule_source": "french_morocco",
+      "provenance_iso2": "MA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "french_morocco",
+        "tno_batch3_mor",
+        "tno_batch3_mor_tangier"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "MOR"
     },
     "NCP": {
       "color_hex": "#bf3568",
@@ -21875,6 +23298,47 @@
       "synthetic_owner": false,
       "tag": "SIE"
     },
+    "SLG": {
+      "base_iso2": "DZ",
+      "capital_state_id": null,
+      "color_hex": "#bca382",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 16,
+      "display_name": "Iberian Algeria",
+      "display_name_en": "Iberian Algeria",
+      "display_name_zh": "西属阿尔及利亚",
+      "entry_kind": "scenario_subject",
+      "feature_count": 16,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "DZ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "IBR",
+      "parent_owner_tags": [
+        "IBR"
+      ],
+      "primary_rule_source": "tno_batch3_slg",
+      "provenance_iso2": "DZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_slg"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "SLG"
+    },
     "SNM": {
       "base_iso2": "SM",
       "capital_state_id": null,
@@ -21915,6 +23379,48 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "SNM"
+    },
+    "SNS": {
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "color_hex": "#8ba479",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 11,
+      "display_name": "Syrian National State",
+      "display_name_en": "Syrian National State",
+      "display_name_zh": "叙利亚民族国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 11,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SY",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_batch3_sns",
+      "provenance_iso2": "SY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_sns",
+        "tno_batch3_sns_family_color"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "SNS"
     },
     "SPH": {
       "base_iso2": "PH",
@@ -22148,12 +23654,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 29,
       "display_name": "Transnistria Governorate",
       "display_name_en": "Transnistria Governorate",
       "display_name_zh": "德涅斯特河沿岸总督区",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 29,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
@@ -22161,7 +23667,7 @@
         "extended"
       ],
       "lookup_iso2": "UA",
-      "notes": "",
+      "notes": "近似、未经配准：州 1282 Dniester Hills/Tiraspol 与现有德涅斯特河东岸行政地块对照；Bender 州 78 保留 ROM。",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "dev_manual_tag_create",
@@ -22169,7 +23675,9 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "dev_manual_tag_create",
-        "tno_user2_rku_to_tns"
+        "tno_user2_rku_to_tns",
+        "tno_batch3_tns",
+        "tno_batch3_tns_dniester"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -22293,6 +23801,46 @@
       "color_hex": "#b4b3da",
       "color_policy": "locked"
     },
+    "UTL": {
+      "base_iso2": "UZ",
+      "capital_state_id": null,
+      "color_hex": "#526947",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Turkestan Legion",
+      "display_name_en": "Turkestan Legion",
+      "display_name_zh": "突厥斯坦军团",
+      "entry_kind": "",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UZ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_utl",
+      "provenance_iso2": "UZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_utl",
+        "tno_batch3_tkm-359"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "synthetic_owner": false,
+      "tag": "UTL"
+    },
     "VEN": {
       "color_hex": "#a55f6d",
       "color_policy": "locked",
@@ -22399,31 +23947,49 @@
       "parent_owner_tag": ""
     },
     "XIK": {
-      "base_iso2": "XIK",
+      "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#6873a0",
+      "color_policy": "locked",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
+      "controller_feature_count": 60,
       "display_name": "24th Army of the National Revolutionary Army",
       "display_name_en": "24th Army of the National Revolutionary Army",
       "display_name_zh": "国民革命军第二十四军",
       "entry_kind": "scenario_country",
+      "feature_count": 60,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
       "inspector_group_anchor_id": "continent_asia",
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
-      "lookup_iso2": "XIK",
-      "mode": "create",
-      "notes": "",
+      "lookup_iso2": "CN",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "",
-      "provenance_iso2": "XIK",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dev_manual_tag_create",
+        "tno_batch3_xik"
+      ],
       "scenario_only": true,
+      "source": "manual_rule",
       "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
       "subject_kind": "",
       "subregion_id": "subregion_eastern_asia",
-      "subregion_label": "Eastern Asia"
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "XIK"
     },
     "XIN": {
       "display_name": "Xinjiang",

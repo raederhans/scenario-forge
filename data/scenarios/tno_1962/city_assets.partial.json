@@ -31855,6 +31855,15 @@
       },
       "stable_key": "id::CITY::ne::1159139591"
     },
+    "CITY::ne::1159139989": {
+      "city_id": "CITY::ne::1159139989",
+      "display_name": {
+        "en": "Tunja",
+        "zh": "通哈"
+      },
+      "host_feature_id": "CO_ADM1_COL-1315",
+      "stable_key": "id::CITY::ne::1159139989"
+    },
     "CITY::ne::1159140335": {
       "aliases": [
         "Mongo"
@@ -33367,6 +33376,15 @@
       "stable_key": "id::CITY::ne::1159145137",
       "tier": "regional"
     },
+    "CITY::ne::1159146051": {
+      "city_id": "CITY::ne::1159146051",
+      "display_name": {
+        "en": "Città di San Marino",
+        "zh": "圣马力诺城"
+      },
+      "host_feature_id": "SM_ADM1_SMR-4883",
+      "stable_key": "id::CITY::ne::1159146051"
+    },
     "CITY::ne::1159146053": {
       "display_name": {
         "en": "Korōru",
@@ -33509,6 +33527,17 @@
         "zh": "阿尔塔"
       },
       "stable_key": "id::CITY::ne::1159146451"
+    },
+    "CITY::ne::1159146489": {
+      "city_id": "CITY::ne::1159146489",
+      "display_name": {
+        "en": "Balboa",
+        "zh": "巴尔博亚"
+      },
+      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_PCZ",
+      "lat": 8.950114614175046,
+      "lon": -79.56761214362476,
+      "stable_key": "id::CITY::ne::1159146489"
     },
     "CITY::ne::1159146491": {
       "city_id": "CITY::ne::1159146491",
@@ -35022,6 +35051,15 @@
       },
       "stable_key": "id::CITY::ne::1159149081"
     },
+    "CITY::ne::1159149089": {
+      "city_id": "CITY::ne::1159149089",
+      "display_name": {
+        "en": "Andorra la Vella",
+        "zh": "安道尔城"
+      },
+      "host_feature_id": "AD_ADM1_AND-4876",
+      "stable_key": "id::CITY::ne::1159149089"
+    },
     "CITY::ne::1159149117": {
       "display_name": {
         "en": "Rochester",
@@ -35056,6 +35094,15 @@
         "zh": "伯灵顿"
       },
       "stable_key": "id::CITY::ne::1159149273"
+    },
+    "CITY::ne::1159149307": {
+      "city_id": "CITY::ne::1159149307",
+      "display_name": {
+        "en": "Port of Spain",
+        "zh": "西班牙港"
+      },
+      "host_feature_id": "TT",
+      "stable_key": "id::CITY::ne::1159149307"
     },
     "CITY::ne::1159149323": {
       "aliases": [
@@ -35552,14 +35599,14 @@
       "aliases": [
         "Dodoma"
       ],
+      "city_id": "CITY::ne::1159149731",
       "display_name": {
         "en": "Dodoma",
         "zh": "多多马"
       },
       "hidden": false,
       "stable_key": "id::CITY::ne::1159149731",
-      "tier": "major",
-      "city_id": "CITY::ne::1159149731"
+      "tier": "major"
     },
     "CITY::ne::1159149733": {
       "aliases": [
@@ -35774,7 +35821,12 @@
     },
     "CITY::ne::1159150087": {
       "city_id": "CITY::ne::1159150087",
-      "host_feature_id": "IRQ-3051"
+      "host_feature_id": "IRQ-3051",
+      "stable_key": "id::CITY::ne::1159150087",
+      "display_name": {
+        "en": "Mosul",
+        "zh": "摩苏尔"
+      }
     },
     "CITY::ne::1159150091": {
       "display_name": {
@@ -36071,12 +36123,12 @@
     },
     "CITY::ne::1159150597": {
       "city_id": "CITY::ne::1159150597",
-      "host_feature_id": "SR_ADM1_SUR-72",
-      "stable_key": "id::CITY::ne::1159150597",
       "display_name": {
         "en": "Paramaribo",
         "zh": "帕拉马里博"
-      }
+      },
+      "host_feature_id": "SR_ADM1_SUR-72",
+      "stable_key": "id::CITY::ne::1159150597"
     },
     "CITY::ne::1159150605": {
       "city_id": "CITY::ne::1159150605",
@@ -36344,7 +36396,12 @@
     },
     "CITY::ne::1159150781": {
       "city_id": "CITY::ne::1159150781",
-      "host_feature_id": "MNG-3331"
+      "host_feature_id": "MNG-3331",
+      "stable_key": "id::CITY::ne::1159150781",
+      "display_name": {
+        "en": "Khüree",
+        "zh": "库伦"
+      }
     },
     "CITY::ne::1159150785": {
       "aliases": [
@@ -36358,7 +36415,8 @@
       "hidden": false,
       "host_feature_id": "NA_ADM1_NAM-3340",
       "stable_key": "id::CITY::ne::1159150785",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159150785"
     },
     "CITY::ne::1159150787": {
       "aliases": [
@@ -36430,7 +36488,12 @@
     },
     "CITY::ne::1159150819": {
       "city_id": "CITY::ne::1159150819",
-      "host_feature_id": "CN_CITY_17275852B10439048942215"
+      "host_feature_id": "CN_CITY_17275852B10439048942215",
+      "stable_key": "id::CITY::ne::1159150819",
+      "display_name": {
+        "en": "Xining",
+        "zh": "西宁"
+      }
     },
     "CITY::ne::1159150831": {
       "city_id": "CITY::ne::1159150831",
@@ -36456,6 +36519,15 @@
     "CITY::ne::1159150853": {
       "city_id": "CITY::ne::1159150853",
       "host_feature_id": "SV_ADM1_SLV-1349"
+    },
+    "CITY::ne::1159150855": {
+      "city_id": "CITY::ne::1159150855",
+      "display_name": {
+        "en": "Kingston",
+        "zh": "金斯敦"
+      },
+      "host_feature_id": "JM",
+      "stable_key": "id::CITY::ne::1159150855"
     },
     "CITY::ne::1159150867": {
       "city_id": "CITY::ne::1159150867",
@@ -36540,6 +36612,15 @@
     "CITY::ne::1159150909": {
       "city_id": "CITY::ne::1159150909",
       "host_feature_id": "GT_ADM1_GTM-1951"
+    },
+    "CITY::ne::1159150911": {
+      "city_id": "CITY::ne::1159150911",
+      "display_name": {
+        "en": "Caiena",
+        "zh": "卡宴"
+      },
+      "host_feature_id": "GF_PRIMARY",
+      "stable_key": "id::CITY::ne::1159150911"
     },
     "CITY::ne::1159150913": {
       "aliases": [
@@ -36812,9 +36893,23 @@
       "city_id": "CITY::ne::1159151133",
       "host_feature_id": "BO_ADM1_BOL-1936"
     },
+    "CITY::ne::1159151135": {
+      "city_id": "CITY::ne::1159151135",
+      "display_name": {
+        "en": "Santa Cruz",
+        "zh": "圣克鲁斯"
+      },
+      "host_feature_id": "BO_ADM1_BOL-1940",
+      "stable_key": "id::CITY::ne::1159151135"
+    },
     "CITY::ne::1159151137": {
       "city_id": "CITY::ne::1159151137",
-      "host_feature_id": "DZA-2145"
+      "host_feature_id": "DZA-2145",
+      "stable_key": "id::CITY::ne::1159151137",
+      "display_name": {
+        "en": "Oran",
+        "zh": "奥兰"
+      }
     },
     "CITY::ne::1159151145": {
       "display_name": {
@@ -36864,14 +36959,14 @@
     },
     "CITY::ne::1159151181": {
       "city_id": "CITY::ne::1159151181",
-      "host_feature_id": "PR",
-      "lat": 18.448865650409047,
-      "lon": -66.11835124365471,
-      "stable_key": "id::CITY::ne::1159151181",
       "display_name": {
         "en": "San Juan",
         "zh": "圣胡安"
-      }
+      },
+      "host_feature_id": "PR",
+      "lat": 18.448865650409047,
+      "lon": -66.11835124365471,
+      "stable_key": "id::CITY::ne::1159151181"
     },
     "CITY::ne::1159151191": {
       "display_name": {
@@ -36907,7 +37002,9 @@
         "en": "Gerusalemme",
         "zh": "耶路撒冷"
       },
-      "stable_key": "id::CITY::ne::1159151203"
+      "stable_key": "id::CITY::ne::1159151203",
+      "city_id": "CITY::ne::1159151203",
+      "host_feature_id": "ISR-3058"
     },
     "CITY::ne::1159151205": {
       "city_id": "CITY::ne::1159151205",
@@ -36917,6 +37014,15 @@
       },
       "host_feature_id": "CV_ADM1_CPV-5053",
       "stable_key": "id::CITY::ne::1159151205"
+    },
+    "CITY::ne::1159151207": {
+      "city_id": "CITY::ne::1159151207",
+      "display_name": {
+        "en": "Nassau",
+        "zh": "拿骚"
+      },
+      "host_feature_id": "BS",
+      "stable_key": "id::CITY::ne::1159151207"
     },
     "CITY::ne::1159151221": {
       "city_id": "CITY::ne::1159151221",
@@ -36941,11 +37047,21 @@
     },
     "CITY::ne::1159151263": {
       "city_id": "CITY::ne::1159151263",
-      "host_feature_id": "RO321"
+      "host_feature_id": "RO321",
+      "stable_key": "id::CITY::ne::1159151263",
+      "display_name": {
+        "en": "Bucharest",
+        "zh": "布加勒斯特"
+      }
     },
     "CITY::ne::1159151269": {
       "city_id": "CITY::ne::1159151269",
-      "host_feature_id": "SYR-4843"
+      "host_feature_id": "SYR-4843",
+      "stable_key": "id::CITY::ne::1159151269",
+      "display_name": {
+        "en": "Damascus",
+        "zh": "大马士革"
+      }
     },
     "CITY::ne::1159151281": {
       "city_id": "CITY::ne::1159151281",
@@ -37020,11 +37136,21 @@
     },
     "CITY::ne::1159151321": {
       "city_id": "CITY::ne::1159151321",
-      "host_feature_id": "CN_CITY_17275852B84192730453130"
+      "host_feature_id": "CN_CITY_17275852B84192730453130",
+      "stable_key": "id::CITY::ne::1159151321",
+      "display_name": {
+        "en": "Lanzhou",
+        "zh": "兰州"
+      }
     },
     "CITY::ne::1159151323": {
       "city_id": "CITY::ne::1159151323",
-      "host_feature_id": "CN_CITY_17275852B34195804181253"
+      "host_feature_id": "CN_CITY_17275852B34195804181253",
+      "stable_key": "id::CITY::ne::1159151323",
+      "display_name": {
+        "en": "Nanning",
+        "zh": "南宁"
+      }
     },
     "CITY::ne::1159151325": {
       "city_id": "CITY::ne::1159151325",
@@ -37044,6 +37170,15 @@
       "host_feature_id": "CN_CITY_17275852B38988280096574",
       "stable_key": "id::CITY::ne::1159151331"
     },
+    "CITY::ne::1159151345": {
+      "city_id": "CITY::ne::1159151345",
+      "display_name": {
+        "en": "Cali",
+        "zh": "卡利"
+      },
+      "host_feature_id": "CO_ADM1_COL-1408",
+      "stable_key": "id::CITY::ne::1159151345"
+    },
     "CITY::ne::1159151347": {
       "city_id": "CITY::ne::1159151347",
       "host_feature_id": "CU"
@@ -37058,7 +37193,12 @@
     },
     "CITY::ne::1159151371": {
       "city_id": "CITY::ne::1159151371",
-      "host_feature_id": "CN_CITY_17275852B36917281821750"
+      "host_feature_id": "CN_CITY_17275852B36917281821750",
+      "stable_key": "id::CITY::ne::1159151371",
+      "display_name": {
+        "en": "Kunming",
+        "zh": "昆明"
+      }
     },
     "CITY::ne::1159151385": {
       "city_id": "CITY::ne::1159151385",
@@ -37430,97 +37570,217 @@
       "source": "reviewed_settlement",
       "stable_key": "id::CITY::scenario::cherdyn"
     },
-    "CITY::ne::1159139989": {
-      "city_id": "CITY::ne::1159139989",
-      "stable_key": "id::CITY::ne::1159139989",
+    "CITY::ne::1159140813": {
+      "city_id": "CITY::ne::1159140813",
+      "stable_key": "id::CITY::ne::1159140813",
       "display_name": {
-        "en": "Tunja",
-        "zh": "通哈"
-      },
-      "host_feature_id": "CO_ADM1_COL-1315"
+        "en": "Zigong",
+        "zh": "自贡"
+      }
     },
-    "CITY::ne::1159151345": {
-      "city_id": "CITY::ne::1159151345",
-      "stable_key": "id::CITY::ne::1159151345",
+    "CITY::gn::1813325": {
+      "city_id": "CITY::gn::1813325",
+      "stable_key": "id::CITY::gn::1813325",
       "display_name": {
-        "en": "Cali",
-        "zh": "卡利"
-      },
-      "host_feature_id": "CO_ADM1_COL-1408"
+        "en": "Daxian",
+        "zh": "达县"
+      }
     },
-    "CITY::ne::1159150855": {
-      "city_id": "CITY::ne::1159150855",
-      "stable_key": "id::CITY::ne::1159150855",
+    "CITY::ne::1159151363": {
+      "city_id": "CITY::ne::1159151363",
+      "stable_key": "id::CITY::ne::1159151363",
       "display_name": {
-        "en": "Kingston",
-        "zh": "金斯敦"
-      },
-      "host_feature_id": "JM"
+        "en": "Xi'an",
+        "zh": "西安"
+      }
     },
-    "CITY::ne::1159149307": {
-      "city_id": "CITY::ne::1159149307",
-      "stable_key": "id::CITY::ne::1159149307",
+    "CITY::gn::1787765": {
+      "city_id": "CITY::gn::1787765",
+      "stable_key": "id::CITY::gn::1787765",
       "display_name": {
-        "en": "Port of Spain",
-        "zh": "西班牙港"
-      },
-      "host_feature_id": "TT"
+        "en": "Yan'an",
+        "zh": "延安"
+      }
     },
-    "CITY::ne::1159151207": {
-      "city_id": "CITY::ne::1159151207",
-      "stable_key": "id::CITY::ne::1159151207",
+    "CITY::ne::1159147037": {
+      "city_id": "CITY::ne::1159147037",
+      "stable_key": "id::CITY::ne::1159147037",
       "display_name": {
-        "en": "Nassau",
-        "zh": "拿骚"
-      },
-      "host_feature_id": "BS"
+        "en": "Dali",
+        "zh": "大理"
+      }
     },
-    "CITY::ne::1159150911": {
-      "city_id": "CITY::ne::1159150911",
-      "stable_key": "id::CITY::ne::1159150911",
+    "CITY::ne::1159130171": {
+      "city_id": "CITY::ne::1159130171",
+      "stable_key": "id::CITY::ne::1159130171",
       "display_name": {
-        "en": "Caiena",
-        "zh": "卡宴"
-      },
-      "host_feature_id": "GF_PRIMARY"
+        "en": "Mengzi",
+        "zh": "蒙自"
+      }
     },
-    "CITY::ne::1159151135": {
-      "city_id": "CITY::ne::1159151135",
-      "stable_key": "id::CITY::ne::1159151135",
+    "CITY::ne::1159149799": {
+      "city_id": "CITY::ne::1159149799",
+      "stable_key": "id::CITY::ne::1159149799",
       "display_name": {
-        "en": "Santa Cruz",
-        "zh": "圣克鲁斯"
-      },
-      "host_feature_id": "BO_ADM1_BOL-1940"
+        "en": "Shaoguan",
+        "zh": "韶关"
+      }
     },
-    "CITY::ne::1159146489": {
-      "city_id": "CITY::ne::1159146489",
-      "stable_key": "id::CITY::ne::1159146489",
+    "CITY::ne::1159139761": {
+      "city_id": "CITY::ne::1159139761",
+      "stable_key": "id::CITY::ne::1159139761",
       "display_name": {
-        "en": "Balboa",
-        "zh": "巴尔博亚"
-      },
-      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_PCZ",
-      "lon": -79.56761214362476,
-      "lat": 8.950114614175046
+        "en": "Maoming",
+        "zh": "茂名"
+      }
     },
-    "CITY::ne::1159146051": {
-      "city_id": "CITY::ne::1159146051",
-      "stable_key": "id::CITY::ne::1159146051",
+    "CITY::ne::1159150821": {
+      "city_id": "CITY::ne::1159150821",
+      "stable_key": "id::CITY::ne::1159150821",
       "display_name": {
-        "en": "Città di San Marino",
-        "zh": "圣马力诺城"
-      },
-      "host_feature_id": "SM_ADM1_SMR-4883"
+        "en": "Guilin",
+        "zh": "桂林"
+      }
     },
-    "CITY::ne::1159149089": {
-      "city_id": "CITY::ne::1159149089",
-      "stable_key": "id::CITY::ne::1159149089",
+    "CITY::ne::1159149785": {
+      "city_id": "CITY::ne::1159149785",
+      "stable_key": "id::CITY::ne::1159149785",
       "display_name": {
-        "en": "Andorra la Vella",
-        "zh": "安道尔城"
+        "en": "Wuzhou",
+        "zh": "梧州"
+      }
+    },
+    "CITY::gn::1816373": {
+      "city_id": "CITY::gn::1816373",
+      "stable_key": "id::CITY::gn::1816373",
+      "display_name": {
+        "en": "Bijie",
+        "zh": "毕节"
+      }
+    },
+    "CITY::ne::1159139661": {
+      "city_id": "CITY::ne::1159139661",
+      "stable_key": "id::CITY::ne::1159139661",
+      "display_name": {
+        "en": "Tongren",
+        "zh": "铜仁"
+      }
+    },
+    "CITY::ne::1159150889": {
+      "city_id": "CITY::ne::1159150889",
+      "stable_key": "id::CITY::ne::1159150889",
+      "display_name": {
+        "en": "Yinchuan",
+        "zh": "银川"
+      }
+    },
+    "CITY::ne::1159149769": {
+      "city_id": "CITY::ne::1159149769",
+      "stable_key": "id::CITY::ne::1159149769",
+      "display_name": {
+        "en": "Wuwei",
+        "zh": "武威"
+      }
+    },
+    "CITY::ne::1159149877": {
+      "city_id": "CITY::ne::1159149877",
+      "stable_key": "id::CITY::ne::1159149877",
+      "display_name": {
+        "en": "Yining",
+        "zh": "伊宁"
+      }
+    },
+    "CITY::ne::1159150885": {
+      "city_id": "CITY::ne::1159150885",
+      "stable_key": "id::CITY::ne::1159150885",
+      "display_name": {
+        "en": "Kashgar",
+        "zh": "喀什"
+      }
+    },
+    "CITY::ne::1159147043": {
+      "city_id": "CITY::ne::1159147043",
+      "stable_key": "id::CITY::ne::1159147043",
+      "display_name": {
+        "en": "Kalgan",
+        "zh": "张家口"
+      }
+    },
+    "CITY::ne::1159149711": {
+      "city_id": "CITY::ne::1159149711",
+      "stable_key": "id::CITY::ne::1159149711",
+      "display_name": {
+        "en": "Dalanzadgad",
+        "zh": "达兰扎达嘎德"
+      }
+    },
+    "CITY::ne::1159149403": {
+      "city_id": "CITY::ne::1159149403",
+      "stable_key": "id::CITY::ne::1159149403",
+      "display_name": {
+        "en": "Iași",
+        "zh": "雅西"
+      }
+    },
+    "CITY::ne::1159135835": {
+      "city_id": "CITY::ne::1159135835",
+      "stable_key": "id::CITY::ne::1159135835",
+      "display_name": {
+        "en": "Timișoara",
+        "zh": "蒂米什瓦拉"
+      }
+    },
+    "CITY::ne::1159150677": {
+      "city_id": "CITY::ne::1159150677",
+      "stable_key": "id::CITY::ne::1159150677",
+      "display_name": {
+        "en": "Chișinău",
+        "zh": "基希讷乌"
+      }
+    },
+    "CITY::ne::1159149397": {
+      "city_id": "CITY::ne::1159149397",
+      "stable_key": "id::CITY::ne::1159149397",
+      "display_name": {
+        "en": "Constanța",
+        "zh": "康斯坦察"
+      }
+    },
+    "CITY::ne::1159149341": {
+      "city_id": "CITY::ne::1159149341",
+      "stable_key": "id::CITY::ne::1159149341",
+      "display_name": {
+        "en": "Nukus",
+        "zh": "努库斯"
       },
-      "host_feature_id": "AD_ADM1_AND-4876"
+      "host_feature_id": "UZB-356"
+    },
+    "CITY::ne::1159134335": {
+      "city_id": "CITY::ne::1159134335",
+      "stable_key": "id::CITY::ne::1159134335",
+      "display_name": {
+        "en": "Qarshi",
+        "zh": "卡尔希"
+      },
+      "host_feature_id": "UZB-361"
+    },
+    "CITY::gn::1175296": {
+      "city_id": "CITY::gn::1175296",
+      "stable_key": "id::CITY::gn::1175296",
+      "display_name": {
+        "en": "Kalat",
+        "zh": "卡拉特"
+      },
+      "host_feature_id": "PAK-1108__SPLIT_KLT"
+    },
+    "CITY::ne::1159150673": {
+      "city_id": "CITY::ne::1159150673",
+      "stable_key": "id::CITY::ne::1159150673",
+      "display_name": {
+        "en": "Rabat",
+        "zh": "拉巴特"
+      },
+      "host_feature_id": "MAR-1451"
     }
   },
   "audit": {

@@ -702,31 +702,6 @@
     },
     {
       "allow_manual_overlay": true,
-      "color_hex_override": "#66a56d",
-      "display_name_override": "Italian Palestine",
-      "notes": "Italy releasable for the Italian Palestine settlement.",
-      "parent_owner_tag": "ITA",
-      "preset_source": {
-        "feature_ids": [
-          "GAZ+00?",
-          "ISR-3053",
-          "ISR-3054",
-          "ISR-3055",
-          "ISR-3056",
-          "ISR-3057",
-          "ISR-3058",
-          "WEB+00?"
-        ],
-        "type": "feature_ids"
-      },
-      "release_lookup_iso2": "IL",
-      "scenario_ids": [
-        "tno_1962"
-      ],
-      "tag": "PAL"
-    },
-    {
-      "allow_manual_overlay": true,
       "color_hex_override": "#566c50",
       "display_name_override": "Italian Transjordan",
       "notes": "Italy releasable for the Italian Transjordan settlement.",
@@ -793,37 +768,6 @@
         "tno_1962"
       ],
       "tag": "TUN"
-    },
-    {
-      "allow_manual_overlay": true,
-      "color_hex_override": "#c8c896",
-      "display_name_override": "Syrian Protectorate",
-      "notes": "Italy releasable for the Syrian protectorate settlement.",
-      "parent_owner_tag": "ITA",
-      "preset_source": {
-        "feature_ids": [
-          "SYR-135",
-          "SYR-136",
-          "SYR-137",
-          "SYR-138",
-          "SYR-139",
-          "SYR-140",
-          "SYR-141",
-          "SYR-142",
-          "SYR-143",
-          "SYR-144",
-          "SYR-145",
-          "SYR-146",
-          "SYR-4843",
-          "SYR-5261"
-        ],
-        "type": "feature_ids"
-      },
-      "release_lookup_iso2": "SY",
-      "scenario_ids": [
-        "tno_1962"
-      ],
-      "tag": "SYR"
     },
     {
       "allow_manual_overlay": true,

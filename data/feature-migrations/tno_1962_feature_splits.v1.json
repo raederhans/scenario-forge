@@ -1,5 +1,25 @@
 {
   "feature_splits": {
+    "CN_MRG_20fbce9fead7": [
+      "CN_MRG_20fbce9fead7__SPLIT_CHI",
+      "CN_MRG_20fbce9fead7__SPLIT_REST"
+    ],
+    "CN_MRG_3811ff27587a": [
+      "CN_MRG_3811ff27587a__SPLIT_CHI",
+      "CN_MRG_3811ff27587a__SPLIT_REST"
+    ],
+    "CN_MRG_b59c07833274": [
+      "CN_MRG_b59c07833274__SPLIT_CHI",
+      "CN_MRG_b59c07833274__SPLIT_REST"
+    ],
+    "IRQ-3243": [
+      "IRQ-3243__SPLIT_BKU",
+      "IRQ-3243__SPLIT_REST"
+    ],
+    "PAK-1108": [
+      "PAK-1108__SPLIT_KLT",
+      "PAK-1108__SPLIT_REST"
+    ],
     "PA_ADM1_PAN-1337": [
       "PA_ADM1_PAN-1337__SPLIT_PCZ",
       "PA_ADM1_PAN-1337__SPLIT_REST"
@@ -7,6 +27,10 @@
     "PA_ADM1_PAN-1340": [
       "PA_ADM1_PAN-1340__SPLIT_PCZ",
       "PA_ADM1_PAN-1340__SPLIT_REST"
+    ],
+    "TKM-359": [
+      "TKM-359__SPLIT_UTL",
+      "TKM-359__SPLIT_REST"
     ]
   },
   "scenarios": [

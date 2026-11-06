@@ -980,14 +980,15 @@
     },
     "GUL": {
       "project_tags": [
-        "GUL"
+        "ARE",
+        "QAT",
+        "BHR"
       ],
-      "default_project_tag": "GUL",
-      "policy": "one_to_one",
+      "default_project_tag": null,
+      "policy": "preserve_custom",
       "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
       "basis": [
-        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
-        "T2 第四节身份核对；history/countries/GUL - Gulf Governate.txt"
+        "保留项目 ARE/QAT/BHR 子政权；原版 GUL 州 658、1335、1789、2169–2172。"
       ]
     },
     "GUX": {
