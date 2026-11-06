@@ -49,13 +49,13 @@
     "relief": "data/ETOPO_2022_v1_60s_N90W180_surface.tif"
   },
   "stats": {
-    "water_px": 767428,
-    "components": 202,
-    "west_px": 274181,
-    "east_px": 493247,
-    "floor_limited_ratio": 0.1346015521977306,
-    "mean_abs_correction_m": 96.74257969299464,
-    "corrected_ratio": 0.3570784490532011,
-    "max_depth_m": 4773.965032538428
+    "water_px": 765638,
+    "components": 199,
+    "west_px": 273489,
+    "east_px": 492149,
+    "floor_limited_ratio": 0.134003275699482,
+    "mean_abs_correction_m": 96.37453755713703,
+    "corrected_ratio": 0.3567430038738934,
+    "max_depth_m": 4773.471882111426
   }
 }
