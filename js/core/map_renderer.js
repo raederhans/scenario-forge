@@ -1217,6 +1217,13 @@ const getRenderPhaseLifecycleOwner = lazyOwner(() => createRenderPhaseLifecycleO
     },
     setRenderPhaseValue: (phase) => {
       setRenderPhaseValueState(runtimeState, phase);
+      // A gesture frame may have committed a moved depth image whose newly
+      // exposed edge is empty; the pass is clean at the final camera, so only
+      // an explicit invalidation makes the idle render shade it exactly.
+      if (phase === RENDER_PHASE_IDLE && bathymetryExactRefreshPending) {
+        bathymetryExactRefreshPending = false;
+        invalidateRenderPasses(["background", "contextScenario"], "bathymetry-gesture-exact");
+      }
     },
     setPhaseEnteredAt: (enteredAtMs) => {
       setPhaseEnteredAtState(runtimeState, enteredAtMs);
@@ -1721,6 +1728,7 @@ function getOceanExclusionPath(collection) {
 }
 
 let bathymetryTextureRuntime = null;
+let bathymetryExactRefreshPending = false;
 
 function publishBathymetryTextureState(snapshot) {
   runtimeState.activeBathymetrySource = snapshot.activeBathymetrySource;
@@ -1771,6 +1779,7 @@ function drawBathymetryTexture(oceanStyle) {
     // Gesture frames move the last depth image; the idle frame re-shades exactly.
     reuseLastOutput: !exportRenderInProgress && runtimeState.renderPhase !== RENDER_PHASE_IDLE,
   });
+  if (result.reused) bathymetryExactRefreshPending = true;
   publishBathymetryTextureState(result);
   return result;
 }
