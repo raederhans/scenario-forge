@@ -1,3 +1,4 @@
+import { lazyOwner } from "./map_renderer/lazy_owner.js";
 import { isUsableLineMesh } from "./renderer/packed_line_mesh.js";
 import { createBorderCanvasPreparationOwner } from "./renderer/border_canvas_preparation_owner.js";
 import { createPhysicalViewportCacheOwner } from "./renderer/physical_viewport_cache_owner.js";
@@ -760,44 +761,16 @@ const cityLayerCache = {
   merged: null,
 };
 // --- owner 初始化区：集中持有 owner 单例引用，并在 getter 中按需延迟创建。 ---
-let urbanCityPolicyOwner = null;
-let cityLabelOwner = null;
 let cityPointsRenderOwner = null;
-let colorResolutionStrategyOwner = null;
-let strategicOverlayHelpersOwner = null;
-let strategicOverlayRuntimeOwner = null;
-let politicalCollectionOwner = null;
-let contextLayerResolverOwner = null;
-let rendererAssetUrlPolicyOwner = null;
-let facilitySurfaceOwner = null;
-let riverLayerRenderOwner = null;
-let oceanRenderOwner = null;
 let physicalLayerRenderOwner = null;
-let scenarioReliefOverlayRenderOwner = null;
-let cityLightsRenderOwner = null;
 const cityLightsAssetProvider = createCityLightsAssetProvider();
-let dayNightRuntimeOwner = null;
-let transportOverviewRenderOwner = null;
-let strategicOverlayRenderOwner = null;
-let borderMeshOwner = null;
-let specialZoneLayersRenderOwner = null;
 let borderDrawOwner = null;
 let borderPathPreparationJob = null;
 let borderPathPreparationFailedRevision = null;
 let borderPathPreparationStats = null;
-let interactionBorderSnapshotOwner = null;
-let spatialIndexRuntimeOwner = null;
-let renderPipelinePassesOwner = null;
-let visualEffectsPassOwner = null;
-let contextPassOrchestratorOwner = null;
 let politicalPassOrchestratorOwner = null;
 let politicalBackgroundRenderOwner = null;
-let politicalPartialRepaintOwner = null;
-let renderCacheOwner = null;
-let cachedPassCompositorOwner = null;
 let exactCompositeReuseOwner = null;
-let transformedFrameCompositorOwner = null;
-let renderPerfMetricsRuntimeOwner = null;
 Object.defineProperty(globalThis, "__renderPerfMetrics", {
   configurable: true,
   enumerable: true,
@@ -813,11 +786,6 @@ Object.defineProperty(globalThis, "__renderPerfMetrics", {
     });
   },
 });
-let renderPassCacheHostOwner = null;
-let renderPassCommitAccountingOwner = null;
-let drawCanvasOrchestrationOwner = null;
-let renderTransformReusePolicyOwner = null;
-let projectedGeometryBoundsOwner = null;
 let projectedBoundsDiagnosticsOwner = null;
 
 function recordProjectedBoundsDiagnosticsState(...args) {
@@ -826,139 +794,78 @@ function recordProjectedBoundsDiagnosticsState(...args) {
   }
   return projectedBoundsDiagnosticsOwner.recordProjectedBoundsDiagnosticsState(...args);
 }
-let bathymetryStylePolicy = null;
 
-function getBathymetryStylePolicy() {
-  if (!bathymetryStylePolicy) {
-    bathymetryStylePolicy = createBathymetryStylePolicy(runtimeState, {
-      clamp,
-      getBathymetryPresetProfile,
-      getFeatureProjectedDensity,
-      getOceanBaseFillColor,
-      getReliefOverlayKind,
-      parseCanvasColorChannels,
-      toRgbaString,
-    });
-  }
-  return bathymetryStylePolicy;
-}
+const getBathymetryStylePolicy = lazyOwner(() => createBathymetryStylePolicy(runtimeState, {
+    clamp,
+    getBathymetryPresetProfile,
+    getFeatureProjectedDensity,
+    getOceanBaseFillColor,
+    getReliefOverlayKind,
+    parseCanvasColorChannels,
+    toRgbaString,
+  }));
 
-let parentBorderGroupingPolicy = null;
+const getParentBorderGroupingPolicy = lazyOwner(() => createParentBorderGroupingPolicy(runtimeState, {
+    canonicalCountryCode,
+    getAdmin1Group,
+    getFeatureCountryCodeNormalized,
+    getFeatureId,
+    shouldExcludePoliticalInteractionFeature,
+  }));
 
-function getParentBorderGroupingPolicy() {
-  if (!parentBorderGroupingPolicy) {
-    parentBorderGroupingPolicy = createParentBorderGroupingPolicy(runtimeState, {
-      canonicalCountryCode,
-      getAdmin1Group,
-      getFeatureCountryCodeNormalized,
-      getFeatureId,
-      shouldExcludePoliticalInteractionFeature,
-    });
-  }
-  return parentBorderGroupingPolicy;
-}
+const getVisibleFrameIdentityPolicy = lazyOwner(() => createVisibleFrameIdentityPolicy(runtimeState, {
+    areZoomTransformsEquivalent,
+    cloneZoomTransform,
+    ensureCurrentSceneSnapshot,
+    getCachedPoliticalPassStaticSignature,
+    getOceanBaseFillColor,
+    getPassFullReferenceTransform,
+    getPassReferenceTransform,
+    getRenderPassCacheState,
+    getRenderPassSignature,
+    getResolvedColorCountForSceneSnapshot,
+    getTransformBucketSignature,
+    rendererSurfaceHost,
+  }));
 
-let visibleFrameIdentityPolicy = null;
+const getFillTargetPolicy = lazyOwner(() => createFillTargetPolicy(runtimeState, {
+    getAdmin1Group,
+    getFeatureCountryCodeNormalized,
+    getFeatureInteractionCountryCodeNormalized,
 
-function getVisibleFrameIdentityPolicy() {
-  if (!visibleFrameIdentityPolicy) {
-    visibleFrameIdentityPolicy = createVisibleFrameIdentityPolicy(runtimeState, {
-      areZoomTransformsEquivalent,
-      cloneZoomTransform,
-      ensureCurrentSceneSnapshot,
-      getCachedPoliticalPassStaticSignature,
-      getOceanBaseFillColor,
-      getPassFullReferenceTransform,
-      getPassReferenceTransform,
-      getRenderPassCacheState,
-      getRenderPassSignature,
-      getResolvedColorCountForSceneSnapshot,
-      getTransformBucketSignature,
-      rendererSurfaceHost,
-    });
-  }
-  return visibleFrameIdentityPolicy;
-}
+    shouldExcludePoliticalInteractionFeature,
+  }));
 
-let fillTargetPolicy = null;
+const getRenderPassSignaturePolicy = lazyOwner(() => createRenderPassSignaturePolicy(runtimeState, {
+    getTransformSignature,
+    getOceanBaseFillColor,
+    getDebugMode: () => String(debugMode),
+    shouldEnableContextBaseTransformReuse,
+    getViewportRenderSignature,
+    getPhysicalLandMaskInfo,
+    getScenarioRuntimeTopologySignatureToken,
+    rendererSurfaceHost,
+    getContextBaseZoomBucketId,
+    shouldRefreshContextBaseForColorChanges,
+    getScenarioOverlaySignatureToken,
+    getLakeBaseFillColor,
+    getLakeStyleConfig,
+    stableJson,
+    getDayNightRuntimeOwner,
+    getPaintContourRevision: () => [getPaintContourRuntimeOwner().getRevision(),
+      getRiverInternalContourOwner().getRevision(), hasVisibleRiverPartitions()].join("|"),
+    getPoliticalBorderRevision: () => getPoliticalBorderRuntimeOwner().getRevision(),
+    getBorderAppearanceRevision: () => String(runtimeState.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase() === "manual"
+      ? 0 : getCountryFillPaletteOwner().getAppearanceRevision(),
+  }));
 
-function getFillTargetPolicy() {
-  if (!fillTargetPolicy) {
-    fillTargetPolicy = createFillTargetPolicy(runtimeState, {
-      getAdmin1Group,
-      getFeatureCountryCodeNormalized,
-      getFeatureInteractionCountryCodeNormalized,
-
-      shouldExcludePoliticalInteractionFeature,
-    });
-  }
-  return fillTargetPolicy;
-}
-
-let renderPassSignaturePolicy = null;
-
-function getRenderPassSignaturePolicy() {
-  if (!renderPassSignaturePolicy) {
-    renderPassSignaturePolicy = createRenderPassSignaturePolicy(runtimeState, {
-      getTransformSignature,
-      getOceanBaseFillColor,
-      getDebugMode: () => String(debugMode),
-      shouldEnableContextBaseTransformReuse,
-      getViewportRenderSignature,
-      getPhysicalLandMaskInfo,
-      getScenarioRuntimeTopologySignatureToken,
-      rendererSurfaceHost,
-      getContextBaseZoomBucketId,
-      shouldRefreshContextBaseForColorChanges,
-      getScenarioOverlaySignatureToken,
-      getLakeBaseFillColor,
-      getLakeStyleConfig,
-      stableJson,
-      getDayNightRuntimeOwner,
-      getPaintContourRevision: () => [getPaintContourRuntimeOwner().getRevision(),
-        getRiverInternalContourOwner().getRevision(), hasVisibleRiverPartitions()].join("|"),
-      getPoliticalBorderRevision: () => getPoliticalBorderRuntimeOwner().getRevision(),
-      getBorderAppearanceRevision: () => String(runtimeState.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase() === "manual"
-        ? 0 : getCountryFillPaletteOwner().getAppearanceRevision(),
-    });
-  }
-  return renderPassSignaturePolicy;
-}
-
-let pixelRatioPolicy = null;
 let appliedDisplayQuality = null;
 
-function getPixelRatioPolicy() {
-  if (!pixelRatioPolicy) {
-    pixelRatioPolicy = createPixelRatioPolicy({ runtimeState, nowMs, getDevicePixelRatio: () => globalThis.devicePixelRatio });
-  }
-  return pixelRatioPolicy;
-}
+const getPixelRatioPolicy = lazyOwner(() => createPixelRatioPolicy({ runtimeState, nowMs, getDevicePixelRatio: () => globalThis.devicePixelRatio }));
 let viewportReadModelOwner = null;
 const renderSnapshotOwner = createRenderSnapshotOwner();
-let viewportCommandOwner = null;
 let rendererViewportUpdateOwner = null;
-let rendererStartupTransactionOwner = null;
-let viewportResizeLifecycleOwner = null;
-let scenarioWaterCachePolicyOwner = null;
-let zoomInteractionLifecycleOwner = null;
-let mapInteractionEventBindingOwner = null;
-let clickSelectionTransactionOwner = null;
-let mapHoverInteractionOwner = null;
-let rendererTransactionResetOwner = null;
-let rendererSurfaceLifecycleOwner = null;
-let rendererProjectionPathOwner = null;
-let rendererSvgSurfaceLifecycleOwner = null;
-let rendererFitProjectionOwner = null;
-let setMapDataTransactionOwner = null;
-let renderRequestBoundaryOwner = null;
-let renderPhaseLifecycleOwner = null;
-let hitCanvasSchedulingOwner = null;
-let visibleFrameDiagnosticsOwner = null;
-let intensityFieldMaskOwner = null;
 let legendControlOwner = null;
-let selectionOverlayOwner = null;
-let transientOverlayRenderOwner = null;
 
 // --- owner 初始化区：getXxxOwner() 统一承载组装入口与依赖注入。 ---
 function markDevSelectionOverlayClean() {
@@ -969,55 +876,47 @@ function markInspectorOverlayClean() {
   runtimeState.inspectorOverlayDirty = false;
 }
 
-function getTransientOverlayRenderOwner() {
-  if (transientOverlayRenderOwner) return transientOverlayRenderOwner;
-  transientOverlayRenderOwner = createTransientOverlayRenderOwner(runtimeState, {
-    rendererSurfaceHost,
-    ensureSpecialZoneEditorState,
-    getSpecialZoneStyle,
-    DEFAULT_SPECIAL_ZONE_TYPE,
-    RENDER_PHASE_IDLE,
-    isSpecialRegionEnabled,
-    isWaterRegionEnabled,
-    getFeatureId,
-    getActiveFacilityHighlightEntry,
-    buildFacilityEntryKey,
-    getRiverCellFeature: id => getRiverPaintRuntime(runtimeState).getCellFeature(id),
-  });
-  return transientOverlayRenderOwner;
-}
+const getTransientOverlayRenderOwner = lazyOwner(() => createTransientOverlayRenderOwner(runtimeState, {
+  rendererSurfaceHost,
+  ensureSpecialZoneEditorState,
+  getSpecialZoneStyle,
+  DEFAULT_SPECIAL_ZONE_TYPE,
+  RENDER_PHASE_IDLE,
+  isSpecialRegionEnabled,
+  isWaterRegionEnabled,
+  getFeatureId,
+  getActiveFacilityHighlightEntry,
+  buildFacilityEntryKey,
+  getRiverCellFeature: id => getRiverPaintRuntime(runtimeState).getCellFeature(id),
+}));
 
-function getSelectionOverlayOwner() {
-  if (selectionOverlayOwner) return selectionOverlayOwner;
-  selectionOverlayOwner = createSelectionOverlayOwner({
-    getOverlayProjectionSignature,
-    getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
-    getDevSelectionIds: () => Array.isArray(runtimeState.devSelectionOrder)
-      ? Array.from(runtimeState.devSelectionOrder, (id) => String(id || "").trim()).filter(Boolean) : [],
-    getInspectorSelection: () => ({
-      featureIds: Array.isArray(runtimeState.inspectorHighlightFeatureIds)
-        ? Array.from(runtimeState.inspectorHighlightFeatureIds, (id) => String(id || "").trim()).filter(Boolean) : [],
-      countryCode: String(runtimeState.inspectorHighlightCountryCode || ""),
-      groupMode: runtimeState.inspectorHighlightGroupMode === true,
-      label: String(runtimeState.inspectorHighlightLabel || ""),
-    }),
-    getLandFeatures: () => runtimeState.landData?.features || [],
-    getLandIndex: () => runtimeState.landIndex,
-    getRuntimeTopology: () => runtimeState.runtimePoliticalTopology,
-    getTopojson: () => globalThis.topojson,
-    getFeatureId,
-    getEntityFeatureId,
-    getCountryFeatureIds: getFeatureIdsForOwner,
-    getDevGroup: () => rendererSurfaceHost.getDevSelectionGroup(),
-    getInspectorGroup: () => rendererSurfaceHost.getInspectorHighlightGroup(),
-    getPath: () => rendererSurfaceHost.getPathSvg(),
-    isDevDirty: () => !!runtimeState.devSelectionOverlayDirty,
-    isInspectorDirty: () => !!runtimeState.inspectorOverlayDirty,
-    markDevClean: markDevSelectionOverlayClean,
-    markInspectorClean: markInspectorOverlayClean,
-  });
-  return selectionOverlayOwner;
-}
+const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
+  getOverlayProjectionSignature,
+  getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
+  getDevSelectionIds: () => Array.isArray(runtimeState.devSelectionOrder)
+    ? Array.from(runtimeState.devSelectionOrder, (id) => String(id || "").trim()).filter(Boolean) : [],
+  getInspectorSelection: () => ({
+    featureIds: Array.isArray(runtimeState.inspectorHighlightFeatureIds)
+      ? Array.from(runtimeState.inspectorHighlightFeatureIds, (id) => String(id || "").trim()).filter(Boolean) : [],
+    countryCode: String(runtimeState.inspectorHighlightCountryCode || ""),
+    groupMode: runtimeState.inspectorHighlightGroupMode === true,
+    label: String(runtimeState.inspectorHighlightLabel || ""),
+  }),
+  getLandFeatures: () => runtimeState.landData?.features || [],
+  getLandIndex: () => runtimeState.landIndex,
+  getRuntimeTopology: () => runtimeState.runtimePoliticalTopology,
+  getTopojson: () => globalThis.topojson,
+  getFeatureId,
+  getEntityFeatureId,
+  getCountryFeatureIds: getFeatureIdsForOwner,
+  getDevGroup: () => rendererSurfaceHost.getDevSelectionGroup(),
+  getInspectorGroup: () => rendererSurfaceHost.getInspectorHighlightGroup(),
+  getPath: () => rendererSurfaceHost.getPathSvg(),
+  isDevDirty: () => !!runtimeState.devSelectionOverlayDirty,
+  isInspectorDirty: () => !!runtimeState.inspectorOverlayDirty,
+  markDevClean: markDevSelectionOverlayClean,
+  markInspectorClean: markInspectorOverlayClean,
+}));
 
 function getLegendControlOwner() {
   if (legendControlOwner) return legendControlOwner;
@@ -1042,704 +941,604 @@ function getLegendControlOwner() {
   return legendControlOwner;
 }
 
-function getRendererSurfaceLifecycleOwner() {
-  if (rendererSurfaceLifecycleOwner) {
-    return rendererSurfaceLifecycleOwner;
-  }
-  rendererSurfaceLifecycleOwner = createRendererSurfaceLifecycleOwner({
-    surfaceHost: rendererSurfaceHost,
-    getters: {
-      getDocument: () => document,
-    },
-    helpers: {
-      createHitCanvasElement,
-    },
-    canvasLayerManager: {
-      CANVAS_LAYER_NAMES,
-      ensureCanvasLayers,
-      getCanvasLayer,
-    },
-  });
-  return rendererSurfaceLifecycleOwner;
-}
+const getRendererSurfaceLifecycleOwner = lazyOwner(() => createRendererSurfaceLifecycleOwner({
+  surfaceHost: rendererSurfaceHost,
+  getters: {
+    getDocument: () => document,
+  },
+  helpers: {
+    createHitCanvasElement,
+  },
+  canvasLayerManager: {
+    CANVAS_LAYER_NAMES,
+    ensureCanvasLayers,
+    getCanvasLayer,
+  },
+}));
 
-function getRendererProjectionPathOwner() {
-  if (rendererProjectionPathOwner) {
-    return rendererProjectionPathOwner;
-  }
-  rendererProjectionPathOwner = createRendererProjectionPathOwner({
-    surfaceHost: rendererSurfaceHost,
-    getters: {
-      getD3: () => globalThis.d3,
-    },
-    constants: {
-      projectionPrecision: PROJECTION_PRECISION,
-      pathPointRadius: PATH_POINT_RADIUS,
-    },
-  });
-  return rendererProjectionPathOwner;
-}
+const getRendererProjectionPathOwner = lazyOwner(() => createRendererProjectionPathOwner({
+  surfaceHost: rendererSurfaceHost,
+  getters: {
+    getD3: () => globalThis.d3,
+  },
+  constants: {
+    projectionPrecision: PROJECTION_PRECISION,
+    pathPointRadius: PATH_POINT_RADIUS,
+  },
+}));
 
-function getRendererSvgSurfaceLifecycleOwner() {
-  if (rendererSvgSurfaceLifecycleOwner) {
-    return rendererSvgSurfaceLifecycleOwner;
-  }
-  rendererSvgSurfaceLifecycleOwner = createRendererSvgSurfaceLifecycleOwner({
-    surfaceHost: rendererSurfaceHost,
-    getters: {
-      getD3: () => globalThis.d3,
-    },
-    helpers: {
-      createSvgElement,
-    },
-  });
-  return rendererSvgSurfaceLifecycleOwner;
-}
+const getRendererSvgSurfaceLifecycleOwner = lazyOwner(() => createRendererSvgSurfaceLifecycleOwner({
+  surfaceHost: rendererSurfaceHost,
+  getters: {
+    getD3: () => globalThis.d3,
+  },
+  helpers: {
+    createSvgElement,
+  },
+}));
 
-function getRendererFitProjectionOwner() {
-  if (rendererFitProjectionOwner) {
-    return rendererFitProjectionOwner;
-  }
-  rendererFitProjectionOwner = createRendererFitProjectionOwner({
-    surfaceHost: rendererSurfaceHost,
-    state: runtimeState,
-    constants: {
-      projectionFitPaddingRatio: PROJECTION_FIT_PADDING_RATIO,
+const getRendererFitProjectionOwner = lazyOwner(() => createRendererFitProjectionOwner({
+  surfaceHost: rendererSurfaceHost,
+  state: runtimeState,
+  constants: {
+    projectionFitPaddingRatio: PROJECTION_FIT_PADDING_RATIO,
+  },
+  getters: {
+    getLogicalCanvasDimensions,
+    getRenderableLandFeatures,
+  },
+  effects: {
+    resetCityAnchorCache: () => {
+      cityAnchorCache = new WeakMap();
     },
-    getters: {
-      getLogicalCanvasDimensions,
-      getRenderableLandFeatures,
+    rebuildProjectedBoundsCache,
+    buildSpatialIndex,
+    setHitCanvasDirty: () => {
+      setHitCanvasDirtyState(runtimeState, true);
     },
-    effects: {
-      resetCityAnchorCache: () => {
-        cityAnchorCache = new WeakMap();
-      },
-      rebuildProjectedBoundsCache,
-      buildSpatialIndex,
-      setHitCanvasDirty: () => {
+    updateSpecialZonesPaths,
+    renderSpecialZoneEditorOverlay,
+    updateZoomTranslateExtent,
+    markAllOverlaysDirty,
+  },
+}));
+
+const getRendererStartupTransactionOwner = lazyOwner(() => createRendererStartupTransactionOwner({
+  state,
+  getters: {
+    isPerfOverlayEnabled,
+  },
+  effects: {
+    resetLayerResolverCache: () => {
+      layerResolverCache.primaryRef = null;
+      layerResolverCache.detailRef = null;
+      layerResolverCache.bundleMode = null;
+      layerResolverCache.contextRevision = 0;
+    },
+    resetPhysicalLandClipPathCache,
+    resetExactRefreshOptimizationState,
+    bumpTopologyRevision: () => {
+      runtimeState.topologyRevision = Number(runtimeState.topologyRevision || 0) + 1;
+    },
+    resetHitCanvasTopologyRevision: () => {
+      runtimeState.hitCanvasTopologyRevision = 0;
+    },
+    clearPendingPoliticalColorEdit,
+    clearRenderPassReferenceTransforms,
+    clearLastGoodFrame,
+    invalidateInteractionComposite,
+    resetFirstVisibleFramePainted,
+    setRenderPassPerfOverlayEnabled: (enabled) => {
+      getRenderPassCacheState().perfOverlayEnabled = enabled;
+    },
+    ensureLayerDataFromTopology: () => {
+      ensureLayerDataFromTopology();
+    },
+    rebuildPoliticalLandCollections: () => {
+      rebuildPoliticalLandCollections();
+    },
+    applyRendererSurfaceBridgeState: () => {
+      applyRendererSurfaceBridgeState(runtimeState, {
+        mapCanvas: rendererSurfaceHost.getMapCanvas(),
+        canvasLayers: rendererSurfaceHost.getCanvasLayers(),
+        context: rendererSurfaceHost.getContext(),
+        politicalPatchCanvas: rendererSurfaceHost.getPoliticalPatchCanvas(),
+        politicalPatchContext: rendererSurfaceHost.getPoliticalPatchContext(),
+        interactionOverlayCanvas: rendererSurfaceHost.getInteractionOverlayCanvas(),
+        interactionOverlayContext: rendererSurfaceHost.getInteractionOverlayContext(),
+      });
+    },
+    ensureSovereigntyState: () => {
+      ensureSovereigntyState();
+    },
+    normalizeColorStateForRender: () => {
+      normalizeColorStateForRender(state, {
+        sanitizeColorMap,
+        sanitizeCountryColorMap,
+      });
+    },
+    setDebugMode: (nextDebugMode) => {
+      runtimeState.debugMode = nextDebugMode;
+    },
+    resetRenderDiagnostics,
+    clearRenderPhaseTimer,
+    resetRenderPhaseState: () => getRenderPhaseLifecycleOwner().resetRenderPhaseState("init-map"),
+    resetTooltipState: () => getMapHoverInteractionOwner().resetTooltipState(),
+    cancelScheduledHoverOverlayRender,
+    markAllOverlaysDirty,
+    clearStagedMapDataTasks,
+    cancelExactAfterSettleRefresh,
+    cancelPendingIndexUiRefresh,
+    resetDeferredRenderFlags: () => {
+      runtimeState.deferContextBasePass = false;
+      runtimeState.deferHitCanvasBuild = false;
+      setDeferExactAfterSettleState(runtimeState, false);
+      runtimeState.hitCanvasBuildScheduled = null;
+    },
+    resetProjectedBoundsCacheState,
+    invalidateAllRenderPasses,
+    syncDayNightClockTimerBridge: () => {
+      registerRuntimeHook(null, "syncDayNightClockTimerFn", syncDayNightClockTimer);
+      syncDayNightClockTimer();
+    },
+  },
+}));
+
+const getSetMapDataTransactionOwner = lazyOwner(() => createSetMapDataTransactionOwner({
+  state,
+  getters: {
+    nowMs,
+    getActiveScenarioId: () => runtimeState.activeScenarioId,
+    getLandFeatureCount: () => Array.isArray(runtimeState.landData?.features)
+      ? runtimeState.landData.features.length
+      : 0,
+    getRenderProfile: () => runtimeState.renderProfile,
+  },
+  effects: {
+    resetRendererTransactionState,
+    clearPendingPoliticalColorEdit,
+    clearRenderPassReferenceTransforms,
+    clearLastGoodFrame,
+    invalidateInteractionComposite,
+    resetFirstVisibleFramePainted,
+    invalidateAllRenderPasses,
+    markAllOverlaysDirty,
+    queueTooltipUpdate,
+    rebuildPrimaryPoliticalCollections,
+    recordCompositeCoverageDiagnostics: ({
+      fullCollection,
+      interactiveCollection,
+    } = {}) => {
+      if (runtimeState.topologyBundleMode === "composite" && Array.isArray(fullCollection?.features)) {
+        const coverage = runtimeState.debugCountryCoverage || collectCountryCoverageStats(fullCollection.features);
+        const interactiveFeatureCount = Array.isArray(interactiveCollection?.features)
+          ? interactiveCollection.features.length
+          : 0;
+        console.info(
+          `[map_renderer] Composite coverage: countries detail=${coverage.detailCountries}, primaryFallback=${coverage.primaryCountries}, total=${coverage.totalCountries}; features detail=${coverage.detailFeatures}, primary=${coverage.primaryFeatures}, total=${coverage.totalFeatures}.`
+          + ` interactive=${interactiveFeatureCount}.`
+        );
+        console.info("[map_renderer] Composite country coverage detail/primary", {
+          summary: {
+            totalCountries: coverage.totalCountries,
+            detailCountries: coverage.detailCountries,
+            primaryCountries: coverage.primaryCountries,
+            totalFeatures: coverage.totalFeatures,
+            detailFeatures: coverage.detailFeatures,
+            primaryFeatures: coverage.primaryFeatures,
+          },
+          priorityCountryGaps: coverage.priorityCountryGaps,
+          detailCountries: coverage.detailCountryList,
+          primaryCountries: coverage.primaryCountryList,
+        });
+      }
+    },
+    sanitizeSetMapDataColorState: () => {
+      runtimeState.sovereignBaseColors = sanitizeCountryColorMap(runtimeState.sovereignBaseColors);
+      runtimeState.visualOverrides = sanitizeColorMap(runtimeState.visualOverrides);
+      runtimeState.waterRegionOverrides = sanitizeColorMap(runtimeState.waterRegionOverrides);
+      runtimeState.specialRegionOverrides = {};
+    },
+
+    setCanvasSize,
+    buildRuntimePoliticalMeta,
+    resetSovereigntyInitialized: () => {
+      runtimeState.sovereigntyInitialized = false;
+    },
+    resetIslandNeighborsCache: () => {
+      islandNeighborsCache = {
+        topologyRef: null,
+        objectRef: null,
+        count: 0,
+        neighbors: [],
+      };
+    },
+    clearSphericalFeatureDiagnosticsCache: () => {
+      ensureProjectedBoundsCache();
+      clearSphericalFeatureDiagnosticsCacheState(runtimeState);
+    },
+    buildIndex,
+    ensureSovereigntyState,
+    setDeferHitCanvasBuild: (deferred) => {
+      runtimeState.deferHitCanvasBuild = Boolean(deferred);
+    },
+    setInteractionInfrastructureState,
+    rebuildProjectedBoundsCache,
+    rebuildStaticMeshes,
+    invalidateBorderCache,
+    updateDynamicBorderStatusUI,
+    rebuildResolvedColors,
+    fitProjection,
+    buildSpatialIndex,
+    updateSpecialZonesPaths,
+    renderSpecialZoneEditorOverlay,
+    updateZoomTranslateExtent,
+    resetZoomToFit,
+    enforceZoomConstraints,
+    setHitCanvasDirty: (dirty) => {
+      setHitCanvasDirtyState(runtimeState, dirty);
+    },
+    beginStagedMapDataWarmup,
+    render,
+    recordRenderPerfMetric,
+  },
+}));
+
+const getRenderRequestBoundaryOwner = lazyOwner(() => createRenderRequestBoundaryOwner({
+  effects: {
+    requestRender,
+    flushRenderBoundary,
+    render,
+  },
+  getters: {
+    hasInteractionRenderContext: () => Boolean(rendererSurfaceHost.getContext()),
+  },
+}));
+
+const getRenderPhaseLifecycleOwner = lazyOwner(() => createRenderPhaseLifecycleOwner({
+  state: {
+    renderPhaseIdle: RENDER_PHASE_IDLE,
+    renderPhaseInteracting: RENDER_PHASE_INTERACTING,
+  },
+  getters: {
+    getRenderPhase: () => runtimeState.renderPhase,
+    getRenderPhaseTimerId: () => runtimeState.renderPhaseTimerId,
+    nowMs,
+    getAdaptiveSettleProfile,
+    hasPendingDayNightRefresh: () => Boolean(runtimeState.pendingDayNightRefresh),
+    shouldStartExactAfterSettleFastPath,
+    needsNavigationRecovery: () => getRenderPassCacheState().lastFrame?.frameMode === "navigation",
+  },
+  effects: {
+    clearTimeout: (timerId) => globalThis.clearTimeout(timerId),
+    setTimeout: (callback, delayMs) => globalThis.setTimeout(callback, delayMs),
+    setRenderPhaseTimerId: (timerId) => {
+      setRenderPhaseTimerIdState(runtimeState, timerId);
+    },
+    setRenderPhaseValue: (phase) => {
+      setRenderPhaseValueState(runtimeState, phase);
+    },
+    setPhaseEnteredAt: (enteredAtMs) => {
+      setPhaseEnteredAtState(runtimeState, enteredAtMs);
+    },
+    setIsInteracting: (isInteracting) => {
+      setRendererIsInteractingState(runtimeState, isInteracting);
+    },
+    cancelPoliticalPathWarmup,
+    setHoverOverlayDirty: (dirty) => {
+      getMapHoverInteractionOwner().setHoverOverlayDirty(Boolean(dirty));
+    },
+    setPendingDayNightRefresh: (pending) => {
+      setPendingDayNightRefreshState(runtimeState, pending);
+    },
+    invalidateRenderPasses,
+    updateDprStage,
+    setCanvasSize,
+    setAdaptiveSettleProfile: (settleProfile) => {
+      setAdaptiveSettleProfileState(runtimeState, settleProfile);
+    },
+    scheduleScenarioChunkRefresh: (options) => (
+      typeof runtimeState.scheduleScenarioChunkRefreshFn === "function"
+        ? runtimeState.scheduleScenarioChunkRefreshFn(options)
+        : "noop"
+    ),
+    setDeferExactAfterSettle: (deferred) => {
+      setDeferExactAfterSettleState(runtimeState, deferred);
+    },
+    render,
+    scheduleExactAfterSettleRefresh,
+  },
+}));
+
+const getHitCanvasSchedulingOwner = lazyOwner(() => createHitCanvasSchedulingOwner({
+  state: {
+    renderPhaseIdle: RENDER_PHASE_IDLE,
+    idleTimeoutMs: STAGED_HIT_CANVAS_TIMEOUT_MS,
+  },
+  getters: {
+    hasHitCanvasRuntime: () => Boolean(rendererSurfaceHost.getHitContext() && rendererSurfaceHost.getPathHitCanvas()),
+    isHitCanvasDirty: () => Boolean(runtimeState.hitCanvasDirty),
+    isHitCanvasBuildDeferred: () => Boolean(runtimeState.deferHitCanvasBuild),
+    getRenderPhase: () => runtimeState.renderPhase,
+    getScheduledHitCanvasBuildHandle: () => runtimeState.hitCanvasBuildScheduled,
+    getActiveScenarioId: () => runtimeState.activeScenarioId,
+    getHitCanvasBuildIdentity: () => [
+      runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.topologyRevision,
+      runtimeState.zoomTransform?.x, runtimeState.zoomTransform?.y, runtimeState.zoomTransform?.k,
+      runtimeState.dpr, runtimeState.width, runtimeState.height,
+    ].join(":"),
+  },
+  effects: {
+    scheduleDeferredWork,
+    cancelDeferredWork,
+    setScheduledHitCanvasBuildHandle: (handle) => {
+      setHitCanvasBuildScheduledState(runtimeState, handle);
+    },
+    runScheduledHitCanvasBuild: (details) => drawScheduledHitCanvasWithMetric(details),
+  },
+}));
+
+const getRendererTransactionResetOwner = lazyOwner(() => createRendererTransactionResetOwner({
+  effects: {
+    clearPendingDynamicBorderTimer,
+    clearRenderPhaseTimer,
+    cancelPendingIndexUiRefresh,
+    cancelPendingSidebarRefresh,
+    cancelScheduledHoverOverlayRender,
+    setRenderPhaseIdle: () => setRenderPhase(RENDER_PHASE_IDLE),
+    resetRenderDiagnostics,
+    clearStagedMapDataTasks,
+    cancelExactAfterSettleRefresh,
+    cancelScheduledHitCanvasBuild: (options) => (
+      getHitCanvasSchedulingOwner().cancelScheduledHitCanvasBuild(options)
+    ),
+    cancelSecondarySpatialBuild: () => {
+      secondarySpatialPreparationVersion++;
+      cancelDeferredWork(secondarySpatialBuildHandle);
+      secondarySpatialBuildHandle = null;
+      pendingSecondarySpatialBuildReasons.clear();
+      return true;
+    },
+    setDeferContextBasePass: (deferred) => {
+      runtimeState.deferContextBasePass = Boolean(deferred);
+    },
+    setDeferHitCanvasBuild: (deferred) => {
+      runtimeState.deferHitCanvasBuild = Boolean(deferred);
+    },
+    setDeferExactAfterSettle: (deferred) => {
+      setDeferExactAfterSettleState(runtimeState, deferred);
+    },
+    resetLayerResolverCache: () => {
+      layerResolverCache.primaryRef = null;
+      layerResolverCache.detailRef = null;
+      layerResolverCache.bundleMode = null;
+      layerResolverCache.contextRevision = 0;
+    },
+    resetDevInteractionState: () => {
+      runtimeState.devHoverHit = null;
+      runtimeState.devSelectedHit = null;
+      runtimeState.devSelectionFeatureIds = new Set();
+      runtimeState.devSelectionOrder = [];
+    },
+    resetDevClipboardState: () => {
+      runtimeState.devClipboardFallbackText = "";
+      runtimeState.devClipboardPreviewFormat = "names_with_ids";
+    },
+    resetPhysicalLandClipPathCache,
+    resetExactRefreshOptimizationState,
+    resetVisibleInternalBorderMeshSignature,
+    bumpTopologyRevision: () => {
+      runtimeState.topologyRevision = Number(runtimeState.topologyRevision || 0) + 1;
+      return runtimeState.topologyRevision;
+    },
+    setHitCanvasDirty: (dirty) => {
+      if (dirty) {
         setHitCanvasDirtyState(runtimeState, true);
-      },
-      updateSpecialZonesPaths,
-      renderSpecialZoneEditorOverlay,
-      updateZoomTranslateExtent,
-      markAllOverlaysDirty,
+      }
     },
-  });
-  return rendererFitProjectionOwner;
-}
+    resetHitCanvasTopologyRevision: () => {
+      runtimeState.hitCanvasTopologyRevision = 0;
+    },
+  },
+}));
 
-function getRendererStartupTransactionOwner() {
-  if (rendererStartupTransactionOwner) {
-    return rendererStartupTransactionOwner;
-  }
-  rendererStartupTransactionOwner = createRendererStartupTransactionOwner({
-    state,
-    getters: {
-      isPerfOverlayEnabled,
+const getMapHoverInteractionOwner = lazyOwner(() => createMapHoverInteractionOwner({
+  state: runtimeState,
+  surfaceHost: rendererSurfaceHost,
+  constants: { hoverSnapPx: HIT_SNAP_RADIUS_HOVER_PX, renderPhaseIdle: RENDER_PHASE_IDLE },
+  getters: {
+    nowMs,
+    getHitFromEvent,
+    getHoveredFacilityEntryFromEvent,
+    isFacilityDetailsSurfaceActive,
+    getHoveredCityTooltipEntry,
+    getTooltipTextForFeature: getTooltipText,
+    getFeatureForHit: (hit) => {
+      const id = hit?.id;
+      if (!id) return null;
+      if (hit.targetType === "special") return runtimeState.specialRegionsById?.get(id) || null;
+      if (hit.targetType === "water") return runtimeState.waterRegionsById?.get(id) || null;
+      return runtimeState.landIndex?.get(id) || null;
     },
-    effects: {
-      resetLayerResolverCache: () => {
-        layerResolverCache.primaryRef = null;
-        layerResolverCache.detailRef = null;
-        layerResolverCache.bundleMode = null;
-        layerResolverCache.contextRevision = 0;
-      },
-      resetPhysicalLandClipPathCache,
-      resetExactRefreshOptimizationState,
-      bumpTopologyRevision: () => {
-        runtimeState.topologyRevision = Number(runtimeState.topologyRevision || 0) + 1;
-      },
-      resetHitCanvasTopologyRevision: () => {
-        runtimeState.hitCanvasTopologyRevision = 0;
-      },
-      clearPendingPoliticalColorEdit,
-      clearRenderPassReferenceTransforms,
-      clearLastGoodFrame,
-      invalidateInteractionComposite,
-      resetFirstVisibleFramePainted,
-      setRenderPassPerfOverlayEnabled: (enabled) => {
-        getRenderPassCacheState().perfOverlayEnabled = enabled;
-      },
-      ensureLayerDataFromTopology: () => {
-        ensureLayerDataFromTopology();
-      },
-      rebuildPoliticalLandCollections: () => {
-        rebuildPoliticalLandCollections();
-      },
-      applyRendererSurfaceBridgeState: () => {
-        applyRendererSurfaceBridgeState(runtimeState, {
-          mapCanvas: rendererSurfaceHost.getMapCanvas(),
-          canvasLayers: rendererSurfaceHost.getCanvasLayers(),
-          context: rendererSurfaceHost.getContext(),
-          politicalPatchCanvas: rendererSurfaceHost.getPoliticalPatchCanvas(),
-          politicalPatchContext: rendererSurfaceHost.getPoliticalPatchContext(),
-          interactionOverlayCanvas: rendererSurfaceHost.getInteractionOverlayCanvas(),
-          interactionOverlayContext: rendererSurfaceHost.getInteractionOverlayContext(),
-        });
-      },
-      ensureSovereigntyState: () => {
-        ensureSovereigntyState();
-      },
-      normalizeColorStateForRender: () => {
-        normalizeColorStateForRender(state, {
-          sanitizeColorMap,
-          sanitizeCountryColorMap,
-        });
-      },
-      setDebugMode: (nextDebugMode) => {
-        runtimeState.debugMode = nextDebugMode;
-      },
-      resetRenderDiagnostics,
-      clearRenderPhaseTimer,
-      resetRenderPhaseState: () => getRenderPhaseLifecycleOwner().resetRenderPhaseState("init-map"),
-      resetTooltipState: () => getMapHoverInteractionOwner().resetTooltipState(),
-      cancelScheduledHoverOverlayRender,
-      markAllOverlaysDirty,
-      clearStagedMapDataTasks,
-      cancelExactAfterSettleRefresh,
-      cancelPendingIndexUiRefresh,
-      resetDeferredRenderFlags: () => {
-        runtimeState.deferContextBasePass = false;
-        runtimeState.deferHitCanvasBuild = false;
-        setDeferExactAfterSettleState(runtimeState, false);
-        runtimeState.hitCanvasBuildScheduled = null;
-      },
-      resetProjectedBoundsCacheState,
-      invalidateAllRenderPasses,
-      syncDayNightClockTimerBridge: () => {
-        registerRuntimeHook(null, "syncDayNightClockTimerFn", syncDayNightClockTimer);
-        syncDayNightClockTimer();
-      },
-    },
-  });
-  return rendererStartupTransactionOwner;
-}
+    getOverlayProjectionSignature,
+    getSelectedFacilityEntry: () => selectedFacilityEntry,
+    shouldBlockUnderlyingSelectionForFacility,
+  },
+  effects: {
+    updateDevHoverHit,
+    renderHoverOverlay,
+    recordInteractionDurationMetric,
+    hidePhysicalIntensityBrushPreview,
+  },
+  helpers: { getFacilityKey: buildFacilityEntryKey },
+}));
 
-function getSetMapDataTransactionOwner() {
-  if (setMapDataTransactionOwner) {
-    return setMapDataTransactionOwner;
-  }
-  setMapDataTransactionOwner = createSetMapDataTransactionOwner({
-    state,
-    getters: {
-      nowMs,
-      getActiveScenarioId: () => runtimeState.activeScenarioId,
-      getLandFeatureCount: () => Array.isArray(runtimeState.landData?.features)
-        ? runtimeState.landData.features.length
-        : 0,
-      getRenderProfile: () => runtimeState.renderProfile,
+const getVisibleFrameDiagnosticsOwner = lazyOwner(() => createVisibleFrameDiagnosticsOwner({
+  runtimeState,
+  effects: {
+    incrementPerfCounter,
+    recordVisibleFrameTransactionDiagnostics: (payload) => recordVisibleFrameTransactionDiagnostics(runtimeState, payload),
+    recordRenderPerfMetric,
+    callFirstVisibleFramePaintedHook: (payload) => {
+      callRuntimeHook(runtimeState, "noteFirstVisibleFramePaintedFn", payload);
     },
-    effects: {
-      resetRendererTransactionState,
-      clearPendingPoliticalColorEdit,
-      clearRenderPassReferenceTransforms,
-      clearLastGoodFrame,
-      invalidateInteractionComposite,
-      resetFirstVisibleFramePainted,
-      invalidateAllRenderPasses,
-      markAllOverlaysDirty,
-      queueTooltipUpdate,
-      rebuildPrimaryPoliticalCollections,
-      recordCompositeCoverageDiagnostics: ({
-        fullCollection,
-        interactiveCollection,
-      } = {}) => {
-        if (runtimeState.topologyBundleMode === "composite" && Array.isArray(fullCollection?.features)) {
-          const coverage = runtimeState.debugCountryCoverage || collectCountryCoverageStats(fullCollection.features);
-          const interactiveFeatureCount = Array.isArray(interactiveCollection?.features)
-            ? interactiveCollection.features.length
-            : 0;
-          console.info(
-            `[map_renderer] Composite coverage: countries detail=${coverage.detailCountries}, primaryFallback=${coverage.primaryCountries}, total=${coverage.totalCountries}; features detail=${coverage.detailFeatures}, primary=${coverage.primaryFeatures}, total=${coverage.totalFeatures}.`
-            + ` interactive=${interactiveFeatureCount}.`
-          );
-          console.info("[map_renderer] Composite country coverage detail/primary", {
-            summary: {
-              totalCountries: coverage.totalCountries,
-              detailCountries: coverage.detailCountries,
-              primaryCountries: coverage.primaryCountries,
-              totalFeatures: coverage.totalFeatures,
-              detailFeatures: coverage.detailFeatures,
-              primaryFeatures: coverage.primaryFeatures,
-            },
-            priorityCountryGaps: coverage.priorityCountryGaps,
-            detailCountries: coverage.detailCountryList,
-            primaryCountries: coverage.primaryCountryList,
-          });
-        }
-      },
-      sanitizeSetMapDataColorState: () => {
-        runtimeState.sovereignBaseColors = sanitizeCountryColorMap(runtimeState.sovereignBaseColors);
-        runtimeState.visualOverrides = sanitizeColorMap(runtimeState.visualOverrides);
-        runtimeState.waterRegionOverrides = sanitizeColorMap(runtimeState.waterRegionOverrides);
-        runtimeState.specialRegionOverrides = {};
-      },
+  },
+  getters: {
+    getRenderPassCacheState,
+    getDefaultTransform: () => runtimeState.zoomTransform || globalThis.d3?.zoomIdentity,
+    getCommittedFrameIdentity,
+    getCommittedFrameKeySignature,
+    getFrameStateSnapshot: () => ({
+      activeScenarioId: runtimeState.activeScenarioId,
+      sceneGeneration: runtimeState.sceneGeneration,
+      scenarioDataGeneration: runtimeState.scenarioDataGeneration,
+      topologyRevision: runtimeState.topologyRevision,
+      colorRevision: runtimeState.colorRevision,
+      selectionVersion: runtimeState.selectionVersion,
+      renderPhase: runtimeState.renderPhase,
+      topologyBundleMode: runtimeState.topologyBundleMode,
+    }),
+    getFirstVisiblePoliticalFrameBlockReason,
+    getOceanBaseFillColor,
+    hasFirstVisibleFramePainted: () => Boolean(runtimeState.firstVisibleFramePainted),
+  },
+}));
 
-      setCanvasSize,
-      buildRuntimePoliticalMeta,
-      resetSovereigntyInitialized: () => {
-        runtimeState.sovereigntyInitialized = false;
-      },
-      resetIslandNeighborsCache: () => {
-        islandNeighborsCache = {
-          topologyRef: null,
-          objectRef: null,
-          count: 0,
-          neighbors: [],
-        };
-      },
-      clearSphericalFeatureDiagnosticsCache: () => {
-        ensureProjectedBoundsCache();
-        clearSphericalFeatureDiagnosticsCacheState(runtimeState);
-      },
-      buildIndex,
-      ensureSovereigntyState,
-      setDeferHitCanvasBuild: (deferred) => {
-        runtimeState.deferHitCanvasBuild = Boolean(deferred);
-      },
-      setInteractionInfrastructureState,
-      rebuildProjectedBoundsCache,
-      rebuildStaticMeshes,
-      invalidateBorderCache,
-      updateDynamicBorderStatusUI,
-      rebuildResolvedColors,
-      fitProjection,
-      buildSpatialIndex,
-      updateSpecialZonesPaths,
-      renderSpecialZoneEditorOverlay,
-      updateZoomTranslateExtent,
-      resetZoomToFit,
-      enforceZoomConstraints,
-      setHitCanvasDirty: (dirty) => {
-        setHitCanvasDirtyState(runtimeState, dirty);
-      },
-      beginStagedMapDataWarmup,
-      render,
-      recordRenderPerfMetric,
-    },
-  });
-  return setMapDataTransactionOwner;
-}
+const getStrategicOverlayHelpersOwner = lazyOwner(() => createStrategicOverlayHelpersOwner({
+  state,
+  constants: {
+    defaultUnitCounterBaseFill: DEFAULT_UNIT_COUNTER_BASE_FILL,
+    strategicLineLabelFont: STRATEGIC_LINE_LABEL_FONT,
+  },
+  groupGetters: {
+    getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs(),
+    getOperationalLinesGroup: () => rendererSurfaceHost.getOperationalLinesGroup(),
+    getOperationGraphicsGroup: () => rendererSurfaceHost.getOperationGraphicsGroup(),
+    getUnitCountersGroup: () => rendererSurfaceHost.getUnitCountersGroup(),
+    getSpecialZonesGroup: () => rendererSurfaceHost.getSpecialZonesGroup(),
+    getSpecialZoneEditorGroup: () => rendererSurfaceHost.getSpecialZoneEditorGroup(),
+  },
+  helpers: {
+    getStrategicOverlayRuntimeOwner,
+    getMapLonLatFromEvent,
+    getLandFeatureIdFromEvent,
+    ensureOperationalLineEditorState,
+    getOperationalLinePreset,
+    projectStrategicPoints,
+    createOperationGraphicPath,
+    getOperationGraphicLabelAnchor,
+    selectOperationalLineById,
+    getOperationGraphicPreset,
+    selectOperationGraphicById,
+    renderOperationGraphicsEditorOverlay,
+    ensureUnitCounterEditorState,
+    getProjectedPoint,
+    getUnitCounterRenderEntries,
+    getUnitCounterCardModel,
+    getUnitCounterRenderScale,
+    getUnitCounterSlotOffset,
+    compareUnitCounterRenderOrder,
+    getUnitCounterNodeTransform,
+    getUnitCounterIconPath,
+    updateSpecialZonesPaths,
+    renderSpecialZoneEditorOverlay,
+    getEffectiveSpecialZonesFeatureCollection,
+  },
+}));
 
-function getRenderRequestBoundaryOwner() {
-  if (renderRequestBoundaryOwner) {
-    return renderRequestBoundaryOwner;
-  }
-  renderRequestBoundaryOwner = createRenderRequestBoundaryOwner({
-    effects: {
-      requestRender,
-      flushRenderBoundary,
-      render,
-    },
-    getters: {
-      hasInteractionRenderContext: () => Boolean(rendererSurfaceHost.getContext()),
-    },
-  });
-  return renderRequestBoundaryOwner;
-}
+const getStrategicOverlayRenderOwner = lazyOwner(() => createStrategicOverlayRenderOwner({
+  state,
+  constants: {
+    defaultUnitCounterRenderer: DEFAULT_UNIT_COUNTER_RENDERER,
+    renderPhaseIdle: RENDER_PHASE_IDLE,
+  },
+  helpers: {
+    getProjectionRenderSignature,
+  },
+  renderers: {
+    renderFrontlineOverlay,
+    renderOperationGraphicsOverlay: () => getStrategicOverlayHelpersOwner().renderOperationGraphicsOverlay(),
+    renderOperationalLinesOverlay: () => getStrategicOverlayHelpersOwner().renderOperationalLinesOverlay(),
+    renderSpecialZones: () => getStrategicOverlayHelpersOwner().renderSpecialZones(),
+    renderUnitCountersOverlay,
+    syncUnitCounterScalesDuringZoom: () => getStrategicOverlayHelpersOwner().syncUnitCounterScalesDuringZoom(),
+  },
+}));
 
-function getRenderPhaseLifecycleOwner() {
-  if (renderPhaseLifecycleOwner) {
-    return renderPhaseLifecycleOwner;
-  }
-  renderPhaseLifecycleOwner = createRenderPhaseLifecycleOwner({
-    state: {
-      renderPhaseIdle: RENDER_PHASE_IDLE,
-      renderPhaseInteracting: RENDER_PHASE_INTERACTING,
-    },
-    getters: {
-      getRenderPhase: () => runtimeState.renderPhase,
-      getRenderPhaseTimerId: () => runtimeState.renderPhaseTimerId,
-      nowMs,
-      getAdaptiveSettleProfile,
-      hasPendingDayNightRefresh: () => Boolean(runtimeState.pendingDayNightRefresh),
-      shouldStartExactAfterSettleFastPath,
-      needsNavigationRecovery: () => getRenderPassCacheState().lastFrame?.frameMode === "navigation",
-    },
-    effects: {
-      clearTimeout: (timerId) => globalThis.clearTimeout(timerId),
-      setTimeout: (callback, delayMs) => globalThis.setTimeout(callback, delayMs),
-      setRenderPhaseTimerId: (timerId) => {
-        setRenderPhaseTimerIdState(runtimeState, timerId);
-      },
-      setRenderPhaseValue: (phase) => {
-        setRenderPhaseValueState(runtimeState, phase);
-      },
-      setPhaseEnteredAt: (enteredAtMs) => {
-        setPhaseEnteredAtState(runtimeState, enteredAtMs);
-      },
-      setIsInteracting: (isInteracting) => {
-        setRendererIsInteractingState(runtimeState, isInteracting);
-      },
-      cancelPoliticalPathWarmup,
-      setHoverOverlayDirty: (dirty) => {
-        getMapHoverInteractionOwner().setHoverOverlayDirty(Boolean(dirty));
-      },
-      setPendingDayNightRefresh: (pending) => {
-        setPendingDayNightRefreshState(runtimeState, pending);
-      },
-      invalidateRenderPasses,
-      updateDprStage,
-      setCanvasSize,
-      setAdaptiveSettleProfile: (settleProfile) => {
-        setAdaptiveSettleProfileState(runtimeState, settleProfile);
-      },
-      scheduleScenarioChunkRefresh: (options) => (
-        typeof runtimeState.scheduleScenarioChunkRefreshFn === "function"
-          ? runtimeState.scheduleScenarioChunkRefreshFn(options)
-          : "noop"
-      ),
-      setDeferExactAfterSettle: (deferred) => {
-        setDeferExactAfterSettleState(runtimeState, deferred);
-      },
-      render,
-      scheduleExactAfterSettleRefresh,
-    },
-  });
-  return renderPhaseLifecycleOwner;
-}
+const getSpecialZoneLayersRenderOwner = lazyOwner(() => createSpecialZoneLayersRenderOwner({
+  state,
+  groupGetters: {
+    getSpecialZonesGroup: () => rendererSurfaceHost.getSpecialZonesGroup(),
+    getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs(),
+  },
+  helpers: {
+    clamp,
+    getDashPattern,
+    getFeatureId,
+    getPathSVG: () => rendererSurfaceHost.getPathSvg(),
+    getSafeCanvasColor,
+  },
+}));
 
-function getHitCanvasSchedulingOwner() {
-  if (hitCanvasSchedulingOwner) {
-    return hitCanvasSchedulingOwner;
-  }
-  hitCanvasSchedulingOwner = createHitCanvasSchedulingOwner({
-    state: {
-      renderPhaseIdle: RENDER_PHASE_IDLE,
-      idleTimeoutMs: STAGED_HIT_CANVAS_TIMEOUT_MS,
-    },
-    getters: {
-      hasHitCanvasRuntime: () => Boolean(rendererSurfaceHost.getHitContext() && rendererSurfaceHost.getPathHitCanvas()),
-      isHitCanvasDirty: () => Boolean(runtimeState.hitCanvasDirty),
-      isHitCanvasBuildDeferred: () => Boolean(runtimeState.deferHitCanvasBuild),
-      getRenderPhase: () => runtimeState.renderPhase,
-      getScheduledHitCanvasBuildHandle: () => runtimeState.hitCanvasBuildScheduled,
-      getActiveScenarioId: () => runtimeState.activeScenarioId,
-      getHitCanvasBuildIdentity: () => [
-        runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.topologyRevision,
-        runtimeState.zoomTransform?.x, runtimeState.zoomTransform?.y, runtimeState.zoomTransform?.k,
-        runtimeState.dpr, runtimeState.width, runtimeState.height,
-      ].join(":"),
-    },
-    effects: {
-      scheduleDeferredWork,
-      cancelDeferredWork,
-      setScheduledHitCanvasBuildHandle: (handle) => {
-        setHitCanvasBuildScheduledState(runtimeState, handle);
-      },
-      runScheduledHitCanvasBuild: (details) => drawScheduledHitCanvasWithMetric(details),
-    },
-  });
-  return hitCanvasSchedulingOwner;
-}
+const getUrbanCityPolicyOwner = lazyOwner(() => createUrbanCityPolicyOwner({
+  state,
+  caches: {
+    cityLayerCache,
+    urbanFeatureIndexCache,
+  },
+  helpers: {
+    compareCityRevealEntries,
+    defaultCityCountryClassRank: CITY_COUNTRY_CLASS_RANK.micro,
+    defaultCityCountryTierRank: CITY_COUNTRY_TIER_RANK.D,
+    getCityAnchor,
+    getCityCanonicalId,
+    getCityCapitalScore,
+    getCityCountryGroupKey,
+    getCityCountryProfileIndex,
+    getCityEffectiveMinZoom,
+    getCityFeatureAliases,
+    getCityFeatureKey,
+    getCityInterpolatedMarkerBudget,
+    getCityInterpolatedMarkerQuota,
+    getCityInterpolatedRevealBucket,
+    getCityLabelBudget,
+    getCityLabelMinZoom,
+    getCityMarkerDensityMultiplier,
+    getCityMarkerSizePx,
+    getCityPriorityCountryReserveBudget,
+    getCityPriorityCountryReserveRank,
+    getCityRevealPhase,
+    getCityScreenPoint,
+    getCitySortWeight,
+    getCityTier,
+    getCityTierWeight,
+    getCityViewportCenterDistanceNorm,
+    getDefaultCityMinZoomForTier,
+    getUrbanFeatureStableId,
+    isCityAnchorInViewport,
+    getCityPaintOverscanPx: () => Math.max(48, getTnoScenePaintOverscanPx("labels")),
+    isCityLabelEligibleForPhase,
+    isCityScenarioTagExcludedFromReveal,
+  },
+}));
 
-function getRendererTransactionResetOwner() {
-  if (rendererTransactionResetOwner) {
-    return rendererTransactionResetOwner;
-  }
-  rendererTransactionResetOwner = createRendererTransactionResetOwner({
-    effects: {
-      clearPendingDynamicBorderTimer,
-      clearRenderPhaseTimer,
-      cancelPendingIndexUiRefresh,
-      cancelPendingSidebarRefresh,
-      cancelScheduledHoverOverlayRender,
-      setRenderPhaseIdle: () => setRenderPhase(RENDER_PHASE_IDLE),
-      resetRenderDiagnostics,
-      clearStagedMapDataTasks,
-      cancelExactAfterSettleRefresh,
-      cancelScheduledHitCanvasBuild: (options) => (
-        getHitCanvasSchedulingOwner().cancelScheduledHitCanvasBuild(options)
-      ),
-      cancelSecondarySpatialBuild: () => {
-        secondarySpatialPreparationVersion++;
-        cancelDeferredWork(secondarySpatialBuildHandle);
-        secondarySpatialBuildHandle = null;
-        pendingSecondarySpatialBuildReasons.clear();
-        return true;
-      },
-      setDeferContextBasePass: (deferred) => {
-        runtimeState.deferContextBasePass = Boolean(deferred);
-      },
-      setDeferHitCanvasBuild: (deferred) => {
-        runtimeState.deferHitCanvasBuild = Boolean(deferred);
-      },
-      setDeferExactAfterSettle: (deferred) => {
-        setDeferExactAfterSettleState(runtimeState, deferred);
-      },
-      resetLayerResolverCache: () => {
-        layerResolverCache.primaryRef = null;
-        layerResolverCache.detailRef = null;
-        layerResolverCache.bundleMode = null;
-        layerResolverCache.contextRevision = 0;
-      },
-      resetDevInteractionState: () => {
-        runtimeState.devHoverHit = null;
-        runtimeState.devSelectedHit = null;
-        runtimeState.devSelectionFeatureIds = new Set();
-        runtimeState.devSelectionOrder = [];
-      },
-      resetDevClipboardState: () => {
-        runtimeState.devClipboardFallbackText = "";
-        runtimeState.devClipboardPreviewFormat = "names_with_ids";
-      },
-      resetPhysicalLandClipPathCache,
-      resetExactRefreshOptimizationState,
-      resetVisibleInternalBorderMeshSignature,
-      bumpTopologyRevision: () => {
-        runtimeState.topologyRevision = Number(runtimeState.topologyRevision || 0) + 1;
-        return runtimeState.topologyRevision;
-      },
-      setHitCanvasDirty: (dirty) => {
-        if (dirty) {
-          setHitCanvasDirtyState(runtimeState, true);
-        }
-      },
-      resetHitCanvasTopologyRevision: () => {
-        runtimeState.hitCanvasTopologyRevision = 0;
-      },
-    },
-  });
-  return rendererTransactionResetOwner;
-}
-
-function getMapHoverInteractionOwner() {
-  if (mapHoverInteractionOwner) return mapHoverInteractionOwner;
-  mapHoverInteractionOwner = createMapHoverInteractionOwner({
-    state: runtimeState,
-    surfaceHost: rendererSurfaceHost,
-    constants: { hoverSnapPx: HIT_SNAP_RADIUS_HOVER_PX, renderPhaseIdle: RENDER_PHASE_IDLE },
-    getters: {
-      nowMs,
-      getHitFromEvent,
-      getHoveredFacilityEntryFromEvent,
-      isFacilityDetailsSurfaceActive,
-      getHoveredCityTooltipEntry,
-      getTooltipTextForFeature: getTooltipText,
-      getFeatureForHit: (hit) => {
-        const id = hit?.id;
-        if (!id) return null;
-        if (hit.targetType === "special") return runtimeState.specialRegionsById?.get(id) || null;
-        if (hit.targetType === "water") return runtimeState.waterRegionsById?.get(id) || null;
-        return runtimeState.landIndex?.get(id) || null;
-      },
-      getOverlayProjectionSignature,
-      getSelectedFacilityEntry: () => selectedFacilityEntry,
-      shouldBlockUnderlyingSelectionForFacility,
-    },
-    effects: {
-      updateDevHoverHit,
-      renderHoverOverlay,
-      recordInteractionDurationMetric,
-      hidePhysicalIntensityBrushPreview,
-    },
-    helpers: { getFacilityKey: buildFacilityEntryKey },
-  });
-  return mapHoverInteractionOwner;
-}
-
-function getVisibleFrameDiagnosticsOwner() {
-  if (visibleFrameDiagnosticsOwner) {
-    return visibleFrameDiagnosticsOwner;
-  }
-  visibleFrameDiagnosticsOwner = createVisibleFrameDiagnosticsOwner({
-    runtimeState,
-    effects: {
-      incrementPerfCounter,
-      recordVisibleFrameTransactionDiagnostics: (payload) => recordVisibleFrameTransactionDiagnostics(runtimeState, payload),
-      recordRenderPerfMetric,
-      callFirstVisibleFramePaintedHook: (payload) => {
-        callRuntimeHook(runtimeState, "noteFirstVisibleFramePaintedFn", payload);
-      },
-    },
-    getters: {
-      getRenderPassCacheState,
-      getDefaultTransform: () => runtimeState.zoomTransform || globalThis.d3?.zoomIdentity,
-      getCommittedFrameIdentity,
-      getCommittedFrameKeySignature,
-      getFrameStateSnapshot: () => ({
-        activeScenarioId: runtimeState.activeScenarioId,
-        sceneGeneration: runtimeState.sceneGeneration,
-        scenarioDataGeneration: runtimeState.scenarioDataGeneration,
-        topologyRevision: runtimeState.topologyRevision,
-        colorRevision: runtimeState.colorRevision,
-        selectionVersion: runtimeState.selectionVersion,
-        renderPhase: runtimeState.renderPhase,
-        topologyBundleMode: runtimeState.topologyBundleMode,
-      }),
-      getFirstVisiblePoliticalFrameBlockReason,
-      getOceanBaseFillColor,
-      hasFirstVisibleFramePainted: () => Boolean(runtimeState.firstVisibleFramePainted),
-    },
-  });
-  return visibleFrameDiagnosticsOwner;
-}
-
-function getStrategicOverlayHelpersOwner() {
-  if (strategicOverlayHelpersOwner) {
-    return strategicOverlayHelpersOwner;
-  }
-  strategicOverlayHelpersOwner = createStrategicOverlayHelpersOwner({
-    state,
-    constants: {
-      defaultUnitCounterBaseFill: DEFAULT_UNIT_COUNTER_BASE_FILL,
-      strategicLineLabelFont: STRATEGIC_LINE_LABEL_FONT,
-    },
-    groupGetters: {
-      getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs(),
-      getOperationalLinesGroup: () => rendererSurfaceHost.getOperationalLinesGroup(),
-      getOperationGraphicsGroup: () => rendererSurfaceHost.getOperationGraphicsGroup(),
-      getUnitCountersGroup: () => rendererSurfaceHost.getUnitCountersGroup(),
-      getSpecialZonesGroup: () => rendererSurfaceHost.getSpecialZonesGroup(),
-      getSpecialZoneEditorGroup: () => rendererSurfaceHost.getSpecialZoneEditorGroup(),
-    },
-    helpers: {
-      getStrategicOverlayRuntimeOwner,
-      getMapLonLatFromEvent,
-      getLandFeatureIdFromEvent,
-      ensureOperationalLineEditorState,
-      getOperationalLinePreset,
-      projectStrategicPoints,
-      createOperationGraphicPath,
-      getOperationGraphicLabelAnchor,
-      selectOperationalLineById,
-      getOperationGraphicPreset,
-      selectOperationGraphicById,
-      renderOperationGraphicsEditorOverlay,
-      ensureUnitCounterEditorState,
-      getProjectedPoint,
-      getUnitCounterRenderEntries,
-      getUnitCounterCardModel,
-      getUnitCounterRenderScale,
-      getUnitCounterSlotOffset,
-      compareUnitCounterRenderOrder,
-      getUnitCounterNodeTransform,
-      getUnitCounterIconPath,
-      updateSpecialZonesPaths,
-      renderSpecialZoneEditorOverlay,
-      getEffectiveSpecialZonesFeatureCollection,
-    },
-  });
-  return strategicOverlayHelpersOwner;
-}
-
-function getStrategicOverlayRenderOwner() {
-  if (strategicOverlayRenderOwner) {
-    return strategicOverlayRenderOwner;
-  }
-  strategicOverlayRenderOwner = createStrategicOverlayRenderOwner({
-    state,
-    constants: {
-      defaultUnitCounterRenderer: DEFAULT_UNIT_COUNTER_RENDERER,
-      renderPhaseIdle: RENDER_PHASE_IDLE,
-    },
-    helpers: {
-      getProjectionRenderSignature,
-    },
-    renderers: {
-      renderFrontlineOverlay,
-      renderOperationGraphicsOverlay: () => getStrategicOverlayHelpersOwner().renderOperationGraphicsOverlay(),
-      renderOperationalLinesOverlay: () => getStrategicOverlayHelpersOwner().renderOperationalLinesOverlay(),
-      renderSpecialZones: () => getStrategicOverlayHelpersOwner().renderSpecialZones(),
-      renderUnitCountersOverlay,
-      syncUnitCounterScalesDuringZoom: () => getStrategicOverlayHelpersOwner().syncUnitCounterScalesDuringZoom(),
-    },
-  });
-  return strategicOverlayRenderOwner;
-}
-
-function getSpecialZoneLayersRenderOwner() {
-  if (specialZoneLayersRenderOwner) {
-    return specialZoneLayersRenderOwner;
-  }
-  specialZoneLayersRenderOwner = createSpecialZoneLayersRenderOwner({
-    state,
-    groupGetters: {
-      getSpecialZonesGroup: () => rendererSurfaceHost.getSpecialZonesGroup(),
-      getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs(),
-    },
-    helpers: {
-      clamp,
-      getDashPattern,
-      getFeatureId,
-      getPathSVG: () => rendererSurfaceHost.getPathSvg(),
-      getSafeCanvasColor,
-    },
-  });
-  return specialZoneLayersRenderOwner;
-}
-
-function getUrbanCityPolicyOwner() {
-  if (urbanCityPolicyOwner) {
-    return urbanCityPolicyOwner;
-  }
-  urbanCityPolicyOwner = createUrbanCityPolicyOwner({
-    state,
-    caches: {
-      cityLayerCache,
-      urbanFeatureIndexCache,
-    },
-    helpers: {
-      compareCityRevealEntries,
-      defaultCityCountryClassRank: CITY_COUNTRY_CLASS_RANK.micro,
-      defaultCityCountryTierRank: CITY_COUNTRY_TIER_RANK.D,
-      getCityAnchor,
-      getCityCanonicalId,
-      getCityCapitalScore,
-      getCityCountryGroupKey,
-      getCityCountryProfileIndex,
-      getCityEffectiveMinZoom,
-      getCityFeatureAliases,
-      getCityFeatureKey,
-      getCityInterpolatedMarkerBudget,
-      getCityInterpolatedMarkerQuota,
-      getCityInterpolatedRevealBucket,
-      getCityLabelBudget,
-      getCityLabelMinZoom,
-      getCityMarkerDensityMultiplier,
-      getCityMarkerSizePx,
-      getCityPriorityCountryReserveBudget,
-      getCityPriorityCountryReserveRank,
-      getCityRevealPhase,
-      getCityScreenPoint,
-      getCitySortWeight,
-      getCityTier,
-      getCityTierWeight,
-      getCityViewportCenterDistanceNorm,
-      getDefaultCityMinZoomForTier,
-      getUrbanFeatureStableId,
-      isCityAnchorInViewport,
-      getCityPaintOverscanPx: () => Math.max(48, getTnoScenePaintOverscanPx("labels")),
-      isCityLabelEligibleForPhase,
-      isCityScenarioTagExcludedFromReveal,
-    },
-  });
-  return urbanCityPolicyOwner;
-}
-
-function getCityLabelOwner() {
-  if (cityLabelOwner) {
-    return cityLabelOwner;
-  }
-  cityLabelOwner = createCityLabelOwner({
-    constants: { textureLabelSerifStack: TEXTURE_LABEL_SERIF_STACK },
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext(),
-      getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
-      getPaintBounds: getTnoSceneLabelPaintBounds,
-    },
-    helpers: {
-      clamp,
-      formatCityMapLabel,
-      getCityDisplayLabel,
-      getCityLabelMinZoom,
-      getCityLabelRenderStyle,
-      getCityMarkerSizePx,
-      getCityVisualCapitalState,
-    },
-  });
-  return cityLabelOwner;
-}
+const getCityLabelOwner = lazyOwner(() => createCityLabelOwner({
+  constants: { textureLabelSerifStack: TEXTURE_LABEL_SERIF_STACK },
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext(),
+    getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
+    getPaintBounds: getTnoSceneLabelPaintBounds,
+  },
+  helpers: {
+    clamp,
+    formatCityMapLabel,
+    getCityDisplayLabel,
+    getCityLabelMinZoom,
+    getCityLabelRenderStyle,
+    getCityMarkerSizePx,
+    getCityVisualCapitalState,
+  },
+}));
 
 function getCityPointsRenderOwner() {
   if (cityPointsRenderOwner) {
@@ -1792,130 +1591,94 @@ function getCityPointsRenderOwner() {
   return cityPointsRenderOwner;
 }
 
-function getColorResolutionStrategyOwner() {
-  if (colorResolutionStrategyOwner) {
-    return colorResolutionStrategyOwner;
-  }
-  colorResolutionStrategyOwner = createColorResolutionStrategyOwner({
-    state: runtimeState,
-    helpers: {
-      canonicalCountryCode,
-      getFeatureCountryCodeNormalized,
-      getFeatureId,
-      getAtlantropaRuleColor,
-      getOceanBaseFillColor,
-      getSafeCanvasColor,
-      isAntarcticSectorFeature,
-      isAtlantropaSeaFeature,
-      isScenarioShellFeature,
-      normalizeMapSemanticMode,
-    },
-  });
-  return colorResolutionStrategyOwner;
-}
+const getColorResolutionStrategyOwner = lazyOwner(() => createColorResolutionStrategyOwner({
+  state: runtimeState,
+  helpers: {
+    canonicalCountryCode,
+    getFeatureCountryCodeNormalized,
+    getFeatureId,
+    getAtlantropaRuleColor,
+    getOceanBaseFillColor,
+    getSafeCanvasColor,
+    isAntarcticSectorFeature,
+    isAtlantropaSeaFeature,
+    isScenarioShellFeature,
+    normalizeMapSemanticMode,
+  },
+}));
 
 const getDisplayOwnerCode = (...args) => getColorResolutionStrategyOwner().getDisplayOwnerCode(...args);
 const getResolvedFeatureColor = (...args) => getColorResolutionStrategyOwner().getResolvedFeatureColor(...args);
 
-function getPoliticalCollectionOwner() {
-  if (politicalCollectionOwner) {
-    return politicalCollectionOwner;
-  }
-  politicalCollectionOwner = createPoliticalCollectionOwner({
-    state,
-    constants: {
-      highFrequencyCountryDetailWhitelist: HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST,
-      interactiveAggregateTierFilters: INTERACTIVE_AGGREGATE_TIER_FILTERS,
-      fragmentCamouflageRules,
-    },
-    helpers: {
-      getDetailTier,
-      getFeatureCountryCodeNormalized,
-      getFeatureId,
-      isPoliticalInteractionRenderableFeature,
-      isRenderDiagEnabled: () => renderDiag.enabled,
-      // Normalization already paid for geoArea; the spatial index diagnostics
-      // read the same number instead of walking every ring a second time.
-      recordSphericalArea: (geometry, area) => getProjectedGeometryBoundsOwner().seedSphericalGeometryArea(geometry, area),
-    },
-  });
-  return politicalCollectionOwner;
-}
+const getPoliticalCollectionOwner = lazyOwner(() => createPoliticalCollectionOwner({
+  state,
+  constants: {
+    highFrequencyCountryDetailWhitelist: HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST,
+    interactiveAggregateTierFilters: INTERACTIVE_AGGREGATE_TIER_FILTERS,
+    fragmentCamouflageRules,
+  },
+  helpers: {
+    getDetailTier,
+    getFeatureCountryCodeNormalized,
+    getFeatureId,
+    isPoliticalInteractionRenderableFeature,
+    isRenderDiagEnabled: () => renderDiag.enabled,
+    // Normalization already paid for geoArea; the spatial index diagnostics
+    // read the same number instead of walking every ring a second time.
+    recordSphericalArea: (geometry, area) => getProjectedGeometryBoundsOwner().seedSphericalGeometryArea(geometry, area),
+  },
+}));
 
-function getContextLayerResolverOwner() {
-  if (contextLayerResolverOwner) {
-    return contextLayerResolverOwner;
-  }
-  contextLayerResolverOwner = createContextLayerResolverOwner({
-    runtimeState: state,
-    caches: {
-      layerResolverCache,
-    },
-    constants: {
-      contextLayerMinScore: CONTEXT_LAYER_MIN_SCORE,
-      layerDiagPrefix: LAYER_DIAG_PREFIX,
-      urbanCorruptBoundsHeightDeg: URBAN_CORRUPT_BOUNDS_HEIGHT_DEG,
-      urbanCorruptBoundsWidthDeg: URBAN_CORRUPT_BOUNDS_WIDTH_DEG,
-    },
-    helpers: {
-      clamp,
-      ensureBathymetryDataAvailability: syncBathymetryTextureScenario,
-      getContextLayerStableSourceToken,
-      getUrbanFeatureOwnerId,
-      getUrbanFeatureStableId,
-      resetScenarioWaterCacheAdaptiveState,
-    },
-  });
-  return contextLayerResolverOwner;
-}
+const getContextLayerResolverOwner = lazyOwner(() => createContextLayerResolverOwner({
+  runtimeState: state,
+  caches: {
+    layerResolverCache,
+  },
+  constants: {
+    contextLayerMinScore: CONTEXT_LAYER_MIN_SCORE,
+    layerDiagPrefix: LAYER_DIAG_PREFIX,
+    urbanCorruptBoundsHeightDeg: URBAN_CORRUPT_BOUNDS_HEIGHT_DEG,
+    urbanCorruptBoundsWidthDeg: URBAN_CORRUPT_BOUNDS_WIDTH_DEG,
+  },
+  helpers: {
+    clamp,
+    ensureBathymetryDataAvailability: syncBathymetryTextureScenario,
+    getContextLayerStableSourceToken,
+    getUrbanFeatureOwnerId,
+    getUrbanFeatureStableId,
+    resetScenarioWaterCacheAdaptiveState,
+  },
+}));
 
-function getRendererAssetUrlPolicyOwner() {
-  if (rendererAssetUrlPolicyOwner) {
-    return rendererAssetUrlPolicyOwner;
-  }
-  rendererAssetUrlPolicyOwner = createRendererAssetUrlPolicyOwner({ state });
-  return rendererAssetUrlPolicyOwner;
-}
+const getRendererAssetUrlPolicyOwner = lazyOwner(() => createRendererAssetUrlPolicyOwner({ state }));
 
-function getFacilitySurfaceOwner() {
-  if (facilitySurfaceOwner) {
-    return facilitySurfaceOwner;
-  }
-  facilitySurfaceOwner = createFacilitySurfaceOwner({
-    helpers: {
-      renderTooltipText,
-      t,
-    },
-  });
-  return facilitySurfaceOwner;
-}
+const getFacilitySurfaceOwner = lazyOwner(() => createFacilitySurfaceOwner({
+  helpers: {
+    renderTooltipText,
+    t,
+  },
+}));
 
-function getRiverLayerRenderOwner() {
-  if (riverLayerRenderOwner) {
-    return riverLayerRenderOwner;
-  }
-  riverLayerRenderOwner = createRiverLayerRenderOwner({
-    state,
-    helpers: {
-      clamp,
-      collectContextMetric,
-      getContext: () => rendererSurfaceHost.getContext(),
-      getContextBaseZoomBucketId,
-      getDashPattern,
-      getFeatureCollectionFeatureCount,
-      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-      getCachedStrokePath: (feature) => (
-        feature?.geometry?.type === "LineString" || feature?.geometry?.type === "MultiLineString"
-          ? getProjectedGeographicPath(feature)
-          : null
-      ),
-      getSafeCanvasColor,
-      nowMs,
-      pathBoundsInScreen,
-    },
-  });
-  return riverLayerRenderOwner;
-}
+const getRiverLayerRenderOwner = lazyOwner(() => createRiverLayerRenderOwner({
+  state,
+  helpers: {
+    clamp,
+    collectContextMetric,
+    getContext: () => rendererSurfaceHost.getContext(),
+    getContextBaseZoomBucketId,
+    getDashPattern,
+    getFeatureCollectionFeatureCount,
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    getCachedStrokePath: (feature) => (
+      feature?.geometry?.type === "LineString" || feature?.geometry?.type === "MultiLineString"
+        ? getProjectedGeographicPath(feature)
+        : null
+    ),
+    getSafeCanvasColor,
+    nowMs,
+    pathBoundsInScreen,
+  },
+}));
 
 let geographicPathCache = null;
 const oceanSphereGeometry = Object.freeze({ type: "Sphere" });
@@ -2012,59 +1775,53 @@ function drawBathymetryTexture(oceanStyle) {
   return result;
 }
 
-function getOceanRenderOwner() {
-  if (oceanRenderOwner) {
-    return oceanRenderOwner;
-  }
-  oceanRenderOwner = createOceanRenderOwner({
-    state,
-    constants: {
-      COASTLINE_ACCENT_DENSITY_ALPHA_LOW,
-      COASTLINE_ACCENT_DENSITY_ALPHA_MID,
-      COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW,
-      COASTLINE_ACCENT_DENSITY_THRESHOLD_MID,
-      COASTLINE_ACCENT_DENSITY_WIDTH_SCALE,
-      COASTLINE_LOD_LOW_ZOOM_MAX,
-      COASTLINE_LOD_MID_ZOOM_MAX,
-      OCEAN_MASK_MODE_BATHYMETRY,
-      OCEAN_MASK_MODE_TOPOLOGY,
-      TNO_COASTAL_ACCENT_COLOR,
-    },
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext(),
-      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-      isExportRendering: () => exportRenderInProgress,
-    },
-    helpers: {
-      applyOceanClipMask,
-      getPhysicalLandMaskInfo,
-      clamp,
-      doesOceanStyleRequireBathymetry,
-      getBathymetryPresetProfile,
-      getCoastlineCollectionForZoom,
-      publishBathymetryVisibility: (summary) => publishBathymetryDiagnostic("bathymetryVisibility", summary),
-      drawBathymetryTexture,
-      getOceanStyleConfig,
-      getProjectedGeographicPath,
-      collectContextMetric,
-      nowMs,
-      getProjectedLineDensityStats,
-      getSafeCanvasColor,
-      getScenarioCoastalAccentLineWidth,
-      getScenarioCoastalAccentOverlayFeatures,
-      getScenarioCoastalAccentOverlayVisualConfig,
-      getViewportAwareCoastlineCollection: (collection, k) => (
-        getBorderDrawOwner().getViewportAwareCoastlineCollection(collection, k)
-      ),
-      isScenarioCoastalAccentEnabled,
-      isUsableMesh,
-      pathBoundsInScreen,
-      resolveCoastlineTopologySource,
-      resolveOceanMask,
-    },
-  });
-  return oceanRenderOwner;
-}
+const getOceanRenderOwner = lazyOwner(() => createOceanRenderOwner({
+  state,
+  constants: {
+    COASTLINE_ACCENT_DENSITY_ALPHA_LOW,
+    COASTLINE_ACCENT_DENSITY_ALPHA_MID,
+    COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW,
+    COASTLINE_ACCENT_DENSITY_THRESHOLD_MID,
+    COASTLINE_ACCENT_DENSITY_WIDTH_SCALE,
+    COASTLINE_LOD_LOW_ZOOM_MAX,
+    COASTLINE_LOD_MID_ZOOM_MAX,
+    OCEAN_MASK_MODE_BATHYMETRY,
+    OCEAN_MASK_MODE_TOPOLOGY,
+    TNO_COASTAL_ACCENT_COLOR,
+  },
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext(),
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    isExportRendering: () => exportRenderInProgress,
+  },
+  helpers: {
+    applyOceanClipMask,
+    getPhysicalLandMaskInfo,
+    clamp,
+    doesOceanStyleRequireBathymetry,
+    getBathymetryPresetProfile,
+    getCoastlineCollectionForZoom,
+    publishBathymetryVisibility: (summary) => publishBathymetryDiagnostic("bathymetryVisibility", summary),
+    drawBathymetryTexture,
+    getOceanStyleConfig,
+    getProjectedGeographicPath,
+    collectContextMetric,
+    nowMs,
+    getProjectedLineDensityStats,
+    getSafeCanvasColor,
+    getScenarioCoastalAccentLineWidth,
+    getScenarioCoastalAccentOverlayFeatures,
+    getScenarioCoastalAccentOverlayVisualConfig,
+    getViewportAwareCoastlineCollection: (collection, k) => (
+      getBorderDrawOwner().getViewportAwareCoastlineCollection(collection, k)
+    ),
+    isScenarioCoastalAccentEnabled,
+    isUsableMesh,
+    pathBoundsInScreen,
+    resolveCoastlineTopologySource,
+    resolveOceanMask,
+  },
+}));
 
 function getPhysicalLayerRenderOwner() {
   if (physicalLayerRenderOwner) {
@@ -2120,8 +1877,6 @@ function getPhysicalLayerRenderOwner() {
   return physicalLayerRenderOwner;
 }
 
-let populationHeatmapRenderOwner = null;
-
 function applyPopulationLandClipMask() {
   if (runtimeState.activeScenarioId === "tno_1962" && !runtimeState.scenarioAtlantropaData?.features?.length) return false;
   if (!applyPhysicalLandClipMask()) return false;
@@ -2141,24 +1896,21 @@ function applyPopulationLandClipMask() {
   return true;
 }
 
-function getPopulationHeatmapRenderOwner() {
-  if (!populationHeatmapRenderOwner) populationHeatmapRenderOwner = createPopulationHeatmapRenderOwner({
-    state: runtimeState,
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext(),
-      getProjection: () => rendererSurfaceHost.getProjection(),
-      getProjectionKey: getProjectionRenderSignature,
-      getSnapshot: () => getPopulationHeatmapSnapshot(runtimeState),
-      sampleDensity: samplePopulationDensityLonLat,
-      isRequested: () => isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
-      getMaskInfo: () => runtimeState.activeScenarioId === "tno_1962" && !runtimeState.scenarioAtlantropaData?.features?.length
-        ? { collection: null, maskSource: "atlantropa-unavailable" } : getPhysicalLandMaskInfo(),
-      isExportRendering: () => exportRenderInProgress,
-    },
-    helpers: { applyLandMask: applyPopulationLandClipMask, recordMetric: recordRenderPerfMetric, nowMs },
-  });
-  return populationHeatmapRenderOwner;
-}
+const getPopulationHeatmapRenderOwner = lazyOwner(() => createPopulationHeatmapRenderOwner({
+  state: runtimeState,
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext(),
+    getProjection: () => rendererSurfaceHost.getProjection(),
+    getProjectionKey: getProjectionRenderSignature,
+    getSnapshot: () => getPopulationHeatmapSnapshot(runtimeState),
+    sampleDensity: samplePopulationDensityLonLat,
+    isRequested: () => isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
+    getMaskInfo: () => runtimeState.activeScenarioId === "tno_1962" && !runtimeState.scenarioAtlantropaData?.features?.length
+      ? { collection: null, maskSource: "atlantropa-unavailable" } : getPhysicalLandMaskInfo(),
+    isExportRendering: () => exportRenderInProgress,
+  },
+  helpers: { applyLandMask: applyPopulationLandClipMask, recordMetric: recordRenderPerfMetric, nowMs },
+}));
 
 export function getPopulationHeatmapRenderReadiness() {
   return getPopulationHeatmapRenderOwner().getReadiness();
@@ -2193,242 +1945,212 @@ function drawPopulationHeatmapPass(k) {
   return getPopulationHeatmapRenderOwner().draw(k);
 }
 
-function getScenarioReliefOverlayRenderOwner() {
-  if (scenarioReliefOverlayRenderOwner) {
-    return scenarioReliefOverlayRenderOwner;
-  }
-  scenarioReliefOverlayRenderOwner = createScenarioReliefOverlayRenderOwner({
-    state,
-    scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
-    constants: {
-      RELIEF_ATLANTROPA_CONTOUR_COLOR,
-      RELIEF_ATLANTROPA_SALT_FILL_COLOR,
-      RELIEF_ATLANTROPA_SALT_STROKE_COLOR,
-      RELIEF_ATLANTROPA_SHORELINE_COLOR,
-      RELIEF_CONTOUR_COLOR,
-      RELIEF_DAM_APPROACH_COLOR,
-      RELIEF_LAKE_SHORELINE_COLOR,
-      RELIEF_SALT_FILL_COLOR,
-      RELIEF_SALT_STROKE_COLOR,
-      RELIEF_SHORELINE_COLOR,
-      RELIEF_SWAMP_FILL_COLOR,
-      RELIEF_SWAMP_STROKE_COLOR,
-      RENDER_PHASE_INTERACTING,
-      RENDER_PHASE_SETTLING,
-    },
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext(),
-      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-      getProjectedGeographicPath,
-    },
-    helpers: {
-      cloneZoomTransform,
-      shouldEnableContextScenarioTransformReuse,
-      collectContextMetric,
-      getEffectiveScenarioReliefOverlayFeatures,
-      getPathBounds,
-      getReliefOverlayKind,
-      getScenarioReliefVisualRevisionToken,
-      isAtlantropaReliefOverlayFeature,
-      isReliefOverlayEnabled,
-      isScenarioCoastalAccentEnabled,
-      nowMs,
-      pathBoundsInScreen,
-    },
-  });
-  return scenarioReliefOverlayRenderOwner;
-}
+const getScenarioReliefOverlayRenderOwner = lazyOwner(() => createScenarioReliefOverlayRenderOwner({
+  state,
+  scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
+  constants: {
+    RELIEF_ATLANTROPA_CONTOUR_COLOR,
+    RELIEF_ATLANTROPA_SALT_FILL_COLOR,
+    RELIEF_ATLANTROPA_SALT_STROKE_COLOR,
+    RELIEF_ATLANTROPA_SHORELINE_COLOR,
+    RELIEF_CONTOUR_COLOR,
+    RELIEF_DAM_APPROACH_COLOR,
+    RELIEF_LAKE_SHORELINE_COLOR,
+    RELIEF_SALT_FILL_COLOR,
+    RELIEF_SALT_STROKE_COLOR,
+    RELIEF_SHORELINE_COLOR,
+    RELIEF_SWAMP_FILL_COLOR,
+    RELIEF_SWAMP_STROKE_COLOR,
+    RENDER_PHASE_INTERACTING,
+    RENDER_PHASE_SETTLING,
+  },
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext(),
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    getProjectedGeographicPath,
+  },
+  helpers: {
+    cloneZoomTransform,
+    shouldEnableContextScenarioTransformReuse,
+    collectContextMetric,
+    getEffectiveScenarioReliefOverlayFeatures,
+    getPathBounds,
+    getReliefOverlayKind,
+    getScenarioReliefVisualRevisionToken,
+    isAtlantropaReliefOverlayFeature,
+    isReliefOverlayEnabled,
+    isScenarioCoastalAccentEnabled,
+    nowMs,
+    pathBoundsInScreen,
+  },
+}));
 
-function getCityLightsRenderOwner() {
-  if (cityLightsRenderOwner) {
-    return cityLightsRenderOwner;
-  }
-  cityLightsRenderOwner = createCityLightsRenderOwner({
-    state,
-    assets: cityLightsAssetProvider.getAssets(),
-    assetProvider: cityLightsAssetProvider,
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext(),
-      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-      getProjection: () => rendererSurfaceHost.getProjection(),
+const getCityLightsRenderOwner = lazyOwner(() => createCityLightsRenderOwner({
+  state,
+  assets: cityLightsAssetProvider.getAssets(),
+  assetProvider: cityLightsAssetProvider,
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext(),
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    getProjection: () => rendererSurfaceHost.getProjection(),
+  },
+  helpers: {
+    buildNightHemisphereFeature,
+    getNightMask: (config, solarState) => getDayNightRuntimeOwner().getNightMask(config, solarState),
+    clamp,
+    ColorManager,
+    createCanvas: (canvasWidth, canvasHeight, targetContext) => {
+      const ownerDocument = targetContext?.canvas?.ownerDocument || globalThis.document;
+      const canvas = typeof ownerDocument?.createElement === "function"
+        ? ownerDocument.createElement("canvas")
+        : (typeof globalThis.OffscreenCanvas === "function" ? new globalThis.OffscreenCanvas(canvasWidth, canvasHeight) : null);
+      return canvas;
     },
-    helpers: {
-      buildNightHemisphereFeature,
-      getNightMask: (config, solarState) => getDayNightRuntimeOwner().getNightMask(config, solarState),
-      clamp,
-      ColorManager,
-      createCanvas: (canvasWidth, canvasHeight, targetContext) => {
-        const ownerDocument = targetContext?.canvas?.ownerDocument || globalThis.document;
-        const canvas = typeof ownerDocument?.createElement === "function"
-          ? ownerDocument.createElement("canvas")
-          : (typeof globalThis.OffscreenCanvas === "function" ? new globalThis.OffscreenCanvas(canvasWidth, canvasHeight) : null);
-        return canvas;
-      },
-      estimateProjectedAreaPx,
-      getCityAnchor,
-      getCityCanonicalId,
-      getCityCapitalScore,
-      getCityGeoCoordinates,
-      getCityScreenPoint,
-      getDefaultZoomTransform: () => globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 },
-      getEffectiveCityCollection,
-      getFeatureGeoCentroid,
-      getProjectedFeatureBounds,
-      getProjectedGeographicPath,
-      getRenderPassLayout,
-      getSafeBlendMode,
-      getTransformSignature,
-      getUrbanCityPolicyOwner,
-      getUrbanGlowMultiplierAt,
-      normalizeDayNightStyleConfig,
-      normalizeIntensityFieldsState,
-      normalizeLongitude,
-      pathBoundsInScreen,
-      prepareTargetContext,
-      recordRenderPerfMetric,
-      sampleIntensityField,
-      stableJson,
-      stringHash,
-      withRenderTarget,
+    estimateProjectedAreaPx,
+    getCityAnchor,
+    getCityCanonicalId,
+    getCityCapitalScore,
+    getCityGeoCoordinates,
+    getCityScreenPoint,
+    getDefaultZoomTransform: () => globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 },
+    getEffectiveCityCollection,
+    getFeatureGeoCentroid,
+    getProjectedFeatureBounds,
+    getProjectedGeographicPath,
+    getRenderPassLayout,
+    getSafeBlendMode,
+    getTransformSignature,
+    getUrbanCityPolicyOwner,
+    getUrbanGlowMultiplierAt,
+    normalizeDayNightStyleConfig,
+    normalizeIntensityFieldsState,
+    normalizeLongitude,
+    pathBoundsInScreen,
+    prepareTargetContext,
+    recordRenderPerfMetric,
+    sampleIntensityField,
+    stableJson,
+    stringHash,
+    withRenderTarget,
+  },
+  effects: {
+    onModernAssetsReady: () => {
+      cityLightsRenderOwner?.updateAssets(cityLightsAssetProvider.getAssets());
+      invalidateRenderPasses("dayNight", "modern-city-lights-asset-ready");
+      requestRendererRender("modern-city-lights-asset-ready");
     },
-    effects: {
-      onModernAssetsReady: () => {
-        cityLightsRenderOwner?.updateAssets(cityLightsAssetProvider.getAssets());
-        invalidateRenderPasses("dayNight", "modern-city-lights-asset-ready");
-        requestRendererRender("modern-city-lights-asset-ready");
-      },
-      onModernAssetsError: (error) => {
-        console.error("[renderer] Failed to load the Modern City Lights asset.", error);
-      },
+    onModernAssetsError: (error) => {
+      console.error("[renderer] Failed to load the Modern City Lights asset.", error);
     },
-  });
-  return cityLightsRenderOwner;
-}
+  },
+}));
 
-function getDayNightRuntimeOwner() {
-  if (dayNightRuntimeOwner) {
-    return dayNightRuntimeOwner;
-  }
-  dayNightRuntimeOwner = createDayNightRuntimeOwner({
-    rendererSurfaceHost,
-    getters: {
-      getDayNightStyleConfigState: () => runtimeState.styleConfig?.dayNight,
-      getCityLayerRevision: () => runtimeState.cityLayerRevision,
-      isBootInteractionReady,
-      isRenderPhaseIdle: () => runtimeState.renderPhase === RENDER_PHASE_IDLE,
+const getDayNightRuntimeOwner = lazyOwner(() => createDayNightRuntimeOwner({
+  rendererSurfaceHost,
+  getters: {
+    getDayNightStyleConfigState: () => runtimeState.styleConfig?.dayNight,
+    getCityLayerRevision: () => runtimeState.cityLayerRevision,
+    isBootInteractionReady,
+    isRenderPhaseIdle: () => runtimeState.renderPhase === RENDER_PHASE_IDLE,
+  },
+  helpers: {
+    clamp,
+    normalizeDayNightStyleConfig,
+    normalizeLongitude,
+    nowMs,
+    stableJson,
+  },
+  effects: {
+    drawNightLightsLayer,
+    ensureCityLightsData: () => {
+      if (runtimeState.baseCityDataState === "idle" && typeof runtimeState.ensureBaseCityDataFn === "function") {
+        // The loader logs failures and owns retries; do not retry on every animation frame.
+        void runtimeState.ensureBaseCityDataFn({ reason: "day-night", renderNow: true, includeLocalization: false }).catch(() => {});
+      }
     },
-    helpers: {
-      clamp,
-      normalizeDayNightStyleConfig,
-      normalizeLongitude,
-      nowMs,
-      stableJson,
-    },
-    effects: {
-      drawNightLightsLayer,
-      ensureCityLightsData: () => {
-        if (runtimeState.baseCityDataState === "idle" && typeof runtimeState.ensureBaseCityDataFn === "function") {
-          // The loader logs failures and owns retries; do not retry on every animation frame.
-          void runtimeState.ensureBaseCityDataFn({ reason: "day-night", renderNow: true, includeLocalization: false }).catch(() => {});
-        }
-      },
-      invalidateRenderPasses,
-      renderFallback: render,
-      requestRender: requestRendererRender,
-      setDayNightStyleConfig: (config) => setDayNightStyleConfigState(runtimeState, config),
-      setPendingDayNightRefresh: (nextPending) => setPendingDayNightRefreshState(runtimeState, nextPending),
-      updateToolbarInputs: refreshPhysicalIntensityUi,
-    },
-  });
-  return dayNightRuntimeOwner;
-}
+    invalidateRenderPasses,
+    renderFallback: render,
+    requestRender: requestRendererRender,
+    setDayNightStyleConfig: (config) => setDayNightStyleConfigState(runtimeState, config),
+    setPendingDayNightRefresh: (nextPending) => setPendingDayNightRefreshState(runtimeState, nextPending),
+    updateToolbarInputs: refreshPhysicalIntensityUi,
+  },
+}));
 
-function getTransportOverviewRenderOwner() {
-  if (transportOverviewRenderOwner) {
-    return transportOverviewRenderOwner;
-  }
-  transportOverviewRenderOwner = createTransportOverviewRenderOwner({
-    state,
-    helpers: {
-      buildFacilityEntryKey,
-      buildFacilityTooltipText,
-      clamp,
-      clearFacilityHoverEntries,
-      collectContextMetric,
-      getActiveFacilityHighlightEntry,
-      getCanvasColorRelativeLuminance,
-      getContext: () => rendererSurfaceHost.getContext(),
-      getFacilityHoverRadiusPx,
-      getFeatureCollectionFeatureCount,
-      getLineMidpointFromCoordinates,
-      getMultiLineLabelAnchor,
-      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-      getProjection: () => rendererSurfaceHost.getProjection(),
-      invalidateRenderPasses,
-      mixCanvasColors,
-      nowMs,
-      requestRender: (reason) => requestRendererRender(reason),
-      setVisibleFacilityHoverEntries,
-    },
-  });
-  return transportOverviewRenderOwner;
-}
+const getTransportOverviewRenderOwner = lazyOwner(() => createTransportOverviewRenderOwner({
+  state,
+  helpers: {
+    buildFacilityEntryKey,
+    buildFacilityTooltipText,
+    clamp,
+    clearFacilityHoverEntries,
+    collectContextMetric,
+    getActiveFacilityHighlightEntry,
+    getCanvasColorRelativeLuminance,
+    getContext: () => rendererSurfaceHost.getContext(),
+    getFacilityHoverRadiusPx,
+    getFeatureCollectionFeatureCount,
+    getLineMidpointFromCoordinates,
+    getMultiLineLabelAnchor,
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    getProjection: () => rendererSurfaceHost.getProjection(),
+    invalidateRenderPasses,
+    mixCanvasColors,
+    nowMs,
+    requestRender: (reason) => requestRendererRender(reason),
+    setVisibleFacilityHoverEntries,
+  },
+}));
 
-function getBorderMeshOwner() {
-  if (borderMeshOwner) {
-    return borderMeshOwner;
-  }
-  borderMeshOwner = createBorderMeshOwner({
-    state,
-    constants: {
-      coastlineEffectiveAreaMultiplier: COASTLINE_EFFECTIVE_AREA_MULTIPLIER,
-      scenarioCoastlineMaxAreaDeltaRatio: SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO,
-      scenarioCoastlineMaxInteriorRingCount: SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT,
-      scenarioCoastlineMaxInteriorRingRatio: SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO,
+const getBorderMeshOwner = lazyOwner(() => createBorderMeshOwner({
+  state,
+  constants: {
+    coastlineEffectiveAreaMultiplier: COASTLINE_EFFECTIVE_AREA_MULTIPLIER,
+    scenarioCoastlineMaxAreaDeltaRatio: SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO,
+    scenarioCoastlineMaxInteriorRingCount: SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT,
+    scenarioCoastlineMaxInteriorRingRatio: SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO,
+  },
+  helpers: {
+    asFeatureLike,
+    canonicalCountryCode,
+    renderDynamicBorders: () => {
+      if (rendererSurfaceHost.getContext()) render();
     },
-    helpers: {
-      asFeatureLike,
-      canonicalCountryCode,
-      renderDynamicBorders: () => {
-        if (rendererSurfaceHost.getContext()) render();
-      },
-      getDetailAdmMeshBuildState: () => detailAdmMeshBuildState,
-      setDetailAdmMeshBuildState: (nextState) => {
-        detailAdmMeshBuildState = nextState;
-      },
-      scheduleDeferredHeavyBorderMeshes,
-      syncStaticMeshSnapshot,
-      ensureSovereigntyState,
-      getAdmin1Group,
-      getEntityCountryCode,
-      getEntityBorderMeshCountryCode,
-      getFeatureCountryCodeNormalized,
-      getFeatureBorderMeshCountryCodeNormalized,
-      getFeatureId,
-      getLatitudeAdjustedSimplifyEpsilon,
-      getLineLength,
-      getParentGroupForEntity,
-      incrementPerfCounter,
-      invalidateRenderPasses,
-      isDynamicBordersEnabled,
-      isAdmDetailTier,
-      isUsableMesh,
-      isWorldBounds,
-      nowMs,
-      publishScenarioCoastlineDecision,
-      recordRenderPerfMetric,
-      resolveOwnerBorderCode,
-      sanitizePolyline,
-      shouldExcludeOwnerBorderEntity,
-      shouldExcludePoliticalInteractionFeature,
-      simplifyPolylineEffectiveArea,
-      getStaticMeshSourceCountries: () => staticMeshSourceCountries,
-      getScenarioSurfaceVersionSignal,
-      updateDynamicBorderStatusUI,
+    getDetailAdmMeshBuildState: () => detailAdmMeshBuildState,
+    setDetailAdmMeshBuildState: (nextState) => {
+      detailAdmMeshBuildState = nextState;
     },
-  });
-  return borderMeshOwner;
-}
+    scheduleDeferredHeavyBorderMeshes,
+    syncStaticMeshSnapshot,
+    ensureSovereigntyState,
+    getAdmin1Group,
+    getEntityCountryCode,
+    getEntityBorderMeshCountryCode,
+    getFeatureCountryCodeNormalized,
+    getFeatureBorderMeshCountryCodeNormalized,
+    getFeatureId,
+    getLatitudeAdjustedSimplifyEpsilon,
+    getLineLength,
+    getParentGroupForEntity,
+    incrementPerfCounter,
+    invalidateRenderPasses,
+    isDynamicBordersEnabled,
+    isAdmDetailTier,
+    isUsableMesh,
+    isWorldBounds,
+    nowMs,
+    publishScenarioCoastlineDecision,
+    recordRenderPerfMetric,
+    resolveOwnerBorderCode,
+    sanitizePolyline,
+    shouldExcludeOwnerBorderEntity,
+    shouldExcludePoliticalInteractionFeature,
+    simplifyPolylineEffectiveArea,
+    getStaticMeshSourceCountries: () => staticMeshSourceCountries,
+    getScenarioSurfaceVersionSignal,
+    updateDynamicBorderStatusUI,
+  },
+}));
 
 let politicalBorderRuntimeOwner = null;
 function getPoliticalBorderRuntimeOwner() {
@@ -2458,8 +2180,6 @@ function getPoliticalBorderDiagnostics() {
   return getPoliticalBorderRuntimeOwner().diagnostics();
 }
 
-let riverPaintRenderOwner = null;
-let riverPaintEditorOwner = null;
 let riverInternalContourOwner = null;
 let riverContourRenderOwner = null;
 function hasVisibleRiverPartitions() {
@@ -2467,18 +2187,15 @@ function hasVisibleRiverPartitions() {
     && !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState)
     && !!getRiverPaintRuntime(runtimeState).getActivePack();
 }
-function getRiverPaintRenderOwner() {
-  if (!riverPaintRenderOwner) riverPaintRenderOwner = createRiverPaintRenderOwner({
-    state: runtimeState,
-    getContext: () => rendererSurfaceHost.getContext(),
-    getPath: () => rendererSurfaceHost.getPathCanvas(),
-    getProjectionKey: getOverlayProjectionSignature,
-    isVisible: pathBoundsInScreen,
-    isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric && !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState),
-    fallbackColor: LAND_FILL_COLOR,
-  });
-  return riverPaintRenderOwner;
-}
+const getRiverPaintRenderOwner = lazyOwner(() => createRiverPaintRenderOwner({
+  state: runtimeState,
+  getContext: () => rendererSurfaceHost.getContext(),
+  getPath: () => rendererSurfaceHost.getPathCanvas(),
+  getProjectionKey: getOverlayProjectionSignature,
+  isVisible: pathBoundsInScreen,
+  isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric && !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState),
+  fallbackColor: LAND_FILL_COLOR,
+}));
 function getRiverInternalContourOwner() {
   if (!riverInternalContourOwner) riverInternalContourOwner = createRiverInternalContourOwner({
     state: runtimeState,
@@ -2515,20 +2232,17 @@ function notifyPaintContourColorsChanged(ids = null) {
   const internalChanged = getRiverInternalContourOwner().notifyPaintChanged(ids);
   if (globalChanged || internalChanged) invalidateRenderPasses("borders", "paint-contours-colors");
 }
-function getRiverPaintEditorOwner() {
-  if (!riverPaintEditorOwner) riverPaintEditorOwner = createRiverPaintEditorOwner({
-    state: runtimeState, captureHistoryState, commitHistoryEntry,
-    refreshParents: refreshResolvedColorsForFeatures, markDirty, addRecentColor, nowMs,
-    selectColor: color => {
-      setClickSelectedColorState(runtimeState, color);
-      runtimeState.updateSwatchUIFn?.();
-    },
-    announce: reason => showToast(runtimeState.currentLanguage === "zh"
-      ? `沿河分区暂不可编辑：${reason}。未修改整块颜色。`
-      : `River cell not editable: ${reason}. The parent was not painted.`, { tone: "warning" }),
-  });
-  return riverPaintEditorOwner;
-}
+const getRiverPaintEditorOwner = lazyOwner(() => createRiverPaintEditorOwner({
+  state: runtimeState, captureHistoryState, commitHistoryEntry,
+  refreshParents: refreshResolvedColorsForFeatures, markDirty, addRecentColor, nowMs,
+  selectColor: color => {
+    setClickSelectedColorState(runtimeState, color);
+    runtimeState.updateSwatchUIFn?.();
+  },
+  announce: reason => showToast(runtimeState.currentLanguage === "zh"
+    ? `沿河分区暂不可编辑：${reason}。未修改整块颜色。`
+    : `River cell not editable: ${reason}. The parent was not painted.`, { tone: "warning" }),
+}));
 
 let paintContourRuntimeOwner = null;
 let borderPaletteSource = null, borderPaletteColorRevision = -1, borderPaletteRevision = '';
@@ -2957,127 +2671,109 @@ function prepareScenarioBorderPaths() {
   return job.promise;
 }
 
-function getInteractionBorderSnapshotOwner() {
-  if (interactionBorderSnapshotOwner) {
-    return interactionBorderSnapshotOwner;
-  }
-  interactionBorderSnapshotOwner = createInteractionBorderSnapshotOwner({
-    state,
-    constants: {
-      renderPassOverscanRatioPerSide: RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
-    },
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext(),
-      getRenderPassCacheState,
-    },
-    helpers: {
-      cloneZoomTransform,
-      drawBordersPass,
-      incrementPerfCounter,
-      invalidateInteractionBorderSnapshotFacade: (reason) => invalidateInteractionBorderSnapshot(reason),
-      nowMs,
-      prepareTargetContext,
-      recordRenderPerfMetric,
-      withRenderTarget,
-    },
-  });
-  return interactionBorderSnapshotOwner;
-}
+const getInteractionBorderSnapshotOwner = lazyOwner(() => createInteractionBorderSnapshotOwner({
+  state,
+  constants: {
+    renderPassOverscanRatioPerSide: RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
+  },
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext(),
+    getRenderPassCacheState,
+  },
+  helpers: {
+    cloneZoomTransform,
+    drawBordersPass,
+    incrementPerfCounter,
+    invalidateInteractionBorderSnapshotFacade: (reason) => invalidateInteractionBorderSnapshot(reason),
+    nowMs,
+    prepareTargetContext,
+    recordRenderPerfMetric,
+    withRenderTarget,
+  },
+}));
 
-function getSpatialIndexRuntimeOwner() {
-  if (spatialIndexRuntimeOwner) {
-    return spatialIndexRuntimeOwner;
-  }
-  spatialIndexRuntimeOwner = createSpatialIndexRuntimeOwner({
-    state,
-    constants: {
-      chunkedIndexBuildSliceSize: CHUNKED_INDEX_BUILD_SLICE_SIZE,
-      chunkedSpatialBuildSliceSize: CHUNKED_SPATIAL_BUILD_SLICE_SIZE,
-      hitGridTargetCols: HIT_GRID_TARGET_COLS,
-      hitGridMinCellPx: HIT_GRID_MIN_CELL_PX,
-      hitGridMaxCellPx: HIT_GRID_MAX_CELL_PX,
-      hitMaxCellsPerItem: HIT_MAX_CELLS_PER_ITEM,
-    },
-    getters: {
-      getPathSvg: () => rendererSurfaceHost.getPathSvg(),
-    },
-    helpers: {
-      rebuildAuxiliaryRegionIndexes,
-      getLogicalCanvasDimensions,
-      computeProjectedFeatureBounds,
-      getProjectedFeatureBounds,
-      shouldSkipFeature,
-      queueIndexUiRefresh,
-      finalizeIndexBuildEffects,
-      getFeatureId,
-      getFeatureCountryCodeNormalized,
-      getFeatureBorderMeshCountryCodeNormalized,
-      shouldExcludePoliticalInteractionFeature,
-      shouldExcludePoliticalVisualFeature,
-      nowMs,
-      recordRenderPerfMetric,
-      setInteractionInfrastructureState,
-      yieldToMain,
-      getEffectiveWaterRegionFeatures,
-      getEffectiveSpecialRegionFeatures,
-      collectFeatureHitGeometries: collectSafeWaterRegionGeometryParts,
-      getSecondarySpatialCacheIdentity: () => [
-        runtimeState.activeScenarioId, runtimeState.sceneGeneration,
-        getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
-        getObjectIdentityToken(rendererSurfaceHost.getPathSvg()),
-        getObjectIdentityToken(rendererSurfaceHost.getPathCanvas()),
-        runtimeState.contextLayerRevision,
-      ].join(":"),
-      getSecondarySpatialSourceIdentity: () => [
-        runtimeState.waterRegionsData?.features, runtimeState.scenarioWaterRegionsData?.features,
-        runtimeState.scenarioAtlantropaData?.features, runtimeState.scenarioSpecialRegionsData?.features,
-        runtimeState.contextLayerExternalDataByName?.lakes?.features, runtimeState.activeScenarioManifest,
-        runtimeState.topologyRevision, runtimeState.dataGeneration, runtimeState.contextLayerRevision,
-        runtimeState.showScenarioAtlantropa,
-      ],
-      computeProjectedGeoBounds,
-      shouldExcludeWaterHitGeometry,
-    },
-  });
-  return spatialIndexRuntimeOwner;
-}
+const getSpatialIndexRuntimeOwner = lazyOwner(() => createSpatialIndexRuntimeOwner({
+  state,
+  constants: {
+    chunkedIndexBuildSliceSize: CHUNKED_INDEX_BUILD_SLICE_SIZE,
+    chunkedSpatialBuildSliceSize: CHUNKED_SPATIAL_BUILD_SLICE_SIZE,
+    hitGridTargetCols: HIT_GRID_TARGET_COLS,
+    hitGridMinCellPx: HIT_GRID_MIN_CELL_PX,
+    hitGridMaxCellPx: HIT_GRID_MAX_CELL_PX,
+    hitMaxCellsPerItem: HIT_MAX_CELLS_PER_ITEM,
+  },
+  getters: {
+    getPathSvg: () => rendererSurfaceHost.getPathSvg(),
+  },
+  helpers: {
+    rebuildAuxiliaryRegionIndexes,
+    getLogicalCanvasDimensions,
+    computeProjectedFeatureBounds,
+    getProjectedFeatureBounds,
+    shouldSkipFeature,
+    queueIndexUiRefresh,
+    finalizeIndexBuildEffects,
+    getFeatureId,
+    getFeatureCountryCodeNormalized,
+    getFeatureBorderMeshCountryCodeNormalized,
+    shouldExcludePoliticalInteractionFeature,
+    shouldExcludePoliticalVisualFeature,
+    nowMs,
+    recordRenderPerfMetric,
+    setInteractionInfrastructureState,
+    yieldToMain,
+    getEffectiveWaterRegionFeatures,
+    getEffectiveSpecialRegionFeatures,
+    collectFeatureHitGeometries: collectSafeWaterRegionGeometryParts,
+    getSecondarySpatialCacheIdentity: () => [
+      runtimeState.activeScenarioId, runtimeState.sceneGeneration,
+      getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+      getObjectIdentityToken(rendererSurfaceHost.getPathSvg()),
+      getObjectIdentityToken(rendererSurfaceHost.getPathCanvas()),
+      runtimeState.contextLayerRevision,
+    ].join(":"),
+    getSecondarySpatialSourceIdentity: () => [
+      runtimeState.waterRegionsData?.features, runtimeState.scenarioWaterRegionsData?.features,
+      runtimeState.scenarioAtlantropaData?.features, runtimeState.scenarioSpecialRegionsData?.features,
+      runtimeState.contextLayerExternalDataByName?.lakes?.features, runtimeState.activeScenarioManifest,
+      runtimeState.topologyRevision, runtimeState.dataGeneration, runtimeState.contextLayerRevision,
+      runtimeState.showScenarioAtlantropa,
+    ],
+    computeProjectedGeoBounds,
+    shouldExcludeWaterHitGeometry,
+  },
+}));
 
-function getRenderCacheOwner() {
-  if (renderCacheOwner) {
-    return renderCacheOwner;
-  }
-  renderCacheOwner = createRenderCacheOwner({
-    state: runtimeState,
-    constants: {
-      interactionCompositePassNames: Object.freeze([...INTERACTION_COMPOSITE_PASS_NAMES]),
-      renderPassNames: Object.freeze([...RENDER_PASS_NAMES]),
-      renderPassOverscanRatioPerSide: RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
-      transformedFramePassNames: new Set(TRANSFORM_REUSED_RENDER_PASS_NAMES),
-    },
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext?.() || null,
-      getActiveInteractionCompositePassNames,
-      getPassPaintOverscanPx: getTnoScenePaintOverscanPx,
-      // Direct scenes retain a complete overview for navigation beyond coverage.
-      // Legacy per-pass padding duplicates that storage and prevents private GPU frames fitting the shared cap.
-      // Keep a small camera margin: zero padding forces every pan event to
-      // rerasterize and upload all transformed passes. Five percent preserves
-      // ordinary drag reuse while leaving room for a private GPU candidate.
-      getPassOverscanRatio: () => !exportRenderInProgress && isTnoRasterSceneSelected()
-        ? 0.05 : RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
-    },
-    helpers: {
-      cloneZoomTransform,
-      areZoomTransformsEquivalent,
-      withRenderTarget,
-      prepareTargetContext,
-      ensureRenderPassCacheState,
-      getTransformSignature,
-      getVisibleFrameIdentity,
-    },
-  });
-  return renderCacheOwner;
-}
+const getRenderCacheOwner = lazyOwner(() => createRenderCacheOwner({
+  state: runtimeState,
+  constants: {
+    interactionCompositePassNames: Object.freeze([...INTERACTION_COMPOSITE_PASS_NAMES]),
+    renderPassNames: Object.freeze([...RENDER_PASS_NAMES]),
+    renderPassOverscanRatioPerSide: RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
+    transformedFramePassNames: new Set(TRANSFORM_REUSED_RENDER_PASS_NAMES),
+  },
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext?.() || null,
+    getActiveInteractionCompositePassNames,
+    getPassPaintOverscanPx: getTnoScenePaintOverscanPx,
+    // Direct scenes retain a complete overview for navigation beyond coverage.
+    // Legacy per-pass padding duplicates that storage and prevents private GPU frames fitting the shared cap.
+    // Keep a small camera margin: zero padding forces every pan event to
+    // rerasterize and upload all transformed passes. Five percent preserves
+    // ordinary drag reuse while leaving room for a private GPU candidate.
+    getPassOverscanRatio: () => !exportRenderInProgress && isTnoRasterSceneSelected()
+      ? 0.05 : RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
+  },
+  helpers: {
+    cloneZoomTransform,
+    areZoomTransformsEquivalent,
+    withRenderTarget,
+    prepareTargetContext,
+    ensureRenderPassCacheState,
+    getTransformSignature,
+    getVisibleFrameIdentity,
+  },
+}));
 
 function getExactCompositeReuseOwner() {
   if (!exactCompositeReuseOwner) {
@@ -3094,193 +2790,161 @@ function getExactCompositeReuseOwner() {
   return exactCompositeReuseOwner;
 }
 
-function getCachedPassCompositorOwner() {
-  if (cachedPassCompositorOwner) return cachedPassCompositorOwner;
-  cachedPassCompositorOwner = createCachedPassCompositorOwner({
-    constants: {
-      renderPassNames: RENDER_PASS_NAMES,
-      paintedOverscanLimit: VIEWPORT_CULL_OVERSCAN_PX,
+const getCachedPassCompositorOwner = lazyOwner(() => createCachedPassCompositorOwner({
+  constants: {
+    renderPassNames: RENDER_PASS_NAMES,
+    paintedOverscanLimit: VIEWPORT_CULL_OVERSCAN_PX,
+  },
+  getters: {
+    getActiveTargetContext: () => rendererSurfaceHost.getContext(),
+    getRenderPassCacheSnapshot: getRenderPassCacheState,
+    getPassReferenceTransform,
+    getRenderPassLayout,
+    getDpr: () => runtimeState.dpr,
+    getRenderPhase: () => runtimeState.renderPhase,
+    isRenderDiagnosticsEnabled: () => !!renderDiag.enabled,
+  },
+  helpers: {
+    cloneZoomTransform,
+    areZoomTransformsEquivalent,
+  },
+  effects: {
+    recordTransformedPassDiagnostics: (passName, details) => {
+      renderDiag.transformedPasses = {
+        ...(renderDiag.transformedPasses || {}),
+        [passName]: details,
+      };
+      publishRenderDiagnostics();
     },
-    getters: {
-      getActiveTargetContext: () => rendererSurfaceHost.getContext(),
-      getRenderPassCacheSnapshot: getRenderPassCacheState,
-      getPassReferenceTransform,
-      getRenderPassLayout,
-      getDpr: () => runtimeState.dpr,
-      getRenderPhase: () => runtimeState.renderPhase,
-      isRenderDiagnosticsEnabled: () => !!renderDiag.enabled,
-    },
-    helpers: {
-      cloneZoomTransform,
-      areZoomTransformsEquivalent,
-    },
-    effects: {
-      recordTransformedPassDiagnostics: (passName, details) => {
-        renderDiag.transformedPasses = {
-          ...(renderDiag.transformedPasses || {}),
-          [passName]: details,
-        };
-        publishRenderDiagnostics();
-      },
-    },
-  });
-  return cachedPassCompositorOwner;
-}
+  },
+}));
 
-function getTransformedFrameCompositorOwner() {
-  if (transformedFrameCompositorOwner) return transformedFrameCompositorOwner;
-  transformedFrameCompositorOwner = createTransformedFrameCompositorOwner({
-    constants: {
-      interactionCompositePassNames: INTERACTION_COMPOSITE_PASS_NAMES,
-      renderPhaseIdle: RENDER_PHASE_IDLE,
-      renderPhaseInteracting: RENDER_PHASE_INTERACTING,
-      renderPhaseSettling: RENDER_PHASE_SETTLING,
+const getTransformedFrameCompositorOwner = lazyOwner(() => createTransformedFrameCompositorOwner({
+  constants: {
+    interactionCompositePassNames: INTERACTION_COMPOSITE_PASS_NAMES,
+    renderPhaseIdle: RENDER_PHASE_IDLE,
+    renderPhaseInteracting: RENDER_PHASE_INTERACTING,
+    renderPhaseSettling: RENDER_PHASE_SETTLING,
+  },
+  getters: {
+    getCurrentTransform: () => runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
+    getRenderPassCacheSnapshot: getRenderPassCacheState,
+    getActiveTransformedFramePassNames,
+    getActiveInteractionCompositePassNames,
+    getRenderPhase: () => runtimeState.renderPhase,
+    getDeferExactAfterSettle: () => runtimeState.deferExactAfterSettle,
+    getActiveScenarioId: () => runtimeState.activeScenarioId,
+    getPendingExactPoliticalFastFrame: () => runtimeState.pendingExactPoliticalFastFrame,
+    getZoomGestureScaleDelta: () => runtimeState.zoomGestureScaleDelta,
+    getZoomGestureEndedAt: () => runtimeState.zoomGestureEndedAt,
+    getDpr: () => runtimeState.dpr,
+  },
+  helpers: {
+    nowMs,
+    canDrawTransformedPass,
+    getInteractionCompositeReuseDecision,
+  },
+  effects: {
+    ensureCompositeBufferCanvas: () => {
+      exactCompositeReuseOwner?.invalidate();
+      return ensureCompositeBufferCanvas();
     },
-    getters: {
-      getCurrentTransform: () => runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
-      getRenderPassCacheSnapshot: getRenderPassCacheState,
-      getActiveTransformedFramePassNames,
-      getActiveInteractionCompositePassNames,
-      getRenderPhase: () => runtimeState.renderPhase,
-      getDeferExactAfterSettle: () => runtimeState.deferExactAfterSettle,
-      getActiveScenarioId: () => runtimeState.activeScenarioId,
-      getPendingExactPoliticalFastFrame: () => runtimeState.pendingExactPoliticalFastFrame,
-      getZoomGestureScaleDelta: () => runtimeState.zoomGestureScaleDelta,
-      getZoomGestureEndedAt: () => runtimeState.zoomGestureEndedAt,
-      getDpr: () => runtimeState.dpr,
+    resetCanvasContext,
+    withRenderTarget,
+    drawInteractionComposite,
+    composeRenderPassesToTarget,
+    drawTransformedPass,
+    drawInteractionLabels: (transform) => replayNavigationLabels(transform),
+    drawInteractionBorderSnapshot,
+    drawBordersPass,
+    blitCompositeBufferToMain,
+    setInteractionCompositeRejectedReason: (reason) => {
+      getRenderPassCacheState().interactionComposite.rejectedReason = reason;
     },
-    helpers: {
-      nowMs,
-      canDrawTransformedPass,
-      getInteractionCompositeReuseDecision,
+    invalidateInteractionComposite,
+    buildInteractionComposite,
+    ensureTransformedPassCoverage: (timings) => getRenderPipelinePassesOwner().ensureTransformedPassCoverage(
+      timings, getActiveInteractionCompositePassNames(),
+    ),
+    canDrawInteractionComposite,
+    setPendingExactPoliticalFastFrame: (value) => {
+      setPendingExactPoliticalFastFrameState(runtimeState, value);
     },
-    effects: {
-      ensureCompositeBufferCanvas: () => {
-        exactCompositeReuseOwner?.invalidate();
-        return ensureCompositeBufferCanvas();
-      },
-      resetCanvasContext,
-      withRenderTarget,
-      drawInteractionComposite,
-      composeRenderPassesToTarget,
-      drawTransformedPass,
-      drawInteractionLabels: (transform) => replayNavigationLabels(transform),
-      drawInteractionBorderSnapshot,
-      drawBordersPass,
-      blitCompositeBufferToMain,
-      setInteractionCompositeRejectedReason: (reason) => {
-        getRenderPassCacheState().interactionComposite.rejectedReason = reason;
-      },
-      invalidateInteractionComposite,
-      buildInteractionComposite,
-      ensureTransformedPassCoverage: (timings) => getRenderPipelinePassesOwner().ensureTransformedPassCoverage(
-        timings, getActiveInteractionCompositePassNames(),
-      ),
-      canDrawInteractionComposite,
-      setPendingExactPoliticalFastFrame: (value) => {
-        setPendingExactPoliticalFastFrameState(runtimeState, value);
-      },
-      recordRenderPerfMetric,
-      recordPassTiming,
-      incrementPerfCounter,
-    },
-  });
-  return transformedFrameCompositorOwner;
-}
+    recordRenderPerfMetric,
+    recordPassTiming,
+    incrementPerfCounter,
+  },
+}));
 
-function getRenderPassCacheHostOwner() {
-  if (renderPassCacheHostOwner) {
-    return renderPassCacheHostOwner;
-  }
-  renderPassCacheHostOwner = createRenderPassCacheHostOwner({
-    effects: {
-      ensureRenderPassCanvas,
-      prepareTargetContext,
-      withRenderTarget,
-    },
-    getters: {
-      getRenderPassLayout,
-    },
-  });
-  return renderPassCacheHostOwner;
-}
+const getRenderPassCacheHostOwner = lazyOwner(() => createRenderPassCacheHostOwner({
+  effects: {
+    ensureRenderPassCanvas,
+    prepareTargetContext,
+    withRenderTarget,
+  },
+  getters: {
+    getRenderPassLayout,
+  },
+}));
 
-function getRenderPassCommitAccountingOwner() {
-  if (renderPassCommitAccountingOwner) {
-    return renderPassCommitAccountingOwner;
-  }
-  renderPassCommitAccountingOwner = createRenderPassCommitAccountingOwner({
-    effects: {
-      clearPassFullReferenceTransforms,
-      incrementPerfCounter,
-      recordPassTiming,
-      recordRenderPerfMetric,
-      schedulePoliticalPathWarmup,
-      setPassFullReferenceTransform,
-      setPassReferenceTransform,
-    },
-    getters: {
-      getPassCounterNames,
-      getRenderPassCacheState,
-      getRenderPassSignature,
-      getVisibleFrameIdentity,
-      nowMs,
-    },
-  });
-  return renderPassCommitAccountingOwner;
-}
+const getRenderPassCommitAccountingOwner = lazyOwner(() => createRenderPassCommitAccountingOwner({
+  effects: {
+    clearPassFullReferenceTransforms,
+    incrementPerfCounter,
+    recordPassTiming,
+    recordRenderPerfMetric,
+    schedulePoliticalPathWarmup,
+    setPassFullReferenceTransform,
+    setPassReferenceTransform,
+  },
+  getters: {
+    getPassCounterNames,
+    getRenderPassCacheState,
+    getRenderPassSignature,
+    getVisibleFrameIdentity,
+    nowMs,
+  },
+}));
 
-function getRenderTransformReusePolicyOwner() {
-  if (renderTransformReusePolicyOwner) {
-    return renderTransformReusePolicyOwner;
-  }
-  renderTransformReusePolicyOwner = createRenderTransformReusePolicyOwner({
-    state,
-    getters: {
-      getRenderPassCacheState,
-      getPassReferenceTransform,
-      getActiveRenderPassNames,
-    },
-    helpers: {
-      cloneZoomTransform,
-      isHeavyScenarioStagedApplyCandidate,
-    },
-  });
-  return renderTransformReusePolicyOwner;
-}
+const getRenderTransformReusePolicyOwner = lazyOwner(() => createRenderTransformReusePolicyOwner({
+  state,
+  getters: {
+    getRenderPassCacheState,
+    getPassReferenceTransform,
+    getActiveRenderPassNames,
+  },
+  helpers: {
+    cloneZoomTransform,
+    isHeavyScenarioStagedApplyCandidate,
+  },
+}));
 
-function getProjectedGeometryBoundsOwner() {
-  if (projectedGeometryBoundsOwner) {
-    return projectedGeometryBoundsOwner;
-  }
-  projectedGeometryBoundsOwner = createProjectedGeometryBoundsOwner({
-    state: runtimeState,
-    getters: {
-      getProjection: () => rendererSurfaceHost.getProjection(),
-      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-      getPathSvg: () => rendererSurfaceHost.getPathSvg(),
-      // bounds() streams through the projection independently of the drawing
-      // context. withRenderTarget creates a temporary Canvas path each pass;
-      // use the stable path for this same projection so those scopes share bounds.
-      getBoundsPath: () => rendererSurfaceHost.getPathSvg() || rendererSurfaceHost.getPathCanvas(),
-      getLandFeatures: () => runtimeState.landData?.features || [],
-      getRiverFeatures: () => runtimeState.riversData?.features || [],
-      getActiveScenarioId: () => runtimeState.activeScenarioId || "",
-      getContextLayerRevision: () => runtimeState.contextLayerRevision,
-      getD3: () => globalThis.d3,
+const getProjectedGeometryBoundsOwner = lazyOwner(() => createProjectedGeometryBoundsOwner({
+  state: runtimeState,
+  getters: {
+    getProjection: () => rendererSurfaceHost.getProjection(),
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    getPathSvg: () => rendererSurfaceHost.getPathSvg(),
+    // bounds() streams through the projection independently of the drawing
+    // context. withRenderTarget creates a temporary Canvas path each pass;
+    // use the stable path for this same projection so those scopes share bounds.
+    getBoundsPath: () => rendererSurfaceHost.getPathSvg() || rendererSurfaceHost.getPathCanvas(),
+    getLandFeatures: () => runtimeState.landData?.features || [],
+    getRiverFeatures: () => runtimeState.riversData?.features || [],
+    getActiveScenarioId: () => runtimeState.activeScenarioId || "",
+    getContextLayerRevision: () => runtimeState.contextLayerRevision,
+    getD3: () => globalThis.d3,
+  },
+  helpers: {
+    getFeatureId,
+    recordRenderPerfMetric,
+    recordProjectedBoundsDiagnosticsState,
+    resetHostWaterPathCaches: () => {
+      scenarioRegionOverlayRenderOwner?.resetWaterPathCaches({ preserveResidentWorker: true });
     },
-    helpers: {
-      getFeatureId,
-      recordRenderPerfMetric,
-      recordProjectedBoundsDiagnosticsState,
-      resetHostWaterPathCaches: () => {
-        scenarioRegionOverlayRenderOwner?.resetWaterPathCaches({ preserveResidentWorker: true });
-      },
-      warn: (...args) => console.warn(...args),
-    },
-  });
-  return projectedGeometryBoundsOwner;
-}
+    warn: (...args) => console.warn(...args),
+  },
+}));
 
 function getViewportReadModelOwner() {
   if (viewportReadModelOwner) {
@@ -3345,33 +3009,27 @@ function getViewportReadModelOwner() {
   return viewportReadModelOwner;
 }
 
-function getViewportCommandOwner() {
-  if (viewportCommandOwner) {
-    return viewportCommandOwner;
-  }
-  viewportCommandOwner = createViewportCommandOwner({
-    state: runtimeState,
-    constants: {
-      minZoomScale: MIN_ZOOM_SCALE,
-      maxZoomScale: MAX_ZOOM_SCALE,
+const getViewportCommandOwner = lazyOwner(() => createViewportCommandOwner({
+  state: runtimeState,
+  constants: {
+    minZoomScale: MIN_ZOOM_SCALE,
+    maxZoomScale: MAX_ZOOM_SCALE,
+  },
+  getters: {
+    getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
+    getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
+    getD3: () => globalThis.d3,
+    canAnimateCamera: () => !!runtimeState.firstVisibleFramePainted
+      && (!!tnoRasterSceneOwner?.isActive() || !!navigationSceneOwner?.isReady()),
+    calculatePanExtent,
+    getCenteredFitZoomTransform,
+  },
+  effects: {
+    setZoomTransform: (transform) => {
+      setZoomTransformState(runtimeState, transform);
     },
-    getters: {
-      getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
-      getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
-      getD3: () => globalThis.d3,
-      canAnimateCamera: () => !!runtimeState.firstVisibleFramePainted
-        && (!!tnoRasterSceneOwner?.isActive() || !!navigationSceneOwner?.isReady()),
-      calculatePanExtent,
-      getCenteredFitZoomTransform,
-    },
-    effects: {
-      setZoomTransform: (transform) => {
-        setZoomTransformState(runtimeState, transform);
-      },
-    },
-  });
-  return viewportCommandOwner;
-}
+  },
+}));
 
 function getRendererViewportUpdateOwner() {
   if (rendererViewportUpdateOwner) {
@@ -3408,364 +3066,324 @@ function getRendererViewportUpdateOwner() {
   return rendererViewportUpdateOwner;
 }
 
-function getViewportResizeLifecycleOwner() {
-  if (viewportResizeLifecycleOwner) {
-    return viewportResizeLifecycleOwner;
-  }
-  viewportResizeLifecycleOwner = createViewportResizeLifecycleOwner({
-    state: runtimeState,
-    getters: {
-      getMapContainer: () => rendererSurfaceHost.getMapContainer(),
-      getGlobal: () => globalThis,
-      getDevicePixelRatio: () => globalThis.devicePixelRatio,
-      hasLandFeatures: () => !!runtimeState.landData?.features?.length,
+const getViewportResizeLifecycleOwner = lazyOwner(() => createViewportResizeLifecycleOwner({
+  state: runtimeState,
+  getters: {
+    getMapContainer: () => rendererSurfaceHost.getMapContainer(),
+    getGlobal: () => globalThis,
+    getDevicePixelRatio: () => globalThis.devicePixelRatio,
+    hasLandFeatures: () => !!runtimeState.landData?.features?.length,
+  },
+  helpers: {
+    scheduleDeferredWork,
+    cancelDeferredWork,
+    nowMs,
+    recordRenderPerfMetric,
+  },
+  effects: {
+    setRenderPhaseInteracting: () => setRenderPhase(RENDER_PHASE_INTERACTING),
+    scheduleRenderPhaseIdle,
+    setCanvasSize,
+    fitProjection,
+    resetZoomToFit,
+    enforceZoomConstraints,
+    markAllOverlaysDirty,
+    render,
+    buildSpatialIndex,
+    setHitCanvasDirty: () => {
+      setHitCanvasDirtyState(runtimeState, true);
     },
-    helpers: {
-      scheduleDeferredWork,
-      cancelDeferredWork,
-      nowMs,
-      recordRenderPerfMetric,
-    },
-    effects: {
-      setRenderPhaseInteracting: () => setRenderPhase(RENDER_PHASE_INTERACTING),
-      scheduleRenderPhaseIdle,
-      setCanvasSize,
-      fitProjection,
-      resetZoomToFit,
-      enforceZoomConstraints,
-      markAllOverlaysDirty,
-      render,
-      buildSpatialIndex,
-      setHitCanvasDirty: () => {
-        setHitCanvasDirtyState(runtimeState, true);
-      },
-      scheduleHitCanvasBuildIfNeeded,
-    },
-  });
-  return viewportResizeLifecycleOwner;
-}
+    scheduleHitCanvasBuildIfNeeded,
+  },
+}));
 
-function getScenarioWaterCachePolicyOwner() {
-  if (scenarioWaterCachePolicyOwner) {
-    return scenarioWaterCachePolicyOwner;
-  }
-  scenarioWaterCachePolicyOwner = createScenarioWaterCachePolicyOwner({
-    state,
-    getters: {
-      readSearchParam,
-      getDevicePixelRatio: () => globalThis.devicePixelRatio,
-      getPreviousRenderedCount: () => getScenarioRegionOverlayRenderOwner().getPreviousWaterRenderedCount(),
-    },
-    helpers: {
-      cloneZoomTransform: (transform) => cloneZoomTransform(transform || globalThis.d3?.zoomIdentity),
-      collectSafeWaterRegionGeometryParts,
-      computeProjectedGeoBounds: (part) => getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part),
-      isWaterRegionRenderable,
-    },
-  });
-  return scenarioWaterCachePolicyOwner;
-}
+const getScenarioWaterCachePolicyOwner = lazyOwner(() => createScenarioWaterCachePolicyOwner({
+  state,
+  getters: {
+    readSearchParam,
+    getDevicePixelRatio: () => globalThis.devicePixelRatio,
+    getPreviousRenderedCount: () => getScenarioRegionOverlayRenderOwner().getPreviousWaterRenderedCount(),
+  },
+  helpers: {
+    cloneZoomTransform: (transform) => cloneZoomTransform(transform || globalThis.d3?.zoomIdentity),
+    collectSafeWaterRegionGeometryParts,
+    computeProjectedGeoBounds: (part) => getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part),
+    isWaterRegionRenderable,
+  },
+}));
 
-function getZoomInteractionLifecycleOwner() {
-  if (zoomInteractionLifecycleOwner) {
-    return zoomInteractionLifecycleOwner;
-  }
-  zoomInteractionLifecycleOwner = createZoomInteractionLifecycleOwner({
-    state: runtimeState,
-    constants: {
-      minZoomScale: MIN_ZOOM_SCALE,
-      maxZoomScale: MAX_ZOOM_SCALE,
-      renderPhaseInteracting: RENDER_PHASE_INTERACTING,
-      renderPhaseSettling: RENDER_PHASE_SETTLING,
+const getZoomInteractionLifecycleOwner = lazyOwner(() => createZoomInteractionLifecycleOwner({
+  state: runtimeState,
+  constants: {
+    minZoomScale: MIN_ZOOM_SCALE,
+    maxZoomScale: MAX_ZOOM_SCALE,
+    renderPhaseInteracting: RENDER_PHASE_INTERACTING,
+    renderPhaseSettling: RENDER_PHASE_SETTLING,
+  },
+  getters: {
+    getD3: () => globalThis.d3,
+    getWidth: () => runtimeState.width,
+    getHeight: () => runtimeState.height,
+    getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
+    getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
+    getZoomIdentity: () => globalThis.d3?.zoomIdentity,
+    getZoomTransform: () => runtimeState.zoomTransform,
+    getPendingZoomTransform: () => runtimeState.pendingZoomTransform,
+    getZoomGestureStartTransform: () => runtimeState.zoomGestureStartTransform,
+    isZoomRenderScheduled: () => !!runtimeState.zoomRenderScheduled,
+  },
+  helpers: {
+    cloneZoomTransform,
+    shouldAllowZoomEvent,
+    nowMs,
+    requestAnimationFrame: (callback) => globalThis.requestAnimationFrame(callback),
+  },
+  effects: {
+    setZoomBehavior: (nextZoomBehavior) => {
+      rendererSurfaceHost.setZoomBehavior(nextZoomBehavior);
     },
-    getters: {
-      getD3: () => globalThis.d3,
-      getWidth: () => runtimeState.width,
-      getHeight: () => runtimeState.height,
-      getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
-      getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
-      getZoomIdentity: () => globalThis.d3?.zoomIdentity,
-      getZoomTransform: () => runtimeState.zoomTransform,
-      getPendingZoomTransform: () => runtimeState.pendingZoomTransform,
-      getZoomGestureStartTransform: () => runtimeState.zoomGestureStartTransform,
-      isZoomRenderScheduled: () => !!runtimeState.zoomRenderScheduled,
+    setZoomGestureStartTransform: (transform) => {
+      setZoomGestureStartTransformState(runtimeState, transform);
     },
-    helpers: {
-      cloneZoomTransform,
-      shouldAllowZoomEvent,
-      nowMs,
-      requestAnimationFrame: (callback) => globalThis.requestAnimationFrame(callback),
+    setZoomGestureScaleDelta: (scaleDelta) => {
+      setZoomGestureScaleDeltaState(runtimeState, scaleDelta);
     },
-    effects: {
-      setZoomBehavior: (nextZoomBehavior) => {
-        rendererSurfaceHost.setZoomBehavior(nextZoomBehavior);
-      },
-      setZoomGestureStartTransform: (transform) => {
-        setZoomGestureStartTransformState(runtimeState, transform);
-      },
-      setZoomGestureScaleDelta: (scaleDelta) => {
-        setZoomGestureScaleDeltaState(runtimeState, scaleDelta);
-      },
-      setPendingExactPoliticalFastFrame: (pending) => {
-        setPendingExactPoliticalFastFrameState(runtimeState, pending);
-      },
-      setPendingZoomTransform: (transform) => {
-        setPendingZoomTransformState(runtimeState, transform);
-      },
-      setZoomRenderScheduled: (scheduled) => {
-        setZoomRenderScheduledState(runtimeState, scheduled);
-      },
-      setZoomGestureEndedAt: (endedAtMs) => {
-        setZoomGestureEndedAtState(runtimeState, endedAtMs);
-      },
-      clearRenderPhaseTimer,
-      cancelExactAfterSettleRefresh,
-      setRenderPhase,
-      captureInteractionBorderSnapshot,
-      renderHoverOverlayIfNeeded,
-      dismissOnboardingHint,
-      updateMap,
-      scheduleScenarioChunkRefresh: (options) => {
-        if (typeof runtimeState.scheduleScenarioChunkRefreshFn === "function") {
-          return runtimeState.scheduleScenarioChunkRefreshFn(options);
-        }
-        return "noop";
-      },
-      scheduleRenderPhaseIdle,
-      updateZoomTranslateExtent,
-      resetZoomToFit,
-      enforceZoomConstraints,
+    setPendingExactPoliticalFastFrame: (pending) => {
+      setPendingExactPoliticalFastFrameState(runtimeState, pending);
     },
-  });
-  return zoomInteractionLifecycleOwner;
-}
+    setPendingZoomTransform: (transform) => {
+      setPendingZoomTransformState(runtimeState, transform);
+    },
+    setZoomRenderScheduled: (scheduled) => {
+      setZoomRenderScheduledState(runtimeState, scheduled);
+    },
+    setZoomGestureEndedAt: (endedAtMs) => {
+      setZoomGestureEndedAtState(runtimeState, endedAtMs);
+    },
+    clearRenderPhaseTimer,
+    cancelExactAfterSettleRefresh,
+    setRenderPhase,
+    captureInteractionBorderSnapshot,
+    renderHoverOverlayIfNeeded,
+    dismissOnboardingHint,
+    updateMap,
+    scheduleScenarioChunkRefresh: (options) => {
+      if (typeof runtimeState.scheduleScenarioChunkRefreshFn === "function") {
+        return runtimeState.scheduleScenarioChunkRefreshFn(options);
+      }
+      return "noop";
+    },
+    scheduleRenderPhaseIdle,
+    updateZoomTranslateExtent,
+    resetZoomToFit,
+    enforceZoomConstraints,
+  },
+}));
 
-function getClickSelectionTransactionOwner() {
-  if (clickSelectionTransactionOwner) return clickSelectionTransactionOwner;
-  clickSelectionTransactionOwner = createClickSelectionTransactionOwner({
-    constants: {
-      clickSnapRadiusPx: HIT_SNAP_RADIUS_CLICK_PX,
-      landFillColor: LAND_FILL_COLOR,
+const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTransactionOwner({
+  constants: {
+    clickSnapRadiusPx: HIT_SNAP_RADIUS_CLICK_PX,
+    landFillColor: LAND_FILL_COLOR,
+  },
+  getters: {
+    getClickState: () => Object.freeze({
+      activeSovereignCode: runtimeState.activeSovereignCode,
+      colors: runtimeState.colors,
+      currentTool: runtimeState.currentTool,
+      interactionGranularity: runtimeState.interactionGranularity,
+      isEditingPreset: runtimeState.isEditingPreset,
+      landData: runtimeState.landData,
+      landIndex: runtimeState.landIndex,
+      operationalLineEditor: runtimeState.operationalLineEditor,
+      operationGraphicsEditor: runtimeState.operationGraphicsEditor,
+      scenarioSpecialRegionsData: runtimeState.scenarioSpecialRegionsData,
+      selectedColor: runtimeState.selectedColor,
+      selectedSpecialRegionId: runtimeState.selectedSpecialRegionId,
+      selectedWaterRegionId: runtimeState.selectedWaterRegionId,
+      sovereignBaseColors: runtimeState.sovereignBaseColors,
+      specialRegionsById: runtimeState.specialRegionsById,
+      specialZoneEditor: runtimeState.specialZoneEditor,
+      startupReadonly: runtimeState.startupReadonly,
+      unitCounterEditor: runtimeState.unitCounterEditor,
+      waterRegionsById: runtimeState.waterRegionsById,
+      waterRegionsData: runtimeState.waterRegionsData,
+    }),
+    getSelectedFacilityEntry: () => selectedFacilityEntry,
+  },
+  effects: {
+    clearClickHoverIds: () => (clearClickHoveredIdState(runtimeState), clearClickScenarioHoverIdsState(runtimeState)),
+    consumeSuppressedBrushClick: () => {
+      if (!suppressNextClickAfterBrush) return false;
+      suppressNextClickAfterBrush = false;
+      return true;
     },
-    getters: {
-      getClickState: () => Object.freeze({
-        activeSovereignCode: runtimeState.activeSovereignCode,
-        colors: runtimeState.colors,
-        currentTool: runtimeState.currentTool,
-        interactionGranularity: runtimeState.interactionGranularity,
-        isEditingPreset: runtimeState.isEditingPreset,
-        landData: runtimeState.landData,
-        landIndex: runtimeState.landIndex,
-        operationalLineEditor: runtimeState.operationalLineEditor,
-        operationGraphicsEditor: runtimeState.operationGraphicsEditor,
-        scenarioSpecialRegionsData: runtimeState.scenarioSpecialRegionsData,
-        selectedColor: runtimeState.selectedColor,
-        selectedSpecialRegionId: runtimeState.selectedSpecialRegionId,
-        selectedWaterRegionId: runtimeState.selectedWaterRegionId,
-        sovereignBaseColors: runtimeState.sovereignBaseColors,
-        specialRegionsById: runtimeState.specialRegionsById,
-        specialZoneEditor: runtimeState.specialZoneEditor,
-        startupReadonly: runtimeState.startupReadonly,
-        unitCounterEditor: runtimeState.unitCounterEditor,
-        waterRegionsById: runtimeState.waterRegionsById,
-        waterRegionsData: runtimeState.waterRegionsData,
-      }),
-      getSelectedFacilityEntry: () => selectedFacilityEntry,
+    removeClickCountryColors: (countryCode) => removeClickCountryColorsState(runtimeState, countryCode),
+    removeClickWaterRegionOverride: (regionId) => removeClickWaterRegionOverrideState(runtimeState, regionId),
+    setClickActiveSovereignCode: (ownerCode, { updateUi = false } = {}) => {
+      setClickActiveSovereignCodeState(runtimeState, ownerCode);
+      if (updateUi && typeof runtimeState.updateActiveSovereignUIFn === "function") {
+        runtimeState.updateActiveSovereignUIFn();
+      }
     },
-    effects: {
-      clearClickHoverIds: () => (clearClickHoveredIdState(runtimeState), clearClickScenarioHoverIdsState(runtimeState)),
-      consumeSuppressedBrushClick: () => {
-        if (!suppressNextClickAfterBrush) return false;
-        suppressNextClickAfterBrush = false;
-        return true;
-      },
-      removeClickCountryColors: (countryCode) => removeClickCountryColorsState(runtimeState, countryCode),
-      removeClickWaterRegionOverride: (regionId) => removeClickWaterRegionOverrideState(runtimeState, regionId),
-      setClickActiveSovereignCode: (ownerCode, { updateUi = false } = {}) => {
-        setClickActiveSovereignCodeState(runtimeState, ownerCode);
-        if (updateUi && typeof runtimeState.updateActiveSovereignUIFn === "function") {
-          runtimeState.updateActiveSovereignUIFn();
-        }
-      },
-      setClickCountryColors: (countryCode, color) => setClickCountryColorsState(runtimeState, countryCode, color),
-      setClickHoverOverlayDirty: (dirty) => setClickHoverOverlayDirtyState(runtimeState, dirty),
-      setClickSelectedColor: (color, { updateSwatch = false } = {}) => {
-        setClickSelectedColorState(runtimeState, color);
-        if (updateSwatch && typeof runtimeState.updateSwatchUIFn === "function") {
-          runtimeState.updateSwatchUIFn();
-        }
-      },
-      setClickSelectedSpecialRegionId: (regionId) => setClickSelectedSpecialRegionIdState(runtimeState, regionId),
-      setClickSelectedWaterRegionId: (regionId) => setClickSelectedWaterRegionIdState(runtimeState, regionId),
-      setFacilityInfoCardExpanded: (expanded) => {
-        facilityInfoCardExpanded = Boolean(expanded);
-      },
-      setHoveredFacilityEntry: (entry) => {
-        getMapHoverInteractionOwner().setHoveredFacilityEntry(entry);
-      },
-      setSelectedFacilityEntry: (entry) => {
-        selectedFacilityEntry = entry;
-      },
-      togglePresetRegion: (landId) => {
-        if (typeof globalThis.togglePresetRegion === "function") globalThis.togglePresetRegion(landId);
-      },
+    setClickCountryColors: (countryCode, color) => setClickCountryColorsState(runtimeState, countryCode, color),
+    setClickHoverOverlayDirty: (dirty) => setClickHoverOverlayDirtyState(runtimeState, dirty),
+    setClickSelectedColor: (color, { updateSwatch = false } = {}) => {
+      setClickSelectedColorState(runtimeState, color);
+      if (updateSwatch && typeof runtimeState.updateSwatchUIFn === "function") {
+        runtimeState.updateSwatchUIFn();
+      }
     },
-    services: {
-      appendOperationalLineVertexFromEvent,
-      appendOperationGraphicVertexFromEvent,
-      appendSpecialZoneVertexFromEvent,
-      applyFacilityInfoCardState,
-      applyFeatureVisualOverrideTransaction,
-      applyVisualSubdivisionFill,
-      applyWaterRegionFill,
-      blockStartupReadonlyInteraction,
-      captureHistoryState,
-      commitHistoryEntry,
-      dismissOnboardingHint,
-      ensureLeafDetailReady,
-      getFeatureCountryCodeNormalized,
-      handleRiverPaintClick: hit => getRiverPaintEditorOwner().handleClick(hit),
-      getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
-        getSafeColor: getSafeCanvasColor,
-        getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
-      }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
-      getHitFromEvent,
-      getHoveredFacilityEntryFromEvent,
-      getIntensityFieldTool,
-      getSafeCanvasColor,
-      getSpecialRegionColor,
-      getWaterRegionColor,
-      handleSpecialZoneMembershipClick,
-      isDoubleClickBatchEligible,
-      isFacilityDetailsSurfaceActive,
-      isMacroOceanWaterRegion,
-      isOpenOceanPaintEnabled,
-      markDirty,
+    setClickSelectedSpecialRegionId: (regionId) => setClickSelectedSpecialRegionIdState(runtimeState, regionId),
+    setClickSelectedWaterRegionId: (regionId) => setClickSelectedWaterRegionIdState(runtimeState, regionId),
+    setFacilityInfoCardExpanded: (expanded) => {
+      facilityInfoCardExpanded = Boolean(expanded);
+    },
+    setHoveredFacilityEntry: (entry) => {
+      getMapHoverInteractionOwner().setHoveredFacilityEntry(entry);
+    },
+    setSelectedFacilityEntry: (entry) => {
+      selectedFacilityEntry = entry;
+    },
+    togglePresetRegion: (landId) => {
+      if (typeof globalThis.togglePresetRegion === "function") globalThis.togglePresetRegion(landId);
+    },
+  },
+  services: {
+    appendOperationalLineVertexFromEvent,
+    appendOperationGraphicVertexFromEvent,
+    appendSpecialZoneVertexFromEvent,
+    applyFacilityInfoCardState,
+    applyFeatureVisualOverrideTransaction,
+    applyVisualSubdivisionFill,
+    applyWaterRegionFill,
+    blockStartupReadonlyInteraction,
+    captureHistoryState,
+    commitHistoryEntry,
+    dismissOnboardingHint,
+    ensureLeafDetailReady,
+    getFeatureCountryCodeNormalized,
+    handleRiverPaintClick: hit => getRiverPaintEditorOwner().handleClick(hit),
+    getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
+      getSafeColor: getSafeCanvasColor,
+      getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
+    }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
+    getHitFromEvent,
+    getHoveredFacilityEntryFromEvent,
+    getIntensityFieldTool,
+    getSafeCanvasColor,
+    getSpecialRegionColor,
+    getWaterRegionColor,
+    handleSpecialZoneMembershipClick,
+    isDoubleClickBatchEligible,
+    isFacilityDetailsSurfaceActive,
+    isMacroOceanWaterRegion,
+    isOpenOceanPaintEnabled,
+    markDirty,
 
-      noteRenderAction,
-      nowMs,
-      placeUnitCounterFromEvent,
-      queueTooltipUpdate,
-      refreshSidebarAfterPaint,
-      refreshSpecialRegionSidebarRowsNow,
-      refreshWaterRegionSidebarRowsNow,
-      renderHoverOverlayIfNeeded,
-      requestInteractionRender,
-      resolveInteractionTargetIds,
-      shouldBlockUnderlyingSelectionForFacility,
-      shouldRequireLeafDetail,
-      syncInspectorCountryToLandSelection,
-      toggleFeatureInDevSelection,
-      updateDevSelectedHit,
-      warnIncompletePaintTargets: () => {
-        const zh = String(runtimeState.currentLanguage || "en").startsWith("zh");
-        showDetailPromotionToast(
-          zh ? "参考分组尚未完整加载，未执行填色。请启用细节层后重试。"
-            : "Reference group members are not fully loaded. No paint was applied; enable the detail layer and retry.",
-          { title: zh ? "填色范围" : "Paint scope", tone: "warning", duration: 3600 },
-        );
-      },
+    noteRenderAction,
+    nowMs,
+    placeUnitCounterFromEvent,
+    queueTooltipUpdate,
+    refreshSidebarAfterPaint,
+    refreshSpecialRegionSidebarRowsNow,
+    refreshWaterRegionSidebarRowsNow,
+    renderHoverOverlayIfNeeded,
+    requestInteractionRender,
+    resolveInteractionTargetIds,
+    shouldBlockUnderlyingSelectionForFacility,
+    shouldRequireLeafDetail,
+    syncInspectorCountryToLandSelection,
+    toggleFeatureInDevSelection,
+    updateDevSelectedHit,
+    warnIncompletePaintTargets: () => {
+      const zh = String(runtimeState.currentLanguage || "en").startsWith("zh");
+      showDetailPromotionToast(
+        zh ? "参考分组尚未完整加载，未执行填色。请启用细节层后重试。"
+          : "Reference group members are not fully loaded. No paint was applied; enable the detail layer and retry.",
+        { title: zh ? "填色范围" : "Paint scope", tone: "warning", duration: 3600 },
+      );
     },
-  });
-  return clickSelectionTransactionOwner;
-}
+  },
+}));
 
-function getMapInteractionEventBindingOwner() {
-  if (mapInteractionEventBindingOwner) {
-    return mapInteractionEventBindingOwner;
-  }
-  mapInteractionEventBindingOwner = createMapInteractionEventBindingOwner({
-    getters: {
-      getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
-      getWindow: () => window,
-      getInteractionRectNode: () => rendererSurfaceHost.getInteractionRect()?.node?.(),
-      isTouchBrushEnabled: () => runtimeState.brushModeEnabled || getIntensityFieldTool().active,
-    },
-    handlers: {
-      mapClick: handleClick,
-      mapDoubleClick: handleDoubleClick,
-      handleMouseMove,
-      handlePhysicalIntensityPointerDown,
-      handlePhysicalIntensityPointerMove,
-      handlePhysicalIntensityPointerEnd,
-      cancelPhysicalIntensitySession,
-      handleBrushPointerDown,
-      handleBrushPointerMove,
-      handleBrushPointerEnd,
-      cancelBrushSession,
-      handleMouseLeave: handleMapMouseLeave,
-      handleSidebarLayoutStart,
-      handleResize,
-      flushSpecialZoneMembershipDragSession,
-      flushBrushSession,
-    },
-    effects: {
-      bindMapContainerResizeObserver,
-      bindBrowserZoomObservers,
-    },
-  });
-  return mapInteractionEventBindingOwner;
-}
+const getMapInteractionEventBindingOwner = lazyOwner(() => createMapInteractionEventBindingOwner({
+  getters: {
+    getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
+    getWindow: () => window,
+    getInteractionRectNode: () => rendererSurfaceHost.getInteractionRect()?.node?.(),
+    isTouchBrushEnabled: () => runtimeState.brushModeEnabled || getIntensityFieldTool().active,
+  },
+  handlers: {
+    mapClick: handleClick,
+    mapDoubleClick: handleDoubleClick,
+    handleMouseMove,
+    handlePhysicalIntensityPointerDown,
+    handlePhysicalIntensityPointerMove,
+    handlePhysicalIntensityPointerEnd,
+    cancelPhysicalIntensitySession,
+    handleBrushPointerDown,
+    handleBrushPointerMove,
+    handleBrushPointerEnd,
+    cancelBrushSession,
+    handleMouseLeave: handleMapMouseLeave,
+    handleSidebarLayoutStart,
+    handleResize,
+    flushSpecialZoneMembershipDragSession,
+    flushBrushSession,
+  },
+  effects: {
+    bindMapContainerResizeObserver,
+    bindBrowserZoomObservers,
+  },
+}));
 
-function getIntensityFieldMaskOwner() {
-  if (intensityFieldMaskOwner) {
-    return intensityFieldMaskOwner;
-  }
-  intensityFieldMaskOwner = createIntensityFieldMaskOwner({
-    getFieldsState: () => runtimeState.intensityFields,
+const getIntensityFieldMaskOwner = lazyOwner(() => createIntensityFieldMaskOwner({
+  getFieldsState: () => runtimeState.intensityFields,
+  getProjection: () => rendererSurfaceHost.getProjection(),
+}));
+
+const getVisualEffectsPassOwner = lazyOwner(() => createVisualEffectsPassOwner({
+  getters: {
+    getContext: () => rendererSurfaceHost.getContext(),
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    getPathSvg: () => rendererSurfaceHost.getPathSvg(),
     getProjection: () => rendererSurfaceHost.getProjection(),
-  });
-  return intensityFieldMaskOwner;
-}
-
-function getVisualEffectsPassOwner() {
-  if (visualEffectsPassOwner) {
-    return visualEffectsPassOwner;
-  }
-  visualEffectsPassOwner = createVisualEffectsPassOwner({
-    getters: {
-      getContext: () => rendererSurfaceHost.getContext(),
-      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-      getPathSvg: () => rendererSurfaceHost.getPathSvg(),
-      getProjection: () => rendererSurfaceHost.getProjection(),
-      getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
-      getTextureStyleConfig,
-      isBootInteractionReady,
+    getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
+    getTextureStyleConfig,
+    isBootInteractionReady,
+  },
+  helpers: {
+    clamp,
+    getDashPattern,
+    getSafeBlendMode,
+    getSafeCanvasColor,
+    normalizeTextureMode,
+  },
+  effects: {
+    requestTextureRerender,
+    drawDayNightRuntimePass: (k, options) => getDayNightRuntimeOwner().drawDayNightPass(k, options),
+    recordRenderPerfMetric,
+  },
+  platform: {
+    createCanvas: () => document.createElement("canvas"),
+    createImage: () => new Image(),
+    createGeoRotation: (rotation) => globalThis.d3?.geoRotation
+      ? globalThis.d3.geoRotation(rotation)
+      : ((point) => point),
+    createPatternTransform: (scale) => {
+      if (!globalThis.DOMMatrix) return null;
+      const matrix = new globalThis.DOMMatrix();
+      matrix.scaleSelf(scale, scale);
+      return matrix;
     },
-    helpers: {
-      clamp,
-      getDashPattern,
-      getSafeBlendMode,
-      getSafeCanvasColor,
-      normalizeTextureMode,
-    },
-    effects: {
-      requestTextureRerender,
-      drawDayNightRuntimePass: (k, options) => getDayNightRuntimeOwner().drawDayNightPass(k, options),
-      recordRenderPerfMetric,
-    },
-    platform: {
-      createCanvas: () => document.createElement("canvas"),
-      createImage: () => new Image(),
-      createGeoRotation: (rotation) => globalThis.d3?.geoRotation
-        ? globalThis.d3.geoRotation(rotation)
-        : ((point) => point),
-      createPatternTransform: (scale) => {
-        if (!globalThis.DOMMatrix) return null;
-        const matrix = new globalThis.DOMMatrix();
-        matrix.scaleSelf(scale, scale);
-        return matrix;
-      },
-    },
-    constants: {
-      paperTextureAssetUrls: PAPER_TEXTURE_ASSET_URLS,
-      paperNoiseTileSize: 192,
-      graticuleSampleDegrees: 2,
-      textureLabelSerifStack: TEXTURE_LABEL_SERIF_STACK,
-    },
-  });
-  return visualEffectsPassOwner;
-}
+  },
+  constants: {
+    paperTextureAssetUrls: PAPER_TEXTURE_ASSET_URLS,
+    paperNoiseTileSize: 192,
+    graticuleSampleDegrees: 2,
+    textureLabelSerifStack: TEXTURE_LABEL_SERIF_STACK,
+  },
+}));
 
 function resolveContextBaseDeferredSnapshot() {
   return {
@@ -3793,44 +3411,38 @@ function resolveContextMarkersDeferredSnapshot() {
   };
 }
 
-function getContextPassOrchestratorOwner() {
-  if (contextPassOrchestratorOwner) {
-    return contextPassOrchestratorOwner;
-  }
-  contextPassOrchestratorOwner = createContextPassOrchestratorOwner({
-    getters: {
-      getDeferContextBasePass: () => runtimeState.deferContextBasePass,
-    },
-    resolvers: {
-      resolveContextBaseDeferredSnapshot,
-      resolveContextMarkersDeferredSnapshot,
-    },
-    helpers: {
-      nowMs,
-    },
-    effects: {
-      beginContextMetricSession,
-      endContextMetricSession,
-      collectContextMetric,
-      recordRenderPerfMetric,
-      recordDeferredRiversLayerMetric,
-      drawPhysicalContourLayer,
-      drawUrbanLayer,
-      drawRiversLayer,
-      drawRoadsLayer: (k, options) => getTransportOverviewRenderOwner().drawRoadsLayer(k, options),
-      drawRailwaysLayer: (k, options) =>
-        getTransportOverviewRenderOwner().drawRailwaysLayer(k, options),
-      drawAirportsLayer: (k, options) =>
-        getTransportOverviewRenderOwner().drawAirportsLayer(k, options),
-      drawPortsLayer: (k, options) => getTransportOverviewRenderOwner().drawPortsLayer(k, options),
-      drawStrategicResourceMarkersLayer,
-      drawCityPointsLayer,
-      drawScenarioRegionOverlaysPass,
-      drawScenarioReliefOverlaysPass,
-    },
-  });
-  return contextPassOrchestratorOwner;
-}
+const getContextPassOrchestratorOwner = lazyOwner(() => createContextPassOrchestratorOwner({
+  getters: {
+    getDeferContextBasePass: () => runtimeState.deferContextBasePass,
+  },
+  resolvers: {
+    resolveContextBaseDeferredSnapshot,
+    resolveContextMarkersDeferredSnapshot,
+  },
+  helpers: {
+    nowMs,
+  },
+  effects: {
+    beginContextMetricSession,
+    endContextMetricSession,
+    collectContextMetric,
+    recordRenderPerfMetric,
+    recordDeferredRiversLayerMetric,
+    drawPhysicalContourLayer,
+    drawUrbanLayer,
+    drawRiversLayer,
+    drawRoadsLayer: (k, options) => getTransportOverviewRenderOwner().drawRoadsLayer(k, options),
+    drawRailwaysLayer: (k, options) =>
+      getTransportOverviewRenderOwner().drawRailwaysLayer(k, options),
+    drawAirportsLayer: (k, options) =>
+      getTransportOverviewRenderOwner().drawAirportsLayer(k, options),
+    drawPortsLayer: (k, options) => getTransportOverviewRenderOwner().drawPortsLayer(k, options),
+    drawStrategicResourceMarkersLayer,
+    drawCityPointsLayer,
+    drawScenarioRegionOverlaysPass,
+    drawScenarioReliefOverlaysPass,
+  },
+}));
 
 function getPoliticalIdRasterEligibilityReason() {
   return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId }).requested, exporting: exportRenderInProgress,
@@ -4267,252 +3879,237 @@ function getPoliticalBackgroundRenderOwner() {
   return politicalBackgroundRenderOwner;
 }
 
-function getPoliticalPartialRepaintOwner() {
-  if (politicalPartialRepaintOwner) return politicalPartialRepaintOwner;
-  politicalPartialRepaintOwner = createPoliticalPartialRepaintOwner({
-    surface: rendererSurfaceHost,
-    getters: {
-      drawWorkerPoliticalFine: () => hasVisibleRiverPartitions() ? null : getGeometryRasterRuntimeOwner().drawPolitical(),
-      hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
-      isPoliticalIdRasterSelected,
-      hasNativePoliticalIdRasterFrame: () => politicalIdRasterRuntimeOwner?.hasNativeFrame() === true,
-      getRuntimeState: () => runtimeState,
-      getDebugMode: () => debugMode,
-      getDefaultTransform: () => runtimeState.zoomTransform || globalThis.d3?.zoomIdentity,
-      getRenderPassCacheState,
+const getPoliticalPartialRepaintOwner = lazyOwner(() => createPoliticalPartialRepaintOwner({
+  surface: rendererSurfaceHost,
+  getters: {
+    drawWorkerPoliticalFine: () => hasVisibleRiverPartitions() ? null : getGeometryRasterRuntimeOwner().drawPolitical(),
+    hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
+    isPoliticalIdRasterSelected,
+    hasNativePoliticalIdRasterFrame: () => politicalIdRasterRuntimeOwner?.hasNativeFrame() === true,
+    getRuntimeState: () => runtimeState,
+    getDebugMode: () => debugMode,
+    getDefaultTransform: () => runtimeState.zoomTransform || globalThis.d3?.zoomIdentity,
+    getRenderPassCacheState,
+  },
+  helpers: {
+    nowMs,
+    getFeatureId,
+    isAtlantropaSeaFeature,
+    getAtlantropaSeaPoliticalFillColor,
+    getAtlantropaSeaPoliticalStrokeColor,
+    getSafeCanvasColor,
+    getResolvedFeatureColor,
+    hashToColor,
+    buildWorkerPixelRingsForGeometry,
+    projectCoordinateToWorkerPixel,
+    orderPoliticalShellUnderlayFirst,
+    shouldExcludePoliticalVisualFeature,
+    shouldSkipFeature,
+    pathBoundsInScreen,
+    getPoliticalFeaturePathEntry,
+    isPoliticalFeaturePathEntryCurrent,
+    rectsIntersect,
+    getRetainedPoliticalBackgroundPathHandle: (transform) => getPoliticalBackgroundRenderOwner().getRetainedPoliticalBackgroundPathHandle(transform),
+    screenRectToProjectedRect,
+    collectLandSpatialItemsForProjectedRects,
+    getFeatureScreenBounds,
+    getRenderPassLayout,
+    getPassReferenceTransform,
+    areZoomTransformsEquivalent,
+    hasPassFullReferenceTransform,
+    getPassFullReferenceTransform,
+    getPoliticalPassFineBaselineMismatch,
+    getCachedPoliticalPassStaticSignature,
+    getPoliticalPathCacheHandle,
+    getVisibleFrameIdentity,
+    createPoliticalRasterWorkerIdentity,
+    getLogicalCanvasDimensions,
+    getRenderPassSignature,
+    getPoliticalPassViewportOverscanPx,
+    collectVisibleLandSpatialItemsWithStats,
+    cloneZoomTransform,
+    getTransformBucketSignature,
+    getIslandNeighborGraph,
+    ensurePoliticalRasterWorkerMetrics: () => ensurePoliticalRasterWorkerMetrics(globalThis),
+  },
+  effects: {
+    incrementPerfCounter,
+    recordRenderPerfMetric,
+    drawPoliticalBackgroundFillsForEntries,
+    withRenderTarget,
+    clearPendingPoliticalColorEdit,
+    setPassReferenceTransform,
+    recordPassTiming,
+    drawPartitionForParent: (feature, k) => getRiverPaintRenderOwner().draw(k, getFeatureId(feature)),
+    onPartialRepaint: () => {
+      getPoliticalPassOrchestratorOwner().noteNativePartialRepaint();
+      if (isPoliticalIdRasterSelected()) politicalIdRasterRuntimeOwner?.noteNativePartialRepaint();
     },
-    helpers: {
-      nowMs,
-      getFeatureId,
-      isAtlantropaSeaFeature,
-      getAtlantropaSeaPoliticalFillColor,
-      getAtlantropaSeaPoliticalStrokeColor,
-      getSafeCanvasColor,
-      getResolvedFeatureColor,
-      hashToColor,
-      buildWorkerPixelRingsForGeometry,
-      projectCoordinateToWorkerPixel,
-      orderPoliticalShellUnderlayFirst,
-      shouldExcludePoliticalVisualFeature,
-      shouldSkipFeature,
-      pathBoundsInScreen,
-      getPoliticalFeaturePathEntry,
-      isPoliticalFeaturePathEntryCurrent,
-      rectsIntersect,
-      getRetainedPoliticalBackgroundPathHandle: (transform) => getPoliticalBackgroundRenderOwner().getRetainedPoliticalBackgroundPathHandle(transform),
-      screenRectToProjectedRect,
-      collectLandSpatialItemsForProjectedRects,
-      getFeatureScreenBounds,
-      getRenderPassLayout,
-      getPassReferenceTransform,
-      areZoomTransformsEquivalent,
-      hasPassFullReferenceTransform,
-      getPassFullReferenceTransform,
-      getPoliticalPassFineBaselineMismatch,
-      getCachedPoliticalPassStaticSignature,
-      getPoliticalPathCacheHandle,
-      getVisibleFrameIdentity,
-      createPoliticalRasterWorkerIdentity,
-      getLogicalCanvasDimensions,
-      getRenderPassSignature,
-      getPoliticalPassViewportOverscanPx,
-      collectVisibleLandSpatialItemsWithStats,
-      cloneZoomTransform,
-      getTransformBucketSignature,
-      getIslandNeighborGraph,
-      ensurePoliticalRasterWorkerMetrics: () => ensurePoliticalRasterWorkerMetrics(globalThis),
+    commitPoliticalPassDiagnostics: (politicalPassDiagnostics) => {
+      renderDiag.politicalPass = politicalPassDiagnostics;
+      publishRenderDiagnostics();
     },
-    effects: {
-      incrementPerfCounter,
-      recordRenderPerfMetric,
-      drawPoliticalBackgroundFillsForEntries,
-      withRenderTarget,
-      clearPendingPoliticalColorEdit,
-      setPassReferenceTransform,
-      recordPassTiming,
-      drawPartitionForParent: (feature, k) => getRiverPaintRenderOwner().draw(k, getFeatureId(feature)),
-      onPartialRepaint: () => {
-        getPoliticalPassOrchestratorOwner().noteNativePartialRepaint();
-        if (isPoliticalIdRasterSelected()) politicalIdRasterRuntimeOwner?.noteNativePartialRepaint();
-      },
-      commitPoliticalPassDiagnostics: (politicalPassDiagnostics) => {
-        renderDiag.politicalPass = politicalPassDiagnostics;
-        publishRenderDiagnostics();
-      },
-      requestPoliticalRasterWorkerPass,
-      onAcceptedBitmapResult: () => {
-        invalidateRenderPasses("political", "political-raster-worker-bitmap-ready");
-        requestRendererRender("political-raster-worker-bitmap-ready", {
-          flush: false,
-          fallback: () => render(),
-        });
-      },
+    requestPoliticalRasterWorkerPass,
+    onAcceptedBitmapResult: () => {
+      invalidateRenderPasses("political", "political-raster-worker-bitmap-ready");
+      requestRendererRender("political-raster-worker-bitmap-ready", {
+        flush: false,
+        fallback: () => render(),
+      });
     },
-    constants: {
-      renderPhaseIdle: RENDER_PHASE_IDLE,
-      landFillColor: LAND_FILL_COLOR,
-      partialFeatureThreshold: POLITICAL_PARTIAL_REPAINT_FEATURE_THRESHOLD,
-      partialCandidateThreshold: POLITICAL_PARTIAL_REPAINT_CANDIDATE_THRESHOLD,
-      partialViewportCoverageMax: POLITICAL_PARTIAL_REPAINT_VIEWPORT_COVERAGE_MAX,
-      partialSyncBuildCandidateMax: POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_CANDIDATE_MAX,
-      partialSyncBuildMissMax: POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_MISS_MAX,
-      partialPaddingPx: POLITICAL_PARTIAL_REPAINT_PAD_PX,
-    },
-  });
-  return politicalPartialRepaintOwner;
-}
+  },
+  constants: {
+    renderPhaseIdle: RENDER_PHASE_IDLE,
+    landFillColor: LAND_FILL_COLOR,
+    partialFeatureThreshold: POLITICAL_PARTIAL_REPAINT_FEATURE_THRESHOLD,
+    partialCandidateThreshold: POLITICAL_PARTIAL_REPAINT_CANDIDATE_THRESHOLD,
+    partialViewportCoverageMax: POLITICAL_PARTIAL_REPAINT_VIEWPORT_COVERAGE_MAX,
+    partialSyncBuildCandidateMax: POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_CANDIDATE_MAX,
+    partialSyncBuildMissMax: POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_MISS_MAX,
+    partialPaddingPx: POLITICAL_PARTIAL_REPAINT_PAD_PX,
+  },
+}));
 
-function getRenderPipelinePassesOwner() {
-  if (renderPipelinePassesOwner) {
-    return renderPipelinePassesOwner;
-  }
-  renderPipelinePassesOwner = createRenderPipelinePassesOwner({
-    state,
-    drawPasses: {
-      drawBackgroundPass,
-      drawPhysicalBasePass,
-      drawPoliticalPass,
-      drawPopulationHeatmapPass,
-      drawContextBasePass,
-      drawContextScenarioPass,
-      drawEffectsPass,
-      drawLineEffectsPass,
-      drawDayNightPass,
-      drawBordersPass,
-      drawContextMarkersPass,
-      drawTextureLabelEffectsPass,
-      drawLabelsPass,
+const getRenderPipelinePassesOwner = lazyOwner(() => createRenderPipelinePassesOwner({
+  state,
+  drawPasses: {
+    drawBackgroundPass,
+    drawPhysicalBasePass,
+    drawPoliticalPass,
+    drawPopulationHeatmapPass,
+    drawContextBasePass,
+    drawContextScenarioPass,
+    drawEffectsPass,
+    drawLineEffectsPass,
+    drawDayNightPass,
+    drawBordersPass,
+    drawContextMarkersPass,
+    drawTextureLabelEffectsPass,
+    drawLabelsPass,
+  },
+  helpers: {
+    detectContextScenarioReasonMismatch,
+    getContextBaseReuseDecision,
+    getContextScenarioReuseDecision,
+    getExactAfterSettleControllerState,
+    getPassReferenceTransform,
+    setPassReferenceTransform,
+    getPassCoverage: (passName, transform) => getCachedPassCompositorOwner().getPassCoverage(passName, transform),
+    prepareRenderPassAsync: (passName) => {
+      if (passName === "political") {
+        if (!exportRenderInProgress && isTnoRasterSceneSelected()) return getPoliticalIdRasterRuntimeOwner().prepareSource();
+        return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
+      }
+      if (passName === "physicalBase") return preparePhysicalCanvasPass();
+      if (passName === "labels") return prepareLabelsPass();
+      if (passName === "contextMarkers") return prepareCityPointsPass();
+      if (passName === "borders") return prepareBorderCanvasPass();
+      if (passName === "contextScenario" && !exportRenderInProgress) {
+        if (isTnoRasterSceneSelected()) return !getScenarioRegionOverlayRenderOwner().prepareScenarioWaterLayer();
+        return !getScenarioRegionOverlayRenderOwner().prepareVisibleWaterPaths();
+      }
+      return null;
     },
-    helpers: {
-      detectContextScenarioReasonMismatch,
-      getContextBaseReuseDecision,
-      getContextScenarioReuseDecision,
-      getExactAfterSettleControllerState,
-      getPassReferenceTransform,
-      setPassReferenceTransform,
-      getPassCoverage: (passName, transform) => getCachedPassCompositorOwner().getPassCoverage(passName, transform),
-      prepareRenderPassAsync: (passName) => {
-        if (passName === "political") {
-          if (!exportRenderInProgress && isTnoRasterSceneSelected()) return getPoliticalIdRasterRuntimeOwner().prepareSource();
-          return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
-        }
-        if (passName === "physicalBase") return preparePhysicalCanvasPass();
-        if (passName === "labels") return prepareLabelsPass();
-        if (passName === "contextMarkers") return prepareCityPointsPass();
-        if (passName === "borders") return prepareBorderCanvasPass();
-        if (passName === "contextScenario" && !exportRenderInProgress) {
-          if (isTnoRasterSceneSelected()) return !getScenarioRegionOverlayRenderOwner().prepareScenarioWaterLayer();
-          return !getScenarioRegionOverlayRenderOwner().prepareVisibleWaterPaths();
-        }
-        return null;
-      },
-      canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted
-        && isBootInteractionReady() && (!hasPendingPoliticalColorEdit() || tnoRasterSceneOwner?.isActive()),
-      nowMs,
-      // The active render boundary still coalesces requests until its finally
-      // block. Queue after that boundary closes so the next slice is not lost.
-      requestRenderContinuation: (reason) => queueMicrotask(() => requestRendererRender(reason)),
-      rebuildResolvedColors,
-      getRenderPassCacheState,
-      getRenderPassSignature,
-      getActiveRenderPassNames,
-      incrementPerfCounter,
-      recordRenderPerfMetric,
-      renderPassToCache,
-      shouldEnableContextBaseTransformReuse,
-      shouldEnableContextScenarioTransformReuse,
-      shouldStartExactAfterSettleFastPath,
-      tryPartialPoliticalPassRepaint,
-    },
-  });
-  return renderPipelinePassesOwner;
-}
+    canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted
+      && isBootInteractionReady() && (!hasPendingPoliticalColorEdit() || tnoRasterSceneOwner?.isActive()),
+    nowMs,
+    // The active render boundary still coalesces requests until its finally
+    // block. Queue after that boundary closes so the next slice is not lost.
+    requestRenderContinuation: (reason) => queueMicrotask(() => requestRendererRender(reason)),
+    rebuildResolvedColors,
+    getRenderPassCacheState,
+    getRenderPassSignature,
+    getActiveRenderPassNames,
+    incrementPerfCounter,
+    recordRenderPerfMetric,
+    renderPassToCache,
+    shouldEnableContextBaseTransformReuse,
+    shouldEnableContextScenarioTransformReuse,
+    shouldStartExactAfterSettleFastPath,
+    tryPartialPoliticalPassRepaint,
+  },
+}));
 
-function getDrawCanvasOrchestrationOwner() {
-  if (drawCanvasOrchestrationOwner) return drawCanvasOrchestrationOwner;
-
-  drawCanvasOrchestrationOwner = createDrawCanvasOrchestrationOwner({
-    constants: {
-      renderPhaseIdle: RENDER_PHASE_IDLE,
-      renderPhaseInteracting: RENDER_PHASE_INTERACTING,
-      renderPhaseSettling: RENDER_PHASE_SETTLING,
+const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestrationOwner({
+  constants: {
+    renderPhaseIdle: RENDER_PHASE_IDLE,
+    renderPhaseInteracting: RENDER_PHASE_INTERACTING,
+    renderPhaseSettling: RENDER_PHASE_SETTLING,
+  },
+  getters: {
+    isFrameSurfaceReady: () => Boolean(rendererSurfaceHost.getContext() && rendererSurfaceHost.getPathCanvas()),
+    getRenderPhase: () => runtimeState.renderPhase,
+    getDeferExactAfterSettle: () => runtimeState.deferExactAfterSettle,
+    getFirstVisibleFramePainted: () => runtimeState.firstVisibleFramePainted,
+    getEffectiveZoomTransform: () => runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
+    getRawZoomTransform: () => runtimeState.zoomTransform,
+    getActiveScenarioId: () => runtimeState.activeScenarioId,
+    getActiveRenderPassNames,
+    nowMs,
+  },
+  effects: {
+    beforeFrame: reconcileRenderFrameResources,
+    afterFrame: () => {
+      getRenderCacheOwner().syncSurfaceResourceAccounting();
+      syncVisibleSurfaceResourceAccounting();
     },
-    getters: {
-      isFrameSurfaceReady: () => Boolean(rendererSurfaceHost.getContext() && rendererSurfaceHost.getPathCanvas()),
-      getRenderPhase: () => runtimeState.renderPhase,
-      getDeferExactAfterSettle: () => runtimeState.deferExactAfterSettle,
-      getFirstVisibleFramePainted: () => runtimeState.firstVisibleFramePainted,
-      getEffectiveZoomTransform: () => runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
-      getRawZoomTransform: () => runtimeState.zoomTransform,
-      getActiveScenarioId: () => runtimeState.activeScenarioId,
-      getActiveRenderPassNames,
-      nowMs,
+    ensureLayerDataFromTopology: () => {
+      ensureLayerDataFromTopology();
+      // Cached viewport frames also need to select the current contour pack.
+      if (runtimeState.renderPhase !== RENDER_PHASE_INTERACTING
+        && !runtimeState.bootBlocking && !runtimeState.startupReadonly && !runtimeState.scenarioApplyInFlight) {
+        ensureContourLodForView();
+        ensurePhysicalAtlasDetailForView();
+      }
     },
-    effects: {
-      beforeFrame: reconcileRenderFrameResources,
-      afterFrame: () => {
-        getRenderCacheOwner().syncSurfaceResourceAccounting();
-        syncVisibleSurfaceResourceAccounting();
-      },
-      ensureLayerDataFromTopology: () => {
-        ensureLayerDataFromTopology();
-        // Cached viewport frames also need to select the current contour pack.
-        if (runtimeState.renderPhase !== RENDER_PHASE_INTERACTING
-          && !runtimeState.bootBlocking && !runtimeState.startupReadonly && !runtimeState.scenarioApplyInFlight) {
-          ensureContourLodForView();
-          ensurePhysicalAtlasDetailForView();
-        }
-      },
-      prepareAsyncFrame: () => navigationExactRefreshNeeded
-        ? !!getGeometryRasterRuntimeOwner().preparePolitical({ force: true })
-        : getGeometryRasterRuntimeOwner().prepareFrame(),
-      requiresExactFrame: () => navigationExactRefreshNeeded,
-      isScenePublicationPending: () => !!tnoRasterSceneOwner?.getDiagnostics().publicationPending,
-      withValidatedCache: (callback) => getRenderCacheOwner().withValidatedCache(callback),
-      incrementPerfCounter,
-      clearPoliticalPatchOverlayIfStale,
-      cancelPoliticalPathWarmup,
-      promoteDeferredColorRenderToIdle,
-      drawTransformedFrameFromCaches,
-      drawLastGoodFrameFallback,
-      drawOverviewFrameFallback,
-      drawNavigationFrame: (transform) => {
-        const drawn = !exportRenderInProgress && (isTnoRasterSceneSelected()
-          ? !!tnoRasterSceneOwner?.present(transform, { refresh: false })
-          : !!navigationSceneOwner?.draw(transform));
-        navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
-          && !exportRenderInProgress;
-        return drawn;
-      },
-      noteMissingVisibleFrameSkippedDuringInteraction,
-      drawBaseVisibleFrameFallback,
-      resetContextBreakdownForExactFrame,
-      composeCachedPasses,
-      abortPendingExactAfterSettleRefreshAfterPaint,
-      markFirstVisibleFramePainted,
-      captureLastGoodFrame,
-      recordRenderPerfMetric,
-      finalizePendingExactAfterSettleRefreshAfterPaint,
-      ensureIdleRenderPasses: (frameTimings, activeRenderPassNames) => {
-        return getRenderPipelinePassesOwner().ensureIdleRenderPasses(frameTimings, activeRenderPassNames);
-      },
-      commitLastFrame: ({ phase, totalMs, timings, transform, frameMode, presented = true }) => {
-        const cache = getRenderPassCacheState();
-        cache.lastFrame = {
-          phase,
-          totalMs,
-          timings,
-          frameMode,
-          presented,
-          targetTransform: cloneZoomTransform(transform),
-          transform: presented ? cloneZoomTransform(transform) : cache.lastFrame?.transform,
-        };
-        if (presented) getRendererViewportUpdateOwner().applyViewportTransform(transform);
-      },
+    prepareAsyncFrame: () => navigationExactRefreshNeeded
+      ? !!getGeometryRasterRuntimeOwner().preparePolitical({ force: true })
+      : getGeometryRasterRuntimeOwner().prepareFrame(),
+    requiresExactFrame: () => navigationExactRefreshNeeded,
+    isScenePublicationPending: () => !!tnoRasterSceneOwner?.getDiagnostics().publicationPending,
+    withValidatedCache: (callback) => getRenderCacheOwner().withValidatedCache(callback),
+    incrementPerfCounter,
+    clearPoliticalPatchOverlayIfStale,
+    cancelPoliticalPathWarmup,
+    promoteDeferredColorRenderToIdle,
+    drawTransformedFrameFromCaches,
+    drawLastGoodFrameFallback,
+    drawOverviewFrameFallback,
+    drawNavigationFrame: (transform) => {
+      const drawn = !exportRenderInProgress && (isTnoRasterSceneSelected()
+        ? !!tnoRasterSceneOwner?.present(transform, { refresh: false })
+        : !!navigationSceneOwner?.draw(transform));
+      navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
+        && !exportRenderInProgress;
+      return drawn;
     },
-  });
-  return drawCanvasOrchestrationOwner;
-}
+    noteMissingVisibleFrameSkippedDuringInteraction,
+    drawBaseVisibleFrameFallback,
+    resetContextBreakdownForExactFrame,
+    composeCachedPasses,
+    abortPendingExactAfterSettleRefreshAfterPaint,
+    markFirstVisibleFramePainted,
+    captureLastGoodFrame,
+    recordRenderPerfMetric,
+    finalizePendingExactAfterSettleRefreshAfterPaint,
+    ensureIdleRenderPasses: (frameTimings, activeRenderPassNames) => {
+      return getRenderPipelinePassesOwner().ensureIdleRenderPasses(frameTimings, activeRenderPassNames);
+    },
+    commitLastFrame: ({ phase, totalMs, timings, transform, frameMode, presented = true }) => {
+      const cache = getRenderPassCacheState();
+      cache.lastFrame = {
+        phase,
+        totalMs,
+        timings,
+        frameMode,
+        presented,
+        targetTransform: cloneZoomTransform(transform),
+        transform: presented ? cloneZoomTransform(transform) : cache.lastFrame?.transform,
+      };
+      if (presented) getRendererViewportUpdateOwner().applyViewportTransform(transform);
+    },
+  },
+}));
 
 // --- 注释锚点：缓存状态（cache state）章节 ---
 // --- 注释锚点：pass-through facade 章节 ---
@@ -4546,7 +4143,6 @@ let pendingScenarioChunkFlushAfterExactHandle = null;
 let staticBorderMeshLifecycle = null;
 let deferredContextBaseEnhancementHandle = null;
 let scenarioRefreshRuntime = null;
-let exactAfterSettleScheduler = null;
 let deferContextBaseEnhancements = false;
 let detailAdmMeshBuildState = {
   signature: "",
@@ -4592,78 +4188,72 @@ function getRenderPassCacheState() {
   return getRenderCacheOwner().getRenderPassCacheState();
 }
 
-function getStrategicOverlayRuntimeOwner() {
-  if (strategicOverlayRuntimeOwner) {
-    return strategicOverlayRuntimeOwner;
-  }
-  strategicOverlayRuntimeOwner = createStrategicOverlayRuntimeOwner({
-    state,
-    constants: {
-      defaultOperationGraphicKind: DEFAULT_OPERATION_GRAPHIC_KIND,
-      defaultOperationalLineKind: DEFAULT_OPERATIONAL_LINE_KIND,
-      defaultSpecialZoneType: DEFAULT_SPECIAL_ZONE_TYPE,
-      defaultCounterAttachmentKind: STRATEGIC_COUNTER_ATTACHMENT_KIND,
-      defaultHitSnapRadiusClickPx: HIT_SNAP_RADIUS_CLICK_PX,
-      defaultUnitCounterEquipmentPct: DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
-      defaultUnitCounterMilstdSidc: DEFAULT_MILSTD_SIDC,
-      defaultUnitCounterOrganizationPct: DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
-      defaultUnitCounterPresetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
-      defaultUnitCounterRenderer: DEFAULT_UNIT_COUNTER_RENDERER,
+const getStrategicOverlayRuntimeOwner = lazyOwner(() => createStrategicOverlayRuntimeOwner({
+  state,
+  constants: {
+    defaultOperationGraphicKind: DEFAULT_OPERATION_GRAPHIC_KIND,
+    defaultOperationalLineKind: DEFAULT_OPERATIONAL_LINE_KIND,
+    defaultSpecialZoneType: DEFAULT_SPECIAL_ZONE_TYPE,
+    defaultCounterAttachmentKind: STRATEGIC_COUNTER_ATTACHMENT_KIND,
+    defaultHitSnapRadiusClickPx: HIT_SNAP_RADIUS_CLICK_PX,
+    defaultUnitCounterEquipmentPct: DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
+    defaultUnitCounterMilstdSidc: DEFAULT_MILSTD_SIDC,
+    defaultUnitCounterOrganizationPct: DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
+    defaultUnitCounterPresetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
+    defaultUnitCounterRenderer: DEFAULT_UNIT_COUNTER_RENDERER,
+  },
+  helpers: {
+    assignUnitCounterEditorFromCounter,
+    canonicalCountryCode,
+    captureHistoryState,
+    commitHistoryEntry,
+    ensureManualSpecialZoneCounter,
+    ensureOperationGraphicCounter,
+    ensureOperationGraphicsEditorState,
+    ensureOperationalLineCounter,
+    ensureOperationalLineEditorState,
+    ensureSpecialZoneEditorState,
+    ensureUnitCounterCounter,
+    ensureUnitCounterEditorState,
+    getDisplayOwnerCode,
+    getFeatureOwnerCode,
+    getHitFromEvent,
+    getMapLonLatFromEvent,
+    getManualSpecialZoneFeatures,
+    getNormalizedUnitCounterCombatState,
+    getOperationGraphicById,
+    getOperationGraphicMinPoints,
+    getOperationalLineById,
+    getOperationalLineMinPoints,
+    getUnitCounterCardModel,
+    getUnitCounterPresetById,
+    markDirty,
+    normalizeOperationGraphicOpacity,
+    normalizeOperationGraphicStroke,
+    normalizeOperationGraphicStylePreset,
+    normalizeOperationGraphicWidth,
+    normalizeOperationalLineStylePreset,
+    normalizeSpecialZoneLayersState,
+    normalizeUnitCounterBaseFillColor,
+    normalizeUnitCounterNationSource,
+    normalizeUnitCounterSizeToken,
+    normalizeUnitCounterStatPercent,
+    normalizeUnitCounterStatsPresetId,
+    refreshSpecialZonesWorkbenchUi,
+    renderNow: () => {
+      if (rendererSurfaceHost.getContext()) render();
     },
-    helpers: {
-      assignUnitCounterEditorFromCounter,
-      canonicalCountryCode,
-      captureHistoryState,
-      commitHistoryEntry,
-      ensureManualSpecialZoneCounter,
-      ensureOperationGraphicCounter,
-      ensureOperationGraphicsEditorState,
-      ensureOperationalLineCounter,
-      ensureOperationalLineEditorState,
-      ensureSpecialZoneEditorState,
-      ensureUnitCounterCounter,
-      ensureUnitCounterEditorState,
-      getDisplayOwnerCode,
-      getFeatureOwnerCode,
-      getHitFromEvent,
-      getMapLonLatFromEvent,
-      getManualSpecialZoneFeatures,
-      getNormalizedUnitCounterCombatState,
-      getOperationGraphicById,
-      getOperationGraphicMinPoints,
-      getOperationalLineById,
-      getOperationalLineMinPoints,
-      getUnitCounterCardModel,
-      getUnitCounterPresetById,
-      markDirty,
-      normalizeOperationGraphicOpacity,
-      normalizeOperationGraphicStroke,
-      normalizeOperationGraphicStylePreset,
-      normalizeOperationGraphicWidth,
-      normalizeOperationalLineStylePreset,
-      normalizeSpecialZoneLayersState,
-      normalizeUnitCounterBaseFillColor,
-      normalizeUnitCounterNationSource,
-      normalizeUnitCounterSizeToken,
-      normalizeUnitCounterStatPercent,
-      normalizeUnitCounterStatsPresetId,
-      refreshSpecialZonesWorkbenchUi,
-      renderNow: () => {
-        if (rendererSurfaceHost.getContext()) render();
-      },
-      renderOperationGraphicsIfNeeded,
-      renderSpecialZonesIfNeeded,
-      renderSpecialZoneEditorOverlay,
-      resetUnitCounterEditorState,
-      showToast,
-      t,
-      updateSpecialZoneEditorUI,
-      updateSpecialZoneLayerMembership,
-      updateStrategicOverlayUi,
-    },
-  });
-  return strategicOverlayRuntimeOwner;
-}
+    renderOperationGraphicsIfNeeded,
+    renderSpecialZonesIfNeeded,
+    renderSpecialZoneEditorOverlay,
+    resetUnitCounterEditorState,
+    showToast,
+    t,
+    updateSpecialZoneEditorUI,
+    updateSpecialZoneLayerMembership,
+    updateStrategicOverlayUi,
+  },
+}));
 
 function getUrbanLayerCapability(...args) {
   return getContextLayerResolverOwner().getUrbanLayerCapability(...args);
@@ -4733,25 +4323,21 @@ function resetProjectedBoundsCacheState() {
   resetProjectedBoundsRuntimeCacheState(state);
 }
 
-function getRenderPerfMetricsRuntimeOwner() {
-  if (renderPerfMetricsRuntimeOwner) return renderPerfMetricsRuntimeOwner;
-  renderPerfMetricsRuntimeOwner = createRenderPerfMetricsRuntimeOwner({
-    constants: { contextBreakdownMetricNames: CONTEXT_BREAKDOWN_METRIC_NAMES },
-    getters: {
-      getRenderPerfContextBreakdownSnapshot: () => (
-        captureRenderPerfContextBreakdownState(runtimeState)
-      ),
-      getRenderPerfMetricSequence: () => runtimeState.renderPerfMetricSequence,
-      nowMs: () => Date.now(),
-    },
-    effects: {
-      ensureRenderPerfMetricsState: () => ensureRenderPerfMetricsState(runtimeState),
-      commitRenderPerfMetricState: (payload) => commitRenderPerfMetricState(runtimeState, payload),
-      setRenderPerfContextBreakdownState: (breakdown) => setRenderPerfContextBreakdownState(runtimeState, breakdown),
-    },
-  });
-  return renderPerfMetricsRuntimeOwner;
-}
+const getRenderPerfMetricsRuntimeOwner = lazyOwner(() => createRenderPerfMetricsRuntimeOwner({
+  constants: { contextBreakdownMetricNames: CONTEXT_BREAKDOWN_METRIC_NAMES },
+  getters: {
+    getRenderPerfContextBreakdownSnapshot: () => (
+      captureRenderPerfContextBreakdownState(runtimeState)
+    ),
+    getRenderPerfMetricSequence: () => runtimeState.renderPerfMetricSequence,
+    nowMs: () => Date.now(),
+  },
+  effects: {
+    ensureRenderPerfMetricsState: () => ensureRenderPerfMetricsState(runtimeState),
+    commitRenderPerfMetricState: (payload) => commitRenderPerfMetricState(runtimeState, payload),
+    setRenderPerfContextBreakdownState: (breakdown) => setRenderPerfContextBreakdownState(runtimeState, breakdown),
+  },
+}));
 
 function recordRenderPerfMetric(name, durationMs, details = {}) { return getRenderPerfMetricsRuntimeOwner().recordRenderPerfMetric(name, durationMs, details); }
 
@@ -6770,59 +6356,53 @@ function setDeferContextBaseEnhancements(value) {
   deferContextBaseEnhancements = !!value;
 }
 
-function getExactAfterSettleScheduler() {
-  if (exactAfterSettleScheduler) {
-    return exactAfterSettleScheduler;
-  }
-  exactAfterSettleScheduler = createExactAfterSettleScheduler({
-    runtimeState,
-    renderPassNames: RENDER_PASS_NAMES,
-    renderPhaseIdle: RENDER_PHASE_IDLE,
-    exactContextRefreshDelayMs: DEFERRED_EXACT_CONTEXT_REFRESH_DELAY_MS,
-    getRenderPassSignature,
-    getActiveRenderPassNames,
-    getContext: () => rendererSurfaceHost.getContext(),
-    getVisibleContextFlagSignature,
-    cloneZoomTransform,
-    getAdaptiveSettleProfile,
-    getContextBaseReuseDecision,
-    shouldForceExactContextBaseRefresh,
-    updateDprStage,
-    setCanvasSize,
-    cancelDeferredContextBaseEnhancement,
-    setDeferContextBaseEnhancements,
-    shouldDeferContextBaseEnhancementsForExactRefresh,
-    scheduleDeferredContextBaseEnhancements,
-    getRenderPassCacheState,
-    getRenderPipelinePassesOwner,
-    prepareRenderPassAsync: (passName) => {
-      if (passName === "political") {
-          if (!exportRenderInProgress && isTnoRasterSceneSelected()) return getPoliticalIdRasterRuntimeOwner().prepareSource();
-          return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
-        }
-      if (passName === "physicalBase") return preparePhysicalCanvasPass();
-      if (passName === "labels") return prepareLabelsPass();
-      if (passName === "contextMarkers") return prepareCityPointsPass();
-        if (passName === "borders") return prepareBorderCanvasPass();
-      if (passName === "contextScenario" && !exportRenderInProgress && isTnoRasterSceneSelected()) {
-        return !getScenarioRegionOverlayRenderOwner().prepareScenarioWaterLayer();
+const getExactAfterSettleScheduler = lazyOwner(() => createExactAfterSettleScheduler({
+  runtimeState,
+  renderPassNames: RENDER_PASS_NAMES,
+  renderPhaseIdle: RENDER_PHASE_IDLE,
+  exactContextRefreshDelayMs: DEFERRED_EXACT_CONTEXT_REFRESH_DELAY_MS,
+  getRenderPassSignature,
+  getActiveRenderPassNames,
+  getContext: () => rendererSurfaceHost.getContext(),
+  getVisibleContextFlagSignature,
+  cloneZoomTransform,
+  getAdaptiveSettleProfile,
+  getContextBaseReuseDecision,
+  shouldForceExactContextBaseRefresh,
+  updateDprStage,
+  setCanvasSize,
+  cancelDeferredContextBaseEnhancement,
+  setDeferContextBaseEnhancements,
+  shouldDeferContextBaseEnhancementsForExactRefresh,
+  scheduleDeferredContextBaseEnhancements,
+  getRenderPassCacheState,
+  getRenderPipelinePassesOwner,
+  prepareRenderPassAsync: (passName) => {
+    if (passName === "political") {
+        if (!exportRenderInProgress && isTnoRasterSceneSelected()) return getPoliticalIdRasterRuntimeOwner().prepareSource();
+        return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
       }
-      return null;
-    },
-    getPhysicalExactRefreshPasses,
-    invalidateRenderPasses,
-    requestRendererRender,
-    render,
-    recordRenderPerfMetric,
-    readRenderPerfMetricDuration,
-    nowMs,
-    enqueueFrameTask,
-    scheduleDeferredWork,
-    cancelDeferredWork,
-    flushPendingScenarioChunkRefreshAfterExact,
-  });
-  return exactAfterSettleScheduler;
-}
+    if (passName === "physicalBase") return preparePhysicalCanvasPass();
+    if (passName === "labels") return prepareLabelsPass();
+    if (passName === "contextMarkers") return prepareCityPointsPass();
+      if (passName === "borders") return prepareBorderCanvasPass();
+    if (passName === "contextScenario" && !exportRenderInProgress && isTnoRasterSceneSelected()) {
+      return !getScenarioRegionOverlayRenderOwner().prepareScenarioWaterLayer();
+    }
+    return null;
+  },
+  getPhysicalExactRefreshPasses,
+  invalidateRenderPasses,
+  requestRendererRender,
+  render,
+  recordRenderPerfMetric,
+  readRenderPerfMetricDuration,
+  nowMs,
+  enqueueFrameTask,
+  scheduleDeferredWork,
+  cancelDeferredWork,
+  flushPendingScenarioChunkRefreshAfterExact,
+}));
 
 function getExactAfterSettleControllerState() {
   return getExactAfterSettleScheduler().getExactAfterSettleControllerState();
@@ -12338,15 +11918,9 @@ function getCityTooltipText(entry) {
   return renderTooltipText({ lines: lines.filter(Boolean) });
 }
 
-let cityPaintStyleModel = null;
-function getCityPaintStyleModel() {
-  if (!cityPaintStyleModel) {
-    cityPaintStyleModel = createCityPaintStyleModel(runtimeState, {
-      getResolvedFeatureColor, computeUrbanAdaptivePaintFromHostColor,
-    });
-  }
-  return cityPaintStyleModel;
-}
+const getCityPaintStyleModel = lazyOwner(() => createCityPaintStyleModel(runtimeState, {
+    getResolvedFeatureColor, computeUrbanAdaptivePaintFromHostColor,
+  }));
 
 function getCityLabelRenderStyle(entry, config = {}) {
   return getCityPaintStyleModel().getCityLabelRenderStyle(entry, config);
@@ -14531,28 +14105,22 @@ function getOperationalLineById(id) {
   return (runtimeState.operationalLines || []).find((entry) => String(entry?.id || "") === selectedId) || null;
 }
 
-let operationGraphicsEditorRenderOwner = null;
-function getOperationGraphicsEditorRenderOwner() {
-  if (!operationGraphicsEditorRenderOwner) {
-    operationGraphicsEditorRenderOwner = createOperationGraphicsEditorRenderOwner(runtimeState, {
-      rendererSurfaceHost,
-      ensureOperationGraphicsEditorState,
-      getOperationGraphicById,
-      DEFAULT_OPERATION_GRAPHIC_KIND,
-      normalizeOperationGraphicStylePreset,
-      normalizeOperationGraphicStroke,
-      normalizeOperationGraphicWidth,
-      normalizeOperationGraphicOpacity,
-      getOperationGraphicPreset,
-      createOperationGraphicPath,
-      getProjectedPoint,
-      getStrategicOverlayRuntimeOwner,
-      getMapLonLatFromEvent,
-      getOperationGraphicEditorMidpoints,
-    });
-  }
-  return operationGraphicsEditorRenderOwner;
-}
+const getOperationGraphicsEditorRenderOwner = lazyOwner(() => createOperationGraphicsEditorRenderOwner(runtimeState, {
+    rendererSurfaceHost,
+    ensureOperationGraphicsEditorState,
+    getOperationGraphicById,
+    DEFAULT_OPERATION_GRAPHIC_KIND,
+    normalizeOperationGraphicStylePreset,
+    normalizeOperationGraphicStroke,
+    normalizeOperationGraphicWidth,
+    normalizeOperationGraphicOpacity,
+    getOperationGraphicPreset,
+    createOperationGraphicPath,
+    getProjectedPoint,
+    getStrategicOverlayRuntimeOwner,
+    getMapLonLatFromEvent,
+    getOperationGraphicEditorMidpoints,
+  }));
 
 function getLandFeatureIdFromEvent(event, eventType = "unit-counter-hit") {
   const hit = getHitFromEvent(event, {

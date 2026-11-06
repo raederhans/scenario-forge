@@ -136,7 +136,7 @@ test("an older LOD completion cannot release or replace a newer pending request"
 });
 
 test("cached frame preparation selects LOD during settle while deferring active gestures", () => {
-  const factory = functionNode("getDrawCanvasOrchestrationOwner");
+  const factory = rendererAst.body.find(node => node.type === "VariableDeclaration" && node.declarations.some(entry => entry.id.name === "getDrawCanvasOrchestrationOwner"));
   let callback;
   function visit(node) {
     if (!node || typeof node !== "object") return;
@@ -147,7 +147,6 @@ test("cached frame preparation selects LOD during settle while deferring active 
     }
   }
   visit(factory);
-  assert.equal(callback?.type, "ArrowFunctionExpression");
   const runtime = { renderPhase: "settling" };
   const events = [];
   const prepare = new Function("runtimeState", "ensureLayerDataFromTopology", "ensureContourLodForView", "ensurePhysicalAtlasDetailForView", "RENDER_PHASE_INTERACTING",
