@@ -292,7 +292,7 @@ test("world device-pixel magnification is decided before destination clearing", 
   assert.equal(f.owner.isReady(), true, "quality rejection does not evict the bounded world frame");
 });
 
-test("a sharp detail can replace blurry world pixels only with full target coverage", () => {
+test("sharp partial details retain world pixels underneath uncovered edges", () => {
   const f = fixture();
   f.prepare();
   f.flushAll();
@@ -308,16 +308,24 @@ test("a sharp detail can replace blurry world pixels only with full target cover
   for (const partial of [{ width: 799, height: 600 }, { width: 800, height: 599 }]) {
     assert.equal(f.owner.draw(f.destination, transform, 1, {
       detailSource: partial, detailTransform: transform, detailDpr: 1,
-    }), false);
-    assert.deepEqual(f.destinationCalls, []);
-    assert.equal(f.metrics.at(-1).details.detailQualityOK, true);
-    assert.equal(f.metrics.at(-1).details.detailCoversViewport, false);
+    }), true);
+    assert.deepEqual(f.destinationCalls.filter(([kind]) => kind === "drawImage"), [
+      ["drawImage", f.canvases[0], 0, 0], ["drawImage", partial, 0, 0],
+    ]);
+    assert.equal(f.destinationCalls[3][0], "fillRect");
+    assert.equal(f.metrics.at(-1).details.edgeFilledByWorld, true);
+    f.destinationCalls.length = 0;
   }
   for (const x of [-1, 1]) {
     assert.equal(f.owner.draw(f.destination, { ...transform, x }, 1, {
       detailSource: detail, detailTransform: transform, detailDpr: 1,
-    }), false, "an uncovered edge cannot be filled by low-quality world pixels");
-    assert.deepEqual(f.destinationCalls, []);
+    }), true);
+    assert.deepEqual(f.destinationCalls.filter(([kind]) => kind === "drawImage"), [
+      ["drawImage", f.canvases[0], 0, 0], ["drawImage", detail, 0, 0],
+    ]);
+    assert.deepEqual(f.destinationCalls[6], ["setTransform", 1, 0, 0, 1, x, 0]);
+    assert.equal(f.metrics.at(-1).details.edgeFilledByWorld, true);
+    f.destinationCalls.length = 0;
   }
   assert.equal(f.owner.draw(f.destination, { ...transform, x: -10 }, 1, {
     detailSource: { width: 820, height: 600 }, detailTransform: transform, detailDpr: 1,
