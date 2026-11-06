@@ -361,8 +361,10 @@ test("layer groups follow map order and display moves existing controls", (conte
   h.get("editorLayer-display").click();
   expectProperty(h, "display", "Layers");
   assert.equal(h.get("displayQuality").parentNode, h.get("qualityRow"));
-  assert.equal(h.get("qualityRow").parentNode, h.get("editorProperty-display"));
-  assert.equal(h.get("experiment").parentNode, h.get("editorProperty-display"));
+  // 两块控件放在同一个容器里，再挂到显示与性能属性页下。
+  const displayStack = h.get("qualityRow").parentNode;
+  assert.equal(displayStack.parentNode, h.get("editorProperty-display"));
+  assert.equal(h.get("experiment").parentNode, displayStack);
 });
 
 test("visibility switches dispatch change and synchronize without navigating", (context) => {
