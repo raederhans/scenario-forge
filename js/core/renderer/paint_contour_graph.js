@@ -1448,7 +1448,10 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
             diagnostics.incrementalSubsetFeatureCount = 0; diagnostics.incrementalSubsetEdgeCount = 0;
           } else {
             for (const [id, packed] of polygons) if (!bounds.has(id)) indexBounds(id, packed);
-            lineSides.clear();
+            // A full rebuild re-registers every live edge. Views of slots freed
+            // since the last finish would keep a lineKey no index holds any more,
+            // and a later reuse of the slot would unregister it a second time.
+            edges.dropViews(); lineSides.clear();
             geometry = geometrySegments(edges, diagnostics, precisions, null, registerLine);
             quantizedInput = null;
             quantizedLines.clear(); quantizedOwners.clear();

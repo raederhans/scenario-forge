@@ -381,3 +381,17 @@ test('a coarse feature elsewhere leaves unrelated fine coasts at their exact sou
   equivalent(actual, full.finish(), 'local fine patch beside a distant coarse feature');
   assert.equal(actual.diagnostics.incremental, true);
 });
+
+test('a removal that falls back to a full build leaves freed edge slots safe to reuse', () => {
+  const features = Array.from({ length: 20 }, (_, i) => rect(`r${i}`, i * 2, 0, i * 2 + 1, 1));
+  const builder = createPaintContourGraphBuilder(options(masks[0]));
+  builder.patch(features); builder.finish();
+  builder.patch([], ['r0', 'r1', 'r2', 'r3']);
+  assert.equal(builder.finish().diagnostics.incremental, false);
+  const added = rect('added', 0, 0, 1, 1);
+  builder.patch([added]);
+  const actual = builder.finish(), full = createPaintContourGraphBuilder(options(masks[0]));
+  full.patch([added, ...features.slice(4)]);
+  equivalent(actual, full.finish(), 'slot reuse after a full fallback');
+  assert.equal(actual.diagnostics.incremental, true);
+});
