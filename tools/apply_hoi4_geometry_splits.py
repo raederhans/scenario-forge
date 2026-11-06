@@ -22,6 +22,7 @@ from map_builder.regional_geometry import (
 )
 from tools.rebuild_polar_assets import read, write, refresh_neighbors
 from tools.materialize_polar_scenarios import refresh_scenario
+from tools.rebind_city_hosts import rebind_city_hosts
 from tools.check_scenario_contracts import write_json, _minimal_geo_locale_patch_payload
 
 
@@ -295,6 +296,7 @@ def run_scenario(scenario_dir, rules):
     write_json(scenario_dir / "geo_locale_patch.json", patch)
     write(topology_path, after)
     refresh_scenario(scenario_dir, assignments, removed_ids=list(splits))
+    rebind_city_hosts(scenario_dir)
     return {"changed": len(splits), "measurements": measurements}
 
 
