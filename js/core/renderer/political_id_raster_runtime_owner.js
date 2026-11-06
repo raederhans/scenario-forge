@@ -1205,9 +1205,18 @@ export function createPoliticalIdRasterRuntimeOwner({
     }
     const reduced = createPoliticalIdRasterOverview({ tiles: staged.tiles, plan: next, dpr: state.dpr,
       maxBytes: Math.max(0, cache.maxBytes - cache.getStats().cpuBytes) });
-    if (!reduced) { overviewReason = "cpu-budget"; return; }
+    // An overview of replaced geometry must not survive a failed rebuild: its
+    // stale codes would show wrong colors while dragging.
+    const dropStaleOverview = () => {
+      if (!overviewFrame || staged.committed.rawIdentity?.geometryContentVersion
+        === overviewCommitted?.rawIdentity?.geometryContentVersion) return;
+      overviewFrame.gpu.dispose(); overviewFrame = null; overviewCommitted = null;
+      overviewPalette = null; overviewBaselinePalette = null; overviewEntries = [];
+      account();
+    };
+    if (!reduced) { overviewReason = "cpu-budget"; dropStaleOverview(); return; }
     const overviewGpu = gpu.createOverview({ tiles: reduced.tiles, palette: staged.palette, revision: staged.paletteKey });
-    if (!overviewGpu) { overviewReason = "gpu-budget"; return; }
+    if (!overviewGpu) { overviewReason = "gpu-budget"; dropStaleOverview(); return; }
     overviewFrame = { ...staged.frame, gpu: overviewGpu, plan: reduced.plan, sourceFrame: staged.frame,
       presentationState: "overview", geometryCurrent: false };
     overviewCommitted = staged.committed;

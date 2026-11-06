@@ -1517,6 +1517,7 @@ function overviewColorFixture() {
     createGpu: options => {
       const gpu = gpuFactory.createGpu(options);
       gpu.createOverview = ({ tiles, palette, revision }) => {
+        if (f.overviewFails) return null;
         const child = overviewFactory.createGpu({ onContextLost() {} });
         child.setPalette(palette, revision); child.setTiles(tiles); return child;
       };
@@ -1567,6 +1568,20 @@ test("a same-view republish after a geometry change replaces the overview and it
   assert.equal(f.owner.matchesPublishedColor("detail", { overview: true }), true);
   assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), false);
   assert.deepEqual([...detailed.gpu.palettes.at(-1).bytes.subarray(-4)], [0x4a, 0x63, 0x46, 255]);
+});
+
+test("a failed overview rebuild after a geometry change drops the stale overview", async t => {
+  const f = overviewColorFixture();
+  t.after(() => f.owner.dispose());
+  f.identity.geometryContentVersion = "coarse";
+  f.owner.draw(); await resolveAll(f); f.owner.draw(); f.owner.publishDirectFrame();
+  assert.ok(f.owner.getOverviewFrame());
+  f.overviewFails = true;
+  f.setFeatures([feature("detail", { minX: -160, minY: -160, maxX: -140, maxY: -140 }, "#4a6346")]);
+  f.identity.geometryContentVersion = "detail"; f.identity.version++;
+  f.owner.draw(); await resolveAll(f, "detail"); f.owner.draw(); f.owner.publishDirectFrame();
+  assert.equal(f.owner.getOverviewFrame(), null, "stale codes must not be shown while dragging");
+  assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), false);
 });
 
 for (const [reason, invalidate] of [
