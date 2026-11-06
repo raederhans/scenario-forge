@@ -328,3 +328,18 @@ class ScenarioCapitalRulesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ModernBatchTwoCapitalsTest(unittest.TestCase):
+    def test_modern_seats_and_replay(self):
+        from map_builder.scenario_capital_rules import MODERN_FACTION_CAPITALS
+        tags = ['NCY','SOS','M23','WAS','KOK','ACE','ADJ','NUN','ARK','CHR','KIO']
+        countries = {tag:{} for tag in tags}
+        root = Path(__file__).resolve().parents[1]
+        city_rows = {f['properties']['id']: f['properties'] for f in json.loads((root/'data/world_cities.geojson').read_text())['features']}
+        result = apply_reviewed_capitals({},countries,city_rows,scenario_id='modern_world',strict=True)
+        for tag in tags:
+            self.assertEqual(result['capitals_by_tag'][tag],MODERN_FACTION_CAPITALS[tag][0])
+        self.assertEqual(apply_reviewed_capitals(result,countries,city_rows,scenario_id='modern_world',strict=True),result)
+        blank = apply_reviewed_capitals({},countries,city_rows,scenario_id='blank_base')
+        self.assertFalse(set(tags).intersection(blank['capitals_by_tag']))

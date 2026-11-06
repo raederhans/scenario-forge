@@ -849,6 +849,48 @@
       "synthetic_owner": false,
       "tag": "ABK"
     },
+    "ACE": {
+      "base_iso2": "ID",
+      "capital_state_id": null,
+      "color_hex": "#585bb1",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Aceh Special Region",
+      "display_name_en": "Aceh Special Region",
+      "display_name_zh": "亚齐特别地区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ID",
+      "notes": "",
+      "parent_owner_tag": "ID",
+      "parent_owner_tags": [
+        "ID"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ace",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ace"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "ACE"
+    },
     "AD": {
       "base_iso2": "AD",
       "capital_state_id": null,
@@ -882,6 +924,48 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "AD"
+    },
+    "ADJ": {
+      "base_iso2": "GE",
+      "capital_state_id": null,
+      "color_hex": "#b32851",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Autonomous Republic of Adjara",
+      "display_name_en": "Autonomous Republic of Adjara",
+      "display_name_zh": "阿扎尔自治共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GE",
+      "notes": "",
+      "parent_owner_tag": "GE",
+      "parent_owner_tags": [
+        "GE"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_adj",
+      "provenance_iso2": "GE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_adj"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "ADJ"
     },
     "AE": {
       "base_iso2": "AE",
@@ -1211,12 +1295,12 @@
       "color_hex": "#b8323a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 2,
+      "controller_feature_count": 3,
       "display_name": "Arakan Army",
       "display_name_en": "Arakan Army",
       "display_name_zh": "若开军",
       "entry_kind": "",
-      "feature_count": 2,
+      "feature_count": 3,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -1225,7 +1309,7 @@
       "inspector_group_id": "myanmar_civil_war",
       "inspector_group_label": "缅甸内战",
       "lookup_iso2": "MM",
-      "notes": "D 类。若开邦整块归若开军（AA/ULA）：书签日 AA 控制若开 17 个镇区中的 14 个，军政府只剩实兑、皎漂、曼昂，按多数整块归入；MM_PRIMARY_GAP_10 是实兑以南的补缝碎片（约 92.9–93.0E、19.8–20.1N），一并归入以免留下飞地。把握较高；实兑、皎漂、曼昂被错划给 AA 属已知近似。选中 2 块。",
+      "notes": "2026-01-01：若开除实兑、皎漂、曼昂镇区外及钦邦 Paletwa。三处军方镇区整体保留是行政近似。补缝块经 ADM3 相交核对属于 Pauktaw。代表驻地妙乌。",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "mw_arakan_army",
@@ -2191,7 +2275,7 @@
       "continent_label": "North America",
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 218,
+      "feature_count": 217,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2487,12 +2571,12 @@
       "color_hex": "#5b4fc4",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 1,
+      "controller_feature_count": 7,
       "display_name": "Chinland Resistance",
       "display_name_en": "Chinland Resistance",
       "display_name_zh": "钦族抵抗力量",
       "entry_kind": "",
-      "feature_count": 1,
+      "feature_count": 7,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -2501,7 +2585,7 @@
       "inspector_group_id": "myanmar_civil_war",
       "inspector_group_label": "缅甸内战",
       "lookup_iso2": "MM",
-      "notes": "D 类。钦邦整块归钦族抵抗力量（Chin Brotherhood 与钦兰委员会合为一个实体）：9 个镇区中 Mindat、Matupi、Kanpetlet、Tonzang、Thantlang、Falam（2026-01 仍在抵抗方手中，2026-04 才被军方夺回）由抵抗方控制，Paletwa 归 AA，军政府只剩 Hakha、Tedim，按多数整块归入。Paletwa 应属 AA、Hakha/Tedim 应属 MM，属已知近似。把握中等。选中 1 块。（核对修正：颜色 #3f6fb5→#5b4fc4，与其他新势力 RGB 距离不足 40）",
+      "notes": "2026-01-01：六镇区与边界余区合并表达钦族抵抗力量；Hakha、Tedim 留 MM，Paletwa 归 ARK。混合控制按多数近似，法兰为合并势力代表驻地。",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "mw_chin_resistance",
@@ -3747,7 +3831,7 @@
       "continent_label": "Asia",
       "display_name": "Georgia",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 10,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -4482,7 +4566,7 @@
       "continent_label": "Asia",
       "display_name": "Indonesia",
       "entry_kind": "",
-      "feature_count": 34,
+      "feature_count": 33,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -4550,7 +4634,7 @@
       "continent_label": "Asia",
       "display_name": "Israel",
       "entry_kind": "",
-      "feature_count": 7,
+      "feature_count": 9,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -4564,7 +4648,8 @@
       "provenance_iso2": "IL",
       "quality": "direct_country_copy",
       "rule_sources": [
-        "mw_golan_buffer_israel"
+        "mw_golan_buffer_israel",
+        "mw_golan_heights"
       ],
       "scenario_only": false,
       "source": "canonical_baseline",
@@ -5200,7 +5285,7 @@
       "inspector_group_id": "myanmar_civil_war",
       "inspector_group_label": "缅甸内战",
       "lookup_iso2": "MM",
-      "notes": "D 类。克钦邦整块归 KIO/KIA：2024 年攻势后 KIA 称控制 18 个镇区中的 14 个，并掌握中缅边境稀土带和帕敢玉石区大部；密支那、八莫（被围）、Waingmaw 仍在军政府手里。镇区数是 KIA 一方说法，按大致近似口径整块归入。把握中等，波动大。选中 1 块。（核对修正：颜色 #2f9d6a→#1fb3a0，与其他新势力 RGB 距离不足 40）",
+      "notes": "2026-01-01：城市及驻军据点留 MM，其余延续第一批乡村多数近似，低置信，不代表完整前线。八莫仅切残存军方据点。首都拉咱。",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "mw_kachin_independence",
@@ -5254,6 +5339,47 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "KM"
+    },
+    "KOK": {
+      "base_iso2": "MM",
+      "capital_state_id": null,
+      "color_hex": "#cf6c3e",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Kokang Administration",
+      "display_name_en": "Kokang Administration",
+      "display_name_zh": "果敢行政当局",
+      "entry_kind": "",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战",
+      "lookup_iso2": "MM",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_kokang",
+      "provenance_iso2": "MM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_kokang"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "KOK"
     },
     "KP": {
       "base_iso2": "KP",
@@ -5856,6 +5982,47 @@
       "synthetic_owner": false,
       "tag": "LY"
     },
+    "M23": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#8a5a22",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Congo River Alliance / M23",
+      "display_name_en": "Congo River Alliance / M23",
+      "display_name_zh": "刚果河联盟／M23",
+      "entry_kind": "",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "congo_conflict",
+      "inspector_group_label": "刚果冲突",
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_m23",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_m23"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "M23"
+    },
     "MA": {
       "base_iso2": "MA",
       "capital_state_id": null,
@@ -6102,7 +6269,7 @@
       "continent_label": "Asia",
       "display_name": "Myanmar",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 26,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6115,7 +6282,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "MM",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_myanmar_military_enclaves"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
@@ -6585,6 +6754,47 @@
       "synthetic_owner": false,
       "tag": "NAG"
     },
+    "NCY": {
+      "base_iso2": "CY",
+      "capital_state_id": null,
+      "color_hex": "#b84b5f",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Turkish Republic of Northern Cyprus",
+      "display_name_en": "Turkish Republic of Northern Cyprus",
+      "display_name_zh": "北塞浦路斯土耳其共和国",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "cyprus_dispute",
+      "inspector_group_label": "塞浦路斯争端",
+      "lookup_iso2": "CY",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_northern_cyprus",
+      "provenance_iso2": "CY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_northern_cyprus"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "de_facto_state",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "NCY"
+    },
     "NE": {
       "base_iso2": "NE",
       "capital_state_id": null,
@@ -6874,6 +7084,48 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "NP"
+    },
+    "NUN": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#773027",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Government of Nunavut",
+      "display_name_en": "Government of Nunavut",
+      "display_name_zh": "努纳武特地区政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CA",
+      "parent_owner_tags": [
+        "CA"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_nun",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_nun"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "NUN"
     },
     "NZ": {
       "base_iso2": "NZ",
@@ -7892,12 +8144,12 @@
       "color_hex": "#e0c040",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 3,
+      "controller_feature_count": 6,
       "display_name": "Autonomous Administration of North and East Syria",
       "display_name_en": "Autonomous Administration of North and East Syria",
       "display_name_zh": "北叙利亚和东叙利亚自治当局（叙利亚民主力量）",
       "entry_kind": "",
-      "feature_count": 3,
+      "feature_count": 6,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -7906,7 +8158,7 @@
       "inspector_group_id": "syria_factions",
       "inspector_group_label": "叙利亚各方",
       "lookup_iso2": "SY",
-      "notes": "书签日取 2026-01 冲突前的最大范围，整省粗版：哈塞克（拉斯艾因一带除外，按多数）、拉卡（泰勒阿布亚德一带除外，按多数）、代尔祖尔（叙利亚只有整省地块，用近似幼发拉底河线切算东岸约占该省 51%，代表点在东岸，按多数整省归入，把握低）。阿勒颇省的科巴尼、代尔哈菲尔因地块是阿勒颇整省而未表达。选中 3 块。",
+      "notes": "2026-01-01：原哈塞克、拉卡、代尔祖尔粗分保持；新增科巴尼、代尔哈菲尔—马斯卡纳、谢赫马克苏德及阿什拉菲耶的人工近似。排除阿勒颇主体、阿夫林、曼比季、杰拉布卢斯；乡村接触线低置信。",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "mw_syria_sdf",
@@ -8312,6 +8564,47 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "SO"
+    },
+    "SOS": {
+      "base_iso2": "GE",
+      "capital_state_id": null,
+      "color_hex": "#7656a8",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "Republic of South Ossetia",
+      "display_name_en": "Republic of South Ossetia",
+      "display_name_zh": "南奥塞梯共和国",
+      "entry_kind": "",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "post_soviet_frozen_conflicts",
+      "inspector_group_label": "后苏联冻结冲突",
+      "lookup_iso2": "GE",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_south_ossetia",
+      "provenance_iso2": "GE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_south_ossetia"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "de_facto_state",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "SOS"
     },
     "SR": {
       "base_iso2": "SR",
@@ -9489,6 +9782,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "VN"
+    },
+    "WAS": {
+      "base_iso2": "MM",
+      "capital_state_id": null,
+      "color_hex": "#7c3752",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 5,
+      "display_name": "Wa State",
+      "display_name_en": "Wa State",
+      "display_name_zh": "佤邦",
+      "entry_kind": "",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战",
+      "lookup_iso2": "MM",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_wa",
+      "provenance_iso2": "MM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_wa"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "de_facto_state",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "WAS"
     },
     "WLS": {
       "base_iso2": "GB",

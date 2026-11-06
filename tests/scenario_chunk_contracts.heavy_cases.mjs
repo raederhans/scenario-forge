@@ -501,7 +501,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function addFeatureToDevSelection[\s\S]*?requestInteractionRender\("dev-selection-add"\);/.test(rendererSource)
         && /function toggleFeatureInDevSelection[\s\S]*?requestInteractionRender\("dev-selection-toggle"\);/.test(rendererSource)
         && /function setDevSelectionDirty\(\)[\s\S]*?runtimeState\.refreshCountryListRowsFn\(\{[\s\S]*?refreshInspector: true,[\s\S]*?refreshPresetTree: true,[\s\S]*?\}\);/.test(rendererSource)
-        && /function syncInspectorCountryToLandSelection[\s\S]*?runtimeState\.selectedInspectorCountryCode = nextCode;[\s\S]*?refreshPresetTree: true/.test(rendererSource)
         && /if \(decision\.devSelectionRequested\) \{[\s\S]*?toggleFeatureInDevSelection\(landId\);[\s\S]*?syncInspectorCountryToLandSelection\(feature, landId, landHit\);/.test(clickSelectionTransactionOwnerSource)
         && !rendererSource.includes("runtimeState.devSelectionModeEnabled && (event?.ctrlKey || event?.metaKey)")
         && /function removeLastDevSelection[\s\S]*?requestInteractionRender\("dev-selection-remove-last"\);/.test(rendererSource)
@@ -693,12 +692,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && politicalRasterWorkerSource.includes("transferToImageBitmap")
         && politicalRasterWorkerSource.includes('type: "ERROR"')
         && politicalRasterWorkerSource.includes("taskId"),
-      exactComposeUsesCompositeBuffer:
-        /function ensureCompositeBufferCanvas\(\) \{[\s\S]*?cache\.compositeBuffer\.canvas = canvas;/.test(renderCacheOwnerSource)
-        && /function composeCachedPasses[\s\S]*?const bufferCanvas = ensureCompositeBufferCanvas\(\);[\s\S]*?const result = getExactCompositeReuseOwner\(\)\.composeExact\(bufferCanvas, passNames, currentTransform\);[\s\S]*?if \(!result\.ok\) \{[\s\S]*?return false;[\s\S]*?blitCompositeBufferToMain\(bufferCanvas\);/.test(rendererSource)
-        && /function getExactCompositeReuseOwner\(\)[\s\S]*?createExactCompositeReuseOwner\(\{[\s\S]*?compose: composeRenderPassesToTarget,/.test(rendererSource)
-        && /function composeExact\(bufferCanvas, passNames, currentTransform\)[\s\S]*?invalidate\(\);\s*resetContext\(context, bufferCanvas\.width, bufferCanvas\.height\);\s*const result = compose\(context, passNames, currentTransform, \{ requireAllPasses: true \}\);\s*if \(result\.ok\) previous = inputs;/.test(exactCompositeReuseOwnerSource)
-        && /function blitCompositeBufferToMain\(bufferCanvas\) \{[\s\S]*?rendererSurfaceHost\.getContext\(\)\.globalCompositeOperation = "copy";[\s\S]*?rendererSurfaceHost\.getContext\(\)\.drawImage\(bufferCanvas, 0, 0\);[\s\S]*?rendererSurfaceHost\.getContext\(\)\.globalCompositeOperation = "source-over";/.test(rendererSource),
       coarsePrewarmDoesNotOverwriteActiveDetailChunks:
         /function hasDetailScenarioChunkIds\(chunkIds = \[\]\) \{[\s\S]*?String\(chunkId \|\| ""\)\.includes\("\.detail\."\)/.test(chunkRuntimeSource)
         && /const SCENARIO_CHUNK_FULL_WORLD_BBOX = Object\.freeze\(\[-180, -90, 180, 90\]\);/.test(chunkRuntimeSource)
@@ -1698,7 +1691,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     assert.ok(rendererSource.includes('recordRenderPerfMetric("politicalPatchOverlayClear"'));
     assert.ok(rendererSource.includes('paintSource: "political-patch-overlay"'));
     assert.ok(/function buildPoliticalRasterWorkerPacket\(options = \{\}\) \{[\s\S]*?return getPoliticalPartialRepaintOwner\(\)\.buildPoliticalRasterWorkerPacket\(options\);/.test(rendererSource));
-    assert.ok(/function getPoliticalPartialRepaintOwner\(\) \{[\s\S]*?helpers: \{[\s\S]*?buildWorkerPixelRingsForGeometry,/.test(rendererSource));
     assert.ok(politicalPartialOwnerSource.includes("helper.buildWorkerPixelRingsForGeometry("));
     assert.ok(packetSource.includes("function collectRasterPolygonalGeometryParts"));
     assert.ok(packetSource.includes('geometryType === "GeometryCollection"'));

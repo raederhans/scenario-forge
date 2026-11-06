@@ -374,3 +374,15 @@ class RiverAdmissionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RiverApprovedIdentityTests(unittest.TestCase):
+    def test_updated_identity_is_used_by_runtime_compatibility(self):
+        import subprocess
+        from tools.repin_river_partition_packs import sync_approved_identity
+        source = """const approved = Object.freeze({sceneId: 'modern_world', scenarioVersion: 1, scenarioGeneratedAt: 'old'});
+        const other = Object.freeze({sceneId: 'other', scenarioVersion: 7, scenarioGeneratedAt: 'unchanged'});
+        const compatible = manifest => manifest.version === approved.scenarioVersion && manifest.generated_at === approved.scenarioGeneratedAt;
+        console.log(JSON.stringify([compatible({version:2,generated_at:'new'}), compatible({version:1,generated_at:'old'}), other]));"""
+        result = subprocess.run(['node','--input-type=module','-e',sync_approved_identity(source,'modern_world',{'version':2,'generated_at':'new'})],check=True,capture_output=True,text=True)
+        self.assertEqual(json.loads(result.stdout),[True,False,{'sceneId':'other','scenarioVersion':7,'scenarioGeneratedAt':'unchanged'}])

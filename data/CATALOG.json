@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "counts": {
-    "entries": 1371,
+    "entries": 1373,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -50,7 +50,7 @@
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
       "scenario_registry": 1,
-      "source_ledger_asset": 4,
+      "source_ledger_asset": 6,
       "special_zones": 1,
       "terrain_contours_major_topology": 1,
       "terrain_contours_minor_topology": 1,
@@ -73,13 +73,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 152,
+      "geojson": 154,
       "javascript": 2,
       "json": 1045,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1369,
+      "json": 1371,
       "module": 2
     }
   },
@@ -982,6 +982,32 @@
       "owner": "data/runtime_asset_registry.json",
       "cachePolicy": "default",
       "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "source:geoboundaries_mmr_adm3_9469f09",
+      "url": "data/scenario-rules/modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
+      "role": "source_ledger_asset",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "data/source_ledger.json::geoboundaries_mmr_adm3_9469f09::current_local_sha256",
+      "owner": "source_ledger",
+      "cachePolicy": "default",
+      "sourceId": "geoboundaries_mmr_adm3_9469f09",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "source:natural_earth_disputed_v5_1_2",
+      "url": "data/scenario-rules/modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson",
+      "role": "source_ledger_asset",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "data/source_ledger.json::natural_earth_disputed_v5_1_2::current_local_sha256",
+      "owner": "source_ledger",
+      "cachePolicy": "default",
+      "sourceId": "natural_earth_disputed_v5_1_2",
       "readMode": "json",
       "aliases": []
     },

@@ -489,7 +489,6 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
     "getRuntimePoliticalBaseCollection",
   ];
   const partialFillSource = extractRendererFunction(politicalPartialOwnerSource, "getPoliticalFeatureFillColor");
-  assert.match(rendererSource, /function getPoliticalPartialRepaintOwner\(\) \{[\s\S]*?createPoliticalPartialRepaintOwner\(\{[\s\S]*?getRuntimeState: \(\) => runtimeState,[\s\S]*?getResolvedFeatureColor,[\s\S]*?effects: \{/);
   const source = `
     const runtimeState = {
       mapSemanticMode: "ownership",

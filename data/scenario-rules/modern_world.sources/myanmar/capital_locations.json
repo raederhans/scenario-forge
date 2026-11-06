@@ -1,0 +1,30 @@
+[
+  {
+    "city": "pangkham",
+    "original": [
+      99.18,
+      22.17
+    ],
+    "registered": [
+      99.17198322391816,
+      22.175230046839637
+    ],
+    "distance_degrees": 0.009571942785622439,
+    "host_feature_id": "MMR-3277__SPLIT_PANGSANG",
+    "note": "就近吸附到底图"
+  },
+  {
+    "city": "laiza",
+    "original": [
+      97.56,
+      24.76
+    ],
+    "registered": [
+      97.55557934498178,
+      24.767972349816564
+    ],
+    "distance_degrees": 0.009115950437983507,
+    "host_feature_id": "MMR-3296__SPLIT_REMAINDER",
+    "note": "就近吸附到底图"
+  }
+]

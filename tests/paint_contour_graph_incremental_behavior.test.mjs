@@ -100,8 +100,10 @@ test('seeded patches and water changes remain equivalent to full builds', () => 
     expectedBuilder.patch(history.filter(id => current.has(id)).map(id => current.get(id)));
     equivalent(actual, expectedBuilder.finish(), `step ${step}`);
     const incremental = step > 0 && (dirty.size === 0 || !waterChanged && dirty.size <= current.size * 0.2);
-    assert.equal(actual.diagnostics.incremental, incremental, `step ${step}: path`);
-    assert.equal(actual.diagnostics.incrementalFeatureCount, incremental ? dirty.size : 0);
+    // A local finish may widen to close a source-collinear group and fall back.
+    const local = !!(actual.diagnostics.incremental || actual.diagnostics.incrementalFallback);
+    assert.equal(local, incremental, `step ${step}: path`);
+    assert.equal(actual.diagnostics.incrementalFeatureCount, actual.diagnostics.incremental && incremental ? dirty.size : 0);
     assert.deepEqual(actual.featureIds, history);
     if (empty) equivalent(actual, previous, `step ${step}: empty patch`);
     previous = actual;
@@ -224,7 +226,7 @@ test('seeded mixed-precision patches preserve cached source geometry', () => {
     builder.patch(changed);
     const actual = builder.finish(), full = createPaintContourGraphBuilder(options(masks[0]));
     full.patch(features); equivalent(actual, full.finish(), `mixed precision step ${step}`);
-    assert.equal(actual.diagnostics.incremental, true);
+    assert.ok(actual.diagnostics.incremental || actual.diagnostics.incrementalFallback, `mixed precision step ${step}: local or widened`);
   }
 });
 
@@ -394,4 +396,59 @@ test('a removal that falls back to a full build leaves freed edge slots safe to 
   full.patch([added, ...features.slice(4)]);
   equivalent(actual, full.finish(), 'slot reuse after a full fallback');
   assert.equal(actual.diagnostics.incremental, true);
+});
+
+test('a source-collinear chain longer than the neighbourhood keeps its whole-group decision', () => {
+  // 110 triangles above one sloped source line (not collinear at 1e-7 identity),
+  // plus two below the first interval: one connected source group whose size
+  // exceeds the comparison budget, so a full build leaves it unmatched.
+  const point = k => [k * 0.1, 10 + k * 0.1 / 3];
+  const triangle = (id, ring) => ({ id, geometry: { type: 'Polygon', coordinates: [[...ring, ring[0]]] } });
+  const above = Array.from({ length: 110 }, (_, k) => triangle(`above${k}`, [point(k), [k * 0.1 + 0.05, 12], point(k + 1)]));
+  const middle = [0.05, 10 + 0.05 / 3];
+  const below = [triangle('below0', [point(0), middle, [0.02, 8]]), triangle('below1', [middle, point(1), [0.08, 8]])];
+  // Distant fillers keep the widened neighbourhood a local finish, not a fallback.
+  const fillers = Array.from({ length: 200 }, (_, i) => rect(`f${i}`, 40 + (i % 20), 30 + Math.floor(i / 20), 40.5 + (i % 20), 30.5 + Math.floor(i / 20)));
+  const features = [...above, ...below, ...fillers];
+  const builder = createPaintContourGraphBuilder(options(masks[0]));
+  builder.patch(features); const initial = builder.finish();
+  builder.patch([above[0]]);
+  const actual = builder.finish(), full = createPaintContourGraphBuilder(options(masks[0]));
+  full.patch(features);
+  const expected = full.finish();
+  equivalent(actual, expected, 'unchanged re-patch of a long source group');
+  equivalent(actual, initial, 'unchanged re-patch keeps the previous graph');
+  assert.equal(actual.diagnostics.incremental, true);
+  // The base neighbourhood is five triangles; the group widens it until it
+  // exceeds the comparison budget, after which any larger group is skipped too.
+  assert.ok(actual.diagnostics.incrementalSubsetFeatureCount > 50, 'the source group widens the neighbourhood');
+});
+
+test('mixed-precision patches along sloped source lines stay equivalent to full builds', () => {
+  // Alternating triangles on both sides of sloped lines form source-collinear
+  // groups; some are coarse, so quantized lines also widen the local finish.
+  let seed = 1;
+  const random = n => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed % n; };
+  const round = value => Math.round(value * 1e4) / 1e4;
+  const fillers = Array.from({ length: 60 }, (_, i) => rect(`f${i}`, 50 + i, 50, 50.5 + i, 50.5));
+  for (let trial = 0; trial < 6; trial++) {
+    const slope = 1 / (2 + random(5)), count = 4 + random(10);
+    const point = k => [k * 0.1, 10 + k * 0.1 * slope];
+    const make = (i, coarse) => {
+      const k = Math.floor(i / 2), ring = [point(k), [k * 0.1 + 0.05, 10 + (i % 2 ? 1.5 : -1.5)], point(k + 1 + random(2))];
+      return { id: `t${i}`, coordinatePrecision: coarse ? 4 : 7,
+        geometry: { type: 'Polygon', coordinates: [[...(coarse ? ring.map(p => p.map(round)) : ring), coarse ? ring[0].map(round) : ring[0]]] } };
+    };
+    const features = Array.from({ length: count * 2 }, (_, i) => make(i, random(3) === 0));
+    const builder = createPaintContourGraphBuilder({ nearSeamTolerance: 0 });
+    builder.patch([...features, ...fillers]); builder.finish();
+    for (let step = 0; step < 4; step++) {
+      const k = random(features.length); features[k] = make(k, random(2) === 0);
+      builder.patch([features[k]]);
+      const actual = builder.finish(), full = createPaintContourGraphBuilder({ nearSeamTolerance: 0 });
+      full.patch([...features, ...fillers]);
+      equivalent(actual, full.finish(), `trial ${trial} step ${step}`);
+      assert.ok(actual.diagnostics.incremental || actual.diagnostics.incrementalFallback, `trial ${trial} step ${step}: local`);
+    }
+  }
 });

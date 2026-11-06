@@ -1,0 +1,227 @@
+{
+  "generated_at": "2026-09-27T13:55:57.885587+00:00",
+  "geo": {
+    "id::CD_ADM1_COD-1894__SPLIT_KALEHE_BUKAVU_UVIRA": {
+      "en": "South Kivu · Kalehe, Bukavu and Uvira",
+      "zh": "南基伍省 · 卡莱亥—布卡武—乌维拉"
+    },
+    "id::CD_ADM1_COD-1894__SPLIT_REMAINDER": {
+      "en": "South Kivu · Remainder",
+      "zh": "南基伍省 · 余区"
+    },
+    "id::CD_ADM1_COD-1898__SPLIT_REMAINDER": {
+      "en": "North Kivu · Remainder",
+      "zh": "北基伍省 · 余区"
+    },
+    "id::CD_ADM1_COD-1898__SPLIT_RUTSHURU_MASISI_GOMA": {
+      "en": "North Kivu · Rutshuru, Masisi and Goma",
+      "zh": "北基伍省 · 鲁丘鲁—马西西—戈马"
+    },
+    "id::CY000__SPLIT_NORTHERN_CYPRUS": {
+      "en": "Κύπρος · Northern Cyprus",
+      "zh": "塞浦路斯 · 北塞浦路斯"
+    },
+    "id::CY000__SPLIT_REMAINDER": {
+      "en": "Κύπρος · Remainder",
+      "zh": "塞浦路斯 · 余区"
+    },
+    "id::GEO-3030__SPLIT_REMAINDER": {
+      "en": "Imereti · Remainder",
+      "zh": "伊梅列季 · 余区"
+    },
+    "id::GEO-3030__SPLIT_SOUTH_OSSETIA": {
+      "en": "Imereti · South Ossetia",
+      "zh": "伊梅列季 · 南奥塞梯"
+    },
+    "id::GEO-3034__SPLIT_REMAINDER": {
+      "en": "Mtskheta-Mtianeti · Remainder",
+      "zh": "姆茨赫塔-姆季亚涅蒂 · 余区"
+    },
+    "id::GEO-3034__SPLIT_SOUTH_OSSETIA": {
+      "en": "Mtskheta-Mtianeti · South Ossetia",
+      "zh": "姆茨赫塔-姆季亚涅蒂 · 南奥塞梯"
+    },
+    "id::GEO-3035__SPLIT_REMAINDER": {
+      "en": "Racha-Lechkhumi-Kvemo Svaneti · Remainder",
+      "zh": "拉查-莱奇库米-克韦莫·斯瓦涅季 · 余区"
+    },
+    "id::GEO-3035__SPLIT_SOUTH_OSSETIA": {
+      "en": "Racha-Lechkhumi-Kvemo Svaneti · South Ossetia",
+      "zh": "拉查-莱奇库米-克韦莫·斯瓦涅季 · 南奥塞梯"
+    },
+    "id::GEO-3039__SPLIT_REMAINDER": {
+      "en": "Shida Kartli · Remainder",
+      "zh": "什达·卡尔特利 · 余区"
+    },
+    "id::GEO-3039__SPLIT_SOUTH_OSSETIA": {
+      "en": "Shida Kartli · South Ossetia",
+      "zh": "什达·卡尔特利 · 南奥塞梯"
+    },
+    "id::ISR-3056__SPLIT_GOLAN_HEIGHTS": {
+      "en": "HaZafon · Golan Heights",
+      "zh": "哈扎丰 · 戈兰高地"
+    },
+    "id::ISR-3056__SPLIT_REMAINDER": {
+      "en": "HaZafon · Remainder",
+      "zh": "哈扎丰 · 余区"
+    },
+    "id::MMR-3273__SPLIT_KYAUKPYU": {
+      "en": "Rakhine · Township Kyaukpyu",
+      "zh": "若开邦 · Kyaukpyu镇区"
+    },
+    "id::MMR-3273__SPLIT_MUNAUNG": {
+      "en": "Rakhine · Township Munaung",
+      "zh": "若开邦 · Munaung镇区"
+    },
+    "id::MMR-3273__SPLIT_REMAINDER": {
+      "en": "Rakhine · Remainder",
+      "zh": "若开邦 · 余区"
+    },
+    "id::MMR-3273__SPLIT_SITTWE": {
+      "en": "Rakhine · Township Sittwe",
+      "zh": "若开邦 · Sittwe镇区"
+    },
+    "id::MMR-3274__SPLIT_FALAM": {
+      "en": "Chin · Township Falam",
+      "zh": "下巴 · Falam镇区"
+    },
+    "id::MMR-3274__SPLIT_HAKHA": {
+      "en": "Chin · Township Hakha",
+      "zh": "下巴 · Hakha镇区"
+    },
+    "id::MMR-3274__SPLIT_KANPETLET": {
+      "en": "Chin · Township Kanpetlet",
+      "zh": "下巴 · Kanpetlet镇区"
+    },
+    "id::MMR-3274__SPLIT_MATUPI": {
+      "en": "Chin · Township Matupi",
+      "zh": "下巴 · Matupi镇区"
+    },
+    "id::MMR-3274__SPLIT_MINDAT": {
+      "en": "Chin · Township Mindat",
+      "zh": "下巴 · Mindat镇区"
+    },
+    "id::MMR-3274__SPLIT_PALETWA": {
+      "en": "Chin · Township Paletwa",
+      "zh": "下巴 · Paletwa镇区"
+    },
+    "id::MMR-3274__SPLIT_REMAINDER": {
+      "en": "Chin · Remainder",
+      "zh": "下巴 · 余区"
+    },
+    "id::MMR-3274__SPLIT_TEDIM": {
+      "en": "Chin · Township Tedim",
+      "zh": "下巴 · Tedim镇区"
+    },
+    "id::MMR-3274__SPLIT_THANTLANG": {
+      "en": "Chin · Township Thantlang",
+      "zh": "下巴 · Thantlang镇区"
+    },
+    "id::MMR-3274__SPLIT_TONZANG": {
+      "en": "Chin · Township Tonzang",
+      "zh": "下巴 · Tonzang镇区"
+    },
+    "id::MMR-3277__SPLIT_HOPANG": {
+      "en": "Shan · Township Hopang",
+      "zh": "山 · Hopang镇区"
+    },
+    "id::MMR-3277__SPLIT_KONKYAN": {
+      "en": "Shan · Township Konkyan",
+      "zh": "山 · Konkyan镇区"
+    },
+    "id::MMR-3277__SPLIT_LAUKKAING": {
+      "en": "Shan · Township Laukkaing",
+      "zh": "山 · Laukkaing镇区"
+    },
+    "id::MMR-3277__SPLIT_MONGMAO": {
+      "en": "Shan · Township Mongmao",
+      "zh": "山 · Mongmao镇区"
+    },
+    "id::MMR-3277__SPLIT_NARPHAN": {
+      "en": "Shan · Township Narphan",
+      "zh": "山 · Narphan镇区"
+    },
+    "id::MMR-3277__SPLIT_PANGSANG": {
+      "en": "Shan · Township Pangsang",
+      "zh": "山 · Pangsang镇区"
+    },
+    "id::MMR-3277__SPLIT_PANGWAUN": {
+      "en": "Shan · Township Pangwaun",
+      "zh": "山 · Pangwaun镇区"
+    },
+    "id::MMR-3277__SPLIT_REMAINDER": {
+      "en": "Shan · Remainder",
+      "zh": "山 · 余区"
+    },
+    "id::MMR-3296__SPLIT_BHAMO_GARRISON": {
+      "en": "Kachin · Bhamo_Garrison strongpoint",
+      "zh": "克钦族 · Bhamo_Garrison据点"
+    },
+    "id::MMR-3296__SPLIT_KHAUNGLANHPU": {
+      "en": "Kachin · Khaunglanhpu strongpoint",
+      "zh": "克钦族 · Khaunglanhpu据点"
+    },
+    "id::MMR-3296__SPLIT_MACHANBAW": {
+      "en": "Kachin · Machanbaw strongpoint",
+      "zh": "克钦族 · Machanbaw据点"
+    },
+    "id::MMR-3296__SPLIT_MOGAUNG": {
+      "en": "Kachin · Mogaung strongpoint",
+      "zh": "克钦族 · Mogaung据点"
+    },
+    "id::MMR-3296__SPLIT_MOHNYIN": {
+      "en": "Kachin · Mohnyin strongpoint",
+      "zh": "克钦族 · Mohnyin据点"
+    },
+    "id::MMR-3296__SPLIT_MYITKYINA": {
+      "en": "Kachin · Myitkyina strongpoint",
+      "zh": "克钦族 · Myitkyina据点"
+    },
+    "id::MMR-3296__SPLIT_NAWNGMUN": {
+      "en": "Kachin · Nawngmun strongpoint",
+      "zh": "克钦族 · Nawngmun据点"
+    },
+    "id::MMR-3296__SPLIT_PUTAO": {
+      "en": "Kachin · Putao strongpoint",
+      "zh": "克钦族 · Putao据点"
+    },
+    "id::MMR-3296__SPLIT_REMAINDER": {
+      "en": "Kachin · Remainder",
+      "zh": "克钦族 · 余区"
+    },
+    "id::MMR-3296__SPLIT_TANAI": {
+      "en": "Kachin · Tanai strongpoint",
+      "zh": "克钦族 · Tanai据点"
+    },
+    "id::MMR-3296__SPLIT_WAINGMAW": {
+      "en": "Kachin · Waingmaw strongpoint",
+      "zh": "克钦族 · Waingmaw据点"
+    },
+    "id::SYR-137__SPLIT_ALEPPO_NEIGHBORHOODS": {
+      "en": "Aleppo · Sheikh Maqsoud and Ashrafieh",
+      "zh": "阿勒颇 · 谢赫马克苏德及阿什拉菲耶"
+    },
+    "id::SYR-137__SPLIT_DEIR_HAFIR_MASKANAH": {
+      "en": "Aleppo · Deir Hafir and Maskanah",
+      "zh": "阿勒颇 · 代尔哈菲尔—马斯卡纳"
+    },
+    "id::SYR-137__SPLIT_KOBANI": {
+      "en": "Aleppo · Kobani countryside",
+      "zh": "阿勒颇 · 科巴尼乡村"
+    },
+    "id::SYR-137__SPLIT_REMAINDER": {
+      "en": "Aleppo · Remainder",
+      "zh": "阿勒颇 · 余区"
+    },
+    "id::SYR-5261__SPLIT_GOLAN_HEIGHTS": {
+      "en": "UNDOF · Golan Heights",
+      "zh": "观察员部队 · 戈兰高地"
+    },
+    "id::SYR-5261__SPLIT_REMAINDER": {
+      "en": "UNDOF · Remainder",
+      "zh": "观察员部队 · 余区"
+    }
+  },
+  "scenario_id": "modern_world",
+  "version": 1
+}

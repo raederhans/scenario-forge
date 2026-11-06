@@ -5,6 +5,7 @@
 // - 面板按 panel_subscriptions.js 的表合并刷新：同一帧里的多次变更取并集，
 //   每个面板钩子最多跑一次，并且在下一次绘制之后才跑，地图像素先上屏。
 // 没有帧调度的环境（Node 测试、worker）立即刷新，保持同步语义。
+import { scheduleAfterPaint } from "../after_paint.js";
 import { emit } from "./bus.js";
 import { STATE_BUS_EVENTS } from "./config.js";
 import { PANEL_HOOKS_BY_CHANGE_DOMAIN } from "./panel_subscriptions.js";
@@ -48,15 +49,8 @@ function flushPanels() {
 
 function schedulePanelFlush() {
   if (flushScheduled) return;
-  const requestFrame = globalThis.requestAnimationFrame;
-  const setTimer = globalThis.setTimeout;
-  if (typeof requestFrame !== "function" || typeof setTimer !== "function") {
-    flushPanels();
-    return;
-  }
   flushScheduled = true;
-  // 帧回调里排的 timer 会在这一帧绘制之后才运行。
-  requestFrame(() => setTimer(flushPanels, 0));
+  scheduleAfterPaint(flushPanels);
 }
 
 export function commitChange({ domains, ...details } = {}) {
