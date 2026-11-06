@@ -3011,7 +3011,12 @@
                     <div id="dockReferencePopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-label="Reference tools">
                       <h3 id="lblReferenceImage" class="sidebar-tool-title" data-i18n="Reference Image">Reference Image</h3>
                       <p id="referenceToolHint" class="sidebar-help-copy" data-i18n="Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.">Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.</p>
-                      <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-input mt-3" aria-labelledby="lblReferenceImage" />
+                      <div class="file-dropzone mt-3">
+                        <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-dropzone-input" aria-labelledby="lblReferenceImage" />
+                        <svg class="ui-icon file-dropzone-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <span class="file-dropzone-prompt" data-i18n="Choose or drop an image">Choose or drop an image</span>
+                        <span id="referenceImageFileName" class="file-dropzone-name u-truncate"></span>
+                      </div>
                       <div class="space-y-3 mt-4">
                         <div>
                           <div class="range-row">

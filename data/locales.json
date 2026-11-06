@@ -296640,7 +296640,7 @@
     },
     "Hidden": {
       "en": "Hidden",
-      "zh": "已隐藏"
+      "zh": "已关闭"
     },
     "Hide": {
       "en": "Hide",
@@ -297940,7 +297940,7 @@
     },
     "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.": {
       "en": "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.",
-      "zh": "没有匹配颜色。清空搜索，或尝试国家名称、ISO-2 代码、来源标签。"
+      "zh": "没有匹配颜色。清空搜索，或尝试国家名称、ISO-2 代码、来源代码。"
     },
     "No matching countries": {
       "en": "No matching countries",
@@ -300924,7 +300924,7 @@
     },
     "Visible": {
       "en": "Visible",
-      "zh": "可见"
+      "zh": "显示中"
     },
     "Visual": {
       "en": "Visual Color",
@@ -303484,7 +303484,7 @@
     },
     "Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.": {
       "en": "Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.",
-      "zh": "上传一张本地图像，再用 opacity / scale / offsets 完成对位。项目会保存这些对位参数，但图像文件本身在重新打开项目时需要再次上传。"
+      "zh": "上传一张本地地图图片，用下方的透明度、缩放和偏移把它对齐。对齐参数会随项目保存；重新打开项目时需要再次上传图片。"
     },
     "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets.": {
       "en": "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets.",
@@ -303737,6 +303737,46 @@
     "Civil War Faction": {
       "en": "Civil War Faction",
       "zh": "内战势力"
+    },
+    "Load error": {
+      "en": "Load error",
+      "zh": "加载失败"
+    },
+    "Loading…": {
+      "en": "Loading…",
+      "zh": "加载中"
+    },
+    "Not in current view": {
+      "en": "Not in current view",
+      "zh": "当前视野内没有要素"
+    },
+    "Ready": {
+      "en": "Ready",
+      "zh": "已就绪"
+    },
+    "Reference map": {
+      "en": "Reference map",
+      "zh": "参考底图"
+    },
+    "Some data failed to load": {
+      "en": "Some data failed to load",
+      "zh": "部分数据加载失败"
+    },
+    "Waiting for data": {
+      "en": "Waiting for data",
+      "zh": "等待数据"
+    },
+    "Choose or drop an image": {
+      "en": "Choose or drop an image",
+      "zh": "选择或拖入图片"
+    },
+    "Close Workspace": {
+      "en": "Close Workspace",
+      "zh": "关闭工作区"
+    },
+    "Open Workspace": {
+      "en": "Open Workspace",
+      "zh": "打开工作区"
     }
   }
 }

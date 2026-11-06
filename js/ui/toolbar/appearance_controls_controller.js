@@ -189,6 +189,7 @@ export function createAppearanceControlsController({
   const setLayerStatusNode = (node, diagnostic) => {
     if (!node || !diagnostic) return;
     const summary = sanitizeLayerStatusText(diagnostic.summary);
+    node.title = diagnostic.detail ? sanitizeLayerStatusText(diagnostic.detail) : "";
     if (node.dataset.statusSummary !== summary) {
       node.textContent = summary;
       node.dataset.statusSummary = summary;

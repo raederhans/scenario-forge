@@ -390,7 +390,7 @@ function enhanceSelect(select) {
   const chevron = document.createElement("span");
   chevron.className = "app-select-chevron";
   chevron.setAttribute("aria-hidden", "true");
-  chevron.textContent = "▾";
+  // 箭头由 CSS 遮罩绘制（.app-select-chevron），这里只留空节点。
   button.append(text, chevron);
 
   const menu = document.createElement("div");

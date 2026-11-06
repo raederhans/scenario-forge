@@ -704,7 +704,7 @@ export function createTransportWorkbenchRightDeckOwner({
     const chevron = document.createElement("span");
     chevron.className = "transport-workbench-section-chevron";
     chevron.setAttribute("aria-hidden", "true");
-    chevron.textContent = "▾";
+    // 箭头由 CSS 遮罩绘制（.transport-workbench-section-chevron）。
     actions.appendChild(chevron);
     heading.appendChild(title);
     summary.appendChild(heading);

@@ -1903,7 +1903,7 @@ function initSidebar({ render } = {}) {
       header.className = "strategic-accordion-header";
       const arrow = document.createElement("span");
       arrow.className = "strategic-accordion-arrow";
-      arrow.textContent = "\u25B6";
+      setUiIcon(arrow, "chevron-right", { size: 14 });
       const titleEl = document.createElement("span");
       titleEl.className = "strategic-accordion-title";
       titleEl.textContent = t(title, "ui");
