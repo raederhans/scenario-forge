@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import unittest
 
@@ -23,16 +24,24 @@ class TnoAtlantropaUrbanTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.collection, cls.report = build_overlays()
+        # The checked-in asset is built on one machine; GEOS/PROJ float
+        # differences elsewhere can change individual placements, so it is
+        # checked for the same properties rather than byte equality.
+        cls.checked_in = json.loads(Path(DEFAULT_OUTPUT).read_text(encoding="utf-8"))
+        cls.collections = {"built": cls.collection, "checked_in": cls.checked_in}
         cls.layers, cls.old_land, _, _ = load_inputs(DEFAULT_ATLANTROPA, DEFAULT_OLD_LAND, DEFAULT_URBAN)
         cls.hosts = {feature_id: geometry for feature_id, _, geometry in cls.layers["land"]}
 
-    def test_build_is_deterministic_and_matches_checked_in_asset(self):
+    def test_build_is_deterministic(self):
         rebuilt, _ = build_overlays()
         self.assertEqual(serialize(rebuilt), serialize(self.collection))
-        self.assertEqual(Path(DEFAULT_OUTPUT).read_text(encoding="utf-8"), serialize(self.collection))
 
     def test_features_have_unique_ids_and_existing_atlantropa_owners(self):
-        features = self.collection["features"]
+        for name, collection in self.collections.items():
+            with self.subTest(collection=name):
+                self._check_ids_and_owners(collection["features"])
+
+    def _check_ids_and_owners(self, features):
         self.assertGreater(len(features), 50)
         ids = [feature["properties"]["id"] for feature in features]
         self.assertEqual(len(ids), len(set(ids)))
@@ -46,7 +55,12 @@ class TnoAtlantropaUrbanTests(unittest.TestCase):
 
     def test_geometry_stays_on_new_land_of_its_host(self):
         blocked = unary_union([geometry for _, _, geometry in self.layers["shoal"] + self.layers["water"]])
-        for feature in self.collection["features"]:
+        for name, collection in self.collections.items():
+            with self.subTest(collection=name):
+                self._check_geometry(collection["features"], blocked)
+
+    def _check_geometry(self, features, blocked):
+        for feature in features:
             geometry = shape(feature["geometry"])
             self.assertTrue(geometry.is_valid, feature["properties"]["id"])
             for part in polygon_parts(geometry):
@@ -59,6 +73,8 @@ class TnoAtlantropaUrbanTests(unittest.TestCase):
     def test_coverage_stays_sparse(self):
         self.assertGreaterEqual(self.report["coverage"], 0.01)
         self.assertLessEqual(self.report["coverage"], 0.03)
+        checked_in_km2 = sum(feature["properties"]["area_sqkm"] for feature in self.checked_in["features"])
+        self.assertAlmostEqual(checked_in_km2, self.report["urban_km2"], delta=self.report["urban_km2"] * 0.1)
 
 
 if __name__ == "__main__":
