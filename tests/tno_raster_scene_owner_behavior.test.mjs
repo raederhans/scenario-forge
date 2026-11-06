@@ -43,6 +43,8 @@ function harness() {
         releaseRetainedLayers: () => {},
         render(frame) {
           if (nextError) throw nextError;
+          // Mirror the real compositor contract: one layer per name per frame.
+          if (new Set(frame.layers.map(layer => layer.name)).size !== frame.layers.length) throw new TypeError("GPU scene layers require unique names.");
           const canvasBytes = frame.layers.reduce((sum, layer) => sum + (layer.canvas ? layer.canvas.width * layer.canvas.height * 4 : 0), 0);
           if (canvasBytes + frame.reservedTextureBytes > options.maxTextureBytes) throw new RangeError("GPU scene texture budget exceeded.");
           records.frames.push(frame);
@@ -534,7 +536,7 @@ test("retained precision layers compose over overview with a shared device-pixel
     }
     const output = h.records.frames.at(-1);
     assert.equal(output.preserveLayers, true);
-    assert.deepEqual(output.layers.map(layer => layer.name), ["overview:base", "political", "overview:labels", "base", "political", "labels"]);
+    assert.deepEqual(output.layers.map(layer => layer.name), ["overview:base", "overview:political", "overview:labels", "base", "political", "labels"]);
     assert.ok(output.layers.slice(0, 3).every(layer => !layer.clip));
     for (const layer of output.layers.slice(3)) {
       assert.deepEqual(layer.clip, { x: (targetX - primaryX) * 2, y: 0, width: 200, height: 100 });

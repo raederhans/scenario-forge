@@ -281,7 +281,8 @@ export function createTnoRasterSceneOwner({
       const y = (transform.y - (background.transform.y + (background.layout.offsetY || 0)) * scale) * dpr;
       for (const name of overview.names) {
         if (name === "political") {
-          layers.push({ name, draw: output => background.gpu.drawLayer({ ...output, transform: {
+          // Compositor layer names are unique per frame; the precise political layer follows.
+          layers.push({ name: "overview:political", draw: output => background.gpu.drawLayer({ ...output, transform: {
             a: backgroundPlan.scale * scale, d: backgroundPlan.scale * scale,
             e: (backgroundPlan.outputX - backgroundPlan.originX * backgroundPlan.scale) * scale + x,
             f: (backgroundPlan.outputY - backgroundPlan.originY * backgroundPlan.scale) * scale + y,
