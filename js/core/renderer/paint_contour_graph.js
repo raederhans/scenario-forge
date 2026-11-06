@@ -493,14 +493,12 @@ function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occu
     if (!group) groups.set(root, group = []);
     group.push(edge);
   });
-  // Report every connected group. It is decisive when over the comparison
-  // budget or not pairwise compatible: any larger group containing it is then
-  // left unmatched in the same way, so its extent cannot change the result.
+  // Report every connected group. One over the comparison budget is decisive:
+  // any larger group containing it is skipped too, so its extent cannot change
+  // the result. (An incompatible group is as well; treating it as undecided
+  // only widens a local finish, so it is not checked twice.)
   if (onGroup) for (const group of groups.values()) {
-    if (group.length < 2) continue;
-    const decisive = group.length * (group.length - 1) / 2 > maxComparisonsPerGroup
-      || !group.every((edge, index) => group.slice(index + 1).every(other => compatible(edge, other)));
-    onGroup(group, decisive);
+    if (group.length > 1) onGroup(group, group.length * (group.length - 1) / 2 > maxComparisonsPerGroup);
   }
   const shared = [], remaining = [], occupied = new Set(occupiedSegments);
   let query = null;
@@ -1085,18 +1083,19 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
   const boundaryBounds = new Map(), boundaryCells = new Map();
   const dirtyEdges = [], lineSides = new Map();
   const pendingBounds = [];
-  // Edge index -> its source-collinear group at the last finish that computed
-  // it: the owners (the extent bound used by local finishes) and whether the
-  // group was decisive, i.e. left unmatched whatever its extent.
+  // Edge index -> owners of its source-collinear group at the last finish that
+  // computed it, for groups within the comparison budget: the extent bound a
+  // local finish widens to.
   const sourceOwners = new Map();
-  function recordSourceGroup(group, decisive, partial = false) {
+  // Only undecided groups spanning several owners are read back: a decisive
+  // group stays unmatched whatever its extent, and a single owner adds nothing.
+  function recordSourceGroup(group, decisive) {
+    if (decisive) return;
+    const first = Math.abs(group[0].members[0]) - 1;
+    if (group.every(edge => Math.abs(edge.members[0]) - 1 === first)) return;
     const owners = new Set();
-    for (const edge of group) {
-      owners.add(Math.abs(edge.members[0]) - 1);
-      if (partial) for (const id of sourceOwners.get(edge.key - 1)?.owners || []) if (featureEdges.has(id)) owners.add(id);
-    }
-    const record = { owners, decisive };
-    for (const edge of group) if (edge.key) sourceOwners.set(edge.key - 1, record);
+    for (const edge of group) owners.add(Math.abs(edge.members[0]) - 1);
+    for (const edge of group) if (edge.key) sourceOwners.set(edge.key - 1, owners);
   }
   let cycle = 1, liveEntries = 0, deadEntries = 0;
   const quantizedLines = new Map(), quantizedOwners = new Map();
@@ -1449,8 +1448,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
           const remembered = edge => sourceOwners.get(edge.key - 1);
           const owned = id => featureEdges.has(id);
           for (const id of base) for (const index of featureEdges.get(id) || []) {
-            const record = sourceOwners.get(index);
-            if (record && !record.decisive) for (const owner of record.owners) if (owned(owner)) { affected.add(owner); complete.add(owner); }
+            for (const owner of sourceOwners.get(index) || []) if (owned(owner)) { affected.add(owner); complete.add(owner); }
           }
           let context, geometry = null, expanded = false, touching = null;
           for (;;) {
@@ -1472,9 +1470,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
               const ownerOf = edge => Math.abs(edge.members[0]) - 1;
               if (!group.some(edge => affected.has(ownerOf(edge)))) return;
               const changes = group.some(edge => base.has(ownerOf(edge)));
-              // A decisive group may be only partly in this context; its record
-              // then keeps the owners it had.
-              touching.push([group, decisive, !decisive]);
+              touching.push([group, decisive]);
               const add = id => {
                 if (!owned(id)) return;
                 if (!complete.has(id)) { complete.add(id); grown = true; }
@@ -1484,8 +1480,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
               // 91 edges: all its owners join at once, and when it may change
               // they are merged, since its decision may now differ for them.
               for (const edge of group) {
-                const record = remembered(edge);
-                if (record && !record.decisive && (changes || !decisive)) for (const id of record.owners) add(id);
+                if (changes || !decisive) for (const id of remembered(edge) || []) add(id);
               }
               // Any larger group containing a decisive one is decisive too, so
               // it needs no more context. Otherwise its own owners become
@@ -1499,7 +1494,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
           }
           if (!geometry) { Object.assign(diagnostics, counters, { incrementalFallback: true }); fullFallback = true; break local; }
           for (const id of affected) for (const index of featureEdges.get(id) || []) sourceOwners.delete(index);
-          for (const [group, decisive, complete] of touching) recordSourceGroup(group, decisive, !complete);
+          for (const [group, decisive] of touching) recordSourceGroup(group, decisive);
           if (quantization) {
             // Owners whose quantized lines change mixed status are added after
             // the merge and read from quantizedInput. Their source intervals are
