@@ -352,7 +352,7 @@ test("reference deep link selects Layers and reference settings", (context) => {
 test("layer groups follow map order and display moves existing controls", (context) => {
   const h = mount(context);
   const groups = h.get("editorTask-layers").querySelectorAll(".editor-layer-group");
-  assert.deepEqual(groups.map((g) => g.querySelector(".editor-group-heading").textContent), ["Political", "Geography", "Settlements & transport", "Data & annotations", "Map appearance"]);
+  assert.deepEqual(groups.map((g) => g.querySelector(".editor-group-heading").textContent), ["Political & borders", "Geography", "Settlements & transport", "Data & annotations", "Map appearance"]);
   assert.deepEqual(groups.map((g) => g.querySelectorAll(".editor-layer-row").map((r) => r.dataset.layerKey)), [
     ["borders", "special-zones"], ["ocean", "physical", "rivers"], ["urban", "citypoints", "transport"],
     ["thematic", "annotations", "legend"], ["presets", "daynight", "texture", "reference", "display"],

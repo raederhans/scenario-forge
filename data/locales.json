@@ -298524,7 +298524,7 @@
     },
     "Political": {
       "en": "Political",
-      "zh": "政治与边界"
+      "zh": "政治"
     },
     "Political Clean": {
       "en": "Political Clean",
@@ -303813,6 +303813,10 @@
     "Show {name}": {
       "en": "Show {name}",
       "zh": "显示 {name}"
+    },
+    "Political & borders": {
+      "en": "Political & borders",
+      "zh": "政治与边界"
     }
   }
 }

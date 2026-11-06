@@ -326,7 +326,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     display: ["Display & performance"],
   };
   for (const [heading, keys] of [
-    ["Political", ["borders", "special-zones"]],
+    ["Political & borders", ["borders", "special-zones"]],
     ["Geography", ["ocean", "physical", "rivers"]],
     ["Settlements & transport", ["urban", "citypoints", "transport"]],
     ["Data & annotations", ["thematic", "annotations", "legend"]],
