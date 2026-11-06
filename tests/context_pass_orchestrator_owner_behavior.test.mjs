@@ -296,7 +296,7 @@ test("context markers preserve normal layer order and draw city points only inte
   }
 });
 
-test("context scenario preserves region then relief order and final timing", () => {
+test("context scenario draws region, relief, then scenario urban supplements, with final timing", () => {
   const { events, owner } = createHarness();
   owner.drawContextScenarioPass(13, { interactive: true });
   assert.deepEqual(events, [
@@ -304,6 +304,7 @@ test("context scenario preserves region then relief order and final timing", () 
     "begin-session",
     ["scenario-region", 13],
     ["scenario-relief", 13],
+    ["urban", 13, { interactive: true, scope: "scenario-overlay" }],
     "end-session",
     "now",
     ["perf-metric", "drawContextScenarioPass", 12, { interactive: true }],
@@ -363,6 +364,7 @@ test("session cleanup preserves original error propagation and omits final timin
     "begin-session",
     ["scenario-region", 1],
     ["scenario-relief", 1],
+    ["urban", 1, { interactive: false, scope: "scenario-overlay" }],
     "end-throws",
   ]);
 });

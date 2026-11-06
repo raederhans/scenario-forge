@@ -12,6 +12,7 @@ import { resolveContourLodRequest } from './physical_contour_lod_policy.js';
 import { resolvePhysicalAtlasCollection } from './physical_atlas_lod_policy.js';
 import { getObjectIdentityToken } from './object_identity.js';
 import { getRiverZoomBucket } from './river_layer_render_owner.js';
+import { getAppendedScenarioUrbanOverlayFeatures } from './scenario_urban_overlay.js';
 
 // Keep pass identities tied to the fields that the pass actually paints.  The
 // physical style object also contains atlas-only controls; including all of it
@@ -167,6 +168,21 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       ].join("::");
     }
     return getTransformSignature(transform);
+  }
+
+  // Scenario urban supplements paint in contextScenario, above scenario land.
+  // Atlantropa color edits already invalidate that pass on the full color path.
+  function getScenarioUrbanOverlaySignature(transform) {
+    const overlayFeatures = getAppendedScenarioUrbanOverlayFeatures(runtimeState.urbanData);
+    if (!runtimeState.showUrban || !overlayFeatures.length) return "scenario-urban:off";
+    return [
+      "scenario-urban:on",
+      getObjectIdentityToken(overlayFeatures, "scenario-urban"),
+      overlayFeatures.length,
+      Number(runtimeState.contextLayerRevision || 0),
+      Number(transform?.k || runtimeState.zoomTransform?.k || 1).toFixed(4),
+      stableJson(normalizeUrbanStyleConfig(runtimeState.styleConfig?.urban || {})),
+    ].join(":");
   }
 
   function getRenderPassSignature(passName, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
@@ -332,6 +348,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         `ocean-fill:${getOceanBaseFillColor()}`,
         `lake-fill:${getLakeBaseFillColor()}`,
         `lake-style:${stableJson(getLakeStyleConfig())}`,
+        getScenarioUrbanOverlaySignature(transform),
       ].join("::");
     }
     if (passName === "textureLabels") {

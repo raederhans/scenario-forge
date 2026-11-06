@@ -90,6 +90,8 @@ const CONTEXT_LAYER_PACKS = {
   ports: { url: resolveDataAssetUrl("context_layer:ports"), format: "geojson" },
   physical: { url: resolveDataAssetUrl("context_layer:physical"), format: "geojson" },
   urban: { url: resolveDataAssetUrl("context_layer:urban"), format: "geojson" },
+  // Synthetic urban patches on TNO Atlantropa land; appended to urban only for tno_1962.
+  urban_tno_atlantropa: { url: resolveDataAssetUrl("context_layer:urban_tno_atlantropa"), format: "geojson" },
   physical_semantics: {
     url: resolveDataAssetUrl("context_layer:physical_semantics"),
     format: "topology",

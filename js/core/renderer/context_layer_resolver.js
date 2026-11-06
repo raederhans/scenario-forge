@@ -3,6 +3,7 @@ import {
   getStartupContextCollection,
 } from "../state/context_layer_revision.js";
 import { requestRuntimeHookAfterPaint } from "../state/index.js";
+import { appendScenarioUrbanOverlay, getActiveScenarioUrbanOverlay } from "./scenario_urban_overlay.js";
 
 export function createContextLayerResolverOwner({
   runtimeState,
@@ -515,6 +516,7 @@ export function createContextLayerResolverOwner({
         specialOverride, specialOverride?.features, specialOverride?.features?.length,
         contextRevision, globalThis.d3?.geoBounds, activeScenarioId,
         runtimeState.topologyBundleMode,
+        layerName === "urban" ? getActiveScenarioUrbanOverlay(runtimeState) : null,
       ];
       const previousStamp = layerSourceStamps.get(layerName);
       if (previousStamp && stamp.length === previousStamp.length
@@ -526,7 +528,15 @@ export function createContextLayerResolverOwner({
         case "landBgData": runtimeState.landBgData = collection; break;
         case "waterRegionsData": runtimeState.waterRegionsData = collection; break;
         case "riversData": runtimeState.riversData = collection; break;
-        case "urbanData": runtimeState.urbanData = collection; break;
+        case "urbanData": {
+          // Scenario supplements follow the selected source instead of competing with it.
+          const urbanCollection = appendScenarioUrbanOverlay(collection, getActiveScenarioUrbanOverlay(runtimeState));
+          if (urbanCollection !== collection) {
+            runtimeState.urbanLayerCapability = getUrbanLayerCapability(urbanCollection);
+          }
+          runtimeState.urbanData = urbanCollection;
+          break;
+        }
         case "physicalData": runtimeState.physicalData = collection; break;
         case "specialZonesData": runtimeState.specialZonesData = collection; break;
       }

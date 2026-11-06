@@ -1,4 +1,5 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+import { getAppendedScenarioUrbanOverlayFeatures } from "./scenario_urban_overlay.js";
 
 // Widths are CSS pixels; the caller's canvas already includes zoom and DPR.
 export function getUrbanZoomPaint(k) {
@@ -59,11 +60,20 @@ export function createUrbanLayerRenderOwner({ state, helpers }) {
     return path;
   }
 
-  function drawUrbanLayer(k, { interactive = false } = {}) {
+  // scope "base" draws the urban layer without scenario supplements;
+  // scope "scenario-overlay" draws only those supplements, above scenario land.
+  function drawUrbanLayer(k, { interactive = false, scope = "base" } = {}) {
     const startedAt = nowMs();
-    const featureCount = state.urbanData?.features?.length || 0;
+    const overlayOnly = scope === "scenario-overlay";
+    const metricName = overlayOnly ? "drawScenarioUrbanOverlayLayer" : "drawUrbanLayer";
+    const overlayFeatures = getAppendedScenarioUrbanOverlayFeatures(state.urbanData);
+    // Most scenarios have no supplement; skip without a per-frame metric.
+    if (overlayOnly && !overlayFeatures.length) return;
+    const features = overlayOnly ? overlayFeatures : (state.urbanData?.features || []);
+    const skippedFeatures = !overlayOnly && overlayFeatures.length ? new Set(overlayFeatures) : null;
+    const featureCount = features.length - (skippedFeatures ? skippedFeatures.size : 0);
     if (!state.showUrban || !featureCount) {
-      collectContextMetric("drawUrbanLayer", nowMs() - startedAt, {
+      collectContextMetric(metricName, nowMs() - startedAt, {
         featureCount, interactive: !!interactive, skipped: true,
         reason: !state.showUrban ? "hidden" : "no-data",
       });
@@ -95,7 +105,8 @@ export function createUrbanLayerRenderOwner({ state, helpers }) {
       context.setLineDash([]);
       context.lineWidth = zoomPaint.strokeWidth;
       if (fillAlpha > 0 || strokeAlpha > 0) {
-        for (const feature of state.urbanData.features) {
+        for (const feature of features) {
+          if (skippedFeatures?.has(feature)) continue;
           if (estimateProjectedAreaPx(feature, k) < minAreaPx || !pathBoundsInScreen(feature)) continue;
           const glowMultiplier = getUrbanGlowFeatureMultiplier(feature);
           const resolvedFillAlpha = clamp(fillAlpha * glowMultiplier, 0, 1);
@@ -130,7 +141,7 @@ export function createUrbanLayerRenderOwner({ state, helpers }) {
     } finally {
       context.restore();
     }
-    collectContextMetric("drawUrbanLayer", nowMs() - startedAt, {
+    collectContextMetric(metricName, nowMs() - startedAt, {
       featureCount, interactive: !!interactive, skipped: false,
       mode: effectiveMode, requestedMode: cfg.mode,
       adaptiveAvailable: !!capability?.adaptiveAvailable, ...counts,
