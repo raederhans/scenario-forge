@@ -935,5 +935,15 @@
   "Open Workspace": "打开工作区",
   "Close Workspace": "关闭工作区",
   "Choose or drop an image": "选择或拖入图片",
-  "Political & borders": "政治与边界"
+  "Political & borders": "政治与边界",
+  "Help": "帮助",
+  "User guide": "使用指南",
+  "Keyboard shortcuts": "键盘快捷键",
+  "Command palette": "命令面板",
+  "Search commands": "搜索命令",
+  "No matching commands": "没有匹配的命令",
+  "No country selected": "还没有选中国家",
+  "Click a parcel on the map, or search for a country on the left.": "在地图上点选一个地块，或在左侧搜索国家。",
+  "Switch language": "切换语言",
+  "Project": "项目"
 }

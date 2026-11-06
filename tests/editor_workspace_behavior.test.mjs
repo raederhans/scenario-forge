@@ -57,6 +57,7 @@ class Element {
     return true;
   }
   click() { for (const callback of this.listeners.get("click") || []) callback({ target: this }); }
+  scrollIntoView() {}
   focus(options) { this.ownerDocument.activeElement = this; this.focusOptions = options; }
   matches(selector) {
     if (selector.startsWith("#")) return this.id === selector.slice(1);
@@ -95,6 +96,7 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   const left = add("leftSidebarContent");
   const right = add("rightSidebarContent");
   add("editorProjectBar");
+  for (const id of ["scenarioGuideBtn", "workspaceGithubLink", "workspaceSaveBtn", "workspaceExportBtn", "btnToggleLang"]) add(id, documentRef.body, id === "workspaceGithubLink" ? "a" : "button");
   for (const [sectionId, detailId] of [
     ["countryInspectorSection", "countryInspectorDetail"],
     ["waterInspectorSection", "waterInspectorDetail"],
@@ -103,7 +105,7 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
     const section = add(sectionId, left, "details");
     const detail = add(detailId, section);
     if (detailId === "countryInspectorDetail" && !countrySelected) detail.classList.add("hidden");
-    if (sectionId === "countryInspectorSection") add("countryList", section);
+    if (sectionId === "countryInspectorSection") { add("countryList", section); add("countrySearch", section, "input"); }
   }
   const panels = [];
   for (const key of ["borders", "physical", "urban", "citypoints", "transport", "presets", "ocean", "thematic", "daynight", "texture", "rivers"]) {
@@ -217,7 +219,11 @@ test("Inspector returns to its existing empty state when no country is selected"
   assert.equal(h.get("countryInspectorDetail").classList.contains("hidden"), true);
   const hint = h.get("editorProperty-countries").querySelector(".editor-empty-hint");
   assert.equal(hint.hidden, false);
-  assert.equal(hint.textContent, "Select a country to view its properties.");
+  assert.equal(hint.querySelector("h3").textContent, "No country selected");
+  h.workspace.selectTask("layers");
+  h.get("editorSearchCountriesBtn").click();
+  assert.equal(h.get("leftSidebarContent").dataset.editorTask, "objects");
+  assert.equal(h.documentRef.activeElement, h.get("countrySearch"));
 });
 
 test("property tabs switch with arrows and Home/End, moving focus and the tab stop", (context) => {
@@ -406,4 +412,32 @@ test("layer search filters groups, shows empty state, and Escape clears it", (co
   assert.equal(search.value, "");
   assert.equal(rows.every((r) => !r.hidden), true);
   assert.equal(h.get("editorLayersEmpty").hidden, true);
+});
+
+test("help menu retains actions, supports arrows and Escape, and opens shortcuts", (context) => {
+  const h = mount(context);
+  const trigger = h.get("editorHelpBtn");
+  const menu = h.get("editorHelpMenu");
+  trigger.click();
+  assert.equal(menu.hidden, false);
+  assert.equal(trigger.getAttribute("aria-expanded"), "true");
+  assert.equal(h.documentRef.activeElement, h.get("editorKeyboardShortcutsBtn"));
+  assert.notEqual(h.get("scenarioGuideBtn").parentNode, menu);
+  const press = (key) => trigger.parentNode.dispatchEvent({ type: "keydown", key, preventDefault() {}, stopPropagation() {} });
+  press("ArrowDown");
+  assert.equal(h.documentRef.activeElement, h.get("editorCommandPaletteBtn"));
+  press("Escape");
+  assert.equal(menu.hidden, true);
+  assert.equal(h.documentRef.activeElement, trigger);
+  trigger.click();
+  h.get("editorKeyboardShortcutsBtn").click();
+  assert.equal(menu.hidden, true);
+  assert.equal(h.get("editorCommandSearch").value, "?");
+  h.documentRef.dispatchEvent({ type: "keydown", key: "Escape", preventDefault() {}, stopPropagation() {} });
+  assert.equal(h.documentRef.activeElement, trigger);
+  trigger.click();
+  h.documentRef.dispatchEvent({ type: "click", target: h.get("countrySearch") });
+  assert.equal(menu.hidden, true);
+  assert.equal(h.get("workspaceGithubLink").parentNode, menu);
+  assert.equal(h.get("workspaceGithubLink").rel, "noopener");
 });
