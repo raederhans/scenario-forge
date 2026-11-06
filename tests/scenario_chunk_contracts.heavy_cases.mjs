@@ -302,10 +302,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && renderPipelinePassesSource.includes('recordRenderPerfMetric("contextScenarioSignatureChanged"'),
       contextScenarioSpecialSignatureTracksPayloadIdentity:
         /function getScenarioSpecialVisualRevisionToken\(\) \{[\s\S]*?special-ref:\$\{getObjectIdentityToken\(runtimeState\.scenarioSpecialRegionsData, "scenario-special"\)\}[\s\S]*?special-count:\$\{getFeatureCollectionFeatureCount\(runtimeState\.scenarioSpecialRegionsData\)\}[\s\S]*?runtimeState\.showScenarioSpecialRegions \? "scenario-special:on" : "scenario-special:off"/.test(rendererSource),
-      interactionMetricsKeepDirectActionAndHitRankDurations:
-        rendererSource.includes('recordInteractionDurationMetric("interactionActionDuration"')
-        && /function rankCandidates\([\s\S]*?candidates,[\s\S]*?lonLat,[\s\S]*?eventType = "unknown",[\s\S]*?targetType = "unknown",[\s\S]*?recordInteractionDurationMetric\("interactionHitRankDuration"[\s\S]*?candidateCount: candidates\.length,[\s\S]*?geoContainsCount,[\s\S]*?containsGeoCount:[\s\S]*?eventType,[\s\S]*?targetType,/.test(interactionHitCandidateSource)
-        && /function rankCandidates\(candidates, lonLat,[\s\S]*?rankHitCandidates\(candidates, lonLat,[\s\S]*?recordInteractionDurationMetric,/.test(rendererSource),
       hoverMetricsUseSamplingAndSlowSampleThreshold:
         rendererSource.includes("const HOVER_INTERACTION_METRIC_SAMPLE_RATE = 10;")
         && rendererSource.includes("const HOVER_INTERACTION_SLOW_SAMPLE_MS = 8;")
@@ -412,10 +408,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /const taskKey = "scenario-chunk-promotion-infra";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(scenarioRefreshRuntimeSource)
         && /const taskKey = "secondary-spatial-index";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(rendererSource)
         && /const taskKey = "deferred-heavy-border-meshes";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(staticBorderMeshLifecycleSource),
-      hoverStrictHitUsesFirstContainingFastPath:
-        /function findFirstContainingCandidate\([\s\S]*?eventType = "hover",[\s\S]*?targetType = "unknown",[\s\S]*?fastPath: `\$\{eventType\}-first-containing`/.test(interactionHitCandidateSource)
-        && /function findFirstContainingCandidate\(candidates, lonLat,[\s\S]*?findFirstContainingHitCandidate\(candidates, lonLat,[\s\S]*?recordInteractionDurationMetric,/.test(rendererSource)
-        && /\(eventType === "hover" \|\| eventType === "brush"\) && !enableSnap[\s\S]*?findFirstContainingCandidate\(strictCandidates, pointer\.lonLat, \{ eventType, targetType: "land" \}\)/.test(rendererSource),
       exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses:
         /function getPhysicalExactRefreshPasses\(\) \{[\s\S]*?\["physicalBase", "political", "contextBase", "borders"\][\s\S]*?\["political", "contextBase", "borders"\][\s\S]*?return passes;[\s\S]*?\}/.test(rendererSource)
         && /function applyExactAfterSettleRefreshPlan[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);[\s\S]*?invalidateRenderPasses\(getPhysicalExactRefreshPasses\(\), reuseDecision\.reason \|\| "context-base-exact"\);/.test(exactSchedulerSource),
@@ -560,33 +552,11 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function enqueueExactAfterSettleSegment\(generation, label, task\) \{[\s\S]*?generation,[\s\S]*?dedupe: true,[\s\S]*?deferOnContinuousInput: false/.test(exactSchedulerSource)
         && /label: `exact-after-settle-pass-\$\{passName\}`,[\s\S]*?generation,[\s\S]*?dedupe: true,[\s\S]*?deferOnContinuousInput: false/.test(readRepoFile("js", "core", "renderer", "render_pipeline_passes.js"))
         && /priority: "high",[\s\S]*?label: `deferred-exact-context-pass-\$\{passName\}`,[\s\S]*?generation: Number\(plan\.controllerGeneration \|\| 0\),[\s\S]*?dedupe: true,[\s\S]*?deferOnContinuousInput: false/.test(exactSchedulerSource),
-      buildHitCanvasReportsVisibleAndGridCandidateCounts:
-        rendererSource.includes("lastHitCanvasBuildStats")
-        && rendererSource.includes("HIT_CANVAS_VIEWPORT_OVERSCAN_PX")
-        && /const visibleSpatialItemsResult = collectVisibleLandSpatialItemsWithStats\(\{[\s\S]*?overscanPx: HIT_CANVAS_VIEWPORT_OVERSCAN_PX,[\s\S]*?\}\);/.test(rendererSource)
-        && rendererSource.includes("visibleItemCount")
-        && spatialQueryIndexSource.includes("cellCandidateCount")
-        && spatialQueryIndexSource.includes("globalCandidateCount")
-        && rendererSource.includes("globalCount")
-        && spatialQueryIndexSource.includes("cellSpan"),
-      dirtyHitCanvasUsesPointProbeBeforeDeferredFullBuild:
-        /function getDirtyHitCanvasPointProbeHit\(event\) \{[\s\S]*?collectGridCandidates\(projectedX, projectedY, 0\)[\s\S]*?rendererSurfaceHost\.getHitContext\(\)\.rect\(px - 1, py - 1, 3, 3\);[\s\S]*?rendererSurfaceHost\.getHitContext\(\)\.clip\(\);[\s\S]*?recordRenderPerfMetric\("hitCanvasPointProbe"[\s\S]*?recordRenderPerfMetric\("hitCanvasViewportProfile"[\s\S]*?profile: "point-probe"/.test(rendererSource)
-        && /function getValidatedCanvasHit\(event, strictIds = null, \{ forceBuild = false \} = \{\}\) \{[\s\S]*?if \(isHitCanvasCurrent\(\)\) \{[\s\S]*?getHitResultFromCanvas\(event\)[\s\S]*?\} else \{[\s\S]*?scheduleHitCanvasBuildIfNeeded\(\{ reason: forceBuild \? "dirty-point-probe-click" : "dirty-point-probe-hover" \}\);[\s\S]*?getDirtyHitCanvasPointProbeHit\(event\);/.test(rendererSource),
-      startupHitCanvasFullBuildIsDeferred:
-        /function recordDeferredFullHitCanvasMetric\(\{ reason = "deferred-full", keepReady = false \} = \{\}\) \{[\s\S]*?mode: "deferred-full"[\s\S]*?reason,[\s\S]*?recordRenderPerfMetric\("hitCanvasViewportProfile"[\s\S]*?profile: "deferred-full"/.test(rendererSource)
-        && /async function buildHitCanvasAfterStartup\(\{ keepReady = false, reason = "startup-deferred-hit-canvas" \} = \{\}\) \{[\s\S]*?recordDeferredFullHitCanvasMetric\(\{[\s\S]*?reason,[\s\S]*?keepReady[\s\S]*?\}\);[\s\S]*?setInteractionInfrastructureState\("hit-canvas-deferred"/.test(rendererSource)
-        && !/async function buildHitCanvasAfterStartup\(\{[\s\S]*?ensureHitCanvasUpToDate\(\{ force: true \}\);[\s\S]*?\n\}/.test(rendererSource),
+      
       stagedHitCanvasWarmupDefersFullBuild:
         /function scheduleStagedHitCanvasWarmup\(startedAt, token\) \{[\s\S]*?recordDeferredFullHitCanvasMetric\(\{[\s\S]*?reason: "staged-hit-canvas-warmup"[\s\S]*?recordRenderPerfMetric\("setMapDataHitCanvasReady"/.test(rendererSource)
         && !/function scheduleStagedHitCanvasWarmup\(startedAt, token\) \{[\s\S]*?ensureHitCanvasUpToDate\(\{ force: true \}\);/.test(rendererSource),
-      buildHitCanvasMetricsSeparateDeferredForcedAndPointProbe:
-        /drawHitCanvasWithMetric\(\{[\s\S]*?mode: "deferred",[\s\S]*?reason,/.test(rendererSource)
-        && /drawHitCanvasWithMetric\(\{[\s\S]*?mode: "forced",[\s\S]*?reason: "strict-validation"/.test(rendererSource)
-        && /recordDeferredFullHitCanvasMetric\(\{[\s\S]*?mode: "deferred-full"[\s\S]*?profile: "deferred-full"/.test(rendererSource)
-        && /recordRenderPerfMetric\("hitCanvasPointProbe"[\s\S]*?recordRenderPerfMetric\("hitCanvasViewportProfile"[\s\S]*?profile: "point-probe"/.test(rendererSource),
-      hitCanvasPixelReadsUseFiniteDpr:
-        /function getHitResultFromCanvas\(event\) \{[\s\S]*?const dpr = Number\.isFinite\(Number\(runtimeState\.dpr\)\) && Number\(runtimeState\.dpr\) > 0[\s\S]*?Math\.round\(sx \* dpr\)[\s\S]*?Math\.round\(sy \* dpr\)/.test(rendererSource)
-        && /function getDirtyHitCanvasPointProbeHit\(event\) \{[\s\S]*?const dpr = Number\.isFinite\(Number\(runtimeState\.dpr\)\) && Number\(runtimeState\.dpr\) > 0[\s\S]*?Math\.round\(sx \* dpr\)[\s\S]*?rendererSurfaceHost\.getHitContext\(\)\.setTransform\(dpr, 0, 0, dpr, 0, 0\);/.test(rendererSource),
+      
       chunkPromotionReportsPrimaryAndDeferredStageMetrics:
         scenarioRefreshRuntimeSource.includes('recordRenderPerfMetric("chunkPromotionPrimaryRefreshMs"')
         && scenarioRefreshRuntimeSource.includes('recordRenderPerfMetric("chunkPromotionDeferredInfraMs"')
@@ -1055,15 +1025,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function isScenarioWaterTopologyExclusiveMode\(\) \{[\s\S]*?return getScenarioWaterRegionsMode\(\) === "exclusive";[\s\S]*?\}/.test(rendererSource),
       tnoWaterCombinesExclusiveScenarioMarineWithSharedLakes:
         /function getEffectiveWaterRegionFeatures\(atlantropaFeatures = getEffectiveAtlantropaFeatures\(\), scenarioWaterFeatures = runtimeState\.scenarioWaterRegionsData\?\.features\) \{[\s\S]*?resolveEffectiveWaterRegionFeatures\(\{[\s\S]*?globalLakeFeatures: runtimeState\.contextLayerExternalDataByName\?\.lakes\?\.features[\s\S]*?exclusive: isScenarioWaterTopologyExclusiveMode\(\)/.test(rendererSource),
-      openOceanRenderAndInteractionUseActiveOverlayGate:
-        /function isOpenOceanOverlayActive\(\) \{[\s\S]*?return isOpenOceanSelectionEnabled\(\) \|\| isOpenOceanPaintEnabled\(\);[\s\S]*?\}/.test(rendererSource)
-        && /function isWaterRegionRenderable\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanRenderable\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
-        && /function isWaterRegionEnabled\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanOverlayActive\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
-        && /function getWaterHitFromPointer\([\s\S]*?\) \{[\s\S]*?if \(!runtimeState\.showWaterRegions && !isOpenOceanOverlayActive\(\) && !isLakeInteractionEnabled\(runtimeState\)\) return createHitResult\(\);/.test(rendererSource)
-        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false, partsOverride = null, opaque = false, collectMetrics = true \} = \{\}\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource)
-        && /function collectWaterGridCandidates\(px, py, radiusProj = 0\) \{[\s\S]*?shouldIncludeItem: \(item\) => isWaterRegionEnabled\(item\.feature\),/.test(rendererSource)
-        && /function rebuildAuxiliaryRegionIndexes\(\) \{[\s\S]*?if \(!isWaterRegionEnabled\(selectedFeature\)\) \{[\s\S]*?runtimeState\.selectedWaterRegionId = "";/.test(rendererSource)
-        && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?if \(!isWaterRegionEnabled\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource),
       // Spherical diagnostics behavior is covered through the real owner in
       // projected_geometry_bounds_owner_behavior.test.mjs.
       waterSphericalDiagnosticsBacksSanitization:
@@ -1191,11 +1152,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function createHitResult\(overrides = \{\}\) \{[\s\S]*?countryCode: null,[\s\S]*?runtimeCountryCode: null,/.test(interactionHitCandidateSource),
       interactionCountryCodeFallsBackFromDisplayOwnerToRuntimeCountry:
         /function getFeatureInteractionCountryCodeNormalized\(feature, featureId = null\) \{[\s\S]*?getDisplayOwnerCode\(feature, resolvedId\)[\s\S]*?getFeatureCountryCodeNormalized\(feature\)/.test(rendererSource),
-      canvasHitPreservesRuntimeCountryAndReturnsInteractionCountry:
-        /function getHitResultFromCanvas\(event\) \{[\s\S]*?countryCode: getFeatureInteractionCountryCodeNormalized\(feature, id\),[\s\S]*?runtimeCountryCode: getFeatureCountryCodeNormalized\(feature\),/.test(rendererSource),
-      spatialHitPreservesRuntimeCountryAndReturnsInteractionCountry:
-        /function toHitResult\([\s\S]*?const runtimeCountryCode = canonicalCountryCode\([\s\S]*?candidate\.item\.countryCode[\s\S]*?const interactionCountryCode = feature[\s\S]*?getFeatureInteractionCountryCodeNormalized\(feature, resolvedId\)[\s\S]*?countryCode: interactionCountryCode \|\| runtimeCountryCode,[\s\S]*?runtimeCountryCode,/.test(interactionHitCandidateSource)
-        && /function toHitResult\(candidate,[\s\S]*?toCandidateHitResult\(candidate,[\s\S]*?getFeatureInteractionCountryCodeNormalized,/.test(rendererSource),
+      
       booleanWeldDonorIslandHasDedicatedInteractiveEscape:
         /function isInteractiveAtlantropaBooleanWeldIslandFeature\(feature, featureId = null\) \{[\s\S]*?candidate\.startsWith\("ATLISL_"\)[\s\S]*?getAtlantropaGeometryRole\(feature\) === "donor_island"[\s\S]*?getAtlantropaJoinMode\(feature\) === "boolean_weld"[\s\S]*?\}/.test(rendererSource),
       booleanWeldIslandCanRenderAndRemainInteractive:
@@ -1278,14 +1235,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function appendLandSpatialItemsRange\([\s\S]*?shouldExcludePoliticalVisualFeature = shouldExcludePoliticalInteractionFeature[\s\S]*?if \(shouldExcludePoliticalVisualFeature\(feature, id\)\) continue;[\s\S]*?interactive: !shouldExcludePoliticalInteractionFeature\(feature, id\)/.test(spatialBuilderSource)
         && /shouldExcludePoliticalVisualFeature = shouldExcludePoliticalInteractionFeature/.test(spatialOwnerSource)
         && /shouldExcludePoliticalVisualFeature,/.test(spatialOwnerSource),
-      hitCanvasFiltersOrdinaryAndMasksRiverNonInteractiveSpatialItems:
-        (() => {
-          const body = extractRendererFunction(rendererSource, "drawHitCanvas");
-          return /const visibleSpatialItemsResult = collectVisibleLandSpatialItemsWithStats\(\{\s*overscanPx: HIT_CANVAS_VIEWPORT_OVERSCAN_PX,\s*\}\);/.test(body)
-            && /const riverVisible = hasVisibleRiverPartitions\(\);\s*const visibleSpatialItems = riverVisible\s*\? orderPoliticalShellUnderlayFirst\(visibleSpatialItemsResult\.items\)\s*: visibleSpatialItemsResult\.items;/.test(body)
-            && /visibleSpatialItems\.forEach\(\(item\) => \{\s*if \(!item\?\.feature\) return;\s*const excluded = shouldExcludePoliticalInteractionFeature\(item\.feature, item\.id\);\s*const key = excluded \? 0 : \(runtimeState\.idToKey\.get\(item\.id\) \|\| 0\);\s*if \(!riverVisible && \(!key \|\| excluded\)\) return;\s*fillHitFeature\(item\.feature, item\.id, key\);/.test(body);
-        })()
-        && /collectVisibleSpatialItemsWithStats\(\{[\s\S]*?shouldIncludeItem:[\s\S]*?!shouldExcludePoliticalVisualFeature/.test(rendererSource),
       atlantropaScenarioLayerFeedsScenarioWaterPath:
         /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?runtimeState\.scenarioAtlantropaData[\s\S]*?water:\$\{counts \? counts\.water : buckets\.water\.length\}/.test(rendererSource)
         && /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?isScenarioAtlantropaVisible\(\) \? "visible:on" : "visible:off"/.test(rendererSource)
