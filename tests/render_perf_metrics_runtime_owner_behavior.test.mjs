@@ -5,7 +5,6 @@ import test from "node:test";
 import { createRenderPerfMetricsRuntimeOwner } from "../js/core/renderer/render_perf_metrics_runtime_owner.js";
 import {
   captureRenderPerfContextBreakdownState,
-  captureRenderPerfMetricsState,
   commitRenderPerfMetricState,
   ensureRenderPerfMetricsState,
   setRenderPerfContextBreakdownState,
@@ -28,7 +27,6 @@ const DEPENDENCIES = Object.freeze({
     "ensureRenderPerfMetricsState",
     "commitRenderPerfMetricState",
     "setRenderPerfContextBreakdownState",
-    "mirrorRenderPerfMetrics",
   ]),
 });
 
@@ -75,9 +73,6 @@ function createHarness({
         events.push(["set-breakdown", breakdown]);
         setRenderPerfContextBreakdownState(state, breakdown);
       },
-      mirrorRenderPerfMetrics(name) {
-        events.push(["mirror-metrics", name, captureRenderPerfMetricsState(state)]);
-      },
     },
   };
   return {
@@ -118,7 +113,7 @@ test("factory validates dependencies and freezes the exact runtime API", () => {
   ]);
 });
 
-test("ensure and record preserve state ordering, sequence, detail overrides, and detached mirrors", () => {
+test("ensure and record preserve state ordering, sequence, and detail overrides", () => {
   const { events, owner, state } = createHarness({ initialSequence: 4 });
   assert.equal(owner.ensureRenderPerfMetrics(), true);
   assert.deepEqual(events, ["ensure-metrics"]);
@@ -143,9 +138,7 @@ test("ensure and record preserve state ordering, sequence, detail overrides, and
     "get-sequence",
     ["now", 100],
     ["commit-entry", "drawFrame", entry, 5],
-    ["mirror-metrics", "drawFrame", state.renderPerfMetrics],
   ]);
-  assert.notEqual(events.at(-1)[2], state.renderPerfMetrics);
 
   events.length = 0;
   assert.equal(owner.recordRenderPerfMetric("  ", 1), null);
@@ -168,7 +161,6 @@ test("collect outside a session falls back to record and retains the second samp
     "get-sequence",
     ["now", 110],
     ["commit-entry", "drawRoadsLayer", entry, 1],
-    ["mirror-metrics", "drawRoadsLayer", state.renderPerfMetrics],
   ]);
 });
 
@@ -262,12 +254,6 @@ test("ending a session records insertion order while preserving the metrics root
     true,
   );
   assert.equal(events.includes("get-breakdown"), true);
-  assert.deepEqual(events.at(-1), [
-    "mirror-metrics",
-    "contextBreakdown",
-    state.renderPerfMetrics,
-  ]);
-  assert.notEqual(events.at(-1)[2], state.renderPerfMetrics);
 
   events.length = 0;
   const fallback = owner.collectContextMetric("afterSession", 1);
@@ -297,12 +283,6 @@ test("begin replaces an unfinished session and end without a session still commi
     true,
   );
   assert.equal(events.includes("get-breakdown"), true);
-  assert.deepEqual(events.at(-1), [
-    "mirror-metrics",
-    "contextBreakdown",
-    state.renderPerfMetrics,
-  ]);
-  assert.notEqual(events.at(-1)[2], state.renderPerfMetrics);
 });
 
 test("reset preserves other metrics and publishes a fresh empty breakdown", () => {
@@ -321,12 +301,6 @@ test("reset preserves other metrics and publishes a fresh empty breakdown", () =
     events.some((event) => Array.isArray(event) && event[0] === "set-breakdown"),
     true,
   );
-  assert.deepEqual(events.at(-1), [
-    "mirror-metrics",
-    "contextBreakdown",
-    state.renderPerfMetrics,
-  ]);
-  assert.notEqual(events.at(-1)[2], state.renderPerfMetrics);
 });
 
 test("owner source stays import-free and free of global state, DOM, and direct clocks", async () => {

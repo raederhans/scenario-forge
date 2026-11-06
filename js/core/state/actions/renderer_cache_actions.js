@@ -205,9 +205,7 @@ export function replaceCachedCoastlineMeshesState(target, collections) {
 export function patchBorderMeshCacheState(target, patch) {
   assertStateTarget(target);
   if (Object.hasOwn(patch, "cachedBorders")) target.cachedBorders = patch.cachedBorders;
-  if (Object.hasOwn(patch, "cachedDynamicOwnerBorders")) target.cachedDynamicOwnerBorders = patch.cachedDynamicOwnerBorders;
   if (Object.hasOwn(patch, "cachedDynamicBordersHash")) target.cachedDynamicBordersHash = patch.cachedDynamicBordersHash;
-  if (Object.hasOwn(patch, "cachedScenarioOpeningOwnerBorders")) target.cachedScenarioOpeningOwnerBorders = patch.cachedScenarioOpeningOwnerBorders;
   if (Object.hasOwn(patch, "cachedFrontlineMesh")) target.cachedFrontlineMesh = patch.cachedFrontlineMesh;
   if (Object.hasOwn(patch, "cachedFrontlineMeshHash")) target.cachedFrontlineMeshHash = patch.cachedFrontlineMeshHash;
 }

@@ -1,5 +1,5 @@
 import { state as runtimeState } from "./state.js";
-import { callRuntimeHook } from "./state/index.js";
+import { commitChange } from "./state/changes.js";
 import { clearDirtyState, markDirtyState } from "./state/actions/ui_dirty_actions.js";
 
 function updateDirtyIndicator() {
@@ -8,7 +8,7 @@ function updateDirtyIndicator() {
     indicator.classList.toggle("hidden", !runtimeState.isDirty);
     indicator.setAttribute("aria-hidden", runtimeState.isDirty ? "false" : "true");
   }
-  callRuntimeHook(runtimeState, "updateProjectSaveStatusFn");
+  commitChange({ domains: ["dirty"], reason: "dirty-indicator" });
 }
 
 function markDirty(reason = "") {

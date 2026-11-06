@@ -70,47 +70,6 @@ function getPoliticalCountryIndex(object, resolveCountry, assignmentRevision) {
   };
 }
 
-export function resolveScenarioOpeningOwnerBorderSelection({
-  state,
-  isUsableMesh = () => false,
-} = {}) {
-  const runtimeRef = state.runtimePoliticalTopology || null;
-  const meshPackRef = state.activeScenarioMeshPack || null;
-  const meshPackMesh = meshPackRef?.meshes?.opening_owner_borders || null;
-  const hasMeshPackMesh = isUsableMesh(meshPackMesh);
-  const hasBaselineOwners = Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
-  const scenarioId = String(state.activeScenarioId || "");
-  const baselineHash = String(state.scenarioBaselineHash || "");
-  const shellRevision = Number(state.scenarioShellOverlayRevision) || 0;
-  const meshSource = hasMeshPackMesh ? "mesh_pack" : "runtime";
-  const shouldBuild =
-    !!scenarioId
-    && state.scenarioBorderMode === "scenario_owner_only"
-    && (
-      hasMeshPackMesh
-      || (!!runtimeRef?.objects?.political && hasBaselineOwners)
-    );
-
-  return {
-    shouldBuild,
-    hasMeshPackMesh,
-    meshPackMesh,
-    runtimeRef,
-    meshPackRef,
-    scenarioId,
-    baselineHash,
-    baselineOwnersRef: state.scenarioBaselineOwnersByFeatureId,
-    shellRevision,
-    meshSource,
-    fallbackOwnershipContext: {
-      ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
-      shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
-      scenarioActive: false,
-      viewMode: "ownership",
-    },
-  };
-}
-
 export function getSourceCountrySets(options = {}) {
   const iterator = getSourceCountrySetsSteps(options);
   let next = iterator.next();

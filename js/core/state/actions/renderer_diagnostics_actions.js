@@ -418,6 +418,22 @@ export function commitRenderPerfMetricState(
   const nextSequence = Math.max(0, Number(sequence || 0));
   const existingMetrics = getOwnObjectPropertyValue(target, "renderPerfMetrics");
   const metrics = existingMetrics || {};
+  if (existingMetrics) {
+    const prototype = Object.getPrototypeOf(metrics);
+    const metricDescriptor = Object.getOwnPropertyDescriptor(metrics, normalizedName);
+    const sequenceDescriptor = Object.getOwnPropertyDescriptor(target, "renderPerfMetricSequence");
+    if (
+      (prototype === Object.prototype || prototype === null)
+      && (metricDescriptor?.writable === true
+        || (!(normalizedName in metrics) && Object.isExtensible(metrics)))
+      && (sequenceDescriptor?.writable === true
+        || (!("renderPerfMetricSequence" in target) && Object.isExtensible(target)))
+    ) {
+      metrics[normalizedName] = entry;
+      target.renderPerfMetricSequence = nextSequence;
+      return nextSequence;
+    }
+  }
   if (!existingMetrics) {
     assertOwnDataPropertyWritable(
       target,
