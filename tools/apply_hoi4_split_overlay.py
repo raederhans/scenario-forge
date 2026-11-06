@@ -329,11 +329,12 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
 
     before, after = Counter(owners.values()), Counter(result_owners.values())
     retired = {tag for tag in result_countries if before[tag] > 0 and after[tag] == 0}
-    containers = set()
+    landless = {tag for tag in result_countries if after[tag] == 0}
+    containers = {tag for tag in landless if countries.get(tag, {}).get("entry_kind") == "scenario_container"}
     while True:
         parents = {country.get("parent_owner_tag") for tag, country in result_countries.items()
                    if tag not in retired or tag in containers}
-        added = retired & parents - containers
+        added = landless & parents - containers
         if not added:
             break
         containers.update(added)
