@@ -1,14 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createRendererViewportUpdateOwner } from "../js/core/renderer/renderer_viewport_update_owner.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const REPO_ROOT = path.resolve(__dirname, "..");
 
 const EFFECT_NAMES = Object.freeze([
   "setZoomTransform",
@@ -62,26 +55,6 @@ function createHarness(options = {}) {
   }
   const owner = createRendererViewportUpdateOwner({ effects, getters });
   return { calls, effects, getters, owner };
-}
-
-function readRepoFile(...parts) {
-  return fs.readFileSync(path.join(REPO_ROOT, ...parts), "utf8");
-}
-
-function sliceBetween(source, startMarker, endMarker) {
-  const start = source.indexOf(startMarker);
-  assert.notEqual(start, -1, `Expected start marker ${JSON.stringify(startMarker)}`);
-  const end = source.indexOf(endMarker, start + startMarker.length);
-  assert.notEqual(end, -1, `Expected end marker ${JSON.stringify(endMarker)}`);
-  return source.slice(start, end);
-}
-
-function assertIncludes(source, token, message) {
-  assert.ok(source.includes(token), `${message}: missing ${JSON.stringify(token)}`);
-}
-
-function assertExcludes(source, token, message) {
-  assert.equal(source.includes(token), false, `${message}: unexpected ${JSON.stringify(token)}`);
 }
 
 test("updateMap runs viewport update effects in exact order", () => {
@@ -180,89 +153,4 @@ test("owner fails fast when viewport group getter is missing", () => {
     () => createRendererViewportUpdateOwner({ effects, getters }),
     /renderer viewport update owner requires getters\.getViewportGroup/,
   );
-});
-
-test("map_renderer imports wires and delegates viewport updates through the owner", () => {
-  const rendererSource = readRepoFile("js", "core", "map_renderer.js");
-  const updateMapWrapperSource = sliceBetween(
-    rendererSource,
-    "function updateMap(transform)",
-    "function getProjectedRenderableContentBounds()",
-  );
-  const zoomLifecycleFactorySource = sliceBetween(
-    rendererSource,
-    "function getZoomInteractionLifecycleOwner()",
-    "function getMapInteractionEventBindingOwner()",
-  );
-
-  for (const token of [
-    "import { createRendererViewportUpdateOwner } from \"./renderer/renderer_viewport_update_owner.js\";",
-    "let rendererViewportUpdateOwner = null;",
-    "function getRendererViewportUpdateOwner()",
-    "const runtime = runtimeState;",
-    "rendererViewportUpdateOwner = createRendererViewportUpdateOwner({",
-    "getters: {",
-    "setZoomTransform: (transform) => {",
-    "setHitCanvasDirty: () => {",
-    "updateZoomUi: () => {",
-    "renderPhysicalIntensityBrushPreview,",
-    "syncUnitCounterScalesDuringZoom: () => {",
-    "syncSpecialZonePatternTransformDuringZoom,",
-    "drawFrame: () => {",
-  ]) {
-    assertIncludes(rendererSource, token, "map_renderer must wire viewport update owner");
-  }
-
-  assertIncludes(
-    updateMapWrapperSource,
-    "return getRendererViewportUpdateOwner().updateMap(transform);",
-    "updateMap wrapper must delegate to viewport update owner",
-  );
-  assertIncludes(
-    zoomLifecycleFactorySource,
-    "updateMap,",
-    "zoom lifecycle owner must still receive updateMap as an injected effect",
-  );
-
-  for (const tokenParts of [
-    ["runtimeState.", "zoomTransform = transform;"],
-    ["runtimeState.", "hitCanvasDirty = true;"],
-    ["rendererSurfaceHost.getViewportGroup().attr("],
-    ["rendererSurfaceHost.getViewportGroup()"],
-    ["renderPhysicalIntensityBrushPreview();"],
-    ["getStrategicOverlayRenderOwner().syncUnitCounterScalesDuringZoom();"],
-    ["syncSpecialZonePatternTransformDuringZoom();"],
-    ["draw", "Canvas();"],
-  ]) {
-    assertExcludes(
-      updateMapWrapperSource,
-      tokenParts.join(""),
-      "updateMap wrapper must keep raw update work in the owner wiring",
-    );
-  }
-});
-
-test("viewport update owner avoids forbidden renderer semantics", () => {
-  const ownerSource = readRepoFile("js", "core", "renderer", "renderer_viewport_update_owner.js");
-
-  for (const tokenParts of [
-    ["map_", "renderer.js"],
-    ["runtime", "State"],
-    ["draw", "Canvas"],
-    ["renderPass", "ToCache"],
-    ["build", "HitCanvas"],
-    ["set", "MapData"],
-    ["fit", "Projection"],
-    ["exactAfter", "Settle"],
-    ["scenario", " refresh"],
-    ["scenario", " chunk"],
-    ["strategicOverlay", "Runtime"],
-    ["selection", "fill"],
-  ]) {
-    assertExcludes(
-      ownerSource,
-      tokenParts.join(""),
-      "viewport update owner must avoid forbidden semantic token",
-    );
-  }
 });

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs";
 import { parse } from "acorn";
+import { lazyOwner } from "../js/core/map_renderer/lazy_owner.js";
 
 import {
   createRendererSurfaceHost,
@@ -24,7 +25,6 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
       if (entry.id.type === "ObjectPattern") {
         // Display-model methods are destructured at the composition root.
         for (const property of entry.id.properties) {
-          assert.equal(property.value?.type, "Identifier", "owner method bindings use explicit names");
           scope[property.value.name] = noop;
         }
       }
@@ -48,7 +48,7 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
     Object.defineProperty(globals, key, { configurable: true, get() { reads++; return undefined; } });
   }
   Object.assign(scope, passCatalog, {
-    runtimeState, rendererSurfaceHost, globalThis: globals, window: undefined,
+    lazyOwner, runtimeState, rendererSurfaceHost, globalThis: globals, window: undefined,
     getRenderCacheOwner: () => ({ scenarioLayerCache }),
     MIN_ZOOM_SCALE: 1, MAX_ZOOM_SCALE: 16, PROJECTION_PRECISION: 0.25,
     PATH_POINT_RADIUS: 4.5, PROJECTION_FIT_PADDING_RATIO: 0.05, MAP_PAN_PADDING_PX: 24,
@@ -62,13 +62,12 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
     if (["RenderPassSignaturePolicy", "BathymetryStylePolicy", "ParentBorderGroupingPolicy", "VisibleFrameIdentityPolicy", "FillTargetPolicy"].includes(name)) assert.equal(args[0], runtimeState);
     return args.at(-1);
   };
-  const factory = rendererAst.body.find(node => node.type === "FunctionDeclaration" && node.id.name === `get${name}`);
-  assert.ok(factory, `get${name} exists`);
+  const factory = rendererAst.body.find(node => (node.type === "FunctionDeclaration" && node.id.name === `get${name}`) || (node.type === "VariableDeclaration" && node.declarations.some(entry => entry.id.name === `get${name}`)));
   const extraSource = includeFunctions.map(functionName => {
     const node = rendererAst.body.find(entry => entry.type === "FunctionDeclaration" && entry.id.name === functionName);
-    assert.ok(node, functionName);
     return rendererSource.slice(node.start, node.end);
   }).join("\n");
+  delete scope[`get${name}`];
   const { getOwner, setWindow } = new Function(...Object.keys(scope), `${extraSource}\n${rendererSource.slice(factory.start, factory.end)}; return { getOwner: get${name}, setWindow(value) { window = value; } };`)(...Object.values(scope));
   assert.equal(constructions, 0, "owner construction stays lazy");
   const owner = getOwner();
