@@ -12,11 +12,28 @@ from map_builder.scenario_capital_rules import REVIEWED_CITY_NAMES, apply_review
 from map_builder.scenario_city_overrides_composer import build_capital_overrides_payload_from_capital_hints
 from map_builder.scenario_capital_placement import place_capital_markers, read_political_features
 
-TNO_CITY_ROWS = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
+TNO_CITY_ROWS = {(ne_id if ne_id.startswith("CITY::") else f"CITY::ne::{ne_id}"):
+                {"id": ne_id if ne_id.startswith("CITY::") else f"CITY::ne::{ne_id}"}
                  for ne_id in REVIEWED_CITY_NAMES["tno_1962"]}
 
 
 class ScenarioCapitalRulesTest(unittest.TestCase):
+    def test_batch3_capitals_and_occupation_seats(self):
+        root = Path(__file__).resolve().parents[1]
+        rows = {f["properties"]["city_id"]: f["properties"] for f in
+                json.loads((root / "data/world_cities.geojson").read_text(encoding="utf-8"))["features"]}
+        expected = {"KRK": "Nukus", "UTL": "Qarshi", "KLT": "Kalat", "MOR": "Rabat",
+                    "SLG": "Oran", "BKU": "Mosul", "IME": "Jerusalem", "SNS": "Damascus"}
+        result = apply_reviewed_capitals({}, {tag: {} for tag in (*expected, "ATL")}, rows,
+                                         scenario_id="tno_1962", strict=True)
+        for tag, name in expected.items():
+            self.assertEqual(result["capital_city_hints"][tag]["city_name"], name)
+        self.assertNotIn("ATL", result["capitals_by_tag"])
+        self.assertEqual(result["cities"]["CITY::gn::1813325"]["display_name"]["en"], "Daxian")
+        for city_id, name in {"1159149329": "Reichenaustadt", "1159150697": "Paulusburg",
+                              "1159150683": "Lourenço Marques", "1159150573": "Salisbury"}.items():
+            self.assertEqual(result["cities"][f"CITY::ne::{city_id}"]["display_name"]["en"], name)
+
     def test_northern_cameroons_uses_gembu_without_a_world_city(self):
         for scenario in ("hoi4_1936", "hoi4_1939"):
             result = apply_reviewed_capitals({}, {"NCM": {}}, {}, scenario_id=scenario)
@@ -154,6 +171,7 @@ class ScenarioCapitalRulesTest(unittest.TestCase):
                     expected.update(historical_names)
                     expected["1159151595"] = ("Beiping", "北平")
                 elif scenario_id == "tno_1962":
+                    expected["1159151531"] = ("Dihua", "迪化")
                     expected["1159151523"] = ("Keijō", "京城")
                     expected["1159150965"] = ("Akmola", "阿克莫拉")
                 for ne_id, names in expected.items():

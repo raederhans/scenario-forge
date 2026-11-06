@@ -10,6 +10,8 @@ const TNO_TAG_MIGRATIONS = Object.freeze([
     SIC: "XIK", SIK: "XIN", HOL: "SUR", GSW: "ANG", PRC: "CHI", TAN: "PRC",
   }), supersededBy: Object.freeze({ ANG: "GSW", PRC: "CHI" }) },
   { version: 2, tags: Object.freeze({ BZ: "BLZ", GY: "GUY" }), supersededBy: Object.freeze({}) },
+  { version: 3, tags: Object.freeze({ ALC: "SLG", PAL: "IME", SYR: "SNS", KUR: "BKU" }),
+    supersededBy: Object.freeze({ SLG: "ALC", IME: "PAL", SNS: "SYR", BKU: "KUR" }) },
 ]);
 const TNO_TAG_MIGRATION_VERSION = TNO_TAG_MIGRATIONS.at(-1).version;
 

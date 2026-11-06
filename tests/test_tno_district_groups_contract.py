@@ -84,6 +84,34 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
         rebuilt, _ = builder.build_tags(self.spec, builder.load_features())
         self.assertEqual(rebuilt, self.payload["tags"])
 
+    def test_batch3_has_explicit_coverage_without_nearest(self) -> None:
+        records = builder.load_features()
+        for tag in ("RKU", "RKM", "RKK", "GEA", "GCO", "ANG", "ATL",
+                    "RGC", "SHX", "YUN", "GNG", "GXC", "GUZ", "GMA", "QMA", "XIN", "MEN", "ROM"):
+            assignments = builder.assign_tag(tag, self.spec["tags"][tag], records)
+            with self.subTest(tag=tag):
+                self.assertTrue(assignments)
+                self.assertFalse([fid for fid, (_, source) in assignments.items() if source == "nearest"])
+
+    def test_batch3_reuses_releasable_members(self) -> None:
+        entries = json.loads((PROJECT_ROOT / "data/releasables/tno_1962.internal.phase1.source.json").read_text(encoding="utf-8"))["entries"]
+        for entry in entries:
+            tag = entry["parent_owner_tag"]
+            if tag not in {"RKU", "RKM", "RKK", "GEA", "GCO", "ANG"}:
+                continue
+            expected = {fid for fid in entry["preset_source"]["feature_ids"] if self.owners.get(fid) == tag}
+            if entry["tag"] == "GEAT":
+                expected.update({"KM_ADM1_COM-4934", "KM_ADM1_COM-4935", "KM_ADM1_COM-4936"})
+            district = self.payload["tags"][tag]["districts"][entry["tag"].lower()]
+            self.assertEqual(set(district["feature_ids"]), expected)
+
+    def test_batch3_special_members(self) -> None:
+        self.assertEqual(len(self.payload["tags"]["ATL"]["districts"]), 9)
+        self.assertEqual(len(self.payload["tags"]["ROM"]["districts"]), 5)
+        self.assertEqual(len(self.payload["tags"]["ANG"]["districts"]["south_west_africa"]["feature_ids"]), 13)
+        self.assertIn("CN_CITY_17275852B86000242921086", self.payload["tags"]["GXC"]["districts"]["southeast_qinlei"]["feature_ids"])
+        self.assertIn("CN_CITY_17275852B62552484302053", self.payload["tags"]["GUZ"]["districts"]["east_xiangxi"]["feature_ids"])
+
     def test_editing_source_materializes_to_published_file(self) -> None:
         # 开发工作区保存大区时会从 scenario_mutations.json 整份重写 manual 文件，二者必须一致。
         context = load_scenario_context("tno_1962")

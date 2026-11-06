@@ -4159,6 +4159,650 @@
         "tno_vic"
       ],
       "tag": "VMT"
+    },
+    {
+      "color_hex": "#9e977a",
+      "cores": "owner",
+      "id": "tno_batch3_bku",
+      "name_en": "Mosul and Kirkuk",
+      "name_zh": "摩苏尔与基尔库克",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "KUR"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "IRQ-3046",
+          "IRQ-3049",
+          "IRQ-3050",
+          "IRQ-3051",
+          "IRQ-3052",
+          "IRQ-3242"
+        ]
+      },
+      "tag": "BKU"
+    },
+    {
+      "color_hex": "#943161",
+      "cores": "owner",
+      "id": "tno_batch3_chi",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "SHX"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B13491036968650",
+          "CN_CITY_17275852B20040471591761",
+          "CN_CITY_17275852B34523810528391",
+          "CN_CITY_17275852B50863739077021",
+          "CN_CITY_17275852B65169663803205",
+          "CN_CITY_17275852B78838385533977",
+          "CN_CITY_17275852B79223379777667",
+          "CN_CITY_17275852B86681645698322",
+          "CN_CITY_17275852B91446059581465"
+        ]
+      },
+      "tag": "CHI"
+    },
+    {
+      "color_hex": "#6a7a59",
+      "cores": "owner",
+      "id": "tno_batch3_gea",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "GER"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "KM_ADM1_COM-4934",
+          "KM_ADM1_COM-4935",
+          "KM_ADM1_COM-4936"
+        ]
+      },
+      "tag": "GEA"
+    },
+    {
+      "color_hex": "#96637a",
+      "cores": "owner",
+      "id": "tno_batch3_guz",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "CHI"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B62552484302053"
+        ]
+      },
+      "tag": "GUZ"
+    },
+    {
+      "color_hex": "#845955",
+      "cores": "owner",
+      "id": "tno_batch3_gxc",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "GNG"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B16521843045020",
+          "CN_CITY_17275852B39380894050966",
+          "CN_CITY_17275852B78973254528560",
+          "CN_CITY_17275852B86000242921086",
+          "CN_CITY_17275852B89468905887192",
+          "CN_CITY_17275852B90470795224142"
+        ]
+      },
+      "tag": "GXC"
+    },
+    {
+      "color_hex": "#5e8053",
+      "cores": "owner",
+      "id": "tno_batch3_ime",
+      "name_en": "Italian Middle East",
+      "name_zh": "意属中东",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "PAL"
+      ],
+      "parent_owner_tag": "ITA",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "ATLPRV_18137",
+          "ATLPRV_18139",
+          "ATLSHL_levant_3",
+          "ATLSHL_levant_4",
+          "ATLSHL_levant_5",
+          "GAZ+00?",
+          "ISR-3053",
+          "ISR-3054",
+          "ISR-3055",
+          "ISR-3056",
+          "ISR-3057",
+          "ISR-3058",
+          "WEB+00?"
+        ]
+      },
+      "subject_kind": "mandate",
+      "tag": "IME"
+    },
+    {
+      "color_hex": "#987e50",
+      "cores": "owner",
+      "id": "tno_batch3_krk",
+      "name_en": "Karakalpakstan",
+      "name_zh": "卡拉卡尔帕克斯坦",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "UZB"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UZB-356"
+        ]
+      },
+      "tag": "KRK"
+    },
+    {
+      "color_hex": "#3d5069",
+      "cores": "owner",
+      "id": "tno_batch3_mad",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "ENG"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "MU"
+        ]
+      },
+      "tag": "MAD"
+    },
+    {
+      "color_hex": "#9b503e",
+      "cores": "owner",
+      "id": "tno_batch3_mor",
+      "name_en": "Morocco",
+      "name_zh": "摩洛哥",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "IBR"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "MAR-1446",
+          "MAR-1447",
+          "MAR-1448",
+          "MAR-1449",
+          "MAR-1450",
+          "MAR-1451",
+          "MAR-1452",
+          "MAR-1453",
+          "MAR-1455",
+          "MAR-1456",
+          "MAR-1457"
+        ]
+      },
+      "tag": "MOR"
+    },
+    {
+      "color_hex": "#bca382",
+      "cores": "owner",
+      "id": "tno_batch3_slg",
+      "name_en": "Iberian Algeria",
+      "name_zh": "西属阿尔及利亚",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "ALC"
+      ],
+      "parent_owner_tag": "IBR",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "DZA-2144",
+          "DZA-2145",
+          "DZA-2146",
+          "DZA-2147",
+          "DZA-2148",
+          "DZA-2149",
+          "DZA-2150",
+          "DZA-2190",
+          "DZA-2199",
+          "DZA-2200",
+          "DZA-2201",
+          "DZA-2202",
+          "DZA-2203",
+          "DZA-2204",
+          "DZA-2205",
+          "DZA-2206"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "SLG"
+    },
+    {
+      "color_hex": "#62875c",
+      "cores": "owner",
+      "id": "tno_batch3_sns",
+      "name_en": "Syrian National State",
+      "name_zh": "叙利亚民族国",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "SYR",
+        "TUR"
+      ],
+      "parent_owner_tag": "ITA",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "ATLPRV_18149",
+          "SYR-135",
+          "SYR-138",
+          "SYR-139",
+          "SYR-142",
+          "SYR-143",
+          "SYR-144",
+          "SYR-145",
+          "SYR-146",
+          "SYR-4843",
+          "SYR-5261"
+        ]
+      },
+      "subject_kind": "mandate",
+      "tag": "SNS"
+    },
+    {
+      "color_hex": "#dfbe67",
+      "cores": "owner",
+      "id": "tno_batch3_tns",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "ROM"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_RAY_74538382B21863106612225",
+          "UA_RAY_74538382B26202854770966",
+          "UA_RAY_74538382B42144983760497",
+          "UA_RAY_74538382B4607226007855",
+          "UA_RAY_74538382B46561623007945",
+          "UA_RAY_74538382B54958880930265",
+          "UA_RAY_74538382B73630411968214",
+          "UA_RAY_74538382B85654458417277",
+          "UA_RAY_74538382B86026417899488",
+          "UA_RAY_74538382B97286599584108"
+        ]
+      },
+      "tag": "TNS"
+    },
+    {
+      "color_hex": "#526947",
+      "cores": "owner",
+      "id": "tno_batch3_utl",
+      "name_en": "Turkestan Legion",
+      "name_zh": "突厥斯坦军团",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "UZB"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UZB-361",
+          "UZB-362"
+        ]
+      },
+      "tag": "UTL"
+    },
+    {
+      "color_hex": "#6873a0",
+      "cores": "owner",
+      "id": "tno_batch3_xik",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "only_from_owners": [
+        "RGC"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B10243812034258",
+          "CN_CITY_17275852B17138311811008",
+          "CN_CITY_17275852B17632126042959",
+          "CN_CITY_17275852B18343080596072",
+          "CN_CITY_17275852B22487922789088",
+          "CN_CITY_17275852B22517944121367",
+          "CN_CITY_17275852B23024603415445",
+          "CN_CITY_17275852B23326850448082",
+          "CN_CITY_17275852B26108585816208",
+          "CN_CITY_17275852B31877610446386",
+          "CN_CITY_17275852B35342422356290",
+          "CN_CITY_17275852B36550991536450",
+          "CN_CITY_17275852B37882683065696",
+          "CN_CITY_17275852B41708679829209",
+          "CN_CITY_17275852B47707436055731",
+          "CN_CITY_17275852B47800079203289",
+          "CN_CITY_17275852B47950992751133",
+          "CN_CITY_17275852B48079321876635",
+          "CN_CITY_17275852B52132557540167",
+          "CN_CITY_17275852B56145168746123",
+          "CN_CITY_17275852B63005050969974",
+          "CN_CITY_17275852B65904297882283",
+          "CN_CITY_17275852B67382669517001",
+          "CN_CITY_17275852B67896385958718",
+          "CN_CITY_17275852B73600363846260",
+          "CN_CITY_17275852B74261219630317",
+          "CN_CITY_17275852B75735248015336",
+          "CN_CITY_17275852B77966044233531",
+          "CN_CITY_17275852B78456779133513",
+          "CN_CITY_17275852B80219081988604",
+          "CN_CITY_17275852B82571536959459",
+          "CN_CITY_17275852B85360434089813",
+          "CN_CITY_17275852B86706643635807",
+          "CN_CITY_17275852B87133434189568",
+          "CN_CITY_17275852B8760593978321",
+          "CN_CITY_17275852B90257281612339",
+          "CN_CITY_17275852B92159102315867",
+          "CN_CITY_17275852B94288996311479",
+          "CN_CITY_17275852B94628873791223",
+          "CN_CITY_17275852B97954418237605",
+          "CN_CITY_17275852B99222209572409",
+          "CN_CITY_17275852B99847595379698"
+        ]
+      },
+      "tag": "XIK"
+    },
+    {
+      "color_hex": "#943161",
+      "cores": "owner",
+      "id": "tno_batch3_cn_mrg_20fbce9fead7",
+      "only_from_owners": [
+        "SHX"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_MRG_20fbce9fead7__SPLIT_CHI"
+        ]
+      },
+      "tag": "CHI"
+    },
+    {
+      "color_hex": "#943161",
+      "cores": "owner",
+      "id": "tno_batch3_cn_mrg_323d6e10e986",
+      "only_from_owners": [
+        "SHX"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_MRG_323d6e10e986"
+        ]
+      },
+      "tag": "CHI"
+    },
+    {
+      "color_hex": "#943161",
+      "cores": "owner",
+      "id": "tno_batch3_cn_mrg_3811ff27587a",
+      "only_from_owners": [
+        "SHX"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_MRG_3811ff27587a__SPLIT_CHI"
+        ]
+      },
+      "tag": "CHI"
+    },
+    {
+      "color_hex": "#943161",
+      "cores": "owner",
+      "id": "tno_batch3_cn_mrg_7e34a2c431cf",
+      "only_from_owners": [
+        "SHX"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_MRG_7e34a2c431cf"
+        ]
+      },
+      "tag": "CHI"
+    },
+    {
+      "color_hex": "#943161",
+      "cores": "owner",
+      "id": "tno_batch3_cn_mrg_b59c07833274",
+      "only_from_owners": [
+        "SHX"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_MRG_b59c07833274__SPLIT_CHI"
+        ]
+      },
+      "tag": "CHI"
+    },
+    {
+      "color_hex": "#943161",
+      "cores": "owner",
+      "id": "tno_batch3_cn_mrg_e4d1257a0bd1",
+      "only_from_owners": [
+        "SHX"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CN_MRG_e4d1257a0bd1"
+        ]
+      },
+      "tag": "CHI"
+    },
+    {
+      "base_iso2": "PK",
+      "color_hex": "#a48258",
+      "cores": "owner",
+      "id": "tno_batch3_pak-1108",
+      "name_en": "Kalat and Makran",
+      "name_zh": "卡拉特与马克兰",
+      "only_from_owners": [
+        "PAK"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "PAK-1108__SPLIT_KLT"
+        ]
+      },
+      "tag": "KLT"
+    },
+    {
+      "color_hex": "#526947",
+      "cores": "owner",
+      "id": "tno_batch3_tkm-359",
+      "only_from_owners": [
+        "TKM"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "TKM-359__SPLIT_UTL"
+        ]
+      },
+      "tag": "UTL"
+    },
+    {
+      "color_hex": "#7c9a70",
+      "cores": [
+        "SLG"
+      ],
+      "id": "tno_batch3_ial_core",
+      "only_from_owners": [
+        "ALC",
+        "IAL"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "DZA-2143"
+        ]
+      },
+      "supersedes": [
+        "tno_user2_alc_to_ial"
+      ],
+      "tag": "IAL"
+    },
+    {
+      "color_hex": "#9e977a",
+      "cores": "owner",
+      "id": "tno_batch3_irq-3243",
+      "only_from_owners": [
+        "KUR"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "IRQ-3243__SPLIT_BKU"
+        ]
+      },
+      "tag": "BKU"
+    },
+    {
+      "color_hex": "#89778e",
+      "cores": "owner",
+      "id": "tno_batch3_diyala_irq",
+      "only_from_owners": [
+        "KUR"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "IRQ-3243__SPLIT_REST"
+        ]
+      },
+      "tag": "IRQ"
+    },
+    {
+      "color_hex": "#9b503e",
+      "cores": "owner",
+      "id": "tno_batch3_mor_tangier",
+      "notes": "州 290 Tangier；MAR-1445 与保留 IBR 的 ES630 Ceuta 几何交集面积为零。",
+      "only_from_owners": [
+        "IBR"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "MAR-1445"
+        ]
+      },
+      "tag": "MOR"
+    },
+    {
+      "color_hex": "#dfbe67",
+      "cores": "owner",
+      "id": "tno_batch3_tns_dniester",
+      "notes": "近似、未经配准：州 1282 Dniester Hills/Tiraspol 与现有德涅斯特河东岸行政地块对照；Bender 州 78 保留 ROM。",
+      "only_from_owners": [
+        "ROM"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "MDA-1628",
+          "MDA-1637",
+          "MDA-1638",
+          "MDA-1645",
+          "MDA-1652"
+        ]
+      },
+      "tag": "TNS"
+    },
+    {
+      "color_hex": "#8ba479",
+      "cores": "keep",
+      "id": "tno_batch3_sns_family_color",
+      "only_from_owners": [
+        "SNS"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "SYR-4843"
+        ]
+      },
+      "tag": "SNS"
     }
   ],
   "version": 1

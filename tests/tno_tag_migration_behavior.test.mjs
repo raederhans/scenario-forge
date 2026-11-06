@@ -4,6 +4,40 @@ import { FileManager } from "../js/core/file_manager.js";
 import { migrateImportedProjectData } from "../js/core/sovereignty_manager.js";
 import { TNO_TAG_MIGRATION_VERSION } from "../js/core/country_code_aliases.js";
 
+for (const [legacy, successor] of Object.entries({ ALC: "SLG", PAL: "IME", SYR: "SNS", KUR: "BKU" })) {
+  test(`retired ${legacy} project edits import as ${successor}`, () => {
+    for (const version of [0, 2]) {
+      for (const colorField of ["sovereignBaseColors", "countryBaseColors"]) {
+        const original = {
+          scenario: { id: "tno_1962", ...(version ? { tagMigrationVersion: version } : {}) },
+          [colorField]: { [legacy]: "#123456", [successor]: "#abcdef", GER: "#555555" },
+          activeSovereignCode: legacy,
+          customPresets: { [legacy]: [{ name: "custom", featureIds: ["saved-feature"] }] },
+          parentBorderEnabledByCountry: { [legacy]: false },
+          releasableBoundaryVariantByTag: { [legacy]: "historical" },
+          visualOverrides: { "saved-feature": "#010101" },
+        };
+        const imported = FileManager.normalizeImportedProjectData(JSON.parse(JSON.stringify(original)));
+        assert.deepEqual(imported.sovereignBaseColors, { [successor]: "#123456", GER: "#555555" });
+        assert.equal(imported.activeSovereignCode, successor);
+        assert.deepEqual(imported.customPresets, { [successor]: original.customPresets[legacy] });
+        assert.deepEqual(imported.parentBorderEnabledByCountry, { [successor]: false });
+        assert.deepEqual(imported.releasableBoundaryVariantByTag, { [successor]: "historical" });
+        assert.deepEqual(imported.visualOverrides, original.visualOverrides);
+        assert.equal(imported.scenario.tagMigrationVersion, TNO_TAG_MIGRATION_VERSION);
+        const again = FileManager.normalizeImportedProjectData(imported);
+        assert.equal(again.activeSovereignCode, successor);
+        assert.equal(again.scenario.tagMigrationVersion, TNO_TAG_MIGRATION_VERSION);
+        for (const field of ["sovereignBaseColors", "customPresets",
+          "parentBorderEnabledByCountry", "releasableBoundaryVariantByTag"]) {
+          assert.deepEqual(again[field], imported[field]);
+          assert.equal(Object.hasOwn(again[field], legacy), false);
+        }
+      }
+    }
+  });
+}
+
 test("legacy TNO country edits migrate atomically at the import boundary", () => {
   const original = {
     scenario: { id: "tno_1962", version: 1, baselineHash: "legacy" },

@@ -1,10 +1,10 @@
 {
   "audit": {
-    "capital_hint_count": 228,
+    "capital_hint_count": 232,
     "capital_territory_conflicts": [],
     "featured_runtime_missing_count": 0,
     "featured_runtime_missing_tags": [],
-    "manual_capital_count": 132,
+    "manual_capital_count": 140,
     "name_conflict_count": 242,
     "name_conflicts": [
       {
@@ -3397,7 +3397,7 @@
       }
     ],
     "renamed_city_count": 4427,
-    "unresolved_capital_count": 13,
+    "unresolved_capital_count": 12,
     "unresolved_capitals": [
       {
         "base_iso2": "BI",
@@ -3414,14 +3414,6 @@
         "lookup_iso2": "BW",
         "reason": "no_controlled_city_candidates",
         "tag": "BOT"
-      },
-      {
-        "base_iso2": "MA",
-        "capital_state_id": 461,
-        "display_name": "Morocco",
-        "lookup_iso2": "MA",
-        "reason": "no_controlled_city_candidates",
-        "tag": "MOR"
       },
       {
         "base_iso2": "MW",
@@ -3556,29 +3548,6 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    "ALC": {
-      "base_iso2": "DZ",
-      "base_tier": "major",
-      "candidate_count": 77,
-      "capital_kind": "admin_capital",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159151137",
-      "city_name": "Oran",
-      "confidence": "medium",
-      "country_code": "DZ",
-      "display_name": "Algerian Command",
-      "host_feature_id": "DZA-2145",
-      "lat": 35.69906,
-      "lon": -0.63588,
-      "lookup_iso2": "DZ",
-      "name_ascii": "Oran",
-      "population": 803329,
-      "resolution_method": "controlled_city_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151137",
-      "tag": "ALC",
-      "urban_match_id": "UA_FFFF100E50A4"
-    },
     "ALT": {
       "country_code": "RU",
       "host_feature_id": "RU_MRG_2953c850d23a",
@@ -3632,7 +3601,7 @@
       "capital_kind": "country_capital",
       "capital_state_id": null,
       "city_id": "CITY::ne::1159150785",
-      "city_name": "Windhoek",
+      "city_name": "Windhuk",
       "confidence": "high",
       "country_code": "NA",
       "display_name": "German Southwest Africa",
@@ -5872,29 +5841,6 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    "KUR": {
-      "base_iso2": "IQ",
-      "base_tier": "major",
-      "candidate_count": 33,
-      "capital_kind": "admin_capital",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159150087",
-      "city_name": "Mosul",
-      "confidence": "medium",
-      "country_code": "IQ",
-      "display_name": "Kurdistan",
-      "host_feature_id": "IRQ-3051",
-      "lat": 36.335,
-      "lon": 43.11889,
-      "lookup_iso2": "IQ",
-      "name_ascii": "Mosul",
-      "population": 1683000,
-      "resolution_method": "controlled_city_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159150087",
-      "tag": "KUR",
-      "urban_match_id": "UA_E88B86F314F2"
-    },
     "KUW": {
       "base_iso2": "KW",
       "base_tier": "major",
@@ -6354,7 +6300,7 @@
       "capital_kind": "country_capital",
       "capital_state_id": 330,
       "city_id": "CITY::ne::1159150781",
-      "city_name": "Ulaanbaatar",
+      "city_name": "Khüree",
       "confidence": "high",
       "country_code": "MN",
       "display_name": "Mongolia",
@@ -6829,29 +6775,6 @@
       "source": "merged",
       "stable_key": "id::CITY::ne::1159150645",
       "tag": "PAK",
-      "urban_match_id": ""
-    },
-    "PAL": {
-      "base_iso2": "IL",
-      "base_tier": "major",
-      "candidate_count": 32,
-      "capital_kind": "country_capital",
-      "capital_state_id": 454,
-      "city_id": "CITY::ne::1159151417",
-      "city_name": "Tel Aviv",
-      "confidence": "high",
-      "country_code": "IL",
-      "display_name": "Italian Palestine",
-      "host_feature_id": "ISR-3057",
-      "lat": 32.08088,
-      "lon": 34.78057,
-      "lookup_iso2": "IL",
-      "name_ascii": "Tel Aviv",
-      "population": 3112000,
-      "resolution_method": "capital_state_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151417",
-      "tag": "PAL",
       "urban_match_id": ""
     },
     "PAN": {
@@ -7835,29 +7758,6 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    "SYR": {
-      "base_iso2": "SY",
-      "base_tier": "major",
-      "candidate_count": 34,
-      "capital_kind": "country_capital",
-      "capital_state_id": 554,
-      "city_id": "CITY::ne::1159151269",
-      "city_name": "Damascus",
-      "confidence": "high",
-      "country_code": "SY",
-      "display_name": "Syrian Protectorate",
-      "host_feature_id": "SYR-4843",
-      "lat": 33.5102,
-      "lon": 36.29128,
-      "lookup_iso2": "SY",
-      "name_ascii": "Damascus",
-      "population": 2466000,
-      "resolution_method": "capital_state_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151269",
-      "tag": "SYR",
-      "urban_match_id": ""
-    },
     "TAT": {
       "base_iso2": "RU",
       "base_tier": "major",
@@ -8437,8 +8337,8 @@
       "city_name": "Litang",
       "name_ascii": "Litang",
       "display_name": "24th Army of the National Revolutionary Army",
-      "lookup_iso2": "XIK",
-      "base_iso2": "XIK",
+      "lookup_iso2": "CN",
+      "base_iso2": "CN",
       "capital_state_id": null,
       "capital_kind": "country_capital",
       "resolution_method": "reviewed_capital",
@@ -8610,6 +8510,190 @@
       "resolution_method": "reviewed_capital",
       "confidence": "high",
       "candidate_count": 1
+    },
+    "KRK": {
+      "country_code": "UZ",
+      "host_feature_id": "UZB-356",
+      "urban_match_id": "",
+      "lon": 59.60576,
+      "lat": 42.45861,
+      "population": 332500,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "KRK",
+      "city_id": "CITY::ne::1159149341",
+      "stable_key": "id::CITY::ne::1159149341",
+      "city_name": "Nukus",
+      "name_ascii": "Nukus",
+      "display_name": "Karakalpakstan",
+      "lookup_iso2": "UZ",
+      "base_iso2": "UZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "UTL": {
+      "country_code": "UZ",
+      "host_feature_id": "UZB-361",
+      "urban_match_id": "",
+      "lon": 65.78905,
+      "lat": 38.86056,
+      "population": 386361,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "UTL",
+      "city_id": "CITY::ne::1159134335",
+      "stable_key": "id::CITY::ne::1159134335",
+      "city_name": "Qarshi",
+      "name_ascii": "Qarshi",
+      "display_name": "Turkestan Legion",
+      "lookup_iso2": "UZ",
+      "base_iso2": "UZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KLT": {
+      "country_code": "PK",
+      "host_feature_id": "PAK-1108__SPLIT_KLT",
+      "urban_match_id": "",
+      "lon": 66.59361,
+      "lat": 29.02663,
+      "population": 26701,
+      "base_tier": "regional",
+      "source": "geonames",
+      "tag": "KLT",
+      "city_id": "CITY::gn::1175296",
+      "stable_key": "id::CITY::gn::1175296",
+      "city_name": "Kalat",
+      "name_ascii": "Kalat",
+      "display_name": "Kalat and Makran",
+      "lookup_iso2": "PK",
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MOR": {
+      "country_code": "MA",
+      "host_feature_id": "MAR-1451",
+      "urban_match_id": "",
+      "lon": -6.83255,
+      "lat": 34.01325,
+      "population": 1705000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MOR",
+      "city_id": "CITY::ne::1159150673",
+      "stable_key": "id::CITY::ne::1159150673",
+      "city_name": "Rabat",
+      "name_ascii": "Rabat",
+      "display_name": "Morocco",
+      "lookup_iso2": "MA",
+      "base_iso2": "MA",
+      "capital_state_id": 461,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "SLG": {
+      "country_code": "DZ",
+      "host_feature_id": "DZA-2145",
+      "urban_match_id": "UA_FFFF100E50A4",
+      "lon": -0.63588,
+      "lat": 35.69906,
+      "population": 803329,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "SLG",
+      "city_id": "CITY::ne::1159151137",
+      "stable_key": "id::CITY::ne::1159151137",
+      "city_name": "Oran",
+      "name_ascii": "Oran",
+      "display_name": "Iberian Algeria",
+      "lookup_iso2": "DZ",
+      "base_iso2": "DZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "BKU": {
+      "country_code": "IQ",
+      "host_feature_id": "IRQ-3051",
+      "urban_match_id": "UA_E88B86F314F2",
+      "lon": 43.11889,
+      "lat": 36.335,
+      "population": 1683000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "BKU",
+      "city_id": "CITY::ne::1159150087",
+      "stable_key": "id::CITY::ne::1159150087",
+      "city_name": "Mosul",
+      "name_ascii": "Mosul",
+      "display_name": "Mosul and Kirkuk",
+      "lookup_iso2": "IQ",
+      "base_iso2": "IQ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IME": {
+      "country_code": "IL",
+      "host_feature_id": "ISR-3058",
+      "urban_match_id": "",
+      "lon": 35.21633,
+      "lat": 31.76904,
+      "population": 1029300,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "IME",
+      "city_id": "CITY::ne::1159151203",
+      "stable_key": "id::CITY::ne::1159151203",
+      "city_name": "Gerusalemme",
+      "name_ascii": "Jerusalem",
+      "display_name": "Italian Middle East",
+      "lookup_iso2": "IL",
+      "base_iso2": "IL",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "SNS": {
+      "country_code": "SY",
+      "host_feature_id": "SYR-4843",
+      "urban_match_id": "",
+      "lon": 36.29128,
+      "lat": 33.5102,
+      "population": 2466000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "SNS",
+      "city_id": "CITY::ne::1159151269",
+      "stable_key": "id::CITY::ne::1159151269",
+      "city_name": "Damascus",
+      "name_ascii": "Damascus",
+      "display_name": "Syrian National State",
+      "lookup_iso2": "SY",
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     }
   },
   "capitals_by_tag": {
@@ -8643,6 +8727,8 @@
     "FFR": "CITY::ne::1159151439",
     "GAY": "CITY::scenario::cherdyn",
     "GCE": "CITY::gn::2635412",
+    "GCO": "CITY::ne::1159151539",
+    "GEA": "CITY::ne::1159151305",
     "GER": "CITY::ne::1159151529",
     "GHA": "CITY::ne::1159151403",
     "GNG": "CITY::ne::1159151331",
@@ -8743,8 +8829,14 @@
     "YAK": "CITY::ne::1159150745",
     "YOR": "CITY::ne::1159151591",
     "ZLT": "CITY::ne::1159149567",
-    "GCO": "CITY::ne::1159151539",
-    "GEA": "CITY::ne::1159151305"
+    "KRK": "CITY::ne::1159149341",
+    "UTL": "CITY::ne::1159134335",
+    "KLT": "CITY::gn::1175296",
+    "MOR": "CITY::ne::1159150673",
+    "SLG": "CITY::ne::1159151137",
+    "BKU": "CITY::ne::1159150087",
+    "IME": "CITY::ne::1159151203",
+    "SNS": "CITY::ne::1159151269"
   },
   "cities": {
     "CITY::gn::1024694": {
@@ -44343,14 +44435,14 @@
       "aliases": [
         "Dodoma"
       ],
+      "city_id": "CITY::ne::1159149731",
       "display_name": {
         "en": "Dodoma",
         "zh": "多多马"
       },
       "hidden": false,
       "stable_key": "id::CITY::ne::1159149731",
-      "tier": "major",
-      "city_id": "CITY::ne::1159149731"
+      "tier": "major"
     },
     "CITY::ne::1159149733": {
       "aliases": [
@@ -44565,7 +44657,12 @@
     },
     "CITY::ne::1159150087": {
       "city_id": "CITY::ne::1159150087",
-      "host_feature_id": "IRQ-3051"
+      "host_feature_id": "IRQ-3051",
+      "stable_key": "id::CITY::ne::1159150087",
+      "display_name": {
+        "en": "Mosul",
+        "zh": "摩苏尔"
+      }
     },
     "CITY::ne::1159150091": {
       "display_name": {
@@ -45135,7 +45232,12 @@
     },
     "CITY::ne::1159150781": {
       "city_id": "CITY::ne::1159150781",
-      "host_feature_id": "MNG-3331"
+      "host_feature_id": "MNG-3331",
+      "stable_key": "id::CITY::ne::1159150781",
+      "display_name": {
+        "en": "Khüree",
+        "zh": "库伦"
+      }
     },
     "CITY::ne::1159150785": {
       "aliases": [
@@ -45149,7 +45251,8 @@
       "hidden": false,
       "host_feature_id": "NA_ADM1_NAM-3340",
       "stable_key": "id::CITY::ne::1159150785",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159150785"
     },
     "CITY::ne::1159150787": {
       "aliases": [
@@ -45221,7 +45324,12 @@
     },
     "CITY::ne::1159150819": {
       "city_id": "CITY::ne::1159150819",
-      "host_feature_id": "CN_CITY_17275852B10439048942215"
+      "host_feature_id": "CN_CITY_17275852B10439048942215",
+      "stable_key": "id::CITY::ne::1159150819",
+      "display_name": {
+        "en": "Xining",
+        "zh": "西宁"
+      }
     },
     "CITY::ne::1159150831": {
       "city_id": "CITY::ne::1159150831",
@@ -45632,7 +45740,12 @@
     },
     "CITY::ne::1159151137": {
       "city_id": "CITY::ne::1159151137",
-      "host_feature_id": "DZA-2145"
+      "host_feature_id": "DZA-2145",
+      "stable_key": "id::CITY::ne::1159151137",
+      "display_name": {
+        "en": "Oran",
+        "zh": "奥兰"
+      }
     },
     "CITY::ne::1159151145": {
       "display_name": {
@@ -45725,7 +45838,9 @@
         "en": "Gerusalemme",
         "zh": "耶路撒冷"
       },
-      "stable_key": "id::CITY::ne::1159151203"
+      "stable_key": "id::CITY::ne::1159151203",
+      "city_id": "CITY::ne::1159151203",
+      "host_feature_id": "ISR-3058"
     },
     "CITY::ne::1159151205": {
       "city_id": "CITY::ne::1159151205",
@@ -45768,11 +45883,21 @@
     },
     "CITY::ne::1159151263": {
       "city_id": "CITY::ne::1159151263",
-      "host_feature_id": "RO321"
+      "host_feature_id": "RO321",
+      "stable_key": "id::CITY::ne::1159151263",
+      "display_name": {
+        "en": "Bucharest",
+        "zh": "布加勒斯特"
+      }
     },
     "CITY::ne::1159151269": {
       "city_id": "CITY::ne::1159151269",
-      "host_feature_id": "SYR-4843"
+      "host_feature_id": "SYR-4843",
+      "stable_key": "id::CITY::ne::1159151269",
+      "display_name": {
+        "en": "Damascus",
+        "zh": "大马士革"
+      }
     },
     "CITY::ne::1159151281": {
       "city_id": "CITY::ne::1159151281",
@@ -45847,11 +45972,21 @@
     },
     "CITY::ne::1159151321": {
       "city_id": "CITY::ne::1159151321",
-      "host_feature_id": "CN_CITY_17275852B84192730453130"
+      "host_feature_id": "CN_CITY_17275852B84192730453130",
+      "stable_key": "id::CITY::ne::1159151321",
+      "display_name": {
+        "en": "Lanzhou",
+        "zh": "兰州"
+      }
     },
     "CITY::ne::1159151323": {
       "city_id": "CITY::ne::1159151323",
-      "host_feature_id": "CN_CITY_17275852B34195804181253"
+      "host_feature_id": "CN_CITY_17275852B34195804181253",
+      "stable_key": "id::CITY::ne::1159151323",
+      "display_name": {
+        "en": "Nanning",
+        "zh": "南宁"
+      }
     },
     "CITY::ne::1159151325": {
       "city_id": "CITY::ne::1159151325",
@@ -45894,7 +46029,12 @@
     },
     "CITY::ne::1159151371": {
       "city_id": "CITY::ne::1159151371",
-      "host_feature_id": "CN_CITY_17275852B36917281821750"
+      "host_feature_id": "CN_CITY_17275852B36917281821750",
+      "stable_key": "id::CITY::ne::1159151371",
+      "display_name": {
+        "en": "Kunming",
+        "zh": "昆明"
+      }
     },
     "CITY::ne::1159151385": {
       "city_id": "CITY::ne::1159151385",
@@ -46265,6 +46405,218 @@
       "population": 0,
       "source": "reviewed_settlement",
       "stable_key": "id::CITY::scenario::cherdyn"
+    },
+    "CITY::ne::1159140813": {
+      "city_id": "CITY::ne::1159140813",
+      "stable_key": "id::CITY::ne::1159140813",
+      "display_name": {
+        "en": "Zigong",
+        "zh": "自贡"
+      }
+    },
+    "CITY::gn::1813325": {
+      "city_id": "CITY::gn::1813325",
+      "stable_key": "id::CITY::gn::1813325",
+      "display_name": {
+        "en": "Daxian",
+        "zh": "达县"
+      }
+    },
+    "CITY::ne::1159151363": {
+      "city_id": "CITY::ne::1159151363",
+      "stable_key": "id::CITY::ne::1159151363",
+      "display_name": {
+        "en": "Xi'an",
+        "zh": "西安"
+      }
+    },
+    "CITY::gn::1787765": {
+      "city_id": "CITY::gn::1787765",
+      "stable_key": "id::CITY::gn::1787765",
+      "display_name": {
+        "en": "Yan'an",
+        "zh": "延安"
+      }
+    },
+    "CITY::ne::1159147037": {
+      "city_id": "CITY::ne::1159147037",
+      "stable_key": "id::CITY::ne::1159147037",
+      "display_name": {
+        "en": "Dali",
+        "zh": "大理"
+      }
+    },
+    "CITY::ne::1159130171": {
+      "city_id": "CITY::ne::1159130171",
+      "stable_key": "id::CITY::ne::1159130171",
+      "display_name": {
+        "en": "Mengzi",
+        "zh": "蒙自"
+      }
+    },
+    "CITY::ne::1159149799": {
+      "city_id": "CITY::ne::1159149799",
+      "stable_key": "id::CITY::ne::1159149799",
+      "display_name": {
+        "en": "Shaoguan",
+        "zh": "韶关"
+      }
+    },
+    "CITY::ne::1159139761": {
+      "city_id": "CITY::ne::1159139761",
+      "stable_key": "id::CITY::ne::1159139761",
+      "display_name": {
+        "en": "Maoming",
+        "zh": "茂名"
+      }
+    },
+    "CITY::ne::1159150821": {
+      "city_id": "CITY::ne::1159150821",
+      "stable_key": "id::CITY::ne::1159150821",
+      "display_name": {
+        "en": "Guilin",
+        "zh": "桂林"
+      }
+    },
+    "CITY::ne::1159149785": {
+      "city_id": "CITY::ne::1159149785",
+      "stable_key": "id::CITY::ne::1159149785",
+      "display_name": {
+        "en": "Wuzhou",
+        "zh": "梧州"
+      }
+    },
+    "CITY::gn::1816373": {
+      "city_id": "CITY::gn::1816373",
+      "stable_key": "id::CITY::gn::1816373",
+      "display_name": {
+        "en": "Bijie",
+        "zh": "毕节"
+      }
+    },
+    "CITY::ne::1159139661": {
+      "city_id": "CITY::ne::1159139661",
+      "stable_key": "id::CITY::ne::1159139661",
+      "display_name": {
+        "en": "Tongren",
+        "zh": "铜仁"
+      }
+    },
+    "CITY::ne::1159150889": {
+      "city_id": "CITY::ne::1159150889",
+      "stable_key": "id::CITY::ne::1159150889",
+      "display_name": {
+        "en": "Yinchuan",
+        "zh": "银川"
+      }
+    },
+    "CITY::ne::1159149769": {
+      "city_id": "CITY::ne::1159149769",
+      "stable_key": "id::CITY::ne::1159149769",
+      "display_name": {
+        "en": "Wuwei",
+        "zh": "武威"
+      }
+    },
+    "CITY::ne::1159149877": {
+      "city_id": "CITY::ne::1159149877",
+      "stable_key": "id::CITY::ne::1159149877",
+      "display_name": {
+        "en": "Yining",
+        "zh": "伊宁"
+      }
+    },
+    "CITY::ne::1159150885": {
+      "city_id": "CITY::ne::1159150885",
+      "stable_key": "id::CITY::ne::1159150885",
+      "display_name": {
+        "en": "Kashgar",
+        "zh": "喀什"
+      }
+    },
+    "CITY::ne::1159147043": {
+      "city_id": "CITY::ne::1159147043",
+      "stable_key": "id::CITY::ne::1159147043",
+      "display_name": {
+        "en": "Kalgan",
+        "zh": "张家口"
+      }
+    },
+    "CITY::ne::1159149711": {
+      "city_id": "CITY::ne::1159149711",
+      "stable_key": "id::CITY::ne::1159149711",
+      "display_name": {
+        "en": "Dalanzadgad",
+        "zh": "达兰扎达嘎德"
+      }
+    },
+    "CITY::ne::1159149403": {
+      "city_id": "CITY::ne::1159149403",
+      "stable_key": "id::CITY::ne::1159149403",
+      "display_name": {
+        "en": "Iași",
+        "zh": "雅西"
+      }
+    },
+    "CITY::ne::1159135835": {
+      "city_id": "CITY::ne::1159135835",
+      "stable_key": "id::CITY::ne::1159135835",
+      "display_name": {
+        "en": "Timișoara",
+        "zh": "蒂米什瓦拉"
+      }
+    },
+    "CITY::ne::1159150677": {
+      "city_id": "CITY::ne::1159150677",
+      "stable_key": "id::CITY::ne::1159150677",
+      "display_name": {
+        "en": "Chișinău",
+        "zh": "基希讷乌"
+      }
+    },
+    "CITY::ne::1159149397": {
+      "city_id": "CITY::ne::1159149397",
+      "stable_key": "id::CITY::ne::1159149397",
+      "display_name": {
+        "en": "Constanța",
+        "zh": "康斯坦察"
+      }
+    },
+    "CITY::ne::1159149341": {
+      "city_id": "CITY::ne::1159149341",
+      "stable_key": "id::CITY::ne::1159149341",
+      "display_name": {
+        "en": "Nukus",
+        "zh": "努库斯"
+      },
+      "host_feature_id": "UZB-356"
+    },
+    "CITY::ne::1159134335": {
+      "city_id": "CITY::ne::1159134335",
+      "stable_key": "id::CITY::ne::1159134335",
+      "display_name": {
+        "en": "Qarshi",
+        "zh": "卡尔希"
+      },
+      "host_feature_id": "UZB-361"
+    },
+    "CITY::gn::1175296": {
+      "city_id": "CITY::gn::1175296",
+      "stable_key": "id::CITY::gn::1175296",
+      "display_name": {
+        "en": "Kalat",
+        "zh": "卡拉特"
+      },
+      "host_feature_id": "PAK-1108__SPLIT_KLT"
+    },
+    "CITY::ne::1159150673": {
+      "city_id": "CITY::ne::1159150673",
+      "stable_key": "id::CITY::ne::1159150673",
+      "display_name": {
+        "en": "Rabat",
+        "zh": "拉巴特"
+      },
+      "host_feature_id": "MAR-1451"
     }
   },
   "generated_at": "2026-03-17T04:10:44.164493+00:00",

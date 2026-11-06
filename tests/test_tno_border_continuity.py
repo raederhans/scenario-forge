@@ -29,10 +29,11 @@ class TnoBorderContinuityTests(unittest.TestCase):
             cross = LineString([(-9, lat), (12, lat)])
             self.assertAlmostEqual(a.intersection(cross).bounds[2], b.intersection(cross).bounds[0], places=9)
         owners = read(manifest['owners_url'])['owners']
+        # SLG (Spanish Algeria) took over the retired ALC parcels one-to-one.
         regions = {tag: shapely.union_all([g for fid, g in dz.items() if owners[fid] == tag])
-                   for tag in ('ALC', 'IAL')}
-        self.assertLessEqual(regions['ALC'].intersection(regions['IAL']).area, 1e-10)
-        shared = regions['ALC'].boundary.intersection(regions['IAL'].boundary)
+                   for tag in ('SLG', 'IAL')}
+        self.assertLessEqual(regions['SLG'].intersection(regions['IAL']).area, 1e-10)
+        shared = regions['SLG'].boundary.intersection(regions['IAL'].boundary)
         pack = read(manifest['mesh_pack_url'])['meshes']['opening_owner_borders']
         local = MultiLineString([line for line in pack['coordinates'] if any(-10 < x < 14 and 17 < y < 39 for x,y in line)])
         self.assertLess(shared.difference(local.buffer(1e-8)).length, 1e-6)

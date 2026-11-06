@@ -81,49 +81,6 @@
       "synthetic_owner": false,
       "tag": "ALB"
     },
-    "ALC": {
-      "base_iso2": "DZ",
-      "capital_state_id": null,
-      "color_hex": "#d1c094",
-      "color_policy": "locked",
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "controller_feature_count": 16,
-      "display_name": "Algerian Military Command",
-      "display_name_en": "Algerian Military Command",
-      "display_name_zh": "阿尔及利亚军事指挥部",
-      "entry_kind": "scenario_subject",
-      "feature_count": 16,
-      "featured": false,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "DZ",
-      "notes": "Algerian Command created from the requested western Algerian transfer set in TNO 1962.",
-      "parent_owner_tag": "IBR",
-      "parent_owner_tags": [
-        "IBR"
-      ],
-      "primary_rule_source": "tno_1962_alc_manual_override",
-      "provenance_iso2": "DZ",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_1962_alc_manual_override"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_id": "subregion_northern_africa",
-      "subregion_label": "Northern Africa",
-      "synthetic_owner": false,
-      "tag": "ALC"
-    },
     "ALT": {
       "base_iso2": "RU",
       "capital_state_id": 654,
@@ -893,6 +850,46 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "BKR"
+    },
+    "BKU": {
+      "base_iso2": "IQ",
+      "capital_state_id": null,
+      "color_hex": "#9e977a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 7,
+      "display_name": "Mosul and Kirkuk",
+      "display_name_en": "Mosul and Kirkuk",
+      "display_name_zh": "摩苏尔与基尔库克",
+      "entry_kind": "",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IQ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_bku",
+      "provenance_iso2": "IQ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_bku",
+        "tno_batch3_irq-3243"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "BKU"
     },
     "BLZ": {
       "base_iso2": "BZ",
@@ -1776,10 +1773,12 @@
       "color_policy": "locked",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 633,
+      "controller_feature_count": 647,
       "display_name": "Republic of China",
+      "display_name_en": "Republic of China",
+      "display_name_zh": "中华民国",
       "entry_kind": "scenario_subject",
-      "feature_count": 633,
+      "feature_count": 647,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -1789,7 +1788,7 @@
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
       "lookup_iso2": "CN",
-      "notes": "1962 semantic shift for CHI: the Nanjing-centered central Chinese client regime now absorbs the former coastal Reorganized Government core and Hainan.",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
         "JAP"
@@ -1798,7 +1797,14 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "japan_nanjing_china_client_1962"
+        "japan_nanjing_china_client_1962",
+        "tno_batch3_chi",
+        "tno_batch3_cn_mrg_20fbce9fead7",
+        "tno_batch3_cn_mrg_323d6e10e986",
+        "tno_batch3_cn_mrg_3811ff27587a",
+        "tno_batch3_cn_mrg_7e34a2c431cf",
+        "tno_batch3_cn_mrg_b59c07833274",
+        "tno_batch3_cn_mrg_e4d1257a0bd1"
       ],
       "scenario_only": false,
       "source": "manual_rule",
@@ -2414,12 +2420,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 123,
+      "controller_feature_count": 122,
       "display_name": "Britain",
       "display_name_en": "Britain",
       "display_name_zh": "英格兰王国",
       "entry_kind": "",
-      "feature_count": 123,
+      "feature_count": 122,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -2753,18 +2759,18 @@
       "color_policy": "locked",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 90,
+      "controller_feature_count": 93,
       "display_name": "German East Africa",
       "display_name_en": "German East Africa",
       "display_name_zh": "东非专员辖区",
-      "feature_count": 90,
+      "feature_count": 93,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "TZ",
-      "notes": "German East Africa colonial government in tno_1962, combining Mozambique, Malawi, Zambia, Zimbabwe, Tanzania, Uganda, Rwanda, and Burundi while preserving local releasables.",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "GER",
       "parent_owner_tags": [
         "GER"
@@ -2781,7 +2787,8 @@
         "tno_reclaim_geas_keep",
         "tno_reclaim_geat_keep",
         "tno_reclaim_geau_keep",
-        "tno_reclaim_geaz_keep"
+        "tno_reclaim_geaz_keep",
+        "tno_batch3_gea"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -2802,7 +2809,7 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 521,
+      "controller_feature_count": 518,
       "disabled_regional_preset_names": [
         "Bavaria",
         "Saxony",
@@ -2817,7 +2824,7 @@
       "display_name_en": "Germany",
       "display_name_zh": "大日耳曼国",
       "entry_kind": "",
-      "feature_count": 521,
+      "feature_count": 518,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -3210,12 +3217,12 @@
       "color_policy": "palette",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 113,
+      "controller_feature_count": 107,
       "display_name": "Guangdong State",
       "display_name_en": "Guangdong State",
       "display_name_zh": "广东国",
       "entry_kind": "scenario_subject",
-      "feature_count": 113,
+      "feature_count": 107,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3543,10 +3550,12 @@
       "color_policy": "locked",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 52,
+      "controller_feature_count": 53,
       "display_name": "Guizhou Clique",
+      "display_name_en": "Guizhou Clique",
+      "display_name_zh": "贵州军阀",
       "entry_kind": "scenario_subject",
-      "feature_count": 52,
+      "feature_count": 53,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3556,7 +3565,7 @@
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
       "lookup_iso2": "CN",
-      "notes": "New Guizhou military clique split out of the former Yunnan sphere.",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
         "JAP"
@@ -3565,7 +3574,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "japan_guizhou_clique_client_1962"
+        "japan_guizhou_clique_client_1962",
+        "tno_batch3_guz"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3586,10 +3596,12 @@
       "color_policy": "locked",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 59,
+      "controller_feature_count": 65,
       "display_name": "Guangxi Clique",
+      "display_name_en": "Guangxi Clique",
+      "display_name_zh": "桂系",
       "entry_kind": "scenario_subject",
-      "feature_count": 59,
+      "feature_count": 65,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3599,7 +3611,7 @@
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
       "lookup_iso2": "CN",
-      "notes": "Guangxi retained as a Japanese-aligned inland client clique.",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
         "JAP"
@@ -3608,7 +3620,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "japan_guangxi_client_1962"
+        "japan_guangxi_client_1962",
+        "tno_batch3_gxc"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3812,7 +3825,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "tno_1962_ial_manual_override",
-        "tno_user2_alc_to_ial"
+        "tno_user2_alc_to_ial",
+        "tno_batch3_ial_core"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3833,12 +3847,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 107,
+      "controller_feature_count": 95,
       "display_name": "Iberian Union",
       "display_name_en": "Iberian Union",
       "display_name_zh": "伊比利亚联盟",
       "entry_kind": "scenario_country",
-      "feature_count": 107,
+      "feature_count": 95,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -4150,6 +4164,47 @@
       "synthetic_owner": false,
       "tag": "IKEN"
     },
+    "IME": {
+      "base_iso2": "IL",
+      "capital_state_id": null,
+      "color_hex": "#5e8053",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 13,
+      "display_name": "Italian Middle East",
+      "display_name_en": "Italian Middle East",
+      "display_name_zh": "意属中东",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IL",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_batch3_ime",
+      "provenance_iso2": "IL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_ime"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "IME"
+    },
     "INS": {
       "base_iso2": "ID",
       "capital_state_id": 335,
@@ -4279,12 +4334,12 @@
       "color_policy": "palette",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
+      "controller_feature_count": 12,
       "display_name": "Iraq",
       "display_name_en": "Iraq",
       "display_name_zh": "伊拉克共和国",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 12,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -4297,7 +4352,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "IQ",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "tno_batch3_diyala_irq"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "tno_baseline",
@@ -4814,6 +4871,45 @@
       "synthetic_owner": false,
       "tag": "KGZ"
     },
+    "KLT": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#a48258",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Kalat and Makran",
+      "display_name_en": "Kalat and Makran",
+      "display_name_zh": "卡拉特与马克兰",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_pak-1108",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_pak-1108"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "KLT"
+    },
     "KOM": {
       "base_iso2": "RU",
       "capital_state_id": null,
@@ -4897,6 +4993,45 @@
       "synthetic_owner": false,
       "tag": "KOR"
     },
+    "KRK": {
+      "base_iso2": "UZ",
+      "capital_state_id": null,
+      "color_hex": "#987e50",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Karakalpakstan",
+      "display_name_en": "Karakalpakstan",
+      "display_name_zh": "卡拉卡尔帕克斯坦",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UZ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_krk",
+      "provenance_iso2": "UZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_krk"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "synthetic_owner": false,
+      "tag": "KRK"
+    },
     "KRS": {
       "base_iso2": "RU",
       "capital_state_id": null,
@@ -4940,45 +5075,6 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "KRS"
-    },
-    "KUR": {
-      "base_iso2": "IQ",
-      "capital_state_id": null,
-      "color_hex": "#635988",
-      "color_policy": "locked",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 7,
-      "display_name": "Kurdistan",
-      "entry_kind": "scenario_country",
-      "feature_count": 7,
-      "featured": false,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "IQ",
-      "notes": "Kurdistan restored from the requested northern Iraq transfer set in TNO 1962.",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_kur_manual_override",
-      "provenance_iso2": "IQ",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_1962_kur_manual_override"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
-      "synthetic_owner": false,
-      "tag": "KUR"
     },
     "KUW": {
       "base_iso2": "KW",
@@ -5228,19 +5324,19 @@
       "color_policy": "palette",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 23,
       "display_name": "Madagascar",
       "display_name_en": "Madagascar",
       "display_name_zh": "法属马达加斯加",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 23,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "MG",
-      "notes": "Madagascar represented as a separate French colony.",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "FRA",
       "parent_owner_tags": [
         "FRA"
@@ -5249,7 +5345,8 @@
       "provenance_iso2": "MG",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "madagascar_colony"
+        "madagascar_colony",
+        "tno_batch3_mad"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -5797,21 +5894,23 @@
     "MOR": {
       "base_iso2": "MA",
       "capital_state_id": 461,
-      "color_hex": "#ac8b6c",
+      "color_hex": "#9b503e",
       "color_policy": "palette",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 0,
+      "controller_feature_count": 12,
       "display_name": "Morocco",
+      "display_name_en": "Morocco",
+      "display_name_zh": "摩洛哥",
       "entry_kind": "",
-      "feature_count": 0,
+      "feature_count": 12,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "MA",
-      "notes": "Unified releasable Morocco under the Iberian Union in tno_1962, replacing the prior French/Spanish split.",
+      "notes": "州 290 Tangier；MAR-1445 与保留 IBR 的 ES630 Ceuta 几何交集面积为零。",
       "parent_owner_tag": "IBR",
       "parent_owner_tags": [
         "IBR"
@@ -5820,7 +5919,9 @@
       "provenance_iso2": "MA",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "french_morocco"
+        "french_morocco",
+        "tno_batch3_mor",
+        "tno_batch3_mor_tangier"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -6821,46 +6922,6 @@
       "synthetic_owner": false,
       "tag": "PAK"
     },
-    "PAL": {
-      "base_iso2": "IL",
-      "capital_state_id": 454,
-      "color_hex": "#66a56d",
-      "color_policy": "palette",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 13,
-      "display_name": "Italian Palestine",
-      "entry_kind": "scenario_subject",
-      "feature_count": 13,
-      "featured": false,
-      "historical_fidelity": "tno_baseline",
-      "historical_fidelity_summary": [
-        "tno_baseline"
-      ],
-      "lookup_iso2": "IL",
-      "notes": "Italian mandate baseline for Palestine in tno_1962.",
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "ITA"
-      ],
-      "primary_rule_source": "tno_italy_pal",
-      "provenance_iso2": "IL",
-      "quality": "approx_existing_geometry",
-      "rule_sources": [
-        "tno_italy_pal"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "tno_baseline",
-      "source_types": [
-        "tno_baseline"
-      ],
-      "subject_kind": "mandate",
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
-      "synthetic_owner": false,
-      "tag": "PAL"
-    },
     "PAN": {
       "base_iso2": "PA",
       "capital_state_id": 304,
@@ -7482,12 +7543,12 @@
       "color_policy": "locked",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 177,
+      "controller_feature_count": 135,
       "display_name": "Sichuan Clique",
       "display_name_en": "Sichuan Clique",
       "display_name_zh": "四川军政监",
       "entry_kind": "scenario_subject",
-      "feature_count": 177,
+      "feature_count": 135,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -7939,12 +8000,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 112,
+      "controller_feature_count": 97,
       "display_name": "Romania",
       "display_name_en": "Romania",
       "display_name_zh": "罗马尼亚王国",
       "entry_kind": "",
-      "feature_count": 112,
+      "feature_count": 97,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -8430,12 +8491,12 @@
       "color_policy": "locked",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 125,
+      "controller_feature_count": 113,
       "display_name": "Shanxi",
       "display_name_en": "Shanxi",
       "display_name_zh": "晋陕行政公署",
       "entry_kind": "scenario_subject",
-      "feature_count": 125,
+      "feature_count": 113,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -8549,6 +8610,47 @@
       "synthetic_owner": false,
       "tag": "SIE"
     },
+    "SLG": {
+      "base_iso2": "DZ",
+      "capital_state_id": null,
+      "color_hex": "#bca382",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 16,
+      "display_name": "Iberian Algeria",
+      "display_name_en": "Iberian Algeria",
+      "display_name_zh": "西属阿尔及利亚",
+      "entry_kind": "scenario_subject",
+      "feature_count": 16,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "DZ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "IBR",
+      "parent_owner_tags": [
+        "IBR"
+      ],
+      "primary_rule_source": "tno_batch3_slg",
+      "provenance_iso2": "DZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_slg"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "SLG"
+    },
     "SLO": {
       "base_iso2": "SK",
       "capital_state_id": 70,
@@ -8629,6 +8731,48 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "SNM"
+    },
+    "SNS": {
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "color_hex": "#8ba479",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 11,
+      "display_name": "Syrian National State",
+      "display_name_en": "Syrian National State",
+      "display_name_zh": "叙利亚民族国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 11,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SY",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_batch3_sns",
+      "provenance_iso2": "SY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_sns",
+        "tno_batch3_sns_family_color"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "SNS"
     },
     "SPH": {
       "base_iso2": "PH",
@@ -8955,46 +9099,6 @@
       "synthetic_owner": false,
       "tag": "SWZ"
     },
-    "SYR": {
-      "base_iso2": "SY",
-      "capital_state_id": 554,
-      "color_hex": "#c8c896",
-      "color_policy": "palette",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 9,
-      "display_name": "Syrian Protectorate",
-      "entry_kind": "scenario_subject",
-      "feature_count": 9,
-      "featured": false,
-      "historical_fidelity": "tno_baseline",
-      "historical_fidelity_summary": [
-        "tno_baseline"
-      ],
-      "lookup_iso2": "SY",
-      "notes": "Italian protectorate baseline for Syria in tno_1962.",
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "ITA"
-      ],
-      "primary_rule_source": "tno_italy_syr",
-      "provenance_iso2": "SY",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_italy_syr"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "tno_baseline",
-      "source_types": [
-        "tno_baseline"
-      ],
-      "subject_kind": "mandate",
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
-      "synthetic_owner": false,
-      "tag": "SYR"
-    },
     "TAT": {
       "base_iso2": "RU",
       "capital_state_id": null,
@@ -9169,12 +9273,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 29,
       "display_name": "Transnistria Governorate",
       "display_name_en": "Transnistria Governorate",
       "display_name_zh": "德涅斯特河沿岸总督区",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 29,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
@@ -9182,7 +9286,7 @@
         "extended"
       ],
       "lookup_iso2": "UA",
-      "notes": "",
+      "notes": "近似、未经配准：州 1282 Dniester Hills/Tiraspol 与现有德涅斯特河东岸行政地块对照；Bender 州 78 保留 ROM。",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "dev_manual_tag_create",
@@ -9190,7 +9294,9 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "dev_manual_tag_create",
-        "tno_user2_rku_to_tns"
+        "tno_user2_rku_to_tns",
+        "tno_batch3_tns",
+        "tno_batch3_tns_dniester"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -9333,12 +9439,12 @@
       "color_policy": "palette",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 116,
+      "controller_feature_count": 114,
       "display_name": "Turkey",
       "display_name_en": "Turkey",
       "display_name_zh": "土耳其共和国",
       "entry_kind": "",
-      "feature_count": 116,
+      "feature_count": 114,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -9688,6 +9794,46 @@
       "synthetic_owner": false,
       "tag": "USA"
     },
+    "UTL": {
+      "base_iso2": "UZ",
+      "capital_state_id": null,
+      "color_hex": "#526947",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Turkestan Legion",
+      "display_name_en": "Turkestan Legion",
+      "display_name_zh": "突厥斯坦军团",
+      "entry_kind": "",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UZ",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_batch3_utl",
+      "provenance_iso2": "UZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_batch3_utl",
+        "tno_batch3_tkm-359"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "synthetic_owner": false,
+      "tag": "UTL"
+    },
     "UZB": {
       "base_iso2": "UZ",
       "capital_state_id": null,
@@ -9695,12 +9841,12 @@
       "color_policy": "palette",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 13,
+      "controller_feature_count": 10,
       "display_name": "Uzbekistan",
       "display_name_en": "Uzbekistan",
       "display_name_zh": "乌兹别克苏维埃社会主义共和国",
       "entry_kind": "",
-      "feature_count": 13,
+      "feature_count": 10,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
@@ -10106,18 +10252,18 @@
       "tag": "WRS"
     },
     "XIK": {
-      "base_iso2": "XIK",
+      "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#6873a0",
       "color_policy": "locked",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 18,
+      "controller_feature_count": 60,
       "display_name": "24th Army of the National Revolutionary Army",
       "display_name_en": "24th Army of the National Revolutionary Army",
       "display_name_zh": "国民革命军第二十四军",
       "entry_kind": "scenario_country",
-      "feature_count": 18,
+      "feature_count": 60,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
@@ -10127,15 +10273,16 @@
       "inspector_group_anchor_id": "continent_asia",
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
-      "lookup_iso2": "XIK",
-      "notes": "",
+      "lookup_iso2": "CN",
+      "notes": "近似、未经配准。TNO 1.10.0b / 1962.1.1.1；州名、城市锚点及现有行政地块对照。",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "dev_manual_tag_create",
-      "provenance_iso2": "XIK",
+      "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "dev_manual_tag_create"
+        "dev_manual_tag_create",
+        "tno_batch3_xik"
       ],
       "scenario_only": true,
       "source": "manual_rule",

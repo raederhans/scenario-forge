@@ -333,6 +333,15 @@ HOI4_SPLIT_CAPITALS = {
 }
 
 TNO_CAPITALS = {
+    'KRK': ('1159149341', 'Nukus', '努库斯'),
+    'UTL': ('1159134335', 'Qarshi', '卡尔希'),
+    'KLT': ('CITY::gn::1175296', 'Kalat', '卡拉特'),
+    'MOR': ('1159150673', 'Rabat', '拉巴特'),
+    'SLG': ('1159151137', 'Oran', '奥兰'),
+    'BKU': ('1159150087', 'Mosul', '摩苏尔'),
+    'IME': ('1159151203', 'Jerusalem', '耶路撒冷'),
+    'SNS': ('1159151269', 'Damascus', '大马士革'),
+
     "CLL": ('1159139989', 'Tunja', '通哈'),
     "CLC": ('1159151345', 'Cali', '卡利'),
     "JAM": ('1159150855', 'Kingston', '金斯敦'),
@@ -498,6 +507,45 @@ HOI4_CITY_NAMES = {
 # Seats of TNO districts that are releasable rather than released keep their
 # occupation-era names as city labels; capitals alone would not carry them.
 TNO_DISTRICT_SEAT_NAMES = {
+    '1159151495': ('Kiew', '基辅'),
+    '1159151585': ('Moskau', '莫斯科'),
+    '1159150961': ('Tiflis', '第比利斯'),
+    '1159151305': ('Daressalam', '达累斯萨拉姆'),
+    '1159151539': ('Leopoldstadt', '利奥波德城'),
+    '1159150785': ('Windhuk', '温得和克'),
+    '1159151533': ('Chengdu', '成都'),
+    '1159140813': ('Zigong', '自贡'),
+    'CITY::gn::1813325': ('Daxian', '达县'),
+    '1159151363': ("Xi'an", '西安'),
+    'CITY::gn::1787765': ("Yan'an", '延安'),
+    '1159151371': ('Kunming', '昆明'),
+    '1159147037': ('Dali', '大理'),
+    '1159130171': ('Mengzi', '蒙自'),
+    '1159151331': ('Kōshū', '廣州'),
+    '1159149799': ('Shaoguan', '韶关'),
+    '1159139761': ('Maoming', '茂名'),
+    '1159150821': ('Guilin', '桂林'),
+    '1159151323': ('Nanning', '南宁'),
+    '1159149785': ('Wuzhou', '梧州'),
+    '1159151325': ('Guiyang', '贵阳'),
+    'CITY::gn::1816373': ('Bijie', '毕节'),
+    '1159139661': ('Tongren', '铜仁'),
+    '1159151321': ('Lanzhou', '兰州'),
+    '1159150889': ('Yinchuan', '银川'),
+    '1159149769': ('Wuwei', '武威'),
+    '1159150819': ('Xining', '西宁'),
+    '1159151531': ('Dihua', '迪化'),
+    '1159149877': ('Yining', '伊宁'),
+    '1159150885': ('Kashgar', '喀什'),
+    '1159147043': ('Kalgan', '张家口'),
+    '1159149711': ('Dalanzadgad', '达兰扎达嘎德'),
+    '1159150781': ('Khüree', '库伦'),
+    '1159151263': ('Bucharest', '布加勒斯特'),
+    '1159149403': ('Iași', '雅西'),
+    '1159135835': ('Timișoara', '蒂米什瓦拉'),
+    '1159150677': ('Chișinău', '基希讷乌'),
+    '1159149397': ('Constanța', '康斯坦察'),
+
     "1159149327": ("Shitomir", "日托米尔"),
     "1159134173": ("Rowno", "罗夫诺"),
     "1159126717": ("Tschernigow", "切尔尼戈夫"),
@@ -629,7 +677,7 @@ def apply_reviewed_capitals(payload, countries, city_rows, *, scenario_id, stric
         if city_id in cities and cities[city_id].get("display_name") != display_name:
             name_city(city_id, display_name["en"], display_name["zh"])
     for ne_id, (en, zh) in REVIEWED_CITY_NAMES.get(scenario_id, {}).items():
-        city_id = f"CITY::ne::{ne_id}"
+        city_id = ne_id if ne_id.startswith("CITY::") else f"CITY::ne::{ne_id}"
         if city_id not in city_rows:
             if strict:
                 raise ValueError(f"{scenario_id}: missing reviewed city {city_id}")
