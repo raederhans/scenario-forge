@@ -10,6 +10,9 @@ export function createSelectionOverlayOwner({
   getFeatureId,
   getEntityFeatureId,
   getCountryFeatureIds,
+  getSelectionBoundary = () => null,
+  getSelectionBoundaryRevision = () => 0,
+  getZoomScale = () => 1,
   getDevGroup,
   getInspectorGroup,
   getPath,
@@ -24,6 +27,8 @@ export function createSelectionOverlayOwner({
   let lastInspectorGroup = null;
   let lastDevPath = null;
   let lastInspectorPath = null;
+  let lastInspectorWidth = null;
+  let inspectorFallback = false;
 
   function normalizeIds(ids) {
     return Array.isArray(ids) ? ids.map((id) => String(id || "").trim()).filter(Boolean) : [];
@@ -38,6 +43,8 @@ export function createSelectionOverlayOwner({
       !!selection.groupMode,
       String(selection.label || ""),
       getLandFeatures()?.length || 0,
+      getSelectionBoundaryRevision(),
+      getTopologyRevision(),
     ]);
   }
 
@@ -50,14 +57,15 @@ export function createSelectionOverlayOwner({
     ]);
   }
 
-  function buildDevSelectionOverlayData(orderedIds, fallbackFeatures) {
+  function buildDevSelectionOverlayData(orderedIds, fallbackFeatures, requireAllMembers = false) {
     const topojson = getTopojson();
     const topology = getRuntimeTopology();
-    if (fallbackFeatures.length <= 1 || typeof topojson?.merge !== "function" || !topology?.objects) {
+    if ((!requireAllMembers && fallbackFeatures.length <= 1) || !orderedIds.length
+      || typeof topojson?.merge !== "function" || !topology?.objects) {
       return fallbackFeatures;
     }
     const requestedIds = new Set(orderedIds);
-    const featureIds = fallbackFeatures.map((feature) => getFeatureId(feature));
+    const featureIds = requireAllMembers ? orderedIds : fallbackFeatures.map((feature) => getFeatureId(feature));
     const selectedIds = new Set(featureIds);
     if (requestedIds.size !== orderedIds.length || selectedIds.size !== featureIds.length
       || featureIds.some((id) => !id || !requestedIds.has(id))) {
@@ -136,21 +144,20 @@ export function createSelectionOverlayOwner({
     const featureLookup = getLandIndex() instanceof Map && getLandIndex().size
       ? getLandIndex()
       : new Map(landFeatures.map((feature) => [getFeatureId(feature), feature]).filter(([featureId]) => featureId));
-    const data = featureIds.length
-      ? featureIds
-        .map((featureId) => featureLookup.get(featureId))
-        .filter(Boolean)
-      // 国家高亮按当前剧本归属取成员，地块的几何原始国家码只在无剧本时等价。
-      : Array.from(getCountryFeatureIds(code) || [])
-        .map((featureId) => featureLookup.get(String(featureId || "").trim()))
-        .filter(Boolean);
-    const renderAsGroup = featureIds.length > 0 && selectionState.groupMode === true;
-    const overlayData = renderAsGroup && data.length
-      ? [{
-        type: "FeatureCollection",
-        features: data,
-        inspectorHighlightKey: `group:${JSON.stringify(featureIds)}`,
-      }]
+    const memberIds = featureIds.length ? featureIds : normalizeIds(Array.from(getCountryFeatureIds(code) || []));
+    const data = memberIds
+      .map((featureId) => featureLookup.get(featureId))
+      .filter(Boolean);
+    const renderAsGroup = featureIds.length !== 1 || selectionState.groupMode === true;
+    let geometry = renderAsGroup ? getSelectionBoundary(new Set(memberIds)) : null;
+    if (renderAsGroup && !geometry) {
+      const merged = buildDevSelectionOverlayData(memberIds, data, true);
+      if (merged !== data) geometry = merged[0].geometry;
+    }
+    inspectorFallback = renderAsGroup && !geometry;
+    const overlayData = geometry
+      ? [true, false].map(halo => ({ type: "Feature", geometry, halo,
+        inspectorHighlightKey: halo ? "boundary-halo" : "boundary" }))
       : data;
     const selection = getInspectorGroup()
       .selectAll("path.inspector-highlight")
@@ -166,15 +173,23 @@ export function createSelectionOverlayOwner({
       .merge(selection)
       .attr("d", getPath())
       .attr("fill", "none")
-      .attr("stroke", "#1d64f2")
-      .attr("stroke-width", 2.4);
+      .attr("stroke", d => d.halo ? "#ffffff" : "#1d64f2")
+      .attr("stroke-opacity", d => d.halo ? 0.55 : 1);
 
     selection.exit().remove();
+    updateInspectorWidth();
     getInspectorGroup()
-      .attr("aria-hidden", data.length ? "false" : "true")
-      .attr("aria-label", data.length
+      .attr("aria-hidden", overlayData.length ? "false" : "true")
+      .attr("aria-label", overlayData.length
         ? `Inspector highlight overlay for ${selectionState.label || code || "feature group"}`
         : "Inspector highlight overlay");
+  }
+
+  function updateInspectorWidth() {
+    const width = inspectorFallback ? 1 : 1.25 + Math.max(0, Math.min(6, getZoomScale() - 2)) * 0.125;
+    getInspectorGroup().selectAll("path.inspector-highlight")
+      .attr("stroke-width", d => d.halo ? width + 2.5 : width);
+    lastInspectorWidth = width;
   }
 
   function renderDevSelectionOverlayIfNeeded({ force = false } = {}) {
@@ -195,7 +210,11 @@ export function createSelectionOverlayOwner({
     const path = getPath();
     if (!group || !path) return;
     const signature = getInspectorOverlaySignature();
-    if (!force && !isInspectorDirty() && signature === lastInspectorSignature && group === lastInspectorGroup && path === lastInspectorPath) return;
+    if (!force && !isInspectorDirty() && signature === lastInspectorSignature && group === lastInspectorGroup && path === lastInspectorPath) {
+      const width = inspectorFallback ? 1 : 1.25 + Math.max(0, Math.min(6, getZoomScale() - 2)) * 0.125;
+      if (width !== lastInspectorWidth) updateInspectorWidth();
+      return;
+    }
     renderInspectorHighlightOverlay();
     markInspectorClean();
     lastInspectorSignature = signature;

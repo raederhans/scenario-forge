@@ -2016,7 +2016,7 @@
             "UK_MRG_5b67c89ee498"
           ],
           "name_en": "North East",
-          "name_zh": "东北"
+          "name_zh": "英格兰东北部"
         },
         "north_west": {
           "district_id": "north_west",
@@ -2043,7 +2043,7 @@
             "UK_MRG_5adcc0eef3cd"
           ],
           "name_en": "North West",
-          "name_zh": "西北"
+          "name_zh": "英格兰西北部"
         },
         "south_east": {
           "district_id": "south_east",
@@ -2069,7 +2069,7 @@
             "UK_MRG_b91d40f3e558"
           ],
           "name_en": "South East",
-          "name_zh": "东南"
+          "name_zh": "英格兰东南部"
         },
         "south_west": {
           "district_id": "south_west",
@@ -2087,7 +2087,7 @@
             "UKK43"
           ],
           "name_en": "South West",
-          "name_zh": "西南"
+          "name_zh": "英格兰西南部"
         },
         "west_midlands": {
           "district_id": "west_midlands",
@@ -6264,7 +6264,7 @@
             "GEO-3039"
           ],
           "name_en": "Generalbezirk Georgien",
-          "name_zh": "格鲁吉亚"
+          "name_zh": "格鲁吉亚总区"
         },
         "kc01": {
           "district_id": "kc01",
@@ -6340,7 +6340,7 @@
             "AZE-5566"
           ],
           "name_en": "Generalbezirk Aserbaidschan",
-          "name_zh": "阿塞拜疆"
+          "name_zh": "阿塞拜疆总区"
         },
         "kc02": {
           "district_id": "kc02",
@@ -6364,7 +6364,7 @@
             "RU_RAY_50074027B89252490479976"
           ],
           "name_en": "Generalbezirk Kuban",
-          "name_zh": "库班"
+          "name_zh": "库班总区"
         },
         "kc03": {
           "district_id": "kc03",
@@ -6391,7 +6391,7 @@
             "RU_RAY_50074027B97915743109256"
           ],
           "name_en": "Generalbezirk Stawropol-Terek",
-          "name_zh": "斯塔夫罗波尔—捷列克"
+          "name_zh": "斯塔夫罗波尔—捷列克总区"
         },
         "kc04": {
           "district_id": "kc04",
@@ -6435,7 +6435,7 @@
             "RU_RAY_50074027B96475461506325"
           ],
           "name_en": "Generalbezirk Bergvölker",
-          "name_zh": "山地民族"
+          "name_zh": "山地民族总区"
         },
         "kc05": {
           "district_id": "kc05",
@@ -6463,7 +6463,7 @@
             "RU_RAY_50074027B85852796728949"
           ],
           "name_en": "Generalbezirk Kalmückien",
-          "name_zh": "卡尔梅克"
+          "name_zh": "卡尔梅克总区"
         }
       },
       "tag": "RKK"
@@ -6499,7 +6499,7 @@
             "RU_RAY_50074027B77320350284147"
           ],
           "name_en": "Generalbezirk Moskau",
-          "name_zh": "莫斯科"
+          "name_zh": "莫斯科总区"
         },
         "ms01": {
           "district_id": "ms01",
@@ -6516,7 +6516,7 @@
             "RU_RAY_50074027B64455240716412"
           ],
           "name_en": "Generalbezirk Ingermanland",
-          "name_zh": "英格里亚"
+          "name_zh": "英格里亚总区"
         },
         "ms02": {
           "district_id": "ms02",
@@ -6532,7 +6532,7 @@
             "RU_RAY_50074027B98073914217058"
           ],
           "name_en": "Generalbezirk Smolensk",
-          "name_zh": "斯摩棱斯克"
+          "name_zh": "斯摩棱斯克总区"
         },
         "ms03": {
           "district_id": "ms03",
@@ -6555,7 +6555,7 @@
             "RU_RAY_50074027B9527926275896"
           ],
           "name_en": "Generalbezirk Tula",
-          "name_zh": "图拉"
+          "name_zh": "图拉总区"
         },
         "ms04": {
           "district_id": "ms04",
@@ -6583,7 +6583,7 @@
             "UA_RAY_74538382B45881397075814"
           ],
           "name_en": "Generalbezirk Woronesch",
-          "name_zh": "沃罗涅日"
+          "name_zh": "沃罗涅日总区"
         },
         "ms05": {
           "district_id": "ms05",
@@ -6599,7 +6599,7 @@
             "RU_RAY_50074027B84622469833682"
           ],
           "name_en": "Generalbezirk Jaroslawl",
-          "name_zh": "雅罗斯拉夫尔"
+          "name_zh": "雅罗斯拉夫尔总区"
         },
         "ms06": {
           "district_id": "ms06",
@@ -6611,7 +6611,7 @@
             "RU_MRG_b963a8bb44cb"
           ],
           "name_en": "Generalbezirk Gorki",
-          "name_zh": "高尔基"
+          "name_zh": "高尔基总区"
         },
         "ms07": {
           "district_id": "ms07",
@@ -6636,7 +6636,7 @@
             "RU_RAY_50074027B95256084907759"
           ],
           "name_en": "Generalbezirk Saratow",
-          "name_zh": "萨拉托夫"
+          "name_zh": "萨拉托夫总区"
         },
         "ms08": {
           "district_id": "ms08",
@@ -6679,7 +6679,7 @@
             "RU_RAY_50074027B99437248655047"
           ],
           "name_en": "Generalbezirk Don-Wolga",
-          "name_zh": "顿河—伏尔加"
+          "name_zh": "顿河—伏尔加总区"
         }
       },
       "tag": "RKM"
@@ -6936,7 +6936,7 @@
             "UA_RAY_74538382B9928068726640"
           ],
           "name_en": "Generalbezirk Kiew",
-          "name_zh": "基辅"
+          "name_zh": "基辅总区"
         },
         "uk01": {
           "district_id": "uk01",
@@ -6982,7 +6982,7 @@
             "UA_RAY_74538382B9733134987595"
           ],
           "name_en": "Generalbezirk Wolhynien-Podolien",
-          "name_zh": "沃里尼亚—波多利亚"
+          "name_zh": "沃里尼亚—波多利亚总区"
         },
         "uk02": {
           "district_id": "uk02",
@@ -7007,7 +7007,7 @@
             "UA_RAY_74538382B89307192182420"
           ],
           "name_en": "Generalbezirk Shitomir",
-          "name_zh": "日托米尔"
+          "name_zh": "日托米尔总区"
         },
         "uk03": {
           "district_id": "uk03",
@@ -7057,7 +7057,7 @@
             "UA_RAY_74538382B98672866452807"
           ],
           "name_en": "Generalbezirk Tschernigow",
-          "name_zh": "切尔尼戈夫"
+          "name_zh": "切尔尼戈夫总区"
         },
         "uk04": {
           "district_id": "uk04",
@@ -7094,7 +7094,7 @@
             "UA_RAY_74538382B92973355473211"
           ],
           "name_en": "Generalbezirk Dnjepropetrowsk",
-          "name_zh": "第聂伯罗彼得罗夫斯克"
+          "name_zh": "第聂伯罗彼得罗夫斯克总区"
         },
         "uk05": {
           "district_id": "uk05",
@@ -7128,7 +7128,7 @@
             "UA_RAY_74538382B99860915109561"
           ],
           "name_en": "Generalbezirk Nikolajew",
-          "name_zh": "尼古拉耶夫"
+          "name_zh": "尼古拉耶夫总区"
         },
         "uk06": {
           "district_id": "uk06",
@@ -7164,7 +7164,7 @@
             "UA_RAY_74538382B95492559683598"
           ],
           "name_en": "Generalbezirk Taurien",
-          "name_zh": "塔夫利达"
+          "name_zh": "塔夫利达总区"
         },
         "uk07": {
           "district_id": "uk07",
@@ -7201,7 +7201,7 @@
             "UA_RAY_74538382B7822777781560"
           ],
           "name_en": "Generalbezirk Charkow",
-          "name_zh": "哈尔科夫"
+          "name_zh": "哈尔科夫总区"
         },
         "uk08": {
           "district_id": "uk08",
@@ -7242,7 +7242,7 @@
             "UA_RAY_74538382B99908513430661"
           ],
           "name_en": "Generalbezirk Donez",
-          "name_zh": "顿涅茨"
+          "name_zh": "顿涅茨总区"
         }
       },
       "tag": "RKU"

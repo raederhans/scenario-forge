@@ -40,6 +40,55 @@ function legacySourceEdgeQuery(edges, occupied) {
 
 const polygon = (id, rings) => ({ id, geometry: { type: 'Polygon', coordinates: rings } });
 const rect = (id, x0, y0, x1, y1) => polygon(id, [[[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]]);
+
+function overlapSegments(graph) {
+  const { coordinates, offsets, overlapOwners, overlapCoverers } = graph.overlap;
+  const result = [];
+  for (let arc = 0; arc < offsets.length - 1; arc++) {
+    const owner = graph.featureIds[overlapOwners[arc]], coverer = graph.featureIds[overlapCoverers[arc]];
+    for (let point = offsets[arc]; point < offsets[arc + 1] - 1; point++) {
+      const ends = [[coordinates[point * 2], coordinates[point * 2 + 1]],
+        [coordinates[point * 2 + 2], coordinates[point * 2 + 3]]];
+      result.push(`${owner}>${coverer}|${ends.map(JSON.stringify).sort().join('|')}`);
+    }
+  }
+  return result.sort();
+}
+
+test('covered one-sided edges retain directed ownership outside the coast mesh', () => {
+  const graph = buildPaintContourGraph([rect('A',0,0,2,2), rect('B',1,-1,3,3)]);
+  assert.deepEqual(overlapSegments(graph), [
+    'A>B|[0,0]|[2,0]', 'A>B|[0,2]|[2,2]', 'A>B|[2,0]|[2,2]', 'B>A|[1,-1]|[1,3]',
+  ]);
+  const coast = graph.coast;
+  const coastEdges = [];
+  for (let arc = 0; arc < coast.offsets.length - 1; arc++) {
+    for (let point = coast.offsets[arc]; point < coast.offsets[arc + 1] - 1; point++) {
+      coastEdges.push([[coast.coordinates[point * 2], coast.coordinates[point * 2 + 1]],
+        [coast.coordinates[point * 2 + 2], coast.coordinates[point * 2 + 3]]].map(JSON.stringify).sort().join('|'));
+    }
+  }
+  assert.deepEqual(coastEdges.sort(), ['[0,0]|[0,2]', '[1,-1]|[3,-1]', '[1,3]|[3,3]', '[3,-1]|[3,3]']);
+});
+
+test('overlap ownership refreshes after incremental coverer changes and removal', () => {
+  const a = rect('A',0,0,2,2), b = rect('B',1,-1,3,3);
+  const fillers = Array.from({ length: 100 }, (_, i) => rect(`f${i}`, 10 + i, 10, 10.5 + i, 10.5));
+  const builder = createPaintContourGraphBuilder();
+  builder.patch([a, b, ...fillers]);
+  builder.finish();
+  const moved = rect('B',1,-2,4,4);
+  builder.patch([moved]);
+  const changed = builder.finish();
+  assert.equal(changed.diagnostics.incremental, true);
+  assert.deepEqual(overlapSegments(changed), overlapSegments(buildPaintContourGraph([a, moved, ...fillers])));
+  builder.patch([], ['B']);
+  const removed = builder.finish();
+  assert.equal(removed.diagnostics.incremental, true);
+  assert.deepEqual(overlapSegments(removed), []);
+  builder.setWaterMask(null);
+  assert.deepEqual(overlapSegments(builder.finish()), []);
+});
 function segments(graph) {
   const result = [];
   for (let i=0; i<graph.offsets.length-1; i++) {
@@ -434,7 +483,9 @@ test('coast chains contain uncovered unpaired edges for either ring winding', as
   const enclosed = segments(buildPaintContourGraph([a, enclosing], { waterMask: packContourWaterMask({ land: surrounding }) }));
   assert.equal(enclosed.length, 4, 'only the enclosing political polygon contributes coast');
   assert.ok(enclosed.flat().every(([x, y]) => x === -2 || x === 4 || y === -2 || y === 4));
-  assert.equal(buildPaintContourGraph([a]).coast, null);
+  const unmasked = buildPaintContourGraph([a]);
+  assert.equal(segments(unmasked).length, 4);
+  assert.deepEqual([...unmasked.coast.coastOwners].map(owner => unmasked.featureIds[owner]), [a.id]);
   const overlapping = square('B', 0.97);
   const water = packContourWaterMask({ water: surrounding });
   const near = segments(buildPaintContourGraph([a, overlapping], { waterMask: water, nearSeamTolerance: 0.05 }));

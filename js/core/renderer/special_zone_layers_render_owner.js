@@ -1,5 +1,7 @@
 import {
   buildSpecialZoneRenderFeatures,
+  normalizeSpecialZoneLayersState,
+  getSpecialZonePatternDefinition,
 } from "../special_zone_layers.js";
 
 // Merged outlines are topology-heavy; keep a small bounded LRU cache per render owner.
@@ -59,6 +61,7 @@ export function createSpecialZoneLayersRenderOwner({
     getDashPattern = () => [],
     getFeatureId = (feature) => String(feature?.properties?.id || feature?.id || "").trim(),
     getPathSVG = () => null,
+    getSelectionBoundary = () => null,
     getSafeCanvasColor = (value, fallback) => value || fallback,
   } = helpers;
 
@@ -177,16 +180,24 @@ export function createSpecialZoneLayersRenderOwner({
 
     const merged = enter.merge(selection)
       .attr("id", (d) => d.id)
-      .attr("width", (d) => (d.pattern === "denseDots" ? 8 : 14))
-      .attr("height", (d) => (d.pattern === "denseDots" ? 8 : 14))
-      .attr("patternTransform", () => getPatternTransform(runtimeState.zoomTransform));
+      .attr("width", (d) => (getSpecialZonePatternDefinition(d.pattern)?.size || (d.pattern === "denseDots" ? 8 : 14)))
+      .attr("height", (d) => (getSpecialZonePatternDefinition(d.pattern)?.size || (d.pattern === "denseDots" ? 8 : 14)))
+      .attr("patternTransform", (d) => `${getPatternTransform(runtimeState.zoomTransform)} rotate(${getSpecialZonePatternDefinition(d.pattern)?.rotation || 0})`);
 
     merged.each(function renderPatternDefinition(d) {
       const patternSelection = globalThis.d3.select(this);
       patternSelection.selectAll("*").remove();
       const stroke = d.stroke;
       const width = d.strokeWidth;
-      if (d.pattern === "diagonalHatch") {
+      const definition = getSpecialZonePatternDefinition(d.pattern);
+      if (definition) {
+        definition.marks.forEach(([tag, attributes]) => {
+          const mark = patternSelection.append(tag);
+          Object.entries(attributes).forEach(([key, value]) => mark.attr(key, value));
+          mark.attr("fill", tag === "path" ? "none" : stroke);
+          if (tag === "path") mark.attr("stroke", stroke);
+        });
+      } else if (d.pattern === "diagonalHatch") {
         patternSelection.append("path").attr("d", "M -4 14 L 14 -4 M 0 18 L 18 0").attr("stroke", stroke).attr("stroke-width", width).attr("fill", "none");
       } else if (d.pattern === "crossHatch") {
         patternSelection.append("path").attr("d", "M -4 14 L 14 -4 M 0 18 L 18 0 M 0 -4 L 18 14 M -4 0 L 14 18").attr("stroke", stroke).attr("stroke-width", width * 0.75).attr("fill", "none");
@@ -228,6 +239,8 @@ export function createSpecialZoneLayersRenderOwner({
 
   function getLayerOutlineFeature(layer, geometryIndex, topology) {
     const memberIds = Array.isArray(layer?.memberFeatureIds) ? [...layer.memberFeatureIds].sort((a, b) => a.localeCompare(b)) : [];
+    const boundary = getSelectionBoundary(new Set(memberIds));
+    if (boundary) return boundary;
     if (!memberIds.length || !topology || !globalThis.topojson?.merge) return null;
     const styleSignature = getLayerOutlineStyleCacheSignature(layer);
     const cacheKey = [
@@ -242,7 +255,7 @@ export function createSpecialZoneLayersRenderOwner({
     const geoms = memberIds
       .map((id) => geometryIndex.get(id))
       .filter(Boolean);
-    if (!geoms.length) return null;
+    if (geoms.length !== memberIds.length) return null;
     try {
       const mergedShape = globalThis.topojson.merge(topology, geoms);
       const feature = {
@@ -264,104 +277,51 @@ export function createSpecialZoneLayersRenderOwner({
     }
   }
 
-  function getOutlineFeatures(features) {
-    const topology = getActiveTopology();
-    const layers = Array.isArray(runtimeState.specialZoneLayers?.layers)
-      ? runtimeState.specialZoneLayers.layers.filter((layer) => layer?.visible !== false)
-      : [];
-    if (!topology || !layers.length || !globalThis.topojson?.merge) {
-      return features.map((feature) => ({ feature, fallback: true }));
-    }
-    const geometryIndex = buildGeometryIndex(topology);
-    const outlines = layers
-      .map((layer) => getLayerOutlineFeature(layer, geometryIndex, topology))
-      .filter(Boolean)
-      .map((feature) => ({ feature, fallback: false }));
-    return outlines.length ? outlines : features.map((feature) => ({ feature, fallback: true }));
-  }
-
   function updateSpecialZonesPaths() {
-    const specialZonesGroup = getSpecialZonesGroup();
+    const group = getSpecialZonesGroup();
     const pathSVG = getPathSVG();
-    if (!specialZonesGroup || !pathSVG) return;
-
+    if (!group || !pathSVG) return;
+    const normalized = normalizeSpecialZoneLayersState(runtimeState.specialZoneLayers);
     const features = getEffectiveSpecialZonesFeatureCollection().features;
-    if (!features.length) {
-      specialZonesGroup.selectAll("path.special-zone").remove();
-      specialZonesGroup.selectAll("path.special-zone-pattern").remove();
-      specialZonesGroup.selectAll("path.special-zone-outline").remove();
-      renderPatternDefs([]);
-      return;
-    }
     renderPatternDefs(features);
-
-    const selection = specialZonesGroup
-      .selectAll("path.special-zone")
-      .data(features, (d, i) => d?.properties?.id || `special-zone-${i}`);
-
-    selection
-      .enter()
-      .append("path")
-      .attr("class", "special-zone")
-      .attr("role", "presentation")
-      .attr("aria-hidden", "true")
-      .merge(selection)
-      .attr("d", pathSVG)
-      .attr("fill", (d) => getSpecialZoneStyle(d).fill)
-      .attr("fill-opacity", (d) => (getSpecialZoneStyle(d).pattern === "outlineOnly" ? 0 : getSpecialZoneStyle(d).fillOpacity))
-      .attr("stroke", "none")
-      .attr("opacity", 0.95);
-
-    selection.exit().remove();
-
-    const patternSelection = specialZonesGroup
-      .selectAll("path.special-zone-pattern")
-      .data(features.filter((feature) => {
-        const pattern = getSpecialZoneStyle(feature).pattern;
-        return pattern && pattern !== "solid" && pattern !== "outlineOnly";
-      }), (d, i) => `${d?.properties?.id || `special-zone-${i}`}:pattern`);
-
-    patternSelection
-      .enter()
-      .append("path")
-      .attr("class", "special-zone-pattern")
-      .attr("role", "presentation")
-      .attr("aria-hidden", "true")
-      .merge(patternSelection)
-      .attr("d", pathSVG)
-      .attr("fill", (d) => `url(#${getPatternDefId(d, getSpecialZoneStyle(d))})`)
-      .attr("fill-opacity", (d) => getSpecialZoneStyle(d).patternOpacity)
-      .attr("stroke", "none")
-      .attr("pointer-events", "none");
-
-    patternSelection.exit().remove();
-
-    const selectedId = String(runtimeState.specialZoneEditor?.selectedId || "");
-    const outlineSelection = specialZonesGroup
-      .selectAll("path.special-zone-outline")
-      .data(getOutlineFeatures(features), (entry, index) => entry.feature?.properties?.id || `special-zone-outline-${index}`);
-
-    outlineSelection
-      .enter()
-      .append("path")
-      .attr("class", "special-zone-outline")
-      .attr("role", "presentation")
-      .attr("aria-hidden", "true")
-      .attr("vector-effect", "non-scaling-stroke")
-      .merge(outlineSelection)
-      .attr("d", (entry) => pathSVG(entry.feature))
-      .attr("fill", "none")
-      .attr("stroke", (entry) => getSpecialZoneStyle(entry.feature).stroke)
-      .attr("stroke-opacity", (entry) => getSpecialZoneStyle(entry.feature).strokeOpacity)
-      .attr("stroke-width", (entry) => {
-        const style = getSpecialZoneStyle(entry.feature);
-        const id = String(entry.feature?.properties?.id || "");
-        return id && id === selectedId ? style.strokeWidth + 0.9 : style.strokeWidth;
-      })
-      .attr("stroke-dasharray", (entry) => getSpecialZoneStyle(entry.feature).dash.join(" "))
-      .attr("pointer-events", "none");
-
-    outlineSelection.exit().remove();
+    const topology = getActiveTopology();
+    const geometryIndex = buildGeometryIndex(topology);
+    const entries = normalized.layers.filter((layer) => layer.visible).map((layer) => {
+      const collection = {
+        type: "FeatureCollection",
+        features: features.filter((feature) => getFeatureLayerId(feature) === layer.id),
+        properties: { __specialZoneLayerId: layer.id, __specialZoneLayerStyle: layer.style },
+      };
+      const outline = getLayerOutlineFeature(layer, geometryIndex, topology);
+      return { layer, collection, outline: outline || collection, fallback: !outline };
+    });
+    group.selectAll("path.special-zone, path.special-zone-pattern, path.special-zone-outline").remove();
+    entries.forEach(({ layer, collection, outline, fallback }) => {
+      const style = layer.style;
+      group.append("path")
+        .attr("class", "special-zone")
+        .attr("d", pathSVG(collection))
+        .attr("fill", style.fill)
+        .attr("fill-opacity", style.pattern === "outlineOnly" ? 0 : style.fillOpacity)
+        .attr("stroke", "none");
+      group.append("path")
+        .attr("class", "special-zone-pattern")
+        .attr("d", pathSVG(collection))
+        .attr("fill", ["solid", "outlineOnly"].includes(style.pattern) ? "none" : `url(#${getPatternDefId(collection, style)})`)
+        .attr("fill-opacity", style.patternOpacity)
+        .attr("stroke", "none")
+        .attr("pointer-events", "none");
+      group.append("path")
+        .attr("class", "special-zone-outline")
+        .attr("d", pathSVG(outline))
+        .attr("fill", "none")
+        .attr("stroke", style.stroke)
+        .attr("stroke-opacity", style.strokeOpacity)
+        .attr("stroke-width", (fallback ? 0.6 : style.strokeWidth) + (layer.id === normalized.activeLayerId ? 0.6 : 0))
+        .attr("stroke-dasharray", layer.category === "claim" ? "6 4" : null)
+        .attr("vector-effect", "non-scaling-stroke")
+        .attr("pointer-events", "none");
+    });
   }
 
   function syncPatternTransformDuringZoom() {
@@ -369,7 +329,7 @@ export function createSpecialZoneLayersRenderOwner({
     if (!strategicDefs) return;
     strategicDefs
       .selectAll("pattern.special-zone-pattern-def")
-      .attr("patternTransform", () => getPatternTransform(runtimeState.zoomTransform));
+      .attr("patternTransform", (d) => `${getPatternTransform(runtimeState.zoomTransform)} rotate(${getSpecialZonePatternDefinition(d.pattern)?.rotation || 0})`);
   }
 
   return {
