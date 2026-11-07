@@ -12185,11 +12185,18 @@ function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate 
     || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
   const fitScale = Math.min(runtimeState.width * 0.72 / extentX, runtimeState.height * 0.72 / extentY);
   const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, fitScale));
-  const nextTransform = globalThis.d3.zoomIdentity
-    .translate(runtimeState.width / 2, runtimeState.height / 2)
-    .scale(scale)
-    .translate(-centerX, -centerY);
-  const selection = globalThis.d3.select(interactionRect.node());
+  const node = interactionRect.node();
+  updateZoomTranslateExtent();
+  // zoom.transform 不经过平移范围约束；先按 translateExtent 约束，避免视角越过世界边缘。
+  const nextTransform = zoomBehavior.constrain()(
+    globalThis.d3.zoomIdentity
+      .translate(runtimeState.width / 2, runtimeState.height / 2)
+      .scale(scale)
+      .translate(-centerX, -centerY),
+    zoomBehavior.extent().call(node, node.__data__, 0, [node]),
+    zoomBehavior.translateExtent(),
+  );
+  const selection = globalThis.d3.select(node);
   const target = animate ? selection.transition().duration(420) : selection;
   target.call(zoomBehavior.transform, nextTransform);
   return true;
