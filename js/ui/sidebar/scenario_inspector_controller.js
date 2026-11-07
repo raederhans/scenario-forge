@@ -69,6 +69,11 @@ export function createScenarioInspectorController({
   applyVisualColorToOwnedRegions,
   clearCountryVisualOverrides,
   renderCountryColorSyncAffordance,
+  // Catalog access is injectable for tests; the sidebar uses the releasable manager.
+  resolveTerritoryEntry = resolveCatalogEntryForTag,
+  resolveTerritoryFeatureIds = resolvePresetFeatureIds,
+  getSelectedBoundaryVariant = getResolvedReleasableBoundaryVariant,
+  selectBoundaryVariant = selectScenarioBoundaryVariant,
 }) {
   const appendScenarioCountryCard = (container, countryState, { parentReturn = false } = {}) => {
     const card = document.createElement("button");
@@ -183,12 +188,12 @@ export function createScenarioInspectorController({
       return;
     }
 
-    const entry = resolveCatalogEntryForTag(countryState.code);
+    const entry = resolveTerritoryEntry(countryState.code);
     const appendTerritorySection = () => {
       if (!entry) return;
-      const territoryIds = resolvePresetFeatureIds(entry);
+      const territoryIds = resolveTerritoryFeatureIds(entry);
       const coreSection = appendActionSection(body, t("Territory", "ui"));
-      const selectedVariant = getResolvedReleasableBoundaryVariant(entry);
+      const selectedVariant = getSelectedBoundaryVariant(entry);
       if (selectedVariant) {
         const select = document.createElement("select");
         select.className = "select-input";
@@ -202,7 +207,7 @@ export function createScenarioInspectorController({
           select.appendChild(option);
         }
         select.value = selectedVariant.id;
-        select.addEventListener("change", () => selectScenarioBoundaryVariant(
+        select.addEventListener("change", () => selectBoundaryVariant(
           countryState.code, select.value, () => selectInspectorCountry(countryState.code)
         ));
         coreSection.appendChild(select);
@@ -219,9 +224,11 @@ export function createScenarioInspectorController({
         input.value = action.id;
         input.checked = !!action.auto_apply_on_core_territory;
         input.disabled = !getCountryState(action.target_owner_tag);
+        const text = document.createElement("span");
+        text.textContent = action.label + (input.disabled
+          ? ` — ${t("Target country is not in this scenario", "ui")}` : "");
         label.appendChild(input);
-        label.appendChild(document.createTextNode(action.label + (input.disabled
-          ? ` — ${t("Target country is not in this scenario", "ui")}` : "")));
+        label.appendChild(text);
         coreSection.appendChild(label);
         companionInputs.push(input);
       }
@@ -246,7 +253,7 @@ export function createScenarioInspectorController({
       const clearVisualBtn = createInspectorActionButton(
         t("Clear Territory Visual Overrides", "ui"),
         () => {
-          const requestedFeatureIds = resolvePresetFeatureIds(entry);
+          const requestedFeatureIds = resolveTerritoryFeatureIds(entry);
           const { matchedIds } = filterToVisibleFeatureIds(requestedFeatureIds);
           const result = clearVisualOverridesForFeatureIds(matchedIds, {
             render,
