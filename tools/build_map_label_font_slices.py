@@ -88,7 +88,7 @@ def subset_woff2(source: bytes, codepoints: list[int]) -> bytes:
     options.name_languages = ["*"]
     options.notdef_outline = True
     options.recalc_timestamp = False
-    font = TTFont(BytesIO(source))
+    font = TTFont(BytesIO(source), recalcTimestamp=False)
     subsetter = subset.Subsetter(options)
     subsetter.populate(unicodes=codepoints)
     subsetter.subset(font)
@@ -100,7 +100,7 @@ def subset_woff2(source: bytes, codepoints: list[int]) -> bytes:
 
 def build(root: Path = ROOT, rest_slice_count: int = REST_SLICE_COUNT) -> list[dict]:
     # 先把 woff2 解码成 TTF 一次：逐片从 woff2 重建 glyf 既慢又占内存。
-    decoded = TTFont(root / SOURCE_FONT)
+    decoded = TTFont(root / SOURCE_FONT, recalcTimestamp=False)
     cmap = decoded.getBestCmap()
     decoded.flavor = None
     buffer = BytesIO()
