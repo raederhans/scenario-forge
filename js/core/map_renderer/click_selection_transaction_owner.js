@@ -375,7 +375,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       return;
     }
     if (state.currentTool === "select") {
-      syncInspectorCountryToLandSelection(feature, landId, landHit);
+      syncInspectorCountryToLandSelection(feature, landId, landHit, event);
       requestInteractionRender("select-land");
       noteRenderAction("select-land", actionStart);
       return;
@@ -404,7 +404,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     // The user may switch to the select tool while leaf detail loads; that click
     // must only inspect, never fall through to a paint.
     if (state.currentTool === "select") {
-      syncInspectorCountryToLandSelection(feature, landId, landHit);
+      syncInspectorCountryToLandSelection(feature, landId, landHit, event);
       requestInteractionRender("select-land");
       noteRenderAction("select-land", actionStart);
       return;
