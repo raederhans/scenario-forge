@@ -2368,6 +2368,7 @@ function createScenarioChunkRuntimeController({
       showScenarioSpecialRegions: normalizeScenarioPerformanceHints(bundle.manifest).specialRegionsDefault !== false,
       showScenarioAtlantropa: normalizeScenarioPerformanceHints(bundle.manifest).scenarioAtlantropaDefault !== false,
       showScenarioReliefOverlays: normalizeScenarioPerformanceHints(bundle.manifest).scenarioReliefOverlaysDefault === true,
+      showEraRailways: false,
       requiredSemanticLayers: resolveRequiredScenarioSemanticLayers({
         scenarioId: getScenarioBundleId(bundle),
         manifest: bundle.manifest,
@@ -2608,6 +2609,7 @@ function createScenarioChunkRuntimeController({
         showScenarioSpecialRegions: runtimeState.showScenarioSpecialRegions !== false,
         showScenarioAtlantropa: runtimeState.showScenarioAtlantropa !== false,
         showScenarioReliefOverlays: runtimeState.showScenarioReliefOverlays !== false,
+        showEraRailways: runtimeState.showEraRailways !== false,
         showCityPoints: runtimeState.showCityPoints !== false,
         requiredSemanticLayers,
       });

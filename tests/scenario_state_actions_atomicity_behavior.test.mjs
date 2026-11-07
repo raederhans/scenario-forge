@@ -32,7 +32,9 @@ const ACTIVATION_KEYS = Object.freeze([
   "scenarioWaterOverlayVersionTag",
   "scenarioSpecialRegionsData",
   "scenarioReliefOverlaysData",
+  "scenarioEraRailwaysData",
   "scenarioReliefOverlayRevision",
+  "scenarioEraRailwaysRevision",
   "scenarioStrategicValuesData",
   "scenarioStrategicValuesRevision",
   "scenarioDistrictGroupsData",
@@ -93,6 +95,7 @@ const PRESENTATION_KEYS = Object.freeze([
   "showScenarioSpecialRegions",
   "showScenarioAtlantropa",
   "showScenarioReliefOverlays",
+  "showEraRailways",
   "showStrategicResourceMarkers",
   "strategicChoroplethMetric",
 ]);
@@ -499,6 +502,7 @@ test("scenario presentation commit and full restore preserve exact container ide
     "showScenarioSpecialRegions",
     "showScenarioAtlantropa",
     "showScenarioReliefOverlays",
+    "showEraRailways",
     "showStrategicResourceMarkers",
     "strategicChoroplethMetric",
   ];
