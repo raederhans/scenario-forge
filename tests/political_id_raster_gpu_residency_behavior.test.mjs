@@ -392,3 +392,18 @@ test("primary and overview share one texture cap and failed candidates preserve 
   gpu.dispose(); assert.equal(overview.isAvailable(), false);
   assert.equal(gpu.getStats().gpuTextureBytes, 0);
 });
+
+test("resident tiles are rebound without a host task each; new uploads still get their own task", async () => {
+  const h = harness(), gpu = createPoliticalIdRasterGpu({ gl: h.gl, maxTextureBytes: 2000 });
+  const residents = [0, 3, 6, 9, 12, 15].map(originX => tile(originX));
+  gpu.setFrame({ tiles: residents, palette, revision: 1 });
+  let ticks = 0;
+  const handle = await gpu.prepareFrame({ tiles: [...residents, tile(18)], palette,
+    yieldTask: () => { ticks += 1; return hostTick(); } });
+  assert.equal(handle.stats.uploadedTiles, 1);
+  assert.equal(ticks, 2, "one task opens the resident batch, one more for the new upload");
+  assert.equal(handle.stats.yieldCount, ticks);
+  handle.commit({ palette, revision: 2 });
+  assert.equal(gpu.getStats().preparedFrameCommits, 1);
+  gpu.dispose();
+});

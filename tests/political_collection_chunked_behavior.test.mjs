@@ -224,3 +224,19 @@ test("primary-only override composition yields while building and emitting the b
   assert.equal(prepared.collection.features[0].id, "1");
   assert.equal(prepared.collection.features.at(-1).id, "override");
 });
+
+test("promoting a feature from a finer source keeps its painter position", () => {
+  const point = (id, x) => ({ type: "Feature", id, properties: { id }, geometry: { type: "Point", coordinates: [x, 0] } });
+  const coarse = { type: "FeatureCollection", features: ["0", "1", "2", "3"].map((id, x) => point(id, x)) };
+  const detailFeature = point("2", 2);
+  const detail = { type: "FeatureCollection", features: [detailFeature] };
+  const store = createPoliticalGeometryStore();
+  store.compose([coarse]);
+  const promoted = store.compose([detail, coarse]);
+  assert.deepEqual(promoted.features.map((item) => item.id), ["0", "1", "2", "3"]);
+  assert.equal(promoted.features[2], detailFeature);
+  assert.deepEqual(getPoliticalGeometrySnapshot(promoted).changedIds, ["2"]);
+  const demoted = store.compose([coarse]);
+  assert.deepEqual(demoted.features.map((item) => item.id), ["0", "1", "2", "3"]);
+  assert.equal(demoted.features[2], coarse.features[2]);
+});
