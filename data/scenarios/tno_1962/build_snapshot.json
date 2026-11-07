@@ -18,7 +18,7 @@
     "scenario_atlantropa.topo.json": "9010ba05c6b71aa9475f3e07d6ce4256e63d5456ce6fcde2e282d16f95a77121",
     "scenario_atlantropa_metadata.json": "99b4a3065aef076c96bd386cdcab9f456ff41c896b63ea3198a09b0dff146a46",
     "special_regions.geojson": "ed778c73ea51338d6576fb5992b189f2b94d9f3d5e199f46c1af520d6b0b3e6c",
-    "special_zone_layers.json": "818a813876ae9298edf10de27c83b8c197dd9091b7b7723ff992c5ff37c8eaf2",
+    "special_zone_layers.json": "08abdeed74d55e0c6339beb985bdcfac3382ebece774803a4ee35e69c59ad6ec",
     "water_regions.geojson": "41beb3ab13d191ab3626cc205a5a73c1510350d92b402d03309e4dd80c5050ad"
   },
   "output_sha": {
@@ -41,6 +41,6 @@
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "4e2aaebcc26091b18ce744af29d489f06c2f563621a1717f4cd22639e5ab841e",
+  "snapshot_fingerprint": "5df196983cacd32d34f5987ce84e865b539537b4a2d69a7962295cd517657072",
   "water_count": 285
 }
