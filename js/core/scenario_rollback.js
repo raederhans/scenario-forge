@@ -92,11 +92,13 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "scenarioRuntimeTopologyVersionTag",
   "scenarioHydrationHealthGate",
   "scenarioReliefOverlaysData",
+  "scenarioEraRailwaysData",
   "scenarioStrategicValuesData",
   "scenarioStrategicValuesRevision",
   "scenarioDistrictGroupsData",
   "scenarioDistrictGroupByFeatureId",
   "scenarioReliefOverlayRevision",
+  "scenarioEraRailwaysRevision",
   "scenarioGeoLocalePatchData",
   "scenarioCityOverridesData",
   "cityLayerRevision",
@@ -156,6 +158,7 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "showScenarioSpecialRegions",
   "showScenarioAtlantropa",
   "showScenarioReliefOverlays",
+  "showEraRailways",
   "showStrategicResourceMarkers",
   "strategicChoroplethMetric",
   "activePaletteId",
@@ -357,6 +360,8 @@ function buildScenarioTransactionRollbackStatePatch(snapshot) {
         || createDefaultScenarioHydrationHealthGate(),
       scenarioReliefOverlaysData:
         cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData),
+      scenarioEraRailwaysData:
+        cloneScenarioStateValue(snapshot.scenarioEraRailwaysData),
       scenarioStrategicValuesData:
         cloneScenarioStateValue(snapshot.scenarioStrategicValuesData),
       scenarioStrategicValuesRevision:
@@ -368,6 +373,8 @@ function buildScenarioTransactionRollbackStatePatch(snapshot) {
         || new Map(),
       scenarioReliefOverlayRevision:
         Number(snapshot.scenarioReliefOverlayRevision) || 0,
+      scenarioEraRailwaysRevision:
+        Number(snapshot.scenarioEraRailwaysRevision) || 0,
       scenarioGeoLocalePatchData:
         cloneScenarioStateValue(snapshot.scenarioGeoLocalePatchData),
       scenarioCityOverridesData:
@@ -437,6 +444,8 @@ function buildScenarioTransactionRollbackStatePatch(snapshot) {
       showScenarioAtlantropa: snapshot.showScenarioAtlantropa,
       showScenarioReliefOverlays:
         snapshot.showScenarioReliefOverlays !== false,
+      showEraRailways:
+        snapshot.showEraRailways !== false,
       showStrategicResourceMarkers:
         !!snapshot.showStrategicResourceMarkers,
       strategicChoroplethMetric:

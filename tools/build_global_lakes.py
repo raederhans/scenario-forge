@@ -7,6 +7,7 @@ are included with Natural Earth IDs and made non-interactive for map rendering.
 from __future__ import annotations
 
 from copy import deepcopy
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -33,6 +34,90 @@ OUTPUT = ROOT / "data" / "global_lakes.geojson"
 SIMPLIFY_DEGREES = 0.005
 COORDINATE_DIGITS = 5
 EXCLUDED_NAMES = {"congo lake"}
+REGULATED_NATURAL_LAKE_IDS = {
+    "1159125041",  # Kubenskoye
+    "1159123795",  # Abitibi
+    "1159123839",  # Saint-Jean
+    "1159123281",  # Ilmen
+    "1159124141",  # Chelan
+    "1159123301",  # Oulujärvi
+    "1159123229",  # Ondozero
+    "1159123265",  # Rikkavesi
+    "1159123247",  # Koitere
+    "1159123091",  # Zaysan
+    "1159124087",  # Lower Arrow
+    "1159124345",  # Upper Arrow
+    "1159123697",  # Sipiwesk
+    "1159123333",  # Umbozero
+    "1159123217",  # Imandra
+    "1159123191",  # Kovdozero
+    "1159123681",  # Cedar Lake
+    "1159123397",  # Akkajaure
+    "1159123319",  # Kemijärvi
+    "1159123415",  # Stora Lulevatten
+    "1159127169",  # Pukaki
+    "1159123651",  # Southern Indian Lake
+    "1159123107",  # Habbaniyah
+    "1159123857",  # Péribonca
+    "1159123351",  # Paduskoye More
+}
+RESERVOIR_YEAR_SUPPLEMENTS = {
+    "1159122923": (1964, "Khashm el Girba Dam completion"),
+    "1159123003": (1959, "Xinfengjiang Dam initial impoundment"),
+    "1159123125": (1956, "Tharthar flood diversion project completion"),
+    "1159123871": (1979, "Robert-Bourassa (La Grande 2) initial impoundment"),
+    "1159124413": (1962, "Ossokmanuan reservoir impoundment for Twin Falls"),
+    "1159124425": (1936, "Red Bluff Dam completion"),
+    "1159124547": (1915, "La Boquilla Dam completion"),
+    "1159124567": (1964, "Infiernillo Dam completion"),
+    "1159124659": (1941, "Santee Dam impoundment of Lake Marion"),
+    "1159124773": (1946, "Manuel Avila Camacho Dam completion"),
+    "1159124783": (1971, "Vicente Guerrero Dam completion"),
+    "1159124935": (1922, "Mitchell Dam on the Coosa River completion"),
+    "1159125243": (1973, "Ilha Solteira Dam completion; NE dam_name identifies this reservoir"),
+    "1159125251": (1967, "Vilyuy Dam impoundment"),
+    "1159125269": (1956, "Kostroma reservoir impoundment"),
+    "1159125457": (1956, "Entrepenas Dam completion"),
+    "1159125483": (1957, "Hirakud Dam completion"),
+    "1159125497": (1967, "Nagarjuna Sagar Dam completion"),
+    "1159125505": (1967, "Danjiangkou Dam initial impoundment"),
+    "1159125549": (1938, "Vaal Dam completion"),
+    "1159125639": (1959, "Xin'anjiang Dam initial impoundment"),
+    "1159125673": (1998, "Porto Primavera reservoir initial filling"),
+    "1159125735": (1968, "Guri Dam first-stage completion"),
+    "1159125781": (1973, "El Chocon Dam completion"),
+    "1159125835": (1957, "Guarico Dam completion"),
+    "1159125877": (1977, "Vanderkloof Dam completion"),
+    "1159125983": (1970, "Chavantes Dam completion"),
+    "1159126009": (1953, "Gal Oya Dam completion"),
+    "1159126023": (1958, "Buendia Dam completion"),
+    "1159126037": (1974, "Beidagang reservoir completion"),
+    "1159126063": (1959, "Kaunas Dam impoundment"),
+    "1159127261": (1965, "Benmore Dam completion"),
+    "1159123597": (1955, "Miguel Aleman Dam completion"),
+}
+
+
+def add_reservoir_years(collection: dict, source: Path) -> None:
+    years = {}
+    for _, row in gpd.read_file(source).iterrows():
+        if row.get("featurecla") != "Reservoir":
+            continue
+        ne_id = str(row["ne_id"])
+        year = int(row["year"])
+        if year > 0:
+            years[ne_id] = year
+        elif year == -99 and ne_id in RESERVOIR_YEAR_SUPPLEMENTS:
+            years[ne_id] = RESERVOIR_YEAR_SUPPLEMENTS[ne_id][0]
+    for feature in collection["features"]:
+        props = feature["properties"]
+        ne_id = str(props.get("ne_id", ""))
+        if ne_id in REGULATED_NATURAL_LAKE_IDS:
+            props.pop("year_built", None)
+        elif ne_id in years:
+            props["year_built"] = years[ne_id]
+        if ne_id == "1159124989":
+            props["year_removed"] = 2023
 
 
 def _clean_name(value: object) -> str:
@@ -137,6 +222,7 @@ def build_collection() -> tuple[dict, dict]:
     compiled = {"type": "FeatureCollection", "features": [*existing, *source_collection["features"]]}
     if source_collection.get("water_geometry_precision"):
         compiled["water_geometry_precision"] = source_collection["water_geometry_precision"]
+    add_reservoir_years(compiled, SOURCE)
     ids = [feature["properties"]["id"] for feature in compiled["features"]]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate global lake feature IDs")
@@ -156,7 +242,18 @@ def build_collection() -> tuple[dict, dict]:
 
 
 def main() -> None:
-    collection, stats = build_collection()
+    global SOURCE
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", type=Path, default=SOURCE)
+    parser.add_argument("--years-only", action="store_true")
+    args = parser.parse_args()
+    SOURCE = args.source
+    if args.years_only:
+        collection = json.loads(OUTPUT.read_text(encoding="utf-8"))
+        add_reservoir_years(collection, SOURCE)
+        stats = {"output_feature_count": len(collection["features"])}
+    else:
+        collection, stats = build_collection()
     output_dir = ROOT / ".runtime" / "tmp"
     output_dir.mkdir(parents=True, exist_ok=True)
     # Keep generated files away from the repository root and atomically replace
@@ -177,6 +274,9 @@ def main() -> None:
         "feature_count": len(collection["features"]),
     })
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.years_only:
+        print(json.dumps(stats, ensure_ascii=False, sort_keys=True))
+        return
     ledger_path = ROOT / "data" / "source_ledger.json"
     ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
     for entry in ledger:

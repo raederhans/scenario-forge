@@ -313,6 +313,11 @@ function resolvePresetFeatureIds(entry = {}) {
   return resolveFeatureIdsFromPresetSource(presetSource, entry);
 }
 
+function resolveBoundaryVariantFeatureIds(entry, variantId) {
+  const variant = normalizeBoundaryVariants(entry).find((item) => item.id === variantId);
+  return resolveFeatureIdsFromPresetSource(variant.preset_source, entry);
+}
+
 function resolveCompanionActionFeatureIds(action = {}, entry = {}) {
   return resolveFeatureIdsFromPresetSource(action?.preset_source, entry);
 }
@@ -709,6 +714,9 @@ export {
   mergePresetLayers,
   normalizeCountryCode,
   normalizePresetName,
+  resolveCatalogEntryForTag,
+  resolvePresetFeatureIds,
+  resolveBoundaryVariantFeatureIds,
   resolveCompanionActionFeatureIds,
   resolveFeatureIdsFromPresetSource,
   rebuildPresetState,

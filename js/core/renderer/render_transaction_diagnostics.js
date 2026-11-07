@@ -44,6 +44,11 @@ const FALLBACK_LAYER_CONFIGS = Object.freeze({
     visibilityField: "showScenarioReliefOverlays",
     revisionField: "scenarioReliefOverlayRevision",
   }),
+  erarailways: Object.freeze({
+    stateField: "scenarioEraRailwaysData",
+    visibilityField: "showEraRailways",
+    revisionField: "scenarioEraRailwaysRevision",
+  }),
   cities: Object.freeze({
     stateField: "scenarioCityOverridesData",
     visibilityField: "showCityPoints",
