@@ -281,7 +281,7 @@ const SERVICE_NAMES = [
   "refreshSpecialRegionSidebarRowsNow", "refreshWaterRegionSidebarRowsNow", "renderHoverOverlayIfNeeded",
   "requestInteractionRender", "resolveInteractionTargetIds", "scheduleDynamicBorderRecompute",
   "shouldBlockUnderlyingSelectionForFacility", "shouldRequireLeafDetail",
-  "syncInspectorCountryToLandSelection", "toggleFeatureInDevSelection", "updateDevSelectedHit",
+  "clearInspectorLandSelection", "syncInspectorCountryToLandSelection", "toggleFeatureInDevSelection", "updateDevSelectedHit",
   "warnIncompletePaintTargets",
 ];
 
@@ -383,6 +383,35 @@ function traceNames(trace) {
   return trace.map(([name]) => name);
 }
 
+for (const [kind, tool, modifiers, clears] of [
+  [null, "select", {}, true],
+  [null, "fill", {}, true],
+  [null, "eraser", {}, true],
+  [null, "eyedropper", {}, true],
+  ["water", "select", {}, true],
+  ["water", "fill", {}, false],
+  ["water", "select", { ctrlKey: true }, false],
+  ["water", "select", { metaKey: true }, false],
+  ["land", "select", {}, false],
+  ["special", "select", {}, false],
+]) {
+  test(`inspector clearing for ${kind || "empty"}, ${tool}, ${JSON.stringify(modifiers)}`, async () => {
+    const harness = await createTransactionOwner({ state: { currentTool: tool } });
+    if (kind) Object.assign(harness.hit, { targetType: kind, id: `${kind}-1` });
+    await harness.owner.handleClick({ ...modifiers, preventDefault() {} });
+    assert.equal(harness.trace.filter(([name]) => name === "clearInspectorLandSelection").length, clears ? 1 : 0);
+    if (kind === "water") {
+      assert.deepEqual(harness.trace.find(([name]) => name === "setClickSelectedWaterRegionId"),
+        ["setClickSelectedWaterRegionId", "water-1"]);
+    }
+    if (clears) {
+      for (const name of ["captureHistoryState", "commitHistoryEntry", "markDirty"]) {
+        assert.equal(traceNames(harness.trace).includes(name), false, name);
+      }
+    }
+  });
+}
+
 test("select land syncs the inspector without loading detail, painting or recording edits", async () => {
   const harness = await createTransactionOwner({
     state: { currentTool: "select" },
@@ -444,6 +473,7 @@ test("empty hit clears water then special and invalidates each selection exactly
     "setClickSelectedSpecialRegionId",
     "refreshSpecialRegionSidebarRowsNow",
     "requestInteractionRender",
+    "clearInspectorLandSelection",
   ]);
   assert.deepEqual(
     harness.trace.filter(([name]) => name === "requestInteractionRender").map(([, reason]) => reason),

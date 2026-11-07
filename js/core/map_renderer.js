@@ -26,7 +26,7 @@ import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
-import { pushRecentColorState, selectInspectorCountryState } from "./state/actions/editor_input_actions.js";
+import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCountryState } from "./state/actions/editor_input_actions.js";
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
@@ -3295,6 +3295,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     shouldBlockUnderlyingSelectionForFacility,
     shouldRequireLeafDetail,
     syncInspectorCountryToLandSelection,
+    clearInspectorLandSelection,
     toggleFeatureInDevSelection,
     updateDevSelectedHit,
     warnIncompletePaintTargets: () => {
@@ -13918,6 +13919,15 @@ function collectCountryCodesForFeatureIds(featureIds) {
   return Array.from(codes);
 }
 
+function clearInspectorLandSelection() {
+  const previousCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
+  if (!previousCode) return false;
+  clearInspectorSelectionState(runtimeState);
+  scheduleSidebarRefresh({ ownerCodes: [previousCode], refreshPresetTree: true });
+  requestInteractionRender("clear-inspector-land-selection");
+  return true;
+}
+
 function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
   const ownerCode = canonicalCountryCode(getFeatureOwnerCode(featureId));
   const featureCode = canonicalCountryCode(
@@ -14837,6 +14847,7 @@ function initMap({
   facilityInfoCardCloseBtn = document.getElementById("facilityInfoCardCloseBtn");
   facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   runtimeState.refreshColorStateFn = refreshColorState;
+  runtimeState.clearInspectorLandSelectionFn = clearInspectorLandSelection;
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);
 
