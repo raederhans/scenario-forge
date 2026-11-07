@@ -103,7 +103,8 @@ test("invisible main territory does not paint or show success even with visible 
     filterToVisibleFeatureIds: ids => ({ matchedIds: ids.filter(id => id !== "core") }),
   }), false);
   assert.equal(h.calls.length, 0);
-  assert.equal(h.toasts.length, 0);
+  assert.equal(h.toasts.length, 1);
+  assert.equal(h.toasts[0].options.tone, "warning");
   assert.equal(h.listRenders, 1);
   assert.deepEqual(state.visualOverrides, { old: "#AABBCC", other: "#123456" });
 });
