@@ -203,7 +203,23 @@ def collect_controls(source, states, root=TNO_ROOT):
     controls = [c for c in controls if usage[c['city_id']] == 1]
     for control in controls:
         control['region'] = region_for(control['lon'], control['lat'])
-    return controls, dict(rejected)
+    controls, geographic_rejections = filter_geographic_controls(controls)
+    return controls, dict(rejected, geographic_rejections=geographic_rejections)
+
+
+def filter_geographic_controls(controls):
+    pixels = np.array([[c['x'], c['y'], 1] for c in controls])
+    lonlat = np.array([[c['lon'], c['lat']] for c in controls])
+    coefficients = np.linalg.lstsq(pixels, lonlat, rcond=None)[0]
+    predicted = pixels @ coefficients
+    _, _, meters = GEOD.inv(*lonlat.T, *predicted.T)
+    kept, rejected = [], []
+    for control, point, distance in zip(controls, predicted, np.asarray(meters) / 1000):
+        if distance > 1500:
+            rejected.append(dict(control, predicted_lonlat=point.tolist(), distance_km=float(distance)))
+        else:
+            kept.append(control)
+    return kept, rejected
 
 
 def spatial_folds(lonlat):
