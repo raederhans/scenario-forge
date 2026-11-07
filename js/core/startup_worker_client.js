@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 import { createWorkerTaskClient } from "./worker_task_client.js";
 import "./geometry_transfer_codec_shared.js";
 
@@ -95,7 +96,7 @@ function resolveWorkerResourceUrl(url) {
     return "";
   }
   try {
-    return new URL(normalizedUrl, globalThis.location?.href || import.meta.url).toString();
+    return new URL(resolveDataUrl(normalizedUrl), globalThis.location?.href || import.meta.url).toString();
   } catch (_error) {
     return normalizedUrl;
   }

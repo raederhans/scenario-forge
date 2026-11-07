@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "../core/data_base_url.js";
 import {
   buildCityLocalizationPatchSteps,
   loadCitySupportData,
@@ -665,7 +666,7 @@ export function createStartupDataPipelineOwner({
     if (!d3Client || typeof d3Client.json !== "function") {
       throw new Error("d3.json is not available for startup scenario manifest loading.");
     }
-    return d3Client.json(manifestUrl);
+    return d3Client.json(resolveDataUrl(manifestUrl));
   }
 
   function resolveStartupBundleUrlFromManifest(manifest, language, scenarioId) {
