@@ -2730,12 +2730,26 @@ function initSidebar({ render } = {}) {
     const inspectorGroupAnchorId = inspectorGroupMeta.anchorId;
     const topLevelGroupId = inspectorGroupId || continentId;
     const topLevelGroupLabel = inspectorGroupLabel || continentLabel;
-    const groupSystems = scenarioMeta.releasable ? [] : getCountryGroupSystems({
-      runtimeState,
-      ownerCode: normalizedEntryCode,
-      groupingCode: groupLookupCode,
-      getOwnerCode: (id) => getMapDataBoundary(runtimeState).reference.getScenarioGroupCode(id),
-    });
+    // 剧本大区可能在国家列表渲染之后才延迟加载完成，所以分组在读取时按当前数据计算，
+    // 并按数据对象身份缓存，避免缓存住只含现代行政区的旧结果。
+    let groupSystemsCacheKey = null;
+    let groupSystemsCache = [];
+    const readGroupSystems = () => {
+      if (scenarioMeta.releasable) return [];
+      const key = [
+        runtimeState.scenarioDistrictGroupsData, runtimeState.hierarchyData,
+        runtimeState.activeScenarioManifest, runtimeState.activeScenarioId, runtimeState.mapSemanticMode,
+      ];
+      if (groupSystemsCacheKey && key.every((value, index) => value === groupSystemsCacheKey[index])) return groupSystemsCache;
+      groupSystemsCacheKey = key;
+      groupSystemsCache = getCountryGroupSystems({
+        runtimeState,
+        ownerCode: normalizedEntryCode,
+        groupingCode: groupLookupCode,
+        getOwnerCode: (id) => getMapDataBoundary(runtimeState).reference.getScenarioGroupCode(id),
+      });
+      return groupSystemsCache;
+    };
     // inspector 状态把 lookup/preset/grouping code 分开保存：
     // 列表分组、预设读取和详情展示可能各自指向不同来源，不能在这里合并成一个 code。
     return {
@@ -2749,8 +2763,8 @@ function initSidebar({ render } = {}) {
       presetLookupCode,
       groupingCode: groupLookupCode,
       presets: runtimeState.presetsState[presetLookupCode] || [],
-      groupSystems,
-      hierarchyGroups: groupSystems[0]?.groups || [],
+      get groupSystems() { return readGroupSystems(); },
+      get hierarchyGroups() { return readGroupSystems()[0]?.groups || []; },
       continentId,
       continentLabel,
       continentDisplayLabel: getDirectGeoLabel(continentLabel) || continentLabel,
