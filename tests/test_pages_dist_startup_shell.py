@@ -1800,6 +1800,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/transport_layers/global_rail/regions/south_america/shards/sa_w082_w058/railways.preview.topo.json",
             "app/data/transport_layers/global_airport/airports.geojson",
             "app/data/transport_layers/global_port/ports.geojson",
+            "app/data/transport_layers/hoi4_era_rail/era_rail.geojson",
             "app/data/transport_layers/japan_airport/airports.geojson",
             "app/data/transport_layers/japan_port/ports.core.geojson",
             "app/data/transport_layers/japan_port/ports.expanded.geojson",

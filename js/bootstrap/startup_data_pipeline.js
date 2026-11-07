@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "../core/data_base_url.js";
 import {
   buildCityLocalizationPatchSteps,
   loadCitySupportData,
@@ -27,6 +28,7 @@ import {
 } from "../core/scenario/locale_asset_contract.js";
 import { applyActivePaletteState } from "../core/palette_manager.js";
 import { loadStartupBundleViaWorker } from "../core/startup_worker_client.js";
+import { overlayStartupManifestPresentationFields } from "../core/scenario/startup_manifest_presentation.js";
 import {
   createStartupBootArtifactsOverride,
   createStartupBundleLoadDiagnostics,
@@ -665,7 +667,7 @@ export function createStartupDataPipelineOwner({
     if (!d3Client || typeof d3Client.json !== "function") {
       throw new Error("d3.json is not available for startup scenario manifest loading.");
     }
-    return d3Client.json(manifestUrl);
+    return d3Client.json(resolveDataUrl(manifestUrl));
   }
 
   function resolveStartupBundleUrlFromManifest(manifest, language, scenarioId) {
@@ -757,6 +759,11 @@ export function createStartupDataPipelineOwner({
           loadDiagnostics,
           d3Client,
         });
+        // 复用上面已加载的 manifest，不额外发请求；缺失时保留启动包原值。
+        startupScenarioBundle.manifest = overlayStartupManifestPresentationFields(
+          startupScenarioBundle.manifest,
+          startupScenarioManifest,
+        );
         const runtimeShellContract = validateScenarioRuntimeShellContract({
           runtimeTopologyPayload: startupScenarioBundle.runtimeTopologyPayload,
           runtimePoliticalMeta: startupScenarioBundle.runtimePoliticalMeta,

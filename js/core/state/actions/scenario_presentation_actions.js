@@ -59,6 +59,7 @@ export const SCENARIO_PRESENTATION_STATE_KEYS = Object.freeze([
   "showScenarioSpecialRegions",
   "showScenarioAtlantropa",
   "showScenarioReliefOverlays",
+  "showEraRailways",
   "showStrategicResourceMarkers",
   "strategicChoroplethMetric",
 ]);
@@ -416,6 +417,8 @@ export function commitScenarioPresentationState(target, patch) {
         patch.showScenarioAtlantropa,
       showScenarioReliefOverlays:
         patch.showScenarioReliefOverlays,
+      showEraRailways:
+        patch.showEraRailways,
       showStrategicResourceMarkers:
         patch.showStrategicResourceMarkers,
       strategicChoroplethMetric:
@@ -703,6 +706,18 @@ function restoreScenarioPresentationStateFromValidated(
     );
   } else {
     delete target.showScenarioReliefOverlays;
+  }
+  if (presentKeys.has("showEraRailways")) {
+    commitUiVisibilityState(
+      target,
+      {
+        showEraRailways:
+          values.showEraRailways,
+      },
+      { normalize: false },
+    );
+  } else {
+    delete target.showEraRailways;
   }
   if (presentKeys.has("showStrategicResourceMarkers")) {
     commitUiVisibilityState(

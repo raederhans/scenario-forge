@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 import countryCodeMapping from "../../data/thematic_layers/wgi_country_code_mapping.json" with { type: "json" };
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
@@ -29,7 +30,7 @@ const ISO_A2_TO_A3 = Object.freeze({ ...countryCodeMapping.by_iso_a2 });
 const requestsByFetcher = new WeakMap();
 
 async function defaultFetchJson(url) {
-  const response = await fetch(url);
+  const response = await fetch(resolveDataUrl(url));
   if (!response.ok) throw new Error(`WGI data request failed: ${response.status}`);
   return response.json();
 }

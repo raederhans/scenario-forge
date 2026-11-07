@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "../core/data_base_url.js";
 import { applyFeaturePaintState } from "../core/state/color_state.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
@@ -213,7 +214,7 @@ function flushSidebarRender(reason = "") {
 
 async function loadRuntimeJsonAsset(assetKey) {
   const url = resolveDataAssetUrl(assetKey);
-  const response = await fetch(url);
+  const response = await fetch(resolveDataUrl(url));
   if (!response.ok) {
     throw new Error(`[hgo_identity] Failed to load ${assetKey}: ${response.status}`);
   }

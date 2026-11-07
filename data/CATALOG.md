@@ -1,8 +1,8 @@
 # Data Catalog
 
-- generated_at: 2026-10-01T02:49:46.447775+00:00
+- generated_at: 2026-11-07T11:35:37Z
 - version: 1
-- entries: 1373
+- entries: 1376
 
 ## Counts by role
 
@@ -65,11 +65,11 @@
 | thematic_layer_catalog | 1 |
 | thematic_layer_manifest | 6 |
 | thematic_source_recipe | 6 |
-| transport_build_audit | 130 |
+| transport_build_audit | 131 |
 | transport_carrier_payload | 8 |
 | transport_catalog | 2 |
-| transport_manifest | 138 |
-| transport_pack | 298 |
+| transport_manifest | 139 |
+| transport_pack | 299 |
 | transport_provenance_payload | 8 |
 | transport_subtype_catalog | 1 |
 | unit_counter_manifest | 1 |
@@ -1246,6 +1246,9 @@
 | transport_manifest:global_road:shards:w180_w150 | data/transport_layers/global_road/shards/w180_w150/manifest.json | transport_manifest | json | json | schema://transport/manifest/v1 |  | no-cache | python tools/build_global_transport_roads.py --shard w180_w150 |  |
 | transport:global_road:shards:w180_w150:preview:roads | data/transport_layers/global_road/shards/w180_w150/roads.preview.topo.json | transport_pack | topojson | json | schema://topojson/line_collection/roads_v1 |  | default | python tools/build_global_transport_roads.py --shard w180_w150 |  |
 | transport:global_road:shards:w180_w150:full:roads | data/transport_layers/global_road/shards/w180_w150/roads.topo.json | transport_pack | topojson | json | schema://topojson/line_collection/roads_v1 |  | default | python tools/build_global_transport_roads.py --shard w180_w150 |  |
+| transport:hoi4_era_rail:build_audit | data/transport_layers/hoi4_era_rail/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail |  |
+| transport:hoi4_era_rail:era_rail | data/transport_layers/hoi4_era_rail/era_rail.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/v1 |  | default | python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail |  |
+| transport_manifest:hoi4_era_rail | data/transport_layers/hoi4_era_rail/manifest.json | transport_manifest | json | json | schema://transport/manifest/v1 |  | no-cache | python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail |  |
 | transport:india_airport:full:airports | data/transport_layers/india_airport/airports.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_country_real_packs.py --pack india_airport |  |
 | transport:india_airport:preview:airports | data/transport_layers/india_airport/airports.preview.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_country_real_packs.py --pack india_airport |  |
 | transport:india_airport:build_audit | data/transport_layers/india_airport/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_transport_country_real_packs.py --pack india_airport |  |

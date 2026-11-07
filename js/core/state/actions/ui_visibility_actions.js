@@ -8,6 +8,7 @@ const BOOLEAN_VISIBILITY_FIELDS = Object.freeze([
   "showScenarioSpecialRegions",
   "showScenarioAtlantropa",
   "showScenarioReliefOverlays",
+  "showEraRailways",
   "showCityPoints",
   "showBlankFeatureLabels",
   "showStrategicResourceMarkers",
@@ -53,6 +54,7 @@ export function commitUiVisibilityState(
   if (Object.hasOwn(patch, "showScenarioSpecialRegions")) target.showScenarioSpecialRegions = normalize ? !!patch.showScenarioSpecialRegions : patch.showScenarioSpecialRegions;
   if (Object.hasOwn(patch, "showScenarioAtlantropa")) target.showScenarioAtlantropa = normalize ? !!patch.showScenarioAtlantropa : patch.showScenarioAtlantropa;
   if (Object.hasOwn(patch, "showScenarioReliefOverlays")) target.showScenarioReliefOverlays = normalize ? !!patch.showScenarioReliefOverlays : patch.showScenarioReliefOverlays;
+  if (Object.hasOwn(patch, "showEraRailways")) target.showEraRailways = normalize ? !!patch.showEraRailways : patch.showEraRailways;
   if (Object.hasOwn(patch, "showCityPoints")) target.showCityPoints = normalize ? !!patch.showCityPoints : patch.showCityPoints;
   if (Object.hasOwn(patch, "showBlankFeatureLabels")) target.showBlankFeatureLabels = normalize ? !!patch.showBlankFeatureLabels : patch.showBlankFeatureLabels;
   if (Object.hasOwn(patch, "showStrategicResourceMarkers")) target.showStrategicResourceMarkers = normalize ? !!patch.showStrategicResourceMarkers : patch.showStrategicResourceMarkers;
@@ -100,6 +102,7 @@ export function restoreProjectImportFields(target, patch) {
   if (Object.hasOwn(patch, "showRoad")) target.showRoad = patch.showRoad;
   if (Object.hasOwn(patch, "showScenarioAtlantropa")) target.showScenarioAtlantropa = patch.showScenarioAtlantropa;
   if (Object.hasOwn(patch, "showScenarioReliefOverlays")) target.showScenarioReliefOverlays = patch.showScenarioReliefOverlays;
+  if (Object.hasOwn(patch, "showEraRailways")) target.showEraRailways = patch.showEraRailways;
   if (Object.hasOwn(patch, "showScenarioSpecialRegions")) target.showScenarioSpecialRegions = patch.showScenarioSpecialRegions;
   if (Object.hasOwn(patch, "showSpecialZones")) target.showSpecialZones = patch.showSpecialZones;
   if (Object.hasOwn(patch, "showStrategicResourceMarkers")) target.showStrategicResourceMarkers = patch.showStrategicResourceMarkers;
