@@ -2,6 +2,7 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Show modern place names": { zh: "显示现代名称", en: "Show modern place names" },
   "Territory": { zh: "领土", en: "Territory" },
   "Boundary variant": { zh: "疆界变体", en: "Boundary variant" },
   "Apply territory": { zh: "应用领土", en: "Apply territory" },
