@@ -336,9 +336,8 @@ def test_jhaw_sidebar_uses_owned_hawaii_hierarchy():
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createCountryInspectorModel } from './js/ui/sidebar/country_inspector_model.js';
-import { getEffectiveScenarioHierarchy, clipHierarchyGroupsToOwner } from './js/core/scenario_hierarchy.js';
+import { getCountryGroupSystems } from './js/core/country_group_provider.js';
 import { getMapDataBoundary } from './js/core/map_data_boundary.js';
-import { normalizeCountryCodeAlias } from './js/core/country_code_aliases.js';
 const read = path => JSON.parse(readFileSync(path, 'utf8'));
 const hierarchy = read('./data/hierarchy.json');
 const countries = read('./data/scenarios/tno_1962/countries.json').countries;
@@ -353,17 +352,12 @@ const runtime = {
 const model = createCountryInspectorModel(runtime, value => value);
 assert.equal(model.resolveInspectorDataCode('JHAW'), 'US');
 assert.deepEqual(model.getCountryGroupingMeta('JHAW'), hierarchy.country_groups.country_meta.US);
-const source = readFileSync('./js/ui/sidebar.js', 'utf8');
-const declarations = ['getHierarchyGroupsForCode', 'getOwnedHierarchyGroups'].map(name => {
-  const start = source.indexOf(`function ${name}(`);
-  return source.slice(start, source.indexOf('\n}', start) + 2);
-}).join('\n');
-const getOwnedHierarchyGroups = new Function('runtimeState', 'getEffectiveScenarioHierarchy',
-  'normalizeCountryCode', 'hierarchyGroupsCache', 'getMapDataBoundary', 'clipHierarchyGroupsToOwner',
-  declarations + '\nreturn getOwnedHierarchyGroups;')(
-    runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias, new WeakMap(),
-    getMapDataBoundary, clipHierarchyGroupsToOwner);
-const groups = getOwnedHierarchyGroups(model.resolveInspectorDataCode('JHAW'), 'JHAW');
+const reference = getMapDataBoundary(runtime).reference;
+const systems = getCountryGroupSystems({
+  runtimeState: runtime, ownerCode: 'JHAW', groupingCode: model.resolveInspectorDataCode('JHAW'),
+  getOwnerCode: id => reference.getScenarioGroupCode(id),
+});
+const groups = systems.find(system => system.id === 'geographic').groups;
 const hawaii = groups.find(group => group.id === 'US_Hawaii');
 assert.ok(hawaii);
 assert.deepEqual([...hawaii.children].sort(), Object.keys(owners).filter(id => owners[id] === 'JHAW').sort());

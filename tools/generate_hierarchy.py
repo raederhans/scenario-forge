@@ -1139,9 +1139,15 @@ def main():
     )
     interaction_policies = build_interaction_policies()
 
+    # 现代行政区分组的中文名按分组 ID 维护，避免与同名城市等地名的翻译互相覆盖。
+    labels_zh_path = DATA_DIR / "i18n" / "hierarchy_group_labels_zh.json"
+    manual_labels_zh = json.loads(labels_zh_path.read_text(encoding="utf-8")) if labels_zh_path.exists() else {}
+    labels_zh = {group_id: label for group_id, label in sorted(manual_labels_zh.items()) if group_id in groups}
+
     output = {
         "groups": groups,
         "labels": labels,
+        "labels_zh": labels_zh,
         "interaction_policies": interaction_policies,
         "country_groups": country_groups,
     }

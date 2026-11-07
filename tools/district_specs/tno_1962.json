@@ -1092,7 +1092,7 @@
         {
           "id": "north_east",
           "name_en": "North East",
-          "name_zh": "东北",
+          "name_zh": "英格兰东北部",
           "match": [
             {
               "id_prefix": [
@@ -1104,7 +1104,7 @@
         {
           "id": "north_west",
           "name_en": "North West",
-          "name_zh": "西北",
+          "name_zh": "英格兰西北部",
           "match": [
             {
               "id_prefix": [
@@ -1181,7 +1181,7 @@
         {
           "id": "south_east",
           "name_en": "South East",
-          "name_zh": "东南",
+          "name_zh": "英格兰东南部",
           "match": [
             {
               "id_prefix": [
@@ -1193,7 +1193,7 @@
         {
           "id": "south_west",
           "name_en": "South West",
-          "name_zh": "西南",
+          "name_zh": "英格兰西南部",
           "match": [
             {
               "id_prefix": [
@@ -3091,7 +3091,7 @@
         {
           "id": "uk00",
           "name_en": "Generalbezirk Kiew",
-          "name_zh": "基辅",
+          "name_zh": "基辅总区",
           "match": [
             {
               "id": [
@@ -3135,7 +3135,7 @@
         {
           "id": "uk01",
           "name_en": "Generalbezirk Wolhynien-Podolien",
-          "name_zh": "沃里尼亚—波多利亚",
+          "name_zh": "沃里尼亚—波多利亚总区",
           "match": [
             {
               "id": [
@@ -3185,7 +3185,7 @@
         {
           "id": "uk02",
           "name_en": "Generalbezirk Shitomir",
-          "name_zh": "日托米尔",
+          "name_zh": "日托米尔总区",
           "match": [
             {
               "id": [
@@ -3214,7 +3214,7 @@
         {
           "id": "uk03",
           "name_en": "Generalbezirk Tschernigow",
-          "name_zh": "切尔尼戈夫",
+          "name_zh": "切尔尼戈夫总区",
           "match": [
             {
               "id": [
@@ -3268,7 +3268,7 @@
         {
           "id": "uk04",
           "name_en": "Generalbezirk Dnjepropetrowsk",
-          "name_zh": "第聂伯罗彼得罗夫斯克",
+          "name_zh": "第聂伯罗彼得罗夫斯克总区",
           "match": [
             {
               "id": [
@@ -3309,7 +3309,7 @@
         {
           "id": "uk05",
           "name_en": "Generalbezirk Nikolajew",
-          "name_zh": "尼古拉耶夫",
+          "name_zh": "尼古拉耶夫总区",
           "match": [
             {
               "id": [
@@ -3347,7 +3347,7 @@
         {
           "id": "uk06",
           "name_en": "Generalbezirk Taurien",
-          "name_zh": "塔夫利达",
+          "name_zh": "塔夫利达总区",
           "match": [
             {
               "id": [
@@ -3387,7 +3387,7 @@
         {
           "id": "uk07",
           "name_en": "Generalbezirk Charkow",
-          "name_zh": "哈尔科夫",
+          "name_zh": "哈尔科夫总区",
           "match": [
             {
               "id": [
@@ -3428,7 +3428,7 @@
         {
           "id": "uk08",
           "name_en": "Generalbezirk Donez",
-          "name_zh": "顿涅茨",
+          "name_zh": "顿涅茨总区",
           "match": [
             {
               "id": [
@@ -3478,7 +3478,7 @@
         {
           "id": "ms00",
           "name_en": "Generalbezirk Moskau",
-          "name_zh": "莫斯科",
+          "name_zh": "莫斯科总区",
           "match": [
             {
               "id": [
@@ -3513,7 +3513,7 @@
         {
           "id": "ms01",
           "name_en": "Generalbezirk Ingermanland",
-          "name_zh": "英格里亚",
+          "name_zh": "英格里亚总区",
           "match": [
             {
               "id": [
@@ -3534,7 +3534,7 @@
         {
           "id": "ms02",
           "name_en": "Generalbezirk Smolensk",
-          "name_zh": "斯摩棱斯克",
+          "name_zh": "斯摩棱斯克总区",
           "match": [
             {
               "id": [
@@ -3554,7 +3554,7 @@
         {
           "id": "ms03",
           "name_en": "Generalbezirk Tula",
-          "name_zh": "图拉",
+          "name_zh": "图拉总区",
           "match": [
             {
               "id": [
@@ -3581,7 +3581,7 @@
         {
           "id": "ms04",
           "name_en": "Generalbezirk Woronesch",
-          "name_zh": "沃罗涅日",
+          "name_zh": "沃罗涅日总区",
           "match": [
             {
               "id": [
@@ -3613,7 +3613,7 @@
         {
           "id": "ms05",
           "name_en": "Generalbezirk Jaroslawl",
-          "name_zh": "雅罗斯拉夫尔",
+          "name_zh": "雅罗斯拉夫尔总区",
           "match": [
             {
               "id": [
@@ -3633,7 +3633,7 @@
         {
           "id": "ms06",
           "name_en": "Generalbezirk Gorki",
-          "name_zh": "高尔基",
+          "name_zh": "高尔基总区",
           "match": [
             {
               "id": [
@@ -3649,7 +3649,7 @@
         {
           "id": "ms07",
           "name_en": "Generalbezirk Saratow",
-          "name_zh": "萨拉托夫",
+          "name_zh": "萨拉托夫总区",
           "match": [
             {
               "id": [
@@ -3678,7 +3678,7 @@
         {
           "id": "ms08",
           "name_en": "Generalbezirk Don-Wolga",
-          "name_zh": "顿河—伏尔加",
+          "name_zh": "顿河—伏尔加总区",
           "match": [
             {
               "id": [
@@ -3730,7 +3730,7 @@
         {
           "id": "kc00",
           "name_en": "Generalbezirk Georgien",
-          "name_zh": "格鲁吉亚",
+          "name_zh": "格鲁吉亚总区",
           "match": [
             {
               "id": [
@@ -3750,7 +3750,7 @@
         {
           "id": "kc01",
           "name_en": "Generalbezirk Aserbaidschan",
-          "name_zh": "阿塞拜疆",
+          "name_zh": "阿塞拜疆总区",
           "match": [
             {
               "id": [
@@ -3830,7 +3830,7 @@
         {
           "id": "kc02",
           "name_en": "Generalbezirk Kuban",
-          "name_zh": "库班",
+          "name_zh": "库班总区",
           "match": [
             {
               "id": [
@@ -3858,7 +3858,7 @@
         {
           "id": "kc03",
           "name_en": "Generalbezirk Stawropol-Terek",
-          "name_zh": "斯塔夫罗波尔—捷列克",
+          "name_zh": "斯塔夫罗波尔—捷列克总区",
           "match": [
             {
               "id": [
@@ -3889,7 +3889,7 @@
         {
           "id": "kc04",
           "name_en": "Generalbezirk Bergvölker",
-          "name_zh": "山地民族",
+          "name_zh": "山地民族总区",
           "match": [
             {
               "id": [
@@ -3937,7 +3937,7 @@
         {
           "id": "kc05",
           "name_en": "Generalbezirk Kalmückien",
-          "name_zh": "卡尔梅克",
+          "name_zh": "卡尔梅克总区",
           "match": [
             {
               "id": [
