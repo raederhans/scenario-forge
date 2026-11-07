@@ -71,3 +71,19 @@ class TnoStrategicValuesTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TnoStrategicAttributionTest(unittest.TestCase):
+    """运行时归属与模组州归属不同的国家（IND→RAJ、HOL→RKN、FRS→FRA），地块必须落到有数值的州桶。"""
+
+    def test_reowned_countries_map_to_populated_state_buckets(self):
+        root = Path(__file__).resolve().parents[1] / "data/scenarios/tno_1962"
+        payload = json.loads((root / "strategic_values.by_feature.json").read_text(encoding="utf-8"))
+        owners = json.loads((root / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
+        buckets, by_feature = payload["buckets"], payload["bucket_by_feature"]
+        for tag in ("RAJ", "RKN", "FRA"):
+            bucket_ids = {by_feature[fid] for fid, owner in owners.items() if owner == tag and fid in by_feature}
+            manpower = sum(buckets[bucket_id].get("manpower", 0) for bucket_id in bucket_ids)
+            with self.subTest(tag=tag):
+                self.assertGreater(manpower, 1_000_000)
+                self.assertTrue(any(bucket_id.startswith("s") for bucket_id in bucket_ids))

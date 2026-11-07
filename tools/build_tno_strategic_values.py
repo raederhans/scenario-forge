@@ -148,6 +148,39 @@ def resolve_spatial_matches(states, names, city_index, owners, source, fitted,
     return points
 
 
+def source_state_owners_by_feature(owners, centroids, states, source, fitted, province_states):
+    """分桶只按模组州的归属匹配锚点：TNO 运行时归属经过重新整理（IND→RAJ、HOL→RKN、FRS→FRA 等），
+    直接用运行时标签会让这些国家的地块全部落进值为 0 的汇总池。这里用省份配准把地块中心落到模组州，
+    取该州在模组里的归属标签；落不到任何州的地块仍用运行时归属。地块的实际归属不受影响。"""
+    # 极地与越界坐标在配准的等积投影里会变成无穷大；这些地块没有胜利点州，直接保留运行时归属。
+    feature_ids = [fid for fid in owners if fid in centroids
+                   and all(math.isfinite(v) for v in centroids[fid])
+                   and -180 <= centroids[fid][0] <= 180 and -85 <= centroids[fid][1] <= 85]
+    attribution = dict(owners)
+    resolved = []
+
+    def resolve(batch):
+        # 个别坐标会让配准模型算出非有限值；出错时二分批次，只剔除出问题的点。
+        try:
+            provinces, _, _ = source.lookup(fitted.lonlat_to_pixel([list(centroids[fid]) for fid in batch]))
+            resolved.extend(zip(batch, provinces))
+        except ValueError:
+            if len(batch) > 1:
+                middle = len(batch) // 2
+                resolve(batch[:middle])
+                resolve(batch[middle:])
+
+    for start in range(0, len(feature_ids), 2000):
+        resolve(feature_ids[start:start + 2000])
+    for fid, pid in resolved:
+        sid = int(province_states[pid]) if pid is not None and int(pid) >= 0 else 0
+        state = states.get(sid)
+        if state is not None and state.owner_tag:
+            attribution[fid] = state.owner_tag
+    print(f"attribution: {len(resolved)}/{len(feature_ids)} features resolved to source states", file=sys.stderr)
+    return attribution
+
+
 def build_payload(tno_root: Path, decisions: list | None = None) -> dict:
     scenario_dir = PROJECT_ROOT / "data/scenarios/tno_1962"
     manifest = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
@@ -179,10 +212,17 @@ def build_payload(tno_root: Path, decisions: list | None = None) -> dict:
     province_states, centers, adjacency, stride = province_geometry(source, states, controls, fitted)
     points = resolve_spatial_matches(states, names, city_index, owners, source, fitted,
                                      province_states, centers, adjacency, stride, decisions)
-    centroids = strategic.decode_runtime_feature_centroids(topology)
+    # strategic.decode_runtime_feature_centroids 不认 TNO 运行时拓扑的打包弧线格式，得到的不是经纬度；
+    # 这里用与城市重定位相同的 decode_topology 解码，取每个地块的经纬度代表点。
+    centroids = {}
+    for feature in decode_topology(topology):
+        if feature["id"] in owners and feature["geometry"] is not None and not feature["geometry"].is_empty:
+            point = feature["geometry"].representative_point()
+            centroids[feature["id"]] = (float(point.x), float(point.y))
     anchors = strategic._state_anchors(points)
+    attribution_owners = source_state_owners_by_feature(owners, centroids, states, source, fitted, province_states)
     buckets, bucket_by_feature = strategic.attribute_features_to_state_buckets(
-        states_by_id=states, owner_by_feature_id=owners, feature_centroids=centroids, state_anchors=anchors,
+        states_by_id=states, owner_by_feature_id=attribution_owners, feature_centroids=centroids, state_anchors=anchors,
     )
     resources = strategic._build_resource_points(
         states_by_id=states, victory_points=points, bucket_by_feature=bucket_by_feature, feature_centroids=centroids,
@@ -212,7 +252,8 @@ def main() -> int:
     output = PROJECT_ROOT / "data/scenarios/tno_1962/strategic_values.by_feature.json"
     if args.check:
         return int(not output.exists() or json.loads(output.read_text(encoding="utf-8")) != payload)
-    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    # 固定写 LF：快照指纹按文件字节计算，Windows 默认的 CRLF 会与提交后的 LF 对不上。
+    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     return 0
 
 
