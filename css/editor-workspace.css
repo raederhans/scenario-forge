@@ -605,3 +605,20 @@
   margin: 0 0 12px; font-size: var(--fs-sm); font-weight: 600; line-height: 1.4; color: var(--ink-900);
 }
 #rightSidebar .editor-property-panel input[type="range"] { accent-color: var(--accent); }
+
+/* 响应式收尾：窄屏抽屉的关闭按钮不压住一级标签；保存状态至少完整显示一个短状态；
+   「名称与显示」等 editor-disclosure 用 SVG 箭头替代浏览器原生三角。 */
+@media (max-width: 1279px) {
+  .editor-project-bar #workspaceSaveStatus { min-width: 4.5em; }
+}
+@media (max-width: 1023px) {
+  .editor-workspace #leftSidebar .editor-task-nav { padding-right: 48px; }
+}
+.editor-disclosure > summary { display: flex; align-items: center; gap: 6px; list-style: none; }
+.editor-disclosure > summary::-webkit-details-marker { display: none; }
+.editor-disclosure > summary::before {
+  content: ""; flex: 0 0 12px; width: 12px; height: 12px; background-color: currentColor;
+  -webkit-mask: var(--icon-chevron-right) center / 12px 12px no-repeat; mask: var(--icon-chevron-right) center / 12px 12px no-repeat;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.editor-disclosure[open] > summary::before { transform: rotate(90deg); }
