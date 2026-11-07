@@ -13,6 +13,7 @@
   "detail_chunk_manifest_url": "data/scenarios/hoi4_1939/detail_chunks.manifest.json",
   "display_name": "HOI4 1939",
   "district_groups_url": "data/scenarios/hoi4_1939/district_groups.manual.json",
+  "era_railways_url": "data/transport_layers/hoi4_era_rail/era_rail.geojson",
   "featured_tags": [
     "FRA",
     "USA",
