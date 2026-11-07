@@ -406,3 +406,16 @@ test("纹理小样拒绝会破坏内联 SVG 的颜色值，图层可带中文显
   assert.equal(getSpecialZoneLayerDisplayName(state.layers[0], "zh"), "莱茵兰非军事区");
   assert.equal(getSpecialZoneLayerDisplayName(state.layers[0], "en"), "Rhineland DMZ");
 });
+
+test("成员按剧本全部地块校验：尚未加载的细分地块不会在编辑时被删掉", async () => {
+  const { getSpecialZoneValidFeatureIds, normalizeSpecialZoneLayersState } = await import("../js/core/special_zone_layers.js");
+  const runtimeState = {
+    scenarioBaselineOwnersByFeatureId: { DEA11: "GER", DEB31: "GER" },
+    landIndex: new Map([["DE_COARSE", {}]]),
+  };
+  const valid = getSpecialZoneValidFeatureIds(runtimeState);
+  const state = normalizeSpecialZoneLayersState({ layers: [{ id: "a", memberFeatureIds: ["DEA11", "DEB31", "GONE"] }] }, { validFeatureIds: valid });
+  assert.deepEqual(state.layers[0].memberFeatureIds, ["DEA11", "DEB31"]);
+  assert.ok(valid.has("DE_COARSE"));
+  assert.equal(getSpecialZoneValidFeatureIds({}), null);
+});

@@ -8,6 +8,7 @@ import {
   createLayerFromPreset,
   createSpecialZonePatternPreviewStyle,
   getSpecialZoneLayerDisplayName,
+  getSpecialZoneValidFeatureIds,
   getSpecialZoneStoryPreviewSteps,
   mutateSpecialZoneLayersState,
   normalizeSpecialZoneLayersState,
@@ -266,9 +267,7 @@ function createSpecialZonesWorkbenchController({
     return MEMBER_BRUSH_MODES.has(mode) ? mode : "add";
   };
 
-  const getValidFeatureIds = () => (
-    runtimeState.landIndex instanceof Map ? new Set(runtimeState.landIndex.keys()) : null
-  );
+  const getValidFeatureIds = () => getSpecialZoneValidFeatureIds(runtimeState);
 
   const filterValidFeatureIds = (featureIds = []) => {
     const validFeatureIds = getValidFeatureIds();
@@ -371,6 +370,7 @@ function createSpecialZonesWorkbenchController({
     const header = document.createElement("div");
     header.className = "special-zone-workbench-header";
     const title = document.createElement("h3");
+    title.dataset.specialZoneWorkbenchTitle = "true";
     title.textContent = translate("Special Zones");
     const overlayToggleLabel = document.createElement("label");
     overlayToggleLabel.className = "special-zone-overlay-toggle";
@@ -989,6 +989,11 @@ function createSpecialZonesWorkbenchController({
 
   const renderSpecialZonesWorkbenchUi = () => {
     if (!ensureRoot()) return;
+    // 面板可能在界面语言就绪前创建，标题和开关文字每次渲染时按当前语言刷新。
+    const titleNode = root.querySelector("[data-special-zone-workbench-title]");
+    if (titleNode) titleNode.textContent = translate("Special Zones");
+    const toggleTextNode = overlayToggleNode?.nextElementSibling;
+    if (toggleTextNode) toggleTextNode.textContent = translate("Show special zones overlay");
     const state = normalizeState();
     const layer = activeLayer();
     if (overlayToggleNode) {

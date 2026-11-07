@@ -385,6 +385,14 @@ function applySpecialZoneStoryStepToPreviewState(rawState, stepId) {
   };
 }
 
+// 成员按剧本全部地块校验（再并上当前已加载地块）：分块加载的剧本在低缩放时 landIndex 只有粗粒度地块，
+// 只用它校验会在加载或任何一次编辑时把尚未加载的细分地块成员静默删掉。
+function getSpecialZoneValidFeatureIds(runtimeState = {}) {
+  const ids = new Set(Object.keys(runtimeState.scenarioBaselineOwnersByFeatureId || {}));
+  if (runtimeState.landIndex instanceof Map) runtimeState.landIndex.forEach((_feature, id) => ids.add(id));
+  return ids.size ? ids : null;
+}
+
 function getSpecialZoneLayerDisplayName(layer, language = "en") {
   const zh = String(language || "").toLowerCase().startsWith("zh");
   return (zh && layer?.nameZh) || layer?.name || layer?.id || "";
@@ -618,6 +626,7 @@ export {
   createSpecialZonePatternPreviewStyle,
   getSpecialZonePatternDefinition,
   getSpecialZoneLayerDisplayName,
+  getSpecialZoneValidFeatureIds,
   createEmptySpecialZoneLayersState,
   createLayerFromPreset,
   createSpecialZoneLayerStyle,
