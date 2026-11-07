@@ -84,6 +84,10 @@ import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
 import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
+import {
+  getActiveScenarioUrbanOverlayLayerName,
+  isScenarioUrbanOverlayLayerName,
+} from "./renderer/scenario_urban_overlay.js";
 import { yieldToBackground } from "./background_yield.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
@@ -4067,6 +4071,7 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
         && !runtimeState.bootBlocking && !runtimeState.startupReadonly && !runtimeState.scenarioApplyInFlight) {
         ensureContourLodForView();
         ensurePhysicalAtlasDetailForView();
+        ensureScenarioUrbanOverlayForView();
       }
     },
     prepareAsyncFrame: () => navigationExactRefreshNeeded
@@ -7898,7 +7903,7 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
       targetPasses.add("dayNight");
     }
     if (normalized === "physical_region_labels") targetPasses.add("labels");
-    if (normalized === "urban") {
+    if (normalized === "urban" || isScenarioUrbanOverlayLayerName(normalized)) {
       targetPasses.add("dayNight");
     }
     if (normalized === "lakes") {
@@ -10638,6 +10643,19 @@ function drawContourCollection(
   });
 }
 
+function ensureScenarioUrbanOverlayForView() {
+  if (!runtimeState.showUrban || typeof runtimeState.ensureContextLayerDataFn !== "function") return;
+  const layerName = getActiveScenarioUrbanOverlayLayerName(runtimeState);
+  // Load the supplement only after the base urban layer, which it extends.
+  if (!layerName || !runtimeState.urbanData?.features?.length) return;
+  const status = runtimeState.contextLayerLoadStateByName?.[layerName];
+  if (runtimeState.contextLayerExternalDataByName?.[layerName]?.features
+    || status === "loading" || status === "error") return;
+  void Promise.resolve().then(() => runtimeState.ensureContextLayerDataFn([layerName], {
+    reason: "scenario-urban-overlay", renderNow: true,
+  })).catch((error) => console.warn("[urban] Scenario urban supplement unavailable; keeping base urban.", error));
+}
+
 let lastContourLodRequest = null;
 
 function ensurePhysicalAtlasDetailForView() {
@@ -10763,8 +10781,8 @@ function composeUrbanLayerRenderOwner() {
 
 const { drawUrbanLayer: drawUrbanLayerFromOwner } = composeUrbanLayerRenderOwner();
 
-function drawUrbanLayer(k, { interactive = false } = {}) {
-  return drawUrbanLayerFromOwner(k, { interactive });
+function drawUrbanLayer(k, { interactive = false, scope = "base" } = {}) {
+  return drawUrbanLayerFromOwner(k, { interactive, scope });
 }
 
 function recordDeferredRiversLayerMetric({ interactive = false, reason = "staged-apply" } = {}) {

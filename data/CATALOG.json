@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-11-07T11:35:37Z",
   "counts": {
-    "entries": 1376,
+    "entries": 1377,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -10,7 +10,7 @@
       "city_lights_entries": 1,
       "city_lights_source": 1,
       "city_overrides": 1,
-      "context_layer": 7,
+      "context_layer": 8,
       "country_feature_policies": 1,
       "detail_topology_na_v1": 1,
       "detail_topology_na_v2": 1,
@@ -73,13 +73,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 155,
+      "geojson": 156,
       "javascript": 2,
       "json": 1047,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1374,
+      "json": 1375,
       "module": 2
     }
   },
@@ -1059,6 +1059,19 @@
       "hashRef": "",
       "owner": "runtime_asset_registry.assets.political_id_raster:tno_1962",
       "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "context_layer:urban_tno_atlantropa",
+      "url": "data/scenarios/tno_1962/urban_overlays.geojson",
+      "role": "context_layer",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.context_layer:urban_tno_atlantropa",
+      "cachePolicy": "default",
       "sourceId": "",
       "readMode": "json",
       "aliases": []
