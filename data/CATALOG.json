@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generated_at": "2026-10-01T02:49:46.447775+00:00",
+  "generated_at": "2026-11-07T11:35:37Z",
   "counts": {
-    "entries": 1374,
+    "entries": 1377,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -61,11 +61,11 @@
       "thematic_layer_catalog": 1,
       "thematic_layer_manifest": 6,
       "thematic_source_recipe": 6,
-      "transport_build_audit": 130,
+      "transport_build_audit": 131,
       "transport_carrier_payload": 8,
       "transport_catalog": 2,
-      "transport_manifest": 138,
-      "transport_pack": 298,
+      "transport_manifest": 139,
+      "transport_pack": 299,
       "transport_provenance_payload": 8,
       "transport_subtype_catalog": 1,
       "unit_counter_manifest": 1,
@@ -73,13 +73,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 155,
+      "geojson": 156,
       "javascript": 2,
-      "json": 1045,
+      "json": 1047,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1372,
+      "json": 1375,
       "module": 2
     }
   },
@@ -17836,6 +17836,51 @@
         "transport:global_road:shards:w180_w150:default:paths:full:roads",
         "variants.default.paths.full.roads"
       ]
+    },
+    {
+      "key": "transport:hoi4_era_rail:build_audit",
+      "url": "data/transport_layers/hoi4_era_rail/build_audit.json",
+      "role": "transport_build_audit",
+      "format": "json",
+      "schemaRef": "schema://transport/build_audit/v1",
+      "hashRef": "",
+      "owner": "python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": [
+        "paths.build_audit"
+      ]
+    },
+    {
+      "key": "transport:hoi4_era_rail:era_rail",
+      "url": "data/transport_layers/hoi4_era_rail/era_rail.geojson",
+      "role": "transport_pack",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "",
+      "owner": "python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": [
+        "paths.era_rail",
+        "transport:hoi4_era_rail:default:paths:era_rail",
+        "variants.default.paths.era_rail"
+      ]
+    },
+    {
+      "key": "transport_manifest:hoi4_era_rail",
+      "url": "data/transport_layers/hoi4_era_rail/manifest.json",
+      "role": "transport_manifest",
+      "format": "json",
+      "schemaRef": "schema://transport/manifest/v1",
+      "hashRef": "",
+      "owner": "python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
     },
     {
       "key": "transport:india_airport:full:airports",

@@ -1,6 +1,28 @@
 {
+  "alliances": {
+    "allies": {
+      "leader": "ENG",
+      "member_count": 118,
+      "name_en": "Allies",
+      "name_zh": "同盟国"
+    },
+    "axis": {
+      "leader": "GER",
+      "member_count": 1,
+      "name_en": "Axis",
+      "name_zh": "轴心国"
+    },
+    "comintern": {
+      "leader": "SOV",
+      "member_count": 28,
+      "name_en": "Comintern",
+      "name_zh": "共产国际"
+    }
+  },
   "countries": {
     "AAT": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AQ",
       "capital_state_id": null,
       "color_hex": "#c68b91",
@@ -29,6 +51,8 @@
       "rule_sources": [
         "batch7_aat_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -42,6 +66,8 @@
       "tag": "AAT"
     },
     "ABD": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#db5d80",
@@ -70,6 +96,8 @@
       "rule_sources": [
         "abd_sheikhdom"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -83,6 +111,8 @@
       "tag": "ABD"
     },
     "ABY": {
+      "alliance": "allies",
+      "alliance_source": "inherited:WDN",
       "base_iso2": "YE",
       "capital_state_id": null,
       "color_hex": "#ce7185",
@@ -111,6 +141,8 @@
       "rule_sources": [
         "batch7_aby"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:WDN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -124,6 +156,8 @@
       "tag": "ABY"
     },
     "AEF": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TD",
       "capital_state_id": null,
       "color_hex": "#4c8ff2",
@@ -153,6 +187,8 @@
         "french_equatorial_africa",
         "aef_colony_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -166,6 +202,8 @@
       "tag": "AEF"
     },
     "AFA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ET",
       "capital_state_id": 908,
       "color_hex": "#990033",
@@ -192,6 +230,8 @@
       "rule_sources": [
         "afar"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -205,6 +245,8 @@
       "tag": "AFA"
     },
     "AFG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AF",
       "capital_state_id": 267,
       "color_hex": "#40a0a7",
@@ -229,6 +271,8 @@
       "provenance_iso2": "AF",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -242,6 +286,8 @@
       "tag": "AFG"
     },
     "AHI": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GH",
       "capital_state_id": null,
       "color_hex": "#a32c50",
@@ -270,6 +316,8 @@
       "rule_sources": [
         "ashanti_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -283,6 +331,8 @@
       "tag": "AHI"
     },
     "AJM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#bc2045",
@@ -311,6 +361,8 @@
       "rule_sources": [
         "ajm_sheikhdom_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -324,6 +376,8 @@
       "tag": "AJM"
     },
     "ALB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AL",
       "capital_state_id": 44,
       "color_hex": "#952d66",
@@ -348,6 +402,8 @@
       "provenance_iso2": "AL",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -361,6 +417,8 @@
       "tag": "ALB"
     },
     "ALG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "DZ",
       "capital_state_id": 459,
       "color_hex": "#245dbb",
@@ -390,6 +448,8 @@
         "french_algeria",
         "algeria_southern_territories"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -403,6 +463,8 @@
       "tag": "ALG"
     },
     "ALK": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "US",
       "capital_state_id": null,
       "color_hex": "#1772b8",
@@ -432,6 +494,8 @@
         "alaska",
         "batch7_alk"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:USA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -445,6 +509,8 @@
       "tag": "ALK"
     },
     "ALW": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SY",
       "capital_state_id": null,
       "color_hex": "#395ed8",
@@ -473,6 +539,8 @@
       "rule_sources": [
         "alawite_government"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -486,6 +554,8 @@
       "tag": "ALW"
     },
     "AND": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AD",
       "capital_state_id": null,
       "color_hex": "#2a4fa8",
@@ -512,6 +582,8 @@
       "rule_sources": [
         "andorra"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -525,6 +597,8 @@
       "tag": "AND"
     },
     "ANG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AO",
       "capital_state_id": 540,
       "color_hex": "#50895b",
@@ -554,6 +628,8 @@
         "portuguese_angola",
         "ang_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -567,6 +643,8 @@
       "tag": "ANG"
     },
     "AOF": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SN",
       "capital_state_id": null,
       "color_hex": "#4f7df9",
@@ -595,6 +673,8 @@
       "rule_sources": [
         "french_west_africa"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -608,6 +688,8 @@
       "tag": "AOF"
     },
     "ARG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AR",
       "capital_state_id": 278,
       "color_hex": "#919dec",
@@ -632,6 +714,8 @@
       "provenance_iso2": "AR",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -645,6 +729,8 @@
       "tag": "ARG"
     },
     "AST": {
+      "alliance": "allies",
+      "alliance_source": "game_history",
       "base_iso2": "PG",
       "capital_state_id": 285,
       "color_hex": "#de4563",
@@ -674,6 +760,8 @@
         "australia_dependencies",
         "ast_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -687,6 +775,8 @@
       "tag": "AST"
     },
     "ATA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AQ",
       "capital_state_id": null,
       "color_hex": "#b9c2cc",
@@ -713,6 +803,8 @@
       "rule_sources": [
         "batch7_ata_hoi4_1936"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -726,6 +818,8 @@
       "tag": "ATA"
     },
     "AUS": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AT",
       "capital_state_id": 4,
       "color_hex": "#c2c6d7",
@@ -750,6 +844,8 @@
       "provenance_iso2": "AT",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -763,6 +859,8 @@
       "tag": "AUS"
     },
     "BAH": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "BH",
       "capital_state_id": null,
       "color_hex": "#b1395e",
@@ -791,6 +889,8 @@
       "rule_sources": [
         "bahrain_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -804,6 +904,8 @@
       "tag": "BAH"
     },
     "BAS": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "LS",
       "capital_state_id": null,
       "color_hex": "#ca5070",
@@ -832,6 +934,8 @@
       "rule_sources": [
         "basutoland_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -845,6 +949,8 @@
       "tag": "BAS"
     },
     "BDA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#f9718b",
@@ -873,6 +979,8 @@
       "rule_sources": [
         "bda_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -886,6 +994,8 @@
       "tag": "BDA"
     },
     "BEA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "KE",
       "capital_state_id": null,
       "color_hex": "#b11051",
@@ -915,6 +1025,8 @@
         "british_east_africa",
         "bea_kenya_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -928,6 +1040,8 @@
       "tag": "BEA"
     },
     "BEI": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "BN",
       "capital_state_id": null,
       "color_hex": "#bc3a50",
@@ -956,6 +1070,8 @@
       "rule_sources": [
         "brunei_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -969,6 +1085,8 @@
       "tag": "BEI"
     },
     "BEL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "BE",
       "capital_state_id": 6,
       "color_hex": "#c1ab08",
@@ -993,6 +1111,8 @@
       "provenance_iso2": "BE",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -1006,6 +1126,8 @@
       "tag": "BEL"
     },
     "BGU": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GY",
       "capital_state_id": null,
       "color_hex": "#e54d76",
@@ -1034,6 +1156,8 @@
       "rule_sources": [
         "british_guiana_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1047,6 +1171,8 @@
       "tag": "BGU"
     },
     "BHM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "BS",
       "capital_state_id": null,
       "color_hex": "#be265c",
@@ -1075,6 +1201,8 @@
       "rule_sources": [
         "bahamas_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1088,6 +1216,8 @@
       "tag": "BHM"
     },
     "BHO": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "BZ",
       "capital_state_id": null,
       "color_hex": "#d55768",
@@ -1116,6 +1246,8 @@
       "rule_sources": [
         "british_honduras_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1129,6 +1261,8 @@
       "tag": "BHO"
     },
     "BHU": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "BT",
       "capital_state_id": 324,
       "color_hex": "#c0415a",
@@ -1157,6 +1291,8 @@
       "rule_sources": [
         "bhutan_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -1170,6 +1306,8 @@
       "tag": "BHU"
     },
     "BHW": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "PK",
       "capital_state_id": null,
       "color_hex": "#da384c",
@@ -1198,6 +1336,8 @@
       "rule_sources": [
         "bahawalpur_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1211,6 +1351,8 @@
       "tag": "BHW"
     },
     "BLR": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "BY",
       "capital_state_id": null,
       "color_hex": "#5a0614",
@@ -1239,6 +1381,8 @@
       "rule_sources": [
         "byelorussian_ssr_hoi4_1936"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1252,6 +1396,8 @@
       "tag": "BLR"
     },
     "BOL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "BO",
       "capital_state_id": 302,
       "color_hex": "#cca66c",
@@ -1276,6 +1422,8 @@
       "provenance_iso2": "BO",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -1289,6 +1437,8 @@
       "tag": "BOL"
     },
     "BOR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": null,
       "color_hex": "#f9bd95",
@@ -1317,6 +1467,8 @@
       "rule_sources": [
         "bor_region"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:INS",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1330,6 +1482,8 @@
       "tag": "BOR"
     },
     "BOT": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "BW",
       "capital_state_id": 542,
       "color_hex": "#d33f6e",
@@ -1358,6 +1512,8 @@
       "rule_sources": [
         "bot_parent_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "fallback_mapped_tag",
       "source_type": "synthetic_fallback",
@@ -1371,6 +1527,8 @@
       "tag": "BOT"
     },
     "BPL": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#fc5a6b",
@@ -1399,6 +1557,8 @@
       "rule_sources": [
         "bpl_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1412,6 +1572,8 @@
       "tag": "BPL"
     },
     "BRA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "BR",
       "capital_state_id": 500,
       "color_hex": "#4c913f",
@@ -1436,6 +1598,8 @@
       "provenance_iso2": "BR",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -1449,6 +1613,8 @@
       "tag": "BRA"
     },
     "BSH": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#91343b",
@@ -1477,6 +1643,8 @@
       "rule_sources": [
         "bashkir_assr_hoi4_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1490,6 +1658,8 @@
       "tag": "BSH"
     },
     "BUL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "BG",
       "capital_state_id": 48,
       "color_hex": "#339b00",
@@ -1514,6 +1684,8 @@
       "provenance_iso2": "BG",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -1527,6 +1699,8 @@
       "tag": "BUL"
     },
     "BWA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "NG",
       "capital_state_id": null,
       "color_hex": "#c34a5d",
@@ -1556,6 +1730,8 @@
         "british_west_africa",
         "bwa_nigeria_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1569,6 +1745,8 @@
       "tag": "BWA"
     },
     "BYA": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#8d1f1a",
@@ -1597,6 +1775,8 @@
       "rule_sources": [
         "buryat_assr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1610,6 +1790,8 @@
       "tag": "BYA"
     },
     "CAB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AO",
       "capital_state_id": null,
       "color_hex": "#729f72",
@@ -1638,6 +1820,8 @@
       "rule_sources": [
         "cabinda_district"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:ANG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1651,6 +1835,8 @@
       "tag": "CAB"
     },
     "CAM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "KH",
       "capital_state_id": null,
       "color_hex": "#687caf",
@@ -1679,6 +1865,8 @@
       "rule_sources": [
         "batch7_cam"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1692,6 +1880,8 @@
       "tag": "CAM"
     },
     "CAN": {
+      "alliance": "allies",
+      "alliance_source": "game_history",
       "base_iso2": "CA",
       "capital_state_id": 276,
       "color_hex": "#e93b3b",
@@ -1716,6 +1906,8 @@
       "provenance_iso2": "CA",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -1729,6 +1921,8 @@
       "tag": "CAN"
     },
     "CAY": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GF",
       "capital_state_id": null,
       "color_hex": "#0f68db",
@@ -1758,6 +1952,8 @@
         "cay_colony",
         "cay_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1771,6 +1967,8 @@
       "tag": "CAY"
     },
     "CDE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#9d6c5a",
@@ -1799,6 +1997,8 @@
       "rule_sources": [
         "cde_debug_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:JAP",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1812,6 +2012,8 @@
       "tag": "CDE"
     },
     "CDX": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#3a4fa5",
@@ -1840,6 +2042,8 @@
       "rule_sources": [
         "cdx_debug_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:CHI",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1853,6 +2057,8 @@
       "tag": "CDX"
     },
     "CEL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": null,
       "color_hex": "#c28d60",
@@ -1881,6 +2087,8 @@
       "rule_sources": [
         "cel_region"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:INS",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1894,6 +2102,8 @@
       "tag": "CEL"
     },
     "CEY": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "LK",
       "capital_state_id": null,
       "color_hex": "#ac3448",
@@ -1923,6 +2133,8 @@
         "ceylon",
         "cey_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1936,6 +2148,8 @@
       "tag": "CEY"
     },
     "CHB": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#d14f67",
@@ -1964,6 +2178,8 @@
       "rule_sources": [
         "chb_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -1977,6 +2193,8 @@
       "tag": "CHB"
     },
     "CHE": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#6b0b08",
@@ -2006,6 +2224,8 @@
         "chechen_ingush_assr_hoi4_1936",
         "che_autonomous_oblast_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2019,6 +2239,8 @@
       "tag": "CHE"
     },
     "CHI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 1035,
       "color_hex": "#28288c",
@@ -2048,6 +2270,8 @@
         "yanan_return_1936",
         "northern_shaanxi_return_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -2061,6 +2285,8 @@
       "tag": "CHI"
     },
     "CHL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CL",
       "capital_state_id": 279,
       "color_hex": "#9b656b",
@@ -2085,6 +2311,8 @@
       "provenance_iso2": "CL",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -2098,6 +2326,8 @@
       "tag": "CHL"
     },
     "CHU": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 256,
       "color_hex": "#3c36a1",
@@ -2128,6 +2358,8 @@
         "yaan_return_1936",
         "sichuan_faction_metadata_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2141,6 +2373,8 @@
       "tag": "CHU"
     },
     "CIH": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#445183",
@@ -2169,6 +2403,8 @@
       "rule_sources": [
         "batch7_cih"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:YUN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2182,6 +2418,8 @@
       "tag": "CIH"
     },
     "COC": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#e7647b",
@@ -2210,6 +2448,8 @@
       "rule_sources": [
         "cochin_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2223,6 +2463,8 @@
       "tag": "COC"
     },
     "COL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CO",
       "capital_state_id": 306,
       "color_hex": "#debb5b",
@@ -2247,6 +2489,8 @@
       "provenance_iso2": "CO",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -2260,6 +2504,8 @@
       "tag": "COL"
     },
     "COS": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CR",
       "capital_state_id": 316,
       "color_hex": "#98802b",
@@ -2284,6 +2530,8 @@
       "provenance_iso2": "CR",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -2297,6 +2545,8 @@
       "tag": "COS"
     },
     "CPV": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CV",
       "capital_state_id": null,
       "color_hex": "#135c37",
@@ -2325,6 +2575,8 @@
       "rule_sources": [
         "cape_verde"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:POR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2338,6 +2590,8 @@
       "tag": "CPV"
     },
     "CQT": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CD",
       "capital_state_id": null,
       "color_hex": "#8b7a18",
@@ -2366,6 +2620,8 @@
       "rule_sources": [
         "cqt_province"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RCG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2379,6 +2635,8 @@
       "tag": "CQT"
     },
     "CRM": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "UA",
       "capital_state_id": null,
       "color_hex": "#7e252d",
@@ -2407,6 +2665,8 @@
       "rule_sources": [
         "crimean_assr_hoi4_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2420,6 +2680,8 @@
       "tag": "CRM"
     },
     "CSZ": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#1a2071",
@@ -2448,6 +2710,8 @@
       "rule_sources": [
         "csz_debug_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:CHI",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2461,6 +2725,8 @@
       "tag": "CSZ"
     },
     "CUB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CU",
       "capital_state_id": 315,
       "color_hex": "#8c41a6",
@@ -2485,6 +2751,8 @@
       "provenance_iso2": "CU",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -2498,6 +2766,8 @@
       "tag": "CUB"
     },
     "CVS": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#972923",
@@ -2526,6 +2796,8 @@
       "rule_sources": [
         "chuvash_assr_hoi4_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2539,6 +2811,8 @@
       "tag": "CVS"
     },
     "CYP": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "CY",
       "capital_state_id": null,
       "color_hex": "#b2113c",
@@ -2567,6 +2841,8 @@
       "rule_sources": [
         "cyprus_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2580,6 +2856,8 @@
       "tag": "CYP"
     },
     "CYS": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#2d398b",
@@ -2608,6 +2886,8 @@
       "rule_sources": [
         "cys_debug_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:CHI",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2621,6 +2901,8 @@
       "tag": "CYS"
     },
     "CZE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CZ",
       "capital_state_id": 9,
       "color_hex": "#36a79c",
@@ -2648,6 +2930,8 @@
         "czechoslovakia_union",
         "czechoslovakia_ruthenia"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -2661,6 +2945,8 @@
       "tag": "CZE"
     },
     "DAG": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#881124",
@@ -2689,6 +2975,8 @@
       "rule_sources": [
         "dagestan_assr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2702,6 +2990,8 @@
       "tag": "DAG"
     },
     "DEE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#405a89",
@@ -2730,6 +3020,8 @@
       "rule_sources": [
         "batch7_dee"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:SIC",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2743,6 +3035,8 @@
       "tag": "DEE"
     },
     "DEN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "DK",
       "capital_state_id": 37,
       "color_hex": "#99745d",
@@ -2767,6 +3061,8 @@
       "provenance_iso2": "DK",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -2780,6 +3076,8 @@
       "tag": "DEN"
     },
     "DJI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "DJ",
       "capital_state_id": null,
       "color_hex": "#336bca",
@@ -2808,6 +3106,8 @@
       "rule_sources": [
         "djibouti"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2821,6 +3121,8 @@
       "tag": "DJI"
     },
     "DMC": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#314598",
@@ -2849,6 +3151,8 @@
       "rule_sources": [
         "dmc_debug_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:CHI",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2862,6 +3166,8 @@
       "tag": "DMC"
     },
     "DNZ": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PL",
       "capital_state_id": null,
       "color_hex": "#c9a227",
@@ -2888,6 +3194,8 @@
       "rule_sources": [
         "danzig"
       ],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2901,6 +3209,8 @@
       "tag": "DNZ"
     },
     "DOD": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GR",
       "capital_state_id": null,
       "color_hex": "#679457",
@@ -2929,6 +3239,8 @@
       "rule_sources": [
         "dodecanese_hoi4_1936"
       ],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "inherited:ITA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -2942,6 +3254,8 @@
       "tag": "DOD"
     },
     "DOM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "DO",
       "capital_state_id": 319,
       "color_hex": "#9882bf",
@@ -2966,6 +3280,8 @@
       "provenance_iso2": "DO",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -2979,6 +3295,8 @@
       "tag": "DOM"
     },
     "DUB": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#ba4364",
@@ -3007,6 +3325,8 @@
       "rule_sources": [
         "dub_sheikhdom_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3020,6 +3340,8 @@
       "tag": "DUB"
     },
     "ECU": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "EC",
       "capital_state_id": 305,
       "color_hex": "#f99262",
@@ -3044,6 +3366,8 @@
       "provenance_iso2": "EC",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3057,6 +3381,8 @@
       "tag": "ECU"
     },
     "EDN": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "YE",
       "capital_state_id": null,
       "color_hex": "#e3576b",
@@ -3085,6 +3411,8 @@
       "rule_sources": [
         "aden_eastern_states_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3098,6 +3426,8 @@
       "tag": "EDN"
     },
     "EGY": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "EG",
       "capital_state_id": 907,
       "color_hex": "#d75176",
@@ -3127,6 +3457,8 @@
         "egypt_kingdom",
         "egypt_sovereign_ally_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3140,6 +3472,8 @@
       "tag": "EGY"
     },
     "EHC": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#c89c86",
@@ -3169,6 +3503,8 @@
         "east_hebei",
         "east_hebei_counties_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:JAP",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3182,6 +3518,8 @@
       "tag": "EHC"
     },
     "ELS": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SV",
       "capital_state_id": 314,
       "color_hex": "#9882bf",
@@ -3206,6 +3544,8 @@
       "provenance_iso2": "SV",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3219,6 +3559,8 @@
       "tag": "ELS"
     },
     "ENG": {
+      "alliance": "allies",
+      "alliance_source": "game_history",
       "base_iso2": "GB",
       "capital_state_id": 126,
       "color_hex": "#c9385d",
@@ -3246,6 +3588,8 @@
         "british_colonies",
         "british_caribbean_guiana"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3259,6 +3603,8 @@
       "tag": "ENG"
     },
     "ERI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ER",
       "capital_state_id": 550,
       "color_hex": "#2f6632",
@@ -3288,6 +3634,8 @@
         "italian_eritrea",
         "eri_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3301,6 +3649,8 @@
       "tag": "ERI"
     },
     "EST": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "EE",
       "capital_state_id": 812,
       "color_hex": "#3287af",
@@ -3325,6 +3675,8 @@
       "provenance_iso2": "EE",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3338,6 +3690,8 @@
       "tag": "EST"
     },
     "ETH": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ET",
       "capital_state_id": 271,
       "color_hex": "#9882bf",
@@ -3362,6 +3716,8 @@
       "provenance_iso2": "ET",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3375,6 +3731,8 @@
       "tag": "ETH"
     },
     "FCM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CM",
       "capital_state_id": null,
       "color_hex": "#4380e1",
@@ -3403,6 +3761,8 @@
       "rule_sources": [
         "french_cameroon"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3416,6 +3776,8 @@
       "tag": "FCM"
     },
     "FIN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "FI",
       "capital_state_id": 111,
       "color_hex": "#cdd4e4",
@@ -3443,6 +3805,8 @@
         "finnish_aland",
         "finnish_karelia"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3456,6 +3820,8 @@
       "tag": "FIN"
     },
     "FLK": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "FK",
       "capital_state_id": null,
       "color_hex": "#d4405a",
@@ -3485,6 +3851,8 @@
         "falklands_hoi4_1936",
         "batch7_falkland_dependencies"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3498,6 +3866,8 @@
       "tag": "FLK"
     },
     "FND": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#1e57cd",
@@ -3526,6 +3896,8 @@
       "rule_sources": [
         "french_india"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3539,6 +3911,8 @@
       "tag": "FND"
     },
     "FRA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "FR",
       "capital_state_id": 16,
       "color_hex": "#3971e4",
@@ -3566,6 +3940,8 @@
         "french_colonies",
         "algeria_northern_departments"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3579,6 +3955,8 @@
       "tag": "FRA"
     },
     "FRO": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "FO",
       "capital_state_id": null,
       "color_hex": "#825c45",
@@ -3607,6 +3985,8 @@
       "rule_sources": [
         "faroe_islands"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:DEN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3620,6 +4000,8 @@
       "tag": "FRO"
     },
     "FUJ": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#d4608e",
@@ -3646,6 +4028,8 @@
       "rule_sources": [
         "fujairah"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3659,6 +4043,8 @@
       "tag": "FUJ"
     },
     "GAM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GM",
       "capital_state_id": null,
       "color_hex": "#c52b4d",
@@ -3688,6 +4074,8 @@
         "gambia_hoi4_1936",
         "gam_colony_metadata_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3701,6 +4089,8 @@
       "tag": "GAM"
     },
     "GDL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GP",
       "capital_state_id": null,
       "color_hex": "#5d82eb",
@@ -3730,6 +4120,8 @@
         "gdl_colony",
         "gdl_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3743,6 +4135,8 @@
       "tag": "GDL"
     },
     "GEM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#71638f",
@@ -3771,6 +4165,8 @@
       "rule_sources": [
         "batch7_gem"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:YUN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3784,6 +4180,8 @@
       "tag": "GEM"
     },
     "GER": {
+      "alliance": "axis",
+      "alliance_source": "game_history",
       "base_iso2": "DE",
       "capital_state_id": 64,
       "color_hex": "#3c3c3c",
@@ -3810,6 +4208,8 @@
       "rule_sources": [
         "germany_frontier_1936"
       ],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -3823,6 +4223,8 @@
       "tag": "GER"
     },
     "GGY": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GG",
       "capital_state_id": null,
       "color_hex": "#ce6379",
@@ -3851,6 +4253,8 @@
       "rule_sources": [
         "batch7_ggy"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3864,6 +4268,8 @@
       "tag": "GGY"
     },
     "GLD": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GH",
       "capital_state_id": null,
       "color_hex": "#b22750",
@@ -3893,6 +4299,8 @@
         "gold_coast_hoi4_1936",
         "gld_colony_metadata_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3906,6 +4314,8 @@
       "tag": "GLD"
     },
     "GLG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#82894b",
@@ -3934,6 +4344,8 @@
       "rule_sources": [
         "batch7_glg"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:QMA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3947,6 +4359,8 @@
       "tag": "GLG"
     },
     "GMA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#a16a39",
@@ -3974,6 +4388,8 @@
         "gansu_ma_clique",
         "hexi_ma_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "manual",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -3987,6 +4403,8 @@
       "tag": "GMA"
     },
     "GMP": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GM",
       "capital_state_id": null,
       "color_hex": "#cf4f62",
@@ -4015,6 +4433,8 @@
       "rule_sources": [
         "gambia_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4028,6 +4448,8 @@
       "tag": "GMP"
     },
     "GNH": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GH",
       "capital_state_id": null,
       "color_hex": "#ab2644",
@@ -4056,6 +4478,8 @@
       "rule_sources": [
         "gold_coast_northern_territories_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4069,6 +4493,8 @@
       "tag": "GNH"
     },
     "GOA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#2a8254",
@@ -4097,6 +4523,8 @@
       "rule_sources": [
         "portuguese_india"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:POR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4110,6 +4538,8 @@
       "tag": "GOA"
     },
     "GRE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GR",
       "capital_state_id": 47,
       "color_hex": "#5db5e3",
@@ -4134,6 +4564,8 @@
       "provenance_iso2": "GR",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -4147,6 +4579,8 @@
       "tag": "GRE"
     },
     "GRN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GL",
       "capital_state_id": 101,
       "color_hex": "#b08c7a",
@@ -4175,6 +4609,8 @@
       "rule_sources": [
         "greenland_parent"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "fallback_mapped_tag",
       "source_type": "synthetic_fallback",
@@ -4188,6 +4624,8 @@
       "tag": "GRN"
     },
     "GSG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#4743af",
@@ -4216,6 +4654,8 @@
       "rule_sources": [
         "gsg_debug_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:CHI",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4229,6 +4669,8 @@
       "tag": "GSG"
     },
     "GUA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GT",
       "capital_state_id": 313,
       "color_hex": "#483170",
@@ -4253,6 +4695,8 @@
       "provenance_iso2": "GT",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -4266,6 +4710,8 @@
       "tag": "GUA"
     },
     "GWA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#cf2b5a",
@@ -4294,6 +4740,8 @@
       "rule_sources": [
         "gwa_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4307,6 +4755,8 @@
       "tag": "GWA"
     },
     "GXC": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 594,
       "color_hex": "#477161",
@@ -4333,6 +4783,8 @@
       "rule_sources": [
         "guangxi_clique"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -4346,6 +4798,8 @@
       "tag": "GXC"
     },
     "HAI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "HT",
       "capital_state_id": 318,
       "color_hex": "#ae7171",
@@ -4370,6 +4824,8 @@
       "provenance_iso2": "HT",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -4383,6 +4839,8 @@
       "tag": "HAI"
     },
     "HAW": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "US",
       "capital_state_id": null,
       "color_hex": "#50a0f8",
@@ -4412,6 +4870,8 @@
         "hawaii",
         "batch7_haw"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4425,6 +4885,8 @@
       "tag": "HAW"
     },
     "HBC": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#5d6fb3",
@@ -4451,6 +4913,8 @@
       "rule_sources": [
         "hebei_chahar"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "manual",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4464,6 +4928,8 @@
       "tag": "HBC"
     },
     "HDM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:EDN",
       "base_iso2": "YE",
       "capital_state_id": null,
       "color_hex": "#d88b9d",
@@ -4492,6 +4958,8 @@
       "rule_sources": [
         "batch7_hdm"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:EDN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4505,6 +4973,8 @@
       "tag": "HDM"
     },
     "HKG": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "HK",
       "capital_state_id": null,
       "color_hex": "#b6314c",
@@ -4533,6 +5003,8 @@
       "rule_sources": [
         "hong_kong_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4546,6 +5018,8 @@
       "tag": "HKG"
     },
     "HNN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#8a6fb0",
@@ -4572,6 +5046,8 @@
       "rule_sources": [
         "hunan_clique"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "manual",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4585,6 +5061,8 @@
       "tag": "HNN"
     },
     "HOL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "NL",
       "capital_state_id": 7,
       "color_hex": "#cb8a4a",
@@ -4611,6 +5089,8 @@
       "rule_sources": [
         "dutch_colonies"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -4624,6 +5104,8 @@
       "tag": "HOL"
     },
     "HON": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "HN",
       "capital_state_id": 312,
       "color_hex": "#809141",
@@ -4648,6 +5130,8 @@
       "provenance_iso2": "HN",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -4661,6 +5145,8 @@
       "tag": "HON"
     },
     "HRD": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "HM",
       "capital_state_id": null,
       "color_hex": "#aa526a",
@@ -4689,6 +5175,8 @@
       "rule_sources": [
         "batch7_hrd"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4702,6 +5190,8 @@
       "tag": "HRD"
     },
     "HSL": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SL",
       "capital_state_id": null,
       "color_hex": "#c6466b",
@@ -4730,6 +5220,8 @@
       "rule_sources": [
         "sierra_leone_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4743,6 +5235,8 @@
       "tag": "HSL"
     },
     "HTY": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TR",
       "capital_state_id": null,
       "color_hex": "#297cef",
@@ -4771,6 +5265,8 @@
       "rule_sources": [
         "alexandretta_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4784,6 +5280,8 @@
       "tag": "HTY"
     },
     "HUN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "HU",
       "capital_state_id": 43,
       "color_hex": "#f97e62",
@@ -4808,6 +5306,8 @@
       "provenance_iso2": "HU",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -4821,6 +5321,8 @@
       "tag": "HUN"
     },
     "HYD": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#dc3c65",
@@ -4852,6 +5354,8 @@
         "parbhani_split_hoi4_1936",
         "raichur_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4865,6 +5369,8 @@
       "tag": "HYD"
     },
     "ICA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#f36b72",
@@ -4893,6 +5399,8 @@
       "rule_sources": [
         "ica_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4906,6 +5414,8 @@
       "tag": "ICA"
     },
     "ICE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "IS",
       "capital_state_id": 100,
       "color_hex": "#647daf",
@@ -4930,6 +5440,8 @@
       "provenance_iso2": "IS",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -4943,6 +5455,8 @@
       "tag": "ICE"
     },
     "IDA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#f25378",
@@ -4971,6 +5485,8 @@
       "rule_sources": [
         "deccan_states_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -4984,6 +5500,8 @@
       "tag": "IDA"
     },
     "IEA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#e15d65",
@@ -5013,6 +5531,8 @@
         "iea_states_hoi4_1936",
         "odisha_states_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5026,6 +5546,8 @@
       "tag": "IEA"
     },
     "IFA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "PK",
       "capital_state_id": null,
       "color_hex": "#c84952",
@@ -5054,6 +5576,8 @@
       "rule_sources": [
         "frontier_states_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5067,6 +5591,8 @@
       "tag": "IFA"
     },
     "IFN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MA",
       "capital_state_id": null,
       "color_hex": "#c4aa41",
@@ -5095,6 +5621,8 @@
       "rule_sources": [
         "ifni"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:SPR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5108,6 +5636,8 @@
       "tag": "IFN"
     },
     "IHA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#fe5f82",
@@ -5137,6 +5667,8 @@
         "iha_states_hoi4_1936",
         "mandi_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5150,6 +5682,8 @@
       "tag": "IHA"
     },
     "IKA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#cf2e43",
@@ -5178,6 +5712,8 @@
       "rule_sources": [
         "ika_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5191,6 +5727,8 @@
       "tag": "IKA"
     },
     "IMO": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "OM",
       "capital_state_id": null,
       "color_hex": "#7f5154",
@@ -5219,6 +5757,8 @@
       "rule_sources": [
         "oman_imamate"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5232,6 +5772,8 @@
       "tag": "IMO"
     },
     "INR": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#da5772",
@@ -5260,6 +5802,8 @@
       "rule_sources": [
         "inr_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5273,6 +5817,8 @@
       "tag": "INR"
     },
     "INS": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": 1058,
       "color_hex": "#e2a371",
@@ -5302,6 +5848,8 @@
         "dutch_east_indies",
         "ins_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -5315,6 +5863,8 @@
       "tag": "INS"
     },
     "IOM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "IM",
       "capital_state_id": null,
       "color_hex": "#de8b9d",
@@ -5343,6 +5893,8 @@
       "rule_sources": [
         "batch7_iom"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5356,6 +5908,8 @@
       "tag": "IOM"
     },
     "IPA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#cd4162",
@@ -5384,6 +5938,8 @@
       "rule_sources": [
         "ipa_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5397,6 +5953,8 @@
       "tag": "IPA"
     },
     "IRA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#db515b",
@@ -5425,6 +5983,8 @@
       "rule_sources": [
         "rajputana_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5438,6 +5998,8 @@
       "tag": "IRA"
     },
     "IRE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "IE",
       "capital_state_id": 113,
       "color_hex": "#509f5a",
@@ -5462,6 +6024,8 @@
       "provenance_iso2": "IE",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -5475,6 +6039,8 @@
       "tag": "IRE"
     },
     "IRQ": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "IQ",
       "capital_state_id": 291,
       "color_hex": "#b27263",
@@ -5499,6 +6065,8 @@
       "provenance_iso2": "IQ",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -5512,6 +6080,8 @@
       "tag": "IRQ"
     },
     "ITA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "IT",
       "capital_state_id": 2,
       "color_hex": "#437f3f",
@@ -5539,6 +6109,8 @@
         "italy_absorbs_san_marino_1936",
         "julian_march"
       ],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -5552,6 +6124,8 @@
       "tag": "ITA"
     },
     "IWA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#e34154",
@@ -5580,6 +6154,8 @@
       "rule_sources": [
         "iwa_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5593,6 +6169,8 @@
       "tag": "IWA"
     },
     "JAM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "JM",
       "capital_state_id": null,
       "color_hex": "#c0345f",
@@ -5621,6 +6199,8 @@
       "rule_sources": [
         "jamaica_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5634,6 +6214,8 @@
       "tag": "JAM"
     },
     "JAP": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "JP",
       "capital_state_id": 282,
       "color_hex": "#ffc9b2",
@@ -5662,6 +6244,8 @@
         "karafuto_kurils",
         "karafuto_south"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -5675,6 +6259,8 @@
       "tag": "JAP"
     },
     "JEB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SY",
       "capital_state_id": null,
       "color_hex": "#5174da",
@@ -5703,6 +6289,8 @@
       "rule_sources": [
         "jabal_druze"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5716,6 +6304,8 @@
       "tag": "JEB"
     },
     "JEY": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "JE",
       "capital_state_id": null,
       "color_hex": "#b94a68",
@@ -5744,6 +6334,8 @@
       "rule_sources": [
         "batch7_jey"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5757,6 +6349,8 @@
       "tag": "JEY"
     },
     "JOH": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MY",
       "capital_state_id": null,
       "color_hex": "#dc4574",
@@ -5785,6 +6379,8 @@
       "rule_sources": [
         "joh_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5798,6 +6394,8 @@
       "tag": "JOH"
     },
     "JOR": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "JO",
       "capital_state_id": 455,
       "color_hex": "#d34869",
@@ -5826,6 +6424,8 @@
       "rule_sources": [
         "transjordan_mandate_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -5839,6 +6439,8 @@
       "tag": "JOR"
     },
     "KAL": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#872d30",
@@ -5867,6 +6469,8 @@
       "rule_sources": [
         "kalmyk_assr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5880,6 +6484,8 @@
       "tag": "KAL"
     },
     "KAS": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#f15562",
@@ -5908,6 +6514,8 @@
       "rule_sources": [
         "kashmir_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5921,6 +6529,8 @@
       "tag": "KAS"
     },
     "KAZ": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "KZ",
       "capital_state_id": null,
       "color_hex": "#720c1d",
@@ -5949,6 +6559,8 @@
       "rule_sources": [
         "kazakh_1936"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -5962,6 +6574,8 @@
       "tag": "KAZ"
     },
     "KBA": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#932330",
@@ -5991,6 +6605,8 @@
         "kabardino_balkar_assr_hoi4_1936",
         "kba_autonomous_oblast_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6004,6 +6620,8 @@
       "tag": "KBA"
     },
     "KED": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MY",
       "capital_state_id": null,
       "color_hex": "#ab3354",
@@ -6032,6 +6650,8 @@
       "rule_sources": [
         "ked_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6045,6 +6665,8 @@
       "tag": "KED"
     },
     "KEL": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MY",
       "capital_state_id": null,
       "color_hex": "#dd506c",
@@ -6073,6 +6695,8 @@
       "rule_sources": [
         "kel_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6086,6 +6710,8 @@
       "tag": "KEL"
     },
     "KHM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#9c7a3c",
@@ -6112,6 +6738,8 @@
       "rule_sources": [
         "khotan_ma"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6125,6 +6753,8 @@
       "tag": "KHM"
     },
     "KHP": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#d34855",
@@ -6153,6 +6783,8 @@
       "rule_sources": [
         "khp_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6166,6 +6798,8 @@
       "tag": "KHP"
     },
     "KIV": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CD",
       "capital_state_id": null,
       "color_hex": "#bfaa50",
@@ -6194,6 +6828,8 @@
       "rule_sources": [
         "kiv_province"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RCG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6207,6 +6843,8 @@
       "tag": "KIV"
     },
     "KKP": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "UZ",
       "capital_state_id": null,
       "color_hex": "#640719",
@@ -6235,6 +6873,8 @@
       "rule_sources": [
         "karakalpak_assr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6248,6 +6888,8 @@
       "tag": "KKP"
     },
     "KLA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "PK",
       "capital_state_id": null,
       "color_hex": "#f16982",
@@ -6276,6 +6918,8 @@
       "rule_sources": [
         "baluchistan_states_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6289,6 +6933,8 @@
       "tag": "KLA"
     },
     "KOM": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#7a201a",
@@ -6318,6 +6964,8 @@
         "komi_assr_hoi4_1936",
         "kom_autonomous_oblast_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6331,6 +6979,8 @@
       "tag": "KOM"
     },
     "KOR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "KR",
       "capital_state_id": 525,
       "color_hex": "#e8afa1",
@@ -6360,6 +7010,8 @@
         "japanese_korea",
         "kor_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6373,6 +7025,8 @@
       "tag": "KOR"
     },
     "KPU": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "PK",
       "capital_state_id": null,
       "color_hex": "#fd6e78",
@@ -6401,6 +7055,8 @@
       "rule_sources": [
         "khairpur_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6414,6 +7070,8 @@
       "tag": "KPU"
     },
     "KRF": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#b08572",
@@ -6442,6 +7100,8 @@
       "rule_sources": [
         "karafuto_administration_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:JAP",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6455,6 +7115,8 @@
       "tag": "KRF"
     },
     "KRL": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#610101",
@@ -6483,6 +7145,8 @@
       "rule_sources": [
         "karelian_assr_hoi4_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6496,6 +7160,8 @@
       "tag": "KRL"
     },
     "KRN": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "MM",
       "capital_state_id": null,
       "color_hex": "#ca3c52",
@@ -6524,6 +7190,8 @@
       "rule_sources": [
         "krn_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6537,6 +7205,8 @@
       "tag": "KRN"
     },
     "KTG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CD",
       "capital_state_id": null,
       "color_hex": "#aba332",
@@ -6565,6 +7235,8 @@
       "rule_sources": [
         "ktg_province"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RCG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6578,6 +7250,8 @@
       "tag": "KTG"
     },
     "KUT": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#ec646c",
@@ -6606,6 +7280,8 @@
       "rule_sources": [
         "kut_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6619,6 +7295,8 @@
       "tag": "KUT"
     },
     "KUW": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "KW",
       "capital_state_id": 656,
       "color_hex": "#db5e73",
@@ -6647,6 +7325,8 @@
       "rule_sources": [
         "kuw_parent_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -6660,6 +7340,8 @@
       "tag": "KUW"
     },
     "KWT": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#ecc0a4",
@@ -6688,6 +7370,8 @@
       "rule_sources": [
         "kwantung_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:JAP",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6701,6 +7385,8 @@
       "tag": "KWT"
     },
     "KWW": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#08509f",
@@ -6730,6 +7416,8 @@
         "guangzhouwan",
         "guangzhouwan_indochina_parent"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:VIN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6743,6 +7431,8 @@
       "tag": "KWW"
     },
     "KYR": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "KG",
       "capital_state_id": null,
       "color_hex": "#750305",
@@ -6771,6 +7461,8 @@
       "rule_sources": [
         "kirghiz_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6784,6 +7476,8 @@
       "tag": "KYR"
     },
     "LAO": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LA",
       "capital_state_id": null,
       "color_hex": "#8596c4",
@@ -6812,6 +7506,8 @@
       "rule_sources": [
         "batch7_lao"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6825,6 +7521,8 @@
       "tag": "LAO"
     },
     "LAT": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LV",
       "capital_state_id": 808,
       "color_hex": "#4b4dba",
@@ -6849,6 +7547,8 @@
       "provenance_iso2": "LV",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -6862,6 +7562,8 @@
       "tag": "LAT"
     },
     "LBA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LY",
       "capital_state_id": 448,
       "color_hex": "#478d51",
@@ -6891,6 +7593,8 @@
         "italian_colonies",
         "lba_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6904,6 +7608,8 @@
       "tag": "LBA"
     },
     "LEB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LB",
       "capital_state_id": 553,
       "color_hex": "#405fc1",
@@ -6933,6 +7639,8 @@
         "french_mandate_lebanon",
         "leb_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -6946,6 +7654,8 @@
       "tag": "LEB"
     },
     "LHJ": {
+      "alliance": "allies",
+      "alliance_source": "inherited:WDN",
       "base_iso2": "YE",
       "capital_state_id": null,
       "color_hex": "#bd536a",
@@ -6974,6 +7684,8 @@
       "rule_sources": [
         "batch7_lhj"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:WDN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -6987,6 +7699,8 @@
       "tag": "LHJ"
     },
     "LIB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LR",
       "capital_state_id": 298,
       "color_hex": "#9882bf",
@@ -7011,6 +7725,8 @@
       "provenance_iso2": "LR",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -7024,6 +7740,8 @@
       "tag": "LIB"
     },
     "LIE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LI",
       "capital_state_id": null,
       "color_hex": "#3a5fcd",
@@ -7050,6 +7768,8 @@
       "rule_sources": [
         "liechtenstein"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7063,6 +7783,8 @@
       "tag": "LIE"
     },
     "LIT": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LT",
       "capital_state_id": 11,
       "color_hex": "#dbdb77",
@@ -7089,6 +7811,8 @@
       "rule_sources": [
         "lithuania_vilnius_override"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -7102,6 +7826,8 @@
       "tag": "LIT"
     },
     "LOL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#4955b2",
@@ -7130,6 +7856,8 @@
       "rule_sources": [
         "liangshan_clans_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:CHU",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7143,6 +7871,8 @@
       "tag": "LOL"
     },
     "LSI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": null,
       "color_hex": "#f1b078",
@@ -7171,6 +7901,8 @@
       "rule_sources": [
         "lsi_region"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:INS",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7184,6 +7916,8 @@
       "tag": "LSI"
     },
     "LSP": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CD",
       "capital_state_id": null,
       "color_hex": "#908917",
@@ -7212,6 +7946,8 @@
       "rule_sources": [
         "lsp_province"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RCG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7225,6 +7961,8 @@
       "tag": "LSP"
     },
     "LUQ": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#c08a3b",
@@ -7251,6 +7989,8 @@
       "rule_sources": [
         "luq_shandong_clique"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "manual",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7264,6 +8004,8 @@
       "tag": "LUQ"
     },
     "LUX": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "LU",
       "capital_state_id": 8,
       "color_hex": "#41afb3",
@@ -7288,6 +8030,8 @@
       "provenance_iso2": "LU",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -7301,6 +8045,8 @@
       "tag": "LUX"
     },
     "MAD": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MG",
       "capital_state_id": 543,
       "color_hex": "#3887fb",
@@ -7332,6 +8078,8 @@
         "mayotte_madagascar_dependency",
         "batch7_adelie"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7345,6 +8093,8 @@
       "tag": "MAD"
     },
     "MAL": {
+      "alliance": "allies",
+      "alliance_source": "game_history",
       "base_iso2": "MY",
       "capital_state_id": 336,
       "color_hex": "#ca4057",
@@ -7374,6 +8124,8 @@
         "malaya_singapore_brunei",
         "malaya_federated_states_hoi4_1936"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -7387,6 +8139,8 @@
       "tag": "MAL"
     },
     "MAN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 328,
       "color_hex": "#c28d7e",
@@ -7418,6 +8172,8 @@
         "manchukuo_parent_hoi4_1936",
         "qinglong_return"
       ],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -7431,6 +8187,8 @@
       "tag": "MAN"
     },
     "MCO": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MC",
       "capital_state_id": null,
       "color_hex": "#d8434e",
@@ -7457,6 +8215,8 @@
       "rule_sources": [
         "monaco"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7470,6 +8230,8 @@
       "tag": "MCO"
     },
     "MCU": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MO",
       "capital_state_id": null,
       "color_hex": "#246736",
@@ -7498,6 +8260,8 @@
       "rule_sources": [
         "macau"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:POR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7511,6 +8275,8 @@
       "tag": "MCU"
     },
     "MEN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 1043,
       "color_hex": "#b9ff98",
@@ -7538,6 +8304,8 @@
         "mengjiang",
         "mongol_banners_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -7551,6 +8319,8 @@
       "tag": "MEN"
     },
     "MEX": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MX",
       "capital_state_id": 277,
       "color_hex": "#689853",
@@ -7575,6 +8345,8 @@
       "provenance_iso2": "MX",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -7588,6 +8360,8 @@
       "tag": "MEX"
     },
     "MHA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:EDN",
       "base_iso2": "YE",
       "capital_state_id": null,
       "color_hex": "#b7617c",
@@ -7616,6 +8390,8 @@
       "rule_sources": [
         "batch7_mha"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:EDN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7629,6 +8405,8 @@
       "tag": "MHA"
     },
     "MLD": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MV",
       "capital_state_id": 281,
       "color_hex": "#b2ff66",
@@ -7653,6 +8431,8 @@
       "provenance_iso2": "MV",
       "quality": "approx_existing_geometry",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "fallback_mapped_tag",
       "source_type": "synthetic_fallback",
@@ -7666,6 +8446,8 @@
       "tag": "MLD"
     },
     "MLK": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": null,
       "color_hex": "#d69569",
@@ -7694,6 +8476,8 @@
       "rule_sources": [
         "mlk_region"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:INS",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7707,6 +8491,8 @@
       "tag": "MLK"
     },
     "MLN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#6976a5",
@@ -7735,6 +8521,8 @@
       "rule_sources": [
         "batch7_mln"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:YUN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7748,6 +8536,8 @@
       "tag": "MLN"
     },
     "MLT": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MT",
       "capital_state_id": null,
       "color_hex": "#ab204d",
@@ -7776,6 +8566,8 @@
       "rule_sources": [
         "malta_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7789,6 +8581,8 @@
       "tag": "MLT"
     },
     "MNP": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#dd4969",
@@ -7817,6 +8611,8 @@
       "rule_sources": [
         "mnp_state_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7830,6 +8626,8 @@
       "tag": "MNP"
     },
     "MON": {
+      "alliance": "comintern",
+      "alliance_source": "game_history",
       "base_iso2": "MN",
       "capital_state_id": 330,
       "color_hex": "#666057",
@@ -7854,6 +8652,8 @@
       "provenance_iso2": "MN",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -7867,6 +8667,8 @@
       "tag": "MON"
     },
     "MOR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MA",
       "capital_state_id": 461,
       "color_hex": "#3375d4",
@@ -7896,6 +8698,8 @@
         "french_morocco",
         "mor_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7909,6 +8713,8 @@
       "tag": "MOR"
     },
     "MRD": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#721a17",
@@ -7937,6 +8743,8 @@
       "rule_sources": [
         "mordovian_assr_hoi4_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7950,6 +8758,8 @@
       "tag": "MRD"
     },
     "MRE": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#841916",
@@ -7979,6 +8789,8 @@
         "mari_assr_hoi4_1936",
         "mre_autonomous_oblast_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -7992,6 +8804,8 @@
       "tag": "MRE"
     },
     "MTQ": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MQ",
       "capital_state_id": null,
       "color_hex": "#5887fd",
@@ -8021,6 +8835,8 @@
         "mtq_colony",
         "mtq_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8034,6 +8850,8 @@
       "tag": "MTQ"
     },
     "MUL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#27257d",
@@ -8062,6 +8880,8 @@
       "rule_sources": [
         "muli_chiefdom_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:CHU",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8075,6 +8895,8 @@
       "tag": "MUL"
     },
     "MUR": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "IO",
       "capital_state_id": null,
       "color_hex": "#d35975",
@@ -8103,6 +8925,8 @@
       "rule_sources": [
         "mauritius_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8116,6 +8940,8 @@
       "tag": "MUR"
     },
     "MYS": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#ea5870",
@@ -8145,6 +8971,8 @@
         "mysore_hoi4_1936",
         "hassan_split_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8158,6 +8986,8 @@
       "tag": "MYS"
     },
     "MZB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MZ",
       "capital_state_id": 544,
       "color_hex": "#42794d",
@@ -8187,6 +9017,8 @@
         "portuguese_mozambique",
         "mzb_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8200,6 +9032,8 @@
       "tag": "MZB"
     },
     "NBO": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MY",
       "capital_state_id": null,
       "color_hex": "#b61547",
@@ -8228,6 +9062,8 @@
       "rule_sources": [
         "north_borneo_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8241,6 +9077,8 @@
       "tag": "NBO"
     },
     "NCM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:BWA",
       "base_iso2": "NG",
       "capital_state_id": null,
       "color_hex": "#d66a7f",
@@ -8269,6 +9107,8 @@
       "rule_sources": [
         "northern_cameroons_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:BWA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8282,6 +9122,8 @@
       "tag": "NCM"
     },
     "NEA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#231884",
@@ -8310,6 +9152,8 @@
       "rule_sources": [
         "nea_debug_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:CHI",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8323,6 +9167,8 @@
       "tag": "NEA"
     },
     "NEP": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "NP",
       "capital_state_id": 323,
       "color_hex": "#9882bf",
@@ -8347,6 +9193,8 @@
       "provenance_iso2": "NP",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -8360,6 +9208,8 @@
       "tag": "NEP"
     },
     "NFL": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "CA",
       "capital_state_id": null,
       "color_hex": "#c93265",
@@ -8388,6 +9238,8 @@
       "rule_sources": [
         "newfoundland_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8401,6 +9253,8 @@
       "tag": "NFL"
     },
     "NGN": {
+      "alliance": "allies",
+      "alliance_source": "inherited:AST",
       "base_iso2": "PG",
       "capital_state_id": null,
       "color_hex": "#f06a88",
@@ -8429,6 +9283,8 @@
       "rule_sources": [
         "ngn_territory_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:AST",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8442,6 +9298,8 @@
       "tag": "NGN"
     },
     "NIC": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "NI",
       "capital_state_id": 317,
       "color_hex": "#92b3bf",
@@ -8466,6 +9324,8 @@
       "provenance_iso2": "NI",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -8479,6 +9339,8 @@
       "tag": "NIC"
     },
     "NNI": {
+      "alliance": "allies",
+      "alliance_source": "inherited:BWA",
       "base_iso2": "NG",
       "capital_state_id": null,
       "color_hex": "#9f3b4f",
@@ -8507,6 +9369,8 @@
       "rule_sources": [
         "nigeria_northern_provinces_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:BWA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8520,6 +9384,8 @@
       "tag": "NNI"
     },
     "NOR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "NO",
       "capital_state_id": 110,
       "color_hex": "#6f4747",
@@ -8544,6 +9410,8 @@
       "provenance_iso2": "NO",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -8557,6 +9425,8 @@
       "tag": "NOR"
     },
     "NOS": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#781d28",
@@ -8586,6 +9456,8 @@
         "north_ossetian_assr_hoi4_1936",
         "nos_autonomous_oblast_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8599,6 +9471,8 @@
       "tag": "NOS"
     },
     "NRH": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "ZM",
       "capital_state_id": null,
       "color_hex": "#c03e5a",
@@ -8627,6 +9501,8 @@
       "rule_sources": [
         "northern_rhodesia_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8640,6 +9516,8 @@
       "tag": "NRH"
     },
     "NTR": {
+      "alliance": "allies",
+      "alliance_source": "inherited:AST",
       "base_iso2": "AU",
       "capital_state_id": null,
       "color_hex": "#b88269",
@@ -8668,6 +9546,8 @@
       "rule_sources": [
         "batch7_ntr"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:AST",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8681,6 +9561,8 @@
       "tag": "NTR"
     },
     "NWA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#2a319a",
@@ -8709,6 +9591,8 @@
       "rule_sources": [
         "northwestern_army_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:CHI",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8722,6 +9606,8 @@
       "tag": "NWA"
     },
     "NWT": {
+      "alliance": "allies",
+      "alliance_source": "inherited:CAN",
       "base_iso2": "CA",
       "capital_state_id": null,
       "color_hex": "#a44b62",
@@ -8750,6 +9636,8 @@
       "rule_sources": [
         "batch7_nwt"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:CAN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8763,6 +9651,8 @@
       "tag": "NWT"
     },
     "NYS": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MW",
       "capital_state_id": null,
       "color_hex": "#cf3e62",
@@ -8791,6 +9681,8 @@
       "rule_sources": [
         "nyasaland_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -8804,6 +9696,8 @@
       "tag": "NYS"
     },
     "NZL": {
+      "alliance": "allies",
+      "alliance_source": "game_history",
       "base_iso2": "NZ",
       "capital_state_id": 284,
       "color_hex": "#9882bf",
@@ -8828,6 +9722,8 @@
       "provenance_iso2": "NZ",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -8841,6 +9737,8 @@
       "tag": "NZL"
     },
     "OMA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "OM",
       "capital_state_id": 294,
       "color_hex": "#9b656b",
@@ -8867,6 +9765,8 @@
       "rule_sources": [
         "muscat_name"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -8880,6 +9780,8 @@
       "tag": "OMA"
     },
     "PAL": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "IL",
       "capital_state_id": 454,
       "color_hex": "#de547c",
@@ -8909,6 +9811,8 @@
         "palestine_mandate",
         "pal_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -8922,6 +9826,8 @@
       "tag": "PAL"
     },
     "PAN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PA",
       "capital_state_id": 304,
       "color_hex": "#9882bf",
@@ -8946,6 +9852,8 @@
       "provenance_iso2": "PA",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -8959,6 +9867,8 @@
       "tag": "PAN"
     },
     "PAP": {
+      "alliance": "allies",
+      "alliance_source": "inherited:AST",
       "base_iso2": "PG",
       "capital_state_id": null,
       "color_hex": "#b73957",
@@ -8987,6 +9897,8 @@
       "rule_sources": [
         "pap_territory_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9000,6 +9912,8 @@
       "tag": "PAP"
     },
     "PAR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PY",
       "capital_state_id": 301,
       "color_hex": "#3971e4",
@@ -9024,6 +9938,8 @@
       "provenance_iso2": "PY",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -9037,6 +9953,8 @@
       "tag": "PAR"
     },
     "PCZ": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PA",
       "capital_state_id": null,
       "color_hex": "#1f75eb",
@@ -9066,6 +9984,8 @@
         "panama_canal_zone",
         "pcz_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:USA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9079,6 +9999,8 @@
       "tag": "PCZ"
     },
     "PER": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "IR",
       "capital_state_id": 266,
       "color_hex": "#477161",
@@ -9103,6 +10025,8 @@
       "provenance_iso2": "IR",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -9116,6 +10040,8 @@
       "tag": "PER"
     },
     "PGU": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GW",
       "capital_state_id": null,
       "color_hex": "#2c6c46",
@@ -9144,6 +10070,8 @@
       "rule_sources": [
         "portuguese_guinea"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:POR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9157,6 +10085,8 @@
       "tag": "PGU"
     },
     "PHI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PH",
       "capital_state_id": 327,
       "color_hex": "#146fdd",
@@ -9186,6 +10116,8 @@
         "philippines_commonwealth",
         "phi_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -9199,6 +10131,8 @@
       "tag": "PHI"
     },
     "PLS": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MY",
       "capital_state_id": null,
       "color_hex": "#ca3351",
@@ -9227,6 +10161,8 @@
       "rule_sources": [
         "pls_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9240,6 +10176,8 @@
       "tag": "PLS"
     },
     "POL": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PL",
       "capital_state_id": 10,
       "color_hex": "#d6668b",
@@ -9266,6 +10204,8 @@
       "rule_sources": [
         "poland_kresy_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -9279,6 +10219,8 @@
       "tag": "POL"
     },
     "POR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PT",
       "capital_state_id": 112,
       "color_hex": "#277446",
@@ -9305,6 +10247,8 @@
       "rule_sources": [
         "portuguese_colonies"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -9318,6 +10262,8 @@
       "tag": "POR"
     },
     "PRC": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#f50c37",
@@ -9347,6 +10293,8 @@
         "wayaobao_soviet_1936",
         "red_fourth_army_1936"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -9360,6 +10308,8 @@
       "tag": "PRC"
     },
     "PRU": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PE",
       "capital_state_id": 303,
       "color_hex": "#c4bdcc",
@@ -9384,6 +10334,8 @@
       "provenance_iso2": "PE",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -9397,6 +10349,8 @@
       "tag": "PRU"
     },
     "PUE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PR",
       "capital_state_id": 686,
       "color_hex": "#0f96fe",
@@ -9426,6 +10380,8 @@
         "puerto_rico_parent",
         "puerto_rico_territory_metadata"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "fallback_mapped_tag",
       "source_type": "synthetic_fallback",
@@ -9439,6 +10395,8 @@
       "tag": "PUE"
     },
     "QAT": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "QA",
       "capital_state_id": null,
       "color_hex": "#b53c57",
@@ -9467,6 +10425,8 @@
       "rule_sources": [
         "qatar_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9480,6 +10440,8 @@
       "tag": "QAT"
     },
     "QMA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#6f8e4a",
@@ -9506,6 +10468,8 @@
       "rule_sources": [
         "qinghai_ma_clique"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "manual",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9519,6 +10483,8 @@
       "tag": "QMA"
     },
     "RAJ": {
+      "alliance": "allies",
+      "alliance_source": "game_history",
       "base_iso2": "IN",
       "capital_state_id": 439,
       "color_hex": "#e74d66",
@@ -9549,6 +10515,8 @@
         "aden_1936",
         "burma_direct_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -9562,6 +10530,8 @@
       "tag": "RAJ"
     },
     "RAK": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#b62359",
@@ -9590,6 +10560,8 @@
       "rule_sources": [
         "rak_sheikhdom_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9603,6 +10575,8 @@
       "tag": "RAK"
     },
     "RCG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CD",
       "capital_state_id": 772,
       "color_hex": "#a3931e",
@@ -9632,6 +10606,8 @@
         "belgian_colonies",
         "rcg_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9645,6 +10621,8 @@
       "tag": "RCG"
     },
     "RDO": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "EH",
       "capital_state_id": null,
       "color_hex": "#e3b750",
@@ -9673,6 +10651,8 @@
       "rule_sources": [
         "rdo_colony"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:SPR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9686,6 +10666,8 @@
       "tag": "RDO"
     },
     "RE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "RE",
       "capital_state_id": null,
       "color_hex": "#1964c9",
@@ -9714,6 +10696,8 @@
       "rule_sources": [
         "re_parent"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:FRA",
       "scenario_only": true,
       "source": "fallback_current_code",
       "source_type": "synthetic_fallback",
@@ -9727,6 +10711,8 @@
       "tag": "RE"
     },
     "RHO": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "ZW",
       "capital_state_id": null,
       "color_hex": "#be2b52",
@@ -9755,6 +10741,8 @@
       "rule_sources": [
         "southern_rhodesia_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9768,6 +10756,8 @@
       "tag": "RHO"
     },
     "RMP": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#fa6578",
@@ -9796,6 +10786,8 @@
       "rule_sources": [
         "rmp_states_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9809,6 +10801,8 @@
       "tag": "RMP"
     },
     "ROM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "RO",
       "capital_state_id": 46,
       "color_hex": "#d7c448",
@@ -9836,6 +10830,8 @@
         "romania_bessarabia_1936",
         "southern_dobruja"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -9849,6 +10845,8 @@
       "tag": "ROM"
     },
     "ROS": {
+      "alliance": "allies",
+      "alliance_source": "inherited:NZL",
       "base_iso2": "AQ",
       "capital_state_id": null,
       "color_hex": "#b98a95",
@@ -9877,6 +10875,8 @@
       "rule_sources": [
         "batch7_ros"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:NZL",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9890,6 +10890,8 @@
       "tag": "ROS"
     },
     "RUA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "BI",
       "capital_state_id": null,
       "color_hex": "#dec252",
@@ -9918,6 +10920,8 @@
       "rule_sources": [
         "ruanda_urundi"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:BEL",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -9931,6 +10935,8 @@
       "tag": "RUA"
     },
     "SAF": {
+      "alliance": "allies",
+      "alliance_source": "game_history",
       "base_iso2": "NA",
       "capital_state_id": 275,
       "color_hex": "#b73158",
@@ -9960,6 +10966,8 @@
         "south_africa_mandate",
         "saf_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -9973,6 +10981,8 @@
       "tag": "SAF"
     },
     "SAU": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SA",
       "capital_state_id": 292,
       "color_hex": "#abbe98",
@@ -9997,6 +11007,8 @@
       "provenance_iso2": "SA",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -10010,6 +11022,8 @@
       "tag": "SAU"
     },
     "SCM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:BWA",
       "base_iso2": "CM",
       "capital_state_id": null,
       "color_hex": "#c76066",
@@ -10038,6 +11052,8 @@
       "rule_sources": [
         "southern_cameroons_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:BWA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10051,6 +11067,8 @@
       "tag": "SCM"
     },
     "SEY": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SC",
       "capital_state_id": null,
       "color_hex": "#b00b46",
@@ -10079,6 +11097,8 @@
       "rule_sources": [
         "seychelles_return_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10092,6 +11112,8 @@
       "tag": "SEY"
     },
     "SGN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "GQ",
       "capital_state_id": null,
       "color_hex": "#fed987",
@@ -10121,6 +11143,8 @@
         "spanish_guinea",
         "sgn_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:SPR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10134,6 +11158,8 @@
       "tag": "SGN"
     },
     "SHA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "MM",
       "capital_state_id": null,
       "color_hex": "#d7375a",
@@ -10162,6 +11188,8 @@
       "rule_sources": [
         "sha_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10175,6 +11203,8 @@
       "tag": "SHA"
     },
     "SHJ": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#ba214f",
@@ -10203,6 +11233,8 @@
       "rule_sources": [
         "shj_sheikhdom_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10216,6 +11248,8 @@
       "tag": "SHJ"
     },
     "SHM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "EH",
       "capital_state_id": null,
       "color_hex": "#dec769",
@@ -10244,6 +11278,8 @@
       "rule_sources": [
         "shm_colony"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:SPR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10257,6 +11293,8 @@
       "tag": "SHM"
     },
     "SHW": {
+      "alliance": "allies",
+      "alliance_source": "inherited:WDN",
       "base_iso2": "YE",
       "capital_state_id": null,
       "color_hex": "#a84161",
@@ -10285,6 +11323,8 @@
       "rule_sources": [
         "batch7_shw"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:WDN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10298,6 +11338,8 @@
       "tag": "SHW"
     },
     "SHX": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 615,
       "color_hex": "#52020f",
@@ -10325,6 +11367,8 @@
         "shanxi_warlord",
         "suiyuan_return_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -10338,6 +11382,8 @@
       "tag": "SHX"
     },
     "SIA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TH",
       "capital_state_id": 1076,
       "color_hex": "#abbe98",
@@ -10362,6 +11408,8 @@
       "provenance_iso2": "TH",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -10375,6 +11423,8 @@
       "tag": "SIA"
     },
     "SIC": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#2f42a9",
@@ -10404,6 +11454,8 @@
         "xikang_clique",
         "xikang_metadata_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10417,6 +11469,8 @@
       "tag": "SIC"
     },
     "SIE": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SL",
       "capital_state_id": null,
       "color_hex": "#d73f66",
@@ -10446,6 +11500,8 @@
         "sierra_leone_hoi4_1936",
         "sie_colony_metadata_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10459,6 +11515,8 @@
       "tag": "SIE"
     },
     "SIK": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 617,
       "color_hex": "#47be98",
@@ -10486,6 +11544,8 @@
         "sinkiang",
         "khotan_ma_return"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -10499,6 +11559,8 @@
       "tag": "SIK"
     },
     "SKM": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#f35d73",
@@ -10527,6 +11589,8 @@
       "rule_sources": [
         "sikkim_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10540,6 +11604,8 @@
       "tag": "SKM"
     },
     "SML": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SO",
       "capital_state_id": null,
       "color_hex": "#cd4761",
@@ -10568,6 +11634,8 @@
       "rule_sources": [
         "british_somaliland_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10581,6 +11649,8 @@
       "tag": "SML"
     },
     "SMN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SM",
       "capital_state_id": null,
       "color_hex": "#6fb3d9",
@@ -10607,6 +11677,8 @@
       "rule_sources": [
         "san_marino"
       ],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "manual",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10620,6 +11692,8 @@
       "tag": "SMN"
     },
     "SMR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MA",
       "capital_state_id": null,
       "color_hex": "#fdda64",
@@ -10649,6 +11723,8 @@
         "spanish_morocco",
         "smr_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:SPR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10662,6 +11738,8 @@
       "tag": "SMR"
     },
     "SNI": {
+      "alliance": "allies",
+      "alliance_source": "inherited:BWA",
       "base_iso2": "NG",
       "capital_state_id": null,
       "color_hex": "#b63846",
@@ -10690,6 +11768,8 @@
       "rule_sources": [
         "sni_provinces"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:BWA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10703,6 +11783,8 @@
       "tag": "SNI"
     },
     "SOM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SO",
       "capital_state_id": 559,
       "color_hex": "#39722c",
@@ -10732,6 +11814,8 @@
         "italian_somaliland",
         "som_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10745,6 +11829,8 @@
       "tag": "SOM"
     },
     "SOV": {
+      "alliance": "comintern",
+      "alliance_source": "game_history",
       "base_iso2": "RU",
       "capital_state_id": 219,
       "color_hex": "#7d0d18",
@@ -10772,6 +11858,8 @@
         "soviet_union",
         "sakhalin_north"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -10785,6 +11873,8 @@
       "tag": "SOV"
     },
     "SPM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PM",
       "capital_state_id": null,
       "color_hex": "#476bd5",
@@ -10813,6 +11903,8 @@
       "rule_sources": [
         "saint_pierre_miquelon"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10826,6 +11918,8 @@
       "tag": "SPM"
     },
     "SPR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ES",
       "capital_state_id": 41,
       "color_hex": "#f2cd5e",
@@ -10852,6 +11946,8 @@
       "rule_sources": [
         "spanish_andorra_only"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -10865,6 +11961,8 @@
       "tag": "SPR"
     },
     "SRW": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MY",
       "capital_state_id": null,
       "color_hex": "#e2486c",
@@ -10893,6 +11991,8 @@
       "rule_sources": [
         "sarawak_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10906,6 +12006,8 @@
       "tag": "SRW"
     },
     "SSH": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "EH",
       "capital_state_id": null,
       "color_hex": "#d1b338",
@@ -10935,6 +12037,8 @@
         "spanish_sahara",
         "ssh_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:SPR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10948,6 +12052,8 @@
       "tag": "SSH"
     },
     "STH": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SH",
       "capital_state_id": null,
       "color_hex": "#c24065",
@@ -10976,6 +12082,8 @@
       "rule_sources": [
         "saint_helena_colony_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -10989,6 +12097,8 @@
       "tag": "STH"
     },
     "STN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CD",
       "capital_state_id": null,
       "color_hex": "#ad9942",
@@ -11017,6 +12127,8 @@
       "rule_sources": [
         "stn_province"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RCG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11030,6 +12142,8 @@
       "tag": "STN"
     },
     "STP": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ST",
       "capital_state_id": null,
       "color_hex": "#468259",
@@ -11058,6 +12172,8 @@
       "rule_sources": [
         "sao_tome"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:POR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11071,6 +12187,8 @@
       "tag": "STP"
     },
     "STR": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SG",
       "capital_state_id": null,
       "color_hex": "#af3851",
@@ -11099,6 +12217,8 @@
       "rule_sources": [
         "straits_settlements_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11112,6 +12232,8 @@
       "tag": "STR"
     },
     "SUB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "PH",
       "capital_state_id": null,
       "color_hex": "#657fa9",
@@ -11140,6 +12262,8 @@
       "rule_sources": [
         "batch7_sub"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:USA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11153,6 +12277,8 @@
       "tag": "SUB"
     },
     "SUD": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SD",
       "capital_state_id": 551,
       "color_hex": "#cc3d6b",
@@ -11183,6 +12309,8 @@
         "anglo_egyptian_sudan",
         "sud_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11196,6 +12324,8 @@
       "tag": "SUD"
     },
     "SUM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": null,
       "color_hex": "#e6ad87",
@@ -11224,6 +12354,8 @@
       "rule_sources": [
         "sum_region"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:INS",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11237,6 +12369,8 @@
       "tag": "SUM"
     },
     "SUR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SR",
       "capital_state_id": null,
       "color_hex": "#ab753c",
@@ -11265,6 +12399,8 @@
       "rule_sources": [
         "suriname"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11278,6 +12414,8 @@
       "tag": "SUR"
     },
     "SWA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:SAF",
       "base_iso2": "NA",
       "capital_state_id": null,
       "color_hex": "#c95579",
@@ -11306,6 +12444,8 @@
       "rule_sources": [
         "south_west_africa_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:SAF",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11319,6 +12459,8 @@
       "tag": "SWA"
     },
     "SWE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SE",
       "capital_state_id": 141,
       "color_hex": "#2484f7",
@@ -11343,6 +12485,8 @@
       "provenance_iso2": "SE",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -11356,6 +12500,8 @@
       "tag": "SWE"
     },
     "SWI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CH",
       "capital_state_id": 3,
       "color_hex": "#e00505",
@@ -11382,6 +12528,8 @@
       "rule_sources": [
         "swiss_liechtenstein"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -11395,6 +12543,8 @@
       "tag": "SWI"
     },
     "SWZ": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "SZ",
       "capital_state_id": null,
       "color_hex": "#c64d67",
@@ -11423,6 +12573,8 @@
       "rule_sources": [
         "swaziland_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11436,6 +12588,8 @@
       "tag": "SWZ"
     },
     "SYR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "SY",
       "capital_state_id": 554,
       "color_hex": "#4e75ee",
@@ -11465,6 +12619,8 @@
         "french_mandate_syria",
         "hatay_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -11478,6 +12634,8 @@
       "tag": "SYR"
     },
     "TAI": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TW",
       "capital_state_id": null,
       "color_hex": "#d5a992",
@@ -11507,6 +12665,8 @@
         "japanese_taiwan",
         "tai_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:JAP",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11520,6 +12680,8 @@
       "tag": "TAI"
     },
     "TAJ": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "TJ",
       "capital_state_id": null,
       "color_hex": "#8a202c",
@@ -11548,6 +12710,8 @@
       "rule_sources": [
         "tajik_ssr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11561,6 +12725,8 @@
       "tag": "TAJ"
     },
     "TAN": {
+      "alliance": "comintern",
+      "alliance_source": "game_history",
       "base_iso2": "RU",
       "capital_state_id": 329,
       "color_hex": "#9882bf",
@@ -11587,6 +12753,8 @@
       "rule_sources": [
         "tannu_tuva"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -11600,6 +12768,8 @@
       "tag": "TAN"
     },
     "TAT": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#832721",
@@ -11628,6 +12798,8 @@
       "rule_sources": [
         "tatar_assr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11641,6 +12813,8 @@
       "tag": "TAT"
     },
     "TGA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "MY",
       "capital_state_id": null,
       "color_hex": "#d84f62",
@@ -11669,6 +12843,8 @@
       "rule_sources": [
         "tga_protectorate_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11682,6 +12858,8 @@
       "tag": "TGA"
     },
     "TGN": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "TZ",
       "capital_state_id": null,
       "color_hex": "#d1526c",
@@ -11710,6 +12888,8 @@
       "rule_sources": [
         "tanganyika_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11723,6 +12903,8 @@
       "tag": "TGN"
     },
     "TGR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "MA",
       "capital_state_id": null,
       "color_hex": "#c9b67d",
@@ -11749,6 +12931,8 @@
       "rule_sources": [
         "tangier_international_zone"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11762,6 +12946,8 @@
       "tag": "TGR"
     },
     "TIB": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 757,
       "color_hex": "#50642d",
@@ -11788,6 +12974,8 @@
       "rule_sources": [
         "tibet"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -11801,6 +12989,8 @@
       "tag": "TIB"
     },
     "TMR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TL",
       "capital_state_id": null,
       "color_hex": "#328b5f",
@@ -11829,6 +13019,8 @@
       "rule_sources": [
         "portuguese_timor"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:POR",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11842,6 +13034,8 @@
       "tag": "TMR"
     },
     "TMS": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "TM",
       "capital_state_id": null,
       "color_hex": "#8f3229",
@@ -11870,6 +13064,8 @@
       "rule_sources": [
         "turkmen_ssr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11883,6 +13079,8 @@
       "tag": "TMS"
     },
     "TOG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TG",
       "capital_state_id": null,
       "color_hex": "#3f66e1",
@@ -11911,6 +13109,8 @@
       "rule_sources": [
         "french_togo"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11924,6 +13124,8 @@
       "tag": "TOG"
     },
     "TPA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#e8476e",
@@ -11952,6 +13154,8 @@
       "rule_sources": [
         "tpa_state_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -11965,6 +13169,8 @@
       "tag": "TPA"
     },
     "TRH": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#607aa4",
@@ -11993,6 +13199,8 @@
       "rule_sources": [
         "batch7_trh"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:SIC",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12006,6 +13214,8 @@
       "tag": "TRH"
     },
     "TRI": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "TT",
       "capital_state_id": null,
       "color_hex": "#e05977",
@@ -12034,6 +13244,8 @@
       "rule_sources": [
         "trinidad_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12047,6 +13259,8 @@
       "tag": "TRI"
     },
     "TRU": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#c04967",
@@ -12075,6 +13289,8 @@
       "rule_sources": [
         "trucial_states_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12088,6 +13304,8 @@
       "tag": "TRU"
     },
     "TSC": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "AZ",
       "capital_state_id": null,
       "color_hex": "#6c0017",
@@ -12116,6 +13334,8 @@
       "rule_sources": [
         "transcaucasian_sfsr"
       ],
+      "ruling_ideology": "communism",
+      "ruling_ideology_source": "inherited:SOV",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12129,6 +13349,8 @@
       "tag": "TSC"
     },
     "TUN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TN",
       "capital_state_id": 458,
       "color_hex": "#3657c4",
@@ -12158,6 +13380,8 @@
         "french_tunisia",
         "tun_family_colour_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12171,6 +13395,8 @@
       "tag": "TUN"
     },
     "TUR": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "TR",
       "capital_state_id": 49,
       "color_hex": "#abbe98",
@@ -12195,6 +13421,8 @@
       "provenance_iso2": "TR",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -12208,6 +13436,8 @@
       "tag": "TUR"
     },
     "TVC": {
+      "alliance": "allies",
+      "alliance_source": "inherited:RAJ",
       "base_iso2": "IN",
       "capital_state_id": null,
       "color_hex": "#ec4a59",
@@ -12236,6 +13466,8 @@
       "rule_sources": [
         "travancore_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:RAJ",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12249,6 +13481,8 @@
       "tag": "TVC"
     },
     "UAQ": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#b12746",
@@ -12277,6 +13511,8 @@
       "rule_sources": [
         "uaq_sheikhdom_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12290,6 +13526,8 @@
       "tag": "UAQ"
     },
     "UDM": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#8f2927",
@@ -12318,6 +13556,8 @@
       "rule_sources": [
         "udmurt_assr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12331,6 +13571,8 @@
       "tag": "UDM"
     },
     "UGA": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "UG",
       "capital_state_id": null,
       "color_hex": "#b0315a",
@@ -12359,6 +13601,8 @@
       "rule_sources": [
         "uganda_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12372,6 +13616,8 @@
       "tag": "UGA"
     },
     "UKR": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "UA",
       "capital_state_id": null,
       "color_hex": "#972c31",
@@ -12400,6 +13646,8 @@
       "rule_sources": [
         "ukrainian_ssr_hoi4_1936"
       ],
+      "ruling_ideology": "",
+      "ruling_ideology_source": "",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12413,6 +13661,8 @@
       "tag": "UKR"
     },
     "URG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "UY",
       "capital_state_id": 300,
       "color_hex": "#abbe98",
@@ -12437,6 +13687,8 @@
       "provenance_iso2": "UY",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -12450,6 +13702,8 @@
       "tag": "URG"
     },
     "USA": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "US",
       "capital_state_id": 361,
       "color_hex": "#1485ed",
@@ -12476,6 +13730,8 @@
       "rule_sources": [
         "olongapo_reservation"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -12489,6 +13745,8 @@
       "tag": "USA"
     },
     "UZB": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "UZ",
       "capital_state_id": null,
       "color_hex": "#79001c",
@@ -12517,6 +13775,8 @@
       "rule_sources": [
         "uzbek_ssr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12530,6 +13790,8 @@
       "tag": "UZB"
     },
     "VEN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "VE",
       "capital_state_id": 307,
       "color_hex": "#abbe98",
@@ -12554,6 +13816,8 @@
       "provenance_iso2": "VE",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "fascism",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -12567,6 +13831,8 @@
       "tag": "VEN"
     },
     "VIN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "VN",
       "capital_state_id": 671,
       "color_hex": "#1a5fd4",
@@ -12595,6 +13861,8 @@
       "rule_sources": [
         "french_indochina"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12608,6 +13876,8 @@
       "tag": "VIN"
     },
     "WDN": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "YE",
       "capital_state_id": null,
       "color_hex": "#c42a5e",
@@ -12636,6 +13906,8 @@
       "rule_sources": [
         "aden_western_states_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12649,6 +13921,8 @@
       "tag": "WDN"
     },
     "WNG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": null,
       "color_hex": "#d49f75",
@@ -12677,6 +13951,8 @@
       "rule_sources": [
         "wng_region"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:INS",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12690,6 +13966,8 @@
       "tag": "WNG"
     },
     "WTO": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "GH",
       "capital_state_id": null,
       "color_hex": "#d6475e",
@@ -12718,6 +13996,8 @@
       "rule_sources": [
         "british_togoland_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12731,6 +14011,8 @@
       "tag": "WTO"
     },
     "XSM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 754,
       "color_hex": "#695a84",
@@ -12757,6 +14039,8 @@
       "rule_sources": [
         "ningxia_ma_clique"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -12770,6 +14054,8 @@
       "tag": "XSM"
     },
     "YAK": {
+      "alliance": "comintern",
+      "alliance_source": "inherited:SOV",
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#65070b",
@@ -12798,6 +14084,8 @@
       "rule_sources": [
         "yakut_assr_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12811,6 +14099,8 @@
       "tag": "YAK"
     },
     "YEM": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "YE",
       "capital_state_id": 293,
       "color_hex": "#9b656b",
@@ -12835,6 +14125,8 @@
       "provenance_iso2": "YE",
       "quality": "direct_country_copy",
       "rule_sources": [],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -12848,6 +14140,8 @@
       "tag": "YEM"
     },
     "YOG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "ID",
       "capital_state_id": null,
       "color_hex": "#d79953",
@@ -12876,6 +14170,8 @@
       "rule_sources": [
         "yogyakarta"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:HOL",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12889,6 +14185,8 @@
       "tag": "YOG"
     },
     "YSH": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#a1a969",
@@ -12917,6 +14215,8 @@
       "rule_sources": [
         "batch7_ysh"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "inherited:QMA",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12930,6 +14230,8 @@
       "tag": "YSH"
     },
     "YUE": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": null,
       "color_hex": "#3f9a63",
@@ -12957,6 +14259,8 @@
         "yue_guangdong_clique",
         "hainan_qinlian_return_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "manual",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -12970,6 +14274,8 @@
       "tag": "YUE"
     },
     "YUG": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "RS",
       "capital_state_id": 107,
       "color_hex": "#48497e",
@@ -12996,6 +14302,8 @@
       "rule_sources": [
         "yugoslavia_union"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -13009,6 +14317,8 @@
       "tag": "YUG"
     },
     "YUK": {
+      "alliance": "allies",
+      "alliance_source": "inherited:CAN",
       "base_iso2": "CA",
       "capital_state_id": null,
       "color_hex": "#c96a79",
@@ -13037,6 +14347,8 @@
       "rule_sources": [
         "batch7_yuk"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:CAN",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",
@@ -13050,6 +14362,8 @@
       "tag": "YUK"
     },
     "YUN": {
+      "alliance": "",
+      "alliance_source": "",
       "base_iso2": "CN",
       "capital_state_id": 325,
       "color_hex": "#2a267a",
@@ -13079,6 +14393,8 @@
         "yunnan_warlord",
         "yunnan_metadata_hoi4_1936"
       ],
+      "ruling_ideology": "neutrality",
+      "ruling_ideology_source": "game_history",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "hoi4_owner",
@@ -13092,6 +14408,8 @@
       "tag": "YUN"
     },
     "ZAN": {
+      "alliance": "allies",
+      "alliance_source": "inherited:ENG",
       "base_iso2": "TZ",
       "capital_state_id": null,
       "color_hex": "#ac2955",
@@ -13120,6 +14438,8 @@
       "rule_sources": [
         "zanzibar_hoi4_1936"
       ],
+      "ruling_ideology": "democratic",
+      "ruling_ideology_source": "inherited:ENG",
       "scenario_only": true,
       "source": "manual_rule",
       "source_type": "scenario_extension",

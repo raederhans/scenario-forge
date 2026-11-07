@@ -47,6 +47,9 @@ function harness() {
     getFeatureId: (value) => value.id,
     getEntityFeatureId: (value) => value.id,
     getCountryFeatureIds: (code) => h.members[code] || [],
+    getSelectionBoundary: ids => { h.boundaryMembers = [...ids]; return h.boundary || null; },
+    getSelectionBoundaryRevision: () => h.boundaryRevision || 0,
+    getZoomScale: () => h.zoom || 1,
     getDevGroup: () => h.devGroup,
     getInspectorGroup: () => h.inspectorGroup,
     getPath: () => h.path,
@@ -153,18 +156,17 @@ test("inspector group, individual, country and empty selection retain overlay be
   const h = harness();
   h.inspector = { featureIds: [" a ", "a", "b"], groupMode: true, label: "Group" };
   h.owner.renderInspectorHighlightOverlay();
-  assert.equal(h.inspectorGroup.rows.length, 1);
-  assert.equal(h.inspectorGroup.rows[0].type, "FeatureCollection");
-  assert.deepEqual(h.inspectorGroup.rows[0].features, h.features);
+  assert.equal(h.inspectorGroup.rows.length, 2);
+  assert.equal(h.inspectorGroup.rows[0].geometry.type, "MultiPolygon");
   assert.equal(h.inspectorGroup.pathAttrs.fill, "none");
-  assert.equal(h.inspectorGroup.pathAttrs["stroke-width"], 2.4);
+  assert.equal(h.inspectorGroup.pathAttrs["stroke-width"](h.inspectorGroup.rows[1]), 1.25);
   h.inspector.groupMode = false;
   h.owner.renderInspectorHighlightOverlay();
-  assert.deepEqual(h.inspectorGroup.rows, h.features);
+  assert.equal(h.inspectorGroup.rows.length, 2);
   h.inspector = { featureIds: [], countryCode: " aa " };
   h.index = null;
   h.owner.renderInspectorHighlightOverlay();
-  assert.deepEqual(h.inspectorGroup.rows, h.features);
+  assert.equal(h.inspectorGroup.rows[1].geometry.type, "MultiPolygon");
   h.inspector = { featureIds: ["b"] };
   h.owner.renderInspectorHighlightOverlay();
   assert.deepEqual(h.inspectorGroup.rows, [h.features[1]]);
@@ -200,4 +202,51 @@ test("IDs containing delimiters cannot collide in either overlay signature", () 
   h.owner.renderInspectorHighlightOverlayIfNeeded();
   assert.deepEqual(h.devGroup.rows.map((value) => value.id), h.ids);
   assert.deepEqual(h.inspectorGroup.rows.map((value) => value.id), h.ids);
+});
+
+test("graph boundary uses halo and outline, updates widths without rebuilding, and follows graph revision", () => {
+  const h = harness();
+  h.inspector = { countryCode: 'AA' };
+  h.boundary = { type: 'MultiLineString', coordinates: [[[0,0],[1,0]]] };
+  h.owner.renderInspectorHighlightOverlayIfNeeded();
+  assert.deepEqual(h.boundaryMembers, ['a', 'b']);
+  assert.equal(h.merged.length, 0);
+  assert.equal(h.inspectorGroup.rows.length, 2);
+  const [halo, outline] = h.inspectorGroup.rows;
+  assert.equal(halo.geometry, h.boundary);
+  assert.equal(outline.geometry, h.boundary);
+  assert.equal(h.inspectorGroup.pathAttrs['stroke-opacity'](halo), 0.55);
+  for (const [zoom, width] of [[1,1.25],[5,1.625],[8,2],[10,2]]) {
+    h.zoom = zoom;
+    h.owner.renderInspectorHighlightOverlayIfNeeded();
+    assert.equal(h.inspectorGroup.pathAttrs['stroke-width'](outline), width);
+    assert.equal(h.inspectorGroup.pathAttrs['stroke-width'](halo), width + 2.5);
+    assert.equal(h.inspectorGroup.renders, 1);
+  }
+  h.boundaryRevision = 1;
+  h.owner.renderInspectorHighlightOverlayIfNeeded();
+  assert.equal(h.inspectorGroup.renders, 2);
+});
+
+test("incomplete topology falls back to one-pixel parcels and single selection scales", () => {
+  const h = harness();
+  h.inspector = { countryCode: 'AA' };
+  h.members.AA.push('unloaded');
+  h.owner.renderInspectorHighlightOverlay();
+  assert.equal(h.merged.length, 0);
+  assert.deepEqual(h.inspectorGroup.rows, h.features);
+  assert.equal(h.inspectorGroup.pathAttrs['stroke-width'](h.features[0]), 1);
+  h.inspector = { featureIds: ['a'] };
+  h.zoom = 8;
+  h.owner.renderInspectorHighlightOverlay();
+  assert.equal(h.inspectorGroup.pathAttrs['stroke-width'](h.features[0]), 2);
+});
+
+test("complete active topology can merge members missing from the land index", () => {
+  const h = harness();
+  h.inspector = { countryCode: 'AA' };
+  h.index.delete('b');
+  h.owner.renderInspectorHighlightOverlay();
+  assert.deepEqual(h.merged[0].map(geometry => geometry.id), ['a', 'b']);
+  assert.equal(h.inspectorGroup.rows.length, 2);
 });

@@ -43,6 +43,8 @@ function harness() {
         releaseRetainedLayers: () => {},
         render(frame) {
           if (nextError) throw nextError;
+          // Mirror the real compositor contract: one layer per name per frame.
+          if (new Set(frame.layers.map(layer => layer.name)).size !== frame.layers.length) throw new TypeError("GPU scene layers require unique names.");
           const canvasBytes = frame.layers.reduce((sum, layer) => sum + (layer.canvas ? layer.canvas.width * layer.canvas.height * 4 : 0), 0);
           if (canvasBytes + frame.reservedTextureBytes > options.maxTextureBytes) throw new RangeError("GPU scene texture budget exceeded.");
           records.frames.push(frame);
@@ -288,7 +290,7 @@ test("zooming out uses a complete bounded overview until the new primary scene i
   const publications = h.owner.getDiagnostics().publications;
   high.presentationState = "retained";
   assert.equal(h.owner.present(h.transform, { refresh: false }), true);
-  assert.equal(h.owner.getDiagnostics().usingOverview, true);
+  assert.equal(h.owner.getDiagnostics().composedWithOverview, true);
   assert.equal(h.owner.getDiagnostics().presentationState, "retained");
   assert.equal(h.owner.getDiagnostics().publications, publications, "preview does not count as new precision publication");
   const output = h.records.frames.at(-1);
@@ -497,4 +499,54 @@ test("compose gates political publication on prepared layers and preserves the s
   calls.length = 0; ready = true;
   assert.equal(scope.composeCachedPasses([]), true);
   assert.deepEqual(calls, ["prepare", "publish-political", "present"]);
+});
+
+
+test("retained precision layers compose over overview with a shared device-pixel clip", () => {
+  for (const [primaryX, targetX, expected] of [[-50, 0, true], [-50, -25, true], [-150, -25, false]]) {
+    const h = harness();
+    const reference = { x: 0, y: 0, k: 2 };
+    const layout = { offsetX: 0, offsetY: 0 };
+    Object.assign(h.currentFrame, { transform: reference, layout, plan: {
+      originX: 0, originY: 0, width: 200, height: 100, scale: 1,
+      outputX: 0, outputY: 0, outputWidth: 200, outputHeight: 100,
+    } });
+    for (const pass of h.passes.values()) Object.assign(pass, { reference, layout, canvas: { width: 200, height: 100 } });
+    let overviewDraws = 0;
+    const overview = { ...h.currentFrame, sourceFrame: h.currentFrame,
+      gpu: { drawLayer: () => { overviewDraws++; return true; } } };
+    h.helpers.getOverviewFrame = () => overview;
+    assert.equal(h.owner.present(reference), true);
+    const primary = { ...h.currentFrame, transform: { ...reference, x: primaryX },
+      plan: { ...h.currentFrame.plan, outputWidth: 300 } };
+    for (const pass of h.passes.values()) pass.reference = primary.transform;
+    h.setFrame(primary);
+    assert.equal(h.owner.present(primary.transform), true);
+    const before = h.owner.getDiagnostics();
+    h.records.compositor.captureRetainedLayers = () => { throw new Error("must not recapture overview"); };
+    h.helpers.ensurePassCoverage = () => { throw new Error("must retain uploaded passes"); };
+    h.passes.clear();
+    assert.equal(h.owner.present({ ...reference, x: targetX }, { refresh: false }), expected);
+    assert.equal(h.owner.getDiagnostics().publications, before.publications);
+    assert.deepEqual(h.records.colorBaselines, [{ overview: false }, { overview: false }]);
+    if (!expected) {
+      assert.equal(h.owner.isActive(), false);
+      assert.equal(overviewDraws, 0);
+      continue;
+    }
+    const output = h.records.frames.at(-1);
+    assert.equal(output.preserveLayers, true);
+    assert.deepEqual(output.layers.map(layer => layer.name), ["overview:base", "overview:political", "overview:labels", "base", "political", "labels"]);
+    assert.ok(output.layers.slice(0, 3).every(layer => !layer.clip));
+    for (const layer of output.layers.slice(3)) {
+      assert.deepEqual(layer.clip, { x: (targetX - primaryX) * 2, y: 0, width: 200, height: 100 });
+      if (!layer.draw) assert.equal(layer.retained, true);
+    }
+    assert.equal(overviewDraws, 1);
+    assert.deepEqual(h.records.direct.transform, { a: 1, d: 1, e: (targetX - primaryX) * 2, f: 0 });
+    assert.equal(h.owner.getDiagnostics().composedWithOverview, true);
+    assert.equal(h.owner.getDiagnostics().usingOverview, false);
+    assert.equal(h.owner.getDiagnostics().presentationState, "retained");
+    assert.equal(h.owner.getDiagnostics().textureUploads, before.textureUploads);
+  }
 });

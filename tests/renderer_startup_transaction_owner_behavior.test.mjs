@@ -109,7 +109,7 @@ test("startup defers only duplicate border derivation until the following setMap
       getRendererStartupTransactionOwner: () => ({ runInitMapResetTransaction: record("resetInitMap") }),
       applyFacilityInfoCardState: record("applyFacilityInfoCardState"),
       ensureHybridLayers: record("ensureHybridLayers"),
-      refreshColorState() {}, recomputeDynamicBordersNow() {}, resolveSpecialZoneParentGroupTargetIds() {},
+      refreshColorState() {}, clearInspectorLandSelection() {}, stepUpInspectorSelection() {}, recomputeDynamicBordersNow() {}, resolveSpecialZoneParentGroupTargetIds() {},
       registerRuntimeHook(target, name, callback) {
         assert.equal(target, null);
         assert.equal(name, "resolveSpecialZoneParentGroupTargetIdsFn");

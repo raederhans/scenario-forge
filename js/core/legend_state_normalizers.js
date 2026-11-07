@@ -15,7 +15,8 @@ export const DEFAULT_LEGEND_CONTROL = Object.freeze({
   xRatio: 0.02,
   yRatio: 0.72,
   width: 240,
-  height: 340,
+  // null 表示按内容自动高度；用户拖动调整后才记录具体高度。
+  height: null,
   opacity: 0.9,
 });
 
@@ -90,12 +91,15 @@ export function normalizeLegendControl(value) {
       LEGEND_CONTROL_LIMITS.minWidth,
       LEGEND_CONTROL_LIMITS.maxWidth
     )),
-    height: Math.round(clampNumber(
-      source.height,
-      DEFAULT_LEGEND_CONTROL.height,
-      LEGEND_CONTROL_LIMITS.minHeight,
-      LEGEND_CONTROL_LIMITS.maxHeight
-    )),
+    height: source.height === null || source.height === undefined || source.height === ""
+      || !Number.isFinite(Number(source.height))
+      ? null
+      : Math.round(clampNumber(
+        source.height,
+        LEGEND_CONTROL_LIMITS.minHeight,
+        LEGEND_CONTROL_LIMITS.minHeight,
+        LEGEND_CONTROL_LIMITS.maxHeight
+      )),
     opacity: clampNumber(
       source.opacity,
       DEFAULT_LEGEND_CONTROL.opacity,

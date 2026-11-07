@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 // Data loading helpers (Phase 13 scaffold)
 
 import {
@@ -72,7 +73,7 @@ function loadRailContextMetadata(d3Client, url) {
   // them when the batch settles; geometry never enters this temporary cache.
   let promise = globalRailContextMetadataPromises.get(url);
   if (!promise) {
-    promise = Promise.resolve().then(() => d3Client.json(url)).catch((error) => {
+    promise = Promise.resolve().then(() => d3Client.json(resolveDataUrl(url))).catch((error) => {
       // Another layer may still be loading. Let a retry refresh failed metadata
       // immediately without waiting for that unrelated request to settle.
       if (globalRailContextMetadataPromises.get(url) === promise) {
@@ -668,7 +669,7 @@ async function loadOptionalJsonCandidate(d3Client, candidateUrls, { label = "res
   let sawFailure = false;
   for (const url of urls.filter(Boolean)) {
     try {
-      const payload = await d3Client.json(url);
+      const payload = await d3Client.json(resolveDataUrl(url));
       const normalized = await normalizer(payload, url);
       if (normalized !== null && normalized !== undefined) {
         return normalized;
@@ -689,7 +690,7 @@ async function loadOptionalJsonCandidate(d3Client, candidateUrls, { label = "res
 
 async function loadRiversFallbackCollection(d3Client) {
   try {
-    const payload = await d3Client.json(GLOBAL_RIVERS_CONTEXT_PACK_URL);
+    const payload = await d3Client.json(resolveDataUrl(GLOBAL_RIVERS_CONTEXT_PACK_URL));
     if (!Array.isArray(payload?.features)) {
       console.warn(
         `[data_loader] Rivers fallback pack invalid at ${GLOBAL_RIVERS_CONTEXT_PACK_URL}.`
@@ -742,17 +743,17 @@ async function loadContextLayerPackInternal(layerName, d3Client) {
       return null;
     }
     globalRoadContextCollectionsPromise ||= (async () => {
-      const catalog = await d3Client.json(GLOBAL_ROAD_CATALOG_URL);
+      const catalog = await d3Client.json(resolveDataUrl(GLOBAL_ROAD_CATALOG_URL));
       const entries = Array.isArray(catalog?.entries) ? catalog.entries : [];
       const roadFeatures = [];
       for (const entry of entries) {
         if (Number(entry?.feature_counts?.preview?.roads || 0) <= 0) continue;
         const manifestPath = String(entry?.manifest_path || "").trim();
         if (!manifestPath) continue;
-        const manifest = await d3Client.json(manifestPath);
+        const manifest = await d3Client.json(resolveDataUrl(manifestPath));
         const roadsPath = String(manifest?.paths?.preview?.roads || "").trim();
         if (!roadsPath) continue;
-        const topology = await d3Client.json(roadsPath);
+        const topology = await d3Client.json(resolveDataUrl(roadsPath));
         const roadsObject = topology?.objects?.roads;
         const roadsCollection = roadsObject ? globalThis.topojson.feature(topology, roadsObject) : null;
         if (Array.isArray(roadsCollection?.features) && roadsCollection.features.length) {
@@ -792,7 +793,7 @@ async function loadContextLayerPackInternal(layerName, d3Client) {
           const manifest = await loadRailContextMetadata(d3Client, manifestPath);
           const railwaysPath = String(manifest?.paths?.preview?.railways || "").trim();
           if (layerName === "railways" && railwaysPath && Number(entry?.feature_counts?.preview?.railways || 0) > 0) {
-            const topology = await d3Client.json(railwaysPath);
+            const topology = await d3Client.json(resolveDataUrl(railwaysPath));
             const railwaysObject = topology?.objects?.railways;
             const railwaysCollection = railwaysObject ? globalThis.topojson.feature(topology, railwaysObject) : null;
             if (Array.isArray(railwaysCollection?.features) && railwaysCollection.features.length) {
@@ -801,7 +802,7 @@ async function loadContextLayerPackInternal(layerName, d3Client) {
           }
           const stationsPath = String(manifest?.paths?.preview?.rail_stations_major || "").trim();
           if (layerName === "rail_stations_major" && stationsPath) {
-            const stationsCollection = await d3Client.json(stationsPath);
+            const stationsCollection = await d3Client.json(resolveDataUrl(stationsPath));
             if (Array.isArray(stationsCollection?.features) && stationsCollection.features.length) {
               stationFeatures.push(...stationsCollection.features);
             }
@@ -831,7 +832,7 @@ async function loadContextLayerPackInternal(layerName, d3Client) {
   }
   const { url, format = "geojson", objectName = "" } = descriptor;
   try {
-    const payload = await d3Client.json(url);
+    const payload = await d3Client.json(resolveDataUrl(url));
     if (format === "topology") {
       const object = payload?.objects?.[objectName];
       const collection = object && globalThis.topojson
@@ -1073,7 +1074,7 @@ export async function loadMeasuredJsonResource(
   // 这里统一收口 fetch + JSON parse + timing metrics。
   // 上层 loader 只关心 payload 和指标，不再各自拼接重复的网络错误语义。
   if (typeof globalThis.fetch === "function") {
-    const response = await globalThis.fetch(url, {
+    const response = await globalThis.fetch(resolveDataUrl(url), {
       cache,
       credentials,
       ...(signal ? { signal } : {}),
@@ -1167,7 +1168,7 @@ export async function loadMeasuredJsonResource(
   }
   // This legacy loader has no cancellation contract. Reject stale results after
   // it settles; only the native fetch branch can interrupt the network request.
-  const payload = await d3Client.json(url);
+  const payload = await d3Client.json(resolveDataUrl(url));
   signal?.throwIfAborted();
   const finishedAt = nowMs();
   return {
@@ -1618,7 +1619,7 @@ export async function loadDeferredDetailBundle({
         candidateKeys: orderedDetailSourceKeys,
       }),
       includeRuntimePolitical
-        ? d3Client.json(runtimePoliticalUrl).catch((err) => {
+        ? d3Client.json(resolveDataUrl(runtimePoliticalUrl)).catch((err) => {
           console.warn("Runtime political topology missing or invalid during deferred load.", err);
           return null;
         })
@@ -1686,11 +1687,11 @@ export async function loadMapData({
         })
         : Promise.resolve(null)
     );
-  const hierarchyPromise = d3Client.json(hierarchyUrl).catch((err) => {
+  const hierarchyPromise = d3Client.json(resolveDataUrl(hierarchyUrl)).catch((err) => {
     console.warn("Hierarchy file missing or invalid, using defaults.", err);
     return null;
   });
-  const paletteRegistryPromise = d3Client.json(paletteRegistryUrl).catch((err) => {
+  const paletteRegistryPromise = d3Client.json(resolveDataUrl(paletteRegistryUrl)).catch((err) => {
     console.warn("Palette registry missing or invalid, continuing with legacy palette fallback.", err);
     return null;
   });
@@ -1713,13 +1714,13 @@ export async function loadMapData({
     const mapUrl = String(activePaletteMeta?.map_url || "").trim();
     return Promise.all([
       paletteUrl
-        ? d3Client.json(paletteUrl).catch((err) => {
+        ? d3Client.json(resolveDataUrl(paletteUrl)).catch((err) => {
           console.warn(`Palette pack missing or invalid at ${paletteUrl}, continuing without asset palette.`, err);
           return null;
         })
         : Promise.resolve(null),
       mapUrl
-        ? d3Client.json(mapUrl).catch((err) => {
+        ? d3Client.json(resolveDataUrl(mapUrl)).catch((err) => {
           console.warn(`Palette map missing or invalid at ${mapUrl}, continuing without asset palette mapping.`, err);
           return null;
         })
@@ -1730,12 +1731,12 @@ export async function loadMapData({
       activePaletteMap,
     }));
   });
-  const releasableCatalogPromise = d3Client.json(releasableCatalogUrl).catch((err) => {
+  const releasableCatalogPromise = d3Client.json(resolveDataUrl(releasableCatalogUrl)).catch((err) => {
     console.warn("Releasable catalog missing or invalid, continuing without releasable overlays.", err);
     return null;
   });
   const contextLayerPackPromise = loadOptionalContextLayerPacks(d3Client, includeContextLayers);
-  const ruCityOverridesPromise = d3Client.json(ruCityOverridesUrl).then((payload) => {
+  const ruCityOverridesPromise = d3Client.json(resolveDataUrl(ruCityOverridesUrl)).then((payload) => {
     if (!Array.isArray(payload?.features)) {
       console.warn(`[data_loader] RU city overrides payload invalid at ${ruCityOverridesUrl}. Ignoring.`);
       return null;
@@ -1748,7 +1749,7 @@ export async function loadMapData({
     console.warn("RU city overrides file missing or invalid, continuing without overrides.", err);
     return null;
   });
-  const specialZonesPromise = d3Client.json(specialZonesUrl).then((payload) => {
+  const specialZonesPromise = d3Client.json(resolveDataUrl(specialZonesUrl)).then((payload) => {
     if (!Array.isArray(payload?.features)) {
       console.warn(`[data_loader] Special zones payload invalid at ${specialZonesUrl}. Ignoring.`);
       return null;
@@ -1811,7 +1812,7 @@ export async function loadMapData({
       if (startupBootArtifacts?.hasScenarioRuntimeBootstrap || topologyBundle.detailDeferred) {
         return null;
       }
-      return d3Client.json(runtimePoliticalUrl).catch((err) => {
+      return d3Client.json(resolveDataUrl(runtimePoliticalUrl)).catch((err) => {
         console.warn("Runtime political topology missing or invalid, continuing without dynamic sovereignty.", err);
         return null;
       });

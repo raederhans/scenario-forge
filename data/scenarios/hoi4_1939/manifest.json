@@ -12,6 +12,8 @@
   "default_country": "GER",
   "detail_chunk_manifest_url": "data/scenarios/hoi4_1939/detail_chunks.manifest.json",
   "display_name": "HOI4 1939",
+  "district_groups_url": "data/scenarios/hoi4_1939/district_groups.manual.json",
+  "era_railways_url": "data/transport_layers/hoi4_era_rail/era_rail.geojson",
   "featured_tags": [
     "FRA",
     "USA",
@@ -2600,7 +2602,7 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "c5ae5283cfb9c7056676d74df867c37e37a8d95ecfd3959d8ab360b1764bddd0",
+  "snapshot_fingerprint": "e0fee0364a257062d5706252cb07fcf78bbbd5d888aaddec27b8b3b878fdd99f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "e70f1eee74aa8e4bdcde8d34115fcc2d806881400225168c8f22590b24f66d42",

@@ -1,3 +1,5 @@
+import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
+import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
 import { setUiIcon } from "../ui_icons.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
 import {
@@ -100,6 +102,9 @@ export function createCountryInspectorController({
   onHgoIdentityRetry = null,
   onHgoIdentitySettingsChange = null,
   onSelectedCountryRendered = null,
+  resolveInspectorGroup,
+  stepUpInspectorSelection,
+  getInspectorFeatureLabel,
 }) {
   const {
     buildInspectorTopLevelCountryEntries,
@@ -256,7 +261,9 @@ export function createCountryInspectorController({
     image.setAttribute("aria-hidden", "true");
     image.classList.toggle("hidden", !flagUrl);
     if (flagUrl) {
-      image.src = flagUrl;
+      const resolvedFlagUrl = resolveDataUrl(flagUrl);
+      if (isExternalDataUrl(resolvedFlagUrl, flagUrl)) image.crossOrigin = "anonymous";
+      image.src = resolvedFlagUrl;
     } else {
       image.removeAttribute("src");
     }
@@ -483,8 +490,8 @@ export function createCountryInspectorController({
       ? normalized
       : "";
 
-    runtimeState.selectedInspectorCountryCode = resolved;
-    runtimeState.inspectorHighlightCountryCode = resolved;
+    if (!resolved) clearInspectorSelectionState(runtimeState);
+    else if (runtimeState.selectedInspectorCountryCode !== resolved) selectInspectorCountryState(runtimeState, resolved);
     return resolved;
   };
 
@@ -507,12 +514,7 @@ export function createCountryInspectorController({
         requiresListRebuild = true;
       }
     }
-    runtimeState.selectedInspectorCountryCode = normalized;
-    runtimeState.inspectorHighlightCountryCode = normalized;
-    // 层级分组预览留下的显式地块会优先于国家高亮，换国家时一并清掉。
-    runtimeState.inspectorHighlightFeatureIds = [];
-    runtimeState.inspectorHighlightGroupMode = false;
-    runtimeState.inspectorHighlightLabel = "";
+    selectInspectorCountryState(runtimeState, normalized);
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.open = true;
     }
@@ -867,7 +869,9 @@ export function createCountryInspectorController({
     if (flagUrl) {
       const flag = document.createElement("img");
       flag.className = "hgo-identity-detail-flag";
-      flag.src = flagUrl;
+      const resolvedFlagUrl = resolveDataUrl(flagUrl);
+      if (isExternalDataUrl(resolvedFlagUrl, flagUrl)) flag.crossOrigin = "anonymous";
+      flag.src = resolvedFlagUrl;
       flag.alt = "";
       flag.setAttribute("aria-hidden", "true");
       flag.loading = "lazy";
@@ -1092,6 +1096,42 @@ export function createCountryInspectorController({
     list.appendChild(fragment);
   };
 
+  let inspectorBreadcrumb = null;
+  const renderInspectorBreadcrumb = (countryState) => {
+    if (!inspectorBreadcrumb) {
+      inspectorBreadcrumb = document.createElement("nav");
+      inspectorBreadcrumb.className = "inspector-selection-breadcrumb";
+      countryInspectorSelected.insertBefore(inspectorBreadcrumb, countryInspectorSelected.firstElementChild);
+    }
+    inspectorBreadcrumb.replaceChildren();
+    const level = runtimeState.inspectorSelectionLevel;
+    inspectorBreadcrumb.hidden = !countryState || (level !== "group" && level !== "feature");
+    if (inspectorBreadcrumb.hidden) return;
+    inspectorBreadcrumb.setAttribute("aria-label", t("Inspector selection path"));
+    const addCrumb = (label, onClick) => {
+      if (inspectorBreadcrumb.children.length) {
+        const separator = document.createElement("span");
+        separator.textContent = "›";
+        separator.setAttribute("aria-hidden", "true");
+        inspectorBreadcrumb.appendChild(separator);
+      }
+      const crumb = document.createElement(onClick ? "button" : "span");
+      crumb.textContent = label;
+      if (onClick) {
+        crumb.type = "button";
+        crumb.addEventListener("click", onClick);
+      } else {
+        crumb.setAttribute("aria-current", "page");
+      }
+      inspectorBreadcrumb.appendChild(crumb);
+    };
+    addCrumb(getCountryInspectorDisplayName(countryState), () => selectInspectorCountry(countryState.code));
+    const featureId = level === "feature" ? runtimeState.inspectorSelectionFeatureId : runtimeState.inspectorHighlightFeatureIds[0];
+    const group = resolveInspectorGroup(countryState.code, featureId);
+    if (group) addCrumb(group.label, level === "feature" ? () => stepUpInspectorSelection() : null);
+    if (level === "feature") addCrumb(getInspectorFeatureLabel(featureId), null);
+  };
+
   const renderCountryInspectorDetail = () => {
     if (!countryInspectorSelected) return;
     incrementSidebarCounter?.("inspectorRenders");
@@ -1120,12 +1160,14 @@ export function createCountryInspectorController({
         countryInspectorColorInput.style.removeProperty("top");
       }
       renderHgoIdentityDetail(null);
+      renderInspectorBreadcrumb(null);
       setCountryInspectorColorPickerOpen(false);
       scheduleAdaptiveInspectorHeights();
       return;
     }
 
     renderHgoIdentityDetail(countryState);
+    renderInspectorBreadcrumb(countryState);
 
     if (countryInspectorColorRow) {
       countryInspectorColorRow.classList.add("hidden");
