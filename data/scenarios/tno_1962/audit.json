@@ -118690,10 +118690,10 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "5df196983cacd32d34f5987ce84e865b539537b4a2d69a7962295cd517657072",
+  "snapshot_fingerprint": "3e31b09ab7c21945bd5f54c4376f0728edc1f58aa0db271b5f9931c3c13862e6",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "ef089e6cb385f210b4e815084a162e8a3b331d2c04eb98ea5c8a0b5ce8b51704",
+    "build_snapshot_sha256": "50a660c0414a999cf60e2fdcc056a703fb25b98c724a2c93a18f201e887b68c0",
     "detail_chunk_manifest_sha256": "5433a525c3fabe1581dd1b1baf26cc7b3be76207fb868cfff237b9b53cc91263",
     "runtime_bootstrap_topology_sha256": "33b995621fa5433a46398c1e3786925d391f057aeda29c472b9ee4bc04eba6aa",
     "runtime_topology_sha256": "2f15c4b5ac44871b5294f3dff9148963bb531df889808940a2c98fd4ee8a793d"

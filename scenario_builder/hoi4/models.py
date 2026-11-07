@@ -118,6 +118,10 @@ class ScenarioCountryRecord:
     feature_count: int
     quality: str
     source: str
+    ruling_ideology: str = ""
+    ruling_ideology_source: str = ""
+    alliance: str = ""
+    alliance_source: str = ""
     display_name_en: str = ""
     display_name_zh: str = ""
     controller_feature_count: int = 0

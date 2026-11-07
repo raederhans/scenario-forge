@@ -10,7 +10,7 @@
     "capital_hints.json": "b73df27bc6cab572fa973164267e934752e5f966ae5e425b5e5a4aa6939ffb53",
     "city_overrides.json": "1490ffbbbc0a5bcc06254d240ddc1ce128438626cd9d70b22c7cf15c472f6d42",
     "cores.by_feature.json": "a8a431fe1748ca83688beb59269694a964e9f4d88b284ea1243bce7933ea9bf6",
-    "countries.json": "9e7b60abe76a68ce99d02a45a81400bdea529306fb5344b118b314a641d7fe5c",
+    "countries.json": "dfd5899300c583643b08cd1a34469cd708682eb92a6aa5760f22261caf77d56d",
     "geo_locale_patch.json": "6bac8b3aa979767b4dfc00e6da1ae8271983474b2e98429c949916752cc6363c",
     "owners.by_feature.json": "d17ff7f31a8c3985d7f6fd69946aed16b283f2a6be1d390ded332e3c7988ecac",
     "runtime_topology.topo.json": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5",
@@ -25,14 +25,14 @@
     "mesh_pack.json": "ec251810e1b33f5dfeae9de757515ae1c0f2554434ab694efe6b1e7c5ca2ea52",
     "runtime_meta.json": "88350735b9f0ff4a4a3ca78a8663eb13b414e7501f2d7b77ba4805d709cccb70",
     "runtime_topology.bootstrap.topo.json": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "startup.bundle.en.json": "8bd92054e4d6be8513905d8f038641a2f3f822d5b24153fc87c31386837a4792",
-    "startup.bundle.en.json.gz": "12123a415fc2defafc347f9670f9c5529d48b4a1744f98418130a167cbbb41bf",
-    "startup.bundle.zh.json": "d57a458ef55dd3d435f14e6ba9a8e69c2f01b361b284507920aeb3f03901ce4a",
-    "startup.bundle.zh.json.gz": "654a145a34288abf6c4e70feaae19d3affddfdbdc954e91289ea824803efeb24"
+    "startup.bundle.en.json": "6082ffd56ceeca5f82437d47ec42a5d6a3428f81e0265ad6349ee0d081320034",
+    "startup.bundle.en.json.gz": "7b407cf76b52406991a0db158cf17afabc99aa4ee3b2e4d7f640fb777e6f6208",
+    "startup.bundle.zh.json": "cb83dd74b0982004991313d4627ed908c69c56faa21f0789c178196c61f1bef2",
+    "startup.bundle.zh.json.gz": "3a30a5df81f0e617965c56456f4c8e1ff66cdb31b91d578c71c6184f90086ae4"
   },
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "5a9ef8d277e3088ffe6aa0a47217d8bdc86a2ccec2573e1eee2c3a934606a4c4",
+  "snapshot_fingerprint": "1ea9c61e7be32281558953292cdb1f8731d91341bf4defcf5d1b94730e01d5a1",
   "water_count": 0
 }
