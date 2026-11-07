@@ -1,3 +1,4 @@
+import { getPoliticalDisplayModeSignature } from "../political_display_mode.js";
 import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
 import { getPopulationSignature } from "../population_spatial_view_model.js";
 // Owns visible frame identity policy decisions; inputs remain live.
@@ -38,6 +39,7 @@ export function createVisibleFrameIdentityPolicy(runtimeState, {
       `strategic-rev:${Number(runtimeState.scenarioStrategicValuesRevision || 0)}`,
       `strategic-metric:${String(runtimeState.strategicChoroplethMetric || "")}`,
       `thematic:${getThematicWgiSignature(runtimeState)}`,
+      `political-display:${getPoliticalDisplayModeSignature(runtimeState)}`,
       `population:${getPopulationSignature(runtimeState)}`,
       `strategic-style:${JSON.stringify(runtimeState.styleConfig?.strategicValues || {})}`,
       runtimeState.showTransport ? "transport:on" : "transport:off",
