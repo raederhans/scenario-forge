@@ -1,3 +1,5 @@
+import { createSpecialZonePatternPreviewStyle, getSpecialZoneLayerDisplayName } from "../special_zone_layers.js";
+
 export function createLegendControlOwner({
   getMapContainer,
   getViewportSize = () => ({ width: 1, height: 1 }),
@@ -100,11 +102,13 @@ export function createLegendControlOwner({
     if (!legendControlElement) return;
     const limits = getLegendControlLimits();
     const width = clamp(Number(controlState.width || 240), limits.minWidth, limits.maxWidth);
-    const height = clamp(Number(controlState.height || 340), limits.minHeight, limits.maxHeight);
+    // 用户没有手动调过高度时按内容自动撑开（CSS max-height 封顶），避免条目很少时留下大块空白。
+    const userHeight = Number(controlState.height);
+    const height = Number.isFinite(userHeight) && userHeight > 0 ? clamp(userHeight, limits.minHeight, limits.maxHeight) : null;
     const opacity = clamp(Number(controlState.opacity || 0.9), limits.minOpacity, limits.maxOpacity);
     const collapsedWidth = Math.min(176, limits.minWidth);
     setStyleIfChanged("width", controlState.collapsed ? `${collapsedWidth}px` : `${Math.round(width)}px`);
-    setStyleIfChanged("height", controlState.collapsed ? "" : `${Math.round(height)}px`);
+    setStyleIfChanged("height", controlState.collapsed || height === null ? "" : `${Math.round(height)}px`);
     setStyleIfChanged("opacity", String(opacity));
     if (legendOpacityInputElement) {
       legendOpacityInputElement.min = String(Math.round(limits.minOpacity * 100));
@@ -336,6 +340,7 @@ export function createLegendControlOwner({
 
     const body = document.createElement("div");
     body.className = "map-legend-control-body";
+    body.style.alignContent = "start";
 
     const opacityPanel = document.createElement("label");
     opacityPanel.className = "map-legend-opacity-panel";
@@ -417,7 +422,7 @@ export function createLegendControlOwner({
     });
   }
 
-  function appendLegendRow(parent, { color, label, stroke = "#1f2937", pattern = "solid" }) {
+  function appendLegendRow(parent, { color, label, stroke = "#1f2937", pattern = "solid", style = null }) {
     const row = document.createElement("div");
     row.className = "map-legend-row";
 
@@ -425,6 +430,7 @@ export function createLegendControlOwner({
     swatch.className = "map-legend-swatch";
     swatch.style.backgroundColor = color || "#8b5cf6";
     swatch.style.borderColor = stroke || "#1f2937";
+    if (style) Object.assign(swatch.style, createSpecialZonePatternPreviewStyle(style));
     if (String(pattern || "solid") !== "solid") swatch.classList.add("has-pattern");
 
     const text = document.createElement("span");
@@ -455,9 +461,10 @@ export function createLegendControlOwner({
     });
     const specialZoneRows = specialZoneLegendLayers.map((layer) => ({
       color: layer.style?.fill || "#8b5cf6",
-      label: layer.name || layer.id,
+      label: getSpecialZoneLayerDisplayName(layer, getLanguage()),
       stroke: layer.style?.stroke || "#6d28d9",
       pattern: layer.style?.pattern || "solid",
+      style: layer.style,
     }));
     const legendKey = JSON.stringify([getLanguage(), colorRows, specialZoneRows, thematicLegend]);
     const shouldRebuild = legendKey !== lastLegendKey;
