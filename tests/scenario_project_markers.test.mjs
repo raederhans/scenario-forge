@@ -46,3 +46,12 @@ test("project symbol retains its screen radius across zoom levels", () => {
     assert.ok(Math.abs((entries()[0].projectedPoint[1] - points[0][1]) * scale - 5) < 1e-9);
   }
 });
+
+test("project marker visibility follows the scenario and the Atlantropa switch", async () => {
+  const { hasVisibleScenarioProjectMarkers } = await import("../js/core/renderer/scenario_project_markers.js");
+  const manifest = { project_markers: [{ id: "suez_canal" }] };
+  assert.equal(hasVisibleScenarioProjectMarkers(manifest, { activeScenarioId: "tno_1962", showScenarioAtlantropa: true }), true);
+  assert.equal(hasVisibleScenarioProjectMarkers(manifest, { activeScenarioId: "tno_1962", showScenarioAtlantropa: false }), false);
+  assert.equal(hasVisibleScenarioProjectMarkers(manifest, { activeScenarioId: "hoi4_1936", showScenarioAtlantropa: true }), false);
+  assert.equal(hasVisibleScenarioProjectMarkers({}, { activeScenarioId: "tno_1962", showScenarioAtlantropa: true }), false);
+});

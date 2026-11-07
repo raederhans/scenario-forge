@@ -1,5 +1,11 @@
+// 绘制 pass 的启用与命中项生成共用同一判断，保证"画出来"与"能点到"一致。
+export function hasVisibleScenarioProjectMarkers(manifest, state) {
+  return state?.activeScenarioId === "tno_1962" && !!state.showScenarioAtlantropa
+    && Array.isArray(manifest?.project_markers) && manifest.project_markers.length > 0;
+}
+
 export function buildScenarioProjectMarkerEntries(manifest, state, projection, transform) {
-  if (state.activeScenarioId !== "tno_1962" || !state.showScenarioAtlantropa || !projection) return [];
+  if (!hasVisibleScenarioProjectMarkers(manifest, state) || !projection) return [];
   return (manifest?.project_markers || []).map((marker) => {
     const coordinates = [marker.lon, marker.lat];
     const projectedPoint = projection(coordinates);

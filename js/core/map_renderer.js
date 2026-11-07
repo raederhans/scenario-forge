@@ -1,4 +1,4 @@
-import { buildScenarioProjectMarkerEntries, drawScenarioProjectMarkers } from "./renderer/scenario_project_markers.js";
+import { buildScenarioProjectMarkerEntries, drawScenarioProjectMarkers, hasVisibleScenarioProjectMarkers } from "./renderer/scenario_project_markers.js";
 import { resolveAtlantropaSeaFillColor } from "./scenario/atlantropa_sea_color.js";
 import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
 import { createHitTestingOwner } from "./map_renderer/hit_testing_owner.js";
@@ -8727,6 +8727,7 @@ function filterCurrentEnabledRenderPasses(passNames) {
     showTransport: !!runtimeState.showTransport,
     showStrategicResourceMarkers: !!runtimeState.showStrategicResourceMarkers,
     showCityPoints: !!runtimeState.showCityPoints,
+    showScenarioProjectMarkers: hasVisibleScenarioProjectMarkers(runtimeState.activeScenarioManifest, runtimeState),
     textureMode: normalizeTextureMode(runtimeState.styleConfig?.texture?.mode),
     dayNightEnabled: !!getDayNightStyleConfig().enabled,
     populationHeatmapEnabled: isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
