@@ -10,6 +10,7 @@ import gzip
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,6 +36,16 @@ MANUAL_OVERRIDES = {"hoi4_1936": _HOI4_OVERRIDES, "hoi4_1939": _HOI4_OVERRIDES}
 
 def compact(payload: object) -> str:
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
+def node_gzip(raw: bytes) -> bytes:
+    """Compress like tools/build_political_id_raster_assets.mjs, the bundles' other writer.
+
+    Node's zlib output is about 0.8% smaller than Python's for these bundles and
+    reproduces the committed sidecars byte for byte.
+    """
+    script = "process.stdout.write(require('node:zlib').gzipSync(require('fs').readFileSync(0), { level: 9 }))"
+    return subprocess.run(["node", "-e", script], input=raw, capture_output=True, check=True).stdout
 
 
 def replace_bundle(text: str, old: dict, new: dict, old_sha: str, new_sha: str) -> str:
@@ -76,7 +87,7 @@ def prepare(scenario_id: str) -> tuple[dict, dict]:
         text = path.read_bytes().decode("utf-8")
         updated = replace_bundle(text, old, new, old_sha, new_sha).encode("utf-8")
         outputs[path] = updated
-        outputs[path.with_suffix(".json.gz")] = gzip.compress(updated, compresslevel=9, mtime=0)
+        outputs[path.with_suffix(".json.gz")] = node_gzip(updated)
     return outputs, report
 
 

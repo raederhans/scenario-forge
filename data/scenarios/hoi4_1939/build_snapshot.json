@@ -26,13 +26,13 @@
     "runtime_meta.json": "d4b804964bac9e176602c39984c769fdce79cbb1861309a927457d0ef76869bb",
     "runtime_topology.bootstrap.topo.json": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "startup.bundle.en.json": "aedba4ce30b63af73f44b95fd9651f492eb78c643b7811b1c74a28dcf6bbf783",
-    "startup.bundle.en.json.gz": "000b80b540f4e7e5548bf37db026e89db0e0d51c9a63387dd6bf600ec9590f4a",
+    "startup.bundle.en.json.gz": "632b256ff1c6dbccdd9abc710ef32f676c88bcaff008f54668800a4cb1da7e0e",
     "startup.bundle.zh.json": "b0954ffc07ed5bb8f02a6f5673aa508ff8c4bbacc50aa107913ef09836592157",
-    "startup.bundle.zh.json.gz": "2376a69505b228eef99c241aabf0bead129d198c4715497792c2030f3ff1ce2f"
+    "startup.bundle.zh.json.gz": "91aece7b9cc7fde0c62534ad23a328f2df53225bfb7970374af27aa3dc3cee7a"
   },
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "5888133109e465bc6223676e9569102bb42b7d1eaa3d24e6cefe96e9ee51ebec",
+  "snapshot_fingerprint": "e0fee0364a257062d5706252cb07fcf78bbbd5d888aaddec27b8b3b878fdd99f",
   "water_count": 0
 }
