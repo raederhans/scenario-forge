@@ -1472,6 +1472,7 @@ const getSpecialZoneLayersRenderOwner = lazyOwner(() => createSpecialZoneLayersR
   },
   helpers: {
     clamp,
+    getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
     getDashPattern,
     getFeatureId,
     getPathSVG: () => rendererSurfaceHost.getPathSvg(),

@@ -9,6 +9,12 @@ const SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES = Object.freeze({
   LOAD_FAILED: "special_zone_layers_load_failed",
 });
 const SPECIAL_ZONE_PATTERN_IDS = Object.freeze([
+  "fineHatch",
+  "dashHatch",
+  "bandStripes",
+  "dotGrid",
+  "fineHorizontal",
+  "openGrid",
   "solid",
   "diagonalHatch",
   "crossHatch",
@@ -22,30 +28,28 @@ const SPECIAL_ZONE_PATTERN_IDS = Object.freeze([
 ]);
 
 const SPECIAL_ZONE_PRESETS = Object.freeze([
-  ["demilitarized", "Demilitarized Zone", "security", "#f59e0b", "#b45309", "diagonalHatch"],
-  ["disputed", "Disputed Area", "political", "#f97316", "#ea580c", "crossHatch"],
-  ["wasteland", "Wasteland", "terrain", "#dc2626", "#991b1b", "solid"],
-  ["buffer", "Buffer Zone", "security", "#facc15", "#a16207", "horizontalLines"],
-  ["occupied", "Occupied Territory", "political", "#ef4444", "#991b1b", "chevrons"],
-  ["protectorate", "Protectorate", "political", "#38bdf8", "#0369a1", "dots"],
-  ["autonomous", "Autonomous Region", "political", "#22c55e", "#15803d", "concentric"],
-  ["military", "Military District", "security", "#64748b", "#334155", "denseDots"],
-  ["frontier", "Frontier Belt", "security", "#a78bfa", "#6d28d9", "wavyLines"],
-  ["special_economic", "Special Economic Zone", "economic", "#14b8a6", "#0f766e", "dots"],
-  ["industrial", "Industrial Zone", "economic", "#fb7185", "#be123c", "horizontalLines"],
-  ["resource", "Resource Concession", "economic", "#84cc16", "#4d7c0f", "diagonalHatch"],
-  ["exclusion", "Exclusion Zone", "security", "#f43f5e", "#9f1239", "outlineOnly"],
-  ["neutral", "Neutral Zone", "political", "#94a3b8", "#475569", "outlineOnly"],
-  ["administrative", "Administrative Zone", "political", "#60a5fa", "#1d4ed8", "solid"],
-  ["cultural", "Cultural Region", "social", "#e879f9", "#a21caf", "wavyLines"],
-  ["maritime", "Maritime Zone", "terrain", "#22d3ee", "#0891b2", "horizontalLines"],
-  ["custom", "Custom Zone", "custom", "#8b5cf6", "#6d28d9", "solid"],
-].map(([id, name, category, fill, stroke, pattern]) => Object.freeze({
+  ["demilitarized", "Demilitarized / buffer", "#f6e05e", "#b7791f", 0.08, "fineHatch"],
+  ["claim", "Claim / dispute", "#fb923c", "#c2410c", 0.06, "dashHatch"],
+  ["occupation", "Occupation / military administration", "#475569", "#475569", 0, "bandStripes", 0.5],
+  ["lease", "Lease / condominium / treaty port", "#5eead4", "#0f766e", 0.06, "dotGrid"],
+  ["economic", "Economic development", "#a3e635", "#4d7c0f", 0.06, "fineHorizontal"],
+  ["restricted", "Restricted access / environmental risk", "#a8a29e", "#57534e", 0.1, "openGrid"],
+  ["custom", "Custom Zone", "#8b5cf6", "#6d28d9", 0.12, "solid"],
+].map(([id, name, fill, stroke, fillOpacity, pattern, patternOpacity = 0.42]) => Object.freeze({
   id,
   name,
-  category,
-  style: Object.freeze(createSpecialZoneLayerStyle({ fill, stroke, pattern })),
+  category: id,
+  style: Object.freeze(createSpecialZoneLayerStyle({ fill, stroke, fillOpacity, pattern, patternOpacity })),
 })));
+
+const LEGACY_PRESET_IDS = Object.freeze({
+  buffer: "demilitarized", neutral: "demilitarized", frontier: "demilitarized",
+  disputed: "claim", occupied: "occupation", military: "occupation",
+  protectorate: "lease", administrative: "lease",
+  special_economic: "economic", industrial: "economic", resource: "economic",
+  exclusion: "restricted", wasteland: "restricted",
+  autonomous: "custom", cultural: "custom", maritime: "custom",
+});
 
 const SPECIAL_ZONE_PRESET_BY_ID = new Map(SPECIAL_ZONE_PRESETS.map((preset) => [preset.id, preset]));
 
@@ -130,7 +134,8 @@ function dedupeSpecialZoneDiagnostics(entries) {
 
 function normalizeSpecialZoneLayer(rawLayer, index, diagnostics, options = {}) {
   const raw = rawLayer && typeof rawLayer === "object" ? rawLayer : {};
-  const presetId = String(raw.presetId || raw.preset || "custom").trim() || "custom";
+  const rawPresetId = String(raw.presetId || raw.preset || "custom").trim() || "custom";
+  const presetId = LEGACY_PRESET_IDS[rawPresetId] || rawPresetId;
   const preset = SPECIAL_ZONE_PRESET_BY_ID.get(presetId) || SPECIAL_ZONE_PRESET_BY_ID.get("custom");
   const id = String(raw.id || `special-zone-layer-${index + 1}`).trim();
   if (!id) return null;
@@ -140,8 +145,10 @@ function normalizeSpecialZoneLayer(rawLayer, index, diagnostics, options = {}) {
   return {
     id,
     name: String(raw.name || preset.name || id).trim() || id,
+    // 剧本预设区域可带中文名；用户改名后以 name 为准（改名时清掉 nameZh）。
+    ...(typeof raw.nameZh === "string" && raw.nameZh.trim() ? { nameZh: raw.nameZh.trim() } : {}),
     presetId: SPECIAL_ZONE_PRESET_BY_ID.has(presetId) ? presetId : "custom",
-    category: String(raw.category || preset.category || "custom").trim() || "custom",
+    category: preset.category,
     source: normalizedSource,
     visible: raw.visible === undefined ? true : !!raw.visible,
     legendVisible: raw.legendVisible === undefined ? true : !!raw.legendVisible,
@@ -378,9 +385,31 @@ function applySpecialZoneStoryStepToPreviewState(rawState, stepId) {
   };
 }
 
+function getSpecialZoneLayerDisplayName(layer, language = "en") {
+  const zh = String(language || "").toLowerCase().startsWith("zh");
+  return (zh && layer?.nameZh) || layer?.name || layer?.id || "";
+}
+
+function getSpecialZonePatternDefinition(pattern) {
+  const definitions = {
+    fineHatch: { size: 8, rotation: 45, marks: [["path", { d: "M0 0V8", "stroke-width": 1 }]] },
+    dashHatch: { size: 9, rotation: 45, marks: [["path", { d: "M0 0V9", "stroke-width": 1, "stroke-dasharray": "3 3" }]] },
+    bandStripes: { size: 10, rotation: -45, marks: [["rect", { width: 4, height: 10 }]] },
+    dotGrid: { size: 14, rotation: 0, marks: [["circle", { cx: 3.5, cy: 3.5, r: 1.1 }], ["circle", { cx: 10.5, cy: 10.5, r: 1.1 }]] },
+    fineHorizontal: { size: 6, rotation: 0, marks: [["path", { d: "M0 0H6", "stroke-width": 0.8 }]] },
+    openGrid: { size: 12, rotation: 0, marks: [["path", { d: "M0 12V0H12", "stroke-width": 0.8 }]] },
+  };
+  return definitions[pattern] || null;
+}
+
 function createSpecialZonePatternPreviewStyle(style = {}) {
-  const fill = normalizeHexColor(style.fill, "#8b5cf6");
-  const stroke = normalizeHexColor(style.stroke, "#6d28d9");
+  // 颜色会拼进内联 SVG 字符串：允许 CSS 颜色写法，拒绝引号、尖括号等可能破坏标记的字符。
+  const safeColor = (value, fallback) => {
+    const candidate = String(value || "").trim();
+    return /^[#a-zA-Z0-9(),.%\s-]{1,48}$/.test(candidate) ? candidate : fallback;
+  };
+  const fill = safeColor(style.fill, "#8b5cf6");
+  const stroke = safeColor(style.stroke, "#6d28d9");
   const pattern = normalizePatternId(style.pattern, "solid");
   const opacity = clampNumber(style.fillOpacity, 0.32, 0, 1);
   const patterns = {
@@ -413,6 +442,15 @@ function createSpecialZonePatternPreviewStyle(style = {}) {
     },
     outlineOnly: { image: "none", size: "12px 12px" },
   };
+  const definition = getSpecialZonePatternDefinition(pattern);
+  if (definition) {
+    const marks = definition.marks.map(([tag, attrs]) => {
+      const paint = tag === "path" ? `fill="none" stroke="${stroke}"` : `fill="${stroke}"`;
+      return `<${tag} ${paint} ${Object.entries(attrs).map(([key, value]) => `${key}="${value}"`).join(" ")}/>`;
+    }).join("");
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><defs><pattern id="p" patternUnits="userSpaceOnUse" width="${definition.size}" height="${definition.size}" patternTransform="rotate(${definition.rotation})">${marks}</pattern></defs><rect width="100%" height="100%" fill="${fill}" fill-opacity="${opacity}"/><rect width="100%" height="100%" fill="url(#p)" opacity="${style.patternOpacity ?? 0.42}"/></svg>`;
+    return { backgroundColor: "transparent", backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(svg)}")`, backgroundSize: "28px 28px", borderColor: stroke, opacity: "1" };
+  }
   const previewPattern = patterns[pattern] || patterns.solid;
   return {
     backgroundColor: fill,
@@ -424,7 +462,7 @@ function createSpecialZonePatternPreviewStyle(style = {}) {
 }
 
 function createLayerFromPreset(presetId = "custom", patch = {}) {
-  const preset = SPECIAL_ZONE_PRESET_BY_ID.get(String(presetId || "").trim()) || SPECIAL_ZONE_PRESET_BY_ID.get("custom");
+  const preset = SPECIAL_ZONE_PRESET_BY_ID.get(LEGACY_PRESET_IDS[presetId] || String(presetId || "").trim()) || SPECIAL_ZONE_PRESET_BY_ID.get("custom");
   return normalizeSpecialZoneLayer({
     id: patch.id || `special-zone-${preset.id}-${Date.now().toString(36)}`,
     name: patch.name || preset.name,
@@ -578,6 +616,8 @@ export {
   buildSpecialZoneRenderFeatures,
   captureScenarioLayerSaveRequestState,
   createSpecialZonePatternPreviewStyle,
+  getSpecialZonePatternDefinition,
+  getSpecialZoneLayerDisplayName,
   createEmptySpecialZoneLayersState,
   createLayerFromPreset,
   createSpecialZoneLayerStyle,

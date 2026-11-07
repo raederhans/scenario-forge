@@ -7,7 +7,7 @@ import { createSpecialZonesWorkbenchController } from "../js/ui/toolbar/special_
 
 class TestClassList {
   constructor(node) { this.node = node; this.values = new Set(); }
-  add(...tokens) { tokens.forEach((token) => this.values.add(token)); this.node.className = Array.from(this.values).join(" "); }
+  add(...tokens) { this.values = new Set(this.node.className.split(/\s+/).filter(Boolean)); tokens.forEach((token) => this.values.add(token)); this.node.className = Array.from(this.values).join(" "); }
   remove(...tokens) { tokens.forEach((token) => this.values.delete(token)); this.node.className = Array.from(this.values).join(" "); }
   contains(token) { return this.values.has(token); }
   toggle(token, force) {
@@ -146,31 +146,37 @@ function getNodeText(node) {
   return [node.textContent, ...(node.children || []).map(getNodeText)].join(" ");
 }
 
-test("empty workbench presents one create action and reveals editing cards after creation", async () => {
+test("empty workbench creates a named categorized project region and starts member editing", async () => {
   const previousDocument = globalThis.document;
   globalThis.document = createTestDocument();
   const container = new TestElement("section");
   const runtimeState = { specialZoneLayers: { layers: [], activeLayerId: "" } };
-  const controller = createSpecialZonesWorkbenchController({
-    runtimeState, container, markDirty() {}, render() {}, updateToolUI() {}, t: (value) => value,
-  });
+  const controller = createSpecialZonesWorkbenchController({ runtimeState, container, t: (value) => value });
   try {
     controller.renderSpecialZonesWorkbenchUi();
-    const root = container.querySelector("[data-special-zone-layers-workbench]");
-    const cards = findAll(container, (node) => node.parentNode?.className === "special-zone-workbench-grid");
-    assert.equal(root.dataset.emptyState, "true");
-    assert.equal(cards.length, 4);
-    assert.equal(cards.filter((card) => !card.hidden).length, 1);
-    assert.equal(findButtonByText(container, "New layer")?.disabled, false);
-    assert.equal(getNodeText(container).includes("Create a layer before editing members or styles."), true);
-    assert.equal(getNodeText(container).includes("Select or create a layer to apply style presets."), false);
-    await findButtonByText(container, "New layer").click();
-    assert.equal(root.dataset.emptyState, "false");
-    assert.equal(cards.filter((card) => !card.hidden).length, 4);
-    assert.ok(container.querySelector(".special-zone-preset-groups"));
-  } finally {
-    globalThis.document = previousDocument;
-  }
+    assert.match(getNodeText(container), /This scenario has no preset regions/);
+    assert.equal(container.querySelector(".special-zone-member-edit"), null);
+    await findButtonByText(container, "New region").click();
+    const form = container.querySelector(".special-zone-create-form");
+    const category = form.querySelector("select");
+    assert.equal(category.options.length, 7);
+    category.value = "claim";
+    for (const handler of category.listeners.get("change")) handler();
+    assert.equal(form.querySelector("input").value, "Claim / dispute");
+    await findButtonByText(container, "Create").click();
+    const layer = runtimeState.specialZoneLayers.layers[0];
+    assert.equal(layer.category, "claim");
+    assert.equal(layer.source, "project");
+    assert.equal(layer.name, "Claim / dispute");
+    assert.equal(layer.style.pattern, "dashHatch");
+    assert.equal(runtimeState.specialZoneLayers.activeLayerId, layer.id);
+    assert.equal(runtimeState.currentTool, "special-zone-membership");
+    assert.equal(runtimeState.specialZoneMembershipTool, "brush");
+    assert.equal(container.querySelector(".special-zone-advanced").open, false);
+    assert.equal(container.querySelector(".special-zone-member-edit").getAttribute("aria-pressed"), "true");
+    const mainText = (node) => node.className === "special-zone-advanced" ? "" : [node.textContent, ...node.children.map(mainText)].join(" ");
+    assert.doesNotMatch(mainText(container), /\b(tile|dev)\b/i);
+  } finally { globalThis.document = previousDocument; }
 });
 
 test("first scenario save loads the optional layer asset and posts canonical payload", async () => {
@@ -230,8 +236,8 @@ test("first scenario save loads the optional layer asset and posts canonical pay
     assert.equal(fetches[0].url, "/__dev/scenario/special-zone-layers/save");
     const body = JSON.parse(fetches[0].options.body);
     assert.equal(body.scenarioId, "tno_1962");
-    assert.equal(body.specialZoneLayers.layers[0].id, "layer-a");
-    assert.deepEqual(body.specialZoneLayers.layers[0].memberFeatureIds, ["a", "b"]);
+    assert.equal(body.specialZoneLayers.layers[0].id, "server-layer");
+    assert.deepEqual(body.specialZoneLayers.layers[0].memberFeatureIds, ["server"]);
     assert.equal(saveBtn.getAttribute("aria-busy"), null);
   } finally {
     globalThis.document = previousDocument;
@@ -545,79 +551,59 @@ test("project-scoped special zones keep status hidden and expose disabled scenar
   }
 });
 
-test("style presets render as collapsed category groups with rectangular previews", () => {
+test("scenario and project regions render separately and category changes apply defaults", async () => {
   const previousDocument = globalThis.document;
   globalThis.document = createTestDocument();
-
   const container = new TestElement("section");
-  const runtimeState = {
-    specialZoneLayers: {
-      layers: [createLayerFromPreset("custom", { id: "project-layer", memberFeatureIds: ["a"] })],
-      activeLayerId: "project-layer",
-    },
-  };
-  const controller = createSpecialZonesWorkbenchController({
-    runtimeState,
-    container,
-    markDirty() {},
-    render() {},
-    updateToolUI() {},
-    t: (value) => value,
-  });
-
+  const runtimeState = { specialZoneLayers: { layers: [
+    createLayerFromPreset("lease", { id: "preset", name: "Treaty region", source: "scenario" }),
+    createLayerFromPreset("custom", { id: "mine", name: "My region" }),
+  ], activeLayerId: "mine" } };
+  const controller = createSpecialZonesWorkbenchController({ runtimeState, container, t: (value) => value });
   try {
     controller.renderSpecialZonesWorkbenchUi();
-    const groups = container.querySelectorAll("details.special-zone-preset-group");
-    assert.ok(groups.length > 1);
-    assert.ok(groups.every((group) => group.open === false));
-    assert.ok(groups.some((group) => getNodeText(group).includes("security (5)")));
-    assert.equal(container.querySelectorAll(".special-zone-preset-tab").length, 0);
-    assert.equal(
-      container.querySelectorAll(".special-zone-preset-preview").length,
-      container.querySelectorAll(".special-zone-preset-card").length,
-    );
-  } finally {
-    globalThis.document = previousDocument;
-  }
+    const rows = container.querySelectorAll(".special-zone-layer-row");
+    assert.notEqual(rows[0].parentNode, rows[1].parentNode);
+    assert.match(getNodeText(rows[0].parentNode), /Preset regions/);
+    assert.match(getNodeText(rows[1].parentNode), /My regions/);
+    const category = container.querySelector(".special-zone-style-card select");
+    category.value = "occupation";
+    for (const handler of category.listeners.get("change")) handler();
+    assert.equal(runtimeState.specialZoneLayers.layers[1].category, "occupation");
+    assert.equal(runtimeState.specialZoneLayers.layers[1].style.fillOpacity, 0);
+    assert.equal(runtimeState.specialZoneLayers.layers[1].style.pattern, "bandStripes");
+    const visibility = container.querySelector(".special-zone-visibility");
+    await visibility.click();
+    assert.equal(runtimeState.specialZoneLayers.layers[0].visible, false);
+  } finally { globalThis.document = previousDocument; }
 });
 
-test("style preset category expansion survives workbench rerender", async () => {
+test("country and group actions reflect selection and add reference members", async () => {
   const previousDocument = globalThis.document;
   globalThis.document = createTestDocument();
-
   const container = new TestElement("section");
-  const runtimeState = {
-    specialZoneLayers: {
-      layers: [createLayerFromPreset("custom", { id: "project-layer", memberFeatureIds: ["a"] })],
-      activeLayerId: "project-layer",
-    },
+  const runtimeState = { activeScenarioId: "scenario", scenarioBaselineOwnersByFeatureId: { a: "AAA", b: "AAA", c: "BBB" },
+    specialZoneLayers: { layers: [createLayerFromPreset("custom", { id: "mine" })], activeLayerId: "mine" },
   };
-  const controller = createSpecialZonesWorkbenchController({
-    runtimeState,
-    container,
-    markDirty() {},
-    render() {},
-    updateToolUI() {},
-    t: (value) => value,
-  });
-
+  const controller = createSpecialZonesWorkbenchController({ runtimeState, container, t: (value) => value });
   try {
     controller.renderSpecialZonesWorkbenchUi();
-    const securityGroup = findFirst(container, (node) => node.dataset?.presetCategory === "security");
-    assert.ok(securityGroup);
-    assert.equal(securityGroup.open, false);
-    securityGroup.open = true;
-    for (const handler of securityGroup.listeners.get("toggle") || []) {
-      await handler({ target: securityGroup, currentTarget: securityGroup });
-    }
-
-    controller.renderSpecialZonesWorkbenchUi();
-    const rerenderedSecurityGroup = findFirst(container, (node) => node.dataset?.presetCategory === "security");
-    assert.ok(rerenderedSecurityGroup);
-    assert.equal(rerenderedSecurityGroup.open, true);
-  } finally {
-    globalThis.document = previousDocument;
-  }
+    assert.equal(findButtonByText(container, "Add selected country").disabled, true);
+    assert.equal(findButtonByText(container, "Add selected group").disabled, true);
+    runtimeState.selectedInspectorCountryCode = "AAA";
+    runtimeState.inspectorHighlightFeatureIds = new Set(["c"]);
+    controller.renderSpecialZonesWorkbenchCurrentTargetUi();
+    assert.equal(findButtonByText(container, "Add selected country").disabled, false);
+    assert.equal(findButtonByText(container, "Add selected group").disabled, true);
+    await findButtonByText(container, "Add selected country").click();
+    assert.deepEqual(runtimeState.specialZoneLayers.layers[0].memberFeatureIds, ["a", "b"]);
+    runtimeState.inspectorHighlightGroupMode = true;
+    controller.renderSpecialZonesWorkbenchCurrentTargetUi();
+    assert.equal(findButtonByText(container, "Add selected group").disabled, false);
+    await findButtonByText(container, "Add selected group").click();
+    assert.deepEqual(runtimeState.specialZoneLayers.layers[0].memberFeatureIds, ["a", "b", "c"]);
+    assert.equal(container.querySelector(".special-zone-advanced").open, false);
+  } finally { globalThis.document = previousDocument; }
 });
 
 test("pattern choices render localized preview buttons and update the active layer", async () => {
@@ -640,7 +626,7 @@ test("pattern choices render localized preview buttons and update the active lay
     updateToolUI() {},
     captureHistoryState: () => ({}),
     pushHistoryEntry() {},
-    t: (value) => ({ "Cross hatch": "交叉斜线", Pattern: "图案" }[value] || value),
+    t: (value) => ({ "Fine hatch": "细斜线", Pattern: "图案" }[value] || value),
   });
 
   try {
@@ -652,14 +638,14 @@ test("pattern choices render localized preview buttons and update the active lay
     assert.equal(patternGrid.getAttribute("role"), "radiogroup");
     assert.equal(patternGrid.getAttribute("aria-label"), "图案");
     assert.equal(patternGrid.querySelectorAll("select").length, 0);
-    assert.equal(container.querySelectorAll(".special-zone-pattern-choice-preview").length, 10);
+    assert.equal(patternGrid.querySelectorAll(".special-zone-pattern-choice-preview").length, 8);
     const crossHatchButton = Array.from(container.querySelectorAll(".special-zone-pattern-choice"))
-      .find((button) => button.dataset.patternId === "crossHatch");
+      .find((button) => button.dataset.patternId === "fineHatch");
     assert.ok(crossHatchButton);
-    assert.match(getNodeText(crossHatchButton), /交叉斜线/);
+    assert.match(getNodeText(crossHatchButton), /细斜线/);
     await crossHatchButton.click();
     const layer = runtimeState.specialZoneLayers.layers.find((entry) => entry.id === "project-layer");
-    assert.equal(layer.style.pattern, "crossHatch");
+    assert.equal(layer.style.pattern, "fineHatch");
     assert.equal(layer.presetId, "custom");
     assert.ok(dirty.includes("special-zone-layer-style"));
   } finally {
@@ -741,14 +727,15 @@ test("new scenario layer waits for optional layer load before mutating state", a
 
   try {
     controller.renderSpecialZonesWorkbenchUi();
-    const newLayerButton = findButtonByText(container, "New layer");
+    const newLayerButton = findButtonByText(container, "New region");
     assert.ok(newLayerButton, "new layer button should render");
     await newLayerButton.click();
+    await findButtonByText(container, "Create").click();
 
     assert.equal(loadCount, 1);
     assert.equal(runtimeState.showSpecialZones, true);
     assert.equal(runtimeState.specialZoneLayers.layers.length, 1);
-    assert.equal(runtimeState.specialZoneLayers.layers[0].source, "scenario");
+    assert.equal(runtimeState.specialZoneLayers.layers[0].source, "project");
     assert.equal(runtimeState.specialZoneLayers.activeLayerId, runtimeState.specialZoneLayers.layers[0].id);
     assert.deepEqual(dirty, ["special-zone-layer-add"]);
   } finally {
@@ -790,9 +777,10 @@ test("new scenario layer ignores stale optional layer load after scenario change
 
   try {
     controller.renderSpecialZonesWorkbenchUi();
-    const newLayerButton = findButtonByText(container, "New layer");
+    const newLayerButton = findButtonByText(container, "New region");
     assert.ok(newLayerButton, "new layer button should render");
-    const clickPromise = newLayerButton.click();
+    await newLayerButton.click();
+    const clickPromise = findButtonByText(container, "Create").click();
     await Promise.resolve();
 
     assert.equal(loadCount, 1);
@@ -1007,7 +995,7 @@ test("large member lists render capped chips and keep drawer search bounded", ()
 
   try {
     controller.renderSpecialZonesWorkbenchUi();
-    assert.equal(container.querySelectorAll(".special-zone-member-chip").length, 30);
+    assert.equal(container.querySelectorAll(".special-zone-member-chip").length, 12);
     assert.ok(findButtonByText(container, "View all (95)"));
   } finally {
     globalThis.document = previousDocument;
@@ -1132,8 +1120,7 @@ test("batch import, set operations, and story preview use compact workbench cont
     assert.deepEqual(runtimeState.specialZoneLayers.layers.find((layer) => layer.id === "target").memberFeatureIds, ["b", "d"]);
 
     controller.renderSpecialZonesWorkbenchUi();
-    const selects = container.querySelectorAll("select");
-    selects[selects.length - 1].value = "source";
+    container.querySelector(".special-zone-member-set-select").value = "source";
     await findButtonByText(container, "Union with layer").click();
     assert.deepEqual(runtimeState.specialZoneLayers.layers.find((layer) => layer.id === "target").memberFeatureIds, ["b", "c", "d"]);
     assert.ok(dirty.includes("special-zone-members-batch-replace"));
