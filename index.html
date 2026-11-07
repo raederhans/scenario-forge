@@ -69,6 +69,7 @@
               <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" hidden aria-hidden="true" tabindex="-1">
                 <option id="optScenarioNone" value="" data-i18n="None">None</option>
               </select>
+              <div class="scenario-picker-row">
               <div class="scenario-select-shell">
                 <button
                   id="scenarioSelectButton"
@@ -82,6 +83,8 @@
                   <span class="scenario-select-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-down"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
                 </button>
                 <div id="scenarioSelectMenu" class="scenario-select-menu hidden" role="listbox" aria-labelledby="lblScenarioSelect"></div>
+              </div>
+              <button id="scenarioIntroButton" type="button" class="btn-secondary scenario-intro-button" disabled aria-label="Scenario introduction" title="Scenario introduction">ⓘ</button>
               </div>
               <div class="sidebar-equal-actions mt-3">
                 <button id="applyScenarioBtn" type="button" class="btn-secondary" data-i18n="Apply">Apply</button>

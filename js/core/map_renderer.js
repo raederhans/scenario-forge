@@ -5689,6 +5689,12 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection, { pu
 
 let frameEffectiveWater = null;
 
+function getActiveScenarioYear() {
+  if (!runtimeState.activeScenarioId) return null;
+  const year = Number(String(runtimeState.activeScenarioManifest?.bookmark_date).split(".")[0]);
+  return Number.isInteger(year) && year > 0 ? year : null;
+}
+
 function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   const manifest = runtimeState.activeScenarioManifest;
   const baseFeatures = runtimeState.waterRegionsData?.features;
@@ -5696,6 +5702,7 @@ function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   return [
     baseFeatures, baseFeatures?.length, scenarioWaterFeatures, scenarioWaterFeatures?.length,
     lakeFeatures, lakeFeatures?.length, runtimeState.activeScenarioId || "", isScenarioWaterTopologyExclusiveMode(),
+    getActiveScenarioYear(),
     manifest?.excluded_water_region_ids, manifest?.excluded_water_region_groups, runtimeState.contextLayerRevision,
     ...atlantropaWater,
   ];
@@ -5727,6 +5734,7 @@ function resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scen
     baseFeatures: runtimeState.waterRegionsData?.features || [],
     scenarioFeatures,
     globalLakeFeatures: runtimeState.contextLayerExternalDataByName?.lakes?.features || [],
+    scenarioYear: getActiveScenarioYear(),
     activeScenarioId: runtimeState.activeScenarioId || "",
     exclusive: isScenarioWaterTopologyExclusiveMode(),
     isExcluded: (feature) => isWaterRegionExcludedByScenario(feature, exclusions),
