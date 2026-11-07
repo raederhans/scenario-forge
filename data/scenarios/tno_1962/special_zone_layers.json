@@ -9,6 +9,16 @@
       "source": "scenario",
       "visible": false,
       "legendVisible": true,
+      "style": {
+        "fill": "#f6e05e",
+        "stroke": "#b7791f",
+        "fillOpacity": 0.08,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "fineHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
       "memberFeatureIds": [
         "FR_ARR_02001",
         "FR_ARR_02004",
@@ -76,6 +86,16 @@
       "source": "scenario",
       "visible": false,
       "legendVisible": true,
+      "style": {
+        "fill": "#f6e05e",
+        "stroke": "#b7791f",
+        "fillOpacity": 0.08,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "fineHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
       "memberFeatureIds": [
         "CN_CITY_17275852B1441354643708",
         "CN_CITY_17275852B38426922086125",
@@ -96,6 +116,16 @@
       "source": "scenario",
       "visible": false,
       "legendVisible": true,
+      "style": {
+        "fill": "#f6e05e",
+        "stroke": "#b7791f",
+        "fillOpacity": 0.08,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "fineHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
       "memberFeatureIds": [
         "ATLISL_levant_cyprus"
       ],
@@ -109,6 +139,16 @@
       "source": "scenario",
       "visible": false,
       "legendVisible": true,
+      "style": {
+        "fill": "#a3e635",
+        "stroke": "#4d7c0f",
+        "fillOpacity": 0.06,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "fineHorizontal",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
       "memberFeatureIds": [
         "UA_RAY_74538382B10810755627981",
         "UA_RAY_74538382B12626856106214",
@@ -139,6 +179,16 @@
       "source": "scenario",
       "visible": false,
       "legendVisible": true,
+      "style": {
+        "fill": "#a8a29e",
+        "stroke": "#57534e",
+        "fillOpacity": 0.1,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "openGrid",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
       "memberFeatureIds": [
         "EGY-1531",
         "EGY-1536"
@@ -153,6 +203,16 @@
       "source": "scenario",
       "visible": false,
       "legendVisible": true,
+      "style": {
+        "fill": "#fb923c",
+        "stroke": "#c2410c",
+        "fillOpacity": 0.06,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "dashHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
       "memberFeatureIds": [
         "RU_MRG_194bb325d1de",
         "RU_MRG_46291296feb9",

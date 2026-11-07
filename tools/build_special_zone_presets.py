@@ -155,6 +155,25 @@ YELLOW_RIVER_FLOOD_COUNTIES = [
 ]
 
 
+# 与 js/core/special_zone_layers.js 的 SPECIAL_ZONE_PRESETS 默认样式保持一致；剧本契约要求每层带完整 style。
+PRESET_STYLES = {
+    "demilitarized": ("#f6e05e", "#b7791f", 0.08, "fineHatch", 0.42),
+    "claim": ("#fb923c", "#c2410c", 0.06, "dashHatch", 0.42),
+    "occupation": ("#475569", "#475569", 0.0, "bandStripes", 0.5),
+    "lease": ("#5eead4", "#0f766e", 0.06, "dotGrid", 0.42),
+    "economic": ("#a3e635", "#4d7c0f", 0.06, "fineHorizontal", 0.42),
+    "restricted": ("#a8a29e", "#57534e", 0.1, "openGrid", 0.42),
+}
+
+
+def preset_style(preset, overrides=None):
+    fill, stroke, fill_opacity, pattern, pattern_opacity = PRESET_STYLES[preset]
+    style = {"fill": fill, "stroke": stroke, "fillOpacity": fill_opacity, "strokeOpacity": 0.92,
+             "strokeWidth": 1.3, "pattern": pattern, "patternOpacity": pattern_opacity, "revision": 1}
+    style.update(overrides or {})
+    return style
+
+
 def layer(layer_id, preset, name_en, name_zh, members, note, style=None):
     if not members:
         raise ValueError(f"{layer_id} 没有成员")
@@ -166,11 +185,10 @@ def layer(layer_id, preset, name_en, name_zh, members, note, style=None):
         "source": "scenario",
         "visible": False,
         "legendVisible": True,
+        "style": preset_style(preset, style),
         "memberFeatureIds": sorted(set(members)),
         "note": note,
     }
-    if style:
-        record["style"] = style
     return record
 
 
