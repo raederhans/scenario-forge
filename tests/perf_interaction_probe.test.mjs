@@ -24,7 +24,7 @@ test("参数默认值及环境变量优先级", (t) => {
   assert.equal(defaults.tailMs, 30000);
   assert.equal(defaults.urlQuery, "");
   assert.equal(defaults.gpu, true);
-  assert.match(defaults.out, /^\.runtime\/output\/perf\/interaction\/interaction-\d{4}-\d{2}-\d{2}T\d{6}\.\d{3}Z\.json$/);
+  assert.match(defaults.out, /^\.runtime\/reports\/generated\/perf-interaction\/interaction-\d{4}-\d{2}-\d{2}T\d{6}\.\d{3}Z\.json$/);
   process.env.MAPCREATOR_DEV_PORT = "9000";
   assert.equal(parseArgs([]).baseUrl, "http://127.0.0.1:9000");
   process.env.MAPCREATOR_BASE_URL = "http://localhost:9001";

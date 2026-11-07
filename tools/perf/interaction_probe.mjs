@@ -14,7 +14,7 @@ export function parseArgs(argv) {
     tailMs: 30000,
     urlQuery: "",
     gpu: true,
-    out: `.runtime/output/perf/interaction/interaction-${new Date().toISOString().replaceAll(":", "")}.json`,
+    out: `.runtime/reports/generated/perf-interaction/interaction-${new Date().toISOString().replaceAll(":", "")}.json`,
   };
   const parameters = {
     "--base-url": ["baseUrl", String],
@@ -191,7 +191,7 @@ async function main() {
   --tail-ms <毫秒>      默认 30000
   --url-query <查询串>  默认空，例如 political_render_mode=raster
   --gpu true|false     默认 true
-  --out <路径>         默认 .runtime/output/perf/interaction/interaction-<ISO时间去掉冒号>.json，相对仓库根
+  --out <路径>         默认 .runtime/reports/generated/perf-interaction/interaction-<ISO时间去掉冒号>.json，相对仓库根
   --help               打印用法并退出`);
     return;
   }
