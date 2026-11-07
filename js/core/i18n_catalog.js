@@ -2,6 +2,7 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Inspector selection path": { zh: "检查器选择路径", en: "Inspector selection path" },
   "Custom Zone": { zh: "自定义区域", en: "Custom Zone" },
   "Demilitarized / buffer": { zh: "非军事化/缓冲", en: "Demilitarized / buffer" },
   "Claim / dispute": { zh: "主张/争议", en: "Claim / dispute" },

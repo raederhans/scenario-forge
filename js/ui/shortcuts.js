@@ -324,7 +324,7 @@ function initShortcuts() {
         syncToolUi();
         return;
       }
-      if (runtimeState.selectedInspectorCountryCode && runtimeState.clearInspectorLandSelectionFn?.()) {
+      if (runtimeState.selectedInspectorCountryCode && runtimeState.stepUpInspectorSelectionFn?.()) {
         event.preventDefault();
       }
     }

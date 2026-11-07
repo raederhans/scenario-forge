@@ -647,6 +647,10 @@ def main() -> int:
     manifest_payload["city_overrides_url"] = f"data/scenarios/{args.scenario_id}/city_overrides.json"
     manifest_payload["capital_hints_url"] = f"data/scenarios/{args.scenario_id}/capital_hints.json"
     manifest_payload["special_zone_layers_url"] = f"data/scenarios/{args.scenario_id}/special_zone_layers.json"
+    if (scenario_output_dir / "district_groups.manual.json").exists():
+        manifest_payload["district_groups_url"] = (
+            f"data/scenarios/{args.scenario_id}/district_groups.manual.json"
+        )
     write_json(scenario_output_dir / "manifest.json", manifest_payload)
 
     ensure_geo_locale_patch_inputs(scenario_output_dir, args.scenario_id)
