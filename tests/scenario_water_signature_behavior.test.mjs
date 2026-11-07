@@ -12,7 +12,7 @@ const identitySource = readFileSync(new URL("../js/core/renderer/object_identity
   .replace("export function", "function");
 const names = [
   "getScenarioAtlantropaRevisionToken", "getScenarioSurfaceVersionParts", "getScenarioSurfaceVersionSignal", "getScenarioWaterVisualRevisionToken",
-  "getEffectiveWaterRegionFeatures", "getFrameEffectiveWaterInputs", "resolveAndSanitizeEffectiveWaterRegionFeatures",
+  "getEffectiveWaterRegionFeatures", "getFrameEffectiveWaterInputs", "resolveAndSanitizeEffectiveWaterRegionFeatures", "getActiveScenarioYear",
   "getEffectiveAtlantropaFeatures", "getAtlantropaRenderLayer",
   "isScenarioAtlantropaVisible", "getScenarioWaterRegionsMode", "isScenarioWaterTopologyExclusiveMode",
   "getScenarioExcludedWaterRegionIds", "getScenarioExcludedWaterRegionGroups", "isScenarioWaterRegion",
