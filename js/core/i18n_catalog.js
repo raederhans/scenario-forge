@@ -31,6 +31,8 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Add": { zh: "添加", en: "Add" },
   "Remove": { zh: "移除", en: "Remove" },
   "Advanced": { zh: "高级", en: "Advanced" },
+  "Scenario districts": { zh: "剧本大区", en: "Scenario districts" },
+  "Modern administrative regions": { zh: "现代行政区", en: "Modern administrative regions" },
   "Political & borders": { zh: "政治与边界", en: "Political & borders" },
   "Help": { zh: "帮助", en: "Help" },
   "User guide": { zh: "使用指南", en: "User guide" },
