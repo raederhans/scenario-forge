@@ -2,6 +2,7 @@ city_label_i18n_redraw.spec.js
 city_points_urban_runtime.spec.js
 dev_workspace_i18n.spec.js
 project_save_load_roundtrip.spec.js
+releasable_territory.spec.js
 sample_guide_deeplink.spec.js
 scenario_apply_concurrency.spec.js
 scenario_apply_resilience.spec.js
