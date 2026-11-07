@@ -15,6 +15,7 @@ strategic_overlay_sidebar_entry_smoke.spec.js
 strategic_overlay_smoke.spec.js
 tno_named_water_rendering.spec.js
 tno_open_ocean_rendering.spec.js
+tno_strategic_values_cold_start.spec.js
 transport_phase_b_main_map_smoke.spec.js
 transport_workbench_country_pack_loading.spec.js
 transport_workbench_industrial_variants.spec.js
