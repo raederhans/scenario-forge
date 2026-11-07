@@ -1,5 +1,6 @@
+import { resolveDataUrl } from "../data_base_url.js";
 export async function loadBathymetryImageBitmap(url, { fetchImpl = fetch } = {}) {
-  const response = await fetchImpl(url);
+  const response = await fetchImpl(resolveDataUrl(url));
   if (!response.ok) throw new Error(`Bathymetry image request failed: ${response.status}`);
   return createImageBitmap(await response.blob(), { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
 }
@@ -34,7 +35,7 @@ export function createBathymetryTextureSource({ manifestUrl, fetchJson, loadImag
 
   return {
     async load() {
-      manifest = await fetchJson(manifestUrl);
+      manifest = await fetchJson(resolveDataUrl(manifestUrl));
       present = new Set(manifest.tiles.present);
       overview = await loadImageBitmap(manifest.overview.url);
       return true;
