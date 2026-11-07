@@ -19,6 +19,9 @@ class Element {
   replaceChildren(...nodes) { this.children = nodes; }
   setAttribute(key, value) { this.attributes[key] = value; }
   addEventListener(type, listener) { this.listeners[type] = listener; }
+  removeEventListener(type) { delete this.listeners[type]; }
+  remove() {}
+  contains(node) { return node === this || this.children.some((child) => child.contains?.(node)); }
 }
 
 const registry = JSON.parse(readFileSync(new URL("../data/scenarios/index.json", import.meta.url), "utf8"));
@@ -28,7 +31,7 @@ function setup() {
   const document = { createElement: (tag) => new Element(document, tag) };
   const container = document.createElement("div");
   const controller = createScenarioIntroCard(container);
-  return { controller, card: container.children[0] };
+  return { controller, container, card: container.children[0] };
 }
 function find(root, className) {
   if (root.className === className) return root;
@@ -100,4 +103,15 @@ test("all five scenarios have presentation copy with Chinese translations", () =
       assert.match(translations[key], /[\u3400-\u9fff]/u);
     }
   }
+});
+
+test("pressing the map outside the card dismisses it, pressing inside keeps it", () => {
+  const { controller, container, card } = setup();
+  controller.show(presentation);
+  container.listeners.pointerdown({ target: find(card, "scenario-intro-description") });
+  assert.equal(card.hidden, false);
+  container.listeners.pointerdown({ target: container });
+  assert.equal(card.hidden, true);
+  controller.dispose();
+  assert.equal(container.listeners.pointerdown, undefined);
 });

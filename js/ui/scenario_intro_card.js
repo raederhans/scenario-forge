@@ -11,6 +11,11 @@ export function createScenarioIntroCard(container) {
   container.appendChild(card);
 
   const hide = () => { card.hidden = true; };
+  // 用户开始操作地图（卡片以外的任何点按）时自动收起，避免卡片挡住地图。
+  const onContainerPointerDown = (event) => {
+    if (!card.hidden && !card.contains(event.target)) hide();
+  };
+  container.addEventListener("pointerdown", onContainerPointerDown, true);
   card.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       event.stopPropagation();
@@ -60,5 +65,8 @@ export function createScenarioIntroCard(container) {
     card.hidden = false;
   };
 
-  return { show, hide, get visible() { return !card.hidden; }, dispose: () => card.remove() };
+  return { show, hide, get visible() { return !card.hidden; }, dispose: () => {
+    container.removeEventListener("pointerdown", onContainerPointerDown, true);
+    card.remove();
+  } };
 }
