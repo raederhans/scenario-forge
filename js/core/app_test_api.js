@@ -49,6 +49,14 @@ function rasterPresented() {
   if (raster.displayState === "preparing" || raster.pending || raster.stagedPending || raster.refinementPending) return false;
   if (raster.gpu?.pendingFrameReady || raster.gpuPreparation?.pending) return false;
   if (raster.actualBackend !== "raster") return true;
+  // The direct GPU scene prepares borders, physical relief and water privately and
+  // publishes them later; the render loop is already idle while they are pending.
+  if (raster.scene?.active) {
+    if (raster.scene.publicationPending || raster.scene.physicalCanvas?.pending) return false;
+    if (raster.borderPreparation?.pending || raster.asyncWork?.borderScheduled) return false;
+    if (raster.waterPreparation?.pending) return false;
+    if (state.renderPassCache?.dirty?.borders) return false;
+  }
   const view = raster.scene?.view;
   const zoom = state.zoomTransform || {};
   return !!view
