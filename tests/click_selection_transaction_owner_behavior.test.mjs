@@ -423,7 +423,7 @@ test("select land syncs the inspector without loading detail, painting or record
   Object.assign(harness.hit, { targetType: "land", id: "land-1", countryCode: "AA" });
   await harness.owner.handleClick({});
   assert.deepEqual(harness.trace.find(([name]) => name === "syncInspectorCountryToLandSelection"), [
-    "syncInspectorCountryToLandSelection", harness.state.landIndex.get("land-1"), "land-1", harness.hit,
+    "syncInspectorCountryToLandSelection", harness.state.landIndex.get("land-1"), "land-1", harness.hit, {},
   ]);
   assert.deepEqual(harness.trace.at(-1), ["noteRenderAction", "select-land", 17]);
   assert.deepEqual(harness.trace.filter(([name]) => name === "requestInteractionRender"), [
@@ -818,4 +818,16 @@ test("factory rejects missing ports and invalid constant values", async () => {
     () => createClickSelectionTransactionOwner({ constants: { clickSnapRadiusPx: 5 } }),
     /getters\.getClickState/,
   );
+});
+
+test("only ordinary select clicks carry the drill event", async () => {
+  for (const [currentTool, ctrlKey, metaKey] of [["select", false, false], ["select", true, false], ["select", false, true], ["fill", false, false]]) {
+    const harness = await createTransactionOwner({ state: { currentTool } });
+    Object.assign(harness.hit, { targetType: "land", id: "land-1", countryCode: "AA" });
+    const event = { detail: 2, ctrlKey, metaKey, preventDefault() {} };
+    await harness.owner.handleClick(event);
+    const sync = harness.trace.find(([name]) => name === "syncInspectorCountryToLandSelection");
+    if (currentTool === "select" && !ctrlKey && !metaKey) assert.equal(sync[4], event);
+    else assert.equal(sync?.[4], undefined);
+  }
 });
