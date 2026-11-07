@@ -82,3 +82,12 @@ test("victory points annotate mismatches and ignore diacritics", () => {
   state.showModernPlaceNames = true;
   assert.equal(model.getCityDisplayLabel(feature), "Breslau (Wrocław)");
 });
+
+test("only real renames get a modern-name annotation", async () => {
+  const { isRenamedPlace } = await import("../js/core/renderer/modern_place_name.js");
+  assert.equal(isRenamedPlace("Breslau", "Wrocław"), true);
+  assert.equal(isRenamedPlace("Vaduz", "Vaduz"), false);
+  assert.equal(isRenamedPlace("Rhodes", "Rhodes"), false);
+  assert.equal(isRenamedPlace("Gdańsk", "Gdansk"), false);
+  assert.equal(isRenamedPlace("Saint Helier", ""), false);
+});
