@@ -20,12 +20,16 @@ test("live manifest presentation fields replace the stale startup bundle copy", 
     bookmark_name: "The New Order",
     featured_tags: ["GER", "JAP"],
     opening_view: { center: [30, 50], zoom: 2 },
+    project_markers: [{ id: "suez_canal", name: { en: "Suez Canal", zh: "苏伊士运河" } }],
   };
   const result = overlayStartupManifestPresentationFields(bundleManifest, liveManifest);
   assert.deepEqual(result.style_defaults, { ocean: { fillColor: "#1f2f45" } });
   assert.equal(result.bookmark_name, "The New Order");
   assert.deepEqual(result.featured_tags, ["GER", "JAP"]);
   assert.deepEqual(result.opening_view, { center: [30, 50], zoom: 2 });
+  assert.deepEqual(result.project_markers, liveManifest.project_markers);
+  liveManifest.project_markers[0].name.en = "changed";
+  assert.equal(result.project_markers[0].name.en, "Suez Canal");
   // 白名单之外的合同字段保持启动包原值。
   assert.equal(result.baseline_hash, "bundle-hash");
   assert.equal(result.runtime_topology_url, bundleManifest.runtime_topology_url);
