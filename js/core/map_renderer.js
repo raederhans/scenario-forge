@@ -12173,17 +12173,43 @@ function focusWaterRegionById(id) {
   if (wrapsDateLine && (!wrappedCenter || !wrappedCenter.every(Number.isFinite))) return false;
   const extentX = Math.max(1, wrapsDateLine ? wrappedWidth : bounds.maxX - bounds.minX);
   const extentY = Math.max(1, bounds.maxY - bounds.minY);
-  const fitScale = Math.min(runtimeState.width * 0.72 / extentX, runtimeState.height * 0.72 / extentY);
-  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, fitScale));
   const centerX = wrapsDateLine ? wrappedCenter[0] : (bounds.minX + bounds.maxX) / 2;
   const centerY = wrapsDateLine ? wrappedCenter[1] : (bounds.minY + bounds.maxY) / 2;
+  return focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate: true });
+}
+
+function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate }) {
+  const interactionRect = rendererSurfaceHost.getInteractionRect();
+  const zoomBehavior = rendererSurfaceHost.getZoomBehavior();
+  if (!interactionRect?.node() || !zoomBehavior || !globalThis.d3?.zoomIdentity
+    || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
+  const fitScale = Math.min(runtimeState.width * 0.72 / extentX, runtimeState.height * 0.72 / extentY);
+  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, fitScale));
   const nextTransform = globalThis.d3.zoomIdentity
     .translate(runtimeState.width / 2, runtimeState.height / 2)
     .scale(scale)
     .translate(-centerX, -centerY);
-  globalThis.d3.select(interactionRect.node()).transition().duration(420)
-    .call(zoomBehavior.transform, nextTransform);
+  const selection = globalThis.d3.select(interactionRect.node());
+  const target = animate ? selection.transition().duration(420) : selection;
+  target.call(zoomBehavior.transform, nextTransform);
   return true;
+}
+
+function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
+  const projection = rendererSurfaceHost.getProjection();
+  if (!projection || !globalThis.d3?.geoPath) return false;
+  const bounds = globalThis.d3.geoPath(projection).bounds({
+    type: "Polygon",
+    coordinates: [[[west, north], [east, north], [east, south], [west, south], [west, north]]],
+  });
+  if (!bounds.flat().every(Number.isFinite)) return false;
+  const [[minX, minY], [maxX, maxY]] = bounds;
+  return focusProjectedBounds({
+    extentX: Math.max(1, maxX - minX),
+    extentY: Math.max(1, maxY - minY),
+    centerX: (minX + maxX) / 2,
+    centerY: (minY + maxY) / 2,
+  }, { animate });
 }
 
 const resolveMarineInteriorAnchor = createMarineInteriorAnchorResolver();
@@ -15474,6 +15500,7 @@ export {
   getEffectiveCityCollection,
   isOpenOceanOverlayActive,
   focusWaterRegionById,
+  focusGeoBounds,
   focusRiverPaintParentById,
   applyRiverPaintCellById,
   renderExportPassesToCanvas,
