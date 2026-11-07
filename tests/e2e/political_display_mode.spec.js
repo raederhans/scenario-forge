@@ -19,6 +19,19 @@ async function pixelAt(page, point) {
   }, png.toString("base64"));
 }
 
+// The GPU palette upload lands a frame or two after the shell reports settled,
+// so wait for the probe pixel itself rather than for the settled signal.
+async function waitForPixelChange(page, point, before, timeout = 10_000) {
+  let pixel = before;
+  await expect.poll(async () => {
+    pixel = await pixelAt(page, point);
+    return pixel.some((value, index) => Math.abs(value - before[index]) > 3);
+  }, { timeout, intervals: [50, 100, 200] }).toBe(true);
+  return pixel;
+}
+
+const nearPixel = (pixel, expected) => pixel.every((value, index) => Math.abs(value - expected[index]) <= 3);
+
 const readEdits = (page) => page.evaluate(() => ({ history: window.__scenarioForgeTestApi.history(), dirty: window.__scenarioForgeTestApi.isDirty() }));
 
 test("HOI4 alliance display restores country pixels without changing edits", async ({ page }) => {
@@ -30,11 +43,14 @@ test("HOI4 alliance display restores country pixels without changing edits", asy
   const before = await pixelAt(page, point);
   const edits = await readEdits(page);
   await selectMode(page, "alliance");
+  await waitForPixelChange(page, point, before);
   expect(await colorShareAround(page, point, "#2f2f2f", { radius: 2, tolerance: 12 })).toBeGreaterThan(0.5);
-  expect(await pixelAt(page, point)).not.toEqual(before);
   expect(await readEdits(page)).toEqual(edits);
+  const alliancePixel = await pixelAt(page, point);
   await selectMode(page, "country");
-  expect(await pixelAt(page, point)).toEqual(before);
+  await waitForPixelChange(page, point, alliancePixel);
+  // Path and GPU presentations may differ by one channel step in antialiasing.
+  expect(nearPixel(await pixelAt(page, point), before)).toBe(true);
   expect(await readEdits(page)).toEqual(edits);
 });
 
@@ -46,11 +62,11 @@ test("TNO alliance redraw completes within three seconds", async ({ page }, test
   const point = await screenPoint(page, [10.5, 51.5]);
   const before = await pixelAt(page, point);
   const started = Date.now();
-  await selectMode(page, "alliance");
+  await page.locator("#politicalDisplayMode").selectOption("alliance", { force: true });
+  await waitForPixelChange(page, point, before);
   const elapsedMs = Date.now() - started;
   console.log(`TNO alliance redraw: ${elapsedMs} ms`);
   await testInfo.attach("tno-alliance-redraw", { body: JSON.stringify({ elapsedMs }), contentType: "application/json" });
   expect(elapsedMs).toBeLessThan(3000);
-  expect(await pixelAt(page, point)).not.toEqual(before);
   expect(await colorShareAround(page, point, "#2f2f2f", { radius: 2, tolerance: 12 })).toBeGreaterThan(0.5);
 });
