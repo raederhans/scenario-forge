@@ -138,7 +138,11 @@ async function measureRun(browser, options, scenarioId, run, pageErrors) {
       const point = await page.evaluate(() => globalThis.__scenarioForgeTestApi.screenPointForLonLat(10, 50));
       await page.mouse.move(point.x, point.y);
       const start = await page.evaluate(() => performance.now());
+      const previousScale = await page.evaluate(() => globalThis.__scenarioForgeTestApi.status().viewport.k);
       await page.mouse.wheel(0, -400);
+      // 派发滚轮不代表应用已处理：先等缩放比例变化，否则会读到上一次的 settled
+      await page.waitForFunction((scale) => globalThis.__scenarioForgeTestApi.status().viewport.k !== scale,
+        previousScale, { polling: 16, timeout: 10000 });
       await waitUntilSettled(page);
       zoomSettledMs.push(await page.evaluate(() => performance.now()) - start);
     }
