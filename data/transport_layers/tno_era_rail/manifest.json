@@ -1,0 +1,55 @@
+{
+  "adapter_id": "tno_era_rail_v1",
+  "family": "era_rail",
+  "geometry_kind": "mixed",
+  "schema_version": 1,
+  "generated_at": "2026-11-07T11:49:50Z",
+  "recipe_version": "era_rail_v1",
+  "source_policy": "local_game_files_facts_only",
+  "distribution_tier": "scenario_optional_layer",
+  "paths": {
+    "era_rail": "data/transport_layers/tno_era_rail/era_rail.geojson",
+    "build_audit": "data/transport_layers/tno_era_rail/build_audit.json"
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "distribution_tier": "scenario_optional_layer",
+      "paths": {
+        "era_rail": "data/transport_layers/tno_era_rail/era_rail.geojson"
+      },
+      "feature_counts": {
+        "railways": 2756,
+        "supply_nodes": 1460
+      }
+    }
+  },
+  "feature_counts": {
+    "railways": 2756,
+    "supply_nodes": 1460
+  },
+  "source_signature": {
+    "railways.txt": {
+      "filename": "map/railways.txt",
+      "size_bytes": 91724,
+      "sha256": "99b5ddac29ad6e9b09027cf5ddeac8929db8145281daeb5beca86fe9a98b7d4b"
+    },
+    "supply_nodes.txt": {
+      "filename": "map/supply_nodes.txt",
+      "size_bytes": 13669,
+      "sha256": "0294448413b7ffcb07b509849f6a705bb81ca9c1fc65cab2ec35e7737412e73b"
+    },
+    "unitstacks.txt": {
+      "filename": "map/unitstacks.txt",
+      "size_bytes": 15552818,
+      "sha256": "bb6e6a80a4912a4a103613d51dcea408778c43ba5cc78ae7728343b8f1d49664"
+    },
+    "provinces.bmp": {
+      "filename": "map/provinces.bmp",
+      "size_bytes": 39321654,
+      "sha256": "0adf3a9f06fec3ef355d21575c7821d2be9616dafcbc0da572e5b78571175f9d"
+    }
+  },
+  "build_command": "python tools/build_era_railways.py --profile tno",
+  "runtime_consumer": "scenario_optional_layer:erarailways"
+}

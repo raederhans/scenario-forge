@@ -1,0 +1,57 @@
+{
+  "profile": "tno",
+  "georeference": {
+    "vanilla": {
+      "control_point_count": 1153,
+      "kept_control_point_count": 1137,
+      "dropped_control_points": [
+        "Anadyr",
+        "Bissau",
+        "Hamilton",
+        "Hilo",
+        "Honolulu",
+        "Hyderabad City",
+        "Kōshū",
+        "Libreville",
+        "Midway",
+        "Novgorod",
+        "Praia",
+        "Saint John",
+        "Springfield",
+        "Stalino",
+        "Stavropol",
+        "Sverdlovsk"
+      ],
+      "cross_validation_km": {
+        "median": 32.5,
+        "p90": 99.9,
+        "p99": 204.2
+      }
+    },
+    "mod_cylindrical": {
+      "shared_province_count": 10128,
+      "consistent_province_count": 7434,
+      "lon_per_px": 0.070275,
+      "lon_at_x0": -179.9771,
+      "lat_residual_km": {
+        "median": 18.3,
+        "p90": 64.0
+      }
+    }
+  },
+  "railway_segment_count": 2756,
+  "railway_level_counts": {
+    "1": 1064,
+    "2": 834,
+    "3": 612,
+    "4": 168,
+    "5": 78
+  },
+  "supply_node_count": 1460,
+  "sea_crossing_midpoint_fixes": 159,
+  "province_vertex_count": 7187,
+  "vanilla_position_vertices": 4270,
+  "mod_model_vertices": 2917,
+  "city_coordinate_vertices": 729,
+  "land_snapped_vertices": 140
+}

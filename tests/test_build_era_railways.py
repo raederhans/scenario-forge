@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 
 from tools.build_era_railways import (
+    ModCylindricalGeoreference,
     PixelGeoreference,
     haversine_km,
     parse_province_anchors,
@@ -87,6 +88,32 @@ class PixelGeoreferenceTest(unittest.TestCase):
         for (x, y), (lon, lat) in zip(probe, predicted):
             expected_lon, expected_lat = truth(x, y)
             self.assertLess(float(haversine_km(lon, lat, expected_lon, expected_lat)), 5.0)
+
+
+class ModCylindricalGeoreferenceTest(unittest.TestCase):
+    def test_reuses_unchanged_provinces_and_fits_latitude_from_y(self):
+        width, height = 5120, 2560
+        rng = np.random.default_rng(2)
+
+        def mod_lat(y):
+            return 85.0 - 170.0 * (y / height) ** 1.1
+
+        mod_anchors, vanilla_positions = {}, {}
+        for pid in range(1, 1201):
+            x, y = rng.uniform(0, width), rng.uniform(100, height - 100)
+            mod_anchors[pid] = (x, y)
+            vanilla_positions[pid] = (x / width * 360.0 - 180.0, mod_lat(y))
+        # ID 被模组重用到别处：位置与原版经度不一致，应被排除。
+        for pid in range(1, 51):
+            lon, lat = vanilla_positions[pid]
+            vanilla_positions[pid] = ((lon + 200.0 + 180.0) % 360.0 - 180.0, lat)
+
+        model = ModCylindricalGeoreference(mod_anchors, vanilla_positions, width=width)
+        self.assertTrue(set(range(1, 51)).isdisjoint(model.consistent_ids))
+        self.assertGreaterEqual(len(model.consistent_ids), 1100)
+        lon, lat = model.to_lonlat(2560.0, 1000.0)
+        self.assertAlmostEqual(lon, 0.0, delta=0.05)
+        self.assertAlmostEqual(lat, mod_lat(1000.0), delta=0.3)
 
 
 if __name__ == "__main__":
