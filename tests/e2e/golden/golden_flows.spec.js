@@ -14,6 +14,7 @@ const {
   screenPoint,
   selectFillTool,
   switchScenario,
+  waitForBackgroundIdle,
   waitForSettled,
   zoomTo,
 } = require("./golden-support");
@@ -72,6 +73,18 @@ for (const scenarioId of SCENARIO_IDS) {
     expect(errors).toEqual([]);
   });
 }
+
+test("starting on blank_base keeps scenario switching after full data arrives", async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = collectPageErrors(page);
+  await openApp(page, { scenarioId: "blank_base" });
+  expect((await readStatus(page)).scenarioId).toBe("blank_base");
+  await waitForBackgroundIdle(page);
+  expect((await readStatus(page)).background).toMatchObject({ fatalRecovery: false, healthGate: "ok" });
+  await switchScenario(page, "hoi4_1936");
+  expect(await mapColorVariety(page)).toBeGreaterThan(5);
+  expect(errors).toEqual([]);
+});
 
 test("undo and redo, by button and keyboard, restore the rendered map", async ({ page }) => {
   test.setTimeout(240_000);
