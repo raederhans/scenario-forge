@@ -1,3 +1,4 @@
+import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
 import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
 import { setUiIcon } from "../ui_icons.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
@@ -260,7 +261,9 @@ export function createCountryInspectorController({
     image.setAttribute("aria-hidden", "true");
     image.classList.toggle("hidden", !flagUrl);
     if (flagUrl) {
-      image.src = flagUrl;
+      const resolvedFlagUrl = resolveDataUrl(flagUrl);
+      if (isExternalDataUrl(resolvedFlagUrl, flagUrl)) image.crossOrigin = "anonymous";
+      image.src = resolvedFlagUrl;
     } else {
       image.removeAttribute("src");
     }
@@ -866,7 +869,9 @@ export function createCountryInspectorController({
     if (flagUrl) {
       const flag = document.createElement("img");
       flag.className = "hgo-identity-detail-flag";
-      flag.src = flagUrl;
+      const resolvedFlagUrl = resolveDataUrl(flagUrl);
+      if (isExternalDataUrl(resolvedFlagUrl, flagUrl)) flag.crossOrigin = "anonymous";
+      flag.src = resolvedFlagUrl;
       flag.alt = "";
       flag.setAttribute("aria-hidden", "true");
       flag.loading = "lazy";
