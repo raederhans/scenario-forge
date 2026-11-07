@@ -13,6 +13,34 @@ from tools.political_detail_partition import feature_bounds, partition_political
 
 
 class RuntimeJsonPackingTests(unittest.TestCase):
+    def test_water_normalization_precedes_delivery_hashes(self):
+        runtime = Path(__file__).resolve().parents[1] / '.runtime/tmp'
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            app = Path(temporary)
+            scenario = app / 'data/scenarios/test'
+            (scenario / 'chunks').mkdir(parents=True)
+            path = scenario / 'chunks/water.json'
+            path.write_text(json.dumps({'type': 'FeatureCollection', 'features': [
+                {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [1.123456789, -0.00000001]}}]}))
+            manifest = scenario / 'detail_chunks.manifest.json'
+            manifest.write_text(json.dumps({'chunks': [{'id': 'water', 'layer': 'water',
+                'url': path.relative_to(app).as_posix(), 'bounds': [1, 0, 2, 1], 'feature_bounds': []}]}))
+            topology = scenario / 'runtime_topology.topo.json'
+            topology.write_bytes(b'{"type":"Topology","arcs":[[[1.123456789,0]]],"objects":{}}')
+            original = topology.read_bytes()
+            pack_published_runtime_data(app)
+            chunk = json.loads(manifest.read_bytes())['chunks'][0]
+            encoded = (app / chunk['url']).read_bytes()
+            decoded = gzip.decompress(encoded)
+            self.assertEqual(chunk['sha256'], hashlib.sha256(encoded).hexdigest())
+            self.assertEqual(chunk['byte_size'], len(encoded))
+            self.assertEqual(chunk['decoded_byte_size'], len(decoded))
+            self.assertEqual(json.loads(decoded)['features'][0]['geometry']['coordinates'], [1.123457, 0])
+            self.assertEqual(chunk['bounds'], [1, 0, 2, 1])
+            self.assertEqual(chunk['feature_bounds'], [[1.123457, 0, 1.123457, 0]])
+            self.assertEqual(topology.read_bytes(), original)
+
     def test_prevalidated_partition_avoids_unused_serialization_and_keeps_shards(self):
         features = [{'type': 'Feature', 'properties': {'id': str(i), 'name': '中'},
                      'geometry': {'type': 'Point', 'coordinates': [i, -0.0]}} for i in range(4)]
@@ -103,6 +131,7 @@ class RuntimeJsonPackingTests(unittest.TestCase):
             pack_published_runtime_data(app)
             actual = json.loads(manifest.read_bytes())['chunks'][0]
             decoded = gzip.decompress((app / actual['url']).read_bytes())
+            payload['objects']['political']['geometries'][0]['arcs'] = [[-1]]
             self.assertEqual(json.loads(decoded), payload)
             self.assertEqual(actual['decoded_byte_size'], len(decoded))
             self.assertEqual(actual['cache_byte_size'], 71_262_910)
