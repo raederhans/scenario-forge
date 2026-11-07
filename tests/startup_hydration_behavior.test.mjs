@@ -1162,3 +1162,66 @@ test("startup hydration retry failure preserves attemptedRetry in the committed 
     console.warn = originalWarn;
   }
 });
+
+function buildLandData(count) {
+  return {
+    type: "FeatureCollection",
+    features: Array.from({ length: count }, (_, index) => ({ properties: { id: `feature-${index}` } })),
+  };
+}
+
+test("hydration health gate passes scenarios without an ownership model after detail promotion", async () => {
+  const effects = [];
+  const targetState = {
+    activeScenarioId: "blank_base",
+    landData: buildLandData(1200),
+    scenarioBaselineOwnersByFeatureId: {},
+    // 用户在空白图上涂过的归属不构成归属模型
+    sovereigntyByFeatureId: { "feature-1": "AA" },
+    scenarioRuntimeTopologyVersionTag: "runtime-v1",
+  };
+  const controller = createMinimalHydrationController(targetState, {
+    getLoadScenarioBundle: () => async () => {
+      effects.push("force-reload");
+      return null;
+    },
+    enterScenarioFatalRecovery: () => effects.push("fatal"),
+  });
+
+  const result = await controller.enforceScenarioHydrationHealthGate();
+
+  assert.equal(result.ok, true);
+  assert.equal(result.attemptedRetry, false);
+  assert.equal(result.report.hasOwnershipModel, false);
+  assert.equal(targetState.scenarioHydrationHealthGate.status, "ok");
+  assert.deepEqual(effects, []);
+});
+
+test("hydration health gate still fails when an ownership model loses coverage", async () => {
+  const effects = [];
+  const targetState = {
+    activeScenarioId: "hoi4_1936",
+    landData: buildLandData(1200),
+    scenarioBaselineOwnersByFeatureId: { "feature-0": "GER" },
+    sovereigntyByFeatureId: {},
+    scenarioRuntimeTopologyVersionTag: "runtime-v1",
+  };
+  const controller = createMinimalHydrationController(targetState, {
+    getLoadScenarioBundle: () => async () => {
+      effects.push("force-reload");
+      return null;
+    },
+    enterScenarioFatalRecovery: () => effects.push("fatal"),
+  });
+
+  const originalWarn = console.warn;
+  console.warn = () => {};
+  try {
+    const result = await controller.enforceScenarioHydrationHealthGate();
+    assert.equal(result.ok, false);
+    assert.equal(result.report.hasOwnershipModel, true);
+    assert.deepEqual(effects, ["force-reload", "fatal"]);
+  } finally {
+    console.warn = originalWarn;
+  }
+});
