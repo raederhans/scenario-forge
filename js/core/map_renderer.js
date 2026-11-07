@@ -12203,7 +12203,9 @@ function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate 
     zoomBehavior.translateExtent(),
   );
   const selection = globalThis.d3.select(node);
-  const target = animate ? selection.transition().duration(420) : selection;
+  // 与其他相机命令一致：系统开启"减少动画"时直接跳到目标视角。
+  const reduceMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
+  const target = animate && !reduceMotion ? selection.transition().duration(420) : selection;
   target.call(zoomBehavior.transform, nextTransform);
   return true;
 }
