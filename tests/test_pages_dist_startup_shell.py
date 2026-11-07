@@ -1801,6 +1801,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/transport_layers/global_airport/airports.geojson",
             "app/data/transport_layers/global_port/ports.geojson",
             "app/data/transport_layers/hoi4_era_rail/era_rail.geojson",
+            "app/data/transport_layers/tno_era_rail/era_rail.geojson",
             "app/data/transport_layers/japan_airport/airports.geojson",
             "app/data/transport_layers/japan_port/ports.core.geojson",
             "app/data/transport_layers/japan_port/ports.expanded.geojson",

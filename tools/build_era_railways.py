@@ -11,9 +11,15 @@ unitstacks.txt、railways.txt、supply_nodes.txt。只提取线路走向、等�
 - 用薄板样条把像素坐标映射到经纬度，迭代剔除名称误匹配造成的离群控制点。
 - 胜利点省份直接使用真实城市坐标；落在海里的顶点吸附到最近的剧本陆地地块。
 
+大改地图的模组（profile tno）：
+- TNO 地图 5120×2560，x 同样与经度线性，纬度是 y 的一维单调函数；省份 ID 大多沿用原版。
+- 与原版共用 ID 且经度一致的陆地省份视为未改动，直接沿用原版配准位置；以这些省份为样本
+  拟合"x 线性 + y 保形插值"的柱面模型，用于模组新增或改动的省份（含亚特兰托帕）。
+- 吸附陆地时把剧本的亚特兰托帕几何一并算作陆地。
+
 用法：
-  python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 \
-      --output-dir data/transport_layers/hoi4_era_rail
+  python tools/build_era_railways.py --profile hoi4   # 写 data/transport_layers/hoi4_era_rail
+  python tools/build_era_railways.py --profile tno    # 写 data/transport_layers/tno_era_rail
 """
 
 from __future__ import annotations
@@ -42,6 +48,22 @@ OUTLIER_THRESHOLD_KM = 350.0
 CITY_SNAP_MAX_KM = 60.0
 COORD_DECIMALS = 3
 LAYER_VERSION = 1
+# 原版配准的控制点与陆地来自 HOI4 1936 剧本（1939 共用同一张原版地图）。
+HOI4_CONTROL_SCENARIO_DIR = Path("data/scenarios/hoi4_1936")
+PROFILES = {
+    "hoi4": {
+        "output_dir": "data/transport_layers/hoi4_era_rail",
+        "register": ("hoi4_1936", "hoi4_1939"),
+    },
+    "tno": {
+        "output_dir": "data/transport_layers/tno_era_rail",
+        "register": ("tno_1962",),
+        "mod_root": "C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901",
+        "topology": "data/scenarios/tno_1962/runtime_topology.topo.json",
+        # 亚特兰托帕新陆地也算陆地，避免线路被吸回旧海岸。
+        "land_objects": ("political", "scenario_atlantropa"),
+    },
+}
 
 
 @dataclass(frozen=True)
@@ -188,13 +210,19 @@ class PixelGeoreference:
 class LandSnapper:
     """顶点落在剧本陆地之外时，吸附到最近陆地地块内侧。"""
 
-    def __init__(self, topology_path: Path):
+    def __init__(self, topology_path: Path, object_names: tuple[str, ...] = ("political",)):
         from shapely import STRtree
 
         from map_builder.population_spatial import decode_topology
 
         topology = json.loads(topology_path.read_text(encoding="utf-8"))
-        geometries = [item["geometry"] for item in decode_topology(topology) if not item["geometry"].is_empty]
+        geometries = [
+            item["geometry"]
+            for object_name in object_names
+            if object_name in topology.get("objects", {})
+            for item in decode_topology(topology, object_name)
+            if not item["geometry"].is_empty
+        ]
         self._geometries = geometries
         self._tree = STRtree(geometries)
 
@@ -224,39 +252,214 @@ def round_coord(value: float) -> float:
     return round(float(value), COORD_DECIMALS)
 
 
+@dataclass
+class VanillaGeoreference:
+    """原版 HOI4 省份 → 经纬度：胜利点省份用真实城市坐标，其余用薄板样条。"""
+
+    anchors: dict[int, tuple[float, float]]
+    georef: PixelGeoreference
+    city_by_province: dict[int, dict]
+
+    @classmethod
+    def build(cls, vanilla_root: Path, strategic_values_path: Path) -> "VanillaGeoreference":
+        map_dir = vanilla_root / "map"
+        _width, height = read_bmp_size(map_dir / "provinces.bmp")
+        anchors = parse_province_anchors(map_dir / "unitstacks.txt", height)
+        controls = load_victory_point_controls(strategic_values_path, anchors)
+        return cls(anchors=anchors, georef=PixelGeoreference(controls), city_by_province={c["province_id"]: c for c in controls})
+
+    def positions(self, province_ids: list[int]) -> tuple[dict[int, tuple[float, float]], set[int]]:
+        """返回位置与"采用了城市坐标"的省份集合；没有锚点的省份不返回。"""
+        known = [pid for pid in province_ids if pid in self.anchors]
+        if not known:
+            return {}, set()
+        predicted = self.georef.to_lonlat(np.array([self.anchors[pid] for pid in known]))
+        result: dict[int, tuple[float, float]] = {}
+        from_city: set[int] = set()
+        for pid, (lon, lat) in zip(known, predicted):
+            city = self.city_by_province.get(pid)
+            if city and float(haversine_km(lon, lat, city["lon"], city["lat"])) <= CITY_SNAP_MAX_KM:
+                result[pid] = (city["lon"], city["lat"])
+                from_city.add(pid)
+            else:
+                result[pid] = (float(lon), float(lat))
+        return result, from_city
+
+
+def load_mod_sources(source_root: Path) -> tuple[dict[int, tuple[float, float]], list[RailwaySegment], list[int], tuple[int, int]]:
+    map_dir = source_root / "map"
+    width, height = read_bmp_size(map_dir / "provinces.bmp")
+    anchors = parse_province_anchors(map_dir / "unitstacks.txt", height)
+    segments = parse_railways(map_dir / "railways.txt")
+    supply_provinces = parse_supply_nodes(map_dir / "supply_nodes.txt")
+    needed = {pid for segment in segments for pid in segment.province_ids} | set(supply_provinces)
+    missing = sorted(pid for pid in needed if pid not in anchors)
+    if missing:
+        raise ValueError(f"省份缺少锚点：{missing[:20]}")
+    return anchors, segments, supply_provinces, (width, height)
+
+
 def build_era_railway_layer(
     *,
     source_root: Path,
     strategic_values_path: Path,
     topology_path: Path,
 ) -> tuple[dict, dict]:
-    map_dir = source_root / "map"
-    _width, height = read_bmp_size(map_dir / "provinces.bmp")
-    anchors = parse_province_anchors(map_dir / "unitstacks.txt", height)
-    segments = parse_railways(map_dir / "railways.txt")
-    supply_provinces = parse_supply_nodes(map_dir / "supply_nodes.txt")
-    controls = load_victory_point_controls(strategic_values_path, anchors)
-    georef = PixelGeoreference(controls)
+    """原版 HOI4：直接用原版配准。"""
+    _anchors, segments, supply_provinces, _size = load_mod_sources(source_root)
+    vanilla = VanillaGeoreference.build(source_root, strategic_values_path)
     snapper = LandSnapper(topology_path)
+    needed = sorted({pid for segment in segments for pid in segment.province_ids} | set(supply_provinces))
+    raw_positions, from_city = vanilla.positions(needed)
+    positions, land_snapped = snap_positions(raw_positions, from_city, snapper)
+    layer, layer_stats = assemble_layer(segments, supply_provinces, positions, snapper)
+    audit = {
+        "georeference": vanilla.georef.stats,
+        **layer_stats,
+        "province_vertex_count": len(needed),
+        "city_coordinate_vertices": len(from_city),
+        "land_snapped_vertices": land_snapped,
+    }
+    return layer, audit
+
+
+class ModCylindricalGeoreference:
+    """模组地图 → 经纬度：x 与经度线性，纬度是 y 的一维单调函数。
+
+    控制点取模组与原版共用 ID、且经度一致的陆地省份（原版位置已配准），
+    以此识别出未被模组改动的省份；ID 被重用到别处的省份会因经度不一致被排除。
+    """
+
+    LON_AGREEMENT_DEG = 0.6
+    LAT_BIN_PX = 16.0
+
+    def __init__(self, mod_anchors: dict[int, tuple[float, float]], vanilla_positions: dict[int, tuple[float, float]], *, width: int):
+        from scipy.interpolate import PchipInterpolator
+
+        shared = sorted(pid for pid in mod_anchors if pid in vanilla_positions)
+        if len(shared) < 200:
+            raise ValueError(f"与原版共享的省份过少：{len(shared)}")
+        x = np.array([mod_anchors[pid][0] for pid in shared])
+        y = np.array([mod_anchors[pid][1] for pid in shared])
+        lon = np.array([vanilla_positions[pid][0] for pid in shared])
+        lat = np.array([vanilla_positions[pid][1] for pid in shared])
+        # 经度：先按"整幅图覆盖 360°"取初值，再用一致的控制点做线性回归。
+        slope, intercept = 360.0 / width, -180.0
+        for _ in range(3):
+            residual = (slope * x + intercept - lon + 180.0) % 360.0 - 180.0
+            consistent = np.abs(residual) < self.LON_AGREEMENT_DEG
+            unwrapped = lon + 360.0 * np.round((slope * x + intercept - lon) / 360.0)
+            slope, intercept = np.polyfit(x[consistent], unwrapped[consistent], 1)
+        residual = (slope * x + intercept - lon + 180.0) % 360.0 - 180.0
+        consistent = np.abs(residual) < self.LON_AGREEMENT_DEG
+        self.slope, self.intercept = float(slope), float(intercept)
+        # 纬度：按 y 分箱取中位数，再用保形分段三次插值（单调、不振荡）。
+        bins = np.floor(y[consistent] / self.LAT_BIN_PX).astype(int)
+        centers, medians = [], []
+        for b in np.unique(bins):
+            mask = bins == b
+            if mask.sum() >= 3:
+                centers.append(float(np.median(y[consistent][mask])))
+                medians.append(float(np.median(lat[consistent][mask])))
+        order = np.argsort(centers)
+        centers_arr = np.array(centers)[order]
+        medians_arr = np.minimum.accumulate(np.array(medians)[order])  # y 向下纬度单调递减
+        self._lat = PchipInterpolator(centers_arr, medians_arr, extrapolate=True)
+        self._y_range = (float(centers_arr[0]), float(centers_arr[-1]))
+        self.consistent_ids = {pid for pid, ok in zip(shared, consistent) if ok}
+        predicted_lat = self._lat(y[consistent])
+        lat_error_km = np.abs(predicted_lat - lat[consistent]) * 111.2
+        self.stats = {
+            "shared_province_count": len(shared),
+            "consistent_province_count": len(self.consistent_ids),
+            "lon_per_px": round(self.slope, 6),
+            "lon_at_x0": round(self.intercept, 4),
+            "lat_residual_km": {
+                "median": round(float(np.median(lat_error_km)), 1),
+                "p90": round(float(np.percentile(lat_error_km, 90)), 1),
+            },
+        }
+
+    def to_lonlat(self, x: float, y: float) -> tuple[float, float]:
+        lon = (self.slope * x + self.intercept + 180.0) % 360.0 - 180.0
+        lat = float(np.clip(self._lat(np.clip(y, *self._y_range)), -89.0, 89.0))
+        return float(lon), lat
+
+
+def build_mod_era_railway_layer(
+    *,
+    mod_root: Path,
+    vanilla_root: Path,
+    strategic_values_path: Path,
+    mod_topology_path: Path,
+    land_object_names: tuple[str, ...],
+) -> tuple[dict, dict]:
+    """大改地图的模组（如 TNO）：借原版配准识别未改动省份，其余用模组地图自身的柱面模型。"""
+    mod_anchors, segments, supply_provinces, (width, _height) = load_mod_sources(mod_root)
+    vanilla = VanillaGeoreference.build(vanilla_root, strategic_values_path)
+    from scenario_builder.hoi4.parser import parse_definition_csv
+
+    vanilla_defs = parse_definition_csv(vanilla_root / "map" / "definition.csv")
+    mod_defs = parse_definition_csv(mod_root / "map" / "definition.csv")
+    shared_land = sorted(
+        pid for pid in mod_anchors
+        if pid in vanilla.anchors
+        and getattr(vanilla_defs.get(pid), "province_type", "") == "land"
+        and getattr(mod_defs.get(pid), "province_type", "") == "land"
+    )
+    vanilla_positions, vanilla_from_city = vanilla.positions(shared_land)
+    model = ModCylindricalGeoreference(mod_anchors, vanilla_positions, width=width)
+    snapper = LandSnapper(mod_topology_path, land_object_names)
 
     needed = sorted({pid for segment in segments for pid in segment.province_ids} | set(supply_provinces))
-    missing = [pid for pid in needed if pid not in anchors]
-    if missing:
-        raise ValueError(f"省份缺少锚点：{missing[:20]}")
-    predicted = georef.to_lonlat(np.array([anchors[pid] for pid in needed]))
-    position_by_province: dict[int, tuple[float, float]] = {}
-    city_by_province = {c["province_id"]: c for c in controls}
-    city_snapped = land_snapped = 0
-    for pid, (lon, lat) in zip(needed, predicted):
-        city = city_by_province.get(pid)
-        if city and float(haversine_km(lon, lat, city["lon"], city["lat"])) <= CITY_SNAP_MAX_KM:
-            position_by_province[pid] = (city["lon"], city["lat"])
-            city_snapped += 1
-            continue
-        position, moved = snapper.snap(float(lon), float(lat))
-        land_snapped += int(moved)
-        position_by_province[pid] = position
+    raw_positions: dict[int, tuple[float, float]] = {}
+    from_city: set[int] = set()
+    reused = 0
+    for pid in needed:
+        if pid in model.consistent_ids:
+            raw_positions[pid] = vanilla_positions[pid]
+            reused += 1
+            if pid in vanilla_from_city:
+                from_city.add(pid)
+        else:
+            raw_positions[pid] = model.to_lonlat(*mod_anchors[pid])
+    positions, land_snapped = snap_positions(raw_positions, from_city, snapper)
+    layer, layer_stats = assemble_layer(segments, supply_provinces, positions, snapper)
+    audit = {
+        "georeference": {"vanilla": vanilla.georef.stats, "mod_cylindrical": model.stats},
+        **layer_stats,
+        "province_vertex_count": len(needed),
+        "vanilla_position_vertices": reused,
+        "mod_model_vertices": len(needed) - reused,
+        "city_coordinate_vertices": len(from_city),
+        "land_snapped_vertices": land_snapped,
+    }
+    return layer, audit
 
+
+def snap_positions(
+    positions: dict[int, tuple[float, float]],
+    keep_exact: set[int],
+    snapper: LandSnapper,
+) -> tuple[dict[int, tuple[float, float]], int]:
+    """城市坐标保持原样，其余落海的顶点吸附到陆地。"""
+    result: dict[int, tuple[float, float]] = {}
+    moved_count = 0
+    for pid, (lon, lat) in positions.items():
+        if pid in keep_exact:
+            result[pid] = (lon, lat)
+            continue
+        result[pid], moved = snapper.snap(lon, lat)
+        moved_count += int(moved)
+    return result, moved_count
+
+
+def assemble_layer(
+    segments: list[RailwaySegment],
+    supply_provinces: list[int],
+    position_by_province: dict[int, tuple[float, float]],
+    snapper: LandSnapper,
+) -> tuple[dict, dict]:
     features: list[dict] = []
     level_counts: dict[str, int] = {}
     midpoint_fixes = 0
@@ -293,17 +496,13 @@ def build_era_railway_layer(
         })
 
     layer = {"type": "FeatureCollection", "version": LAYER_VERSION, "features": features}
-    audit = {
-        "georeference": georef.stats,
+    stats = {
         "railway_segment_count": sum(level_counts.values()),
         "railway_level_counts": dict(sorted(level_counts.items())),
         "supply_node_count": len(supply_provinces),
-        "province_vertex_count": len(needed),
-        "city_coordinate_vertices": city_snapped,
-        "land_snapped_vertices": land_snapped,
         "sea_crossing_midpoint_fixes": midpoint_fixes,
     }
-    return layer, audit
+    return layer, stats
 
 
 def write_json(path: Path, payload: dict, *, compact: bool = False) -> None:
@@ -317,33 +516,47 @@ def write_json(path: Path, payload: dict, *, compact: bool = False) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    parser.add_argument("--source-root", default=None, help="HOI4 安装目录（默认自动探测）")
-    parser.add_argument("--scenario-dir", default="data/scenarios/hoi4_1936")
-    parser.add_argument("--output-dir", default="data/transport_layers/hoi4_era_rail")
+    parser.add_argument("--profile", choices=sorted(PROFILES), default="hoi4")
+    parser.add_argument("--source-root", default=None, help="HOI4 原版安装目录（默认自动探测）")
+    parser.add_argument("--mod-root", default=None, help="模组目录（mod 类 profile 使用，默认取 profile 预设）")
+    parser.add_argument("--output-dir", default=None)
     parser.add_argument(
         "--register-scenario",
         action="append",
         default=None,
-        help="把图层登记到这些剧本 manifest 的 era_railways_url（可重复；默认 hoi4_1936 与 hoi4_1939）",
+        help="把图层登记到这些剧本 manifest 的 era_railways_url（可重复；默认取 profile 预设）",
     )
     args = parser.parse_args(argv)
-    register_scenarios = args.register_scenario or ["hoi4_1936", "hoi4_1939"]
+    profile = PROFILES[args.profile]
+    register_scenarios = args.register_scenario or list(profile["register"])
+    output_rel = args.output_dir or profile["output_dir"]
 
-    source_root = discover_hoi4_source_root(args.source_root)
-    scenario_dir = (ROOT / args.scenario_dir).resolve()
-    output_dir = (ROOT / args.output_dir).resolve()
-    layer, audit = build_era_railway_layer(
-        source_root=source_root,
-        strategic_values_path=scenario_dir / "strategic_values.by_feature.json",
-        topology_path=scenario_dir / "runtime_topology.topo.json",
-    )
+    vanilla_root = discover_hoi4_source_root(args.source_root)
+    output_dir = (ROOT / output_rel).resolve()
+    strategic_values_path = ROOT / HOI4_CONTROL_SCENARIO_DIR / "strategic_values.by_feature.json"
+    if args.profile == "hoi4":
+        source_root = vanilla_root
+        layer, audit = build_era_railway_layer(
+            source_root=vanilla_root,
+            strategic_values_path=strategic_values_path,
+            topology_path=ROOT / HOI4_CONTROL_SCENARIO_DIR / "runtime_topology.topo.json",
+        )
+    else:
+        source_root = Path(args.mod_root or profile["mod_root"])
+        layer, audit = build_mod_era_railway_layer(
+            mod_root=source_root,
+            vanilla_root=vanilla_root,
+            strategic_values_path=strategic_values_path,
+            mod_topology_path=ROOT / profile["topology"],
+            land_object_names=tuple(profile["land_objects"]),
+        )
     write_json(output_dir / "era_rail.geojson", layer, compact=True)
-    write_json(output_dir / "build_audit.json", {"scenario_dir": args.scenario_dir, **audit})
+    write_json(output_dir / "build_audit.json", {"profile": args.profile, **audit})
     write_json(output_dir / "manifest.json", build_transport_manifest(
         output_dir=output_dir,
         source_root=source_root,
         audit=audit,
-        build_command=f"python tools/build_era_railways.py --scenario-dir {args.scenario_dir} --output-dir {args.output_dir}",
+        build_command=f"python tools/build_era_railways.py --profile {args.profile}",
     ))
     layer_url = f"{output_dir.relative_to(ROOT).as_posix()}/era_rail.geojson"
     for scenario_id in register_scenarios:

@@ -194,6 +194,7 @@ TRANSPORT_SMALL_DIRECT_RUNTIME_FILES = {
     "data/transport_layers/global_airport/airports.geojson",
     "data/transport_layers/global_port/ports.geojson",
     "data/transport_layers/hoi4_era_rail/era_rail.geojson",
+    "data/transport_layers/tno_era_rail/era_rail.geojson",
     "data/transport_layers/japan_airport/airports.geojson",
     "data/transport_layers/japan_port/ports.core.geojson",
     "data/transport_layers/japan_port/ports.expanded.geojson",
