@@ -12,6 +12,30 @@ CATEGORIES = {"demilitarized", "claim", "occupation", "lease", "economic", "rest
 
 
 class SpecialZonePresetTest(unittest.TestCase):
+    def test_second_batch_presets(self) -> None:
+        expected = {
+            "hoi4_1939": {"preset-sudetenland": "claim", "preset-bohemia-moravia": "occupation",
+                          "preset-memel": "claim", "preset-albania-occupation": "occupation", "preset-hatay": "claim"},
+        }
+        for scenario, presets in expected.items():
+            data = ScenarioData(scenario)
+            payload = json.loads((ROOT / "data/scenarios" / scenario / "special_zone_layers.json").read_text(encoding="utf-8"))
+            layers = {entry["id"]: entry for entry in payload["layers"]}
+            self.assertTrue(presets.keys() <= layers.keys())
+            for lid, category in presets.items():
+                with self.subTest(scenario=scenario, layer=lid):
+                    self.assertFalse(layers[lid]["visible"])
+                    self.assertTrue(layers[lid]["memberFeatureIds"])
+                    self.assertEqual(layers[lid]["presetId"], category)
+            if scenario == "hoi4_1939":
+                sudetenland = set(layers["preset-sudetenland"]["memberFeatureIds"])
+                protectorate = set(layers["preset-bohemia-moravia"]["memberFeatureIds"])
+                self.assertFalse(sudetenland & protectorate)
+                self.assertEqual(sudetenland, {fid for fid in data.owned_by("GER") if data.props(fid).get("cntr_code") == "CZ"})
+                self.assertEqual(protectorate, {fid for fid in data.owned_by("BOM") if data.props(fid).get("cntr_code") == "CZ"})
+                self.assertEqual(set(layers["preset-albania-occupation"]["memberFeatureIds"]),
+                                 {fid for fid in data.features if data.props(fid).get("cntr_code") == "AL"})
+
     def test_hoi4_1936_second_batch(self) -> None:
         data = ScenarioData("hoi4_1936")
         payload = json.loads((ROOT / "data/scenarios/hoi4_1936/special_zone_layers.json").read_text(encoding="utf-8"))
