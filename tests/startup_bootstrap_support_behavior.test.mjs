@@ -6,6 +6,7 @@ import { getSampleProjectIdFromUrl, resolveSampleProjectFromManifest, fetchSampl
 
 import { initLongAnimationFrameObserver, waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
 import { state as runtimeState } from "../js/core/state.js";
+import { overlayStartupManifestPresentationFields } from "../js/core/scenario/startup_manifest_presentation.js";
 import {
   setLongAnimationFrameObserver,
 } from "../js/core/state/actions/boot_actions.js";
@@ -35,6 +36,7 @@ function createStartupScenarioBootstrap(registry, overrides = {}) {
     loadStartupBundleViaWorker: async () => ({ payload: {} }),
     createStartupScenarioBundleFromPayload: async () => ({ manifest: {} }),
     validateScenarioRuntimeShellContract: () => ({ ok: true }),
+    overlayStartupManifestPresentationFields,
     ...overrides,
   };
   const createOwner = new Function(...Object.keys(dependencies), `${source}\nreturn createStartupDataPipelineOwner;`)(...Object.values(dependencies));
