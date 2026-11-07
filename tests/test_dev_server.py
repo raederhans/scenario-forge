@@ -2051,6 +2051,7 @@ class DevServerTest(unittest.TestCase):
                         {
                             "id": "buffer",
                             "name": "Buffer",
+                            "nameZh": "缓冲区",
                             "presetId": "buffer",
                             "category": "security",
                             "source": "project",
@@ -2072,6 +2073,7 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(payload["layers"][0]["source"], "scenario")
             self.assertIs(payload["layers"][0]["legendVisible"], False)
             self.assertEqual(payload["layers"][0]["memberFeatureIds"], ["DE-1", "DE-3"])
+            self.assertEqual(payload["layers"][0]["nameZh"], "缓冲区")
             self.assertEqual(result["layerCount"], 1)
 
     def test_save_scenario_district_groups_payload_rolls_back_when_manifest_write_fails(self) -> None:

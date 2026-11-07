@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 import { resolveDataAssetUrl } from "./runtime_asset_registry.js";
 
 const HOI4_UNIT_COUNTER_MANIFEST_URL = resolveDataAssetUrl("unit_counter_manifest:hoi4");
@@ -132,7 +133,7 @@ function normalizeHoi4UnitIconManifest(raw) {
 async function loadHoi4UnitIconManifest() {
   if (hoi4ManifestCache) return hoi4ManifestCache;
   if (!hoi4ManifestPromise) {
-    hoi4ManifestPromise = fetch(HOI4_UNIT_COUNTER_MANIFEST_URL, {
+    hoi4ManifestPromise = fetch(resolveDataUrl(HOI4_UNIT_COUNTER_MANIFEST_URL), {
       cache: "no-store",
       credentials: "same-origin",
     })

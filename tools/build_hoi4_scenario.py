@@ -48,6 +48,7 @@ from scenario_builder.hoi4.parser import (
     parse_states,
 )
 from scenario_builder.hoi4.strategic import parse_victory_point_localisation
+from scenario_builder.hoi4.politics import annotate_countries, read_histories
 
 
 DEFAULT_SCENARIO_ID = "hoi4_1936"
@@ -597,6 +598,10 @@ def main() -> int:
         )
 
     ensure_city_authoring_inputs(scenario_output_dir, args.scenario_id)
+    bundle["countries"], _ = annotate_countries(
+        bundle["countries"], read_histories(source_root / "history/countries"),
+        bundle["manifest"]["bookmark_date"],
+    )
     write_json(scenario_output_dir / "countries.json", bundle["countries"])
     write_json(scenario_output_dir / "owners.by_feature.json", bundle["owners"])
     stale_controllers_path = scenario_output_dir / "controllers.by_feature.json"
@@ -647,6 +652,10 @@ def main() -> int:
     manifest_payload["city_overrides_url"] = f"data/scenarios/{args.scenario_id}/city_overrides.json"
     manifest_payload["capital_hints_url"] = f"data/scenarios/{args.scenario_id}/capital_hints.json"
     manifest_payload["special_zone_layers_url"] = f"data/scenarios/{args.scenario_id}/special_zone_layers.json"
+    if (scenario_output_dir / "district_groups.manual.json").exists():
+        manifest_payload["district_groups_url"] = (
+            f"data/scenarios/{args.scenario_id}/district_groups.manual.json"
+        )
     write_json(scenario_output_dir / "manifest.json", manifest_payload)
 
     ensure_geo_locale_patch_inputs(scenario_output_dir, args.scenario_id)

@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "../data_base_url.js";
 import { createProjectionInverseParams, invertProjectedPoint } from './bathymetry_texture_math.js';
 import { buildBathymetryColorRamp } from './bathymetry_texture_palette.js';
 import { createBathymetryTextureSource } from './bathymetry_texture_source.js';
@@ -105,7 +106,7 @@ export function createBathymetryTextureRuntime({
     if (scenarioUrl) {
       const target = scenario, url = scenarioUrl;
       load(target, async () => {
-        const manifest = await fetchJson(url);
+        const manifest = await fetchJson(resolveDataUrl(url));
         const bitmap = await loadImageBitmap(manifest.overlay.url);
         return { bitmap, bounds: manifest.bounds };
       }, (overlay) => overlay.bitmap.close?.(), () => scenario === target);

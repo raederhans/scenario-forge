@@ -2,6 +2,7 @@ import { commitScenarioOptionalLayerPayloadState } from "./state/actions/scenari
 import { commitSpecialZoneLayersState } from "./state/actions/special_zone_actions.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
+  getSpecialZoneValidFeatureIds,
   resolveSpecialZoneTopologyFingerprint,
   normalizeSpecialZoneLayersState,
 } from "./special_zone_layers.js";
@@ -647,6 +648,8 @@ const {
 });
 const hasRenderableScenarioPoliticalTopology = hasRenderableScenarioPoliticalTopologyFromStartupHydration;
 
+
+
 export function applyScenarioOptionalLayerState(
   bundle,
   layerKey,
@@ -704,7 +707,7 @@ export function applyScenarioOptionalLayerState(
         }, {
           defaultSource: "scenario",
           topologyFingerprint,
-          validFeatureIds: state.landIndex instanceof Map ? new Set(state.landIndex.keys()) : null,
+          validFeatureIds: getSpecialZoneValidFeatureIds(state),
         });
       }
       syncScenarioUi();
@@ -713,7 +716,7 @@ export function applyScenarioOptionalLayerState(
     commitSpecialZoneLayersState(state, payload, {
       defaultSource: "scenario",
       topologyFingerprint: resolveSpecialZoneTopologyFingerprint(state),
-      validFeatureIds: state.landIndex instanceof Map ? new Set(state.landIndex.keys()) : null,
+      validFeatureIds: getSpecialZoneValidFeatureIds(state),
     });
   } else {
     state[config.stateField] = payload || null;

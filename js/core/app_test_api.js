@@ -78,6 +78,13 @@ function status() {
       loadedChunkIds: [...(state.activeScenarioChunks?.loadedChunkIds || [])],
       viewportBounds: loadState.lastSelection?.viewportBbox || null,
     },
+    // Work that may still land after `settled`: full bundle hydration and its health gate,
+    // and the deferred detail-topology promotion.
+    background: {
+      detailPending: !!state.detailPromotionInFlight || !!state.detailDeferred,
+      healthGate: String(state.scenarioHydrationHealthGate?.status || "idle"),
+      fatalRecovery: !!state.scenarioFatalRecovery,
+    },
     // Everything that affects pixels has settled: data, chunks, render passes and GPU presentation.
     // Panels refresh after paint; they are part of the settled UI too.
     settled: pipelineIdle && rasterPresented() && !hasPendingPanelRefresh(),

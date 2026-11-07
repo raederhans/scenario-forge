@@ -359,6 +359,9 @@ function createScenarioStartupHydrationController({
     const mergedReliefPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "relief")
       ? runtimeMergedLayerPayloads.relief || null
       : undefined;
+    const mergedEraRailwaysPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "erarailways")
+      ? runtimeMergedLayerPayloads.erarailways || null
+      : undefined;
     const mergedCitiesPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "cities")
       ? runtimeMergedLayerPayloads.cities || null
       : undefined;
@@ -605,6 +608,9 @@ function createScenarioStartupHydrationController({
       scenarioReliefOverlaysData: mergedReliefPayload !== undefined
         ? mergedReliefPayload
         : (bundle.reliefOverlaysPayload || state.scenarioReliefOverlaysData || null),
+      scenarioEraRailwaysData: mergedEraRailwaysPayload !== undefined
+        ? mergedEraRailwaysPayload
+        : (bundle.eraRailwaysPayload || state.scenarioEraRailwaysData || null),
     });
     if (mergedCitiesPayload !== undefined || bundle.cityOverridesPayload) {
       syncScenarioLocalizationState({
@@ -647,18 +653,28 @@ function createScenarioStartupHydrationController({
       || (phase !== "startup" && consumeScenarioTestHook("forceHydrationHealthGateOwnerMismatchOnce"));
     const effectiveOverlapCount = forcedMismatch ? 0 : overlapCount;
     const effectiveOverlapRatio = forcedMismatch && renderedFeatureCount > 0 ? 0 : overlapRatio;
+    // 没有归属模型的剧本（如 blank_base，基线 owners 为空）覆盖率天然为 0，
+    // 这里只用基线判断，用户在空白图上后来涂的归属不算"模型"，不能让它触发强制重载。
+    const baselineOwners = state.scenarioBaselineOwnersByFeatureId;
+    const hasOwnershipModel = !!baselineOwners
+      && typeof baselineOwners === "object"
+      && Object.keys(baselineOwners).length > 0;
     return {
       renderedFeatureCount,
       ownerFeatureCount,
       overlapCount: effectiveOverlapCount,
       overlapRatio: effectiveOverlapRatio,
+      hasOwnershipModel,
       healthy:
-        phase === "startup"
-          ? (renderedFeatureCount === 0 || effectiveOverlapRatio >= ownerFeatureCoverageMinRatio)
-          : (
-            renderedFeatureCount < ownerFeatureCoverageMinFeatures
-            || effectiveOverlapRatio >= ownerFeatureCoverageMinRatio
-          ),
+        (!hasOwnershipModel && !forcedMismatch)
+        || (
+          phase === "startup"
+            ? (renderedFeatureCount === 0 || effectiveOverlapRatio >= ownerFeatureCoverageMinRatio)
+            : (
+              renderedFeatureCount < ownerFeatureCoverageMinFeatures
+              || effectiveOverlapRatio >= ownerFeatureCoverageMinRatio
+            )
+        ),
       reason: forcedMismatch
         ? SCENARIO_HYDRATION_HEALTH_REASONS.ownerFeatureMismatch
         : SCENARIO_HYDRATION_HEALTH_REASONS.ok,

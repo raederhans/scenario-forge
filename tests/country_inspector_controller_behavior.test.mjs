@@ -267,6 +267,9 @@ function textOf(node) {
 
 function createHarness({
   selectedCountry = null,
+  resolveInspectorGroup,
+  stepUpInspectorSelection,
+  getInspectorFeatureLabel,
   hgoIdentity = null,
   countryEntries = [],
   countryTree = [],
@@ -291,6 +294,9 @@ function createHarness({
 
   const controller = createCountryInspectorController({
     runtimeState,
+    resolveInspectorGroup,
+    stepUpInspectorSelection,
+    getInspectorFeatureLabel,
     list,
     searchInput: { value: "", dataset: {}, addEventListener() {} },
     selectedCountryActionsSection: new TestElement("section"),
@@ -919,4 +925,37 @@ test("palette rebuild restores the same row after reorder without stealing exter
   state.recentColors = ["#112233"];
   controller.renderPaletteLibrary();
   assert.equal(document.activeElement, document.body);
+});
+
+test("drill breadcrumb preserves parcel highlight and navigates to group and country", () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+  try {
+    let steps = 0;
+    const harness = createHarness({
+      selectedCountry: { code: "AA", displayName: "国家甲" },
+      resolveInspectorGroup: () => ({ id: "g", label: "北方", children: ["a", "b"] }),
+      stepUpInspectorSelection: () => { steps += 1; },
+      getInspectorFeatureLabel: () => "地块甲",
+    });
+    Object.assign(harness.runtimeState, {
+      inspectorSelectionLevel: "feature", inspectorSelectionGroupId: "g", inspectorSelectionFeatureId: "a",
+      inspectorHighlightCountryCode: "", inspectorHighlightFeatureIds: ["a"],
+    });
+    harness.controller.renderCountryInspectorDetail();
+    assert.equal(harness.runtimeState.inspectorHighlightCountryCode, "");
+    assert.deepEqual(harness.runtimeState.inspectorHighlightFeatureIds, ["a"]);
+    const breadcrumb = harness.countryInspectorSelected.querySelector(".inspector-selection-breadcrumb");
+    assert.deepEqual(breadcrumb.children.map((node) => node.textContent), ["国家甲", "›", "北方", "›", "地块甲"]);
+    breadcrumb.children[2].click();
+    assert.equal(steps, 1);
+    breadcrumb.children[0].click();
+    assert.equal(harness.runtimeState.inspectorSelectionLevel, "country");
+    assert.equal(harness.runtimeState.inspectorHighlightCountryCode, "AA");
+    assert.deepEqual(harness.runtimeState.inspectorHighlightFeatureIds, []);
+    harness.controller.renderCountryInspectorDetail();
+    assert.equal(breadcrumb.hidden, true);
+  } finally {
+    globalThis.document = previousDocument;
+  }
 });

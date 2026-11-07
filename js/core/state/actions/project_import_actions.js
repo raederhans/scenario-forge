@@ -52,6 +52,7 @@ export function captureProjectImportState(target) {
     showRoad: target.showRoad,
     showScenarioAtlantropa: target.showScenarioAtlantropa,
     showScenarioReliefOverlays: target.showScenarioReliefOverlays,
+    showEraRailways: target.showEraRailways,
     showScenarioSpecialRegions: target.showScenarioSpecialRegions,
     showSpecialZones: target.showSpecialZones,
     showStrategicResourceMarkers: target.showStrategicResourceMarkers,

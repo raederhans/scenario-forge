@@ -957,6 +957,7 @@ def _normalize_special_zone_layers_payload(payload: object) -> dict[str, object]
         layers.append({
             "id": layer_id,
             "name": _normalize_text(raw_layer.get("name")) or layer_id,
+            **({"nameZh": _normalize_text(raw_layer.get("nameZh"))} if _normalize_text(raw_layer.get("nameZh")) else {}),
             "presetId": _normalize_text(raw_layer.get("presetId")) or "custom",
             "category": _normalize_text(raw_layer.get("category")) or "custom",
             "source": "scenario",

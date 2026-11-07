@@ -31,7 +31,7 @@ test("special zone layer defaults and preset registry are stable", () => {
   assert.equal(state.layers.length, 0);
   assert.deepEqual(state.storySteps, []);
   assert.equal(state.activeStoryStepId, "");
-  assert.equal(SPECIAL_ZONE_PRESETS.length, 18);
+  assert.equal(SPECIAL_ZONE_PRESETS.length, 7);
   const layer = createLayerFromPreset("custom", { id: "legend-default" });
   assert.equal(layer.legendVisible, true);
 });
@@ -302,7 +302,7 @@ test("style preset updates preserve members and replace mode keeps one explicit 
     layer: createLayerFromPreset("custom", { id: "active", memberFeatureIds: ["2", "1"] }),
   });
 
-  const disputed = SPECIAL_ZONE_PRESETS.find((preset) => preset.id === "disputed");
+  const disputed = SPECIAL_ZONE_PRESETS.find((preset) => preset.id === "claim");
   state = mutateSpecialZoneLayersState(state, {
     action: "updateLayer",
     layerId: "active",
@@ -329,7 +329,7 @@ test("style preset updates preserve members and replace mode keeps one explicit 
   });
 
   layer = state.layers.find((entry) => entry.id === "active");
-  assert.equal(layer.presetId, "disputed");
+  assert.equal(layer.presetId, "claim");
   assert.equal(layer.style.fill, disputed.style.fill);
   assert.deepEqual(layer.memberFeatureIds, ["1", "2"]);
 
@@ -364,4 +364,58 @@ test("render projection copies layer metadata while retaining land geometry", ()
   projected.properties.__specialZoneLayerStyle.fill = "#000000";
   assert.notEqual(layer.style.fill, "#000000");
   assert.equal(layerState.diagnostics[0].code, "preserved");
+});
+
+
+test("legacy presets normalize to canonical categories while retaining stored styles", () => {
+  const groups = {
+    demilitarized: ["buffer", "neutral", "frontier", "demilitarized"],
+    claim: ["disputed"], occupation: ["occupied", "military"],
+    lease: ["protectorate", "administrative"], economic: ["special_economic", "industrial", "resource"],
+    restricted: ["exclusion", "wasteland"], custom: ["autonomous", "cultural", "maritime", "custom"],
+  };
+  for (const [category, ids] of Object.entries(groups)) {
+    for (const presetId of ids) {
+      const layer = normalizeSpecialZoneLayersState({ layers: [{ id: presetId, presetId, category: "political", style: { pattern: "crossHatch", fill: "#123456" }, memberFeatureIds: ["b", "a"] }] }).layers[0];
+      assert.equal(layer.category, category);
+      assert.equal(layer.presetId, category);
+      assert.equal(layer.style.pattern, "crossHatch");
+      assert.equal(layer.style.fill, "#123456");
+    }
+  }
+});
+
+test("new patterns and styles survive serialization with members and source", () => {
+  for (const pattern of ["fineHatch", "dashHatch", "bandStripes", "dotGrid", "fineHorizontal", "openGrid"]) {
+    const layer = createLayerFromPreset("occupation", { id: pattern, source: "scenario", memberFeatureIds: ["b", "a"], style: { pattern, fillOpacity: 0, patternOpacity: 0.5 } });
+    const state = normalizeSpecialZoneLayersState({ layers: [layer] });
+    const restored = normalizeSpecialZoneLayersState(JSON.parse(JSON.stringify(serializeSpecialZoneLayersState(state))));
+    assert.deepEqual(restored.layers, state.layers);
+    assert.equal(restored.layers[0].style.pattern, pattern);
+    assert.deepEqual(restored.layers[0].memberFeatureIds, ["a", "b"]);
+    assert.equal(restored.layers[0].style.fillOpacity, 0);
+  }
+});
+
+test("纹理小样拒绝会破坏内联 SVG 的颜色值，图层可带中文显示名", async () => {
+  const { createSpecialZonePatternPreviewStyle, getSpecialZoneLayerDisplayName, normalizeSpecialZoneLayersState } = await import("../js/core/special_zone_layers.js");
+  const preview = createSpecialZonePatternPreviewStyle({ fill: '"/><script>', stroke: "orange", pattern: "fineHatch" });
+  assert.ok(!decodeURIComponent(preview.backgroundImage).includes("<script>"));
+  assert.equal(preview.borderColor, "orange");
+  const state = normalizeSpecialZoneLayersState({ layers: [{ id: "a", name: "Rhineland DMZ", nameZh: "莱茵兰非军事区", presetId: "demilitarized", memberFeatureIds: [] }] });
+  assert.equal(getSpecialZoneLayerDisplayName(state.layers[0], "zh"), "莱茵兰非军事区");
+  assert.equal(getSpecialZoneLayerDisplayName(state.layers[0], "en"), "Rhineland DMZ");
+});
+
+test("成员按剧本全部地块校验：尚未加载的细分地块不会在编辑时被删掉", async () => {
+  const { getSpecialZoneValidFeatureIds, normalizeSpecialZoneLayersState } = await import("../js/core/special_zone_layers.js");
+  const runtimeState = {
+    scenarioBaselineOwnersByFeatureId: { DEA11: "GER", DEB31: "GER" },
+    landIndex: new Map([["DE_COARSE", {}]]),
+  };
+  const valid = getSpecialZoneValidFeatureIds(runtimeState);
+  const state = normalizeSpecialZoneLayersState({ layers: [{ id: "a", memberFeatureIds: ["DEA11", "DEB31", "GONE"] }] }, { validFeatureIds: valid });
+  assert.deepEqual(state.layers[0].memberFeatureIds, ["DEA11", "DEB31"]);
+  assert.ok(valid.has("DE_COARSE"));
+  assert.equal(getSpecialZoneValidFeatureIds({}), null);
 });

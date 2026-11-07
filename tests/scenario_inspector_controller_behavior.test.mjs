@@ -19,6 +19,7 @@ class Element {
       },
     };
   }
+  setAttribute(name, value) { this[name] = value; }
   appendChild(child) { this.children.push(child); return child; }
   replaceChildren(...children) { this.children = children; }
   addEventListener(type, callback) { this.listeners.set(type, callback); }
@@ -32,7 +33,9 @@ function button(root, label) {
   return result;
 }
 function country(extra = {}) {
-  return { code: "AA", displayName: "Country A", hierarchyGroups: [], ...extra };
+  const groups = extra.hierarchyGroups || [];
+  return { code: "AA", displayName: "Country A", hierarchyGroups: groups,
+    groupSystems: [{ id: "geographic", groups }], ...extra };
 }
 function harness(t, overrides = {}) {
   const previous = globalThis.document;
@@ -45,6 +48,7 @@ function harness(t, overrides = {}) {
   const deps = {
     t: (value) => value,
     getView: () => ({ ...view }),
+    selectGroupSystem: record("selectGroupSystem"),
     getCountryState: () => null,
     storeVisualOpen: record("storeOpen"),
     selectInspectorCountry: record("select"),
@@ -204,4 +208,31 @@ test("color disclosure opens by default, records toggles, and has no ownership b
   h.render(country());
   assert.ok(!nodes(h.root).some((node) => node.textContent === "Return to Political Ownership Brush"));
   assert.ok(!h.calls.some(([name]) => name === "paintMode"));
+});
+
+test("group source and toggle display the selected system without painting until a group is clicked", (t) => {
+  const district = { id: "district:AA:one", label: "District One", labelZh: "第一大区", children: ["a"] };
+  const geographic = { id: "AA_north", label: "North", children: ["b"] };
+  const h = harness(t);
+  h.view.language = "zh";
+  const target = country({
+    hierarchyGroups: [district],
+    groupSystems: [{ id: "scenario_districts", groups: [district] }, { id: "geographic", groups: [geographic] }],
+  });
+  h.render(target);
+  assert.ok(nodes(h.root).some((node) => node.tagName === "small" && node.textContent === "Scenario districts"));
+  assert.equal(button(h.root, "Scenario districts")["aria-pressed"], "true");
+  button(h.root, "第一大区");
+  button(h.root, "Modern administrative regions").fire();
+  assert.ok(nodes(h.root).some((node) => node.tagName === "small" && node.textContent === "Modern administrative regions"));
+  assert.equal(button(h.root, "Modern administrative regions")["aria-pressed"], "true");
+  assert.ok(!nodes(h.root).some((node) => node.textContent === "第一大区"));
+  assert.deepEqual(h.calls.filter(([name]) => name === "selectGroupSystem"), [["selectGroupSystem", "AA", "geographic"]]);
+  assert.ok(!h.calls.some(([name]) => ["hierarchy", "paintOwned", "open"].includes(name)));
+  button(h.root, "North").fire();
+  assert.equal(h.calls.find(([name]) => name === "hierarchy")[1], geographic);
+  h.view.inspectorGroupSystemByCode = { AA: "geographic" };
+  h.render(target);
+  button(h.root, "North");
+  assert.ok(!nodes(h.root).some((node) => node.textContent === "第一大区"));
 });

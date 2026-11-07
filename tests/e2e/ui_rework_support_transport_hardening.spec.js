@@ -42,7 +42,7 @@ async function openTransportWorkbenchFromProject(page) {
   await page.locator("#transportProjectSection #scenarioTransportWorkbenchBtn").click();
 }
 
-test("special zone layer workbench gates members and applies rectangular presets", async ({ page }) => {
+test("special zone workbench creates a categorized region and enables member editing", async ({ page }) => {
   test.setTimeout(120_000);
   await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
@@ -60,29 +60,23 @@ test("special zone layer workbench gates members and applies rectangular presets
 
   const workbench = page.locator("[data-special-zone-layers-workbench]");
   await expect(workbench).toBeVisible();
-  await expect(workbench.locator(".special-zone-member-tool-btn")).toHaveCount(0);
-  await expect(workbench).toContainText("Create a layer before editing members or styles.");
-  await expect(workbench.locator(".special-zone-preset-card")).toHaveCount(0);
-
-  await workbench.getByRole("button", { name: "New layer" }).click();
-  await expect(workbench.locator(".special-zone-member-tool-btn")).toHaveCount(3);
+  await expect(workbench.locator(".special-zone-member-edit")).toHaveCount(0);
+  await workbench.getByRole("button", { name: "New region", exact: true }).click();
+  await workbench.locator(".special-zone-create-form select").selectOption("demilitarized");
+  await workbench.getByRole("button", { name: "Create", exact: true }).click();
+  await expect(workbench.locator(".special-zone-member-edit")).toBeVisible();
+  await expect(workbench.locator(".special-zone-member-edit")).toHaveAttribute("aria-pressed", "true");
   await expect(workbench.locator(".special-zone-current-style-preview")).toBeVisible();
-  const securityPresetGroup = workbench.locator('[data-preset-category="security"]');
-  await securityPresetGroup.locator("summary").click();
-  const demilitarizedPreset = securityPresetGroup.locator(".special-zone-preset-card").filter({ hasText: "Demilitarized Zone" });
-  await expect(demilitarizedPreset.locator(".special-zone-preset-preview")).toBeVisible();
-
-  await demilitarizedPreset.click();
   const layerState = await page.evaluate(async () => {
     const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
     const stateModule = await import(stateModuleUrl);
     const layer = stateModule.state?.specialZoneLayers?.layers?.[0] || null;
     return {
-      presetId: layer?.presetId || "",
+      category: layer?.category || "",
       memberCount: layer?.memberFeatureIds?.length || 0,
     };
   });
-  expect(layerState.presetId).toBe("demilitarized");
+  expect(layerState.category).toBe("demilitarized");
   expect(layerState.memberCount).toBe(0);
 });
 

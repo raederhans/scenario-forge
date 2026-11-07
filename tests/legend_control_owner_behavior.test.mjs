@@ -315,3 +315,11 @@ test("special zone layers still show the legend when no color is named", (t) => 
   assert.equal(h.element().hidden, false);
   assert.deepEqual(h.labels(), ["Zone"]);
 });
+
+test("图例默认按内容自动高度，用户调整过的高度才固定", async () => {
+  const { normalizeLegendControl } = await import("../js/core/legend_state_normalizers.js");
+  assert.equal(normalizeLegendControl({}).height, null);
+  assert.equal(normalizeLegendControl({ height: null }).height, null);
+  assert.equal(normalizeLegendControl({ height: 280 }).height, 280);
+  assert.equal(normalizeLegendControl({ height: 20 }).height, 130);
+});

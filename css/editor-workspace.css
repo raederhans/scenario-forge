@@ -574,3 +574,51 @@
 .editor-layer-name { font-weight: 500; }
 .editor-layer-trigger.is-active .editor-layer-name { font-weight: 600; }
 .editor-display-stack > .border-control-row { padding-bottom: var(--space-3); }
+
+#rightSidebar .editor-property-panel .city-points-label-card .city-points-toggle-stack {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+#rightSidebar .editor-property-panel :is(.frontline-tab-card, .frontline-workbench-block, .special-zone-workbench-card) {
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+#rightSidebar .editor-property-panel .frontline-tab-card::before {
+  display: none;
+}
+
+#rightSidebar .editor-property-panel .special-zone-workbench-card {
+  border-top: 1px solid var(--line-1);
+}
+
+/* W3 收尾：模式参数区不再套白框；专题页 h3 与其他分组标题同级；未用 .range-input 的滑块跟随强调色。 */
+#rightSidebar .editor-property-panel .ml-5.space-y-2 { padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+#rightSidebar .editor-property-panel :is(.appearance-control-card > h3, .strategic-values-heading > h3) {
+  margin: 0 0 12px; font-size: var(--fs-sm); font-weight: 600; line-height: 1.4; color: var(--ink-900);
+}
+#rightSidebar .editor-property-panel input[type="range"] { accent-color: var(--accent); }
+
+/* 响应式收尾：窄屏抽屉的关闭按钮不压住一级标签；保存状态至少完整显示一个短状态；
+   「名称与显示」等 editor-disclosure 用 SVG 箭头替代浏览器原生三角。 */
+@media (max-width: 1279px) {
+  .editor-project-bar #workspaceSaveStatus { min-width: 4.5em; }
+}
+@media (max-width: 1023px) {
+  .editor-workspace #leftSidebar .editor-task-nav { padding-right: 48px; }
+}
+.editor-disclosure > summary { display: flex; align-items: center; gap: 6px; list-style: none; }
+.editor-disclosure > summary::-webkit-details-marker { display: none; }
+.editor-disclosure > summary::before {
+  content: ""; flex: 0 0 12px; width: 12px; height: 12px; background-color: currentColor;
+  -webkit-mask: var(--icon-chevron-right) center / 12px 12px no-repeat; mask: var(--icon-chevron-right) center / 12px 12px no-repeat;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.editor-disclosure[open] > summary::before { transform: rotate(90deg); }

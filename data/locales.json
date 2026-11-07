@@ -298088,7 +298088,7 @@
     },
     "Notes": {
       "en": "Notes",
-      "zh": "备注"
+      "zh": "说明"
     },
     "ORG": {
       "en": "ORG",
@@ -303817,6 +303817,58 @@
     "Political & borders": {
       "en": "Political & borders",
       "zh": "政治与边界"
+    },
+    "Bathymetry details": {
+      "en": "Bathymetry details",
+      "zh": "测深细节"
+    },
+    "Local adjustment: depth field": {
+      "en": "Local adjustment: depth field",
+      "zh": "局部调整：深度场"
+    },
+    "Local adjustment: glow field": {
+      "en": "Local adjustment: glow field",
+      "zh": "局部调整：辉光场"
+    },
+    "More options": {
+      "en": "More options",
+      "zh": "更多选项"
+    },
+    "Click a parcel on the map, or search for a country on the left.": {
+      "en": "Click a parcel on the map, or search for a country on the left.",
+      "zh": "在地图上点选一个地块，或在左侧搜索国家。"
+    },
+    "Command palette": {
+      "en": "Command palette",
+      "zh": "命令面板"
+    },
+    "Help": {
+      "en": "Help",
+      "zh": "帮助"
+    },
+    "Keyboard shortcuts": {
+      "en": "Keyboard shortcuts",
+      "zh": "键盘快捷键"
+    },
+    "No country selected": {
+      "en": "No country selected",
+      "zh": "还没有选中国家"
+    },
+    "No matching commands": {
+      "en": "No matching commands",
+      "zh": "没有匹配的命令"
+    },
+    "Search commands": {
+      "en": "Search commands",
+      "zh": "搜索命令"
+    },
+    "Switch language": {
+      "en": "Switch language",
+      "zh": "切换语言"
+    },
+    "User guide": {
+      "en": "User guide",
+      "zh": "使用指南"
     }
   }
 }

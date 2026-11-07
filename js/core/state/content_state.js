@@ -544,6 +544,7 @@ export function hydrateHierarchyState(
 
   if (target.hierarchyData?.groups) {
     const labels = target.hierarchyData.labels || {};
+    const labelsZh = target.hierarchyData.labels_zh || {};
     Object.entries(target.hierarchyData.groups).forEach(([groupId, children]) => {
       const code = normalizeCountryCode(groupId.split("_")[0]);
       if (!code) return;
@@ -551,6 +552,7 @@ export function hydrateHierarchyState(
       list.push({
         id: groupId,
         label: labels[groupId] || groupId,
+        ...(labelsZh[groupId] ? { labelZh: labelsZh[groupId] } : {}),
         children: Array.isArray(children) ? children : [],
       });
       target.hierarchyGroupsByCode.set(code, list);

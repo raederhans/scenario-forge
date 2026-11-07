@@ -441,6 +441,7 @@ export function getVisibleScenarioChunkLayers({
   showScenarioSpecialRegions = false,
   showScenarioAtlantropa = false,
   showScenarioReliefOverlays = false,
+  showEraRailways = false,
   showCityPoints = false,
   requiredSemanticLayers = [],
 } = {}) {
@@ -450,6 +451,7 @@ export function getVisibleScenarioChunkLayers({
     showScenarioSpecialRegions ? "special" : "",
     showScenarioAtlantropa ? "scenario_atlantropa" : "",
     showScenarioReliefOverlays ? "relief" : "",
+    showEraRailways ? "erarailways" : "",
     showCityPoints ? "cities" : "",
     ...(Array.isArray(requiredSemanticLayers) ? requiredSemanticLayers : []),
   ]

@@ -1,3 +1,4 @@
+import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
 import { createHitTestingOwner } from "./map_renderer/hit_testing_owner.js";
 import { lazyOwner } from "./map_renderer/lazy_owner.js";
 import { isUsableLineMesh } from "./renderer/packed_line_mesh.js";
@@ -26,7 +27,7 @@ import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
-import { pushRecentColorState, selectInspectorCountryState } from "./state/actions/editor_input_actions.js";
+import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCountryState, selectInspectorGroupState, selectInspectorFeatureState } from "./state/actions/editor_input_actions.js";
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
@@ -881,6 +882,9 @@ const getTransientOverlayRenderOwner = lazyOwner(() => createTransientOverlayRen
 
 const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getOverlayProjectionSignature,
+  getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
+  getSelectionBoundaryRevision: () => getPaintContourRuntimeOwner().getRevision(),
+  getZoomScale: () => runtimeState.zoomTransform?.k || 1,
   getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
   getDevSelectionIds: () => Array.isArray(runtimeState.devSelectionOrder)
     ? Array.from(runtimeState.devSelectionOrder, (id) => String(id || "").trim()).filter(Boolean) : [],
@@ -1469,6 +1473,7 @@ const getSpecialZoneLayersRenderOwner = lazyOwner(() => createSpecialZoneLayersR
   },
   helpers: {
     clamp,
+    getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
     getDashPattern,
     getFeatureId,
     getPathSVG: () => rendererSurfaceHost.getPathSvg(),
@@ -2341,6 +2346,7 @@ function getPaintContourRuntimeOwner() {
       state: runtimeState,
       getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
+      resolveSourceFeatureId: (feature, id) => feature?.properties?.__riverParentId || id,
       resolveClassification: resolveClassifiedBorderFeature,
       getWaterMaskSources: () => ({
         land: runtimeState.showScenarioAtlantropa === false ? runtimeState.landBgData
@@ -2382,6 +2388,8 @@ function getPaintContourRuntimeOwner() {
       },
       onChange: (reason) => {
         invalidateRenderPasses("borders", reason);
+        // 特殊区域外轮廓依赖边图；边图异步就绪后让特殊区域重绘，不再停留在回退轮廓。
+        runtimeState.specialZonesOverlayDirty = true;
         requestRendererRender(reason, { flush: false });
       },
     });
@@ -3291,6 +3299,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     shouldBlockUnderlyingSelectionForFacility,
     shouldRequireLeafDetail,
     syncInspectorCountryToLandSelection,
+    clearInspectorLandSelection,
     toggleFeatureInDevSelection,
     updateDevSelectedHit,
     warnIncompletePaintTargets: () => {
@@ -7092,7 +7101,10 @@ function renderUnitCountersIfNeeded({ force = false } = {}) {
 }
 
 function renderInspectorHighlightOverlayIfNeeded({ force = false } = {}) {
-  return getSelectionOverlayOwner().renderInspectorHighlightOverlayIfNeeded({ force });
+  const result = getSelectionOverlayOwner().renderInspectorHighlightOverlayIfNeeded({ force });
+  // 侧栏与地图点击都会经过这里；检查器选中变化后同步特殊区域工作台的“加入选中国家/分组”按钮。
+  refreshSpecialZonesWorkbenchCurrentTargetUiIfChanged();
+  return result;
 }
 
 function renderHoverOverlayIfNeeded({ force = false, eventType = "hover" } = {}) {
@@ -13914,7 +13926,17 @@ function collectCountryCodesForFeatureIds(featureIds) {
   return Array.from(codes);
 }
 
-function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
+function clearInspectorLandSelection() {
+  const previousCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
+  if (!previousCode) return false;
+  clearInspectorSelectionState(runtimeState);
+  scheduleSidebarRefresh({ ownerCodes: [previousCode], refreshPresetTree: true });
+  requestInteractionRender("clear-inspector-land-selection");
+  return true;
+}
+
+function syncInspectorCountryToLandSelection(feature, featureId, hit = null, event = null) {
+  if (event?.detail >= 2) return false;
   const ownerCode = canonicalCountryCode(getFeatureOwnerCode(featureId));
   const featureCode = canonicalCountryCode(
     ownerCode
@@ -13926,13 +13948,55 @@ function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
   if (!nextCode) return false;
 
   const previousCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
-  selectInspectorCountryState(runtimeState, nextCode);
+  const step = event ? resolveInspectorDrillStep({
+    current: {
+      countryCode: previousCode,
+      level: runtimeState.inspectorSelectionLevel || "country",
+      groupId: runtimeState.inspectorSelectionGroupId,
+      featureId: runtimeState.inspectorSelectionFeatureId,
+    },
+    hit: { countryCode: nextCode, featureId },
+    findGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
+  }) : { level: "country", countryCode: nextCode };
+  applyInspectorDrillSelection(step);
   // The inspector, its rows and the preset tree follow after the click's frame is painted.
   scheduleSidebarRefresh({
     ownerCodes: [previousCode, nextCode].filter(Boolean),
     refreshPresetTree: true,
   });
   return nextCode !== previousCode;
+}
+
+function applyInspectorDrillSelection({ level, countryCode, group, featureId }) {
+  if (level === "group") {
+    selectInspectorGroupState(runtimeState, countryCode, group);
+    setInspectorFeatureHighlight(group.children, { groupMode: true, label: group.label });
+  } else if (level === "feature") {
+    selectInspectorFeatureState(runtimeState, countryCode, featureId, group);
+    setInspectorFeatureHighlight([featureId], {
+      label: getGeoFeatureDisplayLabel(runtimeState.landIndex.get(featureId)),
+    });
+  } else {
+    selectInspectorCountryState(runtimeState, countryCode);
+  }
+}
+
+function stepUpInspectorSelection() {
+  const countryCode = runtimeState.selectedInspectorCountryCode;
+  const step = resolveInspectorStepUp({
+    current: {
+      countryCode,
+      level: runtimeState.inspectorSelectionLevel,
+      featureId: runtimeState.inspectorSelectionFeatureId,
+    },
+    findGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
+  });
+  if (!step) return false;
+  if (!step.countryCode) return clearInspectorLandSelection();
+  applyInspectorDrillSelection(step);
+  scheduleSidebarRefresh({ ownerCodes: [countryCode], refreshPresetTree: true });
+  requestInteractionRender("step-up-inspector-selection");
+  return true;
 }
 
 // Keyboard equivalent of a select-tool land click: same selection state, no paint or history.
@@ -14055,7 +14119,11 @@ function getSpecialZonesWorkbenchCurrentTargetSignature() {
     ? String(runtimeState.devHoverHit.id || "").trim()
     : "";
   const hoveredId = String(runtimeState.hoveredId || "").trim();
-  return selectedId || hoverHitId || hoveredId || "";
+  const inspectorSelection = [
+    runtimeState.selectedInspectorCountryCode || "",
+    runtimeState.inspectorHighlightGroupMode ? (runtimeState.inspectorHighlightFeatureIds || []).length : 0,
+  ].join(":");
+  return `${selectedId || hoverHitId || hoveredId || ""}|${inspectorSelection}`;
 }
 
 function notifyDevWorkspace() {
@@ -14833,6 +14901,8 @@ function initMap({
   facilityInfoCardCloseBtn = document.getElementById("facilityInfoCardCloseBtn");
   facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   runtimeState.refreshColorStateFn = refreshColorState;
+  runtimeState.clearInspectorLandSelectionFn = clearInspectorLandSelection;
+  runtimeState.stepUpInspectorSelectionFn = stepUpInspectorSelection;
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);
 
