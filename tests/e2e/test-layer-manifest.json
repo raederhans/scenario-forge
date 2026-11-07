@@ -437,6 +437,13 @@
       "executionMode": "browser",
       "domain": "water-runtime",
       "ownerHint": "water-runtime"
+    },
+    {
+      "specPath": "tests/e2e/tno_strategic_values_cold_start.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
     }
   ]
 }
