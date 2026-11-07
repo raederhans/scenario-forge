@@ -28,6 +28,9 @@ function createHarness(startupError) {
   const loadCalls = [];
   const dependencies = {
     normalizeScenarioId: (value) => String(value || "").trim(),
+    // 开场视角与样例深链判断是启动流程的显示副作用，这里与恢复逻辑无关。
+    applyScenarioOpeningView: () => {},
+    getSampleProjectIdFromUrl: () => "",
     async loadScenarioBundle(scenarioId, options) {
       assert.equal(runtimeState.scenarioApplyInFlight, true);
       loadCalls.push({ scenarioId, options });
