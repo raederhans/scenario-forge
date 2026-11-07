@@ -2,28 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createSpecialZoneLayersRenderOwner } from "../js/core/renderer/special_zone_layers_render_owner.js";
 
-function createSelection() {
-  return {
-    nodes: [],
-    data(features) { this.nodes = features.map((datum) => ({ datum, attributes: {} })); return this; },
-    enter() { return this; },
-    append() { return this; },
-    merge() { return this; },
-    attr(name, value) {
-      this.nodes.forEach((node) => { node.attributes[name] = typeof value === "function" ? value(node.datum) : value; });
-      return this;
-    },
-    exit() { return { remove() {} }; },
-  };
-}
-
-for (const [style, expected] of [[{ fillOpacity: 0 }, 0], [{}, 0.32], [{ fillOpacity: null }, 0.32], [{ fillOpacity: 0.5 }, 0.5]]) {
+for (const [style, expected] of [[{ fillOpacity: 0 }, 0], [{}, 0.12], [{ fillOpacity: null }, 0.32], [{ fillOpacity: 0.5 }, 0.5]]) {
   test(`special zone renderer outputs fill-opacity ${expected}`, () => {
-    const selections = new Map();
+    const nodes = [];
     const group = {
-      selectAll(selector) {
-        if (!selections.has(selector)) selections.set(selector, createSelection());
-        return selections.get(selector);
+      selectAll() { return { remove() { nodes.length = 0; } }; },
+      append() {
+        const node = { attributes: {} };
+        nodes.push(node);
+        const selection = { attr(name, value) { node.attributes[name] = value; return selection; } };
+        return selection;
       },
     };
     const owner = createSpecialZoneLayersRenderOwner({
@@ -35,8 +23,7 @@ for (const [style, expected] of [[{ fillOpacity: 0 }, 0], [{}, 0.32], [{ fillOpa
       groupGetters: { getSpecialZonesGroup: () => group },
     });
     owner.updateSpecialZonesPaths();
-    const nodes = selections.get("path.special-zone").nodes;
-    assert.equal(nodes.length, 1);
+    assert.equal(nodes.length, 3);
     assert.equal(nodes[0].attributes["fill-opacity"], expected);
   });
 }

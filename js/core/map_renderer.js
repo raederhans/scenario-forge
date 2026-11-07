@@ -1472,6 +1472,7 @@ const getSpecialZoneLayersRenderOwner = lazyOwner(() => createSpecialZoneLayersR
   },
   helpers: {
     clamp,
+    getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
     getDashPattern,
     getFeatureId,
     getPathSVG: () => rendererSurfaceHost.getPathSvg(),
@@ -2386,6 +2387,8 @@ function getPaintContourRuntimeOwner() {
       },
       onChange: (reason) => {
         invalidateRenderPasses("borders", reason);
+        // 特殊区域外轮廓依赖边图；边图异步就绪后让特殊区域重绘，不再停留在回退轮廓。
+        runtimeState.specialZonesOverlayDirty = true;
         requestRendererRender(reason, { flush: false });
       },
     });
@@ -7097,7 +7100,10 @@ function renderUnitCountersIfNeeded({ force = false } = {}) {
 }
 
 function renderInspectorHighlightOverlayIfNeeded({ force = false } = {}) {
-  return getSelectionOverlayOwner().renderInspectorHighlightOverlayIfNeeded({ force });
+  const result = getSelectionOverlayOwner().renderInspectorHighlightOverlayIfNeeded({ force });
+  // 侧栏与地图点击都会经过这里；检查器选中变化后同步特殊区域工作台的“加入选中国家/分组”按钮。
+  refreshSpecialZonesWorkbenchCurrentTargetUiIfChanged();
+  return result;
 }
 
 function renderHoverOverlayIfNeeded({ force = false, eventType = "hover" } = {}) {
@@ -14069,7 +14075,11 @@ function getSpecialZonesWorkbenchCurrentTargetSignature() {
     ? String(runtimeState.devHoverHit.id || "").trim()
     : "";
   const hoveredId = String(runtimeState.hoveredId || "").trim();
-  return selectedId || hoverHitId || hoveredId || "";
+  const inspectorSelection = [
+    runtimeState.selectedInspectorCountryCode || "",
+    runtimeState.inspectorHighlightGroupMode ? (runtimeState.inspectorHighlightFeatureIds || []).length : 0,
+  ].join(":");
+  return `${selectedId || hoverHitId || hoveredId || ""}|${inspectorSelection}`;
 }
 
 function notifyDevWorkspace() {
