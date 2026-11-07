@@ -12,6 +12,7 @@
   "default_country": "GER",
   "detail_chunk_manifest_url": "data/scenarios/hoi4_1936/detail_chunks.manifest.json",
   "display_name": "HOI4 1936",
+  "district_groups_url": "data/scenarios/hoi4_1936/district_groups.manual.json",
   "featured_tags": [
     "FRA",
     "USA",
