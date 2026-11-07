@@ -866,9 +866,9 @@ function politicalCoverageQuery(polygons) {
       if (px < x0 || px > x1 || y < y0 || y > y1) continue;
       let query = queries.get(id);
       if (!query) queries.set(id, query = createContourPolygonQuery(polygons.get(id), false));
-      if (query(x, y)) return true;
+      if (query(x, y)) return id;
     }
-    return false;
+    return -1;
   };
 }
 
@@ -963,7 +963,7 @@ function sharedSegments(geometry, diagnostics, options, polygons) {
   diagnostics.oneSidedSegments = remaining.length;
   const consumed = new Map();
   for (const edge of nearSeamSegments(remaining, shared, diagnostics, options.nearSeamTolerance, options.land, polygons, consumed)) shared.push(edge);
-  const coast = [];
+  const coast = [], overlap = [];
   const covered = politicalCoverageQuery(polygons);
   for (const edge of remaining) {
     const start = edge.start, end = edge.end;
@@ -978,9 +978,12 @@ function sharedSegments(geometry, diagnostics, options, polygons) {
       const t = (lo + hi) / 2;
       let x = start[0] + dx * t + sign * dy / length * 1e-5;
       x = ((x + 180) % 360 + 360) % 360 - 180;
-      if (covered(x, start[1] + dy * t - sign * dx / length * 1e-5)) return;
+      const coverer = covered(x, start[1] + dy * t - sign * dx / length * 1e-5);
       const a = point(lo), b = point(hi);
-      coast.push({ start: a, end: b, a: coordinate(a), b: coordinate(b), owner: Math.abs(edge.members[0]) - 1 });
+      const owner = Math.abs(edge.members[0]) - 1;
+      const segment = { start: a, end: b, a: coordinate(a), b: coordinate(b), owner };
+      if (coverer < 0) coast.push(segment);
+      else overlap.push({ ...segment, coverer, pair: [owner, coverer] });
     };
     let cursor = 0;
     for (const [lo, hi] of (consumed.get(edge) || []).sort((a, b) => a[0] - b[0])) {
@@ -988,13 +991,13 @@ function sharedSegments(geometry, diagnostics, options, polygons) {
     }
     emit(cursor, 1);
   }
-  return { shared, coast };
+  return { shared, coast, overlap };
 }
 
-function packChains(groups, featureIds, diagnostics, coast) {
+function packChains(groups, featureIds, diagnostics, coast, overlap = false) {
   const paths = [];
   let pointCount = 0;
-  const orderedGroups = [...groups.values()].sort((a, b) => coast ? a[0].owner - b[0].owner
+  const orderedGroups = [...groups.values()].sort((a, b) => coast && !overlap ? a[0].owner - b[0].owner
     : a[0].pair[0] - b[0].pair[0] || a[0].pair[1] - b[0].pair[1]);
   const compareEdges = (a, b) => edgeCoordinate(a, false, 0) - edgeCoordinate(b, false, 0)
     || edgeCoordinate(a, false, 1) - edgeCoordinate(b, false, 1)
@@ -1056,6 +1059,7 @@ function packChains(groups, featureIds, diagnostics, coast) {
   const offsets = new Uint32Array(paths.length + 1);
   const owners = new Uint32Array(coast ? 0 : paths.length * 2);
   const coastOwners = coast ? new Uint32Array(paths.length) : null;
+  const overlapCoverers = overlap ? new Uint32Array(paths.length) : null;
   let position = 0;
   const writePoint = (edge, second) => {
     coordinates[position * 2] = edgeCoordinate(edge, second, 0, true);
@@ -1065,6 +1069,7 @@ function packChains(groups, featureIds, diagnostics, coast) {
     offsets[index] = position;
     if (!coast) { owners[index * 2] = pair[0]; owners[index * 2 + 1] = pair[1]; }
     else coastOwners[index] = edges[0].owner;
+    if (overlap) overlapCoverers[index] = edges[0].coverer;
     for (let step = 0; step < steps.length; step++) {
       const token = steps[step], edge = edges[Math.abs(token) - 1], forward = token > 0;
       if (!step) writePoint(edge, !forward);
@@ -1072,6 +1077,7 @@ function packChains(groups, featureIds, diagnostics, coast) {
     }
   });
   offsets[paths.length] = position;
+  if (overlap) return { coordinates, offsets, overlapOwners: coastOwners, overlapCoverers };
   if (coast) return { coordinates, offsets, coastOwners, arcs: Uint32Array.from(paths, (_, index) => index) };
   return { featureIds: [...featureIds], coordinates, offsets, owners,
     diagnostics: { ...diagnostics, arcCount: paths.length, pointCount, packedBytes: coordinates.byteLength + offsets.byteLength + owners.byteLength } };
@@ -1296,7 +1302,8 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
       const previous = segmentCache?.shared.get(key);
       if (previous?.length === group.length && group.every((edge, i) => edge === previous[i])) shared.set(key, previous);
     }
-    return { shared, coast: segments.coast && indexSegments(segments.coast, edge => edge.owner) };
+    return { shared, coast: segments.coast && indexSegments(segments.coast, edge => edge.owner),
+      overlap: indexSegments(segments.overlap, pairKey) };
   }
   function mergeGroups(previous, next, affected, paired) {
     for (const [key, group] of previous) {
@@ -1528,6 +1535,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
           mergeGroups(geometryCache.remaining, cached.remaining, affected, false);
           mergeGroups(segmentCache.shared, local.shared, affected, true);
           if (local.coast) mergeGroups(segmentCache.coast, local.coast, affected, false);
+          mergeGroups(segmentCache.overlap, local.overlap, affected, true);
           diagnostics.incremental = true; diagnostics.incrementalFeatureCount = dirty.size;
         }
         if (!fullFallback) {
@@ -1566,6 +1574,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
       const graph = packChains(segmentCache.shared, featureIds, diagnostics, false);
       const coastStart = performance.now();
       graph.coast = segmentCache.coast ? packChains(segmentCache.coast, featureIds, diagnostics, true) : null;
+      graph.overlap = packChains(segmentCache.overlap, featureIds, diagnostics, true, true);
       // 无陆地蒙版时海岸只供选区外轮廓使用，不作为可绘制海岸线（保持原有绘制行为）。
       if (graph.coast) graph.coast.renderable = !!land;
       if (diagnostics.incremental) Object.defineProperties(graph.diagnostics, {
