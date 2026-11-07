@@ -437,6 +437,13 @@
       "executionMode": "browser",
       "domain": "water-runtime",
       "ownerHint": "water-runtime"
+    },
+    {
+      "specPath": "tests/e2e/atlantropa_project_markers.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
     }
   ]
 }
