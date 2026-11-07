@@ -1,6 +1,66 @@
 {
   "version": 1,
-  "layers": [],
+  "layers": [
+    {
+      "id": "preset-danzig-dmz",
+      "name": "Danzig Demilitarized Area",
+      "nameZh": "但泽非军事化地带",
+      "presetId": "demilitarized",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "memberFeatureIds": [
+        "PL_MRG_727dd6268093__SPLIT_DANZIG",
+        "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
+        "PL_POW_2209__SPLIT_DANZIG",
+        "PL_POW_2210__SPLIT_DANZIG",
+        "PL_POW_2261",
+        "PL_POW_2264"
+      ],
+      "note": "HOI4 州 85 set_demilitarized_zone，书签日仍有效"
+    },
+    {
+      "id": "preset-yellow-river-flood",
+      "name": "Yellow River Flood Area",
+      "nameZh": "黄泛区",
+      "presetId": "restricted",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "memberFeatureIds": [
+        "CN_CITY_17275852B11831222400516",
+        "CN_CITY_17275852B13720894899448",
+        "CN_CITY_17275852B14656646152928",
+        "CN_CITY_17275852B21027902515532",
+        "CN_CITY_17275852B25230716975612",
+        "CN_CITY_17275852B27387408000676",
+        "CN_CITY_17275852B29180806171493",
+        "CN_CITY_17275852B34461807983634",
+        "CN_CITY_17275852B35544294560010",
+        "CN_CITY_17275852B36068725262944",
+        "CN_CITY_17275852B41138581062594",
+        "CN_CITY_17275852B42150871691362",
+        "CN_CITY_17275852B4361013542927",
+        "CN_CITY_17275852B45046943691615",
+        "CN_CITY_17275852B45530821909299",
+        "CN_CITY_17275852B46380594187155",
+        "CN_CITY_17275852B47775830384450",
+        "CN_CITY_17275852B51025607344217",
+        "CN_CITY_17275852B52729797795226",
+        "CN_CITY_17275852B56434829262827",
+        "CN_CITY_17275852B5674127157826",
+        "CN_CITY_17275852B69259623848725",
+        "CN_CITY_17275852B77400672470843",
+        "CN_CITY_17275852B77980777243348",
+        "CN_CITY_17275852B83104882902138",
+        "CN_CITY_17275852B95241901152258",
+        "CN_CITY_17275852B96094758616716",
+        "CN_CITY_17275852B96665943782542",
+        "CN_MRG_427fc101d0bb"
+      ],
+      "note": "1938-06 花园口决堤；HOI4 州 598/606/607 的 yellow_river_blown 修正（1938-10-25 起 300 天）"
+    }
+  ],
   "activeLayerId": "",
   "topologyFingerprint": "",
   "diagnostics": []
