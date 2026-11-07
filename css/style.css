@@ -3652,15 +3652,6 @@ details.card[open] > summary::after {
   border-radius: var(--radius-xs);
 }
 
-.map-legend-swatch.has-pattern::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-top: 1px solid currentColor;
-  transform: rotate(-35deg);
-  transform-origin: center;
-}
-
 .map-legend-label {
   overflow: hidden;
   font-size: 0.73rem;
@@ -13352,30 +13343,40 @@ button.scenario-action-card:hover {
 }
 
 .special-zone-layer-row {
-  padding: 6px;
-  border: 1px solid var(--line-1);
-  border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line-1);
 }
 
 .special-zone-layer-row.is-active {
-  border-color: color-mix(in srgb, var(--accent) 24%, transparent);
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  background: var(--line-1);
+  border-radius: var(--radius-sm);
 }
 
-.special-zone-layer-row .secondary-btn:first-child {
-  flex: 1 1 100%;
-  justify-content: flex-start;
+.special-zone-layer-select {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   text-align: left;
 }
 
-.special-zone-layer-row .secondary-btn:nth-last-child(-n + 2) {
-  flex: 0 0 30px;
-  padding: 0;
+.special-zone-layer-select .special-zone-pattern-choice-preview {
+  flex: 0 0 24px;
+  width: 24px;
 }
 
-.special-zone-layer-row.is-active button:first-child {
-  font-weight: 700;
+.special-zone-create-form,
+.special-zone-advanced[open] {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.special-zone-advanced > summary {
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .special-zone-preset-groups {
@@ -13520,15 +13521,15 @@ button.scenario-action-card:hover {
   align-items: center;
   display: grid;
   gap: 8px;
-  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-columns: 28px minmax(0, 1fr);
   justify-content: stretch;
   text-align: left;
   width: 100%;
 }
 
 .special-zone-style-card .special-zone-pattern-choice {
-  gap: 5px;
-  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 6px;
+  grid-template-columns: 24px minmax(0, 1fr);
   min-height: 28px;
   padding: 4px 6px;
 }
@@ -13540,16 +13541,16 @@ button.scenario-action-card:hover {
 }
 
 .special-zone-pattern-choice-preview {
-  aspect-ratio: 2.6 / 1;
-  border: 2px solid currentColor;
-  border-radius: var(--radius-sm);
+  aspect-ratio: 1 / 1;
+  border: 1px solid currentColor;
+  border-radius: 4px;
   display: block;
   min-width: 0;
-  width: 72px;
+  width: 28px;
 }
 
 .special-zone-style-card .special-zone-pattern-choice-preview {
-  width: 34px;
+  width: 24px;
 }
 
 .special-zone-pattern-choice-name {

@@ -1,3 +1,4 @@
+import { exitSpecialZoneMembershipToolState } from "../core/state/actions/special_zone_actions.js";
 import {
   STATE_BUS_EVENTS,
   callRuntimeHook,
@@ -300,6 +301,14 @@ function initShortcuts() {
         event.preventDefault();
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_STRATEGIC_OVERLAY_UI);
         flushShortcutRender("shortcut-strategic-overlay-cancel");
+        return;
+      }
+      if (runtimeState.currentTool === "special-zone-membership") {
+        event.preventDefault();
+        exitSpecialZoneMembershipToolState(runtimeState);
+        syncToolUi();
+        callRuntimeHook(runtimeState, "updateSpecialZonesWorkbenchUIFn");
+        flushShortcutRender("shortcut-special-zone-membership-exit");
         return;
       }
       if (runtimeState.specialZoneEditor?.active) {
