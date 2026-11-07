@@ -12,6 +12,7 @@
   "default_country": "GER",
   "detail_chunk_manifest_url": "data/scenarios/hoi4_1936/detail_chunks.manifest.json",
   "display_name": "HOI4 1936",
+  "district_groups_url": "data/scenarios/hoi4_1936/district_groups.manual.json",
   "featured_tags": [
     "FRA",
     "USA",
@@ -2604,7 +2605,7 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "ea00a06671cdeb73723bb5fbf526883d6ee40273e18096a4e8cdc2ff3573f9fe",
+  "snapshot_fingerprint": "74171811c328b2bcca20f607c61452fd46101fa8d4f550e2bb3d1c1638614107",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "c282bf3118df7018a6e946bc6500a54db1e23afc4ed9212f29ccd3f847b0cfc2",
