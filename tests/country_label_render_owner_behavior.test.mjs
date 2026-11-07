@@ -1389,3 +1389,27 @@ test("deferred fit completes for a country wholly inside the paint margin", () =
   assert.equal(callbacks.length, 0, "no repeated invalidation/preparation loop");
   assert.ok(context.events.some(event => event[0] === "fill"));
 });
+
+test("Chinese labels request their font slices once per source revision and language", async () => {
+  const loads = [];
+  const fonts = { load(font, text) { loads.push([font, text]); return Promise.resolve([]); } };
+  const { owner, state, source } = createHarness({ names: ["中国", "日本国"], helperOptions: { getFontSet: () => fonts } });
+  const settle = async () => { for (let i = 0; i < 3; i++) await Promise.resolve(); };
+  owner.drawCountryLabels(1);
+  await settle();
+  assert.equal(loads.length, 0, "English labels never request the Chinese face");
+  state.language = "zh";
+  owner.drawCountryLabels(1);
+  owner.drawCountryLabels(1);
+  await settle();
+  assert.equal(loads.length, 1, "repeated frames reuse the same request");
+  assert.match(loads[0][0], /^400 16px "Map Noto Serif SC"/);
+  assert.deepEqual([...loads[0][1]].sort(), [..."中国日本"].sort(), "exactly the label glyphs, deduplicated");
+  source.revision = 2;
+  source.countries[1].name = "满洲国";
+  owner.drawCountryLabels(1);
+  await settle();
+  assert.equal(loads.length, 2);
+  assert.deepEqual([...loads[1][1]].sort(), [..."中国满洲"].sort());
+  assert.equal(owner.getDiagnostics().chineseGlyphRequests, 2);
+});
