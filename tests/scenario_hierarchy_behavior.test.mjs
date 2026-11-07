@@ -10,6 +10,7 @@ import { getQuickFillLevelModel } from "../js/ui/toolbar/quick_fill_level_contro
 import { readFileSync } from "node:fs";
 import { parse } from "acorn";
 import { normalizeCountryCodeAlias } from "../js/core/country_code_aliases.js";
+import { getHierarchyGroupsForCode as getProviderHierarchyGroups } from "../js/core/country_group_provider.js";
 
 // Bind the actual consumer functions to a local fixture, as in the import
 // transaction tests. Never write the application's shared state singleton.
@@ -122,7 +123,7 @@ test("quick-fill and border consumers plus source-bound sidebar and releasable c
   assert.equal(candidate.featureToGroup.size, 3144);
 
   runtime.hierarchyGroupsByCode = new Map([["US", [{ id: "US_old", children: ["US_ZN_31_1__R"] }]]]);
-  const { getHierarchyGroupsForCode } = bindConsumers("../js/ui/sidebar.js", ["getHierarchyGroupsForCode"], runtime);
+  const getHierarchyGroupsForCode = (code) => getProviderHierarchyGroups(runtime, code);
   const { resolveFeatureIdsFromPresetSource } = bindConsumers("../js/core/releasable_manager.js",
     ["normalizePresetSource", "getActiveFeatureMergeOverride", "projectSharedFeatureIds",
       "resolveFeatureIdsFromPresetSource", "resolveMemberFeatureIdsFromPresetSource"], runtime);
@@ -158,7 +159,7 @@ test("sidebar indexes scenario hierarchy once across country queries and refresh
       return Reflect.ownKeys(target);
     },
   });
-  const { getHierarchyGroupsForCode } = bindConsumers("../js/ui/sidebar.js", ["getHierarchyGroupsForCode"], runtime);
+  const getHierarchyGroupsForCode = (code) => getProviderHierarchyGroups(runtime, code);
   const us = getHierarchyGroupsForCode("us");
   assert.deepEqual(us, expectedUS);
   assert.deepEqual(getHierarchyGroupsForCode("IN"), expectedIN);

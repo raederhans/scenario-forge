@@ -2,6 +2,8 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Scenario districts": { zh: "剧本大区", en: "Scenario districts" },
+  "Modern administrative regions": { zh: "现代行政区", en: "Modern administrative regions" },
   "Political & borders": { zh: "政治与边界", en: "Political & borders" },
   "Help": { zh: "帮助", en: "Help" },
   "User guide": { zh: "使用指南", en: "User guide" },

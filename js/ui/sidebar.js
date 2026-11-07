@@ -1,7 +1,7 @@
 import { applyFeaturePaintState } from "../core/state/color_state.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
-import { clipHierarchyGroupsToOwner, getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
+import { getCountryGroupSystems, getHierarchyGroupsForCode as getGeographicHierarchyGroups } from "../core/country_group_provider.js";
 // Sidebar UI (Phase 13)
 import {
   state as runtimeState,
@@ -64,7 +64,7 @@ import { initDevWorkspace } from "./dev_workspace.js";
 import { UI_URL_STATE_KEYS } from "./ui_contract.js";
 import { createCountryInspectorModel } from "./sidebar/country_inspector_model.js";
 import { createScenarioTerritoryController } from "./sidebar/scenario_territory_controller.js";
-import { createScenarioInspectorController } from "./sidebar/scenario_inspector_controller.js";
+import { createScenarioInspectorController, renderCountryGroupButtons } from "./sidebar/scenario_inspector_controller.js";
 import { createRegionalPresetController } from "./sidebar/regional_preset_controller.js";
 import { createCountryInspectorController } from "./sidebar/country_inspector_controller.js";
 import { createRegionSearchController } from "./sidebar/region_search_controller.js";
@@ -415,59 +415,8 @@ function ensureCountryPaletteColor(code, fallbackIndex = 0) {
   return generated;
 }
 
-const hierarchyGroupsCache = new WeakMap();
-
 export function getHierarchyGroupsForCode(code) {
-  const normalizedCode = normalizeCountryCode(code);
-  if (!normalizedCode) return [];
-  const hierarchy = getEffectiveScenarioHierarchy(runtimeState);
-  if (hierarchy === runtimeState.hierarchyData && runtimeState.hierarchyGroupsByCode.size > 0) {
-    return runtimeState.hierarchyGroupsByCode.get(normalizedCode) || [];
-  }
-  if (!hierarchy?.groups) return [];
-  if (!normalizedCode.includes("_")) {
-    let cached = hierarchyGroupsCache.get(hierarchy);
-    if (!cached || cached.groups !== hierarchy.groups || cached.labels !== hierarchy.labels) {
-      const byCode = new Map();
-      const labels = hierarchy.labels || {};
-      Object.entries(hierarchy.groups).forEach(([groupId, children]) => {
-        const separator = groupId.indexOf("_");
-        if (separator < 0) return;
-        const groupCode = groupId.slice(0, separator);
-        if (!byCode.has(groupCode)) byCode.set(groupCode, []);
-        byCode.get(groupCode).push({
-          id: groupId,
-          label: labels[groupId] || groupId.slice(separator + 1).replace(/_/g, " "),
-          children: Array.isArray(children) ? children : [],
-        });
-      });
-      byCode.forEach((groups) => groups.sort((a, b) => a.label.localeCompare(b.label)));
-      cached = { groups: hierarchy.groups, labels: hierarchy.labels, byCode };
-      hierarchyGroupsCache.set(hierarchy, cached);
-    }
-    return cached.byCode.get(normalizedCode) || [];
-  }
-  const labels = hierarchy.labels || {};
-  const groups = [];
-  Object.entries(hierarchy.groups).forEach(([groupId, children]) => {
-    if (!groupId.startsWith(`${normalizedCode}_`)) return;
-    const label = labels[groupId] || groupId.replace(`${normalizedCode}_`, "").replace(/_/g, " ");
-    groups.push({
-      id: groupId,
-      label,
-      children: Array.isArray(children) ? children : [],
-    });
-  });
-  groups.sort((a, b) => a.label.localeCompare(b.label));
-  return groups;
-}
-
-// 剧本国家的层级分组按地理国家码查到（RKM → RU），再裁到该国实际拥有的地块。
-function getOwnedHierarchyGroups(groupingCode, ownerCode) {
-  const groups = getHierarchyGroupsForCode(groupingCode);
-  if (!runtimeState.activeScenarioId || runtimeState.mapSemanticMode === "blank") return groups;
-  const reference = getMapDataBoundary(runtimeState).reference;
-  return clipHierarchyGroupsToOwner(groups, ownerCode, (id) => reference.getScenarioGroupCode(id));
+  return getGeographicHierarchyGroups(runtimeState, code);
 }
 
 function applyVisualOverridesToFeatureIds(
@@ -2781,6 +2730,12 @@ function initSidebar({ render } = {}) {
     const inspectorGroupAnchorId = inspectorGroupMeta.anchorId;
     const topLevelGroupId = inspectorGroupId || continentId;
     const topLevelGroupLabel = inspectorGroupLabel || continentLabel;
+    const groupSystems = scenarioMeta.releasable ? [] : getCountryGroupSystems({
+      runtimeState,
+      ownerCode: normalizedEntryCode,
+      groupingCode: groupLookupCode,
+      getOwnerCode: (id) => getMapDataBoundary(runtimeState).reference.getScenarioGroupCode(id),
+    });
     // inspector 状态把 lookup/preset/grouping code 分开保存：
     // 列表分组、预设读取和详情展示可能各自指向不同来源，不能在这里合并成一个 code。
     return {
@@ -2794,7 +2749,8 @@ function initSidebar({ render } = {}) {
       presetLookupCode,
       groupingCode: groupLookupCode,
       presets: runtimeState.presetsState[presetLookupCode] || [],
-      hierarchyGroups: scenarioMeta.releasable ? [] : getOwnedHierarchyGroups(groupLookupCode, normalizedEntryCode),
+      groupSystems,
+      hierarchyGroups: groupSystems[0]?.groups || [],
       continentId,
       continentLabel,
       continentDisplayLabel: getDirectGeoLabel(continentLabel) || continentLabel,
@@ -3470,6 +3426,12 @@ function initSidebar({ render } = {}) {
     return;
   };
 
+  const storeInspectorGroupSystem = (code, id) => {
+    runtimeState.ui ||= {};
+    runtimeState.ui.inspectorGroupSystemByCode ||= {};
+    runtimeState.ui.inspectorGroupSystemByCode[code] = id;
+  };
+
   const renderParentCountryActions = (container, countryState) => {
     renderCountryColorSyncAffordance(container, countryState);
     const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"), {
@@ -3477,24 +3439,26 @@ function initSidebar({ render } = {}) {
       defaultOpen: false,
       rememberKey: "territories-presets:hierarchy-groups",
     });
-    if (countryState.hierarchyGroups.length > 0) {
-      countryState.hierarchyGroups.forEach((group) => {
-        const button = createInspectorActionButton(
-          getDirectGeoLabel(group.label) || group.label,
-          () => applyHierarchyGroup(group, runtimeState.selectedColor, render)
-        );
-        groupSection.appendChild(button);
-      });
-    } else {
-      groupSection.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
-    }
+    renderCountryGroupButtons(groupSection, countryState, {
+      t,
+      language: runtimeState.currentLanguage,
+      translateGeo: getDirectGeoLabel,
+      selectedSystemId: runtimeState.ui?.inspectorGroupSystemByCode?.[countryState.code],
+      selectSystem: (id) => storeInspectorGroupSystem(countryState.code, id),
+      createInspectorActionButton,
+      applyGroup: (group) => applyHierarchyGroup(group, runtimeState.selectedColor, render),
+      createEmptyNote,
+    });
 
     renderRegionalPresets(container, countryState);
   };
 
   const { renderScenarioActionsPanel } = createScenarioInspectorController({
     t: translateCountryGeoLabel,
+    selectGroupSystem: storeInspectorGroupSystem,
     getView: () => ({
+      language: runtimeState.currentLanguage,
+      inspectorGroupSystemByCode: runtimeState.ui?.inspectorGroupSystemByCode,
       visualOpen: !!runtimeState.ui?.scenarioVisualAdjustmentsOpen,
       paintMode: String(runtimeState.paintMode || "visual"),
       selectedColor: String(runtimeState.selectedColor || ""),
