@@ -73,7 +73,10 @@ function harness(t, overrides = {}) {
     createEmptyNote: (text) => Object.assign(new Element(), { textContent: text }),
     renderRegionalPresets: record("presets"),
     normalizeCountryCode: (value) => String(value || "").trim().toUpperCase(),
-    getPrimaryReleasablePresetRef: () => ({ preset: { name: "Core A", ids: ["visible", "hidden"] } }),
+    resolveTerritoryEntry: () => ({ tag: "AA", boundary_variants: [], companion_actions: [] }),
+    resolveTerritoryFeatureIds: () => ["visible", "hidden"],
+    getSelectedBoundaryVariant: () => null,
+    selectBoundaryVariant: record("variant"),
     applyScenarioReleasableCoreTerritory: record("core"),
     selectedCountryActionsSection: host,
     scheduleAdaptiveInspectorHeights: record("schedule"),
@@ -120,17 +123,32 @@ test("parent and child navigation retain labels, swatches, and country targets",
 });
 
 test("core reference keeps visual actions while retired ownership actions are absent", (t) => {
-  const h = harness(t);
-  const target = country({ releasable: true, boundaryVariants: [{ id: " BASE ", label: "Base" }, { id: "alt", label: "Alternate" }] });
+  const variants = [{ id: "base", label: "Base", description: "" }, { id: "alt", label: "Alternate", description: "" }];
+  const h = harness(t, {
+    resolveTerritoryEntry: () => ({ tag: "AA", boundary_variants: variants, companion_actions: [] }),
+    getSelectedBoundaryVariant: () => variants[0],
+  });
+  const target = country({ releasable: true });
   h.render(target);
   const labels = nodes(h.root).filter((node) => node.tagName === "button").map((node) => node.textContent);
   for (const label of ["Base", "Alternate", "Activate Releasable", "Reapply Core Territory"]) {
     assert.ok(!labels.includes(label), `retired action remains absent: ${label}`);
   }
-  button(h.root, "Apply Visual Color to Core Territory").fire();
-  assert.ok(!h.calls.some(([name]) => ["activate", "variant", "transfers"].includes(name)));
+  // Variants are a selection only: choosing one paints nothing by itself.
+  const select = nodes(h.root).find((node) => node.tagName === "select");
+  assert.deepEqual(select.children.map((option) => option.value), ["base", "alt"]);
+  select.value = "alt";
+  select.fire("change");
+  assert.deepEqual(h.calls.find(([name]) => name === "variant").slice(1, 3), ["AA", "alt"]);
+  assert.ok(!h.calls.some(([name]) => name === "core"));
+  button(h.root, "Apply territory").fire();
+  assert.ok(!h.calls.some(([name]) => ["activate", "transfers"].includes(name)));
   assert.ok(!h.calls.some(([name]) => name === "presets"));
-  assert.deepEqual(h.calls.find(([name]) => name === "core"), ["core", target, { source: "visual-adjustments", actionMode: "visual" }]);
+  const core = h.calls.find(([name]) => name === "core");
+  assert.equal(core[1], target);
+  assert.deepEqual(core[2].companionActionIds, []);
+  assert.equal(core[2].filterToVisibleFeatureIds, h.deps.filterToVisibleFeatureIds);
+  assert.equal("actionMode" in core[2], false);
 });
 
 test("non-releasable country retains reference painting without an ownership target action", (t) => {
@@ -143,20 +161,31 @@ test("non-releasable country retains reference painting without an ownership tar
 });
 
 test("missing core disables visual core buttons and explains missing territory", (t) => {
-  const h = harness(t, { getPrimaryReleasablePresetRef: () => null });
+  const h = harness(t, { resolveTerritoryFeatureIds: () => [] });
   h.render(country({ releasable: true }));
-  assert.equal(button(h.root, "Apply Visual Color to Core Territory").disabled, true);
-  assert.equal(button(h.root, "Clear Core Territory Visual Overrides").disabled, true);
+  assert.equal(button(h.root, "Apply territory").disabled, true);
+  assert.equal(button(h.root, "Clear Territory Visual Overrides").disabled, true);
   assert.equal(nodes(h.root).filter((node) => node.textContent === "No core territory defined").length, 1);
+});
+
+test("existing scenario countries keep country visuals and add territory only with a catalog entry", (t) => {
+  const withEntry = harness(t);
+  withEntry.render(country());
+  button(withEntry.root, "Paint Reference Regions With Country Color");
+  button(withEntry.root, "Apply territory");
+  const without = harness(t, { resolveTerritoryEntry: () => null });
+  without.render(country());
+  button(without.root, "Paint Reference Regions With Country Color");
+  assert.ok(!nodes(without.root).some((node) => node.tagName === "button" && node.textContent === "Apply territory"));
 });
 
 test("visual core actions preserve visual mode and filter clear targets to visible features", (t) => {
   const h = harness(t);
   const target = country({ releasable: true });
   h.render(target);
-  button(h.root, "Apply Visual Color to Core Territory").fire();
-  button(h.root, "Clear Core Territory Visual Overrides").fire();
-  assert.deepEqual(h.calls.find(([name]) => name === "core"), ["core", target, { source: "visual-adjustments", actionMode: "visual" }]);
+  button(h.root, "Apply territory").fire();
+  button(h.root, "Clear Territory Visual Overrides").fire();
+  assert.equal(h.calls.find(([name]) => name === "core")[1], target);
   assert.deepEqual(h.calls.find(([name]) => name === "filter"), ["filter", ["visible", "hidden"]]);
   const clear = h.calls.find(([name]) => name === "clearCore");
   assert.deepEqual(clear[1], ["visible"]);

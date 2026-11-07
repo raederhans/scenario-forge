@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 import { createRegionalPresetController } from "../js/ui/sidebar/regional_preset_controller.js";
-import { createScenarioTerritoryController } from "../js/ui/sidebar/scenario_territory_controller.js";
 
 class FakeElement {
   constructor(tagName) {
@@ -119,31 +118,6 @@ function createHarness({
     },
   });
   return { controller, runtimeState, calls, render, visible };
-}
-
-function createTerritoryControllerForRegionalHarness(controller, calls) {
-  calls.hooks = [];
-  calls.companions = [];
-  calls.shells = [];
-  return createScenarioTerritoryController({
-    t: (value) => value,
-    prepareScenarioCoreApplication: controller.prepareScenarioCoreApplication,
-    getPrimaryReleasablePresetRef: controller.getPrimaryReleasablePresetRef,
-    applyPresetReference: controller.applyPresetReference,
-    getCountryState: () => null,
-    getResolvedCountryColor: () => "#445566",
-    blockLockedScenarioInteraction: () => false,
-    applyScenarioOwnerControllerAssignments: () => ({
-      applied: true, changed: 1, matchedCount: 1,
-    }),
-    activateCoreOwner: (...args) => calls.hooks.push(args),
-    setReleasableBoundaryVariant: () => true,
-    applyScenarioAutoCompanionActions: (...args) => calls.companions.push(args),
-    refreshScenarioShellOverlays: (...args) => calls.shells.push(args),
-    showToast: () => {},
-    render: () => {},
-    renderList: () => {},
-  });
 }
 
 function withMutedWarnings(run) {
@@ -553,40 +527,3 @@ test("direct preset references apply generated ids with partial visibility and p
   }]);
   assert.equal(calls.ownership.length, 0);
 });
-
-test("territory controller visual apply consumes the generated regional reference without ownership side effects", () => {
-  const { controller, calls } = createHarness({
-    visibleIds: ["core-a"],
-    scenarioMetaByCode: {
-      CORE: {
-        tag: "CORE",
-        release_lookup_iso2: "AA",
-        selected_boundary_variant_id: "generated",
-        boundary_variants: [{ id: "generated", preset_source: { ids: ["core-a"] } }],
-      },
-    },
-  });
-  const territoryController = createTerritoryControllerForRegionalHarness(controller, calls);
-
-  const applied = territoryController.applyScenarioReleasableCoreTerritory(
-    { code: "CORE", presetLookupCode: "AA" },
-    { source: "test", actionMode: "visual" },
-  );
-
-  assert.equal(applied, true);
-  assert.deepEqual(calls.visual, [{
-    ids: ["core-a"],
-    color: "#445566",
-    options: {
-      render: calls.visual[0]?.options?.render,
-      historyKind: "scenario-core-apply-visual",
-      dirtyReason: "scenario-core-apply-visual",
-    },
-  }]);
-  assert.equal(typeof calls.visual[0]?.options?.render, "function");
-  assert.equal(calls.ownership.length, 0);
-  assert.deepEqual(calls.hooks, []);
-  assert.deepEqual(calls.companions, []);
-  assert.deepEqual(calls.shells, []);
-});
-

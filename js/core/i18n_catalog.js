@@ -2,6 +2,13 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Territory": { zh: "领土", en: "Territory" },
+  "Boundary variant": { zh: "疆界变体", en: "Boundary variant" },
+  "Apply territory": { zh: "应用领土", en: "Apply territory" },
+  "Paints with this country's current color; can be undone.": { zh: "按本国当前颜色涂色；可撤销", en: "Paints with this country's current color; can be undone." },
+  "Clear Territory Visual Overrides": { zh: "清除领土上的视觉覆盖色", en: "Clear Territory Visual Overrides" },
+  "Target country is not in this scenario": { zh: "目标国不存在于当前剧本", en: "Target country is not in this scenario" },
+  "companion actions": { zh: "项联动动作", en: "companion actions" },
   "Inspector selection path": { zh: "检查器选择路径", en: "Inspector selection path" },
   "Custom Zone": { zh: "自定义区域", en: "Custom Zone" },
   "Demilitarized / buffer": { zh: "非军事化/缓冲", en: "Demilitarized / buffer" },
