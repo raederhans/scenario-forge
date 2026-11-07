@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pandas as pd
+import shapely
 
 from map_builder import config as cfg
 from map_builder.geo.utils import pick_column
@@ -20,6 +21,14 @@ DEFERRED_ISLAND_SHAPE_IDS = {
 def exclude_deferred_island_districts(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """Exclude the reviewed source island districts without culling mainland."""
     return gdf.loc[~gdf["shapeID"].astype(str).isin(DEFERRED_ISLAND_SHAPE_IDS)].copy()
+
+
+def simplify_india_adm2_coverage(geometries) -> list:
+    """Simplify the India ADM2 districts together, keeping shared edges shared."""
+    geometries = list(geometries)
+    if not shapely.coverage_is_valid(geometries):
+        raise ValueError("India ADM2 source is not a valid polygon coverage.")
+    return list(shapely.coverage_simplify(geometries, cfg.SIMPLIFY_INDIA))
 
 
 def apply_south_asia_replacement(hybrid_gdf: gpd.GeoDataFrame, land_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -95,6 +104,11 @@ def apply_south_asia_replacement(hybrid_gdf: gpd.GeoDataFrame, land_gdf: gpd.Geo
     except Exception as exc:
         print(f"[South Asia] ADM1 join failed; adm1_name left empty: {exc}")
 
+    # Simplify India ADM2 as one coverage so neighbouring districts keep shared
+    # edges; simplifying each district alone opens gaps and overlaps between them.
+    ind_gdf = ind_gdf[ind_gdf.geometry.notna() & ~ind_gdf.geometry.is_empty].copy()
+    ind_gdf["geometry"] = simplify_india_adm2_coverage(ind_gdf.geometry.tolist())
+
     # Clip India against China geometry to avoid overlaps
     china_geom = None
     try:
@@ -110,11 +124,7 @@ def apply_south_asia_replacement(hybrid_gdf: gpd.GeoDataFrame, land_gdf: gpd.Geo
         except Exception as exc:
             print(f"[South Asia] China clip failed; continuing without: {exc}")
 
-    # Simplify India ADM2
     ind_gdf = ind_gdf[ind_gdf.geometry.notna() & ~ind_gdf.geometry.is_empty].copy()
-    ind_gdf["geometry"] = ind_gdf.geometry.simplify(
-        tolerance=cfg.SIMPLIFY_INDIA, preserve_topology=True
-    )
 
     ind_gdf["id"] = "IN_ADM2_" + ind_gdf["shapeID"].astype(str)
     ind_gdf["name"] = ind_gdf["shapeName"].astype(str)

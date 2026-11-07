@@ -112832,7 +112832,7 @@
     "ATL": {
       "base_iso2": "ZZ",
       "continent_label": "Special",
-      "controller_feature_count": 488,
+      "controller_feature_count": 489,
       "display_name": "Atlantropa Reclamation Zone",
       "entry_kind": "",
       "feature_count": 489,
@@ -118690,13 +118690,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "4e2aaebcc26091b18ce744af29d489f06c2f563621a1717f4cd22639e5ab841e",
+  "snapshot_fingerprint": "279c190856c00c08b3f3db2ac95fb27d75e217826fda3196eee6e76b99aa7f96",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "2c59586df6d1bb0cf108f4127f7487e7c3ced2e3047b950244cb047fc28d2c97",
-    "detail_chunk_manifest_sha256": "5433a525c3fabe1581dd1b1baf26cc7b3be76207fb868cfff237b9b53cc91263",
+    "build_snapshot_sha256": "845a8d836ea5c27712b52e4b74592c30254f40b2826ba423143cf3731e79fa99",
+    "detail_chunk_manifest_sha256": "456f738acae2e3e7ae9c9420cc1ebbf4c14bbba1eb52468b34cb1acdcde5a6e4",
     "runtime_bootstrap_topology_sha256": "33b995621fa5433a46398c1e3786925d391f057aeda29c472b9ee4bc04eba6aa",
-    "runtime_topology_sha256": "2f15c4b5ac44871b5294f3dff9148963bb531df889808940a2c98fd4ee8a793d"
+    "runtime_topology_sha256": "eb5314788d1cc4bef50a882a37c55c9f12ae9b62f2aa2f673fb9bfca24ab74c4"
   },
   "summary": {
     "approximate_count": 973,
