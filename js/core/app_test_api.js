@@ -61,6 +61,8 @@ function status() {
     phase: String(state.bootPhase || ""),
     blocking: state.bootBlocking !== false,
     startupReadonly: !!state.startupReadonly,
+    // The first map frame is on screen (startup may still be blocking input).
+    firstFramePainted: !!state.firstVisibleFramePainted,
     viewable: !!state.firstVisibleFramePainted && state.bootBlocking === false,
     // Editing is allowed (startup may open read-only until full data arrives).
     editable: interactive && !state.startupReadonly,

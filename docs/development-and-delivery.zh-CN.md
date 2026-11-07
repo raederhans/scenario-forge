@@ -40,4 +40,6 @@ npm run test:e2e:golden  # 黄金用户流程（约 10 分钟）
 
 另外，Scenario Contract Matrix（5 个场景的严格数据合约）和 Transport Contract Required 也在每个 PR 上运行，可以从 Actions 手动重跑；它们不是 required check。性能门禁由 `perf-pr-gate.yml` 和 [性能策略](../tools/ci/perf_policy.mjs) 决定。
 
+交互性能（真实首帧、settled 后 30 s 长帧尾巴、拖拽中最长帧、缩放/平移 settled）用本地探针测量：先运行 `python tools/dev_server.py --port <端口>`，再运行 `MAPCREATOR_DEV_PORT=<端口> npm run perf:interaction -- --scenarios hoi4_1936 --runs 3`；`--url-query political_render_mode=vector` 之类的参数可以做对照。默认用真实 GPU，结果写到 `.runtime/output/perf/interaction/`。CI 用软件渲染，这几个指标的绝对值在 CI 上没有可比性，所以只在本地对照测量。
+
 保存工作到功能分支无需先追平 `main`。准备合并时再 fetch 目标分支并确认最终提交的 required check；合并后的 Pages 发布独立验收。
