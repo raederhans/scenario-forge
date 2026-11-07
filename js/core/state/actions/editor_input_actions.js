@@ -4,6 +4,12 @@
 
 const MAX_RECENT_COLORS = 4;
 
+export function clearInspectorSelectionState(target) {
+  const hadSelection = Boolean(target.selectedInspectorCountryCode);
+  selectInspectorCountryState(target, "");
+  return hadSelection;
+}
+
 export function selectInspectorCountryState(target, countryCode) {
   target.selectedInspectorCountryCode = countryCode;
   target.inspectorHighlightCountryCode = countryCode;

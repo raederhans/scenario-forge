@@ -313,6 +313,10 @@ function initShortcuts() {
         runtimeState.brushModeEnabled = false;
         setBrushPanModifier(false);
         syncToolUi();
+        return;
+      }
+      if (runtimeState.selectedInspectorCountryCode && runtimeState.clearInspectorLandSelectionFn?.()) {
+        event.preventDefault();
       }
     }
   });
