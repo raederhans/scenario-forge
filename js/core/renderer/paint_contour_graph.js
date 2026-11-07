@@ -961,11 +961,11 @@ function quantizedSegments(geometry, diagnostics, precisions) {
 function sharedSegments(geometry, diagnostics, options, polygons) {
   const shared = [...geometry.shared], remaining = geometry.remaining;
   diagnostics.oneSidedSegments = remaining.length;
-  const consumed = options.land ? new Map() : null;
+  const consumed = new Map();
   for (const edge of nearSeamSegments(remaining, shared, diagnostics, options.nearSeamTolerance, options.land, polygons, consumed)) shared.push(edge);
   const coast = [];
-  const covered = options.land ? politicalCoverageQuery(polygons) : null;
-  if (options.land) for (const edge of remaining) {
+  const covered = politicalCoverageQuery(polygons);
+  for (const edge of remaining) {
     const start = edge.start, end = edge.end;
     let dx = end[0] - start[0];
     if (dx > 180) dx -= 360;
@@ -988,7 +988,7 @@ function sharedSegments(geometry, diagnostics, options, polygons) {
     }
     emit(cursor, 1);
   }
-  return { shared, coast: options.land ? coast : null };
+  return { shared, coast };
 }
 
 function packChains(groups, featureIds, diagnostics, coast) {
@@ -1055,6 +1055,7 @@ function packChains(groups, featureIds, diagnostics, coast) {
   const coordinates = new Float64Array(pointCount * 2);
   const offsets = new Uint32Array(paths.length + 1);
   const owners = new Uint32Array(coast ? 0 : paths.length * 2);
+  const coastOwners = coast ? new Uint32Array(paths.length) : null;
   let position = 0;
   const writePoint = (edge, second) => {
     coordinates[position * 2] = edgeCoordinate(edge, second, 0, true);
@@ -1063,6 +1064,7 @@ function packChains(groups, featureIds, diagnostics, coast) {
   paths.forEach(({ edges, steps, pair }, index) => {
     offsets[index] = position;
     if (!coast) { owners[index * 2] = pair[0]; owners[index * 2 + 1] = pair[1]; }
+    else coastOwners[index] = edges[0].owner;
     for (let step = 0; step < steps.length; step++) {
       const token = steps[step], edge = edges[Math.abs(token) - 1], forward = token > 0;
       if (!step) writePoint(edge, !forward);
@@ -1070,7 +1072,7 @@ function packChains(groups, featureIds, diagnostics, coast) {
     }
   });
   offsets[paths.length] = position;
-  if (coast) return { coordinates, offsets, arcs: Uint32Array.from(paths, (_, index) => index) };
+  if (coast) return { coordinates, offsets, coastOwners, arcs: Uint32Array.from(paths, (_, index) => index) };
   return { featureIds: [...featureIds], coordinates, offsets, owners,
     diagnostics: { ...diagnostics, arcCount: paths.length, pointCount, packedBytes: coordinates.byteLength + offsets.byteLength + owners.byteLength } };
 }
@@ -1564,6 +1566,8 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
       const graph = packChains(segmentCache.shared, featureIds, diagnostics, false);
       const coastStart = performance.now();
       graph.coast = segmentCache.coast ? packChains(segmentCache.coast, featureIds, diagnostics, true) : null;
+      // 无陆地蒙版时海岸只供选区外轮廓使用，不作为可绘制海岸线（保持原有绘制行为）。
+      if (graph.coast) graph.coast.renderable = !!land;
       if (diagnostics.incremental) Object.defineProperties(graph.diagnostics, {
         incrementalNeighborMs: { value: neighborMs },
         incrementalCoastPackMs: { value: performance.now() - coastStart },

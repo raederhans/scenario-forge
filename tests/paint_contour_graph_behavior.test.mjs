@@ -434,7 +434,9 @@ test('coast chains contain uncovered unpaired edges for either ring winding', as
   const enclosed = segments(buildPaintContourGraph([a, enclosing], { waterMask: packContourWaterMask({ land: surrounding }) }));
   assert.equal(enclosed.length, 4, 'only the enclosing political polygon contributes coast');
   assert.ok(enclosed.flat().every(([x, y]) => x === -2 || x === 4 || y === -2 || y === 4));
-  assert.equal(buildPaintContourGraph([a]).coast, null);
+  const unmasked = buildPaintContourGraph([a]);
+  assert.equal(segments(unmasked).length, 4);
+  assert.deepEqual([...unmasked.coast.coastOwners].map(owner => unmasked.featureIds[owner]), [a.id]);
   const overlapping = square('B', 0.97);
   const water = packContourWaterMask({ water: surrounding });
   const near = segments(buildPaintContourGraph([a, overlapping], { waterMask: water, nearSeamTolerance: 0.05 }));

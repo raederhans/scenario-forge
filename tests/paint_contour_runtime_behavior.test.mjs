@@ -12,6 +12,23 @@ import { packContourWaterMask } from '../js/core/renderer/paint_contour_water_ma
 const stableDiagnostics = diagnostics => Object.fromEntries(Object.entries(diagnostics)
   .filter(([key]) => !(key.startsWith('nearSeam') && (key.endsWith('Ms') || key.endsWith('Bytes')))));
 
+test('selection boundary is independent of classification and rebuilds with geometry', async () => {
+  const h = harness({ resolveSourceFeatureId: () => 'parent' });
+  h.state.activeScenarioId = 'blank_base';
+  assert.equal(h.runtime.getSelectionBoundary(['parent']), null);
+  await h.flush(); await h.finish();
+  const first = h.runtime.getSelectionBoundary(['parent']);
+  assert.equal(first.type, 'MultiLineString');
+  assert.equal(h.runtime.getSelectionBoundary(['parent']), first);
+  assert.equal(h.runtime.getClassification(), null);
+  h.state.land = [h.a, rect('B', 3)];
+  assert.equal(h.runtime.getSelectionBoundary(['parent']), null);
+  await h.flush(); await h.finish();
+  const next = h.runtime.getSelectionBoundary(['parent']);
+  assert.notDeepEqual(next, first);
+  h.runtime.dispose();
+});
+
 test('scenario classification reuses the graph, refreshes dirty arcs and invalidates borders on grouping or palette changes', async () => {
   let palette = { A: '#ff0000', B: '#00ff00' }, districts = {}, h;
   const overrides = {}, resolved = [];

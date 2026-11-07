@@ -881,6 +881,9 @@ const getTransientOverlayRenderOwner = lazyOwner(() => createTransientOverlayRen
 
 const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getOverlayProjectionSignature,
+  getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
+  getSelectionBoundaryRevision: () => getPaintContourRuntimeOwner().getRevision(),
+  getZoomScale: () => runtimeState.zoomTransform?.k || 1,
   getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
   getDevSelectionIds: () => Array.isArray(runtimeState.devSelectionOrder)
     ? Array.from(runtimeState.devSelectionOrder, (id) => String(id || "").trim()).filter(Boolean) : [],
@@ -2341,6 +2344,7 @@ function getPaintContourRuntimeOwner() {
       state: runtimeState,
       getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
+      resolveSourceFeatureId: (feature, id) => feature?.properties?.__riverParentId || id,
       resolveClassification: resolveClassifiedBorderFeature,
       getWaterMaskSources: () => ({
         land: runtimeState.showScenarioAtlantropa === false ? runtimeState.landBgData
