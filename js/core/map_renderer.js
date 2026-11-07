@@ -1,3 +1,4 @@
+import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
 import { createHitTestingOwner } from "./map_renderer/hit_testing_owner.js";
 import { lazyOwner } from "./map_renderer/lazy_owner.js";
 import { isUsableLineMesh } from "./renderer/packed_line_mesh.js";
@@ -26,7 +27,7 @@ import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
-import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCountryState } from "./state/actions/editor_input_actions.js";
+import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCountryState, selectInspectorGroupState, selectInspectorFeatureState } from "./state/actions/editor_input_actions.js";
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
@@ -13928,7 +13929,8 @@ function clearInspectorLandSelection() {
   return true;
 }
 
-function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
+function syncInspectorCountryToLandSelection(feature, featureId, hit = null, event = null) {
+  if (event?.detail >= 2) return false;
   const ownerCode = canonicalCountryCode(getFeatureOwnerCode(featureId));
   const featureCode = canonicalCountryCode(
     ownerCode
@@ -13940,13 +13942,55 @@ function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
   if (!nextCode) return false;
 
   const previousCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
-  selectInspectorCountryState(runtimeState, nextCode);
+  const step = event ? resolveInspectorDrillStep({
+    current: {
+      countryCode: previousCode,
+      level: runtimeState.inspectorSelectionLevel || "country",
+      groupId: runtimeState.inspectorSelectionGroupId,
+      featureId: runtimeState.inspectorSelectionFeatureId,
+    },
+    hit: { countryCode: nextCode, featureId },
+    findGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
+  }) : { level: "country", countryCode: nextCode };
+  applyInspectorDrillSelection(step);
   // The inspector, its rows and the preset tree follow after the click's frame is painted.
   scheduleSidebarRefresh({
     ownerCodes: [previousCode, nextCode].filter(Boolean),
     refreshPresetTree: true,
   });
   return nextCode !== previousCode;
+}
+
+function applyInspectorDrillSelection({ level, countryCode, group, featureId }) {
+  if (level === "group") {
+    selectInspectorGroupState(runtimeState, countryCode, group);
+    setInspectorFeatureHighlight(group.children, { groupMode: true, label: group.label });
+  } else if (level === "feature") {
+    selectInspectorFeatureState(runtimeState, countryCode, featureId, group);
+    setInspectorFeatureHighlight([featureId], {
+      label: getGeoFeatureDisplayLabel(runtimeState.landIndex.get(featureId)),
+    });
+  } else {
+    selectInspectorCountryState(runtimeState, countryCode);
+  }
+}
+
+function stepUpInspectorSelection() {
+  const countryCode = runtimeState.selectedInspectorCountryCode;
+  const step = resolveInspectorStepUp({
+    current: {
+      countryCode,
+      level: runtimeState.inspectorSelectionLevel,
+      featureId: runtimeState.inspectorSelectionFeatureId,
+    },
+    findGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
+  });
+  if (!step) return false;
+  if (!step.countryCode) return clearInspectorLandSelection();
+  applyInspectorDrillSelection(step);
+  scheduleSidebarRefresh({ ownerCodes: [countryCode], refreshPresetTree: true });
+  requestInteractionRender("step-up-inspector-selection");
+  return true;
 }
 
 // Keyboard equivalent of a select-tool land click: same selection state, no paint or history.
@@ -14848,6 +14892,7 @@ function initMap({
   facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   runtimeState.refreshColorStateFn = refreshColorState;
   runtimeState.clearInspectorLandSelectionFn = clearInspectorLandSelection;
+  runtimeState.stepUpInspectorSelectionFn = stepUpInspectorSelection;
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);
 

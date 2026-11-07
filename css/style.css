@@ -14088,3 +14088,22 @@ body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled {
   border-color: var(--line-1);
   cursor: not-allowed;
 }
+
+.inspector-selection-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+.inspector-selection-breadcrumb[hidden] { display: none; }
+.inspector-selection-breadcrumb button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
