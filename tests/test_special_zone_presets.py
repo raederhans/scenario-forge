@@ -19,6 +19,7 @@ class SpecialZonePresetTest(unittest.TestCase):
             "modern_world": {"preset-western-sahara": "claim", "preset-southern-kurils": "claim",
                              "preset-falkland-islands": "claim", "preset-kosovo-status": "claim",
                              "preset-antarctic-overlap": "claim"},
+            "tno_1962": {"preset-colombia-dmz": "demilitarized"},
         }
         for scenario, presets in expected.items():
             data = ScenarioData(scenario)

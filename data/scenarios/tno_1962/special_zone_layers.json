@@ -2,6 +2,33 @@
   "version": 1,
   "layers": [
     {
+      "id": "preset-colombia-dmz",
+      "name": "Colombian Demilitarized States",
+      "nameZh": "哥伦比亚非军事化州",
+      "presetId": "demilitarized",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "style": {
+        "fill": "#f6e05e",
+        "stroke": "#b7791f",
+        "fillOpacity": 0.08,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "fineHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
+      "memberFeatureIds": [
+        "CO_ADM1_COL-1283",
+        "CO_ADM1_COL-1318",
+        "CO_ADM1_COL-1403",
+        "CO_ADM1_COL-1407",
+        "CO_ADM1_COL-1421"
+      ],
+      "note": "初始 history 设置 set_demilitarized_zone = yes；TNO 文件：history/states/1650-Caqueta.txt:19；history/states/2447-Putumayo.txt:16；history/states/2448-Amazonas Colombia.txt:16；history/states/2449-Norte de Santander.txt:9；history/states/493-La Guajira.txt:9；按同名省近似"
+    },
+    {
       "id": "preset-french-dmz",
       "name": "French Demilitarized Belt",
       "nameZh": "法国非军事化地带",
