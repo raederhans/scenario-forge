@@ -786,7 +786,70 @@ function selectTransportOverviewLabelEntries(candidates, {
   return visibleLabelEntries;
 }
 
+function drawEraRailwaysLayer(k, { interactive = false } = {}) {
+  syncRenderTargets();
+  const startedAt = nowMs();
+  const collection = runtimeState.scenarioEraRailwaysData;
+  const featureCount = getFeatureCollectionFeatureCount(collection);
+  const reason = !runtimeState.showTransport || !runtimeState.showEraRailways
+    ? "hidden" : interactive ? "interactive-pass"
+      : !collection?.features?.length ? "no-data" : !pathCanvas ? "no-path" : "";
+  if (reason) {
+    collectContextMetric("drawEraRailwaysLayer", nowMs() - startedAt, {
+      featureCount, visibleFeatureCount: 0, interactive: !!interactive, skipped: true, reason,
+    });
+    return;
+  }
+  const groups = [[], [], [], [], []];
+  const nodes = [];
+  for (const feature of collection.features) {
+    if (feature.properties?.kind === "railway" && feature.geometry?.type === "LineString") {
+      groups[clamp(Math.round(Number(feature.properties.level) || 1), 1, 5) - 1].push(feature);
+    } else if (feature.properties?.kind === "supply_node" && feature.geometry?.type === "Point") {
+      nodes.push(feature);
+    }
+  }
+  const widths = [0.7, 1.0, 1.35, 1.75, 2.2];
+  const scale = clamp(Math.sqrt(k) / 1.4, 0.75, 1.6);
+  let visibleFeatureCount = 0;
+  context.save();
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.setLineDash([]);
+  groups.forEach((features, index) => {
+    if (!features.length) return;
+    context.beginPath();
+    features.forEach((feature) => pathCanvas(feature));
+    context.strokeStyle = "#ffffff";
+    context.globalAlpha = 0.45;
+    context.lineWidth = (widths[index] * scale + 1.2) / k;
+    context.stroke();
+    context.strokeStyle = "#3d342c";
+    context.globalAlpha = 0.85;
+    context.lineWidth = widths[index] * scale / k;
+    context.stroke();
+    visibleFeatureCount += features.length;
+  });
+  if (k >= 2.2 && projection) {
+    context.globalAlpha = 1;
+    context.fillStyle = "#3d342c";
+    context.strokeStyle = "#ffffff";
+    context.lineWidth = 0.8 / k;
+    for (const feature of nodes) {
+      const [x, y] = projection(feature.geometry.coordinates);
+      context.fillRect(x - 2 / k, y - 2 / k, 4 / k, 4 / k);
+      context.strokeRect(x - 2 / k, y - 2 / k, 4 / k, 4 / k);
+      visibleFeatureCount += 1;
+    }
+  }
+  context.restore();
+  collectContextMetric("drawEraRailwaysLayer", nowMs() - startedAt, {
+    featureCount, visibleFeatureCount, interactive: false, skipped: false,
+  });
+}
+
 function drawRailwaysLayer(k, { interactive = false } = {}) {
+  drawEraRailwaysLayer(k, { interactive });
   pendingLabelBatches = pendingLabelBatches.filter((batch) => batch.metricName !== "drawRailwaysLayer");
   syncRenderTargets();
   const startedAt = nowMs();
@@ -1432,6 +1495,7 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
     drawPendingLabels,
     drawAirportsLayer,
     drawPortsLayer,
+    drawEraRailwaysLayer,
     drawRailwaysLayer,
     drawRoadsLayer,
     getTransportOverviewStyleConfig,

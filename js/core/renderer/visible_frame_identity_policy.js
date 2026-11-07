@@ -1,3 +1,4 @@
+import { getObjectIdentityToken } from "./object_identity.js";
 import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
 import { getPopulationSignature } from "../population_spatial_view_model.js";
 // Owns visible frame identity policy decisions; inputs remain live.
@@ -45,6 +46,8 @@ export function createVisibleFrameIdentityPolicy(runtimeState, {
       runtimeState.showAirports ? "airports:on" : "airports:off",
       runtimeState.showPorts ? "ports:on" : "ports:off",
       runtimeState.showRail ? "rail:on" : "rail:off",
+      runtimeState.showEraRailways ? "era-rail:on" : "era-rail:off",
+      getObjectIdentityToken(runtimeState.scenarioEraRailwaysData),
       runtimeState.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
       `context-rev:${Number(runtimeState.contextLayerRevision || 0)}`,
       `city-rev:${Number(runtimeState.cityLayerRevision || 0)}`,

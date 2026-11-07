@@ -292,7 +292,7 @@ test("scenario rollback authority key sets are pairwise disjoint and cover the e
 
   const authorityKeys = authorityEntries.flatMap(([, keys]) => keys);
   // Retired featureOverrides/countryBaseColors (-2), canonical riverPaint (+1).
-  assert.equal(authorityKeys.length, 109);
+  assert.equal(authorityKeys.length, 112);
   assert.deepEqual(
     sorted(extractRollbackPatchValueKeys(ROLLBACK_SOURCE)),
     sorted(authorityKeys),
@@ -309,7 +309,7 @@ test("scenario rollback authority key sets are pairwise disjoint and cover the e
     ROLLBACK_SOURCE,
     "ROLLBACK_REQUIRED_KEYS",
   );
-  assert.equal(requiredSnapshotKeys.length, 109);
+  assert.equal(requiredSnapshotKeys.length, 112);
   assert.deepEqual(
     sorted(
       requiredSnapshotKeys.map(

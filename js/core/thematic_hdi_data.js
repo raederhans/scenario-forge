@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 export const THEMATIC_HDI_LAYER_ID = "social_human_development_v1";
 export const THEMATIC_HDI_DATA_VERSION = "undp-hdr-2025:2023";
 export const THEMATIC_HDI_METRIC_ID = "undp_hdi";
@@ -19,7 +20,7 @@ const SUPPORTED_SCENARIOS = ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962
 const requestsByFetcher = new WeakMap();
 
 async function defaultFetchJson(url) {
-  const response = await fetch(url);
+  const response = await fetch(resolveDataUrl(url));
   if (!response.ok) throw new Error(`HDI data request failed: ${response.status}`);
   return response.json();
 }

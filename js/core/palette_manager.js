@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 import { state as runtimeState, defaultCountryPalette, legacyDefaultCountryPalette } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import {
@@ -528,8 +529,8 @@ async function ensurePaletteAssetsLoaded(
   }
 
   const [pack, map] = await Promise.all([
-    d3Client.json(paletteUrl),
-    d3Client.json(mapUrl),
+    d3Client.json(resolveDataUrl(paletteUrl)),
+    d3Client.json(resolveDataUrl(mapUrl)),
   ]);
   runtimeState.palettePackCacheById[targetId] = pack;
   runtimeState.paletteMapCacheById[targetId] = map;
