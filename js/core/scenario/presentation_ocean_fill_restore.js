@@ -130,6 +130,16 @@ function projectScenarioStyleDefaultsPatch(styleOverride) {
   return Object.keys(patch).length ? patch : null;
 }
 
+function recordScenarioStyleUserOverride(state, groupKey, key, value) {
+  if (!state.activeScenarioId) return;
+  const patch = projectScenarioStyleDefaultsPatch({ [groupKey]: { [key]: value } });
+  if (!patch?.[groupKey]) return;
+  state.scenarioStyleUserOverrides ||= {};
+  const overrides = state.scenarioStyleUserOverrides[state.activeScenarioId] ||= {};
+  overrides[groupKey] ||= {};
+  overrides[groupKey][key] = value;
+}
+
 function createScenarioOceanFillRestoreRuntime({
   state,
   invalidateOceanBackgroundVisualState = null,
@@ -275,7 +285,12 @@ function createScenarioOceanFillRestoreRuntime({
   }
 
   function syncScenarioOceanFillForActivation(manifest) {
-    const nextOverride = getScenarioStyleDefaultsOverride(manifest);
+    const defaults = getScenarioStyleDefaultsOverride(manifest);
+    const userOverrides = state.scenarioStyleUserOverrides?.[state.activeScenarioId];
+    const nextOverride = defaults || userOverrides ? { ...defaults } : null;
+    Object.entries(userOverrides || {}).forEach(([groupKey, values]) => {
+      nextOverride[groupKey] = { ...nextOverride[groupKey], ...values };
+    });
     const hadPresentationSnapshot = !!state.scenarioPresentationStyleBeforeActivate;
     if (nextOverride) {
       const baselineSnapshot = cloneScenarioStyleDefaultsSnapshot(nextOverride);
@@ -326,4 +341,5 @@ function createScenarioOceanFillRestoreRuntime({
 
 export {
   createScenarioOceanFillRestoreRuntime,
+  recordScenarioStyleUserOverride,
 };
