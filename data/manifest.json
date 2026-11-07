@@ -217,9 +217,9 @@
       "owner": "tools/build_global_lakes.py",
       "role": "context_layer",
       "schema_ref": "schema://geojson/feature_collection/polygon/v1",
-      "sha256": "3e9b2dac45850639a6d3fd03b0a7bee5a585f8b9d93f4b5041012c1ff20c110b",
+      "sha256": "482a37d9ba7ba532febd4149d6bf07d8a0394813feb502606cf5ecb1d15a2e24",
       "simplification": "preserve_topology_0.005_degrees_existing_named_geometries_preserved",
-      "size_bytes": 2381103,
+      "size_bytes": 2384560,
       "type": "geojson"
     },
     "global_physical_semantics.detail.topo.json": {

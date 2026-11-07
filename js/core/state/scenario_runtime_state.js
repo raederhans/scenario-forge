@@ -204,6 +204,9 @@ export function setScenarioRuntimeOptionalLayerState(target, nextState = {}) {
   if (hasOwn.call(nextState, "scenarioReliefOverlaysData")) {
     target.scenarioReliefOverlaysData = nextState.scenarioReliefOverlaysData || null;
   }
+  if (hasOwn.call(nextState, "scenarioEraRailwaysData")) {
+    target.scenarioEraRailwaysData = nextState.scenarioEraRailwaysData || null;
+  }
   if (hasOwn.call(nextState, "scenarioStrategicValuesData")) {
     target.scenarioStrategicValuesData = nextState.scenarioStrategicValuesData || null;
   }
@@ -325,10 +328,12 @@ export function createDefaultScenarioRuntimeState({
     scenarioShellOverlayRevision: 0,
     scenarioBaselineCoresByFeatureId: {},
     scenarioReliefOverlayRevision: 0,
+    scenarioEraRailwaysRevision: 0,
     scenarioParentBorderEnabledBeforeActivate: null,
     scenarioPaintModeBeforeActivate: null,
     scenarioOceanFillBeforeActivate: null,
     scenarioOceanStyleBeforeActivate: null,
+    scenarioStyleUserOverrides: {},
     scenarioDisplaySettingsBeforeActivate: null,
     activeScenarioPerformanceHints: null,
     activeScenarioMeshPack: null,
@@ -345,6 +350,7 @@ export function createDefaultScenarioRuntimeState({
     scenarioLandMaskVersionTag: "",
     scenarioContextLandMaskVersionTag: "",
     scenarioReliefOverlaysData: null,
+    scenarioEraRailwaysData: null,
     scenarioStrategicValuesData: null,
     scenarioStrategicValuesRevision: 0,
     scenarioDistrictGroupsData: null,

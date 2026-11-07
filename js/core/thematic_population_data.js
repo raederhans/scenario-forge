@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 export const THEMATIC_POPULATION_LAYER_ID = "population_wdi_population_v1";
 export const THEMATIC_POPULATION_DATA_VERSION = "wdi-2026-07-13:2023";
 export const THEMATIC_POPULATION_METRIC_ID = "wdi_population_total";
@@ -19,7 +20,7 @@ const SUPPORTED_SCENARIOS = ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962
 const requestsByFetcher = new WeakMap();
 
 async function defaultFetchJson(url) {
-  const response = await fetch(url);
+  const response = await fetch(resolveDataUrl(url));
   if (!response.ok) throw new Error(`population data request failed: ${response.status}`);
   return response.json();
 }

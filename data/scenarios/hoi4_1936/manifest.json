@@ -13,6 +13,7 @@
   "detail_chunk_manifest_url": "data/scenarios/hoi4_1936/detail_chunks.manifest.json",
   "display_name": "HOI4 1936",
   "district_groups_url": "data/scenarios/hoi4_1936/district_groups.manual.json",
+  "era_railways_url": "data/transport_layers/hoi4_era_rail/era_rail.geojson",
   "featured_tags": [
     "FRA",
     "USA",
@@ -2621,7 +2622,7 @@
   "strategic_values_url": "data/scenarios/hoi4_1936/strategic_values.by_feature.json",
   "style_defaults": {
     "ocean": {
-      "fillColor": "#2d4769"
+      "fillColor": "#3b4a55"
     }
   },
   "summary": {

@@ -359,6 +359,9 @@ function createScenarioStartupHydrationController({
     const mergedReliefPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "relief")
       ? runtimeMergedLayerPayloads.relief || null
       : undefined;
+    const mergedEraRailwaysPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "erarailways")
+      ? runtimeMergedLayerPayloads.erarailways || null
+      : undefined;
     const mergedCitiesPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "cities")
       ? runtimeMergedLayerPayloads.cities || null
       : undefined;
@@ -605,6 +608,9 @@ function createScenarioStartupHydrationController({
       scenarioReliefOverlaysData: mergedReliefPayload !== undefined
         ? mergedReliefPayload
         : (bundle.reliefOverlaysPayload || state.scenarioReliefOverlaysData || null),
+      scenarioEraRailwaysData: mergedEraRailwaysPayload !== undefined
+        ? mergedEraRailwaysPayload
+        : (bundle.eraRailwaysPayload || state.scenarioEraRailwaysData || null),
     });
     if (mergedCitiesPayload !== undefined || bundle.cityOverridesPayload) {
       syncScenarioLocalizationState({

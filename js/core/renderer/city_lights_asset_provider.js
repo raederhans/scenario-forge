@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "../data_base_url.js";
 import {
   HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
 } from "../city_lights_historical_1930_asset.js";
@@ -62,7 +63,7 @@ function normalizeUrbanShapeAssets(collection) {
 export function createCityLightsAssetProvider({
   importModernAsset = () => import("../city_lights_modern_asset.js"),
   historicalEntries = HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
-  fetchUrbanShapeAsset = (url) => globalThis.fetch(url),
+  fetchUrbanShapeAsset = (url) => globalThis.fetch(resolveDataUrl(url)),
   resolveUrbanShapeAssetUrl = () => resolveDataAssetUrl("world_urban_lights"),
 } = {}) {
   let modernAssets = null;
