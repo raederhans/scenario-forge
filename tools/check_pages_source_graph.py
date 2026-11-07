@@ -74,15 +74,15 @@ def build_source_inventory(root: Path) -> dict[str, Path]:
         add(path, f"hgo/{path.relative_to(hgo_root).as_posix()}")
     for name in pages.DATA_RUNTIME_FILES:
         add(root / "data" / name, f"app/data/{name}")
+    policy = pages.build_pages_production_publication_policy(root / "data/scenarios")
     for name in pages.DATA_RUNTIME_DIRS:
-        tree(root / "data" / name, f"app/data/{name}")
+        tree(root / "data" / name, f"app/data/{name}", lambda path: policy.allows(path.relative_to(root)))
     for name in (*pages.HGO_IDENTITY_RUNTIME_FILES, "hgo_flags.png_manifest.json"):
         add(root / "data/hgo_catalogs" / name, f"app/data/hgo_catalogs/{name}")
     for tier in pages.HGO_IDENTITY_FLAG_TIERS:
         tree(root / "data/hgo_catalogs/flags_png" / tier, f"app/data/hgo_catalogs/flags_png/{tier}")
-    policy = pages.build_pages_production_publication_policy(root / "data/scenarios")
     for name in ("scenarios", "transport_layers"):
-        tree(root / "data" / name, f"app/data/{name}", lambda path: policy.allows(path.relative_to(root)))
+        tree(root / "data" / name, f"app/data/{name}", lambda path: policy.allows(path.relative_to(root)) and not (path.match("startup.bundle.*.json") and path.with_suffix(".json.gz").is_file()))
     return inventory
 
 
