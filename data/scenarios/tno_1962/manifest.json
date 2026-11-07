@@ -3109,7 +3109,7 @@
   "startup_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
   "style_defaults": {
     "atlantropa_salt_flat": {
-      "fillColor": "#7c6f53"
+      "fillColor": "#a8956c"
     },
     "atlantropa_sea": {
       "fillColor": "#203856"
@@ -3119,7 +3119,7 @@
     },
     "ocean": {
       "experimentalAdvancedStyles": true,
-      "fillColor": "#2d4769",
+      "fillColor": "#1f2f45",
       "preset": "bathymetry_soft"
     }
   },

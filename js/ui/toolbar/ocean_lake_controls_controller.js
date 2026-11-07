@@ -1,3 +1,4 @@
+import { recordScenarioStyleUserOverride } from "../../core/scenario/presentation_ocean_fill_restore.js";
 import { normalizeLakeStyleConfig } from "../../core/state.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import {
@@ -183,8 +184,11 @@ export function createOceanLakeControlsController({
     const defaults = getBathymetryPresetStyleDefaults(preset);
     if (!defaults) return false;
     state.styleConfig.ocean.opacity = defaults.opacity;
+    recordScenarioStyleUserOverride(state, "ocean", "opacity", state.styleConfig.ocean.opacity);
     state.styleConfig.ocean.scale = defaults.scale;
+    recordScenarioStyleUserOverride(state, "ocean", "scale", state.styleConfig.ocean.scale);
     state.styleConfig.ocean.contourStrength = defaults.contourStrength;
+    recordScenarioStyleUserOverride(state, "ocean", "contourStrength", state.styleConfig.ocean.contourStrength);
     return true;
   };
 
@@ -298,6 +302,7 @@ export function createOceanLakeControlsController({
     if (oceanFillColor) {
       bindOceanVisualInput(oceanFillColor, (event, commitNow) => {
         state.styleConfig.ocean.fillColor = normalizeOceanFillColor(event.target.value);
+        recordScenarioStyleUserOverride(state, "ocean", "fillColor", state.styleConfig.ocean.fillColor);
         renderLakeUi();
         if (commitNow) {
           applyOceanVisualUpdateNow(invalidateOceanBackgroundVisualState, "ocean-fill");
@@ -332,6 +337,7 @@ export function createOceanLakeControlsController({
           state.styleConfig.ocean.preset = nextPreset;
           applyBathymetryPresetDefaults(nextPreset);
         }
+        recordScenarioStyleUserOverride(state, "ocean", "preset", state.styleConfig.ocean.preset);
         syncOceanPresetControlValues();
         renderOceanAdvancedStylesUi();
         renderOceanBathymetryDebugUi();
@@ -344,6 +350,7 @@ export function createOceanLakeControlsController({
       oceanAdvancedStylesToggle.checked = oceanAdvancedStylesEnabled();
       oceanAdvancedStylesToggle.addEventListener("change", (event) => {
         state.styleConfig.ocean.experimentalAdvancedStyles = !!event.target.checked;
+        recordScenarioStyleUserOverride(state, "ocean", "experimentalAdvancedStyles", state.styleConfig.ocean.experimentalAdvancedStyles);
         if (state.styleConfig.ocean.experimentalAdvancedStyles && state.styleConfig.ocean.preset === "flat") {
           state.styleConfig.ocean.preset = "bathymetry_soft";
           applyBathymetryPresetDefaults("bathymetry_soft");
@@ -351,6 +358,7 @@ export function createOceanLakeControlsController({
         if (!state.styleConfig.ocean.experimentalAdvancedStyles && advancedPresets.has(state.styleConfig.ocean.preset)) {
           state.styleConfig.ocean.preset = "flat";
         }
+        recordScenarioStyleUserOverride(state, "ocean", "preset", state.styleConfig.ocean.preset);
         syncOceanPresetControlValues();
         renderOceanAdvancedStylesUi();
         renderOceanBathymetryDebugUi();
@@ -363,6 +371,7 @@ export function createOceanLakeControlsController({
       oceanCoastalAccentToggle.checked = state.styleConfig.ocean.coastalAccentEnabled !== false;
       oceanCoastalAccentToggle.addEventListener("change", (event) => {
         state.styleConfig.ocean.coastalAccentEnabled = !!event.target.checked;
+        recordScenarioStyleUserOverride(state, "ocean", "coastalAccentEnabled", state.styleConfig.ocean.coastalAccentEnabled);
         applyOceanVisualUpdateNow(invalidateOceanCoastalAccentVisualState, "ocean-coastal-accent");
       });
       oceanCoastalAccentToggle.dataset.bound = "true";
@@ -371,6 +380,7 @@ export function createOceanLakeControlsController({
     bindOceanVisualInput(oceanTextureOpacity, (event, commitNow) => {
       const value = Number(event.target.value);
       state.styleConfig.ocean.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.9, 0, 1);
+      recordScenarioStyleUserOverride(state, "ocean", "opacity", state.styleConfig.ocean.opacity);
       if (oceanTextureOpacityValue) {
         oceanTextureOpacityValue.textContent = `${event.target.value}%`;
       }
@@ -384,6 +394,7 @@ export function createOceanLakeControlsController({
     bindOceanVisualInput(oceanTextureScale, (event, commitNow) => {
       const value = Number(event.target.value);
       state.styleConfig.ocean.scale = clamp(Number.isFinite(value) ? value / 100 : 1.25, 0.6, 2.4);
+      recordScenarioStyleUserOverride(state, "ocean", "scale", state.styleConfig.ocean.scale);
       if (oceanTextureScaleValue) {
         oceanTextureScaleValue.textContent = `${state.styleConfig.ocean.scale.toFixed(2)}x`;
       }
@@ -397,6 +408,7 @@ export function createOceanLakeControlsController({
     bindOceanVisualInput(oceanContourStrength, (event, commitNow) => {
       const value = Number(event.target.value);
       state.styleConfig.ocean.contourStrength = clamp(Number.isFinite(value) ? value / 100 : 0, 0, 1);
+      recordScenarioStyleUserOverride(state, "ocean", "contourStrength", state.styleConfig.ocean.contourStrength);
       if (oceanContourStrengthValue) {
         oceanContourStrengthValue.textContent = `${event.target.value}%`;
       }

@@ -1,4 +1,5 @@
 import { buildScenarioProjectMarkerEntries, drawScenarioProjectMarkers } from "./renderer/scenario_project_markers.js";
+import { resolveAtlantropaSeaFillColor } from "./scenario/atlantropa_sea_color.js";
 import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
 import { createHitTestingOwner } from "./map_renderer/hit_testing_owner.js";
 import { lazyOwner } from "./map_renderer/lazy_owner.js";
@@ -3651,8 +3652,8 @@ function getPoliticalIdRasterRuntimeOwner() {
             runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
           geometryContentVersion,
           version: `${geometryContentVersion}:${[...foreground].sort().join(",")}`,
-          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
-          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
+          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor()].join(":"),
+          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor()].join(":"),
         };
       },
     },
@@ -5310,6 +5311,7 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     runtimeState.allowOpenOceanSelect ? "open-ocean-select:on" : "open-ocean-select:off",
     runtimeState.allowOpenOceanPaint ? "open-ocean-paint:on" : "open-ocean-paint:off",
     `ocean-fill:${getOceanBaseFillColor()}`,
+    `atlantropa-sea-fill:${getAtlantropaSeaFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
     `ocean-surface:${stableJson(runtimeState.styleConfig?.ocean || {})}`,
@@ -5912,10 +5914,14 @@ function getAtlantropaShoalManifestFillColor() {
   );
 }
 
+function getAtlantropaSeaFillColor() {
+  return resolveAtlantropaSeaFillColor(runtimeState.activeScenarioManifest, getOceanBaseFillColor());
+}
+
 function getAtlantropaRuleColor(rule) {
   const normalizedRule = String(rule || "").trim().toLowerCase();
   if (normalizedRule === "atlantropa_sea") {
-    return getOceanBaseFillColor();
+    return getAtlantropaSeaFillColor();
   }
   if (normalizedRule === "salt_flat") {
     return getAtlantropaSaltFlatManifestFillColor();
@@ -5938,7 +5944,7 @@ function isInteractiveAtlantropaBooleanWeldIslandFeature(feature, featureId = nu
 }
 
 function getAtlantropaSeaPoliticalFillColor() {
-  return getOceanBaseFillColor();
+  return getAtlantropaSeaFillColor();
 }
 
 function getAtlantropaSeaPoliticalStrokeColor() {
@@ -9502,7 +9508,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
-    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
+    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(), getAtlantropaSeaFillColor(),
     runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
