@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  captureScenarioStyleBaselineBeforeUserEdit,
   createScenarioOceanFillRestoreRuntime,
   recordScenarioStyleUserOverride,
 } from "../js/core/scenario/presentation_ocean_fill_restore.js";
@@ -72,4 +73,23 @@ test("only active scenario whitelist edits are recorded", () => {
   activate("A", {});
   assert.equal(state.styleConfig.ocean.preset, "bathymetry_soft");
   assert.equal(state.styleConfig.ocean.experimentalAdvancedStyles, true);
+});
+
+test("editing a group the scenario does not override keeps the pristine baseline (A -> B -> A -> exit)", () => {
+  const { state, runtime, activate } = setup();
+  const pristineCoast = { ...state.styleConfig.coastlines };
+  const oceanOnlyA = { ocean: { fillColor: "#aabbcc" } };
+  const oceanOnlyB = { ocean: { fillColor: "#ddeeff" } };
+  activate("A", oceanOnlyA);
+  // 与界面入口相同的顺序：先记基线，再改样式，再记录用户改动。
+  captureScenarioStyleBaselineBeforeUserEdit(state, "coastlines");
+  state.styleConfig.coastlines = { ...state.styleConfig.coastlines, color: "#abcdef" };
+  recordScenarioStyleUserOverride(state, "coastlines", "color", "#abcdef");
+  activate("B", oceanOnlyB);
+  assert.equal(state.styleConfig.coastlines.color, pristineCoast.color, "edit must not leak into B");
+  activate("A", oceanOnlyA);
+  assert.equal(state.styleConfig.coastlines.color, "#abcdef", "A keeps the user edit");
+  state.activeScenarioId = "";
+  runtime.restoreScenarioOceanFillAfterExit();
+  assert.deepEqual(state.styleConfig.coastlines, pristineCoast, "exit restores the pristine value");
 });

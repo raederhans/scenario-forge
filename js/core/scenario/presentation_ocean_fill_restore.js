@@ -130,6 +130,17 @@ function projectScenarioStyleDefaultsPatch(styleOverride) {
   return Object.keys(patch).length ? patch : null;
 }
 
+const SCENARIO_USER_STYLE_GROUPS = new Set(["ocean", "internalBorders", "empireBorders", "coastlines"]);
+
+// 用户第一次改动某个剧本默认里没有的样式组之前，先把该组原值记入基线快照；
+// 否则切走再切回时，已改过的值会被当成基线，泄漏到其他剧本，退出剧本也恢复不回去。
+function captureScenarioStyleBaselineBeforeUserEdit(state, groupKey) {
+  if (!state.activeScenarioId || !SCENARIO_USER_STYLE_GROUPS.has(groupKey)) return;
+  state.scenarioPresentationStyleBeforeActivate ||= {};
+  if (Object.prototype.hasOwnProperty.call(state.scenarioPresentationStyleBeforeActivate, groupKey)) return;
+  state.scenarioPresentationStyleBeforeActivate[groupKey] = { ...(state.styleConfig?.[groupKey] || {}) };
+}
+
 function recordScenarioStyleUserOverride(state, groupKey, key, value) {
   if (!state.activeScenarioId) return;
   const patch = projectScenarioStyleDefaultsPatch({ [groupKey]: { [key]: value } });
@@ -340,6 +351,7 @@ function createScenarioOceanFillRestoreRuntime({
 }
 
 export {
+  captureScenarioStyleBaselineBeforeUserEdit,
   createScenarioOceanFillRestoreRuntime,
   recordScenarioStyleUserOverride,
 };
