@@ -40,6 +40,7 @@ export function createColorResolutionStrategyOwner({
   helpers = {},
 } = {}) {
   const {
+    resolveEffectiveOwnerCode,
     canonicalCountryCode,
     getFeatureCountryCodeNormalized,
     getFeatureId,
@@ -89,6 +90,7 @@ export function createColorResolutionStrategyOwner({
       getAtlantropaRuleColor,
       getOceanBaseFillColor,
       getOwnerCode: getDisplayOwnerCode,
+      getEffectiveOwnerCode: resolveEffectiveOwnerCode,
     });
     if (!resolved.color && normalizeMapSemanticMode(state.mapSemanticMode) === "blank") {
       return BLANK_OWNERLESS_FEATURE_FILL_COLOR;

@@ -3,6 +3,13 @@
   "scope": "tests/e2e/*.spec.js",
   "specs": [
     {
+      "specPath": "tests/e2e/political_display_mode.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "political-display",
+      "ownerHint": "map-renderer"
+    },
+    {
       "specPath": "tests/e2e/city_label_i18n_redraw.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",
