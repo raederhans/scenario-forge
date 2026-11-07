@@ -1,7 +1,7 @@
 import { applyFeaturePaintState } from "../core/state/color_state.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
-import { getCountryGroupSystems, getHierarchyGroupsForCode as getGeographicHierarchyGroups } from "../core/country_group_provider.js";
+import { findCountryGroupForFeature, getGroupDisplayLabel, getCountryGroupSystems, getHierarchyGroupsForCode as getGeographicHierarchyGroups } from "../core/country_group_provider.js";
 // Sidebar UI (Phase 13)
 import {
   state as runtimeState,
@@ -3160,6 +3160,9 @@ function initSidebar({ render } = {}) {
   countryInspectorSelected.after(countryInspectorDetail.lastElementChild);
 
   const countryInspectorController = createCountryInspectorController({
+    resolveInspectorGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
+    stepUpInspectorSelection: () => callRuntimeHook(runtimeState, "stepUpInspectorSelectionFn"),
+    getInspectorFeatureLabel: (id) => getGeoFeatureDisplayLabel(runtimeState.landIndex.get(id)),
     onSelectedCountryRendered: regionSearchController.setCountry,
     runtimeState: state,
     list,
@@ -3266,6 +3269,18 @@ function initSidebar({ render } = {}) {
   };
 
   const getCountryState = (code) => latestCountryStatesByCode.get(code);
+  registerRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", (code, featureId) => {
+    const countryState = getCountryState(code);
+    if (!countryState) return null;
+    const systems = countryState.groupSystems;
+    const systemId = runtimeState.ui.inspectorGroupSystemByCode?.[code] || systems[0]?.id;
+    const group = findCountryGroupForFeature(systems, systemId, featureId);
+    return group ? {
+      id: group.id,
+      label: getGroupDisplayLabel(group, runtimeState.currentLanguage, getDirectGeoLabel),
+      children: group.children,
+    } : null;
+  });
 
   const appendActionSection = (
     container,
