@@ -1,6 +1,48 @@
+import { getGroupDisplayLabel } from "../../core/country_group_provider.js";
+
+export function renderCountryGroupButtons(container, countryState, {
+  t, language, translateGeo, selectedSystemId, selectSystem,
+  createInspectorActionButton, applyGroup, createEmptyNote,
+}) {
+  const systems = countryState.groupSystems;
+  const selected = systems.find((system) => system.id === selectedSystemId) || systems[0];
+  const sourceLabel = (id) => id === "scenario_districts"
+    ? t("Scenario districts", "ui") : t("Modern administrative regions", "ui");
+  if (selected) {
+    const note = document.createElement("small");
+    note.className = "scenario-action-hint";
+    note.textContent = sourceLabel(selected.id);
+    container.appendChild(note);
+  }
+  if (systems.filter((system) => system.groups.length).length > 1) {
+    const toggle = document.createElement("div");
+    toggle.className = "frontline-segmented-field";
+    systems.forEach((system) => {
+      const button = createInspectorActionButton(sourceLabel(system.id), () => {
+        selectSystem(system.id);
+        container.replaceChildren();
+        renderCountryGroupButtons(container, countryState, {
+          t, language, translateGeo, selectedSystemId: system.id, selectSystem,
+          createInspectorActionButton, applyGroup, createEmptyNote,
+        });
+      });
+      button.className = `frontline-segmented-choice${selected.id === system.id ? " is-active" : ""}`;
+      button.setAttribute("aria-pressed", String(selected.id === system.id));
+      toggle.appendChild(button);
+    });
+    container.appendChild(toggle);
+  }
+  const groups = selected?.groups || [];
+  groups.forEach((group) => container.appendChild(createInspectorActionButton(
+    getGroupDisplayLabel(group, language, translateGeo), () => applyGroup(group)
+  )));
+  if (!groups.length) container.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
+}
+
 export function createScenarioInspectorController({
   t,
   getView,
+  selectGroupSystem,
   getCountryState,
   storeVisualOpen,
   selectInspectorCountry,
@@ -246,20 +288,24 @@ export function createScenarioInspectorController({
 
       if (countryState.hierarchyGroups.length > 0) {
         const groupSection = appendActionSection(body, t("Hierarchy Groups (Visual Color)", "ui"));
-        countryState.hierarchyGroups.forEach((group) => {
-          groupSection.appendChild(createInspectorActionButton(
-            t(group.label, "geo") || group.label,
-            () => {
-              applyHierarchyGroupWithMode(group, {
-                mode: "visual",
-                color: getView().selectedColor,
-                render,
-                visualHistoryKind: "scenario-hierarchy-apply-visual",
-                visualDirtyReason: "scenario-hierarchy-apply-visual",
-              });
-              setScenarioVisualAdjustmentsOpen(true);
-            }
-          ));
+        renderCountryGroupButtons(groupSection, countryState, {
+          t,
+          language: getView().language,
+          translateGeo: (label) => t(label, "geo"),
+          selectedSystemId: getView().inspectorGroupSystemByCode?.[countryState.code],
+          selectSystem: (id) => selectGroupSystem(countryState.code, id),
+          createInspectorActionButton,
+          createEmptyNote,
+          applyGroup: (group) => {
+            applyHierarchyGroupWithMode(group, {
+              mode: "visual",
+              color: getView().selectedColor,
+              render,
+              visualHistoryKind: "scenario-hierarchy-apply-visual",
+              visualDirtyReason: "scenario-hierarchy-apply-visual",
+            });
+            setScenarioVisualAdjustmentsOpen(true);
+          },
         });
       }
 
