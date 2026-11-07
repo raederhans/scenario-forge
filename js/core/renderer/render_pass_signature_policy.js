@@ -132,6 +132,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       runtimeState.showAirports ? "airports:on" : "airports:off",
       runtimeState.showPorts ? "ports:on" : "ports:off",
       runtimeState.showRail ? "rail:on" : "rail:off",
+      runtimeState.showEraRailways ? "era-rail:on" : "era-rail:off",
+      getObjectIdentityToken(runtimeState.scenarioEraRailwaysData),
       ...dataParts,
       `scene:${Number(runtimeState.sceneGeneration || 0)}`,
       `scenario-data:${Number(runtimeState.scenarioDataGeneration || 0)}`,

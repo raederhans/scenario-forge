@@ -1743,3 +1743,18 @@ test("legacy-only and schema 1 paint normalize once; canonical maps including em
     assert.deepEqual(restored.visualOverrides, features);
   }
 });
+
+test("era railway visibility survives project roundtrip and defaults on for old projects", async () => {
+  const payload = await exportProjectPayload({
+    activePaletteId: "hoi4_vanilla", annotationView: {}, exportWorkbenchUi: {},
+    styleConfig: {}, showEraRailways: false,
+  });
+  assert.equal(payload.layerVisibility.showEraRailways, false);
+  const result = await importProjectPayload(payload);
+  assert.equal(result.errors.length, 0);
+  assert.equal(result.callbacks[0].layerVisibility.showEraRailways, false);
+  delete payload.layerVisibility.showEraRailways;
+  const legacy = await importProjectPayload(payload);
+  assert.equal(legacy.errors.length, 0);
+  assert.equal(legacy.callbacks[0].layerVisibility.showEraRailways, true);
+});

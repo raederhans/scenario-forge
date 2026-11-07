@@ -305,6 +305,7 @@ export function createDefaultUiState() {
     showScenarioSpecialRegions: true,
     showScenarioAtlantropa: true,
     showScenarioReliefOverlays: true,
+    showEraRailways: true,
     showCityPoints: true,
     showBlankFeatureLabels: false,
     showStrategicResourceMarkers: false,
@@ -439,6 +440,10 @@ export function restoreImportedLayerVisibilityState(target, layerVisibility = nu
       layerVisibility.showScenarioReliefOverlays === undefined
         ? true
         : !!layerVisibility.showScenarioReliefOverlays,
+    showEraRailways:
+      layerVisibility.showEraRailways === undefined
+        ? true
+        : !!layerVisibility.showEraRailways,
     showCityPoints:
       layerVisibility.showCityPoints === undefined ? true : !!layerVisibility.showCityPoints,
     showBlankFeatureLabels:

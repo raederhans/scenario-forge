@@ -30,6 +30,7 @@ export function setAppearanceVisibilityState(target, key, value) {
     case "showScenarioSpecialRegions": commitUiVisibilityState(target, { showScenarioSpecialRegions: next }); break;
     case "showScenarioAtlantropa": commitUiVisibilityState(target, { showScenarioAtlantropa: next }); break;
     case "showScenarioReliefOverlays": commitUiVisibilityState(target, { showScenarioReliefOverlays: next }); break;
+    case "showEraRailways": commitUiVisibilityState(target, { showEraRailways: next }); break;
     case "showCityPoints": commitUiVisibilityState(target, { showCityPoints: next }); break;
     case "showStrategicResourceMarkers": commitUiVisibilityState(target, { showStrategicResourceMarkers: next }); break;
     case "strategicChoroplethMetric": commitUiVisibilityState(target, { strategicChoroplethMetric: next }, { normalize: false }); break;

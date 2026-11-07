@@ -131,6 +131,7 @@ export function commitScenarioOptionalLayerPayloadState(target, scenarioId, laye
     water: "waterRegionsPayload", special: "specialRegionsPayload",
     scenario_atlantropa: "scenarioAtlantropaPayload", specialzonelayers: "specialZoneLayersPayload",
     relief: "reliefOverlaysPayload", cities: "cityOverridesPayload", strategicvalues: "strategicValuesPayload",
+    erarailways: "eraRailwaysPayload",
   };
   if (!Object.hasOwn(fields, key) || fields[key] !== field) return false;
   target.scenarioBundleCacheById[id][field] = payload;
@@ -160,7 +161,9 @@ export const SCENARIO_ACTIVATION_STATE_KEYS = Object.freeze([
   "scenarioWaterOverlayVersionTag",
   "scenarioSpecialRegionsData",
   "scenarioReliefOverlaysData",
+  "scenarioEraRailwaysData",
   "scenarioReliefOverlayRevision",
+  "scenarioEraRailwaysRevision",
   "scenarioStrategicValuesData",
   "scenarioStrategicValuesRevision",
   "scenarioDistrictGroupsData",
@@ -190,6 +193,7 @@ export const SCENARIO_CHUNK_OPTIONAL_LAYER_STATE_CONFIGS = Object.freeze({
   scenario_atlantropa: Object.freeze({ stateField: "scenarioAtlantropaData", revisionField: "scenarioAtlantropaRevision" }),
   specialzonelayers: Object.freeze({ stateField: "specialZoneLayers", revisionField: "" }),
   relief: Object.freeze({ stateField: "scenarioReliefOverlaysData", revisionField: "scenarioReliefOverlayRevision" }),
+  erarailways: Object.freeze({ stateField: "scenarioEraRailwaysData", revisionField: "scenarioEraRailwaysRevision" }),
   cities: Object.freeze({ stateField: "scenarioCityOverridesData", revisionField: "cityLayerRevision" }),
   strategicvalues: Object.freeze({ stateField: "scenarioStrategicValuesData", revisionField: "scenarioStrategicValuesRevision" }),
 });
@@ -238,6 +242,7 @@ function readOptionalLayerValue(target, layerKey) {
     case "scenario_atlantropa": return target.scenarioAtlantropaData;
     case "specialzonelayers": return target.specialZoneLayers;
     case "relief": return target.scenarioReliefOverlaysData;
+    case "erarailways": return target.scenarioEraRailwaysData;
     case "cities": return target.scenarioCityOverridesData;
     case "strategicvalues": return target.scenarioStrategicValuesData;
   }
@@ -250,6 +255,7 @@ function hasOptionalLayerValue(target, layerKey) {
     case "scenario_atlantropa": return hasOwn(target, "scenarioAtlantropaData");
     case "specialzonelayers": return hasOwn(target, "specialZoneLayers");
     case "relief": return hasOwn(target, "scenarioReliefOverlaysData");
+    case "erarailways": return hasOwn(target, "scenarioEraRailwaysData");
     case "cities": return hasOwn(target, "scenarioCityOverridesData");
     case "strategicvalues": return hasOwn(target, "scenarioStrategicValuesData");
   }
@@ -259,6 +265,7 @@ function readOptionalLayerRevision(target, layerKey) {
   switch (layerKey) {
     case "scenario_atlantropa": return target.scenarioAtlantropaRevision;
     case "relief": return target.scenarioReliefOverlayRevision;
+    case "erarailways": return target.scenarioEraRailwaysRevision;
     case "cities": return target.cityLayerRevision;
     case "strategicvalues": return target.scenarioStrategicValuesRevision;
   }
@@ -268,6 +275,7 @@ function hasOptionalLayerRevision(target, layerKey) {
   switch (layerKey) {
     case "scenario_atlantropa": return hasOwn(target, "scenarioAtlantropaRevision");
     case "relief": return hasOwn(target, "scenarioReliefOverlayRevision");
+    case "erarailways": return hasOwn(target, "scenarioEraRailwaysRevision");
     case "cities": return hasOwn(target, "cityLayerRevision");
     case "strategicvalues": return hasOwn(target, "scenarioStrategicValuesRevision");
     default: return false;
@@ -328,6 +336,13 @@ export function applyScenarioChunkOptionalLayerState(target, layerKey, payload) 
       target.scenarioReliefOverlaysData = payload;
       target.scenarioReliefOverlayRevision =
         Math.max(0, Number(target.scenarioReliefOverlayRevision) || 0) + 1;
+      break;
+    case "erarailways":
+      changed = target.scenarioEraRailwaysData !== payload;
+      if (!changed) break;
+      target.scenarioEraRailwaysData = payload;
+      target.scenarioEraRailwaysRevision =
+        Math.max(0, Number(target.scenarioEraRailwaysRevision) || 0) + 1;
       break;
     case "strategicvalues":
       changed = target.scenarioStrategicValuesData !== payload;
@@ -441,6 +456,12 @@ export function restoreScenarioChunkPromotionState(target, snapshot) {
         else delete target.scenarioReliefOverlaysData;
         if (entry.revisionPresent) target.scenarioReliefOverlayRevision = entry.revisionValue;
         else delete target.scenarioReliefOverlayRevision;
+        break;
+      case "erarailways":
+        if (entry.statePresent) target.scenarioEraRailwaysData = entry.stateValue;
+        else delete target.scenarioEraRailwaysData;
+        if (entry.revisionPresent) target.scenarioEraRailwaysRevision = entry.revisionValue;
+        else delete target.scenarioEraRailwaysRevision;
         break;
       case "strategicvalues":
         if (entry.statePresent) target.scenarioStrategicValuesData = entry.stateValue;
@@ -557,8 +578,11 @@ export function commitScenarioActivationState(target, patch) {
     patch.scenarioWaterOverlayVersionTag;
   target.scenarioSpecialRegionsData = patch.scenarioSpecialRegionsData;
   target.scenarioReliefOverlaysData = patch.scenarioReliefOverlaysData;
+  target.scenarioEraRailwaysData = patch.scenarioEraRailwaysData;
   target.scenarioReliefOverlayRevision =
     patch.scenarioReliefOverlayRevision;
+  target.scenarioEraRailwaysRevision =
+    patch.scenarioEraRailwaysRevision;
   target.scenarioStrategicValuesData = patch.scenarioStrategicValuesData;
   target.scenarioStrategicValuesRevision =
     patch.scenarioStrategicValuesRevision;
@@ -705,11 +729,22 @@ function restoreScenarioActivationBeforeAuditStateFromValidated(
   } else {
     delete target.scenarioReliefOverlaysData;
   }
+  if (presentKeys.has("scenarioEraRailwaysData")) {
+    target.scenarioEraRailwaysData = values.scenarioEraRailwaysData;
+  } else {
+    delete target.scenarioEraRailwaysData;
+  }
   if (presentKeys.has("scenarioReliefOverlayRevision")) {
     target.scenarioReliefOverlayRevision =
       values.scenarioReliefOverlayRevision;
   } else {
     delete target.scenarioReliefOverlayRevision;
+  }
+  if (presentKeys.has("scenarioEraRailwaysRevision")) {
+    target.scenarioEraRailwaysRevision =
+      values.scenarioEraRailwaysRevision;
+  } else {
+    delete target.scenarioEraRailwaysRevision;
   }
   if (presentKeys.has("scenarioStrategicValuesData")) {
     target.scenarioStrategicValuesData = values.scenarioStrategicValuesData;

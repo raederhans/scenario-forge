@@ -43,6 +43,15 @@ export const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
     visibilityField: "showScenarioReliefOverlays",
     revisionField: "scenarioReliefOverlayRevision",
   },
+  erarailways: {
+    bundleField: "eraRailwaysPayload",
+    stateField: "scenarioEraRailwaysData",
+    urlField: "era_railways_url",
+    objectName: "",
+    visibilityField: "showEraRailways",
+    revisionField: "scenarioEraRailwaysRevision",
+    loadPolicy: "background",
+  },
   cities: {
     bundleField: "cityOverridesPayload",
     stateField: "scenarioCityOverridesData",
@@ -69,6 +78,7 @@ export function normalizeScenarioOptionalLayerKey(value) {
   } else if (rawKey === "strategic_values" || rawKey === "strategic-values") {
     key = "strategicvalues";
   }
+  if (rawKey === "era_railways" || rawKey === "era-railways") key = "erarailways";
   return Object.prototype.hasOwnProperty.call(SCENARIO_OPTIONAL_LAYER_CONFIGS, key) ? key : "";
 }
 
@@ -102,6 +112,7 @@ export function createScenarioOptionalLayerRuntime(state, {
     if (!normalizedKey || !state.activeScenarioId) return null;
     const bundle = state.scenarioBundleCacheById?.[normalizeScenarioId(state.activeScenarioId)];
     if (!bundle) return null;
+    if (normalizedKey === "erarailways" && !bundle.manifest?.era_railways_url) return null;
     if (scenarioBundleUsesChunkedLayer(bundle, normalizedKey)) {
       // chunk-owned layer 的数据所有权在 chunk refresh controller，这里只发刷新请求，不直接补拉独立 JSON。
       scheduleScenarioChunkRefresh({
@@ -137,6 +148,10 @@ export function createScenarioOptionalLayerRuntime(state, {
 
   function isScenarioOptionalLayerRequestedForVisibility(layerKey, config) {
     const normalizedKey = normalizeScenarioOptionalLayerKey(layerKey);
+    if (normalizedKey === "erarailways") {
+      const bundle = state.scenarioBundleCacheById?.[normalizeScenarioId(state.activeScenarioId)];
+      return !!bundle?.manifest?.era_railways_url && state.showEraRailways !== false;
+    }
     if (normalizedKey === "strategicvalues") {
       return !!state.showStrategicResourceMarkers || !!String(state.strategicChoroplethMetric || "").trim();
     }
@@ -214,7 +229,25 @@ export function createScenarioOptionalLayerRuntime(state, {
         return !activeBundle[config.bundleField] && !state[config.stateField];
       })
       .map(([layerKey]) => layerKey);
-    if (!requestedLayers.length) {
+    const backgroundLayers = requestedLayers.filter((key) => SCENARIO_OPTIONAL_LAYER_CONFIGS[key].loadPolicy === "background");
+    const blockingLayers = requestedLayers.filter((key) => SCENARIO_OPTIONAL_LAYER_CONFIGS[key].loadPolicy !== "background");
+    for (const layerKey of backgroundLayers) {
+      void loadScenarioOptionalLayerPayloadById(activeScenarioId, layerKey, {
+        d3Client,
+        applyToActiveScenario: true,
+        scenarioApplyEpoch: transactionScenarioApplyEpoch,
+        scenarioApplyRequestId: transactionScenarioApplyRequestId,
+        isScenarioApplyRequestCurrent,
+      }).then(() => {
+        if (shouldContinueScenarioApplyContext(currentnessContext, "optional-layer-background-load")
+          && state.scenarioBundleCacheById?.[activeScenarioId] === activeBundle) {
+          flushRenderBoundary(`scenario-optional-layer-background:${layerKey}`);
+        }
+      }).catch((error) => {
+        console.warn(`[scenario] Background optional layer failed: ${layerKey}`, error);
+      });
+    }
+    if (!blockingLayers.length) {
       recordVisibilitySnapshot("optional-layer-visibility-sync-complete", {
         requestedLayers,
         loadedPayloadCount: 0,
@@ -222,7 +255,7 @@ export function createScenarioOptionalLayerRuntime(state, {
       return [];
     }
     const payloads = await Promise.all(
-      requestedLayers.map((layerKey) =>
+      blockingLayers.map((layerKey) =>
         loadScenarioOptionalLayerPayloadById(activeScenarioId, layerKey, {
           d3Client,
           applyToActiveScenario: true,

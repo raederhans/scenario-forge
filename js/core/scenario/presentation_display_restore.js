@@ -49,6 +49,7 @@ function createScenarioDisplayRestoreRuntime({
       showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
       showScenarioAtlantropa: state.showScenarioAtlantropa !== false,
       showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+      showEraRailways: state.showEraRailways !== false,
       showStrategicResourceMarkers: !!state.showStrategicResourceMarkers,
       strategicChoroplethMetric: String(state.strategicChoroplethMetric || ""),
     };
@@ -104,6 +105,7 @@ function createScenarioDisplayRestoreRuntime({
       state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
       state.showScenarioAtlantropa = snapshot.showScenarioAtlantropa !== false;
       state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
+      state.showEraRailways = snapshot.showEraRailways !== false;
       state.showStrategicResourceMarkers = !!snapshot.showStrategicResourceMarkers;
       state.strategicChoroplethMetric = String(snapshot.strategicChoroplethMetric || "");
     }
