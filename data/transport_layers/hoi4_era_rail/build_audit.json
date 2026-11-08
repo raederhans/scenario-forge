@@ -1,0 +1,42 @@
+{
+  "profile": "hoi4",
+  "georeference": {
+    "control_point_count": 1153,
+    "kept_control_point_count": 1137,
+    "dropped_control_points": [
+      "Anadyr",
+      "Bissau",
+      "Hamilton",
+      "Hilo",
+      "Honolulu",
+      "Hyderabad City",
+      "Kōshū",
+      "Libreville",
+      "Midway",
+      "Novgorod",
+      "Praia",
+      "Saint John",
+      "Springfield",
+      "Stalino",
+      "Stavropol",
+      "Sverdlovsk"
+    ],
+    "cross_validation_km": {
+      "median": 32.5,
+      "p90": 99.9,
+      "p99": 204.2
+    }
+  },
+  "railway_segment_count": 909,
+  "railway_level_counts": {
+    "1": 467,
+    "2": 406,
+    "3": 29,
+    "4": 7
+  },
+  "supply_node_count": 727,
+  "sea_crossing_midpoint_fixes": 78,
+  "province_vertex_count": 3162,
+  "city_coordinate_vertices": 669,
+  "land_snapped_vertices": 79
+}

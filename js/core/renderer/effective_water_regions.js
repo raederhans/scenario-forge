@@ -10,11 +10,18 @@ export function isLakeInteractionEnabled(state) {
   return state?.styleConfig?.lakes?.interactive === true;
 }
 
+export function isLakeVisibleInScenarioYear(feature, scenarioYear) {
+  if (scenarioYear === null) return true;
+  const { year_built, year_removed } = feature.properties;
+  return !(year_built > scenarioYear || year_removed <= scenarioYear);
+}
+
 export function resolveEffectiveWaterRegionFeatures({
   baseFeatures = [],
   scenarioFeatures = [],
   globalLakeFeatures = [],
   activeScenarioId = "",
+  scenarioYear = null,
   exclusive = false,
   isExcluded = () => false,
 } = {}) {
@@ -33,6 +40,10 @@ export function resolveEffectiveWaterRegionFeatures({
   // The existing TNO exclusions prevent duplicate clones. They must not hide
   // the common lake collection, which now replaces those clones by stable ID.
   for (const [id, feature] of lakesById) {
+    if (!isLakeVisibleInScenarioYear(feature, scenarioYear)) {
+      result.delete(id);
+      continue;
+    }
     if (id !== "congo_lake" && !feature.properties.scenario_id) result.set(id, feature);
   }
   return [...result.values()];

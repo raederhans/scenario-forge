@@ -1,4 +1,5 @@
 import { createPackedLineMesh } from './packed_line_mesh.js';
+import { createSelectionBoundaryIndex } from './selection_boundary.js';
 import { getContourCoordinatePrecision } from '../paint_contour_source.js';
 import { createPaintContourWorkerClient } from '../paint_contour_worker_client.js';
 import { createPaintContourMesh } from './paint_contour_mesh.js';
@@ -44,6 +45,7 @@ function* sameContourGeometry(left, right) {
   return true;
 }
 export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
+  resolveSourceFeatureId = (_feature, id) => id,
   isEligible = () => true, resolveColor, onChange = () => {},
   // Coverage-only features (scenario shell fills) join the geometry so their
   // land is not mistaken for coast, but never resolve a color or border key.
@@ -69,6 +71,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   let topologyRevision = -1, geometryEpoch = 0, registeredEpoch = -1;
   let featuresById = new Map(), precisionById = new Map(), registered = null, registeredPrecision = null, view = null;
   let acknowledgedGraph = null, coastMesh = null, lastCoastMesh = null;
+  let selectionGraph = null, selectionIndex = null;
   let inFlight = null, scheduled = false, revision = 0, paintRevision = -1;
   let boundaryRevision = null, bordersSeparated = false;
   // A geometry rebuild within one scene keeps the last paint-aware borders;
@@ -83,6 +86,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   function clear() {
     generation += 1; client.dispose(); registered = null; registeredPrecision = null; view = null; inFlight = null;
     acknowledgedGraph = null; lastClassification = null; coastMesh = null; lastCoastMesh = null;
+    selectionGraph = null; selectionIndex = null;
     registeredWaterRevision = null;
     status = 'idle'; error = ''; graphDiagnostics = null; revision += 1;
   }
@@ -161,7 +165,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     if (changed && (classified || modeChanged)) onChange('paint-contours-colors');
   }
   function createView() {
-    coastMesh = acknowledgedGraph.coast ? createPackedLineMesh(acknowledgedGraph.coast) : null;
+    coastMesh = acknowledgedGraph.coast && acknowledgedGraph.coast.renderable !== false ? createPackedLineMesh(acknowledgedGraph.coast) : null;
     classified = shouldClassify();
     const paintable = id => {
       const feature = featuresById.get(id);
@@ -304,6 +308,17 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   }
   return Object.freeze({
     ensureReady,
+    getSelectionBoundary(memberIds) {
+      syncSource();
+      if (status !== 'ready' || !acknowledgedGraph) return null;
+      if (selectionGraph !== acknowledgedGraph) {
+        selectionGraph = acknowledgedGraph;
+        selectionIndex = createSelectionBoundaryIndex(selectionGraph, {
+          resolveSourceFeatureId: id => resolveSourceFeatureId(featuresById.get(id), id),
+        });
+      }
+      return selectionIndex.getBoundaryLines(memberIds);
+    },
     hasPendingWork: () => scheduled || !!inFlight || status === 'building',
     getMeshes() { syncSource(); syncPaint(); return view?.getActiveArcCount() ? [view.getMesh()] : EMPTY; },
     getClassification() {

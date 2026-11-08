@@ -1,6 +1,50 @@
+import { resolveCatalogEntryForTag, resolvePresetFeatureIds, getResolvedReleasableBoundaryVariant } from "../../core/releasable_manager.js";
+import { selectScenarioBoundaryVariant } from "./scenario_territory_controller.js";
+import { getGroupDisplayLabel } from "../../core/country_group_provider.js";
+
+export function renderCountryGroupButtons(container, countryState, {
+  t, language, translateGeo, selectedSystemId, selectSystem,
+  createInspectorActionButton, applyGroup, createEmptyNote,
+}) {
+  const systems = countryState.groupSystems;
+  const selected = systems.find((system) => system.id === selectedSystemId) || systems[0];
+  const sourceLabel = (id) => id === "scenario_districts"
+    ? t("Scenario districts", "ui") : t("Modern administrative regions", "ui");
+  if (selected) {
+    const note = document.createElement("small");
+    note.className = "scenario-action-hint";
+    note.textContent = sourceLabel(selected.id);
+    container.appendChild(note);
+  }
+  if (systems.filter((system) => system.groups.length).length > 1) {
+    const toggle = document.createElement("div");
+    toggle.className = "frontline-segmented-field";
+    systems.forEach((system) => {
+      const button = createInspectorActionButton(sourceLabel(system.id), () => {
+        selectSystem(system.id);
+        container.replaceChildren();
+        renderCountryGroupButtons(container, countryState, {
+          t, language, translateGeo, selectedSystemId: system.id, selectSystem,
+          createInspectorActionButton, applyGroup, createEmptyNote,
+        });
+      });
+      button.className = `frontline-segmented-choice${selected.id === system.id ? " is-active" : ""}`;
+      button.setAttribute("aria-pressed", String(selected.id === system.id));
+      toggle.appendChild(button);
+    });
+    container.appendChild(toggle);
+  }
+  const groups = selected?.groups || [];
+  groups.forEach((group) => container.appendChild(createInspectorActionButton(
+    getGroupDisplayLabel(group, language, translateGeo), () => applyGroup(group)
+  )));
+  if (!groups.length) container.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
+}
+
 export function createScenarioInspectorController({
   t,
   getView,
+  selectGroupSystem,
   getCountryState,
   storeVisualOpen,
   selectInspectorCountry,
@@ -15,7 +59,6 @@ export function createScenarioInspectorController({
   createEmptyNote,
   renderRegionalPresets,
   normalizeCountryCode,
-  getPrimaryReleasablePresetRef,
   applyScenarioReleasableCoreTerritory,
   selectedCountryActionsSection,
   scheduleAdaptiveInspectorHeights,
@@ -26,6 +69,11 @@ export function createScenarioInspectorController({
   applyVisualColorToOwnedRegions,
   clearCountryVisualOverrides,
   renderCountryColorSyncAffordance,
+  // Catalog access is injectable for tests; the sidebar uses the releasable manager.
+  resolveTerritoryEntry = resolveCatalogEntryForTag,
+  resolveTerritoryFeatureIds = resolvePresetFeatureIds,
+  getSelectedBoundaryVariant = getResolvedReleasableBoundaryVariant,
+  selectBoundaryVariant = selectScenarioBoundaryVariant,
 }) {
   const appendScenarioCountryCard = (container, countryState, { parentReturn = false } = {}) => {
     const card = document.createElement("button");
@@ -140,28 +188,72 @@ export function createScenarioInspectorController({
       return;
     }
 
-    if (countryState.releasable) {
-      const presetRef = getPrimaryReleasablePresetRef(countryState);
-      const coreSection = appendActionSection(body, t("Core Territory Visuals", "ui"));
+    const entry = resolveTerritoryEntry(countryState.code);
+    const appendTerritorySection = () => {
+      if (!entry) return;
+      const territoryIds = resolveTerritoryFeatureIds(entry);
+      const coreSection = appendActionSection(body, t("Territory", "ui"));
+      const selectedVariant = getSelectedBoundaryVariant(entry);
+      if (selectedVariant) {
+        const select = document.createElement("select");
+        select.className = "select-input";
+        select.setAttribute("aria-label", t("Boundary variant", "ui"));
+        select.title = selectedVariant.description;
+        for (const variant of entry.boundary_variants) {
+          const option = document.createElement("option");
+          option.value = variant.id;
+          option.textContent = variant.label;
+          option.title = variant.description;
+          select.appendChild(option);
+        }
+        select.value = selectedVariant.id;
+        select.addEventListener("change", () => selectBoundaryVariant(
+          countryState.code, select.value, () => selectInspectorCountry(countryState.code)
+        ));
+        coreSection.appendChild(select);
+      }
+      const companionInputs = [];
+      for (const action of entry.companion_actions || []) {
+        if (action.hidden_in_ui) continue;
+        const label = document.createElement("label");
+        label.className = "toggle-label";
+        label.title = action.description || "";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.className = "checkbox-input";
+        input.value = action.id;
+        input.checked = !!action.auto_apply_on_core_territory;
+        input.disabled = !getCountryState(action.target_owner_tag);
+        const text = document.createElement("span");
+        text.textContent = action.label + (input.disabled
+          ? ` — ${t("Target country is not in this scenario", "ui")}` : "");
+        label.appendChild(input);
+        label.appendChild(text);
+        coreSection.appendChild(label);
+        companionInputs.push(input);
+      }
 
       const applyVisualBtn = createInspectorActionButton(
-        t("Apply Visual Color to Core Territory", "ui"),
+        t("Apply territory", "ui"),
         () => {
           applyScenarioReleasableCoreTerritory(countryState, {
-            source: "visual-adjustments",
-            actionMode: "visual",
+            filterToVisibleFeatureIds,
+            companionActionIds: companionInputs.filter((input) => input.checked && !input.disabled).map((input) => input.value),
           });
           setScenarioVisualAdjustmentsOpen(true);
         }
       );
-      applyVisualBtn.disabled = !presetRef;
+      applyVisualBtn.disabled = !territoryIds.length;
       coreSection.appendChild(applyVisualBtn);
+      const hint = document.createElement("p");
+      hint.className = "scenario-action-hint";
+      hint.textContent = t("Paints with this country's current color; can be undone.", "ui");
+      coreSection.appendChild(hint);
 
       const clearVisualBtn = createInspectorActionButton(
-        t("Clear Core Territory Visual Overrides", "ui"),
+        t("Clear Territory Visual Overrides", "ui"),
         () => {
-          if (!presetRef) return;
-          const requestedFeatureIds = Array.isArray(presetRef.preset?.ids) ? presetRef.preset.ids : [];
+          const requestedFeatureIds = resolveTerritoryFeatureIds(entry);
           const { matchedIds } = filterToVisibleFeatureIds(requestedFeatureIds);
           const result = clearVisualOverridesForFeatureIds(matchedIds, {
             render,
@@ -187,12 +279,16 @@ export function createScenarioInspectorController({
           setScenarioVisualAdjustmentsOpen(true);
         }
       );
-      clearVisualBtn.disabled = !presetRef;
+      clearVisualBtn.disabled = !territoryIds.length;
       coreSection.appendChild(clearVisualBtn);
 
-      if (!presetRef) {
+      if (!territoryIds.length) {
         coreSection.appendChild(createEmptyNote(t("No core territory defined", "ui")));
       }
+    };
+
+    if (countryState.releasable) {
+      appendTerritorySection();
     } else {
       const countrySection = appendActionSection(body, t("Country Visuals", "ui"));
 
@@ -246,24 +342,29 @@ export function createScenarioInspectorController({
 
       if (countryState.hierarchyGroups.length > 0) {
         const groupSection = appendActionSection(body, t("Hierarchy Groups (Visual Color)", "ui"));
-        countryState.hierarchyGroups.forEach((group) => {
-          groupSection.appendChild(createInspectorActionButton(
-            t(group.label, "geo") || group.label,
-            () => {
-              applyHierarchyGroupWithMode(group, {
-                mode: "visual",
-                color: getView().selectedColor,
-                render,
-                visualHistoryKind: "scenario-hierarchy-apply-visual",
-                visualDirtyReason: "scenario-hierarchy-apply-visual",
-              });
-              setScenarioVisualAdjustmentsOpen(true);
-            }
-          ));
+        renderCountryGroupButtons(groupSection, countryState, {
+          t,
+          language: getView().language,
+          translateGeo: (label) => t(label, "geo"),
+          selectedSystemId: getView().inspectorGroupSystemByCode?.[countryState.code],
+          selectSystem: (id) => selectGroupSystem(countryState.code, id),
+          createInspectorActionButton,
+          createEmptyNote,
+          applyGroup: (group) => {
+            applyHierarchyGroupWithMode(group, {
+              mode: "visual",
+              color: getView().selectedColor,
+              render,
+              visualHistoryKind: "scenario-hierarchy-apply-visual",
+              visualDirtyReason: "scenario-hierarchy-apply-visual",
+            });
+            setScenarioVisualAdjustmentsOpen(true);
+          },
         });
       }
 
       renderRegionalPresets(body, countryState, { mode: "visual" });
+      appendTerritorySection();
     }
 
     details.appendChild(body);

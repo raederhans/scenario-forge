@@ -1,3 +1,5 @@
+import { resolveAtlantropaSeaFillColor } from "./scenario/atlantropa_sea_color.js";
+import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
 import { createHitTestingOwner } from "./map_renderer/hit_testing_owner.js";
 import { lazyOwner } from "./map_renderer/lazy_owner.js";
 import { isUsableLineMesh } from "./renderer/packed_line_mesh.js";
@@ -26,7 +28,7 @@ import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
-import { pushRecentColorState, selectInspectorCountryState } from "./state/actions/editor_input_actions.js";
+import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCountryState, selectInspectorGroupState, selectInspectorFeatureState } from "./state/actions/editor_input_actions.js";
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
@@ -881,6 +883,9 @@ const getTransientOverlayRenderOwner = lazyOwner(() => createTransientOverlayRen
 
 const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getOverlayProjectionSignature,
+  getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
+  getSelectionBoundaryRevision: () => getPaintContourRuntimeOwner().getRevision(),
+  getZoomScale: () => runtimeState.zoomTransform?.k || 1,
   getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
   getDevSelectionIds: () => Array.isArray(runtimeState.devSelectionOrder)
     ? Array.from(runtimeState.devSelectionOrder, (id) => String(id || "").trim()).filter(Boolean) : [],
@@ -1469,6 +1474,7 @@ const getSpecialZoneLayersRenderOwner = lazyOwner(() => createSpecialZoneLayersR
   },
   helpers: {
     clamp,
+    getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
     getDashPattern,
     getFeatureId,
     getPathSVG: () => rendererSurfaceHost.getPathSvg(),
@@ -2359,6 +2365,7 @@ function getPaintContourRuntimeOwner() {
       state: runtimeState,
       getFeatures: getPaintContourSourceFeatures,
       getFeatureId,
+      resolveSourceFeatureId: (feature, id) => feature?.properties?.__riverParentId || id,
       resolveClassification: resolveClassifiedBorderFeature,
       isCoverageOnly: (feature, id) => isScenarioShellFeature(feature, id),
       getWaterMaskSources: () => ({
@@ -2402,6 +2409,8 @@ function getPaintContourRuntimeOwner() {
       },
       onChange: (reason) => {
         invalidateRenderPasses("borders", reason);
+        // 特殊区域外轮廓依赖边图；边图异步就绪后让特殊区域重绘，不再停留在回退轮廓。
+        runtimeState.specialZonesOverlayDirty = true;
         requestRendererRender(reason, { flush: false });
       },
     });
@@ -3311,6 +3320,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     shouldBlockUnderlyingSelectionForFacility,
     shouldRequireLeafDetail,
     syncInspectorCountryToLandSelection,
+    clearInspectorLandSelection,
     toggleFeatureInDevSelection,
     updateDevSelectedHit,
     warnIncompletePaintTargets: () => {
@@ -3660,8 +3670,8 @@ function getPoliticalIdRasterRuntimeOwner() {
             runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
           geometryContentVersion,
           version: `${geometryContentVersion}:${[...foreground].sort().join(",")}`,
-          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
-          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
+          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor()].join(":"),
+          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor()].join(":"),
         };
       },
     },
@@ -5319,6 +5329,7 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     runtimeState.allowOpenOceanSelect ? "open-ocean-select:on" : "open-ocean-select:off",
     runtimeState.allowOpenOceanPaint ? "open-ocean-paint:on" : "open-ocean-paint:off",
     `ocean-fill:${getOceanBaseFillColor()}`,
+    `atlantropa-sea-fill:${getAtlantropaSeaFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
     `ocean-surface:${stableJson(runtimeState.styleConfig?.ocean || {})}`,
@@ -5699,6 +5710,12 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection, { pu
 
 let frameEffectiveWater = null;
 
+function getActiveScenarioYear() {
+  if (!runtimeState.activeScenarioId) return null;
+  const year = Number(String(runtimeState.activeScenarioManifest?.bookmark_date).split(".")[0]);
+  return Number.isInteger(year) && year > 0 ? year : null;
+}
+
 function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   const manifest = runtimeState.activeScenarioManifest;
   const baseFeatures = runtimeState.waterRegionsData?.features;
@@ -5706,6 +5723,7 @@ function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   return [
     baseFeatures, baseFeatures?.length, scenarioWaterFeatures, scenarioWaterFeatures?.length,
     lakeFeatures, lakeFeatures?.length, runtimeState.activeScenarioId || "", isScenarioWaterTopologyExclusiveMode(),
+    getActiveScenarioYear(),
     manifest?.excluded_water_region_ids, manifest?.excluded_water_region_groups, runtimeState.contextLayerRevision,
     ...atlantropaWater,
   ];
@@ -5737,6 +5755,7 @@ function resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scen
     baseFeatures: runtimeState.waterRegionsData?.features || [],
     scenarioFeatures,
     globalLakeFeatures: runtimeState.contextLayerExternalDataByName?.lakes?.features || [],
+    scenarioYear: getActiveScenarioYear(),
     activeScenarioId: runtimeState.activeScenarioId || "",
     exclusive: isScenarioWaterTopologyExclusiveMode(),
     isExcluded: (feature) => isWaterRegionExcludedByScenario(feature, exclusions),
@@ -5910,10 +5929,14 @@ function getAtlantropaShoalManifestFillColor() {
   );
 }
 
+function getAtlantropaSeaFillColor() {
+  return resolveAtlantropaSeaFillColor(runtimeState.activeScenarioManifest, getOceanBaseFillColor());
+}
+
 function getAtlantropaRuleColor(rule) {
   const normalizedRule = String(rule || "").trim().toLowerCase();
   if (normalizedRule === "atlantropa_sea") {
-    return getOceanBaseFillColor();
+    return getAtlantropaSeaFillColor();
   }
   if (normalizedRule === "salt_flat") {
     return getAtlantropaSaltFlatManifestFillColor();
@@ -5936,7 +5959,7 @@ function isInteractiveAtlantropaBooleanWeldIslandFeature(feature, featureId = nu
 }
 
 function getAtlantropaSeaPoliticalFillColor() {
-  return getOceanBaseFillColor();
+  return getAtlantropaSeaFillColor();
 }
 
 function getAtlantropaSeaPoliticalStrokeColor() {
@@ -7112,7 +7135,10 @@ function renderUnitCountersIfNeeded({ force = false } = {}) {
 }
 
 function renderInspectorHighlightOverlayIfNeeded({ force = false } = {}) {
-  return getSelectionOverlayOwner().renderInspectorHighlightOverlayIfNeeded({ force });
+  const result = getSelectionOverlayOwner().renderInspectorHighlightOverlayIfNeeded({ force });
+  // 侧栏与地图点击都会经过这里；检查器选中变化后同步特殊区域工作台的“加入选中国家/分组”按钮。
+  refreshSpecialZonesWorkbenchCurrentTargetUiIfChanged();
+  return result;
 }
 
 function renderHoverOverlayIfNeeded({ force = false, eventType = "hover" } = {}) {
@@ -9497,7 +9523,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
-    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
+    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(), getAtlantropaSeaFillColor(),
     runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
@@ -13934,7 +13960,17 @@ function collectCountryCodesForFeatureIds(featureIds) {
   return Array.from(codes);
 }
 
-function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
+function clearInspectorLandSelection() {
+  const previousCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
+  if (!previousCode) return false;
+  clearInspectorSelectionState(runtimeState);
+  scheduleSidebarRefresh({ ownerCodes: [previousCode], refreshPresetTree: true });
+  requestInteractionRender("clear-inspector-land-selection");
+  return true;
+}
+
+function syncInspectorCountryToLandSelection(feature, featureId, hit = null, event = null) {
+  if (event?.detail >= 2) return false;
   const ownerCode = canonicalCountryCode(getFeatureOwnerCode(featureId));
   const featureCode = canonicalCountryCode(
     ownerCode
@@ -13946,13 +13982,55 @@ function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
   if (!nextCode) return false;
 
   const previousCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
-  selectInspectorCountryState(runtimeState, nextCode);
+  const step = event ? resolveInspectorDrillStep({
+    current: {
+      countryCode: previousCode,
+      level: runtimeState.inspectorSelectionLevel || "country",
+      groupId: runtimeState.inspectorSelectionGroupId,
+      featureId: runtimeState.inspectorSelectionFeatureId,
+    },
+    hit: { countryCode: nextCode, featureId },
+    findGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
+  }) : { level: "country", countryCode: nextCode };
+  applyInspectorDrillSelection(step);
   // The inspector, its rows and the preset tree follow after the click's frame is painted.
   scheduleSidebarRefresh({
     ownerCodes: [previousCode, nextCode].filter(Boolean),
     refreshPresetTree: true,
   });
   return nextCode !== previousCode;
+}
+
+function applyInspectorDrillSelection({ level, countryCode, group, featureId }) {
+  if (level === "group") {
+    selectInspectorGroupState(runtimeState, countryCode, group);
+    setInspectorFeatureHighlight(group.children, { groupMode: true, label: group.label });
+  } else if (level === "feature") {
+    selectInspectorFeatureState(runtimeState, countryCode, featureId, group);
+    setInspectorFeatureHighlight([featureId], {
+      label: getGeoFeatureDisplayLabel(runtimeState.landIndex.get(featureId)),
+    });
+  } else {
+    selectInspectorCountryState(runtimeState, countryCode);
+  }
+}
+
+function stepUpInspectorSelection() {
+  const countryCode = runtimeState.selectedInspectorCountryCode;
+  const step = resolveInspectorStepUp({
+    current: {
+      countryCode,
+      level: runtimeState.inspectorSelectionLevel,
+      featureId: runtimeState.inspectorSelectionFeatureId,
+    },
+    findGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
+  });
+  if (!step) return false;
+  if (!step.countryCode) return clearInspectorLandSelection();
+  applyInspectorDrillSelection(step);
+  scheduleSidebarRefresh({ ownerCodes: [countryCode], refreshPresetTree: true });
+  requestInteractionRender("step-up-inspector-selection");
+  return true;
 }
 
 // Keyboard equivalent of a select-tool land click: same selection state, no paint or history.
@@ -14075,7 +14153,11 @@ function getSpecialZonesWorkbenchCurrentTargetSignature() {
     ? String(runtimeState.devHoverHit.id || "").trim()
     : "";
   const hoveredId = String(runtimeState.hoveredId || "").trim();
-  return selectedId || hoverHitId || hoveredId || "";
+  const inspectorSelection = [
+    runtimeState.selectedInspectorCountryCode || "",
+    runtimeState.inspectorHighlightGroupMode ? (runtimeState.inspectorHighlightFeatureIds || []).length : 0,
+  ].join(":");
+  return `${selectedId || hoverHitId || hoveredId || ""}|${inspectorSelection}`;
 }
 
 function notifyDevWorkspace() {
@@ -14853,6 +14935,8 @@ function initMap({
   facilityInfoCardCloseBtn = document.getElementById("facilityInfoCardCloseBtn");
   facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   runtimeState.refreshColorStateFn = refreshColorState;
+  runtimeState.clearInspectorLandSelectionFn = clearInspectorLandSelection;
+  runtimeState.stepUpInspectorSelectionFn = stepUpInspectorSelection;
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);
 

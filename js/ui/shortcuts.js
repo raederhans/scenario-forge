@@ -1,3 +1,4 @@
+import { exitSpecialZoneMembershipToolState } from "../core/state/actions/special_zone_actions.js";
 import {
   STATE_BUS_EVENTS,
   callRuntimeHook,
@@ -302,6 +303,14 @@ function initShortcuts() {
         flushShortcutRender("shortcut-strategic-overlay-cancel");
         return;
       }
+      if (runtimeState.currentTool === "special-zone-membership") {
+        event.preventDefault();
+        exitSpecialZoneMembershipToolState(runtimeState);
+        syncToolUi();
+        callRuntimeHook(runtimeState, "updateSpecialZonesWorkbenchUIFn");
+        flushShortcutRender("shortcut-special-zone-membership-exit");
+        return;
+      }
       if (runtimeState.specialZoneEditor?.active) {
         event.preventDefault();
         cancelSpecialZoneDraw();
@@ -313,6 +322,10 @@ function initShortcuts() {
         runtimeState.brushModeEnabled = false;
         setBrushPanModifier(false);
         syncToolUi();
+        return;
+      }
+      if (runtimeState.selectedInspectorCountryCode && runtimeState.stepUpInspectorSelectionFn?.()) {
+        event.preventDefault();
       }
     }
   });

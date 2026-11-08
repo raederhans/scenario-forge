@@ -1,4 +1,5 @@
 import { createUiIcon, setUiIcon } from "./ui_icons.js";
+import { initCommandPalette } from "./command_palette.js";
 
 // The workspace moves existing controls so their business owners keep their
 // element references, event handlers, and native form contracts.
@@ -250,7 +251,28 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     // existing empty-state message outside that card in the property pane.
     if (key === "water") move("waterInspectorEmpty", property);
     if (key === "countries") {
-      const hint = make("p", "editor-empty-hint", "Select a country to view its properties.");
+      const hint = make("div", "editor-empty-hint editor-country-empty");
+      const searchCountry = button("Search countries", "editorSearchCountriesBtn", () => {
+        // 左栏收起或窄屏抽屉关着时，搜索框不可聚焦：先经各自的现有开关把左栏亮出来。
+        const body = documentRef.body;
+        if (globalThis.matchMedia?.("(max-width: 1023px)").matches) {
+          if (!body.classList.contains("left-drawer-open")) get("leftPanelToggle")?.click();
+        } else if (body.classList.contains("left-sidebar-collapsed")) {
+          get("leftSidebarCollapseBtn")?.click();
+        }
+        selectObject("countries");
+        const focusSearch = () => get("countrySearch")?.focus();
+        focusSearch();
+        // 抽屉打开时会把焦点交给抽屉起点，下一帧再落到搜索框。
+        globalThis.requestAnimationFrame?.(focusSearch);
+      });
+      searchCountry.className = "btn-secondary";
+      hint.append(
+        createUiIcon("citypoints", { size: 20, doc: documentRef }),
+        make("h3", "", "No country selected"),
+        make("p", "", "Click a parcel on the map, or search for a country on the left."),
+        searchCountry,
+      );
       const selectionName = make("h3", "editor-selected-name");
       property.prepend(hint, selectionName);
       const syncEmpty = () => {
@@ -297,20 +319,32 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
 
   const layerHost = tasks.get("layers").host;
   const layerGroups = [];
-  const visibilityIds = {
-    physical: "togglePhysical", urban: "toggleUrban", citypoints: "toggleCityPoints",
-    rivers: "toggleRivers", daynight: "dayNightEnabled", transport: "transportAppearanceMasterToggle",
-    "special-zones": "scenarioSpecialRegionVisibilityToggle",
+  // 眼睛开关代理属性页里该图层自己的总开关。按需解析：特殊区域的叠加层开关由工作台运行时创建。
+  const visibilityControls = {
+    physical: () => get("togglePhysical"), urban: () => get("toggleUrban"), citypoints: () => get("toggleCityPoints"),
+    rivers: () => get("toggleRivers"), daynight: () => get("dayNightEnabled"), transport: () => get("transportAppearanceMasterToggle"),
+    "special-zones": () => documentRef.querySelector("[data-special-zone-overlay-toggle]"),
   };
   const refreshLayerVisibility = () => {
-    for (const { toggle, checkbox, row, label } of layerEntries) {
+    for (const { toggle, getCheckbox, row, label } of layerEntries) {
       if (!toggle) continue;
+      const checkbox = getCheckbox();
+      setHidden(toggle, !checkbox);
+      if (!checkbox) continue;
       setAttribute(toggle, "aria-pressed", checkbox.checked);
       setAttribute(toggle, "aria-label", t(checkbox.checked ? "Hide {name}" : "Show {name}", "ui").replace("{name}", t(label, "ui")));
       setUiIcon(toggle, checkbox.checked ? "eye" : "eye-off", { doc: documentRef });
       row.classList.toggle("is-layer-off", !checkbox.checked);
     }
   };
+  let visibilityRefreshQueued = false;
+  const scheduleVisibilityRefresh = () => {
+    if (visibilityRefreshQueued) return;
+    visibilityRefreshQueued = true;
+    queueMicrotask(() => { visibilityRefreshQueued = false; refreshLayerVisibility(); });
+  };
+  // 任何 change 都同步一次：只有几个开关，开销可以忽略，也不依赖总开关节点是否被重建。
+  documentRef.addEventListener("change", refreshLayerVisibility, true);
   const search = make("input", "input editor-layer-search", "", "editorLayerSearch");
   search.type = "search";
   search.placeholder = t("Search layers", "ui");
@@ -383,26 +417,28 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
           dot.title = strip.textContent.trim();
         }
       };
-      new MutationObserver(syncStatus).observe(host, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["data-status-tone"] });
+      // 预设、项目加载等会直接改复选框的 checked 而不派发 change；它们都会刷新属性页里的状态条，借这里同步眼睛开关。
+      new MutationObserver(() => { syncStatus(); scheduleVisibilityRefresh(); }).observe(host, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["data-status-tone"] });
       syncStatus();
       const row = make("div", "editor-layer-row");
       row.dataset.layerKey = key;
       row.append(btn);
       tabs.append(row);
-      const checkbox = get(visibilityIds[key]);
+      const getCheckbox = visibilityControls[key] || (() => null);
       let toggle;
-      if (checkbox) {
+      if (visibilityControls[key]) {
         toggle = make("button", "editor-layer-visibility");
         toggle.type = "button";
         toggle.addEventListener("click", () => {
+          const checkbox = getCheckbox();
+          if (!checkbox) return;
           checkbox.checked = !checkbox.checked;
           checkbox.dispatchEvent(new Event("change", { bubbles: true }));
           refreshLayerVisibility();
         });
-        checkbox.addEventListener("change", refreshLayerVisibility);
         row.append(toggle);
       }
-      const entry = { key, label, name, row, btn, host, panel, propertyKey, checkbox, toggle };
+      const entry = { key, label, name, row, btn, host, panel, propertyKey, getCheckbox, toggle };
       entries.push(entry);
       layerEntries.push(entry);
       btn.addEventListener("click", () => {
@@ -541,7 +577,87 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   const divider = make("span", "editor-project-divider");
   divider.setAttribute("aria-hidden", "true");
   topActions.append(divider, inspectorToggle);
-  for (const id of ["scenarioGuideBtn", "workspaceGithubLink", "btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
+  const commandPalette = initCommandPalette({ documentRef, t, getCommands: () => [
+    ...[...propertyEntries].filter(([, entry]) => entry.task === "layers").map(([key, entry]) => ({ key, label: entry.label, button: entry.trigger, group: "Layers" })),
+    ...objectEntries.map((entry) => ({ key: entry.key, label: propertyEntries.get(entry.key).label, button: entry.button, group: "Objects" })),
+    ...[
+      ["toolSelectBtn", "Select tool", "V"], ["toolFillBtn", "Fill tool", "F"],
+      ["toolEraserBtn", "Eraser tool", "E"], ["toolEyedropperBtn", "Eyedropper tool", "I"],
+      ["brushModeBtn", "Brush", "B"],
+    ].map(([key, label, shortcut]) => ({ key, label, shortcut, button: get(key), group: "Tools" })),
+    ...[
+      ["workspaceSaveBtn", "Save project"], ["workspaceExportBtn", "Export image"],
+      ["btnToggleLang", "Switch language"], ["scenarioGuideBtn", "User guide"],
+    ].map(([key, label]) => ({ key, label, button: get(key), group: "Project" })),
+  ] });
+  const help = make("div", "editor-help");
+  const helpMenu = make("div", "editor-help-menu", "", "editorHelpMenu");
+  helpMenu.hidden = true;
+  helpMenu.setAttribute("role", "menu");
+  const closeHelp = (restoreFocus = false) => {
+    helpMenu.hidden = true;
+    helpButton.setAttribute("aria-expanded", "false");
+    if (restoreFocus) helpButton.focus();
+  };
+  const helpButton = button("", "editorHelpBtn", () => {
+    helpMenu.hidden = !helpMenu.hidden;
+    helpButton.setAttribute("aria-expanded", String(!helpMenu.hidden));
+    if (!helpMenu.hidden) helpItems().at(0)?.focus();
+  });
+  helpButton.setAttribute("aria-haspopup", "menu");
+  helpButton.setAttribute("aria-controls", helpMenu.id);
+  helpButton.setAttribute("aria-expanded", "false");
+  const helpIcon = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
+  for (const [name, value] of Object.entries({ viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", "aria-hidden": "true" })) helpIcon.setAttribute(name, value);
+  const helpPath = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
+  for (const [name, value] of Object.entries({ d: "M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0ZM9 9a3 3 0 0 1 6 0c0 2-3 2-3 5m0 3v.1", stroke: "currentColor", "stroke-width": "1.6", "stroke-linecap": "round", "stroke-linejoin": "round" })) helpPath.setAttribute(name, value);
+  helpIcon.append(helpPath);
+  helpButton.append(helpIcon);
+  // 指南仍是顶栏上可见的独立按钮（指南弹层关闭时焦点要回到它）；帮助菜单只放快捷键、命令面板和 GitHub。
+  helpButton.setAttribute("aria-label", t("Help", "ui"));
+  helpButton.dataset.i18nAriaLabel = "Help";
+  helpButton.title = t("Help", "ui");
+  const openPalette = (query) => { closeHelp(true); commandPalette.open(query); };
+  helpMenu.append(button("Keyboard shortcuts", "editorKeyboardShortcutsBtn", () => openPalette("?")));
+  const paletteButton = button("", "editorCommandPaletteBtn", () => openPalette(""));
+  const paletteShortcut = make("kbd", "");
+  paletteShortcut.textContent = "Ctrl+K";
+  paletteButton.append(make("span", "", "Command palette"), paletteShortcut);
+  helpMenu.append(paletteButton);
+  const github = move("workspaceGithubLink", helpMenu);
+  if (github) {
+    github.textContent = "GitHub";
+    github.target = "_blank";
+    github.rel = "noopener";
+  }
+  for (const item of helpMenu.children) {
+    item.setAttribute("role", "menuitem");
+    item.tabIndex = -1;
+    item.addEventListener("click", () => closeHelp());
+  }
+  const helpItems = () => [...helpMenu.children].filter((item) => !item.disabled);
+  help.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !helpMenu.hidden) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeHelp(true);
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      helpMenu.hidden = false;
+      helpButton.setAttribute("aria-expanded", "true");
+      const items = helpItems();
+      const index = items.indexOf(documentRef.activeElement);
+      const next = index === -1
+        ? (event.key === "ArrowDown" ? 0 : items.length - 1)
+        : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+      items[next]?.focus();
+    } else if (event.key === "Tab") closeHelp();
+  });
+  documentRef.addEventListener("click", (event) => { if (!help.contains(event.target)) closeHelp(); });
+  help.append(helpButton, helpMenu);
+  move("scenarioGuideBtn", topActions);
+  topActions.append(help);
+  for (const id of ["btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
   const strategyBtn = button("Edit annotations", "editorStrategicModeBtn", () => {
     const active = !documentRef.body.classList.contains("frontline-mode-active");
     setStrategicMode(active);

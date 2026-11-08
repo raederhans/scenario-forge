@@ -1,3 +1,4 @@
+import { resolveDataUrl } from "./data_base_url.js";
 export const POPULATION_LAYER_ID = "population_ghsl_2020_v1";
 export const POPULATION_DATA_VERSION = "ghsl-r2023a-e2020-v1";
 export const POPULATION_YEAR = 2020;
@@ -11,7 +12,7 @@ const ROW_STATUSES = Object.freeze(["ok", "partial_coverage", "no_data", "invali
   "overlapping_geometry", "unestimated_scenario_land", "water_not_applicable"]);
 
 async function defaultFetchJson(url) {
-  const response = await fetch(url);
+  const response = await fetch(resolveDataUrl(url));
   if (!response.ok) throw new Error(`Population data request failed: ${response.status}`);
   return response.json();
 }

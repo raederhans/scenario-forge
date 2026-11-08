@@ -1,3 +1,5 @@
+import { ensureActiveScenarioOptionalLayerLoaded } from "../../core/scenario_resources.js";
+import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import {
   normalizeTransportOverviewStyleConfig,
   resolveLinkedTransportOverviewScopeAndThreshold,
@@ -49,6 +51,17 @@ export function createTransportAppearanceController({
 
   const toggleAirports = document.getElementById("toggleAirports");
   const togglePorts = document.getElementById("togglePorts");
+  const toggleEraRailways = document.getElementById("toggleEraRailways");
+  const eraRailwaysToggleRow = document.getElementById("eraRailwaysToggleRow");
+
+  // 启动剧本的 activeScenarioManifest 可能是启动包内嵌的子集，不含 era_railways_url；
+  // 与可选图层加载器一致，以剧本 bundle 缓存里的完整 manifest 为准。
+  function activeScenarioHasEraRailways() {
+    const scenarioId = String(runtimeState.activeScenarioId || "").trim();
+    return !!(runtimeState.scenarioEraRailwaysData
+      || runtimeState.scenarioBundleCacheById?.[scenarioId]?.manifest?.era_railways_url
+      || runtimeState.activeScenarioManifest?.era_railways_url);
+  }
   const toggleRail = document.getElementById("toggleRail");
   const toggleRoad = document.getElementById("toggleRoad");
 
@@ -320,6 +333,8 @@ export function createTransportAppearanceController({
     if (railThresholdResolved) railThresholdResolved.textContent = t(formatTransportThresholdLabel(railScopeState.importanceThreshold), "ui");
     if (railScope) railScope.value = String(getTransportFamilyValue(railConfig, railDefaults, "scope", "mainline_plus_regional"));
     if (railImportanceThreshold) railImportanceThreshold.value = String(getTransportFamilyValue(railConfig, railDefaults, "importanceThreshold", "secondary"));
+    if (toggleEraRailways) toggleEraRailways.checked = runtimeState.showEraRailways !== false;
+    if (eraRailwaysToggleRow) eraRailwaysToggleRow.hidden = !activeScenarioHasEraRailways();
     if (toggleRail) toggleRail.checked = !!runtimeState.showRail;
     if (transportRailSummaryMeta) {
       transportRailSummaryMeta.textContent = buildTransportFamilySummaryText("rail", transportEnabled, !!runtimeState.showRail, railConfig, railScopeState);
@@ -481,6 +496,19 @@ export function createTransportAppearanceController({
         renderTransportAppearanceDirty("toggle-ports");
       });
       togglePorts.dataset.bound = "true";
+    }
+
+    if (toggleEraRailways && !toggleEraRailways.dataset.bound) {
+      toggleEraRailways.addEventListener("change", (event) => {
+        setAppearanceVisibilityState(runtimeState, "showEraRailways", event.target.checked);
+        if (runtimeState.showEraRailways) {
+          setAppearanceVisibilityState(runtimeState, "showTransport", true);
+          releaseDeferredContextForTransportToggle("toggle-era-railways");
+          void ensureActiveScenarioOptionalLayerLoaded("erarailways", { renderNow: true });
+        }
+        renderTransportAppearanceDirty("toggle-era-railways");
+      });
+      toggleEraRailways.dataset.bound = "true";
     }
 
     if (toggleRail && !toggleRail.dataset.bound) {

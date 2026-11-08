@@ -12,7 +12,7 @@ const identitySource = readFileSync(new URL("../js/core/renderer/object_identity
   .replace("export function", "function");
 const names = [
   "getScenarioAtlantropaRevisionToken", "getScenarioSurfaceVersionParts", "getScenarioSurfaceVersionSignal", "getScenarioWaterVisualRevisionToken",
-  "getEffectiveWaterRegionFeatures", "getFrameEffectiveWaterInputs", "resolveAndSanitizeEffectiveWaterRegionFeatures",
+  "getEffectiveWaterRegionFeatures", "getFrameEffectiveWaterInputs", "resolveAndSanitizeEffectiveWaterRegionFeatures", "getActiveScenarioYear",
   "getEffectiveAtlantropaFeatures", "getAtlantropaRenderLayer",
   "isScenarioAtlantropaVisible", "getScenarioWaterRegionsMode", "isScenarioWaterTopologyExclusiveMode",
   "getScenarioExcludedWaterRegionIds", "getScenarioExcludedWaterRegionGroups", "isScenarioWaterRegion",
@@ -48,7 +48,7 @@ export function createHarness(source = rendererSource) {
     sanitizeWaterRegionFeatures: (features) => features.filter((entry) => !entry.properties.unsafe),
     getSphericalGeometryDiagnostics: () => ({ invalid: false }), recordRenderPerfMetric: () => {},
     getFeatureCollectionFeatureCount: (collection) => collection?.features?.length || 0,
-    stableJson: JSON.stringify, getOceanBaseFillColor: () => "#ocean", getLakeBaseFillColor: () => "#lake",
+    stableJson: JSON.stringify, getOceanBaseFillColor: () => "#ocean", getAtlantropaSeaFillColor: () => "#ocean", getLakeBaseFillColor: () => "#lake",
     getLakeStyleConfig: () => ({ opacity: 1 }),
     getScenarioSpecialVisualRevisionToken: () => "special",
     getScenarioReliefVisualRevisionToken: () => "relief",

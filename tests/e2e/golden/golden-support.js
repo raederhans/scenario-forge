@@ -37,10 +37,13 @@ async function closeScenarioGuide(page) {
   if (await guide.isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
 }
 
-async function openApp(page, { timeout = 120_000 } = {}) {
+async function openApp(page, { timeout = 120_000, scenarioId = "" } = {}) {
   await page.setViewportSize({ width: 1440, height: 900 });
   const started = Date.now();
-  await page.goto(GOLDEN_APP_PATH, { waitUntil: "domcontentloaded" });
+  const appPath = scenarioId
+    ? `${GOLDEN_APP_PATH}&default_scenario=${encodeURIComponent(scenarioId)}`
+    : GOLDEN_APP_PATH;
+  await page.goto(appPath, { waitUntil: "domcontentloaded" });
   await waitForSettled(page, { timeout });
   const startupMs = Date.now() - started;
   await closeScenarioGuide(page);
@@ -152,6 +155,19 @@ async function fillAt(page, point, { scenarioId = "" } = {}) {
   return Object.keys(after).filter((id) => after[id] !== before[id]);
 }
 
+// Wait for work that may land after `settled`: full bundle hydration (and its health
+// gate) and the deferred detail-topology promotion.
+async function waitForBackgroundIdle(page, { timeout = 120_000 } = {}) {
+  await expect.poll(async () => {
+    const status = await readStatus(page);
+    if (status?.bootError) throw new Error(`boot error: ${status.bootError}`);
+    const background = status?.background;
+    return !!background
+      && !background.detailPending
+      && (background.healthGate !== "idle" || background.fatalRecovery);
+  }, { timeout, intervals: [500, 1000] }).toBe(true);
+}
+
 module.exports = {
   GOLDEN_APP_PATH,
   PROBE_LON_LAT,
@@ -167,6 +183,7 @@ module.exports = {
   screenPoint,
   selectFillTool,
   switchScenario,
+  waitForBackgroundIdle,
   waitForSettled,
   zoomTo,
 };

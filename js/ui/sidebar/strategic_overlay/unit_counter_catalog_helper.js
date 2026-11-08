@@ -1,3 +1,4 @@
+import { resolveDataUrl, isExternalDataUrl } from "../../../core/data_base_url.js";
 import {
   createEmptyHoi4UnitIconReviewDraft,
   filterHoi4UnitIconEntries,
@@ -318,8 +319,10 @@ export function createUnitCounterCatalog({
     const isCurrentPresetCandidate = getHoi4CurrentPresetCandidateEntryId(currentPresetId) === entry.id;
     record.card.classList.toggle("is-candidate", isCurrentPresetCandidate);
     if (variantPath) {
-      if (record.image.getAttribute("src") !== variantPath) {
-        record.image.src = variantPath;
+      const resolvedVariantPath = resolveDataUrl(variantPath);
+      if (record.image.getAttribute("src") !== resolvedVariantPath) {
+        if (isExternalDataUrl(resolvedVariantPath, variantPath)) record.image.crossOrigin = "anonymous";
+        record.image.src = resolvedVariantPath;
       }
       record.image.hidden = false;
       record.missing.hidden = true;

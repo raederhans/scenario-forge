@@ -809,7 +809,7 @@ test('exact edit completion prepares invalidated coverage before leaving and ret
   f.owner.draw(); await resolveAll(f); f.owner.draw();
   await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
   const builds = f.requests.length;
-  f.features[0].geometry = { type: 'Polygon', coordinates: [] };
+  f.features[0].geometry = { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]] };
   f.identity.version++;
   f.owner.noteNativePartialRepaint();
   await new Promise(resolve => setTimeout(resolve, 15));
@@ -840,7 +840,7 @@ for (const [name, change] of [
     t.after(() => f.owner.dispose());
     f.owner.draw(); await resolveAll(f); f.owner.draw();
     await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
-    f.features[0].geometry = { type: 'Polygon', coordinates: [] };
+    f.features[0].geometry = { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]] };
     f.identity.version++;
     f.owner.noteNativePartialRepaint();
     await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
@@ -1065,7 +1065,7 @@ for (const changed of ["geometry", "scene", "coverage", "projection", "layout"])
     f.identity.colorVersion++;
     if (changed === "geometry") {
       f.identity.geometryContentVersion = "content-2";
-      f.features[0].geometry = { type: "Polygon", coordinates: [] };
+      f.features[0].geometry = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]] };
     } else if (changed === "layout") f.layout.offsetX++;
     else f.identity[`${changed}Key`] += "-changed";
     f.owner.draw();
@@ -1517,6 +1517,7 @@ function overviewColorFixture() {
     createGpu: options => {
       const gpu = gpuFactory.createGpu(options);
       gpu.createOverview = ({ tiles, palette, revision }) => {
+        if (f.overviewFails) return null;
         const child = overviewFactory.createGpu({ onContextLost() {} });
         child.setPalette(palette, revision); child.setTiles(tiles); return child;
       };
@@ -1545,6 +1546,42 @@ test("overview colors match their own initial palette after a newer primary publ
   f.owner.draw();
   assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), true);
   assert.equal(f.owner.matchesPublishedColor("missing", { overview: true }), false);
+});
+
+test("a same-view republish after a geometry change replaces the overview and its feature IDs", async t => {
+  const f = overviewColorFixture();
+  t.after(() => f.owner.dispose());
+  f.identity.geometryContentVersion = "coarse";
+  f.owner.draw(); await resolveAll(f); f.owner.draw(); f.owner.publishDirectFrame();
+  const coarse = f.owner.getOverviewFrame();
+  assert.ok(coarse);
+  assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), true);
+  // Startup-like swap: the same scene and view now publish detailed features
+  // with other IDs and colors in place of the coarse collection.
+  f.setFeatures([feature("detail", { minX: -160, minY: -160, maxX: -140, maxY: -140 }, "#4a6346")]);
+  f.identity.geometryContentVersion = "detail"; f.identity.version++;
+  f.owner.draw(); await resolveAll(f, "detail"); f.owner.draw(); f.owner.publishDirectFrame();
+  const detailed = f.owner.getOverviewFrame();
+  assert.ok(detailed);
+  assert.notEqual(detailed, coarse, "an overview of replaced geometry cannot stand in for the new frame");
+  assert.equal(detailed.sourceFrame, f.owner.getDirectFrame());
+  assert.equal(f.owner.matchesPublishedColor("detail", { overview: true }), true);
+  assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), false);
+  assert.deepEqual([...detailed.gpu.palettes.at(-1).bytes.subarray(-4)], [0x4a, 0x63, 0x46, 255]);
+});
+
+test("a failed overview rebuild after a geometry change drops the stale overview", async t => {
+  const f = overviewColorFixture();
+  t.after(() => f.owner.dispose());
+  f.identity.geometryContentVersion = "coarse";
+  f.owner.draw(); await resolveAll(f); f.owner.draw(); f.owner.publishDirectFrame();
+  assert.ok(f.owner.getOverviewFrame());
+  f.overviewFails = true;
+  f.setFeatures([feature("detail", { minX: -160, minY: -160, maxX: -140, maxY: -140 }, "#4a6346")]);
+  f.identity.geometryContentVersion = "detail"; f.identity.version++;
+  f.owner.draw(); await resolveAll(f, "detail"); f.owner.draw(); f.owner.publishDirectFrame();
+  assert.equal(f.owner.getOverviewFrame(), null, "stale codes must not be shown while dragging");
+  assert.equal(f.owner.matchesPublishedColor("a", { overview: true }), false);
 });
 
 for (const [reason, invalidate] of [

@@ -14,6 +14,7 @@
   "detail_chunk_manifest_url": "data/scenarios/tno_1962/detail_chunks.manifest.json",
   "display_name": "TNO 1962",
   "district_groups_url": "data/scenarios/tno_1962/district_groups.manual.json",
+  "era_railways_url": "data/transport_layers/tno_era_rail/era_rail.geojson",
   "excluded_water_region_groups": [
     "mediterranean"
   ],
@@ -3031,7 +3032,7 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "4e2aaebcc26091b18ce744af29d489f06c2f563621a1717f4cd22639e5ab841e",
+  "snapshot_fingerprint": "63d241d9855b9d2a939f5ec3e2cc122e314df662e1b1da5b22a0f7388dae3251",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "5433a525c3fabe1581dd1b1baf26cc7b3be76207fb868cfff237b9b53cc91263",
@@ -3046,7 +3047,7 @@
   "startup_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
   "style_defaults": {
     "atlantropa_salt_flat": {
-      "fillColor": "#7c6f53"
+      "fillColor": "#a8956c"
     },
     "atlantropa_sea": {
       "fillColor": "#203856"
@@ -3056,7 +3057,7 @@
     },
     "ocean": {
       "experimentalAdvancedStyles": true,
-      "fillColor": "#2d4769",
+      "fillColor": "#1f2f45",
       "preset": "bathymetry_soft"
     }
   },
