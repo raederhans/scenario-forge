@@ -85,6 +85,18 @@ export function assertRasterCacheRevisit(warm, revisit) {
   assert.ok(revisit.diagnostics.assets.indexedDBHits > 0, 'revisit must actually read persisted coverage');
 }
 
+// 切片选择在视角变化后才异步刷新，随后卸载多余切片并更新拓扑版本，这些都可能晚于 settled。
+// 参考帧必须拍在当前视角的最终几何上，否则会与之后的对比帧差出几百条路径。
+async function waitChunksMatchView(page) {
+  const ready = await page.waitForFunction(() => {
+    const { viewport, chunks } = globalThis.__scenarioForgeTestApi.status();
+    const selected = chunks.viewportBounds, current = viewport.bounds;
+    return !!selected && !!current && current.every((value, index) => Math.abs(value - selected[index]) < 1e-6)
+      && chunks.idle && chunks.requiredChunkIds.length === chunks.loadedChunkIds.length;
+  }, null, { timeout: RELEASE_WAIT_TIMEOUT_MS });
+  await ready.dispose();
+}
+
 async function toggle(page, enabled) {
   const requested = await page.evaluate(async (enabled) => {
     const { renderer } = await window.__scenarioForgeTestApi.internals();
@@ -298,6 +310,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     for (const zoom of interactionOnly ? [] : [130, 100]) {
       await page.evaluate(value => window.__rasterTask.renderer.setZoomPercent(value), zoom);
       await page.waitForFunction(value => Math.abs(window.__rasterTask.state.zoomTransform.k - value / 100) < 1e-7, zoom);
+      await waitChunksMatchView(page);
       await compareSettledPixels(page, zoom, { captureReference: true });
     }
   }
