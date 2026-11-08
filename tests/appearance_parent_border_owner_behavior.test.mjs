@@ -117,6 +117,9 @@ function createHarness(runtimeOverrides = {}) {
     enableAllButton: new TestElement("button"),
     disableAllButton: new TestElement("button"),
     countryList: new TestElement("div"),
+    countrySearch: new TestElement("input"),
+    enabledOnlyToggle: new TestElement("input"),
+    countrySummary: new TestElement("summary"),
     emptyNode: new TestElement("p"),
   };
   nodes.emptyNode.className = "hidden";
@@ -268,4 +271,44 @@ test("parent border owner shows empty state and skips repeated empty renders", (
   assert.equal(harness.nodes.emptyNode.classList.contains("hidden"), false);
   assert.equal(harness.nodes.countryList.replaceChildrenCallCount, 1);
   assert.deepEqual(harness.runtimeState.parentBorderEnabledByCountry, {});
+});
+
+test("country search and enabled-only filter compose and follow selection changes", () => {
+  const { nodes, owner, runtimeState } = createHarness();
+  owner.bindEvents();
+  owner.renderCountryList();
+  const visible = () => nodes.countryList.children.filter((row) => !row.hidden).map((row) => row.children[1].textContent);
+  assert.equal(nodes.countrySummary.textContent, "By country (1 on)");
+  nodes.countrySearch.value = "gErMaNy";
+  nodes.countrySearch.dispatch("input");
+  assert.deepEqual(visible(), ["geo:Germany (DEU)"]);
+  nodes.countrySearch.value = " fra ";
+  nodes.countrySearch.dispatch("input");
+  assert.deepEqual(visible(), ["geo:France (FRA)"]);
+  nodes.enabledOnlyToggle.checked = true;
+  nodes.enabledOnlyToggle.dispatch("change");
+  assert.deepEqual(visible(), ["geo:France (FRA)"]);
+  nodes.countrySearch.value = "DEU";
+  nodes.countrySearch.dispatch("input");
+  assert.deepEqual(visible(), []);
+  nodes.enableAllButton.dispatch("click");
+  assert.deepEqual(visible(), ["geo:Germany (DEU)"]);
+  assert.equal(nodes.countrySummary.textContent, "By country (2 on)");
+  const checkbox = nodes.countryList.children[1].children[0];
+  checkbox.checked = false;
+  checkbox.dispatch("change");
+  assert.deepEqual(visible(), []);
+  nodes.countrySearch.value = "";
+  nodes.countrySearch.dispatch("input");
+  assert.deepEqual(visible(), ["geo:France (FRA)"]);
+  nodes.disableAllButton.dispatch("click");
+  assert.deepEqual(visible(), []);
+  assert.equal(nodes.countrySummary.textContent, "By country (0 on)");
+  nodes.enabledOnlyToggle.checked = false;
+  nodes.enabledOnlyToggle.dispatch("change");
+  assert.equal(visible().length, 2);
+  runtimeState.parentBorderEnabledByCountry.DEU = true;
+  owner.renderCountryList();
+  assert.equal(nodes.countrySummary.textContent, "By country (1 on)");
+  assert.equal(nodes.countryList.replaceChildrenCallCount, 1);
 });

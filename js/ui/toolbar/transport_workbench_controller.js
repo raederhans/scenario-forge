@@ -9,8 +9,8 @@ import { markDirty } from "../../core/dirty_state.js";
 import { t } from "../i18n.js";
 import {
   focusSurface as focusOverlaySurface,
-  rememberSurfaceTrigger as rememberOverlayTrigger,
-  restoreSurfaceTriggerFocus as restoreOverlayTriggerFocus,
+  rememberSurfaceTrigger,
+  restoreSurfaceTriggerFocus,
 } from "../ui_contract.js";
 import {
   getTransportWorkbenchCarrierViewState,
@@ -112,6 +112,10 @@ export function createTransportWorkbenchController({
   transportWorkbenchDataSections = null,
   transportWorkbenchFamilyTabs = [],
 } = {}) {
+  // ui_contract 的触发按钮登记需要一个注册表；之前直接把 overlay 当注册表传入，导致关闭后焦点无法回到入口按钮。
+  const surfaceFocusReturnTargets = new WeakMap();
+  const rememberOverlayTrigger = (surface, trigger) => rememberSurfaceTrigger(surfaceFocusReturnTargets, surface, trigger);
+  const restoreOverlayTriggerFocus = (surface) => restoreSurfaceTriggerFocus(surfaceFocusReturnTargets, surface);
   // controller 只拥有 workbench 自己的 overlay/panel/preview 交互闭环。
   // 更高层的 toolbar surface 仲裁、别的工作台切换、URL restore 仍由 toolbar.js 处理。
   const transportWorkbenchStateOwner = createTransportWorkbenchStateOwner(runtimeState);

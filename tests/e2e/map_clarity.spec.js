@@ -55,7 +55,7 @@ test('display quality preserves camera and scenario political borders survive sa
   expect(initial.exactPasses).toEqual([initial.camera,initial.camera]);
 
   await page.locator('#editorTaskLayersBtn').click();
-  await page.locator('#editorLayer-display').click();
+  await page.locator('[data-appearance-tab="presets"]').click();
   for (const [quality, dpr] of [['balanced',1.5], ['performance',1.25], ['high',2]]) {
     await page.locator('#displayQuality').selectOption(quality);
     await expect.poll(async () => (await read()).dpr).toBe(dpr);

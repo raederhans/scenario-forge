@@ -92,7 +92,7 @@ function createHarness({ applyEnabled = true, rejectApply = false, popoverHandle
     inspectorTabButtons: [new TestElement("button")],
   };
   nodes.familyTabs[0].dataset.transportFamily = "rail";
-  nodes.inspectorTabButtons[0].dataset.transportInspectorTab = "coverage";
+  nodes.inspectorTabButtons[0].dataset.transportInspectorTab = "data";
   nodes.packSelect.value = "japan_road";
   let open = false;
   const events = [];
@@ -178,12 +178,15 @@ test("transport workbench tabs support roving keyboard activation", async () => 
   const railTab = new TestElement("button");
   const inspectTab = new TestElement("button");
   const dataTab = new TestElement("button");
+  const hiddenTab = new TestElement("button");
+  hiddenTab.dataset.transportInspectorTab = "aggregation";
+  hiddenTab.hidden = true;
   roadTab.dataset.transportFamily = "road";
   railTab.dataset.transportFamily = "rail";
   inspectTab.dataset.transportInspectorTab = "inspect";
   dataTab.dataset.transportInspectorTab = "data";
   harness.nodes.familyTabs.splice(0, harness.nodes.familyTabs.length, roadTab, railTab);
-  harness.nodes.inspectorTabButtons.splice(0, harness.nodes.inspectorTabButtons.length, inspectTab, dataTab);
+  harness.nodes.inspectorTabButtons.splice(0, harness.nodes.inspectorTabButtons.length, inspectTab, hiddenTab, dataTab);
 
   let preventDefaultCount = 0;
   harness.owner.bind();
@@ -201,6 +204,9 @@ test("transport workbench tabs support roving keyboard activation", async () => 
     },
   });
 
+  await inspectTab.dispatch("keydown", { key: "ArrowRight" });
+  assert.equal(dataTab.dataset.focused, "true");
+  assert.equal(hiddenTab.dataset.focused, undefined);
   assert.equal(railTab.dataset.focused, "true");
   assert.equal(inspectTab.dataset.focused, "true");
   assert.equal(preventDefaultCount, 2);
@@ -208,6 +214,9 @@ test("transport workbench tabs support roving keyboard activation", async () => 
     "family:rail",
     "render-ui",
     "tab:inspect",
+    "shell:road",
+    "inspector:road:true:false",
+    "tab:data",
     "shell:road",
     "inspector:road:true:false",
   ]);
@@ -234,7 +243,7 @@ test("transport workbench event owner keeps preview controls, pack, family, and 
     "pack:japan_road",
     "family:rail",
     "render-ui",
-    "tab:coverage",
+    "tab:data",
     "shell:road",
     "inspector:road:true:false",
   ]);
