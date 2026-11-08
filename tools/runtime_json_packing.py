@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 
 from map_builder.json_source import portable_gzip_bytes
+from tools.published_geometry_normalization import normalize_published_geometry
 from tools.political_detail_partition import (
     feature_bounds, geometry_coordinates, geometry_part_count,
     partition_political_detail_features, political_detail_chunk_ids,
@@ -207,6 +208,7 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
             compacted_count += 1
             whitespace_saved += source_size - compact_size
 
+    geometry_normalization = normalize_published_geometry(app_root, byte_exact_paths=excluded)
     chunk_count = 0
     gzip_saved = 0
     for manifest_path in sorted((data_root / "scenarios").glob("*/detail_chunks.manifest.json")):
@@ -272,4 +274,5 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
             record.update(size_bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
         _write_json(manifest_path, manifest)
     return {"compacted_files": compacted_count, "whitespace_saved_bytes": whitespace_saved,
-            "gzip_chunk_count": chunk_count, "gzip_saved_bytes": gzip_saved}
+            "gzip_chunk_count": chunk_count, "gzip_saved_bytes": gzip_saved,
+            "geometry_normalization": geometry_normalization}

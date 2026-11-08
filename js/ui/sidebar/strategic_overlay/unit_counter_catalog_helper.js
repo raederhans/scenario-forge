@@ -473,8 +473,8 @@ export function createUnitCounterCatalog({
     }
     if (unitCounterCatalogHeaderHint) {
       unitCounterCatalogHeaderHint.textContent = usingHoi4Catalog
-        ? t("Review imported Hearts of Iron IV counter icons. This library is read-only for now.", "ui")
-        : t("Search the internal counter catalog, then apply a preset back into the editor.", "ui");
+        ? t("Browse Hearts of Iron IV counter icons.", "ui")
+        : t("Search counter presets, then apply one to the editor.", "ui");
     }
     if (unitCounterCatalogSourceTabs) {
       Array.from(unitCounterCatalogSourceTabs.querySelectorAll("[data-counter-catalog-source]")).forEach((element) => {

@@ -131,7 +131,6 @@ export function createTransportWorkbenchPopoverOwner({
   const renderInfoContent = (family) => {
     if (!infoBody || !family) return { blockCount: 0 };
     infoBody.replaceChildren();
-    const dataContract = getDataContract(family.id);
     const defaultBlocks = [
       {
         title: "Current lens",
@@ -145,7 +144,7 @@ export function createTransportWorkbenchPopoverOwner({
         ? null
         : {
           title: "Availability",
-          body: `${family.label} is still a reserved shell. Detailed controls stay closed until the live Japan schema and packs are wired.`,
+          body: "Not available yet",
         },
       {
         title: "Preview controls",
@@ -155,34 +154,14 @@ export function createTransportWorkbenchPopoverOwner({
         title: "Capability matrix",
         body: () => buildTransportCapabilityMatrixBody(translate),
       },
-      dataContract
-        ? {
-          title: "Data path",
-          body: `${dataContract.adapterId} stays on ${dataContract.packs.join(" + ")} using ${dataContract.geometrySource} with ${dataContract.hardeningSource}. Keep the pack build reproducible and diagnostics-friendly so rule changes can be traced later.`,
-        }
-        : null,
     ];
     const blocks = family.id === "layers"
       ? [
         {
           title: pickUiCopy("当前用途", "Current use"),
           body: pickUiCopy(
-            "Layers 用来调整 transport families 的当前本地绘制顺序。中间排序板负责拖拽重排，Inspect 会同步回显当前顺序。",
-            "Layers controls the current local draw order for transport families. Use the center board to drag and reorder families, and use Inspect to review the active order.",
-          ),
-        },
-        {
-          title: pickUiCopy("排序板行为", "Board behavior"),
-          body: pickUiCopy(
-            "Layers 使用排序板模式。这里没有缩放、旋转或基线对比，重点是确认绘制顺序和 family 状态。",
-            "Layers uses board mode. Zoom, rotate, and baseline compare are hidden here, and the main task is confirming draw order and family status.",
-          ),
-        },
-        {
-          title: pickUiCopy("Inspector 分工", "Inspector role"),
-          body: pickUiCopy(
-            "左侧只保留上下文说明，真正的顺序确认在中间排序板和右侧 Inspect。其余页签继续保留统一结构，方便以后接入更多帮助内容。",
-            "The left column keeps context only, while the center board and right-side Inspect confirm the active order. The remaining tabs stay in place so later help and controls can land without changing the shell.",
+            "在中间排序板拖动图层以调整绘制顺序。",
+            "Drag layers in the middle board to change their drawing order.",
           ),
         },
         {

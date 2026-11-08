@@ -82,6 +82,7 @@ import {
   getUrbanFeatureOwnerId,
 } from "./renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
+import { formatCityVictoryPoints } from "./renderer/modern_place_name.js";
 import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
@@ -2341,14 +2342,33 @@ function getClassifiedBorderMeshes() {
   }
   return classification;
 }
+// Shell fills are drawn from the full collection but are not interactive, so
+// the surfaces lack them. Contours add them back as coverage-only features.
+let contourSourceBase = null, contourSourceFull = null, contourSourceFeatures = null;
+function getPaintContourSourceFeatures() {
+  const base = getRiverPaintRuntime(runtimeState).surfaces();
+  const full = runtimeState.landDataFull?.features;
+  if (base !== contourSourceBase || full !== contourSourceFull) {
+    contourSourceBase = base; contourSourceFull = full;
+    const baseIds = new Set();
+    for (const feature of base) baseIds.add(getFeatureId(feature));
+    const shells = Array.isArray(full) ? full.filter((feature) => {
+      const id = getFeatureId(feature);
+      return id && !baseIds.has(id) && isScenarioShellFeature(feature, id);
+    }) : [];
+    contourSourceFeatures = shells.length ? Object.freeze([...base, ...shells]) : base;
+  }
+  return contourSourceFeatures;
+}
 function getPaintContourRuntimeOwner() {
   if (!paintContourRuntimeOwner) {
     paintContourRuntimeOwner = createPaintContourRuntime({
       state: runtimeState,
-      getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
+      getFeatures: getPaintContourSourceFeatures,
       getFeatureId,
       resolveSourceFeatureId: (feature, id) => feature?.properties?.__riverParentId || id,
       resolveClassification: resolveClassifiedBorderFeature,
+      isCoverageOnly: (feature, id) => isScenarioShellFeature(feature, id),
       getWaterMaskSources: () => ({
         land: runtimeState.showScenarioAtlantropa === false ? runtimeState.landBgData
           : runtimeState.scenarioLandMaskData || runtimeState.scenarioContextLandMaskData || runtimeState.landBgData,
@@ -2371,8 +2391,9 @@ function getPaintContourRuntimeOwner() {
         const parentId = runtime.getCellFeature(leftId)?.properties?.__riverParentId;
         return !parentId || parentId !== runtime.getCellFeature(rightId)?.properties?.__riverParentId;
       },
+      // Visible shell fills cover gaps between source admin parcels; without
+      // them the parcel edges beside each fill would be classified as coast.
       isEligible: (feature, id) => !shouldExcludePoliticalVisualFeature(feature, id)
-        && !isScenarioShellFeature(feature, id)
         && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
         && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner"),
       resolveColor: (feature, id) => {
@@ -11055,6 +11076,13 @@ function getCityTooltipText(entry) {
     (name) => t(name, "geo"),
   );
   const lines = [fullLabel];
+  const victoryPoints = formatCityVictoryPoints(
+    props.__city_scenario_victory_points,
+    props.__city_scenario_vp_name,
+    getCityDisplayLabel(entry?.feature, { showModernPlaceNames: false }),
+    runtimeState.currentLanguage,
+  );
+  if (victoryPoints) lines.push(victoryPoints);
   const capitalDescriptor = getCityCapitalDescriptor(entry);
   if (capitalDescriptor) {
     lines.push(capitalDescriptor);

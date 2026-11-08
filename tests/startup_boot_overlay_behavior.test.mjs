@@ -349,7 +349,7 @@ test("chunk sub-progress advances the visible progress monotonically", () => {
   });
 });
 
-test("phase transitions use window minima without moving backwards and update steps", () => {
+test("phase transitions advance visible progress without adding a step list", () => {
   withProgressHarness((controller) => {
     for (const [phase, minimum] of [["shell", 0], ["base-data", 3], ["scenario-bundle", 16],
       ["scenario-apply", 36], ["initial-chunk-visual", 40], ["warmup", 88],
@@ -357,10 +357,8 @@ test("phase transitions use window minima without moving backwards and update st
       controller.setBootState(phase);
       assert.equal(runtimeState.bootProgress, minimum);
     }
-    const steps = document.getElementById("bootOverlaySteps").children;
-    assert.equal(steps[0].getAttribute("data-status"), "completed");
-    assert.equal(steps[7].getAttribute("data-status"), "active");
-    assert.equal(steps[8].getAttribute("data-status"), "pending");
+    assert.equal(document.getElementById("bootOverlaySteps"), null);
+    assert.equal(document.getElementById("bootOverlayProgressText").textContent, "92%");
     controller.setBootState("base-data");
     assert.equal(runtimeState.bootProgress, 92);
     controller.setBootState("ready");
@@ -380,9 +378,17 @@ test("scenario messages use registry display names in both languages and otherwi
       for (const phase of ["scenario-bundle", "scenario-apply"]) {
         controller.setBootState(phase);
         const message = document.getElementById("bootOverlayMessage").textContent;
-        assert.ok(message.includes("HOI4 1936"));
+        assert.equal(message, language === "zh"
+          ? (phase === "scenario-apply" ? "正在布置 HOI4 1936。" : "正在加载 HOI4 1936。")
+          : (phase === "scenario-apply" ? "Setting up HOI4 1936." : "Loading HOI4 1936."));
         assert.ok(!message.includes("TNO 1962"));
       }
+    }
+    for (const language of ["en", "zh"]) {
+      setCurrentLanguage(runtimeState, language);
+      controller.setBootState("interaction-infra");
+      assert.equal(document.getElementById("bootOverlayMessage").textContent,
+        language === "zh" ? "即将完成。" : "Almost ready.");
     }
     runtimeState.activeScenarioId = "custom_scenario";
     controller.setBootState("scenario-bundle");
