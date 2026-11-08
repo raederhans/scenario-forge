@@ -71,14 +71,21 @@ export function createPoliticalGeometryStore() {
       const viewSources = [...orderedSources];
       let view = sameOrder ? previousView : null;
       if (!view) {
+        // Painter order follows the live winner table: a promoted feature keeps
+        // the position it first had instead of jumping ahead with its source.
+        // Order must not depend on chunk-load history, or every promotion
+        // reorders (and invalidates ID raster tiles for) unchanged features.
+        const orderedIds = [...winners.keys()];
         let byId = null, features = null;
         view = {
           get featuresById() {
             if (!byId) {
-              byId = new Map();
+              const firstById = new Map();
               for (const source of viewSources) {
-                for (const [id, feature] of source.byId) if (!byId.has(id)) byId.set(id, feature);
+                for (const [id, feature] of source.byId) if (!firstById.has(id)) firstById.set(id, feature);
               }
+              byId = new Map();
+              for (const id of orderedIds) if (firstById.has(id)) byId.set(id, firstById.get(id));
             }
             return byId;
           },

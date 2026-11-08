@@ -93,13 +93,14 @@ function fixture(context, { count = 1 } = {}) {
   });
   const grid = new Element();
   const summary = new Element();
+  const hint = new Element();
   const state = { strategicOverlayUi: { counterCatalogSource: "hoi4", counterEditorModalOpen: false }, unitCounterEditor: { presetId: "INF" } };
   const render = () => catalog.render({
-    elements: { unitCounterCatalogGrid: grid, unitCounterLibraryReviewSummary: summary }, catalogView: buildCatalogView(state),
+    elements: { unitCounterCatalogGrid: grid, unitCounterLibraryReviewSummary: summary, unitCounterCatalogHeaderHint: hint }, catalogView: buildCatalogView(state),
     effectivePresetId: "INF", helpers: { getFilteredUnitCounterCatalog: () => [] },
   });
   const ready = async () => { resolve({ entries }); await pending; await Promise.resolve(); };
-  return { catalog, state, grid, summary, render, ready, reject, pending, entries, saved, frames, canceled,
+  return { catalog, state, grid, summary, hint, render, ready, reject, pending, entries, saved, frames, canceled,
     get loads() { return loads; }, get refreshes() { return refreshes; } };
 }
 
@@ -248,4 +249,32 @@ test("bound export saves the current draft and releases its download URL", async
   assert.deepEqual(JSON.parse(await payload.text()), f.saved.at(-1));
   release();
   assert.deepEqual(revoked, ["blob:fixture"]);
+});
+
+
+test("catalog hints describe browsing and applying presets", (context) => {
+  const f = fixture(context);
+  f.render();
+  assert.equal(f.hint.textContent, "Browse Hearts of Iron IV counter icons.");
+  f.state.strategicOverlayUi.counterCatalogSource = "internal";
+  f.render();
+  assert.equal(f.hint.textContent, "Search counter presets, then apply one to the editor.");
+});
+
+
+test("symbol hints explain the expected code for each renderer", async () => {
+  const { refreshUnitCounterIdentitySection } = await import("../js/ui/sidebar/strategic_overlay/unit_counter_render_helpers.js");
+  const hint = {};
+  for (const [renderer, expected] of [
+    ["milstd", "Paste a full SIDC code."],
+    ["game", "Enter a short code such as HQ, ARM or INF."],
+  ]) {
+    refreshUnitCounterIdentitySection({
+      documentRef: {}, elements: { unitCounterSymbolHint: hint }, state: {},
+      t: value => value, syncSelectOptions: () => {},
+      model: { effectiveRenderer: renderer, nationOptions: [], unitEditor: {} },
+      getSidebarUnitCounterPresetOptions: () => [],
+    });
+    assert.equal(hint.textContent, expected);
+  }
 });

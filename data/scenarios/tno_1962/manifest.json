@@ -77,6 +77,7 @@
   "detail_chunk_manifest_url": "data/scenarios/tno_1962/detail_chunks.manifest.json",
   "display_name": "TNO 1962",
   "district_groups_url": "data/scenarios/tno_1962/district_groups.manual.json",
+  "era_railways_url": "data/transport_layers/tno_era_rail/era_rail.geojson",
   "excluded_water_region_groups": [
     "mediterranean"
   ],

@@ -535,11 +535,10 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "inclusion",
       title: "Inclusion",
-      description: "Decide what enters the Japan road pack before any style rule runs.",
       controls: [
         { type: "multi", key: "roadClass", label: "Road classes", options: ROAD_CLASS_OPTIONS, description: "Pilot scope stays on motorway, trunk, and primary." },
         { type: "toggle", key: "excludeLinks", label: "Exclude *_link", description: "Keep motorway_link, trunk_link, and primary_link out by default." },
-        { type: "toggle", key: "excludeServiceLike", label: "Exclude service-like roads", description: "Keep service, residential, and track out of the first pack." },
+        { type: "toggle", key: "excludeServiceLike", label: "Exclude service-like roads" },
         { type: "select", key: "zoomGate", label: "Zoom gate", description: "Controls low, mid, and high-zoom reveal behavior.", options: [
           { value: "strict", label: "Strict corridor" },
           { value: "balanced", label: "Balanced" },
@@ -550,7 +549,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "source_hardening",
       title: "Source Hardening",
-      description: "Bind OSM geometry and N06 motorway hardening into one Japan adapter.",
       controls: [
         { type: "select", key: "motorwayIdentitySource", label: "Motorway identity source", description: "Japan baseline defaults to OSM geometry plus N06 hardening.", options: [
           { value: "osm_plus_n06", label: "OSM + N06 hardening" },
@@ -564,7 +562,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "noise_control",
       title: "Noise Control",
-      description: "Use explicit rules. Do not lean on fuzzy post-fix cleanup.",
       controls: [
         { type: "toggle", key: "mergeContiguousSegments", label: "Merge contiguous segments", description: "Safely merge same-class runs before rendering." },
         { type: "range", key: "minProjectedSegmentPx", label: "Min projected segment", description: "Very short projected segments drop out to reduce spark noise.", min: 2, max: 16, step: 1, unit: "px" },
@@ -579,7 +576,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "labels",
       title: "Labels",
-      description: "Reference labels stay in a dedicated pack focused on motorway and national route numbers.",
       controls: [
         { type: "toggle", key: "showRefs", label: "Show refs", description: "Turns road reference labels on or off." },
         { type: "multi", key: "refClasses", label: "Ref classes", options: ROAD_REF_CLASS_OPTIONS, description: "Primary is now available. Lower classes stay visible in UI but disabled until data lands." },
@@ -590,7 +586,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Style",
-      description: "These controls style only the transport overlay shell, not the carrier base map.",
       controls: [
         { type: "select", key: "strokePreset", label: "Stroke preset", description: "Sets motorway, trunk, and primary emphasis.", options: [
           { value: "corridor", label: "Corridor" },
@@ -609,13 +604,11 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
         { type: "range", key: "refOpacity", label: "Ref opacity", description: "Overall road reference-label opacity.", min: 30, max: 100, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Diagnostics", description: "Review the current data and loading status.", kind: "diagnostics" },
   ],
   rail: [
     {
       key: "network_scope",
       title: "Network Scope",
-      description: "Lock what enters the Japan rail pack before render style.",
       controls: [
         { type: "multi", key: "status", label: "Statuses", options: RAIL_STATUS_OPTIONS, description: "Japan rail baseline opens only active by default." },
         { type: "multi", key: "class", label: "Classes", options: RAIL_CLASS_OPTIONS, description: "Low zoom should favor high_speed and trunk." },
@@ -626,7 +619,7 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "source_reconciliation",
       title: "Source Reconciliation",
-      description: "Official active network stays locked. OSM only patches lifecycle and gaps.",
+      description: "Choose how official and OSM railway information is combined.",
       controls: [
         { type: "toggle", key: "officialActiveNetworkLocked", label: "Official active network locked", description: "Official Japan source defines active network boundaries." },
         { type: "toggle", key: "allowOsmActiveGapFill", label: "Allow OSM active gap fill", description: "Permit OSM to fill only obvious official gaps." },
@@ -640,7 +633,7 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "major_stations",
       title: "Major Stations",
-      description: "Only major stations are in scope, not a full station product.",
+      description: "Choose which major stations and names appear on the map.",
       controls: [
         { type: "toggle", key: "showMajorStations", label: "Show major stations", description: "Turn the major station layer on or off." },
         { type: "select", key: "importanceThreshold", label: "Importance threshold", description: "Controls the lowest station importance that survives.", options: [
@@ -656,7 +649,7 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "line_presentation",
       title: "Line Presentation",
-      description: "Differentiate lifecycle by line style, brightness, and opacity first.",
+      description: "Distinguish railway status with line styles and fading.",
       controls: [
         { type: "select", key: "statusEncoding", label: "Status encoding", description: "How inactive lines fade away in preview.", options: [
           { value: "line_style", label: "Line style" },
@@ -674,20 +667,17 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Style",
-      description: "These controls style the live rail preview and the shared rail overview bridge.",
       controls: [
         { type: "range", key: "lineOpacity", label: "Line opacity", description: "Overall rail line opacity.", min: 40, max: 100, step: 1, unit: "%" },
         { type: "range", key: "stationOpacity", label: "Station opacity", description: "Overall major-station opacity.", min: 35, max: 100, step: 1, unit: "%" },
         { type: "range", key: "inactiveFadeStrength", label: "Inactive fade strength", description: "How strongly inactive lifecycle states fade.", min: 0, max: 100, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Diagnostics", description: "Explain reconciliation intent only. Do not fabricate pack statistics.", kind: "diagnostics" },
   ],
   airport: [
     {
       key: "facility_scope",
       title: "Facility Scope",
-      description: "Keep the first airport pass deterministic and point-only.",
       controls: [
         { type: "multi", key: "airportTypes", label: "Airport types", options: AIRPORT_TYPE_OPTIONS, description: "Select which official airport classes remain visible." },
         { type: "multi", key: "statuses", label: "Statuses", options: AIRPORT_STATUS_OPTIONS, description: "Filter airport status using normalized official status categories." },
@@ -701,7 +691,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "visibility",
       title: "Visibility",
-      description: "Keep label reveal simple and intentional.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose airport names only when the current zoom can carry them cleanly." },
         { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively airport names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
@@ -710,18 +699,16 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Style",
-      description: "These controls style only the airport overlay shell.",
       controls: [
         { type: "range", key: "baseOpacity", label: "Base opacity", description: "Overall airport point opacity.", min: 35, max: 100, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Diagnostics", description: "Expose airport adapter intent and pack status only.", kind: "diagnostics" },
   ],
   port: [
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Keep ports inspect-first, but allow aggregate and density views when the official layer becomes crowded.",
+      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for ports.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds, not fixed counts.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -748,7 +735,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "facility_scope",
       title: "Facility Scope",
-      description: "Filter the currently selected official coverage tier without introducing a second tier control.",
       controls: [
         { type: "multi", key: "legalDesignations", label: "Legal designations", options: PORT_DESIGNATION_OPTIONS, description: "Select which official port legal classes remain visible." },
         { type: "multi", key: "managerTypes", label: "Manager types", options: PORT_MANAGER_TYPE_OPTIONS, description: "Filter by official manager type code." },
@@ -771,18 +757,16 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Style",
-      description: "These controls style only the port overlay shell.",
       controls: [
         { type: "range", key: "baseOpacity", label: "Base opacity", description: "Overall port point opacity.", min: 35, max: 100, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Diagnostics", description: "Expose port adapter intent and release constraints only.", kind: "diagnostics" },
   ],
   mineral_resources: [
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Mineral review defaults to aggregation so dense mine points reveal pattern before single-site inspection.",
+      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for mineral resources.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds drive when inspect, aggregate, or density takes over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -818,19 +802,17 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Appearance",
-      description: "These controls only affect the mineral point overlay shell.",
       controls: [
         { type: "range", key: "pointOpacity", label: "Point opacity", description: "Overall mineral point opacity.", min: 28, max: 100, step: 1, unit: "%" },
         { type: "range", key: "pointSize", label: "Point size", description: "Scales the mineral point marker size.", min: 72, max: 148, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Data Check", description: "Keep pack scope, visible site count, and source governance visible during review.", kind: "diagnostics" },
   ],
   energy_facilities: [
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Energy stays inspect-first, but the same mode language is available when facility density rises.",
+      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for energy facilities.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when aggregation should take over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -857,7 +839,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "facility_scope",
       title: "Facility Scope",
-      description: "Only approved local subtypes enter the live energy pack.",
       controls: [
         {
           type: "multi",
@@ -882,19 +863,17 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Appearance",
-      description: "These controls only affect the energy point overlay shell.",
       controls: [
         { type: "range", key: "pointOpacity", label: "Point opacity", description: "Overall energy point opacity.", min: 30, max: 100, step: 1, unit: "%" },
         { type: "range", key: "pointSize", label: "Point size", description: "Scales the energy point marker size.", min: 72, max: 148, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Data Check", description: "Keep local versus reference-only subtype scope and pack state visible during review.", kind: "diagnostics" },
   ],
   industrial_zones: [
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Industrial land defaults to aggregated pattern reading before raw polygon inspection.",
+      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for industrial land.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when polygons collapse into pattern views.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -921,15 +900,14 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "data_variant",
       title: "Source Track",
-      description: "Switch between the official review track and the open publishable track without blending them.",
+      description: "Keep official review data separate from publicly releasable data.",
       controls: [
-        { type: "select", key: "variant", label: "Source track", description: "Choose which industrial land source track to review in the carrier.", options: INDUSTRIAL_VARIANT_OPTIONS },
+        { type: "select", key: "variant", label: "Source track", options: INDUSTRIAL_VARIANT_OPTIONS },
       ],
     },
     {
       key: "filtering",
       title: "Filters",
-      description: "Reduce the visible land footprint without inventing a merged industrial score.",
       controls: [
         { type: "multi", key: "siteClasses", label: "Land type", options: INDUSTRIAL_SITE_CLASS_OPTIONS, description: "Keep only the industrial land types you want to inspect." },
         {
@@ -954,19 +932,17 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Appearance",
-      description: "These controls only affect the industrial land overlay shell in the carrier.",
       controls: [
         { type: "range", key: "fillOpacity", label: "Fill opacity", description: "Overall polygon fill opacity.", min: 18, max: 100, step: 1, unit: "%" },
         { type: "range", key: "outlineOpacity", label: "Outline opacity", description: "Overall polygon outline opacity.", min: 28, max: 100, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Data Check", description: "Keep the active source track, filter scope, and pack state visible during review.", kind: "diagnostics" },
   ],
   logistics_hubs: [
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Logistics hubs default to aggregation so you can read corridors and hot zones before drilling into points.",
+      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for logistics hubs.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when the layer moves between inspect, aggregate, and density.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -993,7 +969,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "facility_scope",
       title: "Hub Scope",
-      description: "Reduce the visible hub set while keeping the logistics layer point-based.",
       controls: [
         { type: "multi", key: "hubTypes", label: "Hub category", options: LOGISTICS_HUB_TYPE_OPTIONS, description: "Filter which logistics hub categories remain visible." },
         { type: "multi", key: "operatorClassifications", label: "Operator type", options: LOGISTICS_OPERATOR_CLASSIFICATION_OPTIONS, description: "Filter hubs by operator type." },
@@ -1011,13 +986,11 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "style",
       title: "Appearance",
-      description: "These controls only affect the logistics point overlay shell.",
       controls: [
         { type: "range", key: "pointOpacity", label: "Point opacity", description: "Overall logistics point opacity.", min: 30, max: 100, step: 1, unit: "%" },
         { type: "range", key: "pointSize", label: "Point size", description: "Scales the logistics point marker size.", min: 72, max: 148, step: 1, unit: "%" },
       ],
     },
-    { key: "diagnostics", title: "Data Check", description: "Keep the active hub scope, visible point count, and pack state visible during review.", kind: "diagnostics" },
   ],
 });
 
@@ -1030,21 +1003,21 @@ export const TRANSPORT_WORKBENCH_INLINE_HELP_COPY = {
   road: {
     source_hardening: {
       title: "Source hardening",
-      body: "This block decides how Japan road identity is stabilized before the pack is emitted. Keep geometry on the shared OSM corridor and use N06 only where motorway identity or official refs need deterministic reinforcement.",
+      body: "Use official road names and route numbers where available.",
     },
     noise_control: {
       title: "Noise control",
-      body: "This block suppresses short or dense segments before they crowd the preview. The goal is not to invent heuristics, but to make motorway, trunk, and primary stay readable across Tokyo and Osaka at the same review zooms.",
+      body: "Hide short or crowded road segments to keep major roads readable.",
     },
   },
   rail: {
     source_reconciliation: {
       title: "Source reconciliation",
-      body: "This block explains how the official active network and OSM lifecycle patches resolve conflicts. Keep the official active backbone authoritative, and only let OSM fill explicit gaps or non-active status where the official source is silent.",
+      body: "Combine official active railway lines with OSM information for gaps and inactive lines.",
     },
     line_presentation: {
       title: "Line presentation",
-      body: "This block decides how status and class differences are shown once the rail pack is wired. Active lines should stay structurally clear first, while branch, service, and inactive states remain secondary and never overpower the trunk network.",
+      body: "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.",
     },
   },
 };
@@ -1057,7 +1030,7 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["roads", "road_labels"],
     geometrySource: "OSM / Geofabrik Japan",
     hardeningSource: "N06 motorway identity",
-    governance: "Local-source-only pack build with reproducible inputs, explicit diagnostics, and UTF-8-first Japanese text handling.",
+    governance: "OSM / Geofabrik Japan and N06.",
     pendingStatus: "Loads on demand from the Japan road geometry and reference-label packs",
   },
   rail: {
@@ -1067,7 +1040,7 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["railways", "rail_stations_major"],
     geometrySource: "Official active network",
     hardeningSource: "OSM lifecycle / gap patch",
-    governance: "Local-source-only pack build with UTF-8-first MLIT ingestion, CP932 fallback, repo-versioned overrides, and explicit diagnostics.",
+    governance: "Official active network and OSM lifecycle / gap information.",
     pendingStatus: "Waiting for the Japan rail lines and major-station packs",
   },
   airport: {
@@ -1077,7 +1050,7 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["airports"],
     geometrySource: "Official airport point source",
     hardeningSource: "Administrative category / importance review",
-    governance: "Deferred point pack aligned to the cityPoints-style load and visibility chain.",
+    governance: "Official airport point source.",
     pendingStatus: "Waiting for airports Japan pack",
   },
   port: {
@@ -1087,7 +1060,7 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["ports"],
     geometrySource: "Official or quasi-official major port node source",
     hardeningSource: "Official designation / coverage-tier review",
-    governance: "Deferred point pack with tiered official coverage. Routes and harbor polygons stay out of v1, but the runtime can switch between core, expanded, and full official subsets.",
+    governance: "Official or quasi-official major port node source.",
     pendingStatus: "Waiting for ports Japan pack",
   },
   mineral_resources: {
@@ -1097,7 +1070,7 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["mineral_resources"],
     geometrySource: "Official mineral resource distribution point source",
     hardeningSource: "Manual resource class normalization",
-    governance: "Local static pack with UTF-8 storage, CP932 source decode, explicit four-islands clipping, and repo-versioned class normalization.",
+    governance: "Official mineral resource distribution point source.",
     pendingStatus: "Waiting for the Japan mineral resource pack manifest",
   },
   energy_facilities: {
@@ -1107,17 +1080,17 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["energy_facilities"],
     geometrySource: "Official energy facility point source",
     hardeningSource: "Facility subtype and status normalization",
-    governance: "Local static pack for verified MLIT power-plant subtypes, with broader energy categories kept in a reference-only subtype catalog until their source chain is approved.",
+    governance: "MLIT power-plant sources; other energy categories are reference-only.",
     pendingStatus: "Waiting for the Japan energy facility pack manifest",
   },
   industrial_zones: {
-    country: "Active carrier",
+    country: "Selected region",
     adapterId: "active_industrial_zones_manifest",
     geometryKind: "polygon_or_point",
     packs: ["industrial_zones"],
-    geometrySource: "Active pack manifest: source-separated polygons or source-derived point centers",
-    hardeningSource: "Carrier binding, variant split, and source lineage governance",
-    governance: "Multi-country industrial family. Polygon packs and OSM center-point packs keep their own geometry contract and are not merged into one synthetic layer.",
+    geometrySource: "Industrial land polygons or site locations",
+    hardeningSource: "Separate official and public sources",
+    governance: "OSM and official industrial land sources; official review and public release data remain separate.",
     pendingStatus: "Waiting for the active industrial land pack manifest",
   },
   logistics_hubs: {
@@ -1127,7 +1100,7 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["logistics_hubs"],
     geometrySource: "Official P31 logistics hub point source",
     hardeningSource: "Main-islands clipping and explicit raw code preservation",
-    governance: "Supplement point layer kept separate from industrial polygons. Internal-first release until the source path is approved for broader distribution.",
+    governance: "Official P31 logistics hub point source; internal use only, not approved for external distribution.",
     pendingStatus: "Waiting for logistics_hubs Japan pack",
   },
 };

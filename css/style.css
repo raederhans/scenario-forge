@@ -4492,6 +4492,19 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   flex: 1 1 240px;
 }
 
+.country-group-system-toggle {
+  flex: 0 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.country-group-system-toggle .frontline-segmented-choice {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 6px;
+  line-height: 14px;
+  white-space: normal;
+}
+
 .frontline-segmented-native {
   position: absolute;
   inset: 0;
