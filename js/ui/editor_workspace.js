@@ -92,8 +92,18 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     segments.append(btn);
     segmentButtons.set(key, btn);
   }
+  let notesOpen = false;
+  const notesButton = button("", "editorPropertiesNotesBtn", () => {
+    notesOpen = !notesOpen;
+    syncNotes(propertyEntries.get(currentProperty));
+  });
+  notesButton.hidden = true;
+  notesButton.setAttribute("aria-label", t("Notes and sources", "ui"));
+  notesButton.dataset.i18nAriaLabel = "Notes and sources";
+  notesButton.setAttribute("aria-expanded", "false");
+  notesButton.append(createUiIcon("info", { doc: documentRef }));
   const propertyHeading = make("div", "editor-properties-heading");
-  propertyHeading.append(backButton, title);
+  propertyHeading.append(backButton, title, notesButton);
   propertyHeader.append(segments, propertyHeading);
   right.prepend(propertyHeader);
   const properties = make("div", "editor-properties-body", "", "editorPropertiesBody");
@@ -110,12 +120,62 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   // Native layer owners may hide their old panel before our click listener runs.
   // Remember user scrolling as it happens, before that layout can collapse.
   right.addEventListener("scroll", () => propertyScroll.set(currentProperty, right.scrollTop), { passive: true });
+  const collectNotes = (host, key) => {
+    let notes = get(`editorPropertyNotes-${key}`);
+    const pending = [...host.querySelectorAll("[data-page-note]")].filter((node) => !notes?.contains(node));
+    const sources = pending.map((node) => {
+      let heading;
+      for (let parent = node.parentNode; parent && parent !== host; parent = parent.parentNode) {
+        heading = [...parent.children].find((child) => child !== node && (
+          child.tagName === "SUMMARY" || child.classList.contains("section-header") ||
+          child.tagName === "H3" || child.tagName === "H4"
+        ));
+        if (heading) break;
+      }
+      return { node, heading };
+    });
+    if (pending.length && !notes) {
+      notes = make("section", "editor-property-notes", "", `editorPropertyNotes-${key}`);
+      notes.hidden = true;
+      host.prepend(notes);
+    }
+    for (const { node, heading } of sources) {
+      const context = heading?.dataset.i18n || heading?.textContent.trim() || "";
+      let group = [...notes.children].find((child) => child.dataset.noteContext === context);
+      if (!group) {
+        group = make("div", "editor-property-notes-group");
+        group.dataset.noteContext = context;
+        if (heading) {
+          const label = make("h3", "editor-property-notes-context");
+          label.textContent = heading.textContent;
+          if (heading.dataset.i18n) label.dataset.i18n = heading.dataset.i18n;
+          group.append(label);
+        }
+        notes.append(group);
+      }
+      group.append(node);
+    }
+    if (notes && host.children[0] !== notes) host.prepend(notes);
+    return notes;
+  };
+  const syncNotes = (entry) => {
+    const notes = collectNotes(entry.host, currentProperty);
+    setHidden(notesButton, !notes);
+    setAttribute(notesButton, "aria-expanded", !!notes && notesOpen);
+    if (notes) {
+      setAttribute(notesButton, "aria-controls", notes.id);
+      setHidden(notes, !notesOpen);
+    } else {
+      notesButton.removeAttribute("aria-controls");
+    }
+  };
   const addProperty = (key, label, nodes, task = "") => {
     const host = make("section", "editor-property-panel", "", `editorProperty-${key}`);
     host.setAttribute("aria-label", t(label, "ui"));
     host.dataset.i18nAriaLabel = label;
     for (const node of nodes.filter(Boolean)) host.append(node);
     properties.append(host);
+    collectNotes(host, key);
     const segment = key === "project" ? null : task === "layers" ? "layers" : "inspector";
     propertyEntries.set(key, { host, label, task, segment });
     if (segment) {
@@ -134,6 +194,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     const changed = currentProperty !== key;
     if (changed && workspaceReady && !navigatingBack) propertyHistory.push(currentProperty);
     currentProperty = key;
+    syncNotes(entry);
     if (entry.segment) {
       segmentProperties.set(entry.segment, key);
       setAttribute(segmentButtons.get(entry.segment), "aria-controls", entry.host.id);
