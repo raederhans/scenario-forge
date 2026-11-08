@@ -1,3 +1,4 @@
+import { captureScenarioStyleBaselineBeforeUserEdit, recordScenarioStyleUserOverride } from "../../core/scenario/presentation_ocean_fill_restore.js";
 import { isPoliticalBorderEnabled } from "../../core/renderer/political_border_policy.js";
 import {
   ensureAppearanceStyleConfigState,
@@ -173,9 +174,14 @@ export function createAppearanceBorderOwner({
     if (!node || node.dataset.borderBound === "true") return;
     node.addEventListener("input", (event) => {
       syncBorderConfig(key);
-      patchAppearanceStyleGroupState(runtimeState, key, {
+      const patch = {
         color: normalizeBorderColor(event.target.value, borderConfigs[key].color),
         ...(typeof extraPatch === "function" ? extraPatch() : {}),
+      };
+      captureScenarioStyleBaselineBeforeUserEdit(runtimeState, key);
+      patchAppearanceStyleGroupState(runtimeState, key, patch);
+      Object.entries(patch).forEach(([field, value]) => {
+        recordScenarioStyleUserOverride(runtimeState, key, field, value);
       });
       renderDirty(reason);
     });
@@ -188,7 +194,9 @@ export function createAppearanceBorderOwner({
       const value = Number(event.target.value);
       const nextOpacity = clamp(Number.isFinite(value) ? value / 100 : borderConfigs[key].opacity, 0, 1);
       syncBorderConfig(key);
+      captureScenarioStyleBaselineBeforeUserEdit(runtimeState, key);
       patchAppearanceStyleGroupState(runtimeState, key, { opacity: nextOpacity });
+      recordScenarioStyleUserOverride(runtimeState, key, "opacity", nextOpacity);
       setRangePercent(groupNodes, nextOpacity);
       renderDirty(reason);
     });
@@ -206,7 +214,9 @@ export function createAppearanceBorderOwner({
         defaults.maxWidth
       );
       syncBorderConfig(key);
+      captureScenarioStyleBaselineBeforeUserEdit(runtimeState, key);
       patchAppearanceStyleGroupState(runtimeState, key, { width: nextWidth });
+      recordScenarioStyleUserOverride(runtimeState, key, "width", nextWidth);
       setRangeNumber(groupNodes, nextWidth, defaults.widthPrecision);
       renderDirty(reason);
     });
@@ -227,9 +237,11 @@ export function createAppearanceBorderOwner({
     if (nodes.internal.autoColorInput && nodes.internal.autoColorInput.dataset.borderBound !== "true") {
       nodes.internal.autoColorInput.addEventListener("change", (event) => {
         syncBorderConfig("internalBorders");
+        captureScenarioStyleBaselineBeforeUserEdit(runtimeState, "internalBorders");
         patchAppearanceStyleGroupState(runtimeState, "internalBorders", {
           colorMode: event.target.checked ? "auto" : "manual",
         });
+        recordScenarioStyleUserOverride(runtimeState, "internalBorders", "colorMode", runtimeState.styleConfig.internalBorders.colorMode);
         if (nodes.internal.colorInput) nodes.internal.colorInput.disabled = event.target.checked;
         renderDirty("internal-border-color-mode");
       });

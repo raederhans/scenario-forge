@@ -809,7 +809,7 @@ test('exact edit completion prepares invalidated coverage before leaving and ret
   f.owner.draw(); await resolveAll(f); f.owner.draw();
   await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
   const builds = f.requests.length;
-  f.features[0].geometry = { type: 'Polygon', coordinates: [] };
+  f.features[0].geometry = { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]] };
   f.identity.version++;
   f.owner.noteNativePartialRepaint();
   await new Promise(resolve => setTimeout(resolve, 15));
@@ -840,7 +840,7 @@ for (const [name, change] of [
     t.after(() => f.owner.dispose());
     f.owner.draw(); await resolveAll(f); f.owner.draw();
     await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
-    f.features[0].geometry = { type: 'Polygon', coordinates: [] };
+    f.features[0].geometry = { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]] };
     f.identity.version++;
     f.owner.noteNativePartialRepaint();
     await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
@@ -1065,7 +1065,7 @@ for (const changed of ["geometry", "scene", "coverage", "projection", "layout"])
     f.identity.colorVersion++;
     if (changed === "geometry") {
       f.identity.geometryContentVersion = "content-2";
-      f.features[0].geometry = { type: "Polygon", coordinates: [] };
+      f.features[0].geometry = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]] };
     } else if (changed === "layout") f.layout.offsetX++;
     else f.identity[`${changed}Key`] += "-changed";
     f.owner.draw();

@@ -560,3 +560,19 @@ test("complete coverage preserves authenticated fragment-pruned background witho
   fine.geometry = {type:"MultiPolygon",coordinates:[polygon(99)]};
   assert.throws(collect,/Conflicting display geometry/,"a forged pruning label cannot admit another shape");
 });
+
+test("a replacement geometry object with identical coordinates keeps its version and dirties nothing", () => {
+  const h = harness();
+  const bounds = { minX: 0, minY: 0, maxX: 10, maxY: 10 };
+  const ring = () => [[0, 0], [10, 0], [10, 10], [0, 0]];
+  const before = h.publish([feature("a", "#010203", bounds, { type: "Polygon", coordinates: [ring()] })]);
+  const same = h.publish([feature("a", "#010203", bounds, { type: "Polygon", coordinates: [ring()] })]);
+  assert.equal(same.geometryRevision, before.geometryRevision);
+  assert.equal(same.entries[0].geometryVersion, before.entries[0].geometryVersion);
+  assert.deepEqual(same.changedIds, []);
+  assert.deepEqual(same.dirtyBounds, []);
+  const moved = h.publish([feature("a", "#010203", bounds, { type: "Polygon", coordinates: [[[0, 0], [10, 0], [9, 10], [0, 0]]] })]);
+  assert.equal(moved.geometryRevision, before.geometryRevision + 1);
+  assert.notEqual(moved.entries[0].geometryVersion, before.entries[0].geometryVersion);
+  assert.deepEqual(moved.changedIds, ["a"]);
+});
