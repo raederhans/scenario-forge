@@ -447,6 +447,7 @@ export function restoreImportedLayerVisibilityState(target, layerVisibility = nu
         : !!layerVisibility.showEraRailways,
     showCityPoints:
       layerVisibility.showCityPoints === undefined ? true : !!layerVisibility.showCityPoints,
+    showModernPlaceNames: !!layerVisibility.showModernPlaceNames,
     showBlankFeatureLabels:
       layerVisibility.showBlankFeatureLabels === undefined ? false : !!layerVisibility.showBlankFeatureLabels,
     showStrategicResourceMarkers:
