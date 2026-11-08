@@ -88,7 +88,7 @@ test("starting on blank_base keeps scenario switching after full data arrives", 
 });
 
 // The GPU direct scene must place the same city and country names as the vector path.
-for (const scenarioId of ["tno_1962"]) {
+for (const scenarioId of ["tno_1962", "hoi4_1936"]) {
   test(`${scenarioId}: the GPU scene shows the same map labels as the vector path`, async ({ page }) => {
     test.setTimeout(420_000);
     const errors = collectPageErrors(page);

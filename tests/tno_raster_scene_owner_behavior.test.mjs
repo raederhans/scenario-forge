@@ -367,6 +367,40 @@ test("wide political tiles cannot publish a panned or zoomed-out unpadded canvas
   assert.equal(h.map.style.visibility, "visible");
 });
 
+test("a moving view composes retained passes and political tiles over their painted extent until the exact frame", () => {
+  const h = harness();
+  const labels = h.passes.get("labels");
+  labels.reference = { ...h.transform };
+  labels.layout = { offsetX: 0, offsetY: 0 };
+  labels.canvas = { width: h.map.width, height: h.map.height };
+  assert.equal(h.owner.present(h.transform), true);
+  const moving = { refresh: false, allowPartialPasses: true };
+  const panned = { ...h.transform, x: h.transform.x + 20 };
+  assert.equal(h.owner.present(panned, moving), true);
+  let diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.partialPasses, true);
+  assert.equal(diagnostics.fallbackReason, "");
+  const frame = h.records.frames.at(-1);
+  assert.equal(h.records.frames.length, 2, "no pass is repainted for the moving frame");
+  const label = frame.layers.find(layer => layer.name === "labels");
+  assert.equal(label.retained, true);
+  assert.equal(label.transform.e, 40, "the painted labels move with the view in device pixels");
+  // Beyond the resident political tiles the drawn part stays instead of hiding the scene.
+  assert.equal(h.owner.present({ ...h.transform, x: 1000 }, moving), true);
+  assert.equal(h.owner.getDiagnostics().partialPasses, true);
+  assert.equal(h.map.style.visibility, "hidden");
+  // Frames that are not part of a gesture keep requiring complete coverage.
+  assert.equal(h.owner.present(panned, { refresh: false }), false);
+  assert.equal(h.owner.getDiagnostics().fallbackReason, "pass-coverage");
+  assert.equal(h.owner.getDiagnostics().partialPasses, false);
+  assert.equal(h.owner.present({ ...h.transform, x: 1000 }), false);
+  assert.equal(h.owner.getDiagnostics().fallbackReason, "direct-frame-coverage");
+  assert.equal(h.owner.present(h.transform), true);
+  diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.partialPasses, false, "the exact frame publishes complete coverage");
+  assert.equal(diagnostics.presentationState, "published");
+});
+
 test("coverage callback rejects before pass reads and refreshed revision uploads in original order", () => {
   const h = harness();
   const labels = h.passes.get("labels");
