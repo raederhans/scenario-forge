@@ -1,3 +1,4 @@
+import { getPoliticalDisplayModeSignature } from "../political_display_mode.js";
 import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
 import { getPopulationSignature } from "../population_spatial_view_model.js";
 import { getPopulationHeatmapSnapshot } from "../population_spatial_runtime.js";
@@ -151,6 +152,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       runtimeState.topologyBundleMode || "single",
       runtimeState.strategicChoroplethMetric || "",
       getThematicWgiSignature(runtimeState),
+      getPoliticalDisplayModeSignature(runtimeState),
       getPopulationSignature(runtimeState),
       runtimeState.scenarioStrategicValuesRevision || 0,
       stableJson(runtimeState.styleConfig?.strategicValues || {}),

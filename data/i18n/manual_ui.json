@@ -6,6 +6,13 @@
   "Clear Territory Visual Overrides": "清除领土上的视觉覆盖色",
   "Target country is not in this scenario": "目标国不存在于当前剧本",
   "companion actions": "项联动动作",
+  "Map mode": "地图模式",
+  "Countries": "国家",
+  "Alliances": "阵营",
+  "Government type": "政体",
+  "This scenario has no alliance or government data.": "当前剧本没有阵营或政体数据。",
+  "Map modes only change how the map is shown; edits and saves are unaffected.": "地图模式仅改变显示方式，不影响编辑和保存。",
+
   "Inspector selection path": "检查器选择路径",
   "Notes": "说明",
   "More options": "更多选项",
