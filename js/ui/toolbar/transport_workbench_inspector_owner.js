@@ -1,4 +1,5 @@
 import { t } from "../i18n.js";
+import { state as runtimeState } from "../../core/state.js";
 // Transport workbench inspector owner.
 // Owns inspector row models, diagnostic summaries, manifest-only rows, and small inspector DOM factories.
 
@@ -679,11 +680,14 @@ export function buildTransportWorkbenchInspectorRenderSignature({
   familyId = "",
   compareHeld = false,
   model = {},
+  language = "",
 } = {}) {
   // signature 只描述“当前看见的语义内容”，不关心临时节点身份，
   // 这样 preview 轮询时只要内容没变，就可以安全跳过 details DOM 重建。
+  // 行标签按当前语言翻译后写入 DOM，所以语言也属于可见内容。
   return JSON.stringify({
     familyId: String(familyId || ""),
+    language: String(language || ""),
     compareHeld: !!compareHeld,
     stateCards: (model.stateCards || []).map((card) => [
       String(card?.title || ""),
@@ -787,6 +791,7 @@ export function createTransportWorkbenchInspectorOwner({
       familyId: family?.id,
       compareHeld,
       model: inspectorModel,
+      language: runtimeState.currentLanguage,
     });
     if (
       lastInspectorDetailsRender?.detailsNode === detailsNode

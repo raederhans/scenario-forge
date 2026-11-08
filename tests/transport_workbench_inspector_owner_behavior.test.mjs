@@ -509,6 +509,12 @@ test("inspector owner skips detail DOM rebuilds when the rendered model is uncha
         },
       }),
     );
+    // 行标签按语言翻译后渲染：同样内容切换语言后必须重建，不能复用旧语言的 DOM。
+    const sameRows = { familyId: "road", compareHeld: false, model: { rows: [["Loaded roads", "4706"]], stateCards: [] } };
+    assert.notEqual(
+      buildTransportWorkbenchInspectorRenderSignature({ ...sameRows, language: "zh" }),
+      buildTransportWorkbenchInspectorRenderSignature({ ...sameRows, language: "en" }),
+    );
   } finally {
     globalThis.document = previousDocument;
   }
