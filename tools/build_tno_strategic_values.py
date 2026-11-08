@@ -212,13 +212,8 @@ def build_payload(tno_root: Path, decisions: list | None = None) -> dict:
     province_states, centers, adjacency, stride = province_geometry(source, states, controls, fitted)
     points = resolve_spatial_matches(states, names, city_index, owners, source, fitted,
                                      province_states, centers, adjacency, stride, decisions)
-    # strategic.decode_runtime_feature_centroids 不认 TNO 运行时拓扑的打包弧线格式，得到的不是经纬度；
-    # 这里用与城市重定位相同的 decode_topology 解码，取每个地块的经纬度代表点。
-    centroids = {}
-    for feature in decode_topology(topology):
-        if feature["id"] in owners and feature["geometry"] is not None and not feature["geometry"].is_empty:
-            point = feature["geometry"].representative_point()
-            centroids[feature["id"]] = (float(point.x), float(point.y))
+    centroids = {feature_id: point for feature_id, point in strategic.decode_runtime_feature_centroids(topology).items()
+                 if feature_id in owners}
     anchors = strategic._state_anchors(points)
     attribution_owners = source_state_owners_by_feature(owners, centroids, states, source, fitted, province_states)
     buckets, bucket_by_feature = strategic.attribute_features_to_state_buckets(
