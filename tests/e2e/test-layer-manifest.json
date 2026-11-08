@@ -453,6 +453,13 @@
       "ownerHint": "map-runtime"
     },
     {
+      "specPath": "tests/e2e/tno_strategic_values_cold_start.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
+    },
+    {
       "specPath": "tests/e2e/atlantropa_project_markers.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",
