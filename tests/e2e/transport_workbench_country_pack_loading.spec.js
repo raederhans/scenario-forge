@@ -26,17 +26,9 @@ const TARGET_PACKS = [
 test.setTimeout(900000);
 
 async function openTransportWorkbench(page) {
-  const projectTab = page.locator("#inspectorSidebarTabProject");
-  if ((await projectTab.getAttribute("aria-selected")) !== "true") {
-    await projectTab.click();
-  }
-  await expect(projectTab).toHaveAttribute("aria-selected", "true");
-  const transportSection = page.locator("#transportProjectSection");
-  if ((await transportSection.evaluate((node) => node.open)) !== true) {
-    await page.locator("#lblTransportProject").click();
-  }
-  await expect(transportSection).toHaveJSProperty("open", true);
-  await page.locator("#projectSidebarPanel #scenarioTransportWorkbenchBtn").click();
+  await page.locator("#editorTaskLayersBtn").click();
+  await page.locator("#appearanceTabTransport").click();
+  await page.locator("#transportProjectSection #scenarioTransportWorkbenchBtn").click();
   await page.waitForFunction(() => {
     const panel = document.querySelector("#transportWorkbenchOverlay");
     return !!panel && panel.getAttribute("aria-hidden") === "false";
