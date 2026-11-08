@@ -8,6 +8,7 @@ export const STARTUP_MANIFEST_PRESENTATION_FIELDS = Object.freeze([
   "bookmark_date",
   "featured_tags",
   "opening_view",
+  "project_markers",
 ]);
 
 export function overlayStartupManifestPresentationFields(bundleManifest, liveManifest) {

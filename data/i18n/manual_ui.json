@@ -1077,5 +1077,7 @@
   "Lines, graphics and unit counters are saved with the project and included in exports.": "作战线、图形和单位标记随项目保存，并包含在导出中。",
   "By country ({count} on)": "按国家（已启用 {count} 个）",
   "Enabled only": "只看已启用",
-  "Display quality": "显示画质"
+  "Display quality": "显示画质",
+  "Dam": "大坝",
+  "Canal": "运河"
 }

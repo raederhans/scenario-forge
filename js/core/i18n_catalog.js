@@ -2,6 +2,8 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Dam": { zh: "大坝", en: "Dam" },
+  "Canal": { zh: "运河", en: "Canal" },
   "Show modern place names": { zh: "显示现代名称", en: "Show modern place names" },
   "Major powers": { zh: "主要势力", en: "Major powers" },
   "Featured in this scenario": { zh: "本剧本特色", en: "Featured in this scenario" },

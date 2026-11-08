@@ -451,6 +451,13 @@
       "executionMode": "browser",
       "domain": "map-layer",
       "ownerHint": "map-runtime"
+    },
+    {
+      "specPath": "tests/e2e/atlantropa_project_markers.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
     }
   ]
 }

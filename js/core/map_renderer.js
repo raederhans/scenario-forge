@@ -1,3 +1,4 @@
+import { buildScenarioProjectMarkerEntries, drawScenarioProjectMarkers, hasVisibleScenarioProjectMarkers } from "./renderer/scenario_project_markers.js";
 import { resolveAtlantropaSeaFillColor } from "./scenario/atlantropa_sea_color.js";
 import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
 import { createHitTestingOwner } from "./map_renderer/hit_testing_owner.js";
@@ -1658,6 +1659,7 @@ const getContextLayerResolverOwner = lazyOwner(() => createContextLayerResolverO
 const getRendererAssetUrlPolicyOwner = lazyOwner(() => createRendererAssetUrlPolicyOwner({ state }));
 
 const getFacilitySurfaceOwner = lazyOwner(() => createFacilitySurfaceOwner({
+  getLanguage: () => runtimeState.currentLanguage,
   helpers: {
     renderTooltipText,
     t,
@@ -5380,7 +5382,10 @@ function getRenderPassTransformSignature(passName, transform) {
 }
 
 function getRenderPassSignature(passName, transform) {
-  const signature = getRenderPassSignaturePolicy().getRenderPassSignature(passName, transform);
+  let signature = getRenderPassSignaturePolicy().getRenderPassSignature(passName, transform);
+  if (passName === "contextMarkers") {
+    signature += `|projects:${runtimeState.activeScenarioId}:${!!runtimeState.showScenarioAtlantropa}:${getObjectIdentityToken(runtimeState.activeScenarioManifest?.project_markers)}:${transform.k}`;
+  }
   const layout = getRenderPassLayout(passName);
   const margin = getTnoScenePaintOverscanPx(passName);
   return `${signature}|surface:${layout.pixelWidth}:${layout.pixelHeight}:${layout.offsetX}:${layout.offsetY}:${layout.dpr}|paint-margin:${margin}`;
@@ -8744,6 +8749,7 @@ function filterCurrentEnabledRenderPasses(passNames) {
     showTransport: !!runtimeState.showTransport,
     showStrategicResourceMarkers: !!runtimeState.showStrategicResourceMarkers,
     showCityPoints: !!runtimeState.showCityPoints,
+    showScenarioProjectMarkers: hasVisibleScenarioProjectMarkers(runtimeState.activeScenarioManifest, runtimeState),
     textureMode: normalizeTextureMode(runtimeState.styleConfig?.texture?.mode),
     dayNightEnabled: !!getDayNightStyleConfig().enabled,
     populationHeatmapEnabled: isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
@@ -11130,10 +11136,18 @@ function getHoveredCityTooltipEntry(event, hit) {
   return getCityPointsRenderOwner().getHoveredCityTooltipEntry(event, hit);
 }
 
+function getScenarioProjectMarkerEntries() {
+  return buildScenarioProjectMarkerEntries(
+    runtimeState.activeScenarioManifest, runtimeState,
+    rendererSurfaceHost.getProjection(), runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
+  );
+}
+
 function listVisibleFacilityHoverEntries() {
   return [
     ...(Array.isArray(visibleFacilityHoverEntriesByFamily.airport) ? visibleFacilityHoverEntriesByFamily.airport : []),
     ...(Array.isArray(visibleFacilityHoverEntriesByFamily.port) ? visibleFacilityHoverEntriesByFamily.port : []),
+    ...getScenarioProjectMarkerEntries(),
     ...(Array.isArray(visibleFacilityHoverEntriesByFamily.rail) ? visibleFacilityHoverEntriesByFamily.rail : []),
   ];
 }
@@ -11295,6 +11309,7 @@ function getHoveredFacilityEntryFromEvent(event) {
   let bestDistance = Number.POSITIVE_INFINITY;
   let bestPriority = -1;
   entries.forEach((entry) => {
+    if (entry.familyId === "project" && runtimeState.currentTool !== "select") return;
     const [entryX, entryY] = entry?.screenPoint || [];
     if (![entryX, entryY].every(Number.isFinite)) {
       return;
@@ -11388,6 +11403,13 @@ function zoomToFacilityEntry(entry, { targetScale = 4.8, durationMs = 420 } = {}
 }
 
 function syncFacilityInfoCardVisibility() {
+  if (!isFacilityDetailsSurfaceActive("project")
+    && getMapHoverInteractionOwner().getHoveredFacilityEntry()?.familyId === "project") {
+    getMapHoverInteractionOwner().setHoveredFacilityEntry(null);
+    getMapHoverInteractionOwner().setHoverOverlayDirty(true);
+    queueTooltipUpdate({ visible: false });
+    setMapInteractionCursor("");
+  }
   if (!selectedFacilityEntry) {
     return;
   }
@@ -11403,6 +11425,7 @@ function syncFacilityInfoCardVisibility() {
 }
 
 function isFacilityDetailsSurfaceActive(familyId = "") {
+  if (familyId === "project") return runtimeState.activeScenarioId === "tno_1962" && !!runtimeState.showScenarioAtlantropa;
   const transportPanel = document.getElementById("appearancePanelTransport");
   if (
     transportPanel instanceof HTMLElement
@@ -11921,7 +11944,8 @@ function drawContextMarkersPass(k, options = undefined) {
   // Candidate lifetime matches the cached marker pass, not an individual frame.
   getTransportOverviewRenderOwner().resetLabelCandidates();
   invalidateRenderPasses("labels", "transport-label-candidates");
-  return getContextPassOrchestratorOwner().drawContextMarkersPass(k, options);
+  getContextPassOrchestratorOwner().drawContextMarkersPass(k, options);
+  drawScenarioProjectMarkers(rendererSurfaceHost.getContext(), getScenarioProjectMarkerEntries(), k);
 }
 
 function drawContextScenarioPass(k, options = undefined) {
@@ -13489,6 +13513,7 @@ function updatePerfOverlay() {
 }
 
 function render() {
+  syncFacilityInfoCardVisibility();
   const startedAt = perfIsEnabled() ? nowMs() : 0;
   const metricSequenceStartedAt = startedAt > 0
     ? Math.max(0, Number(runtimeState.renderPerfMetricSequence || 0))
