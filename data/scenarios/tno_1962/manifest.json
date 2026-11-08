@@ -3172,5 +3172,13 @@
   "tag_migration_version": 2,
   "version": 2,
   "water_regions_mode": "exclusive",
-  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson"
+  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson",
+  "opening_view": {
+    "bounds": [
+      -15,
+      22,
+      80,
+      66
+    ]
+  }
 }

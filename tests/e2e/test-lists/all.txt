@@ -35,6 +35,7 @@ scenario_apply_resilience.spec.js
 scenario_blank_exit.spec.js
 scenario_boundary_regression.spec.js
 scenario_controls_dispatcher_contract.spec.js
+scenario_opening_view.spec.js
 scenario_shell_overlay_contract.spec.js
 shortcut_history_render_boundary.spec.js
 sidebar_default_collapse.spec.js

@@ -37,6 +37,18 @@ async function closeScenarioGuide(page) {
   if (await guide.isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
 }
 
+// 取点前显式建立视角前提：用户可见的快捷键 0 把视角复位到全图，等缩放回到 1 且渲染稳定。
+// 剧本可以有自己的开场视角，黄金流程不依赖"打开或切换后仍是全图"。
+async function resetViewToWorld(page, { scenarioId = "", timeout = 120_000 } = {}) {
+  await parkMouse(page);
+  await page.keyboard.press("0");
+  await expect.poll(async () => {
+    const status = await readStatus(page);
+    return Math.abs(Number(status?.viewport?.k) - 1) < 0.01;
+  }, { timeout, intervals: [100, 250, 500] }).toBe(true);
+  await waitForSettled(page, { scenarioId, timeout });
+}
+
 async function openApp(page, { timeout = 120_000, scenarioId = "" } = {}) {
   await page.setViewportSize({ width: 1440, height: 900 });
   const started = Date.now();
@@ -47,6 +59,7 @@ async function openApp(page, { timeout = 120_000, scenarioId = "" } = {}) {
   await waitForSettled(page, { timeout });
   const startupMs = Date.now() - started;
   await closeScenarioGuide(page);
+  await resetViewToWorld(page, { timeout });
   return { startupMs };
 }
 
@@ -60,6 +73,7 @@ async function switchScenario(page, scenarioId, { timeout = 120_000 } = {}) {
   await page.locator("#applyScenarioBtn").click();
   await waitForSettled(page, { scenarioId, timeout });
   await closeScenarioGuide(page);
+  await resetViewToWorld(page, { scenarioId, timeout });
 }
 
 async function screenPoint(page, [lon, lat] = PROBE_LON_LAT) {
@@ -183,6 +197,7 @@ module.exports = {
   screenPoint,
   selectFillTool,
   switchScenario,
+  resetViewToWorld,
   waitForBackgroundIdle,
   waitForSettled,
   zoomTo,
