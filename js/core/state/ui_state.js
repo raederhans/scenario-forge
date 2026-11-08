@@ -307,6 +307,7 @@ export function createDefaultUiState() {
     showScenarioReliefOverlays: true,
     showEraRailways: true,
     showCityPoints: true,
+    showModernPlaceNames: false,
     showBlankFeatureLabels: false,
     showStrategicResourceMarkers: false,
     strategicChoroplethMetric: "",

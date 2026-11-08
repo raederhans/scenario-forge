@@ -1,3 +1,4 @@
+import { isPoliticalDisplayModeActive, resolvePoliticalDisplayColor } from "./political_display_mode.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { resolveThematicWgiFeatureColor } from "./thematic_wgi_view_model.js";
 import { resolvePopulationFeatureColor, normalizePopulationStyle, isPopulationActive, POPULATION_MISSING_COLOR } from "./population_spatial_view_model.js";
@@ -115,6 +116,11 @@ function resolveFeatureColor(featureId, ctx = {}) {
     return strategicColor;
   }
 
+  if (isPoliticalDisplayModeActive(runtimeState)) {
+    const ownerCode = ctx.getEffectiveOwnerCode?.(feature, id);
+    const color = resolvePoliticalDisplayColor(runtimeState, ownerCode);
+    if (color) return { color, source: `political-display:${runtimeState.politicalDisplayMode}`, featureId: id, ownerCode };
+  }
   return resolveBaseLandColor(id, ctx, getSafeColor);
 }
 

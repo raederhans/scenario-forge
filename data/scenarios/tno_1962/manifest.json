@@ -1,4 +1,67 @@
 {
+  "project_markers": [
+    {
+      "id": "gibraltar_dam",
+      "kind": "dam",
+      "lon": -5.6,
+      "lat": 35.95,
+      "name": {
+        "en": "Gibraltar Dam",
+        "zh": "直布罗陀大坝"
+      },
+      "status": {
+        "en": "Strait closed; project unfinished",
+        "zh": "已截断海峡，工程未完工"
+      },
+      "body": {
+        "en": "The dam across the Strait of Gibraltar cut the Mediterranean off from the Atlantic and lowered its level, exposing the salt flats and new coastline on this map. In the mod's older state lore the project was never fully completed and needs repair.",
+        "zh": "横跨直布罗陀海峡的大坝把地中海与大西洋隔开，水位随之下降，露出了本图上的盐碱地和新海岸线。按模组旧版州设定，这项工程从未全部完工，坝体仍需修缮。"
+      },
+      "source": "TNO localisation/english/TNO_state_lore_l_english.yml:100 (state_lore_desc.20_unfin)；现行 TNO_FactionStatus_l_english.yml:167 称其为未实施提案，本剧本地图按亚特兰托帕已建成绘制，取旧版设定"
+    },
+    {
+      "id": "suez_canal",
+      "kind": "canal",
+      "lon": 32.35,
+      "lat": 30.6,
+      "name": {
+        "en": "Suez Canal",
+        "zh": "苏伊士运河"
+      },
+      "status": {
+        "en": "Open to shipping; Italian control",
+        "zh": "通航中，意大利控制"
+      },
+      "body": {
+        "en": "Owned and garrisoned by Italy, the canal remains open to shipping between the Mediterranean and the Red Sea; Atlantropa did not stop its operation.",
+        "zh": "运河由意大利拥有并驻军控制，地中海与红海之间仍正常通航，亚特兰托帕工程并未妨碍其运作。"
+      },
+      "source": "TNO_Italy_loc_l_english.yml:353 ita_open_up_suez_desc；:5724 ita_suez_perla_impero_desc；history/states/965-Suez Canal.txt"
+    },
+    {
+      "id": "congo_dams",
+      "kind": "dam",
+      "lon": 13.6,
+      "lat": -5.5,
+      "name": {
+        "en": "Congo Dams",
+        "zh": "刚果大坝群"
+      },
+      "status": {
+        "en": "Built; Congo Lake formed",
+        "zh": "已建成，刚果湖已形成"
+      },
+      "body": {
+        "en": "A series of dams built near the mouth of the Congo after the war flooded the basin into the vast Congo Lake, now used for hydroelectric power and inland shipping.",
+        "zh": "战后在刚果河口附近修建的一系列大坝，把刚果盆地淹成广阔的刚果湖，用于水力发电和内河航运。"
+      },
+      "location_note": {
+        "en": "Marker position is approximate.",
+        "zh": "标记位置为示意。"
+      },
+      "source": "TNO_Country_Info_Screen_l_english.yml:912 COG_CountryInfo_Content_desc.5；TNO_Congo_l_english.yml:472 COG_congo_lake_trading_desc"
+    }
+  ],
   "audit_url": "data/scenarios/tno_1962/audit.json",
   "baseline_hash": "341a183adbadb30ed71c8a19b9c1bd076b8ee39bdf49d8aff8362d1cf46935a5",
   "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
@@ -14,6 +77,7 @@
   "detail_chunk_manifest_url": "data/scenarios/tno_1962/detail_chunks.manifest.json",
   "display_name": "TNO 1962",
   "district_groups_url": "data/scenarios/tno_1962/district_groups.manual.json",
+  "era_railways_url": "data/transport_layers/tno_era_rail/era_rail.geojson",
   "excluded_water_region_groups": [
     "mediterranean"
   ],
@@ -3031,7 +3095,7 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "63d241d9855b9d2a939f5ec3e2cc122e314df662e1b1da5b22a0f7388dae3251",
+  "snapshot_fingerprint": "dee0b168793e9eb52c9624a2c91e2fac1a2cf9ec3c7f9d8d585c75f00729e39b",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "5433a525c3fabe1581dd1b1baf26cc7b3be76207fb868cfff237b9b53cc91263",
@@ -3044,6 +3108,7 @@
   "startup_bundle_url_zh": "data/scenarios/tno_1962/startup.bundle.zh.json",
   "startup_bundle_version": 7,
   "startup_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
+  "strategic_values_url": "data/scenarios/tno_1962/strategic_values.by_feature.json",
   "style_defaults": {
     "atlantropa_salt_flat": {
       "fillColor": "#a8956c"

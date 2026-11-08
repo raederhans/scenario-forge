@@ -144,3 +144,8 @@ test("population heatmap visibility requires the explicit switch, including load
   assert.ok(enabled.indexOf("populationHeatmap") < enabled.indexOf("borders"));
   assert.ok(filterEnabledRenderPassNames(INTERACTION_COMPOSITE_PASS_NAMES, { populationHeatmapEnabled: true }).includes("populationHeatmap"));
 });
+
+test("visible scenario project markers keep the marker pass enabled without transport, resources or cities", () => {
+  assert.ok(!filterEnabledRenderPassNames(RENDER_PASS_NAMES).includes("contextMarkers"));
+  assert.ok(filterEnabledRenderPassNames(RENDER_PASS_NAMES, { showScenarioProjectMarkers: true }).includes("contextMarkers"));
+});

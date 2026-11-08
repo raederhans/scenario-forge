@@ -1,3 +1,4 @@
+atlantropa_project_markers.spec.js
 city_label_i18n_redraw.spec.js
 city_lights_layer_regression.spec.js
 city_marker_visibility_regression.spec.js
@@ -15,12 +16,14 @@ hoi4_rk_russia_regression.spec.js
 interaction_funnel_contract.spec.js
 main_shell_i18n.spec.js
 map_clarity.spec.js
+map_label_font_slices.spec.js
 marine_label_performance.spec.js
 non_1962_runtime_matrix.spec.js
 ocean_geometry_contract.spec.js
 ownership_retirement.spec.js
 physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
+political_display_mode.spec.js
 project_save_load_roundtrip.spec.js
 releasable_territory.spec.js
 review_regressions.spec.js
@@ -51,6 +54,7 @@ tno_atlantropa_coastline.spec.js
 tno_named_water_rendering.spec.js
 tno_open_ocean_rendering.spec.js
 tno_startup_visible_context_layers_contract.spec.js
+tno_strategic_values_cold_start.spec.js
 transport_phase_b_main_map_smoke.spec.js
 transport_workbench_country_pack_loading.spec.js
 transport_workbench_industrial_variants.spec.js

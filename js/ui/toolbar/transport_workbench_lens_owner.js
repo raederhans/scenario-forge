@@ -18,8 +18,8 @@ export function buildTransportWorkbenchLensModel({
           type: "empty",
           title: translate("Future draw stack"),
           body: pickUiCopy(
-            "使用中间排序板调整 8 个 transport families 的绘制顺序。左侧负责上下文，右侧负责状态查看。",
-            "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current runtimeState.",
+            "拖动行以调整绘制顺序。",
+            "Drag rows to change the drawing order.",
           ),
         },
       ],

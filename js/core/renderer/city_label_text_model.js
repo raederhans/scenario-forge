@@ -1,3 +1,5 @@
+import { formatModernPlaceName, isRenamedPlace } from "./modern_place_name.js";
+
 const CITY_LABEL_MAX_WIDTH_PX = {
   sparse: { capital: 212, major: 186, regional: 164, minor: 150 },
   balanced: { capital: 188, major: 166, regional: 148, minor: 134 },
@@ -229,8 +231,15 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     return cleaned || rawLabel;
   }
 
-  function getCityDisplayLabel(feature) {
-    return cleanCityMapLabelText(resolveCityDisplayLabel(feature), feature);
+  function getCityDisplayLabel(feature, { showModernPlaceNames = !!runtimeState.showModernPlaceNames } = {}) {
+    const label = cleanCityMapLabelText(resolveCityDisplayLabel(feature), feature);
+    if (!showModernPlaceNames || !getCityOverrideDisplayLabel(feature)) return label;
+    const props = feature?.properties || {};
+    // 只给真正的改名加对照：英文名不同才算改名，简繁或译名差异不括注。
+    if (!isRenamedPlace(props.__city_display_name_override?.en, props.__city_base_display_name?.en)) return label;
+    const modernName = props.__city_base_display_name?.[runtimeState.currentLanguage];
+    if (!modernName) return label;
+    return formatModernPlaceName(label, cleanCityMapLabelText(modernName, feature), runtimeState.currentLanguage);
   }
 
   function isCjkText(value = "") {

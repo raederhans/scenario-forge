@@ -1188,7 +1188,7 @@ function initSidebar({ render } = {}) {
     const statusHint = document.createElement("p");
     statusHint.id = "frontlineStatusHint";
     statusHint.className = "sidebar-tool-hint frontline-compact-hint";
-    statusHint.textContent = t("Overlay off.", "ui");
+    statusHint.hidden = true;
 
     statusRow.appendChild(statusTitleGroup);
 
@@ -1199,10 +1199,6 @@ function initSidebar({ render } = {}) {
     const emptyState = document.createElement("div");
     emptyState.id = "frontlineEmptyState";
     emptyState.className = "inspector-empty-state frontline-empty-state";
-    const emptyTitle = document.createElement("h3");
-    emptyTitle.className = "section-header-block";
-    emptyTitle.textContent = t("Frontline is off", "ui");
-    emptyState.appendChild(emptyTitle);
 
     const settings = document.createElement("div");
     settings.id = "frontlineSettingsPanel";
@@ -1211,10 +1207,6 @@ function initSidebar({ render } = {}) {
     const controlsHeader = document.createElement("div");
     controlsHeader.className = "section-header mt-2";
     controlsHeader.textContent = t("View", "ui");
-
-    const controlsHint = document.createElement("p");
-    controlsHint.className = "sidebar-tool-hint frontline-compact-hint";
-    controlsHint.textContent = t("Style and labels.", "ui");
 
     const controlsRow = buildRow();
     controlsRow.classList.add("frontline-compact-row");
@@ -1245,7 +1237,6 @@ function initSidebar({ render } = {}) {
     controlsAdvanced.appendChild(controlsAdvancedBody);
 
     settings.appendChild(controlsHeader);
-    settings.appendChild(controlsHint);
     settings.appendChild(controlsRow);
     settings.appendChild(controlsAdvanced);
 
@@ -1275,7 +1266,8 @@ function initSidebar({ render } = {}) {
 
     const hint = document.createElement("p");
     hint.className = "sidebar-tool-hint";
-    hint.textContent = t("Project-local lines, graphics, and unit counters for export.", "ui");
+    hint.dataset.pageNote = "";
+    hint.textContent = t("Lines, graphics and unit counters are saved with the project and included in exports.", "ui");
 
     const publishStatus = document.createElement("p");
     publishStatus.id = "strategicOverlayPublishStatus";
@@ -1308,9 +1300,6 @@ function initSidebar({ render } = {}) {
     const operationalLineHeader = document.createElement("div");
     operationalLineHeader.className = "section-header mt-3";
     operationalLineHeader.textContent = t("Operational Lines", "ui");
-    const operationalLineHint = document.createElement("p");
-    operationalLineHint.className = "sidebar-tool-hint";
-    operationalLineHint.textContent = t("Plan lines.", "ui");
     const operationalLineRow = buildRow();
     operationalLineRow.classList.add("frontline-compact-row", "strategic-line-primary-row");
     const operationalLineKindSelect = buildSelect("operationalLineKindSelect", [
@@ -1364,9 +1353,6 @@ function initSidebar({ render } = {}) {
     const graphicsHeader = document.createElement("div");
     graphicsHeader.className = "section-header mt-3";
     graphicsHeader.textContent = t("Operation Graphics", "ui");
-    const graphicsHint = document.createElement("p");
-    graphicsHint.className = "sidebar-tool-hint";
-    graphicsHint.textContent = t("Arrows and markers.", "ui");
     const graphicsRow = buildRow();
     graphicsRow.classList.add("frontline-compact-row", "strategic-graphics-primary-row");
     const graphicsKindSelect = buildSelect("operationGraphicKindSelect", [
@@ -1460,9 +1446,6 @@ function initSidebar({ render } = {}) {
     const unitHeader = document.createElement("div");
     unitHeader.className = "section-header mt-4";
     unitHeader.textContent = t("Unit Counters", "ui");
-    const unitHint = document.createElement("p");
-    unitHint.className = "sidebar-tool-hint";
-    unitHint.textContent = t("Map pieces.", "ui");
     const unitEditorShell = document.createElement("div");
     unitEditorShell.className = "unit-counter-editor-shell mt-2";
     unitEditorShell.id = "unitCounterEditorShell";
@@ -1535,10 +1518,7 @@ function initSidebar({ render } = {}) {
     counterEditorModalTitle.id = "unitCounterEditorModalTitle";
     counterEditorModalTitle.className = "counter-editor-modal-title";
     counterEditorModalTitle.textContent = t("Counter Editor", "ui");
-    const counterEditorModalMessage = document.createElement("p");
-    counterEditorModalMessage.className = "counter-editor-modal-message";
-    counterEditorModalMessage.textContent = t("Browse symbols, tune combat state, and preview the selected counter in one place.", "ui");
-    counterEditorModalCopy.append(counterEditorModalTitle, counterEditorModalMessage);
+    counterEditorModalCopy.append(counterEditorModalTitle);
     const counterEditorModalCloseBtn = document.createElement("button");
     counterEditorModalCloseBtn.type = "button";
     counterEditorModalCloseBtn.id = "unitCounterEditorModalCloseBtn";
@@ -1819,21 +1799,18 @@ function initSidebar({ render } = {}) {
     strategicOverlaySection.appendChild(headerRow);
     strategicOverlaySection.appendChild(workspaceActions);
     operationalLineBlock.appendChild(operationalLineHeader);
-    operationalLineBlock.appendChild(operationalLineHint);
     operationalLineBlock.appendChild(operationalLineRow);
     operationalLineBlock.appendChild(operationalLineStyleRow);
     operationalLineBlock.appendChild(operationalLineEditorHint);
     operationalLineBlock.appendChild(operationalLineActions);
     operationalLineBlock.appendChild(operationalLineList);
     graphicsBlock.appendChild(graphicsHeader);
-    graphicsBlock.appendChild(graphicsHint);
     graphicsBlock.appendChild(graphicsRow);
     graphicsBlock.appendChild(graphicsAdvanced);
     graphicsBlock.appendChild(graphicsEditorHint);
     graphicsBlock.appendChild(graphicsActions);
     graphicsBlock.appendChild(graphicsList);
     countersBlock.appendChild(unitHeader);
-    countersBlock.appendChild(unitHint);
     unitEditorShell.appendChild(unitPreviewFrame);
     unitEditorShell.appendChild(unitPlacementStatus);
     unitEditorShell.appendChild(unitPresetNationRow);
@@ -3373,11 +3350,6 @@ function initSidebar({ render } = {}) {
 
     const copy = document.createElement("div");
     copy.className = "inspector-color-sync-copy";
-
-    const compactTitle = document.createElement("div");
-    compactTitle.className = "section-header-block inspector-color-sync-title";
-    compactTitle.textContent = t("Country Color", "ui");
-    copy.appendChild(compactTitle);
 
     const suggestionSelect = document.createElement("select");
     suggestionSelect.className = "inspector-color-suggestion-select";
