@@ -63,7 +63,7 @@ import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from 
 import { getContextCollectionRevision, getContextGeometryRevision } from "./state/context_layer_revision.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
-import { readPoliticalRenderPolicy, writePoliticalRenderMode, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility, publishPoliticalIdRasterStatus } from "./renderer/political_id_raster_trial.js";
+import { readPoliticalRenderPolicy, writePoliticalRenderMode, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility, publishPoliticalIdRasterStatus, isDirectRasterSceneScenario } from "./renderer/political_id_raster_trial.js";
 import { collectPoliticalRasterDisplayFeatures, collectPoliticalRasterDisplayFeaturesAsync } from "./renderer/political_id_raster_source.js";
 import { createPoliticalIdRasterRuntimeOwner } from "./renderer/political_id_raster_runtime_owner.js";
 import { createTnoRasterSceneOwner } from "./renderer/tno_raster_scene_owner.js";
@@ -3513,7 +3513,7 @@ function resetPoliticalRasterPolicy() {
 }
 
 function isTnoRasterSceneSelected() {
-  return runtimeState.activeScenarioId === "tno_1962" && isPoliticalIdRasterPrimary()
+  return isDirectRasterSceneScenario(runtimeState.activeScenarioId) && isPoliticalIdRasterPrimary()
     && isPoliticalIdRasterSelected() && !tnoRasterSceneFailure;
 }
 
@@ -4109,7 +4109,11 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
     drawOverviewFrameFallback,
     drawNavigationFrame: (transform) => {
       const drawn = !exportRenderInProgress && (isTnoRasterSceneSelected()
-        ? !!tnoRasterSceneOwner?.present(transform, { refresh: false })
+        ? !!tnoRasterSceneOwner?.present(transform, { refresh: false,
+          // Moving views keep the vector path's contract: transform what is
+          // painted, refill the uncovered edges in the exact frame afterwards.
+          allowPartialPasses: runtimeState.renderPhase === RENDER_PHASE_INTERACTING
+            || runtimeState.renderPhase === RENDER_PHASE_SETTLING })
         : !!navigationSceneOwner?.draw(transform));
       navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
         && !exportRenderInProgress;
@@ -4919,7 +4923,7 @@ function getNavigationSceneOwner() {
 
 function prepareScenarioNavigation() {
   ensureCurrentSceneSnapshot("scenario-navigation-prefetch");
-  if (runtimeState.activeScenarioId === "tno_1962" && isPoliticalIdRasterPrimary()) return;
+  if (isDirectRasterSceneScenario(runtimeState.activeScenarioId) && isPoliticalIdRasterPrimary()) return;
   getNavigationSceneOwner().prewarm();
 }
 
