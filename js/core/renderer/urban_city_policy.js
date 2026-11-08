@@ -48,7 +48,7 @@ export function getUrbanCityRenderPassSignatureParts(state, passName) {
     return [cities, `${strategic}:${String(state?.strategicChoroplethMetric || "")}`, ...sharedTail];
   }
   if (passName === "labels") {
-    return [state?.deferContextBasePass ? "labels:deferred" : "labels:ready", cities, strategic, ...sharedTail];
+    return [state?.deferContextBasePass ? "labels:deferred" : "labels:ready", `modernNames:${!!state?.showModernPlaceNames}`, cities, strategic, ...sharedTail];
   }
   throw new RangeError(`Unsupported urban city render pass: ${String(passName || "")}`);
 }
@@ -241,6 +241,10 @@ export function createUrbanCityPolicyOwner({
         __city_has_host_override: true,
       } : {}),
       __city_has_display_name_override: hasDisplayNameOverride,
+      __city_base_display_name: {
+        en: String(props.__city_locale?.en || props.label_en || props.name_en || props.label || props.name || "").trim(),
+        zh: String(props.__city_locale?.zh || props.label_zh || props.name_zh || props.label_cn || props.name_cn || "").trim(),
+      },
       __city_display_name_override: hasDisplayNameOverride ? { ...displayName } : null,
       __city_hidden: overrideEntry.hidden === undefined ? !!props.__city_hidden : !!overrideEntry.hidden,
       __city_base_tier: nextTier,

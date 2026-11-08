@@ -18,15 +18,13 @@ import {
 } from "./transport_workbench_descriptor.js";
 import { buildTransportWorkbenchPackDetailsRows } from "./transport_workbench_inspector_owner.js";
 import {
+  normalizeTransportWorkbenchInspectorTab,
   mapTransportWorkbenchLabelLevelToMaxLevel,
   mapTransportWorkbenchMaxLevelToLabelLevel,
 } from "./transport_workbench_config_owner.js";
 
 const TAB_MOUNTS = {
   display: "display",
-  aggregation: "aggregation",
-  labels: "labels",
-  coverage: "coverage",
   data: "data",
 };
 const DATA_TAB_VISIBLE_ROW_LIMIT = 80;
@@ -255,8 +253,8 @@ export function createTransportWorkbenchRightDeckOwner({
 } = {}) {
   const getSectionsForTab = (familyId, tabId) => {
     const sectionMap = TRANSPORT_WORKBENCH_TAB_SECTION_MAP[familyId] || {};
-    const allowedSectionKeys = new Set(sectionMap[tabId] || []);
-    return (TRANSPORT_WORKBENCH_CONTROL_SCHEMAS[familyId] || []).filter((section) => allowedSectionKeys.has(section.key));
+    const schema = TRANSPORT_WORKBENCH_CONTROL_SCHEMAS[familyId] || [];
+    return (sectionMap[tabId] || []).map((key) => schema.find((section) => section.key === key)).filter(Boolean);
   };
 
   const createEditOverlayNode = (family, previewSnapshot) => {
@@ -403,7 +401,7 @@ export function createTransportWorkbenchRightDeckOwner({
     const meta = document.createElement("div");
     meta.className = "transport-workbench-data-meta";
     meta.append(
-      createDataMetaNode(translate("Pack Rows"), totalRows),
+      createDataMetaNode(translate("Loaded rows"), totalRows),
       createDataMetaNode(translate("Table Rows"), rows.length),
       createDataMetaNode(translate("Mode"), previewSnapshot.packMode || previewSnapshot.status || "idle"),
       createDataMetaNode(translate("Shown"), Math.min(visibleRows.length, viewRows.length))
@@ -417,7 +415,7 @@ export function createTransportWorkbenchRightDeckOwner({
       const details = document.createElement("details");
       details.className = "transport-workbench-pack-details";
       const summary = document.createElement("summary");
-      summary.textContent = translate("Pack details");
+      summary.textContent = translate("Source details");
       const detailList = document.createElement("div");
       detailList.className = "transport-workbench-data-meta";
       packDetailsRows.forEach(([label, value]) => {
@@ -429,7 +427,7 @@ export function createTransportWorkbenchRightDeckOwner({
     if (rows.length === 0) {
       const empty = document.createElement("p");
       empty.className = "transport-workbench-note-text";
-      empty.textContent = translate("No loaded feature rows for the current preview pack.");
+      empty.textContent = translate("No items to show.");
       card.appendChild(empty);
       return card;
     }
@@ -542,7 +540,7 @@ export function createTransportWorkbenchRightDeckOwner({
     if (viewRows.length > visibleRows.length || totalRows > rows.length) {
       const note = document.createElement("p");
       note.className = "transport-workbench-note-text transport-workbench-data-limit-note";
-      note.textContent = translate("Search and sort use the current table sample; the side panel keeps a bounded row set to stay responsive.");
+      note.textContent = translate("Search and sort apply to the rows listed here.");
       card.appendChild(note);
     }
     return card;
@@ -559,7 +557,7 @@ export function createTransportWorkbenchRightDeckOwner({
     const title = document.createElement("div");
     title.className = "transport-workbench-field-title";
     title.textContent = translate(control.label);
-    field.appendChild(title);
+    if (control.type !== "toggle") field.appendChild(title);
 
     if (control.type === "toggle") {
       const label = document.createElement("label");
@@ -569,11 +567,10 @@ export function createTransportWorkbenchRightDeckOwner({
       input.checked = !!config[control.key];
       input.disabled = compareHeld;
       const text = document.createElement("span");
-      text.textContent = translate(input.checked ? "Enabled" : "Disabled");
+      text.textContent = translate(control.label);
       input.addEventListener("change", () => {
         if (compareHeld) return;
         updateFamilyConfig(familyId, control.key, input.checked);
-        text.textContent = translate(input.checked ? "Enabled" : "Disabled");
       });
       label.appendChild(input);
       label.appendChild(text);
@@ -679,7 +676,7 @@ export function createTransportWorkbenchRightDeckOwner({
     const visibleControls = (section.controls || []).filter((control) => (
       typeof control.showWhen !== "function" || control.showWhen(config)
     ));
-    if (section.kind !== "diagnostics" && visibleControls.length === 0) {
+    if (section.kind === "diagnostics" || visibleControls.length === 0) {
       return null;
     }
     const details = document.createElement("details");
@@ -710,26 +707,17 @@ export function createTransportWorkbenchRightDeckOwner({
     summary.appendChild(heading);
     summary.appendChild(actions);
     details.appendChild(summary);
-    const body = section.kind === "diagnostics"
-      ? renderDiagnosticsBody(family.id, config)
-      : document.createElement("div");
-    if (section.kind !== "diagnostics") {
-      body.className = "transport-workbench-section-body";
-      if (section.description) {
-        const description = document.createElement("p");
-        description.className = "transport-workbench-section-description";
-        description.textContent = translate(section.description);
-        body.appendChild(description);
-      }
-      visibleControls.forEach((control) => {
-        body.appendChild(renderControl(family.id, control, config, compareHeld));
-      });
-    } else if (section.description) {
+    const body = document.createElement("div");
+    body.className = "transport-workbench-section-body";
+    if (section.description) {
       const description = document.createElement("p");
-      description.className = "transport-workbench-section-description transport-workbench-section-description-diagnostics";
+      description.className = "transport-workbench-section-description";
       description.textContent = translate(section.description);
-      body.prepend(description);
+      body.appendChild(description);
     }
+    visibleControls.forEach((control) => {
+      body.appendChild(renderControl(family.id, control, config, compareHeld));
+    });
     details.appendChild(body);
     return details;
   };
@@ -755,10 +743,7 @@ export function createTransportWorkbenchRightDeckOwner({
             ? "Label settings"
             : "Coverage settings"
     );
-    const kicker = document.createElement("span");
-    kicker.className = "transport-workbench-shell-kicker";
-    kicker.textContent = translate("Current settings");
-    heading.append(title, kicker);
+    heading.append(title);
     card.appendChild(heading);
     const grid = document.createElement("div");
     grid.className = "transport-workbench-shell-grid";
@@ -818,9 +803,6 @@ export function createTransportWorkbenchRightDeckOwner({
     const addShellToggle = (labelText, checked, onChange, mountTarget = grid) => {
       const control = document.createElement("div");
       control.className = "transport-workbench-shell-control";
-      const label = document.createElement("div");
-      label.className = "transport-workbench-shell-label";
-      label.textContent = translate(labelText);
       const toggle = document.createElement("label");
       toggle.className = "transport-workbench-toggle";
       const input = document.createElement("input");
@@ -828,14 +810,13 @@ export function createTransportWorkbenchRightDeckOwner({
       input.checked = !!checked;
       input.disabled = compareHeld;
       const text = document.createElement("span");
-      text.textContent = input.checked ? translate("Enabled") : translate("Disabled");
+      text.textContent = translate(labelText);
       input.addEventListener("change", () => {
         if (compareHeld) return;
-        text.textContent = input.checked ? translate("Enabled") : translate("Disabled");
         onChange(input.checked);
       });
       toggle.append(input, text);
-      control.append(label, toggle);
+      control.append(toggle);
       mountTarget.appendChild(control);
     };
     if (tabId === "display") {
@@ -922,12 +903,7 @@ export function createTransportWorkbenchRightDeckOwner({
         }));
       }
     }
-    const note = document.createElement("p");
-    note.className = "transport-workbench-shell-note";
-    note.textContent = tabId === "data"
-      ? translate("Manifest and audit stay read-only here so control tuning and source truth do not get mixed.")
-      : translate("Use this panel to adjust the current family without changing the lens column context.");
-    card.append(grid, note);
+    card.append(grid);
     return card;
   };
 
@@ -980,29 +956,24 @@ export function createTransportWorkbenchRightDeckOwner({
   const renderTabSections = (family, config, compareHeld, tabId, mountNode) => {
     if (!isElementLike(mountNode)) return;
     mountNode.replaceChildren();
-    const shellCard = createShellCard(family, tabId, config, compareHeld);
-    if (shellCard) {
-      mountNode.appendChild(shellCard);
-    }
+    if (family.id === "layers") return;
+    const densityFamily = TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id);
+    const shellSectionIds = { display_mode: "display", aggregation_mode: "aggregation", label_strategy: "labels" };
+    getSectionsForTab(family.id, tabId).forEach((section) => {
+      const shellId = densityFamily && shellSectionIds[section.key];
+      const node = shellId
+        ? createShellCard(family, shellId, config, compareHeld)
+        : createSectionNode(family, section, config, compareHeld);
+      if (node) mountNode.appendChild(node);
+    });
     if (tabId === "data") {
+      if (family.id === "port") mountNode.appendChild(createShellCard(family, "coverage", config, compareHeld));
       const previewSnapshot = getPreviewSnapshot(family.id, config) || {};
       const editOverlayNode = createEditOverlayNode(family, previewSnapshot);
-      if (editOverlayNode) {
-        mountNode.appendChild(editOverlayNode);
-      }
+      if (editOverlayNode) mountNode.appendChild(editOverlayNode);
       mountNode.appendChild(createDataTabNode(family, config));
     }
-    const skipDefaultSections = TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id)
-      && (tabId === "aggregation" || tabId === "labels");
-    if (!skipDefaultSections) {
-      getSectionsForTab(family.id, tabId).forEach((section) => {
-        const node = createSectionNode(family, section, config, compareHeld);
-        if (node) {
-          mountNode.appendChild(node);
-        }
-      });
-    }
-    if (tabId === "aggregation" || tabId === "labels") {
+    if (tabId === "display" && densityFamily) {
       const advanced = document.createElement("details");
       advanced.className = "transport-workbench-advanced";
       const summary = document.createElement("summary");
@@ -1010,50 +981,31 @@ export function createTransportWorkbenchRightDeckOwner({
       advanced.appendChild(summary);
       const body = document.createElement("div");
       body.className = "transport-workbench-section-body transport-workbench-section-body-advanced";
-      const copy = document.createElement("p");
-      copy.className = "transport-workbench-section-description";
-      copy.textContent = tabId === "aggregation"
-        ? pickUiCopy(
-          "调整聚合半径、网格大小和密度阈值。",
-          "Adjust cluster radius, cell size, and density thresholds."
-        )
-        : pickUiCopy(
-          "调整标签间距和显示阈值。",
-          "Adjust label spacing and display thresholds."
-        );
-      appendAdvancedRange(tabId, family, config, body, compareHeld);
-      body.appendChild(copy);
+      appendAdvancedRange("aggregation", family, config, body, compareHeld);
+      appendAdvancedRange("labels", family, config, body, compareHeld);
       advanced.appendChild(body);
       mountNode.appendChild(advanced);
-    }
-    if (mountNode.childElementCount === 0) {
-      const empty = document.createElement("div");
-      empty.className = "transport-workbench-empty-card";
-      const title = document.createElement("div");
-      title.className = "transport-workbench-empty-title";
-      title.textContent = tabId === "data" ? translate("No audit payload yet") : translate("No controls in this tab");
-      const body = document.createElement("p");
-      body.className = "transport-workbench-empty-text";
-      body.textContent = tabId === "data"
-        ? translate("This family has not exposed extra manifest or audit cards in the current shell.")
-        : family.id === "layers"
-          ? pickUiCopy(
-            "在中间拖动图层以调整顺序，并在 Inspect 确认结果。",
-            "Drag layers in the center board to change their order, then check the result in Inspect."
-          )
-          : pickUiCopy(
-            "此页没有可调整的设置。请使用其他页签，或在 Inspect 查看当前结果。",
-            "No settings are available here. Use another tab or check the current result in Inspect."
-          );
-      empty.append(title, body);
-      mountNode.appendChild(empty);
     }
   };
 
   const renderTabs = ({ family, config, compareHeld, activeTab }) => {
-    const resolvedTab = setInspectorTab(activeTab);
+    const visibleTabs = family.id === "layers" ? [] : ["inspect", "display", "data"].filter((tabId) => (
+      tabId === "inspect" || tabId === "data" || getSectionsForTab(family.id, tabId).some((section) => (
+        (section.controls || []).some((control) => typeof control.showWhen !== "function" || control.showWhen(config))
+      ))
+    ));
+    const requestedTab = normalizeTransportWorkbenchInspectorTab(activeTab);
+    const resolvedTab = setInspectorTab(visibleTabs.includes(requestedTab) ? requestedTab : "inspect");
+    const tabList = tabButtons[0]?.parentNode;
+    if (tabList) {
+      tabList.hidden = family.id === "layers";
+      tabList.classList.toggle("hidden", tabList.hidden);
+    }
     tabButtons.forEach((button) => {
-      const isActive = String(button.dataset.transportInspectorTab || "") === resolvedTab;
+      const tabId = String(button.dataset.transportInspectorTab || "");
+      button.hidden = !visibleTabs.includes(tabId);
+      button.classList.toggle("hidden", button.hidden);
+      const isActive = !button.hidden && tabId === resolvedTab;
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-selected", isActive ? "true" : "false");
       button.setAttribute("tabindex", isActive ? "0" : "-1");

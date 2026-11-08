@@ -2965,7 +2965,9 @@ def validate_strict_bundle_contract(
             errors.append(
                 f"{SCENARIO_STRATEGIC_VALUES_FILENAME} scenario_id must match manifest.scenario_id."
             )
-        if strategic_payload.get("baseline_hash") != owners_payload.get("baseline_hash"):
+        # TNO 的 owners 文件不带 baseline_hash；此时与运行时校验口径一致，比对 manifest 的 baseline_hash。
+        expected_strategic_baseline = owners_payload.get("baseline_hash") or manifest.get("baseline_hash")
+        if strategic_payload.get("baseline_hash") != expected_strategic_baseline:
             errors.append(
                 f"{SCENARIO_STRATEGIC_VALUES_FILENAME} baseline_hash must match owners.by_feature.json baseline_hash."
             )

@@ -10,6 +10,7 @@ const {
   mapColorVariety,
   openApp,
   parkMouse,
+  readStableLabels,
   readStatus,
   screenPoint,
   selectFillTool,
@@ -85,6 +86,32 @@ test("starting on blank_base keeps scenario switching after full data arrives", 
   expect(await mapColorVariety(page)).toBeGreaterThan(5);
   expect(errors).toEqual([]);
 });
+
+// The GPU direct scene must place the same city and country names as the vector path.
+for (const scenarioId of ["tno_1962", "hoi4_1936"]) {
+  test(`${scenarioId}: the GPU scene shows the same map labels as the vector path`, async ({ page }) => {
+    test.setTimeout(420_000);
+    const errors = collectPageErrors(page);
+    const labelsAt = async (query, backend) => {
+      await openApp(page, { scenarioId, query });
+      expect(await page.evaluate(() => globalThis.__scenarioForgeTestApi.politicalBackend())).toBe(backend);
+      const views = [];
+      for (const steps of [2, 1]) {
+        await zoomTo(page, [10, 45], { steps, scenarioId });
+        views.push({ k: (await readStatus(page)).viewport.k, labels: await readStableLabels(page) });
+      }
+      return views;
+    };
+    const scene = await labelsAt("", "raster");
+    const vector = await labelsAt("political_render_mode=vector", "vector");
+    for (const [index, view] of scene.entries()) {
+      expect(view.k).toBeCloseTo(vector[index].k, 3);
+      expect(view.labels.cities.length, `no city names at ${view.k.toFixed(2)}x`).toBeGreaterThan(0);
+      expect(view.labels, `labels at ${view.k.toFixed(2)}x`).toEqual(vector[index].labels);
+    }
+    expect(errors).toEqual([]);
+  });
+}
 
 test("undo and redo, by button and keyboard, restore the rendered map", async ({ page }) => {
   test.setTimeout(240_000);

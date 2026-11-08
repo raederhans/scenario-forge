@@ -10,7 +10,7 @@ export function renderCountryGroupButtons(container, countryState, {
   const selected = systems.find((system) => system.id === selectedSystemId) || systems[0];
   const sourceLabel = (id) => id === "scenario_districts"
     ? t("Scenario districts", "ui") : t("Modern administrative regions", "ui");
-  if (selected) {
+  if (selected && systems.filter((system) => system.groups.length).length <= 1) {
     const note = document.createElement("small");
     note.className = "scenario-action-hint";
     note.textContent = sourceLabel(selected.id);
@@ -18,7 +18,7 @@ export function renderCountryGroupButtons(container, countryState, {
   }
   if (systems.filter((system) => system.groups.length).length > 1) {
     const toggle = document.createElement("div");
-    toggle.className = "frontline-segmented-field";
+    toggle.className = "frontline-segmented-field country-group-system-toggle";
     systems.forEach((system) => {
       const button = createInspectorActionButton(sourceLabel(system.id), () => {
         selectSystem(system.id);
@@ -168,6 +168,7 @@ export function createScenarioInspectorController({
 
     const body = document.createElement("div");
     body.className = "scenario-visual-adjustments-body";
+    if (countryState) renderCountryColorSyncAffordance(body, countryState);
 
     // Color Only 面板面向视觉颜色调整，主要写入视觉颜色覆盖。
     // 它可以复用 preset/hierarchy 的目标选择，但不得触发 owner/controller、边界或 diff 计数链。
@@ -290,7 +291,7 @@ export function createScenarioInspectorController({
     if (countryState.releasable) {
       appendTerritorySection();
     } else {
-      const countrySection = appendActionSection(body, t("Country Visuals", "ui"));
+      const countrySection = body;
 
       countrySection.appendChild(createInspectorActionButton(
         t("Paint Reference Regions With Country Color", "ui"),
@@ -341,7 +342,7 @@ export function createScenarioInspectorController({
       ));
 
       if (countryState.hierarchyGroups.length > 0) {
-        const groupSection = appendActionSection(body, t("Hierarchy Groups (Visual Color)", "ui"));
+        const groupSection = appendActionSection(body, t("Hierarchy Groups", "ui"));
         renderCountryGroupButtons(groupSection, countryState, {
           t,
           language: getView().language,
@@ -373,9 +374,6 @@ export function createScenarioInspectorController({
 
   const renderScenarioActionsPanel = (container, countryState) => {
     container.replaceChildren();
-    if (countryState) {
-      renderCountryColorSyncAffordance(container, countryState);
-    }
 
     if (!countryState) {
       container.appendChild(createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui")));

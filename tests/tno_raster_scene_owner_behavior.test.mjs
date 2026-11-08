@@ -367,6 +367,40 @@ test("wide political tiles cannot publish a panned or zoomed-out unpadded canvas
   assert.equal(h.map.style.visibility, "visible");
 });
 
+test("a moving view composes retained passes and political tiles over their painted extent until the exact frame", () => {
+  const h = harness();
+  const labels = h.passes.get("labels");
+  labels.reference = { ...h.transform };
+  labels.layout = { offsetX: 0, offsetY: 0 };
+  labels.canvas = { width: h.map.width, height: h.map.height };
+  assert.equal(h.owner.present(h.transform), true);
+  const moving = { refresh: false, allowPartialPasses: true };
+  const panned = { ...h.transform, x: h.transform.x + 20 };
+  assert.equal(h.owner.present(panned, moving), true);
+  let diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.partialPasses, true);
+  assert.equal(diagnostics.fallbackReason, "");
+  const frame = h.records.frames.at(-1);
+  assert.equal(h.records.frames.length, 2, "no pass is repainted for the moving frame");
+  const label = frame.layers.find(layer => layer.name === "labels");
+  assert.equal(label.retained, true);
+  assert.equal(label.transform.e, 40, "the painted labels move with the view in device pixels");
+  // Beyond the resident political tiles the drawn part stays instead of hiding the scene.
+  assert.equal(h.owner.present({ ...h.transform, x: 1000 }, moving), true);
+  assert.equal(h.owner.getDiagnostics().partialPasses, true);
+  assert.equal(h.map.style.visibility, "hidden");
+  // Frames that are not part of a gesture keep requiring complete coverage.
+  assert.equal(h.owner.present(panned, { refresh: false }), false);
+  assert.equal(h.owner.getDiagnostics().fallbackReason, "pass-coverage");
+  assert.equal(h.owner.getDiagnostics().partialPasses, false);
+  assert.equal(h.owner.present({ ...h.transform, x: 1000 }), false);
+  assert.equal(h.owner.getDiagnostics().fallbackReason, "direct-frame-coverage");
+  assert.equal(h.owner.present(h.transform), true);
+  diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.partialPasses, false, "the exact frame publishes complete coverage");
+  assert.equal(diagnostics.presentationState, "published");
+});
+
 test("coverage callback rejects before pass reads and refreshed revision uploads in original order", () => {
   const h = harness();
   const labels = h.passes.get("labels");
@@ -399,7 +433,7 @@ test("coverage callback rejects before pass reads and refreshed revision uploads
   assert.deepEqual(h.records.frames[1].layers[2].transform, { a: 1, d: 1, e: 0, f: 0 });
 });
 
-test("TNO default layers enable 96px paint margin while optional producers and vector keep zero", async () => {
+test("TNO borders and texture labels enable 96px paint margin while labels, vector and export keep zero", async () => {
   const { readFile } = await import("node:fs/promises");
   const { createDefaultUiState, createDefaultStyleConfig } = await import("../js/core/state/ui_state.js");
   const { default: vm } = await import("node:vm");
@@ -409,17 +443,13 @@ test("TNO default layers enable 96px paint margin while optional producers and v
   const runtimeState = { ...createDefaultUiState(), styleConfig: createDefaultStyleConfig() };
   const scope = { runtimeState, exportRenderInProgress: false, isTnoRasterSceneSelected: () => true, VIEWPORT_CULL_OVERSCAN_PX: 96 };
   vm.createContext(scope); vm.runInContext(source.slice(begin, end), scope);
-  for (const name of ["borders", "labels", "textureLabels"]) assert.equal(scope.getTnoScenePaintOverscanPx(name), 96);
-  runtimeState.showRoad = true;
+  for (const name of ["borders", "textureLabels"]) assert.equal(scope.getTnoScenePaintOverscanPx(name), 96);
+  // City and country names keep the viewport placement contract of the vector path.
   assert.equal(scope.getTnoScenePaintOverscanPx("labels"), 0);
-  runtimeState.showRoad = false;
-  runtimeState.styleConfig.physical.showRegionLabels = true;
-  assert.equal(scope.getTnoScenePaintOverscanPx("labels"), 0);
-  runtimeState.styleConfig.physical.showRegionLabels = false;
   scope.isTnoRasterSceneSelected = () => false;
-  assert.equal(scope.getTnoScenePaintOverscanPx("labels"), 0);
+  assert.equal(scope.getTnoScenePaintOverscanPx("borders"), 0);
   scope.isTnoRasterSceneSelected = () => true; scope.exportRenderInProgress = true;
-  assert.equal(scope.getTnoScenePaintOverscanPx("labels"), 0);
+  assert.equal(scope.getTnoScenePaintOverscanPx("borders"), 0);
 });
 
 test("successful GPU handoff retires legacy navigation while incomplete, vector and export retain it", async () => {

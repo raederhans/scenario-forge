@@ -257,34 +257,10 @@ export function buildTransportFamilySummaryText({
   visualMode,
   translate,
 }) {
-  if (!familyEnabled || !masterEnabled) return translateUi(translate, "Hidden");
+  if (!familyEnabled || !masterEnabled) return translateUi(translate, "Off");
   const metric = getTransportFamilyRenderMetric(familyId, metrics);
-  const filteredCount = getTransportFamilyFilteredCount({
-    familyId,
-    familyConfig,
-    effectiveScope,
-    collections,
-    zoomScale,
-    visualMode,
-  });
-  const loadedAuxiliaryText = formatTransportLoadedAuxiliaryText(familyId, filteredCount, translate);
-  const lineDetails = buildTransportLineSummaryDetails(familyId, collections, translate);
-  const joinSummaryParts = (...parts) => parts.filter(Boolean).join(" · ");
-  // summary 文案优先表达阶段语义，再补 loaded/visible 数量。
-  // 这样 UI 可以区分“还在加载”“已加载但当前视角 0 visible”“已经真正显示出来”。
-  if (isTransportFamilyRenderSettlingMetric(metric)) {
-    return loadedAuxiliaryText
-      ? joinSummaryParts(translateUi(translate, "Loading/settling"), loadedAuxiliaryText, ...lineDetails)
-      : joinSummaryParts(translateUi(translate, "Loading/settling"), ...lineDetails);
-  }
+  // 标题行只放一个状态：关闭、加载中，或当前可见数量；加载中不能显示成 0 个。
+  if (isTransportFamilyRenderSettlingMetric(metric)) return translateUi(translate, "Loading…");
   const visibleCount = Math.max(0, Math.round(Number(metric.visibleFeatureCount || 0)));
-  if (visibleCount > 0) {
-    return joinSummaryParts(translateUi(translate, "Visible"), formatTransportFamilyCountText(familyId, visibleCount, translate), ...lineDetails);
-  }
-  if (Number(metric.featureCount || 0) > 0 || Number.isFinite(filteredCount)) {
-    return loadedAuxiliaryText
-      ? joinSummaryParts(translateUi(translate, "Loaded · 0 visible"), loadedAuxiliaryText, ...lineDetails)
-      : joinSummaryParts(translateUi(translate, "Loaded · 0 visible"), ...lineDetails);
-  }
-  return joinSummaryParts(translateUi(translate, "Loading/settling"), ...lineDetails);
+  return formatTransportFamilyCountText(familyId, visibleCount, translate);
 }

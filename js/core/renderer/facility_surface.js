@@ -2,7 +2,7 @@ import { getActiveModal, restoreFocusOrigin } from "../../ui/ui_contract.js";
 
 export function shouldBlockUnderlyingMapSelectionForFacility(entry, allowUnderlyingMapSelection = false) {
   const familyId = String(entry?.familyId || "").trim().toLowerCase();
-  return (familyId === "airport" || familyId === "port") && !allowUnderlyingMapSelection;
+  return (familyId === "project" || familyId === "airport" || familyId === "port") && !allowUnderlyingMapSelection;
 }
 
 export function buildUnderlyingMapHoverClearPatch(currentState = {}) {
@@ -23,6 +23,7 @@ export function buildUnderlyingMapHoverClearPatch(currentState = {}) {
 
 export function createFacilitySurfaceOwner({
   helpers = {},
+  getLanguage = () => "en",
 } = {}) {
   const {
     renderTooltipText,
@@ -43,6 +44,7 @@ export function createFacilitySurfaceOwner({
   function buildFacilityTooltipText(entry) {
     if (!entry) return "";
     const properties = entry.properties || {};
+    if (entry.familyId === "project") return renderTooltipText({ lines: [properties.name[getLanguage() === "zh" ? "zh" : "en"]] });
     const lines = [String(properties.name || "").trim()];
     if (entry.familyId === "airport") {
       const typeLabel = String(properties.airport_type_label || properties.airport_type || properties.category || "").trim();
@@ -85,6 +87,7 @@ export function createFacilitySurfaceOwner({
   }
 
   function buildFacilityInfoCardTitle(entry) {
+    if (entry?.familyId === "project") return entry.properties.name[getLanguage() === "zh" ? "zh" : "en"];
     const familyLabel = entry?.familyId === "port" ? t("Port", "ui") : t("Airport", "ui");
     const name = String(entry?.properties?.name || "").trim() || t("Unnamed facility", "ui");
     return `${familyLabel} · ${name}`;
@@ -95,6 +98,18 @@ export function createFacilitySurfaceOwner({
       return { rows: [], hasExtraRows: false };
     }
     const properties = entry.properties || {};
+    if (entry.familyId === "project") {
+      const language = getLanguage() === "zh" ? "zh" : "en";
+      return {
+        rows: [
+          { label: "", value: t(properties.kind === "dam" ? "Dam" : "Canal", "ui") },
+          { label: t("Status", "ui"), value: properties.status[language] },
+          { label: "", value: properties.body[language] },
+          ...(properties.location_note ? [{ label: "", value: properties.location_note[language] }] : []),
+        ],
+        hasExtraRows: false,
+      };
+    }
     const defaultRows = [];
     const extraRows = [];
     const pushRow = (target, label, value) => {
@@ -208,6 +223,7 @@ export function createFacilitySurfaceOwner({
     rows.forEach((row) => {
       const rowNode = document.createElement("div");
       rowNode.className = "facility-info-card-row";
+      if (!row.label) rowNode.classList.add("facility-info-card-prose");
       const labelNode = document.createElement("span");
       labelNode.className = "facility-info-card-label";
       labelNode.textContent = String(row?.label || "");
