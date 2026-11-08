@@ -333,6 +333,7 @@ export function createDefaultScenarioRuntimeState({
     scenarioPaintModeBeforeActivate: null,
     scenarioOceanFillBeforeActivate: null,
     scenarioOceanStyleBeforeActivate: null,
+    scenarioStyleUserOverrides: {},
     scenarioDisplaySettingsBeforeActivate: null,
     activeScenarioPerformanceHints: null,
     activeScenarioMeshPack: null,

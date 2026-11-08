@@ -160,7 +160,6 @@ DATA_RUNTIME_DIRS = (
     "palette-maps",
     "palettes",
     "releasables",
-    "scenario-rules",
     "thematic_layers",
     "unit_counter_libraries",
 )
@@ -181,7 +180,16 @@ SCENARIO_PUBLISHED_DERIVED_RELATIVE_FILES = {
     Path("tno_1962") / "derived" / "geometry_drop_audit.json",
 }
 SCENARIO_EXCLUDED_FILE_NAMES = {"audit.json"}
-SCENARIO_EXCLUDED_RELATIVE_FILES: set[Path] = set()
+SCENARIO_EXCLUDED_RELATIVE_FILES = {
+    Path("hoi4_1939/startup.runtime_shell.topo.json"),
+    *(Path("tno_1962") / name for name in (
+        "capital_defaults.partial.json", "city_assets.partial.json",
+        "geo_name_overrides.manual.json", "releasable_catalog.manual.json",
+        "scenario_manual_overrides.json", "scenario_mutations.json",
+        "water_refinement_source_reviews.json", "water_regions.provenance.json",
+        "geo_locale_reviewed_exceptions.json",
+    )),
+}
 TRANSPORT_METADATA_FILE_NAMES = {
     "catalog.json",
     "manifest.json",
@@ -194,6 +202,7 @@ TRANSPORT_SMALL_DIRECT_RUNTIME_FILES = {
     "data/transport_layers/global_airport/airports.geojson",
     "data/transport_layers/global_port/ports.geojson",
     "data/transport_layers/hoi4_era_rail/era_rail.geojson",
+    "data/transport_layers/tno_era_rail/era_rail.geojson",
     "data/transport_layers/japan_airport/airports.geojson",
     "data/transport_layers/japan_port/ports.core.geojson",
     "data/transport_layers/japan_port/ports.expanded.geojson",
@@ -712,6 +721,14 @@ class PagesProductionPublicationPolicy:
             normalized = Path(*parts[1:])
             parts = normalized.parts
 
+        if parts[:2] == ("data", "scenario-rules"):
+            return False
+        if parts[:2] == ("data", "palette-maps") and normalized.name.endswith(".audit.json"):
+            return False
+
+        if parts[:2] == ("data", "thematic_layers") and normalized.name in {"audit.json", "build_audit.json"}:
+            return False
+
         scenario_prefix = ("data", "scenarios")
         if parts[:2] == scenario_prefix:
             relative_path = Path(*parts[2:])
@@ -1064,6 +1081,17 @@ def copy_scenario_runtime_data() -> None:
     strip_scenario_publish_audit_urls(destination_dir)
 
 
+def remove_compressed_startup_plaintext(scenarios_dir: Path) -> None:
+    for path in scenarios_dir.glob("*/startup.bundle.*.json"):
+        if path.with_suffix(".json.gz").is_file():
+            path.unlink()
+
+
+def published_startup_bundle_path(path: Path) -> Path:
+    compressed = path.with_suffix(path.suffix + ".gz")
+    return compressed if compressed.is_file() else path
+
+
 def strip_scenario_publish_audit_urls(scenarios_dir: Path) -> None:
     """Keep Pages metadata aligned with the runtime allowlist.
 
@@ -1119,16 +1147,21 @@ def strip_scenario_publish_audit_urls(scenarios_dir: Path) -> None:
         if isinstance(payload, dict) and strip_unpublished_manifest_urls(payload):
             write_text_lf(manifest_path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
-    for bundle_path in scenarios_dir.glob("*/startup.bundle.*.json"):
-        if not bundle_path.is_file():
-            continue
-        payload = json.loads(bundle_path.read_text(encoding="utf-8"))
+    bundle_paths = set(scenarios_dir.glob("*/startup.bundle.*.json"))
+    bundle_paths.update(path.with_suffix("") for path in scenarios_dir.glob("*/startup.bundle.*.json.gz"))
+    for bundle_path in sorted(bundle_paths):
+        published_path = published_startup_bundle_path(bundle_path)
+        payload = json.loads(
+            gzip.decompress(published_path.read_bytes())
+            if published_path.suffix == ".gz" else published_path.read_bytes()
+        )
         manifest_subset = payload.get("manifest_subset") if isinstance(payload, dict) else None
         if not isinstance(manifest_subset, dict):
             continue
         if strip_unpublished_manifest_urls(manifest_subset):
             bundle_bytes = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-            write_bytes_with_parent(bundle_path, bundle_bytes)
+            if bundle_path.is_file():
+                write_bytes_with_parent(bundle_path, bundle_bytes)
             gzip_path = bundle_path.with_suffix(bundle_path.suffix + ".gz")
             if gzip_path.is_file():
                 write_bytes_with_parent(gzip_path, gzip.compress(bundle_bytes, mtime=0))
@@ -1158,12 +1191,15 @@ def normalize_windows_path_text(path: Path) -> str:
     return os.path.normcase(os.path.normpath(text))
 
 
-def _require_dist_url(url: str, *, source: str, missing: list[str], required: bool = False) -> None:
+def _require_dist_url(url: str, *, source: str, missing: list[str], required: bool = False, startup_bundle: bool = False) -> None:
     if not url:
         if required:
             missing.append(f"{source}: <empty>")
         return
-    if not _dist_path_for_app_url(url).is_file():
+    path = _dist_path_for_app_url(url)
+    if startup_bundle:
+        path = published_startup_bundle_path(path)
+    if not path.is_file():
         missing.append(f"{source}: {url}")
 
 
@@ -1232,10 +1268,12 @@ def validate_dist_scenario_startup_urls() -> None:
         ):
             value = str(manifest.get(field_name) or "").strip()
             if value:
-                _require_dist_url(value, source=f"{scenario_id}.manifest.{field_name}", missing=missing)
+                _require_dist_url(value, source=f"{scenario_id}.manifest.{field_name}", missing=missing,
+                                  startup_bundle=field_name in {"startup_bundle_url_en", "startup_bundle_url_zh"})
         for field_name, value in list(manifest.items()):
-            if field_name.endswith("_url") and isinstance(value, str) and value.startswith("data/scenarios/"):
-                _require_dist_url(value, source=f"{scenario_id}.manifest.{field_name}", missing=missing)
+            if (field_name.endswith("_url") or field_name in {"startup_bundle_url_en", "startup_bundle_url_zh"}) and isinstance(value, str) and value.startswith("data/scenarios/"):
+                _require_dist_url(value, source=f"{scenario_id}.manifest.{field_name}", missing=missing,
+                                  startup_bundle=field_name in {"startup_bundle_url_en", "startup_bundle_url_zh"})
         raster_manifest_url = str(manifest.get("political_id_raster_manifest_url") or "").strip()
         if raster_manifest_url and _dist_path_for_app_url(raster_manifest_url).is_file():
             validate_dist_political_id_raster_manifest(raster_manifest_url, scenario_id)
@@ -1255,18 +1293,19 @@ def validate_dist_scenario_startup_urls() -> None:
                         )
         for language in ("en", "zh"):
             bundle_url = str(manifest.get(f"startup_bundle_url_{language}") or "").strip()
-            bundle_path = _dist_path_for_app_url(bundle_url)
+            bundle_path = published_startup_bundle_path(_dist_path_for_app_url(bundle_url))
             if not bundle_path.is_file():
                 continue
             # startup bundle 内嵌的 manifest_subset 也是公开合同的一部分。
             # 这里继续递归校验，防止页面首屏能拿到 bundle，却在后续跳转时引用未发布文件。
-            bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+            bundle = json.loads(gzip.decompress(bundle_path.read_bytes()) if bundle_path.suffix == ".gz" else bundle_path.read_bytes())
             manifest_subset = bundle.get("manifest_subset") if isinstance(bundle, dict) else None
             if not isinstance(manifest_subset, dict):
                 continue
             for field_name, value in list(manifest_subset.items()):
-                if field_name.endswith("_url") and isinstance(value, str) and value.startswith("data/scenarios/"):
-                    _require_dist_url(value, source=f"{scenario_id}.startup_bundle_{language}.{field_name}", missing=missing)
+                if (field_name.endswith("_url") or field_name in {"startup_bundle_url_en", "startup_bundle_url_zh"}) and isinstance(value, str) and value.startswith("data/scenarios/"):
+                    _require_dist_url(value, source=f"{scenario_id}.startup_bundle_{language}.{field_name}", missing=missing,
+                                      startup_bundle=field_name in {"startup_bundle_url_en", "startup_bundle_url_zh"})
     if missing:
         raise FileNotFoundError(
             "Pages dist scenario metadata references unpublished files:\n"
@@ -1780,14 +1819,35 @@ def copy_hgo_identity_runtime_data() -> None:
     )
 
 
+def strip_thematic_publish_audit_urls(destination_dir: Path) -> None:
+    for manifest_path in destination_dir.rglob("manifest.json"):
+        payload = json.loads(manifest_path.read_bytes())
+        changed = False
+        for field in ("audit_url", "build_audit_path"):
+            if field in payload:
+                del payload[field]
+                changed = True
+        paths = payload.get("paths", {})
+        if "build_audit" in paths:
+            del paths["build_audit"]
+            changed = True
+        if changed:
+            write_text_lf(manifest_path, json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+
+
 def copy_runtime_data() -> None:
+    publication_policy = build_pages_production_publication_policy()
     for relative_file in DATA_RUNTIME_FILES:
         if relative_file == "city_aliases.json":
             write_pages_city_aliases_subset()
         else:
             copy_relative_file(f"data/{relative_file}")
     for directory_name in DATA_RUNTIME_DIRS:
-        copy_tree_contents(ROOT / "data" / directory_name, APP_DIST_ROOT / "data" / directory_name)
+        copy_tree_filtered(
+            ROOT / "data" / directory_name, APP_DIST_ROOT / "data" / directory_name,
+            lambda _relative, source: publication_policy.allows(source.relative_to(ROOT)),
+        )
+    strip_thematic_publish_audit_urls(APP_DIST_ROOT / "data" / "thematic_layers")
     copy_hgo_identity_runtime_data()
     copy_scenario_runtime_data()
     copy_transport_runtime_data()
@@ -1797,6 +1857,10 @@ def copy_runtime_data() -> None:
         APP_DIST_ROOT,
         byte_exact_paths=[path.relative_to("app") for path in BYTE_EXACT_APP_DATA_PATHS],
     )
+    remove_compressed_startup_plaintext(APP_DIST_ROOT / "data" / "scenarios")
+    prune_dist_catalog_to_published_files()
+    prune_dist_runtime_asset_registry_to_published_files()
+    prune_dist_data_manifest_to_published_files()
     validate_dist_scenario_startup_urls()
 
 

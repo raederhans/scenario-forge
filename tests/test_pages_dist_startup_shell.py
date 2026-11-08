@@ -1788,7 +1788,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/hgo_catalogs/flags_png/small/AB/ABK.png",
             "app/data/hgo_catalogs/flags_png/medium/AB/ABK.png",
             "app/data/city_lights/historical_1930_entries.json",
-            "app/data/scenarios/tno_1962/startup.bundle.en.json",
+            "app/data/scenarios/tno_1962/startup.bundle.en.json.gz",
             "app/data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json",
             "app/data/scenarios/tno_1962/derived/geometry_drop_audit.json",
             "app/data/scenarios/tno_1962/chunks/political.coarse.r0c0.json.gz",
@@ -1801,6 +1801,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/transport_layers/global_airport/airports.geojson",
             "app/data/transport_layers/global_port/ports.geojson",
             "app/data/transport_layers/hoi4_era_rail/era_rail.geojson",
+            "app/data/transport_layers/tno_era_rail/era_rail.geojson",
             "app/data/transport_layers/japan_airport/airports.geojson",
             "app/data/transport_layers/japan_port/ports.core.geojson",
             "app/data/transport_layers/japan_port/ports.expanded.geojson",
@@ -2361,7 +2362,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     bundle_url = manifest.get(f"startup_bundle_url_{language}")
                     if not isinstance(bundle_url, str) or not bundle_url:
                         continue
-                    bundle = json.loads((PAGES_DIST_ROOT / "app" / bundle_url).read_text(encoding="utf-8"))
+                    bundle_path = build_pages_dist.published_startup_bundle_path(PAGES_DIST_ROOT / "app" / bundle_url)
+                    bundle = json.loads(gzip.decompress(bundle_path.read_bytes()) if bundle_path.suffix == ".gz" else bundle_path.read_bytes())
                     manifest_subset = bundle.get("manifest_subset")
                     self.assertIsInstance(manifest_subset, dict)
                     for key, value in manifest_subset.items():

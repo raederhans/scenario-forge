@@ -7,14 +7,16 @@ const feature = (id, value = 0) => ({ type: "Feature", properties: { id }, geome
 const collection = (...features) => ({ type: "FeatureCollection", features });
 const ids = (value) => value.features.map((f) => f.properties.id);
 
-test("detail replacement and eviction preserve full coarse coverage and exact first-wins order", () => {
+test("detail replacement and eviction preserve full coarse coverage, first-wins winners and stable positions", () => {
   const store = createPoliticalGeometryStore();
   const a = feature("a"), b = feature("b"), c = feature("c");
   const base = collection(a, b, c), detailA = feature("a", 2), detailB = feature("b", 3);
   const first = store.compose([collection(detailA), base]);
   assert.deepEqual(ids(first), ["a", "b", "c"]);
   const second = store.compose([collection(detailB), collection(detailA), base]);
-  assert.deepEqual(ids(second), ["b", "a", "c"]);
+  // A promoted feature keeps its position; only the winning object changes.
+  assert.deepEqual(ids(second), ["a", "b", "c"]);
+  assert.equal(second.features[1], detailB);
   assert.equal(second.features[2], c);
   assert.deepEqual(getPoliticalGeometrySnapshot(second).changedIds, ["b"]);
   const reverted = store.compose([base]);
@@ -38,7 +40,7 @@ test("new detail does not re-read immutable base IDs; reordering overlapping sou
   assert.equal(promoted.features.length, 12000);
   store.compose([left, right, base]);
   const reordered = store.compose([right, left, base]);
-  assert.equal(reordered.features[0], right.features[0]);
+  assert.equal(reordered.features[1], right.features[0], "precedence changes, the position does not");
   assert.deepEqual(getPoliticalGeometrySnapshot(reordered).changedIds, ["f1"]);
 });
 

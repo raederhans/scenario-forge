@@ -87,6 +87,51 @@ function* movedIdsByLongestIncreasingSubsequence(previousEntries, nextEntries) {
   return moved;
 }
 
+function equalPositionList(left, right) {
+  if (left.length !== right.length) return false;
+  for (let index = 0; index < left.length; index++) {
+    const a = left[index], b = right[index];
+    if (a === b) continue;
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    for (let axis = 0; axis < a.length; axis++) if (a[axis] !== b[axis]) return false;
+  }
+  return true;
+}
+
+// Exact coordinate equality of nested GeoJSON coordinate arrays, one ring or
+// line per step so large replacements stay inside the preparation budget.
+function* equalCoordinatesSteps(left, right) {
+  if (left === right) return true;
+  if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) return false;
+  if (!left.length) return true;
+  if (typeof left[0] === "number" || typeof right[0] === "number") return equalPositionList([left], [right]);
+  if (Array.isArray(left[0]) && typeof left[0][0] === "number") {
+    const same = equalPositionList(left, right);
+    yield "geometry-compare";
+    return same;
+  }
+  for (let index = 0; index < left.length; index++) {
+    if (!(yield* equalCoordinatesSteps(left[index], right[index]))) return false;
+  }
+  return true;
+}
+
+function* equivalentGeometrySteps(left, right) {
+  if (left === right) return true;
+  if (!left || !right || typeof left !== "object" || typeof right !== "object"
+    || typeof left.type !== "string" || left.type !== right.type) return false;
+  if (left.type === "GeometryCollection") {
+    const leftParts = left.geometries, rightParts = right.geometries;
+    if (!Array.isArray(leftParts) || !Array.isArray(rightParts) || leftParts.length !== rightParts.length) return false;
+    for (let index = 0; index < leftParts.length; index++) {
+      if (!(yield* equivalentGeometrySteps(leftParts[index], rightParts[index]))) return false;
+    }
+    return true;
+  }
+  if (!Array.isArray(left.coordinates) || !Array.isArray(right.coordinates)) return false;
+  return yield* equalCoordinatesSteps(left.coordinates, right.coordinates);
+}
+
 const abortPreparation = () => new DOMException("Stale political raster source preparation", "AbortError");
 function drainSteps(iterator) {
   let step;
@@ -191,6 +236,7 @@ export function createPoliticalIdRasterSource({
   let hasPublished = false;
   let currentSnapshot = null;
   let currentEntryById = new Map();
+  let currentGeometryById = new Map();
   let idsByCode = new Map();
   let nextCode = 1;
   let geometryRevision = 0;
@@ -263,24 +309,31 @@ export function createPoliticalIdRasterSource({
     // cannot consume IDs or leave an unbounded chain of weak-cache overlays.
     const newObjectVersions = new WeakMap(), newPrimitiveVersions = new Map(), versionAssignments = [];
     let candidateNextGeometryVersion = nextGeometryVersion;
-    const geometryVersionOf = geometry => {
+    const geometryVersionOf = function* ({ id, geometry, bounds }) {
       const object = (typeof geometry === "object" && geometry !== null) || typeof geometry === "function";
       if (!object && geometry == null) return 0;
       const existing = object ? objectGeometryVersions : primitiveGeometryVersions;
       const pending = object ? newObjectVersions : newPrimitiveVersions;
       let version = existing.get(geometry) ?? pending.get(geometry);
       if (version === undefined) {
-        version = candidateNextGeometryVersion++;
+        // Chunk promotion often swaps in a new object with identical coordinates.
+        // Same content keeps the previous version, so its tiles stay valid.
+        const previous = oldById.get(id);
+        const previousGeometry = currentGeometryById.get(id);
+        const sameContent = object && !!previous && previousGeometry !== undefined && previousGeometry !== geometry
+          && equalBounds(previous.bounds, bounds) && (yield* equivalentGeometrySteps(previousGeometry, geometry));
+        version = sameContent ? previous.geometryVersion : candidateNextGeometryVersion++;
         pending.set(geometry, version); versionAssignments.push([geometry, version, object]);
       }
       return version;
     };
-    const nextEntries = [], nextById = new Map();
+    const nextEntries = [], nextById = new Map(), nextGeometryById = new Map();
     for (const candidate of candidates) {
       const entry = Object.freeze({ id: candidate.id, code: nextIdsByCode.get(candidate.id),
         feature: candidate.feature, bounds: candidate.bounds, drawOrder: candidate.drawOrder,
-        geometryVersion: geometryVersionOf(candidate.geometry) });
-      nextEntries.push(entry); nextById.set(entry.id, entry); yield "entries";
+        geometryVersion: yield* geometryVersionOf(candidate) });
+      nextEntries.push(entry); nextById.set(entry.id, entry); nextGeometryById.set(entry.id, candidate.geometry);
+      yield "entries";
     }
     const globallyChanged = sceneChanged || projectionChanged || coverageChanged;
     const movedIds = globallyChanged ? new Set() : yield* movedIdsByLongestIncreasingSubsequence(oldEntries, nextEntries);
@@ -336,7 +389,7 @@ export function createPoliticalIdRasterSource({
       publicPalette.set(nextPalette.subarray(offset, offset + 4096), offset); yield "public-palette";
     }
     return { baselineEpoch, snapshot, publicSnapshot: makePublicSnapshot(snapshot, publicPalette),
-      nextById, nextIdsByCode, candidateNextCode, candidateNextGeometryVersion, versionAssignments, revisionKey };
+      nextById, nextGeometryById, nextIdsByCode, candidateNextCode, candidateNextGeometryVersion, versionAssignments, revisionKey };
   }
 
   function rememberCandidate(prepared, signal) {
@@ -369,7 +422,8 @@ export function createPoliticalIdRasterSource({
     }
     nextGeometryVersion = prepared.candidateNextGeometryVersion;
     currentSnapshot = prepared.snapshot;
-    currentEntryById = prepared.nextById; idsByCode = prepared.nextIdsByCode;
+    currentEntryById = prepared.nextById; currentGeometryById = prepared.nextGeometryById;
+    idsByCode = prepared.nextIdsByCode;
     nextCode = prepared.candidateNextCode; colorRevisionKey = prepared.revisionKey;
     geometryRevision = currentSnapshot.geometryRevision; paletteRevision = currentSnapshot.paletteRevision;
     mappingRevision = currentSnapshot.mappingRevision; hasColorRevision = hasPublished = true;
@@ -474,6 +528,7 @@ export function createPoliticalIdRasterSource({
     publicationEpoch++; preparedCandidates = new WeakMap();
     currentSnapshot = null;
     currentEntryById = new Map();
+    currentGeometryById = new Map();
     idsByCode = new Map();
     nextCode = 1;
     objectGeometryVersions = new WeakMap();

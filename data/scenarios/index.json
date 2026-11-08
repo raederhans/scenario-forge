@@ -14,31 +14,113 @@
       "scenario_id": "blank_base",
       "display_name": "Blank Map",
       "manifest_url": "data/scenarios/blank_base/manifest.json",
-      "audit_url": "data/scenarios/blank_base/audit.json"
+      "audit_url": "data/scenarios/blank_base/audit.json",
+      "presentation": {
+        "year": 2026,
+        "title": "Blank Map",
+        "tagline": "Unclaimed canvas · present-day provinces",
+        "intro": "Every province of the present-day world with no owner assigned. Paint your own alternate history from scratch: countries, borders and colours are entirely up to you.",
+        "powers": [],
+        "layers": []
+      }
     },
     {
       "scenario_id": "hoi4_1936",
       "display_name": "HOI4 1936",
       "manifest_url": "data/scenarios/hoi4_1936/manifest.json",
-      "audit_url": "data/scenarios/hoi4_1936/audit.json"
+      "audit_url": "data/scenarios/hoi4_1936/audit.json",
+      "presentation": {
+        "year": 1936,
+        "title": "The Gathering Storm",
+        "tagline": "1 January 1936 · The gathering storm",
+        "intro": "The world three years before the Second World War. Germany is rearming and about to remilitarise the Rhineland, Italy is at war in Ethiopia, and Spain is months from civil war. In Asia, Japan holds Manchukuo while China remains divided among the Nationalist government, the Communists and regional warlords.",
+        "powers": [
+          "GER",
+          "ENG",
+          "FRA",
+          "ITA",
+          "SOV",
+          "USA",
+          "JAP",
+          "CHI"
+        ],
+        "layers": [
+          "Victory points and strategic resources",
+          "Preset special zones (off by default): Rhineland, Turkish Straits, Danzig"
+        ]
+      }
     },
     {
       "scenario_id": "hoi4_1939",
       "display_name": "HOI4 1939",
       "manifest_url": "data/scenarios/hoi4_1939/manifest.json",
-      "audit_url": "data/scenarios/hoi4_1939/audit.json"
+      "audit_url": "data/scenarios/hoi4_1939/audit.json",
+      "presentation": {
+        "year": 1939,
+        "title": "Blitzkrieg",
+        "tagline": "14 August 1939 · On the eve of war",
+        "intro": "Two weeks before the invasion of Poland. Germany has annexed Austria, the Sudetenland and Bohemia-Moravia, Italy has occupied Albania, and the Spanish Civil War has just ended. In the Far East, Japan has been at war with China for two years.",
+        "powers": [
+          "GER",
+          "ENG",
+          "FRA",
+          "ITA",
+          "SOV",
+          "USA",
+          "JAP",
+          "CHI"
+        ],
+        "layers": [
+          "Victory points and strategic resources",
+          "Preset special zones (off by default): Danzig, Yellow River flood zone"
+        ]
+      }
     },
     {
       "scenario_id": "modern_world",
       "display_name": "Modern World",
       "manifest_url": "data/scenarios/modern_world/manifest.json",
-      "audit_url": "data/scenarios/modern_world/audit.json"
+      "audit_url": "data/scenarios/modern_world/audit.json",
+      "presentation": {
+        "year": 2026,
+        "title": "Modern World",
+        "tagline": "2026 · The world today",
+        "intro": "The political map of 2026, including occupied and de facto independent areas such as Russian-held eastern Ukraine, Northern Cyprus and divided Kashmir.",
+        "powers": [
+          "US",
+          "CN",
+          "RU",
+          "IN",
+          "DE",
+          "JP"
+        ],
+        "layers": [
+          "Preset special zones (off by default): Golan Heights, Russian-held Ukraine, Kashmir, Northern Cyprus"
+        ]
+      }
     },
     {
       "scenario_id": "tno_1962",
       "display_name": "TNO 1962",
       "manifest_url": "data/scenarios/tno_1962/manifest.json",
-      "audit_url": "data/scenarios/tno_1962/audit.json"
+      "audit_url": "data/scenarios/tno_1962/audit.json",
+      "presentation": {
+        "year": 1962,
+        "title": "The New Order, 1962",
+        "tagline": "1962 · Alternate history after an Axis victory",
+        "intro": "An alternate 1962 in which Germany won the Second World War. The Greater Germanic Reich rules Europe up to the Arkhangelsk–Astrakhan line through its Reichskommissariats, Japan leads the Co-Prosperity Sphere in Asia, and the United States heads the OFN. East of the line, Russia has collapsed into rival warlord states.",
+        "powers": [
+          "GER",
+          "JAP",
+          "USA",
+          "ITA"
+        ],
+        "layers": [
+          "Atlantropa: the Gibraltar dam has lowered the Mediterranean, exposing salt flats and a new coastline",
+          "Congo Lake",
+          "Preset special zones (off by default): demilitarised zones, Gotenland settlement area, Suez"
+        ]
+      }
     }
   ]
 }
