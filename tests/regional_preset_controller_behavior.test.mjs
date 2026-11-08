@@ -337,7 +337,7 @@ test("scenario visual clicks use the current color/history and reopen disclosure
   });
   const container = new FakeElement("div");
   controller.renderRegionalPresets(container, { code: "AA" }, { mode: "visual" });
-  assert.equal(calls.sections[0].title, "t:Regional Presets (Visual Color)");
+  assert.equal(calls.sections[0].title, "t:Regional Presets");
   assert.equal(calls.sections[0].options, undefined);
   const button = calls.sections[0].section.children[0];
 

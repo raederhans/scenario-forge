@@ -1266,7 +1266,8 @@ function initSidebar({ render } = {}) {
 
     const hint = document.createElement("p");
     hint.className = "sidebar-tool-hint";
-    hint.textContent = t("Project-local lines, graphics, and unit counters for export.", "ui");
+    hint.dataset.pageNote = "";
+    hint.textContent = t("Lines, graphics and unit counters are saved with the project and included in exports.", "ui");
 
     const publishStatus = document.createElement("p");
     publishStatus.id = "strategicOverlayPublishStatus";
@@ -3349,11 +3350,6 @@ function initSidebar({ render } = {}) {
 
     const copy = document.createElement("div");
     copy.className = "inspector-color-sync-copy";
-
-    const compactTitle = document.createElement("div");
-    compactTitle.className = "section-header-block inspector-color-sync-title";
-    compactTitle.textContent = t("Country Color", "ui");
-    copy.appendChild(compactTitle);
 
     const suggestionSelect = document.createElement("select");
     suggestionSelect.className = "inspector-color-suggestion-select";

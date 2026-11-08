@@ -71,7 +71,7 @@
 .editor-workspace #leftSidebar .editor-object-section > .inspector-panel-body { padding: 0; }
 .editor-workspace #leftSidebar .country-list > * { box-shadow: none; }
 .editor-workspace #leftSidebar .hgo-identity-controls { border: 0; background: transparent; padding: 8px 0; }
-.editor-object-section > summary, .editor-object-section > .sidebar-section-description { display: none; }
+.editor-object-section > summary { display: none; }
 .editor-workspace .editor-object-section > .inspector-panel-body { padding: 0; }
 .editor-workspace .inspector-search-shell, .editor-workspace .inspector-search-block { margin: 0; padding: 0; border: 0; background: transparent; }
 .editor-workspace #countryList, .editor-workspace #waterRegionList, .editor-workspace #specialRegionList, .editor-workspace #presetTree { height: auto; max-height: none; overflow: visible; }
@@ -144,7 +144,7 @@
 .editor-property-panel .appearance-day-night-stack { gap: 0; margin-top: 0; }
 .editor-property-panel .appearance-day-night-card { padding: 14px 0; border: 0; border-bottom: 1px solid var(--border-subtle); border-radius: 0; background: transparent; box-shadow: none; }
 .editor-property-panel .appearance-day-night-advanced { padding: 14px 0; border: 0; border-radius: 0; background: transparent; }
-.editor-property-panel .sidebar-section-description, .editor-property-panel .sidebar-shell-anchor { display: none; }
+.editor-property-panel .sidebar-shell-anchor { display: none; }
 .editor-property-panel .sidebar-group-label, .editor-property-panel .range-label, .editor-property-panel .toggle-label { font-size: var(--fs-sm); line-height: 1.5; letter-spacing: 0; text-transform: none; }
 .editor-property-panel .appearance-section-header, .editor-property-panel .appearance-card-title { font-size: var(--fs-md); line-height: 1.5; letter-spacing: 0; }
 .editor-property-panel .sidebar-tool-hint, .editor-property-panel .layer-status-strip, .editor-property-panel .city-points-advanced-hint { font-size: var(--fs-xs); line-height: 1.5; }
@@ -200,7 +200,6 @@
   .editor-workspace .dock-group-mode:has(#riverPaintToggleBtn:not(:disabled)) { display: flex !important; }
 }
 .editor-workspace #transportProjectSection { padding: 12px 0; border: 0; box-shadow: none; background: transparent; }
-.editor-workspace #transportProjectSection .sidebar-section-description { display: none; }
 .editor-workspace #transportProjectSection > summary { font-size: var(--fs-sm); }
 .editor-workspace #transportProjectSection > .inspector-panel-body { padding: 8px 0 0; }
 .editor-workspace #bottomDock .dock-tool-btn { min-width: 36px; min-height: 36px; }
@@ -569,7 +568,7 @@
 .editor-layer-status[data-status-tone="active"] { background: var(--success); }
 .editor-layer-status[data-status-tone="warning"] { background: var(--warning); }
 .editor-workspace #leftSidebar .editor-layer-secondary { margin: var(--space-1) 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
-.editor-layer-secondary > summary, .editor-layer-secondary > .sidebar-section-description { display: none; }
+.editor-layer-secondary > summary { display: none; }
 .editor-workspace #leftSidebar .editor-layer-secondary .inspector-panel-body { padding: 0 var(--space-2); }
 .editor-layer-name { font-weight: 500; }
 .editor-layer-trigger.is-active .editor-layer-name { font-weight: 600; }
@@ -622,3 +621,18 @@
   transition: transform var(--dur-fast) var(--ease);
 }
 .editor-disclosure[open] > summary::before { transform: rotate(90deg); }
+
+.editor-property-notes {
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--line-1);
+}
+.editor-property-notes-context {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  margin: var(--space-2) 0;
+}
+#rightSidebar .editor-property-notes p { font-size: var(--fs-xs); margin: var(--space-2) 0; }
