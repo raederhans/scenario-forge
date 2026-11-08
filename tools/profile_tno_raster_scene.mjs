@@ -580,13 +580,10 @@ async function dismissGuide(page) {
 
 async function mode(page, value) {
   await dismissGuide(page);
-  if (await evaluate(page, () => document.body.classList.contains("left-sidebar-collapsed"))) await page.locator("#leftSidebarCollapseBtn").click();
-  await page.locator("#editorTaskLayersBtn").click();
-  await page.locator("#editorLayer-display").click();
-  await page.locator("#politicalRenderMode").evaluate(element => {
-    for (let p = element.parentElement; p; p = p.parentElement) if (p.tagName === "DETAILS") p.open = true;
-  });
-  await page.locator("#politicalRenderMode").selectOption(value);
+  await evaluate(page, async (value) => {
+    const { renderer } = await window.__scenarioForgeTestApi.internals();
+    renderer.setPoliticalRenderMode(value);
+  }, value);
   const current = await settle(page);
   assert.equal(current.diagnostics.mode, value);
   assert.equal(current.diagnostics.actualBackend, value);

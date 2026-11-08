@@ -23,41 +23,39 @@ const BOOT_PHASE_WINDOWS = {
   ready: { min: 100, max: 100 },
   error: { min: 0, max: 99 },
 };
-const BOOT_STEPS = Object.keys(BOOT_PHASE_WINDOWS).filter((phase) => phase !== "error");
 
 const BOOT_COPY = {
   en: {
-    steps: { completed: "Completed", active: "In progress", pending: "Pending" },
-    "initial-chunk-visual": { title: "Loading visible map chunks", message: "Preparing the initial scenario map." },
+    "initial-chunk-visual": { title: "Loading your map", message: "Preparing your map." },
     shell: {
-      title: "Preparing application shell",
-      message: "Loading the workspace frame before interaction unlocks.",
+      title: "Opening workspace",
+      message: "Preparing your workspace.",
       retry: "Retry",
       continue: "Continue without scenario",
     },
     "base-data": {
       title: "Loading base map",
-      message: "Fetching topology, palette, hierarchy, and core localization data.",
+      message: "Loading map features and colors.",
     },
     "scenario-bundle": {
       title: "Loading default scenario",
-      message: "Preparing the {scenario} scenario bundle for the first visible frame.",
+      message: "Loading {scenario}.",
     },
     "scenario-apply": {
-      title: "Applying default scenario",
-      message: "Composing ownership, controllers, runtime topology, and UI state for {scenario}.",
+      title: "Setting up your scenario",
+      message: "Setting up {scenario}.",
     },
     warmup: {
-      title: "Finalizing first render",
-      message: "Flushing the first visible frame before detailed interactions finish preparing.",
+      title: "Preparing the view",
+      message: "Getting your map ready to view.",
     },
     "detail-promotion": {
-      title: "Preparing detailed interactions",
-      message: "Promoting the detailed topology behind the visible map.",
+      title: "Preparing map editing",
+      message: "Loading map details for editing.",
     },
     "interaction-infra": {
-      title: "Building interaction indexes",
-      message: "Finishing selection, hover, and hit-testing before the interface unlocks.",
+      title: "Almost ready",
+      message: "Almost ready.",
     },
     ready: {
       title: "Ready",
@@ -71,37 +69,36 @@ const BOOT_COPY = {
     },
   },
   zh: {
-    steps: { completed: "已完成", active: "进行中", pending: "待处理" },
-    "initial-chunk-visual": { title: "正在加载首屏地图分片", message: "正在准备剧本首屏地图。" },
+    "initial-chunk-visual": { title: "正在加载地图", message: "正在准备地图。" },
     shell: {
-      title: "正在准备应用框架",
-      message: "先完成工作区壳层初始化，再开放交互。",
+      title: "正在打开工作区",
+      message: "正在准备工作区。",
       retry: "重试",
       continue: "无剧本继续",
     },
     "base-data": {
       title: "正在加载基础地图",
-      message: "正在获取基础拓扑、调色板、层级和核心地名数据。",
+      message: "正在加载地图要素和颜色。",
     },
     "scenario-bundle": {
       title: "正在加载默认剧本",
-      message: "正在准备 {scenario} 剧本包，用于首个可见画面。",
+      message: "正在加载 {scenario}。",
     },
     "scenario-apply": {
-      title: "正在应用默认剧本",
-      message: "正在为 {scenario} 组合归属、控制、运行时拓扑和 UI 状态。",
+      title: "正在布置剧本",
+      message: "正在布置 {scenario}。",
     },
     warmup: {
-      title: "正在完成首帧渲染",
-      message: "首个可见画面即将就绪，随后继续准备细分交互。",
+      title: "正在准备画面",
+      message: "正在准备地图画面。",
     },
     "detail-promotion": {
-      title: "正在准备细分交互",
-      message: "正在在可见地图背后提升细分拓扑。",
+      title: "正在准备地图编辑",
+      message: "正在加载可编辑的地图细节。",
     },
     "interaction-infra": {
-      title: "正在建立交互索引",
-      message: "正在完成点击、悬停与选择支持，随后开放交互。",
+      title: "即将完成",
+      message: "即将完成。",
     },
     ready: {
       title: "加载完成",
@@ -183,7 +180,6 @@ export function createStartupBootOverlayController() {
   let bootOverlayBound = false;
   let bootContinueHandler = null;
   let bootSubProgressListener = null;
-  let stepNodes = [];
   let startupReadonlyUnlockHandle = null;
   let bootMetricsLogged = false;
 
@@ -216,14 +212,6 @@ export function createStartupBootOverlayController() {
       setBootStateFields(state, { progress: Math.max(runtimeState.bootProgress, next) });
     }
     const dom = getBootDom();
-    const stepCopy = BOOT_COPY[getBootLanguage()].steps;
-    const currentStep = BOOT_STEPS.indexOf(runtimeState.bootPhase);
-    stepNodes.forEach((node, index) => {
-      const status = index < currentStep || runtimeState.bootPhase === "ready"
-        ? "completed" : index === currentStep ? "active" : "pending";
-      node.textContent = `${getBootCopy(BOOT_STEPS[index]).title} — ${stepCopy[status]}`;
-      node.setAttribute("data-status", status);
-    });
     const copy = getBootCopy(runtimeState.bootPhase);
     const shellCopy = getBootCopy("shell");
     const failed = runtimeState.bootPhase === "error";
@@ -340,14 +328,6 @@ export function createStartupBootOverlayController() {
         void bootContinueHandler();
       }
     });
-    const steps = document.createElement("ol");
-    steps.id = "bootOverlaySteps";
-    stepNodes = BOOT_STEPS.map(() => {
-      const node = document.createElement("li");
-      steps.appendChild(node);
-      return node;
-    });
-    dom.title.parentElement.appendChild(steps);
     bootOverlayBound = true;
     syncBootOverlay();
   };

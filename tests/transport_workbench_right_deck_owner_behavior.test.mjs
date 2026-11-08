@@ -364,7 +364,7 @@ test("right deck owner keeps density label shell toggle read-only while compare 
   assert.deepEqual(events, []);
 }));
 
-test("right deck owner renders diagnostics body in the data tab", () => withTestDocument(() => {
+test("right deck owner omits diagnostics body in the data tab", () => withTestDocument(() => {
   const events = [];
   const mount = new TestElement("div");
   const diagnosticBody = new TestElement("div");
@@ -384,9 +384,9 @@ test("right deck owner renders diagnostics body in the data tab", () => withTest
     mount
   );
 
-  assert.deepEqual(events, [["road", true]]);
-  assert.match(textOf(mount), /diagnostic-body/);
-  assert.match(textOf(mount), /Review the current data and loading status/);
+  assert.deepEqual(events, []);
+  assert.doesNotMatch(textOf(mount), /diagnostic-body/);
+  assert.doesNotMatch(textOf(mount), /Review the current data and loading status/);
 }));
 
 test("Data tab keeps source restrictions in collapsed pack details", () => withTestDocument(() => {
@@ -402,9 +402,9 @@ test("Data tab keeps source restrictions in collapsed pack details", () => withT
   const details = findAllByTag(mount, "details").find((node) => node.className === "transport-workbench-pack-details");
   assert.ok(details);
   assert.equal(details.open, false);
-  assert.match(textOf(details), /Pack details/);
-  assert.match(textOf(details), /Source policy internal review/);
-  assert.match(textOf(details), /N06 encoding CP932/);
+  assert.match(textOf(details), /Source details/);
+  assert.doesNotMatch(textOf(details), /Source policy internal review/);
+  assert.doesNotMatch(textOf(details), /N06 encoding CP932/);
   assert.match(textOf(details), /Source and use/);
 }));
 
@@ -453,12 +453,12 @@ test("right deck owner renders preview data rows and selects rows without mutati
   );
 
   assert.match(textOf(mount), /Loaded Data/);
-  assert.match(textOf(mount), /Pack Rows/);
+  assert.match(textOf(mount), /Loaded rows/);
   assert.match(textOf(mount), /Table Rows/);
   const metaItems = findAllByClass(mount, "transport-workbench-data-meta-item").map((item) => textOf(item).replace(/\s+/g, " ").trim());
-  assert.deepEqual(metaItems.slice(0, 2), ["Pack Rows 20", "Table Rows 2"]);
-  assert.match(textOf(mount), /current table sample/);
-  assert.match(textOf(mount), /bounded row set/);
+  assert.deepEqual(metaItems.slice(0, 2), ["Loaded rows 20", "Table Rows 2"]);
+  assert.match(textOf(mount), /Search and sort apply to the rows listed here/);
+  assert.doesNotMatch(textOf(mount), /bounded row set/);
   assert.match(textOf(mount), /Route 1/);
   assert.match(textOf(mount), /road_class: motorway/);
   const selectedButton = findAllByTag(mount, "button").find((button) => button.dataset.transportDataRowId === "road-1");
@@ -663,5 +663,18 @@ test("right deck owner replaces the active mount when tab and family change", ()
 
   assert.equal(labelsButton.classList.contains("is-active"), true);
   assert.match(textOf(labelsMount), /Labels/);
-  assert.equal(!!findByText(labelsMount, /Reference labels/), true);
+  assert.equal(!!findByText(labelsMount, /Reference labels/), false);
+}));
+
+
+test("data tabs omit diagnostic sections and shell notes for every family", () => withTestDocument(() => {
+  const owner = createTransportWorkbenchRightDeckOwner();
+  for (const id of ["road", "rail", "airport", "port", "mineral_resources", "energy_facilities", "industrial_zones", "logistics_hubs"]) {
+    const mount = new TestElement("div");
+    owner.renderTabSections({ id }, {}, false, "data", mount);
+    assert.equal(findAllByClass(mount, "transport-workbench-section-body-diagnostics").length, 0);
+    assert.equal(findAllByClass(mount, "transport-workbench-shell-note").length, 0);
+    assert.match(textOf(mount), /Source and use/);
+    assert.doesNotMatch(textOf(mount), /Pack status|N06 matched|Name conflicts|Data Check|Diagnostics/);
+  }
 }));

@@ -166,7 +166,8 @@ test("transport workbench popover owner keeps info and section help mutually exc
   assert.equal(testDom.infoPopover.classList.contains("hidden"), false);
   assert.equal(testDom.infoButton.getAttribute("aria-expanded"), "true");
   assert.equal(testDom.infoBody.replaceChildrenCallCount, 1);
-  assert.equal(testDom.infoBody.children.length, 5);
+  assert.equal(testDom.infoBody.children.length, 4);
+  assert.equal(testDom.infoBody.children.some((node) => node.children[0].textContent === "t:Data path"), false);
   assert.equal(testDom.infoBody.children[3].children[0].textContent, "t:Capability matrix");
   assert.match(testDom.infoBody.children[3].children[1].textContent, /t:Road: t:main map apply/);
   assert.match(testDom.infoBody.children[3].children[1].textContent, /t:Layers: t:workbench board/);
@@ -190,7 +191,7 @@ test("transport workbench popover owner keeps info and section help mutually exc
   assert.equal(testDom.sectionHelpPopover.getAttribute("aria-hidden"), "false");
   assert.equal(helpButton.getAttribute("aria-expanded"), "true");
   assert.equal(testDom.sectionHelpTitle.textContent, "t:Source hardening");
-  assert.match(testDom.sectionHelpBody.children[0].textContent, /t:This block decides/);
+  assert.match(testDom.sectionHelpBody.children[0].textContent, /t:Use official road names and route numbers where available/);
   assert.equal(testDom.sectionHelpPopover.style.left, "30px");
   assert.equal(testDom.sectionHelpPopover.style.top, "36px");
 
@@ -219,6 +220,8 @@ test("transport workbench popover owner restores focus and lets Escape close the
   };
 
   testDom.owner.toggleInfoPopover(family);
+  assert.equal(testDom.infoBody.children.length, 2);
+  assert.equal(testDom.infoBody.children[0].children[1].textContent, "t:Drag layers in the middle board to change their drawing order.");
   assert.equal(testDom.owner.handleEscape(escapeEvent), true);
   assert.equal(testDom.infoPopover.classList.contains("hidden"), true);
   assert.equal(testDom.infoButton.focusCallCount, 1);

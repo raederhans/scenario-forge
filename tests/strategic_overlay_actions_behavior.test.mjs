@@ -370,3 +370,24 @@ test("strategic overlay callers retain direct entity mutation only in declared d
   assert.match(mutateLayersActionSource, /mutateSpecialZoneLayersState\(current, inputs\.mutation\)/);
   assert.match(mutateLayersActionSource, /return commitSpecialZoneLayersState\(target, nextState, inputs\.options\);/);
 });
+
+
+test("frontline hint only explains a missing scenario", async () => {
+  const { createStrategicOverlayController } = await import("../js/ui/sidebar/strategic_overlay_controller.js");
+  const state = { annotationView: { frontlineEnabled: false } };
+  const hint = {};
+  const controller = createStrategicOverlayController({
+    state, elements: { frontlineStatusHint: hint, frontlineStyleChoiceButtons: [] },
+    helpers: { t: value => value, normalizeAnnotationView: value => value },
+  });
+  controller.refreshUI({ scopes: "frontlineControls" });
+  assert.equal(hint.textContent, "Scenario required.");
+  assert.equal(hint.hidden, false);
+  state.activeScenarioId = "test";
+  for (const enabled of [false, true]) {
+    state.annotationView.frontlineEnabled = enabled;
+    controller.refreshUI({ scopes: "frontlineControls" });
+    assert.equal(hint.textContent, "");
+    assert.equal(hint.hidden, true);
+  }
+});
