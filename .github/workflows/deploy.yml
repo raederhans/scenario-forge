@@ -174,6 +174,7 @@ jobs:
             /tools/pages_artifact_admission.py
             /tools/pages_artifact_root.py
             /tools/pages_artifact_shadow.py
+            /tools/pages_stable_mtime.py
 
       - name: Download verified dist artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
@@ -191,6 +192,11 @@ jobs:
         env:
           EXPECTED_SOURCE_SHA: ${{ github.sha }}
         run: python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --verify-receipt .runtime/pages-release/receipt.json --expected-source-sha "$EXPECTED_SOURCE_SHA"
+
+      - name: Derive file mtimes from content
+        # Pages 的 ETag 是 W/"<mtime>-<size>"：按内容派生 mtime，内容不变的文件跨部署保持
+        # 同一个 ETag，回访用户走 304 而不是全量重下。放在字节校验之后、打包之前。
+        run: python tools/pages_stable_mtime.py .runtime/pages-release/dist
 
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
