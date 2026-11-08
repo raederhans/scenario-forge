@@ -118,71 +118,24 @@ def load_world_city_index(path: Path | None = None, payload: dict[str, Any] | No
     return {"cities": cities, "by_name": dict(by_name)}
 
 
-def _decode_arc(topology: dict[str, Any], arc_ref: int) -> list[tuple[float, float]]:
-    arcs = topology.get("arcs") if isinstance(topology.get("arcs"), list) else []
-    arc_index = -arc_ref - 1 if arc_ref < 0 else arc_ref
-    if arc_index < 0 or arc_index >= len(arcs):
-        return []
-    transform = topology.get("transform") if isinstance(topology.get("transform"), dict) else {}
-    scale = transform.get("scale") if isinstance(transform.get("scale"), list) else [1, 1]
-    translate = transform.get("translate") if isinstance(transform.get("translate"), list) else [0, 0]
-    x = 0
-    y = 0
-    points: list[tuple[float, float]] = []
-    for pair in arcs[arc_index]:
-        if not isinstance(pair, list) or len(pair) < 2:
-            continue
-        x += int(pair[0])
-        y += int(pair[1])
-        points.append((x * float(scale[0]) + float(translate[0]), y * float(scale[1]) + float(translate[1])))
-    if arc_ref < 0:
-        points.reverse()
-    return points
-
-
-def _collect_geometry_points(topology: dict[str, Any], geometry: dict[str, Any]) -> list[tuple[float, float]]:
-    geometry_type = str(geometry.get("type") or "")
-    arcs = geometry.get("arcs")
-    arc_refs: list[int] = []
-    if geometry_type == "Polygon" and isinstance(arcs, list):
-        for ring in arcs:
-            if isinstance(ring, list):
-                arc_refs.extend(int(ref) for ref in ring if isinstance(ref, int))
-    elif geometry_type == "MultiPolygon" and isinstance(arcs, list):
-        for polygon in arcs:
-            if not isinstance(polygon, list):
-                continue
-            for ring in polygon:
-                if isinstance(ring, list):
-                    arc_refs.extend(int(ref) for ref in ring if isinstance(ref, int))
-    points: list[tuple[float, float]] = []
-    for ref in arc_refs:
-        points.extend(_decode_arc(topology, ref))
-    return points
-
-
 def decode_runtime_feature_centroids(topology_payload: dict[str, Any], object_name: str = "political") -> dict[str, tuple[float, float]]:
-    geometries = (
-        topology_payload.get("objects", {})
-        .get(object_name, {})
-        .get("geometries", [])
-        if isinstance(topology_payload, dict)
-        else []
-    )
+    """返回每个地块的经纬度代表点（保证落在地块内部）。
+
+    复用 map_builder.population_spatial.decode_topology 的拓扑解码：它同时处理带 transform 的
+    增量弧线和不带 transform 的绝对坐标弧线。旧实现总是按增量取整累加，遇到当前运行时拓扑的
+    绝对浮点弧线会算出非经纬度的结果。
+    """
+    from map_builder.population_spatial import decode_topology
+
+    if not isinstance(topology_payload, dict) or object_name not in topology_payload.get("objects", {}):
+        return {}
     centroids: dict[str, tuple[float, float]] = {}
-    for geometry in geometries if isinstance(geometries, list) else []:
-        if not isinstance(geometry, dict):
+    for feature in decode_topology(topology_payload, object_name):
+        geometry = feature.get("geometry")
+        if geometry is None or geometry.is_empty:
             continue
-        props = geometry.get("properties") if isinstance(geometry.get("properties"), dict) else {}
-        feature_id = str(props.get("id") or geometry.get("id") or "").strip()
-        if not feature_id:
-            continue
-        points = _collect_geometry_points(topology_payload, geometry)
-        if not points:
-            continue
-        lon = sum(point[0] for point in points) / len(points)
-        lat = sum(point[1] for point in points) / len(points)
-        centroids[feature_id] = (lon, lat)
+        point = geometry.representative_point()
+        centroids[feature["id"]] = (float(point.x), float(point.y))
     return centroids
 
 
