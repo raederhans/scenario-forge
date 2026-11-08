@@ -2662,13 +2662,5 @@
     "synthetic_owner_feature_count": 23,
     "topology_blocker_count": 0
   },
-  "version": 2,
-  "opening_view": {
-    "bounds": [
-      -12,
-      34,
-      48,
-      63
-    ]
-  }
+  "version": 2
 }
