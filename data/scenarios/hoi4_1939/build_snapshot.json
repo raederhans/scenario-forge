@@ -14,7 +14,7 @@
     "geo_locale_patch.json": "81dbf6d7d075232d327dfe1d69b81a28c5c24559365b8df5c8eafd99bdb3ca49",
     "owners.by_feature.json": "fce28e09e259d9a8dc44a4e9993544a735ba8aa70199af82d917ab1dcdd5575e",
     "runtime_topology.topo.json": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5",
-    "special_zone_layers.json": "f6f34179fd4052f9c814c7c16b9d2b47388ebab5822ac8d3a14ac0e6994f3ebf",
+    "special_zone_layers.json": "40d79d01e33d4adaead29b1d776399a16cddb9fe0637725505c8601104f85278",
     "strategic_values.by_feature.json": "26eadce39606b6ef2ac1636880850857f9221eb8496b526f9930d1e6ed222d70"
   },
   "output_sha": {
@@ -33,6 +33,6 @@
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "d63623ac3617f14d06a65f60be8be788b1b27dc97d259e7244c269a99ae8c465",
+  "snapshot_fingerprint": "a86a04236fc79e78e412e475a5c1bf66e71ba30025a833ff8fc25e05765b7335",
   "water_count": 0
 }

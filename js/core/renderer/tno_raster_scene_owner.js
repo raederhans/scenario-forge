@@ -19,7 +19,7 @@ export function createTnoRasterSceneOwner({
   let active = false, disposed = false, previousVisibility = null;
   let fallbackReason = "not-presented", totalFrameMs = 0, view = null;
   let published = null, overview = null, publications = 0, retainedFrames = 0, usingOverview = false;
-  let colorBaselineFrame = null, composedWithOverview = false;
+  let colorBaselineFrame = null, composedWithOverview = false, partialPasses = false;
   let lastPresentationState = "unavailable";
   let publicationPreparation = null, preparationError = "";
 
@@ -107,6 +107,7 @@ export function createTnoRasterSceneOwner({
     previousVisibility = null;
     active = false;
     composedWithOverview = false;
+    partialPasses = false;
     fallbackReason = reason;
     return false;
   }
@@ -213,8 +214,13 @@ export function createTnoRasterSceneOwner({
         && background.x + background.width >= rect.x + rect.width - 1e-6
         && background.y + background.height >= rect.y + rect.height - 1e-6));
   }
-  function present(transform, { refresh = true } = {}) {
+  // allowPartialPasses: while the view moves, a retained pass texture that no
+  // longer covers the viewport is composed over its painted extent and the
+  // uncovered edge stays empty until the exact frame after the gesture.
+  // Repainting the pass instead re-runs its full producer on every input frame.
+  function present(transform, { refresh = true, allowPartialPasses = false } = {}) {
     composedWithOverview = false;
+    let uncoveredPass = false;
     if (publicationPreparation && !preparationCurrent(publicationPreparation, { identity: !refresh })) cancelPublicationPreparation();
     if (disposed) return hide("disposed");
     if (!compositor?.isAvailable() || surface.getMapCanvas() !== mapCanvas) return hide("surface-unavailable");
@@ -253,7 +259,12 @@ export function createTnoRasterSceneOwner({
     const left = (plan.outputX - offsetX * dpr) * ratio + dx * dpr;
     const top = (plan.outputY - offsetY * dpr) * ratio + dy * dpr;
     const right = left + plan.outputWidth * ratio, bottom = top + plan.outputHeight * ratio;
-    if (!composedWithOverview && (left > 1e-6 || top > 1e-6 || right < width - 1e-6 || bottom < height - 1e-6)) return hide("direct-frame-coverage");
+    if (!composedWithOverview && (left > 1e-6 || top > 1e-6 || right < width - 1e-6 || bottom < height - 1e-6)) {
+      // Past the resident tiles a moving view keeps the drawn part in place;
+      // hiding the scene would show the 2D canvas's stale fallback frame.
+      if (!allowPartialPasses) return hide("direct-frame-coverage");
+      uncoveredPass = true;
+    }
     // Cache canvases belong to the candidate producer and can change between
     // yielded passes. Navigation only reads the uploaded published textures.
     const retainedScene = usingOverview ? overview : published;
@@ -318,7 +329,10 @@ export function createTnoRasterSceneOwner({
         f: (y - (layout.offsetY ?? 0) * scale) * dpr };
       if (!composedWithOverview && (layerTransform.e > 1e-6 || layerTransform.f > 1e-6
         || layerTransform.e + source.width * scale < width - 1e-6
-        || layerTransform.f + source.height * scale < height - 1e-6)) return hide("pass-coverage");
+        || layerTransform.f + source.height * scale < height - 1e-6)) {
+        if (!(allowPartialPasses && saved)) return hide("pass-coverage");
+        uncoveredPass = true;
+      }
       const revision = saved?.revision ?? (revisions.get(name) || 0);
       passSnapshots.set(name, { width: source.width, height: source.height, reference: { ...reference }, layout: { ...layout }, revision });
       layers.push({ name: saved?.textureName || name, ...(retain ? { retained: true } : { canvas: source }), revision,
@@ -352,6 +366,7 @@ export function createTnoRasterSceneOwner({
       mapCanvas.style.visibility = "hidden";
       canvas.style.display = "block";
       active = true;
+      partialPasses = uncoveredPass;
       fallbackReason = "";
       view = { x: transform.x, y: transform.y, k: transform.k, dpr, width, height };
       account();
@@ -388,7 +403,7 @@ export function createTnoRasterSceneOwner({
       lastFrameMs: stats.lastFrameMs || 0, totalFrameMs, fallbackReason, view: view ? { ...view } : null,
       presentationState: active ? lastPresentationState : "unavailable",
       publishedEpoch: published?.frame?.epoch ?? null, publications, retainedFrames,
-      usingOverview, composedWithOverview, overviewReady: !!overview,
+      usingOverview, composedWithOverview, partialPasses, overviewReady: !!overview,
       publicationPending: ["pending", "ready"].includes(publicationPreparation?.status), preparationError,
       preparedPassCount: stats.preparedPassCount || 0, preparedBytes: stats.preparedBytes || 0,
       privateTextureBytes: stats.privateTextureBytes || 0, maxUploadTaskMs: stats.maxUploadTaskMs || 0,
