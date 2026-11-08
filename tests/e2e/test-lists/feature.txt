@@ -3,6 +3,7 @@ city_label_i18n_redraw.spec.js
 city_points_urban_runtime.spec.js
 dev_workspace_i18n.spec.js
 map_label_font_slices.spec.js
+political_display_mode.spec.js
 project_save_load_roundtrip.spec.js
 releasable_territory.spec.js
 sample_guide_deeplink.spec.js

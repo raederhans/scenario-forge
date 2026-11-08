@@ -9,6 +9,7 @@ import { createPhysicalViewportCacheOwner } from "./renderer/physical_viewport_c
 import { planPhysicalViewportSurface } from "./renderer/physical_raster_surface.js";
 import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
 import { analyzeScenarioPoliticalDerivedStateCoverageChunked } from "./renderer/scenario_chunk_promotion_helpers.js";
+import { getPoliticalDisplayLegend, getPoliticalDisplayModeSignature } from "./political_display_mode.js";
 import { getThematicWgiLegend, getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
 import { getPopulationLegend, getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
 import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./population_spatial_runtime.js";
@@ -924,7 +925,7 @@ function getLegendControlOwner() {
     getLegendModel: (uniqueColors, labels) => ({
       colors: Array.isArray(uniqueColors) ? uniqueColors : readLegendColors(state),
       specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
-      thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState),
+      thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState) || getPoliticalDisplayLegend(runtimeState),
       labelMap: labels || LegendManager.getLabels(state),
     }),
     getControlState: () => LegendManager.getControlState(state),
@@ -1598,6 +1599,7 @@ function getCityPointsRenderOwner() {
 const getColorResolutionStrategyOwner = lazyOwner(() => createColorResolutionStrategyOwner({
   state: runtimeState,
   helpers: {
+    resolveEffectiveOwnerCode: (feature, id) => resolveBorderIdentity(id, feature),
     canonicalCountryCode,
     getFeatureCountryCodeNormalized,
     getFeatureId,
@@ -3518,11 +3520,10 @@ function isTnoRasterSceneSelected() {
 // These producers paint the entire requested rectangle, not only its backing canvas.
 function getTnoScenePaintOverscanPx(passName) {
   if (exportRenderInProgress || !isTnoRasterSceneSelected()) return 0;
-  if (!["borders", "labels", "textureLabels"].includes(passName)) return 0;
-  // Optional producers still have viewport-specific placement contracts.
-  if (passName === "labels" && ((runtimeState.showTransport
-    && ["showAirports", "showPorts", "showRoad", "showRail"].some(name => runtimeState[name]))
-    || (runtimeState.showPhysical && runtimeState.styleConfig?.physical?.showRegionLabels))) return 0;
+  // City and country names are laid out against a budget and collision boxes:
+  // a paint margin would let off-screen names claim on-screen slots, so the
+  // labels pass keeps the viewport placement contract of the vector path.
+  if (!["borders", "textureLabels"].includes(passName)) return 0;
   return VIEWPORT_CULL_OVERSCAN_PX;
 }
 
@@ -3673,8 +3674,8 @@ function getPoliticalIdRasterRuntimeOwner() {
             runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
           geometryContentVersion,
           version: `${geometryContentVersion}:${[...foreground].sort().join(",")}`,
-          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor()].join(":"),
-          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor()].join(":"),
+          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
+          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
         };
       },
     },
@@ -9530,7 +9531,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
-    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(), getAtlantropaSeaFillColor(),
+    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPoliticalDisplayModeSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(), getAtlantropaSeaFillColor(),
     runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
@@ -15404,6 +15405,23 @@ export function getRendererAsyncWorkStatus() {
     borderScheduled: (staticBorderMeshLifecycle?.hasPendingWork() || paintContourRuntimeOwner?.hasPendingWork()) || false,
     exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
   };
+}
+
+// Labels placed by the last full labels pass that touch the visible viewport:
+// city IDs and country codes. Off-screen paint margins are excluded.
+export function getVisibleMapLabels() {
+  const width = Number(runtimeState.width) || 0, height = Number(runtimeState.height) || 0;
+  const onScreen = (x, y, w = 0, h = 0) => x + w >= 0 && y + h >= 0 && x <= width && y <= height;
+  const cities = (cityPointsRenderOwner?.getLastDrawnCityLabels() || [])
+    .filter(({ screenPoint }) => Array.isArray(screenPoint) && onScreen(screenPoint[0], screenPoint[1]))
+    .map(({ id }) => String(id));
+  const countryDiagnostics = countryLabelRenderOwner?.getDiagnostics();
+  const countries = (countryDiagnostics?.lastLabels || [])
+    .filter(({ bounds }) => bounds && onScreen(bounds.x, bounds.y, bounds.w, bounds.h))
+    .map(({ countryCode }) => String(countryCode));
+  return { cities: [...new Set(cities)].sort(), countries: [...new Set(countries)].sort(),
+    // Country names still waiting for an asynchronous layout fit in this view.
+    pendingCountryFits: Number(countryDiagnostics?.pendingFits) || 0 };
 }
 
 export function getCountryLabelReadiness() {

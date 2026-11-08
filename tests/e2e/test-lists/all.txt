@@ -23,6 +23,7 @@ ocean_geometry_contract.spec.js
 ownership_retirement.spec.js
 physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
+political_display_mode.spec.js
 project_save_load_roundtrip.spec.js
 releasable_territory.spec.js
 review_regressions.spec.js

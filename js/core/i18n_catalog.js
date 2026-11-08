@@ -38,6 +38,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Clear Territory Visual Overrides": { zh: "清除领土上的视觉覆盖色", en: "Clear Territory Visual Overrides" },
   "Target country is not in this scenario": { zh: "目标国不存在于当前剧本", en: "Target country is not in this scenario" },
   "companion actions": { zh: "项联动动作", en: "companion actions" },
+  "Map mode": { zh: "地图模式", en: "Map mode" },
+  "Countries": { zh: "国家", en: "Countries" },
+  "Alliances": { zh: "阵营", en: "Alliances" },
+  "Government type": { zh: "政体", en: "Government type" },
+  "This scenario has no alliance or government data.": { zh: "当前剧本没有阵营或政体数据。", en: "This scenario has no alliance or government data." },
+  "Map modes only change how the map is shown; edits and saves are unaffected.": { zh: "地图模式仅改变显示方式，不影响编辑和保存。", en: "Map modes only change how the map is shown; edits and saves are unaffected." },
+
   "Inspector selection path": { zh: "检查器选择路径", en: "Inspector selection path" },
   "Custom Zone": { zh: "自定义区域", en: "Custom Zone" },
   "Demilitarized / buffer": { zh: "非军事化/缓冲", en: "Demilitarized / buffer" },

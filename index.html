@@ -2236,6 +2236,17 @@
                     <button id="populationExportStats" type="button" class="btn-secondary" data-i18n="Export parcel statistics (CSV)">Export parcel statistics (CSV)</button>
                   </details>
                 </section>
+                <section id="politicalDisplayModePanel" class="appearance-control-card" aria-labelledby="politicalDisplayModeTitle">
+                  <h3 id="politicalDisplayModeTitle" data-i18n="Map mode">Map mode</h3>
+                  <select id="politicalDisplayMode" class="select-input" aria-labelledby="politicalDisplayModeTitle" aria-describedby="politicalDisplayModeStatus">
+                    <option value="country" data-i18n="Countries">Countries</option>
+                    <option value="alliance" data-i18n="Alliances">Alliances</option>
+                    <option value="government" data-i18n="Government type">Government type</option>
+                  </select>
+                  <p id="politicalDisplayModeStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <div id="politicalDisplayModeLegend" class="thematic-wgi-legend" hidden></div>
+                  <p class="hint" data-i18n="Map modes only change how the map is shown; edits and saves are unaffected.">Map modes only change how the map is shown; edits and saves are unaffected.</p>
+                </section>
                 <section id="thematicWgiPanel" class="appearance-control-card" aria-labelledby="thematicWgiTitle">
                   <h3 id="thematicWgiTitle" data-i18n="Country indicators">Country indicators</h3>
                   <label for="thematicWgiMetric" class="range-label" data-i18n="Indicator">Indicator</label>
