@@ -2,6 +2,7 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "No renamed places in this selection": { zh: "所选范围内没有改名城市", en: "No renamed places in this selection" },
   "Dam": { zh: "大坝", en: "Dam" },
   "Canal": { zh: "运河", en: "Canal" },
   "Show modern place names": { zh: "显示现代名称", en: "Show modern place names" },

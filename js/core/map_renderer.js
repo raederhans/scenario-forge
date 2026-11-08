@@ -10965,6 +10965,8 @@ function getCityMarkerSprite(entry, config = {}) {
 const buildCityRevealPlan = (...args) => getUrbanCityPolicyOwner().buildCityRevealPlan(...args);
 
 const getEffectiveCityCollection = (...args) => getUrbanCityPolicyOwner().getEffectiveCityCollection(...args);
+// 只读已合并好的城市集合，不在调用方同步触发合并（检查器等 UI 读名称用）。
+const getCachedEffectiveCityCollection = () => getUrbanCityPolicyOwner().getCachedEffectiveCityCollection();
 
 function getCityAnchor(feature) {
   if (!feature || !rendererSurfaceHost.getProjection()) return null;
@@ -15552,6 +15554,7 @@ export {
   buildCityRevealPlan,
   getCityLabelRenderStyle,
   getCityMarkerRenderStyle,
+  getCachedEffectiveCityCollection,
   getEffectiveCityCollection,
   isOpenOceanOverlayActive,
   focusWaterRegionById,
