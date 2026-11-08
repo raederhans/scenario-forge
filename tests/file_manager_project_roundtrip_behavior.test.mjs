@@ -5,7 +5,7 @@ import { FileManager } from "../js/core/file_manager.js";
 import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
 import { normalizePopulationStyle } from "../js/core/population_spatial_view_model.js";
 import { THEMATIC_INDICATORS } from "../js/core/thematic_indicator_catalog.js";
-import { createDefaultStyleConfig, restoreImportedStyleConfigState } from "../js/core/state/ui_state.js";
+import { createDefaultStyleConfig, restoreImportedLayerVisibilityState, restoreImportedStyleConfigState } from "../js/core/state/ui_state.js";
 import {
   getInteractionFunnelDebugState,
   importProjectThroughFunnel,
@@ -452,6 +452,22 @@ test("project roundtrip preserves lake opt-in and old projects default to displa
     delete payload.styleConfig.lakes.interactive;
     assert.equal(FileManager.normalizeImportedProjectData(payload).styleConfig.lakes.interactive, false);
   }
+});
+
+test("project roundtrip keeps the modern place-name toggle and old projects default to era names", () => {
+  for (const enabled of [false, true]) {
+    const payload = FileManager.buildProjectPayload({ showModernPlaceNames: enabled });
+    assert.equal(payload.layerVisibility.showModernPlaceNames, enabled);
+    const imported = FileManager.normalizeImportedProjectData(JSON.parse(JSON.stringify(payload)));
+    const target = { showModernPlaceNames: !enabled };
+    restoreImportedLayerVisibilityState(target, imported.layerVisibility);
+    assert.equal(target.showModernPlaceNames, enabled);
+  }
+  const legacy = FileManager.buildProjectPayload({ showModernPlaceNames: true });
+  delete legacy.layerVisibility.showModernPlaceNames;
+  const target = { showModernPlaceNames: true };
+  restoreImportedLayerVisibilityState(target, FileManager.normalizeImportedProjectData(legacy).layerVisibility);
+  assert.equal(target.showModernPlaceNames, false);
 });
 
 test("project roundtrip preserves country label visibility", () => {
