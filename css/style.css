@@ -14207,3 +14207,6 @@ body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.facility-info-card-prose .facility-info-card-label { display: none; }
+.facility-info-card-prose .facility-info-card-value { grid-column: 1 / -1; text-align: left; }

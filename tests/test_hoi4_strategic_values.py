@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import math
 import tempfile
 import unittest
 from pathlib import Path
@@ -51,10 +53,34 @@ class Hoi4StrategicValuesTest(unittest.TestCase):
     def test_decode_runtime_feature_centroids_handles_topojson_arcs(self) -> None:
         centroids = decode_runtime_feature_centroids(miniature_topology())
 
-        self.assertAlmostEqual(centroids["POL-A"][0], 0.8)
-        self.assertAlmostEqual(centroids["POL-A"][1], 0.8)
-        self.assertAlmostEqual(centroids["POL-B"][0], 10.8)
-        self.assertAlmostEqual(centroids["POL-B"][1], 0.8)
+        # 代表点必须落在各自的 2×2 方块内（带 transform 的增量弧线）。
+        for feature_id, (x0, y0) in {"POL-A": (0, 0), "POL-B": (10, 0), "GER-A": (20, 0)}.items():
+            x, y = centroids[feature_id]
+            self.assertTrue(x0 < x < x0 + 2 and y0 < y < y0 + 2, (feature_id, x, y))
+
+    def test_decode_runtime_feature_centroids_handles_absolute_coordinate_arcs(self) -> None:
+        # 当前运行时拓扑不带 transform，弧线是绝对经纬度浮点坐标。
+        topology = {
+            "type": "Topology",
+            "arcs": [[[2.25, 48.8], [2.45, 48.8], [2.45, 48.9], [2.25, 48.9], [2.25, 48.8]]],
+            "objects": {"political": {"type": "GeometryCollection", "geometries": [
+                {"type": "Polygon", "properties": {"id": "PARIS"}, "arcs": [[0]]},
+            ]}},
+        }
+        lon, lat = decode_runtime_feature_centroids(topology)["PARIS"]
+        self.assertTrue(2.25 < lon < 2.45 and 48.8 < lat < 48.9, (lon, lat))
+
+    def test_real_hoi4_runtime_topology_centroids_are_geographic(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        manifest = json.loads((root / "data/scenarios/hoi4_1936/manifest.json").read_text(encoding="utf-8"))
+        topology = json.loads((root / manifest["runtime_topology_url"]).read_text(encoding="utf-8"))
+        centroids = decode_runtime_feature_centroids(topology)
+        self.assertGreater(len(centroids), 20000)
+        outside = [fid for fid, (lon, lat) in centroids.items() if not (-180 <= lon <= 180 and -90 <= lat <= 90)]
+        self.assertEqual(outside, [])
+        # 巴黎所在地块（FR_ARR_75001）的代表点应在巴黎市中心 15 km 内。
+        lon, lat = centroids["FR_ARR_75001"]
+        self.assertLess(math.hypot((lon - 2.35) * math.cos(math.radians(48.86)), lat - 48.86) * 111, 15)
 
     def test_build_payload_attributes_features_and_metrics(self) -> None:
         states = {

@@ -282,31 +282,31 @@ test("appearance transport summary reports hidden, loading, visible, and loaded 
     masterEnabled: false,
     familyEnabled: true,
     metrics: {},
-  }), "Hidden");
+  }), "Off");
 
-  assert.match(buildTransportFamilySummaryText({
+  assert.equal(buildTransportFamilySummaryText({
     ...baseInput,
     familyId: "airport",
     masterEnabled: true,
     familyEnabled: true,
     metrics: { drawAirportsLayer: { reason: "staged-apply" } },
-  }), /^Loading\/settling/);
+  }), "Loading…");
 
-  assert.match(buildTransportFamilySummaryText({
+  assert.equal(buildTransportFamilySummaryText({
     ...baseInput,
     familyId: "road",
     masterEnabled: true,
     familyEnabled: true,
     metrics: { drawRoadsLayer: { reason: "complete", visibleFeatureCount: 2, featureCount: 2 } },
-  }), /^Visible · 2 roads/);
+  }), "2 roads");
 
-  assert.match(buildTransportFamilySummaryText({
+  assert.equal(buildTransportFamilySummaryText({
     ...baseInput,
     familyId: "road",
     masterEnabled: true,
     familyEnabled: true,
     metrics: { drawRoadsLayer: { reason: "complete", visibleFeatureCount: 0, featureCount: 2 } },
-  }), /^Loaded · 0 visible · 2 roads loaded/);
+  }), "0 roads");
 });
 
 test("appearance transport summary count cache refreshes when transport collection changes", () => {
@@ -409,7 +409,7 @@ test("appearance transport summary keeps invalid family ids explicit and empty",
     zoomScale: 4,
     visualMode: "distribution",
     translate: (key) => key,
-  }), "Loading/settling");
+  }), "Loading…");
 
   assert.equal(getTransportFamilyRenderMetric("pipeline", {
     drawAirportsLayer: { reason: "airport" },

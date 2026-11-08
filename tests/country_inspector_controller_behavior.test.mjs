@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { renderCountryGroupButtons } from "../js/ui/sidebar/scenario_inspector_controller.js";
 import { createCountryInspectorController } from "../js/ui/sidebar/country_inspector_controller.js";
 import { createPaletteLibraryPanelController } from "../js/ui/toolbar/palette_library_panel.js";
 import { state } from "../js/core/state.js";
@@ -1058,4 +1059,36 @@ test("inspector modern-name toggle shares state and lists present-day names for 
   } finally {
     globalThis.document = previousDocument;
   }
+});
+
+test("country group selector does not repeat the selected system label", (context) => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+  context.after(() => { globalThis.document = previousDocument; });
+  const container = new TestElement();
+  const country = { groupSystems: [
+    { id: "scenario_districts", groups: [{ id: "north", label: "North" }] },
+    { id: "modern", groups: [{ id: "south", label: "South" }] },
+  ] };
+  const options = {
+    t: (key) => key, language: "en", translateGeo: (key) => key,
+    selectedSystemId: "scenario_districts", selectSystem() {}, applyGroup() {},
+    createInspectorActionButton: (label, action) => {
+      const button = new TestElement("button");
+      button.textContent = label;
+      button.addEventListener("click", action);
+      return button;
+    },
+    createEmptyNote: () => new TestElement("small"),
+  };
+  renderCountryGroupButtons(container, country, options);
+  assert.equal(container.querySelectorAll(".scenario-action-hint").length, 0);
+  const toggle = container.querySelector(".country-group-system-toggle");
+  assert.deepEqual(toggle.children.map((node) => node.textContent), ["Scenario districts", "Modern administrative regions"]);
+  toggle.children[1].click();
+  assert.equal(container.querySelectorAll(".scenario-action-hint").length, 0);
+  assert.equal(container.querySelector(".country-group-system-toggle").children[1].getAttribute("aria-pressed"), "true");
+  container.replaceChildren();
+  renderCountryGroupButtons(container, { groupSystems: [country.groupSystems[0]] }, options);
+  assert.equal(container.querySelector(".scenario-action-hint").textContent, "Scenario districts");
 });

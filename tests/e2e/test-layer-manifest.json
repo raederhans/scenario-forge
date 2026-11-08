@@ -10,6 +10,13 @@
       "ownerHint": "scenario"
     },
     {
+      "specPath": "tests/e2e/political_display_mode.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "political-display",
+      "ownerHint": "map-renderer"
+    },
+    {
       "specPath": "tests/e2e/city_label_i18n_redraw.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",
@@ -437,6 +444,27 @@
       "executionMode": "browser",
       "domain": "water-runtime",
       "ownerHint": "water-runtime"
+    },
+    {
+      "specPath": "tests/e2e/map_label_font_slices.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "map-layer",
+      "ownerHint": "map-runtime"
+    },
+    {
+      "specPath": "tests/e2e/tno_strategic_values_cold_start.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
+    },
+    {
+      "specPath": "tests/e2e/atlantropa_project_markers.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
     }
   ]
 }

@@ -156,17 +156,9 @@ test("phase 02 shell and sidebar mainline stays on the new rails", async ({ page
 
   await expect(page.locator("#scenarioContextBar #scenarioTransportWorkbenchBtn")).toHaveCount(0);
   await expect(page.locator("#zoomControls #scenarioTransportWorkbenchBtn")).toHaveCount(0);
-  if (await page.locator("body.editor-workspace").count()) {
-    await expect(page.locator("#editorProjectBar #inspectorSidebarTabProject")).toBeVisible();
-    await page.locator("#editorTaskLayersBtn").click();
-  } else {
-    await page.locator("#inspectorSidebarTabProject").click();
-  }
-  const transportSection = page.locator("#transportProjectSection");
-  if ((await transportSection.evaluate((node) => node.open)) !== true) {
-    await page.locator("#lblTransportProject").click();
-  }
-  await expect(transportSection).toHaveJSProperty("open", true);
+  await expect(page.locator("#editorProjectBar #inspectorSidebarTabProject")).toBeVisible();
+  await page.locator("#editorTaskLayersBtn").click();
+  await page.locator("#appearanceTabTransport").click();
   const transportTrigger = page.locator("#transportProjectSection #scenarioTransportWorkbenchBtn");
   await expect(transportTrigger).toBeVisible();
   await expect(transportTrigger).toHaveText("Open workbench");
