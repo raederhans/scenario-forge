@@ -177,7 +177,9 @@ export function createAppearanceCityPointsOwner({
   const bindEvents = () => {
     if (nodes.showModernPlaceNames && nodes.showModernPlaceNames.dataset.bound !== "true") {
       nodes.showModernPlaceNames.addEventListener("change", (event) => {
+        // 检查器里的同名开关也转发到这里，状态只在外观这一处修改；改完让检查器同步勾选和今名对照。
         runtimeState.showModernPlaceNames = !!event.target.checked;
+        runtimeState.refreshCountryInspectorDetailFn?.();
         renderDirty("city-points-modern-names-toggle");
       });
       nodes.showModernPlaceNames.dataset.bound = "true";

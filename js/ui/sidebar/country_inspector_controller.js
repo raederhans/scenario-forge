@@ -1,6 +1,7 @@
 import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
 import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
 import { setUiIcon } from "../ui_icons.js";
+import { formatModernPlaceName } from "../../core/renderer/modern_place_name.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
 import {
   ensureInspectorExpansionState,
@@ -105,6 +106,9 @@ export function createCountryInspectorController({
   resolveInspectorGroup,
   stepUpInspectorSelection,
   getInspectorFeatureLabel,
+  hasScenarioRenamedPlaces = () => false,
+  getRenamedPlacesInFeatures = () => ({ entries: [], total: 0 }),
+  setShowModernPlaceNames = () => {},
 }) {
   const {
     buildInspectorTopLevelCountryEntries,
@@ -1132,6 +1136,67 @@ export function createCountryInspectorController({
     if (level === "feature") addCrumb(getInspectorFeatureLabel(featureId), null);
   };
 
+  // 时代地名：剧本里有改名城市时，检查器给出与外观同源的"显示现代名称"开关；
+  // 开启后，选中大区或地块时列出其中改名城市的今名对照。
+  let modernNamesBlock = null;
+  let modernNamesToggle = null;
+  let modernNamesList = null;
+  const renderInspectorModernPlaceNames = (countryState) => {
+    const available = !!countryState && hasScenarioRenamedPlaces();
+    if (!available) {
+      if (modernNamesBlock) modernNamesBlock.hidden = true;
+      return;
+    }
+    if (!modernNamesBlock) {
+      modernNamesBlock = document.createElement("div");
+      modernNamesBlock.className = "inspector-modern-names";
+      const label = document.createElement("label");
+      label.className = "toggle-label";
+      modernNamesToggle = document.createElement("input");
+      modernNamesToggle.type = "checkbox";
+      modernNamesToggle.className = "checkbox-input";
+      modernNamesToggle.id = "inspectorShowModernPlaceNames";
+      modernNamesToggle.addEventListener("change", (event) => setShowModernPlaceNames(!!event.target.checked));
+      const text = document.createElement("span");
+      text.dataset.modernNamesLabel = "true";
+      label.append(modernNamesToggle, text);
+      modernNamesList = document.createElement("ul");
+      modernNamesList.className = "inspector-modern-names-list";
+      modernNamesBlock.append(label, modernNamesList);
+      const siblings = Array.from(countryInspectorSelected.children || []);
+      const anchor = siblings[siblings.indexOf(inspectorBreadcrumb) + 1] || null;
+      countryInspectorSelected.insertBefore(modernNamesBlock, anchor);
+    }
+    modernNamesBlock.hidden = false;
+    modernNamesBlock.querySelector("[data-modern-names-label]").textContent = t("Show modern place names", "ui");
+    const enabled = !!runtimeState.showModernPlaceNames;
+    modernNamesToggle.checked = enabled;
+    modernNamesList.replaceChildren();
+    const level = runtimeState.inspectorSelectionLevel;
+    modernNamesList.hidden = !enabled || (level !== "group" && level !== "feature");
+    if (modernNamesList.hidden) return;
+    const language = runtimeState.currentLanguage === "zh" ? "zh" : "en";
+    const featureIds = level === "feature"
+      ? [runtimeState.inspectorSelectionFeatureId]
+      : (resolveInspectorGroup(countryState.code, runtimeState.inspectorHighlightFeatureIds[0])?.children || []);
+    const { entries, total } = getRenamedPlacesInFeatures(featureIds);
+    const addLine = (textContent, className = "") => {
+      const item = document.createElement("li");
+      if (className) item.className = className;
+      item.textContent = textContent;
+      modernNamesList.appendChild(item);
+    };
+    if (!entries.length) {
+      addLine(t("No renamed places in this selection", "ui"), "is-empty");
+      return;
+    }
+    entries.forEach(({ eraName, modernName }) => addLine(formatModernPlaceName(eraName, modernName, language)));
+    if (total > entries.length) {
+      const rest = total - entries.length;
+      addLine(language === "zh" ? `另有 ${rest} 处` : `${rest} more`, "is-more");
+    }
+  };
+
   const renderCountryInspectorDetail = () => {
     if (!countryInspectorSelected) return;
     incrementSidebarCounter?.("inspectorRenders");
@@ -1161,6 +1226,7 @@ export function createCountryInspectorController({
       }
       renderHgoIdentityDetail(null);
       renderInspectorBreadcrumb(null);
+      renderInspectorModernPlaceNames(null);
       setCountryInspectorColorPickerOpen(false);
       scheduleAdaptiveInspectorHeights();
       return;
@@ -1168,6 +1234,7 @@ export function createCountryInspectorController({
 
     renderHgoIdentityDetail(countryState);
     renderInspectorBreadcrumb(countryState);
+    renderInspectorModernPlaceNames(countryState);
 
     if (countryInspectorColorRow) {
       countryInspectorColorRow.classList.add("hidden");

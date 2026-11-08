@@ -277,6 +277,7 @@ function createHarness({
   buildCountryRowMetaText = () => "",
   getSelectedLandInspectorCountryCode = () => "",
   t = (value) => value,
+  modernNames = {},
 } = {}) {
   const host = new TestElement("section");
   const list = new TestElement("div");
@@ -354,6 +355,7 @@ function createHarness({
       settingsChangeCalls += 1;
       observedVariantSelections.push({ ...runtimeState.hgoIdentity.variantSelections });
     },
+    ...modernNames,
   });
 
   return {
@@ -994,4 +996,66 @@ test("palette variants show category names and keep sources in button titles", c
     ["Map color", "UI color", "Country file color"]);
   assert.deepEqual(variants.map(button => button.title),
     ["colors.txt:color", "colors.txt:color_ui", "Middle East - Pakt.txt:color"]);
+});
+
+test("inspector modern-name toggle shares state and lists present-day names for the drilled selection", () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+  try {
+    const toggled = [];
+    const requestedIds = [];
+    let hasRenamed = true;
+    const harness = createHarness({
+      selectedCountry: { code: "GER", displayName: "德国" },
+      resolveInspectorGroup: () => ({ id: "g", label: "东普鲁士", children: ["a", "b", "c"] }),
+      stepUpInspectorSelection: () => {},
+      getInspectorFeatureLabel: () => "地块甲",
+      modernNames: {
+        hasScenarioRenamedPlaces: () => hasRenamed,
+        getRenamedPlacesInFeatures: (ids) => {
+          requestedIds.push([...ids]);
+          return ids.length > 1
+            ? { entries: [{ eraName: "柯尼斯堡", modernName: "加里宁格勒" }, { eraName: "蒂尔西特", modernName: "苏维埃茨克" }], total: 3 }
+            : { entries: [], total: 0 };
+        },
+        setShowModernPlaceNames: (enabled) => toggled.push(enabled),
+      },
+    });
+    const state = harness.runtimeState;
+    Object.assign(state, {
+      currentLanguage: "zh", showModernPlaceNames: false,
+      inspectorSelectionLevel: "group", inspectorSelectionGroupId: "g", inspectorSelectionFeatureId: "",
+      inspectorHighlightCountryCode: "", inspectorHighlightFeatureIds: ["a", "b", "c"],
+    });
+    harness.controller.renderCountryInspectorDetail();
+    const block = harness.countryInspectorSelected.querySelector(".inspector-modern-names");
+    const toggle = block.querySelector("input");
+    const listNode = block.querySelector(".inspector-modern-names-list");
+    assert.equal(block.hidden, false);
+    assert.equal(toggle.checked, false);
+    assert.equal(listNode.hidden, true, "开关关闭时不列今名");
+    assert.deepEqual(requestedIds, []);
+
+    toggle.checked = true;
+    toggle.change();
+    assert.deepEqual(toggled, [true], "检查器开关走共享入口");
+
+    state.showModernPlaceNames = true;
+    harness.controller.renderCountryInspectorDetail();
+    assert.equal(toggle.checked, true, "外观改过的状态同步回检查器");
+    assert.equal(listNode.hidden, false);
+    assert.deepEqual(requestedIds.at(-1), ["a", "b", "c"]);
+    assert.deepEqual(listNode.children.map(textOf), ["柯尼斯堡（今加里宁格勒）", "蒂尔西特（今苏维埃茨克）", "另有 1 处"]);
+
+    Object.assign(state, { inspectorSelectionLevel: "feature", inspectorSelectionFeatureId: "a" });
+    harness.controller.renderCountryInspectorDetail();
+    assert.deepEqual(requestedIds.at(-1), ["a"]);
+    assert.deepEqual(listNode.children.map(textOf), ["No renamed places in this selection"]);
+
+    hasRenamed = false;
+    harness.controller.renderCountryInspectorDetail();
+    assert.equal(block.hidden, true, "没有改名城市的剧本不显示开关");
+  } finally {
+    globalThis.document = previousDocument;
+  }
 });

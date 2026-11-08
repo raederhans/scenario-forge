@@ -1059,5 +1059,6 @@
   "Loaded rows": "已加载行数",
   "Source details": "来源详情",
   "Drag layers in the middle board to change their drawing order.": "在中间排序板拖动图层以调整绘制顺序。",
-  "Dataset": "数据集"
+  "Dataset": "数据集",
+  "No renamed places in this selection": "所选范围内没有改名城市"
 }

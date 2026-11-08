@@ -486,6 +486,7 @@ class FileManager {
       showEraRailways:
         appState.showEraRailways === undefined ? true : !!appState.showEraRailways,
       showCityPoints: appState.showCityPoints === undefined ? true : !!appState.showCityPoints,
+      showModernPlaceNames: !!appState.showModernPlaceNames,
       showStrategicResourceMarkers: !!appState.showStrategicResourceMarkers,
       strategicChoroplethMetric: String(appState.strategicChoroplethMetric || ""),
       showUrban: !!appState.showUrban,
@@ -847,6 +848,7 @@ class FileManager {
           : !!data.layerVisibility.showEraRailways,
       showCityPoints:
         data.layerVisibility.showCityPoints === undefined ? true : !!data.layerVisibility.showCityPoints,
+      showModernPlaceNames: !!data.layerVisibility.showModernPlaceNames,
       showStrategicResourceMarkers:
         data.layerVisibility.showStrategicResourceMarkers === undefined
           ? false
