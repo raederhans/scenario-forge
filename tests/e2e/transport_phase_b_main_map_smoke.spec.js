@@ -7,6 +7,12 @@ const SMOKE_CASES = [
   { family: "airport", packId: "usa_airport", keys: ["airports"] },
 ];
 
+async function openTransportWorkbench(page) {
+  await page.locator("#editorTaskLayersBtn").click();
+  await page.locator("#appearanceTabTransport").click();
+  await page.locator("#transportProjectSection #scenarioTransportWorkbenchBtn").click();
+}
+
 async function applyPack(page, { family, packId, keys }) {
   await page.locator(`button[data-transport-family="${family}"]`).click();
   await page.locator("#transportWorkbenchPackSelect").selectOption(packId);
@@ -46,13 +52,7 @@ test("transport Phase B country packs apply to the main map", async ({ page }) =
   await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page, { timeout: 120_000 });
 
-  await page.locator("#inspectorSidebarTabProject").click();
-  const transportSection = page.locator("#transportProjectSection");
-  if ((await transportSection.evaluate((node) => node.open)) !== true) {
-    await page.locator("#lblTransportProject").click();
-  }
-  await expect(transportSection).toHaveJSProperty("open", true);
-  await page.locator("#projectSidebarPanel #scenarioTransportWorkbenchBtn").click();
+  await openTransportWorkbench(page);
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
   await expect(page.locator("#transportWorkbenchPackSelect")).toBeVisible();
 

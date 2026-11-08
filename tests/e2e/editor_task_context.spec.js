@@ -164,7 +164,7 @@ test("migrated headings label their content and Project uses button state after 
     ["projectLegendHeading", "#projectLegendSection"],
     ["legendProjectHeading", "#legendProjectSection"],
     ["frontlineProjectHeading", "#frontlineProjectSection"],
-    ["transportProjectHeading", "#transportProjectSection"],
+    ["transportProjectHeading", "#editorProperty-data-appearance-panel-transport #transportProjectSection"],
     ["exportProjectHeading", "#exportProjectSection"],
     ["inspectorUtilitiesHeading", "#inspectorUtilitiesSection"],
     ["diagnosticsHeading", "#diagnosticsSection"],

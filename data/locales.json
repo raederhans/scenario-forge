@@ -304345,6 +304345,14 @@
     "Show modern place names": {
       "en": "Show modern place names",
       "zh": "显示现代名称"
+    },
+    "By country ({count} on)": {
+      "en": "By country ({count} on)",
+      "zh": "按国家（已启用 {count} 个）"
+    },
+    "Enabled only": {
+      "en": "Enabled only",
+      "zh": "只看已启用"
     }
   }
 }
