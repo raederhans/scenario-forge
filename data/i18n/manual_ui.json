@@ -1,4 +1,8 @@
 {
+  "Add scenario defense lines": "添加剧本预置防线",
+  "{count} preset lines; {present} already on map": "{count} 条预置防线；{present} 条已在地图上",
+  "No preset defense lines for this scenario.": "当前剧本没有预置防线。",
+  "Added {count} defense lines": "已添加 {count} 条防线",
   "Territory": "领土",
   "Boundary variant": "疆界变体",
   "Apply territory": "应用领土",

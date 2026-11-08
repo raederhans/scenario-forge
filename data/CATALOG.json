@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-11-07T11:35:37Z",
   "counts": {
-    "entries": 1376,
+    "entries": 1377,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -12,6 +12,7 @@
       "city_overrides": 1,
       "context_layer": 7,
       "country_feature_policies": 1,
+      "defense_line_presets": 1,
       "detail_topology_na_v1": 1,
       "detail_topology_na_v2": 1,
       "feature_migration_table": 2,
@@ -75,11 +76,11 @@
     "by_format": {
       "geojson": 155,
       "javascript": 2,
-      "json": 1047,
+      "json": 1048,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1374,
+      "json": 1375,
       "module": 2
     }
   },
@@ -584,6 +585,19 @@
       "aliases": [
         "source:marine_regions_shared_refinement"
       ]
+    },
+    {
+      "key": "defense_line_presets",
+      "url": "data/operational_presets/defense_lines.json",
+      "role": "defense_line_presets",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.defense_line_presets",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
     },
     {
       "key": "manifest_output:palette-maps/hgo.audit.json",

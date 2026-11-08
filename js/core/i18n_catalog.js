@@ -2,6 +2,10 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Add scenario defense lines": { zh: "添加剧本预置防线", en: "Add scenario defense lines" },
+  "{count} preset lines; {present} already on map": { zh: "{count} 条预置防线；{present} 条已在地图上", en: "{count} preset lines; {present} already on map" },
+  "No preset defense lines for this scenario.": { zh: "当前剧本没有预置防线。", en: "No preset defense lines for this scenario." },
+  "Added {count} defense lines": { zh: "已添加 {count} 条防线", en: "Added {count} defense lines" },
   "Major powers": { zh: "主要势力", en: "Major powers" },
   "Featured in this scenario": { zh: "本剧本特色", en: "Featured in this scenario" },
   "Close scenario introduction": { zh: "关闭剧本简介", en: "Close scenario introduction" },
