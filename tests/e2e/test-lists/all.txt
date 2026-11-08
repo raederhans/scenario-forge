@@ -15,6 +15,7 @@ hoi4_rk_russia_regression.spec.js
 interaction_funnel_contract.spec.js
 main_shell_i18n.spec.js
 map_clarity.spec.js
+map_label_font_slices.spec.js
 marine_label_performance.spec.js
 non_1962_runtime_matrix.spec.js
 ocean_geometry_contract.spec.js
@@ -23,6 +24,7 @@ physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
 political_display_mode.spec.js
 project_save_load_roundtrip.spec.js
+releasable_territory.spec.js
 review_regressions.spec.js
 river_contour_visibility.spec.js
 river_layer_regression.spec.js

@@ -6,7 +6,7 @@
 // Keep it small: add a query only when a golden flow needs it.
 
 import { state } from "./state.js";
-import { getPoliticalIdRasterDiagnostics } from "./map_renderer/public.js";
+import { getCountryLabelReadiness, getPoliticalIdRasterDiagnostics, getVisibleMapLabels } from "./map_renderer/public.js";
 import { hasPendingPanelRefresh } from "./state/changes.js";
 
 const API_VERSION = 2;
@@ -30,6 +30,16 @@ function renderIdle() {
 }
 
 let rendererModule = null;
+
+// Country names are fitted asynchronously and their source is rebuilt when late data
+// (full bundle, localization) arrives after the map settles. Names are pixels too.
+// A failed source or layout worker never becomes ready, so it does not hold settled.
+function labelsSettled() {
+  const readiness = getCountryLabelReadiness();
+  if (!readiness.expected || readiness.ready) return true;
+  if (readiness.sourceStatus === "error" || readiness.sourceStatus === "disposed") return true;
+  return (Number(readiness.workerErrors) || 0) > 0;
+}
 
 // The GPU raster path presents frames asynchronously after the render phase reports idle.
 // Pixels are stable only once no raster work is pending and the presented view matches the zoom.
@@ -61,6 +71,8 @@ function status() {
     phase: String(state.bootPhase || ""),
     blocking: state.bootBlocking !== false,
     startupReadonly: !!state.startupReadonly,
+    // The first map frame is on screen (startup may still be blocking input).
+    firstFramePainted: !!state.firstVisibleFramePainted,
     viewable: !!state.firstVisibleFramePainted && state.bootBlocking === false,
     // Editing is allowed (startup may open read-only until full data arrives).
     editable: interactive && !state.startupReadonly,
@@ -87,7 +99,7 @@ function status() {
     },
     // Everything that affects pixels has settled: data, chunks, render passes and GPU presentation.
     // Panels refresh after paint; they are part of the settled UI too.
-    settled: pipelineIdle && rasterPresented() && !hasPendingPanelRefresh(),
+    settled: pipelineIdle && rasterPresented() && labelsSettled() && !hasPendingPanelRefresh(),
   };
 }
 
@@ -113,6 +125,17 @@ function history() {
 
 function isDirty() {
   return !!state.isDirty;
+}
+
+// City IDs and country codes whose names are drawn in the visible map area.
+function labels() {
+  return getVisibleMapLabels();
+}
+
+// "raster" when political regions are drawn from GPU ID tiles, otherwise "vector".
+function politicalBackend() {
+  const raster = getPoliticalIdRasterDiagnostics();
+  return raster?.selected && raster.actualBackend === "raster" ? "raster" : "vector";
 }
 
 function selection() {
@@ -147,6 +170,8 @@ export function installAppTestApi(target = globalThis) {
     history,
     isDirty,
     selection,
+    labels,
+    politicalBackend,
     internals,
   });
 }

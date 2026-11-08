@@ -3,6 +3,13 @@
   "scope": "tests/e2e/*.spec.js",
   "specs": [
     {
+      "specPath": "tests/e2e/releasable_territory.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
+    },
+    {
       "specPath": "tests/e2e/political_display_mode.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",
@@ -437,6 +444,13 @@
       "executionMode": "browser",
       "domain": "water-runtime",
       "ownerHint": "water-runtime"
+    },
+    {
+      "specPath": "tests/e2e/map_label_font_slices.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "map-layer",
+      "ownerHint": "map-runtime"
     }
   ]
 }

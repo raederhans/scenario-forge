@@ -31,7 +31,6 @@ import {
   resolveLayerStatusTone,
   sanitizeLayerStatusText,
 } from "./layer_status_diagnostics.js";
-import { createThematicLayerPreviewController } from "./thematic_layer_preview_controller.js";
 import {
   getLayerPanelStatusAnchorMap,
 } from "./layer_panel_contracts.js";
@@ -172,7 +171,6 @@ export function createAppearanceControlsController({
   moveMapContentPanels();
   const layerStatusAnchorById = getLayerPanelStatusAnchorMap();
   const layerStatusNodes = new Map();
-  let thematicLayerPreviewController = null;
   const ensureLayerStatusNode = (diagnosticId) => {
     if (layerStatusNodes.has(diagnosticId)) return layerStatusNodes.get(diagnosticId);
     const anchorId = layerStatusAnchorById[diagnosticId];
@@ -218,7 +216,6 @@ export function createAppearanceControlsController({
   const renderLayerStatusSummaries = () => {
     const diagnostics = buildLayerStatusDiagnostics(runtimeState, {
       translate: t,
-      thematicCatalogPreview: thematicLayerPreviewController?.getPreview?.() || null,
     });
     const diagnosticsById = new Map(diagnostics.map((diagnostic) => [diagnostic.id, diagnostic]));
     Object.keys(layerStatusAnchorById).forEach((diagnosticId) => {
@@ -239,7 +236,6 @@ export function createAppearanceControlsController({
       workbenchStatusNode.hidden = labels.length === 0;
     }
   };
-  thematicLayerPreviewController = createThematicLayerPreviewController({ t });
   const politicalDisplayModeOwner = createPoliticalDisplayModeOwner({ runtimeState, t });
   const thematicWgiOwner = createThematicWgiOwner({
     runtimeState, t, markDirty,
@@ -249,7 +245,6 @@ export function createAppearanceControlsController({
     runtimeState, t, markDirty,
     refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
   });
-  void thematicLayerPreviewController.load().then(() => renderLayerStatusSummaries());
   const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
   const mapContentTabButtons = Array.from(document.querySelectorAll("[data-map-content-tab]"));
@@ -421,6 +416,7 @@ export function createAppearanceControlsController({
     if (displayQuality) displayQuality.value = normalizeDisplayQuality(runtimeState.styleConfig?.rendering?.quality);
   };
   const parentBorderOwner = createAppearanceParentBorderOwner({
+    translateUi: (key) => t(key, "ui"),
     runtimeState,
     nodes: {
       visibleToggle: parentBordersVisible,
@@ -432,6 +428,9 @@ export function createAppearanceControlsController({
       enableAllButton: parentBorderEnableAll,
       disableAllButton: parentBorderDisableAll,
       countryList: parentBorderCountryList,
+      countrySearch: document.getElementById("parentBorderCountrySearch"),
+      enabledOnlyToggle: document.getElementById("parentBorderEnabledOnly"),
+      countrySummary: document.getElementById("lblParentBorderCountries"),
       emptyNode: parentBorderEmpty,
     },
     translateGeo,
@@ -580,6 +579,8 @@ export function createAppearanceControlsController({
     if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? t("Opacity", "ui") : t("Fill Opacity", "ui");
     if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);
     if (urbanManualControls) urbanManualControls.classList.toggle("hidden", !isManual);
+    document.getElementById("urbanAdaptiveAdvancedControls")?.classList.toggle("hidden", isManual);
+    document.getElementById("urbanManualAdvancedControls")?.classList.toggle("hidden", !isManual);
     if (urbanColor) urbanColor.value = urbanConfig.color;
     if (urbanOpacity) urbanOpacity.value = String(Math.round(urbanConfig.fillOpacity * 100));
     if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(urbanConfig.fillOpacity * 100)}%`;
@@ -620,7 +621,6 @@ export function createAppearanceControlsController({
     syncUrbanControls();
     urbanIntensityFieldEditor.render();
     appearancePresetsOwner.renderAppearancePresetsUi();
-    thematicLayerPreviewController?.render();
     renderLayerStatusSummaries();
   };
 

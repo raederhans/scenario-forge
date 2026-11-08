@@ -250,9 +250,11 @@ function createScenarioLifecycleRuntime({
     runtimeState.scenarioWaterOverlayVersionTag = "";
     runtimeState.scenarioSpecialRegionsData = null;
     runtimeState.scenarioReliefOverlaysData = null;
+    runtimeState.scenarioEraRailwaysData = null;
     runtimeState.scenarioDistrictGroupsData = null;
     runtimeState.scenarioDistrictGroupByFeatureId = new Map();
     runtimeState.scenarioReliefOverlayRevision = (Number(runtimeState.scenarioReliefOverlayRevision) || 0) + 1;
+    runtimeState.scenarioEraRailwaysRevision = (Number(runtimeState.scenarioEraRailwaysRevision) || 0) + 1;
     applyBlankScenarioPresentationDefaults();
     runtimeState.scenarioReleasableIndex = createDefaultScenarioReleasableIndex();
     runtimeState.releasableCatalog = runtimeState.defaultReleasableCatalog || null;

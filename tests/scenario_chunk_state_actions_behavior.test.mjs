@@ -61,6 +61,7 @@ const OPTIONAL_LAYER_CONFIGS = Object.freeze({
   scenario_atlantropa: Object.freeze({ stateField: "scenarioAtlantropaData", revisionField: "scenarioAtlantropaRevision" }),
   specialzonelayers: Object.freeze({ stateField: "specialZoneLayers", revisionField: "" }),
   relief: Object.freeze({ stateField: "scenarioReliefOverlaysData", revisionField: "scenarioReliefOverlayRevision" }),
+  erarailways: Object.freeze({ stateField: "scenarioEraRailwaysData", revisionField: "scenarioEraRailwaysRevision" }),
   cities: Object.freeze({ stateField: "scenarioCityOverridesData", revisionField: "cityLayerRevision" }),
   strategicvalues: Object.freeze({ stateField: "scenarioStrategicValuesData", revisionField: "scenarioStrategicValuesRevision" }),
 });

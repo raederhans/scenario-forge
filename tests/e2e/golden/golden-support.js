@@ -37,12 +37,13 @@ async function closeScenarioGuide(page) {
   if (await guide.isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
 }
 
-async function openApp(page, { timeout = 120_000, scenarioId = "" } = {}) {
+async function openApp(page, { timeout = 120_000, scenarioId = "", query = "" } = {}) {
   await page.setViewportSize({ width: 1440, height: 900 });
   const started = Date.now();
-  const appPath = scenarioId
+  let appPath = scenarioId
     ? `${GOLDEN_APP_PATH}&default_scenario=${encodeURIComponent(scenarioId)}`
     : GOLDEN_APP_PATH;
+  if (query) appPath += `&${query}`;
   await page.goto(appPath, { waitUntil: "domcontentloaded" });
   await waitForSettled(page, { timeout });
   const startupMs = Date.now() - started;
@@ -168,6 +169,24 @@ async function waitForBackgroundIdle(page, { timeout = 120_000 } = {}) {
   }, { timeout, intervals: [500, 1000] }).toBe(true);
 }
 
+// The names drawn in the visible map: city IDs and country codes. Country names fit
+// asynchronously and some label passes redraw once more after the map settles, so
+// wait for no pending fits and two equal reads a second apart.
+async function readStableLabels(page, { timeout = 60_000 } = {}) {
+  const read = () => page.evaluate(() => globalThis.__scenarioForgeTestApi.labels());
+  let previous = null;
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const next = await read();
+    if (!next.pendingCountryFits && previous && JSON.stringify(next) === JSON.stringify(previous)) {
+      return { cities: next.cities, countries: next.countries };
+    }
+    previous = next.pendingCountryFits ? null : next;
+    await page.waitForTimeout(1000);
+  }
+  throw new Error(`map labels did not settle: ${JSON.stringify(previous)}`);
+}
+
 module.exports = {
   GOLDEN_APP_PATH,
   PROBE_LON_LAT,
@@ -179,6 +198,7 @@ module.exports = {
   mapColorVariety,
   openApp,
   parkMouse,
+  readStableLabels,
   readStatus,
   screenPoint,
   selectFillTool,

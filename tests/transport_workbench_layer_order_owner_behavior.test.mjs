@@ -95,13 +95,13 @@ test("transport workbench layer order rows expose live, metadata, and reserved s
   });
 
   assert.deepEqual(rows.map((row) => [row.id, row.label, row.status, row.live]), [
-    ["road", "road-label", "Live now", true],
-    ["energy_facilities", "energy_facilities-label", "Metadata live", false],
-    ["custom", "custom-label", "Reserved", false],
+    ["road", "road-label", "Available", true],
+    ["energy_facilities", "energy_facilities-label", "Not available yet", false],
+    ["custom", "custom-label", "Not available yet", false],
   ]);
-  assert.equal(rows[0].caption, "Live preview is already wired into the Japan carrier.");
-  assert.equal(rows[1].caption, "Inspector now reads the live manifest and build audit.");
-  assert.equal(rows[2].caption, "Reserved family shell. Real renderer attaches later.");
+  assert.equal(rows[0].caption, "Preview available");
+  assert.equal(rows[1].caption, "Not available yet");
+  assert.equal(rows[2].caption, "Not available yet");
 });
 
 test("transport workbench layer order owner renders rows and live status classes", () => {
@@ -126,9 +126,9 @@ test("transport workbench layer order owner renders rows and live status classes
     assert.equal(list.children.length, 3);
     assert.equal(list.children[0].dataset.layerFamily, "road");
     assert.equal(list.children[0].children[2].classList.contains("is-live"), true);
-    assert.match(textOf(list.children[0]), /t:Live now/);
-    assert.match(textOf(list.children[1]), /t:Metadata live/);
-    assert.match(textOf(list.children[2]), /t:Reserved/);
+    assert.match(textOf(list.children[0]), /t:Available/);
+    assert.match(textOf(list.children[1]), /t:Not available yet/);
+    assert.match(textOf(list.children[2]), /t:Not available yet/);
   } finally {
     globalThis.document = previousDocument;
   }

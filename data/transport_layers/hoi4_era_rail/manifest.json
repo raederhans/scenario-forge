@@ -1,0 +1,55 @@
+{
+  "adapter_id": "hoi4_era_rail_v1",
+  "family": "era_rail",
+  "geometry_kind": "mixed",
+  "schema_version": 1,
+  "generated_at": "2026-11-07T11:53:24Z",
+  "recipe_version": "era_rail_v1",
+  "source_policy": "local_game_files_facts_only",
+  "distribution_tier": "scenario_optional_layer",
+  "paths": {
+    "era_rail": "data/transport_layers/hoi4_era_rail/era_rail.geojson",
+    "build_audit": "data/transport_layers/hoi4_era_rail/build_audit.json"
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "distribution_tier": "scenario_optional_layer",
+      "paths": {
+        "era_rail": "data/transport_layers/hoi4_era_rail/era_rail.geojson"
+      },
+      "feature_counts": {
+        "railways": 909,
+        "supply_nodes": 727
+      }
+    }
+  },
+  "feature_counts": {
+    "railways": 909,
+    "supply_nodes": 727
+  },
+  "source_signature": {
+    "railways.txt": {
+      "filename": "map/railways.txt",
+      "size_bytes": 27762,
+      "sha256": "86cc3fba40f39442bb4bf883a51740951c09073c5234e6b7b744d966fa2ee455"
+    },
+    "supply_nodes.txt": {
+      "filename": "map/supply_nodes.txt",
+      "size_bytes": 5941,
+      "sha256": "cf80e9f359676b92f7bb60f00725b5fe3384339269567b461b728f97fd997abb"
+    },
+    "unitstacks.txt": {
+      "filename": "map/unitstacks.txt",
+      "size_bytes": 10335662,
+      "sha256": "3560408b690ebf0e1e720e9bad4d977e26abcfcd86a0854b2a26e1832799e267"
+    },
+    "provinces.bmp": {
+      "filename": "map/provinces.bmp",
+      "size_bytes": 34603062,
+      "sha256": "e131d30e5dcb13d9c2a8598f820a2de0ae9828f3a24f2bddc1bcfff40f71660a"
+    }
+  },
+  "build_command": "python tools/build_era_railways.py --profile hoi4",
+  "runtime_consumer": "scenario_optional_layer:erarailways"
+}

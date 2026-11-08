@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { renderCountryGroupButtons } from "../js/ui/sidebar/scenario_inspector_controller.js";
 import { createCountryInspectorController } from "../js/ui/sidebar/country_inspector_controller.js";
 import { createPaletteLibraryPanelController } from "../js/ui/toolbar/palette_library_panel.js";
 import { state } from "../js/core/state.js";
@@ -958,4 +959,73 @@ test("drill breadcrumb preserves parcel highlight and navigates to group and cou
   } finally {
     globalThis.document = previousDocument;
   }
+});
+
+
+test("palette variants show category names and keep sources in button titles", context => {
+  const previousDocument = globalThis.document;
+  const previousRaf = globalThis.requestAnimationFrame;
+  const previousCancel = globalThis.cancelAnimationFrame;
+  const previousState = Object.fromEntries([
+    "activePalettePack", "activePaletteMap", "currentLanguage", "recentColors", "paletteLibrarySearch",
+    "paletteLibraryGroupingMode", "ui",
+  ].map(key => [key, state[key]]));
+  context.after(() => {
+    globalThis.document = previousDocument;
+    globalThis.requestAnimationFrame = previousRaf;
+    globalThis.cancelAnimationFrame = previousCancel;
+    Object.assign(state, previousState);
+  });
+  globalThis.document = createTestDocument();
+  globalThis.requestAnimationFrame = () => 1;
+  globalThis.cancelAnimationFrame = () => {};
+  Object.assign(state, {
+    activePalettePack: { entries: { TST: {
+      hex: "#112233", map_hex: "#112233", ui_hex: "#445566", country_file_hex: "#778899",
+      map_source: "colors.txt:color", ui_source: "colors.txt:color_ui", country_file_source: "Middle East - Pakt.txt:color",
+    } } },
+    activePaletteMap: { mapped: {} }, currentLanguage: "en",
+    recentColors: [], paletteLibrarySearch: "", paletteLibraryGroupingMode: "default",
+    ui: { ...state.ui, paletteLibrarySections: {} },
+  });
+  const list = new TestElement("div");
+  createPaletteLibraryPanelController({ paletteLibraryList: list }).renderPaletteLibrary();
+  const variants = list.querySelectorAll(".palette-library-variant-btn");
+  assert.deepEqual(variants.map(button => button.querySelector(".palette-library-variant-label").textContent),
+    ["Map color", "UI color", "Country file color"]);
+  assert.deepEqual(variants.map(button => button.title),
+    ["colors.txt:color", "colors.txt:color_ui", "Middle East - Pakt.txt:color"]);
+});
+
+
+test("country group selector does not repeat the selected system label", (context) => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+  context.after(() => { globalThis.document = previousDocument; });
+  const container = new TestElement();
+  const country = { groupSystems: [
+    { id: "scenario_districts", groups: [{ id: "north", label: "North" }] },
+    { id: "modern", groups: [{ id: "south", label: "South" }] },
+  ] };
+  const options = {
+    t: (key) => key, language: "en", translateGeo: (key) => key,
+    selectedSystemId: "scenario_districts", selectSystem() {}, applyGroup() {},
+    createInspectorActionButton: (label, action) => {
+      const button = new TestElement("button");
+      button.textContent = label;
+      button.addEventListener("click", action);
+      return button;
+    },
+    createEmptyNote: () => new TestElement("small"),
+  };
+  renderCountryGroupButtons(container, country, options);
+  assert.equal(container.querySelectorAll(".scenario-action-hint").length, 0);
+  const toggle = container.querySelector(".country-group-system-toggle");
+  assert.deepEqual(toggle.children.map((node) => node.textContent), ["Scenario districts", "Modern administrative regions"]);
+  toggle.children[1].click();
+  assert.equal(container.querySelectorAll(".scenario-action-hint").length, 0);
+  assert.equal(container.querySelector(".country-group-system-toggle").children[1].getAttribute("aria-pressed"), "true");
+  container.replaceChildren();
+  renderCountryGroupButtons(container, { groupSystems: [country.groupSystems[0]] }, options);
+  assert.equal(container.querySelector(".scenario-action-hint").textContent, "Scenario districts");
 });

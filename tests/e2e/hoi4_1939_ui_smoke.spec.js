@@ -79,7 +79,7 @@ test('hoi4 1939 owner-sync smoke', async ({ page }, testInfo) => {
       expect(scenarioAuditHint.toLowerCase()).toContain('split');
       expect(scenarioAuditHint).toContain(String(ownerControllerSplitFeatureCount));
     } else {
-      expect(scenarioAuditHint.toLowerCase()).toContain('ownership baseline active');
+      expect(scenarioAuditHint.toLowerCase()).toContain("using the scenario's original borders");
     }
 
     expect(controllerOnlyCountries).toHaveLength(Number(manifest?.summary?.controller_rule_count || 0));

@@ -633,23 +633,23 @@ test("layer search, visibility and display preserve control ownership", async ({
   await search.fill("unmatched-layer-name");
   await expect(page.locator("#editorLayersEmpty")).toBeVisible();
   await search.press("Escape");
-  await expect(page.locator(".editor-layer-row:visible")).toHaveCount(16);
-  await page.locator("#editorLayer-display").click();
-  await expect(page.locator("#editorProperty-display #displayQuality")).toBeVisible();
-  await expect(page.locator("#editorProperty-display #politicalRenderMode")).toHaveCount(1);
+  await expect(page.locator(".editor-layer-row:visible")).toHaveCount(15);
+  await page.locator('[data-appearance-tab="presets"]').click();
+  await expect(page.locator("#editorProperty-data-appearance-panel-presets #displayQuality")).toBeVisible();
+  await expect(page.locator("#editorProperty-data-appearance-panel-presets #politicalRenderMode")).toHaveCount(0);
   await page.evaluate(() => {
-    const host = document.getElementById("editorProperty-display");
+    const host = document.getElementById("editorProperty-data-appearance-panel-presets");
     const strip = document.createElement("div");
     strip.className = "layer-status-strip";
     strip.dataset.statusTone = "active";
     strip.textContent = "Ready";
     host.append(strip);
   });
-  const dot = page.locator('[data-layer-key="display"] .editor-layer-status');
+  const dot = page.locator('[data-layer-key="presets"] .editor-layer-status');
   await expect(dot).toBeVisible();
   await expect(dot).toHaveAttribute("data-status-tone", "active");
   await expect(dot).toHaveAttribute("title", "Ready");
-  await page.locator("#editorProperty-display .layer-status-strip").evaluate((strip) => {
+  await page.locator("#editorProperty-data-appearance-panel-presets .layer-status-strip").evaluate((strip) => {
     strip.dataset.statusTone = "warning";
     strip.textContent = "Unavailable";
   });

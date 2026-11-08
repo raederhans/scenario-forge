@@ -1225,7 +1225,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/vendor/fonts/README.md",
             "app/vendor/fonts/ebgaramond/EBGaramond-500.woff2",
             "app/vendor/fonts/ebgaramond/OFL.txt",
-            "app/vendor/fonts/notoserifsc/NotoSerifSC-400.woff2",
+            *build_pages_dist.MAP_LABEL_CJK_FONT_SLICE_PATHS,
             "app/vendor/fonts/notoserifsc/OFL.txt",
         )
         css_path = "app/css/map-label-fonts.css"
@@ -1241,10 +1241,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
         inventory = build_pages_dist.build_pages_reachability_inventory(records, module_graph=graph)
         self.assertEqual(inventory["admission"]["status"], "complete")
         self.assertEqual(inventory["product_inventory"]["unknown_file_count"], 0)
-        self.assertEqual(inventory["untraversed_owned_file_count"], 5)
+        self.assertEqual(inventory["untraversed_owned_file_count"], len(font_paths))
         self.assertEqual(
             next(item for item in inventory["categories"] if item["id"] == "on-demand-product")["file_count"],
-            5,
+            len(font_paths),
         )
         for path in font_paths:
             with self.subTest(path=path):
@@ -1260,6 +1260,11 @@ class PagesDistStartupShellTest(unittest.TestCase):
             build_pages_dist._classify_pages_dist_path("app/vendor/fonts/unregistered.woff2", graph),
             ("unknown", "unclassified", "no-declarative-owner"),
             "the exact font list must not admit arbitrary files in the fonts directory",
+        )
+        self.assertEqual(
+            build_pages_dist._classify_pages_dist_path("app/vendor/fonts/notoserifsc/NotoSerifSC-400.woff2", graph),
+            ("unknown", "unclassified", "no-declarative-owner"),
+            "the complete source font is a generator input, not a published asset",
         )
 
     def test_pages_dist_inventory_rejects_orphan_and_typo_counterexamples(self) -> None:
@@ -1788,7 +1793,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/hgo_catalogs/flags_png/small/AB/ABK.png",
             "app/data/hgo_catalogs/flags_png/medium/AB/ABK.png",
             "app/data/city_lights/historical_1930_entries.json",
-            "app/data/scenarios/tno_1962/startup.bundle.en.json",
+            "app/data/scenarios/tno_1962/startup.bundle.en.json.gz",
             "app/data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json",
             "app/data/scenarios/tno_1962/derived/geometry_drop_audit.json",
             "app/data/scenarios/tno_1962/chunks/political.coarse.r0c0.json.gz",
@@ -1800,6 +1805,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/transport_layers/global_rail/regions/south_america/shards/sa_w082_w058/railways.preview.topo.json",
             "app/data/transport_layers/global_airport/airports.geojson",
             "app/data/transport_layers/global_port/ports.geojson",
+            "app/data/transport_layers/hoi4_era_rail/era_rail.geojson",
+            "app/data/transport_layers/tno_era_rail/era_rail.geojson",
             "app/data/transport_layers/japan_airport/airports.geojson",
             "app/data/transport_layers/japan_port/ports.core.geojson",
             "app/data/transport_layers/japan_port/ports.expanded.geojson",
@@ -2360,7 +2367,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     bundle_url = manifest.get(f"startup_bundle_url_{language}")
                     if not isinstance(bundle_url, str) or not bundle_url:
                         continue
-                    bundle = json.loads((PAGES_DIST_ROOT / "app" / bundle_url).read_text(encoding="utf-8"))
+                    bundle_path = build_pages_dist.published_startup_bundle_path(PAGES_DIST_ROOT / "app" / bundle_url)
+                    bundle = json.loads(gzip.decompress(bundle_path.read_bytes()) if bundle_path.suffix == ".gz" else bundle_path.read_bytes())
                     manifest_subset = bundle.get("manifest_subset")
                     self.assertIsInstance(manifest_subset, dict)
                     for key, value in manifest_subset.items():

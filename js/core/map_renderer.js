@@ -1,3 +1,4 @@
+import { resolveAtlantropaSeaFillColor } from "./scenario/atlantropa_sea_color.js";
 import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
 import { createHitTestingOwner } from "./map_renderer/hit_testing_owner.js";
 import { lazyOwner } from "./map_renderer/lazy_owner.js";
@@ -82,6 +83,7 @@ import {
   getUrbanFeatureOwnerId,
 } from "./renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
+import { formatCityVictoryPoints } from "./renderer/modern_place_name.js";
 import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
@@ -2342,14 +2344,33 @@ function getClassifiedBorderMeshes() {
   }
   return classification;
 }
+// Shell fills are drawn from the full collection but are not interactive, so
+// the surfaces lack them. Contours add them back as coverage-only features.
+let contourSourceBase = null, contourSourceFull = null, contourSourceFeatures = null;
+function getPaintContourSourceFeatures() {
+  const base = getRiverPaintRuntime(runtimeState).surfaces();
+  const full = runtimeState.landDataFull?.features;
+  if (base !== contourSourceBase || full !== contourSourceFull) {
+    contourSourceBase = base; contourSourceFull = full;
+    const baseIds = new Set();
+    for (const feature of base) baseIds.add(getFeatureId(feature));
+    const shells = Array.isArray(full) ? full.filter((feature) => {
+      const id = getFeatureId(feature);
+      return id && !baseIds.has(id) && isScenarioShellFeature(feature, id);
+    }) : [];
+    contourSourceFeatures = shells.length ? Object.freeze([...base, ...shells]) : base;
+  }
+  return contourSourceFeatures;
+}
 function getPaintContourRuntimeOwner() {
   if (!paintContourRuntimeOwner) {
     paintContourRuntimeOwner = createPaintContourRuntime({
       state: runtimeState,
-      getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
+      getFeatures: getPaintContourSourceFeatures,
       getFeatureId,
       resolveSourceFeatureId: (feature, id) => feature?.properties?.__riverParentId || id,
       resolveClassification: resolveClassifiedBorderFeature,
+      isCoverageOnly: (feature, id) => isScenarioShellFeature(feature, id),
       getWaterMaskSources: () => ({
         land: runtimeState.showScenarioAtlantropa === false ? runtimeState.landBgData
           : runtimeState.scenarioLandMaskData || runtimeState.scenarioContextLandMaskData || runtimeState.landBgData,
@@ -2372,8 +2393,9 @@ function getPaintContourRuntimeOwner() {
         const parentId = runtime.getCellFeature(leftId)?.properties?.__riverParentId;
         return !parentId || parentId !== runtime.getCellFeature(rightId)?.properties?.__riverParentId;
       },
+      // Visible shell fills cover gaps between source admin parcels; without
+      // them the parcel edges beside each fill would be classified as coast.
       isEligible: (feature, id) => !shouldExcludePoliticalVisualFeature(feature, id)
-        && !isScenarioShellFeature(feature, id)
         && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
         && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner"),
       resolveColor: (feature, id) => {
@@ -3496,11 +3518,10 @@ function isTnoRasterSceneSelected() {
 // These producers paint the entire requested rectangle, not only its backing canvas.
 function getTnoScenePaintOverscanPx(passName) {
   if (exportRenderInProgress || !isTnoRasterSceneSelected()) return 0;
-  if (!["borders", "labels", "textureLabels"].includes(passName)) return 0;
-  // Optional producers still have viewport-specific placement contracts.
-  if (passName === "labels" && ((runtimeState.showTransport
-    && ["showAirports", "showPorts", "showRoad", "showRail"].some(name => runtimeState[name]))
-    || (runtimeState.showPhysical && runtimeState.styleConfig?.physical?.showRegionLabels))) return 0;
+  // City and country names are laid out against a budget and collision boxes:
+  // a paint margin would let off-screen names claim on-screen slots, so the
+  // labels pass keeps the viewport placement contract of the vector path.
+  if (!["borders", "textureLabels"].includes(passName)) return 0;
   return VIEWPORT_CULL_OVERSCAN_PX;
 }
 
@@ -3651,8 +3672,8 @@ function getPoliticalIdRasterRuntimeOwner() {
             runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
           geometryContentVersion,
           version: `${geometryContentVersion}:${[...foreground].sort().join(",")}`,
-          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
-          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
+          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
+          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
         };
       },
     },
@@ -5310,6 +5331,7 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     runtimeState.allowOpenOceanSelect ? "open-ocean-select:on" : "open-ocean-select:off",
     runtimeState.allowOpenOceanPaint ? "open-ocean-paint:on" : "open-ocean-paint:off",
     `ocean-fill:${getOceanBaseFillColor()}`,
+    `atlantropa-sea-fill:${getAtlantropaSeaFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
     `ocean-surface:${stableJson(runtimeState.styleConfig?.ocean || {})}`,
@@ -5690,6 +5712,12 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection, { pu
 
 let frameEffectiveWater = null;
 
+function getActiveScenarioYear() {
+  if (!runtimeState.activeScenarioId) return null;
+  const year = Number(String(runtimeState.activeScenarioManifest?.bookmark_date).split(".")[0]);
+  return Number.isInteger(year) && year > 0 ? year : null;
+}
+
 function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   const manifest = runtimeState.activeScenarioManifest;
   const baseFeatures = runtimeState.waterRegionsData?.features;
@@ -5697,6 +5725,7 @@ function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   return [
     baseFeatures, baseFeatures?.length, scenarioWaterFeatures, scenarioWaterFeatures?.length,
     lakeFeatures, lakeFeatures?.length, runtimeState.activeScenarioId || "", isScenarioWaterTopologyExclusiveMode(),
+    getActiveScenarioYear(),
     manifest?.excluded_water_region_ids, manifest?.excluded_water_region_groups, runtimeState.contextLayerRevision,
     ...atlantropaWater,
   ];
@@ -5728,6 +5757,7 @@ function resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scen
     baseFeatures: runtimeState.waterRegionsData?.features || [],
     scenarioFeatures,
     globalLakeFeatures: runtimeState.contextLayerExternalDataByName?.lakes?.features || [],
+    scenarioYear: getActiveScenarioYear(),
     activeScenarioId: runtimeState.activeScenarioId || "",
     exclusive: isScenarioWaterTopologyExclusiveMode(),
     isExcluded: (feature) => isWaterRegionExcludedByScenario(feature, exclusions),
@@ -5901,10 +5931,14 @@ function getAtlantropaShoalManifestFillColor() {
   );
 }
 
+function getAtlantropaSeaFillColor() {
+  return resolveAtlantropaSeaFillColor(runtimeState.activeScenarioManifest, getOceanBaseFillColor());
+}
+
 function getAtlantropaRuleColor(rule) {
   const normalizedRule = String(rule || "").trim().toLowerCase();
   if (normalizedRule === "atlantropa_sea") {
-    return getOceanBaseFillColor();
+    return getAtlantropaSeaFillColor();
   }
   if (normalizedRule === "salt_flat") {
     return getAtlantropaSaltFlatManifestFillColor();
@@ -5927,7 +5961,7 @@ function isInteractiveAtlantropaBooleanWeldIslandFeature(feature, featureId = nu
 }
 
 function getAtlantropaSeaPoliticalFillColor() {
-  return getOceanBaseFillColor();
+  return getAtlantropaSeaFillColor();
 }
 
 function getAtlantropaSeaPoliticalStrokeColor() {
@@ -9491,7 +9525,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
-    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPoliticalDisplayModeSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
+    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPoliticalDisplayModeSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(), getAtlantropaSeaFillColor(),
     runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
@@ -11043,6 +11077,13 @@ function getCityTooltipText(entry) {
     (name) => t(name, "geo"),
   );
   const lines = [fullLabel];
+  const victoryPoints = formatCityVictoryPoints(
+    props.__city_scenario_victory_points,
+    props.__city_scenario_vp_name,
+    getCityDisplayLabel(entry?.feature, { showModernPlaceNames: false }),
+    runtimeState.currentLanguage,
+  );
+  if (victoryPoints) lines.push(victoryPoints);
   const capitalDescriptor = getCityCapitalDescriptor(entry);
   if (capitalDescriptor) {
     lines.push(capitalDescriptor);
@@ -15339,6 +15380,23 @@ export function getRendererAsyncWorkStatus() {
     borderScheduled: (staticBorderMeshLifecycle?.hasPendingWork() || paintContourRuntimeOwner?.hasPendingWork()) || false,
     exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
   };
+}
+
+// Labels placed by the last full labels pass that touch the visible viewport:
+// city IDs and country codes. Off-screen paint margins are excluded.
+export function getVisibleMapLabels() {
+  const width = Number(runtimeState.width) || 0, height = Number(runtimeState.height) || 0;
+  const onScreen = (x, y, w = 0, h = 0) => x + w >= 0 && y + h >= 0 && x <= width && y <= height;
+  const cities = (cityPointsRenderOwner?.getLastDrawnCityLabels() || [])
+    .filter(({ screenPoint }) => Array.isArray(screenPoint) && onScreen(screenPoint[0], screenPoint[1]))
+    .map(({ id }) => String(id));
+  const countryDiagnostics = countryLabelRenderOwner?.getDiagnostics();
+  const countries = (countryDiagnostics?.lastLabels || [])
+    .filter(({ bounds }) => bounds && onScreen(bounds.x, bounds.y, bounds.w, bounds.h))
+    .map(({ countryCode }) => String(countryCode));
+  return { cities: [...new Set(cities)].sort(), countries: [...new Set(countries)].sort(),
+    // Country names still waiting for an asynchronous layout fit in this view.
+    pendingCountryFits: Number(countryDiagnostics?.pendingFits) || 0 };
 }
 
 export function getCountryLabelReadiness() {

@@ -680,16 +680,6 @@ const config = {
                 '<h2 id="lblTransportPanel" class="section-header" data-i18n="Transport">Transport</h2>',
                 index_html,
             )
-            self.assertIn(
-                'data-i18n="Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls."',
-                index_html,
-            )
-            self.assertIn('data-i18n-aria-label="Transport actions"', index_html)
-        self.assertIn("Transport actions", ui)
-        self.assertIn(
-            "Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.",
-            ui,
-        )
 
     def test_cloud_save_and_fragment_ui_keys_exist_in_source_and_dist_locales(self) -> None:
         required_ui_keys = {

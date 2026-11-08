@@ -381,6 +381,7 @@ function createScenarioApplyPipeline({
           showScenarioSpecialRegions: runtimeState.showScenarioSpecialRegions !== false,
           showScenarioAtlantropa: runtimeState.showScenarioAtlantropa !== false,
           showScenarioReliefOverlays: runtimeState.showScenarioReliefOverlays !== false,
+          showEraRailways: runtimeState.showEraRailways !== false,
         }
         : cloneScenarioStateValue(runtimeState.scenarioDisplaySettingsBeforeActivate);
     const scenarioOceanFillBeforeActivate = runtimeState.scenarioOceanFillBeforeActivate === null
@@ -453,7 +454,9 @@ function createScenarioApplyPipeline({
       scenarioWaterOverlayVersionTag: scenarioWaterRegionsData ? runtimeVersionTag : "",
       scenarioSpecialRegionsData: staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null,
       scenarioReliefOverlaysData: staged.scenarioReliefOverlaysPayload || null,
+      scenarioEraRailwaysData: staged.scenarioEraRailwaysPayload || null,
       scenarioReliefOverlayRevision: (Number(runtimeState.scenarioReliefOverlayRevision) || 0) + 1,
+      scenarioEraRailwaysRevision: (Number(runtimeState.scenarioEraRailwaysRevision) || 0) + 1,
       scenarioStrategicValuesData: staged.scenarioStrategicValuesPayload || null,
       scenarioStrategicValuesRevision: (Number(runtimeState.scenarioStrategicValuesRevision) || 0) + 1,
       scenarioDistrictGroupsData: staged.districtGroupsPayload,
@@ -824,6 +827,7 @@ function createScenarioApplyPipeline({
     const mergedSpecialPayload = getActiveScenarioMergedChunkLayerPayload("special", scenarioId);
     const mergedAtlantropaPayload = getActiveScenarioMergedChunkLayerPayload("scenario_atlantropa", scenarioId);
     const mergedReliefPayload = getActiveScenarioMergedChunkLayerPayload("relief", scenarioId);
+    const mergedEraRailwaysPayload = getActiveScenarioMergedChunkLayerPayload("erarailways", scenarioId);
     const mergedCitiesPayload = getActiveScenarioMergedChunkLayerPayload("cities", scenarioId);
     const mergedStrategicValuesPayload = getActiveScenarioMergedChunkLayerPayload("strategicvalues", scenarioId);
     const scenarioStrategicValuesPayload = normalizeScenarioApplyStrategicValuesPayload(
@@ -941,6 +945,9 @@ function createScenarioApplyPipeline({
       scenarioReliefOverlaysPayload: mergedReliefPayload !== undefined
         ? mergedReliefPayload
         : (bundle.reliefOverlaysPayload || null),
+      scenarioEraRailwaysPayload: mergedEraRailwaysPayload !== undefined
+        ? mergedEraRailwaysPayload
+        : (bundle.eraRailwaysPayload || null),
       scenarioCityOverridesPayload: mergedCitiesPayload !== undefined
         ? mergedCitiesPayload
         : (bundle.cityOverridesPayload || null),
