@@ -48,10 +48,10 @@
     "5": 78
   },
   "supply_node_count": 1460,
-  "sea_crossing_midpoint_fixes": 159,
+  "sea_crossing_midpoint_fixes": 169,
   "province_vertex_count": 7187,
   "vanilla_position_vertices": 4270,
   "mod_model_vertices": 2917,
   "city_coordinate_vertices": 729,
-  "land_snapped_vertices": 140
+  "land_snapped_vertices": 148
 }

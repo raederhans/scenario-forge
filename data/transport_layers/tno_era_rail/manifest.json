@@ -3,7 +3,7 @@
   "family": "era_rail",
   "geometry_kind": "mixed",
   "schema_version": 1,
-  "generated_at": "2026-11-07T11:49:50Z",
+  "generated_at": "2026-11-08T02:57:05Z",
   "recipe_version": "era_rail_v1",
   "source_policy": "local_game_files_facts_only",
   "distribution_tier": "scenario_optional_layer",

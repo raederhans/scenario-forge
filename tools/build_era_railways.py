@@ -207,6 +207,11 @@ class PixelGeoreference:
         return result
 
 
+def is_water_surface(properties: dict) -> bool:
+    """亚特兰托帕对象里既有新陆地（盐碱地）也有残余海面，海面不能算作陆地。"""
+    return str((properties or {}).get("atl_surface_kind") or "").strip().lower() == "sea"
+
+
 class LandSnapper:
     """顶点落在剧本陆地之外时，吸附到最近陆地地块内侧。"""
 
@@ -221,7 +226,7 @@ class LandSnapper:
             for object_name in object_names
             if object_name in topology.get("objects", {})
             for item in decode_topology(topology, object_name)
-            if not item["geometry"].is_empty
+            if not item["geometry"].is_empty and not is_water_surface(item["properties"])
         ]
         self._geometries = geometries
         self._tree = STRtree(geometries)

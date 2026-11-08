@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 
 from tools.build_era_railways import (
+    LandSnapper,
     ModCylindricalGeoreference,
     PixelGeoreference,
     haversine_km,
@@ -88,6 +89,36 @@ class PixelGeoreferenceTest(unittest.TestCase):
         for (x, y), (lon, lat) in zip(probe, predicted):
             expected_lon, expected_lat = truth(x, y)
             self.assertLess(float(haversine_km(lon, lat, expected_lon, expected_lat)), 5.0)
+
+
+class LandSnapperTest(unittest.TestCase):
+    def test_atlantropa_sea_polygons_are_not_treated_as_land(self):
+        # 两个相邻方块：x∈[0,1] 为新陆地（盐碱地），x∈[1,2] 为残余海面。
+        topology = {
+            "type": "Topology",
+            "arcs": [
+                [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]],
+                [[1, 0], [2, 0], [2, 1], [1, 1], [1, 0]],
+            ],
+            "objects": {
+                "scenario_atlantropa": {
+                    "type": "GeometryCollection",
+                    "geometries": [
+                        {"type": "Polygon", "arcs": [[0]], "properties": {"id": "land", "atl_surface_kind": "salt_flat_land"}},
+                        {"type": "Polygon", "arcs": [[1]], "properties": {"id": "sea", "atl_surface_kind": "sea"}},
+                    ],
+                },
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "topology.json"
+            path.write_text(json.dumps(topology), encoding="utf-8")
+            snapper = LandSnapper(path, ("political", "scenario_atlantropa"))
+        self.assertTrue(snapper.is_land(0.5, 0.5))
+        self.assertFalse(snapper.is_land(1.5, 0.5))
+        (lon, _lat), moved = snapper.snap(1.5, 0.5)
+        self.assertTrue(moved)
+        self.assertLess(lon, 1.0)
 
 
 class ModCylindricalGeoreferenceTest(unittest.TestCase):
