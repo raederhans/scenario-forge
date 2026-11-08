@@ -92,9 +92,9 @@ test("manifest-only rows expose error and ready pack governance", () => {
     { status: "error", error: "source missing" },
     { governance: "data/transport/energy.json" },
   );
-  assert.equal(rowValue(errorRows, "Pack status"), "Energy facilities pack failed to load");
+  assert.equal(errorRows.some(([label]) => label === "Pack status"), false);
   assert.equal(rowValue(errorRows, "Error"), "source missing");
-  assert.equal(rowValue(errorRows, "Data path"), "data/transport/energy.json");
+  assert.equal(rowValue(errorRows, "Source and use"), "data/transport/energy.json");
 
   const readyRows = buildManifestOnlyInspectorRows(
     { id: "energy_facilities", label: "Energy facilities" },
@@ -127,7 +127,7 @@ test("manifest-only rows expose error and ready pack governance", () => {
     },
     { adapterId: "fallback", governance: "governed" },
   );
-  assert.equal(rowValue(readyRows, "Pack version"), "japan_energy_facilities_v1");
+  assert.equal(readyRows.some(([label]) => label === "Pack version"), false);
   assert.equal(rowValue(readyRows, "Default variant"), "preview");
   assert.equal(rowValue(readyRows, "Variants"), "preview (2)");
   assert.equal(rowValue(readyRows, "Local subtypes"), "thermal (3)");
@@ -163,13 +163,13 @@ test("diagnostic rows stay family specific", () => {
   assert.equal(rowValue(hubRows, "Operator type"), "Public");
 });
 
-test("inspector model preserves road, rail, airport, and port pack status rows", () => {
+test("inspector model omits build status rows for road, rail, airport, and port", () => {
   const roadError = buildTransportWorkbenchInspectorModel({
     family: { id: "road", label: "Road" },
     previewSnapshot: { status: "error", error: "road missing" },
     dataContract: { governance: "road.json" },
   });
-  assert.equal(rowValue(roadError.rows, "Pack status"), "Road pack failed to load");
+  assert.equal(roadError.rows.some(([label]) => label === "Pack status"), false);
   assert.equal(rowValue(roadError.rows, "Error"), "road missing");
 
   const roadLoading = buildTransportWorkbenchInspectorModel({
@@ -178,7 +178,7 @@ test("inspector model preserves road, rail, airport, and port pack status rows",
     previewSnapshot: { status: "pending" },
     dataContract: { governance: "road.json" },
   });
-  assert.equal(rowValue(roadLoading.rows, "Pack status"), "Loading Japan road pack");
+  assert.equal(roadLoading.rows.some(([label]) => label === "Pack status"), false);
   assert.equal(roadLoading.rows.some(([label]) => label === "Adapter"), false);
 
   const pendingCases = [
@@ -209,7 +209,7 @@ test("inspector model preserves road, rail, airport, and port pack status rows",
       previewSnapshot: { status: "error", error: `${family.id} missing` },
       dataContract: { governance: `${family.id}.json` },
     });
-    assert.equal(rowValue(errorModel.rows, "Pack status"), errorStatus);
+    assert.equal(errorModel.rows.some(([label]) => label === "Pack status"), false);
 
     const loadingModel = buildTransportWorkbenchInspectorModel({
       family,
@@ -217,7 +217,7 @@ test("inspector model preserves road, rail, airport, and port pack status rows",
       previewSnapshot: { status: "pending" },
       dataContract: { governance: `${family.id}.json` },
     });
-    assert.equal(rowValue(loadingModel.rows, "Pack status"), pendingStatus);
+    assert.equal(loadingModel.rows.some(([label]) => label === "Pack status"), false);
   });
 });
 
@@ -428,8 +428,10 @@ test("owner factory injects layer metadata and keeps translated lens label", () 
     rightDeckLabel: "Translated right deck",
   });
   assert.equal(summaryRows.some(([label]) => label === "Right deck"), false);
-  assert.equal(rowValue(summaryRows, "Pack status"), "ready");
+  assert.equal(summaryRows.some(([label]) => label === "Pack status"), false);
   assert.equal(summaryRows.some(([label]) => label === "Compare"), false);
+  assert.equal(rowValue(summaryRows, "Category"), "Road");
+  assert.equal(summaryRows.some(([label]) => label === "Preview" || label === "Pack"), false);
 });
 
 test("pack governance stays available for Data while Inspect shows the current result", () => {
@@ -449,13 +451,13 @@ test("pack governance stays available for Data while Inspect shows the current r
     dataContract: { governance: "Review source terms before distribution." },
   });
   assert.equal(rowValue(model.rows, "Loaded roads"), "12");
-  for (const label of ["Pack version", "Source policy", "N06 member", "N06 encoding"]) {
+  for (const label of ["Pack version", "Source policy", "N06 member", "N06 encoding", "Pack status", "N06 matched", "Name conflicts"]) {
     assert.equal(model.rows.some(([candidate]) => candidate === label), false);
   }
   const details = buildTransportWorkbenchPackDetailsRows(previewSnapshot, {
     governance: "Review source terms before distribution.",
   }, "road");
-  assert.equal(rowValue(details, "N06 encoding"), "CP932");
+  assert.equal(details.some(([label]) => label === "N06 encoding"), false);
   assert.equal(rowValue(details, "License tier"), "restricted");
   assert.equal(rowValue(details, "Source and use"), "Review source terms before distribution.");
 });

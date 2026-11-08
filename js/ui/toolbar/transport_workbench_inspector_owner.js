@@ -53,27 +53,18 @@ const INSPECTOR_GOVERNANCE_ROW_LABELS = new Set([
 
 export function buildTransportWorkbenchPackDetailsRows(previewSnapshot = {}, dataContract = null, familyId = "") {
   const manifest = previewSnapshot.manifest || {};
-  const audit = previewSnapshot.audit || {};
   const selectedProps = previewSnapshot.selected?.properties || {};
   const variant = previewSnapshot.activeVariant
     ? getTransportWorkbenchManifestVariantMeta(manifest, previewSnapshot.activeVariant, familyId)
     : null;
   const rows = [
-    ["Pack version", manifest.adapter_id || dataContract?.adapterId || "—"],
-    ["Recipe version", manifest.recipe_version || audit.recipe_version || "—"],
-    ["Source policy", manifest.source_policy || "—"],
     ["License tier", variant?.license_tier || manifest.license_tier || "—"],
     ["Distribution tier", variant?.distribution_tier || manifest.distribution_tier || "—"],
     ["Release policy", manifest.release_policy || "—"],
-    ["N06 member", manifest.n06_source_member || audit.n06_source_member || "—"],
-    ["N06 encoding", manifest.n06_encoding || audit.n06_encoding || "—"],
-    ["Source encoding", manifest.source_encoding || audit.source_encoding || "—"],
-    ["Data packs", Array.isArray(dataContract?.packs) ? dataContract.packs.join(", ") : "—"],
     ["Geometry source", dataContract?.geometrySource || "—"],
     ["Coverage scope", manifest.coverage_scope || "—"],
     ["Source dataset", selectedProps.source_dataset || "—"],
     ["Source member", selectedProps.source_member || "—"],
-    ["Last build", formatTransportWorkbenchManifestTimestamp(manifest.generated_at)],
     ["Source and use", dataContract?.governance || "—"],
   ];
   return rows.filter(([, value]) => value !== "—" && value !== "unknown");
@@ -128,32 +119,24 @@ export function formatTransportWorkbenchRoadHiddenReason(reason) {
 export function buildManifestOnlyInspectorRows(family, previewSnapshot, dataContract) {
   if (previewSnapshot?.status === "error") {
     return [
-      ["Pack status", `${family.label} pack failed to load`],
       ["Error", previewSnapshot.error || "Unknown error"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   }
   if (previewSnapshot?.status !== "ready") {
     return [
-      ["Adapter", dataContract?.adapterId || `japan_${family.id}_v1`],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-      ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || `Waiting for ${family.label} Japan pack`) : `Loading ${family.label} Japan pack`],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   }
 
   const manifest = previewSnapshot.manifest || {};
-  const audit = previewSnapshot.audit || {};
   const previewCounts = manifest?.feature_counts?.preview || {};
   const fullCounts = manifest?.feature_counts?.full || {};
   const variantEntries = listTransportWorkbenchManifestVariantEntries(manifest);
   const rows = [
-    ["Pack version", manifest.adapter_id || dataContract?.adapterId || `japan_${family.id}_v1`],
-    ["Recipe version", manifest.recipe_version || audit.recipe_version || "unknown"],
     ["Distribution tier", manifest.distribution_tier || "unknown"],
     ["License tier", manifest.license_tier || "unknown"],
     ["Coverage scope", manifest.coverage_scope || "unknown"],
-    ["Source policy", manifest.source_policy || "unknown"],
-    ["Last build", formatTransportWorkbenchManifestTimestamp(manifest.generated_at)],
     ["Preview features", JSON.stringify(previewCounts || {})],
     ["Full features", JSON.stringify(fullCounts || {})],
   ];
@@ -269,8 +252,9 @@ export function buildTransportWorkbenchLensSummaryRows({
   rightDeckLabel,
 } = {}) {
   return [
-    ["Preview", family?.previewTitle || family?.label || ""],
-    ["Pack status", previewSnapshot?.status || "pending"],
+    ["Category", family?.label || ""],
+    ["Sample region", dataContract?.country || ""],
+    ["Mode", previewSnapshot?.packMode || ""],
   ];
 }
 
@@ -297,17 +281,9 @@ export function buildTransportWorkbenchInspectorModel({
   if (familyId === "road" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
     rows = [
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_road_v1"],
-      ["Recipe version", previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
-      ["N06 member", previewSnapshot.manifest?.n06_source_member || previewSnapshot.audit?.n06_source_member || "unknown"],
-      ["N06 encoding", previewSnapshot.manifest?.n06_encoding || previewSnapshot.audit?.n06_encoding || "unknown"],
-      ["Last build", String(previewSnapshot.manifest?.generated_at || "unknown").replace("T", " ").replace("Z", " UTC")],
       ["Loaded roads", String(previewSnapshot.stats?.totalRoads || 0)],
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
       ["Filtered roads", String(previewSnapshot.stats?.filteredRoads || 0)],
-      ["N06 matched", String(previewSnapshot.audit?.n06_matched_count || 0)],
-      ["Name conflicts", String(previewSnapshot.audit?.name_conflict_count || 0)],
     ];
     if (selected?.type === "road") {
       rows.push(
@@ -317,12 +293,8 @@ export function buildTransportWorkbenchInspectorModel({
         ["Official ref", selected.officialRef || "--"],
         ["Road class", selected.roadClass || "--"],
         ["Source", selected.source || "--"],
-        ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "--"],
         ["Visibility", selected.visible ? "Visible" : formatTransportWorkbenchRoadHiddenReason(selected.hiddenReason)],
       );
-      if (selected.n06MatchDistanceMeters !== null && selected.n06MatchDistanceMeters !== undefined) {
-        rows.push(["N06 match distance", `${Math.round(selected.n06MatchDistanceMeters)}m`]);
-      }
     } else if (selected?.type === "label") {
       rows.push(
         ["Selected label", selected.ref || "--"],
@@ -334,28 +306,20 @@ export function buildTransportWorkbenchInspectorModel({
     }
   } else if (familyId === "road" && previewSnapshot?.status === "error") {
     rows = [
-      ["Pack status", "Road pack failed to load"],
       ["Error", previewSnapshot.error || "Unknown error"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "road") {
     rows = [
-      ["Pack status", "Loading Japan road pack"],
-      ["Adapter", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "rail" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
     rows = [
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_rail_v1"],
-      ["Recipe version", previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
-      ["Last build", String(previewSnapshot.manifest?.generated_at || "unknown").replace("T", " ").replace("Z", " UTC")],
       ["Loaded lines", String(previewSnapshot.stats?.totalLines || 0)],
       ["Visible lines", String(previewSnapshot.stats?.visibleLines || 0)],
       ["Loaded stations", String(previewSnapshot.stats?.totalStations || 0)],
       ["Visible stations", String(previewSnapshot.stats?.visibleStations || 0)],
-      ["Adapter", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
       ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
       ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
     ];
@@ -368,7 +332,6 @@ export function buildTransportWorkbenchInspectorModel({
         ["Status", selected.status || "--"],
         ["Class", selected.lineClass || "--"],
         ["Source", selected.source || "--"],
-        ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "--"],
         ["Visibility", selected.visible ? "Visible" : formatJapanRailVisibilityReason(selected.hiddenReason)],
       );
     } else if (selected?.type === "station") {
@@ -384,33 +347,26 @@ export function buildTransportWorkbenchInspectorModel({
     }
   } else if (familyId === "rail" && previewSnapshot?.status === "error") {
     rows = [
-      ["Pack status", "Rail pack failed to load"],
       ["Error", previewSnapshot.error || "Unknown error"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "rail") {
     rows = [
-      ["Adapter", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
       ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
       ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
       ["Stations", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Hidden"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-      ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for the Japan rail lines and major-station packs") : "Loading Japan rail pack"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "airport" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
     const selectedProps = selected?.properties || {};
     rows = [
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_airport_v1"],
-      ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
-      ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
       ["Loaded airports", String(previewSnapshot.stats?.totalFeatures || 0)],
       ["Visible airports", String(previewSnapshot.stats?.visibleFeatures || 0)],
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
       ["Airport types", formatTransportWorkbenchOptionLabels(config.airportTypes, AIRPORT_TYPE_OPTIONS)],
       ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, AIRPORT_STATUS_OPTIONS)],
-      ["Pack mode", previewSnapshot.packMode || "preview"],
+      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
@@ -429,34 +385,28 @@ export function buildTransportWorkbenchInspectorModel({
     }
   } else if (familyId === "airport" && previewSnapshot?.status === "error") {
     rows = [
-      ["Pack status", "Airport pack failed to load"],
       ["Error", previewSnapshot.error || "Unknown error"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "airport") {
     rows = [
       ["Airport types", formatTransportWorkbenchOptionLabels(config.airportTypes, AIRPORT_TYPE_OPTIONS)],
       ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, AIRPORT_STATUS_OPTIONS)],
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-      ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for airport Japan pack") : "Loading Japan airport pack"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "port" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
     const selectedProps = selected?.properties || {};
     rows = [
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_port_v1"],
-      ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
       ["Release policy", previewSnapshot.manifest?.release_policy || "unknown"],
-      ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
       ["Loaded ports", String(previewSnapshot.stats?.totalFeatures || 0)],
       ["Visible ports", String(previewSnapshot.stats?.visibleFeatures || 0)],
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
       ["Coverage tier", previewSnapshot.activeVariant || config.coverageTier || getTransportWorkbenchManifestDefaultVariantId(previewSnapshot.manifest, "port")],
       ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
       ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
-      ["Pack mode", previewSnapshot.packMode || "preview"],
+      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
@@ -472,9 +422,8 @@ export function buildTransportWorkbenchInspectorModel({
     }
   } else if (familyId === "port" && previewSnapshot?.status === "error") {
     rows = [
-      ["Pack status", "Port pack failed to load"],
       ["Error", previewSnapshot.error || "Unknown error"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "port") {
     rows = [
@@ -482,23 +431,17 @@ export function buildTransportWorkbenchInspectorModel({
       ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
       ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-      ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for port Japan pack") : "Loading Japan port pack"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "mineral_resources" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
     const selectedProps = selected?.properties || {};
     rows = [
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_mineral_resources_v1"],
-      ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
-      ["Source encoding", previewSnapshot.manifest?.source_encoding || previewSnapshot.audit?.source_encoding || "unknown"],
-      ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
       ["Loaded sites", String(previewSnapshot.stats?.totalFeatures || 0)],
       ["Visible sites", String(previewSnapshot.stats?.visibleFeatures || 0)],
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Pack mode", previewSnapshot.packMode || "preview"],
+      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
@@ -515,15 +458,13 @@ export function buildTransportWorkbenchInspectorModel({
     }
   } else if (familyId === "mineral_resources" && previewSnapshot?.status === "error") {
     rows = [
-      ["Pack status", "Mineral resource pack failed to load"],
       ["Error", previewSnapshot.error || "Unknown error"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "mineral_resources") {
     rows = [
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-      ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for the Japan mineral resource pack manifest") : "Loading Japan mineral resource pack"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "energy_facilities" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
@@ -537,18 +478,14 @@ export function buildTransportWorkbenchInspectorModel({
       .map((entry) => String(entry.subtype_id || "").trim())
       .filter(Boolean);
     rows = [
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_energy_facilities_v1"],
-      ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
       ["Distribution tier", previewSnapshot.manifest?.distribution_tier || "unknown"],
-      ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
       ["Loaded facilities", String(previewSnapshot.stats?.totalFeatures || 0)],
       ["Visible facilities", String(previewSnapshot.stats?.visibleFeatures || 0)],
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
       ["Local subtypes", formatTransportWorkbenchOptionLabels(selectedSubtypeValues, subtypeOptions)],
       ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, ENERGY_STATUS_OPTIONS)],
       ["Reference-only subtypes", referenceOnlySubtypes.length ? referenceOnlySubtypes.join(", ") : "none"],
-      ["Pack mode", previewSnapshot.packMode || "preview"],
+      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
@@ -563,16 +500,14 @@ export function buildTransportWorkbenchInspectorModel({
     }
   } else if (familyId === "energy_facilities" && previewSnapshot?.status === "error") {
     rows = [
-      ["Pack status", "Energy facility pack failed to load"],
       ["Error", previewSnapshot.error || "Unknown error"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "energy_facilities") {
     rows = [
       ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, ENERGY_STATUS_OPTIONS)],
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-      ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for the Japan energy facility pack manifest") : "Loading Japan energy facility pack"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "industrial_zones" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
@@ -621,12 +556,9 @@ export function buildTransportWorkbenchInspectorModel({
     }
     rows.push(
       ["Loaded sites", String(totalFeatures)],
-      ["Pack mode", previewSnapshot.packMode || "preview"],
+      ["Mode", previewSnapshot.packMode || "preview"],
       ["Variant tier", variantMeta?.distribution_tier || "unknown"],
       ["License tier", variantMeta?.license_tier || "unknown"],
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "active_industrial_zones_manifest"],
-      ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
     );
     if (selected) {
       rows.push(
@@ -637,21 +569,21 @@ export function buildTransportWorkbenchInspectorModel({
   } else if (familyId === "industrial_zones" && previewSnapshot?.status === "error") {
     stateCards.push(createStateCard(
       "Industrial land preview failed",
-      previewSnapshot.error || "The industrial land pack could not be loaded.",
+      previewSnapshot.error || "Industrial land could not be loaded.",
       "emphasis",
     ));
-    rows = [["Data path", dataContract?.governance || "Deferred pack governance pending"]];
+    rows = [["Source and use", dataContract?.governance || "—"]];
   } else if (familyId === "industrial_zones") {
     stateCards.push(createStateCard(
       "Preparing industrial land preview",
-      "The current source track is still loading into the active carrier.",
+      "Loading…",
       "soft",
     ));
     rows = [
       ["Source track", config.variant || (previewSnapshot?.manifest ? getTransportWorkbenchManifestDefaultVariantId(previewSnapshot.manifest, "industrial_zones") : "internal")],
       ["Land type", formatTransportWorkbenchOptionLabels(config.siteClasses, INDUSTRIAL_SITE_CLASS_OPTIONS)],
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Data check", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "logistics_hubs" && previewSnapshot?.status === "ready") {
     const selected = previewSnapshot.selected;
@@ -686,12 +618,8 @@ export function buildTransportWorkbenchInspectorModel({
     }
     rows.push(
       ["Loaded hubs", String(totalFeatures)],
-      ["Pack mode", previewSnapshot.packMode || "preview"],
+      ["Mode", previewSnapshot.packMode || "preview"],
       ["Distribution tier", previewSnapshot.manifest?.distribution_tier || "unknown"],
-      ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
-      ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_logistics_hubs_v1"],
-      ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
-      ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
     );
     if (selected) {
       rows.push(["Source member", selectedProps.source_member || "--"]);
@@ -699,21 +627,21 @@ export function buildTransportWorkbenchInspectorModel({
   } else if (familyId === "logistics_hubs" && previewSnapshot?.status === "error") {
     stateCards.push(createStateCard(
       "Logistics hub preview failed",
-      previewSnapshot.error || "The logistics hub pack could not be loaded.",
+      previewSnapshot.error || "Logistics hubs could not be loaded.",
       "emphasis",
     ));
-    rows = [["Data path", dataContract?.governance || "Deferred pack governance pending"]];
+    rows = [["Source and use", dataContract?.governance || "—"]];
   } else if (familyId === "logistics_hubs") {
     stateCards.push(createStateCard(
       "Preparing logistics hub preview",
-      "The current hub scope is still loading into the Japan carrier.",
+      "Loading…",
       "soft",
     ));
     rows = [
       ["Hub category", formatTransportWorkbenchOptionLabels(config.hubTypes, LOGISTICS_HUB_TYPE_OPTIONS)],
       ["Operator type", formatTransportWorkbenchOptionLabels(config.operatorClassifications, LOGISTICS_OPERATOR_CLASSIFICATION_OPTIONS)],
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Data check", dataContract?.governance || "Deferred pack governance pending"],
+      ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (isManifestOnlyRuntimeFamily(familyId)) {
     rows = buildManifestOnlyInspectorRows(family, previewSnapshot, dataContract);
@@ -730,8 +658,6 @@ export function buildTransportWorkbenchInspectorModel({
     });
   } else {
     rows = [
-      ["Adapter", "Reserved shell only"],
-      ["Pack status", `Waiting for ${family?.label || "selected family"} Japan adapter`],
     ];
   }
   return {
