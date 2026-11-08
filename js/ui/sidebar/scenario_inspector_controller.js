@@ -18,7 +18,7 @@ export function renderCountryGroupButtons(container, countryState, {
   }
   if (systems.filter((system) => system.groups.length).length > 1) {
     const toggle = document.createElement("div");
-    toggle.className = "frontline-segmented-field";
+    toggle.className = "frontline-segmented-field country-group-system-toggle";
     systems.forEach((system) => {
       const button = createInspectorActionButton(sourceLabel(system.id), () => {
         selectSystem(system.id);

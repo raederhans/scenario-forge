@@ -43,7 +43,7 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
     hex.setCustomValidity("");
     hint.textContent = ids?.size
       ? (zh() ? `${ids.size} 个地区 · 改色会覆盖局部涂色，可撤销` : `${ids.size} regions · Replaces local paint; undo available`)
-      : (zh() ? "选择已有国家 tag" : "Select an existing country tag");
+      : (zh() ? "选择国家" : "Choose a country");
   }
   function commit(raw) {
     const color = normalizeHexColor(raw);
@@ -78,7 +78,7 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
     hex.setAttribute("aria-label", zh() ? "国家颜色十六进制值" : "Country color hex value");
     const placeholder = doc.createElement("option");
     placeholder.value = "";
-    placeholder.textContent = zh() ? "选择国家 tag…" : "Select country tag…";
+    placeholder.textContent = zh() ? "选择国家…" : "Choose a country…";
     select.replaceChildren(placeholder);
     for (const code of [...groups.keys()].sort()) {
       const option = doc.createElement("option");
