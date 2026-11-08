@@ -342,6 +342,7 @@ export function createCityPointsRenderOwner({
     return [
       cityCollection, cityCollection?.features, cityCollection?.features?.length, runtimeState.cityLayerRevision,
       runtimeState.showCityPoints, runtimeState.worldCitiesData, runtimeState.scenarioCityOverridesData,
+      !!runtimeState.showModernPlaceNames, runtimeState.currentLanguage,
       runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.scenarioDataGeneration,
       runtimeState.scenarioStrategicValuesData, runtimeState.scenarioStrategicValuesRevision, runtimeState.sovereigntyRevision,
       runtimeState.sovereigntyByFeatureId,

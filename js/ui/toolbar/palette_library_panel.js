@@ -382,9 +382,12 @@ function createPaletteLibraryPanelController({
 
       const label = document.createElement("span");
       label.className = "palette-library-variant-label";
-      label.textContent = variant.source
-        ? `${t(variant.label, "ui")} · ${variant.source}`
-        : t(variant.label, "ui");
+      label.textContent = t({
+        Map: "Map color",
+        UI: "UI color",
+        "Country file": "Country file color",
+      }[variant.label], "ui");
+      button.title = variant.source;
 
       button.appendChild(swatch);
       button.appendChild(label);

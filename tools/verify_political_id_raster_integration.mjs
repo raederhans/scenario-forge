@@ -86,21 +86,12 @@ export function assertRasterCacheRevisit(warm, revisit) {
 }
 
 async function toggle(page, enabled) {
-  const wasCollapsed = await page.evaluate(() => document.body.classList.contains("left-sidebar-collapsed"));
-  if (wasCollapsed) await page.locator("#leftSidebarCollapseBtn").click();
-  if (!(await page.locator("#politicalRasterTrial").isVisible())) {
-    await page.locator("#editorTaskLayersBtn").click();
-    await page.locator("#editorLayer-display").click();
-  }
-  const control = page.locator("#politicalRasterTrial");
-  await control.evaluate(element => {
-    for (let parent = element.parentElement; parent; parent = parent.parentElement) {
-      if (parent.tagName === "DETAILS") parent.open = true;
-    }
-  });
-  await control.setChecked(enabled);
-  assert.equal(await control.isChecked(), enabled);
-  if (wasCollapsed) await page.locator("#leftSidebarCollapseBtn").click();
+  const requested = await page.evaluate(async (enabled) => {
+    const { renderer } = await window.__scenarioForgeTestApi.internals();
+    renderer.setPoliticalIdRasterTrialEnabled(enabled);
+    return renderer.getPoliticalIdRasterDiagnostics().requested;
+  }, enabled);
+  assert.equal(requested, enabled);
 }
 
 async function compareSettledPixels(page, zoom, { captureReference = false, precise = true } = {}) {
@@ -277,7 +268,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
           activePostReadyTaskKey: s.activePostReadyTaskKey, scenarioApplyInFlight: s.scenarioApplyInFlight,
           chunks: Object.fromEntries(["pendingReason", "refreshScheduled", "promotionScheduled", "pendingPromotion",
             "pendingInfraPromotion", "promotionCommitInFlight"].map(key => [key, s.runtimeChunkLoadState?.[key]])),
-          status: document.querySelector("#politicalRasterTrialStatus")?.textContent };
+          status: { displayState: raster.displayState, reason: raster.reason } };
       }, scenarioId); } catch { /* browser watchdog */ }
       throw error;
     } finally {
@@ -341,7 +332,11 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   async function verifyEditing() {
     report.edit = await editHistory(page, !expectNativeBudgetFallback);
     if (exerciseBrush) report.brush = await brushHistory(page, !expectNativeBudgetFallback);
-    report.status = await page.locator("#politicalRasterTrialStatus").textContent();
+    report.status = await page.evaluate(async () => {
+      const { renderer } = await window.__scenarioForgeTestApi.internals();
+      const { displayState, reason } = renderer.getPoliticalIdRasterDiagnostics();
+      return { displayState, reason };
+    });
     report.states = await page.evaluate(() => window.__rasterStates);
     if (expectNativeBudgetFallback) assert.ok(report.states.some(value => value.displayState === "fallback"));
     else {

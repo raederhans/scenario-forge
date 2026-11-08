@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generated_at": "2026-11-07T11:35:37Z",
+  "generated_at": "2026-11-08T02:57:05Z",
   "counts": {
-    "entries": 1376,
+    "entries": 1379,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -61,11 +61,11 @@
       "thematic_layer_catalog": 1,
       "thematic_layer_manifest": 6,
       "thematic_source_recipe": 6,
-      "transport_build_audit": 131,
+      "transport_build_audit": 132,
       "transport_carrier_payload": 8,
       "transport_catalog": 2,
-      "transport_manifest": 139,
-      "transport_pack": 299,
+      "transport_manifest": 140,
+      "transport_pack": 300,
       "transport_provenance_payload": 8,
       "transport_subtype_catalog": 1,
       "unit_counter_manifest": 1,
@@ -73,13 +73,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 155,
+      "geojson": 156,
       "javascript": 2,
-      "json": 1047,
+      "json": 1049,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1374,
+      "json": 1377,
       "module": 2
     }
   },
@@ -17831,7 +17831,7 @@
       "format": "json",
       "schemaRef": "schema://transport/build_audit/v1",
       "hashRef": "",
-      "owner": "python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail",
+      "owner": "python tools/build_era_railways.py --profile hoi4",
       "cachePolicy": "no-cache",
       "sourceId": "",
       "readMode": "json",
@@ -17846,7 +17846,7 @@
       "format": "geojson",
       "schemaRef": "schema://geojson/feature_collection/v1",
       "hashRef": "",
-      "owner": "python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail",
+      "owner": "python tools/build_era_railways.py --profile hoi4",
       "cachePolicy": "default",
       "sourceId": "",
       "readMode": "json",
@@ -17863,7 +17863,7 @@
       "format": "json",
       "schemaRef": "schema://transport/manifest/v1",
       "hashRef": "",
-      "owner": "python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail",
+      "owner": "python tools/build_era_railways.py --profile hoi4",
       "cachePolicy": "no-cache",
       "sourceId": "",
       "readMode": "json",
@@ -19855,6 +19855,51 @@
         "transport:russia_road:default:paths:full:roads",
         "variants.default.paths.full.roads"
       ]
+    },
+    {
+      "key": "transport:tno_era_rail:build_audit",
+      "url": "data/transport_layers/tno_era_rail/build_audit.json",
+      "role": "transport_build_audit",
+      "format": "json",
+      "schemaRef": "schema://transport/build_audit/v1",
+      "hashRef": "",
+      "owner": "python tools/build_era_railways.py --profile tno",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": [
+        "paths.build_audit"
+      ]
+    },
+    {
+      "key": "transport:tno_era_rail:era_rail",
+      "url": "data/transport_layers/tno_era_rail/era_rail.geojson",
+      "role": "transport_pack",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "",
+      "owner": "python tools/build_era_railways.py --profile tno",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": [
+        "paths.era_rail",
+        "transport:tno_era_rail:default:paths:era_rail",
+        "variants.default.paths.era_rail"
+      ]
+    },
+    {
+      "key": "transport_manifest:tno_era_rail",
+      "url": "data/transport_layers/tno_era_rail/manifest.json",
+      "role": "transport_manifest",
+      "format": "json",
+      "schemaRef": "schema://transport/manifest/v1",
+      "hashRef": "",
+      "owner": "python tools/build_era_railways.py --profile tno",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
     },
     {
       "key": "transport:uk_airport:full:airports",

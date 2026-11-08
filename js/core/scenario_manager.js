@@ -1527,7 +1527,7 @@ function formatScenarioAuditText() {
   if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
     return "";
   }
-  return t("Ownership baseline active.", "ui");
+  return t("Using the scenario's original borders.", "ui");
 }
 
 export {

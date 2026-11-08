@@ -159,7 +159,7 @@ test("transport workbench lens owner rebuilds when lens family or row content ch
   assert.equal(changedFamily.reused, false);
   assert.equal(mount.replaceChildrenCallCount, 3);
   assert.equal(mount.childElementCount, 1);
-  assert.match(textOf(mount), /Use the center board to reorder/);
+  assert.match(textOf(mount), /Drag rows to change the drawing order/);
 
   assert.equal(
     buildTransportWorkbenchLensRenderSignature(owner.buildModel({

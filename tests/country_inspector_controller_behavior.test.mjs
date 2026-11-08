@@ -959,3 +959,39 @@ test("drill breadcrumb preserves parcel highlight and navigates to group and cou
     globalThis.document = previousDocument;
   }
 });
+
+
+test("palette variants show category names and keep sources in button titles", context => {
+  const previousDocument = globalThis.document;
+  const previousRaf = globalThis.requestAnimationFrame;
+  const previousCancel = globalThis.cancelAnimationFrame;
+  const previousState = Object.fromEntries([
+    "activePalettePack", "activePaletteMap", "currentLanguage", "recentColors", "paletteLibrarySearch",
+    "paletteLibraryGroupingMode", "ui",
+  ].map(key => [key, state[key]]));
+  context.after(() => {
+    globalThis.document = previousDocument;
+    globalThis.requestAnimationFrame = previousRaf;
+    globalThis.cancelAnimationFrame = previousCancel;
+    Object.assign(state, previousState);
+  });
+  globalThis.document = createTestDocument();
+  globalThis.requestAnimationFrame = () => 1;
+  globalThis.cancelAnimationFrame = () => {};
+  Object.assign(state, {
+    activePalettePack: { entries: { TST: {
+      hex: "#112233", map_hex: "#112233", ui_hex: "#445566", country_file_hex: "#778899",
+      map_source: "colors.txt:color", ui_source: "colors.txt:color_ui", country_file_source: "Middle East - Pakt.txt:color",
+    } } },
+    activePaletteMap: { mapped: {} }, currentLanguage: "en",
+    recentColors: [], paletteLibrarySearch: "", paletteLibraryGroupingMode: "default",
+    ui: { ...state.ui, paletteLibrarySections: {} },
+  });
+  const list = new TestElement("div");
+  createPaletteLibraryPanelController({ paletteLibraryList: list }).renderPaletteLibrary();
+  const variants = list.querySelectorAll(".palette-library-variant-btn");
+  assert.deepEqual(variants.map(button => button.querySelector(".palette-library-variant-label").textContent),
+    ["Map color", "UI color", "Country file color"]);
+  assert.deepEqual(variants.map(button => button.title),
+    ["colors.txt:color", "colors.txt:color_ui", "Middle East - Pakt.txt:color"]);
+});
