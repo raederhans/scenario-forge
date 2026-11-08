@@ -4300,6 +4300,7 @@ function cancelOperationalLineDraw(...args) { return getStrategicOverlayRuntimeO
 function selectOperationalLineById(...args) { return getStrategicOverlayRuntimeOwner().selectOperationalLineById(...args); }
 function deleteSelectedOperationalLine(...args) { return getStrategicOverlayRuntimeOwner().deleteSelectedOperationalLine(...args); }
 function updateSelectedOperationalLine(...args) { return getStrategicOverlayRuntimeOwner().updateSelectedOperationalLine(...args); }
+function addScenarioDefenseLinePresets(...args) { return getStrategicOverlayRuntimeOwner().addScenarioDefenseLinePresets(...args); }
 function startOperationGraphicDraw(...args) { return getStrategicOverlayRuntimeOwner().startOperationGraphicDraw(...args); }
 function undoOperationGraphicVertex(...args) { return getStrategicOverlayRuntimeOwner().undoOperationGraphicVertex(...args); }
 function finishOperationGraphicDraw(...args) { return getStrategicOverlayRuntimeOwner().finishOperationGraphicDraw(...args); }
@@ -15424,6 +15425,7 @@ export {
   selectOperationalLineById,
   deleteSelectedOperationalLine,
   updateSelectedOperationalLine,
+  addScenarioDefenseLinePresets,
   startOperationGraphicDraw,
   undoOperationGraphicVertex,
   finishOperationGraphicDraw,

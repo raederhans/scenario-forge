@@ -34,6 +34,7 @@ export {
   deleteSelectedOperationGraphic,
   deleteSelectedOperationGraphicVertex,
   deleteSelectedOperationalLine,
+  addScenarioDefenseLinePresets,
   deleteSelectedUnitCounter,
   finishOperationGraphicDraw,
   finishOperationalLineDraw,

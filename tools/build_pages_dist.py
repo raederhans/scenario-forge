@@ -157,6 +157,7 @@ DATA_RUNTIME_FILES = (
 DATA_RUNTIME_DIRS = (
     "bathymetry",
     "feature-migrations",
+    "operational_presets",
     "palette-maps",
     "palettes",
     "releasables",
