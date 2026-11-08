@@ -1033,6 +1033,11 @@ test("adaptive support, transport, and palette surfaces stay contained", async (
 
   await page.locator("#transportWorkbenchCloseBtn").click();
   if (await page.locator("body.editor-workspace").count()) {
+    // 交通入口在右栏：窄屏下关闭工作台会恢复右侧抽屉，先关掉它再打开左栏。
+    if (await page.locator("body.right-drawer-open").count()) {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
+    }
     if (await page.locator("#leftSidebar").evaluate((node) => node.inert)) await page.locator("#leftPanelToggle").click();
     await page.locator("#editorTaskPaletteBtn").click();
   }

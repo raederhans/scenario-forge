@@ -259,18 +259,8 @@ export function buildTransportFamilySummaryText({
 }) {
   if (!familyEnabled || !masterEnabled) return translateUi(translate, "Off");
   const metric = getTransportFamilyRenderMetric(familyId, metrics);
-  const filteredCount = getTransportFamilyFilteredCount({
-    familyId,
-    familyConfig,
-    effectiveScope,
-    collections,
-    zoomScale,
-    visualMode,
-  });
-  if (isTransportFamilyRenderSettlingMetric(metric)) {
-    return formatTransportLoadedAuxiliaryText(familyId, filteredCount, translate)
-      || translateUi(translate, "Loading/settling");
-  }
+  // 标题行只放一个状态：关闭、加载中，或当前可见数量；加载中不能显示成 0 个。
+  if (isTransportFamilyRenderSettlingMetric(metric)) return translateUi(translate, "Loading…");
   const visibleCount = Math.max(0, Math.round(Number(metric.visibleFeatureCount || 0)));
   return formatTransportFamilyCountText(familyId, visibleCount, translate);
 }

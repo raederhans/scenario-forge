@@ -577,8 +577,8 @@ export function createAppearanceControlsController({
     if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? t("Opacity", "ui") : t("Fill Opacity", "ui");
     if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);
     if (urbanManualControls) urbanManualControls.classList.toggle("hidden", !isManual);
-    document.getElementById("urbanAdaptiveAdvancedControls").classList.toggle("hidden", isManual);
-    document.getElementById("urbanManualAdvancedControls").classList.toggle("hidden", !isManual);
+    document.getElementById("urbanAdaptiveAdvancedControls")?.classList.toggle("hidden", isManual);
+    document.getElementById("urbanManualAdvancedControls")?.classList.toggle("hidden", !isManual);
     if (urbanColor) urbanColor.value = urbanConfig.color;
     if (urbanOpacity) urbanOpacity.value = String(Math.round(urbanConfig.fillOpacity * 100));
     if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(urbanConfig.fillOpacity * 100)}%`;
