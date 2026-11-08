@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { TRANSPORT_WORKBENCH_FAMILIES } from "../js/ui/toolbar/transport_workbench_descriptor.js";
+import { normalizeTransportWorkbenchUiState } from "../js/core/state_defaults.js";
+import { createTransportWorkbenchStateOwner } from "../js/ui/toolbar/transport_workbench_state_owner.js";
 
 import {
   createTransportWorkbenchRightDeckOwner,
@@ -243,7 +246,7 @@ test("right deck owner renders only the active control tab", () => withTestDocum
   });
 
   owner.renderTabs({
-    family: { id: "layers" },
+    family: { id: "road" },
     config: {},
     compareHeld: false,
     activeTab: "display",
@@ -251,7 +254,8 @@ test("right deck owner renders only the active control tab", () => withTestDocum
 
   assert.equal(displayButton.classList.contains("is-active"), true);
   assert.equal(aggregationPanel.classList.contains("hidden"), true);
-  assert.match(textOf(displayMount), /No controls in this tab/);
+  assert.match(textOf(displayMount), /Style/);
+  assert.equal(aggregationButton.hidden, true);
   assert.equal(aggregationMount.childElementCount, 1);
 }));
 
@@ -296,11 +300,11 @@ test("right deck owner updates advanced range text on input and commits on chang
     { id: "mineral_resources" },
     { aggregationClusterRadiusPx: 48 },
     false,
-    "aggregation",
+    "display",
     mount
   );
   const ranges = findAllByTag(mount, "input").filter((input) => input.type === "range");
-  const advancedRange = ranges[ranges.length - 1];
+  const advancedRange = findAllByTag(findAllByClass(mount, "transport-workbench-advanced")[0], "input")[0];
   const initialReplaceCount = mount.replaceChildrenCallCount;
   advancedRange.value = "64";
   advancedRange.dispatch("input");
@@ -324,7 +328,7 @@ test("right deck owner keeps density shell and advanced controls read-only while
     { id: "mineral_resources" },
     { aggregationClusterRadiusPx: 48 },
     true,
-    "aggregation",
+    "display",
     mount
   );
   const inputs = findAllByTag(mount, "input");
@@ -354,7 +358,7 @@ test("right deck owner keeps density label shell toggle read-only while compare 
     { id: "mineral_resources" },
     { labelSeparation: 1 },
     true,
-    "labels",
+    "display",
     mount
   );
   const checkbox = findAllByTag(mount, "input").find((input) => input.type === "checkbox");
@@ -606,7 +610,7 @@ test("right deck owner adds and removes airport edit overlay points from the dat
   assert.match(textOf(mount), /Overlay Airport/);
   assert.match(textOf(mount), /Updated: 1/);
   assert.match(textOf(mount), /Deleted: 1/);
-  const inputs = findAllByTag(mount, "input");
+  const inputs = findAllByTag(findAllByClass(mount, "transport-workbench-edit-overlay-form")[0], "input");
   assert.equal(inputs[0].value, "Selected Airport");
   assert.equal(inputs[1].value, "139.77");
   assert.equal(inputs[2].value, "35.68");
@@ -631,39 +635,29 @@ test("right deck owner adds and removes airport edit overlay points from the dat
 
 test("right deck owner replaces the active mount when tab and family change", () => withTestDocument(() => {
   const displayMount = new TestElement("div");
-  const labelsMount = new TestElement("div");
+  const dataMount = new TestElement("div");
   const displayButton = new TestElement("button");
   displayButton.dataset.transportInspectorTab = "display";
-  const labelsButton = new TestElement("button");
-  labelsButton.dataset.transportInspectorTab = "labels";
-  let currentTab = "display";
+  const dataButton = new TestElement("button");
+  dataButton.dataset.transportInspectorTab = "data";
   const owner = createTransportWorkbenchRightDeckOwner({
-    tabButtons: [displayButton, labelsButton],
-    panels: { display: new TestElement("section"), labels: new TestElement("section") },
-    mounts: { display: displayMount, labels: labelsMount },
-    setInspectorTab: () => currentTab,
+    tabButtons: [displayButton, dataButton],
+    panels: { display: new TestElement("section"), data: new TestElement("section") },
+    mounts: { display: displayMount, data: dataMount },
     getDisplayConfig: () => createDisplayConfig(),
   });
-
-  owner.renderTabs({
-    family: { id: "layers" },
-    config: {},
-    compareHeld: false,
-    activeTab: "display",
-  });
-  assert.match(textOf(displayMount), /Drag layers in the center board/);
-
-  currentTab = "labels";
+  owner.renderTabs({ family: { id: "airport" }, config: {}, compareHeld: false, activeTab: "data" });
+  assert.match(textOf(dataMount), /Facility Scope/);
   owner.renderTabs({
     family: { id: "road" },
     config: { showRefs: true, refClasses: ["motorway"], labelDensityPreset: "balanced", allowPrimaryRefsAtHighZoom: false },
     compareHeld: false,
     activeTab: "labels",
   });
-
-  assert.equal(labelsButton.classList.contains("is-active"), true);
-  assert.match(textOf(labelsMount), /Labels/);
-  assert.equal(!!findByText(labelsMount, /Reference labels/), false);
+  assert.equal(displayButton.classList.contains("is-active"), true);
+  assert.equal(dataButton.classList.contains("is-active"), false);
+  assert.match(textOf(displayMount), /Labels/);
+  assert.equal(!!findByText(displayMount, /Reference labels/), false);
 }));
 
 
@@ -677,4 +671,61 @@ test("data tabs omit diagnostic sections and shell notes for every family", () =
     assert.match(textOf(mount), /Source and use/);
     assert.doesNotMatch(textOf(mount), /Pack status|N06 matched|Name conflicts|Data Check|Diagnostics/);
   }
+}));
+
+
+test("every family exposes only populated tabs and layers hides the tab bar", () => withTestDocument(() => {
+  for (const family of TRANSPORT_WORKBENCH_FAMILIES) {
+    const tabList = new TestElement("div");
+    const ids = ["inspect", "display", "aggregation", "labels", "coverage", "data"];
+    const buttons = ids.map((id) => {
+      const button = new TestElement("button");
+      button.dataset.transportInspectorTab = id;
+      tabList.appendChild(button);
+      return button;
+    });
+    const panels = Object.fromEntries(ids.map((id) => [id, new TestElement("section")]));
+    panels.inspect.appendChild(new TestElement("div"));
+    const mounts = Object.fromEntries(ids.filter((id) => id !== "inspect").map((id) => [id, new TestElement("div")]));
+    const owner = createTransportWorkbenchRightDeckOwner({
+      tabButtons: buttons, panels, mounts, getDisplayConfig: () => createDisplayConfig(),
+    });
+    owner.renderTabs({ family, config: {}, activeTab: "display" });
+    assert.deepEqual(buttons.filter((button) => !button.hidden).map((button) => button.dataset.transportInspectorTab),
+      family.id === "layers" ? [] : ["inspect", "display", "data"]);
+    assert.equal(tabList.hidden, family.id === "layers");
+    if (family.id === "layers") {
+      assert.equal(panels.inspect.hidden, false);
+      assert.equal(panels.display.hidden, true);
+      continue;
+    }
+    for (const id of ["display", "data"]) {
+      owner.renderTabs({ family, config: {}, activeTab: id });
+      assert.ok(mounts[id].childElementCount > 0, `${family.id}/${id}`);
+      assert.doesNotMatch(textOf(mounts[id]), /No controls in this tab|No settings are available here/);
+    }
+  }
+}));
+
+test("saved inspector tabs migrate through core restoration and workbench state", () => {
+  for (const [saved, expected] of Object.entries({ inspect: "inspect", display: "display", aggregation: "display", labels: "display", coverage: "data", data: "data" })) {
+    const runtimeState = { transportWorkbenchUi: { activeInspectorTab: saved } };
+    assert.equal(normalizeTransportWorkbenchUiState(runtimeState.transportWorkbenchUi).activeInspectorTab, expected);
+    const owner = createTransportWorkbenchStateOwner(runtimeState);
+    assert.equal(owner.ensureUiState().activeInspectorTab, expected);
+    assert.equal(owner.setInspectorTab(saved), expected);
+  }
+});
+
+test("density display merges basic controls and exposes a single advanced group", () => withTestDocument(() => {
+  const mount = new TestElement("div");
+  const owner = createTransportWorkbenchRightDeckOwner({ getDisplayConfig: () => createDisplayConfig() });
+  owner.renderTabSections({ id: "port" }, {}, false, "display", mount);
+  assert.equal(findAllByClass(mount, "transport-workbench-advanced").length, 1);
+  assert.doesNotMatch(textOf(mount), /Current settings|Enabled|Disabled|Display Mode/);
+  const headings = findAllByClass(mount, "transport-workbench-note-title").map((node) => node.textContent);
+  assert.deepEqual(headings, ["Display settings", "Aggregation settings", "Label settings"]);
+  const checkbox = findAllByTag(mount, "input").find((node) => node.type === "checkbox");
+  assert.equal(checkbox.parentNode.tagName, "label");
+  assert.match(textOf(checkbox.parentNode), /Allow label aggregation/);
 }));

@@ -834,11 +834,32 @@ test("phase 03 transport preview omits compare controls", async ({ page }) => {
   await expect(transportSection).toHaveJSProperty("open", true);
   await transportTrigger.click();
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
+  const inspectorTabs = page.locator("#transportWorkbenchInspectorTabs [role=tab]:visible");
+  await expect(inspectorTabs).toHaveCount(3);
+  expect(await inspectorTabs.evaluateAll((nodes) => nodes.map((node) => node.dataset.transportInspectorTab)))
+    .toEqual(["inspect", "display", "data"]);
+  const inspectTab = page.locator('[data-transport-inspector-tab="inspect"]');
+  const displayTab = page.locator('[data-transport-inspector-tab="display"]');
+  const dataTab = page.locator('[data-transport-inspector-tab="data"]');
+  await inspectTab.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(displayTab).toBeFocused();
+  await expect(displayTab).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowRight");
+  await expect(dataTab).toBeFocused();
+  await expect(dataTab).toHaveAttribute("aria-selected", "true");
+  await page.locator('[data-transport-family="layers"]').click();
+  await expect(page.locator("#transportWorkbenchInspectorTabs")).toBeHidden();
+  await page.locator('[data-transport-family="road"]').click();
+  await expect(inspectorTabs).toHaveCount(3);
   await expect(page.locator("#transportWorkbenchPreviewTitle")).toHaveCount(1);
   await expect(page.locator("#transportWorkbenchZoomInBtn")).toHaveCount(1);
   await expect(page.locator("#transportWorkbenchApplyBtn")).toHaveCount(1);
   await expect(compareBtn).toHaveCount(0);
   await expect(compareStatus).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#transportWorkbenchOverlay")).toBeHidden();
+  await expect(transportTrigger).toBeFocused();
 });
 
 test("transport visual mode and apply bridge stay aligned across appearance and workbench", async ({ page }) => {
