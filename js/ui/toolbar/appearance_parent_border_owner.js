@@ -48,6 +48,7 @@ export function createAppearanceParentBorderOwner({
   runtimeState,
   nodes = {},
   translateGeo = (value) => value,
+  translateUi = (value) => value,
   renderDirty = () => {},
   clamp = (value, min, max) => Math.min(max, Math.max(min, value)),
   documentRef = globalThis.document,
@@ -62,9 +63,22 @@ export function createAppearanceParentBorderOwner({
     enableAllButton = null,
     disableAllButton = null,
     countryList = null,
+    countrySearch = null,
+    enabledOnlyToggle = null,
+    countrySummary = null,
     emptyNode = null,
   } = nodes;
   const checkboxByCountryCode = new Map();
+  const rowByCountryCode = new Map();
+  const syncCountryFilter = () => {
+    const query = (countrySearch?.value || "").trim().toLocaleLowerCase();
+    for (const [code, { label, displayName }] of rowByCountryCode) {
+      label.hidden = !`${displayName} ${code}`.toLocaleLowerCase().includes(query)
+        || (!!enabledOnlyToggle?.checked && !runtimeState.parentBorderEnabledByCountry?.[code]);
+    }
+    const count = Object.values(runtimeState.parentBorderEnabledByCountry || {}).filter(Boolean).length;
+    if (countrySummary) countrySummary.textContent = translateUi("By country ({count} on)").replace("{count}", count);
+  };
 
   const getParentBorderStyle = () => {
     if (!runtimeState.styleConfig || typeof runtimeState.styleConfig !== "object") {
@@ -134,6 +148,7 @@ export function createAppearanceParentBorderOwner({
       patchAppearanceParentBorderEnabledMapState(runtimeState, {
         [code]: event.target.checked,
       });
+      syncCountryFilter();
       renderDirty("parent-border-country");
     });
     checkboxByCountryCode.set(code, checkbox);
@@ -141,6 +156,7 @@ export function createAppearanceParentBorderOwner({
     const text = documentRef.createElement("span");
     text.textContent = `${displayName} (${code})`;
 
+    rowByCountryCode.set(code, { label, displayName });
     label.appendChild(checkbox);
     label.appendChild(text);
     return label;
@@ -160,6 +176,8 @@ export function createAppearanceParentBorderOwner({
     if (!rows.length) {
       emptyNode?.classList.remove("hidden");
       checkboxByCountryCode.clear();
+      rowByCountryCode.clear();
+      syncCountryFilter();
       if (countryList.dataset.parentBorderRowsSignature !== nextSignature) {
         countryList.replaceChildren();
         countryList.dataset.parentBorderRowsSignature = nextSignature;
@@ -173,12 +191,15 @@ export function createAppearanceParentBorderOwner({
     // parent border 面板会被高频 render，保住节点复用能减少滚动位置和焦点抖动。
     if (countryList.dataset.parentBorderRowsSignature === nextSignature) {
       syncCountryCheckboxes(rows, enabled);
+      syncCountryFilter();
       return { rebuilt: false, rows: rows.length };
     }
 
     checkboxByCountryCode.clear();
+    rowByCountryCode.clear();
     const rowNodes = rows.map((row) => createCountryRow(row, enabled));
     countryList.replaceChildren(...rowNodes);
+    syncCountryFilter();
     countryList.dataset.parentBorderRowsSignature = nextSignature;
     return { rebuilt: true, rows: rows.length };
   };
@@ -186,6 +207,12 @@ export function createAppearanceParentBorderOwner({
   const bindEvents = () => {
     syncStyleControls();
     syncVisibilityUi();
+    for (const [node, event] of [[countrySearch, "input"], [enabledOnlyToggle, "change"]]) {
+      if (node && node.dataset.parentBorderBound !== "true") {
+        node.addEventListener(event, syncCountryFilter);
+        node.dataset.parentBorderBound = "true";
+      }
+    }
 
     if (colorInput && colorInput.dataset.parentBorderBound !== "true") {
       colorInput.addEventListener("input", (event) => {

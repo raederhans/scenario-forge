@@ -190,7 +190,9 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       return;
     }
 
-    const clickedFacilityEntry = getHoveredFacilityEntryFromEvent(event);
+    const facilityHit = getHoveredFacilityEntryFromEvent(event);
+    const clickedFacilityEntry = facilityHit?.familyId === "project" && state.currentTool !== "select"
+      ? null : facilityHit;
     if (clickedFacilityEntry && isFacilityDetailsSurfaceActive(clickedFacilityEntry.familyId)) {
       setHoveredFacilityEntry(clickedFacilityEntry);
       setSelectedFacilityEntry(clickedFacilityEntry);

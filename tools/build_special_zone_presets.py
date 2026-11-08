@@ -196,6 +196,16 @@ def new_territories(data: ScenarioData):
                          cntr_code="HK", bbox=(113.8, 22.1, 114.5, 22.6))
 
 
+def sudetenland(data: ScenarioData):
+    # 1938 年慕尼黑协定后并入德国；按书签归属区分 GER 与保护国 BOM，排除波兰持有的捷克地块。
+    return [fid for fid in data.owned_by("GER") if data.props(fid).get("cntr_code") == "CZ"]
+
+
+def bohemia_moravia(data: ScenarioData):
+    # 1939 年 3 月设立保护国；剧本以 BOM 表示，成员与德国直接并入的苏台德分离。
+    return [fid for fid in data.owned_by("BOM") if data.props(fid).get("cntr_code") == "CZ"]
+
+
 # 与 js/core/special_zone_layers.js 的 SPECIAL_ZONE_PRESETS 默认样式保持一致；剧本契约要求每层带完整 style。
 PRESET_STYLES = {
     "demilitarized": ("#f6e05e", "#b7791f", 0.08, "fineHatch", 0.42),
@@ -285,6 +295,20 @@ def build(scenario_id: str):
         ]
     elif scenario_id == "hoi4_1939":
         layers += [
+            layer("preset-sudetenland", "claim", "Sudetenland (annexed 1938)", "苏台德（1938 年并入）",
+                  sudetenland(data), "1938 年 10 月慕尼黑协定后并入德国；采用 CZ 中 GER 持有地块，约 21700 平方公里，排除 BOM 保护国"),
+            layer("preset-bohemia-moravia", "occupation", "Protectorate of Bohemia and Moravia", "波希米亚-摩拉维亚保护国",
+                  bohemia_moravia(data), "1939 年 3 月德国占领；采用 CZ 中保护国 BOM 持有地块，排除苏台德和波兰持有部分"),
+            # 克莱佩达县约 4786 km²，未超过历史梅梅尔地区约 2657 km² 的三倍。
+            layer("preset-memel", "claim", "Memel Territory (annexed 1939)", "梅梅尔地区（1939 年并入）",
+                  [fid for fid in data.owned_by("GER") if data.props(fid).get("cntr_code") == "LT"],
+                  "1939 年 3 月德国从立陶宛并入梅梅尔；采用德属克莱佩达县地块近似，约 4786 平方公里"),
+            layer("preset-albania-occupation", "occupation", "Italian-occupied Albania", "意占阿尔巴尼亚",
+                  [fid for fid in data.features if data.props(fid).get("cntr_code") == "AL"],
+                  "1939 年 4 月意大利入侵；按现代 AL 地块覆盖阿尔巴尼亚，剧本保留 ALB 标签"),
+            layer("preset-hatay", "claim", "Hatay (annexed by Turkey 1939)", "哈塔伊（1939 年并入土耳其）",
+                  data.by_names(["Hatay"], cntr_code="TR", bbox=(35, 35, 37, 38)),
+                  "1939 年哈塔伊并入土耳其，叙利亚不承认；现代哈塔伊省约 5806 平方公里，未超过原专区约 4700 平方公里的三倍"),
             layer("preset-danzig-dmz", "demilitarized", "Danzig Demilitarized Area", "但泽非军事化地带",
                   data.owned_by("DNZ"), "HOI4 州 85 set_demilitarized_zone，书签日仍有效"),
             layer("preset-yellow-river-flood", "restricted", "Yellow River Flood Area", "黄泛区",

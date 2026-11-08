@@ -10,6 +10,7 @@ const BOOLEAN_VISIBILITY_FIELDS = Object.freeze([
   "showScenarioReliefOverlays",
   "showEraRailways",
   "showCityPoints",
+  "showModernPlaceNames",
   "showBlankFeatureLabels",
   "showStrategicResourceMarkers",
   "showUrban",
@@ -56,6 +57,7 @@ export function commitUiVisibilityState(
   if (Object.hasOwn(patch, "showScenarioReliefOverlays")) target.showScenarioReliefOverlays = normalize ? !!patch.showScenarioReliefOverlays : patch.showScenarioReliefOverlays;
   if (Object.hasOwn(patch, "showEraRailways")) target.showEraRailways = normalize ? !!patch.showEraRailways : patch.showEraRailways;
   if (Object.hasOwn(patch, "showCityPoints")) target.showCityPoints = normalize ? !!patch.showCityPoints : patch.showCityPoints;
+  if (Object.hasOwn(patch, "showModernPlaceNames")) target.showModernPlaceNames = normalize ? !!patch.showModernPlaceNames : patch.showModernPlaceNames;
   if (Object.hasOwn(patch, "showBlankFeatureLabels")) target.showBlankFeatureLabels = normalize ? !!patch.showBlankFeatureLabels : patch.showBlankFeatureLabels;
   if (Object.hasOwn(patch, "showStrategicResourceMarkers")) target.showStrategicResourceMarkers = normalize ? !!patch.showStrategicResourceMarkers : patch.showStrategicResourceMarkers;
   if (Object.hasOwn(patch, "showUrban")) target.showUrban = normalize ? !!patch.showUrban : patch.showUrban;
@@ -94,6 +96,7 @@ export function restoreProjectImportFields(target, patch) {
   if (Object.hasOwn(patch, "showAirports")) target.showAirports = patch.showAirports;
   if (Object.hasOwn(patch, "showBlankFeatureLabels")) target.showBlankFeatureLabels = patch.showBlankFeatureLabels;
   if (Object.hasOwn(patch, "showCityPoints")) target.showCityPoints = patch.showCityPoints;
+  if (Object.hasOwn(patch, "showModernPlaceNames")) target.showModernPlaceNames = patch.showModernPlaceNames;
   if (Object.hasOwn(patch, "showOpenOceanRegions")) target.showOpenOceanRegions = patch.showOpenOceanRegions;
   if (Object.hasOwn(patch, "showPhysical")) target.showPhysical = patch.showPhysical;
   if (Object.hasOwn(patch, "showPorts")) target.showPorts = patch.showPorts;
