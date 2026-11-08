@@ -75,7 +75,7 @@ export function createPopulationSpatialOwner({ runtimeState, t = (key) => key, m
     if (nodes.populationRetry) nodes.populationRetry.hidden = view.status !== "failed" && !(needsHeatmap && (heatmap.status === "failed" || heatmap.refinementStatus === "failed"));
     setText("populationReferenceNote", view.referenceNote);
     if (nodes.populationReferenceNote) nodes.populationReferenceNote.hidden = !view.referenceNote || !view.enabled;
-    setText("populationSourceNote", text("GHSL 2020 · 1 km source grid. Land area excludes mapped lakes; small parcels are area-weighted estimates."));
+    setText("populationSourceNote", text("GHSL 2020 population grid (1 km). Land area excludes mapped lakes; small parcels are estimated by overlap."));
     const legend = ready ? getPopulationLegend(runtimeState) : null;
     if (nodes.populationLegend) {
       nodes.populationLegend.hidden = !legend;

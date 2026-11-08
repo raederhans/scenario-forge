@@ -633,8 +633,8 @@
       "description": "Manual runtime asset registry shared by JS resolvers and build manifest generation.",
       "owner": "data/runtime_asset_registry.json",
       "role": "runtime_asset_registry",
-      "sha256": "cc6c9fe01cec779ec93755913a004747fed394afc625a6014d8431a81d7b6ba3",
-      "size_bytes": 387460
+      "sha256": "e615558ad959f85e8d16fe57d5d4d9e3dc2436d65d1db1e5dcfea27f7a1215a6",
+      "size_bytes": 387471
     },
     "thematic_layers/index.json": {
       "role": "thematic_layer_catalog",
@@ -966,7 +966,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_manifest.schema.json",
       "size_bytes": 187827,
-      "sha256": "c0fe744ba58507a9b8a8ce893e812abf61fa291fa8afad17ea1bbe0434a9e5e0",
+      "sha256": "ee103dbfa5de519db4862d3787cb9c867555c060cb0583acf18863bd9f7971a7",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/overview.json": {
@@ -985,8 +985,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 5136304,
-      "sha256": "cfe9451f50b9dc30a33907069d8e4d81891bb19194a792a8398d95de78a6bd8e",
+      "size_bytes": 5605154,
+      "sha256": "d78df01b643f38d6c6bd603b889622f5f2ad50905da6c10316b8984f4831c301",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1936.json": {
@@ -995,8 +995,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 5536781,
-      "sha256": "1883fa937c070a0e462e326c18985647eb9c70dd1509b52bd970076ab81cdcf7",
+      "size_bytes": 5979525,
+      "sha256": "2e90e5081cbb8cd02fa56e36a326ed9c0517e031be71704ac137dad07260a384",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1939.json": {
@@ -1005,8 +1005,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 5536781,
-      "sha256": "de39abb0514d2a0f00abbf9b15f2c8ba78c53b91b958a25287b4f5e2903b2acf",
+      "size_bytes": 5979525,
+      "sha256": "84b2a4c1593caea93b115de2c877efc5dad6a2abff48aa9d589126b774088f89",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/tno_1962.json": {
@@ -1015,8 +1015,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 2519362,
-      "sha256": "377191fd7c0b3227b686bc22746882c23ebc40593155158ce66574d08964fc5a",
+      "size_bytes": 2843300,
+      "sha256": "df923e369adf314254b0f8998ce3afcb1f5b40ae7cdc8cd5755bf33b37df0c74",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/tiles/r384_c1152.json": {
@@ -7785,8 +7785,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "schema://json/object/v1",
-      "size_bytes": 10129244,
-      "sha256": "1e60d33ca62cd3a020a6dec2c13fd771faed5b91c16e4591a10afa057f2e6946"
+      "size_bytes": 8717084,
+      "sha256": "099a4a8d51037d154a78bf251a5071a388fad3650614a96a5c7f2593bbe0b9f2"
     },
     "thematic_layers/population/ghsl_population_2020_v1/source_ledger.json": {
       "role": "population_spatial_provenance",
@@ -8015,6 +8015,11 @@
         "url": "data/transport_layers/japan_corridor/carrier.json",
         "role": "transport_workbench_carrier",
         "family_id": "japan_corridor"
+      },
+      "bathymetry:global_texture": {
+        "url": "data/bathymetry/global/manifest.json",
+        "role": "bathymetry_texture_manifest",
+        "family_id": "global"
       },
       "feature_migrations:by_hybrid_v1": {
         "url": "data/feature-migrations/by_hybrid_v1.json",

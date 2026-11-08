@@ -76,7 +76,7 @@ class Element {
   contains(node) { return node === this || this.children.some((child) => child.contains(node)); }
 }
 
-function mount(context, initialSearch = "", { countrySelected = true } = {}) {
+function mount(context, initialSearch = "", { countrySelected = true, prepare = () => {} } = {}) {
   const documentRef = new Element("document");
   documentRef.body = new Element("body");
   documentRef.append(documentRef.body);
@@ -125,8 +125,6 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   const qualityRow = add("qualityRow", documentRef.getElementById("panel-borders"));
   qualityRow.className = "border-control-row";
   add("displayQuality", qualityRow, "select");
-  const experiment = add("experiment", documentRef.getElementById("panel-borders"), "details");
-  add("politicalRenderMode", experiment, "select");
   add("specialZonePopover", right);
   add("legendProjectSection", right, "details");
   add("transportProjectSection", left, "details");
@@ -155,6 +153,7 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   context.after(() => Object.assign(globalThis, previous));
   const navigations = [];
   const sidebarTabs = [];
+  prepare({ add, documentRef });
   const workspace = initEditorWorkspace({
     documentRef, initialSearch, t: (key) => key,
     setSidebarTab: (key) => sidebarTabs.push(key),
@@ -263,7 +262,7 @@ test("property segments occupy a separate header row from the title and annotati
   const title = h.get("editorPropertiesTitle");
   const strategy = h.get("editorStrategicModeBtn");
   assert.deepEqual(segments.parentNode.children, [segments, title.parentNode]);
-  assert.deepEqual(title.parentNode.children, [h.get("editorPropertiesBackBtn"), title]);
+  assert.deepEqual(title.parentNode.children, [h.get("editorPropertiesBackBtn"), title, h.get("editorPropertiesNotesBtn")]);
   assert.notEqual(segments.parentNode, strategy.parentNode);
   assert.equal(strategy.parentNode, h.get("editorProperty-annotations"));
   assert.equal(h.get("editorFinishAnnotationsBtn").parentNode, h.get("strategicCommandBar"));
@@ -372,10 +371,9 @@ test("layer groups follow map order and display moves existing controls", (conte
   h.get("editorLayer-display").click();
   expectProperty(h, "display", "Layers");
   assert.equal(h.get("displayQuality").parentNode, h.get("qualityRow"));
-  // 两块控件放在同一个容器里，再挂到显示与性能属性页下。
   const displayStack = h.get("qualityRow").parentNode;
   assert.equal(displayStack.parentNode, h.get("editorProperty-display"));
-  assert.equal(h.get("experiment").parentNode, displayStack);
+  assert.equal(h.get("editorProperty-display").querySelector("#politicalRenderMode"), null);
 });
 
 test("visibility switches dispatch change and synchronize without navigating", (context) => {
@@ -447,4 +445,61 @@ test("help menu retains actions, supports arrows and Escape, and opens shortcuts
   assert.equal(menu.hidden, true);
   assert.equal(h.get("workspaceGithubLink").parentNode, menu);
   assert.equal(h.get("workspaceGithubLink").rel, "noopener");
+});
+
+
+test("property notes move original nodes, group sources and keep the global open state", (context) => {
+  let first;
+  const h = mount(context, "", { prepare: ({ add, documentRef }) => {
+    const panel = documentRef.getElementById("panel-physical");
+    for (const id of ["first", "second"]) {
+      const group = add(`notes-group-${id}`, panel, "details");
+      const heading = add(`notes-title-${id}`, group, "summary");
+      heading.textContent = "Terrain";
+      heading.dataset.i18n = "Terrain";
+      const note = add(`note-${id}`, group, "p");
+      note.setAttribute("data-page-note", "");
+      note.textContent = id;
+      if (id === "first") first = note;
+    }
+  } });
+  const button = h.get("editorPropertiesNotesBtn");
+  assert.equal(button.hidden, true);
+  h.workspace.showProperty("data-appearance-panel-physical");
+  const notes = h.get("editorPropertyNotes-data-appearance-panel-physical");
+  assert.equal(h.get("editorProperty-data-appearance-panel-physical").children[0], notes);
+  assert.equal(notes.contains(first), true);
+  assert.equal(h.get("note-first"), first);
+  assert.equal(notes.children.length, 1);
+  assert.equal(notes.querySelector("h3").dataset.i18n, "Terrain");
+  assert.equal(button.hidden, false);
+  assert.equal(button.getAttribute("aria-controls"), notes.id);
+  assert.equal(notes.hidden, true);
+  button.click();
+  assert.equal(notes.hidden, false);
+  assert.equal(button.getAttribute("aria-expanded"), "true");
+  h.workspace.showProperty("countries");
+  assert.equal(button.hidden, true);
+  assert.equal(button.getAttribute("aria-expanded"), "false");
+  h.workspace.showProperty("data-appearance-panel-physical");
+  assert.equal(notes.hidden, false);
+  assert.equal(button.getAttribute("aria-expanded"), "true");
+  button.click();
+  assert.equal(notes.hidden, true);
+  assert.equal(button.getAttribute("aria-expanded"), "false");
+});
+
+test("property notes collect nodes created after workspace initialization", (context) => {
+  const h = mount(context);
+  const note = h.documentRef.createElement("p");
+  note.setAttribute("data-page-note", "");
+  note.id = "late-note";
+  h.get("panel-urban").append(note);
+  h.workspace.showProperty("data-appearance-panel-urban");
+  const notes = h.get("editorPropertyNotes-data-appearance-panel-urban");
+  assert.equal(notes.contains(note), true);
+  assert.equal(h.get("editorPropertiesNotesBtn").hidden, false);
+  h.workspace.showProperty("countries");
+  h.workspace.showProperty("data-appearance-panel-urban");
+  assert.equal(notes.querySelectorAll("[data-page-note]").length, 1);
 });

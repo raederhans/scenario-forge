@@ -1,8 +1,8 @@
 # Data Catalog
 
-- generated_at: 2026-11-07T11:35:37Z
+- generated_at: 2026-11-08T02:57:05Z
 - version: 1
-- entries: 1376
+- entries: 1379
 
 ## Counts by role
 
@@ -65,11 +65,11 @@
 | thematic_layer_catalog | 1 |
 | thematic_layer_manifest | 6 |
 | thematic_source_recipe | 6 |
-| transport_build_audit | 131 |
+| transport_build_audit | 132 |
 | transport_carrier_payload | 8 |
 | transport_catalog | 2 |
-| transport_manifest | 139 |
-| transport_pack | 299 |
+| transport_manifest | 140 |
+| transport_pack | 300 |
 | transport_provenance_payload | 8 |
 | transport_subtype_catalog | 1 |
 | unit_counter_manifest | 1 |
@@ -1246,9 +1246,9 @@
 | transport_manifest:global_road:shards:w180_w150 | data/transport_layers/global_road/shards/w180_w150/manifest.json | transport_manifest | json | json | schema://transport/manifest/v1 |  | no-cache | python tools/build_global_transport_roads.py --shard w180_w150 |  |
 | transport:global_road:shards:w180_w150:preview:roads | data/transport_layers/global_road/shards/w180_w150/roads.preview.topo.json | transport_pack | topojson | json | schema://topojson/line_collection/roads_v1 |  | default | python tools/build_global_transport_roads.py --shard w180_w150 |  |
 | transport:global_road:shards:w180_w150:full:roads | data/transport_layers/global_road/shards/w180_w150/roads.topo.json | transport_pack | topojson | json | schema://topojson/line_collection/roads_v1 |  | default | python tools/build_global_transport_roads.py --shard w180_w150 |  |
-| transport:hoi4_era_rail:build_audit | data/transport_layers/hoi4_era_rail/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail |  |
-| transport:hoi4_era_rail:era_rail | data/transport_layers/hoi4_era_rail/era_rail.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/v1 |  | default | python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail |  |
-| transport_manifest:hoi4_era_rail | data/transport_layers/hoi4_era_rail/manifest.json | transport_manifest | json | json | schema://transport/manifest/v1 |  | no-cache | python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail |  |
+| transport:hoi4_era_rail:build_audit | data/transport_layers/hoi4_era_rail/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_era_railways.py --profile hoi4 |  |
+| transport:hoi4_era_rail:era_rail | data/transport_layers/hoi4_era_rail/era_rail.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/v1 |  | default | python tools/build_era_railways.py --profile hoi4 |  |
+| transport_manifest:hoi4_era_rail | data/transport_layers/hoi4_era_rail/manifest.json | transport_manifest | json | json | schema://transport/manifest/v1 |  | no-cache | python tools/build_era_railways.py --profile hoi4 |  |
 | transport:india_airport:full:airports | data/transport_layers/india_airport/airports.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_country_real_packs.py --pack india_airport |  |
 | transport:india_airport:preview:airports | data/transport_layers/india_airport/airports.preview.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_country_real_packs.py --pack india_airport |  |
 | transport:india_airport:build_audit | data/transport_layers/india_airport/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_transport_country_real_packs.py --pack india_airport |  |
@@ -1373,6 +1373,9 @@
 | transport:russia_road:preview:road_labels | data/transport_layers/russia_road/road_labels.preview.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_country_real_packs.py --pack russia_road |  |
 | transport:russia_road:preview:roads | data/transport_layers/russia_road/roads.preview.topo.json | transport_pack | topojson | json | schema://topojson/line_collection/roads_v1 |  | default | python tools/build_transport_country_real_packs.py --pack russia_road |  |
 | transport:russia_road:full:roads | data/transport_layers/russia_road/roads.topo.json | transport_pack | topojson | json | schema://topojson/line_collection/roads_v1 |  | default | python tools/build_transport_country_real_packs.py --pack russia_road |  |
+| transport:tno_era_rail:build_audit | data/transport_layers/tno_era_rail/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_era_railways.py --profile tno |  |
+| transport:tno_era_rail:era_rail | data/transport_layers/tno_era_rail/era_rail.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/v1 |  | default | python tools/build_era_railways.py --profile tno |  |
+| transport_manifest:tno_era_rail | data/transport_layers/tno_era_rail/manifest.json | transport_manifest | json | json | schema://transport/manifest/v1 |  | no-cache | python tools/build_era_railways.py --profile tno |  |
 | transport:uk_airport:full:airports | data/transport_layers/uk_airport/airports.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_country_real_packs.py --pack uk_airport |  |
 | transport:uk_airport:preview:airports | data/transport_layers/uk_airport/airports.preview.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_country_real_packs.py --pack uk_airport |  |
 | transport:uk_airport:build_audit | data/transport_layers/uk_airport/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_transport_country_real_packs.py --pack uk_airport |  |
