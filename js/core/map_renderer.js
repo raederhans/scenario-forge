@@ -4109,7 +4109,11 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
     drawOverviewFrameFallback,
     drawNavigationFrame: (transform) => {
       const drawn = !exportRenderInProgress && (isTnoRasterSceneSelected()
-        ? !!tnoRasterSceneOwner?.present(transform, { refresh: false })
+        ? !!tnoRasterSceneOwner?.present(transform, { refresh: false,
+          // Moving views keep the vector path's contract: transform what is
+          // painted, refill the uncovered edges in the exact frame afterwards.
+          allowPartialPasses: runtimeState.renderPhase === RENDER_PHASE_INTERACTING
+            || runtimeState.renderPhase === RENDER_PHASE_SETTLING })
         : !!navigationSceneOwner?.draw(transform));
       navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
         && !exportRenderInProgress;
