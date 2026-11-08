@@ -439,6 +439,13 @@
       "ownerHint": "water-runtime"
     },
     {
+      "specPath": "tests/e2e/map_label_font_slices.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "map-layer",
+      "ownerHint": "map-runtime"
+    },
+    {
       "specPath": "tests/e2e/atlantropa_project_markers.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",
