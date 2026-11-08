@@ -303869,6 +303869,458 @@
     "User guide": {
       "en": "User guide",
       "zh": "使用指南"
+    },
+    "1 January 1936 · The gathering storm": {
+      "en": "1 January 1936 · The gathering storm",
+      "zh": "1936 年 1 月 1 日 · 风暴前夕"
+    },
+    "14 August 1939 · On the eve of war": {
+      "en": "14 August 1939 · On the eve of war",
+      "zh": "1939 年 8 月 14 日 · 大战前夜"
+    },
+    "1962 · Alternate history after an Axis victory": {
+      "en": "1962 · Alternate history after an Axis victory",
+      "zh": "1962 年 · 轴心国胜利后的架空世界"
+    },
+    "2026 · The world today": {
+      "en": "2026 · The world today",
+      "zh": "2026 年 · 当今世界"
+    },
+    "Add": {
+      "en": "Add",
+      "zh": "添加"
+    },
+    "Add selected country": {
+      "en": "Add selected country",
+      "zh": "加入当前选中国家"
+    },
+    "Add selected group": {
+      "en": "Add selected group",
+      "zh": "加入当前选中分组"
+    },
+    "Alps terrain shading": {
+      "en": "Alps terrain shading",
+      "zh": "阿尔卑斯山地形阴影"
+    },
+    "An alternate 1962 in which Germany won the Second World War. The Greater Germanic Reich rules Europe up to the Arkhangelsk–Astrakhan line through its Reichskommissariats, Japan leads the Co-Prosperity Sphere in Asia, and the United States heads the OFN. East of the line, Russia has collapsed into rival warlord states.": {
+      "en": "An alternate 1962 in which Germany won the Second World War. The Greater Germanic Reich rules Europe up to the Arkhangelsk–Astrakhan line through its Reichskommissariats, Japan leads the Co-Prosperity Sphere in Asia, and the United States heads the OFN. East of the line, Russia has collapsed into rival warlord states.",
+      "zh": "德国赢得第二次世界大战后的架空 1962 年。大日耳曼帝国通过各帝国专员辖区统治欧洲，直至阿尔汉格尔斯克—阿斯特拉罕一线；日本主导亚洲的共荣圈，美国领导自由国家组织（OFN）。这条线以东，俄罗斯已分裂为互相争斗的军阀政权。"
+    },
+    "Apply territory": {
+      "en": "Apply territory",
+      "zh": "应用领土"
+    },
+    "Atlantropa: the Gibraltar dam has lowered the Mediterranean, exposing salt flats and a new coastline": {
+      "en": "Atlantropa: the Gibraltar dam has lowered the Mediterranean, exposing salt flats and a new coastline",
+      "zh": "亚特兰托帕：直布罗陀大坝使地中海水位下降，露出盐碱地和新海岸线"
+    },
+    "Band stripes": {
+      "en": "Band stripes",
+      "zh": "宽条纹"
+    },
+    "Blank Map": {
+      "en": "Blank Map",
+      "zh": "空白地图"
+    },
+    "Blitzkrieg": {
+      "en": "Blitzkrieg",
+      "zh": "闪电战"
+    },
+    "Boundary variant": {
+      "en": "Boundary variant",
+      "zh": "疆界变体"
+    },
+    "Browse Hearts of Iron IV counter icons.": {
+      "en": "Browse Hearts of Iron IV counter icons.",
+      "zh": "浏览《钢铁雄心 IV》的单位计数器图标。"
+    },
+    "Category": {
+      "en": "Category",
+      "zh": "类别"
+    },
+    "Choose how official and OSM railway information is combined.": {
+      "en": "Choose how official and OSM railway information is combined.",
+      "zh": "选择如何结合官方与 OSM 铁路信息。"
+    },
+    "Choose individual sites, grouped sites, or a density view.": {
+      "en": "Choose individual sites, grouped sites, or a density view.",
+      "zh": "选择单个地点、分组地点或密度视图。"
+    },
+    "Choose which major stations and names appear on the map.": {
+      "en": "Choose which major stations and names appear on the map.",
+      "zh": "选择地图上显示的主要车站及名称。"
+    },
+    "Claim / dispute": {
+      "en": "Claim / dispute",
+      "zh": "主张/争议"
+    },
+    "Clear Territory Visual Overrides": {
+      "en": "Clear Territory Visual Overrides",
+      "zh": "清除领土上的视觉覆盖色"
+    },
+    "Click parcels to add or remove; press Esc to finish.": {
+      "en": "Click parcels to add or remove; press Esc to finish.",
+      "zh": "点击地块加入或移除，按 Esc 结束"
+    },
+    "Close scenario introduction": {
+      "en": "Close scenario introduction",
+      "zh": "关闭剧本简介"
+    },
+    "Combine official active railway lines with OSM information for gaps and inactive lines.": {
+      "en": "Combine official active railway lines with OSM information for gaps and inactive lines.",
+      "zh": "以官方运营线路为主，用 OSM 补充缺失及非运营线路。"
+    },
+    "Congo Lake": {
+      "en": "Congo Lake",
+      "zh": "刚果湖"
+    },
+    "Country file color": {
+      "en": "Country file color",
+      "zh": "国家文件色"
+    },
+    "Create": {
+      "en": "Create",
+      "zh": "创建"
+    },
+    "Custom Zone": {
+      "en": "Custom Zone",
+      "zh": "自定义区域"
+    },
+    "Dashed hatch": {
+      "en": "Dashed hatch",
+      "zh": "虚线斜纹"
+    },
+    "Demilitarized / buffer": {
+      "en": "Demilitarized / buffer",
+      "zh": "非军事化/缓冲"
+    },
+    "Distinguish railway status with line styles and fading.": {
+      "en": "Distinguish railway status with line styles and fading.",
+      "zh": "用线型和淡化效果区分铁路状态。"
+    },
+    "Drag layers in the middle board to change their drawing order.": {
+      "en": "Drag layers in the middle board to change their drawing order.",
+      "zh": "在中间排序板拖动图层以调整绘制顺序。"
+    },
+    "Drag rows to change the drawing order.": {
+      "en": "Drag rows to change the drawing order.",
+      "zh": "拖动行以调整绘制顺序。"
+    },
+    "Economic development": {
+      "en": "Economic development",
+      "zh": "经济开发"
+    },
+    "Edit members on map": {
+      "en": "Edit members on map",
+      "zh": "在地图上编辑成员"
+    },
+    "Enter a short code such as HQ, ARM or INF.": {
+      "en": "Enter a short code such as HQ, ARM or INF.",
+      "zh": "输入简短代码，例如 HQ、ARM 或 INF。"
+    },
+    "Every province of the present-day world with no owner assigned. Paint your own alternate history from scratch: countries, borders and colours are entirely up to you.": {
+      "en": "Every province of the present-day world with no owner assigned. Paint your own alternate history from scratch: countries, borders and colours are entirely up to you.",
+      "zh": "当代世界的全部地块，没有任何预设归属。适合从零开始绘制自己的架空历史：国家、疆界和配色完全由你决定。"
+    },
+    "Featured in this scenario": {
+      "en": "Featured in this scenario",
+      "zh": "本剧本特色"
+    },
+    "Fine hatch": {
+      "en": "Fine hatch",
+      "zh": "细斜线"
+    },
+    "Fine horizontal": {
+      "en": "Fine horizontal",
+      "zh": "水平细线"
+    },
+    "Global oceans": {
+      "en": "Global oceans",
+      "zh": "全球海洋"
+    },
+    "Hide short or crowded road segments to keep major roads readable.": {
+      "en": "Hide short or crowded road segments to keep major roads readable.",
+      "zh": "隐藏过短或过密的路段，让主要道路更清晰。"
+    },
+    "Industrial land could not be loaded.": {
+      "en": "Industrial land could not be loaded.",
+      "zh": "无法加载工业用地。"
+    },
+    "Industrial land polygons or site locations": {
+      "en": "Industrial land polygons or site locations",
+      "zh": "工业用地范围或地点位置"
+    },
+    "Inspector selection path": {
+      "en": "Inspector selection path",
+      "zh": "检查器选择路径"
+    },
+    "Keep official review data separate from publicly releasable data.": {
+      "en": "Keep official review data separate from publicly releasable data.",
+      "zh": "官方审阅数据与可公开发布的数据分开显示。"
+    },
+    "Lease / condominium / treaty port": {
+      "en": "Lease / condominium / treaty port",
+      "zh": "租借/共管/条约港"
+    },
+    "Loaded rows": {
+      "en": "Loaded rows",
+      "zh": "已加载行数"
+    },
+    "Logistics hubs could not be loaded.": {
+      "en": "Logistics hubs could not be loaded.",
+      "zh": "无法加载物流枢纽。"
+    },
+    "MLIT power-plant sources; other energy categories are reference-only.": {
+      "en": "MLIT power-plant sources; other energy categories are reference-only.",
+      "zh": "来源：日本国土交通省发电厂数据；其他能源类别仅供参考。"
+    },
+    "Major powers": {
+      "en": "Major powers",
+      "zh": "主要势力"
+    },
+    "Map color": {
+      "en": "Map color",
+      "zh": "地图色"
+    },
+    "Modern World": {
+      "en": "Modern World",
+      "zh": "现代世界"
+    },
+    "Modern administrative regions": {
+      "en": "Modern administrative regions",
+      "zh": "现代行政区"
+    },
+    "Move down": {
+      "en": "Move down",
+      "zh": "下移"
+    },
+    "Move up": {
+      "en": "Move up",
+      "zh": "上移"
+    },
+    "My regions": {
+      "en": "My regions",
+      "zh": "我的区域"
+    },
+    "Names from 200% zoom; terrain shading from 400%. Current geography reference.": {
+      "en": "Names from 200% zoom; terrain shading from 400%. Current geography reference.",
+      "zh": "放大至 200% 显示名称，400% 显示地形阴影。以现今地理为参考。"
+    },
+    "New region": {
+      "en": "New region",
+      "zh": "新建区域"
+    },
+    "No items to show.": {
+      "en": "No items to show.",
+      "zh": "暂无可显示的项目。"
+    },
+    "Not available yet": {
+      "en": "Not available yet",
+      "zh": "暂不可用"
+    },
+    "OSM / Geofabrik Japan and N06.": {
+      "en": "OSM / Geofabrik Japan and N06.",
+      "zh": "来源：OSM / Geofabrik 日本数据与 N06。"
+    },
+    "OSM and official industrial land sources; official review and public release data remain separate.": {
+      "en": "OSM and official industrial land sources; official review and public release data remain separate.",
+      "zh": "来源：OSM 与官方工业用地数据；官方审阅数据与公开发布数据分开。"
+    },
+    "Occupation / military administration": {
+      "en": "Occupation / military administration",
+      "zh": "占领/军管"
+    },
+    "Official P31 logistics hub point source; internal use only, not approved for external distribution.": {
+      "en": "Official P31 logistics hub point source; internal use only, not approved for external distribution.",
+      "zh": "来源：官方物流枢纽点位数据；仅限内部使用，尚未批准对外分发。"
+    },
+    "Official active network and OSM lifecycle / gap information.": {
+      "en": "Official active network and OSM lifecycle / gap information.",
+      "zh": "来源：官方运营铁路网络，OSM 补充状态与缺失线路。"
+    },
+    "Official airport point source.": {
+      "en": "Official airport point source.",
+      "zh": "来源：官方机场点位数据。"
+    },
+    "Official mineral resource distribution point source.": {
+      "en": "Official mineral resource distribution point source.",
+      "zh": "来源：官方矿产资源分布点位数据。"
+    },
+    "Official or quasi-official major port node source.": {
+      "en": "Official or quasi-official major port node source.",
+      "zh": "来源：官方或准官方主要港口点位数据。"
+    },
+    "Open grid": {
+      "en": "Open grid",
+      "zh": "稀疏方格"
+    },
+    "Paints with this country's current color; can be undone.": {
+      "en": "Paints with this country's current color; can be undone.",
+      "zh": "按本国当前颜色涂色；可撤销"
+    },
+    "Paste a full SIDC code.": {
+      "en": "Paste a full SIDC code.",
+      "zh": "粘贴完整的 SIDC 编码。"
+    },
+    "Preparing your map.": {
+      "en": "Preparing your map.",
+      "zh": "正在准备地图。"
+    },
+    "Preset regions": {
+      "en": "Preset regions",
+      "zh": "预设区域"
+    },
+    "Preset special zones (off by default): Danzig, Yellow River flood zone": {
+      "en": "Preset special zones (off by default): Danzig, Yellow River flood zone",
+      "zh": "预设特殊区域（默认关闭）：但泽、黄泛区"
+    },
+    "Preset special zones (off by default): Golan Heights, Russian-held Ukraine, Kashmir, Northern Cyprus": {
+      "en": "Preset special zones (off by default): Golan Heights, Russian-held Ukraine, Kashmir, Northern Cyprus",
+      "zh": "预设特殊区域（默认关闭）：戈兰高地、乌克兰境内俄控区、克什米尔、北塞浦路斯"
+    },
+    "Preset special zones (off by default): Rhineland, Turkish Straits, Danzig": {
+      "en": "Preset special zones (off by default): Rhineland, Turkish Straits, Danzig",
+      "zh": "预设特殊区域（默认关闭）：莱茵兰、土耳其海峡、但泽"
+    },
+    "Preset special zones (off by default): demilitarised zones, Gotenland settlement area, Suez": {
+      "en": "Preset special zones (off by default): demilitarised zones, Gotenland settlement area, Suez",
+      "zh": "预设特殊区域（默认关闭）：非军事区、哥腾兰定居区、苏伊士"
+    },
+    "Preview available": {
+      "en": "Preview available",
+      "zh": "可预览"
+    },
+    "Rail labels show line names.": {
+      "en": "Rail labels show line names.",
+      "zh": "铁路标签显示线路名称。"
+    },
+    "Remove": {
+      "en": "Remove",
+      "zh": "移除"
+    },
+    "Restricted access / environmental risk": {
+      "en": "Restricted access / environmental risk",
+      "zh": "限制进入/环境风险"
+    },
+    "Road labels show route numbers or names.": {
+      "en": "Road labels show route numbers or names.",
+      "zh": "道路标签显示路线编号或名称。"
+    },
+    "Sample region": {
+      "en": "Sample region",
+      "zh": "样本地区"
+    },
+    "Scenario districts": {
+      "en": "Scenario districts",
+      "zh": "剧本大区"
+    },
+    "Scenario introduction": {
+      "en": "Scenario introduction",
+      "zh": "剧本简介"
+    },
+    "Search and sort apply to the rows listed here.": {
+      "en": "Search and sort apply to the rows listed here.",
+      "zh": "搜索和排序作用于此处列出的行。"
+    },
+    "Search counter presets, then apply one to the editor.": {
+      "en": "Search counter presets, then apply one to the editor.",
+      "zh": "搜索单位计数器预设，再应用到编辑器。"
+    },
+    "Search countries or colors": {
+      "en": "Search countries or colors",
+      "zh": "搜索国家或颜色"
+    },
+    "Selected region": {
+      "en": "Selected region",
+      "zh": "所选地区"
+    },
+    "Separate official and public sources": {
+      "en": "Separate official and public sources",
+      "zh": "官方与公开来源分开"
+    },
+    "Show Era Railways": {
+      "en": "Show Era Railways",
+      "zh": "显示时代铁路"
+    },
+    "Source details": {
+      "en": "Source details",
+      "zh": "来源详情"
+    },
+    "Staggered dots": {
+      "en": "Staggered dots",
+      "zh": "交错点阵"
+    },
+    "Target country is not in this scenario": {
+      "en": "Target country is not in this scenario",
+      "zh": "目标国不存在于当前剧本"
+    },
+    "Territory": {
+      "en": "Territory",
+      "zh": "领土"
+    },
+    "Text and annotations": {
+      "en": "Text and annotations",
+      "zh": "文字与标注"
+    },
+    "The Gathering Storm": {
+      "en": "The Gathering Storm",
+      "zh": "风暴前夕"
+    },
+    "The New Order, 1962": {
+      "en": "The New Order, 1962",
+      "zh": "新秩序 1962"
+    },
+    "The political map of 2026, including occupied and de facto independent areas such as Russian-held eastern Ukraine, Northern Cyprus and divided Kashmir.": {
+      "en": "The political map of 2026, including occupied and de facto independent areas such as Russian-held eastern Ukraine, Northern Cyprus and divided Kashmir.",
+      "zh": "2026 年的世界政治格局，包含占领区与事实独立地区，如俄控乌克兰东部、北塞浦路斯与分治的克什米尔。"
+    },
+    "The world three years before the Second World War. Germany is rearming and about to remilitarise the Rhineland, Italy is at war in Ethiopia, and Spain is months from civil war. In Asia, Japan holds Manchukuo while China remains divided among the Nationalist government, the Communists and regional warlords.": {
+      "en": "The world three years before the Second World War. Germany is rearming and about to remilitarise the Rhineland, Italy is at war in Ethiopia, and Spain is months from civil war. In Asia, Japan holds Manchukuo while China remains divided among the Nationalist government, the Communists and regional warlords.",
+      "zh": "第二次世界大战爆发前三年的世界。德国正在重整军备，即将进驻莱茵兰；意大利正在入侵埃塞俄比亚，西班牙数月后将陷入内战。在亚洲，日本扶植的满洲国已经建立，中国仍分裂为国民政府、中共与各地军阀。"
+    },
+    "This scenario has no preset regions.": {
+      "en": "This scenario has no preset regions.",
+      "zh": "当前剧本没有预设区域"
+    },
+    "Two weeks before the invasion of Poland. Germany has annexed Austria, the Sudetenland and Bohemia-Moravia, Italy has occupied Albania, and the Spanish Civil War has just ended. In the Far East, Japan has been at war with China for two years.": {
+      "en": "Two weeks before the invasion of Poland. Germany has annexed Austria, the Sudetenland and Bohemia-Moravia, Italy has occupied Albania, and the Spanish Civil War has just ended. In the Far East, Japan has been at war with China for two years.",
+      "zh": "德国入侵波兰前两周。德国已吞并奥地利、苏台德和波希米亚-摩拉维亚，意大利占领了阿尔巴尼亚，西班牙内战刚刚结束。在远东，中日战争已进入第三年。"
+    },
+    "UI color": {
+      "en": "UI color",
+      "zh": "界面色"
+    },
+    "Unclaimed canvas · present-day provinces": {
+      "en": "Unclaimed canvas · present-day provinces",
+      "zh": "无归属画布 · 当代地块"
+    },
+    "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.": {
+      "en": "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.",
+      "zh": "用线型和淡化效果区分铁路状态，干线比支线和作业线更醒目。"
+    },
+    "Use official road names and route numbers where available.": {
+      "en": "Use official road names and route numbers where available.",
+      "zh": "有官方道路名称和路线编号时优先使用。"
+    },
+    "Using the scenario's original borders.": {
+      "en": "Using the scenario's original borders.",
+      "zh": "使用剧本原始归属。"
+    },
+    "Victory points and strategic resources": {
+      "en": "Victory points and strategic resources",
+      "zh": "胜利点与战略资源"
+    },
+    "companion actions": {
+      "en": "companion actions",
+      "zh": "项联动动作"
+    },
+    "{count} parcels": {
+      "en": "{count} parcels",
+      "zh": "{count} 个地块"
+    },
+    "Dataset": {
+      "en": "Dataset",
+      "zh": "数据集"
     }
   }
 }

@@ -1,5 +1,8 @@
 import { gpuAffineMatrix } from "./gpu_scene_compositor.js";
 
+// Reused (already resident) tiles are bound in batches up to this many ms per host task.
+const RESIDENT_TILE_SLICE_MS = 4;
+
 // IDs are categorical. Direct navigation resolves four texels to premultiplied
 // RGBA before interpolation; integer IDs are always fetched with texelFetch.
 const VERTEX = `#version 300 es
@@ -231,20 +234,26 @@ export function createPoliticalIdRasterGpu({
       if (next.size !== tiles.length) throw new TypeError("Duplicate ID raster tiles.");
       return tiles.map(tile => planTile(tile, tiles));
     }
-    function planTile(tile, tiles) {
-      if (!Number.isSafeInteger(tile.width) || !Number.isSafeInteger(tile.height) || tile.width <= 0 || tile.height <= 0
-        || !Number.isSafeInteger(tile.originX ?? 0) || !Number.isSafeInteger(tile.originY ?? 0)) throw new TypeError("Invalid ID raster tile.");
+    // A resident texture is reusable when the tile and its gutter neighbors are unchanged.
+    function matchResidentTile(tile, tiles) {
       const x = tile.originX || 0, y = tile.originY || 0;
       const neighbors = sharedGl ? tiles.filter(other => other !== tile
         && (other.originX || 0) <= x + tile.width && (other.originX || 0) + other.width >= x
         && (other.originY || 0) <= y + tile.height && (other.originY || 0) + other.height >= y) : [];
       const token = tokenOf(tile);
       const neighborTokens = neighbors.map(tokenOf);
-      const existing = resident.get(token);
-      if (existing && existing.originX === x && existing.originY === y && existing.width === tile.width && existing.height === tile.height
-        && existing.neighbors.length === neighborTokens.length && existing.neighbors.every((value, index) => value === neighborTokens[index])) {
-        return { tile, token, existing, bytes: existing.bytes };
-      }
+      const candidate = resident.get(token);
+      const existing = candidate && candidate.originX === x && candidate.originY === y
+        && candidate.width === tile.width && candidate.height === tile.height
+        && candidate.neighbors.length === neighborTokens.length
+        && candidate.neighbors.every((value, index) => value === neighborTokens[index]) ? candidate : null;
+      return { neighbors, token, neighborTokens, existing };
+    }
+    function planTile(tile, tiles) {
+      if (!Number.isSafeInteger(tile.width) || !Number.isSafeInteger(tile.height) || tile.width <= 0 || tile.height <= 0
+        || !Number.isSafeInteger(tile.originX ?? 0) || !Number.isSafeInteger(tile.originY ?? 0)) throw new TypeError("Invalid ID raster tile.");
+      const { neighbors, token, neighborTokens, existing } = matchResidentTile(tile, tiles);
+      if (existing) return { tile, token, existing, bytes: existing.bytes };
       // Accepted derived tiles are immutable. Resident texture replay needs
       // only layout/token compatibility, not materialized CPU payloads.
       const sourceCodes = tile.codes;
@@ -336,10 +345,17 @@ export function createPoliticalIdRasterGpu({
       try {
         const nextPaletteShape = dimensions(palette.length / 4);
         const paletteReservation = Math.max(paletteBytes, nextPaletteShape.width * nextPaletteShape.height * 4);
+        let sliceStartedAt = -Infinity;
         for (const tile of tiles) {
-          // One bounded tile per real host task. Never keep padded CPU arrays
+          // One bounded upload per real host task. Never keep padded CPU arrays
           // for a whole frame or make pending textures visible to drawLayer.
-          await yieldTask(); stats.yieldCount++; check();
+          // Resident tiles only rebind a texture: they share a task until the
+          // slice budget is spent instead of waiting for a host task each.
+          if (!matchResidentTile(tile, tiles).existing || performance.now() - sliceStartedAt >= RESIDENT_TILE_SLICE_MS) {
+            await yieldTask(); stats.yieldCount++;
+            sliceStartedAt = performance.now();
+          }
+          check();
           const startedAt = performance.now();
           const plan = planTile(tile, tiles);
           const plannedAt = performance.now();

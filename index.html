@@ -69,6 +69,7 @@
               <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" hidden aria-hidden="true" tabindex="-1">
                 <option id="optScenarioNone" value="" data-i18n="None">None</option>
               </select>
+              <div class="scenario-picker-row">
               <div class="scenario-select-shell">
                 <button
                   id="scenarioSelectButton"
@@ -82,6 +83,8 @@
                   <span class="scenario-select-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-down"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
                 </button>
                 <div id="scenarioSelectMenu" class="scenario-select-menu hidden" role="listbox" aria-labelledby="lblScenarioSelect"></div>
+              </div>
+              <button id="scenarioIntroButton" type="button" class="btn-secondary scenario-intro-button" disabled aria-label="Scenario introduction" title="Scenario introduction">ⓘ</button>
               </div>
               <div class="sidebar-equal-actions mt-3">
                 <button id="applyScenarioBtn" type="button" class="btn-secondary" data-i18n="Apply">Apply</button>
@@ -238,7 +241,7 @@
                           <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled data-i18n="Bathymetry Contours">Bathymetry Contours</option>
                         </select>
                       </div>
-                      <p class="sidebar-tool-hint" data-i18n="Global oceans · raster-derived bathymetry">Global oceans · raster-derived bathymetry</p>
+                      <p class="sidebar-tool-hint" data-i18n="Global oceans">Global oceans</p>
                       <p class="sidebar-tool-hint" data-i18n="Scenario depth is schematic">Scenario depth is schematic</p>
                       <details class="appearance-mini-section appearance-mini-section-subtle">
                         <summary class="section-header" data-i18n="Depth legend and sources">Depth legend and sources</summary>
@@ -374,23 +377,6 @@
                     <option value="performance" data-i18n="Performance priority">Performance priority</option>
                   </select>
                 </div>
-                <details class="appearance-mini-section mt-3">
-                  <summary data-i18n="Rendering experiment">Rendering experiment</summary>
-                  <label class="toggle-label mt-3">
-                    <input id="politicalRasterTrial" type="checkbox" class="checkbox-input" aria-describedby="politicalRasterTrialStatus" />
-                    <span data-i18n="Raster acceleration (experimental)">Raster acceleration (experimental)</span>
-                  </label>
-                  <label class="toggle-label mt-3" for="politicalRenderMode" data-i18n="Political display mode">Political display mode</label>
-                  <select id="politicalRenderMode" aria-describedby="politicalRenderBackend" class="select-input">
-                    <option value="auto" data-i18n="Automatic (raster for TNO)">Automatic (raster for TNO)</option>
-                    <option value="raster" data-i18n="Raster display">Raster display</option>
-                    <option value="vector" data-i18n="Native vector compatibility">Native vector compatibility</option>
-                    <option value="hybrid" data-i18n="Legacy hybrid comparison">Legacy hybrid comparison</option>
-                  </select>
-                  <p id="politicalRenderBackend" class="hint-text" role="status"></p>
-                  <p id="politicalRasterTrialStatus" class="hint-text" role="status"></p>
-                  <p class="hint-text" data-i18n="Persistent raster stays raster after navigation; legacy hybrid restores native detail.">Persistent raster stays raster after navigation; legacy hybrid restores native detail.</p>
-                </details>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
                     <summary id="lblInternalBorders" class="section-header" data-i18n="Internal Borders">Internal Borders</summary>
@@ -575,11 +561,11 @@
                   <label class="toggle-label"><input id="physicalRegionLabels" type="checkbox" class="checkbox-input" /><span data-i18n="Physical region names">Physical region names</span></label>
                   <div>
                   <div class="range-row">
-                  <label class="range-label" for="physicalHillshadeOpacity" data-i18n="Alps DEM shading">Alps DEM shading</label>
+                  <label class="range-label" for="physicalHillshadeOpacity" data-i18n="Alps terrain shading">Alps terrain shading</label>
                   <span id="physicalHillshadeOpacityValue" class="range-value">0%</span>
                   </div>
                   <input id="physicalHillshadeOpacity" type="range" min="0" max="30" value="0" class="range-input" />
-                  <p class="physical-hint" data-i18n="Names from 200% zoom; DEM shading from 400%. Current geography reference.">Names from 200% zoom; DEM shading from 400%. Current geography reference.</p>
+                  <p class="physical-hint" data-i18n="Names from 200% zoom; terrain shading from 400%. Current geography reference.">Names from 200% zoom; terrain shading from 400%. Current geography reference.</p>
                   </div>
                   <div>
                   <div class="range-row">
@@ -1007,6 +993,10 @@
                                 <label class="toggle-label">
                                   <input id="cityPointLabelsEnabled" type="checkbox" class="checkbox-input" checked />
                                   <span id="lblCityPointLabelsEnabled" data-i18n="Show City Labels">Show City Labels</span>
+                                </label>
+                                <label class="toggle-label">
+                                  <input id="showModernPlaceNames" type="checkbox" class="checkbox-input" />
+                                  <span data-i18n="Show modern place names">Show modern place names</span>
                                 </label>
                                 <label class="toggle-label">
                                   <input id="cityCapitalOverlayEnabled" type="checkbox" class="checkbox-input" checked />
@@ -1933,7 +1923,7 @@
                                 <option value="dense" data-i18n="Dense">Dense</option>
                               </select>
                             </div>
-                            <p class="panel-hint" data-i18n="Rail labels currently use line names only.">Rail labels currently use line names only.</p>
+                            <p class="panel-hint" data-i18n="Rail labels show line names.">Rail labels show line names.</p>
                           </div>
 
                           <section class="space-y-3">
@@ -2033,7 +2023,7 @@
                                 <option value="dense" data-i18n="Dense">Dense</option>
                               </select>
                             </div>
-                            <p class="panel-hint" data-i18n="Road labels use segment ref/name when present.">Road labels use segment ref/name when present.</p>
+                            <p class="panel-hint" data-i18n="Road labels show route numbers or names.">Road labels show route numbers or names.</p>
                           </div>
 
                           <section class="space-y-3">
@@ -2081,7 +2071,6 @@
                   <section class="appearance-prop-group transport-workbench-reminder-card">
                     <div class="space-y-2">
                       <h3 id="lblTransportWorkbenchReminder" class="appearance-prop-heading" data-i18n="Transport Workbench">Transport Workbench</h3>
-                      <p id="transportWorkbenchReminderHint" class="panel-hint" data-i18n="Open the dedicated workbench for country or region-level transport review and editing.">Open the dedicated workbench for country or region-level transport review and editing.</p>
                       <button id="transportAppearanceWorkbenchBtn" type="button" class="btn-secondary" data-i18n="Open Transport Workbench">Open Transport Workbench</button>
                     </div>
                   </section>
@@ -2295,18 +2284,6 @@
                     </details>
                   </div>
                 </section>
-                <details class="appearance-mini-section appearance-mini-section-subtle"><summary class="section-header" data-i18n="Experimental layer catalog">Experimental layer catalog</summary>
-                <p
-                  id="thematicLayerCatalogStatus"
-                  class="layer-status-strip is-muted"
-                  role="status"
-                  aria-live="polite"
-                  data-i18n="Preview metadata pending"
-                >
-                  Preview metadata pending
-                </p>
-                <div id="thematicLayerPreviewList" class="thematic-layer-preview-list" role="list"></div>
-                </details>
               </section>
             </div>
           </details>
@@ -2339,7 +2316,7 @@
               </div>
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch" data-i18n="Search Colors">Search Colors</label>
               <div class="palette-library-search-row mt-2">
-                <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag..." class="input palette-library-search-input" />
+                <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search countries or colors" data-i18n-placeholder="Search countries or colors" class="input palette-library-search-input" />
                 <button id="paletteLibrarySearchClear" type="button" class="palette-library-search-clear hidden" data-i18n-aria-label="Clear color search" aria-label="Clear color search"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-close"><path d="M6 6l12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
               </div>
               <div id="paletteLibrarySummary" class="body-text mt-2 hidden" hidden data-i18n="0 colors">0 colors</div>
@@ -3178,7 +3155,7 @@
                     <strong id="transportWorkbenchCountryStatus" class="transport-workbench-meta-value" data-i18n="Japan">Japan</strong>
                   </div>
                   <label class="transport-workbench-meta-pill transport-workbench-pack-picker">
-                    <span class="transport-workbench-meta-label" data-i18n="Pack">Pack</span>
+                    <span class="transport-workbench-meta-label" data-i18n="Dataset">Dataset</span>
                     <select id="transportWorkbenchPackSelect" class="transport-workbench-pack-select" aria-label="Transport pack" data-i18n-aria-label="Transport pack"></select>
                   </label>
                   <div class="transport-workbench-meta-pill">
@@ -3282,7 +3259,6 @@
           <div class="export-workbench-topbar">
             <div class="export-workbench-topbar-copy">
               <div class="export-workbench-topbar-kicker" data-i18n="Export">Export</div>
-              <h3 class="export-workbench-topbar-title" data-i18n="Export workbench">Export workbench</h3>
             </div>
             <button id="exportWorkbenchAdvancedBtn" type="button" class="btn-secondary export-workbench-advanced-btn" aria-expanded="false" aria-controls="exportWorkbenchParams exportWorkbenchLayers" data-i18n="Advanced settings">Advanced settings</button>
             <button
@@ -3310,8 +3286,7 @@
           </div>
           <div class="export-workbench-grid">
             <section id="exportWorkbenchParams" hidden class="export-workbench-column export-workbench-column-params" aria-labelledby="exportWorkbenchParamsTitle">
-              <div class="export-workbench-column-kicker" data-i18n="Base image">Base image</div>
-              <h4 id="exportWorkbenchParamsTitle" class="export-workbench-column-title" data-i18n="Base frame tuning">Base frame tuning</h4>
+              <div id="exportWorkbenchParamsTitle" class="export-workbench-column-kicker" data-i18n="Base image">Base image</div>
               <div class="export-workbench-control-list">
                 <label class="export-workbench-control" for="exportWorkbenchBrightness">
                   <span class="export-workbench-control-row">
@@ -3345,7 +3320,6 @@
               <div class="export-workbench-bake-shell">
                 <div class="export-workbench-group-header">
                   <span class="export-workbench-column-kicker" data-i18n="Bake outputs">Bake outputs</span>
-                  <span class="export-workbench-group-hint" data-i18n="Prepare reusable export layers">Prepare reusable export layers</span>
                 </div>
                 <div class="export-workbench-bake-actions">
                   <button id="exportWorkbenchBakeVisibleBtn" type="button" class="btn-secondary" data-i18n="Bake current pack">Bake current pack</button>
@@ -3381,14 +3355,13 @@
                 <div class="export-workbench-layer-group">
                   <div class="export-workbench-group-header">
                     <span class="export-workbench-column-kicker" data-i18n="Main layers">Main layers</span>
-                    <span class="export-workbench-group-hint" data-i18n="Sort · Visibility">Sort · Visibility</span>
                   </div>
                   <div id="exportWorkbenchMainLayerList" class="export-workbench-layer-list" role="list"></div>
                 </div>
                 <div class="export-workbench-layer-group">
                   <div class="export-workbench-group-header">
                     <span class="export-workbench-column-kicker" data-i18n="Text elements">Text elements</span>
-                    <span class="export-workbench-group-hint" data-i18n="Render-pass labels and SVG annotations">Render-pass labels and SVG annotations</span>
+                    <span class="export-workbench-group-hint" data-i18n="Text and annotations">Text and annotations</span>
                   </div>
                   <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list"></div>
                 </div>
@@ -3814,9 +3787,8 @@
     </div>
     <div id="bootOverlay" class="boot-overlay" role="status" aria-live="polite" aria-busy="true">
       <div class="boot-overlay__panel">
-        <div class="boot-overlay__eyebrow" data-i18n="Scenario Boot">Scenario Boot</div>
         <h2 id="bootOverlayTitle" class="boot-overlay__title" data-i18n="Preparing default scenario">Preparing default scenario</h2>
-        <p id="bootOverlayMessage" class="boot-overlay__message" data-i18n="Loading the base map and TNO 1962 assets before interaction unlocks.">Loading the base map and TNO 1962 assets before interaction unlocks.</p>
+        <p id="bootOverlayMessage" class="boot-overlay__message" data-i18n="Preparing your map.">Preparing your map.</p>
         <details id="bootOverlayErrorDetails" class="boot-overlay__error-details hidden" hidden>
           <summary id="bootOverlayErrorSummary" data-i18n="Technical details">Technical details</summary>
           <pre id="bootOverlayErrorText"></pre>

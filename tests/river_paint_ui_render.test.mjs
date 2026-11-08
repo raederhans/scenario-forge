@@ -321,8 +321,8 @@ test('control is unavailable outside pilot scene and while startup is readonly',
   const { state } = await makeFixture(); const button = buttonFixture();
   const controls = createRiverPaintControls({ state, button, rebuildGeometry() {} });
   assert.equal(button.disabled, false);
-  state.activeScenarioId = 'tno_1962'; controls.sync(); assert.equal(button.disabled, true);
-  state.activeScenarioId = 'modern_world'; state.startupReadonly = true; controls.sync(); assert.equal(button.disabled, true);
+  state.activeScenarioId = 'tno_1962'; controls.sync(); assert.equal(button.disabled, true); assert.equal(button.hidden, true);
+  state.activeScenarioId = 'modern_world'; state.startupReadonly = true; controls.sync(); assert.equal(button.disabled, true); assert.equal(button.hidden, false);
   controls.dispose(); assert.deepEqual(button.listeners, {});
 });
 

@@ -1,6 +1,8 @@
 import { loadScenarioBundle } from "../core/scenario_resources.js";
 import { applyScenarioBundleCommand } from "../core/scenario_dispatcher.js";
 import { normalizeScenarioId } from "../core/scenario/shared.js";
+import { applyScenarioOpeningView } from "../core/scenario/presentation_opening_view.js";
+import { getSampleProjectIdFromUrl } from "../core/sample_project_url.js";
 
 function buildScenarioBundleBootMetrics(bundle) {
   return bundle?.loadDiagnostics?.optionalResources?.runtime_topology?.metrics
@@ -138,6 +140,10 @@ export function createStartupScenarioBootOwner({
       if (typeof runtimeState.updateScenarioUIFn === "function") {
         runtimeState.updateScenarioUIFn();
       }
+    }
+
+    if (!getSampleProjectIdFromUrl()) {
+      applyScenarioOpeningView(defaultScenarioBundle.manifest, { animate: false });
     }
 
     warnOnStartupBundleIntegrity?.(defaultScenarioBundle, {

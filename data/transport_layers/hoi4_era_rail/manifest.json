@@ -3,7 +3,7 @@
   "family": "era_rail",
   "geometry_kind": "mixed",
   "schema_version": 1,
-  "generated_at": "2026-11-07T11:35:37Z",
+  "generated_at": "2026-11-07T11:53:24Z",
   "recipe_version": "era_rail_v1",
   "source_policy": "local_game_files_facts_only",
   "distribution_tier": "scenario_optional_layer",
@@ -50,6 +50,6 @@
       "sha256": "e131d30e5dcb13d9c2a8598f820a2de0ae9828f3a24f2bddc1bcfff40f71660a"
     }
   },
-  "build_command": "python tools/build_era_railways.py --scenario-dir data/scenarios/hoi4_1936 --output-dir data/transport_layers/hoi4_era_rail",
+  "build_command": "python tools/build_era_railways.py --profile hoi4",
   "runtime_consumer": "scenario_optional_layer:erarailways"
 }

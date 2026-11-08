@@ -1,4 +1,5 @@
 import { state as runtimeState } from "../core/state.js";
+import { applyScenarioOpeningView } from "../core/scenario/presentation_opening_view.js";
 import { callRuntimeHook, registerOwnedRuntimeHook } from "../core/state/index.js";
 import {
   clearActiveScenarioCommand,
@@ -20,6 +21,7 @@ import { loadScenarioRegistry } from "../core/scenario_resources.js";
 import { t } from "./i18n.js";
 import { bindSelectKeyboard, focusSelectedSelectOption } from "./styled_selects.js";
 import { showToast } from "./toast.js";
+import { createScenarioIntroCard } from "./scenario_intro_card.js";
 const state = runtimeState;
 let disposeActiveScenarioControls = null;
 
@@ -31,6 +33,7 @@ export function initScenarioControls() {
   const dispose = () => {
     events.abort();
     releaseHook();
+    introCard?.dispose();
     if (disposeActiveScenarioControls === dispose) disposeActiveScenarioControls = null;
   };
   disposeActiveScenarioControls = dispose;
@@ -39,6 +42,10 @@ export function initScenarioControls() {
   const scenarioSelectButton = document.getElementById("scenarioSelectButton");
   const scenarioSelectButtonText = document.getElementById("scenarioSelectButtonText");
   const scenarioSelectMenu = document.getElementById("scenarioSelectMenu");
+  const scenarioIntroButton = document.getElementById("scenarioIntroButton");
+  const mapStage = document.getElementById("mapContainer")?.parentElement;
+  const introCard = mapStage ? createScenarioIntroCard(mapStage) : null;
+  let introScenarioId = "";
   const applyScenarioBtn = document.getElementById("applyScenarioBtn");
   const resetScenarioBtn = document.getElementById("resetScenarioBtn");
   const clearScenarioBtn = document.getElementById("clearScenarioBtn");
@@ -66,7 +73,7 @@ export function initScenarioControls() {
     scenarioSelectButton.title = scenarioSelect?.title || "";
     scenarioSelectMenu.replaceChildren();
 
-    optionPayloads.forEach(({ value, label }) => {
+    optionPayloads.forEach(({ value, label, tagline }) => {
       const optionButton = document.createElement("button");
       optionButton.type = "button";
       optionButton.className = "scenario-select-option";
@@ -75,6 +82,12 @@ export function initScenarioControls() {
       optionButton.classList.toggle("is-selected", normalizeScenarioId(value) === normalizedValue);
       optionButton.dataset.value = value;
       optionButton.textContent = label;
+      if (tagline) {
+        const subtitle = document.createElement("span");
+        subtitle.className = "scenario-select-tagline";
+        subtitle.textContent = t(tagline, "ui");
+        optionButton.appendChild(subtitle);
+      }
       optionButton.addEventListener("click", () => {
         if (events.signal.aborted || !scenarioSelect || scenarioSelect.disabled) return;
         scenarioSelect.value = value;
@@ -89,6 +102,16 @@ export function initScenarioControls() {
   const renderScenarioControls = () => {
     if (events.signal.aborted) return;
     const entries = getScenarioRegistryEntries();
+    const activeEntry = entries.find((entry) => normalizeScenarioId(entry.scenario_id) === normalizeScenarioId(runtimeState.activeScenarioId));
+    if (scenarioIntroButton) {
+      scenarioIntroButton.disabled = !activeEntry?.presentation;
+      scenarioIntroButton.title = t("Scenario introduction", "ui");
+      scenarioIntroButton.setAttribute("aria-label", t("Scenario introduction", "ui"));
+    }
+    if (introCard?.visible) {
+      if (introScenarioId !== normalizeScenarioId(runtimeState.activeScenarioId) || !activeEntry?.presentation) introCard.hide();
+      else introCard.show(activeEntry.presentation);
+    }
     const isApplyInFlight = !!runtimeState.scenarioApplyInFlight;
     const isBootBlocking = runtimeState.bootBlocking !== false || runtimeState.startupReadonly;
     const fatalState = getScenarioFatalRecoveryState();
@@ -100,6 +123,7 @@ export function initScenarioControls() {
         ...entries.map((entry) => ({
           value: normalizeScenarioId(entry.scenario_id),
           label: getScenarioDisplayName(entry, entry.scenario_id),
+          tagline: entry.presentation?.tagline,
         })),
       ];
       const activeValue = normalizeScenarioId(runtimeState.activeScenarioId);
@@ -166,6 +190,14 @@ export function initScenarioControls() {
 
   releaseHook = registerOwnedRuntimeHook(state, "updateScenarioUIFn", renderScenarioControls);
 
+  const showActiveIntroduction = () => {
+    const entry = getScenarioRegistryEntries().find((entry) => normalizeScenarioId(entry.scenario_id) === normalizeScenarioId(runtimeState.activeScenarioId));
+    if (!entry?.presentation) return;
+    introScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+    introCard?.show(entry.presentation);
+  };
+  scenarioIntroButton?.addEventListener("click", showActiveIntroduction, eventOptions);
+
   if (scenarioSelect) {
     scenarioSelect.addEventListener("change", () => {
       pendingScenarioId = normalizeScenarioId(scenarioSelect.value);
@@ -223,8 +255,10 @@ export function initScenarioControls() {
           markDirtyReason: "scenario-apply",
           showToastOnComplete: true,
         });
+        applyScenarioOpeningView(runtimeState.activeScenarioManifest, { animate: true });
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
+        if (!events.signal.aborted && pendingScenarioId === scenarioId) showActiveIntroduction();
       } catch (error) {
         if (events.signal.aborted) return;
         console.error("Failed to apply scenario:", error);

@@ -33,6 +33,7 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     const info = runtime.diagnostics();
     const supported = state.activeScenarioId === RIVER_PAINT_PILOT.sceneId;
     const enabled = supported && !!state.riverPaint?.editMode;
+    button.hidden = !supported;
     button.disabled = !supported || !!state.startupReadonly;
     button.classList.toggle('is-active', enabled);
     button.setAttribute('aria-pressed', String(enabled));
@@ -40,7 +41,7 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     const label = info.pending ? (zh() ? '取消加载' : 'Cancel loading') : (zh() ? '沿河填色' : 'River cells');
     button.textContent = label;
     const description = !supported
-      ? (zh() ? '试点仅支持 Modern World。' : 'Pilot available in Modern World only.')
+      ? ''
       : info.error ? (zh() ? `沿河分区未就绪：${info.error}` : `River partitions unavailable: ${info.error}`)
       : (zh() ? '搜索已加载的沿河地点，按河流筛选。旧项目保留原范围；关闭工具保留颜色。'
         : 'Search loaded river locations or filter by river. Existing projects retain their coverage. Turning off the tool preserves paint.');

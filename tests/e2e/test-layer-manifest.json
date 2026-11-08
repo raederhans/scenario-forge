@@ -444,6 +444,13 @@
       "executionMode": "browser",
       "domain": "map-layer",
       "ownerHint": "map-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_opening_view.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
     }
   ]
 }

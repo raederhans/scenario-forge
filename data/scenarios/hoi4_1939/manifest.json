@@ -2602,7 +2602,7 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "e0fee0364a257062d5706252cb07fcf78bbbd5d888aaddec27b8b3b878fdd99f",
+  "snapshot_fingerprint": "d63623ac3617f14d06a65f60be8be788b1b27dc97d259e7244c269a99ae8c465",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "e70f1eee74aa8e4bdcde8d34115fcc2d806881400225168c8f22590b24f66d42",
@@ -2618,7 +2618,7 @@
   "strategic_values_url": "data/scenarios/hoi4_1939/strategic_values.by_feature.json",
   "style_defaults": {
     "ocean": {
-      "fillColor": "#2d4769"
+      "fillColor": "#3b4a55"
     }
   },
   "summary": {
@@ -2658,5 +2658,13 @@
     "synthetic_owner_feature_count": 23,
     "topology_blocker_count": 0
   },
-  "version": 2
+  "version": 2,
+  "opening_view": {
+    "bounds": [
+      -12,
+      34,
+      48,
+      63
+    ]
+  }
 }
