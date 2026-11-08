@@ -483,15 +483,20 @@
                         </div>
                         <input id="parentBorderWidth" type="range" min="0.2" max="4.0" step="0.05" value="1.10" class="range-input" />
                       </div>
-                      <div id="lblParentBorderCountries" class="range-label mt-2" data-i18n="Show Parent Borders By Country">Show Parent Borders By Country</div>
-                      <div class="parent-border-actions mt-2">
-                        <button id="parentBorderEnableAll" type="button" class="btn-secondary" data-i18n="Enable All">Enable All</button>
-                        <button id="parentBorderDisableAll" type="button" class="btn-secondary" data-i18n="Clear All">Clear All</button>
-                      </div>
-                      <div id="parentBorderEmpty" class="parent-border-empty mt-2 hidden">
-                        No supported countries in current dataset.
-                      </div>
-                      <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
+                      <details class="appearance-mini-section">
+                        <summary id="lblParentBorderCountries">By country (0 on)</summary>
+                        <label class="range-label" for="parentBorderCountrySearch" data-i18n="Search countries">Search countries</label>
+                        <input id="parentBorderCountrySearch" type="search" class="text-input" />
+                        <label class="toggle-label mt-2"><input id="parentBorderEnabledOnly" type="checkbox" class="checkbox-input" /><span data-i18n="Enabled only">Enabled only</span></label>
+                        <div class="parent-border-actions mt-2">
+                          <button id="parentBorderEnableAll" type="button" class="btn-secondary" data-i18n="Enable All">Enable All</button>
+                          <button id="parentBorderDisableAll" type="button" class="btn-secondary" data-i18n="Clear All">Clear All</button>
+                        </div>
+                        <div id="parentBorderEmpty" class="parent-border-empty mt-2 hidden">
+                          No supported countries in current dataset.
+                        </div>
+                        <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
+                      </details>
                       <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button" data-i18n="Recalculate Borders">Recalculate Borders</button>
                       <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
                     </div>
@@ -648,50 +653,7 @@
                   <input id="physicalMinorContours" type="checkbox" class="checkbox-input" checked />
                   <span id="lblPhysicalMinorContours" data-i18n="Show Minor Contours">Show Minor Contours</span>
                   </label>
-                  <details id="physicalContourAdvanced" class="physical-disclosure" >
-                  <summary id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</summary>
-                  <div class="physical-section-body">
-                  <div class="flex items-center justify-between gap-3">
-                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor" data-i18n="Contour Color">Contour Color</label>
-                  <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth" data-i18n="Major Width">Major Width</label>
-                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
-                  </div>
-                  <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth" data-i18n="Minor Width">Minor Width</label>
-                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
-                  </div>
-                  <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval" data-i18n="Minor Interval (m)">Minor Interval (m)</label>
-                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
-                  </div>
-                  <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Minimum Elevation (m)">Major Minimum Elevation (m)</label>
-                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
-                  </div>
-                  <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="200" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Minimum Elevation (m)">Minor Minimum Elevation (m)</label>
-                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
-                  </div>
-                  <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="280" class="range-input" />
-                  </div>
-                  </div>
-                  </details>
+
                   </div>
                   </details>
                   <details id="physicalLocalSection" class="physical-disclosure" >
@@ -767,6 +729,50 @@
                   </select>
                   </div>
                   </div>
+                  <section id="physicalContourAdvanced" class="appearance-prop-group" >
+                  <h3 class="appearance-prop-heading" id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</h3>
+                  <div class="physical-section-body">
+                  <div class="flex items-center justify-between gap-3">
+                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor" data-i18n="Contour Color">Contour Color</label>
+                  <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth" data-i18n="Major Width">Major Width</label>
+                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
+                  </div>
+                  <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth" data-i18n="Minor Width">Minor Width</label>
+                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
+                  </div>
+                  <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval" data-i18n="Minor Interval (m)">Minor Interval (m)</label>
+                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
+                  </div>
+                  <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Minimum Elevation (m)">Major Minimum Elevation (m)</label>
+                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
+                  </div>
+                  <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="200" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Minimum Elevation (m)">Minor Minimum Elevation (m)</label>
+                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
+                  </div>
+                  <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="280" class="range-input" />
+                  </div>
+                  </div>
+                  </section>
                   </details>
                   </div>
                   </details>
@@ -797,8 +803,32 @@
                             </div>
                             <input id="urbanAdaptiveStrength" type="range" min="0" max="100" value="30" class="range-input" />
                           </div>
-                          <details class="appearance-mini-section">
-                            <summary class="section-header" data-i18n="Advanced">Advanced</summary>
+
+                        </div>
+                        <div id="urbanManualControls" class="space-y-2 hidden">
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblUrbanColor" class="range-label" for="urbanColor" data-i18n="Color">Color</label>
+                            <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
+                          </div>
+
+                        </div>
+                        <div>
+                          <div class="range-row">
+                          <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity" data-i18n="Fill Opacity">Fill Opacity</label>
+                            <span id="urbanOpacityValue" class="range-value">34%</span>
+                          </div>
+                          <input id="urbanOpacity" type="range" min="0" max="100" value="34" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea" data-i18n="Min Area (px)">Min Area (px)</label>
+                            <span id="urbanMinAreaValue" class="range-value">1</span>
+                          </div>
+                          <input id="urbanMinArea" type="range" min="1" max="80" value="1" class="range-input" />
+                        </div>
+                        <details class="appearance-mini-section">
+                          <summary class="section-header" data-i18n="Advanced">Advanced</summary>
+                          <div id="urbanAdaptiveAdvancedControls" class="space-y-2">
                             <div>
                               <div class="range-row">
                                 <label class="range-label" for="urbanStrokeOpacity" data-i18n="Stroke Opacity">Stroke Opacity</label>
@@ -833,15 +863,8 @@
                                 <input id="urbanAdaptiveTintStrength" type="range" min="0" max="50" value="0" class="range-input" />
                               </div>
                             </div>
-                          </details>
-                        </div>
-                        <div id="urbanManualControls" class="space-y-2 hidden">
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblUrbanColor" class="range-label" for="urbanColor" data-i18n="Color">Color</label>
-                            <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
                           </div>
-                          <details class="appearance-mini-section">
-                            <summary class="section-header" data-i18n="Advanced">Advanced</summary>
+                          <div id="urbanManualAdvancedControls" class="space-y-2 hidden">
                             <div>
                               <div class="range-row">
                                 <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode" data-i18n="Blend Mode">Blend Mode</label>
@@ -852,24 +875,7 @@
                                 <option id="optUrbanBlendOverlay" value="overlay" data-i18n="Overlay">Overlay</option>
                               </select>
                             </div>
-                          </details>
-                        </div>
-                        <div>
-                          <div class="range-row">
-                          <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity" data-i18n="Fill Opacity">Fill Opacity</label>
-                            <span id="urbanOpacityValue" class="range-value">34%</span>
                           </div>
-                          <input id="urbanOpacity" type="range" min="0" max="100" value="34" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea" data-i18n="Min Area (px)">Min Area (px)</label>
-                            <span id="urbanMinAreaValue" class="range-value">1</span>
-                          </div>
-                          <input id="urbanMinArea" type="range" min="1" max="80" value="1" class="range-input" />
-                        </div>
-                        <details class="appearance-mini-section">
-                          <summary class="section-header" data-i18n="Local adjustment: glow field">Local adjustment: glow field</summary>
                           <div class="appearance-prop-group">
                             <h3 id="lblUrbanIntensityFieldPanel" class="appearance-prop-heading" data-i18n="Glow Field">Glow Field</h3>
                             <div class="space-y-2 mt-2">
@@ -1620,7 +1626,6 @@
                       </summary>
                       <div id="transportAirportControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h3 id="lblTransportAirportVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="toggleAirports" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportAirportToggle" data-i18n="Show Airports">Show Airports</span>
@@ -1628,13 +1633,27 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h3 id="lblTransportAirportLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="airportLabelsEnabled" type="checkbox" class="checkbox-input" checked />
                             <span id="lblAirportLabelsEnabled" data-i18n="Show Airport Labels">Show Airport Labels</span>
                           </label>
                         </section>
 
+                        <div>
+                          <div class="range-row">
+                            <label id="lblAirportCoverageReach" class="range-label" for="airportCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                            <span id="airportCoverageReachValue" class="range-value">50%</span>
+                          </div>
+                          <input id="airportCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblAirportLabelDensity" class="range-label" for="airportLabelDensity" data-i18n="Label Density">Label Density</label>
+                          <select id="airportLabelDensity" class="select-input">
+                            <option value="sparse" data-i18n="Sparse">Sparse</option>
+                            <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                            <option value="dense" data-i18n="Dense">Dense</option>
+                          </select>
+                        </div>
                         <details class="appearance-mini-section">
                           <summary class="section-header" data-i18n="More options">More options</summary>
                           <div class="space-y-3">
@@ -1659,14 +1678,7 @@
                           </div>
 
                           <div class="space-y-3">
-                            <div class="flex items-center justify-between gap-3">
-                              <label id="lblAirportLabelDensity" class="range-label" for="airportLabelDensity" data-i18n="Label Density">Label Density</label>
-                              <select id="airportLabelDensity" class="select-input">
-                                <option value="sparse" data-i18n="Sparse">Sparse</option>
-                                <option value="balanced" selected data-i18n="Balanced">Balanced</option>
-                                <option value="dense" data-i18n="Dense">Dense</option>
-                              </select>
-                            </div>
+
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblAirportLabelMode" class="range-label" for="airportLabelMode" data-i18n="Label Mode">Label Mode</label>
                               <select id="airportLabelMode" class="select-input">
@@ -1693,14 +1705,7 @@
                           </div>
 
                           <section class="space-y-3">
-                            <h3 id="lblTransportAirportScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblAirportCoverageReach" class="range-label" for="airportCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                                <span id="airportCoverageReachValue" class="range-value">50%</span>
-                              </div>
-                              <input id="airportCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
-                            </div>
+
                             <label class="toggle-label">
                               <input id="airportScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblAirportScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
@@ -1743,7 +1748,6 @@
                       </summary>
                       <div id="transportPortControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h3 id="lblTransportPortVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="togglePorts" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportPortToggle" data-i18n="Show Ports">Show Ports</span>
@@ -1751,13 +1755,27 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h3 id="lblTransportPortLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="portLabelsEnabled" type="checkbox" class="checkbox-input" checked />
                             <span id="lblPortLabelsEnabled" data-i18n="Show Port Labels">Show Port Labels</span>
                           </label>
                         </section>
 
+                        <div>
+                          <div class="range-row">
+                            <label id="lblPortCoverageReach" class="range-label" for="portCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                            <span id="portCoverageReachValue" class="range-value">50%</span>
+                          </div>
+                          <input id="portCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblPortLabelDensity" class="range-label" for="portLabelDensity" data-i18n="Label Density">Label Density</label>
+                          <select id="portLabelDensity" class="select-input">
+                            <option value="sparse" data-i18n="Sparse">Sparse</option>
+                            <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                            <option value="dense" data-i18n="Dense">Dense</option>
+                          </select>
+                        </div>
                         <details class="appearance-mini-section">
                           <summary class="section-header" data-i18n="More options">More options</summary>
                           <div class="space-y-3">
@@ -1782,14 +1800,7 @@
                           </div>
 
                           <div class="space-y-3">
-                            <div class="flex items-center justify-between gap-3">
-                              <label id="lblPortLabelDensity" class="range-label" for="portLabelDensity" data-i18n="Label Density">Label Density</label>
-                              <select id="portLabelDensity" class="select-input">
-                                <option value="sparse" data-i18n="Sparse">Sparse</option>
-                                <option value="balanced" selected data-i18n="Balanced">Balanced</option>
-                                <option value="dense" data-i18n="Dense">Dense</option>
-                              </select>
-                            </div>
+
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblPortLabelMode" class="range-label" for="portLabelMode" data-i18n="Label Mode">Label Mode</label>
                               <select id="portLabelMode" class="select-input">
@@ -1816,14 +1827,7 @@
                           </div>
 
                           <section class="space-y-3">
-                            <h3 id="lblTransportPortScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblPortCoverageReach" class="range-label" for="portCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                                <span id="portCoverageReachValue" class="range-value">50%</span>
-                              </div>
-                              <input id="portCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
-                            </div>
+
                             <label class="toggle-label">
                               <input id="portScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblPortScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
@@ -1866,7 +1870,6 @@
                       </summary>
                       <div id="transportRailControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h3 id="lblTransportRailVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="toggleRail" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportRailToggle" data-i18n="Show Rail">Show Rail</span>
@@ -1878,13 +1881,27 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h3 id="lblTransportRailLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="railLabelsEnabled" type="checkbox" class="checkbox-input" />
                             <span id="lblRailLabelsEnabled" data-i18n="Show Rail Labels">Show Rail Labels</span>
                           </label>
                         </section>
 
+                        <div>
+                          <div class="range-row">
+                            <label id="lblRailCoverageReach" class="range-label" for="railCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                            <span id="railCoverageReachValue" class="range-value">20%</span>
+                          </div>
+                          <input id="railCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblRailLabelDensity" class="range-label" for="railLabelDensity" data-i18n="Label Density">Label Density</label>
+                          <select id="railLabelDensity" class="select-input">
+                            <option value="sparse" selected data-i18n="Sparse">Sparse</option>
+                            <option value="balanced" data-i18n="Balanced">Balanced</option>
+                            <option value="dense" data-i18n="Dense">Dense</option>
+                          </select>
+                        </div>
                         <details class="appearance-mini-section">
                           <summary class="section-header" data-i18n="More options">More options</summary>
                           <div class="space-y-3">
@@ -1909,26 +1926,12 @@
                           </div>
 
                           <div class="space-y-3">
-                            <div class="flex items-center justify-between gap-3">
-                              <label id="lblRailLabelDensity" class="range-label" for="railLabelDensity" data-i18n="Label Density">Label Density</label>
-                              <select id="railLabelDensity" class="select-input">
-                                <option value="sparse" selected data-i18n="Sparse">Sparse</option>
-                                <option value="balanced" data-i18n="Balanced">Balanced</option>
-                                <option value="dense" data-i18n="Dense">Dense</option>
-                              </select>
-                            </div>
+
                             <p data-page-note class="panel-hint" data-i18n="Rail labels show line names.">Rail labels show line names.</p>
                           </div>
 
                           <section class="space-y-3">
-                            <h3 id="lblTransportRailScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblRailCoverageReach" class="range-label" for="railCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                                <span id="railCoverageReachValue" class="range-value">20%</span>
-                              </div>
-                              <input id="railCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
-                            </div>
+
                             <label class="toggle-label">
                               <input id="railScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblRailScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
@@ -1970,7 +1973,6 @@
                       </summary>
                       <div id="transportRoadControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h3 id="lblTransportRoadVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="toggleRoad" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportRoadToggle" data-i18n="Show Road">Show Road</span>
@@ -1978,13 +1980,27 @@
                         </section>
 
                         <section class="space-y-2">
-                          <h3 id="lblTransportRoadLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="roadLabelsEnabled" type="checkbox" class="checkbox-input" />
                             <span id="lblRoadLabelsEnabled" data-i18n="Show Road Labels">Show Road Labels</span>
                           </label>
                         </section>
 
+                        <div>
+                          <div class="range-row">
+                            <label id="lblRoadCoverageReach" class="range-label" for="roadCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                            <span id="roadCoverageReachValue" class="range-value">20%</span>
+                          </div>
+                          <input id="roadCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                        </div>
+                        <div>
+                          <label id="lblRoadLabelDensity" class="range-label" for="roadLabelDensity" data-i18n="Label Density">Label Density</label>
+                          <select id="roadLabelDensity" class="select-input mt-1">
+                            <option value="sparse" data-i18n="Sparse">Sparse</option>
+                            <option value="balanced" data-i18n="Balanced">Balanced</option>
+                            <option value="dense" data-i18n="Dense">Dense</option>
+                          </select>
+                        </div>
                         <details class="appearance-mini-section">
                           <summary class="section-header" data-i18n="More options">More options</summary>
                           <div class="space-y-3">
@@ -2009,26 +2025,12 @@
                           </div>
 
                           <div class="space-y-3">
-                            <div>
-                              <label id="lblRoadLabelDensity" class="range-label" for="roadLabelDensity" data-i18n="Label Density">Label Density</label>
-                              <select id="roadLabelDensity" class="select-input mt-1">
-                                <option value="sparse" data-i18n="Sparse">Sparse</option>
-                                <option value="balanced" data-i18n="Balanced">Balanced</option>
-                                <option value="dense" data-i18n="Dense">Dense</option>
-                              </select>
-                            </div>
+
                             <p data-page-note class="panel-hint" data-i18n="Road labels show route numbers or names.">Road labels show route numbers or names.</p>
                           </div>
 
                           <section class="space-y-3">
-                            <h3 id="lblTransportRoadScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblRoadCoverageReach" class="range-label" for="roadCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                                <span id="roadCoverageReachValue" class="range-value">20%</span>
-                              </div>
-                              <input id="roadCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
-                            </div>
+
                             <label class="toggle-label">
                               <input id="roadScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblRoadScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
@@ -2062,10 +2064,21 @@
                     </details>
                   </div>
 
-                  <section class="appearance-prop-group transport-workbench-reminder-card">
+                  <section id="transportProjectSection" class="appearance-prop-group transport-workbench-reminder-card">
                     <div class="space-y-2">
                       <h3 id="lblTransportWorkbenchReminder" class="appearance-prop-heading" data-i18n="Transport Workbench">Transport Workbench</h3>
-                      <button id="transportAppearanceWorkbenchBtn" type="button" class="btn-secondary" data-i18n="Open Transport Workbench">Open Transport Workbench</button>
+                      <button
+                        id="scenarioTransportWorkbenchBtn"
+                        type="button"
+                        class="btn-secondary sidebar-support-entry-btn"
+                        aria-haspopup="dialog"
+                        aria-controls="transportWorkbenchOverlay"
+                        aria-expanded="false"
+                        data-transport-entry-label="Open workbench"
+                        data-i18n="Open workbench"
+                      >
+                        Open workbench
+                      </button>
                     </div>
                   </section>
                 </div>
@@ -2974,29 +2987,7 @@
             </details>
 
             <h2 id="transportProjectHeading" class="visually-hidden" data-i18n="Transport workbench">Transport workbench</h2>
-            <details id="transportProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="transportProjectHeading lblTransportProject">
-              <summary id="lblTransportProject" class="sidebar-section-head">
-                <span class="sidebar-section-title is-secondary" data-i18n="Transport workbench">Transport workbench</span>
 
-              </summary>
-
-              <div class="inspector-panel-body">
-                <div class="sidebar-support-actions" role="group" aria-label="Transport actions" data-i18n-aria-label="Transport actions">
-                  <button
-                    id="scenarioTransportWorkbenchBtn"
-                    type="button"
-                    class="btn-secondary sidebar-support-entry-btn"
-                    aria-haspopup="dialog"
-                    aria-controls="transportWorkbenchOverlay"
-                    aria-expanded="false"
-                    data-transport-entry-label="Open workbench"
-                    data-i18n="Open workbench"
-                  >
-                    Open workbench
-                  </button>
-                </div>
-              </div>
-            </details>
 
             <h2 id="exportProjectHeading" class="visually-hidden" data-i18n="Export">Export</h2>
             <details id="exportProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="exportProjectHeading lblExportProject" open>

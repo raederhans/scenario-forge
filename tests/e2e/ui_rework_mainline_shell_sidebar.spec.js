@@ -162,11 +162,7 @@ test("phase 02 shell and sidebar mainline stays on the new rails", async ({ page
   } else {
     await page.locator("#inspectorSidebarTabProject").click();
   }
-  const transportSection = page.locator("#transportProjectSection");
-  if ((await transportSection.evaluate((node) => node.open)) !== true) {
-    await page.locator("#lblTransportProject").click();
-  }
-  await expect(transportSection).toHaveJSProperty("open", true);
+  await page.locator('[data-appearance-tab="transport"]').click();
   const transportTrigger = page.locator("#transportProjectSection #scenarioTransportWorkbenchBtn");
   await expect(transportTrigger).toBeVisible();
   await expect(transportTrigger).toHaveText("Open workbench");
