@@ -506,9 +506,6 @@ export const TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS = [
 export const TRANSPORT_WORKBENCH_INSPECTOR_TABS = [
   { id: "inspect", label: "Inspect" },
   { id: "display", label: "Display" },
-  { id: "aggregation", label: "Aggregation" },
-  { id: "labels", label: "Labels" },
-  { id: "coverage", label: "Coverage" },
   { id: "data", label: "Data" },
 ];
 
@@ -1107,66 +1104,36 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
 
 export const TRANSPORT_WORKBENCH_TAB_SECTION_MAP = {
   road: {
-    display: ["style"],
-    aggregation: ["inclusion", "source_hardening", "noise_control"],
-    labels: ["labels"],
-    coverage: [],
-    data: ["diagnostics"],
+    display: ["style", "inclusion", "noise_control", "labels"],
+    data: ["source_hardening"],
   },
   rail: {
-    display: ["line_presentation", "style"],
-    aggregation: ["network_scope", "source_reconciliation"],
-    labels: ["major_stations"],
-    coverage: [],
-    data: ["diagnostics"],
+    display: ["line_presentation", "style", "network_scope", "major_stations"],
+    data: ["source_reconciliation"],
   },
   airport: {
-    display: ["style"],
-    aggregation: [],
-    labels: ["visibility"],
-    coverage: ["facility_scope"],
-    data: ["diagnostics"],
+    display: ["style", "visibility"],
+    data: ["facility_scope"],
   },
   port: {
-    display: ["display_mode", "style"],
-    aggregation: ["aggregation_mode"],
-    labels: ["label_strategy", "visibility"],
-    coverage: ["facility_scope"],
-    data: ["diagnostics"],
+    display: ["display_mode", "style", "aggregation_mode", "label_strategy", "visibility"],
+    data: ["facility_scope"],
   },
   mineral_resources: {
-    display: ["display_mode", "style"],
-    aggregation: ["aggregation_mode"],
-    labels: ["label_strategy", "visibility"],
-    coverage: [],
-    data: ["diagnostics"],
-  },
-  energy_facilities: {
-    display: ["display_mode", "style"],
-    aggregation: ["aggregation_mode"],
-    labels: ["label_strategy", "visibility"],
-    coverage: ["facility_scope"],
-    data: ["diagnostics"],
-  },
-  industrial_zones: {
-    display: ["display_mode", "style"],
-    aggregation: ["aggregation_mode"],
-    labels: ["label_strategy", "visibility"],
-    coverage: ["data_variant", "filtering"],
-    data: ["diagnostics"],
-  },
-  logistics_hubs: {
-    display: ["display_mode", "style"],
-    aggregation: ["aggregation_mode"],
-    labels: ["label_strategy", "visibility"],
-    coverage: ["facility_scope"],
-    data: ["diagnostics"],
-  },
-  layers: {
-    display: [],
-    aggregation: [],
-    labels: [],
-    coverage: [],
+    display: ["display_mode", "style", "aggregation_mode", "label_strategy", "visibility"],
     data: [],
   },
+  energy_facilities: {
+    display: ["display_mode", "style", "aggregation_mode", "label_strategy", "visibility"],
+    data: ["facility_scope"],
+  },
+  industrial_zones: {
+    display: ["display_mode", "style", "aggregation_mode", "label_strategy", "visibility"],
+    data: ["data_variant", "filtering"],
+  },
+  logistics_hubs: {
+    display: ["display_mode", "style", "aggregation_mode", "label_strategy", "visibility"],
+    data: ["facility_scope"],
+  },
+  layers: { display: [], data: [] },
 };

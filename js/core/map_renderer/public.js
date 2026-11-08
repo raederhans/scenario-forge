@@ -5,6 +5,8 @@ export {
   buildInteractionInfrastructureAfterStartup,
   initMap,
   getPoliticalIdRasterDiagnostics,
+  getVisibleMapLabels,
+  getCountryLabelReadiness,
   setPoliticalIdRasterTrialEnabled,
   setPoliticalRenderMode,
   getPopulationHeatmapRenderReadiness,

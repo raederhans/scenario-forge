@@ -42,6 +42,8 @@ export function normalizeTransportWorkbenchFamily(value) {
 
 export function normalizeTransportWorkbenchInspectorTab(value) {
   const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "aggregation" || normalized === "labels") return "display";
+  if (normalized === "coverage") return "data";
   return TRANSPORT_WORKBENCH_INSPECTOR_TAB_IDS.includes(normalized) ? normalized : "inspect";
 }
 

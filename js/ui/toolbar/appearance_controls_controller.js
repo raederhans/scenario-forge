@@ -1,4 +1,5 @@
 import { createStrategicValuesOwner } from "./strategic_values_owner.js";
+import { createPoliticalDisplayModeOwner } from "./political_display_mode_owner.js";
 import { createThematicWgiOwner } from "./thematic_wgi_owner.js";
 import { createPopulationSpatialOwner } from "./population_spatial_owner.js";
 import { normalizeDisplayQuality } from "../../core/renderer/display_quality_policy.js";
@@ -235,6 +236,7 @@ export function createAppearanceControlsController({
       workbenchStatusNode.hidden = labels.length === 0;
     }
   };
+  const politicalDisplayModeOwner = createPoliticalDisplayModeOwner({ runtimeState, t });
   const thematicWgiOwner = createThematicWgiOwner({
     runtimeState, t, markDirty,
     refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
@@ -414,6 +416,7 @@ export function createAppearanceControlsController({
     if (displayQuality) displayQuality.value = normalizeDisplayQuality(runtimeState.styleConfig?.rendering?.quality);
   };
   const parentBorderOwner = createAppearanceParentBorderOwner({
+    translateUi: (key) => t(key, "ui"),
     runtimeState,
     nodes: {
       visibleToggle: parentBordersVisible,
@@ -425,6 +428,9 @@ export function createAppearanceControlsController({
       enableAllButton: parentBorderEnableAll,
       disableAllButton: parentBorderDisableAll,
       countryList: parentBorderCountryList,
+      countrySearch: document.getElementById("parentBorderCountrySearch"),
+      enabledOnlyToggle: document.getElementById("parentBorderEnabledOnly"),
+      countrySummary: document.getElementById("lblParentBorderCountries"),
       emptyNode: parentBorderEmpty,
     },
     translateGeo,
@@ -573,6 +579,8 @@ export function createAppearanceControlsController({
     if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? t("Opacity", "ui") : t("Fill Opacity", "ui");
     if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);
     if (urbanManualControls) urbanManualControls.classList.toggle("hidden", !isManual);
+    document.getElementById("urbanAdaptiveAdvancedControls")?.classList.toggle("hidden", isManual);
+    document.getElementById("urbanManualAdvancedControls")?.classList.toggle("hidden", !isManual);
     if (urbanColor) urbanColor.value = urbanConfig.color;
     if (urbanOpacity) urbanOpacity.value = String(Math.round(urbanConfig.fillOpacity * 100));
     if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(urbanConfig.fillOpacity * 100)}%`;
@@ -604,6 +612,7 @@ export function createAppearanceControlsController({
     cityPointsOwner.renderCityPointsUi();
     strategicValuesOwner.render();
     thematicWgiOwner.render();
+    politicalDisplayModeOwner.render();
     populationSpatialOwner.render();
     renderBorderUi();
     if (toggleUrban) toggleUrban.checked = !!runtimeState.showUrban;
