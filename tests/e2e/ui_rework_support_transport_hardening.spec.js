@@ -16,29 +16,17 @@ async function activateSupportTrigger(page, selector) {
   await page.keyboard.press("Enter");
 }
 
-async function openTransportWorkbenchFromProject(page) {
-  if (await page.locator("body.editor-workspace").count()) {
-    if (await page.locator("#leftSidebar").evaluate((node) => node.inert)) {
-      if (await page.locator("#sidebarDrawerBackdrop").isVisible()) {
-        await page.keyboard.press("Escape");
-        await expect(page.locator("#sidebarDrawerBackdrop")).toBeHidden();
-        await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
-      }
-      await page.locator("#leftPanelToggle").click();
+async function openTransportWorkbench(page) {
+  if (await page.locator("#leftSidebar").evaluate((node) => node.inert)) {
+    if (await page.locator("#sidebarDrawerBackdrop").isVisible()) {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("#sidebarDrawerBackdrop")).toBeHidden();
+      await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
     }
-    await page.locator("#editorTaskLayersBtn").click();
-  } else {
-    const projectTab = page.locator("#inspectorSidebarTabProject");
-    if ((await projectTab.getAttribute("aria-selected")) !== "true") {
-      await projectTab.click();
-    }
-    await expect(projectTab).toHaveAttribute("aria-selected", "true");
+    await page.locator("#leftPanelToggle").click();
   }
-  const transportSection = page.locator("#transportProjectSection");
-  if ((await transportSection.evaluate((node) => node.open)) !== true) {
-    await page.locator("#lblTransportProject").click();
-  }
-  await expect(transportSection).toHaveJSProperty("open", true);
+  await page.locator("#editorTaskLayersBtn").click();
+  await page.locator("#appearanceTabTransport").click();
   await page.locator("#transportProjectSection #scenarioTransportWorkbenchBtn").click();
 }
 
@@ -167,7 +155,7 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
   await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
   await expect(page.locator(guideTrigger)).toBeFocused();
 
-  await openTransportWorkbenchFromProject(page);
+  await openTransportWorkbench(page);
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
   await expect(page.locator("#transportWorkbenchLensTitle")).toBeVisible();
   await expect(page.locator(".transport-workbench-meta-strip")).toBeVisible();
@@ -320,7 +308,6 @@ test("project support panels and inspector search stay polished and inset", asyn
     const projectSectionIds = [
       "projectLegendSection",
       "frontlineProjectSection",
-      "transportProjectSection",
       "exportProjectSection",
       "inspectorUtilitiesSection",
       "diagnosticsSection",
@@ -820,25 +807,34 @@ test("phase 03 transport preview omits compare controls", async ({ page }) => {
   const compareBtn = page.locator("#transportWorkbenchCompareBtn");
   const compareStatus = page.locator("#transportWorkbenchCompareStatus");
 
-  if (await page.locator("body.editor-workspace").count()) {
-    await page.locator("#editorTaskLayersBtn").click();
-  } else {
-    const projectTab = page.locator("#inspectorSidebarTabProject");
-    if ((await projectTab.getAttribute("aria-selected")) !== "true") await projectTab.click();
-    await expect(projectTab).toHaveAttribute("aria-selected", "true");
-  }
-  const transportSection = page.locator("#transportProjectSection");
-  if ((await transportSection.evaluate((node) => node.open)) !== true) {
-    await page.locator("#lblTransportProject").click();
-  }
-  await expect(transportSection).toHaveJSProperty("open", true);
-  await transportTrigger.click();
+  await openTransportWorkbench(page);
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
+  const inspectorTabs = page.locator("#transportWorkbenchInspectorTabs [role=tab]:visible");
+  await expect(inspectorTabs).toHaveCount(3);
+  expect(await inspectorTabs.evaluateAll((nodes) => nodes.map((node) => node.dataset.transportInspectorTab)))
+    .toEqual(["inspect", "display", "data"]);
+  const inspectTab = page.locator('[data-transport-inspector-tab="inspect"]');
+  const displayTab = page.locator('[data-transport-inspector-tab="display"]');
+  const dataTab = page.locator('[data-transport-inspector-tab="data"]');
+  await inspectTab.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(displayTab).toBeFocused();
+  await expect(displayTab).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowRight");
+  await expect(dataTab).toBeFocused();
+  await expect(dataTab).toHaveAttribute("aria-selected", "true");
+  await page.locator('[data-transport-family="layers"]').click();
+  await expect(page.locator("#transportWorkbenchInspectorTabs")).toBeHidden();
+  await page.locator('[data-transport-family="road"]').click();
+  await expect(inspectorTabs).toHaveCount(3);
   await expect(page.locator("#transportWorkbenchPreviewTitle")).toHaveCount(1);
   await expect(page.locator("#transportWorkbenchZoomInBtn")).toHaveCount(1);
   await expect(page.locator("#transportWorkbenchApplyBtn")).toHaveCount(1);
   await expect(compareBtn).toHaveCount(0);
   await expect(compareStatus).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#transportWorkbenchOverlay")).toBeHidden();
+  await expect(transportTrigger).toBeFocused();
 });
 
 test("transport visual mode and apply bridge stay aligned across appearance and workbench", async ({ page }) => {
@@ -876,7 +872,7 @@ test("transport visual mode and apply bridge stay aligned across appearance and 
     showPorts: true,
   });
 
-  await openTransportWorkbenchFromProject(page);
+  await openTransportWorkbench(page);
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
 
   await expect(page.locator("#transportWorkbenchApplyBtn")).toHaveText("Apply to Main Map", { timeout: 30_000 });
@@ -1017,7 +1013,7 @@ test("adaptive support, transport, and palette surfaces stay contained", async (
   } else {
     await page.keyboard.press("Escape");
   }
-  await openTransportWorkbenchFromProject(page);
+  await openTransportWorkbench(page);
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
   await page.locator("#transportWorkbenchInfoBtn").click();
   await expect(page.locator("#transportWorkbenchInfoPopover")).toBeVisible();
@@ -1037,6 +1033,11 @@ test("adaptive support, transport, and palette surfaces stay contained", async (
 
   await page.locator("#transportWorkbenchCloseBtn").click();
   if (await page.locator("body.editor-workspace").count()) {
+    // 交通入口在右栏：窄屏下关闭工作台会恢复右侧抽屉，先关掉它再打开左栏。
+    if (await page.locator("body.right-drawer-open").count()) {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
+    }
     if (await page.locator("#leftSidebar").evaluate((node) => node.inert)) await page.locator("#leftPanelToggle").click();
     await page.locator("#editorTaskPaletteBtn").click();
   }

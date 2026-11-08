@@ -1301,14 +1301,15 @@ function normalizeTransportWorkbenchUiState(rawUi) {
     : "road";
   const activePackIdByFamily = normalizeTransportWorkbenchActivePackIdByFamily(raw.activePackIdByFamily, activeFamily, raw.activePackId);
   const activePackId = activeFamily === "layers" ? "" : activePackIdByFamily[activeFamily];
+  const savedTab = String(raw.activeInspectorTab || "").trim().toLowerCase();
+  const inspectorTab = savedTab === "aggregation" || savedTab === "labels"
+    ? "display" : savedTab === "coverage" ? "data" : savedTab;
   return {
     open: !!raw.open,
     activeFamily,
     activePackId,
     activePackIdByFamily,
-    activeInspectorTab: ["inspect", "display", "aggregation", "labels", "coverage", "data"].includes(String(raw.activeInspectorTab || "").trim().toLowerCase())
-      ? String(raw.activeInspectorTab || "").trim().toLowerCase()
-      : "inspect",
+    activeInspectorTab: ["inspect", "display", "data"].includes(inspectorTab) ? inspectorTab : "inspect",
     sampleCountry,
     previewCarrierId,
     previewMode: "bounded_zoom_pan",

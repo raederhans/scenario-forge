@@ -418,14 +418,13 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     legend: ["Legend", "legendProjectSection"],
     annotations: ["Frontlines & Annotations", "frontlineProjectSection"],
     reference: ["Reference map", "dockReferencePopover"],
-    display: ["Display & performance"],
   };
   for (const [heading, keys] of [
     ["Political & borders", ["borders", "special-zones"]],
     ["Geography", ["ocean", "physical", "rivers"]],
     ["Settlements & transport", ["urban", "citypoints", "transport"]],
     ["Data & annotations", ["thematic", "annotations", "legend"]],
-    ["Map appearance", ["presets", "daynight", "texture", "reference", "display"]],
+    ["Map appearance", ["presets", "daynight", "texture", "reference"]],
   ]) {
     const group = make("div", "editor-layer-group");
     group.append(make("h3", "editor-group-heading", heading));
@@ -442,14 +441,11 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       const panelAttribute = btn ? "data-appearance-panel" : "data-map-content-panel";
       btn ||= documentRef.querySelector(`[data-map-content-tab="${key}"]`);
       const panel = extras[key] ? get(extras[key][1]) : documentRef.querySelector(`[${panelAttribute}="${key}"]`);
-      if (key !== "display" && !panel) continue;
+      if (!panel) continue;
       const label = extras[key]?.[0] || btn.dataset.i18n || btn.textContent.trim();
       const propertyKey = extras[key] ? key : `${panelAttribute}-${key}`;
-      // 显示与性能把两块现有控件整块搬进一个容器：直接挂在属性页下的 details 会被当成外壳隐藏标题。
-      const displayStack = key === "display" ? make("section", "editor-display-stack") : null;
-      if (displayStack) displayStack.append(...[get("displayQuality")?.closest(".border-control-row")].filter(Boolean));
-      const nodes = displayStack ? [displayStack] : [panel];
-      const host = addProperty(propertyKey, label, nodes, "layers");
+      const host = addProperty(propertyKey, label, [panel], "layers");
+      if (key === "presets") panel.prepend(get("displayQuality").closest(".border-control-row"));
       if (key === "reference") {
         panel.classList.remove("hidden", "sidebar-tool-popover");
         panel.removeAttribute("role");
@@ -528,24 +524,15 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       buttons[next].click();
       buttons[next].focus();
     }, true);
-    let secondary;
-    if (keys.includes("transport")) {
-      secondary = move("transportProjectSection", group);
-      if (secondary) {
-        secondary.open = true;
-        secondary.classList.add("editor-layer-secondary");
-      }
-    }
-    layerGroups.push({ group, entries, secondary });
+    layerGroups.push({ group, entries });
   }
   const empty = make("p", "editor-empty-hint", "No matching layers", "editorLayersEmpty");
   layerHost.append(empty);
   const filterLayers = () => {
     const query = search.value.trim().toLocaleLowerCase();
-    for (const { group, entries, secondary } of layerGroups) {
+    for (const { group, entries } of layerGroups) {
       for (const entry of entries) entry.row.hidden = !`${entry.name.textContent} ${entry.label} ${entry.key}`.toLocaleLowerCase().includes(query);
       group.hidden = entries.every(({ row }) => row.hidden);
-      if (secondary) secondary.hidden = !!query && !entries.some(({ key, row }) => key === "transport" && !row.hidden);
       const visible = entries.filter(({ row }) => !row.hidden);
       const selected = visible.find(({ btn }) => btn.getAttribute("aria-selected") === "true") || visible[0];
       for (const entry of entries) setAttribute(entry.btn, "tabindex", entry === selected ? 0 : -1);

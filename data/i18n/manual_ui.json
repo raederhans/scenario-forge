@@ -1068,6 +1068,9 @@
   "The image is not saved with the project. Upload it again after reopening.": "图片不会随项目保存，重新打开项目后需再次上传。",
   "Upload a local map image, then align it with opacity, scale and offset.": "上传本地地图图片，再用透明度、缩放和偏移对齐。",
   "Lines, graphics and unit counters are saved with the project and included in exports.": "作战线、图形和单位标记随项目保存，并包含在导出中。",
+  "By country ({count} on)": "按国家（已启用 {count} 个）",
+  "Enabled only": "只看已启用",
+  "Display quality": "显示画质",
   "Dam": "大坝",
   "Canal": "运河"
 }
