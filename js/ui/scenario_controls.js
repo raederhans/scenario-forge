@@ -1,5 +1,4 @@
 import { state as runtimeState } from "../core/state.js";
-import { applyScenarioOpeningView } from "../core/scenario/presentation_opening_view.js";
 import { callRuntimeHook, registerOwnedRuntimeHook } from "../core/state/index.js";
 import {
   clearActiveScenarioCommand,
@@ -255,7 +254,6 @@ export function initScenarioControls() {
           markDirtyReason: "scenario-apply",
           showToastOnComplete: true,
         });
-        applyScenarioOpeningView(runtimeState.activeScenarioManifest, { animate: true });
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
         if (!events.signal.aborted && pendingScenarioId === scenarioId) showActiveIntroduction();

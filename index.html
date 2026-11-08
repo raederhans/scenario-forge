@@ -225,11 +225,11 @@
                   </section>
 
                   <section class="appearance-control-card" aria-labelledby="lblOceanStyleCard">
-                    <h3 id="lblOceanStyleCard" class="appearance-control-card-title" data-i18n="Bathymetry Style">Bathymetry Style</h3>
+                    <h3 id="lblOceanStyleCard" class="appearance-control-card-title" data-i18n="Bathymetry">Bathymetry</h3>
                     <div class="appearance-control-card-stack">
                       <label class="toggle-label">
                         <input id="oceanAdvancedStylesToggle" type="checkbox" checked class="checkbox-input" />
-                        <span id="lblOceanAdvancedStylesToggle" data-i18n="Bathymetry">Bathymetry</span>
+                        <span id="lblOceanAdvancedStylesToggle" data-i18n="Show">Show</span>
                       </label>
                       <div>
                         <div class="range-row">
@@ -241,20 +241,20 @@
                           <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled data-i18n="Bathymetry Contours">Bathymetry Contours</option>
                         </select>
                       </div>
-                      <p class="sidebar-tool-hint" data-i18n="Global oceans">Global oceans</p>
+                      <p data-page-note class="sidebar-tool-hint" data-i18n="Global oceans">Global oceans</p>
                       <p class="sidebar-tool-hint" data-i18n="Scenario depth is schematic">Scenario depth is schematic</p>
                       <details class="appearance-mini-section appearance-mini-section-subtle">
                         <summary class="section-header" data-i18n="Depth legend and sources">Depth legend and sources</summary>
                         <div class="sidebar-tool-hint mt-2">
-                          <p data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
-                          <p data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
+                          <p data-page-note data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
+                          <p data-page-note data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
                           <p><span data-i18n="Regional depth bins">Regional depth bins</span>:
                             <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
                             <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
                             <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
                             <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
                           </p>
-                          <p data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
+                          <p data-page-note data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
                         </div>
                       </details>
                     </div>
@@ -506,12 +506,12 @@
                 aria-hidden="true"
               >
                 <div class="appearance-subsection-stack mt-3">
-                  <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="physical regions terrain atlas terrain contours">
-                  <summary id="lblPhysicalPanel" class="section-header" data-i18n="Physical Regions">Physical Regions</summary>
+                  <details open class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="physical regions terrain atlas terrain contours">
+                  <summary hidden id="lblPhysicalPanel" class="section-header" data-i18n="Physical Regions">Physical Regions</summary>
                   <div class="physical-panel-body">
                   <label class="toggle-label mt-2">
                   <input id="togglePhysical" type="checkbox" class="checkbox-input" />
-                  <span id="lblPhysicalLayer" data-i18n="Physical Regions">Physical Regions</span>
+                  <span id="lblPhysicalLayer" data-i18n="Show">Show</span>
                   </label>
                   <div class="physical-basic-controls">
                   <div class="flex items-center justify-between gap-3">
@@ -538,12 +538,12 @@
                   <input id="physicalOpacity" type="range" min="0" max="100" value="50" class="range-input" />
                   </div>
                   </div>
-                  <p id="physicalPresetHint" class="physical-hint">
+                  <p data-page-note id="physicalPresetHint" class="physical-hint">
                   </p>
                   <details id="physicalAtlasSection" class="physical-disclosure" >
                   <summary id="lblTerrainAtlasPanel" data-i18n="Terrain Atlas">Terrain Atlas</summary>
                   <div class="physical-section-body">
-                  <p class="physical-hint" data-i18n="Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.">Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.</p>
+                  <p data-page-note class="physical-hint" data-i18n="Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.">Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.</p>
                   <div>
                   <div class="range-row">
                   <label class="range-label" for="physicalLandformIntensity" data-i18n="Landform strength">Landform strength</label>
@@ -565,7 +565,7 @@
                   <span id="physicalHillshadeOpacityValue" class="range-value">0%</span>
                   </div>
                   <input id="physicalHillshadeOpacity" type="range" min="0" max="30" value="0" class="range-input" />
-                  <p class="physical-hint" data-i18n="Names from 200% zoom; terrain shading from 400%. Current geography reference.">Names from 200% zoom; terrain shading from 400%. Current geography reference.</p>
+                  <p data-page-note class="physical-hint" data-i18n="Names from 200% zoom; terrain shading from 400%. Current geography reference.">Names from 200% zoom; terrain shading from 400%. Current geography reference.</p>
                   </div>
                   <div>
                   <div class="range-row">
@@ -771,12 +771,12 @@
                   </div>
                   </details>
 
-                  <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="urban areas">
-                    <summary id="lblUrbanPanel" class="section-header" data-i18n="Urban Areas">Urban Areas</summary>
+                  <details open class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="urban areas">
+                    <summary hidden id="lblUrbanPanel" class="section-header" data-i18n="Urban Areas">Urban Areas</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
                         <input id="toggleUrban" type="checkbox" class="checkbox-input" />
-                        <span id="lblUrbanLayer" data-i18n="Urban Areas">Urban Areas</span>
+                        <span id="lblUrbanLayer" data-i18n="Show">Show</span>
                       </label>
                       <div class="ml-5 space-y-2">
                         <div>
@@ -921,13 +921,7 @@
                             <input id="toggleCityPoints" type="checkbox" class="checkbox-input" checked />
                             <span id="lblCityPointsLayer" data-i18n="City Points">City Points</span>
                           </label>
-                          <span class="summary-info-trigger city-points-help-trigger" tabindex="0" role="button" aria-label="City points help" data-i18n-aria-label="City points help">
-                            <svg class="summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                              <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                            </svg>
-                            <span id="cityPointsHelpTooltip" class="info-tooltip" data-i18n="Pick a city marker style, then tune marker density and label density for the current map scale.">Pick a city marker style, then tune marker density and label density for the current map scale.</span>
-                          </span>
+                          <p data-page-note id="cityPointsHelpTooltip" class="city-points-advanced-hint" data-i18n="Pick a city marker style, then tune marker density and label density for the current map scale.">Pick a city marker style, then tune marker density and label density for the current map scale.</p>
                         </div>
                         <div class="city-points-panel-stack">
                           <section class="appearance-control-card city-hierarchy-card" aria-labelledby="cityHierarchyTitle">
@@ -960,7 +954,7 @@
                                 <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
                                 <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
                               </div>
-                              <p id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
+                              <p data-page-note id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
                             </details>
                           </section>
 
@@ -1923,7 +1917,7 @@
                                 <option value="dense" data-i18n="Dense">Dense</option>
                               </select>
                             </div>
-                            <p class="panel-hint" data-i18n="Rail labels show line names.">Rail labels show line names.</p>
+                            <p data-page-note class="panel-hint" data-i18n="Rail labels show line names.">Rail labels show line names.</p>
                           </div>
 
                           <section class="space-y-3">
@@ -2023,7 +2017,7 @@
                                 <option value="dense" data-i18n="Dense">Dense</option>
                               </select>
                             </div>
-                            <p class="panel-hint" data-i18n="Road labels show route numbers or names.">Road labels show route numbers or names.</p>
+                            <p data-page-note class="panel-hint" data-i18n="Road labels show route numbers or names.">Road labels show route numbers or names.</p>
                           </div>
 
                           <section class="space-y-3">
@@ -2219,7 +2213,7 @@
                   <details><summary data-i18n="Density legend and source">Density legend and source</summary>
                     <p class="hint" data-i18n="persons/km²">persons/km²</p>
                     <div id="populationLegend" class="thematic-wgi-legend" hidden></div>
-                    <p id="populationSourceNote" class="city-points-advanced-hint"></p>
+                    <p data-page-note id="populationSourceNote" class="city-points-advanced-hint"></p>
                   </details>
                   <details><summary data-i18n="Population statistics">Population statistics</summary>
                     <label for="populationSummaryScope" class="range-label" data-i18n="Summary scope">Summary scope</label>
@@ -2250,7 +2244,7 @@
                 <section id="strategicValuesPanel" class="appearance-control-card strategic-values-panel" aria-labelledby="strategicValuesTitle">
                   <div class="strategic-values-heading"><h3 id="strategicValuesTitle" data-i18n="Scenario strategic data">Scenario strategic data</h3><button id="strategicValuesLoad" type="button" class="btn-secondary" data-i18n="Load data">Load data</button></div>
                   <p id="strategicValuesStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
-                  <p id="strategicValuesSource" class="city-points-advanced-hint"></p>
+                  <p data-page-note id="strategicValuesSource" class="city-points-advanced-hint"></p>
                   <div class="appearance-control-card-stack">
                     <label for="strategicChoroplethMetric" class="range-label" data-i18n="Region shading">Region shading</label>
                     <select id="strategicChoroplethMetric" class="select-input"><option value="" data-i18n="None">None</option></select>
@@ -2603,13 +2597,13 @@
           >
           <div class="sidebar-shell-heading sidebar-shell-heading-right sidebar-shell-anchor" data-i18n="Inspector">Inspector</div>
 
-          <h2 id="countryInspectorHeading" class="visually-hidden" data-i18n="Country Inspector">Country Inspector</h2>
+          <h2 hidden id="countryInspectorHeading" class="visually-hidden" data-i18n="Country Inspector">Country Inspector</h2>
           <details id="countryInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="countryInspectorHeading lblCountryInspector">
             <summary id="lblCountryInspector" class="sidebar-section-head">
               <span class="sidebar-section-title" data-i18n="Country Inspector">Country Inspector</span>
 
             </summary>
-              <p class="sidebar-section-description" data-i18n="Inspect countries, active owners, and direct color overrides.">Inspect countries, active owners, and direct color overrides.</p>
+
             <div class="inspector-panel-body">
               <div class="inspector-search-shell">
                 <div class="card-flat inspector-search-block">
@@ -2657,7 +2651,7 @@
               <span class="sidebar-section-title" data-i18n="Territories &amp; Presets">Territories &amp; Presets</span>
 
             </summary>
-              <p class="sidebar-section-description" data-i18n="Inspect territories, presets, releasables, and scenario ownership actions for the selected country.">Inspect territories, presets, releasables, and scenario ownership actions for the selected country.</p>
+
             <div class="inspector-panel-body">
               <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
             </div>
@@ -2669,7 +2663,7 @@
               <span class="sidebar-section-title is-conditional" data-i18n="Special Regions">Special Regions</span>
 
             </summary>
-              <p class="sidebar-section-description" data-i18n="Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.">Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.</p>
+
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblScenarioSpecialRegionVisibility" class="sidebar-group-label" data-i18n="Visibility">Visibility</h3>
@@ -2677,14 +2671,14 @@
                   <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioSpecialRegionVisibilityToggle" data-i18n="Show Scenario Special Regions">Show Scenario Special Regions</span>
                 </label>
-                <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
+                <p data-page-note id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
                   Toggle Atlantropa-style scenario regions without affecting the base map.
                 </p>
                 <label class="toggle-label mt-3" title="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
                   <input id="scenarioReliefOverlayVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioReliefOverlayVisibilityToggle" data-i18n="Show Scenario Relief Overlays">Show Scenario Relief Overlays</span>
                 </label>
-                <p id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
+                <p data-page-note id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
                   Toggle shoreline, basin contour, and texture overlays for the active scenario.
                 </p>
               </div>
@@ -2748,7 +2742,7 @@
               <span class="sidebar-section-title" data-i18n="Water Regions">Water Regions</span>
 
             </summary>
-              <p class="sidebar-section-description" data-i18n="Inspect seas, lakes, straits, and direct water color overrides.">Inspect seas, lakes, straits, and direct water color overrides.</p>
+
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblWaterInteraction" class="sidebar-group-label" data-i18n="Interaction">Interaction</h3>
@@ -2905,13 +2899,13 @@
           >
             <div class="sidebar-shell-heading sidebar-shell-heading-right sidebar-shell-anchor" data-i18n="Project">Project</div>
 
-            <h2 id="projectLegendHeading" class="visually-hidden" data-i18n="Project Management">Project Management</h2>
+            <h2 hidden id="projectLegendHeading" class="visually-hidden" data-i18n="Project Management">Project Management</h2>
             <details id="projectLegendSection" class="card inspector-section sidebar-section-shell" aria-labelledby="projectLegendHeading lblProjectLegend">
-              <summary id="lblProjectLegend" class="sidebar-section-head">
+              <summary hidden id="lblProjectLegend" class="sidebar-section-head">
                 <span class="sidebar-anchor-title" data-i18n="Project Management">Project Management</span>
 
               </summary>
-              <p class="sidebar-section-description" data-i18n="Manage project files, loading choices, and account-backed saves.">Manage project files, loading choices, and account-backed saves.</p>
+
               <div id="projectManagementStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
@@ -2954,23 +2948,23 @@
               </div>
             </section>
 
-            <h2 id="legendProjectHeading" class="visually-hidden" data-i18n="Legend">Legend</h2>
+            <h2 hidden id="legendProjectHeading" class="visually-hidden" data-i18n="Legend">Legend</h2>
             <details id="legendProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="legendProjectHeading lblLegendProject">
               <summary id="lblLegendProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Legend">Legend</span>
 
               </summary>
-              <p class="sidebar-section-description" data-i18n="Edit the small project legend list for the current working map.">Edit the small project legend list for the current working map.</p>
+
               <div id="legendEditorStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
-            <h2 id="frontlineProjectHeading" class="visually-hidden" data-i18n="Frontlines & Annotations">Frontlines &amp; Annotations</h2>
+            <h2 hidden id="frontlineProjectHeading" class="visually-hidden" data-i18n="Frontlines & Annotations">Frontlines &amp; Annotations</h2>
             <details id="frontlineProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="frontlineProjectHeading lblFrontlineProject">
               <summary id="lblFrontlineProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Frontlines & Annotations">Frontlines & Annotations</span>
 
               </summary>
-              <p class="sidebar-section-description" data-i18n="Review derived frontlines and project-local strategic annotations for publishable maps.">Review derived frontlines and project-local strategic annotations for publishable maps.</p>
+
               <div class="inspector-panel-body">
                 <p class="sidebar-tool-hint inspector-frontline-intro hidden sidebar-help-copy" data-i18n="Frontlines and strategic annotations workspace.">
                   Frontlines and strategic annotations workspace.
@@ -2985,7 +2979,7 @@
                 <span class="sidebar-section-title is-secondary" data-i18n="Transport workbench">Transport workbench</span>
 
               </summary>
-              <p class="sidebar-section-description" data-i18n="Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.">Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.</p>
+
               <div class="inspector-panel-body">
                 <div class="sidebar-support-actions" role="group" aria-label="Transport actions" data-i18n-aria-label="Transport actions">
                   <button
@@ -3010,7 +3004,7 @@
                 <span class="sidebar-section-title is-secondary" data-i18n="Export">Export</span>
 
               </summary>
-              <p class="sidebar-section-description" data-i18n="Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.">Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.</p>
+
               <div class="inspector-panel-body">
                 <div class="sidebar-support-summary-row" aria-label="Export summary" data-i18n-aria-label="Export summary">
                   <div class="sidebar-support-summary-pill">
@@ -3047,7 +3041,8 @@
 
                     <div id="dockReferencePopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-label="Reference tools">
                       <h3 id="lblReferenceImage" class="sidebar-tool-title" data-i18n="Reference Image">Reference Image</h3>
-                      <p id="referenceToolHint" class="sidebar-help-copy" data-i18n="Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.">Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.</p>
+                      <p id="referenceToolHint" class="sidebar-help-copy" data-i18n="The image is not saved with the project. Upload it again after reopening.">The image is not saved with the project. Upload it again after reopening.</p>
+                      <p data-page-note class="sidebar-help-copy" data-i18n="Upload a local map image, then align it with opacity, scale and offset.">Upload a local map image, then align it with opacity, scale and offset.</p>
                       <div class="file-dropzone mt-3">
                         <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-dropzone-input" aria-labelledby="lblReferenceImage" />
                         <svg class="ui-icon file-dropzone-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
