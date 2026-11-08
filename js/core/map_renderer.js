@@ -3495,11 +3495,10 @@ function isTnoRasterSceneSelected() {
 // These producers paint the entire requested rectangle, not only its backing canvas.
 function getTnoScenePaintOverscanPx(passName) {
   if (exportRenderInProgress || !isTnoRasterSceneSelected()) return 0;
-  if (!["borders", "labels", "textureLabels"].includes(passName)) return 0;
-  // Optional producers still have viewport-specific placement contracts.
-  if (passName === "labels" && ((runtimeState.showTransport
-    && ["showAirports", "showPorts", "showRoad", "showRail"].some(name => runtimeState[name]))
-    || (runtimeState.showPhysical && runtimeState.styleConfig?.physical?.showRegionLabels))) return 0;
+  // City and country names are laid out against a budget and collision boxes:
+  // a paint margin would let off-screen names claim on-screen slots, so the
+  // labels pass keeps the viewport placement contract of the vector path.
+  if (!["borders", "textureLabels"].includes(passName)) return 0;
   return VIEWPORT_CULL_OVERSCAN_PX;
 }
 
@@ -15351,6 +15350,23 @@ export function getRendererAsyncWorkStatus() {
     borderScheduled: (staticBorderMeshLifecycle?.hasPendingWork() || paintContourRuntimeOwner?.hasPendingWork()) || false,
     exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
   };
+}
+
+// Labels placed by the last full labels pass that touch the visible viewport:
+// city IDs and country codes. Off-screen paint margins are excluded.
+export function getVisibleMapLabels() {
+  const width = Number(runtimeState.width) || 0, height = Number(runtimeState.height) || 0;
+  const onScreen = (x, y, w = 0, h = 0) => x + w >= 0 && y + h >= 0 && x <= width && y <= height;
+  const cities = (cityPointsRenderOwner?.getLastDrawnCityLabels() || [])
+    .filter(({ screenPoint }) => Array.isArray(screenPoint) && onScreen(screenPoint[0], screenPoint[1]))
+    .map(({ id }) => String(id));
+  const countryDiagnostics = countryLabelRenderOwner?.getDiagnostics();
+  const countries = (countryDiagnostics?.lastLabels || [])
+    .filter(({ bounds }) => bounds && onScreen(bounds.x, bounds.y, bounds.w, bounds.h))
+    .map(({ countryCode }) => String(countryCode));
+  return { cities: [...new Set(cities)].sort(), countries: [...new Set(countries)].sort(),
+    // Country names still waiting for an asynchronous layout fit in this view.
+    pendingCountryFits: Number(countryDiagnostics?.pendingFits) || 0 };
 }
 
 export function getCountryLabelReadiness() {

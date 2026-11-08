@@ -77,6 +77,8 @@ export function createCityPointsRenderOwner({
   let preparedRevealPlan = null;
   let privatePreparation = null;
   let visibleCityHoverEntries = [];
+  // City names placed by the last full labels pass: [{ id, screenPoint }].
+  let lastDrawnCityLabels = [];
   let context = null;
   let projection = null;
   let mapSvg = null;
@@ -630,6 +632,7 @@ export function createCityPointsRenderOwner({
       return;
     }
     if (runtimeState.deferContextBasePass) {
+      lastDrawnCityLabels = [];
       recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
         interactive: false,
         skipped: true,
@@ -643,6 +646,7 @@ export function createCityPointsRenderOwner({
       cacheHoverEntries: true,
     });
     if (renderState.skipped || !renderState.markerEntries.length) {
+      lastDrawnCityLabels = [];
       recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
         interactive: false,
         skipped: true,
@@ -694,6 +698,9 @@ export function createCityPointsRenderOwner({
     } else {
       labelCount = drawCityLabelsFromEntries(renderState.labelEntries, labelOptions);
     }
+    lastDrawnCityLabels = [...new Set([...(overviewLayout?.capitalEntries || []), ...renderState.labelEntries])]
+      .filter((entry) => entry.acceptedLabelPlacement)
+      .map((entry) => ({ id: entry.cityId ?? entry.id, screenPoint: entry.screenPoint ? [...entry.screenPoint] : null }));
     recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
       interactive: false,
       skipped: false,
@@ -761,6 +768,7 @@ export function createCityPointsRenderOwner({
   return {
     prepareCurrentView,
     cancelPreparation,
+    getLastDrawnCityLabels: () => lastDrawnCityLabels.map((label) => ({ ...label })),
     cacheVisibleCityHoverEntries,
     drawCityMarkersFromEntries,
     drawCityPointsLayer,
