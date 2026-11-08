@@ -10,6 +10,7 @@ sample_guide_deeplink.spec.js
 scenario_apply_concurrency.spec.js
 scenario_apply_resilience.spec.js
 scenario_blank_exit.spec.js
+scenario_opening_view.spec.js
 sidebar_default_collapse.spec.js
 strategic_overlay_counter_canvas_smoke.spec.js
 strategic_overlay_editing.spec.js

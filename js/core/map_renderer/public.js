@@ -83,6 +83,7 @@ export {
 
   // Viewport.
   focusWaterRegionById,
+  focusGeoBounds,
   focusRiverPaintParentById,
   applyRiverPaintCellById,
   getZoomPercent,

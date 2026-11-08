@@ -282,6 +282,10 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     assert.equal(session.network.length, 0, "explicit native reference must not download raster assets");
     await toggle(page, false);
     await settled(page);
+    // 剧本可能以开场视角启动（如 HOI4 对准欧洲）。从那里缩放会被平移范围夹住、
+    // 视图中心随之偏移，与恢复阶段的视图对不上。先回到全图，两个阶段从同一起点出发。
+    await page.evaluate(() => window.__rasterTask.renderer.resetZoomToFit());
+    await settled(page);
     if (expectNativeBudgetFallback) {
       // The fit transform can lie just outside the large view's zoom constraint.
       // Match the real 100% input path before capturing the 130% reference.
@@ -415,6 +419,10 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     await waitRasterStartup(page, { timeout: remaining() }); mark('startupReadyMs');
     await waitRasterView(page, scenarioId, { timeout: remaining() }); mark('rasterReadyMs');
     await settled(page, true, remaining()); mark('settledMs');
+    // 预生成覆盖只含全图视角，开场视角不在其中。显式回到全图再断言命中与缓存复访。
+    await page.evaluate(() => window.__rasterTask.renderer.resetZoomToFit());
+    await waitRasterView(page, scenarioId, { timeout: remaining() });
+    await settled(page, true, remaining()); mark('worldViewSettledMs');
     await page.waitForFunction(() => {
       const assets = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assets;
       return assets.pendingReads === 0 && assets.pendingWrites === 0;

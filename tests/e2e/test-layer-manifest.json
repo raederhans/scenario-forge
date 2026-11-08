@@ -465,6 +465,13 @@
       "executionMode": "browser",
       "domain": "scenario-runtime",
       "ownerHint": "scenario"
+    },
+    {
+      "specPath": "tests/e2e/scenario_opening_view.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario"
     }
   ]
 }
