@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { loadDeferredDetailBundle } from "../js/core/data_loader.js";
+import { loadDeferredDetailBundle, loadMapData } from "../js/core/data_loader.js";
 
 const sources = {
   na_v2: "data/europe_topology.na_v2.json",
@@ -28,6 +28,31 @@ async function withFakeLoader(detailByUrl, check) {
     globalThis.fetch = previousFetch;
     console.warn = previousWarn;
   }
+}
+
+for (const [name, hasScenarioRuntimeBootstrap, expectDetail] of [
+  ["a scenario bootstrap leaves the detail topology to the deferred promotion", true, false],
+  ["startup without a scenario bootstrap still loads the detail topology", false, true],
+]) {
+  test(name, async (t) => {
+    const previousLocation = Object.getOwnPropertyDescriptor(globalThis, "location");
+    // The "full" profile never defers on its own, whatever hardware runs the test.
+    Object.defineProperty(globalThis, "location", { configurable: true, value: { search: "?render_profile=full", href: "http://localhost/" } });
+    t.after(() => {
+      if (previousLocation) Object.defineProperty(globalThis, "location", previousLocation);
+      else delete globalThis.location;
+    });
+    const primary = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [{ id: "p", type: "Polygon", arcs: [[0]] }] } }, arcs: [[[0, 0], [1, 0]]] };
+    const detail = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [{ id: "d", type: "Polygon", arcs: [[0]] }] } }, arcs: [[[0, 0], [1, 0]]] };
+    await withFakeLoader({ [sources.na_v2]: detail }, async (d3Client, calls) => {
+      const result = await loadMapData({ d3Client, includeCityData: false, includeContextLayers: false,
+        startupBootArtifactsOverride: { topologyPrimary: primary, hasScenarioRuntimeBootstrap, locales: {}, geoAliases: {} } });
+      assert.equal(calls.includes(sources.na_v2), expectDetail);
+      assert.equal(result.topologyDetail, expectDetail ? detail : null);
+      assert.equal(result.detailDeferred, !expectDetail);
+      assert.equal(result.topologyBundleMode, expectDetail ? "composite" : "single");
+    });
+  });
 }
 
 test("deferred detail skips a malformed candidate and accepts the next political topology", async () => {
