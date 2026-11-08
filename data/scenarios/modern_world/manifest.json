@@ -2536,6 +2536,5 @@
     "synthetic_owner_feature_count": 0,
     "topology_blocker_count": 0
   },
-  "version": 2,
-  "geo_locale_patch_url": "data/scenarios/modern_world/geo_locale_patch.json"
+  "version": 2
 }
