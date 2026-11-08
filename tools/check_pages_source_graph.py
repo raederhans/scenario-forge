@@ -54,7 +54,8 @@ def build_source_inventory(root: Path) -> dict[str, Path]:
     if editor.parent != root:
         tree(editor.parent, "app")
     for name in pages.APP_SHARED_DIRS:
-        tree(root / name, f"app/{name}")
+        tree(root / name, f"app/{name}",
+             lambda path: path.relative_to(root).as_posix() not in pages.PAGES_SOURCE_ONLY_APP_FILES)
     add(editor, "app/index.html")
     hgo = root / "apps/hgo"
     add(hgo / "index.html", "hgo/index.html")
