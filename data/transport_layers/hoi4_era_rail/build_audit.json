@@ -1,5 +1,5 @@
 {
-  "scenario_dir": "data/scenarios/hoi4_1936",
+  "profile": "hoi4",
   "georeference": {
     "control_point_count": 1153,
     "kept_control_point_count": 1137,
@@ -35,8 +35,8 @@
     "4": 7
   },
   "supply_node_count": 727,
+  "sea_crossing_midpoint_fixes": 78,
   "province_vertex_count": 3162,
   "city_coordinate_vertices": 669,
-  "land_snapped_vertices": 79,
-  "sea_crossing_midpoint_fixes": 78
+  "land_snapped_vertices": 79
 }
