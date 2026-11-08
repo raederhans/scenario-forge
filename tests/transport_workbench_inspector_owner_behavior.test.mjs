@@ -427,11 +427,7 @@ test("owner factory injects layer metadata and keeps translated lens label", () 
     dataContract: { packs: ["japan_road"], geometryKind: "line" },
     rightDeckLabel: "Translated right deck",
   });
-  assert.equal(summaryRows.some(([label]) => label === "Right deck"), false);
-  assert.equal(summaryRows.some(([label]) => label === "Pack status"), false);
-  assert.equal(summaryRows.some(([label]) => label === "Compare"), false);
-  assert.equal(rowValue(summaryRows, "Category"), "Road");
-  assert.equal(summaryRows.some(([label]) => label === "Preview" || label === "Pack"), false);
+  assert.deepEqual(summaryRows, []);
 });
 
 test("pack governance stays available for Data while Inspect shows the current result", () => {

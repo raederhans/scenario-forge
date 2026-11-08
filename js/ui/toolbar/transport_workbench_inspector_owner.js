@@ -1,3 +1,4 @@
+import { t } from "../i18n.js";
 // Transport workbench inspector owner.
 // Owns inspector row models, diagnostic summaries, manifest-only rows, and small inspector DOM factories.
 
@@ -130,15 +131,11 @@ export function buildManifestOnlyInspectorRows(family, previewSnapshot, dataCont
   }
 
   const manifest = previewSnapshot.manifest || {};
-  const previewCounts = manifest?.feature_counts?.preview || {};
-  const fullCounts = manifest?.feature_counts?.full || {};
   const variantEntries = listTransportWorkbenchManifestVariantEntries(manifest);
   const rows = [
     ["Distribution tier", manifest.distribution_tier || "unknown"],
     ["License tier", manifest.license_tier || "unknown"],
     ["Coverage scope", manifest.coverage_scope || "unknown"],
-    ["Preview features", JSON.stringify(previewCounts || {})],
-    ["Full features", JSON.stringify(fullCounts || {})],
   ];
 
   if (variantEntries.length > 0) {
@@ -251,11 +248,8 @@ export function buildTransportWorkbenchLensSummaryRows({
   dataContract,
   rightDeckLabel,
 } = {}) {
-  return [
-    ["Category", family?.label || ""],
-    ["Sample region", dataContract?.country || ""],
-    ["Mode", previewSnapshot?.packMode || ""],
-  ];
+  // 类别、样本地区和模式已在左列顶部的元信息里显示，这里不再重复。
+  return [];
 }
 
 function createStateCard(title, body, tone = "soft") {
@@ -713,10 +707,10 @@ export function createTransportWorkbenchInspectorOwner({
     row.className = "transport-workbench-inspector-row";
     const labelNode = document.createElement("span");
     labelNode.className = "transport-workbench-inspector-key";
-    labelNode.textContent = label;
+    labelNode.textContent = t(label, "ui");
     const valueNode = document.createElement("span");
     valueNode.className = "transport-workbench-inspector-value";
-    valueNode.textContent = value;
+    valueNode.textContent = t(value, "ui");
     row.appendChild(labelNode);
     row.appendChild(valueNode);
     const classNames = getTransportWorkbenchInspectorRowClassNames({

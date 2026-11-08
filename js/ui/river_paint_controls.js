@@ -34,7 +34,7 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     const supported = state.activeScenarioId === RIVER_PAINT_PILOT.sceneId;
     const enabled = supported && !!state.riverPaint?.editMode;
     button.hidden = !supported;
-    button.disabled = !!state.startupReadonly;
+    button.disabled = !supported || !!state.startupReadonly;
     button.classList.toggle('is-active', enabled);
     button.setAttribute('aria-pressed', String(enabled));
     button.setAttribute('aria-busy', String(info.pending));
