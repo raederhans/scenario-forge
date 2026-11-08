@@ -276,8 +276,33 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     workerCount: 0, workersCreated: 0, workerPoolLimit: maxLayoutWorkers,
     maxWorkerQueue: 0, maxPendingWorkerFits: 0,
     rejectedByVisibility: 0, rejectedByCollision: 0, rejectedByViewport: 0, noFit: 0, rejectedLabels: [],
-    skippedByVisibilityUpperBound: 0,
+    skippedByVisibilityUpperBound: 0, chineseGlyphRequests: 0,
   };
+
+  // 中文标签字体按 unicode-range 切片发布；canvas 画字不会按需拉取切片，所以对标签文本显式请求
+  // 所需切片，加载完成后由 map_renderer 的 loadingdone 监听清文本缓存并重绘。
+  // 标签源在国名、本地化或别名变化时会换新的 countries 数组而不改 revision，所以按数组身份判断
+  // 是否要重新扫描，并只请求此前没请求过的字符。
+  const getFontSet = helpers.getFontSet || (() => globalThis.document?.fonts);
+  const requestedChineseGlyphs = new Set();
+  let scannedChineseCountries = null, scannedChineseLanguage = "";
+  function requestChineseLabelGlyphs(source, language) {
+    const fonts = getFontSet();
+    const countries = source?.countries;
+    if (typeof fonts?.load !== "function"
+      || (countries === scannedChineseCountries && language === scannedChineseLanguage)) return;
+    scannedChineseCountries = countries;
+    scannedChineseLanguage = language;
+    const glyphs = new Set();
+    for (const record of countries || []) {
+      for (const char of displayText(record?.name, language)) if (!requestedChineseGlyphs.has(char)) glyphs.add(char);
+    }
+    if (!glyphs.size) return;
+    for (const char of glyphs) requestedChineseGlyphs.add(char);
+    diagnostics.chineseGlyphRequests += 1;
+    Promise.resolve().then(() => fonts.load(`400 16px ${CHINESE_FONT}`, [...glyphs].join("")))
+      .catch(() => { for (const char of glyphs) requestedChineseGlyphs.delete(char); });
+  }
 
   function storeFit(entry, key, fit) {
     entry.fits.delete(key);
@@ -716,6 +741,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const source = getCountryLabelSource(), projection = getProjection(), viewport = getViewportSize();
     if (source?.status !== "ready" || !(viewport.width > 0 && viewport.height > 0)) return null;
     const raw = getTransform() || {}, language = String(getLanguage() || "en"), isChinese = language.startsWith("zh");
+    if (isChinese) requestChineseLabelGlyphs(source, language);
     const view = { geometry: getGeometry(source, projection), projection, countries: source.countries, viewport: { ...viewport },
       transform: { x: Number(raw.x) || 0, y: Number(raw.y) || 0, k }, language, isChinese,
       font: isChinese ? CHINESE_FONT : ENGLISH_FONT, textGeneration,
@@ -754,6 +780,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const language = String(getLanguage() || "en");
     const isChinese = language.startsWith("zh");
     const font = isChinese ? CHINESE_FONT : ENGLISH_FONT;
+    if (isChinese) requestChineseLabelGlyphs(source, language);
     const hierarchy = getMapLabelHierarchy(k, state);
     const geometry = getGeometry(source, projection);
     const records = new Map((source.countries || []).map((record) => [record.countryCode, record]));

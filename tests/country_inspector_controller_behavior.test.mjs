@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { renderCountryGroupButtons } from "../js/ui/sidebar/scenario_inspector_controller.js";
 import { createCountryInspectorController } from "../js/ui/sidebar/country_inspector_controller.js";
 import { createPaletteLibraryPanelController } from "../js/ui/toolbar/palette_library_panel.js";
 import { state } from "../js/core/state.js";
@@ -277,6 +278,7 @@ function createHarness({
   buildCountryRowMetaText = () => "",
   getSelectedLandInspectorCountryCode = () => "",
   t = (value) => value,
+  modernNames = {},
 } = {}) {
   const host = new TestElement("section");
   const list = new TestElement("div");
@@ -354,6 +356,7 @@ function createHarness({
       settingsChangeCalls += 1;
       observedVariantSelections.push({ ...runtimeState.hgoIdentity.variantSelections });
     },
+    ...modernNames,
   });
 
   return {
@@ -958,4 +961,134 @@ test("drill breadcrumb preserves parcel highlight and navigates to group and cou
   } finally {
     globalThis.document = previousDocument;
   }
+});
+
+
+test("palette variants show category names and keep sources in button titles", context => {
+  const previousDocument = globalThis.document;
+  const previousRaf = globalThis.requestAnimationFrame;
+  const previousCancel = globalThis.cancelAnimationFrame;
+  const previousState = Object.fromEntries([
+    "activePalettePack", "activePaletteMap", "currentLanguage", "recentColors", "paletteLibrarySearch",
+    "paletteLibraryGroupingMode", "ui",
+  ].map(key => [key, state[key]]));
+  context.after(() => {
+    globalThis.document = previousDocument;
+    globalThis.requestAnimationFrame = previousRaf;
+    globalThis.cancelAnimationFrame = previousCancel;
+    Object.assign(state, previousState);
+  });
+  globalThis.document = createTestDocument();
+  globalThis.requestAnimationFrame = () => 1;
+  globalThis.cancelAnimationFrame = () => {};
+  Object.assign(state, {
+    activePalettePack: { entries: { TST: {
+      hex: "#112233", map_hex: "#112233", ui_hex: "#445566", country_file_hex: "#778899",
+      map_source: "colors.txt:color", ui_source: "colors.txt:color_ui", country_file_source: "Middle East - Pakt.txt:color",
+    } } },
+    activePaletteMap: { mapped: {} }, currentLanguage: "en",
+    recentColors: [], paletteLibrarySearch: "", paletteLibraryGroupingMode: "default",
+    ui: { ...state.ui, paletteLibrarySections: {} },
+  });
+  const list = new TestElement("div");
+  createPaletteLibraryPanelController({ paletteLibraryList: list }).renderPaletteLibrary();
+  const variants = list.querySelectorAll(".palette-library-variant-btn");
+  assert.deepEqual(variants.map(button => button.querySelector(".palette-library-variant-label").textContent),
+    ["Map color", "UI color", "Country file color"]);
+  assert.deepEqual(variants.map(button => button.title),
+    ["colors.txt:color", "colors.txt:color_ui", "Middle East - Pakt.txt:color"]);
+});
+
+test("inspector modern-name toggle shares state and lists present-day names for the drilled selection", () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+  try {
+    const toggled = [];
+    const requestedIds = [];
+    let hasRenamed = true;
+    const harness = createHarness({
+      selectedCountry: { code: "GER", displayName: "德国" },
+      resolveInspectorGroup: () => ({ id: "g", label: "东普鲁士", children: ["a", "b", "c"] }),
+      stepUpInspectorSelection: () => {},
+      getInspectorFeatureLabel: () => "地块甲",
+      modernNames: {
+        hasScenarioRenamedPlaces: () => hasRenamed,
+        getRenamedPlacesInFeatures: (ids) => {
+          requestedIds.push([...ids]);
+          return ids.length > 1
+            ? { entries: [{ eraName: "柯尼斯堡", modernName: "加里宁格勒" }, { eraName: "蒂尔西特", modernName: "苏维埃茨克" }], total: 3 }
+            : { entries: [], total: 0 };
+        },
+        setShowModernPlaceNames: (enabled) => toggled.push(enabled),
+      },
+    });
+    const state = harness.runtimeState;
+    Object.assign(state, {
+      currentLanguage: "zh", showModernPlaceNames: false,
+      inspectorSelectionLevel: "group", inspectorSelectionGroupId: "g", inspectorSelectionFeatureId: "",
+      inspectorHighlightCountryCode: "", inspectorHighlightFeatureIds: ["a", "b", "c"],
+    });
+    harness.controller.renderCountryInspectorDetail();
+    const block = harness.countryInspectorSelected.querySelector(".inspector-modern-names");
+    const toggle = block.querySelector("input");
+    const listNode = block.querySelector(".inspector-modern-names-list");
+    assert.equal(block.hidden, false);
+    assert.equal(toggle.checked, false);
+    assert.equal(listNode.hidden, true, "开关关闭时不列今名");
+    assert.deepEqual(requestedIds, []);
+
+    toggle.checked = true;
+    toggle.change();
+    assert.deepEqual(toggled, [true], "检查器开关走共享入口");
+
+    state.showModernPlaceNames = true;
+    harness.controller.renderCountryInspectorDetail();
+    assert.equal(toggle.checked, true, "外观改过的状态同步回检查器");
+    assert.equal(listNode.hidden, false);
+    assert.deepEqual(requestedIds.at(-1), ["a", "b", "c"]);
+    assert.deepEqual(listNode.children.map(textOf), ["柯尼斯堡（今加里宁格勒）", "蒂尔西特（今苏维埃茨克）", "另有 1 处"]);
+
+    Object.assign(state, { inspectorSelectionLevel: "feature", inspectorSelectionFeatureId: "a" });
+    harness.controller.renderCountryInspectorDetail();
+    assert.deepEqual(requestedIds.at(-1), ["a"]);
+    assert.deepEqual(listNode.children.map(textOf), ["No renamed places in this selection"]);
+
+    hasRenamed = false;
+    harness.controller.renderCountryInspectorDetail();
+    assert.equal(block.hidden, true, "没有改名城市的剧本不显示开关");
+  } finally {
+    globalThis.document = previousDocument;
+  }
+});
+
+test("country group selector does not repeat the selected system label", (context) => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+  context.after(() => { globalThis.document = previousDocument; });
+  const container = new TestElement();
+  const country = { groupSystems: [
+    { id: "scenario_districts", groups: [{ id: "north", label: "North" }] },
+    { id: "modern", groups: [{ id: "south", label: "South" }] },
+  ] };
+  const options = {
+    t: (key) => key, language: "en", translateGeo: (key) => key,
+    selectedSystemId: "scenario_districts", selectSystem() {}, applyGroup() {},
+    createInspectorActionButton: (label, action) => {
+      const button = new TestElement("button");
+      button.textContent = label;
+      button.addEventListener("click", action);
+      return button;
+    },
+    createEmptyNote: () => new TestElement("small"),
+  };
+  renderCountryGroupButtons(container, country, options);
+  assert.equal(container.querySelectorAll(".scenario-action-hint").length, 0);
+  const toggle = container.querySelector(".country-group-system-toggle");
+  assert.deepEqual(toggle.children.map((node) => node.textContent), ["Scenario districts", "Modern administrative regions"]);
+  toggle.children[1].click();
+  assert.equal(container.querySelectorAll(".scenario-action-hint").length, 0);
+  assert.equal(container.querySelector(".country-group-system-toggle").children[1].getAttribute("aria-pressed"), "true");
+  container.replaceChildren();
+  renderCountryGroupButtons(container, { groupSystems: [country.groupSystems[0]] }, options);
+  assert.equal(container.querySelector(".scenario-action-hint").textContent, "Scenario districts");
 });

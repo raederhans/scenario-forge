@@ -387,9 +387,8 @@ export function createStrategicOverlayController({
     if (frontlineStatusHint) {
       frontlineStatusHint.textContent = !hasScenario
         ? t("Scenario required.", "ui")
-        : frontlineEnabled
-        ? t("Derived frontlines on.", "ui")
-        : t("Overlay off.", "ui");
+        : "";
+      frontlineStatusHint.hidden = hasScenario;
     }
     if (frontlineEnabledToggle) {
       frontlineEnabledToggle.checked = frontlineEnabled;

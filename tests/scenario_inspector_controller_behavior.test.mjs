@@ -198,7 +198,7 @@ test("hierarchy visuals read click-time color and leave ownership routes untouch
   const h = harness(t);
   const group = { label: "Group A" };
   h.render(country({ hierarchyGroups: [group] }));
-  const visual = nodes(h.root).find((node) => node.textContent === "Hierarchy Groups (Visual Color)");
+  const visual = nodes(h.root).find((node) => node.textContent === "Hierarchy Groups");
   h.view.selectedColor = "#fedcba";
   button(visual, "Group A").fire();
   button(h.root, "Paint Reference Regions With Country Color").fire();
@@ -219,7 +219,7 @@ test("hierarchy exposes only a visual action even if stale view state requests o
   const call = h.calls.find(([name]) => name === "hierarchy");
   assert.equal(call[2].mode, "visual");
   assert.equal(nodes(h.root).filter((node) => node.textContent === "Group A").length, 1);
-  assert.ok(!nodes(h.root).some((node) => node.textContent === "Hierarchy Groups"));
+  assert.equal(nodes(h.root).filter((node) => node.textContent === "Hierarchy Groups").length, 1);
 });
 
 test("color disclosure opens by default, records toggles, and has no ownership brush switch", (t) => {
@@ -249,11 +249,12 @@ test("group source and toggle display the selected system without painting until
     groupSystems: [{ id: "scenario_districts", groups: [district] }, { id: "geographic", groups: [geographic] }],
   });
   h.render(target);
-  assert.ok(nodes(h.root).some((node) => node.tagName === "small" && node.textContent === "Scenario districts"));
+  // 有分段切换时不再另外显示同名的来源小字。
+  assert.ok(!nodes(h.root).some((node) => node.tagName === "small"));
   assert.equal(button(h.root, "Scenario districts")["aria-pressed"], "true");
   button(h.root, "第一大区");
   button(h.root, "Modern administrative regions").fire();
-  assert.ok(nodes(h.root).some((node) => node.tagName === "small" && node.textContent === "Modern administrative regions"));
+  assert.ok(!nodes(h.root).some((node) => node.tagName === "small"));
   assert.equal(button(h.root, "Modern administrative regions")["aria-pressed"], "true");
   assert.ok(!nodes(h.root).some((node) => node.textContent === "第一大区"));
   assert.deepEqual(h.calls.filter(([name]) => name === "selectGroupSystem"), [["selectGroupSystem", "AA", "geographic"]]);

@@ -153,11 +153,17 @@ test("urban city policy owns revision-sensitive render pass signature parts", ()
   ]);
   assert.deepEqual(getUrbanCityRenderPassSignatureParts(state, "labels"), [
     "labels:deferred",
+    "modernNames:false",
     "cities:4",
     "strategic:5",
     "sovereignty:6",
     "colors:7",
   ]);
+  // 打开"显示现代名称"会改变标签文本，标签 pass 签名必须随之变化。
+  assert.notDeepEqual(
+    getUrbanCityRenderPassSignatureParts({ ...state, showModernPlaceNames: true }, "labels"),
+    getUrbanCityRenderPassSignatureParts(state, "labels"),
+  );
   assert.throws(
     () => getUrbanCityRenderPassSignatureParts(state, "political"),
     /Unsupported urban city render pass/,

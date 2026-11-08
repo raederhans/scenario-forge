@@ -2,6 +2,11 @@ const MODE_KEY = "scenario-forge-political-render-mode";
 const MODES = new Set(["auto", "raster", "vector", "hybrid"]);
 const KEY = "scenario-forge-political-id-raster";
 export const POLITICAL_ID_RASTER_STATUS_EVENT = "political-id-raster-status";
+// Scenarios whose political layer defaults to the resident ID raster drawn
+// directly in the GPU scene. `political_render_mode=vector` (URL or storage)
+// still forces the vector path.
+const DIRECT_RASTER_SCENE_SCENARIO_IDS = new Set(["tno_1962", "hoi4_1936", "hoi4_1939"]);
+export const isDirectRasterSceneScenario = (scenarioId) => DIRECT_RASTER_SCENE_SCENARIO_IDS.has(scenarioId);
 let previousStatus = "";
 
 export function readPoliticalIdRasterPreference({ search = globalThis.location?.search || "", storage } = {}) {
@@ -48,7 +53,7 @@ function readDefaultStoredMode() {
   return storedMode;
 }
 
-/** TNO uses the resident raster scene by default; the numeric trial remains hybrid. */
+/** Direct-scene scenarios use the resident raster by default; the numeric trial remains hybrid. */
 export function readPoliticalRenderPolicy({ search = globalThis.location?.search || "", storage, scenarioId = "" } = {}) {
   const params = readSearchPolicy(search);
   let value = params.mode, preferenceSource = "url";
@@ -59,7 +64,7 @@ export function readPoliticalRenderPolicy({ search = globalThis.location?.search
   if (value === null) ({ value, source: preferenceSource } = storage == null ? readDefaultStoredMode() : readStoredMode(storage));
   if (value === null) { value = "auto"; preferenceSource = "default"; }
   const valid = MODES.has(value), mode = valid ? value : "vector";
-  const automaticRasterEnabled = scenarioId === "tno_1962";
+  const automaticRasterEnabled = isDirectRasterSceneScenario(scenarioId);
   const effectiveMode = mode === "auto" ? (automaticRasterEnabled ? "raster" : "vector") : mode;
   return Object.freeze({ mode, effectiveMode, preferenceSource, valid,
     requested: effectiveMode === "raster" || effectiveMode === "hybrid",
@@ -92,7 +97,7 @@ export function writePoliticalIdRasterPreference(enabled) {
 
 export function getPoliticalIdRasterEligibility({ requested, exporting, debugMode, firstVisible, riverPartitions, scenarioId }) {
   if (!requested) return "off";
-  if (!["hoi4_1936", "hoi4_1939", "tno_1962"].includes(scenarioId)) return "unsupported-scenario";
+  if (!isDirectRasterSceneScenario(scenarioId)) return "unsupported-scenario";
   if (exporting) return "export";
   if (debugMode !== "PROD") return "debug-mode";
   // Read-only startup may use the raster once a frame is visible: otherwise a

@@ -2,16 +2,16 @@
 // Owns layer-order row models, drag/drop DOM wiring, and status copy for the Layers family panel.
 
 const LIVE_LAYER_COPY = {
-  caption: "Live preview is already wired into the Japan carrier.",
-  status: "Live now",
+  caption: "Preview available",
+  status: "Available",
 };
 const MANIFEST_LAYER_COPY = {
-  caption: "Inspector now reads the live manifest and build audit.",
-  status: "Metadata live",
+  caption: "Not available yet",
+  status: "Not available yet",
 };
 const RESERVED_LAYER_COPY = {
-  caption: "Reserved family shell. Real renderer attaches later.",
-  status: "Reserved",
+  caption: "Not available yet",
+  status: "Not available yet",
 };
 
 export function buildTransportWorkbenchLayerOrderRows({

@@ -101,6 +101,11 @@ ROOT_PUBLIC_FILE_SUFFIXES = {
     ".avif",
 }
 APP_SHARED_DIRS = ("css", "js", "vendor")
+# 只作生成源、不发布的文件：中文标签字体按 unicode-range 切片发布（tools/build_map_label_font_slices.py）。
+PAGES_SOURCE_ONLY_APP_FILES = frozenset({"vendor/fonts/notoserifsc/NotoSerifSC-400.woff2"})
+MAP_LABEL_CJK_FONT_SLICE_PATHS = tuple(
+    f"app/vendor/fonts/notoserifsc/slices/NotoSerifSC-400.s{index:02d}.woff2" for index in range(25)
+)
 REQUIRED_DIST_FILES = (
     "index.html",
     "app/index.html",
@@ -203,6 +208,7 @@ TRANSPORT_SMALL_DIRECT_RUNTIME_FILES = {
     "data/transport_layers/global_airport/airports.geojson",
     "data/transport_layers/global_port/ports.geojson",
     "data/transport_layers/hoi4_era_rail/era_rail.geojson",
+    "data/transport_layers/tno_era_rail/era_rail.geojson",
     "data/transport_layers/japan_airport/airports.geojson",
     "data/transport_layers/japan_port/ports.core.geojson",
     "data/transport_layers/japan_port/ports.expanded.geojson",
@@ -681,7 +687,7 @@ PAGES_PRODUCT_INVENTORY_RULES = (
             "app/vendor/fflate.browser.js",
             "app/vendor/fonts/ebgaramond/EBGaramond-500.woff2",
             "app/vendor/fonts/ebgaramond/OFL.txt",
-            "app/vendor/fonts/notoserifsc/NotoSerifSC-400.woff2",
+            *MAP_LABEL_CJK_FONT_SLICE_PATHS,
             "app/vendor/fonts/notoserifsc/OFL.txt",
             "app/vendor/fonts/README.md",
             "app/vendor/textures/README.md",
@@ -1024,7 +1030,15 @@ def build_editor_dist(editor_entry: Path) -> None:
     for directory_name in APP_SHARED_DIRS:
         source_dir = ROOT / directory_name
         if source_dir.is_dir():
-            shutil.copytree(source_dir, APP_DIST_ROOT / directory_name, dirs_exist_ok=True)
+            shutil.copytree(
+                source_dir,
+                APP_DIST_ROOT / directory_name,
+                dirs_exist_ok=True,
+                ignore=lambda folder, names: {
+                    name for name in names
+                    if (Path(folder) / name).relative_to(ROOT).as_posix() in PAGES_SOURCE_ONLY_APP_FILES
+                },
+            )
     target_index = APP_DIST_ROOT / "index.html"
     shutil.copy2(editor_entry, target_index)
     inject_editor_noindex(target_index)

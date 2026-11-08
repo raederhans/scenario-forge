@@ -40,6 +40,7 @@ function collectCityPointsNodes(documentRef) {
     cityPointsCapitalColor: documentRef.getElementById("cityPointsCapitalColor"),
     cityPointsOpacity: documentRef.getElementById("cityPointsOpacity"),
     cityPointLabelsEnabled: documentRef.getElementById("cityPointLabelsEnabled"),
+    showModernPlaceNames: documentRef.getElementById("showModernPlaceNames"),
     cityPointsLabelSize: documentRef.getElementById("cityPointsLabelSize"),
     cityCapitalOverlayEnabled: documentRef.getElementById("cityCapitalOverlayEnabled"),
     cityPointsMarkerScaleValue: documentRef.getElementById("cityPointsMarkerScaleValue"),
@@ -103,6 +104,7 @@ export function createAppearanceCityPointsOwner({
 
   const renderCityPointsUi = () => {
     if (nodes.toggleCityPoints) nodes.toggleCityPoints.checked = !!runtimeState.showCityPoints;
+    if (nodes.showModernPlaceNames) nodes.showModernPlaceNames.checked = !!runtimeState.showModernPlaceNames;
     const cityPointsConfig = syncCityPointsConfig();
     if (nodes.cityPointsDensityPreset) nodes.cityPointsDensityPreset.value = cityPointsConfig.densityPreset;
     if (nodes.cityPointsMinRank) nodes.cityPointsMinRank.value = cityPointsConfig.minSettlementRank;
@@ -173,6 +175,15 @@ export function createAppearanceCityPointsOwner({
     bindCityPointsControl(element, mutate, reason, { events: ["change"], afterMutate });
 
   const bindEvents = () => {
+    if (nodes.showModernPlaceNames && nodes.showModernPlaceNames.dataset.bound !== "true") {
+      nodes.showModernPlaceNames.addEventListener("change", (event) => {
+        // 检查器里的同名开关也转发到这里，状态只在外观这一处修改；改完让检查器同步勾选和今名对照。
+        runtimeState.showModernPlaceNames = !!event.target.checked;
+        runtimeState.refreshCountryInspectorDetailFn?.();
+        renderDirty("city-points-modern-names-toggle");
+      });
+      nodes.showModernPlaceNames.dataset.bound = "true";
+    }
     if (nodes.toggleCityPoints && nodes.toggleCityPoints.dataset.bound !== "true") {
       nodes.toggleCityPoints.checked = !!runtimeState.showCityPoints;
       nodes.toggleCityPoints.addEventListener("change", (event) => {

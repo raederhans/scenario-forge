@@ -44,6 +44,7 @@ export function captureProjectImportState(target) {
     showAirports: target.showAirports,
     showBlankFeatureLabels: target.showBlankFeatureLabels,
     showCityPoints: target.showCityPoints,
+    showModernPlaceNames: target.showModernPlaceNames,
     showOpenOceanRegions: target.showOpenOceanRegions,
     showPhysical: target.showPhysical,
     showPorts: target.showPorts,

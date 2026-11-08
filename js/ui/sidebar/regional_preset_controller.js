@@ -311,7 +311,7 @@ export function createRegionalPresetController(runtimeState, {
 
     const visual = mode === "visual";
     const section = visual
-      ? appendActionSection(container, t("Regional Presets (Visual Color)", "ui"))
+      ? appendActionSection(container, t("Regional Presets", "ui"))
       : appendActionSection(container, t("Regional Presets", "ui"), {
         collapsible: true,
         defaultOpen: false,
