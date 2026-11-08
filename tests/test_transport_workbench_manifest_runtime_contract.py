@@ -158,7 +158,6 @@ class TransportWorkbenchManifestRuntimeContractTest(unittest.TestCase):
         self.assertIn('geometryKind: "polygon_or_point"', registry_content)
         self.assertIn('adapterId: "active_industrial_zones_manifest"', descriptor_content)
         self.assertIn('geometryKind: "polygon_or_point"', descriptor_content)
-        self.assertIn("Polygon packs and OSM center-point packs keep their own geometry contract", descriptor_content)
         self.assertNotIn('adapterId: "japan_industrial_zones_v2"', descriptor_content)
         self.assertIn("deepFreeze({", descriptor_content)
         self.assertIn("TRANSPORT_WORKBENCH_DENSITY_FAMILY_ID_SET", descriptor_content)

@@ -403,7 +403,7 @@ export function createTransportWorkbenchRightDeckOwner({
     const meta = document.createElement("div");
     meta.className = "transport-workbench-data-meta";
     meta.append(
-      createDataMetaNode(translate("Pack Rows"), totalRows),
+      createDataMetaNode(translate("Loaded rows"), totalRows),
       createDataMetaNode(translate("Table Rows"), rows.length),
       createDataMetaNode(translate("Mode"), previewSnapshot.packMode || previewSnapshot.status || "idle"),
       createDataMetaNode(translate("Shown"), Math.min(visibleRows.length, viewRows.length))
@@ -417,7 +417,7 @@ export function createTransportWorkbenchRightDeckOwner({
       const details = document.createElement("details");
       details.className = "transport-workbench-pack-details";
       const summary = document.createElement("summary");
-      summary.textContent = translate("Pack details");
+      summary.textContent = translate("Source details");
       const detailList = document.createElement("div");
       detailList.className = "transport-workbench-data-meta";
       packDetailsRows.forEach(([label, value]) => {
@@ -429,7 +429,7 @@ export function createTransportWorkbenchRightDeckOwner({
     if (rows.length === 0) {
       const empty = document.createElement("p");
       empty.className = "transport-workbench-note-text";
-      empty.textContent = translate("No loaded feature rows for the current preview pack.");
+      empty.textContent = translate("No items to show.");
       card.appendChild(empty);
       return card;
     }
@@ -542,7 +542,7 @@ export function createTransportWorkbenchRightDeckOwner({
     if (viewRows.length > visibleRows.length || totalRows > rows.length) {
       const note = document.createElement("p");
       note.className = "transport-workbench-note-text transport-workbench-data-limit-note";
-      note.textContent = translate("Search and sort use the current table sample; the side panel keeps a bounded row set to stay responsive.");
+      note.textContent = translate("Search and sort apply to the rows listed here.");
       card.appendChild(note);
     }
     return card;
@@ -679,7 +679,7 @@ export function createTransportWorkbenchRightDeckOwner({
     const visibleControls = (section.controls || []).filter((control) => (
       typeof control.showWhen !== "function" || control.showWhen(config)
     ));
-    if (section.kind !== "diagnostics" && visibleControls.length === 0) {
+    if (section.kind === "diagnostics" || visibleControls.length === 0) {
       return null;
     }
     const details = document.createElement("details");
@@ -710,26 +710,17 @@ export function createTransportWorkbenchRightDeckOwner({
     summary.appendChild(heading);
     summary.appendChild(actions);
     details.appendChild(summary);
-    const body = section.kind === "diagnostics"
-      ? renderDiagnosticsBody(family.id, config)
-      : document.createElement("div");
-    if (section.kind !== "diagnostics") {
-      body.className = "transport-workbench-section-body";
-      if (section.description) {
-        const description = document.createElement("p");
-        description.className = "transport-workbench-section-description";
-        description.textContent = translate(section.description);
-        body.appendChild(description);
-      }
-      visibleControls.forEach((control) => {
-        body.appendChild(renderControl(family.id, control, config, compareHeld));
-      });
-    } else if (section.description) {
+    const body = document.createElement("div");
+    body.className = "transport-workbench-section-body";
+    if (section.description) {
       const description = document.createElement("p");
-      description.className = "transport-workbench-section-description transport-workbench-section-description-diagnostics";
+      description.className = "transport-workbench-section-description";
       description.textContent = translate(section.description);
-      body.prepend(description);
+      body.appendChild(description);
     }
+    visibleControls.forEach((control) => {
+      body.appendChild(renderControl(family.id, control, config, compareHeld));
+    });
     details.appendChild(body);
     return details;
   };
@@ -922,12 +913,7 @@ export function createTransportWorkbenchRightDeckOwner({
         }));
       }
     }
-    const note = document.createElement("p");
-    note.className = "transport-workbench-shell-note";
-    note.textContent = tabId === "data"
-      ? translate("Manifest and audit stay read-only here so control tuning and source truth do not get mixed.")
-      : translate("Use this panel to adjust the current family without changing the lens column context.");
-    card.append(grid, note);
+    card.append(grid);
     return card;
   };
 
@@ -1031,11 +1017,11 @@ export function createTransportWorkbenchRightDeckOwner({
       empty.className = "transport-workbench-empty-card";
       const title = document.createElement("div");
       title.className = "transport-workbench-empty-title";
-      title.textContent = tabId === "data" ? translate("No audit payload yet") : translate("No controls in this tab");
+      title.textContent = tabId === "data" ? translate("No items to show.") : translate("No controls in this tab");
       const body = document.createElement("p");
       body.className = "transport-workbench-empty-text";
       body.textContent = tabId === "data"
-        ? translate("This family has not exposed extra manifest or audit cards in the current shell.")
+        ? translate("No items to show.")
         : family.id === "layers"
           ? pickUiCopy(
             "在中间拖动图层以调整顺序，并在 Inspect 确认结果。",
