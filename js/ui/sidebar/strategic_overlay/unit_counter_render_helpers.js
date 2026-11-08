@@ -166,8 +166,8 @@ export function refreshUnitCounterIdentitySection({
   }
   if (unitCounterSymbolHint) {
     unitCounterSymbolHint.textContent = model.effectiveRenderer === "milstd"
-      ? t("MILSTD uses the browser-loaded milsymbol renderer. Paste a full SIDC for the symbol body.", "ui")
-      : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
+      ? t("Paste a full SIDC code.", "ui")
+      : t("Enter a short code such as HQ, ARM or INF.", "ui");
   }
   if (state.unitCounterEditor?.selectedId || state.unitCounterEditor?.active || state.strategicOverlayUi?.counterEditorModalOpen) {
     setAccordionOpen(documentRef, "accordionCounters");

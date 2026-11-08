@@ -125,8 +125,6 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   const qualityRow = add("qualityRow", documentRef.getElementById("panel-borders"));
   qualityRow.className = "border-control-row";
   add("displayQuality", qualityRow, "select");
-  const experiment = add("experiment", documentRef.getElementById("panel-borders"), "details");
-  add("politicalRenderMode", experiment, "select");
   add("specialZonePopover", right);
   add("legendProjectSection", right, "details");
   add("transportProjectSection", left, "details");
@@ -372,10 +370,9 @@ test("layer groups follow map order and display moves existing controls", (conte
   h.get("editorLayer-display").click();
   expectProperty(h, "display", "Layers");
   assert.equal(h.get("displayQuality").parentNode, h.get("qualityRow"));
-  // 两块控件放在同一个容器里，再挂到显示与性能属性页下。
   const displayStack = h.get("qualityRow").parentNode;
   assert.equal(displayStack.parentNode, h.get("editorProperty-display"));
-  assert.equal(h.get("experiment").parentNode, displayStack);
+  assert.equal(h.get("editorProperty-display").querySelector("#politicalRenderMode"), null);
 });
 
 test("visibility switches dispatch change and synchronize without navigating", (context) => {

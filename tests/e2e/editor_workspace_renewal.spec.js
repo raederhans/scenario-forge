@@ -636,7 +636,7 @@ test("layer search, visibility and display preserve control ownership", async ({
   await expect(page.locator(".editor-layer-row:visible")).toHaveCount(16);
   await page.locator("#editorLayer-display").click();
   await expect(page.locator("#editorProperty-display #displayQuality")).toBeVisible();
-  await expect(page.locator("#editorProperty-display #politicalRenderMode")).toHaveCount(1);
+  await expect(page.locator("#editorProperty-display #politicalRenderMode")).toHaveCount(0);
   await page.evaluate(() => {
     const host = document.getElementById("editorProperty-display");
     const strip = document.createElement("div");
