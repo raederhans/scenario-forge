@@ -1390,7 +1390,7 @@ test("deferred fit completes for a country wholly inside the paint margin", () =
   assert.ok(context.events.some(event => event[0] === "fill"));
 });
 
-test("Chinese labels request their font slices once per source revision and language", async () => {
+test("Chinese labels request their font slices once per published name set and language", async () => {
   const loads = [];
   const fonts = { load(font, text) { loads.push([font, text]); return Promise.resolve([]); } };
   const { owner, state, source } = createHarness({ names: ["中国", "日本国"], helperOptions: { getFontSet: () => fonts } });
@@ -1405,11 +1405,32 @@ test("Chinese labels request their font slices once per source revision and lang
   assert.equal(loads.length, 1, "repeated frames reuse the same request");
   assert.match(loads[0][0], /^400 16px "Map Noto Serif SC"/);
   assert.deepEqual([...loads[0][1]].sort(), [..."中国日本"].sort(), "exactly the label glyphs, deduplicated");
-  source.revision = 2;
-  source.countries[1].name = "满洲国";
+  // 国名变化时标签源换新的 countries 数组、revision 不变：新字必须被请求，已请求过的字不重复。
+  source.countries = source.countries.map((record, index) => index === 1 ? { ...record, name: "满洲国" } : record);
   owner.drawCountryLabels(1);
   await settle();
-  assert.equal(loads.length, 2);
-  assert.deepEqual([...loads[1][1]].sort(), [..."中国满洲"].sort());
+  assert.equal(loads.length, 2, "a republished name set without a geometry revision still requests new glyphs");
+  assert.deepEqual([...loads[1][1]].sort(), [..."满洲"].sort(), "only glyphs not requested before");
+  source.revision = 2;
+  source.countries = [...source.countries];
+  owner.drawCountryLabels(1);
+  await settle();
+  assert.equal(loads.length, 2, "a new revision with no new glyphs issues no request");
   assert.equal(owner.getDiagnostics().chineseGlyphRequests, 2);
+});
+
+test("a failed Chinese glyph request is retried when the names are published again", async () => {
+  let fail = true;
+  const loads = [];
+  const fonts = { load(font, text) { loads.push(text); return fail ? Promise.reject(new Error("offline")) : Promise.resolve([]); } };
+  const { owner, state, source } = createHarness({ names: ["中国"], helperOptions: { getFontSet: () => fonts } });
+  const settle = async () => { for (let i = 0; i < 4; i++) await Promise.resolve(); };
+  state.language = "zh";
+  owner.drawCountryLabels(1);
+  await settle();
+  fail = false;
+  source.countries = [...source.countries];
+  owner.drawCountryLabels(1);
+  await settle();
+  assert.deepEqual(loads, ["中国", "中国"]);
 });

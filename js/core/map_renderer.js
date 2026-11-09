@@ -4328,6 +4328,7 @@ function cancelOperationalLineDraw(...args) { return getStrategicOverlayRuntimeO
 function selectOperationalLineById(...args) { return getStrategicOverlayRuntimeOwner().selectOperationalLineById(...args); }
 function deleteSelectedOperationalLine(...args) { return getStrategicOverlayRuntimeOwner().deleteSelectedOperationalLine(...args); }
 function updateSelectedOperationalLine(...args) { return getStrategicOverlayRuntimeOwner().updateSelectedOperationalLine(...args); }
+function addScenarioDefenseLinePresets(...args) { return getStrategicOverlayRuntimeOwner().addScenarioDefenseLinePresets(...args); }
 function startOperationGraphicDraw(...args) { return getStrategicOverlayRuntimeOwner().startOperationGraphicDraw(...args); }
 function undoOperationGraphicVertex(...args) { return getStrategicOverlayRuntimeOwner().undoOperationGraphicVertex(...args); }
 function finishOperationGraphicDraw(...args) { return getStrategicOverlayRuntimeOwner().finishOperationGraphicDraw(...args); }
@@ -10965,6 +10966,8 @@ function getCityMarkerSprite(entry, config = {}) {
 const buildCityRevealPlan = (...args) => getUrbanCityPolicyOwner().buildCityRevealPlan(...args);
 
 const getEffectiveCityCollection = (...args) => getUrbanCityPolicyOwner().getEffectiveCityCollection(...args);
+// 只读已合并好的城市集合，不在调用方同步触发合并（检查器等 UI 读名称用）。
+const getCachedEffectiveCityCollection = () => getUrbanCityPolicyOwner().getCachedEffectiveCityCollection();
 
 function getCityAnchor(feature) {
   if (!feature || !rendererSurfaceHost.getProjection()) return null;
@@ -15499,6 +15502,7 @@ export {
   selectOperationalLineById,
   deleteSelectedOperationalLine,
   updateSelectedOperationalLine,
+  addScenarioDefenseLinePresets,
   startOperationGraphicDraw,
   undoOperationGraphicVertex,
   finishOperationGraphicDraw,
@@ -15552,6 +15556,7 @@ export {
   buildCityRevealPlan,
   getCityLabelRenderStyle,
   getCityMarkerRenderStyle,
+  getCachedEffectiveCityCollection,
   getEffectiveCityCollection,
   isOpenOceanOverlayActive,
   focusWaterRegionById,

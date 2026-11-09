@@ -97,6 +97,55 @@ function detailPromotionFixture() {
   return h;
 }
 
+function chunkedScenarioFixture({ manifest = { detail_chunk_manifest_url: "data/scenarios/tno_1962/detail_chunks.manifest.json" }, runtimePolitical = true } = {}) {
+  const h = { loads: 0 };
+  h.state = { activeScenarioId: "tno_1962", activeScenarioManifest: manifest, sceneGeneration: 1, topologyBundleMode: "single",
+    detailDeferred: true, detailPromotionCompleted: false, detailPromotionInFlight: false,
+    runtimePoliticalTopology: runtimePolitical ? { objects: { political: {} } } : null };
+  h.detail = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [] } }, arcs: [] };
+  h.owner = createDeferredDetailPromotionOwner({ runtimeState: h.state, helpers: {
+    loadDetailBundle: async (options) => { h.loads++; h.includeRuntimePolitical = options.includeRuntimePolitical; return { topologyDetail: h.detail, topologyBundleMode: "composite", detailSourceUsed: "na_v2" }; },
+    yieldToInput: async () => {},
+  } });
+  return h;
+}
+
+test("a chunked scenario reaches the composite state without downloading the detail topology", async () => {
+  const h = chunkedScenarioFixture();
+  assert.equal(await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false }), true);
+  assert.equal(h.loads, 0);
+  assert.equal(h.state.topologyDetail, undefined);
+  assert.equal(h.state.topologyBundleMode, "composite");
+  assert.equal(h.state.detailDeferred, false);
+  assert.equal(h.state.detailPromotionCompleted, true);
+});
+
+for (const [name, options] of [
+  ["a scenario without chunks", { manifest: { runtime_topology_url: "data/scenarios/modern_world/runtime_topology.topo.json" } }],
+  ["a chunked scenario whose runtime has no political topology", { runtimePolitical: false }],
+]) {
+  test(`${name} still downloads the detail topology`, async () => {
+    const h = chunkedScenarioFixture(options);
+    assert.equal(await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false }), true);
+    assert.equal(h.loads, 1);
+    assert.equal(h.state.topologyDetail, h.detail);
+  });
+}
+
+test("the base map still downloads the detail topology after a chunked scenario is cleared", async () => {
+  const h = chunkedScenarioFixture();
+  await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false });
+  Object.assign(h.state, { activeScenarioId: "", activeScenarioManifest: null, runtimePoliticalTopology: null,
+    topologyBundleMode: "single", detailDeferred: true, detailPromotionCompleted: false });
+  assert.equal(await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false }), true);
+  assert.equal(h.loads, 1);
+  assert.equal(h.state.topologyDetail, h.detail);
+  assert.equal(h.state.topologyBundleMode, "composite");
+  // Same state as booting into the scenario with the detail topology: composed from detail, no default runtime.
+  assert.equal(h.includeRuntimePolitical, false);
+  assert.equal(h.state.runtimePoliticalTopology, null);
+});
+
 test("detail promotion yields to input between loading the bundle and applying it", async () => {
   const h = detailPromotionFixture();
   const promotion = h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false });

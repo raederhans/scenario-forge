@@ -2,7 +2,7 @@
 
 - generated_at: 2026-11-08T02:57:05Z
 - version: 1
-- entries: 1379
+- entries: 1380
 
 ## Counts by role
 
@@ -16,6 +16,7 @@
 | city_overrides | 1 |
 | context_layer | 7 |
 | country_feature_policies | 1 |
+| defense_line_presets | 1 |
 | detail_topology_na_v1 | 1 |
 | detail_topology_na_v2 | 1 |
 | feature_migration_table | 2 |
@@ -116,6 +117,7 @@
 | build_manifest | data/manifest.json | build_manifest | json | json | schema://json/object/v1 |  | no-cache | runtime_asset_registry.assets.build_manifest |  |
 | source:marine_regions_refinement_supplement_v19 | data/marine_regions.additional.source.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::marine_regions_refinement_supplement_v19::current_local_sha256 | default | source_ledger | marine_regions_refinement_supplement_v19 |
 | manifest_output:marine_regions.refined.source.geojson | data/marine_regions.refined.source.geojson | marine_refinement_source | geojson | json | schema://geojson/feature_collection/v1 | data/manifest.json::outputs::marine_regions.refined.source.geojson::sha256 | default | tools/build_marine_refinement_sources.py | marine_regions_shared_refinement |
+| defense_line_presets | data/operational_presets/defense_lines.json | defense_line_presets | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.defense_line_presets |  |
 | manifest_output:palette-maps/hgo.audit.json | data/palette-maps/hgo.audit.json | palette_audit | json | json | schema://json/object/v1 | data/manifest.json::outputs::palette-maps/hgo.audit.json::sha256 | default | init_map_data.palette_assets |  |
 | manifest_output:palette-maps/hgo.map.json | data/palette-maps/hgo.map.json | palette_map | json | json | schema://json/object/v1 | data/manifest.json::outputs::palette-maps/hgo.map.json::sha256 | default | tools.import_country_palette |  |
 | manifest_output:palette-maps/hoi4_vanilla.audit.json | data/palette-maps/hoi4_vanilla.audit.json | palette_audit | json | json | schema://json/object/v1 | data/manifest.json::outputs::palette-maps/hoi4_vanilla.audit.json::sha256 | default | init_map_data.palette_assets |  |
