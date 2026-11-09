@@ -3,8 +3,8 @@ export const CANONICAL_RENDER_SAMPLE_ROLE_ID = "last-post-promotion-idle-scenari
 export const GOVERNED_RENDER_SAMPLE_SCENARIOS = Object.freeze(["tno_1962", "hoi4_1939"]);
 export const STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID = "standard-perf-5-run-v1";
 export const SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID = "standard-perf-5-run-v2";
-export const SETTLED_RENDER_SAMPLE_ROLE_POLICY_ID = "render-sample-role-v3";
-export const SETTLED_CANONICAL_RENDER_SAMPLE_ROLE_ID = "initial-scenario-frame-through-startup-settlement-v1";
+export const SETTLED_RENDER_SAMPLE_ROLE_POLICY_ID = "render-sample-role-v4";
+export const SETTLED_CANONICAL_RENDER_SAMPLE_ROLE_ID = "first-full-scenario-frame-through-startup-settlement-v1";
 export const WILLIAMS_CROSSOVER_RENDER_SAMPLE_RUN_PROFILE_ID = "p2-williams-crossover-v7";
 
 const RENDER_SAMPLE_RUN_PROFILES = Object.freeze({
@@ -113,7 +113,7 @@ function roleCheck(id, pass, expected, actual) {
   });
 }
 
-function isCanonicalCandidate(sample, scenarioId, promotionRecordedAt) {
+function isFullScenarioFrame(sample, scenarioId) {
   return (
     sample?.activeScenarioId === scenarioId
     && sample?.phase === "idle"
@@ -121,11 +121,15 @@ function isCanonicalCandidate(sample, scenarioId, promotionRecordedAt) {
     && (((sample.politicalSource || "") !== "" && sample.politicalSource !== "vector")
       || (sample.contextScenarioMs !== null && sample.contextScenarioMs > 0))
     && sample?.recordedAt !== null
-    && promotionRecordedAt !== null
-    && sample.recordedAt >= promotionRecordedAt
     && sample?.durationMs !== null
     && sample.durationMs > 0
   );
+}
+
+function isCanonicalCandidate(sample, scenarioId, promotionRecordedAt) {
+  return isFullScenarioFrame(sample, scenarioId)
+    && promotionRecordedAt !== null
+    && sample.recordedAt >= promotionRecordedAt;
 }
 
 export function analyzeRenderSampleRole({ scenarioId, snapshot, summary = null, runProfileId = STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID } = {}) {
@@ -260,16 +264,18 @@ export function analyzeRenderSampleRole({ scenarioId, snapshot, summary = null, 
   });
 }
 
-export function findInitialScenarioRenderSample(snapshot, scenarioId, initialPromotion) {
+export function findInitialScenarioRenderSample(snapshot, scenarioId) {
   const samples = Array.isArray(snapshot?.renderSamples?.samples) ? snapshot.renderSamples.samples : [];
-  return samples.map(summarizeSample).find((sample) => isCanonicalCandidate(sample, scenarioId, finiteNumberOrNull(initialPromotion?.recordedAt))) || null;
+  return samples.map(summarizeSample).find((sample) => isFullScenarioFrame(sample, scenarioId)) || null;
 }
 
 function analyzeSettledRenderSampleRole({ scenarioId, snapshot, summary }) {
   // Historical/Williams evidence keeps the last-frame rule. Standard v2 binds
-  // a completed observation window and charges every commit after the anchored
-  // first full scenario frame, so asynchronous follow-up work cannot disappear from
-  // the comparison by selecting only the first or the cheapest frame.
+  // a completed observation window and charges every commit from the first full
+  // scenario frame, so asynchronous follow-up work cannot disappear from the
+  // comparison by selecting only the first or the cheapest frame. The window is
+  // not anchored on the startup promotion: the GPU direct scene paints its full
+  // frames before it and follows with composites that repaint no political layer.
   const legacy = analyzeRenderSampleRole({ scenarioId, snapshot, summary });
   const identity = resolveRenderSampleRolePolicyIdentity(SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID);
   if (!legacy.governed) return Object.freeze({ ...legacy, ...identity });
@@ -277,7 +283,7 @@ function analyzeSettledRenderSampleRole({ scenarioId, snapshot, summary }) {
   const initialPromotion = completion?.initialPromotion;
   const initialPromotionAt = finiteNumberOrNull(initialPromotion?.recordedAt);
   const samples = (Array.isArray(snapshot?.renderSamples?.samples) ? snapshot.renderSamples.samples : []).map(summarizeSample);
-  const candidate = findInitialScenarioRenderSample(snapshot, legacy.requestedScenarioId, initialPromotion);
+  const candidate = findInitialScenarioRenderSample(snapshot, legacy.requestedScenarioId);
   const before = candidate ? samples.slice(0, candidate.index) : [];
   const after = candidate ? samples.slice(candidate.index + 1) : [];
   const last = samples.at(-1);
@@ -289,7 +295,7 @@ function analyzeSettledRenderSampleRole({ scenarioId, snapshot, summary }) {
     roleCheck("sample-array-count", samples.length >= 1, ">= 1", samples.length),
     roleCheck("sample-time-order", samples.every((sample, index) => sample && (!index || sample.recordedAt >= samples[index - 1]?.recordedAt)), "nondecreasing", samples.map((s) => s?.recordedAt)),
     roleCheck("initial-promotion-bound", initialPromotionAt !== null && initialPromotionAt >= 0 && initialPromotion?.activeScenarioId === legacy.requestedScenarioId && initialPromotion?.reason === "startup-initial-visual", "observed initial startup promotion", initialPromotion || null),
-    roleCheck("initial-frame-anchor", !!candidate && completion?.initialFrameSequence === candidate.sequence, "first full frame after initial promotion", completion?.initialFrameSequence ?? null),
+    roleCheck("initial-frame-anchor", !!candidate && completion?.initialFrameSequence === candidate.sequence, "first full scenario frame", completion?.initialFrameSequence ?? null),
     roleCheck("initial-sample-prefix-unchanged", !!candidate && Array.isArray(completion?.initialSamplePrefix) && completion.initialSamplePrefix.length === candidate.index + 1 && same(completion.initialSamplePrefix, snapshot.renderSamples.samples.slice(0, candidate.index + 1)), "captured prefix unchanged", completion?.initialSamplePrefix?.length ?? null),
     roleCheck("promotion-observation-history", Array.isArray(promotions) && promotions.length > 0
       && same(promotions[0].metric, initialPromotion)
@@ -297,8 +303,8 @@ function analyzeSettledRenderSampleRole({ scenarioId, snapshot, summary }) {
       && promotions.every((entry, index) => entry?.metric?.activeScenarioId === legacy.requestedScenarioId
         && finiteNumberOrNull(entry.observedAt) !== null && entry.observedAt >= entry.metric.recordedAt
         && (!index || entry.metric.recordedAt >= promotions[index - 1].metric.recordedAt)), "initial through final observed promotions", promotions || null),
-    roleCheck("all-pre-canonical-samples-before-promotion", before.every((sample) => sample?.recordedAt < initialPromotionAt), `< ${initialPromotionAt}`, before.map((s) => s?.recordedAt)),
-    roleCheck("post-canonical-same-scenario-idle", after.every((sample) => sample?.activeScenarioId === legacy.requestedScenarioId && sample.phase === "idle" && sample.durationMs !== null && sample.durationMs >= 0), "same scenario, idle, finite nonnegative CPU", after),
+    roleCheck("post-anchor-same-scenario", after.every((sample) => sample?.activeScenarioId === legacy.requestedScenarioId && sample.durationMs !== null && sample.durationMs >= 0), "same scenario, finite nonnegative CPU", after),
+    roleCheck("post-promotion-idle", after.every((sample) => sample?.recordedAt < initialPromotionAt || sample?.phase === "idle"), "idle once promoted", after.map((s) => s?.phase)),
     roleCheck("settlement-complete", completion?.complete === true && completion?.activeScenarioId === legacy.requestedScenarioId, "completed requested scenario", completion || null),
     roleCheck("settlement-binds-samples", completion?.sampleCount === samples.length && completion?.lastSampleSequence === last?.sequence, "exact count and last sequence", [completion?.sampleCount ?? null, completion?.lastSampleSequence ?? null]),
     roleCheck("settlement-after-last-frame", finiteNumberOrNull(completion?.observedAt) !== null && completion.observedAt >= last?.recordedAt, ">= last frame", completion?.observedAt ?? null),

@@ -14186,6 +14186,18 @@ body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled {
   font-size: 0.8rem;
 }
 .inspector-selection-breadcrumb[hidden] { display: none; }
+.inspector-modern-names { margin-bottom: 0.5rem; }
+.inspector-modern-names[hidden],
+.inspector-modern-names-list[hidden] { display: none; }
+.inspector-modern-names-list {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.inspector-modern-names-list .is-empty,
+.inspector-modern-names-list .is-more { color: var(--text-muted, inherit); opacity: 0.8; }
 .inspector-selection-breadcrumb button {
   border: 0;
   background: transparent;
