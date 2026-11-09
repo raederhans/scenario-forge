@@ -225,6 +225,12 @@ def antarctic_overlap(data: ScenarioData):
                          cntr_code="AQ", bbox=(-74, -90, -53, -60))
 
 
+def colombian_dmz(data: ScenarioData):
+    # TNO 五个初始非军事州与现代同名省对应；约 26.7 万平方公里，采用省级范围近似。
+    return data.by_names(["Caquetá", "Putumayo", "Amazonas", "Norte de Santander", "La Guajira"],
+                         cntr_code="CO", bbox=(-78, -5, -66, 13))
+
+
 # 与 js/core/special_zone_layers.js 的 SPECIAL_ZONE_PRESETS 默认样式保持一致；剧本契约要求每层带完整 style。
 PRESET_STYLES = {
     "demilitarized": ("#f6e05e", "#b7791f", 0.08, "fineHatch", 0.42),
@@ -336,6 +342,9 @@ def build(scenario_id: str):
         ]
     elif scenario_id == "tno_1962":
         layers += [
+            layer("preset-colombia-dmz", "demilitarized", "Colombian Demilitarized States", "哥伦比亚非军事化州",
+                  colombian_dmz(data),
+                  "初始 history 设置 set_demilitarized_zone = yes；TNO 文件：history/states/1650-Caqueta.txt:19；history/states/2447-Putumayo.txt:16；history/states/2448-Amazonas Colombia.txt:16；history/states/2449-Norte de Santander.txt:9；history/states/493-La Guajira.txt:9；按同名省近似"),
             layer("preset-french-dmz", "demilitarized", "French Demilitarized Belt", "法国非军事化地带",
                   french_dmz(data), "TNO 州 15/16/788/1625/1626/1635 set_demilitarized_zone"),
             layer("preset-sichuan-dmz", "demilitarized", "Sichuan Demilitarized States", "四川非军事化地带",
