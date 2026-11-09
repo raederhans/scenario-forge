@@ -1,6 +1,11 @@
 {
   "schema_version": 1,
   "assets": {
+    "defense_line_presets": {
+      "url": "data/operational_presets/defense_lines.json",
+      "role": "defense_line_presets",
+      "description": "Scenario defense line presets added on demand as editable operational lines."
+    },
     "build_manifest": {
       "url": "data/manifest.json",
       "role": "build_manifest",
