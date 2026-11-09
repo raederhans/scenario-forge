@@ -1041,7 +1041,7 @@ export async function waitForStandardPerfSettlement(readObservation, scenarioId,
       }
     }
     if (initialPromotion && initialFrameSequence === null) {
-      const sample = findInitialScenarioRenderSample(last.snapshot, scenarioId, initialPromotion);
+      const sample = findInitialScenarioRenderSample(last.snapshot, scenarioId);
       if (sample) {
         initialFrameSequence = sample.sequence;
         initialSamplePrefix = structuredClone(last.snapshot.renderSamples.samples.slice(0, sample.index + 1));

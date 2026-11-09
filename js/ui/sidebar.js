@@ -22,6 +22,7 @@ import {
   deleteSelectedOperationGraphic,
   deleteSelectedOperationGraphicVertex,
   deleteSelectedOperationalLine,
+  addScenarioDefenseLinePresets,
   deleteSelectedUnitCounter,
   finishOperationGraphicDraw,
   finishOperationalLineDraw,
@@ -69,7 +70,8 @@ import { createScenarioInspectorController, renderCountryGroupButtons } from "./
 import { createRegionalPresetController } from "./sidebar/regional_preset_controller.js";
 import { createCountryInspectorController } from "./sidebar/country_inspector_controller.js";
 import { createRegionSearchController } from "./sidebar/region_search_controller.js";
-import { selectLandFeatureById } from "../core/map_renderer.js";
+import { getCachedEffectiveCityCollection, selectLandFeatureById } from "../core/map_renderer.js";
+import { isRenamedPlace, listRenamedPlacesInFeatures } from "../core/renderer/modern_place_name.js";
 import { createStrategicOverlayController } from "./sidebar/strategic_overlay_controller.js";
 import { createWaterSpecialRegionController } from "./sidebar/water_special_region_controller.js";
 import { createProjectSupportDiagnosticsController } from "./sidebar/project_support_diagnostics_controller.js";
@@ -187,6 +189,7 @@ const mapRenderer = Object.freeze({
   deleteSelectedOperationGraphic,
   deleteSelectedOperationGraphicVertex,
   deleteSelectedOperationalLine,
+  addScenarioDefenseLinePresets,
   deleteSelectedUnitCounter,
   finishOperationGraphicDraw,
   finishOperationalLineDraw,
@@ -3137,10 +3140,33 @@ function initSidebar({ render } = {}) {
   regionSearchController.mount(countryInspectorDetail);
   countryInspectorSelected.after(countryInspectorDetail.lastElementChild);
 
+  const renamedPlacesCache = { features: null, hasAny: false };
   const countryInspectorController = createCountryInspectorController({
     resolveInspectorGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
     stepUpInspectorSelection: () => callRuntimeHook(runtimeState, "stepUpInspectorSelectionFn"),
     getInspectorFeatureLabel: (id) => getGeoFeatureDisplayLabel(runtimeState.landIndex.get(id)),
+    hasScenarioRenamedPlaces: () => {
+      const features = getCachedEffectiveCityCollection()?.features;
+      if (!Array.isArray(features)) return false;
+      if (renamedPlacesCache.features !== features) {
+        renamedPlacesCache.features = features;
+        renamedPlacesCache.hasAny = features.some((feature) => {
+          const props = feature?.properties || {};
+          return isRenamedPlace(props.__city_display_name_override?.en, props.__city_base_display_name?.en);
+        });
+      }
+      return renamedPlacesCache.hasAny;
+    },
+    getRenamedPlacesInFeatures: (featureIds) => listRenamedPlacesInFeatures(
+      getCachedEffectiveCityCollection()?.features, featureIds, runtimeState.currentLanguage,
+    ),
+    // 转发给外观面板的开关，由它统一改状态、重绘地图并回刷检查器。
+    setShowModernPlaceNames: (enabled) => {
+      const appearanceToggle = document.getElementById("showModernPlaceNames");
+      if (!appearanceToggle) return;
+      appearanceToggle.checked = !!enabled;
+      appearanceToggle.dispatchEvent(new Event("change", { bubbles: true }));
+    },
     onSelectedCountryRendered: regionSearchController.setCountry,
     runtimeState: state,
     list,
