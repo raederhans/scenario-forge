@@ -3810,6 +3810,35 @@
       </div>
     </div>
 
+    <script>
+      // 模块图加载完成前（主模块还在下载/解析）遮罩只有 HTML 里的英文静态文案。
+      // 这里按 hydrateLanguage() 的同一优先级（?lang → 已存偏好 → 浏览器语言）提前定好语言，
+      // 把 <html lang> 和遮罩文案先切到中文，避免"先英文、后中文"。译文取自现有目录
+      // （locales_baseline.json / manual_ui.json）里这两个 data-i18n 键的 zh 值；
+      // 模块起来后由 i18n.js 与 startup_boot_overlay.js 接管。
+      (function () {
+        var pick = function (v) {
+          v = String(v || "").trim().toLowerCase();
+          return /^zh(?:[-_]|$)/.test(v) ? "zh" : /^en(?:[-_]|$)/.test(v) ? "en" : null;
+        };
+        var lang = null;
+        try { lang = pick(new URLSearchParams(location.search).get("lang")); } catch (e) {}
+        try {
+          ["scenario_forge_language", "map_lang", "scenario_forge_landing_lang"].forEach(function (k) {
+            if (!lang) lang = pick(localStorage.getItem(k));
+          });
+        } catch (e) {}
+        lang = lang || pick(navigator.language) || "en";
+        if (lang !== "zh") return;
+        document.documentElement.lang = "zh-CN";
+        var set = function (id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
+        set("bootOverlayTitle", "正在准备默认剧本");
+        set("bootOverlayMessage", "正在准备地图。");
+        set("bootOverlayErrorSummary", "技术详情");
+        set("bootRetryBtn", "重试");
+        set("bootContinueBtn", "无剧本继续");
+      })();
+    </script>
     <script src="vendor/d3.v7.min.js"></script>
     <script src="vendor/topojson-client.min.js"></script>
     <script type="module" src="js/main.js"></script>

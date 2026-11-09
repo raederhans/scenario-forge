@@ -453,6 +453,8 @@ async function finalizeReadyState(renderDispatcher) {
 }
 
 async function bootstrap() {
+  // 语言要在遮罩第一次同步前就绪，否则 initializeBootOverlay() 会先按默认 "en" 写一次英文文案。
+  hydrateLanguage();
   initializeBootOverlay();
   if (!globalThis.d3 || !globalThis.topojson) {
     console.error("D3/topojson not loaded. Ensure scripts are included before main.js.");
@@ -464,7 +466,6 @@ async function bootstrap() {
     return;
   }
 
-  hydrateLanguage();
   resetBootMetrics();
   setBootPreviewVisibleState(state, false);
   setBootState("shell", {
