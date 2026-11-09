@@ -12239,17 +12239,65 @@ function focusWaterRegionById(id) {
   if (wrapsDateLine && (!wrappedCenter || !wrappedCenter.every(Number.isFinite))) return false;
   const extentX = Math.max(1, wrapsDateLine ? wrappedWidth : bounds.maxX - bounds.minX);
   const extentY = Math.max(1, bounds.maxY - bounds.minY);
-  const fitScale = Math.min(runtimeState.width * 0.72 / extentX, runtimeState.height * 0.72 / extentY);
-  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, fitScale));
   const centerX = wrapsDateLine ? wrappedCenter[0] : (bounds.minX + bounds.maxX) / 2;
   const centerY = wrapsDateLine ? wrappedCenter[1] : (bounds.minY + bounds.maxY) / 2;
-  const nextTransform = globalThis.d3.zoomIdentity
-    .translate(runtimeState.width / 2, runtimeState.height / 2)
-    .scale(scale)
-    .translate(-centerX, -centerY);
-  globalThis.d3.select(interactionRect.node()).transition().duration(420)
-    .call(zoomBehavior.transform, nextTransform);
+  return focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate: true });
+}
+
+function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate, pinWorldTop = false }) {
+  const interactionRect = rendererSurfaceHost.getInteractionRect();
+  const zoomBehavior = rendererSurfaceHost.getZoomBehavior();
+  if (!interactionRect?.node() || !zoomBehavior || !globalThis.d3?.zoomIdentity
+    || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
+  const fitScale = Math.min(runtimeState.width * 0.72 / extentX, runtimeState.height * 0.72 / extentY);
+  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, fitScale));
+  const node = interactionRect.node();
+  updateZoomTranslateExtent();
+  // zoom.transform 不经过平移范围约束；先按 translateExtent 约束，避免视角越过世界边缘。
+  const nextTransform = zoomBehavior.constrain()(
+    globalThis.d3.zoomIdentity
+      .translate(runtimeState.width / 2, runtimeState.height / 2)
+      .scale(scale)
+      .translate(-centerX, -centerY),
+    zoomBehavior.extent().call(node, node.__data__, 0, [node]),
+    zoomBehavior.translateExtent(),
+  );
+  const targetTransform = pinWorldTop ? pinTransformToWorldTop(nextTransform) : nextTransform;
+  const selection = globalThis.d3.select(node);
+  // 与其他相机命令一致：系统开启"减少动画"时直接跳到目标视角。
+  const reduceMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
+  const target = animate && !reduceMotion ? selection.transition().duration(420) : selection;
+  target.call(zoomBehavior.transform, targetTransform);
   return true;
+}
+
+// 平移范围允许世界上沿露在视口内，高纬度开场时上方会出现一段地图外的空白。
+// 只上推到世界上沿贴住视口顶部，缩放不变；世界比视口矮时保持原位，避免把空白挪到下方。
+function pinTransformToWorldTop(transform) {
+  const projection = rendererSurfaceHost.getProjection();
+  const [[, worldTop], [, worldBottom]] = globalThis.d3.geoPath(projection).bounds({ type: "Sphere" });
+  if (!Number.isFinite(worldTop) || !Number.isFinite(worldBottom)) return transform;
+  if ((worldBottom - worldTop) * transform.k < runtimeState.height) return transform;
+  const topOnScreen = transform.y + transform.k * worldTop;
+  if (topOnScreen <= 0) return transform;
+  return globalThis.d3.zoomIdentity.translate(transform.x, transform.y - topOnScreen).scale(transform.k);
+}
+
+function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
+  const projection = rendererSurfaceHost.getProjection();
+  if (!projection || !globalThis.d3?.geoPath) return false;
+  const bounds = globalThis.d3.geoPath(projection).bounds({
+    type: "Polygon",
+    coordinates: [[[west, north], [east, north], [east, south], [west, south], [west, north]]],
+  });
+  if (!bounds.flat().every(Number.isFinite)) return false;
+  const [[minX, minY], [maxX, maxY]] = bounds;
+  return focusProjectedBounds({
+    extentX: Math.max(1, maxX - minX),
+    extentY: Math.max(1, maxY - minY),
+    centerX: (minX + maxX) / 2,
+    centerY: (minY + maxY) / 2,
+  }, { animate, pinWorldTop: true });
 }
 
 const resolveMarineInteriorAnchor = createMarineInteriorAnchorResolver();
@@ -15560,6 +15608,7 @@ export {
   getEffectiveCityCollection,
   isOpenOceanOverlayActive,
   focusWaterRegionById,
+  focusGeoBounds,
   focusRiverPaintParentById,
   applyRiverPaintCellById,
   renderExportPassesToCanvas,
