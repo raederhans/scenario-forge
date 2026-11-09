@@ -2,6 +2,153 @@
   "version": 1,
   "layers": [
     {
+      "id": "preset-western-sahara",
+      "name": "Western Sahara",
+      "nameZh": "西撒哈拉（地位未定）",
+      "presetId": "claim",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "style": {
+        "fill": "#fb923c",
+        "stroke": "#c2410c",
+        "fillOpacity": 0.06,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "dashHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
+      "memberFeatureIds": [
+        "EH_ADMIN0_PASSTHROUGH",
+        "MAR-3456",
+        "MAR-3469"
+      ],
+      "note": "西撒哈拉地位未定；摩洛哥实控大部、波利萨里奥主张，采用 EH 及 MA 下两个南部大区近似"
+    },
+    {
+      "id": "preset-southern-kurils",
+      "name": "Southern Kuril Islands",
+      "nameZh": "南千岛群岛（北方四岛）争议",
+      "presetId": "claim",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "style": {
+        "fill": "#fb923c",
+        "stroke": "#c2410c",
+        "fillOpacity": 0.06,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "dashHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
+      "memberFeatureIds": [
+        "RU_RAY_50074027B16974547320790",
+        "RU_RAY_50074027B75924608914452"
+      ],
+      "note": "俄罗斯实控、日本主张；按南库里尔区与库里尔区岛屿地块近似，包含择捉以北岛屿，约 5815 平方公里，未超过四岛约 5000 平方公里的三倍"
+    },
+    {
+      "id": "preset-falkland-islands",
+      "name": "Falkland Islands",
+      "nameZh": "福克兰（马尔维纳斯）群岛争议",
+      "presetId": "claim",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "style": {
+        "fill": "#fb923c",
+        "stroke": "#c2410c",
+        "fillOpacity": 0.06,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "dashHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
+      "memberFeatureIds": [
+        "FK"
+      ],
+      "note": "英国实控、阿根廷主张；采用 FK 群岛地块"
+    },
+    {
+      "id": "preset-kosovo-status",
+      "name": "Kosovo status",
+      "nameZh": "科索沃地位争议",
+      "presetId": "claim",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "style": {
+        "fill": "#fb923c",
+        "stroke": "#c2410c",
+        "fillOpacity": 0.06,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "dashHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
+      "memberFeatureIds": [
+        "XK_ADM1_KOS-5886",
+        "XK_ADM1_KOS-5887",
+        "XK_ADM1_KOS-5888",
+        "XK_ADM1_KOS-5889",
+        "XK_ADM1_KOS-5890",
+        "XK_ADM1_KOS-5891",
+        "XK_ADM1_KOS-5892",
+        "XK_ADM1_KOS-5893",
+        "XK_ADM1_KOS-5894",
+        "XK_ADM1_KOS-5895",
+        "XK_ADM1_KOS-5896",
+        "XK_ADM1_KOS-5897",
+        "XK_ADM1_KOS-5898",
+        "XK_ADM1_KOS-5899",
+        "XK_ADM1_KOS-5900",
+        "XK_ADM1_KOS-5901",
+        "XK_ADM1_KOS-5902",
+        "XK_ADM1_KOS-5903",
+        "XK_ADM1_KOS-5904",
+        "XK_ADM1_KOS-5905",
+        "XK_ADM1_KOS-5906",
+        "XK_ADM1_KOS-5907",
+        "XK_ADM1_KOS-5908",
+        "XK_ADM1_KOS-5909",
+        "XK_ADM1_KOS-5910",
+        "XK_ADM1_KOS-5911",
+        "XK_ADM1_KOS-5912",
+        "XK_ADM1_KOS-5913",
+        "XK_ADM1_KOS-5914",
+        "XK_ADM1_KOS-5915"
+      ],
+      "note": "科索沃独立地位存在争议，塞尔维亚主张；采用 XK 地块"
+    },
+    {
+      "id": "preset-antarctic-overlap",
+      "name": "Overlapping Antarctic Claims",
+      "nameZh": "南极领土主张重叠区",
+      "presetId": "claim",
+      "source": "scenario",
+      "visible": false,
+      "legendVisible": true,
+      "style": {
+        "fill": "#fb923c",
+        "stroke": "#c2410c",
+        "fillOpacity": 0.06,
+        "strokeOpacity": 0.92,
+        "strokeWidth": 1.3,
+        "pattern": "dashHatch",
+        "patternOpacity": 0.42,
+        "revision": 1
+      },
+      "memberFeatureIds": [
+        "AQ_PEN_OVERLAP_CORE"
+      ],
+      "note": "阿根廷、智利、英国三方主张共同重叠的西经 74–53 度扇区；采用现有南极扇区地块"
+    },
+    {
       "id": "preset-golan-dispute",
       "name": "Golan Heights Dispute",
       "nameZh": "戈兰高地争议区",

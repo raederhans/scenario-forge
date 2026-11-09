@@ -206,6 +206,31 @@ def bohemia_moravia(data: ScenarioData):
     return [fid for fid in data.owned_by("BOM") if data.props(fid).get("cntr_code") == "CZ"]
 
 
+def western_sahara(data: ScenarioData):
+    # EH 地块只覆盖部分西撒哈拉；另纳入现代数据列在 MA 下的两个南部大区，合计约 24 万平方公里。
+    return ([fid for fid in data.features if data.props(fid).get("cntr_code") == "EH"]
+            + data.by_names(["Laâyoune - Boujdour - Sakia El Hamra", "Oued el Dahab"],
+                            cntr_code="MA", bbox=(-18, 20, -8, 28)))
+
+
+def southern_kurils(data: ScenarioData):
+    # 国后、色丹、齿舞属南库里尔区；库里尔区含择捉及以北岛屿，两地块约 5815 km²，未超过四岛约 5000 km² 的三倍。
+    return data.by_names(["Yuzhno-Kurilsky District", "Kurilsky District"],
+                         cntr_code="RU", bbox=(145, 43, 153, 48))
+
+
+def antarctic_overlap(data: ScenarioData):
+    # 阿根廷、智利、英国三方共同重叠为西经 74–53 度；两侧扇区分别仅为两方重叠，不纳入。
+    return data.by_names(["Antarctica / Peninsula 74W-53W Overlap Sector"],
+                         cntr_code="AQ", bbox=(-74, -90, -53, -60))
+
+
+def colombian_dmz(data: ScenarioData):
+    # TNO 五个初始非军事州与现代同名省对应；约 26.7 万平方公里，采用省级范围近似。
+    return data.by_names(["Caquetá", "Putumayo", "Amazonas", "Norte de Santander", "La Guajira"],
+                         cntr_code="CO", bbox=(-78, -5, -66, 13))
+
+
 # 与 js/core/special_zone_layers.js 的 SPECIAL_ZONE_PRESETS 默认样式保持一致；剧本契约要求每层带完整 style。
 PRESET_STYLES = {
     "demilitarized": ("#f6e05e", "#b7791f", 0.08, "fineHatch", 0.42),
@@ -317,6 +342,9 @@ def build(scenario_id: str):
         ]
     elif scenario_id == "tno_1962":
         layers += [
+            layer("preset-colombia-dmz", "demilitarized", "Colombian Demilitarized States", "哥伦比亚非军事化州",
+                  colombian_dmz(data),
+                  "初始 history 设置 set_demilitarized_zone = yes；TNO 文件：history/states/1650-Caqueta.txt:19；history/states/2447-Putumayo.txt:16；history/states/2448-Amazonas Colombia.txt:16；history/states/2449-Norte de Santander.txt:9；history/states/493-La Guajira.txt:9；按同名省近似"),
             layer("preset-french-dmz", "demilitarized", "French Demilitarized Belt", "法国非军事化地带",
                   french_dmz(data), "TNO 州 15/16/788/1625/1626/1635 set_demilitarized_zone"),
             layer("preset-sichuan-dmz", "demilitarized", "Sichuan Demilitarized States", "四川非军事化地带",
@@ -334,6 +362,18 @@ def build(scenario_id: str):
         ]
     elif scenario_id == "modern_world":
         layers += [
+            layer("preset-western-sahara", "claim", "Western Sahara", "西撒哈拉（地位未定）",
+                  western_sahara(data), "西撒哈拉地位未定；摩洛哥实控大部、波利萨里奥主张，采用 EH 及 MA 下两个南部大区近似"),
+            layer("preset-southern-kurils", "claim", "Southern Kuril Islands", "南千岛群岛（北方四岛）争议",
+                  southern_kurils(data), "俄罗斯实控、日本主张；按南库里尔区与库里尔区岛屿地块近似，包含择捉以北岛屿，约 5815 平方公里，未超过四岛约 5000 平方公里的三倍"),
+            layer("preset-falkland-islands", "claim", "Falkland Islands", "福克兰（马尔维纳斯）群岛争议",
+                  [fid for fid in data.features if data.props(fid).get("cntr_code") == "FK"],
+                  "英国实控、阿根廷主张；采用 FK 群岛地块"),
+            layer("preset-kosovo-status", "claim", "Kosovo status", "科索沃地位争议",
+                  [fid for fid in data.features if data.props(fid).get("cntr_code") == "XK"],
+                  "科索沃独立地位存在争议，塞尔维亚主张；采用 XK 地块"),
+            layer("preset-antarctic-overlap", "claim", "Overlapping Antarctic Claims", "南极领土主张重叠区",
+                  antarctic_overlap(data), "阿根廷、智利、英国三方主张共同重叠的西经 74–53 度扇区；采用现有南极扇区地块"),
             layer("preset-golan-dispute", "claim", "Golan Heights Dispute", "戈兰高地争议区",
                   data.require(["ISR-3056__SPLIT_GOLAN_HEIGHTS", "SYR-5261__SPLIT_GOLAN_HEIGHTS"]),
                   "Natural Earth 争议区 1159320905；以色列实控、叙利亚法理"),

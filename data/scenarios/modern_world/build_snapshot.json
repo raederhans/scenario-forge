@@ -14,12 +14,12 @@
     "geo_locale_patch.json": "22e39c12d095b293a74848c0079cbed82a3516bfaaa90de58dc1586b9a28c1d8",
     "owners.by_feature.json": "c639eec0cf513079c677de56c89db4b3000a0cd2e31c560aaab397a63c77c2b2",
     "runtime_topology.topo.json": "48215cc527e437d17634e994c5698b5706f9166cee9b59b90dc370b0367aee3b",
-    "special_zone_layers.json": "10d5f94ec1bea75ea4906962470b0e474a3be4425a894505e9d3f59ad6e1843f"
+    "special_zone_layers.json": "2dc725d3ccaa7453286f8381e6b4c151e53a7274e730ca6ce84eee17563080f0"
   },
   "output_sha": {},
   "profile": "lightweight_base",
   "report_paths": {},
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "6e3fa2d4411ad611d2b8ea7c7c9127a47874ed01a98624e929e00cb9d4d2ba92",
+  "snapshot_fingerprint": "2d129847297a2495adf9c986ac7a6cd71e1fb4813c5ba9a38856a4fa411ded97",
   "water_count": 0
 }

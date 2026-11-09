@@ -16,6 +16,10 @@ class SpecialZonePresetTest(unittest.TestCase):
         expected = {
             "hoi4_1939": {"preset-sudetenland": "claim", "preset-bohemia-moravia": "occupation",
                           "preset-memel": "claim", "preset-albania-occupation": "occupation", "preset-hatay": "claim"},
+            "modern_world": {"preset-western-sahara": "claim", "preset-southern-kurils": "claim",
+                             "preset-falkland-islands": "claim", "preset-kosovo-status": "claim",
+                             "preset-antarctic-overlap": "claim"},
+            "tno_1962": {"preset-colombia-dmz": "demilitarized"},
         }
         for scenario, presets in expected.items():
             data = ScenarioData(scenario)
