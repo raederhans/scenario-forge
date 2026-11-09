@@ -320,6 +320,22 @@ test("account dialog and quick color labels refresh without clearing entered val
   await page.locator("#backendAccountCloseBtn").click();
 });
 
+test("scenario picker keeps the current name visible beside the intro button", async ({ page }) => {
+  await openWorkspace(page);
+  await page.locator("#editorProjectBar .editor-scenario-menu summary").click();
+  const selectButton = page.locator("#scenarioSelectButton");
+  const introButton = page.locator("#scenarioIntroButton");
+  await expect(selectButton).toBeVisible();
+  const selectBox = await selectButton.boundingBox();
+  const introBox = await introButton.boundingBox();
+  expect(selectBox.width).toBeGreaterThan(introBox.width * 3);
+  expect(selectBox.x + selectBox.width).toBeLessThanOrEqual(introBox.x);
+  await selectButton.click();
+  await expect(page.locator("#scenarioSelectMenu")).toBeVisible();
+  const option = page.locator('#scenarioSelectMenu .scenario-select-option[data-value]:not([data-value=""])').first();
+  await expect(option).toBeVisible();
+});
+
 test("managed scenario disclosure survives selection and runtime refresh", async ({ page }) => {
   await openWorkspace(page);
   const disclosure = page.locator("#editorProjectBar .editor-scenario-menu");
