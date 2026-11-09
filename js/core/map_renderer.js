@@ -12244,7 +12244,7 @@ function focusWaterRegionById(id) {
   return focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate: true });
 }
 
-function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate }) {
+function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate, pinWorldTop = false }) {
   const interactionRect = rendererSurfaceHost.getInteractionRect();
   const zoomBehavior = rendererSurfaceHost.getZoomBehavior();
   if (!interactionRect?.node() || !zoomBehavior || !globalThis.d3?.zoomIdentity
@@ -12262,12 +12262,25 @@ function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate 
     zoomBehavior.extent().call(node, node.__data__, 0, [node]),
     zoomBehavior.translateExtent(),
   );
+  const targetTransform = pinWorldTop ? pinTransformToWorldTop(nextTransform) : nextTransform;
   const selection = globalThis.d3.select(node);
   // 与其他相机命令一致：系统开启"减少动画"时直接跳到目标视角。
   const reduceMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
   const target = animate && !reduceMotion ? selection.transition().duration(420) : selection;
-  target.call(zoomBehavior.transform, nextTransform);
+  target.call(zoomBehavior.transform, targetTransform);
   return true;
+}
+
+// 平移范围允许世界上沿露在视口内，高纬度开场时上方会出现一段地图外的空白。
+// 只上推到世界上沿贴住视口顶部，缩放不变；世界比视口矮时保持原位，避免把空白挪到下方。
+function pinTransformToWorldTop(transform) {
+  const projection = rendererSurfaceHost.getProjection();
+  const [[, worldTop], [, worldBottom]] = globalThis.d3.geoPath(projection).bounds({ type: "Sphere" });
+  if (!Number.isFinite(worldTop) || !Number.isFinite(worldBottom)) return transform;
+  if ((worldBottom - worldTop) * transform.k < runtimeState.height) return transform;
+  const topOnScreen = transform.y + transform.k * worldTop;
+  if (topOnScreen <= 0) return transform;
+  return globalThis.d3.zoomIdentity.translate(transform.x, transform.y - topOnScreen).scale(transform.k);
 }
 
 function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
@@ -12284,7 +12297,7 @@ function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
     extentY: Math.max(1, maxY - minY),
     centerX: (minX + maxX) / 2,
     centerY: (minY + maxY) / 2,
-  }, { animate });
+  }, { animate, pinWorldTop: true });
 }
 
 const resolveMarineInteriorAnchor = createMarineInteriorAnchorResolver();

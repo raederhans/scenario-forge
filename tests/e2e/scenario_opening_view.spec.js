@@ -12,6 +12,15 @@ async function viewportBounds(page) {
   });
 }
 
+// 世界上沿（北极）相对地图容器顶部的像素，<= 0 表示开场不露地图外的空白。
+async function worldTopOffset(page) {
+  return page.evaluate(async () => {
+    const point = await globalThis.__scenarioForgeTestApi.screenPointForLonLat(20, 90);
+    const y = Array.isArray(point) ? point[1] : point.y;
+    return y - document.querySelector("#mapContainer").getBoundingClientRect().top;
+  });
+}
+
 function containsLonLat([west, south, east, north], [lon, lat]) {
   return lon >= west && lon <= east && lat >= south && lat <= north;
 }
@@ -38,6 +47,7 @@ test("scenarios open on their own stage: TNO on Eurasia at startup, HOI4 on Euro
     expect(containsLonLat(tno.bounds, point), `TNO opening view should show ${point}`).toBe(true);
   }
   expect(containsLonLat(tno.bounds, [-100, 40]), "TNO opening view should not be the whole world").toBe(false);
+  expect(await worldTopOffset(page), "TNO opening view should not show blank space above the world").toBeLessThanOrEqual(1);
 
   await applyScenarioFromPicker(page, "hoi4_1936");
   const hoi4 = await viewportBounds(page);
@@ -46,6 +56,7 @@ test("scenarios open on their own stage: TNO on Eurasia at startup, HOI4 on Euro
     expect(containsLonLat(hoi4.bounds, point), `HOI4 opening view should show ${point}`).toBe(true);
   }
   expect(containsLonLat(hoi4.bounds, [121.5, -25.5]), "HOI4 opening view should not include Australia").toBe(false);
+  expect(await worldTopOffset(page), "HOI4 opening view should not show blank space above the world").toBeLessThanOrEqual(1);
 
   await applyScenarioFromPicker(page, "modern_world");
   const modern = await viewportBounds(page);
