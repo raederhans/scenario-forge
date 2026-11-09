@@ -218,6 +218,8 @@ function createScenarioLifecycleRuntime({
     const previousScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
     const hasBaselineRuntimeTopology = !!runtimeState.defaultRuntimePoliticalTopology?.objects?.political;
     const hasBaselineDetailTopology = !!runtimeState.topologyDetail?.objects?.political;
+    // Only a chunked scenario completes the promotion without the detail topology.
+    const skippedDetailTopology = !!runtimeState.detailPromotionCompleted && !hasBaselineDetailTopology;
     if (runtimeState.runtimeChunkLoadState?.refreshTimerId) {
       globalThis.clearTimeout(runtimeState.runtimeChunkLoadState.refreshTimerId);
     }
@@ -240,7 +242,7 @@ function createScenarioLifecycleRuntime({
     runtimeState.runtimePoliticalTopology = runtimeState.defaultRuntimePoliticalTopology || null;
     // 清空 scenario 后回到 startup baseline；coarse topology 可见时仍允许 detail promotion 延后完成。
     runtimeState.topologyBundleMode = hasBaselineDetailTopology ? "composite" : "single";
-    runtimeState.detailDeferred = hasBaselineRuntimeTopology && !hasBaselineDetailTopology;
+    runtimeState.detailDeferred = (hasBaselineRuntimeTopology || skippedDetailTopology) && !hasBaselineDetailTopology;
     runtimeState.detailPromotionInFlight = false;
     runtimeState.detailPromotionCompleted = hasBaselineDetailTopology;
     resetScenarioChunkRuntimeState({ scenarioId: "" });
@@ -302,6 +304,8 @@ function createScenarioLifecycleRuntime({
         tone: "success",
       });
     }
+    // Chunked scenarios never load the default detail topology; the base map does need it.
+    if (runtimeState.detailDeferred) void runtimeState.ensureDetailTopologyFn?.();
   }
 
   return {
