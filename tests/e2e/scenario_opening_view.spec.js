@@ -36,14 +36,14 @@ async function applyScenarioFromPicker(page, scenarioId) {
   await waitForSettled(page, { scenarioId });
 }
 
-test("scenarios open on their own stage: TNO on Eurasia at startup, HOI4 on Europe after switching, modern on the world", async ({ page }) => {
+test("scenarios open on their own stage: TNO on western Eurasia at startup, HOI4 on Europe after switching, modern on the world", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${APP_PATH}&default_scenario=tno_1962`, { waitUntil: "domcontentloaded" });
   await waitForSettled(page, { scenarioId: "tno_1962" });
 
   const tno = await viewportBounds(page);
-  expect(tno.k).toBeGreaterThan(1.5);
-  for (const point of [[10, 50], [37.6, 55.8], [70, 45]]) {
+  expect(tno.k).toBeGreaterThan(3);
+  for (const point of [[-3.7, 40.4], [13.4, 52.5], [37.6, 55.8], [44.4, 33.3]]) {
     expect(containsLonLat(tno.bounds, point), `TNO opening view should show ${point}`).toBe(true);
   }
   expect(containsLonLat(tno.bounds, [-100, 40]), "TNO opening view should not be the whole world").toBe(false);
@@ -51,7 +51,7 @@ test("scenarios open on their own stage: TNO on Eurasia at startup, HOI4 on Euro
 
   await applyScenarioFromPicker(page, "hoi4_1936");
   const hoi4 = await viewportBounds(page);
-  expect(hoi4.k).toBeGreaterThan(tno.k);
+  expect(hoi4.k).toBeGreaterThan(3);
   for (const point of [[2.35, 48.85], [13.4, 52.5], [21, 52.2]]) {
     expect(containsLonLat(hoi4.bounds, point), `HOI4 opening view should show ${point}`).toBe(true);
   }

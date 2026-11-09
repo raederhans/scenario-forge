@@ -3176,10 +3176,10 @@
   "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson",
   "opening_view": {
     "bounds": [
-      -15,
-      22,
-      80,
-      66
+      -12,
+      34,
+      48,
+      63
     ]
   }
 }
