@@ -4,6 +4,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 import { createScenarioRefreshRuntime } from "../js/core/map_renderer/scenario_refresh_runtime.js";
 import { captureScenarioRefreshState, resolveScenarioRefreshScope, isScenarioRefreshSceneCurrent } from "../js/core/map_renderer/scenario_refresh_scope.js";
+import { scenarioSupportsChunkedRuntime } from "../js/core/scenario/bundle_loader.js";
 const topology = () => ({ objects: { political: { geometries: [] } } });
 function fixture() {
   const state = { activeScenarioId: "tno", sceneGeneration: 1, currentScenarioApplyRequestId: 1,
@@ -105,7 +106,7 @@ function bootstrapFixture({ useRealRefresh = false } = {}) {
   let resolveLoad;
   const load = new Promise(resolve => { resolveLoad = resolve; });
   const calls = [], queued = [], loadRequests = [];
-  const scope = { console: { warn() {}, info() {} }, isScenarioRefreshSceneCurrent,
+  const scope = { console: { warn() {}, info() {} }, isScenarioRefreshSceneCurrent, scenarioSupportsChunkedRuntime,
     captureScenarioRefreshState: () => captureScenarioRefreshState(f.state, 1),
     refreshMapDataForScenarioApply: (options) => {
       calls.push(["refresh", options]);
