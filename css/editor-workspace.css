@@ -167,8 +167,8 @@
 .editor-workspace .range-row { align-items: baseline; gap: 12px; }
 .editor-workspace .range-label { min-width: 0; white-space: normal; overflow-wrap: break-word; }
 .editor-workspace .range-value { flex-shrink: 0; font-variant-numeric: tabular-nums; }
-.editor-workspace input[type="range"].range-input { min-height: 28px; cursor: pointer; }
-.editor-workspace input[type="range"].range-input:disabled { cursor: default; }
+.editor-workspace input[type="range"] { min-height: var(--hit-min); cursor: pointer; }
+.editor-workspace input[type="range"]:disabled { cursor: default; }
 .editor-workspace :is(button, input, select) { font-family: inherit; }
 .editor-workspace :is(.sidebar-shell-heading, .sidebar-field-label, .sidebar-group-label, .appearance-tab-btn) { letter-spacing: 0; text-transform: none; }
 .editor-workspace .editor-task-panel > .color-library-card { padding: 0; border: 0; background: none; }
