@@ -1,4 +1,8 @@
 {
+  "Add scenario defense lines": "添加剧本预置防线",
+  "{count} preset lines; {present} already on map": "{count} 条预置防线；{present} 条已在地图上",
+  "No preset defense lines for this scenario.": "当前剧本没有预置防线。",
+  "Added {count} defense lines": "已添加 {count} 条防线",
   "Territory": "领土",
   "Boundary variant": "疆界变体",
   "Apply territory": "应用领土",
@@ -1067,6 +1071,7 @@
   "Source details": "来源详情",
   "Drag layers in the middle board to change their drawing order.": "在中间排序板拖动图层以调整绘制顺序。",
   "Dataset": "数据集",
+  "No renamed places in this selection": "所选范围内没有改名城市",
   "Notes and sources": "说明与来源",
   "Show": "显示",
   "Regional Presets": "区域预设",

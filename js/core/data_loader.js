@@ -1276,6 +1276,7 @@ async function loadTopologyBundle({
   renderProfile,
   prefetchedPrimaryTopology = null,
   prefetchedPrimaryMetrics = null,
+  deferDetail = false,
 } = {}) {
   const variant = resolveTopologyVariant();
   if (variant?.url) {
@@ -1329,7 +1330,7 @@ async function loadTopologyBundle({
     };
   }
 
-  if (shouldDeferDetailLoad(renderProfile)) {
+  if (deferDetail || shouldDeferDetailLoad(renderProfile)) {
     console.info(
       `[data_loader] render_profile=${renderProfile} deferred detail loading. Starting in coarse-only primary mode.`
     );
@@ -1801,6 +1802,9 @@ export async function loadMapData({
       renderProfile,
       prefetchedPrimaryTopology: startupBootArtifacts?.topologyPrimary || null,
       prefetchedPrimaryMetrics: startupBootArtifacts?.resourceMetrics?.topologyPrimary || null,
+      // A scenario bootstrap brings its own political runtime, so the detail
+      // topology must not hold startup back; the deferred promotion decides later.
+      deferDetail: !!startupBootArtifacts?.hasScenarioRuntimeBootstrap,
     })
   ));
   const runtimePoliticalPromise = Promise.all([startupBootArtifactsPromise, topologyBundlePromise]).then(

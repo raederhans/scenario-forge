@@ -279,20 +279,29 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     skippedByVisibilityUpperBound: 0, chineseGlyphRequests: 0,
   };
 
-  // 中文标签字体按 unicode-range 切片发布；canvas 画字不会按需拉取切片，所以对本剧本全部标签文本
-  // 显式请求一次所需切片，加载完成后由 map_renderer 的 loadingdone 监听清文本缓存并重绘。
+  // 中文标签字体按 unicode-range 切片发布；canvas 画字不会按需拉取切片，所以对标签文本显式请求
+  // 所需切片，加载完成后由 map_renderer 的 loadingdone 监听清文本缓存并重绘。
+  // 标签源在国名、本地化或别名变化时会换新的 countries 数组而不改 revision，所以按数组身份判断
+  // 是否要重新扫描，并只请求此前没请求过的字符。
   const getFontSet = helpers.getFontSet || (() => globalThis.document?.fonts);
-  let requestedChineseGlyphsKey = "";
+  const requestedChineseGlyphs = new Set();
+  let scannedChineseCountries = null, scannedChineseLanguage = "";
   function requestChineseLabelGlyphs(source, language) {
     const fonts = getFontSet();
-    const key = `${source?.sourceToken}|${source?.revision}|${language}`;
-    if (typeof fonts?.load !== "function" || key === requestedChineseGlyphsKey) return;
-    requestedChineseGlyphsKey = key;
+    const countries = source?.countries;
+    if (typeof fonts?.load !== "function"
+      || (countries === scannedChineseCountries && language === scannedChineseLanguage)) return;
+    scannedChineseCountries = countries;
+    scannedChineseLanguage = language;
     const glyphs = new Set();
-    for (const record of source?.countries || []) for (const char of displayText(record?.name, language)) glyphs.add(char);
+    for (const record of countries || []) {
+      for (const char of displayText(record?.name, language)) if (!requestedChineseGlyphs.has(char)) glyphs.add(char);
+    }
     if (!glyphs.size) return;
+    for (const char of glyphs) requestedChineseGlyphs.add(char);
     diagnostics.chineseGlyphRequests += 1;
-    Promise.resolve().then(() => fonts.load(`400 16px ${CHINESE_FONT}`, [...glyphs].join(""))).catch(() => {});
+    Promise.resolve().then(() => fonts.load(`400 16px ${CHINESE_FONT}`, [...glyphs].join("")))
+      .catch(() => { for (const char of glyphs) requestedChineseGlyphs.delete(char); });
   }
 
   function storeFit(entry, key, fit) {

@@ -12,6 +12,7 @@ import { refreshScenarioShellOverlays } from "../core/scenario_shell_overlay.js"
 import { patchScenarioChunkLoadState } from "../core/state/actions/scenario_chunk_runtime_actions.js";
 import { setDefaultRuntimePoliticalTopologyState } from "../core/state/actions/scenario_chunk_promotion_actions.js";
 import { isScenarioRefreshSceneCurrent } from "../core/map_renderer/scenario_refresh_scope.js";
+import { scenarioSupportsChunkedRuntime } from "../core/scenario/bundle_loader.js";
 import { getDeferredPromotionDelay } from "./startup_bootstrap_support.js";
 
 const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
@@ -56,6 +57,7 @@ export function createDeferredDetailPromotionOwner({
 
   let deferredPromotionHandle = null;
   let forcedStartupReadonlyInfraRetryCount = 0;
+  let detailSkippedForScenario = false;
 
   function hasDetailTopologyLoaded() {
     return !!runtimeState.topologyDetail?.objects?.political;
@@ -126,15 +128,31 @@ export function createDeferredDetailPromotionOwner({
   }
 
   function shouldAdoptDeferredRuntimePoliticalTopology() {
+    // Booting into a scenario never loads the default runtime topology, and the
+    // base map after leaving it composes from the detail topology instead.
+    if (detailSkippedForScenario) return false;
     if (!String(runtimeState.activeScenarioId || "").trim()) {
       return true;
     }
     return !runtimeState.runtimePoliticalTopology?.objects?.political;
   }
 
+  // A chunked scenario draws political features from its own runtime topology and
+  // chunks. The default detail topology would add nothing to the map, so it can
+  // reach the composite state without the download. Leaving the scenario for one
+  // that needs it loads it again: at apply time or from clearActiveScenario.
+  function activeScenarioOwnsPoliticalDetail() {
+    if (!String(runtimeState.activeScenarioId || "").trim()
+      || !runtimeState.runtimePoliticalTopology?.objects?.political
+      || !scenarioSupportsChunkedRuntime(runtimeState.activeScenarioManifest)) return false;
+    detailSkippedForScenario = true;
+    return true;
+  }
+
   /**
    * 事务：detail topology 准备。
    * 成功路径：加载 detail bundle -> 写入 topology/detail/runtime runtimeState -> 刷新 map data -> 标记 detailPromotionCompleted。
+   * 分片剧本：政治要素来自剧本自己的 runtime 与分片，不下载 detail bundle，直接走同一提交。
    * 恢复路径：加载失败或无 topologyDetail 时保留当前可运行状态并返回 false，调用方按既有启动路径继续。
    */
   async function ensureDetailTopologyReady({
@@ -152,7 +170,7 @@ export function createDeferredDetailPromotionOwner({
     });
     const previousRefreshState = captureScenarioRefreshState();
     let mapDataRefreshed = false;
-    if (hasDetailTopologyLoaded()) {
+    if (hasDetailTopologyLoaded() || activeScenarioOwnsPoliticalDetail()) {
       if (runtimeState.topologyBundleMode !== "composite") {
         runtimeState.topologyBundleMode = "composite";
         if (applyMapData) {

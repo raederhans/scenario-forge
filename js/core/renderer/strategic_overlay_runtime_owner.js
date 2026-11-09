@@ -253,6 +253,24 @@ export function createStrategicOverlayRuntimeOwner({
     renderNow();
   }
 
+  function addScenarioDefenseLinePresets(entries) {
+    if (!entries.length) return 0;
+    const before = captureHistoryState({ strategicOverlay: ["operationalLines"] });
+    commitStrategicOverlayCollectionsState(state, {
+      operationalLines: [...state.operationalLines, ...entries],
+    });
+    setStrategicOverlayDirtyState(state, "operationalLinesDirty", true);
+    commitHistoryEntry({
+      kind: "add-scenario-defense-lines",
+      before,
+      after: captureHistoryState({ strategicOverlay: ["operationalLines"] }),
+    });
+    markDirty("add-scenario-defense-lines");
+    updateStrategicOverlayUi();
+    renderNow();
+    return entries.length;
+  }
+
   function finishOperationalLineDraw() {
     ensureOperationalLineEditorState();
     const kind = String(state.operationalLineEditor.kind || defaultOperationalLineKind);
@@ -550,6 +568,7 @@ export function createStrategicOverlayRuntimeOwner({
     ...unitCounterDomain,
     deleteSelectedOperationalLine,
     finishOperationalLineDraw,
+    addScenarioDefenseLinePresets,
     finishSpecialZoneMembershipDrag,
     hasSpecialZoneMembershipDragSession,
     selectOperationalLineById,

@@ -11,6 +11,7 @@ import {
   refreshUnitCounterPreviewSection,
 } from "./strategic_overlay/unit_counter_render_helpers.js";
 import { patchStrategicOverlayEditorState } from "../../core/state/actions/strategic_overlay_actions.js";
+import { loadDefenseLinePresets, buildScenarioDefenseLineEntries } from "../../core/scenario/defense_line_presets.js";
 
 /**
  * Owns the strategic overlay workspace inside the sidebar:
@@ -153,6 +154,65 @@ export function createStrategicOverlayController({
     showToast,
     DEFAULT_UNIT_COUNTER_PRESET_ID,
   } = helpers;
+
+  let defenseLinePayload;
+  let defenseLineLoading = false;
+  let defenseLineButton;
+  let defenseLineStatus;
+
+  function refreshDefenseLinePresets() {
+    if (!defenseLineButton) return;
+    defenseLineButton.textContent = t("Add scenario defense lines", "ui");
+    const presets = defenseLinePayload?.scenarios?.[state.activeScenarioId] || [];
+    const existingIds = new Set((state.operationalLines || []).map((line) => line.id));
+    const present = presets.filter((line) => existingIds.has(`preset_${state.activeScenarioId}_${line.id}`)).length;
+    // The preset file is fetched on first click only, so it never joins startup.
+    defenseLineButton.disabled = defenseLineLoading
+      || (!!defenseLinePayload && (!presets.length || present === presets.length));
+    defenseLineStatus.textContent = presets.length
+      ? t("{count} preset lines; {present} already on map", "ui")
+        .replace("{count}", presets.length).replace("{present}", present)
+      : defenseLinePayload ? t("No preset defense lines for this scenario.", "ui") : "";
+  }
+
+  async function fetchDefenseLinePresets() {
+    defenseLineLoading = true;
+    defenseLineButton.disabled = true;
+    try {
+      defenseLinePayload = await loadDefenseLinePresets({});
+    } catch (error) {
+      defenseLineStatus.textContent = error.message;
+      defenseLineButton.disabled = false;
+    } finally {
+      defenseLineLoading = false;
+    }
+    if (defenseLinePayload) refreshDefenseLinePresets();
+  }
+
+  if (operationalLineStartBtn?.parentElement) {
+    defenseLineButton = document.createElement("button");
+    defenseLineButton.type = "button";
+    defenseLineButton.id = "operationalLinePresetsBtn";
+    defenseLineButton.className = operationalLineStartBtn.className;
+    operationalLineStartBtn.parentElement.append(defenseLineButton);
+    defenseLineStatus = document.createElement("div");
+    defenseLineStatus.className = operationalLineEditorHint?.className || "";
+    defenseLineStatus.setAttribute("role", "status");
+    operationalLineStartBtn.parentElement.after(defenseLineStatus);
+    defenseLineButton.addEventListener("click", async () => {
+      if (!defenseLinePayload) await fetchDefenseLinePresets();
+      if (!defenseLinePayload) return;
+      const entries = buildScenarioDefenseLineEntries(
+        defenseLinePayload, state.activeScenarioId, state.operationalLines,
+        { language: state.currentLanguage }
+      );
+      const count = mapRenderer.addScenarioDefenseLinePresets(entries);
+      if (count && showToast) {
+        showToast(t("Added {count} defense lines", "ui").replace("{count}", count));
+      }
+      refreshDefenseLinePresets();
+    });
+  }
 
   const unitCounterCatalog = createUnitCounterCatalog({
     t,
@@ -395,6 +455,7 @@ export function createStrategicOverlayController({
   };
 
   const refreshStrategicOverlayUI = ({ scopes = "all" } = {}) => {
+    refreshDefenseLinePresets();
     const normalizedScopes = normalizeStrategicOverlayRefreshScopes(scopes);
     const annotationView = normalizeAnnotationView(state.annotationView);
     const syncSelectOptions = (selectEl, options, { value, disabled, signatureKey = "optionsSignature" } = {}) => {

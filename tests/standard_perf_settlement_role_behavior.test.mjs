@@ -188,8 +188,81 @@ test("historical and Williams roles retain their original last-frame contract", 
     assert.equal(result.roleMatched, false);
     assert.ok(result.roleMismatches.includes("canonical-candidate-is-last"));
   }
-  assert.equal(buildRenderSampleRolePolicyIdentity(profile).policyId, "render-sample-role-v3");
+  assert.equal(buildRenderSampleRolePolicyIdentity(profile).policyId, "render-sample-role-v4");
   assert.equal(buildRenderSampleRolePolicyIdentity(historicalProfile).policyId, "render-sample-role-v2");
+});
+
+// Shape of a real GPU direct scene startup: both full frames precede the startup
+// promotion, which is followed only by composites that repaint no political layer.
+function directSceneFixture({ durations = {}, lateFullFrame = false } = {}) {
+  const frame = (sequence, recordedAt, durationMs, fields = {}) => ({
+    sequence, recordedAt, durationMs: durations[sequence] ?? durationMs, activeScenarioId: scenarioId, phase: "idle",
+    politicalSource: "", politicalBgProgressive: false, contextScenarioMs: 0, ...fields,
+  });
+  const samples = [
+    frame(1, 100, 320, { politicalSource: "vector", contextScenarioMs: 100 }),
+    frame(2, 200, 2),
+    frame(3, 300, 6, { phase: "interacting" }),
+    frame(4, 500, 400, { politicalSource: "political-id-raster", contextScenarioMs: 18 }),
+    frame(5, 900, 3),
+    frame(6, 1100, 9),
+    frame(7, 1200, 60),
+    ...(lateFullFrame ? [frame(8, 1300, 20, { politicalSource: "political-id-raster" })] : []),
+  ];
+  const promotion = { recordedAt: 1000, activeScenarioId: scenarioId, reason: "startup-initial-visual", sequence: 5 };
+  const snapshot = {
+    renderPerfMetrics: { scenarioChunkPromotionVisualStage: promotion },
+    renderSamples: { count: samples.length, medianMs: 6, samples },
+    standardPerfSettlement: { complete: true, activeScenarioId: scenarioId, observedAt: 3000,
+      sampleCount: samples.length, lastSampleSequence: samples.at(-1).sequence, status: readyStatus(), capabilityMode: "renderer-async-status",
+      initialPromotion: structuredClone(promotion), initialFrameSequence: 1, initialSamplePrefix: structuredClone(samples.slice(0, 1)),
+      promotionObservations: [{ observedAt: 1050, metric: structuredClone(promotion) }] },
+  };
+  bindQuietEvidence(snapshot);
+  return snapshot;
+}
+
+for (const lateFullFrame of [false, true]) {
+  test(`direct scene startup charges every frame from the first full frame (late full frame: ${lateFullFrame})`, () => {
+    const result = analyze(directSceneFixture({ lateFullFrame }));
+    assert.deepEqual(result.roleMismatches, []);
+    assert.equal(result.canonicalSample.sequence, 1);
+    assert.equal(result.canonicalCandidateRenderMs, 320);
+    assert.equal(result.canonicalRenderSampleMs, 800 + (lateFullFrame ? 20 : 0));
+  });
+}
+
+test("the charged window still reports a slowdown of any frame at the unchanged threshold", () => {
+  const charged = (durations) => summarizeSnapshot(directSceneFixture({ durations }), scenarioId, profile).canonicalRenderSampleMs;
+  const report = (cpu) => ({ workloadIdentity: { renderSampleRunProfileId: profile }, scenarios: {
+    [scenarioId]: { summary: { canonicalRenderSampleMs: cpu, renderSampleMedianMs: 1, totalStartupMs: 100 } },
+  } });
+  const failures = (durations) => compareAgainstBaseline(report(charged(durations)), report(charged({})), 1.15)
+    .filter((failure) => failure.metricKey === "canonicalRenderSampleMs");
+  for (const [name, durations] of [
+    ["first vector frame", { 1: 620 }],
+    ["raster frame before the promotion", { 4: 700 }],
+    ["composite before the promotion", { 5: 300 }],
+    ["composite after the promotion", { 7: 360 }],
+  ]) assert.equal(failures(durations).length, 1, name);
+  assert.equal(failures({ 4: 500 }).length, 0, "a 12.5% slower total stays inside the 1.25 threshold");
+});
+
+for (const [name, mutate, mismatch] of [
+  ["no full frame", (s) => {
+    Object.assign(s.renderSamples.samples[0], { politicalSource: "" });
+    Object.assign(s.renderSamples.samples[3], { politicalSource: "" });
+    Object.assign(s.standardPerfSettlement, { initialFrameSequence: null, initialSamplePrefix: null });
+  }, "initial-frame-anchor"],
+  ["an unobserved startup promotion", (s) => { s.standardPerfSettlement.initialPromotion = null; }, "initial-promotion-bound"],
+  ["an interaction after the promotion", (s) => { s.renderSamples.samples[6].phase = "interacting"; }, "post-promotion-idle"],
+  ["another scenario inside the window", (s) => { s.renderSamples.samples[4].activeScenarioId = "hoi4_1939"; }, "post-anchor-same-scenario"],
+]) test(`direct scene startup fails closed on ${name}`, () => {
+  const snapshot = directSceneFixture();
+  mutate(snapshot);
+  const result = analyze(snapshot);
+  assert.ok(result.roleMismatches.includes(mismatch), result.roleMismatches.join(","));
+  assert.equal(result.canonicalRenderSampleMs, null);
 });
 
 test("later promotion and repeated full frames remain billed behind the frozen initial anchor", async () => {
