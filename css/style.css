@@ -2132,9 +2132,10 @@ select.app-select-native:disabled {
   min-width: 0;
 }
 
-.scenario-intro-button {
-  flex: 0 0 auto;
-  padding: 6px 9px;
+.scenario-picker-row .scenario-intro-button {
+  flex: 0 0 var(--control-md);
+  width: var(--control-md);
+  padding: 0;
 }
 
 .scenario-select-option:has(.scenario-select-tagline) {
