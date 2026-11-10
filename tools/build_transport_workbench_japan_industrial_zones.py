@@ -25,9 +25,7 @@ OUTPUT_DIR = ROOT / "data" / "transport_layers" / "japan_industrial_zones"
 MANIFEST_PATH = OUTPUT_DIR / "manifest.json"
 AUDIT_PATH = OUTPUT_DIR / "build_audit.json"
 INTERNAL_FULL_OUTPUT_PATH = OUTPUT_DIR / "industrial_zones.internal.geojson"
-INTERNAL_PREVIEW_OUTPUT_PATH = OUTPUT_DIR / "industrial_zones.internal.preview.geojson"
 OPEN_FULL_OUTPUT_PATH = OUTPUT_DIR / "industrial_zones.open.geojson"
-OPEN_PREVIEW_OUTPUT_PATH = OUTPUT_DIR / "industrial_zones.open.preview.geojson"
 CARRIER_PATH = ROOT / "data" / "transport_layers" / "japan_corridor" / "carrier.json"
 SOURCE_CACHE_DIR = ROOT / ".runtime" / "source-cache" / "transport" / "japan" / "industrial_zones"
 L05_ARCHIVE_DIR = SOURCE_CACHE_DIR / "L05"
@@ -425,9 +423,7 @@ def main() -> None:
         raise SystemExit("No OSM industrial polygons remained after clipping.")
 
     write_json(INTERNAL_FULL_OUTPUT_PATH, feature_collection_payload(internal_features), compact=False)
-    write_json(INTERNAL_PREVIEW_OUTPUT_PATH, feature_collection_payload(internal_features), compact=False)
     write_json(OPEN_FULL_OUTPUT_PATH, feature_collection_payload(open_features), compact=False)
-    write_json(OPEN_PREVIEW_OUTPUT_PATH, feature_collection_payload(open_features), compact=False)
 
     l05_paths = l05_1_paths + l05_2_paths
     source_signature = {
@@ -449,7 +445,7 @@ def main() -> None:
             "source_policy": "local_source_cache_with_download",
             "paths": {
                 "preview": {
-                    "industrial_zones": str(INTERNAL_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                    "industrial_zones": str(INTERNAL_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
                 },
                 "full": {
                     "industrial_zones": str(INTERNAL_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
@@ -468,7 +464,7 @@ def main() -> None:
             "source_policy": "local_source_cache_only",
             "paths": {
                 "preview": {
-                    "industrial_zones": str(OPEN_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                    "industrial_zones": str(OPEN_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
                 },
                 "full": {
                     "industrial_zones": str(OPEN_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
@@ -495,7 +491,7 @@ def main() -> None:
         "source_policy": "local_source_cache_with_download",
         "paths": {
             "preview": {
-                "industrial_zones": str(INTERNAL_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                "industrial_zones": str(INTERNAL_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
             },
             "full": {
                 "industrial_zones": str(INTERNAL_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),

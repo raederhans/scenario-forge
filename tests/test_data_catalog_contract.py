@@ -278,6 +278,10 @@ class DataCatalogContractTest(unittest.TestCase):
     def test_catalog_contains_transport_preview_and_manifest_entries(self) -> None:
         payload = self._load_catalog()
         entries = {entry["key"]: entry for entry in payload.get("entries") or []}
+        # 预览与完整共用同一文件时，预览键登记为完整条目的别名。
+        for entry in payload.get("entries") or []:
+            for alias in entry.get("aliases") or []:
+                entries.setdefault(alias, entry)
 
         self.assertIn("transport_manifest:road", entries)
         self.assertIn("transport:road:preview:roads", entries)

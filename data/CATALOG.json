@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-11-08T02:57:05Z",
   "counts": {
-    "entries": 1380,
+    "entries": 1379,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -66,7 +66,7 @@
       "transport_carrier_payload": 8,
       "transport_catalog": 2,
       "transport_manifest": 140,
-      "transport_pack": 300,
+      "transport_pack": 298,
       "transport_provenance_payload": 8,
       "transport_subtype_catalog": 1,
       "unit_counter_manifest": 1,
@@ -74,13 +74,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 157,
+      "geojson": 155,
       "javascript": 2,
       "json": 1050,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1378,
+      "json": 1377,
       "module": 2
     }
   },
@@ -18745,24 +18745,11 @@
       "readMode": "json",
       "aliases": [
         "paths.full.industrial_zones",
-        "transport:industrial_zones:internal:paths:full:industrial_zones",
-        "variants.internal.paths.full.industrial_zones"
-      ]
-    },
-    {
-      "key": "transport:industrial_zones:preview:industrial_zones",
-      "url": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson",
-      "role": "transport_pack",
-      "format": "geojson",
-      "schemaRef": "schema://geojson/feature_collection/polygon/v1",
-      "hashRef": "",
-      "owner": "python tools/build_transport_workbench_japan_industrial_zones.py",
-      "cachePolicy": "default",
-      "sourceId": "",
-      "readMode": "json",
-      "aliases": [
         "paths.preview.industrial_zones",
+        "transport:industrial_zones:internal:paths:full:industrial_zones",
         "transport:industrial_zones:internal:paths:preview:industrial_zones",
+        "transport:industrial_zones:preview:industrial_zones",
+        "variants.internal.paths.full.industrial_zones",
         "variants.internal.paths.preview.industrial_zones"
       ]
     },
@@ -18778,21 +18765,8 @@
       "sourceId": "",
       "readMode": "json",
       "aliases": [
-        "variants.open.paths.full.industrial_zones"
-      ]
-    },
-    {
-      "key": "transport:industrial_zones:open:paths:preview:industrial_zones",
-      "url": "data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson",
-      "role": "transport_pack",
-      "format": "geojson",
-      "schemaRef": "schema://geojson/feature_collection/polygon/v1",
-      "hashRef": "",
-      "owner": "python tools/build_transport_workbench_japan_industrial_zones.py",
-      "cachePolicy": "default",
-      "sourceId": "",
-      "readMode": "json",
-      "aliases": [
+        "transport:industrial_zones:open:paths:preview:industrial_zones",
+        "variants.open.paths.full.industrial_zones",
         "variants.open.paths.preview.industrial_zones"
       ]
     },

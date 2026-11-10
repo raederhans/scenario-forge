@@ -52,9 +52,7 @@
   "output_contract": {
     "publish": [
       "industrial_zones.internal.geojson",
-      "industrial_zones.internal.preview.geojson",
       "industrial_zones.open.geojson",
-      "industrial_zones.open.preview.geojson",
       "manifest.json",
       "build_audit.json"
     ],
