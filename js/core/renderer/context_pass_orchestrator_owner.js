@@ -206,6 +206,8 @@ export function createContextPassOrchestratorOwner({
     try {
       drawScenarioRegionOverlaysPass(k);
       drawScenarioReliefOverlaysPass(k);
+      // Scenario urban supplements sit on land this pass paints over contextBase.
+      drawUrbanLayer(k, { interactive, scope: "scenario-overlay" });
     } finally {
       endContextMetricSession();
     }

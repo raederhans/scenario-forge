@@ -636,9 +636,23 @@ def main():
     parser.add_argument("--overlap-policy", choices=("strict", "preserve-published-visible"), default="strict")
     parser.add_argument("--published-lineage", type=Path,
                         help="Explicit legacy checkpoint with geometry-identical island donor provenance")
+    parser.add_argument("--refresh-urban-overlays", action="store_true",
+                        help="Regenerate urban_overlays.geojson from the staged Atlantropa land")
     args = parser.parse_args()
-    print(rebuild_stage(args.source_dir, args.stage_dir, overlap_policy=args.overlap_policy,
-                        published_lineage=args.published_lineage))
+    result = rebuild_stage(args.source_dir, args.stage_dir, overlap_policy=args.overlap_policy,
+                           published_lineage=args.published_lineage)
+    if args.refresh_urban_overlays:
+        result["urban_overlays"] = refresh_urban_overlays(Path(result["stage_dir"]))
+    print(result)
+
+
+def refresh_urban_overlays(stage_dir: Path):
+    """Keep the synthetic urban supplement aligned with the staged land."""
+    from tools import build_tno_atlantropa_urban as urban
+    return urban.write_overlays(
+        stage_dir / urban.DEFAULT_OUTPUT.name,
+        atlantropa_path=stage_dir / b.SCENARIO_ATLANTROPA_TOPOLOGY_FILENAME,
+    )
 
 
 if __name__ == "__main__":

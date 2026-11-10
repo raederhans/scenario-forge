@@ -235,6 +235,7 @@ test("production layer invalidation preserves the water source token and schedul
   const scheduled = [], invalidated = [];
   const scope = { PHYSICAL_ATLAS_DETAIL_LAYER: "physical_semantics_detail", layerResolverCache: { waterRegionsDataToken: "stable-water" },
     getPhysicalInputInvalidationPasses: passes => passes,
+    isScenarioUrbanOverlayLayerName: name => name === "urban_tno_atlantropa",
     invalidateRenderPasses: (passes) => invalidated.push([...passes]), clearRenderPassReferenceTransforms() {},
     contextLayerRenderScheduler: { request: (...args) => scheduled.push(args) } };
   vm.createContext(scope); vm.runInContext(body, scope);
@@ -247,6 +248,8 @@ test("production layer invalidation preserves the water source token and schedul
   assert.ok(invalidated[2].includes("physicalBase"));
   assert.ok(invalidated[2].includes("contextBase"));
   assert.ok(invalidated[2].includes("labels"));
+  scope.invalidateContextLayerVisualStateBatch(["urban_tno_atlantropa"], "load", { renderNow: false });
+  assert.deepEqual(invalidated[3], ["contextBase", "dayNight"]);
 });
 
 test("a preset submits all context families as one batch rather than independent renderNow requests", () => {

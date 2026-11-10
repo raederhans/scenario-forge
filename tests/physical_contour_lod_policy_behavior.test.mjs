@@ -149,14 +149,15 @@ test("cached frame preparation selects LOD during settle while deferring active 
   visit(factory);
   const runtime = { renderPhase: "settling" };
   const events = [];
-  const prepare = new Function("runtimeState", "ensureLayerDataFromTopology", "ensureContourLodForView", "ensurePhysicalAtlasDetailForView", "RENDER_PHASE_INTERACTING",
+  const prepare = new Function("runtimeState", "ensureLayerDataFromTopology", "ensureContourLodForView", "ensurePhysicalAtlasDetailForView",
+    "ensureScenarioUrbanOverlayForView", "RENDER_PHASE_INTERACTING",
     `return (${rendererSource.slice(callback.start, callback.end)});`
-  )(runtime, () => events.push("topology"), () => events.push("lod"), () => events.push("atlas"), "interacting");
-  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod", "atlas"]);
+  )(runtime, () => events.push("topology"), () => events.push("lod"), () => events.push("atlas"), () => events.push("urban-overlay"), "interacting");
+  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod", "atlas", "urban-overlay"]);
   runtime.renderPhase = "interacting";
   prepare(); assert.deepEqual(events.splice(0), ["topology"]);
   runtime.renderPhase = "idle";
-  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod", "atlas"]);
+  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod", "atlas", "urban-overlay"]);
   runtime.scenarioApplyInFlight = true;
   prepare(); assert.deepEqual(events, ["topology"]);
 });

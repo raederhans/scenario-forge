@@ -80,6 +80,12 @@
       "role": "context_layer",
       "family_id": "urban"
     },
+    "context_layer:urban_tno_atlantropa": {
+      "url": "data/scenarios/tno_1962/urban_overlays.geojson",
+      "role": "context_layer",
+      "family_id": "urban",
+      "description": "Synthetic urban patches on TNO Atlantropa land; appended to urban only while tno_1962 shows that land."
+    },
     "context_layer:physical_semantics": {
       "url": "data/global_physical_semantics.topo.json",
       "role": "context_layer",

@@ -10,7 +10,7 @@
       "city_lights_entries": 1,
       "city_lights_source": 1,
       "city_overrides": 1,
-      "context_layer": 7,
+      "context_layer": 8,
       "country_feature_policies": 1,
       "defense_line_presets": 1,
       "detail_topology_na_v1": 1,
@@ -74,7 +74,7 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 156,
+      "geojson": 157,
       "javascript": 2,
       "json": 1050,
       "topojson": 172
@@ -1073,6 +1073,19 @@
       "hashRef": "",
       "owner": "runtime_asset_registry.assets.political_id_raster:tno_1962",
       "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "context_layer:urban_tno_atlantropa",
+      "url": "data/scenarios/tno_1962/urban_overlays.geojson",
+      "role": "context_layer",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.context_layer:urban_tno_atlantropa",
+      "cachePolicy": "default",
       "sourceId": "",
       "readMode": "json",
       "aliases": []
