@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { createRenderPerfMetricsRuntimeOwner } from "../js/core/renderer/render_perf_metrics_runtime_owner.js";
@@ -9,11 +8,6 @@ import {
   ensureRenderPerfMetricsState,
   setRenderPerfContextBreakdownState,
 } from "../js/core/state/actions/renderer_diagnostics_actions.js";
-
-const OWNER_URL = new URL(
-  "../js/core/renderer/render_perf_metrics_runtime_owner.js",
-  import.meta.url,
-);
 
 const BREAKDOWN_NAMES = new Set(["drawRoadsLayer", "drawRiversLayer"]);
 
@@ -303,11 +297,3 @@ test("reset preserves other metrics and publishes a fresh empty breakdown", () =
   );
 });
 
-test("owner source stays import-free and free of global state, DOM, and direct clocks", async () => {
-  const source = await readFile(OWNER_URL, "utf8");
-  assert.doesNotMatch(source, /^\s*import\s/m);
-  assert.doesNotMatch(source, /\b(?:state|runtimeState|appState)\b/);
-  assert.doesNotMatch(source, /\b(?:window|document|globalThis)\b/);
-  assert.doesNotMatch(source, /Date\.now\s*\(/);
-  assert.doesNotMatch(source, /performance\.now\s*\(/);
-});

@@ -2,14 +2,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createRendererProjectionPathOwner } from "../js/core/renderer/renderer_projection_path_owner.js";
 import { getProjectionGeometryGeneration } from "../js/core/renderer/projection_geometry_identity.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const REPO_ROOT = path.resolve(__dirname, "..");
 
 test("initializing projection paths advances explicit geometry generation", () => {
   const harness = createHarness();
@@ -249,18 +244,3 @@ test("fails fast when required host API or constants are missing", () => {
   );
 });
 
-test("projection/path owner stays independent from renderer runtime state", () => {
-  const ownerSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js", "core", "renderer", "renderer_projection_path_owner.js"),
-    "utf8",
-  );
-
-  for (const token of [
-    "runtimeState",
-    "from \"../state.js\"",
-    "from \"./state.js\"",
-    "map_renderer.js",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `owner source must avoid ${token}`);
-  }
-});

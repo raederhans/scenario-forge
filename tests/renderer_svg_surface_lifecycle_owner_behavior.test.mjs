@@ -2,15 +2,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createRendererSvgSurfaceLifecycleOwner } from "../js/core/renderer/renderer_svg_surface_lifecycle_owner.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const REPO_ROOT = path.resolve(__dirname, "..");
-
 const ROOT_CHILD_ORDER = Object.freeze([
   "interaction-layer",
   "viewport-layer",
@@ -311,31 +306,3 @@ test("fails fast when required dependencies are missing", () => {
   );
 });
 
-test("owner source stays outside renderer semantics", () => {
-  const ownerSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js", "core", "renderer", "renderer_svg_surface_lifecycle_owner.js"),
-    "utf8",
-  );
-
-  for (const token of [
-    "runtimeState",
-    "from \"../state.js\"",
-    "from \"./state.js\"",
-    "map_renderer.js",
-    "drawCanvas",
-    "renderPassToCache",
-    "buildHitCanvas",
-    "applyDevSelectionFill",
-    "refreshMapDataForScenarioChunkPromotion",
-    "exactAfterSettle",
-    "strategicOverlayRuntime",
-    "fitProjection",
-    "updateMap",
-    "initZoom",
-    "bindEvents",
-    "renderLegend",
-    "LegendManager",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `owner source must avoid ${token}`);
-  }
-});

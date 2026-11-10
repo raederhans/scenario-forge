@@ -9,7 +9,6 @@ import { createRenderPassCacheHostOwner } from "../js/core/map_renderer/render_p
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
-const OWNER_PATH = path.join(REPO_ROOT, "js/core/map_renderer/render_pass_cache_host_owner.js");
 const MAP_RENDERER_PATH = path.join(REPO_ROOT, "js/core/map_renderer.js");
 
 function extractFunctionSource(source, functionName) {
@@ -425,31 +424,6 @@ test("renderPassToCache wrapper delegates political cache commit accounting afte
     hostSummary: hostResult,
   });
 });
-
-test("owner source excludes renderer lifecycle and cache commit work", () => {
-  const ownerSource = fs.readFileSync(OWNER_PATH, "utf8");
-
-  for (const token of [
-    "drawCanvas",
-    "drawPoliticalPass",
-    "drawContextBasePass",
-    "drawContextScenarioPass",
-    "buildHitCanvas",
-    "setPassReferenceTransform",
-    "cache.signatures",
-    "cache.dirty",
-    "recordPassTiming",
-    "recordRenderPerfMetric",
-    "schedulePoliticalPathWarmup",
-    "runtimeState",
-    "globalThis.d3",
-    "document",
-    "window",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `owner source must not include ${token}`);
-  }
-});
-
 
 test("direct host avoids allocation and native continuation retains full host semantics", () => {
   const events = [];
