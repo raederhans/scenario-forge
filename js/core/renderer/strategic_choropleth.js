@@ -1,3 +1,5 @@
+import { getFeatureId } from "../feature_identity.js";
+
 const RESOURCE_METRIC_IDS = Object.freeze([
   "steel",
   "oil",
@@ -49,15 +51,6 @@ function clampUnit(value) {
 
 function normalizeMetricId(metricId) {
   return String(metricId || "").trim().toLowerCase();
-}
-
-function getFeatureId(featureOrId) {
-  if (typeof featureOrId === "string" || typeof featureOrId === "number") {
-    return String(featureOrId).trim();
-  }
-  if (!featureOrId || typeof featureOrId !== "object") return "";
-  const properties = featureOrId.properties || {};
-  return String(featureOrId.id || properties.id || properties.feature_id || "").trim();
 }
 
 function getBucket(payload, bucketId) {
