@@ -8689,7 +8689,6 @@ function rebuildStaticMeshes({
     &&
     runtimeState.activeScenarioId
     && runtimeState.scenarioBorderMode === "scenario_owner_only"
-    && "ownership" === "ownership"
   ) {
     refreshScenarioOpeningOwnerBorders({
       renderNow: false,
@@ -14213,10 +14212,6 @@ function refreshSidebarAfterPaint({
 
 function requestInteractionRender(reason = "interaction") {
   return getRenderRequestBoundaryOwner().requestInteractionRenderBoundary(reason).completed;
-}
-
-function flushInteractionRender(reason = "interaction") {
-  return getRenderRequestBoundaryOwner().flushInteractionRenderBoundary(reason).completed;
 }
 
 function requestRendererRender(reason = "renderer", { flush = false, fallback = null } = {}) {

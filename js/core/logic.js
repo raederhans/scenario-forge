@@ -3,16 +3,12 @@ import { state as runtimeState, countryPalette, defaultCountryPalette } from "./
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
-import { getCountryCode as getSharedFeatureCountryCode, normalizeFeatureCountryCode } from "./feature_identity.js";
+import { normalizeFeatureCountryCode } from "./feature_identity.js";
 import { getScenarioCountryTags, uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
 const state = runtimeState;
 
 function normalizeCountryCode(rawCode) {
   return normalizeFeatureCountryCode(rawCode);
-}
-
-function getCountryCode(feature) {
-  return getSharedFeatureCountryCode(feature);
 }
 
 function applyCountryColor(code, color) {
@@ -79,34 +75,5 @@ function resetCountryColors() {
   });
 }
 
-function applyPaletteToMap() {
-  if (!runtimeState.landData) return;
-  const touchedOwners = new Set();
-  for (const feature of runtimeState.landData.features) {
-    const code = getCountryCode(feature);
-    const color = countryPalette[code];
-    if (color) {
-      runtimeState.sovereignBaseColors[code] = color;
-      touchedOwners.add(code);
-    }
-  }
-  refreshResolvedColorsForOwners([...touchedOwners], { renderNow: true });
-}
-
-function saveMapState() {
-  try {
-    localStorage.setItem(
-      "map_colors",
-      JSON.stringify({
-        schemaVersion: 2,
-        sovereignBaseColors: runtimeState.sovereignBaseColors || {},
-        visualOverrides: runtimeState.visualOverrides || {},
-      })
-    );
-  } catch (error) {
-    console.warn("Unable to save map state:", error);
-  }
-}
-
-export { applyCountryColor, resetCountryColors, applyPaletteToMap, saveMapState };
+export { applyCountryColor, resetCountryColors };
 
