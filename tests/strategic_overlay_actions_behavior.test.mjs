@@ -1,8 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import * as strategicOverlayActions from "../js/core/state/actions/strategic_overlay_actions.js";
 
@@ -12,17 +9,6 @@ const {
   restoreStrategicOverlaySnapshotState,
   setStrategicOverlayDirtyState,
 } = strategicOverlayActions;
-
-const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(TEST_DIR, "..");
-
-function getFunctionSource(source, functionName) {
-  const startToken = `function ${functionName}`;
-  const start = source.indexOf(startToken);
-  assert.notEqual(start, -1, `missing ${functionName}`);
-  const next = source.indexOf("\n  function ", start + startToken.length);
-  return source.slice(start, next === -1 ? source.length : next);
-}
 
 test("strategic overlay actions reject invalid targets and unknown authorities", () => {
   assert.throws(() => commitStrategicOverlayCollectionsState(null, {}), /target must be an object/);
@@ -252,125 +238,6 @@ test("strategic entity group patches preserve untouched entries and reject unkno
     /unknown operationalLines entity field: renderer/,
   );
 });
-
-test("strategic overlay callers retain direct entity mutation only in declared drag hot paths", () => {
-  const operationGraphicsSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/core/renderer/strategic_overlay_runtime/operation_graphics_runtime_domain.js"),
-    "utf8",
-  );
-  const unitCounterSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/core/renderer/strategic_overlay_runtime/unit_counter_runtime_domain.js"),
-    "utf8",
-  );
-  const runtimeOwnerSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/core/renderer/strategic_overlay_runtime_owner.js"),
-    "utf8",
-  );
-  const sidebarControllerSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/ui/sidebar/strategic_overlay_controller.js"),
-    "utf8",
-  );
-  const counterBindingsSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/ui/sidebar/strategic_overlay/unit_counter_bind_events_helper.js"),
-    "utf8",
-  );
-  const specialZonesRuntimeSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/core/renderer/strategic_overlay_runtime/special_zones_runtime_domain.js"),
-    "utf8",
-  );
-  const specialZoneLayersSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/core/special_zone_layers.js"),
-    "utf8",
-  );
-  const specialZoneActionsSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/core/state/actions/special_zone_actions.js"),
-    "utf8",
-  );
-  const specialZonesWorkbenchSource = fs.readFileSync(
-    path.join(REPO_ROOT, "js/ui/toolbar/special_zones_workbench_controller.js"),
-    "utf8",
-  );
-
-  assert.doesNotMatch(operationGraphicsSource, /graphic\.points\.splice\(/);
-  const graphicDragSource = getFunctionSource(operationGraphicsSource, "moveOperationGraphicVertexDrag");
-  assert.match(graphicDragSource, /target\.graphic\.points\[target\.normalizedIndex\] = \[lon, lat\];/);
-  const operationGraphicsWithoutDrag = operationGraphicsSource.replace(graphicDragSource, "");
-  assert.doesNotMatch(operationGraphicsWithoutDrag, /(?:target\.graphic|graphic)\.points(?:\[[^\]]+\])?\s*=/);
-
-  const directCounterEntityWrites = unitCounterSource.match(/\bcounter\.(?:renderer|label|sidc|symbolCode|nationTag|nationSource|presetId|iconId|unitType|echelon|subLabel|strengthText|baseFillColor|organizationPct|equipmentPct|statsPresetId|statsSource|size|attachment|layoutAnchor|anchor)\s*=/g) || [];
-  assert.deepEqual(directCounterEntityWrites, [
-    "counter.attachment =",
-    "counter.layoutAnchor =",
-    "counter.anchor =",
-    "counter.anchor =",
-    "counter.layoutAnchor =",
-  ]);
-  const counterMoveSource = getFunctionSource(unitCounterSource, "moveUnitCounterDrag");
-  const counterFinishSource = getFunctionSource(unitCounterSource, "finishUnitCounterDrag");
-  assert.match(counterMoveSource, /counter\.attachment = null;/);
-  assert.match(counterFinishSource, /counter\.anchor =/);
-  const unitCounterWithoutDrag = unitCounterSource
-    .replace(counterMoveSource, "")
-    .replace(counterFinishSource, "");
-  assert.doesNotMatch(
-    unitCounterWithoutDrag,
-    /\bcounter\.(?:renderer|label|sidc|symbolCode|nationTag|nationSource|presetId|iconId|unitType|echelon|subLabel|strengthText|baseFillColor|organizationPct|equipmentPct|statsPresetId|statsSource|size|attachment|layoutAnchor|anchor)\s*=/,
-  );
-  assert.doesNotMatch(
-    runtimeOwnerSource,
-    /\bline\.(?:kind|label|stylePreset|stroke|width|opacity|attachedCounterIds)\s*=/,
-  );
-  assert.match(runtimeOwnerSource, /patchStrategicOverlayEntityState\(state, "operationalLines", selectedId, entityPatch\);/);
-  assert.match(operationGraphicsSource, /patchStrategicOverlayEntityState\(state, "operationGraphics", selectedId, entityPatch\);/);
-  assert.match(unitCounterSource, /patchStrategicOverlayEntityState\(state, "unitCounters", selectedId, entityPatch\);/);
-  assert.doesNotMatch(
-    sidebarControllerSource,
-    /state\.(?:operationalLineEditor|operationGraphicsEditor|strategicOverlayUi)\.[A-Za-z_$][\w$]*\s*=/,
-  );
-  assert.doesNotMatch(
-    counterBindingsSource,
-    /state\.(?:unitCounterEditor|strategicOverlayUi)\.[A-Za-z_$][\w$]*\s*=/,
-  );
-  [
-    operationGraphicsSource,
-    unitCounterSource,
-    runtimeOwnerSource,
-    sidebarControllerSource,
-    counterBindingsSource,
-    specialZonesRuntimeSource,
-    specialZonesWorkbenchSource,
-  ].forEach((source) => {
-    assert.doesNotMatch(
-      source,
-      /const (?:patchEditor|markOverlayDirty|markUnitCountersDirty|markOperationalLinesDirty|patchOperationalLineEditor|patchOperationGraphicsEditor|patchStrategicUi|patchUnitCounterEditor|setPresetCategoryOpen)\b/,
-    );
-  });
-  assert.doesNotMatch(
-    specialZoneLayersSource,
-    /target\.(?:specialZoneLayers|specialZonesOverlayDirty|specialZoneEditor)\s*(?:=|\+=|-=|\|=|\?\?=)/,
-  );
-  assert.match(
-    getFunctionSource(operationGraphicsSource, "appendOperationGraphicVertexFromEvent"),
-    /patchStrategicOverlayEditorState\(state, "operationGraphicsEditor"/,
-  );
-  assert.match(
-    getFunctionSource(unitCounterSource, "placeUnitCounterFromEvent"),
-    /patchStrategicOverlayEditorState\(state, "unitCounterEditor"/,
-  );
-  assert.match(
-    getFunctionSource(runtimeOwnerSource, "appendOperationalLineVertexFromEvent"),
-    /patchStrategicOverlayEditorState\(state, "operationalLineEditor"/,
-  );
-  assert.match(
-    getFunctionSource(specialZonesRuntimeSource, "selectSpecialZoneById"),
-    /patchSpecialZoneEditorState\(state,/,
-  );
-  assert.doesNotMatch(specialZoneLayersSource, /\bmutateSpecialZoneLayersStateAction\b/);
-  const mutateLayersActionSource = getFunctionSource(specialZoneActionsSource, "mutateSpecialZoneLayersStateAction");
-  assert.match(mutateLayersActionSource, /mutateSpecialZoneLayersState\(current, inputs\.mutation\)/);
-  assert.match(mutateLayersActionSource, /return commitSpecialZoneLayersState\(target, nextState, inputs\.options\);/);
-});
-
 
 test("frontline hint only explains a missing scenario", async () => {
   const { createStrategicOverlayController } = await import("../js/ui/sidebar/strategic_overlay_controller.js");

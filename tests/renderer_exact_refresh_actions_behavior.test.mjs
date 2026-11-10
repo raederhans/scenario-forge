@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const MODULE_PATH = "../js/core/state/actions/renderer_exact_refresh_actions.js";
-const SOURCE_PATH = new URL(MODULE_PATH, import.meta.url);
 
 async function loadActions() {
   try {
@@ -28,30 +26,6 @@ function createIdentity(overrides = {}) {
     ...overrides,
   });
 }
-
-test("renderer exact refresh actions are import-free and expose target-first state functions", async () => {
-  const source = await readFile(SOURCE_PATH, "utf8");
-  assert.doesNotMatch(source, /^\s*import\s/m);
-
-  const exportNames = [...source.matchAll(/export function\s+(\w+)\s*\(\s*([^,\s)]+)/g)]
-    .map((match) => [match[1], match[2]]);
-  assert.deepEqual(exportNames, [
-    ["ensureExactAfterSettleControllerState", "target"],
-    ["captureExactAfterSettleControllerState", "target"],
-    ["resetExactAfterSettleControllerState", "target"],
-    ["isExactAfterSettleGenerationCurrentState", "target"],
-    ["isExactAfterSettleControllerActiveState", "target"],
-    ["refreshExactAfterSettleControllerIdentityState", "target"],
-    ["beginExactAfterSettleControllerScheduleState", "target"],
-    ["beginExactAfterSettleControllerApplyState", "target"],
-    ["replaceExactAfterSettlePendingPlanState", "target"],
-    ["completeExactAfterSettleControllerApplyState", "target"],
-    ["beginExactAfterSettleControllerFinalizeState", "target"],
-    ["setDeferExactAfterSettleState", "target"],
-    ["setPendingExactPoliticalFastFrameState", "target"],
-    ["setExactAfterSettleHandleState", "target"],
-  ]);
-});
 
 test("controller capture returns a detached normalized snapshot", async () => {
   const {

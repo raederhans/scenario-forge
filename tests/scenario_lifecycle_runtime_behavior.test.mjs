@@ -2691,6 +2691,43 @@ test("scenario rollback restores presentation and localization sentinels includi
   });
 });
 
+test("scenario rollback writes back every captured key so a fresh capture matches the original snapshot", () => withAppStateRestored(() => {
+  const before = captureScenarioApplyRollbackSnapshot();
+  const capturedKeys = Object.keys(before).filter((key) => key !== "rollbackPresentStateKeys");
+  assert.ok(capturedKeys.length >= 100, "rollback snapshot should cover the scenario transaction state");
+
+  const statePatch = {};
+  for (const key of capturedKeys) {
+    if (key === "scenarioUiState" || key === "styleConfigOcean" || key.endsWith("Enabled")) continue;
+    statePatch[key] = { rollbackSentinel: key };
+  }
+  // The audit UI restore merges into the live object, so overwrite its known fields instead.
+  statePatch.scenarioAuditUi = { loading: true, loadedForScenarioId: "failed_scenario", errorMessage: "failed" };
+  applyAppStatePatch(statePatch);
+  appState.ui = {
+    ...(appState.ui || {}),
+    politicalEditingExpanded: !before.scenarioUiState.politicalEditingExpanded,
+    scenarioVisualAdjustmentsOpen: !before.scenarioUiState.scenarioVisualAdjustmentsOpen,
+  };
+  appState.styleConfig = { ...(appState.styleConfig || {}), ocean: { rollbackSentinel: "ocean" } };
+
+  restoreScenarioApplyRollbackSnapshot(before);
+  const after = captureScenarioApplyRollbackSnapshot();
+
+  // Replacing the chunk load state advances its generation so stale in-flight loads are fenced off.
+  assert.ok(after.runtimeChunkLoadState.generation > before.runtimeChunkLoadState.generation);
+  after.runtimeChunkLoadState = { ...after.runtimeChunkLoadState, generation: before.runtimeChunkLoadState.generation };
+  const unrestoredKeys = capturedKeys.filter((key) => {
+    try {
+      assert.deepEqual(after[key], before[key]);
+      return false;
+    } catch {
+      return true;
+    }
+  });
+  assert.deepEqual(unrestoredKeys, []);
+}));
+
 test("scenario data health accepts current coarse collections before chunk payload promotion", () => {
   const health = withAppStatePatch({
     activeScenarioManifest: {

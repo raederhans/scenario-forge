@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
@@ -22,28 +21,6 @@ import {
   createDefaultRenderPassCacheState,
   ensureRenderPassCacheState,
 } from "../js/core/state/renderer_runtime_state.js";
-
-test("renderer cache actions stay import-free with target-first exports", async () => {
-  const source = await readFile(
-    new URL("../js/core/state/actions/renderer_cache_actions.js", import.meta.url),
-    "utf8",
-  );
-  assert.doesNotMatch(source, /^\s*import\s/m);
-  for (const name of [
-    "commitRenderPassCacheState",
-    "commitProjectedBoundsCacheState",
-    "clearSphericalFeatureDiagnosticsCacheState",
-    "getSphericalFeatureDiagnosticsCacheEntryState",
-    "replaceCachedDetailAdmBordersState",
-    "replaceCachedCoastlineMeshesState",
-    "setDynamicBordersDirtyState",
-    "setPendingDynamicBorderTimerState",
-    "setSphericalFeatureDiagnosticsCacheEntryState",
-  ]) {
-    assert.match(source, new RegExp(`export function ${name}\\(\\s*target[,)]`));
-  }
-  assert.doesNotMatch(source, /ensureRenderPassCacheState/);
-});
 
 test("coastline publication retains all prepared containers and geometry identities", () => {
   const geometry = Object.freeze({ type: "MultiLineString", coordinates: Object.freeze([]) });

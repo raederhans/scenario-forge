@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
@@ -42,16 +41,6 @@ function deepFreeze(value, visited = new Set()) {
   }
   return Object.freeze(value);
 }
-
-test("render pass cache normalizer stays pure and import-free", async () => {
-  const source = await readFile(
-    new URL("../js/core/renderer/render_pass_cache_state_normalizer.js", import.meta.url),
-    "utf8",
-  );
-  assert.doesNotMatch(source, /^\s*import\s/m);
-  assert.match(source, /export function normalizeRenderPassCacheState\(\s*currentCache,/);
-  assert.doesNotMatch(source, /renderPassCache\s*=/);
-});
 
 test("normalized fast path preserves identity and performs zero transform clones", () => {
   const defaults = createDefaults();

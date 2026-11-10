@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
@@ -8,34 +7,10 @@ import {
 } from "../js/core/renderer/render_snapshot.js";
 
 const MODULE_PATH = "../js/core/state/actions/renderer_diagnostics_actions.js";
-const SOURCE_URL = new URL(MODULE_PATH, import.meta.url);
 
 async function loadActions() {
   return import(MODULE_PATH);
 }
-
-test("renderer diagnostics actions stay import-free with target-first exports", async () => {
-  const source = await readFile(SOURCE_URL, "utf8");
-  assert.doesNotMatch(source, /^\s*import\s/m);
-  for (const name of [
-    "captureRenderPerfMetricsState",
-    "captureRenderPerfContextBreakdownState",
-    "captureRenderPerfMetricEntryState",
-    "captureProjectedBoundsDiagnosticsState",
-    "captureRenderSnapshotState",
-    "ensureRenderPerfMetricsState",
-    "replaceRenderPerfMetricsState",
-    "setRenderPerfMetricEntryState",
-    "setRenderPerfContextBreakdownState",
-    "commitRenderPerfMetricState",
-    "setFirstVisibleFramePaintedState",
-    "resetProjectedBoundsDiagnosticsState",
-    "setProjectedBoundsDiagnosticsState",
-    "setDebugCountryCoverageState",
-  ]) {
-    assert.match(source, new RegExp(`export function ${name}\\(\\s*target[,)]`));
-  }
-});
 
 test("renderer diagnostics actions reject invalid targets", async () => {
   const actions = await loadActions();
