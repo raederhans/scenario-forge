@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>控件画廊（仅开发）</title>
+  <!-- 与 index.html 相同的样式表与顺序。画廊只记录现状，不放进发布产物（tests/ 不在 Pages 发布目录里）。 -->
+  <link rel="stylesheet" href="../../../css/style.css" />
+  <link rel="stylesheet" href="../../../css/map-label-fonts.css" />
+  <link rel="stylesheet" href="../../../css/editor-workspace.css" />
+  <link rel="stylesheet" href="../../../css/editor-shell.css" />
+  <link rel="stylesheet" href="../../../css/editor-tool-guidance.css" />
+  <link rel="stylesheet" href="gallery-layout.css" />
+</head>
+<body class="editor-workspace gallery-page">
+  <header class="gallery-intro">
+    <h1>控件画廊</h1>
+    <p>每行依次是：默认、悬停、聚焦（键盘）、禁用。悬停和聚焦由截图 spec 通过 DevTools 协议强制，手动打开页面时只看得到默认和禁用。</p>
+  </header>
+
+  <!-- ───────── 按钮：页面层（不在侧栏内） ───────── -->
+  <section class="gallery-section" data-gallery-section="buttons-global">
+    <h2 class="gallery-heading">按钮 · 页面层</h2>
+    <div data-specimen="btn-primary"><button type="button" class="btn-primary">Apply</button></div>
+    <div data-specimen="btn-primary（主按钮 ID 恢复）"><button type="button" id="workspaceSaveBtn" class="btn-primary">Save</button></div>
+    <div data-specimen="btn-secondary"><button type="button" class="btn-secondary">Import</button></div>
+    <div data-specimen="btn-secondary.is-danger-confirm"><button type="button" class="btn-secondary is-danger-confirm">Confirm delete</button></div>
+    <div data-specimen="secondary-btn"><button type="button" class="secondary-btn">New region</button></div>
+    <div data-specimen="danger-btn"><button type="button" class="danger-btn">Delete</button></div>
+    <div data-specimen="scenario-context-action-btn"><button type="button" class="scenario-context-action-btn">Scenario actions</button></div>
+    <div data-specimen="scenario-context-action-btn[aria-expanded]"><button type="button" class="scenario-context-action-btn" aria-expanded="true">Scenario actions</button></div>
+    <div data-specimen="scenario-context-icon-btn"><button type="button" class="scenario-context-icon-btn" aria-label="More"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-more"><circle cx="6" cy="12" r="1.4" fill="currentColor"></circle><circle cx="12" cy="12" r="1.4" fill="currentColor"></circle><circle cx="18" cy="12" r="1.4" fill="currentColor"></circle></svg></button></div>
+    <div data-specimen="editor-nav-button"><button type="button" class="editor-nav-button">Back</button></div>
+    <div data-specimen="editor-nav-button[aria-pressed]"><button type="button" class="editor-nav-button" aria-pressed="true">Layers</button></div>
+    <div data-specimen="boot-overlay .btn-primary"><div class="boot-overlay__actions"><button type="button" id="bootRetryBtn" class="btn-primary" data-gallery-target>Retry</button></div></div>
+  </section>
+
+  <!-- ───────── 按钮：侧栏内（#leftSidebar / #rightSidebar 上下文） ───────── -->
+  <section class="gallery-section" data-gallery-section="buttons-sidebar">
+    <h2 class="gallery-heading">按钮 · 侧栏内</h2>
+    <aside id="leftSidebar" class="sidebar sidebar-left gallery-ctx">
+      <div data-specimen="#leftSidebar .btn-primary"><button type="button" class="btn-primary">Apply</button></div>
+      <div data-specimen="#leftSidebar .btn-secondary"><button type="button" class="btn-secondary">Reset</button></div>
+      <div data-specimen=".btn-secondary.sidebar-support-entry-btn"><button type="button" class="btn-secondary sidebar-support-entry-btn">Diagnostics</button></div>
+      <div data-specimen="#appearancePresetApplyBtn"><button type="button" id="appearancePresetApplyBtn" class="btn-primary">Apply preset</button></div>
+      <div data-specimen="mode-toggle-btn"><div class="mode-toggle-row" data-gallery-target-child><button type="button" class="mode-toggle-btn">By Parent</button></div></div>
+      <div data-specimen="mode-toggle-btn.is-active"><div class="mode-toggle-row"><button type="button" class="mode-toggle-btn is-active">By Country</button></div></div>
+    </aside>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="sidebar-action-primary"><button type="button" class="sidebar-action-primary inspector-detail-primary-btn">Apply color</button></div>
+      <div data-specimen="sidebar-action-secondary"><button type="button" class="sidebar-action-secondary">Clear override</button></div>
+      <div data-specimen="sidebar-action-secondary.is-danger"><button type="button" class="sidebar-action-secondary is-danger">Remove</button></div>
+      <div data-specimen="sidebar-tool-action-primary"><button type="button" class="sidebar-tool-action-primary">Run</button></div>
+      <div data-specimen="inspector-item-btn"><button type="button" class="inspector-item-btn">Bavaria preset</button></div>
+      <div data-specimen="inspector-accordion-btn"><button type="button" class="inspector-accordion-btn country-explorer-header" aria-expanded="false"><div class="country-explorer-heading"><div class="country-row-title">Europe (42)</div></div><span class="inspector-mini-label"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-right"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></div>
+    </aside>
+  </section>
+
+  <!-- ───────── 按钮：工具坞、缩放 ───────── -->
+  <section class="gallery-section" data-gallery-section="buttons-dock-zoom">
+    <h2 class="gallery-heading">按钮 · 工具坞与缩放</h2>
+    <div id="bottomDock" class="bottom-dock gallery-ctx">
+      <div data-specimen="dock-tool-btn"><button type="button" class="btn-tool dock-tool-btn" aria-label="Fill"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><path d="M7 15 15 7l3 3-8 8H7v-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg><span>Fill</span></button></div>
+      <div data-specimen="dock-tool-btn.is-active"><button type="button" class="btn-tool dock-tool-btn is-active" aria-pressed="true"><span>Eraser</span></button></div>
+      <div data-specimen="dock-icon-btn"><button type="button" class="dock-icon-btn" aria-label="Undo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="M9 7 5 11l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5 11h9a5 5 0 0 1 0 10h-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg></button></div>
+      <div data-specimen="dock-action-icon-btn-primary"><button type="button" class="dock-icon-btn dock-action-icon-btn dock-action-icon-btn-primary" aria-label="Apply"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="m5 12 5 5 9-10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+      <div data-specimen="dock-segment-btn"><div class="dock-segmented-control"><button type="button" class="dock-segment-btn" aria-pressed="false">River cells</button></div></div>
+      <div data-specimen="dock-segment-btn[aria-pressed]"><div class="dock-segmented-control"><button type="button" class="dock-segment-btn is-active" aria-pressed="true">Color</button></div></div>
+      <div data-specimen="dock-handle-btn"><button type="button" class="dock-handle-btn" aria-label="Collapse dock"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+    </div>
+    <div class="zoom-controls gallery-ctx">
+      <div data-specimen="zoom-btn"><button type="button" class="zoom-btn" aria-label="Zoom in"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-plus"><path d="M12 5v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+      <div data-specimen="zoom-btn.zoom-pill-btn"><button type="button" class="zoom-btn zoom-pill-btn zoom-language-btn shell-utility-status-btn">中文</button></div>
+    </div>
+  </section>
+
+  <!-- ───────── 按钮：交通工作台、特殊区域 ───────── -->
+  <section class="gallery-section" data-gallery-section="buttons-workbenches">
+    <h2 class="gallery-heading">按钮 · 交通工作台与特殊区域</h2>
+    <div class="transport-workbench-panel gallery-ctx"><div class="transport-workbench-shell">
+      <div data-specimen="transport-workbench-icon-btn"><button type="button" class="transport-workbench-icon-btn" aria-expanded="false">Guide</button></div>
+      <div data-specimen="transport-workbench-close-btn"><button type="button" class="transport-workbench-close-btn">Close</button></div>
+      <div data-specimen="transport-workbench-preview-control-btn"><button type="button" class="transport-workbench-preview-control-btn">Reset view</button></div>
+      <div data-specimen="transport-workbench-data-action-button"><button type="button" class="transport-workbench-data-action-button">Export CSV</button></div>
+      <div data-specimen="transport-workbench-data-action-button-subtle"><button type="button" class="transport-workbench-data-action-button transport-workbench-data-action-button-subtle">Clear</button></div>
+    </div></div>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx"><section class="editor-property-panel"><div class="special-zone-layers-workbench"><div class="special-zone-workbench-card">
+      <div data-specimen="special-zone secondary-btn"><button type="button" class="secondary-btn">New region</button></div>
+      <div data-specimen="special-zone-member-edit"><button type="button" class="secondary-btn special-zone-member-edit">Edit members</button></div>
+      <div data-specimen="special-zone-layer-row"><div class="special-zone-layer-row is-active"><button type="button" class="secondary-btn special-zone-visibility" aria-pressed="true" aria-label="Hide">◉</button><button type="button" class="secondary-btn special-zone-layer-select" aria-pressed="true" data-gallery-target><span class="special-zone-pattern-choice-preview" style="background-color:#d9c27a"></span><span>Demilitarized zone · Custom Zone · 12 parcels</span></button></div></div>
+      <div data-specimen="special-zone-member-chip"><div class="special-zone-member-chip-list"><button type="button" class="special-zone-member-chip">Alsace</button><button type="button" class="secondary-btn special-zone-member-overflow-btn">+8</button></div></div>
+    </div></div></section></aside>
+  </section>
+
+  <!-- ───────── 弹窗（app_dialog 实际生成） ───────── -->
+  <section class="gallery-section" data-gallery-section="dialogs">
+    <h2 class="gallery-heading">确认弹窗 · app_dialog 生成</h2>
+    <div class="gallery-dialog-slot" data-dialog-tone="info"></div>
+    <div class="gallery-dialog-slot" data-dialog-tone="warning"></div>
+    <div data-specimen="app-dialog-btn-secondary" data-states="default hover focus"><div class="app-dialog"><div class="app-dialog-footer"><button type="button" class="app-dialog-btn app-dialog-btn-secondary" data-gallery-target>Cancel</button></div></div></div>
+    <div data-specimen="app-dialog-btn-primary" data-states="default hover focus"><div class="app-dialog"><div class="app-dialog-footer"><button type="button" class="app-dialog-btn app-dialog-btn-primary" data-gallery-target>Confirm</button></div></div></div>
+  </section>
+
+  <!-- ───────── Toast（toast.js 实际生成） ───────── -->
+  <section class="gallery-section" data-gallery-section="toasts">
+    <h2 class="gallery-heading">Toast · toast.js 生成</h2>
+    <div id="toastViewport" class="toast-viewport gallery-ctx" aria-live="polite" aria-atomic="false"></div>
+  </section>
+
+  <!-- ───────── 文本与搜索输入 ───────── -->
+  <section class="gallery-section" data-gallery-section="inputs">
+    <h2 class="gallery-heading">文本与搜索输入</h2>
+    <div data-specimen=".input"><input type="text" class="input" placeholder="Layer name" /></div>
+    <div data-specimen=".select-input (text)"><input type="text" class="select-input" placeholder="Custom label" /></div>
+    <div data-specimen=".text-input (search)"><input type="search" class="text-input" placeholder="Search guide" /></div>
+    <div data-specimen=".dock-zoom-input"><div id="bottomDock" class="gallery-ctx-inline"><input type="text" inputmode="numeric" class="input dock-zoom-input" value="100%" /></div></div>
+    <div data-specimen="transport edit-overlay-input"><div class="transport-workbench-panel"><input type="text" class="text-input transport-workbench-edit-overlay-input" value="A7" /></div></div>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="#rightSidebar .input"><input type="text" class="input" placeholder="Layer name" /></div>
+      <div data-specimen="inspector-search-input"><div class="inspector-search-shell"><div class="card-flat inspector-search-block"><div class="inspector-search-input-row"><svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg><input type="text" placeholder="Search country or code..." class="input inspector-search-input" data-gallery-target /></div></div></div></div>
+      <div data-specimen="palette-library-search-input"><input type="text" class="input palette-library-search-input" placeholder="Search palette" /></div>
+      <div data-specimen="special-zone-workbench-field text"><div class="special-zone-workbench-card special-zone-style-card"><label class="special-zone-workbench-field"><span>Name</span><input type="text" value="Saar territory" data-gallery-target /></label></div></div>
+      <div data-specimen="special-zone-member-drawer-search"><input type="search" class="input special-zone-member-drawer-search" placeholder="Search parcels" /></div>
+    </aside>
+  </section>
+
+  <!-- ───────── 下拉 ───────── -->
+  <section class="gallery-section" data-gallery-section="selects">
+    <h2 class="gallery-heading">下拉 · 增强与未增强</h2>
+    <div data-specimen="select-input（styled_selects 增强）"><select class="select-input"><option>Political</option><option>Physical</option></select></div>
+    <div data-specimen="select-input（未增强，原生）"><select class="select-input" data-app-select-skip="true"><option>Political</option><option>Physical</option></select></div>
+    <div data-specimen="dock-select（原生）"><select class="dock-select" data-app-select-skip="true"><option>Fill</option><option>Border</option></select></div>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="#rightSidebar select-input（增强）"><select class="select-input"><option>By parent</option><option>By country</option></select></div>
+      <div data-specimen="transport-workbench-select（增强）"><div class="transport-workbench-panel"><div class="transport-workbench-field"><div class="transport-workbench-field-title">Road class</div><select class="select-input transport-workbench-select" data-gallery-target><option>Motorway</option><option>Trunk</option></select></div></div></div>
+      <div data-specimen="special-zone-category-select（增强）"><div class="special-zone-workbench-card special-zone-style-card"><div class="special-zone-workbench-field"><span>Category</span><select class="special-zone-category-select" aria-label="Category" data-gallery-target><option>Custom Zone</option><option>Demilitarized</option></select></div></div></div>
+    </aside>
+  </section>
+
+  <!-- ───────── 复选框与开关 ───────── -->
+  <section class="gallery-section" data-gallery-section="toggles">
+    <h2 class="gallery-heading">复选框与开关</h2>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="toggle-label + checkbox-input"><label class="toggle-label"><input type="checkbox" class="checkbox-input" data-gallery-target /><span>Parcel Names</span></label></div>
+      <div data-specimen="toggle-label + checkbox-input（选中）"><label class="toggle-label"><input type="checkbox" class="checkbox-input" checked data-gallery-target /><span>Show rivers</span></label></div>
+      <div data-specimen="toggle-switch（无 CSS 规则）"><label class="toggle-switch"><input type="checkbox" data-gallery-target /><span class="toggle-slider"></span></label></div>
+      <div data-specimen="transport-workbench-toggle"><div class="transport-workbench-panel"><div class="transport-workbench-field"><label class="transport-workbench-toggle"><input type="checkbox" checked data-gallery-target /><span>Show labels</span></label></div></div></div>
+    </aside>
+  </section>
+
+  <!-- ───────── 滑块与颜色 ───────── -->
+  <section class="gallery-section" data-gallery-section="ranges-colors">
+    <h2 class="gallery-heading">滑块与颜色选择</h2>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="range-row + range-input"><div><div class="range-row"><label class="range-label">Bathymetry opacity</label><span class="range-value">90%</span></div><input type="range" class="range-input" min="0" max="100" value="90" data-gallery-target /></div></div>
+      <div data-specimen="export-workbench-range-input"><input type="range" class="range-input export-workbench-range-input" min="1" max="4" value="2" /></div>
+      <div data-specimen="transport-workbench-range"><div class="transport-workbench-panel"><div class="transport-workbench-field"><div class="transport-workbench-field-title">Line width</div><div class="transport-workbench-range-row"><input type="range" class="transport-workbench-range" min="0" max="10" value="4" data-gallery-target /><span class="transport-workbench-range-value">4</span></div></div></div></div>
+      <div data-specimen="color-input"><div class="flex items-center justify-between gap-3"><label class="range-label">Tint Color</label><input type="color" value="#f2dea1" class="color-input" data-gallery-target /></div></div>
+      <div data-specimen="dock-custom-color"><input type="color" class="color-input dock-custom-color" value="#7a4b2a" /></div>
+      <div data-specimen="special-zone 原生 color"><div class="special-zone-workbench-card special-zone-style-card"><label class="special-zone-workbench-field"><span>Fill</span><input type="color" value="#d9c27a" data-gallery-target /></label></div></div>
+    </aside>
+  </section>
+
+  <!-- ───────── 标签页 ───────── -->
+  <section class="gallery-section" data-gallery-section="tabs">
+    <h2 class="gallery-heading">标签页各家族（每行：未选中 / 悬停 / 聚焦 / 选中）</h2>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="appearance-tab-btn" data-states="default hover focus selected"><div class="appearance-tab-row" role="tablist"><button type="button" class="appearance-tab-btn" role="tab" aria-selected="false" data-gallery-target>Borders</button></div></div>
+      <div data-specimen="map-content-tab-btn" data-states="default hover focus selected"><div class="appearance-tab-row map-content-tab-row" role="tablist"><button type="button" class="appearance-tab-btn map-content-tab-btn" role="tab" aria-selected="false" data-gallery-target>Labels</button></div></div>
+      <div data-specimen="inspector-sidebar-tab-btn" data-states="default hover focus selected"><div class="inspector-sidebar-tab-row" role="tablist"><button type="button" class="inspector-sidebar-tab-btn" role="tab" aria-selected="false" data-gallery-target>Inspector</button></div></div>
+      <div data-specimen="palette-library-source-btn" data-states="default hover focus selected"><div class="palette-library-sources" role="tablist"><button type="button" class="palette-library-source-btn" role="tab" aria-selected="false" data-gallery-target>HOI4</button></div></div>
+    </aside>
+    <div class="transport-workbench-panel gallery-ctx"><div class="transport-workbench-shell">
+      <div data-specimen="transport-workbench-family-tab" data-states="default hover focus selected"><div class="transport-workbench-family-tabs" role="tablist"><button type="button" class="transport-workbench-family-tab" role="tab" aria-selected="false" data-gallery-target>Rail</button></div></div>
+      <div data-specimen="transport-workbench-inspector-tab" data-states="default hover focus selected"><div class="transport-workbench-inspector-tabs" role="tablist"><button type="button" class="transport-workbench-inspector-tab" role="tab" aria-selected="false" data-gallery-target>Data</button></div></div>
+    </div></div>
+    <div class="scenario-guide-popover gallery-ctx">
+      <div data-specimen="scenario-guide-nav-btn" data-states="default hover focus selected"><div class="scenario-guide-nav" role="tablist"><button type="button" class="scenario-guide-nav-btn" role="tab" aria-selected="false" data-gallery-target>Quick path</button></div></div>
+    </div>
+    <div data-specimen="export-workbench-preview-toggle-btn" data-states="default hover focus selected"><button type="button" class="export-workbench-preview-toggle-btn">Final</button></div>
+  </section>
+
+  <!-- ───────── 折叠面板 ───────── -->
+  <section class="gallery-section" data-gallery-section="disclosures">
+    <h2 class="gallery-heading">折叠面板（每行：收起 / 悬停 / 聚焦 / 展开）</h2>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="card appearance-card" data-states="default hover focus open"><details class="card appearance-card"><summary class="section-header">Appearance</summary><div class="mt-3">Panel body</div></details></div>
+      <div data-specimen="appearance-mini-section" data-states="default hover focus open"><details class="appearance-mini-section"><summary class="section-header">Bathymetry details</summary><div>Panel body</div></details></div>
+      <div data-specimen="appearance-mini-section-subtle" data-states="default hover focus open"><details class="appearance-mini-section appearance-mini-section-subtle"><summary class="section-header">More options</summary><div>Panel body</div></details></div>
+      <div data-specimen="physical-disclosure" data-states="default hover focus open"><details class="physical-disclosure"><summary>Advanced</summary><div>Panel body</div></details></div>
+    </aside>
+    <div class="scenario-guide-popover gallery-ctx">
+      <div data-specimen="scenario-guide-tool-panel" data-states="default hover focus open"><details class="scenario-guide-tool-panel"><summary>Paint tools</summary><div>Panel body</div></details></div>
+    </div>
+  </section>
+
+  <!-- ───────── 列表项 ───────── -->
+  <section class="gallery-section" data-gallery-section="list-rows">
+    <h2 class="gallery-heading">列表项（每行：默认 / 悬停 / 聚焦 / 选中）</h2>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="country-select-row" data-states="default hover focus selected"><div class="country-select-row"><button type="button" class="country-select-main country-select-main-btn" aria-pressed="false" data-gallery-target><div class="country-select-title">France</div><div class="country-select-meta">FRA · 96 parcels</div></button></div></div>
+      <div data-specimen="palette-library-row" data-states="default hover focus selected"><div class="palette-library-row-shell"><button type="button" class="palette-library-row" aria-pressed="false" data-gallery-target><span class="color-swatch" style="background-color:#4a6b8a"></span><span class="palette-library-meta u-min-0"><span class="palette-library-title u-truncate">Germany</span><span class="palette-library-subtitle">GER · HOI4</span></span></button></div></div>
+      <div data-specimen="special-zone-member-drawer-row" data-states="default hover focus"><dialog open class="special-zone-member-drawer gallery-inline-dialog"><div class="special-zone-member-drawer-list"><button type="button" class="special-zone-member-drawer-row" data-gallery-target>Alsace · FRA-1234</button></div></dialog></div>
+    </aside>
+    <aside id="leftSidebar" class="sidebar sidebar-left gallery-ctx">
+      <div data-specimen="#leftSidebar editor-layer-row" data-states="default hover focus selected"><div class="editor-layer-row"><button type="button" class="editor-layer-trigger" data-gallery-target>Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer">◉</button></div></div>
+      <div data-specimen="#leftSidebar editor-layer-visibility"><div class="editor-layer-row"><button type="button" class="editor-layer-trigger">Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer" data-gallery-target>◉</button></div></div>
+    </aside>
+    <div class="transport-workbench-panel gallery-ctx">
+      <div data-specimen="transport-workbench-data-row-button" data-states="default hover focus selected"><button type="button" class="transport-workbench-data-row-button" aria-pressed="false">A7 · Motorway</button></div>
+    </div>
+  </section>
+
+  <!-- ───────── 修复前无效的三条声明所在位置 ───────── -->
+  <section class="gallery-section" data-gallery-section="invalid-declaration-sites">
+    <h2 class="gallery-heading">特殊区域成员抽屉与图例分区（style.css 三处多右括号声明的位置）</h2>
+    <dialog open class="special-zone-member-drawer gallery-inline-dialog" aria-label="Members">
+      <div class="special-zone-member-drawer-header"><h4>Members</h4><button type="button" class="secondary-btn">Close</button></div>
+      <input type="search" class="input special-zone-member-drawer-search" placeholder="Search parcels" />
+      <div class="special-zone-member-drawer-list">
+        <button type="button" class="special-zone-member-drawer-row">Alsace · FRA-1234</button>
+        <button type="button" class="special-zone-member-drawer-row">Lorraine · FRA-1235</button>
+      </div>
+    </dialog>
+    <div class="map-legend gallery-ctx"><div class="legend-special-zone-section"><h4 class="legend-section-title">Special Zone Layers</h4><div class="legend-row legend-row-special-zone"><span class="legend-swatch legend-swatch-special-zone" style="background-color:#d9c27a"></span><span class="legend-special-zone-label">Demilitarized zone</span></div></div></div>
+  </section>
+
+  <script type="module" src="gallery.js"></script>
+</body>
+</html>
