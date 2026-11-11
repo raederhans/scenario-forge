@@ -13,7 +13,7 @@
   "source_policy": "local_source_cache_with_download",
   "paths": {
     "preview": {
-      "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson"
+      "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson"
     },
     "full": {
       "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson"
@@ -218,7 +218,7 @@
       "source_policy": "local_source_cache_with_download",
       "paths": {
         "preview": {
-          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson"
+          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson"
         },
         "full": {
           "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson"
@@ -243,7 +243,7 @@
       "source_policy": "local_source_cache_only",
       "paths": {
         "preview": {
-          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson"
+          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson"
         },
         "full": {
           "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson"
