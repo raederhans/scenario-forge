@@ -18,7 +18,7 @@ export function shouldHoldRasterAssetRequest() {
   return true;
 }
 
-export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false, launchOptions = {}, initScripts = [] } = {}) {
+export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false, startAtWorldView = false, launchOptions = {}, initScripts = [] } = {}) {
   const url = new URL(baseUrl);
   const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
   const publishedTarget = url.origin === "https://raederhans.github.io" && url.pathname === "/scenario-forge/app/";
@@ -111,6 +111,15 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       context.on("requestfailed", request => {
         if (held.delete(request)) void page.evaluate(() => { window.__rasterAssetFaults.aborted++; }).catch(() => {});
       });
+    }
+    if (startAtWorldView) {
+      // 没有 opening_view 的清单走启动时的全图路径，不必先加载开场视角的切片再复位。
+      // 只拦一次：路由存在时 Playwright 会禁用 HTTP 缓存，不能影响之后的请求。
+      await context.route(`**/data/scenarios/${scenarioId}/manifest.json*`, async route => {
+        const response = await route.fetch();
+        const { opening_view: _openingView, ...manifest } = await response.json();
+        await route.fulfill({ response, json: manifest });
+      }, { times: 1 });
     }
     const errors = [], network = [], warnings = [];
     context.on("response", response => {
