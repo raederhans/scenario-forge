@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
+import { formatScenarioStatusText } from '../js/core/scenario_manager.js';
+import { formatScenarioFatalRecoveryMessage } from '../js/core/scenario_recovery.js';
+import { state } from '../js/core/state.js';
 
 const source = readFileSync(new URL('../js/core/scenario_manager.js', import.meta.url), 'utf8');
 const declaration = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
@@ -109,21 +112,19 @@ test('stale promotion result does not report a failure against a newer import', 
   await work;
 });
 
-test('scenario status passes a scalar identity in both normal and fatal status branches', () => {
-  const status = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
-    .find(node => node.id?.name === 'formatScenarioStatusText');
-  let fatal = null;
-  const context = vm.createContext({
-    runtimeState: { activeScenarioId: 'test', activeScenarioManifest: {} },
-    getScenarioFatalRecoveryState: () => fatal,
-    getScenarioDisplayName: (_manifest, id) => { assert.equal(id, 'test'); return 'Test'; },
-    formatScenarioFatalRecoveryMessage: () => 'Recovery required',
-    evaluateScenarioDataHealth: () => ({}),
-    SCENARIO_DETAIL_MIN_RATIO_STRICT: 0.8,
-    t: text => text,
-  });
-  vm.runInContext(source.slice(status.start, status.end), context);
-  assert.equal(context.formatScenarioStatusText(), 'Test');
-  fatal = {};
-  assert.equal(context.formatScenarioStatusText(), 'Test - Recovery required');
+test('scenario status names the active scenario in both normal and fatal status branches', () => {
+  const keys = ['activeScenarioId', 'activeScenarioManifest', 'scenarioFatalRecovery'];
+  const saved = Object.fromEntries(keys.map(key => [key, state[key]]));
+  try {
+    state.activeScenarioId = 'test';
+    state.activeScenarioManifest = { display_name: 'Test' };
+    state.scenarioFatalRecovery = null;
+    assert.equal(formatScenarioStatusText(), 'Test');
+    state.scenarioFatalRecovery = {};
+    assert.equal(formatScenarioStatusText(), `Test - ${formatScenarioFatalRecoveryMessage({})}`);
+    state.activeScenarioId = '';
+    assert.equal(formatScenarioStatusText(), formatScenarioFatalRecoveryMessage({}));
+  } finally {
+    Object.assign(state, saved);
+  }
 });
