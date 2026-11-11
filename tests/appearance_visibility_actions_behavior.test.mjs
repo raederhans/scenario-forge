@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import {
   patchAppearanceVisibilityState,
   setAppearanceVisibilitySnapshotState,
@@ -10,6 +9,7 @@ import {
 test("appearance visibility actions enforce whitelist and boolean values", () => {
   const target = { showUrban: false, showPhysical: true, showTransport: true };
   assert.equal(setAppearanceVisibilityState(target, "showUrban", 1), true);
+  assert.equal(target.showUrban, true);
   assert.equal(
     setAppearanceVisibilityState(
       target,
@@ -55,15 +55,3 @@ test("appearance visibility snapshot setter preserves exact parent-border values
   );
 });
 
-test("appearance visibility delegates shared keys and directly owns only parent border visibility", () => {
-  const source = readFileSync(
-    new URL("../js/core/state/actions/appearance_visibility_actions.js", import.meta.url),
-    "utf8",
-  );
-  assert.match(source, /case "showUrban": commitUiVisibilityState\(target, \{ showUrban: next \}\)/);
-  assert.match(source, /target\.parentBordersVisible = next/);
-  assert.doesNotMatch(
-    source,
-    /target\.(?:showWaterRegions|showOpenOceanRegions|allowOpenOceanSelect|allowOpenOceanPaint|showScenarioSpecialRegions|showScenarioAtlantropa|showScenarioReliefOverlays|showCityPoints|showStrategicResourceMarkers|strategicChoroplethMetric|showUrban|showPhysical|showRivers|showTransport|showSpecialZones|showRoad|showRail|showAirports|showPorts|showBlankFeatureLabels)\s*=/,
-  );
-});

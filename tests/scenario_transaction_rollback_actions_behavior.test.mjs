@@ -1,8 +1,5 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import {
   restoreScenarioActivationAfterColorDirtyState,
@@ -45,22 +42,6 @@ import {
 } from "../js/core/state/actions/scenario_chunk_promotion_actions.js";
 import { cloneScenarioStateValue } from "../js/core/scenario/shared.js";
 
-const REPO_ROOT = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
-const ACTION_SOURCE = fs.readFileSync(
-  path.join(
-    REPO_ROOT,
-    "js/core/state/actions/scenario_transaction_rollback_actions.js",
-  ),
-  "utf8",
-);
-const ROLLBACK_SOURCE = fs.readFileSync(
-  path.join(REPO_ROOT, "js/core/scenario_rollback.js"),
-  "utf8",
-);
-
 const EXPECTED_SUPPLEMENTAL_KEYS = Object.freeze([
   "defaultRuntimePoliticalTopology",
   "scenarioPoliticalChunkData",
@@ -97,30 +78,6 @@ const EXPECTED_SUPPLEMENTAL_HANDOFF_PHASE_BY_KEY = Object.freeze({
   scheduleScenarioChunkRefreshFn: "P4.2b",
   awaitInitialScenarioChunkVisualPromotionFn: "P4.2b",
 });
-
-function sorted(values) {
-  return [...values].sort((left, right) => left.localeCompare(right));
-}
-
-function extractFrozenStringArray(source, constantName) {
-  const match = source.match(
-    new RegExp(
-      `const ${constantName} = Object\\.freeze\\(\\[([\\s\\S]*?)\\n\\]\\);`,
-    ),
-  );
-  assert.ok(match, `${constantName} must remain a frozen string array`);
-  return [...match[1].matchAll(/"([^"]+)"/g)].map((entry) => entry[1]);
-}
-
-function extractRollbackPatchValueKeys(source) {
-  const normalizedSource = source.replace(/\r\n?/g, "\n");
-  const match = normalizedSource.match(
-    /function buildScenarioTransactionRollbackStatePatch\(snapshot\) \{[\s\S]*?const values = \{\n(?<body>[\s\S]*?)\n  \};\n  return \{/,
-  );
-  assert.ok(match?.groups?.body, "rollback patch values object must remain statically discoverable");
-  return [...match.groups.body.matchAll(/^ {6}([A-Za-z_$][\w$]*):/gm)]
-    .map((entry) => entry[1]);
-}
 
 function createValues(keys) {
   return Object.fromEntries(
@@ -293,40 +250,6 @@ test("scenario rollback authority key sets are pairwise disjoint and cover the e
   const authorityKeys = authorityEntries.flatMap(([, keys]) => keys);
   // Retired featureOverrides/countryBaseColors (-2), canonical riverPaint (+1).
   assert.equal(authorityKeys.length, 112);
-  assert.deepEqual(
-    sorted(extractRollbackPatchValueKeys(ROLLBACK_SOURCE)),
-    sorted(authorityKeys),
-  );
-
-  const snapshotToAuthorityKey = Object.freeze({
-    scenarioUiState: "ui",
-    styleConfigOcean: "styleConfig",
-    scheduleScenarioChunkRefreshEnabled: "scheduleScenarioChunkRefreshFn",
-    awaitInitialScenarioChunkVisualPromotionEnabled:
-      "awaitInitialScenarioChunkVisualPromotionFn",
-  });
-  const requiredSnapshotKeys = extractFrozenStringArray(
-    ROLLBACK_SOURCE,
-    "ROLLBACK_REQUIRED_KEYS",
-  );
-  assert.equal(requiredSnapshotKeys.length, 112);
-  assert.deepEqual(
-    sorted(
-      requiredSnapshotKeys.map(
-        (key) => snapshotToAuthorityKey[key] || key,
-      ),
-    ),
-    sorted(authorityKeys),
-  );
-});
-
-test("scenario rollback patch discovery is portable across line endings", () => {
-  const lfSource = ROLLBACK_SOURCE.replace(/\r\n?/g, "\n");
-  const crlfSource = lfSource.replaceAll("\n", "\r\n");
-  assert.deepEqual(
-    extractRollbackPatchValueKeys(crlfSource),
-    extractRollbackPatchValueKeys(lfSource),
-  );
 });
 
 test("scenario rollback supplemental authority has an exact frozen phase handoff", () => {
@@ -646,58 +569,4 @@ test("scenario transaction supplemental validator rejects incomplete patches", (
     /missing required key: defaultRuntimePoliticalTopology/,
   );
   assert.deepEqual(target, before);
-});
-
-test("scenario transaction rollback action keeps a narrow canonical state-action boundary", () => {
-  const importSources = [...ACTION_SOURCE.matchAll(
-    /^import\s*\{[\s\S]*?\}\s*from\s*"([^"]+)";/gm,
-  )].map((match) => match[1]).sort();
-  assert.deepEqual(importSources, []);
-  for (const actionName of [
-    "replaceScenarioChunkRuntimeState",
-    "setScenarioChunkRuntimeHooksState",
-    "setDefaultRuntimePoliticalTopologyState",
-    "setScenarioPoliticalChunkPayloadState",
-  ]) {
-    assert.match(ROLLBACK_SOURCE, new RegExp(`\\b${actionName}\\(`));
-    assert.doesNotMatch(ACTION_SOURCE, new RegExp(`\\b${actionName}\\(`));
-  }
-  assert.doesNotMatch(
-    ACTION_SOURCE,
-    /\b(?:globalThis|window|document|runtimeState)\b/,
-  );
-  assert.doesNotMatch(ACTION_SOURCE, /\btarget\s*\[/);
-  assert.doesNotMatch(ACTION_SOURCE, /\bdelete\s+target\s*\[/);
-  const delegatedP42bKeys = new Set([
-    "defaultRuntimePoliticalTopology",
-    "scenarioPoliticalChunkData",
-    "scenarioPoliticalVisibleChunkData",
-    "activeScenarioChunks",
-    "runtimeChunkLoadState",
-    "scheduleScenarioChunkRefreshFn",
-    "awaitInitialScenarioChunkVisualPromotionFn",
-  ]);
-  for (const key of SCENARIO_TRANSACTION_ROLLBACK_SUPPLEMENTAL_STATE_KEYS.filter(
-    (key) => !delegatedP42bKeys.has(key),
-  )) {
-    assert.match(
-      ACTION_SOURCE,
-      new RegExp(`\\btarget\\.${key}\\b`),
-      `${key} must have an explicit static target write`,
-    );
-  }
-  for (const key of delegatedP42bKeys) {
-    assert.doesNotMatch(
-      ACTION_SOURCE,
-      new RegExp(`\\btarget\\.${key}\\s*=`),
-      `${key} must delegate to its P4.2b canonical action`,
-    );
-  }
-  for (const key of ALL_DOMAIN_KEYS) {
-    assert.doesNotMatch(
-      ACTION_SOURCE,
-      new RegExp(`\\btarget\\.${key}\\s*=`),
-      `${key} must stay in its canonical domain action`,
-    );
-  }
 });

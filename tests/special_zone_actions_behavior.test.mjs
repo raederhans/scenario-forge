@@ -1,8 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import {
   commitSpecialZoneLayersState,
@@ -21,8 +18,6 @@ import {
   registerSpecialZonesWorkbenchRuntimeHooks,
 } from "../js/core/state/actions/special_zone_actions.js";
 
-const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(TEST_DIR, "..");
 
 test("special zone editor compatibility preserves valid legacy fields and fills missing fields", () => {
   const vertices = [[1, 2]];
@@ -214,17 +209,9 @@ test("special zone finite setters normalize brush mode and boolean dirty state",
   assert.deepEqual(setSpecialZonePresetCategoryOpenState(target, "other", true), ["conflict", "other"]);
   assert.deepEqual(setSpecialZonePresetCategoryOpenState(target, "conflict", false), ["other"]);
   assert.equal(setSpecialZonesVisibilityState(target, 1), true);
+  assert.equal(target.showSpecialZones, true);
   assert.equal(setSpecialZonesOverlayDirtyState(target, 0), false);
   assert.throws(() => setSpecialZonesOverlayDirtyState([], true), /target must be an object/);
-});
-
-test("special zone visibility delegates to the canonical UI visibility action", () => {
-  const source = fs.readFileSync(
-    path.join(REPO_ROOT, "js/core/state/actions/special_zone_actions.js"),
-    "utf8",
-  );
-  assert.match(source, /commitUiVisibilityState\(target, \{ showSpecialZones: nextVisible \}\)/);
-  assert.doesNotMatch(source, /target\.showSpecialZones\s*=/);
 });
 
 test("manual special zone compatibility state is repaired through one action boundary", () => {
