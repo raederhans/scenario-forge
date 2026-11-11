@@ -12,7 +12,7 @@ const VALID_LAYERS = new Set(["smoke", "contract", "regression", "feature"]);
 const VALID_EXECUTION_MODES = new Set(["browser", "hybrid", "static-contract"]);
 const LAYER_ORDER = ["smoke", "contract", "regression", "feature", "all"];
 const NON_SMOKE_LAYERS = ["contract", "regression", "feature"];
-const EXPECTED_E2E_SPEC_COUNT = 67;
+const EXPECTED_E2E_SPEC_COUNT = 44;
 // 第一阶段 smoke 明确写死为这 4 个 spec，避免入口再次漂移。
 const FIXED_SMOKE_SPECS = [
   "tests/e2e/main_shell_i18n.spec.js",
@@ -24,18 +24,13 @@ const KNOWN_DIRECT_E2E_SCRIPT_TARGETS = new Set([
   "tests/e2e/ui_contract_foundation.spec.js",
   "tests/e2e/ui_rework_mainline_shell_sidebar.spec.js",
   "tests/e2e/ui_rework_support_transport_hardening.spec.js",
-  "tests/e2e/scenario_apply_concurrency.spec.js",
   "tests/e2e/startup_bundle_recovery_contract.spec.js",
   "tests/e2e/scenario_shell_overlay_contract.spec.js",
-  "tests/e2e/physical_layer_regression.spec.js",
   "tests/e2e/physical_layer_runtime_contract.spec.js",
   "tests/e2e/main_shell_i18n.spec.js",
   "tests/e2e/hoi4_1939_ui_smoke.spec.js",
   "tests/e2e/tno_1962_ui_smoke.spec.js",
-  "tests/e2e/strategic_overlay_smoke.spec.js",
-  "tests/e2e/project_save_load_roundtrip.spec.js",
   "tests/e2e/interaction_funnel_contract.spec.js",
-  "tests/e2e/scenario_apply_resilience.spec.js",
 ]);
 
 function readManifest() {
@@ -123,7 +118,6 @@ function validateManifest() {
     FIXED_SMOKE_SPECS.every((specPath) => actualSmokeEntries.includes(specPath)),
     "Smoke layer must stay fixed to the approved 4 spec set."
   );
-  ensure(!actualSmokeEntries.includes("tests/e2e/scenario_apply_resilience.spec.js"), "scenario_apply_resilience.spec.js must stay outside smoke.");
 
   const expectedLists = buildExpectedLists(specs);
   for (const specPath of KNOWN_DIRECT_E2E_SCRIPT_TARGETS) {
