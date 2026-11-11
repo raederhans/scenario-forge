@@ -13,6 +13,17 @@ npm run test:e2e:smoke   # browser smoke
 npm run test:e2e:golden  # golden user flows (about 10 minutes)
 ```
 
+Browser test entry points:
+
+| Entry | Scope |
+| --- | --- |
+| `npm run test:e2e:golden` | `tests/e2e/golden/`: golden user flows that reach the app only through the DOM and `js/core/app_test_api.js`. |
+| `npm run test:e2e:smoke`, `test:e2e:layer:<contract\|regression\|feature\|all>` | Root-level `tests/e2e/` specs, layered by `tests/e2e/test-layer-manifest.json`. The manifest is the single source: every root-level spec has exactly one entry, checked by `node tools/e2e_layering.mjs check` (`npm run verify:test:e2e-layers`); per-layer Playwright lists are generated at run time under `.runtime/tests/e2e-lists/`. `layer:all` is every manifest spec and excludes `dev/`, `golden/`, `release/` and `ui_gallery/`. |
+| `npm run test:e2e` | Playwright's default scope: everything under `tests/e2e/` except `release/` (CI also drops `dev/` and `@dev` cases). |
+| `npm run test:e2e:pages-public-release-gate` | `tests/e2e/release/` against the published site in `SCENARIO_FORGE_PAGES_URL`; the `:deployed` variant defaults to the live Pages URL. |
+
+`npm run verify:tno-strict-contracts` runs the strict TNO data contracts and writes the strict, coverage-ledger and Atlantropa reports in one pass; `npm run verify:tno-coverage-chain` adds the polar coverage check and the chunk contract tests.
+
 `dist/` is not tracked. CI builds the Pages artifact from source with `tools/build_pages_dist.py`, which bundles the editor's JavaScript into `app/js/bundle/` with `tools/build_editor_bundle.mjs` (esbuild). Run `npm run verify:pages-dist` for a local build.
 
 `tests/quarantine.json` is the only skip list on PRs. Every entry needs a reason and leaves as soon as the test is fixed or deleted. Nightly adds the slow lists with `--with-slow` but still skips the quarantine, so it only goes red on new breakage; run `--all` by hand for a full audit including the quarantine. perf-pr-gate no longer runs on a schedule, only on PRs and manual dispatch.
