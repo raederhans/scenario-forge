@@ -76,14 +76,13 @@ test("visible legend avoids feature scans until actual renderer color transactio
     getPoliticalDerivedStateIdentity: () => [],
     getRiverPaintRuntime,
     getCountryFillPaletteOwner: () => palette,
-    getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
-    getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: (ids) => {
+    notifyPaintContourColorsChanged: (ids) => {
       // The extracted transaction owns publication order; the contour runtime
       // has its own behavior suite. Observe the actual committed colors here.
       contourNotifications.push({ ids: Array.from(ids), revision: state.colorRevision });
       for (const id of ids) assert.equal(state.colors[id], "#abcdef");
-      return true;
-    } }),
+      borderInvalidations.push({ reason: "paint-contours-colors", revision: state.colorRevision });
+    },
     ensureSovereigntyState() {},
     getRenderPassCacheState: () => ({ partialPoliticalDirtyIds: new Set() }),
     hasPendingPoliticalColorEdit: () => false, normalizePoliticalColorEditIds: ids => ids,
@@ -104,7 +103,7 @@ test("visible legend avoids feature scans until actual renderer color transactio
       assert.equal(dominantColors.get("BB"), "#445566", "unpainted country's palette is preserved");
       visibleColors = read(state);
     },
-  }, ["notifyPaintContourColorsChanged"]);
+  });
   refresh(["A"], { renderNow: true });
   assert.equal(state.colors, colors, "transaction mutates the existing table");
   assert.equal(state.colorRevision, 1, "color transaction commits before deferred presentation");

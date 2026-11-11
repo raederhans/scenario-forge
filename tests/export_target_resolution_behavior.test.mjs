@@ -1,3 +1,4 @@
+import { createPaintContourAssembly } from "../js/core/renderer/paint_contour_assembly.js";
 import { THEMATIC_INDICATORS } from "../js/core/thematic_indicator_catalog.js";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -649,13 +650,41 @@ function activateReferenceDisplay(state, mode) {
 }
 
 function installContourPreparation(h) {
-  const functionSource = source.match(/async function ensurePaintContoursReady\(\) \{[\s\S]*?\n\}/)?.[0];
-  assert.ok(functionSource);
   const calls = [];
-  h.context.getPaintContourRuntimeOwner = () => ({ ensureReady: async () => calls.push("political-paint-contours") });
-  h.context.getRiverInternalContourOwner = () => ({ ensureReady: async () => calls.push("river-internal-contours") });
-  vm.runInContext(functionSource, h.context);
-  return { calls, prepare: h.context.ensurePaintContoursReady };
+  const contourFeature = { id: "contour", properties: {}, geometry: { type: "Polygon",
+    coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]] } };
+  h.runtimeState.landData = { features: [contourFeature] };
+  let politicalRecorded = false;
+  const assembly = createPaintContourAssembly({
+    runtimeState: h.runtimeState,
+    getFeatureId: feature => {
+      if (!politicalRecorded) { calls.push("political-paint-contours"); politicalRecorded = true; }
+      return feature.id;
+    },
+    canonicalCountryCode: value => String(value || "").trim().toUpperCase(),
+    getDisplayOwnerCode: () => "",
+    getAdmin1Group: () => "",
+    getFeatureCountryCodeNormalized: () => "",
+    isScenarioShellFeature: () => false,
+    getEffectiveWaterRegionFeatures: () => [],
+    buildAtlantropaLandLikeFeatureCollection: () => null,
+    hasVisibleRiverPartitions: () => false,
+    shouldExcludePoliticalVisualFeature: () => false,
+    isAtlantropaSeaFeature: () => false,
+    LAND_FILL_COLOR: "#aaaaaa",
+    invalidateRenderPasses() {}, requestRendererRender() {},
+    getRiverInternalContourOwner: () => ({ ensureReady: async () => calls.push("river-internal-contours") }),
+  });
+  return { calls, async prepare() {
+    politicalRecorded = false;
+    try {
+      await assembly.ensurePaintContoursReady();
+      assert.equal(assembly.hasPendingPaintContourWork(), false);
+      assert.equal(assembly.getPaintContourRuntimeOwner().diagnostics().status, "ready");
+    } finally {
+      assembly.disposePaintContoursIfCreated();
+    }
+  } };
 }
 
 for (const badPack of ["baseline-mismatch", "missing-geometry"]) {
