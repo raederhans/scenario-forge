@@ -217,9 +217,9 @@
       "owner": "tools/build_global_lakes.py",
       "role": "context_layer",
       "schema_ref": "schema://geojson/feature_collection/polygon/v1",
-      "sha256": "96b97c298d0a00cb61660ff2006cfc8f7be905b411f45513741875cccf68ece9",
+      "sha256": "482a37d9ba7ba532febd4149d6bf07d8a0394813feb502606cf5ecb1d15a2e24",
       "simplification": "preserve_topology_0.005_degrees_existing_named_geometries_preserved",
-      "size_bytes": 2384561,
+      "size_bytes": 2384560,
       "type": "geojson"
     },
     "global_physical_semantics.detail.topo.json": {
@@ -270,16 +270,16 @@
       "description": "Historic Geographical Overhaul source-only flag index.",
       "owner": "tools.build_hgo_flag_index",
       "role": "hgo_flags_index",
-      "sha256": "1accd58eecbe63524ca482955b898d41f650d752da724a935f04220ed7188658",
-      "size_bytes": 1947346
+      "sha256": "de0cb039030ac3e77bdbe686d5ce234192f94868dc8f4fc055c1c38eaa553d28",
+      "size_bytes": 1882149
     },
     "hgo_catalogs/hgo_flags.png_manifest.json": {
       "artifact_class": "derived",
       "description": "Historic Geographical Overhaul authorized converted flag PNG manifest.",
       "owner": "tools.build_hgo_flag_png_catalog",
       "role": "hgo_flags_png_manifest",
-      "sha256": "f799e1bde0e22cbfd86376f524cb8b6adc7756c18c829bde982f22209b72451d",
-      "size_bytes": 4744356
+      "sha256": "f2f68f5ea04390ef3d29aaa577522c7e7c793df1b1b0f688de4fec0a21f889b4",
+      "size_bytes": 4622888
     },
     "hgo_catalogs/hgo_identity_aliases.json": {
       "artifact_class": "manual",
@@ -294,16 +294,16 @@
       "description": "Historic Geographical Overhaul reusable place-name catalog.",
       "owner": "tools.build_hgo_name_catalog",
       "role": "hgo_place_names",
-      "sha256": "750a80293ae05d212dd4e0208d59d800647337a5dee9915f2eec530e2055f378",
-      "size_bytes": 5164039
+      "sha256": "47c5f6a9359f01c3f08a067ab59891017d2e82e2a144c1bfbd649f184e527e0f",
+      "size_bytes": 4969946
     },
     "hgo_catalogs/index.json": {
       "artifact_class": "derived",
       "description": "Historic Geographical Overhaul Tier-A catalog index.",
       "owner": "tools.build_hgo_flag_index",
       "role": "hgo_tier_a_catalog",
-      "sha256": "a438604c7585b42092c7d83fe4f0b087adf1b8aca2ef822696eb9113ef31c46f",
-      "size_bytes": 1141
+      "sha256": "69a35f7816a5f6cfa33c1a08f399768c25b4b026585b11dc164e93c0bdfe5426",
+      "size_bytes": 1097
     },
     "hierarchy.json": {
       "artifact_class": "publish",
