@@ -1,6 +1,8 @@
 // Pure layer-based special zone model and transformations.
 // The layer store is the canonical special-zone runtime shape; legacy freehand data is reported as diagnostics on import.
 
+import { normalizeHexColor as normalizeSharedHexColor } from "./color_hex_utils.js";
+
 const SPECIAL_ZONE_LAYER_VERSION = 1;
 const SPECIAL_ZONE_SOURCES = new Set(["project", "scenario"]);
 const SPECIAL_ZONE_MEMBERSHIP_BRUSH_MODES = new Set(["add", "remove"]);
@@ -60,12 +62,7 @@ function clampNumber(value, fallback, min, max) {
 }
 
 function normalizeHexColor(value, fallback) {
-  const candidate = String(value || "").trim();
-  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
-  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
-    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
-  }
-  return fallback;
+  return normalizeSharedHexColor(value) ?? fallback;
 }
 
 function normalizePatternId(value, fallback = "solid") {

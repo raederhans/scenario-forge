@@ -1,4 +1,5 @@
 import { resolveDataUrl } from "./data_base_url.js";
+import { normalizeHexColor as normalizeSharedHexColor } from "./color_hex_utils.js";
 import { state as runtimeState, defaultCountryPalette, legacyDefaultCountryPalette } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import {
@@ -20,16 +21,7 @@ function normalizeCountryCode(rawCode) {
 }
 
 function normalizeHexColor(value) {
-  const input = String(value || "").trim().toLowerCase();
-  const shortHex = /^#([0-9a-f]{3})$/.exec(input);
-  if (shortHex) {
-    return `#${shortHex[1]
-      .split("")
-      .map((char) => `${char}${char}`)
-      .join("")}`;
-  }
-  if (/^#[0-9a-f]{6}$/.test(input)) return input;
-  return "";
+  return normalizeSharedHexColor(value) ?? "";
 }
 
 function getMappedIso2(mappedEntry) {
