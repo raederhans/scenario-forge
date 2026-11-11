@@ -1,0 +1,84 @@
+/* 画廊自身的排版。只改容器的定位、尺寸和显隐，让编辑器里的浮层/侧栏容器能平铺展示；
+   不改任何控件的外观。选择器都带 html body.gallery-page 前缀，保证无论编辑器样式是否分层都由这里决定容器布局。 */
+html body.gallery-page {
+  position: static;
+  height: auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  background: var(--surface-panel);
+}
+
+html body.gallery-page .gallery-intro { margin: 0 0 16px; max-width: 900px; }
+html body.gallery-page .gallery-intro h1 { margin: 0 0 4px; font-size: 20px; }
+html body.gallery-page .gallery-intro p { margin: 0; font-size: 13px; color: var(--ink-500); }
+
+html body.gallery-page .gallery-section {
+  margin: 0 0 24px;
+  padding: 12px;
+  border: 1px dashed #b9b0a0;
+  background: var(--surface-panel);
+}
+html body.gallery-page .gallery-heading { margin: 0 0 12px; font-size: 15px; }
+
+html body.gallery-page .gallery-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px dotted #d6cfc2;
+}
+html body.gallery-page .gallery-row-name {
+  flex: 0 0 200px;
+  font: 12px/1.4 ui-monospace, Consolas, monospace;
+  color: var(--ink-500);
+  word-break: break-all;
+}
+html body.gallery-page .gallery-cell { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+html body.gallery-page .gallery-cell-caption { font-size: 11px; color: var(--ink-500); }
+html body.gallery-page .gallery-cell-stage { position: relative; }
+
+/* 编辑器里这些容器是 fixed / absolute 的浮层或侧栏；画廊里改成文档流中的普通块。 */
+html body.gallery-page :is(#leftSidebar, #rightSidebar, #bottomDock, #toastViewport, .gallery-ctx, .gallery-ctx-inline) {
+  position: relative;
+  inset: auto;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  width: auto;
+  max-width: 1000px;
+  height: auto;
+  max-height: none;
+  min-height: 0;
+  margin: 0 0 12px;
+  overflow: visible;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  z-index: auto;
+}
+html body.gallery-page :is(#leftSidebar, #rightSidebar, #bottomDock, .gallery-ctx) { display: block; }
+html body.gallery-page .gallery-ctx-inline { display: inline-block; margin: 0; }
+html body.gallery-page #toastViewport { display: flex; }
+
+html body.gallery-page .gallery-inline-overlay {
+  position: relative;
+  inset: auto;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  margin: 0 0 12px;
+  z-index: auto;
+}
+html body.gallery-page dialog.gallery-inline-dialog {
+  position: relative;
+  inset: auto;
+  margin: 0 0 12px;
+}
+
+@media (max-width: 600px) {
+  html body.gallery-page .gallery-row-name { flex-basis: 100%; }
+}
