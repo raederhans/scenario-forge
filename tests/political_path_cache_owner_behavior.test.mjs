@@ -147,6 +147,37 @@ test("recreated cache owners release the previous accounted map before replacing
   assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, undefined);
 });
 
+test("path cache resets report reason, previous size, signature and reason", (t) => {
+  const h = fixture(t);
+  const first = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
+  first.map.set("old", { path: true });
+  const preparedSignature = h.cache.politicalPathCacheSignature;
+  assert.ok(preparedSignature);
+  h.metrics.length = 0;
+
+  h.owner.invalidatePoliticalPathCache("topology-replaced");
+  const invalidation = h.metrics.filter(([name]) => name === "politicalPathCacheReset");
+  assert.deepEqual(invalidation.map(([, value, details]) => [value, details]), [[0, {
+    reason: "topology-replaced",
+    previousSize: 1,
+    previousSignature: preparedSignature,
+    previousReason: "prepared",
+  }]]);
+
+  const rebuilt = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
+  rebuilt.map.set("again", { path: true });
+  h.metrics.length = 0;
+  h.state.activeScenarioId = "next-scenario";
+  const next = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
+  const mismatch = h.metrics.filter(([name]) => name === "politicalPathCacheReset");
+  assert.equal(mismatch.length, 1);
+  assert.deepEqual(mismatch[0][2], next.resetSummary);
+  assert.equal(next.resetSummary.reason, "prepare-mismatch");
+  assert.equal(next.resetSummary.previousSize, 1);
+  assert.equal(next.resetSummary.nextSignature, h.cache.politicalPathCacheSignature);
+  assert.notEqual(next.resetSummary.nextSignature, next.resetSummary.previousSignature);
+});
+
 test("cache mismatch reads are non-destructive; preparation preserves map identity and snapshots transforms", (t) => {
   const h = fixture(t);
   const cold = h.owner.getPoliticalPathCacheHandle();
