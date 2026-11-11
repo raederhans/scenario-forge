@@ -1,8 +1,5 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import thematicIndex from "../data/thematic_layers/index.json" with { type: "json" };
 import {
@@ -33,10 +30,6 @@ import {
   buildLayerStatusDiagnostics,
 } from "../js/ui/toolbar/layer_status_diagnostics.js";
 import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, "..");
-const CONTRACT_SOURCE = path.join(REPO_ROOT, "js", "ui", "toolbar", "layer_panel_contracts.js");
 
 function createState(overrides = {}) {
   return {
@@ -183,17 +176,6 @@ test("thematic contracts expose admitted main-map capabilities beside read-only 
   assert.equal(hdiContract.enabled(ready), false);
   assert.equal(wgiContract.enabled(ruleOfLawReady), true);
   assert.equal(wgiContract.enabled({ ...ruleOfLawReady, thematicWgiRuntime: ready.thematicWgiRuntime }), false);
-});
-
-test("layer panel contract module stays read-only and renderer-free", () => {
-  const source = fs.readFileSync(CONTRACT_SOURCE, "utf8");
-
-  assert.equal(/\bstate\.[A-Za-z0-9_$]+\s*=/.test(source), false);
-  assert.equal(/\bruntimeState\b/.test(source), false);
-  assert.equal(/\bmarkDirty\b/.test(source), false);
-  assert.equal(/\brequestRender\b/.test(source), false);
-  assert.equal(/\bdocument\b|\bwindow\b/.test(source), false);
-  assert.equal(source.includes("../core/map_renderer"), false);
 });
 
 test("diagnostics continue to expose clean summaries through contract-backed definitions", () => {

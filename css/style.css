@@ -13811,7 +13811,7 @@ button.scenario-action-card:hover {
 }
 
 .special-zone-member-drawer {
-  border: 1px solid var(--line-1));
+  border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-1);
   max-width: min(520px, calc(100vw - 28px));
@@ -13843,7 +13843,7 @@ button.scenario-action-card:hover {
 }
 
 .special-zone-member-drawer-row {
-  border: 1px solid var(--line-1));
+  border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
   background: var(--line-1);
   cursor: pointer;
@@ -13852,7 +13852,7 @@ button.scenario-action-card:hover {
 }
 
 .legend-special-zone-section {
-  border-top: 1px solid var(--line-1));
+  border-top: 1px solid var(--line-1);
   display: grid;
   gap: 6px;
   margin-top: 10px;

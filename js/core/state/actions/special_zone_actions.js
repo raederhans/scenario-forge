@@ -8,6 +8,7 @@ import {
 } from "../../special_zone_layers.js";
 import { createDefaultSpecialZoneEditorState } from "../strategic_overlay_state.js";
 import { commitUiVisibilityState } from "./ui_visibility_actions.js";
+import { registerRuntimeHook } from "../index.js";
 
 export const SPECIAL_ZONE_EDITOR_FIELD_KEYS = Object.freeze([
   "active",
@@ -400,10 +401,10 @@ export function exitSpecialZoneMembershipToolState(target) {
 export function registerSpecialZonesWorkbenchRuntimeHooks(target, hooks = {}) {
   if (!target || typeof target !== "object") return;
   if (typeof hooks.renderWorkbench === "function") {
-    target.updateSpecialZonesWorkbenchUIFn = hooks.renderWorkbench;
+    registerRuntimeHook(target, "updateSpecialZonesWorkbenchUIFn", hooks.renderWorkbench);
   }
   if (typeof hooks.renderCurrentTarget === "function") {
-    target.updateSpecialZonesWorkbenchCurrentTargetUIFn = hooks.renderCurrentTarget;
+    registerRuntimeHook(target, "updateSpecialZonesWorkbenchCurrentTargetUIFn", hooks.renderCurrentTarget);
   }
 }
 
