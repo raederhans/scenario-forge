@@ -15,7 +15,9 @@ body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input
   padding-block: 0;
 }
 body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput),
-body.editor-workspace .input--sm { height: var(--control-compact); min-height: var(--control-compact); }
+/* 基础选择器里的 #riverPaintSearchInput 让整条规则有 ID 级特异性；这里用 :is() 带一个同类的 ID 分支，
+   匹配范围仍只是 .input--sm，特异性高过基础规则。 */
+body.editor-workspace :is(.input--sm, #riverPaintSearchInput.input--sm) { height: var(--control-compact); min-height: var(--control-compact); }
 body.editor-workspace :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput):focus,
 body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput):focus {
   border-color: var(--accent);
@@ -26,6 +28,7 @@ body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input
 @media (pointer: coarse) {
   body.editor-workspace :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput),
   body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput) { min-height: 44px; }
+  body.editor-workspace :is(.input--sm, #riverPaintSearchInput.input--sm) { min-height: 44px; }
 }
 
 } /* end @layer overrides */

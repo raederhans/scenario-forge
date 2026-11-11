@@ -56,6 +56,9 @@ body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotB
 body :is(.btn--primary, .app-dialog-btn-primary):hover:not(:disabled) { background: var(--accent-hover); }
 body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn { background: var(--accent); color: var(--surface-raised); }
 body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:hover:not(:disabled) { background: var(--accent-hover); }
+/* 侧栏的默认与悬停规则带 ID，修饰类在侧栏里要同等特异性才能生效。 */
+body :is(#leftSidebar, #rightSidebar) .btn--primary { background: var(--accent); color: var(--surface-raised); font-weight: 600; }
+body :is(#leftSidebar, #rightSidebar) .btn--primary:hover:not(:disabled) { background: var(--accent-hover); }
 body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.btn--danger, .danger-btn, .is-danger),
 body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.btn--danger, .danger-btn, .is-danger) {
   background: transparent;
@@ -97,8 +100,10 @@ body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled {
 
 /* 尺寸修饰（现有别名不使用）。 */
 body :is(.btn--sm) { height: var(--control-compact); min-height: var(--control-compact); padding: 0 var(--space-2); }
-body :is(.btn--lg) { height: 44px; min-height: 44px; }
-body :is(.btn--icon) { width: auto; min-width: max(var(--hit-min), var(--control-md)); padding: 0; aspect-ratio: 1; }
+body :is(.btn--lg),
+body :is(#leftSidebar, #rightSidebar) .btn--lg { height: 44px; min-height: 44px; }
+body :is(.btn--icon),
+body :is(#leftSidebar, #rightSidebar) .btn--icon { width: auto; min-width: max(var(--hit-min), var(--control-md)); padding: 0; aspect-ratio: 1; }
 
 @media (pointer: coarse) {
   body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn),

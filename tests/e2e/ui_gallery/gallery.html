@@ -216,6 +216,25 @@
     </div>
   </section>
 
+  <!-- ───────── 组件修饰类（createButton / createTextInput 生成） ───────── -->
+  <section class="gallery-section" data-gallery-section="component-modifiers">
+    <h2 class="gallery-heading">组件修饰类 · 页面层与侧栏内</h2>
+    <div data-specimen=".btn--primary"><button type="button" class="btn--primary">Apply</button></div>
+    <div data-specimen=".btn--secondary"><button type="button" class="btn--secondary">Cancel</button></div>
+    <div data-specimen=".btn--danger"><button type="button" class="btn--danger">Delete</button></div>
+    <div data-specimen=".btn--secondary.btn--sm"><button type="button" class="btn--secondary btn--sm">Small</button></div>
+    <div data-specimen=".btn--secondary.btn--lg"><button type="button" class="btn--secondary btn--lg">Large</button></div>
+    <div data-specimen=".btn--icon"><button type="button" class="btn--icon" aria-label="Add"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="M12 5v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><path d="M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg></button></div>
+    <div data-specimen=".input"><input type="text" class="input" placeholder="Default 36" /></div>
+    <div data-specimen=".input.input--sm"><input type="text" class="input input--sm" placeholder="Compact 32" /></div>
+    <aside id="rightSidebar" class="sidebar-right gallery-ctx">
+      <div data-specimen="#rightSidebar .btn--primary"><button type="button" class="btn--primary">Apply</button></div>
+      <div data-specimen="#rightSidebar .btn--secondary.btn--lg"><button type="button" class="btn--secondary btn--lg">Large</button></div>
+      <div data-specimen="#rightSidebar .btn--icon"><button type="button" class="btn--icon" aria-label="Add"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="M12 5v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><path d="M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg></button></div>
+      <div data-specimen="#rightSidebar .input.input--sm"><input type="text" class="input input--sm" placeholder="Compact 32" /></div>
+    </aside>
+  </section>
+
   <!-- ───────── 修复前无效的三条声明所在位置 ───────── -->
   <section class="gallery-section" data-gallery-section="invalid-declaration-sites">
     <h2 class="gallery-heading">特殊区域成员抽屉与图例分区（style.css 三处多右括号声明的位置）</h2>
