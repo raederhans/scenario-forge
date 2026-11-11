@@ -1,11 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import * as activation from "../js/core/state/actions/scenario_activation_actions.js";
-import * as presentation from "../js/core/state/actions/scenario_presentation_actions.js";
-import * as palette from "../js/core/state/actions/scenario_palette_actions.js";
-import * as health from "../js/core/state/actions/scenario_health_actions.js";
-import * as supplemental from "../js/core/state/actions/scenario_transaction_rollback_actions.js";
+import { state as appState } from "../js/core/state.js";
+import { captureScenarioApplyRollbackSnapshot } from "../js/core/scenario_rollback.js";
 import { createScenarioBundleRuntimeController } from "../js/core/scenario/bundle_runtime.js";
 import { createScenarioRollbackClone } from "../js/core/scenario/rollback_clone.js";
 import { trimScenarioBundleCache, SCENARIO_BUNDLE_CACHE_LIMIT, SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT } from "../js/core/scenario/bundle_cache.js";
@@ -82,30 +79,30 @@ test("overlapping selections keep caller-owned results even when the newest sele
 test("actual rollback capture deduplicates activation and chunk topology while every capture is isolated", () => {
   let copies = 0;
   const topology = { get arcs() { copies += 1; return [[1, 2]]; } };
-  const runtimeState = {
+  const fixture = {
     scenarioRuntimeTopologyData: topology, runtimePoliticalTopology: topology,
     defaultRuntimePoliticalTopology: topology,
     activeScenarioChunks: { payloadByChunkId: { a: { payload: topology } } },
-    styleConfig: { ocean: { color: "blue" } },
+    styleConfig: { ...appState.styleConfig, ocean: { color: "blue" } },
   };
-  const source = readFileSync(new URL("../js/core/scenario_rollback.js", import.meta.url), "utf8");
-  const captureSource = source.slice(source.indexOf("function cloneScenarioRollbackCaptureValues("),
-    source.indexOf("function buildScenarioTransactionRollbackStatePatch(")).replace("export function", "function");
-  const dependencies = { ...activation, ...presentation, ...palette, ...health, ...supplemental,
-    runtimeState, createScenarioRollbackClone,
-    readRegisteredRuntimeHookSource: () => null, ensureScenarioAuditUiState: () => {},
-    scheduleScenarioChunkRefresh: () => {}, awaitInitialScenarioChunkVisualPromotion: () => {},
-  };
-  const capture = new Function(...Object.keys(dependencies), `${captureSource}; return captureScenarioApplyRollbackSnapshot;`)(...Object.values(dependencies));
-  const first = capture();
-  assert.equal(copies, 1);
-  assert.equal(first.scenarioRuntimeTopologyData, first.defaultRuntimePoliticalTopology);
-  assert.equal(first.activeScenarioChunks.payloadByChunkId.a.payload, first.runtimePoliticalTopology);
-  first.runtimePoliticalTopology.arcs[0][0] = 99;
-  const next = capture();
-  assert.equal(copies, 2);
-  assert.deepEqual(next.runtimePoliticalTopology.arcs, [[1, 2]]);
-  assert.notEqual(first.styleConfigOcean, runtimeState.styleConfig.ocean);
+  const savedState = { ...appState };
+  try {
+    Object.assign(appState, fixture);
+    const first = captureScenarioApplyRollbackSnapshot();
+    assert.equal(copies, 1);
+    assert.equal(first.scenarioRuntimeTopologyData, first.defaultRuntimePoliticalTopology);
+    assert.equal(first.activeScenarioChunks.payloadByChunkId.a.payload, first.runtimePoliticalTopology);
+    first.runtimePoliticalTopology.arcs[0][0] = 99;
+    const next = captureScenarioApplyRollbackSnapshot();
+    assert.equal(copies, 2);
+    assert.deepEqual(next.runtimePoliticalTopology.arcs, [[1, 2]]);
+    assert.notEqual(first.styleConfigOcean, appState.styleConfig.ocean);
+  } finally {
+    for (const key of Object.keys(appState)) {
+      if (!Object.hasOwn(savedState, key)) delete appState[key];
+    }
+    Object.assign(appState, savedState);
+  }
 });
 
 test("bundle controller trims on cache hit and after the apply lock is released", async () => {

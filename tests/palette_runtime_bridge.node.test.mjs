@@ -2,51 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const source = await readFile(new URL("../js/core/palette_runtime_bridge.js", import.meta.url), "utf8");
-const runtimeBridge = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`);
-const stateDefaultsSource = await readFile(new URL("../js/core/state_defaults.js", import.meta.url), "utf8");
-const colorHexUtilsSource = await readFile(new URL("../js/core/color_hex_utils.js", import.meta.url), "utf8");
-const colorHexUtilsDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(colorHexUtilsSource)}`;
-const transportCapabilityRegistrySource = await readFile(new URL("../js/core/transport_capability_registry.js", import.meta.url), "utf8");
-const transportPackResolverSource = await readFile(new URL("../js/core/transport_pack_resolver.js", import.meta.url), "utf8");
-const transportPackResolverDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(transportPackResolverSource)}`;
-const patchedTransportCapabilityRegistrySource = transportCapabilityRegistrySource.replace(
-  "./transport_pack_resolver.js",
-  transportPackResolverDataUrl,
-);
-const transportCapabilityRegistryDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(patchedTransportCapabilityRegistrySource)}`;
-const countryFeaturePoliciesSource = await readFile(new URL("../js/core/country_feature_policies.js", import.meta.url), "utf8");
-const countryFeaturePoliciesJsonSource = await readFile(new URL("../data/country_feature_policies.json", import.meta.url), "utf8");
-const countryFeaturePoliciesJsonDataUrl = `data:application/json,${encodeURIComponent(countryFeaturePoliciesJsonSource)}`;
-const patchedCountryFeaturePoliciesSource = countryFeaturePoliciesSource.replace(
-  "../../data/country_feature_policies.json",
-  countryFeaturePoliciesJsonDataUrl,
-);
-const countryFeaturePoliciesDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(patchedCountryFeaturePoliciesSource)}`;
-const patchedStateDefaultsSource = stateDefaultsSource
-  .replace("./color_hex_utils.js", colorHexUtilsDataUrl)
-  .replace("./transport_capability_registry.js", transportCapabilityRegistryDataUrl)
-  .replace("./transport_pack_resolver.js", transportPackResolverDataUrl)
-  .replace("./country_feature_policies.js", countryFeaturePoliciesDataUrl);
-const stateDefaultsDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(patchedStateDefaultsSource)}`;
-const colorStateSource = await readFile(new URL("../js/core/state/color_state.js", import.meta.url), "utf8");
-const patchedColorStateSource = colorStateSource
-  .replace("../river_paint/partition_model.js", new URL("../js/core/river_paint/partition_model.js", import.meta.url).href)
-  .replace("../state_defaults.js", stateDefaultsDataUrl)
-  .replace("../color_hex_utils.js", colorHexUtilsDataUrl);
-const colorStateModule = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(patchedColorStateSource)}`);
+const runtimeBridge = await import("../js/core/palette_runtime_bridge.js");
+const colorStateModule = await import("../js/core/state/color_state.js");
 const colorResolverModule = await import(new URL("../js/core/color_resolver.js", import.meta.url));
 const colorHexUtilsModule = await import(new URL("../js/core/color_hex_utils.js", import.meta.url));
 const colorManagerModule = await import(new URL("../js/core/color_manager.js", import.meta.url));
-const countryCodeAliasesSource = await readFile(new URL("../js/core/country_code_aliases.js", import.meta.url), "utf8");
-const countryCodeAliasesDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(countryCodeAliasesSource)}`;
+const featureIdentityModule = await import("../js/core/feature_identity.js");
+// 乙类：启动 worker 的身份解析是 classic worker 脚本里的私有函数，尚无可导入入口，暂时截取执行。
 const featureIdentitySharedSource = await readFile(new URL("../js/core/feature_identity_shared.js", import.meta.url), "utf8");
-const featureIdentitySharedDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(featureIdentitySharedSource)}`;
-const featureIdentitySource = await readFile(new URL("../js/core/feature_identity.js", import.meta.url), "utf8");
-const patchedFeatureIdentitySource = featureIdentitySource
-  .replace("./feature_identity_shared.js", featureIdentitySharedDataUrl)
-  .replace("./country_code_aliases.js", countryCodeAliasesDataUrl);
-const featureIdentityModule = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(patchedFeatureIdentitySource)}`);
 const startupWorkerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 const startupWorkerHelperStart = startupWorkerSource.indexOf("const COUNTRY_CODE_ALIASES");
 const startupWorkerHelperEnd = startupWorkerSource.indexOf("async function fetchJsonResource", startupWorkerHelperStart);
