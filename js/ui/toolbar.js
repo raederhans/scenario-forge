@@ -45,6 +45,8 @@ import {
 import { captureHistoryState, canRedoHistory, canUndoHistory, getLatestHistoryEntry, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { setExportBakeState } from "../core/state/actions/export_workbench_actions.js";
+import { commitUiVisibilityState } from "../core/state/actions/ui_visibility_actions.js";
+import { setAppearanceVisibilityState } from "../core/state/actions/appearance_visibility_actions.js";
 import {
   buildPaletteQuickSwatches,
   getPaletteSourceOptions,
@@ -1589,7 +1591,7 @@ function initToolbar({ render } = {}) {
   if (!runtimeState.parentBorderEnabledByCountry || typeof runtimeState.parentBorderEnabledByCountry !== "object") {
     runtimeState.parentBorderEnabledByCountry = {};
   }
-  runtimeState.parentBordersVisible = runtimeState.parentBordersVisible !== false;
+  setAppearanceVisibilityState(runtimeState, "parentBordersVisible", runtimeState.parentBordersVisible !== false);
 
   const paletteCountryEditor = createPaletteCountryEditor({
     state: runtimeState,
@@ -2828,9 +2830,11 @@ function initToolbar({ render } = {}) {
   if (toggleOpenOceanRegions) {
     toggleOpenOceanRegions.checked = !!runtimeState.showOpenOceanRegions;
     toggleOpenOceanRegions.addEventListener("change", (event) => {
-      runtimeState.allowOpenOceanSelect = !!event.target.checked;
-      runtimeState.allowOpenOceanPaint = !!event.target.checked;
-      runtimeState.showOpenOceanRegions = !!event.target.checked;
+      commitUiVisibilityState(runtimeState, {
+        allowOpenOceanSelect: !!event.target.checked,
+        allowOpenOceanPaint: !!event.target.checked,
+        showOpenOceanRegions: !!event.target.checked,
+      });
       if (!runtimeState.showOpenOceanRegions) {
         runtimeState.hoveredWaterRegionId = null;
       }
