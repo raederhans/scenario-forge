@@ -1,7 +1,6 @@
-import test from "node:test";
+import test, { afterEach, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import vm from "node:vm";
 import { createRequire } from "node:module";
 import {
   buildCityLocalizationPatch, normalizeCityFeatureCollection,
@@ -13,23 +12,36 @@ import {
   commitPreparedBaseCitySupportData, commitPreparedFullLocalizationData,
   isCityRevisionFromLocalizationPublication,
 } from "../js/core/state/content_state.js";
-import { prepareScenarioLocalizationState } from "../js/core/scenario_localization_state.js";
+import {
+  prepareScenarioLocalizationState, syncScenarioLocalizationState, syncScenarioLocalizationStateAsync,
+} from "../js/core/scenario_localization_state.js";
+import { state } from "../js/core/state.js";
 import { applyScenarioChunkCityExternalEffectState } from "../js/core/state/actions/scenario_presentation_actions.js";
 
 const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
 
-function localizationFixture(runtimeState, mapConstructor = Map) {
-  const source = readFileSync(new URL("../js/core/scenario_localization_state.js", import.meta.url), "utf8")
-    .replace(/^import[\s\S]*?;\r?\n/gm, "").replace(/^export /gm, "");
-  return vm.runInNewContext(`${source}\n({ syncScenarioLocalizationState, syncScenarioLocalizationStateAsync, prepareScenarioLocalizationState })`, {
-    runtimeState, buildCityLocalizationPatch, normalizeCityText,
-    applyScenarioChunkCityExternalEffectState, copyLocalizationEntries, prepareLocalizationCandidate,
-    isCityRevisionFromLocalizationPublication,
-    console: { info() {} }, globalThis, Map: mapConstructor,
-  });
-}
+const LOCALIZATION_RUNTIME_KEYS = Object.freeze([
+  "activeScenarioId", "activeScenarioManifest", "currentLanguage", "cityLayerRevision",
+  "baseGeoLocales", "baseGeoAliasToStableKey", "baseCityAliasesData", "worldCitiesData", "ruCityOverrides",
+  "scenarioCityOverridesData", "scenarioGeoLocalePatchData", "locales", "geoAliasToStableKey",
+]);
 
-const syncFixture = (snapshot) => localizationFixture(snapshot).syncScenarioLocalizationState;
+let savedRuntimeState = null;
+beforeEach(() => {
+  savedRuntimeState = { ...state };
+});
+afterEach(() => {
+  for (const key of Object.keys(state)) {
+    if (!Object.hasOwn(savedRuntimeState, key)) delete state[key];
+  }
+  Object.assign(state, savedRuntimeState);
+});
+
+// The localization owner reads and publishes through the shared runtime state.
+function bindRuntimeState(fields) {
+  for (const key of LOCALIZATION_RUNTIME_KEYS) state[key] = undefined;
+  return Object.assign(state, fields);
+}
 
 test("cooperative full localization matches the synchronous TNO merge including language fallbacks and aliases", async () => {
   const previousD3 = globalThis.d3;
@@ -49,10 +61,10 @@ test("cooperative full localization matches the synchronous TNO merge including 
     };
     const oldLocales = snapshot.locales;
     const cityPatch = buildCityLocalizationPatch({ cityCollection: worldCitiesData, cityAliases: baseCityAliasesData });
-    const synchronous = { ...snapshot, locales: { ...oldLocales } };
+    const synchronous = bindRuntimeState({ ...snapshot, locales: { ...oldLocales } });
     commitFullLocalizationData(synchronous, { uiLocales: full.ui,
       geoLocales: { ...full.geo, ...cityPatch.geo }, aliasToStableKey: { ...aliases, ...cityPatch.aliasToStableKey }, scenarioActive: true });
-    syncFixture(synchronous)({ cityOverridesPayload: scenarioCityOverridesData, geoLocalePatchPayload: scenarioGeoLocalePatchData });
+    syncScenarioLocalizationState({ cityOverridesPayload: scenarioCityOverridesData, geoLocalePatchPayload: scenarioGeoLocalePatchData });
 
     let yields = 0;
     let clock = 0;
@@ -131,17 +143,21 @@ function optionalCityFixture() {
 }
 
 test("async optional cities publish complete equivalent tables and reuse only a confirmed result", async () => {
-  const { snapshot, payload, options } = optionalCityFixture();
+  const { snapshot: fields, payload, options } = optionalCityFixture();
   let copied = 0;
-  Object.defineProperty(snapshot.baseGeoLocales, "count-copy", { enumerable: true, get() { copied++; return { en: "Count" }; } });
-  const expected = { ...snapshot, locales: { ...snapshot.locales } };
-  syncFixture(expected)({ cityOverridesPayload: payload });
+  Object.defineProperty(fields.baseGeoLocales, "count-copy", { enumerable: true, get() { copied++; return { en: "Count" }; } });
+  bindRuntimeState({ ...fields, locales: { ...fields.locales } });
+  syncScenarioLocalizationState({ cityOverridesPayload: payload });
+  const expected = {
+    locales: JSON.parse(JSON.stringify(state.locales)),
+    geoAliasToStableKey: { ...state.geoAliasToStableKey },
+  };
   copied = 0;
-  const api = localizationFixture(snapshot);
+  const snapshot = bindRuntimeState(fields);
   const previousLocales = snapshot.locales;
   const previousAliases = snapshot.geoAliasToStableKey;
   let yields = 0;
-  assert.equal(await api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
+  assert.equal(await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
     ...options, yieldControl: async () => {
       yields++;
       assert.equal(snapshot.scenarioCityOverridesData, null);
@@ -152,27 +168,27 @@ test("async optional cities publish complete equivalent tables and reuse only a 
     },
   }), true);
   assert.ok(yields > 2);
-  assert.deepEqual(JSON.parse(JSON.stringify(snapshot.locales)), JSON.parse(JSON.stringify(expected.locales)));
-  assert.deepEqual({ ...snapshot.geoAliasToStableKey }, { ...expected.geoAliasToStableKey });
+  assert.deepEqual(JSON.parse(JSON.stringify(state.locales)), expected.locales);
+  assert.deepEqual({ ...state.geoAliasToStableKey }, expected.geoAliasToStableKey);
   assert.equal(snapshot.scenarioCityOverridesData, payload);
   assert.equal(snapshot.cityLayerRevision, 1);
   assert.equal(copied, 1);
   const completedGeo = snapshot.locales.geo;
-  assert.equal(await api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
+  assert.equal(await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
     yieldControl: async () => assert.fail("confirmed input must not copy or yield again"),
   }), true);
-  api.syncScenarioLocalizationState({ cityOverridesPayload: payload });
+  syncScenarioLocalizationState({ cityOverridesPayload: payload });
   assert.equal(snapshot.locales.geo, completedGeo);
   assert.equal(copied, 1, "both async and sync rehydrate reuse the fully confirmed result");
 });
 
 test("async optional cities discard cancellation and a later retry publishes all entries", async () => {
-  const { snapshot, payload, options } = optionalCityFixture();
-  const api = localizationFixture(snapshot);
+  const { snapshot: fields, payload, options } = optionalCityFixture();
+  const snapshot = bindRuntimeState(fields);
   const previousLocales = snapshot.locales;
   let current = true;
   let yields = 0;
-  assert.equal(await api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
+  assert.equal(await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
     ...options, isCurrent: () => current,
     yieldControl: async () => { if (++yields === 2) current = false; },
   }), false);
@@ -181,7 +197,7 @@ test("async optional cities discard cancellation and a later retry publishes all
   assert.equal(snapshot.scenarioCityOverridesData, null);
   assert.equal(snapshot.cityLayerRevision, 0);
   current = true;
-  assert.equal(await api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
+  assert.equal(await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
     ...options, isCurrent: () => current, yieldControl: async () => {},
   }), true);
   assert.equal(snapshot.locales.geo.HOST.en, "New city");
@@ -189,10 +205,10 @@ test("async optional cities discard cancellation and a later retry publishes all
 });
 
 test("parallel base localization and patch replacement restart preparation using the latest input", async () => {
-  const { snapshot, payload, options } = optionalCityFixture();
-  const api = localizationFixture(snapshot);
+  const { snapshot: fields, payload, options } = optionalCityFixture();
+  const snapshot = bindRuntimeState(fields);
   let yields = 0;
-  assert.equal(await api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
+  assert.equal(await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
     ...options, yieldControl: async () => {
       if (++yields !== 2) return;
       const baseGeoLocales = { LATEST: { en: "Full locale" } };
@@ -220,11 +236,11 @@ test("parallel base localization and patch replacement restart preparation using
 });
 
 test("city edits during async preparation cancel publication and preserve the edit", async () => {
-  const { snapshot, payload, options } = optionalCityFixture();
-  const api = localizationFixture(snapshot);
+  const { snapshot: fields, payload, options } = optionalCityFixture();
+  const snapshot = bindRuntimeState(fields);
   const editedCity = { cities: { edit: { display_name: { en: "Edited" } } } };
   let yields = 0;
-  assert.equal(await api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
+  assert.equal(await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
     ...options, yieldControl: async () => {
       if (++yields !== 2) return;
       snapshot.scenarioCityOverridesData = editedCity;
@@ -237,10 +253,10 @@ test("city edits during async preparation cancel publication and preserve the ed
 });
 
 test("a city revision edit after localization publication invalidates its continuation proof", async () => {
-  const { snapshot, payload, options } = optionalCityFixture();
-  const api = localizationFixture(snapshot);
+  const { snapshot: fields, payload, options } = optionalCityFixture();
+  const snapshot = bindRuntimeState(fields);
   let yields = 0;
-  assert.equal(await api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
+  assert.equal(await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, {
     ...options, yieldControl: async () => {
       if (++yields !== 2) return;
       commitPreparedFullLocalizationData(snapshot, {
@@ -259,9 +275,9 @@ test("a city revision edit after localization publication invalidates its contin
 
 for (const changedInput of ["baseGeoLocales", "baseGeoAliasToStableKey", "scenarioGeoLocalePatchData", "worldCitiesData", "ruCityOverrides", "locales", "geoAliasToStableKey", "cityLayerRevision", "cities", "featureCollection"]) {
   test(`confirmed localization is rebuilt after ${changedInput} changes`, async () => {
-    const { snapshot, payload, options } = optionalCityFixture();
-    const api = localizationFixture(snapshot);
-    const prepare = () => api.syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, { ...options, yieldControl: async () => {} });
+    const { snapshot: fields, payload, options } = optionalCityFixture();
+    const snapshot = bindRuntimeState(fields);
+    const prepare = () => syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, { ...options, yieldControl: async () => {} });
     await prepare();
     const previous = snapshot.locales.geo;
     if (changedInput === "cityLayerRevision") snapshot.cityLayerRevision++;
@@ -302,8 +318,9 @@ test("large scenario alias remaps yield with bounded synchronous work and match 
     baseGeoLocales: {}, baseGeoAliasToStableKey: baseAliasMap,
     locales: { ui: {}, geo: {} },
   };
-  const synchronous = { ...snapshot, locales: { ...snapshot.locales } };
-  syncFixture(synchronous)();
+  bindRuntimeState({ ...snapshot, locales: { ...snapshot.locales } });
+  syncScenarioLocalizationState();
+  const synchronous = { geoAliasToStableKey: { ...state.geoAliasToStableKey }, locales: { geo: { ...state.locales.geo } } };
 
   let steps = 0;
   let previousSteps = 0;
@@ -315,8 +332,12 @@ test("large scenario alias remaps yield with bounded synchronous work and match 
       return super.has(key);
     }
   }
-  const api = localizationFixture(snapshot, CountingMap);
-  const result = await api.prepareScenarioLocalizationState(snapshot, undefined, {
+  // Count alias lookups by letting the owner construct its Maps from a counting subclass.
+  const OriginalMap = globalThis.Map;
+  globalThis.Map = CountingMap;
+  let result;
+  try {
+    result = await prepareScenarioLocalizationState(snapshot, undefined, {
     nowMs: () => ++clock,
     sliceBudgetMs: 1,
     yieldControl: async () => {
@@ -326,6 +347,9 @@ test("large scenario alias remaps yield with bounded synchronous work and match 
       previousSteps = steps;
     },
   });
+  } finally {
+    globalThis.Map = OriginalMap;
+  }
   assert.equal(steps, 50_000);
   assert.ok(remapYields > 1, "remapping itself must span multiple tasks");
   assert.ok(steps - previousSteps <= 512, "the final partial slice must also be bounded");

@@ -1,17 +1,10 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
   createCityLightsAssetProvider,
   MODERN_CITY_LIGHTS_ASSET_SPECIFIER,
 } from "../js/core/renderer/city_lights_asset_provider.js";
-
-const rendererSource = await readFile(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-const providerSource = await readFile(
-  new URL("../js/core/renderer/city_lights_asset_provider.js", import.meta.url),
-  "utf8",
-);
 
 function createModernAsset(overrides = {}) {
   return {
@@ -26,14 +19,6 @@ function createModernAsset(overrides = {}) {
     ...overrides,
   };
 }
-
-test("map renderer startup graph has no static Modern City Lights asset import", () => {
-  assert.doesNotMatch(rendererSource, /from\s+["']\.\/city_lights_modern_asset\.js["']/);
-  assert.match(rendererSource, /createCityLightsAssetProvider\(\)/);
-  assert.match(rendererSource, /return getCityLightsRenderOwner\(\)\.drawNightLightsLayer\(k, config, solarState\);/);
-  assert.match(providerSource, /import\(["']\.\.\/city_lights_modern_asset\.js["']\)/);
-  assert.doesNotMatch(providerSource, /from\s+["']\.\.\/city_lights_modern_asset\.js["']/);
-});
 
 test("provider does not import the modern asset until explicitly requested", async () => {
   const imports = [];

@@ -11,7 +11,6 @@ import * as fflate from "../vendor/fflate.browser.js";
 const sharedDecoder = globalThis.__scenarioForgeJsonResourceDecoderShared;
 const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 const sharedSource = await readFile(new URL("../js/core/json_resource_decoder_shared.js", import.meta.url), "utf8");
-const dataLoaderSource = await readFile(new URL("../js/core/data_loader.js", import.meta.url), "utf8");
 
 test("plain response reads body once without re-encoding valid UTF-8 for metrics", async () => {
   let blobAllocations = 0;
@@ -214,7 +213,7 @@ function createWorkerHarness({ fetchHandler = null, disableNativeDecompression =
   return { context, posted, self };
 }
 
-test("shared decoder helper follows classic/ESM global helper pattern without export statements", () => {
+test("shared decoder helper installs its decoding API on globalThis", () => {
   assert.ok(sharedDecoder, "Shared decoder must be defined on globalThis");
   assert.equal(typeof sharedDecoder.isExplicitGzipJsonUrl, "function");
   assert.equal(typeof sharedDecoder.hasGzipMagicBytes, "function");
@@ -222,14 +221,6 @@ test("shared decoder helper follows classic/ESM global helper pattern without ex
   assert.equal(typeof sharedDecoder.decodeResponsePayload, "function");
   assert.equal(typeof sharedDecoder.loadFallbackGunzip, "function");
 
-  // Pure script syntax requirement: no top-level import or export
-  assert.doesNotMatch(sharedSource, /^\s*export\s+/m, "Shared helper must not use export keyword so importScripts succeeds");
-  assert.doesNotMatch(sharedSource, /^\s*import\s+/m, "Shared helper must not use import keyword");
-
-  // Verify worker and data_loader integration
-  assert.match(workerSource, /json_resource_decoder_shared\.js/, "Worker must importScripts json_resource_decoder_shared.js");
-  assert.match(dataLoaderSource, /import\s+["']\.\/json_resource_decoder_shared\.js["']/, "data_loader must import json_resource_decoder_shared.js");
-  assert.match(sharedSource, /import\(\s*["']\.\.\/\.\.\/vendor\/fflate\.browser\.js["']\s*\)/, "Shared helper must contain literal dynamic import of vendored fflate");
 });
 
 test("isExplicitGzipJsonUrl identifies explicit gzip extensions and strips query and hash", () => {

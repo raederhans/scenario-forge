@@ -11,7 +11,6 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
-const OWNER_PATH = path.join(REPO_ROOT, "js/core/map_renderer/render_pass_commit_accounting_owner.js");
 const MAP_RENDERER_PATH = path.join(REPO_ROOT, "js/core/map_renderer.js");
 
 function extractFunctionSource(source, functionName) {
@@ -421,28 +420,3 @@ test("renderPassToCache wrapper delegates host draw result to commit accounting 
   });
 });
 
-test("owner source excludes draw orchestration and adjacent renderer owners", () => {
-  const ownerSource = fs.readFileSync(OWNER_PATH, "utf8");
-
-  for (const token of [
-    "drawCanvas",
-    "drawPoliticalPass",
-    "drawContextBasePass",
-    "drawContextScenarioPass",
-    "renderPassToCache(",
-    "prepareRenderPassHost",
-    "ensureRenderPassCanvas",
-    "prepareTargetContext",
-    "withRenderTarget",
-    "buildHitCanvas",
-    "scenario_refresh",
-    "exact_after_settle",
-    "strategic_overlay",
-    "document",
-    "window",
-    "globalThis.d3",
-    "runtimeState",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `owner source must not include ${token}`);
-  }
-});

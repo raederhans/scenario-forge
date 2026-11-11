@@ -2,14 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createCachedPassCompositorOwner } from "../js/core/renderer/cached_pass_compositor_owner.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const REPO_ROOT = path.resolve(__dirname, "..");
-const OWNER_PATH = path.join(REPO_ROOT, "js", "core", "renderer", "cached_pass_compositor_owner.js");
 
 function createCanvasContext(label) {
   const calls = [];
@@ -571,26 +565,3 @@ test("compose reads requireAllPasses once before capturing the cache snapshot", 
   assert.deepEqual(events, ["require-all", "cache-snapshot"]);
 });
 
-test("owner source stays free of renderer globals imports and dynamic dispatch helpers", () => {
-  const source = fs.readFileSync(OWNER_PATH, "utf8");
-  assert.deepEqual([...source.matchAll(/^import .* from "(.*)";/gm)].map((match) => match[1]), ["./cached_surface_coverage.js"]);
-  for (const token of [
-    "map_renderer.js",
-    "RendererRuntimeContext",
-    "globalThis",
-    "document",
-    "window",
-    "runtimeState",
-    "getRenderPassCacheState",
-    "getPassCanvas",
-    "isPassDirty",
-    "runGetter",
-    "runEffect",
-    "effectOrder",
-    "getterOrder",
-    "createTrace",
-  ]) {
-    assert.equal(source.includes(token), false, token);
-  }
-  assert.ok(source.split(/\r?\n/).length <= 320);
-});

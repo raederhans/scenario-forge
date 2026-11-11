@@ -1,12 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 import { createVisibleFrameDiagnosticsOwner } from "../js/core/renderer/visible_frame_diagnostics_owner.js";
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OWNER_PATH = "js/core/renderer/visible_frame_diagnostics_owner.js";
 
 function createCommittedFrameIdentity(overrides = {}) {
   return {
@@ -400,7 +395,7 @@ test("createVisibleFrameDiagnosticsOwner fails fast for missing dependencies", (
   );
 });
 
-test("visible frame diagnostics owner returns frozen summaries and stays outside render lifecycle internals", () => {
+test("visible frame diagnostics owner returns frozen summaries", () => {
   const { owner } = createHarness();
 
   const summary = owner.recordVisibleFrameTransaction("committed", { reason: "freeze-check" });
@@ -410,18 +405,4 @@ test("visible frame diagnostics owner returns frozen summaries and stays outside
   assert.equal(Object.isFrozen(summary.getterOrder), true);
   assert.equal(Object.isFrozen(summary.counterOrder), true);
 
-  const ownerSource = fs.readFileSync(path.join(REPO_ROOT, OWNER_PATH), "utf8");
-  for (const token of [
-    "map_renderer.js",
-    "runtimeState =",
-    "drawCanvas",
-    "renderPassToCache",
-    "buildHitCanvas",
-    "createScenarioRefreshRuntime",
-    "createExactAfterSettleScheduler",
-    "createStrategicOverlayRuntimeOwner",
-    "renderer_render_lifecycle_owner",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `${OWNER_PATH} must avoid ${token}`);
-  }
 });

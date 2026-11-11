@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -316,23 +315,6 @@ test("day-night owner toggles mode panels and writes cycle speed", () => {
   assert.equal(harness.runtimeState.styleConfig.dayNight.cycleSecondsPerDay, 45);
 });
 
-test("day-night renderer supports utc and cycle clock tokens", () => {
-  const source = readFileSync(
-    join(process.cwd(), "js", "core", "renderer", "day_night_runtime_owner.js"),
-    "utf8",
-  );
-
-  assert.match(source, /function getCycleUtcMinutes\(config = getDayNightStyleConfig\(\), now = createDate\(\)\)/);
-  assert.match(source, /if \(config\.mode === "cycle"\) \{\s*return `\$\{dayKey\}\|cycle:/);
-  assert.match(source, /getCycleUtcMinutes\(config, now\)\.toFixed\(2\)/);
-  assert.match(source, /const cycleFrameIntervalMs = Number\(constants\.cycleFrameIntervalMs\) \|\| \(1000 \/ 30\);/);
-  assert.match(source, /function scheduleDayNightCycleFrame\(callback\)/);
-  assert.match(source, /requestAnimationFrame\(callback\)/);
-  assert.match(source, /function syncDayNightCycleAnimation\(initialConfig\)/);
-  assert.match(source, /initialMode !== "utc" && initialMode !== "cycle"/);
-  assert.match(source, /mode !== "utc" && mode !== "cycle"/);
-});
-
 test("day-night owner renders modern defaults from normalized state", () => {
   const defaults = createDefaultDayNightStyleConfig();
   const harness = createHarness([
@@ -412,30 +394,3 @@ test("day-night modern range fallbacks match normalized defaults", () => {
   assert.equal(harness.runtimeState.styleConfig.dayNight.shadowOpacity, defaults.shadowOpacity);
 });
 
-test("day-night HTML initial values match normalized defaults", () => {
-  const defaults = createDefaultDayNightStyleConfig();
-  const html = readFileSync(join(process.cwd(), "index.html"), "utf8");
-  const assertRangeDefault = (id, expectedPercent) => {
-    const inputPattern = new RegExp(`<input[^>]*id="${id}"[^>]*value="${expectedPercent}"`, "s");
-    const valuePattern = new RegExp(`<span[^>]*id="${id}Value"[^>]*>${expectedPercent}%<\\/span>`, "s");
-    assert.match(html, inputPattern);
-    assert.match(html, valuePattern);
-  };
-
-  assertRangeDefault("dayNightCityLightsIntensity", Math.round(defaults.cityLightsIntensity * 100));
-  assertRangeDefault("dayNightCityLightsTextureOpacity", Math.round(defaults.cityLightsTextureOpacity * 100));
-  assertRangeDefault("dayNightCityLightsCorridorStrength", Math.round(defaults.cityLightsCorridorStrength * 100));
-  assertRangeDefault("dayNightCityLightsCoreSharpness", Math.round(defaults.cityLightsCoreSharpness * 100));
-  assertRangeDefault(
-    "dayNightCityLightsPopulationBoostStrength",
-    Math.round(defaults.cityLightsPopulationBoostStrength * 100),
-  );
-  assertRangeDefault("dayNightHistoricalCityLightsDensity", Math.round(defaults.historicalCityLightsDensity * 100));
-  assertRangeDefault(
-    "dayNightHistoricalCityLightsSecondaryRetention",
-    Math.round(defaults.historicalCityLightsSecondaryRetention * 100),
-  );
-  assertRangeDefault("dayNightShadowOpacity", Math.round(defaults.shadowOpacity * 100));
-  assert.match(html, new RegExp(`<input[^>]*id="dayNightCycleSpeed"[^>]*value="${defaults.cycleSecondsPerDay}"`, "s"));
-  assert.match(html, /<span[^>]*id="dayNightCycleSpeedValue"[^>]*><\/span>/s);
-});

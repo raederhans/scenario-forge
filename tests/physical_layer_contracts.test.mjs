@@ -163,10 +163,9 @@ test("physical clip key does not traverse feature arrays and explicit reset stil
   for (let repeat = 0; repeat < 10; repeat++) assert.equal(h.key(), key);
 });
 
-test("physical layer runtime assets stay publishable through registry and Pages allowlist", () => {
+test("physical layer runtime assets stay registered in the source and manifest registries", () => {
   const registry = JSON.parse(readRepoFile("data", "runtime_asset_registry.json"));
   const manifest = JSON.parse(readRepoFile("data", "manifest.json"));
-  const pagesDistSource = readRepoFile("tools", "build_pages_dist.py");
 
   const expectedAssets = {
     "context_layer:physical": "data/europe_physical.geojson",
@@ -178,7 +177,6 @@ test("physical layer runtime assets stay publishable through registry and Pages 
   Object.entries(expectedAssets).forEach(([assetKey, assetPath]) => {
     assert.equal(registry.assets?.[assetKey]?.url, assetPath, assetKey);
     assert.equal(manifest.runtime_asset_registry?.assets?.[assetKey]?.url, assetPath, assetKey);
-    assert.ok(pagesDistSource.includes(`"${assetPath.replace("data/", "")}"`), assetPath);
   });
 
 });

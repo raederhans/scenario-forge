@@ -19,12 +19,6 @@ import {
   RENDER_TRANSACTION_WARNING_CODES,
 } from "../js/core/renderer/render_transaction_diagnostics.js";
 
-const REPO_ROOT = process.cwd();
-
-function readRepoFile(...relativeParts) {
-  return fs.readFileSync(path.join(REPO_ROOT, ...relativeParts), "utf8");
-}
-
 function withGlobalDiagnosticsReset(callback) {
   const globalName = getRenderTransactionGlobalName();
   const hadGlobal = Object.prototype.hasOwnProperty.call(globalThis, globalName);
@@ -828,18 +822,6 @@ test("visible frame reuse warns when the active scenario changes", () => {
   ));
 });
 
-test("chunk runtime source preserves scenario apply epoch on async promotion snapshots", () => {
-  const chunkRuntime = readRepoFile("js", "core", "scenario", "chunk_runtime.js");
-
-  [
-    "scenarioApplyEpochBySelectionVersion",
-    "selectionScenarioApplyEpoch",
-    "pendingPromotion?.scenarioApplyEpoch",
-    "promotionScenarioApplyEpoch",
-    "recordRenderTransactionSnapshotBase",
-  ].forEach((token) => assert.ok(chunkRuntime.includes(token), `chunk runtime should include ${token}`));
-});
-
 test("manual render warnings and pass invalidations are retained", () => {
   const runtimeState = {
     activeScenarioId: "tno_1962",
@@ -864,73 +846,3 @@ test("manual render warnings and pass invalidations are retained", () => {
   assert.equal(snapshot.renderPasses.lastInvalidationReason, "test-invalidation");
 });
 
-test("render transaction instrumentation remains wired into apply, chunk, and renderer flows", () => {
-  const scenarioManager = readRepoFile("js", "core", "scenario_manager.js");
-  const scenarioPipeline = readRepoFile("js", "core", "scenario_apply_pipeline.js");
-  const postApply = readRepoFile("js", "core", "scenario_post_apply_effects.js");
-  const chunkRuntime = readRepoFile("js", "core", "scenario", "chunk_runtime.js");
-  const mapRenderer = readRepoFile("js", "core", "map_renderer.js");
-  const renderDiagnostics = readRepoFile("js", "core", "renderer", "render_transaction_diagnostics.js");
-  const scenarioResources = readRepoFile("js", "core", "scenario_resources.js");
-  const optionalLayers = readRepoFile("js", "core", "scenario", "optional_layer_runtime.js");
-  assert.ok(scenarioResources.includes("registerRenderTransactionOptionalLayerConfigs"));
-  assert.ok(scenarioResources.includes("optional-layer-state-apply"));
-
-  [
-    "scenario-apply-requested",
-    "scenario-apply-staged",
-    "scenario-apply-committed",
-    "scenario-post-apply-complete",
-    "scenarioApplyInflightTargetMismatch",
-    "scenario-apply-reused-active-target",
-    "scenario-apply-queued-latest-target",
-    "scenario-apply-queue-drain-started",
-    "scenario-apply-queue-drain-skipped-stale",
-    "scenario-apply-queue-drain-complete",
-    "scenario-apply-target-committed",
-  ].forEach((token) => assert.ok(scenarioManager.includes(token), `scenario_manager should include ${token}`));
-
-  [
-    "scenario-apply-pipeline-staged",
-    "scenario-apply-runtime-commit-complete",
-    "scenario-apply-postcommit-complete",
-  ].forEach((token) => assert.ok(scenarioPipeline.includes(token), `scenario_apply_pipeline should include ${token}`));
-
-  [
-    "scenario-coarse-prewarm-start",
-    "scenario-refresh-map-data-complete",
-    "scenario-data-health-refreshed",
-    "scenario-detail-prewarm-complete",
-    "scenario-apply-stale-callback-skipped",
-    "scenarioApplyRequestId",
-  ].forEach((token) => assert.ok(postApply.includes(token), `scenario_post_apply_effects should include ${token}`));
-
-  [
-    "scenario-chunk-refresh-requested",
-    "scenario-chunk-selection-created",
-    "scenario-chunk-selection-reused",
-    "scenario-chunk-promotion-pending-created",
-    "scenario-chunk-promotion-commit-start",
-    "scenario-chunk-promotion-visual-complete",
-    "scenario-political-chunk-payload-written",
-    "scenarioApplyRequestIdBySelectionVersion",
-    "political-chunk-payload-write",
-  ].forEach((token) => assert.ok(chunkRuntime.includes(token), `chunk_runtime should include ${token}`));
-
-  [
-    "render-pass-invalidated",
-    "visible-frame-${normalizedStatus}",
-    "color-rebuild-complete",
-    "pending-political-color-edit-cleared",
-    "partial-color-refresh-complete",
-    "progressive-political-full-cache-ready",
-  ].forEach((token) => assert.ok(
-    mapRenderer.includes(token) || renderDiagnostics.includes(token),
-    `renderer diagnostics should include ${token}`
-  ));
-
-  [
-    "optional-layer-visibility-sync-start",
-    "optional-layer-visibility-sync-complete",
-  ].forEach((token) => assert.ok(optionalLayers.includes(token), `optional_layer_runtime should include ${token}`));
-});

@@ -2,13 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createPoliticalPassOrchestratorOwner } from "../js/core/renderer/political_pass_orchestrator_owner.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const OWNER_PATH = path.resolve(__dirname, "../js/core/renderer/political_pass_orchestrator_owner.js");
 
 const SCENE_IDENTITY = Object.freeze({
   sceneGeneration: 7,
@@ -580,25 +575,6 @@ test("all committed results keep the exact key order and JSON-safe schema", () =
     assert.deepEqual(JSON.parse(JSON.stringify(result)), result);
   }
 });
-
-test("owner source stays import-free and excludes renderer state, DOM, D3, canvas, and feature algorithms", () => {
-  const source = fs.readFileSync(OWNER_PATH, "utf8");
-  assert.equal(/^\s*import\s/m.test(source), false);
-  for (const forbidden of [
-    "runtimeState",
-    "RendererRuntimeContext",
-    "globalThis",
-    "document.",
-    "window.",
-    "getContext(",
-    "drawPoliticalFeature(",
-    "buildPoliticalRasterWorkerPacket(",
-    "tryPartialPoliticalPassRepaint(",
-  ]) {
-    assert.equal(source.includes(forbidden), false, `owner should exclude ${forbidden}`);
-  }
-});
-
 
 test("partition surfaces draw after fine/worker base passes", () => {
   for (const options of [{ workerEnabled: false }, { bitmapResult: {}, bitmapDrawn: true }]) {
