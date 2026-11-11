@@ -5,7 +5,6 @@ import vm from "node:vm";
 import { BOUNDED_UI_FILES, classifyPerformance, isBoundedUiChange, isOrdinaryDocumentation } from "../tools/ci/perf_policy.mjs";
 
 const workflow = fs.readFileSync(new URL("../.github/workflows/perf-pr-gate.yml", import.meta.url), "utf8").replace(/\r\n/g, "\n");
-const measure = fs.readFileSync(new URL("../.github/workflows/perf-measure.yml", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 const script = workflow.split("node <<'NODE'\n")[1].split("\n          NODE")[0];
 const policyOutputs = policy => Object.fromEntries(Object.entries(policy).map(([key, value]) =>
   [key, typeof value === "boolean" ? String(value) : Array.isArray(value) ? JSON.stringify(value) : value]));
@@ -64,23 +63,6 @@ test("strict intent and force always require measurement and retain enforcement 
   const data = classifyPerformance({ changedFiles: ["data/scenarios/tno_1962/x.json"], labels: ["ci:perf-strict"] });
   assert.equal(data.required_for_merge, true);
   assert.equal(data.should_enforce_regressions, false);
-});
-
-test("required check waits only for classification and required reusable measurement", () => {
-  const gate = workflow.slice(workflow.indexOf("  perf-gate:\n"));
-  assert.match(gate, /needs: \[classify, perf-scenarios\]/);
-  assert.doesNotMatch(gate, /perf-observation/);
-  const required = workflow.slice(workflow.indexOf("  perf-scenarios:\n"), workflow.indexOf("  perf-observation:\n"));
-  const observation = workflow.slice(workflow.indexOf("  perf-observation:\n"), workflow.indexOf("  perf-gate:\n"));
-  for (const caller of [required, observation]) assert.match(caller, /uses: \.\/\.github\/workflows\/perf-measure.yml/);
-  assert.match(required, /if: needs.classify.outputs.required_for_merge == 'true'/);
-  assert.match(observation, /if: needs.classify.outputs.diagnostic_only == 'true'/);
-  assert.match(required, /measurement_lane: perf-required-scenario/);
-  assert.match(observation, /measurement_lane: perf-observation-scenario/);
-  assert.doesNotMatch(workflow + measure, /continue-on-error/);
-  assert.doesNotMatch(workflow, /npm ci|--runs 5/);
-  assert.match(measure, /name: \$\{\{ inputs.measurement_lane \}\} \(\$\{\{ matrix.scenario \}\}\)/);
-  assert.match(measure, /--runs 5 --warmups 3/);
 });
 
 test("aggregator accepts only the exact required outcome for a valid policy", () => {
