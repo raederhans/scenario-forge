@@ -9,9 +9,9 @@ import { createPhysicalViewportCacheOwner } from "./renderer/physical_viewport_c
 import { planPhysicalViewportSurface } from "./renderer/physical_raster_surface.js";
 import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
 import { analyzeScenarioPoliticalDerivedStateCoverageChunked } from "./renderer/scenario_chunk_promotion_helpers.js";
-import { getPoliticalDisplayLegend, getPoliticalDisplayModeSignature } from "./political_display_mode.js";
-import { getThematicWgiLegend, getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
-import { getPopulationLegend, getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
+import { getPoliticalDisplayModeSignature } from "./political_display_mode.js";
+import { getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
+import { getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
 import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./population_spatial_runtime.js";
 import { samplePopulationDensityLonLat } from "./population_spatial_data.js";
 import { createPopulationHeatmapRenderOwner, getPopulationViewportDetailTileIds } from "./renderer/population_heatmap_render_owner.js";
@@ -250,12 +250,10 @@ import {
   isPoliticalRasterWorkerBitmapEnabled,
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
-import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
-import { createDeferredPanelRender } from "./deferred_panel_render.js";
 import { createSourceMetricsCache } from "./renderer/source_metrics_cache.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
-import { createLegendControlOwner } from "./renderer/legend_control_owner.js";
+import { createLegendRuntime } from "./renderer/legend_runtime.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import {
   getGeoFeatureDisplayLabel,
@@ -863,7 +861,6 @@ const getPixelRatioPolicy = lazyOwner(() => createPixelRatioPolicy({ runtimeStat
 let viewportReadModelOwner = null;
 const renderSnapshotOwner = createRenderSnapshotOwner();
 let rendererViewportUpdateOwner = null;
-let legendControlOwner = null;
 
 // --- owner 初始化区：getXxxOwner() 统一承载组装入口与依赖注入。 ---
 function markDevSelectionOverlayClean() {
@@ -919,28 +916,13 @@ const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   markInspectorClean: markInspectorOverlayClean,
 }));
 
-function getLegendControlOwner() {
-  if (legendControlOwner) return legendControlOwner;
-  const readLegendColors = createRevisionedLegendColorReader();
-  legendControlOwner = createLegendControlOwner({
-    getMapContainer: () => rendererSurfaceHost.getMapContainer(),
-    getViewportSize: () => ({ width: Number(runtimeState.width), height: Number(runtimeState.height) }),
-    getLanguage: () => String(runtimeState.currentLanguage || state.currentLanguage || ""),
-    getLegendModel: (uniqueColors, labels) => ({
-      colors: Array.isArray(uniqueColors) ? uniqueColors : readLegendColors(state),
-      specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
-      thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState) || getPoliticalDisplayLegend(runtimeState),
-      labelMap: labels || LegendManager.getLabels(state),
-    }),
-    getControlState: () => LegendManager.getControlState(state),
-    getControlLimits: () => LegendManager.getControlLimits(),
-    updateControlState: (patch) => LegendManager.updateControlState(state, patch),
-    toggleControlCollapsed: () => LegendManager.toggleControlCollapsed(state),
-    hideControl: () => LegendManager.hideControl(state),
-    clamp,
-  });
-  return legendControlOwner;
-}
+const legendRuntime = createLegendRuntime({
+  state,
+  runtimeState,
+  getMapContainer: () => rendererSurfaceHost.getMapContainer(),
+  clamp,
+});
+export const renderLegend = legendRuntime.renderLegend;
 
 const getRendererSurfaceLifecycleOwner = lazyOwner(() => createRendererSurfaceLifecycleOwner({
   surfaceHost: rendererSurfaceHost,
@@ -8010,7 +7992,7 @@ function ensureHybridLayers() {
   const svg = globalThis.d3.select(mapSvg);
 
   svg.select("g.legend-group").remove();
-  ensureLegendControlElement();
+  legendRuntime.ensureLegendControlElement();
 }
 
 function setCanvasSize({
@@ -13450,30 +13432,6 @@ function renderInspectorHighlightOverlay() {
   return getSelectionOverlayOwner().renderInspectorHighlightOverlay();
 }
 
-function ensureLegendControlElement() {
-  return getLegendControlOwner().ensureLegendControlElement();
-}
-
-export function renderLegend(uniqueColors = null, labels = null) {
-  return getLegendControlOwner().renderLegend(uniqueColors, labels);
-}
-
-// Both legends rescan every painted color after a color change, and the map legend
-// reads its own layout to place itself. Idle render passes refresh them after paint,
-// so a paint click's frame does not pay for it.
-let deferredLegendRender = null;
-function requestLegendRender() {
-  deferredLegendRender ||= createDeferredPanelRender({
-    render: () => {
-      renderLegend();
-      if (typeof runtimeState.updateLegendUI === "function") {
-        runtimeState.updateLegendUI();
-      }
-    },
-  });
-  deferredLegendRender.request();
-}
-
 function ensurePerfOverlayElement() {
   const cache = getRenderPassCacheState();
   if (!cache.perfOverlayEnabled || !rendererSurfaceHost.getMapContainer()) return null;
@@ -13628,7 +13586,7 @@ function render() {
   renderInspectorHighlightOverlayIfNeeded();
   renderHoverOverlayIfNeeded({ eventType: "render-frame" });
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
-    requestLegendRender();
+    legendRuntime.requestLegendRender();
   }
   updatePerfOverlay();
   if (startedAt > 0) {
