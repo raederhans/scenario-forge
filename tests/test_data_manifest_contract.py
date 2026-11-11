@@ -10,7 +10,13 @@ from tools.build_data_catalog import validate_catalog_entry_contract
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+# 这些文本产物在仓库里是 LF；Windows 检出会变成 CRLF，比较前统一换行。
 CANONICAL_LF_MANIFEST_OUTPUTS = {
+    "global_lakes.geojson",
+    "hgo_catalogs/hgo_flags.index.json",
+    "hgo_catalogs/hgo_flags.png_manifest.json",
+    "hgo_catalogs/hgo_place_names.json",
+    "hgo_catalogs/index.json",
     "js/core/city_lights_modern_asset.js",
     "js/core/city_lights_historical_1930_asset.js",
 }
