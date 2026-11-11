@@ -143,11 +143,7 @@ import {
   getUrbanFeatureStableId,
   getCityCapitalScore,
   getCitySortWeight,
-  getCityCountryTierFromScenarioRecord,
-  getCityCountryVisibilityClass,
   isCityScenarioTagExcludedFromReveal,
-  getCityCountryRevealOverride,
-  getFallbackCityCountryTier,
   getCityRevealPhase,
   getCityRevealPhaseInterpolation,
   getCityRevealBucket,
@@ -163,8 +159,6 @@ import {
   getCityMarkerSizePx,
   CITY_COUNTRY_TIER_RANK,
   CITY_COUNTRY_CLASS_RANK,
-  CITY_PRIMARY_POWER_TAGS,
-  CITY_SECONDARY_POWER_TAGS,
   CITY_MARKER_SIZE_LIMITS_PX,
 } from "./renderer/city_reveal_policy.js";
 import {
@@ -1484,8 +1478,6 @@ const getUrbanCityPolicyOwner = lazyOwner(() => createUrbanCityPolicyOwner({
     getCityAnchor,
     getCityCanonicalId,
     getCityCapitalScore,
-    getCityCountryGroupKey,
-    getCityCountryProfileIndex,
     getCityEffectiveMinZoom,
     getCityFeatureAliases,
     getCityFeatureKey,
@@ -4138,7 +4130,6 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
 // --- 注释锚点：pass-through facade 章节 ---
 // --- 注释锚点：实际渲染实现（render implementation）章节 ---
 
-const cityCountryProfileCache = new WeakMap();
 const visibleFacilityHoverEntriesByFamily = {
   airport: [],
   port: [],
@@ -10829,107 +10820,6 @@ function composeCityLabelTextModel() {
 }
 
 const { getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel } = composeCityLabelTextModel();
-
-function getCityCountryGroupKey(feature) {
-  const props = feature?.properties || {};
-  const scenarioTag = getUrbanCityPolicyOwner().getCityScenarioTag(feature);
-  if (scenarioTag) return `tag:${scenarioTag}`;
-  const countryCode = String(props.__city_country_code || props.country_code || "").trim().toUpperCase();
-  if (countryCode) return `cc:${countryCode}`;
-  const hostFeatureId = String(props.__city_host_feature_id || props.host_feature_id || "").trim();
-  if (hostFeatureId) return `host:${hostFeatureId}`;
-  return `city:${getCityCanonicalId(feature) || getCityFeatureKey(feature)}`;
-}
-
-function getScenarioFeaturedTagSet() {
-  return new Set(
-    Array.isArray(runtimeState.activeScenarioManifest?.featured_tags)
-      ? runtimeState.activeScenarioManifest.featured_tags
-        .map((value) => String(value || "").trim().toUpperCase())
-        .filter(Boolean)
-      : []
-  );
-}
-
-function getCityCountryProfileIndex(cityCollection) {
-  if (!cityCollection?.features?.length) {
-    return new Map();
-  }
-  const cached = cityCountryProfileCache.get(cityCollection);
-  if (cached) {
-    return cached;
-  }
-
-  const profiles = new Map();
-  cityCollection.features.forEach((feature) => {
-    const props = feature?.properties || {};
-    const groupKey = getCityCountryGroupKey(feature);
-    let profile = profiles.get(groupKey);
-    if (!profile) {
-      profile = {
-        groupKey,
-        scenarioTag: getUrbanCityPolicyOwner().getCityScenarioTag(feature),
-        countryCode: String(props.__city_country_code || props.country_code || "").trim().toUpperCase(),
-        featureCount: 0,
-        hasCapital: false,
-        hasCountryCapital: false,
-        maxPopulation: 0,
-        maxTierWeight: 0,
-        controllerFeatureCount: 0,
-        countryClass: "micro",
-        classWeightBias: 0,
-        minQuotaFloorBoost: 0,
-      };
-      profiles.set(groupKey, profile);
-    }
-    profile.featureCount += 1;
-    profile.hasCapital = profile.hasCapital || !!props.__city_is_capital;
-    profile.hasCountryCapital = profile.hasCountryCapital || !!props.__city_is_country_capital;
-    profile.maxPopulation = Math.max(profile.maxPopulation, Math.max(0, Number(props.__city_population || 0)));
-    profile.maxTierWeight = Math.max(profile.maxTierWeight, getCityTierWeight(feature));
-  });
-
-  const featuredTags = getScenarioFeaturedTagSet();
-  const defaultCountry = String(runtimeState.activeScenarioManifest?.default_country || "")
-    .trim()
-    .toUpperCase();
-  profiles.forEach((profile) => {
-    const record = profile.scenarioTag ? runtimeState.scenarioCountriesByTag?.[profile.scenarioTag] : null;
-    const revealOverride = getCityCountryRevealOverride(record);
-    const isDefaultCountry = !!profile.scenarioTag && profile.scenarioTag === defaultCountry;
-    const isFeaturedCountry = !!record?.featured || featuredTags.has(profile.scenarioTag);
-    const isPrimaryPower = CITY_PRIMARY_POWER_TAGS.has(profile.scenarioTag);
-    const isSecondaryPower = CITY_SECONDARY_POWER_TAGS.has(profile.scenarioTag);
-    profile.controllerFeatureCount = Math.max(
-      0,
-      Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? profile.featureCount ?? 0) || 0
-    );
-    profile.countryTier = getCityCountryTierFromScenarioRecord(profile, record, {
-      defaultCountry,
-      featuredTags,
-    }) || getFallbackCityCountryTier(profile);
-    profile.countryClass = revealOverride.className || getCityCountryVisibilityClass(profile, record, {
-      defaultCountry,
-      featuredTags,
-    });
-    profile.countryClassRank = CITY_COUNTRY_CLASS_RANK[profile.countryClass] || 0;
-    profile.classWeightBias = Number(revealOverride.classWeightBias || 0);
-    profile.minQuotaFloorBoost = Number(revealOverride.minQuotaFloorBoost || 0);
-    profile.countryTierRank = CITY_COUNTRY_TIER_RANK[profile.countryTier] || 0;
-    profile.isDefaultCountry = isDefaultCountry;
-    profile.isFeaturedCountry = isFeaturedCountry;
-    profile.isPrimaryPower = isPrimaryPower;
-    profile.isSecondaryPower = isSecondaryPower;
-    profile.isPriorityCountry = (
-      isDefaultCountry
-      || isPrimaryPower
-      || isSecondaryPower
-    );
-  });
-
-  cityCountryProfileCache.set(cityCollection, profiles);
-  return profiles;
-}
 
 function getCityInterpolatedRevealBucket(entry, scale) {
   const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
