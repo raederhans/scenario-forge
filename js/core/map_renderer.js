@@ -78,7 +78,7 @@ import { createBrushInteractionSessionOwner } from "./renderer/brush_interaction
 import { createPhysicalIntensityPreviewOwner } from "./renderer/physical_intensity_preview_owner.js";
 import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
 import { createScenarioRegionOverlayRenderOwner } from "./renderer/scenario_region_overlay_render_owner.js";
-import { chooseMarineFocusBounds, createMarineInteriorAnchorResolver, drawMarineLabels, getMarineLabelMinScale, isMarineLabelEligible, shouldShowMarineRegionNames } from "./renderer/marine_label_owner.js";
+import { chooseMarineFocusBounds, createMarineLabelOwner, shouldShowMarineRegionNames } from "./renderer/marine_label_owner.js";
 import {
   createUrbanAdaptivePaintModel,
   getUrbanFeatureOwnerId,
@@ -1970,6 +1970,24 @@ const getScenarioReliefOverlayRenderOwner = lazyOwner(() => createScenarioRelief
     nowMs,
     pathBoundsInScreen,
   },
+}));
+
+const getMarineLabelOwner = lazyOwner(() => createMarineLabelOwner({
+  state,
+  getContext: () => rendererSurfaceHost.getContext(),
+  getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+  getProjection: () => rendererSurfaceHost.getProjection(),
+  getD3: () => globalThis.d3,
+  isOpenOceanRenderable,
+  isWaterRegionRenderable,
+  getProjectedFeatureBounds,
+  projectedGeoBoundsInScreen,
+  collectSafeWaterRegionGeometryParts,
+  getScenarioWaterPartBounds: part => getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part),
+  getLabelPaintBounds: getTnoSceneLabelPaintBounds,
+  getGeoFeatureDisplayLabel,
+  recordRenderPerfMetric,
+  nowMs,
 }));
 
 const getCityLightsRenderOwner = lazyOwner(() => createCityLightsRenderOwner({
@@ -12042,7 +12060,7 @@ function drawLabelsPassContent(k, { interactive = false } = {}) {
   drawBlankFeatureLabelsPass(k, { interactive });
   const occupiedBoxes = [];
   if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
-    drawOrdinaryMarineLabels(k, occupiedBoxes);
+    getMarineLabelOwner().drawOrdinaryMarineLabels(k, occupiedBoxes);
   }
   // Keep capitals beside their symbols. Overview country titles take priority
   // over ordinary city names; regional views favor the whole city layer.
@@ -12187,97 +12205,6 @@ function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
     centerX: (minX + maxX) / 2,
     centerY: (minY + maxY) / 2,
   }, { animate, pinWorldTop: true });
-}
-
-const resolveMarineInteriorAnchor = createMarineInteriorAnchorResolver();
-let marineLabelProjectionGeneration = null;
-let marineLabelAnchorCache = new WeakMap();
-let marineLabelCentroidInteriorCache = new WeakMap();
-
-function drawOrdinaryMarineLabels(k, occupiedBoxes) {
-  if (!runtimeState.showWaterRegions || !runtimeState.waterRegionsById?.size) return;
-  const startedAt = nowMs();
-  const context = rendererSurfaceHost.getContext();
-  const path = rendererSurfaceHost.getPathCanvas();
-  if (!context || typeof path?.centroid !== "function") return;
-  const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
-  if (!transform) return;
-  const generation = getProjectionGeometryGeneration(rendererSurfaceHost.getProjection());
-  if (generation !== marineLabelProjectionGeneration) {
-    marineLabelProjectionGeneration = generation;
-    marineLabelAnchorCache = new WeakMap();
-    marineLabelCentroidInteriorCache = new WeakMap();
-  }
-  const selectedId = String(runtimeState.selectedWaterRegionId || "");
-  const entries = [];
-  for (const [id, feature] of runtimeState.waterRegionsById) {
-    const minScale = getMarineLabelMinScale(feature);
-    if (!isMarineLabelEligible(feature, {
-      showWaterRegions: runtimeState.showWaterRegions,
-      openOceanRenderable: isOpenOceanRenderable(),
-    }) || (k < minScale && id !== selectedId)
-      || !isWaterRegionRenderable(feature)) continue;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id });
-    if (!projectedGeoBoundsInScreen(bounds)) continue;
-    const parts = collectSafeWaterRegionGeometryParts(feature);
-    let selectedPart = null;
-    let selectedPartBounds = null;
-    let largestArea = -1;
-    for (const part of parts) {
-      const partBounds = getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part);
-      if (!projectedGeoBoundsInScreen(partBounds)) continue;
-      const area = Math.max(0, partBounds.maxX - partBounds.minX) * Math.max(0, partBounds.maxY - partBounds.minY);
-      if (area > largestArea) {
-        selectedPart = part;
-        selectedPartBounds = partBounds;
-        largestArea = area;
-      }
-    }
-    if (!selectedPart) continue;
-    let anchors = marineLabelAnchorCache.get(feature);
-    if (!anchors) {
-      anchors = new WeakMap();
-      marineLabelAnchorCache.set(feature, anchors);
-    }
-    let centroid = anchors.get(selectedPart);
-    if (!centroid) {
-      centroid = path.centroid(selectedPart);
-      if (Array.isArray(centroid) && centroid.every(Number.isFinite)) anchors.set(selectedPart, centroid);
-    }
-    const projection = rendererSurfaceHost.getProjection();
-    if (typeof projection?.invert !== "function" || !globalThis.d3?.geoContains) continue;
-    const anchor = resolveMarineInteriorAnchor({
-      part: selectedPart, generation, centroid, bounds: selectedPartBounds, transform,
-      width: runtimeState.width, height: runtimeState.height,
-      paintBounds: getTnoSceneLabelPaintBounds(),
-      gridSize: id === selectedId ? 5 : 3,
-      contains: (point) => {
-        if (point === centroid && marineLabelCentroidInteriorCache.has(selectedPart)) {
-          return marineLabelCentroidInteriorCache.get(selectedPart);
-        }
-        const lonLat = projection.invert(point);
-        const isInside = Array.isArray(lonLat) && lonLat.every(Number.isFinite)
-          && globalThis.d3.geoContains(selectedPart, lonLat);
-        if (point === centroid) marineLabelCentroidInteriorCache.set(selectedPart, isInside);
-        return isInside;
-      },
-    });
-    if (!anchor) continue;
-    const screenPoint = [anchor[0] * transform.k + transform.x, anchor[1] * transform.k + transform.y];
-    entries.push({ id, feature, label: getGeoFeatureDisplayLabel(feature), anchor, screenPoint, area: largestArea });
-  }
-  let selectedDrawn = false;
-  const drawnCount = drawMarineLabels(entries, {
-    context, scale: k, width: runtimeState.width, height: runtimeState.height,
-    paintBounds: getTnoSceneLabelPaintBounds(),
-    language: runtimeState.currentLanguage, selectedId, occupiedBoxes,
-    onPlaced: (entry) => { if (entry.id === selectedId) selectedDrawn = true; },
-  });
-  recordRenderPerfMetric("drawMarineLabels", nowMs() - startedAt, {
-    candidateCount: entries.length,
-    drawnCount,
-    selectedVisible: selectedDrawn,
-  });
 }
 
 function renderPassToCache(passName, drawFn, transform, timings) {
