@@ -324,7 +324,7 @@ function initShortcuts() {
         syncToolUi();
         return;
       }
-      if (runtimeState.selectedInspectorCountryCode && runtimeState.stepUpInspectorSelectionFn?.()) {
+      if (runtimeState.selectedInspectorCountryCode && callRuntimeHook(runtimeState, "stepUpInspectorSelectionFn")) {
         event.preventDefault();
       }
     }

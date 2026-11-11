@@ -131,9 +131,10 @@ test("special zone layer mutation action normalizes, mutates, and commits inside
   assert.equal(target.specialZonesOverlayDirty, true);
 });
 
-test("special zone membership tools store string tools and retain runtime hook identity", () => {
-  const renderWorkbench = () => {};
-  const renderCurrentTarget = () => {};
+test("special zone membership tools store string tools and expose registered workbench hooks", (t) => {
+  const hookCalls = [];
+  const renderWorkbench = () => { hookCalls.push("workbench"); };
+  const renderCurrentTarget = () => { hookCalls.push("target"); };
   const target = {
     currentTool: { toString: () => "select" },
     brushModeEnabled: true,
@@ -148,8 +149,10 @@ test("special zone membership tools store string tools and retain runtime hook i
   assert.equal(target.currentTool, "select");
 
   registerSpecialZonesWorkbenchRuntimeHooks(target, { renderWorkbench, renderCurrentTarget });
-  assert.equal(target.updateSpecialZonesWorkbenchUIFn, renderWorkbench);
-  assert.equal(target.updateSpecialZonesWorkbenchCurrentTargetUIFn, renderCurrentTarget);
+  t.after(() => registerSpecialZonesWorkbenchRuntimeHooks(target, { renderWorkbench: () => {}, renderCurrentTarget: () => {} }));
+  target.updateSpecialZonesWorkbenchUIFn();
+  target.updateSpecialZonesWorkbenchCurrentTargetUIFn();
+  assert.deepEqual(hookCalls, ["workbench", "target"]);
 });
 
 test("special zone snapshot restore preserves absent properties and normalizes present properties", () => {

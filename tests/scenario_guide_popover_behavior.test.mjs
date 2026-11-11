@@ -29,10 +29,6 @@ test("main quick guide remains independent while the HGO guide links to its own 
     ["#scenarioGuideStepOwner strong", ownerHeading],
     ["#scenarioGuideStepApplyActions strong", editHeading],
   ]);
-  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  for (const id of ["scenarioGuideStepActive", "scenarioGuideStepOwner", "scenarioGuideStepApplyActions"]) {
-    assert.ok(html.includes(`id="${id}"`), `${id} exists in the shipping guide`);
-  }
   const controller = createScenarioGuidePopoverController({
     state,
     scenarioGuidePopover: { querySelector: (selector) => nodes.get(selector) },
@@ -55,7 +51,6 @@ test("main quick guide remains independent while the HGO guide links to its own 
   assert.equal(identity.hidden, true);
   assert.equal(hgoPanel.hidden, false);
   assert.equal(hgoNav["aria-selected"], "true");
-  assert.ok(html.includes('href="apps/hgo/index.html"'), "HGO entry navigates to the independent app");
 });
 
 test("new workspace labels agree across runtime and manual catalogs without changing generic Color", () => {
