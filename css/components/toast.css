@@ -1,0 +1,130 @@
+@layer components {
+/* Toast：js/ui/components/toast.js 生成的结构。 */
+.toast-viewport {
+  position: absolute;
+  top: 88px;
+  right: 24px;
+  z-index: var(--z-sidebar);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: min(340px, 78vw);
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--surface-raised) 12%, transparent);
+  background: color-mix(in srgb, var(--ink-900) 92%, transparent);
+  color: var(--surface-raised);
+  box-shadow: var(--shadow-1);
+  pointer-events: auto;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.toast.is-removing {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.toast.toast-success {
+  background: color-mix(in srgb, var(--success) 10%, var(--surface-raised));
+  color: var(--ink-900);
+  border-left: 3px solid var(--success);
+}
+
+.toast.toast-warning {
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface-raised));
+  color: var(--ink-900);
+  border-left: 3px solid var(--warning);
+}
+
+.toast.toast-error {
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface-raised));
+  color: var(--ink-900);
+  border-left: 3px solid var(--danger);
+}
+
+.toast-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.toast-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+}
+
+.toast-message {
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  opacity: 1;
+}
+
+.toast-action {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--surface-raised);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.toast-action:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--surface-raised) 12%, transparent);
+  border-color: currentColor;
+}
+
+.toast:is(.toast-success, .toast-warning, .toast-error) .toast-action {
+  color: var(--accent);
+  background: var(--surface-raised);
+  border-color: var(--line-2);
+}
+
+.toast:is(.toast-success, .toast-warning, .toast-error) .toast-action:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.toast-action:focus-visible,
+.toast-dismiss:focus-visible,
+.app-dialog-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--surface-raised) 88%, transparent);
+  outline-offset: 2px;
+}
+
+.toast-action:disabled {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.toast-dismiss {
+  flex: 0 0 auto;
+  min-width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.toast-dismiss:hover {
+  background: var(--line-1);
+}
+} /* end @layer components */
