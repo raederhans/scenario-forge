@@ -14,6 +14,7 @@ export function buildScenarioProjectMarkerEntries(manifest, state, projection, t
       packId: "tno_1962",
       stableId: marker.id,
       properties: marker,
+      tooltipText: String(marker.name?.[state.currentLanguage === "zh" ? "zh" : "en"] || ""),
       coordinates,
       projectedPoint,
       screenPoint: transform.apply(projectedPoint),

@@ -2,7 +2,7 @@
 
 - generated_at: 2026-11-08T02:57:05Z
 - version: 1
-- entries: 1380
+- entries: 1379
 
 ## Counts by role
 
@@ -70,7 +70,7 @@
 | transport_carrier_payload | 8 |
 | transport_catalog | 2 |
 | transport_manifest | 140 |
-| transport_pack | 300 |
+| transport_pack | 298 |
 | transport_provenance_payload | 8 |
 | transport_subtype_catalog | 1 |
 | unit_counter_manifest | 1 |
@@ -1305,9 +1305,7 @@
 | transport:energy_facilities:subtype_catalog | data/transport_layers/japan_energy_facilities/subtype_catalog.json | transport_subtype_catalog | json | json | schema://transport/subtype_catalog/v1 |  | no-cache | python tools/build_transport_workbench_japan_energy_facilities.py |  |
 | transport:industrial_zones:build_audit | data/transport_layers/japan_industrial_zones/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_transport_workbench_japan_industrial_zones.py |  |
 | transport:industrial_zones:full:industrial_zones | data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/polygon/v1 |  | default | python tools/build_transport_workbench_japan_industrial_zones.py |  |
-| transport:industrial_zones:preview:industrial_zones | data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/polygon/v1 |  | default | python tools/build_transport_workbench_japan_industrial_zones.py |  |
 | transport:industrial_zones:open:paths:full:industrial_zones | data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/polygon/v1 |  | default | python tools/build_transport_workbench_japan_industrial_zones.py |  |
-| transport:industrial_zones:open:paths:preview:industrial_zones | data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/polygon/v1 |  | default | python tools/build_transport_workbench_japan_industrial_zones.py |  |
 | transport_manifest:industrial_zones | data/transport_layers/japan_industrial_zones/manifest.json | transport_manifest | json | json | schema://transport/manifest/v1 |  | no-cache | python tools/build_transport_workbench_japan_industrial_zones.py |  |
 | transport:logistics_hubs:build_audit | data/transport_layers/japan_logistics_hubs/build_audit.json | transport_build_audit | json | json | schema://transport/build_audit/v1 |  | no-cache | python tools/build_transport_workbench_japan_logistics_hubs.py |  |
 | transport:logistics_hubs:full:logistics_hubs | data/transport_layers/japan_logistics_hubs/logistics_hubs.geojson | transport_pack | geojson | json | schema://geojson/feature_collection/point/v1 |  | default | python tools/build_transport_workbench_japan_logistics_hubs.py |  |

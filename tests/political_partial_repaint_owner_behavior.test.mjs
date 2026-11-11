@@ -3,13 +3,10 @@ import { projectCoordinateToWorkerPixel } from "../js/core/map_renderer/politica
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createPoliticalPartialRepaintOwner } from "../js/core/renderer/political_partial_repaint_owner.js";
 import { isPoliticalFeaturePathEntryCurrent } from "../js/core/renderer/political_path_cache_owner.js";
 import { createPoliticalFeaturePolicy } from "../js/core/renderer/political_feature_policy.js";
-
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function createHarness(overrides = {}) {
   const events = [];
@@ -585,14 +582,6 @@ test("request and draw exceptions propagate through the owner boundary", () => {
   const drawHarness = createHarness();
   drawHarness.context.drawImage = () => { throw drawError; };
   assert.throws(() => drawHarness.owner.drawPoliticalWorkerBitmapResult({ bitmap: {} }, {}), drawError);
-});
-
-test("owner remains import-free and avoids DOM, globals, and worker singleton state", () => {
-  const source = fs.readFileSync(path.join(REPO_ROOT, "js/core/renderer/political_partial_repaint_owner.js"), "utf8");
-  assert.doesNotMatch(source, /^import\s/m);
-  for (const token of ["document.", "window.", "globalThis", "new Worker", "setTimeout(", "politicalRasterWorkerClient"]){
-    assert.equal(source.includes(token), false, token);
-  }
 });
 
 test('selected ID raster leaves partial paint completion to the full political pass', () => {

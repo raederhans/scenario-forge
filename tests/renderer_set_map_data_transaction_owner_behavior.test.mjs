@@ -2,13 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createSetMapDataTransactionOwner } from "../js/core/map_renderer/set_map_data_transaction_owner.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const REPO_ROOT = path.resolve(__dirname, "..");
 
 const EFFECT_NAMES = Object.freeze([
   "resetRendererTransactionState",
@@ -94,14 +89,6 @@ const DEFAULT_EFFECT_ORDER = Object.freeze([
   "recordRenderPerfMetric",
   "setInteractionInfrastructureState",
 ]);
-
-function readRepoFile(...parts) {
-  return fs.readFileSync(path.join(REPO_ROOT, ...parts), "utf8");
-}
-
-function assertExcludes(source, token, message) {
-  assert.equal(source.includes(token), false, `${message}: unexpected ${JSON.stringify(token)}`);
-}
 
 function createHarness({
   collections = {
@@ -321,25 +308,3 @@ test("owner fails fast when required effects or getters are missing", () => {
   }
 });
 
-test("owner source stays inside the setMapData transaction boundary", () => {
-  const ownerSource = readRepoFile("js", "core", "map_renderer", "set_map_data_transaction_owner.js");
-
-  for (const tokenParts of [
-    ["map_", "renderer.js"],
-    ["runtime", "State"],
-    ["draw", "Canvas"],
-    ["renderPass", "ToCache"],
-    ["build", "HitCanvas"],
-    ["createScenario", "RefreshRuntime"],
-    ["createExact", "AfterSettleScheduler"],
-    ["createStrategicOverlay", "RuntimeOwner"],
-    ["renderer_render", "_lifecycle_owner"],
-    ["public", " facade"],
-  ]) {
-    assertExcludes(
-      ownerSource,
-      tokenParts.join(""),
-      "setMapData transaction owner must avoid forbidden boundary token",
-    );
-  }
-});

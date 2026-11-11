@@ -11,6 +11,7 @@ import {
   getCountryCode as getSharedFeatureCountryCode,
   getFeatureId as getSharedFeatureId,
 } from "./feature_identity.js";
+import { resolveDataUrl } from "./data_base_url.js";
 import { resolveDataAssetUrl } from "./runtime_asset_registry.js";
 import { planProjectFeatureMigration } from "./project_feature_migration.js";
 import {
@@ -200,7 +201,7 @@ async function loadFeatureMigrationMap({ fetchImpl = globalThis.fetch } = {}) {
     const merged = {};
     for (const url of FEATURE_MIGRATION_URLS) {
       try {
-        const response = await fetchImpl(url, { cache: "no-store" });
+        const response = await fetchImpl(resolveDataUrl(url), { cache: "no-store" });
         if (!response?.ok) {
           console.warn(`Unable to load feature migration asset: ${url} (${response?.status || "n/a"})`);
           continue;
@@ -229,7 +230,7 @@ async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = g
     featureMergeLineagePromise = (async () => {
       if (typeof fetchImpl !== "function") return null;
       try {
-        const response = await fetchImpl(FEATURE_MERGE_LINEAGE_URL, { cache: "no-store" });
+        const response = await fetchImpl(resolveDataUrl(FEATURE_MERGE_LINEAGE_URL), { cache: "no-store" });
         if (!response?.ok) {
           console.warn(`Unable to load feature merge lineage: ${FEATURE_MERGE_LINEAGE_URL} (${response?.status || "n/a"})`);
           return null;

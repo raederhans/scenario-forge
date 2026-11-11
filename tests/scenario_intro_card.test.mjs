@@ -28,10 +28,11 @@ const registry = JSON.parse(readFileSync(new URL("../data/scenarios/index.json",
 const translations = JSON.parse(readFileSync(new URL("../data/i18n/manual_ui.json", import.meta.url), "utf8"));
 const presentation = registry.scenarios.find((entry) => entry.scenario_id === "hoi4_1936").presentation;
 function setup() {
-  const document = { createElement: (tag) => new Element(document, tag) };
+  const document = new EventTarget();
+  document.createElement = (tag) => new Element(document, tag);
   const container = document.createElement("div");
   const controller = createScenarioIntroCard(container);
-  return { controller, container, card: container.children[0] };
+  return { controller, container, document, card: container.children[0] };
 }
 function find(root, className) {
   if (root.className === className) return root;
@@ -72,14 +73,17 @@ test("renders translated presentation, current country names and colors, and lay
 });
 
 test("close and Escape hide the card, and show replaces content and omits empty sections", () => {
-  const { controller, card } = setup();
+  const { controller, card, document } = setup();
   assert.equal(card.hidden, true);
   controller.show(presentation);
   find(card, "scenario-intro-close").listeners.click();
   assert.equal(card.hidden, true);
   controller.show(presentation);
   let stopped = false;
-  card.listeners.keydown({ key: "Escape", stopPropagation() { stopped = true; } });
+  const escape = new Event("keydown");
+  escape.key = "Escape";
+  escape.stopPropagation = () => { stopped = true; };
+  document.dispatchEvent(escape);
   assert.equal(stopped, true);
   assert.equal(card.hidden, true);
   const blank = registry.scenarios.find((entry) => entry.scenario_id === "blank_base").presentation;
@@ -114,4 +118,35 @@ test("pressing the map outside the card dismisses it, pressing inside keeps it",
   assert.equal(card.hidden, true);
   controller.dispose();
   assert.equal(container.listeners.pointerdown, undefined);
+});
+
+test("Escape from outside the card is handled only while visible, including after reopen", () => {
+  const { controller, card, document } = setup();
+  const opener = new EventTarget();
+  const keyFromOpener = (key) => {
+    const event = new Event("keydown");
+    event.key = key;
+    let stopped = false;
+    event.stopPropagation = () => { stopped = true; };
+    // Model a focused opener outside the card bubbling its keydown to document.
+    opener.dispatchEvent(event);
+    document.dispatchEvent(event);
+    return stopped;
+  };
+  assert.equal(keyFromOpener("Escape"), false);
+  controller.show(presentation);
+  controller.show(presentation);
+  assert.equal(keyFromOpener("Enter"), false);
+  assert.equal(card.hidden, false);
+  assert.equal(keyFromOpener("Escape"), true);
+  assert.equal(card.hidden, true);
+  assert.equal(keyFromOpener("Escape"), false);
+  controller.show(presentation);
+  controller.hide();
+  assert.equal(keyFromOpener("Escape"), false);
+  controller.show(presentation);
+  assert.equal(keyFromOpener("Escape"), true);
+  controller.show(presentation);
+  controller.dispose();
+  assert.equal(keyFromOpener("Escape"), false);
 });

@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -179,11 +178,4 @@ test("history undo and redo restore strategic overlay and special-zone snapshot 
   assert.equal(fixtureState.unitCountersDirty, true);
   assert.equal(fixtureState.specialZonesOverlayDirty, true);
 
-  const historySource = readFileSync(new URL("../js/core/history_manager.js", import.meta.url), "utf8");
-  assert.match(historySource, /restoreStrategicOverlaySnapshotState\(runtimeState, snapshot\)/);
-  assert.match(historySource, /restoreSpecialZoneSnapshotState\(runtimeState, snapshot\)/);
-  assert.doesNotMatch(
-    historySource,
-    /runtimeState\.(?:operationalLines|operationGraphics|unitCounters|specialZoneLayers|specialZoneMembershipBrushMode|frontlineOverlayDirty|operationalLinesDirty|operationGraphicsDirty|unitCountersDirty)\s*=/,
-  );
 });

@@ -5,6 +5,9 @@ import { parse } from "acorn";
 import * as walk from "acorn-walk";
 import { createMapHoverInteractionOwner } from "../js/core/map_renderer/map_hover_interaction_owner.js";
 
+import { buildScenarioProjectMarkerEntries } from "../js/core/renderer/scenario_project_markers.js";
+import { shouldBlockUnderlyingMapSelectionForFacility } from "../js/core/renderer/facility_surface.js";
+
 const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 let lookupSource;
 walk.simple(parse(rendererSource, { ecmaVersion: "latest", sourceType: "module" }), {
@@ -238,4 +241,29 @@ test("overlay signature responds to external state and selected facility changes
 
 test("owner fails fast for missing explicit dependencies", () => {
   assert.throws(() => createMapHoverInteractionOwner(), /getters.nowMs must be a function/);
+});
+
+
+test("Atlantropa project markers show their localized names while blocking underlying hover", () => {
+  const manifest = { project_markers: [
+    { id: "gibraltar", name: { en: "Gibraltar Dam", zh: "直布罗陀大坝" }, lon: -5, lat: 36 },
+    { id: "suez", name: { en: "Suez Canal", zh: "苏伊士运河" }, lon: 32, lat: 30 },
+    { id: "congo", name: { en: "Congo Dam", zh: "刚果大坝" }, lon: 15, lat: -4 },
+  ] };
+  for (const currentLanguage of ["en", "zh", "fr"]) {
+    const h = createHarness({ activeScenarioId: "tno_1962", showScenarioAtlantropa: true, currentLanguage });
+    const entries = buildScenarioProjectMarkerEntries(manifest, h.state, point => point, { apply: point => point });
+    for (const entry of entries) {
+      h.data.now += 20;
+      h.data.hit = { id: "underlying-land", targetType: "land" };
+      h.data.facility = entry;
+      h.data.block = shouldBlockUnderlyingMapSelectionForFacility(entry);
+      assert.equal(h.move().branch, "facility-tooltip");
+      h.flush();
+      assert.equal(h.surfaces.tooltip.textContent, entry.properties.name[currentLanguage === "zh" ? "zh" : "en"]);
+      assert.equal(h.surfaces.tooltip.style.opacity, "1");
+      assert.equal(h.state.hoveredId, null);
+      assert.equal(h.calls.some(([name]) => name === "feature" || name === "city"), false);
+    }
+  }
 });

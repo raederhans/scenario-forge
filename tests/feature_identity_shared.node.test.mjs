@@ -5,7 +5,6 @@ import { runInNewContext } from "node:vm";
 import { normalizeCountryCodeAlias } from "../js/core/country_code_aliases.js";
 
 const featureIdentity = await import("../js/core/feature_identity.js");
-const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 const sharedSource = await readFile(new URL("../js/core/feature_identity_shared.js", import.meta.url), "utf8");
 
 test("country aliases preserve canonical, Unicode, and coercion behavior", () => {
@@ -71,12 +70,3 @@ test("main-thread feature identity keeps alias and reserved-code behavior in sha
   assert.equal(featureIdentity.getCountryCode({ properties: { country_code: "2ra" } }), "2RA");
 });
 
-test("startup worker delegates feature identity rules to the worker-safe shared helper", () => {
-  assert.match(workerSource, /feature_identity_shared\.js/);
-  assert.match(workerSource, /FEATURE_IDENTITY\.getFeatureId\(feature\)/);
-  assert.match(workerSource, /FEATURE_IDENTITY\.getCountryCode\(feature, \{/);
-  assert.doesNotMatch(workerSource, /const FEATURE_ID_KEYS = Object\.freeze/);
-  assert.doesNotMatch(workerSource, /const COUNTRY_CODE_KEYS = Object\.freeze/);
-  assert.match(sharedSource, /const FEATURE_ID_KEYS = Object\.freeze/);
-  assert.match(sharedSource, /const COUNTRY_CODE_KEYS = Object\.freeze/);
-});

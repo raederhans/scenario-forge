@@ -1876,8 +1876,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/transport_layers/global_rail/regions/south_america/shards/sa_w082_w058/railways.topo.json",
             "app/data/transport_layers/japan_road/roads.topo.json",
             "app/data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson",
-            "app/data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson",
-            "app/data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson",
+            "app/data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson",
             "app/data/hgo_runtime/manifest.json",
             "app/data/hgo_runtime/seed.json",
             "app/data/hgo_runtime/provinces.bmp",
@@ -2237,8 +2236,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
         source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
         dist_manifest = json.loads(dist_manifest_path.read_text(encoding="utf-8"))
         local_preview_paths = {
-            "data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson",
-            "data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson",
+            "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson",
+            "data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson",
         }
 
         self.assertTrue(local_preview_paths.issubset({

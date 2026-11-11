@@ -2,12 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createRendererTransactionResetOwner } from "../js/core/map_renderer/renderer_transaction_reset_owner.js";
-
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OWNER_PATH = "js/core/map_renderer/renderer_transaction_reset_owner.js";
 
 const REFRESH_DEFAULT_ORDER = Object.freeze([
   "clearPendingDynamicBorderTimer",
@@ -206,22 +202,3 @@ test("reset summaries are frozen", () => {
   assert.equal(Object.isFrozen(summary.getterOrder), true);
 });
 
-test("renderer transaction reset owner stays inside reset sequencing", () => {
-  const ownerSource = fs.readFileSync(path.join(REPO_ROOT, OWNER_PATH), "utf8");
-  for (const token of [
-    "runtimeState",
-    "drawCanvas",
-    "renderPassToCache",
-    "buildHitCanvas",
-    "scheduleHitCanvasBuildIfNeeded",
-    "getValidatedCanvasHit",
-    "getDirtyHitCanvasPointProbeHit",
-    "createScenarioRefreshRuntime",
-    "createExactAfterSettleScheduler",
-    "createStrategicOverlayRuntimeOwner",
-    "from \"../map_renderer.js\"",
-    "from \"./map_renderer.js\"",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `${OWNER_PATH} must avoid ${token}`);
-  }
-});

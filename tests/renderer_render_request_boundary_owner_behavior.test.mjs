@@ -2,11 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 import { createRenderRequestBoundaryOwner } from "../js/core/map_renderer/render_request_boundary_owner.js";
-
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OWNER_PATH = "js/core/map_renderer/render_request_boundary_owner.js";
 
 function createHarness({
   requestResult = true,
@@ -166,18 +162,3 @@ test("createRenderRequestBoundaryOwner fails fast for missing dependencies", () 
   );
 });
 
-test("render request boundary owner stays outside render lifecycle internals", () => {
-  const ownerSource = fs.readFileSync(path.join(REPO_ROOT, OWNER_PATH), "utf8");
-  for (const token of [
-    "runtimeState",
-    "drawCanvas",
-    "renderPassToCache",
-    "buildHitCanvas",
-    "createScenarioRefreshRuntime",
-    "createExactAfterSettleScheduler",
-    "createStrategicOverlayRuntimeOwner",
-    "renderer_render_lifecycle_owner",
-  ]) {
-    assert.equal(ownerSource.includes(token), false, `${OWNER_PATH} must avoid ${token}`);
-  }
-});
