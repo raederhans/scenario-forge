@@ -64,6 +64,7 @@
 - 默认基址为空 → 与迁移前完全相同（返回同一个 URL 字符串，fetch 参数不变）。
 - 配置方式：页面 `<head>` 里加 `<meta name="scenario-forge-data-base" content="https://data.example.org/scenario-forge/v1/">`。只接受 `http://`/`https://` 绝对地址，没有尾斜杠时自动补上。
 - 解析规则：`data/xxx` 或 `./data/xxx` → `<基址>data/xxx`；绝对 URL、协议相对、根相对、`blob:`、非 `data/` 的相对路径原样透传。外部桶里保持与产物 `app/` 下相同的目录结构，manifest 内的相对 URL 无需改写。
+- 项目导入迁移：`js/core/sovereignty_manager.js` 中旧地块映射和政区合并谱系的请求，在调用 `fetchImpl` 前经 `resolveDataUrl` 解析，随数据基址切换。
 - Worker：启动 Worker 收到的是主线程已解析好的绝对 URL；模块本身不访问 `document`，在 Worker 中可显式传入基址调用 `resolveDataUrl(url, base)`。
 - 图片：旗帜、单位图标在 URL 被改写为外部地址时自动设置 `crossOrigin = "anonymous"`，否则进 canvas 会污染画布（导出失败）。
 
