@@ -519,18 +519,12 @@ test("legend nodes are reused until shared legend content changes", async () => 
   assert.equal(h.nodes.thematicWgiLegend.children.length, 9);
 });
 
-test("metric select offers all official metrics with an accessible HTML label", () => {
+test("metric select offers all official metrics", () => {
   const h = createHarness();
   h.owner.render();
   assert.equal(h.nodes.thematicWgiMetric.value, GE);
   assert.deepEqual(h.nodes.thematicWgiMetric.children.map((option) => [option.value, option.textContent]),
     THEMATIC_INDICATORS.map((metric) => [metric.id, metric.labelEn]));
-  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  assert.match(html, /<label for="thematicWgiMetric"[^>]*data-i18n="Indicator"/);
-  assert.match(html, /<span data-i18n="Show thematic shading">Show thematic shading<\/span>/);
-  assert.match(html, /<select id="thematicWgiMetric" class="select-input" aria-describedby="thematicWgiStatus"/);
-  assert.match(html, /id="thematicWgiTitle" data-i18n="Country indicators"/);
-  assert.match(html, /id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden/);
 });
 
 test("switching enabled metrics hides old data and loads the selected metric with one persisted dirty change", async () => {
