@@ -28,7 +28,11 @@ function applyState(cell, stateName) {
   if (stateName === "selected") {
     if (target.hasAttribute("aria-selected")) target.setAttribute("aria-selected", "true");
     if (target.hasAttribute("aria-pressed")) target.setAttribute("aria-pressed", "true");
-    target.classList.add(target.classList.contains("palette-library-row") ? "is-selected" : "is-active");
+    // 与各 owner 的选中写法一致：国家行把 is-selected 加在行容器上（country_inspector_controller.js），
+    // 调色板行加在按钮自身，其余家族用 is-active。
+    const countryRow = target.closest(".country-select-row");
+    if (countryRow) countryRow.classList.add("is-selected");
+    else target.classList.add(target.classList.contains("palette-library-row") ? "is-selected" : "is-active");
   }
   if (stateName === "open") target.closest("details")?.setAttribute("open", "");
 }
