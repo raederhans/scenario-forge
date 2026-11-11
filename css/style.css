@@ -285,11 +285,17 @@ body.transport-workbench-open.right-drawer-open::after {
   background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
   box-shadow: var(--shadow-1);
 }
+} /* end @layer base */
+
+@layer overrides {
 
 .boot-overlay.is-peek .boot-overlay__panel {
   background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
   box-shadow: var(--shadow-1);
 }
+} /* end @layer overrides */
+
+@layer base {
 
 .boot-overlay__eyebrow {
   margin-bottom: 10px;
@@ -1244,9 +1250,6 @@ input[type="checkbox"].checkbox-input {
   box-shadow: none;
   transform: none;
 }
-} /* end @layer overrides */
-
-@layer components {
 
 .btn-primary.is-loading,
 .btn-secondary.is-loading,
@@ -1257,9 +1260,6 @@ input[type="checkbox"].checkbox-input {
   opacity: 0.8;
   cursor: wait;
 }
-} /* end @layer components */
-
-@layer overrides {
 
 .btn-secondary.is-danger-confirm,
 .dock-icon-btn.is-danger-confirm {
@@ -2004,11 +2004,14 @@ input[type="checkbox"].checkbox-input {
   min-width: 0;
   width: 100%;
 }
+} /* end @layer panels */
+
+@layer components {
 
 .app-select-shell.hidden {
   display: none !important;
 }
-} /* end @layer panels */
+} /* end @layer components */
 
 @layer overrides {
 
@@ -2496,15 +2499,15 @@ details.appearance-subsection > *:not(summary),
 .appearance-mini-section-subtle > summary {
   padding: 10px 12px;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .appearance-mini-section-subtle > summary.section-header {
   font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--text-secondary);
 }
-} /* end @layer panels */
-
-@layer overrides {
 
 .appearance-mini-section-subtle > *:not(summary) {
   padding: 0 12px 14px;
@@ -3594,6 +3597,9 @@ details.card[open] > summary::after {
   width: 100%;
   height: 100%;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 #mapContainer {
   position: absolute;
@@ -3612,6 +3618,9 @@ details.card[open] > summary::after {
   overflow: hidden;
   box-shadow: none;
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 #mapContainer::after {
   content: "";
@@ -3630,10 +3639,16 @@ details.card[open] > summary::after {
 #colorCanvas {
   box-shadow: none;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 #map-svg {
   background: transparent;
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .map-layer {
   position: absolute;
@@ -3898,6 +3913,9 @@ details.card[open] > summary::after {
   pointer-events: none;
   opacity: 0;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 /* ── Textures ──────────────────────────────────────────── */
 /* ── Floating Tooltip ──────────────────────────────────── */
@@ -3925,6 +3943,9 @@ details.card[open] > summary::after {
   will-change: transform, opacity;
   transition: opacity 75ms ease;
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .facility-info-card {
   position: fixed;
@@ -4516,6 +4537,9 @@ body:not(.developer-mode) .dev-only {
   white-space: normal;
   word-break: keep-all;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 #strategicOverlayPanel.is-workspace-modal .strategic-workspace-header-copy .sidebar-tool-hint {
   max-width: 42ch;
@@ -4523,6 +4547,9 @@ body:not(.developer-mode) .dev-only {
   writing-mode: horizontal-tb;
   word-break: normal;
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 #strategicOverlayPanel.is-workspace-modal .strategic-workspace-actions {
   display: none;
@@ -4535,10 +4562,16 @@ body:not(.developer-mode) .dev-only {
   overflow: visible;
   background: transparent;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 #strategicOverlayPanel.is-workspace-modal .strategic-accordion-header {
   display: none;
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 #strategicOverlayPanel.is-workspace-modal .strategic-accordion-body {
   display: none;
@@ -4550,6 +4583,9 @@ body:not(.developer-mode) .dev-only {
 #strategicOverlayPanel.is-workspace-modal[data-workspace-section="counter"] #accordionCounters > .strategic-accordion-body {
   display: block;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 #strategicOverlayPanel.is-workspace-modal .strategic-workspace-icon-close {
   min-height: 40px;
@@ -4561,10 +4597,16 @@ body:not(.developer-mode) .dev-only {
 #strategicOverlayPanel.is-workspace-modal .btn {
   min-height: 42px;
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 #strategicOverlayPanel.is-workspace-modal .btn {
   padding-inline: 14px;
 }
+} /* end @layer panels */
+
+@layer components {
 
 #strategicOverlayPanel.is-workspace-modal[data-workspace-section="line"] #operationalLineStartBtn,
 #strategicOverlayPanel.is-workspace-modal[data-workspace-section="line"] .strategic-line-management-actions,
@@ -4574,6 +4616,9 @@ body:not(.developer-mode) .dev-only {
 #strategicOverlayPanel.is-workspace-modal[data-workspace-section="line"] .strategic-graphics-list {
   display: none !important;
 }
+} /* end @layer components */
+
+@layer panels {
 
 #strategicOverlayPanel.is-workspace-modal[data-workspace-section="line"] .strategic-workspace-section-counters {
   display: none;
@@ -4734,6 +4779,9 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   align-items: center;
   gap: 8px;
 }
+} /* end @layer panels */
+
+@layer components {
 
 .unit-counter-grid-row {
   display: grid !important;
@@ -4741,6 +4789,9 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   gap: 10px;
   align-items: start;
 }
+} /* end @layer components */
+
+@layer panels {
 
 .unit-counter-grid-row > * {
   min-width: 0;
@@ -5037,10 +5088,16 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   border-radius: inherit;
   background: linear-gradient(90deg, rgba(34, 197, 94, 0.92), rgba(74, 222, 128, 0.8));
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .unit-counter-preview-stat.is-equipment .unit-counter-preview-stat-fill {
   background: linear-gradient(90deg, rgba(234, 179, 8, 0.94), rgba(250, 204, 21, 0.82));
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .unit-counter-preview-footer {
   display: flex;
@@ -5277,10 +5334,16 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   border-radius: inherit;
   background: linear-gradient(90deg, rgba(34, 197, 94, 0.94), rgba(74, 222, 128, 0.84));
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .unit-counter-combat-bar.is-equipment .unit-counter-combat-bar-fill {
   background: linear-gradient(90deg, rgba(234, 179, 8, 0.96), rgba(250, 204, 21, 0.84));
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .unit-counter-color-panel {
   display: grid;
@@ -8735,7 +8798,7 @@ body.counter-editor-modal-open {
 }
 } /* end @layer components */
 
-@layer panels {
+@layer overrides {
 
 #specialRegionInspectorSection .inspector-detail-section,
 #waterInspectorSection .inspector-detail-section {
@@ -8745,9 +8808,6 @@ body.counter-editor-modal-open {
     linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
   box-shadow: var(--shadow-1);
 }
-} /* end @layer panels */
-
-@layer overrides {
 
 #waterInspectorSection .water-filter-card {
   padding: 12px;
@@ -9206,12 +9266,18 @@ body.counter-editor-modal-open {
 .dock-clear-btn {
   flex: 0 0 auto;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .dock-icon-btn.is-active {
   border-color: var(--line-2);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   color: var(--color-accent);
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .dock-utility-popover,
 .sidebar-tool-popover {
@@ -9452,10 +9518,16 @@ body.counter-editor-modal-open {
 .scenario-context-bar.is-auto-compact .scenario-context-action-btn {
   display: inline-flex;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .scenario-context-bar.is-highlight {
   box-shadow: var(--shadow-1);
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .scenario-context-item {
   display: inline-flex;
@@ -9530,14 +9602,14 @@ body.counter-editor-modal-open {
   cursor: pointer;
   transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .scenario-context-action-btn.is-active {
   border-color: rgba(120, 84, 71, 0.3);
   box-shadow: var(--shadow-1);
 }
-} /* end @layer panels */
-
-@layer overrides {
 
 .scenario-context-icon-btn.is-active,
 .scenario-context-icon-btn:hover {
@@ -9929,11 +10001,17 @@ body.counter-editor-modal-open {
   color: var(--text-primary);
   transform: rotate(90deg);
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .scenario-guide-tool-panel[open] .scenario-guide-tool-summary {
   border-bottom: 1px solid var(--line-1);
   background: var(--surface-raised);
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .scenario-guide-tool-title {
   min-width: 0;
@@ -10274,14 +10352,14 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   box-shadow: var(--shadow-1);
   z-index: calc(var(--z-map-overlay) - 8);
 }
-} /* end @layer overrides */
-
-@layer panels {
 
 .bottom-dock.dev-workspace-mode.is-collapsed .dock-handle-btn {
   top: 50%;
   transform: translateY(-50%);
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .bottom-dock.dev-workspace-mode:not(.is-collapsed) .dock-handle-btn {
   transform: none;
@@ -11116,6 +11194,9 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   box-shadow: var(--shadow-1);
   transform: none;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 #countryList .country-select-row button:hover,
 #countryList .country-select-row button:focus-visible {
@@ -11123,6 +11204,9 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   border-left-color: transparent;
   background: transparent;
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .country-select-row.is-selected {
   border-color: color-mix(in srgb, var(--accent) 26%, transparent);
@@ -11209,6 +11293,9 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   min-height: var(--control-compact);
   width: 100%;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 #countryList .country-select-main-btn {
   display: flex;
@@ -11222,6 +11309,9 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   transition: none;
   min-height: var(--control-compact);
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .country-select-main-btn:focus-visible {
   outline: 2px solid var(--accent);
@@ -12011,12 +12101,18 @@ button.scenario-action-card:hover {
 .inspector-detail-primary-btn {
   flex: 1 1 100%;
 }
+} /* end @layer panels */
+
+@layer overrides {
 
 .inspector-detail-primary-btn.is-active {
   border-color: color-mix(in srgb, var(--accent) 24%, transparent);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   color: var(--color-accent);
 }
+} /* end @layer overrides */
+
+@layer panels {
 
 .inspector-color-row {
   display: flex;
@@ -13375,12 +13471,20 @@ button.scenario-action-card:hover {
   .bottom-dock .dock-group-mode {
     display: none !important;
   }
+}
+} /* end @layer overrides */
+
+@layer components {
+@container (max-width: 420px) {
 
   .dock-color-current-copy,
   #paletteGrid {
     display: none !important;
   }
 }
+} /* end @layer components */
+
+@layer overrides {
 
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -30,7 +30,13 @@
 /* The right-panel toggle is a panel switch like Project, not bare text. */
 .editor-project-bar #editorInspectorToggleBtn { flex: 0 0 auto; width: auto; padding: 6px 14px; border: 1px solid var(--line-1); border-radius: var(--radius-pill); background: var(--surface-raised); font-weight: 700; }
 .editor-project-bar #editorInspectorToggleBtn[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); border-color: transparent; }
+} /* end @layer overrides */
+
+@layer components {
 .editor-workspace .editor-retired-shell { display: none !important; }
+} /* end @layer components */
+
+@layer overrides {
 .editor-empty-hint { color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.7; margin: 8px 0; }
 .editor-selected-name { color: var(--text-primary); font-size: var(--fs-md); margin: 0 0 12px; line-height: 1.5; }
 .editor-project-bar #workspaceSaveStatus { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; font-size: var(--editor-meta-size); }
