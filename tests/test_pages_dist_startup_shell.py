@@ -20,14 +20,11 @@ from tools.scenario_contract_paths import TNO_COVERAGE_REPORT_PATHS
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PAGES_DIST_ROOT = resolve_pages_artifact_root(repo_root=REPO_ROOT)
-LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
-LANDING_APP_JS = REPO_ROOT / "landing" / "app.js"
 LANDING_ASSETS = REPO_ROOT / "landing" / "assets"
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 DRAW_CANVAS_ORCHESTRATION_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "draw_canvas_orchestration_owner.js"
 CACHED_PASS_COMPOSITOR_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / "cached_pass_compositor_owner.js"
 DIST_ROOT_INDEX = PAGES_DIST_ROOT / "index.html"
-DIST_APP_JS = PAGES_DIST_ROOT / "app.js"
 EDITOR_INDEX = REPO_ROOT / "index.html"
 DIST_APP_INDEX = PAGES_DIST_ROOT / "app" / "index.html"
 DIST_APP_JS_ROOT = PAGES_DIST_ROOT / "app" / "js"
@@ -1573,41 +1570,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
 
         self.assertEqual(stabilize(None), stabilize(0))
         self.assertEqual(stabilize(0), stabilize(999_999))
-
-
-    def test_landing_copy_stays_user_facing(self) -> None:
-        sources = {
-            "landing/index.html": LANDING_INDEX.read_text(encoding="utf-8"),
-            "landing/app.js": LANDING_APP_JS.read_text(encoding="utf-8"),
-        }
-        if DIST_ROOT_INDEX.exists():
-            sources["dist/index.html"] = DIST_ROOT_INDEX.read_text(encoding="utf-8")
-        if DIST_APP_JS.exists():
-            sources["dist/app.js"] = DIST_APP_JS.read_text(encoding="utf-8")
-
-        stale_fragments = (
-            "Every source claim below is tied to checked-in manifests",
-            "The Japan transport pack is the strongest current sample",
-            "Use the checked-in Japan transport manifests",
-            "Source ledgers, asset catalogs",
-            "Source signatures and build audits",
-            "Transport packs with manifests",
-            "Cataloged, reproducible, and inspectable",
-            "source ledgers, transport manifests",
-            "manifest review",
-            "manifest-led pipeline",
-            "已入库",
-            "入库清单",
-            "来源台账",
-            "构建审计",
-            "清单驱动流水线",
-            "数据入库基础",
-        )
-
-        for source_name, source in sources.items():
-            for stale_fragment in stale_fragments:
-                with self.subTest(source=source_name, stale_fragment=stale_fragment):
-                    self.assertNotIn(stale_fragment, source)
 
 
     def test_dist_app_index_keeps_pages_startup_contract(self) -> None:

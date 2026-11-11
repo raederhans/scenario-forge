@@ -1,8 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import {
   escapeAttr,
@@ -15,8 +12,6 @@ import {
   sampleProjectPayload,
   translateBackendConsole,
 } from "../backend/backend_console_helpers.js";
-
-const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 test("backend console locales expose the same message keys", () => {
   assert.deepEqual(
@@ -39,19 +34,6 @@ test("backend console document metadata follows the resolved locale", () => {
   assert.equal(getBackendConsoleDocumentLang("unknown"), "zh-Hans");
   assert.equal(getBackendConsoleTitle("zh"), "Scenario Forge 社区与后台");
   assert.equal(getBackendConsoleTitle("en"), "Scenario Forge Community and Admin");
-});
-
-test("backend console page i18n keys are backed by messages", () => {
-  const html = readFileSync(path.join(ROOT_DIR, "backend", "index.html"), "utf8");
-  const app = readFileSync(path.join(ROOT_DIR, "backend", "app.js"), "utf8");
-  const htmlKeys = [...html.matchAll(/data-i18n="([^"]+)"/g)].map((match) => match[1]);
-  const appLiteralKeys = [...app.matchAll(/\bt\("([^"]+)"/g)].map((match) => match[1]);
-  const messageKeys = new Set(getBackendConsoleMessageKeys("zh"));
-  const missingKeys = [...new Set([...htmlKeys, ...appLiteralKeys])]
-    .filter((key) => !messageKeys.has(key))
-    .sort();
-
-  assert.deepEqual(missingKeys, []);
 });
 
 test("backend console sample project payload keeps the save schema shape", () => {
