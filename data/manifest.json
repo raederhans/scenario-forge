@@ -116,9 +116,9 @@
       "raw_world_bounds_geometries": 37,
       "role": "detail_topology_na_v2",
       "schema_ref": "schema://topology/detail_political_bundle_v2",
-      "sha256": "dd4c57a13dc743c31cbcf8b0a566007c8313e29d67a44244e2fa264765164b25",
+      "sha256": "d820476bb90fa0d5c4f9142714c7d9bb6e41298a488613281a46160e9d2eff5b",
       "simplification": "detail_publish_v2",
-      "size_bytes": 89854709,
+      "size_bytes": 92082041,
       "target_zoom_range": [
         1.7,
         20
@@ -140,9 +140,9 @@
       "raw_world_bounds_geometries": 442,
       "role": "runtime_political_topology",
       "schema_ref": "schema://topology/runtime_political_v1",
-      "sha256": "0cbdeb87217531984bb6fdb1533f6953b7a93adddd90850de01b19f3fefc25fa",
+      "sha256": "28f97a856a0a10a17390c9a17c5867b353d03d33d84cf945fa487e95a9a80134",
       "simplification": "runtime_projection_v1",
-      "size_bytes": 32355958,
+      "size_bytes": 34410032,
       "target_zoom_range": [
         1.7,
         20
@@ -270,16 +270,16 @@
       "description": "Historic Geographical Overhaul source-only flag index.",
       "owner": "tools.build_hgo_flag_index",
       "role": "hgo_flags_index",
-      "sha256": "1accd58eecbe63524ca482955b898d41f650d752da724a935f04220ed7188658",
-      "size_bytes": 1947346
+      "sha256": "de0cb039030ac3e77bdbe686d5ce234192f94868dc8f4fc055c1c38eaa553d28",
+      "size_bytes": 1882149
     },
     "hgo_catalogs/hgo_flags.png_manifest.json": {
       "artifact_class": "derived",
       "description": "Historic Geographical Overhaul authorized converted flag PNG manifest.",
       "owner": "tools.build_hgo_flag_png_catalog",
       "role": "hgo_flags_png_manifest",
-      "sha256": "f799e1bde0e22cbfd86376f524cb8b6adc7756c18c829bde982f22209b72451d",
-      "size_bytes": 4744356
+      "sha256": "f2f68f5ea04390ef3d29aaa577522c7e7c793df1b1b0f688de4fec0a21f889b4",
+      "size_bytes": 4622888
     },
     "hgo_catalogs/hgo_identity_aliases.json": {
       "artifact_class": "manual",
@@ -294,16 +294,16 @@
       "description": "Historic Geographical Overhaul reusable place-name catalog.",
       "owner": "tools.build_hgo_name_catalog",
       "role": "hgo_place_names",
-      "sha256": "750a80293ae05d212dd4e0208d59d800647337a5dee9915f2eec530e2055f378",
-      "size_bytes": 5164039
+      "sha256": "47c5f6a9359f01c3f08a067ab59891017d2e82e2a144c1bfbd649f184e527e0f",
+      "size_bytes": 4969946
     },
     "hgo_catalogs/index.json": {
       "artifact_class": "derived",
       "description": "Historic Geographical Overhaul Tier-A catalog index.",
       "owner": "tools.build_hgo_flag_index",
       "role": "hgo_tier_a_catalog",
-      "sha256": "a438604c7585b42092c7d83fe4f0b087adf1b8aca2ef822696eb9113ef31c46f",
-      "size_bytes": 1141
+      "sha256": "69a35f7816a5f6cfa33c1a08f399768c25b4b026585b11dc164e93c0bdfe5426",
+      "size_bytes": 1097
     },
     "hierarchy.json": {
       "artifact_class": "publish",
@@ -312,8 +312,8 @@
       "group_count": 1548,
       "owner": "init_map_data.hierarchy_locales",
       "role": "hierarchy",
-      "sha256": "b0a2a9b094e9f1bffa3fca5699457df3432e3f48a1032b70a9b303d06522d941",
-      "size_bytes": 508822,
+      "sha256": "c2f80af33007ae87d8f1857668e8dff20fbb23385775c466a6770d9954784b42",
+      "size_bytes": 517861,
       "type": "hierarchy"
     },
     "js/core/city_lights_historical_1930_asset.js": {
@@ -363,8 +363,8 @@
       "geo_entry_count": 72674,
       "owner": "init_map_data.hierarchy_locales",
       "role": "locales",
-      "sha256": "203dd78ed441700b9870bd88d52685411fa9cb01e904e48632c6aad495f48eb0",
-      "size_bytes": 8384607,
+      "sha256": "6d5387573e239fd15fa406d473b5332deb68d1d97fe7c8860dff76ae614be973",
+      "size_bytes": 8559317,
       "type": "locales",
       "ui_entry_count": 2090
     },
@@ -570,7 +570,7 @@
       "palette_id": "tno",
       "quick_tag_count": 24,
       "role": "palette_pack",
-      "sha256": "52388b21bfb0150155a7729d85852bf6463698ae56df17c106cf0c71cc105a83",
+      "sha256": "1b658c6878027668ffef7dbe41aa53e412dac7053f3fa7c239eb27af49996d9a",
       "size_bytes": 235007,
       "type": "palette_pack"
     },
@@ -633,8 +633,8 @@
       "description": "Manual runtime asset registry shared by JS resolvers and build manifest generation.",
       "owner": "data/runtime_asset_registry.json",
       "role": "runtime_asset_registry",
-      "sha256": "e615558ad959f85e8d16fe57d5d4d9e3dc2436d65d1db1e5dcfea27f7a1215a6",
-      "size_bytes": 387471
+      "sha256": "cae8983bb51a88967ff2d06a692839dcefbba503cb9c4352fb9f0a52585599d6",
+      "size_bytes": 388005
     },
     "thematic_layers/index.json": {
       "role": "thematic_layer_catalog",
@@ -7801,6 +7801,11 @@
   "runtime_asset_registry": {
     "schema_version": 1,
     "assets": {
+      "defense_line_presets": {
+        "url": "data/operational_presets/defense_lines.json",
+        "role": "defense_line_presets",
+        "description": "Scenario defense line presets added on demand as editable operational lines."
+      },
       "build_manifest": {
         "url": "data/manifest.json",
         "role": "build_manifest",
@@ -7874,6 +7879,12 @@
         "url": "data/europe_urban.geojson",
         "role": "context_layer",
         "family_id": "urban"
+      },
+      "context_layer:urban_tno_atlantropa": {
+        "url": "data/scenarios/tno_1962/urban_overlays.geojson",
+        "role": "context_layer",
+        "family_id": "urban",
+        "description": "Synthetic urban patches on TNO Atlantropa land; appended to urban only while tno_1962 shows that land."
       },
       "context_layer:physical_semantics": {
         "url": "data/global_physical_semantics.topo.json",
