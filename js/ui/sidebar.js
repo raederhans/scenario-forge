@@ -1,3 +1,5 @@
+import { createButton } from "./components/button.js";
+import { createTextInput } from "./components/text_input.js";
 import { resolveDataUrl } from "../core/data_base_url.js";
 import { applyFeaturePaintState } from "../core/state/color_state.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
@@ -698,24 +700,8 @@ function initSidebar({ render } = {}) {
     });
     return select;
   };
-  const buildButton = (id, label, variant = "btn-secondary") => {
-    const button = document.createElement("button");
-    button.id = id;
-    button.type = "button";
-    button.className = variant;
-    button.textContent = t(label, "ui");
-    return button;
-  };
-  const buildInput = (id, placeholder, type = "text") => {
-    const input = document.createElement("input");
-    input.id = id;
-    input.type = type;
-    input.className = "input";
-    if (placeholder) {
-      input.placeholder = t(placeholder, "ui");
-    }
-    return input;
-  };
+  const buildButton = (id, label, variant = "btn-secondary") => createButton({ id, className: variant, label: t(label, "ui") });
+  const buildInput = (id, placeholder, type = "text") => createTextInput({ id, type, placeholder: placeholder ? t(placeholder, "ui") : "" });
   const buildCheckboxLabel = (id, label, className) => {
     const shell = document.createElement("label");
     shell.className = className;

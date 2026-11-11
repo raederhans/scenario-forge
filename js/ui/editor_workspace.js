@@ -1,3 +1,4 @@
+import { createButton } from "./components/button.js";
 import { createUiIcon, setUiIcon } from "./ui_icons.js";
 import { initCommandPalette } from "./command_palette.js";
 
@@ -34,8 +35,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     if (node.hidden !== hidden) node.hidden = hidden;
   };
   const button = (key, id, action) => {
-    const node = make("button", "editor-nav-button", key, id);
-    node.type = "button";
+    const node = createButton({ className: "editor-nav-button", id, i18nKey: key, label: t(key, "ui"), documentRef });
     node.addEventListener("click", action);
     return node;
   };

@@ -1,6 +1,7 @@
 // Layer-based Special Zones workbench controller.
 // 这个控制器只管理 special zone layer UI；toolbar.js 继续负责弹层、焦点和跨面板仲裁。
 
+import { createButton as createComponentButton } from "../components/button.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   SPECIAL_ZONE_PRESETS,
@@ -29,11 +30,7 @@ import { callRuntimeHook } from "../../core/state/index.js";
 import { createLatestRequestQueue } from "./latest_request_queue.js";
 
 function createButton(label, className = "secondary-btn") {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = className;
-  button.textContent = label;
-  return button;
+  return createComponentButton({ className, label: String(label ?? "") });
 }
 
 function createLabel(text, control) {
