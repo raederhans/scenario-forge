@@ -74,29 +74,34 @@ test("city name synchronization indexes one batch and refreshes after in-place s
 });
 
 test("scenario name synchronization never maps distant capitals into Russian city polygons", () => {
-  // Execute the real module against a process-local fixture. The synthetic
-  // polygon must not become a direct write to the application singleton.
-  const localState = { ...runtimeState, locales: { ...runtimeState.locales },
-    ruCityOverrides: { features: [{ properties: { id: "RU_TEST_VOLGOGRAD" },
-      geometry: { type: "Point", coordinates: [44.50184, 48.71939] } }] } };
-  const source = readFileSync(new URL("../js/core/scenario_localization_state.js", import.meta.url), "utf8")
-    .replace(/^import[\s\S]*?;\r?\n/gm, "").replace(/^export /gm, "");
-  const syncLocal = vm.runInNewContext(`${source}\nsyncScenarioLocalizationState`, {
-    runtimeState: localState, buildCityLocalizationPatch, normalizeCityText,
-    applyScenarioChunkCityExternalEffectState, copyLocalizationEntries, prepareLocalizationCandidate, console,
-    globalThis: { d3: { geoContains: () => true, geoCentroid: () => [44.50184, 48.71939] } },
-  });
-  for (const cityId of ["CITY::ne::1159149593", "CITY::ne::1159150731"]) {
-    syncLocal({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
-      cities: { [cityId]: { city_id: cityId, display_name: { en: "Reviewed city", zh: "审核城市" } } },
+  // Run the real synchronization against the shared runtime state, with a
+  // synthetic Russian city polygon, then restore every touched key.
+  const savedState = { ...runtimeState };
+  const savedD3 = globalThis.d3;
+  try {
+    runtimeState.locales = { ...runtimeState.locales, geo: { ...(runtimeState.locales?.geo || {}) } };
+    runtimeState.ruCityOverrides = { features: [{ properties: { id: "RU_TEST_VOLGOGRAD" },
+      geometry: { type: "Point", coordinates: [44.50184, 48.71939] } }] };
+    globalThis.d3 = { ...(savedD3 || {}), geoContains: () => true, geoCentroid: () => [44.50184, 48.71939] };
+    for (const cityId of ["CITY::ne::1159149593", "CITY::ne::1159150731"]) {
+      syncScenarioLocalizationState({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
+        cities: { [cityId]: { city_id: cityId, display_name: { en: "Reviewed city", zh: "审核城市" } } },
+      }), geoLocalePatchPayload: null });
+      assert.equal(runtimeState.locales.geo.RU_TEST_VOLGOGRAD, undefined, cityId);
+    }
+    const cityId = "CITY::ne::1159150697";
+    syncScenarioLocalizationState({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
+      cities: { [cityId]: { city_id: cityId, display_name: { en: "Stalingrad", zh: "斯大林格勒" } } },
     }), geoLocalePatchPayload: null });
-    assert.equal(localState.locales.geo.RU_TEST_VOLGOGRAD, undefined, cityId);
+    assert.deepEqual({ ...runtimeState.locales.geo.RU_TEST_VOLGOGRAD }, { en: "Stalingrad", zh: "斯大林格勒" });
+  } finally {
+    for (const key of Object.keys(runtimeState)) {
+      if (!Object.hasOwn(savedState, key)) delete runtimeState[key];
+    }
+    Object.assign(runtimeState, savedState);
+    if (savedD3 === undefined) delete globalThis.d3;
+    else globalThis.d3 = savedD3;
   }
-  const cityId = "CITY::ne::1159150697";
-  syncLocal({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
-    cities: { [cityId]: { city_id: cityId, display_name: { en: "Stalingrad", zh: "斯大林格勒" } } },
-  }), geoLocalePatchPayload: null });
-  assert.deepEqual({ ...localState.locales.geo.RU_TEST_VOLGOGRAD }, { en: "Stalingrad", zh: "斯大林格勒" });
 });
 
 // Publish the process-local baseline through the same authority as city loading.

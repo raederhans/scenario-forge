@@ -7,25 +7,25 @@ import {
 import { createQuickFillHierarchyResolver } from "../js/core/quick_fill_hierarchy.js";
 import { createParentBorderGroupingPolicy } from "../js/core/renderer/parent_border_grouping_policy.js";
 import { getQuickFillLevelModel } from "../js/ui/toolbar/quick_fill_level_controls.js";
-import { readFileSync } from "node:fs";
-import { parse } from "acorn";
-import { normalizeCountryCodeAlias } from "../js/core/country_code_aliases.js";
+import { resolveFeatureIdsFromPresetSource } from "../js/core/releasable_manager.js";
+import { state } from "../js/core/state.js";
 import { getHierarchyGroupsForCode as getProviderHierarchyGroups } from "../js/core/country_group_provider.js";
 
-// Bind the actual consumer functions to a local fixture, as in the import
-// transaction tests. Never write the application's shared state singleton.
-function bindConsumers(path, names, runtime) {
-  const source = readFileSync(new URL(path, import.meta.url), "utf8");
-  const nodes = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
-    .map(node => node.type === "ExportNamedDeclaration" ? node.declaration : node);
-  const declarations = names.map(name => {
-    const node = nodes.find(entry => entry?.type === "FunctionDeclaration" && entry.id.name === name);
-    assert.ok(node, `Missing consumer ${name}`);
-    return source.slice(node.start, node.end);
-  }).join("\n");
-  return new Function("runtimeState", "getEffectiveScenarioHierarchy", "normalizeCountryCode",
-    "expandScenarioFeatureIds", "projectScenarioFeatureIds", "hierarchyGroupsCache", `${declarations}\nreturn { ${names.join(", ")} };`)(
-    runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias, expandScenarioFeatureIds, projectScenarioFeatureIds, new WeakMap());
+// The releasable consumer reads the shared runtime state. Bind the fixture's
+// fields for one call and put every touched key back afterwards.
+function withRuntimeState(runtime, callback) {
+  const previous = new Map(Object.keys(runtime).map(key => [key, {
+    present: Object.hasOwn(state, key), value: state[key],
+  }]));
+  Object.assign(state, runtime);
+  try {
+    return callback();
+  } finally {
+    previous.forEach(({ present, value }, key) => {
+      if (present) state[key] = value;
+      else delete state[key];
+    });
+  }
 }
 
 function fixture() {
@@ -124,15 +124,13 @@ test("quick-fill and border consumers plus source-bound sidebar and releasable c
 
   runtime.hierarchyGroupsByCode = new Map([["US", [{ id: "US_old", children: ["US_ZN_31_1__R"] }]]]);
   const getHierarchyGroupsForCode = (code) => getProviderHierarchyGroups(runtime, code);
-  const { resolveFeatureIdsFromPresetSource } = bindConsumers("../js/core/releasable_manager.js",
-    ["normalizePresetSource", "getActiveFeatureMergeOverride", "projectSharedFeatureIds",
-      "resolveFeatureIdsFromPresetSource", "resolveMemberFeatureIdsFromPresetSource"], runtime);
   const sidebar = getHierarchyGroupsForCode("US");
   assert.equal(sidebar.length, 51);
   assert.deepEqual(sidebar.find(g => g.id === "US_State_0").children, groups.US_State_0);
   assert.deepEqual(getHierarchyGroupsForCode("IN")[0].children, ["IN_1", "IN_2"]);
   for (const type of ["hierarchy_group_ids", "feature_ids"]) {
-    assert.deepEqual(resolveFeatureIdsFromPresetSource({ type, group_ids: ["US_State_0"] }), groups.US_State_0);
+    assert.deepEqual(withRuntimeState(runtime, () => resolveFeatureIdsFromPresetSource({ type, group_ids: ["US_State_0"] })),
+      groups.US_State_0);
   }
   runtime.activeScenarioManifest = null;
   assert.equal(getHierarchyGroupsForCode("US")[0].id, "US_old");
