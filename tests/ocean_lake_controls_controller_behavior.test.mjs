@@ -32,7 +32,7 @@ class Control {
   }
 }
 
-function createFixture(stateOverride = null) {
+function createFixture(stateOverride = null, { documentRef = { getElementById: () => null } } = {}) {
   const styleConfig = createDefaultStyleConfig();
   styleConfig.ocean.preset = "flat";
   styleConfig.ocean.experimentalAdvancedStyles = false;
@@ -70,11 +70,46 @@ function createFixture(stateOverride = null) {
     oceanContourStrength: contour,
     oceanTextureOpacityValue: opacityValue,
     oceanContourStrengthValue: contourValue,
-    documentRef: { getElementById: () => null },
+    documentRef,
   });
   controller.bindEvents();
   return { state, controller, toggle, select, opacity, opacityValue, scale, contour, contourValue, lakeOutlineToggle, lakeInvalidations, oceanRegionNamesToggle, renderReasons };
 }
+
+test("ocean depth field editor renders and toggles only the oceanDepth channel", () => {
+  const priorStyle = runtimeState.styleConfig;
+  const priorFields = runtimeState.intensityFields;
+  const priorTool = runtimeState.intensityFieldTool;
+  const nodes = new Map();
+  const documentRef = {
+    getElementById(id) {
+      if (!id.startsWith("oceanDepthField")) return null;
+      if (!nodes.has(id)) nodes.set(id, new Control());
+      return nodes.get(id);
+    },
+  };
+  try {
+    clearHistory();
+    const fixture = createFixture(runtimeState, { documentRef });
+    fixture.controller.renderOceanLakeControlsUi();
+    const enabled = nodes.get("oceanDepthFieldEnabled");
+    assert.ok(enabled, "ocean depth editor should look up its enable toggle");
+    assert.equal(enabled.checked, runtimeState.intensityFields.channels.oceanDepth.enabled);
+    assert.equal(nodes.get("oceanDepthFieldPointCount")?.textContent, String(runtimeState.intensityFields.channels.oceanDepth.points.length));
+    const atlasEnabledBefore = runtimeState.intensityFields.channels.physicalAtlas.enabled;
+    const nextEnabled = !enabled.checked;
+    enabled.checked = nextEnabled;
+    enabled.dispatch("change");
+    assert.equal(runtimeState.intensityFields.channels.oceanDepth.enabled, nextEnabled);
+    assert.equal(runtimeState.intensityFields.channels.physicalAtlas.enabled, atlasEnabledBefore);
+    assert.ok(fixture.renderReasons.includes("ocean-depth-field-enabled"));
+  } finally {
+    clearHistory();
+    runtimeState.intensityFields = priorFields;
+    runtimeState.intensityFieldTool = priorTool;
+    setAppearanceStyleConfigState(runtimeState, priorStyle);
+  }
+});
 
 test("lake outline control starts enabled and invalidates water on toggle", () => {
   const priorStyle = runtimeState.styleConfig;

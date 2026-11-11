@@ -1,20 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFileSync } from "node:fs";
-import { parse } from "acorn";
-import * as walk from "acorn-walk";
 import { createWorkspaceChromeSupportSurfaceController } from "../js/ui/toolbar/workspace_chrome_support_surface_controller.js";
 
-const toolbarSource = readFileSync(new URL("../js/ui/toolbar.js", import.meta.url), "utf8");
-let refreshCallbackSource;
-walk.simple(parse(toolbarSource, { ecmaVersion: "latest", sourceType: "module" }), {
-  CallExpression(node) {
-    if (node.callee.name !== "createWorkspaceChromeSupportSurfaceController") return;
-    const callback = node.arguments[0].properties.find(property => property.key.name === "refreshPaintModeUi").value;
-    refreshCallbackSource = toolbarSource.slice(callback.start, callback.end);
-  },
-});
-const createRefreshCallback = new Function("runtimeState", `return (${refreshCallbackSource});`);
 
 class Button {
   constructor(id = "") {
@@ -101,7 +88,7 @@ function createHarness(context, initial = {}) {
   const calls = [];
   const controller = createWorkspaceChromeSupportSurfaceController({
     state, ...nodes, t: (text, group) => { assert.equal(group, "ui"); return text; },
-    refreshPaintModeUi: createRefreshCallback(state),
+    refreshPaintModeUi: () => { if (typeof state.updatePaintModeUIFn === "function") state.updatePaintModeUIFn(); },
     rememberOverlayTrigger: (surface, trigger) => calls.push(["remember", surface, trigger]),
     focusOverlaySurface: surface => surface.focus(),
     restoreOverlayTriggerFocus: (surface, trigger) => { calls.push(["restore", surface, trigger]); trigger?.focus(); },

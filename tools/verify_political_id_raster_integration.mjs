@@ -248,7 +248,8 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   referenceUrl.searchParams.set("geometry_worker", "0");
   referenceUrl.searchParams.set("political_raster_worker_bitmap", "0");
   const startupStarted = performance.now();
-  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: false, published, holdRasterAssets: recoverAssets });
+  // 大视口用例只验证预算回退，开场路径由同剧本的常规用例覆盖；它从全图启动，省掉开场切片和复位的耗时。
+  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: false, published, holdRasterAssets: recoverAssets, startAtWorldView: expectNativeBudgetFallback });
   const { page } = session;
   const report = { scenarioId, dpr, viewport, requirePrebuiltAssets, expectNativeBudgetFallback, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
   async function runPhase(name, action) {
@@ -292,17 +293,20 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   async function prepareNativeReferences() {
     assert.equal(await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().requested), false);
     assert.equal(session.network.length, 0, "explicit native reference must not download raster assets");
+    // 分步计时写进报告：这个阶段贴着发布门预算，CI 日志要能指出时间花在哪一步。
+    let stepStarted = performance.now();
+    const step = name => { const now = performance.now(); report.timings[`native-reference:${name}`] = now - stepStarted; stepStarted = now; };
     await toggle(page, false);
-    await settled(page);
+    await settled(page); step("startup-view");
     // 剧本可能以开场视角启动（如 HOI4 对准欧洲）。从那里缩放会被平移范围夹住、
     // 视图中心随之偏移，与恢复阶段的视图对不上。先回到全图，两个阶段从同一起点出发。
     await page.evaluate(() => window.__rasterTask.renderer.resetZoomToFit());
-    await settled(page);
+    await settled(page); step("world-view");
     if (expectNativeBudgetFallback) {
       // The fit transform can lie just outside the large view's zoom constraint.
       // Match the real 100% input path before capturing the 130% reference.
+      // 变换是同步写入的；这里不等整帧，下面的循环会等切片和 130% 的完整参考帧。
       await page.evaluate(() => window.__rasterTask.renderer.setZoomPercent(100));
-      await settled(page);
     }
     // Capture both complete native views once. Repeated OFF/ON cycles dispose
     // the owner and repeat cold loading, obscuring same-owner recovery and
@@ -310,8 +314,8 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     for (const zoom of interactionOnly ? [] : [130, 100]) {
       await page.evaluate(value => window.__rasterTask.renderer.setZoomPercent(value), zoom);
       await page.waitForFunction(value => Math.abs(window.__rasterTask.state.zoomTransform.k - value / 100) < 1e-7, zoom);
-      await waitChunksMatchView(page);
-      await compareSettledPixels(page, zoom, { captureReference: true });
+      await waitChunksMatchView(page); step(`chunks-${zoom}`);
+      await compareSettledPixels(page, zoom, { captureReference: true }); step(`reference-${zoom}`);
     }
   }
   async function verifyRecoveryAndZoom() {

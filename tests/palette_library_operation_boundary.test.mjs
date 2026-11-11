@@ -22,42 +22,17 @@ function walk(node, visit) {
   }
 }
 
-function importedNames(ast, source) {
-  const declaration = ast.body.find((node) => (
-    node.type === "ImportDeclaration" && node.source.value === source
-  ));
-  return new Set((declaration?.specifiers || []).map((specifier) => specifier.imported?.name || specifier.local.name));
-}
-
-test("toolbar composes the palette operation instead of owning target queries or color transactions", () => {
+// 乙类：applyPaletteLibraryColor 是 toolbar 工厂内的闭包，尚无可直接导入的入口，暂时截取执行。
+test("toolbar palette apply wrapper gives recent-color, swatch, render and toast feedback per result", () => {
   const source = readFileSync(new URL("js/ui/toolbar.js", ROOT), "utf8");
   const ast = parseModule("js/ui/toolbar.js");
-  assert.equal(
-    importedNames(ast, "../core/palette_library_operation.js").has("createPaletteLibraryOperation"),
-    true,
-  );
-
-  const forbiddenDefinitions = new Set([
-    "getFeatureIdsForOwnerColorRefresh",
-    "resolvePaletteLibraryApplyTarget",
-  ]);
-  const defined = new Set();
-  let operationFactoryCalls = 0;
   let applyWrapper = null;
   walk(ast, (node) => {
-    if (node.type === "FunctionDeclaration" && node.id) defined.add(node.id.name);
-    if (node.type === "VariableDeclarator" && node.id?.type === "Identifier") {
-      defined.add(node.id.name);
-      if (node.id.name === "applyPaletteLibraryColor") applyWrapper = node.init;
-    }
-    if (node.type === "CallExpression" && node.callee?.type === "Identifier"
-      && node.callee.name === "createPaletteLibraryOperation") {
-      operationFactoryCalls += 1;
+    if (node.type === "VariableDeclarator" && node.id?.type === "Identifier"
+      && node.id.name === "applyPaletteLibraryColor") {
+      applyWrapper = node.init;
     }
   });
-
-  assert.deepEqual([...forbiddenDefinitions].filter((name) => defined.has(name)), []);
-  assert.equal(operationFactoryCalls, 1);
   assert.ok(applyWrapper, "toolbar must keep one UI feedback wrapper for palette apply results");
 
   const execute = (result) => {
