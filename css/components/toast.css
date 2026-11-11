@@ -88,6 +88,9 @@
   background: color-mix(in srgb, var(--surface-raised) 12%, transparent);
   border-color: currentColor;
 }
+} /* end @layer components */
+
+@layer overrides {
 
 .toast:is(.toast-success, .toast-warning, .toast-error) .toast-action {
   color: var(--accent);
@@ -99,6 +102,9 @@
   background: var(--accent-soft);
   border-color: var(--accent);
 }
+} /* end @layer overrides */
+
+@layer components {
 
 .toast-action:focus-visible,
 .toast-dismiss:focus-visible,
