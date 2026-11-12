@@ -1,3 +1,7 @@
+import { cloneJsonLike } from "./json_clone.js";
+
+export { cloneJsonLike };
+
 const ENABLED_KEY = "mc_perf_enabled";
 const MAX_RENDER_SAMPLES = 256;
 
@@ -33,24 +37,6 @@ function persistEnabledFlag(nextValue) {
     localStorage.removeItem(ENABLED_KEY);
   } catch (_error) {
     // Ignore storage failures so perf probing never blocks runtime behavior.
-  }
-}
-
-export function cloneJsonLike(value) {
-  if (value === undefined) {
-    return undefined;
-  }
-  if (typeof globalThis.structuredClone === "function") {
-    try {
-      return globalThis.structuredClone(value);
-    } catch (_error) {
-      // Fall through to JSON clone fallback.
-    }
-  }
-  try {
-    return JSON.parse(JSON.stringify(value));
-  } catch (_error) {
-    return undefined;
   }
 }
 

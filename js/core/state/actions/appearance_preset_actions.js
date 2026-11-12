@@ -1,3 +1,4 @@
+import { cloneStateValue } from "./clone_state_value.js";
 import {
   buildRestoredAppearancePresetIntensityFields,
   deleteAppearancePreset,
@@ -12,16 +13,6 @@ import { setIntensityFieldsState } from "./intensity_field_actions.js";
 
 function assertTarget(target) {
   if (!target || typeof target !== "object" || Array.isArray(target)) throw new TypeError("[appearance_preset_actions] target must be an object");
-}
-function cloneStateValue(value) {
-  if (Array.isArray(value)) return value.map(cloneStateValue);
-  if (value instanceof Date) return new Date(value.getTime());
-  if (value instanceof Map) return new Map(Array.from(value, ([key, entry]) => [cloneStateValue(key), cloneStateValue(entry)]));
-  if (value instanceof Set) return new Set(Array.from(value, cloneStateValue));
-  if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, cloneStateValue(entry)]));
-  }
-  return value;
 }
 function detachActionInputs(inputs) { return cloneStateValue({ ...inputs }); }
 export function setAppearancePresetsState(target, value) { assertTarget(target); target.appearancePresets = value; return value; }

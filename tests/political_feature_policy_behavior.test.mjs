@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createPoliticalFeaturePolicy } from "../js/core/renderer/political_feature_policy.js";
-import { createRendererShellPolicyHarness } from "./helpers/scenario_chunk_contract_support.mjs";
+import { createPoliticalPolicyFixture } from "./helpers/scenario_chunk_contract_support.mjs";
 
 const feature = (id, properties = {}) => ({ properties: { id, ...properties } });
 
@@ -108,20 +108,18 @@ test("large paint ordering reads pending validity and cache once and rechecks ne
   assert.equal(h.cacheReads, 2);
 });
 
-test("foreground reader without a sorting snapshot observes each pending replacement", () => {
-  const source = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
-  const h = createRendererShellPolicyHarness(
-    source("../js/core/map_renderer.js"),
-    source("../js/core/renderer/political_partial_repaint_owner.js"),
-  );
+test("foreground ordering observes each pending replacement and override map", () => {
+  const h = createPoliticalPolicyFixture();
   const item = feature("detail-a");
-  assert.equal(h.isPoliticalForegroundFeature(item), false);
+  const other = feature("detail-z");
+  const order = () => h.orderPoliticalShellUnderlayFirst([item, other]).map((entry) => entry.properties.id);
+  assert.deepEqual(order(), ["detail-a", "detail-z"]);
   h.setPendingColorEditIds(["detail-a"]);
-  assert.equal(h.isPoliticalForegroundFeature(item), true);
+  assert.deepEqual(order(), ["detail-z", "detail-a"]);
   h.setPendingColorEditIds(["detail-b"]);
-  assert.equal(h.isPoliticalForegroundFeature(item), false);
+  assert.deepEqual(order(), ["detail-a", "detail-z"]);
   h.setVisualOverrides({ "detail-a": "#112233" });
-  assert.equal(h.isPoliticalForegroundFeature(item), true);
+  assert.deepEqual(order(), ["detail-z", "detail-a"]);
 });
 
 test("visual and interaction eligibility retain Antarctic, base geography, and helper distinctions", () => {

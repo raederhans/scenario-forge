@@ -1,6 +1,7 @@
 // Central read-only runtime snapshot bridge for console/debug inspection.
 // 这里不暴露可写 runtime owner，只聚合普通 JSON snapshot。
 
+import { cloneJsonLike } from "./json_clone.js";
 import { normalizeLoadStatusForDisplay } from "./load_status_display.js";
 
 const SNAPSHOT_SCHEMA_VERSION = 1;
@@ -8,22 +9,6 @@ const SECTION_NAMES = ["assets", "loadStatus", "perf", "diag", "version"];
 const providerRegistry = Object.freeze(
   Object.fromEntries(SECTION_NAMES.map((sectionName) => [sectionName, new Map()]))
 );
-
-function cloneJsonLike(value) {
-  if (value === undefined) return undefined;
-  if (typeof globalThis.structuredClone === "function") {
-    try {
-      return globalThis.structuredClone(value);
-    } catch (_error) {
-      // Fall through to JSON clone.
-    }
-  }
-  try {
-    return JSON.parse(JSON.stringify(value));
-  } catch (_error) {
-    return undefined;
-  }
-}
 
 function normalizeProviderValue(value, fallback = {}) {
   const cloned = cloneJsonLike(value);
