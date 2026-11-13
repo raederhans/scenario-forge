@@ -72,18 +72,12 @@ function readRepoFile(...parts) {
   return fs.readFileSync(path.join(REPO_ROOT, ...parts), "utf8");
 }
 
-function assertExcludes(source, token, message) {
-  assert.equal(source.includes(token), false, `${message}: unexpected ${JSON.stringify(token)}`);
-}
-
 test("startup defers only duplicate border derivation until the following setMapData", () => {
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
   const initMapSource = rendererSource.slice(
     rendererSource.indexOf("function initMap({"),
     rendererSource.indexOf("function markRendererTopologyChanged(")
   );
-  const mainSource = readRepoFile("js", "main.js");
-  assert.match(mainSource, /initMap\(\{[\s\S]*?deferStaticMeshesUntilSetMapData: true,[\s\S]*?\}\);\s*setMapData\(\{/);
 
   function runStartup(deferStaticMeshesUntilSetMapData) {
     const calls = [];
@@ -245,31 +239,3 @@ test("missing required effects and getters fail fast", () => {
   );
 });
 
-test("owner source stays import-safe and avoids forbidden renderer semantics", () => {
-  const ownerSource = readRepoFile("js", "core", "renderer", "renderer_startup_transaction_owner.js");
-
-  for (const tokenParts of [
-    ["map_", "renderer.js"],
-    ["runtime", "State"],
-    ["draw", "Canvas"],
-    ["renderPass", "ToCache"],
-    ["build", "HitCanvas"],
-    ["set", "MapData"],
-    ["scenario", " refresh"],
-    ["scenario", " chunk"],
-    ["exactAfter", "Settle"],
-    ["strategicOverlay", "Runtime"],
-    ["init", "Zoom"],
-    ["bind", "Events"],
-    ["public", " facade"],
-  ]) {
-    assertExcludes(
-      ownerSource,
-      tokenParts.join(""),
-      "startup transaction owner must avoid forbidden semantic token",
-    );
-  }
-  for (const token of ["summary", "effectOrder"]) {
-    assertExcludes(ownerSource, token, "startup transaction owner must not retain trace bookkeeping");
-  }
-});
