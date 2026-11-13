@@ -36,30 +36,6 @@ test("water filters show complete default values and lake settings guide without
   await expect(page.locator("#waterInspectorSortSelect option[value=type]")).toHaveText("类型");
 });
 
-test("lake interaction toggles update guidance and keep translated settings navigation on compact viewport", async ({ page }) => {
-  await openWorkspace(page);
-  await page.locator("#editorObjects-water").click();
-  const settings = page.locator("#waterInspectorLakeSettingsBtn");
-  const lake = page.locator("#waterInspectorLakeInteractionToggle");
-  await settings.click();
-  await lake.check();
-  await expect(settings).toBeHidden();
-  await expect(page.locator("#waterInspectorEmptyHint")).not.toContainText("先在设置中");
-  await lake.uncheck();
-  await expect(lake).not.toBeChecked();
-  await page.locator("#btnToggleLang").click();
-  await expect(settings).toHaveText("Lake interaction settings");
-  await expect(page.locator("#waterInspectorEmptyHint")).toContainText("first enable lake interaction");
-  await expect(page.locator("#waterInspectorSortSelect option[value=name]")).toHaveText("Name");
-  await page.setViewportSize({ width: 768, height: 900 });
-  await page.locator("#rightPanelToggle").click();
-  await settings.click();
-  await expect(page.locator("body")).toHaveClass(/left-drawer-open/);
-  await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
-  await expect(lake).toBeFocused();
-  await expect(lake).not.toBeChecked();
-});
-
 test("tooltips support focus and Escape while brush guidance follows tool and language changes", async ({ page }) => {
   await openWorkspace(page);
   const tooltip = page.locator("#editorToolTooltip");

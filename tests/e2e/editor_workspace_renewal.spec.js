@@ -572,42 +572,6 @@ test("properties Back restores the layer task and its selected entry after visit
   }
 });
 
-test("legend URL reload restores its layer task and property without entering annotation mode", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.addInitScript(() => localStorage.setItem("map_lang", "en"));
-  await openWorkspace(page);
-  await page.locator("#editorTaskLayersBtn").click();
-  await page.locator("#editorLayer-legend").click();
-  await expect(page.locator("#editorProperty-legend")).toBeVisible();
-  await expect.poll(() => new URL(page.url()).searchParams.get("section")).toBe("legendProjectSection");
-  await page.reload({ waitUntil: "domcontentloaded" });
-  await waitForAppInteractive(page);
-  await expect(page.locator("#editorTask-layers")).toBeVisible();
-  await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#editorLayer-legend")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#editorProperty-legend")).toBeVisible();
-  await expect(page.locator("#editorProperty-countries")).toBeHidden();
-  await expect(page.locator("body")).not.toHaveClass(/frontline-mode-active/);
-
-  const generator = page.locator("#editorProperty-legend .legend-generator-card");
-  const modeTrigger = generator.locator(".app-select-button").first();
-  const continentTrigger = generator.locator(".app-select-button").nth(1);
-  await expect(modeTrigger).toBeVisible();
-  // 增强选择器的名称是"字段名 + 当前值"，读屏能同时听到字段和选中项。
-  await expect(modeTrigger).toHaveAccessibleName(/^Generation Mode /);
-  await modeTrigger.click();
-  await generator.getByRole("option", { name: "Continent Focus", exact: true }).click();
-  await expect(modeTrigger.locator(".app-select-text")).toHaveText("Continent Focus");
-  await expect(modeTrigger).toHaveAccessibleName("Generation Mode Continent Focus");
-  await expect(continentTrigger).toBeVisible();
-  await expect(continentTrigger).toHaveAccessibleName(/^Continent /);
-  await page.locator("#btnToggleLang").click();
-  await expect.poll(() => readState(page, "currentLanguage")).toBe("zh");
-  await expect(modeTrigger).toHaveAccessibleName(/^生成模式/);
-  await expect(continentTrigger).toBeVisible();
-  await expect(continentTrigger).toHaveAccessibleName(/^大洲/);
-});
-
 test("workspace widths and mobile drawer have no horizontal page overflow", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);

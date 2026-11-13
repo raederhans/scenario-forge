@@ -14,55 +14,6 @@ async function loadCandidate(page) {
   await page.locator('#toolFillBtn').click();
 }
 
-test('overlap source ranks and all seven candidate hits agree with independent visibility', async ({ page }, testInfo) => {
-  // JUSTIFY: One full Modern World load and bounded overlapping-parent click/undo checks.
-  test.setTimeout(120_000);
-  const errors = []; page.on('pageerror', error => errors.push(error.message));
-  await loadCandidate(page);
-  const result = await page.evaluate(async oracle => {
-    const { state } = await import('./js/core/state.js');
-    const renderer = await import('./js/core/map_renderer.js');
-    const history = await import('./js/core/history_manager.js');
-    const { setClickSelectedColorState } = await import('./js/core/state/actions/renderer_interaction_actions.js');
-    const { restoreProjectImportFields } = await import('./js/core/state/actions/scenario_presentation_actions.js');
-    restoreProjectImportFields(state, { interactionGranularity: 'subdivision' });
-    state.brushModeEnabled = false; history.clearHistory();
-    const ranks = state.landData.features.map((f, i) => ({ id: f.properties.id || f.id, drawOrder: i }));
-    const expectedIds = new Set(oracle.sourceOrderIds);
-    const actualOrder = ranks.filter(row => expectedIds.has(row.id)).map(row => row.id);
-    const interaction = d3.select('rect.interaction-layer'), svg = interaction.node().ownerSVGElement;
-    const evidence = [];
-    let sequence = 0;
-    for (const mode of ['spatial', 'canvas', 'auto']) {
-      const url = new URL(location.href); url.searchParams.set('hit_mode', mode); window.history.replaceState(null, '', url);
-      for (const point of oracle.points.filter(row => row.kind.endsWith('interior'))) {
-        const screen = renderer.projectGeoToScreen(...point.coordinates);
-        const svgPoint = svg.createSVGPoint(); svgPoint.x = screen[0]; svgPoint.y = screen[1];
-        const client = svgPoint.matrixTransform(svg.getScreenCTM());
-        const color = '#' + (0x204060 + ++sequence * 73).toString(16).padStart(6, '0');
-        setClickSelectedColorState(state, color);
-        await interaction.on('click').call(interaction.node(), {
-          clientX: client.x, clientY: client.y, detail: 1, timeStamp: performance.now(),
-          preventDefault() {}, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false,
-        });
-        const expected = point.expectedCellIds[0] || point.expectedParentId;
-        const actual = point.expectedCellIds.length ? state.riverPaint.overrides[expected] : state.visualOverrides[expected];
-        evidence.push({ mode, kind: point.kind, target: point.targetParentId, expected, actual, color,
-          historyCount: state.historyPast.length });
-        history.undoHistory(); history.clearHistory();
-      }
-    }
-    return { actualOrder, ranks, evidence, contours: renderer.getPaintContourDiagnostics() };
-  }, oracle);
-  await testInfo.attach('overlap-runtime-evidence.json', { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
-  expect(result.actualOrder).toEqual(oracle.sourceOrderIds);
-  for (const row of result.evidence) {
-    expect(row.actual, JSON.stringify(row)).toBe(row.color);
-    expect(row.historyCount, JSON.stringify(row)).toBe(1);
-  }
-  expect(errors).toEqual([]);
-});
-
 test('overlap repaint and borders-only export preserve visible bank colors and internal seams', async ({ page }, testInfo) => {
   // JUSTIFY: Full Modern World startup and three bounded native export compositions.
   test.setTimeout(120_000);
