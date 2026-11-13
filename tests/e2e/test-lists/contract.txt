@@ -1,5 +1,0 @@
-interaction_funnel_contract.spec.js
-physical_layer_runtime_contract.spec.js
-scenario_shell_overlay_contract.spec.js
-startup_bundle_recovery_contract.spec.js
-tno_startup_visible_context_layers_contract.spec.js

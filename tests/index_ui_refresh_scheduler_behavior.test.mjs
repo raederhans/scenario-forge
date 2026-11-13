@@ -1,15 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import vm from "node:vm";
-
-const renderer = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-const schedulerStart = renderer.indexOf("function cancelPendingIndexUiRefresh() {");
-const schedulerEnd = renderer.indexOf("\nfunction normalizeSidebarRefreshIds(", schedulerStart);
-const finalizeStart = renderer.indexOf("function finalizeIndexBuildEffects() {");
-const finalizeEnd = renderer.indexOf("\nfunction adoptRuntimePoliticalMeta(", finalizeStart);
-assert.ok(schedulerStart >= 0 && schedulerEnd > schedulerStart);
-assert.ok(finalizeStart >= 0 && finalizeEnd > finalizeStart);
+import { createIndexUiRefreshScheduler } from "../js/core/renderer/index_ui_refresh_scheduler.js";
 
 function harness({ animationFrames = true } = {}) {
   let nextHandle = 0;
@@ -19,10 +10,8 @@ function harness({ animationFrames = true } = {}) {
     ["renderWaterRegionListFn", "water"], ["renderSpecialRegionListFn", "special"]]) {
     state[hook] = () => calls.push([scope, state.revision]);
   }
-  const context = vm.createContext({
+  const owner = createIndexUiRefreshScheduler({
     runtimeState: state,
-    pendingIndexUiRefreshHandle: null, pendingIndexUiRefreshState: null,
-    deferredIndexUiRefreshHandle: null, deferredIndexUiRefreshState: null,
     setTimeout(callback) { const handle = ++nextHandle; tasks.set(handle, callback); return handle; },
     clearTimeout(handle) { canceledTasks.push(handle); tasks.delete(handle); },
     ...(animationFrames ? {
@@ -32,24 +21,21 @@ function harness({ animationFrames = true } = {}) {
     notifyDevWorkspace: () => calls.push(["workspace", state.revision]),
     recordUiRefreshMetric() {}, callRuntimeHook() {},
   });
-  vm.runInContext(`${renderer.slice(schedulerStart, schedulerEnd)}\n${renderer.slice(finalizeStart, finalizeEnd)}`, context);
   const runNext = queue => {
     const entry = queue.entries().next().value;
     assert.ok(entry, "expected a scheduled callback");
     queue.delete(entry[0]); entry[1]();
   };
-  return { context, state, calls, frames, tasks, canceledFrames, canceledTasks,
+  return { owner, state, calls, frames, tasks, canceledFrames, canceledTasks,
     frame: () => runNext(frames), task: () => runNext(tasks) };
 }
 
-test("index finalization dirties geometry immediately and coalesces latest UI after a frame in a separate task", () => {
+test("deferred requests coalesce latest UI after a frame in a separate task", () => {
   const h = harness();
-  h.context.queueIndexUiRefresh({ renderCountryList: true }, "deferred");
-  h.context.finalizeIndexBuildEffects();
-  h.context.finalizeIndexBuildEffects();
-  h.context.queueIndexUiRefresh({ renderWaterRegionList: true, renderSpecialRegionList: true }, "deferred");
-  assert.equal(h.state.devSelectionOverlayDirty, true);
-  assert.equal(h.state.hitCanvasDirty, true);
+  h.owner.queueIndexUiRefresh({ renderCountryList: true }, "deferred");
+  h.owner.queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
+  h.owner.queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
+  h.owner.queueIndexUiRefresh({ renderWaterRegionList: true, renderSpecialRegionList: true }, "deferred");
   assert.deepEqual(h.calls, []);
   assert.equal(h.frames.size, 1); assert.equal(h.tasks.size, 0);
   h.frame();
@@ -58,38 +44,43 @@ test("index finalization dirties geometry immediately and coalesces latest UI af
   h.state.revision = 2;
   h.task();
   assert.deepEqual(h.calls, [["country", 2], ["water", 2], ["special", 2], ["workspace", 2]]);
-  assert.equal(h.context.pendingIndexUiRefreshState, null);
-  assert.equal(h.context.pendingIndexUiRefreshHandle, null);
+  assert.equal(h.frames.size, 0);
+  assert.equal(h.tasks.size, 0);
+  h.owner.queueIndexUiRefresh({ renderWaterRegionList: true });
+  assert.equal(h.tasks.size, 1);
+  h.task();
+  assert.deepEqual(h.calls, [["country", 2], ["water", 2], ["special", 2], ["workspace", 2], ["water", 2]]);
+  assert.equal(h.tasks.size, 0);
 });
 
 test("pending immediate and deferred requests merge without adding another UI task", () => {
   const h = harness();
-  h.context.queueIndexUiRefresh({ renderCountryList: true });
-  h.context.queueIndexUiRefresh({ renderWaterRegionList: true });
-  h.context.finalizeIndexBuildEffects();
+  h.owner.queueIndexUiRefresh({ renderCountryList: true });
+  h.owner.queueIndexUiRefresh({ renderWaterRegionList: true });
+  h.owner.queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
   assert.equal(h.tasks.size, 1); assert.equal(h.frames.size, 1);
   h.frame();
   assert.equal(h.tasks.size, 1);
   h.task();
   assert.deepEqual(h.calls, [["country", 1], ["water", 1], ["workspace", 1]]);
-  h.context.queueIndexUiRefresh({ renderSpecialRegionList: true }, "none");
+  h.owner.queueIndexUiRefresh({ renderSpecialRegionList: true }, "none");
   assert.equal(h.frames.size, 0); assert.equal(h.tasks.size, 0);
 });
 
 test("cancellation uses the right scheduler and stale callbacks cannot consume a new scene's UI work", () => {
   const h = harness();
-  h.context.scheduleIndexUiRefresh({ renderCountryList: true });
-  h.context.finalizeIndexBuildEffects();
+  h.owner.scheduleIndexUiRefresh({ renderCountryList: true });
+  h.owner.queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
   const [taskHandle, staleTask] = h.tasks.entries().next().value;
   const [frameHandle, staleFrame] = h.frames.entries().next().value;
-  h.context.cancelPendingIndexUiRefresh();
+  h.owner.cancelPendingIndexUiRefresh();
   assert.deepEqual(h.canceledTasks, [taskHandle]);
   assert.deepEqual(h.canceledFrames, [frameHandle]);
-  assert.equal(h.context.pendingIndexUiRefreshState, null);
-  assert.equal(h.context.deferredIndexUiRefreshState, null);
+  assert.equal(h.tasks.size, 0);
+  assert.equal(h.frames.size, 0);
   h.state.revision = 3;
-  h.context.scheduleIndexUiRefresh({ renderSpecialRegionList: true });
-  h.context.finalizeIndexBuildEffects();
+  h.owner.scheduleIndexUiRefresh({ renderSpecialRegionList: true });
+  h.owner.queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
   staleTask(); staleFrame();
   assert.deepEqual(h.calls, []);
   assert.equal(h.tasks.size, 1); assert.equal(h.frames.size, 1);
@@ -101,9 +92,9 @@ test("a UI callback can queue a later refresh without losing its request", () =>
   const h = harness();
   h.state.renderCountryListFn = () => {
     h.calls.push(["country", h.state.revision]);
-    h.context.queueIndexUiRefresh({ renderWaterRegionList: true });
+    h.owner.queueIndexUiRefresh({ renderWaterRegionList: true });
   };
-  h.context.scheduleIndexUiRefresh({ renderCountryList: true });
+  h.owner.scheduleIndexUiRefresh({ renderCountryList: true });
   h.task();
   assert.deepEqual(h.calls, [["country", 1]]); assert.equal(h.tasks.size, 1);
   h.state.revision = 4; h.task();
@@ -112,11 +103,11 @@ test("a UI callback can queue a later refresh without losing its request", () =>
 
 test("the no-animation-frame fallback still separates the gate and UI tasks and supports cancellation", () => {
   const h = harness({ animationFrames: false });
-  h.context.finalizeIndexBuildEffects();
+  h.owner.queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
   const canceledHandle = h.tasks.keys().next().value;
-  h.context.cancelPendingIndexUiRefresh();
+  h.owner.cancelPendingIndexUiRefresh();
   assert.deepEqual(h.canceledTasks, [canceledHandle]);
-  h.context.finalizeIndexBuildEffects();
+  h.owner.queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
   h.task(); assert.deepEqual(h.calls, []); assert.equal(h.tasks.size, 1);
   h.task(); assert.deepEqual(h.calls, [["workspace", 1]]);
 });

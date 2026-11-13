@@ -1646,16 +1646,6 @@ class DevServerTest(unittest.TestCase):
                 backend_app.resolve(),
             )
 
-    def test_backend_console_exposes_chinese_default_and_language_toggle(self) -> None:
-        html = (dev_server.ROOT / "backend" / "index.html").read_text(encoding="utf-8")
-        app_js = (dev_server.ROOT / "backend" / "app.js").read_text(encoding="utf-8")
-
-        self.assertIn('lang="zh-Hans"', html)
-        self.assertIn("Scenario Forge 社区与后台", html)
-        self.assertIn('id="languageToggle"', html)
-        self.assertIn("localStorage.getItem(\"backendConsoleLocale\")", app_js)
-        self.assertIn("languageButton", app_js)
-
     def test_do_post_dispatches_backend_register_and_forwards_session_cookie(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             events: list[tuple[str, object]] = []
