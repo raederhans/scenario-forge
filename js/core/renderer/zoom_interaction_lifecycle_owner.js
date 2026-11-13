@@ -31,7 +31,23 @@ export function createZoomInteractionLifecycleOwner({
   let gestureActive = false;
   let frameGeneration = 0;
   let disposed = false;
+  let mousePointer = null;
+  let zoomTarget = null;
   const updateMap = requireFunction(effects, "updateMap", "effects");
+
+  function rememberMousePointer(event) {
+    mousePointer = event.pointerType === "mouse" && event.button === 0
+      ? { node: event.currentTarget, id: event.pointerId }
+      : null;
+  }
+
+  function releaseMousePointer() {
+    const pointer = mousePointer;
+    mousePointer = null;
+    if (pointer?.node.hasPointerCapture?.(pointer.id)) {
+      pointer.node.releasePointerCapture(pointer.id);
+    }
+  }
 
   function getD3() {
     return typeof getters.getD3 === "function" ? getters.getD3() : null;
@@ -117,8 +133,16 @@ export function createZoomInteractionLifecycleOwner({
       && Number(left.k) === Number(right.k);
   }
 
-  function handleZoomStart() {
+  function handleZoomStart(event = {}) {
     if (disposed) return;
+    // Chromium can suppress mouseup over a disabled HTML control, even for
+    // D3's window capture listener. Retarget an accepted mouse pan to its map
+    // surface so D3 receives the native mouseup and finishes its own gesture.
+    // Capture only after D3 accepts mousedown; brush, touch and wheel keep their
+    // existing routing. pointerdown supplies the ID that MouseEvent lacks.
+    if (event.sourceEvent?.type === "mousedown") {
+      mousePointer?.node.setPointerCapture?.(mousePointer.id);
+    }
     frameGeneration += 1;
     gestureStartTransform = cloneTransform(getCurrentTransform());
     gestureActive = false;
@@ -170,6 +194,7 @@ export function createZoomInteractionLifecycleOwner({
 
   function handleZoomEnd(event = {}) {
     if (disposed) return;
+    releaseMousePointer();
     const endTransform = event.transform || getPendingZoomTransform() || getCurrentTransform();
     if (!gestureActive && !transformsEqual(endTransform, getCurrentTransform())) activateGesture();
     frameGeneration += 1;
@@ -196,6 +221,8 @@ export function createZoomInteractionLifecycleOwner({
   }
 
   function initZoom() {
+    releaseMousePointer();
+    zoomTarget?.on("pointerdown.zoomCapture", null);
     disposed = false;
     const d3 = getD3();
     const rect = getInteractionRect();
@@ -217,9 +244,10 @@ export function createZoomInteractionLifecycleOwner({
     currentZoomBehavior = zoomBehavior;
     effects.setZoomBehavior?.(zoomBehavior);
     effects.updateZoomTranslateExtent?.();
-    const zoomTarget = d3.select(node);
+    zoomTarget = d3.select(node);
     zoomTarget.call(zoomBehavior);
     zoomTarget.on("dblclick.zoom", null);
+    zoomTarget.on("pointerdown.zoomCapture", rememberMousePointer);
     effects.resetZoomToFit?.();
     // Align D3 with the fitted transform without emitting a zoom gesture: the
     // first frame has not been painted yet, so a gesture here would only run a
@@ -229,6 +257,9 @@ export function createZoomInteractionLifecycleOwner({
   }
 
   function dispose() {
+    releaseMousePointer();
+    zoomTarget?.on("pointerdown.zoomCapture", null);
+    zoomTarget = null;
     disposed = true;
     frameGeneration += 1;
     gestureActive = false;

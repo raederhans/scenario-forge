@@ -258,7 +258,10 @@ test("initZoom configures behavior and installs zoom handlers", () => {
   assert.equal(harness.behavior.filterFn({ type: "blocked" }), false);
   assert.deepEqual(harness.calls.select, [harness.interactionNode]);
   assert.deepEqual(harness.calls.targetCall, [{ method: harness.behavior, args: [] }]);
-  assert.deepEqual(harness.calls.targetOn, [{ type: "dblclick.zoom", value: null }]);
+  assert.equal(harness.calls.targetOn[0].type, "dblclick.zoom");
+  assert.equal(harness.calls.targetOn[0].value, null);
+  assert.equal(harness.calls.targetOn[1].type, "pointerdown.zoomCapture");
+  assert.equal(typeof harness.calls.targetOn[1].value, "function");
   assert.deepEqual(harness.calls.order.slice(0, 5), [
     "setZoomBehavior",
     "updateZoomTranslateExtent",
@@ -266,6 +269,37 @@ test("initZoom configures behavior and installs zoom handlers", () => {
     "enforceZoomConstraints",
     "filter:wheel",
   ]);
+});
+
+test("only an accepted mouse zoom captures its pointer, and end/dispose release it", () => {
+  const { owner, calls, handlers, interactionNode } = createHarness();
+  const captured = new Set();
+  interactionNode.setPointerCapture = id => captured.add(id);
+  interactionNode.hasPointerCapture = id => captured.has(id);
+  interactionNode.releasePointerCapture = id => captured.delete(id);
+  owner.initZoom();
+  const pointerDown = calls.targetOn.find(entry => entry.type === "pointerdown.zoomCapture").value;
+  const down = pointerType => pointerDown({ pointerType, button: 0, pointerId: 7, currentTarget: interactionNode });
+
+  down("mouse");
+  assert.equal(captured.size, 0, "a pointerdown rejected by the zoom filter must not capture");
+  handlers.start({ sourceEvent: { type: "wheel" } });
+  assert.equal(captured.size, 0, "wheel zoom must not capture a remembered mouse pointer");
+  handlers.end();
+  for (const pointerType of ["touch", "pen"]) {
+    down(pointerType);
+    handlers.start({ sourceEvent: { type: "mousedown" } });
+    assert.equal(captured.size, 0);
+    handlers.end();
+  }
+  for (const finish of [() => handlers.end(), () => owner.dispose()]) {
+    down("mouse");
+    handlers.start({ sourceEvent: { type: "mousedown" } });
+    assert.deepEqual([...captured], [7]);
+    finish();
+    assert.equal(captured.size, 0, "also release a click with no changed transform");
+  }
+  assert.deepEqual(calls.targetOn.at(-1), { type: "pointerdown.zoomCapture", value: null });
 });
 
 test("first changed transform enters interacting phase and captures start state", () => {
