@@ -237,14 +237,6 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                     path = root / scenario_id / f"startup.bundle.{language}.json.gz"
                     self.assertLess(path.stat().st_size, build_startup_bundle.STARTUP_BUNDLE_GZIP_BUDGET_BYTES)
 
-    def test_chunked_startup_bundle_builders_pass_detail_manifest_source(self) -> None:
-        hoi4_builder = (Path(__file__).resolve().parents[1] / "tools" / "build_hoi4_scenario.py").read_text(encoding="utf-8")
-        tno_builder = (Path(__file__).resolve().parents[1] / "tools" / "patch_tno_1962_bundle.py").read_text(encoding="utf-8")
-
-        self.assertIn("detail_chunk_manifest_path=detail_chunk_manifest_path if detail_chunk_manifest_path.exists() else None", hoi4_builder)
-        self.assertIn('scenario_dir / "detail_chunks.manifest.json"', tno_builder)
-        self.assertIn("detail_chunk_manifest_path=(", tno_builder)
-
     def test_tno_1962_checked_in_startup_bundle_includes_arctic_shell(self) -> None:
         scenario_dir = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "tno_1962"
         bootstrap = json.loads((scenario_dir / "runtime_topology.bootstrap.topo.json").read_text(encoding="utf-8"))

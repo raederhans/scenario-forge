@@ -10,8 +10,19 @@ npm run test:node        # Node only (tests/*.test.mjs)
 npm run test:python      # Python only (pytest -n auto)
 node --test tests/<file>.test.mjs   # one file
 npm run test:e2e:smoke   # browser smoke
-npm run test:e2e:golden  # golden user flows (about 10 minutes)
+npm run test:e2e:golden  # golden user flows (about 20 minutes)
 ```
+
+Browser test entry points:
+
+| Entry | Scope |
+| --- | --- |
+| `npm run test:e2e:golden` | `tests/e2e/golden/`: golden user flows that reach the app only through the DOM and `js/core/app_test_api.js`. |
+| `npm run test:e2e:smoke`, `test:e2e:layer:<contract\|regression\|feature\|all>` | Root-level `tests/e2e/` specs, layered by `tests/e2e/test-layer-manifest.json`. The manifest is the single source: every root-level spec has exactly one entry, checked by `node tools/e2e_layering.mjs check` (`npm run verify:test:e2e-layers`); per-layer Playwright lists are generated at run time under `.runtime/tests/e2e-lists/`. `layer:all` is every manifest spec and excludes `dev/`, `golden/`, `release/` and `ui_gallery/`. |
+| `npm run test:e2e` | Playwright's default scope: everything under `tests/e2e/` except `release/` (CI also drops `dev/` and `@dev` cases). |
+| `npm run test:e2e:pages-public-release-gate` | `tests/e2e/release/` against the published site in `SCENARIO_FORGE_PAGES_URL`; the `:deployed` variant defaults to the live Pages URL. |
+
+`npm run verify:tno-strict-contracts` runs the strict TNO data contracts and writes the strict, coverage-ledger and Atlantropa reports in one pass; `npm run verify:tno-coverage-chain` adds the polar coverage check and the chunk contract tests.
 
 `dist/` is not tracked. CI builds the Pages artifact from source with `tools/build_pages_dist.py`, which bundles the editor's JavaScript into `app/js/bundle/` with `tools/build_editor_bundle.mjs` (esbuild). Run `npm run verify:pages-dist` for a local build.
 
@@ -33,7 +44,7 @@ Every PR runs the same jobs; there is no path-based routing:
 | --- | --- |
 | `pr-tests` | All Node unit tests (two shards) and all Python unit tests. |
 | `pr-verify-fast` | Public sample project validation, Quick Fill hierarchy data and audit, data catalog health, Pages source references, Pages artifact build and startup shell checks. |
-| `pr-golden` | Golden user flows (editor flows sharded per test into four jobs, landing flows in a fifth): startup, switching and filling in all five scenarios, undo/redo, save and reopen, PNG export, performance budgets. They reach the app only through the DOM and `js/core/app_test_api.js`. |
+| `pr-golden` | Golden user flows (editor flows sharded per test into four jobs, landing flows in a fifth): startup, switching and filling in all five scenarios, undo/redo, save and reopen, PNG export, performance budgets, and the panels (`golden_ui_flows.spec.js`: appearance tabs, transport workbench, special zones, export workbench layers, language switch, inspector colors, command palette). They reach the app only through the DOM and `js/core/app_test_api.js`. |
 | `pr-verify-smoke` | Browser smoke, the Golden Demo and the live Quick Fill toolbar smoke (`tools/check_quick_fill_browser.mjs`). |
 | `pr-verify-hgo` | Checks, tests and data validation for the standalone HGO editor. |
 | `PR Verify Required` | Fails when any job above fails; the only required check. |

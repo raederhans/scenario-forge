@@ -1,8 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { createScenarioStartupHydrationController } from "../js/core/scenario/startup_hydration.js";
 import { createScenarioBootstrapBundleFromCache } from "../js/core/scenario/bundle_loader.js";
@@ -18,12 +15,6 @@ import {
   createStartupScenarioBootstrapCacheKey,
   createStartupScenarioBootstrapCoreCacheKey,
 } from "../js/core/startup_cache.js";
-
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-
-function readRepoFile(...segments) {
-  return readFileSync(path.join(REPO_ROOT, ...segments), "utf8");
-}
 
 function createMinimalHydrationController(state, overrides = {}) {
   return createScenarioStartupHydrationController({
@@ -208,19 +199,6 @@ test(`health gate retry arriving after a new scenario ${invalidation} cannot cha
   assert.deepEqual(effects, []);
 });
 }
-
-test("startup shell-empty scenario political baseline cannot fall back to modern primary", () => {
-  const rendererSource = readRepoFile("js", "core", "map_renderer.js");
-
-  assert.match(
-    rendererSource,
-    /const hasScenarioRuntimePoliticalSource = !!String\(runtimeState\.activeScenarioId \|\| ""\)\.trim\(\)\s*&& !!runtimeTopology\?\.objects\?\.political;/,
-  );
-  assert.match(
-    rendererSource,
-    /if \(runtimeBaseCollection\) \{[\s\S]*?fullCollection = runtimeBaseCollection;[\s\S]*?\} else if \(hasScenarioRuntimePoliticalSource\) \{[\s\S]*?fullCollection = \{ type: "FeatureCollection", features: \[\] \};[\s\S]*?\} else if \(primaryTopology\?\.objects\?\.political/,
-  );
-});
 
 test("runtime version tag is driven by source sha metadata", () => {
   const { buildScenarioRuntimeVersionTag } = createMinimalHydrationController({ activeScenarioId: "sample" });

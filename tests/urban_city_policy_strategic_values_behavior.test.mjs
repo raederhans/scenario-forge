@@ -395,14 +395,15 @@ test("priority reserve fades to zero before the P4 boundary", () => {
 });
 
 function createRevealFixture(features, overrides = {}, state = { urbanData: null }) {
-  const profile = { groupKey: "country", countryTier: "A", countryTierRank: 5 };
+  state.sovereigntyByFeatureId = Object.fromEntries(features.map(feature => [
+    feature.properties.__city_host_feature_id, "TEST",
+  ]));
+  state.scenarioCountriesByTag = { TEST: { controller_feature_count: 150 } };
   const helpers = {
     ...cityPolicy,
     defaultCityCountryClassRank: 2,
     defaultCityCountryTierRank: 2,
     getCityAnchor: (feature) => feature.geometry.coordinates,
-    getCityCountryGroupKey: () => "country",
-    getCityCountryProfileIndex: () => new Map([["country", profile]]),
     getCityFeatureKey: (feature) => feature.id,
     getCityInterpolatedRevealBucket: (entry, scale) => cityPolicy.getCityRevealBucket(entry, getCityRevealPhase(scale).id),
     getCityScreenPoint: (anchor) => anchor,
