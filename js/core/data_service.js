@@ -1,3 +1,4 @@
+import { cloneJsonLike } from "./json_clone.js";
 import catalogPayload from "../../data/CATALOG.json" with { type: "json" };
 import { loadMeasuredJsonResource } from "./data_loader.js";
 import {
@@ -30,22 +31,6 @@ const statusByRequestId = new Map();
 const metricsByRequestId = new Map();
 const pendingJsonRequestsById = new Map();
 let lastUpdatedAt = 0;
-
-function cloneJsonLike(value) {
-  if (value === undefined) return undefined;
-  if (typeof globalThis.structuredClone === "function") {
-    try {
-      return globalThis.structuredClone(value);
-    } catch (_error) {
-      // Fall through to JSON clone.
-    }
-  }
-  try {
-    return JSON.parse(JSON.stringify(value));
-  } catch (_error) {
-    return undefined;
-  }
-}
 
 function normalizeCatalogPath(value) {
   return String(value || "").replaceAll("\\", "/").trim();

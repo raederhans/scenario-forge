@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
 
 import { strFromU8, unzipSync } from "../vendor/fflate.browser.js";
 import {
@@ -464,12 +463,64 @@ test("export annotation family counts use strategic overlay selectors", () => {
   });
 });
 
-test("export workbench controller renders annotation family summaries", () => {
-  const source = readFileSync(new URL("../js/ui/toolbar/export_workbench_controller.js", import.meta.url), "utf8");
-  assert.match(source, /const getTextLayerSummary = \(entry\) => \{/);
-  assert.match(source, /entry\.familyCounts/);
-  assert.match(source, /EXPORT_ANNOTATION_FAMILY_VIEW_MODELS/);
-  assert.match(source, /export-workbench-layer-meta/);
+test("export workbench text layer list shows annotation family counts", (context) => {
+  const selectorCounts = new Map([
+    [".frontline-overlay-layer path, .frontline-labels-layer .frontline-label", 3],
+    [".unit-counters-layer .unit-counter", 5],
+  ]);
+  const mapSvg = {
+    querySelectorAll: (selector) => ({ length: selectorCounts.get(selector) || 0 }),
+  };
+  const createElement = () => {
+    const element = {
+      children: [],
+      dataset: {},
+      className: "",
+      textContent: "",
+      title: "",
+      classList: { toggle() {}, add() {} },
+      addEventListener() {},
+      appendChild(child) { element.children.push(child); return child; },
+      append(...children) { element.children.push(...children); },
+    };
+    return element;
+  };
+  const previousDocument = globalThis.document;
+  globalThis.document = {
+    getElementById: (id) => (id === "map-svg" ? mapSvg : null),
+    createElement,
+  };
+  context.after(() => { globalThis.document = previousDocument; });
+  const list = {
+    children: [],
+    replaceChildren(...children) { this.children = children; },
+    appendChild(child) { this.children.push(child); return child; },
+  };
+  const controller = createExportWorkbenchController({
+    ...createExportWorkbenchControllerDependencies(),
+    state: {},
+    t: (key) => key,
+    exportWorkbenchTextElementList: list,
+  });
+
+  controller.renderExportWorkbenchTextElementList();
+
+  const findMeta = (node) => {
+    if (node?.className === "export-workbench-layer-meta") return node;
+    for (const child of node?.children || []) {
+      const found = findMeta(child);
+      if (found) return found;
+    }
+    return null;
+  };
+  const annotationItem = list.children.find((item) => item.dataset.exportTextLayerId === "svg-annotations");
+  assert.ok(annotationItem, "strategic annotations should be listed as an export text layer");
+  assert.equal(findMeta(annotationItem)?.textContent, "Frontlines: 3 · Unit counters: 5");
+
+  selectorCounts.clear();
+  controller.renderExportWorkbenchTextElementList();
+  const emptyItem = list.children.find((item) => item.dataset.exportTextLayerId === "svg-annotations");
+  assert.equal(findMeta(emptyItem)?.textContent, "No strategic annotations currently visible");
 });
 
 function deferred() {
