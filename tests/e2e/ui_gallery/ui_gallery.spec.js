@@ -19,6 +19,7 @@ const SECTIONS = [
   "tabs",
   "disclosures",
   "list-rows",
+  "component-modifiers",
   "invalid-declaration-sites",
 ];
 const WIDTHS = [1440, 375];

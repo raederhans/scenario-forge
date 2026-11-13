@@ -98,7 +98,7 @@
 
 | 组件 | 基础类 | 变体 | 要点 |
 |---|---|---|---|
-| 按钮 | `.btn` | `--primary` `--secondary` `--ghost` `--danger` `--icon`，尺寸 `--sm` `--lg` | 主按钮每个面板最多一个；危险按钮默认 ghost 样式（红字），确认态才填充 |
+| 按钮 | `.btn--*`（`.btn` 暂不启用，见 3.4） | `--primary` `--secondary` `--danger` `--icon`，尺寸 `--sm` `--lg` | 主按钮每个面板最多一个；危险按钮默认 ghost 样式（红字），确认态才填充 |
 | 图标 | 内联 SVG（JS 里用 `js/ui/components/ui_icons.js` 的 `createUiIcon` / `setUiIcon`） | 16 / 20 px | 24 viewBox、`stroke-width: 1.6`、`currentColor`。不用 `<` `>` `-` `+` `v` `^` `▾` 等字符当图标 |
 | 输入框 / 选择框 | `.field` + `.input` / `.app-select-button` | — | 高 36（侧栏密集区 32），`--surface-raised` 底，`--line-1` 描边，聚焦时 `--accent` 描边 + 外环 |
 | 分段控件 / 标签页 | `.segmented` | `--tabs`（下划线式，用于一级标签） | 一级导航用下划线标签；同级筛选用分段控件；不再用胶囊按钮当标签 |
@@ -128,6 +128,12 @@
 | 按下 | — | `--accent-soft` 底 | — | — |
 | 聚焦 | 2 px `--accent` outline，偏移 2 | 同左 | 同左 | `--accent` 边 + 3 px `--accent` outline |
 | 禁用 | `--surface-sunken` 底、`--ink-400` 字、`not-allowed` | 同左 | 同左 | 浏览器默认禁用外观 |
+
+- 样式唯一来源：`css/components/button.css`、`css/components/text-input.css`。
+- 类名：新代码用 `.btn--primary` / `.btn--secondary` / `.btn--danger` / `.btn--icon`（各自自足）加尺寸 `.btn--sm` / `.btn--lg`；文本输入用 `.input`，密集尺寸 `.input--sm`。`.btn` 暂不作基础类启用：单位计数器面板已把它当作独立类使用，该面板迁移后再收拢。
+- 旧别名 `.btn-primary` 目前渲染为**次按钮**外观（历史上由末尾覆盖统一成白底），主按钮外观只给 `.btn--primary`、`.app-dialog-btn-primary` 和 `#workspaceSaveBtn`、`#appearancePresetApplyBtn`、`#exportWorkbenchSnapshotBtn`、`#bootRetryBtn`。
+- 这两个文件暂放 `overrides` 层并保留原选择器的特异性：原先 `style.css` 末尾的覆盖压住了约 64 条面板规则里的同名声明，直接降到 `components` 层会让这些死声明复活。面板迁移时顺手删掉被压住的声明，全部清完后改成 `:where()` 并移到 `components` 层。
+- 构造入口：`js/ui/components/button.js` 的 `createButton({ label, variant, size, className, id, type, title, ariaLabel, i18nKey, disabled })`，`js/ui/components/text_input.js` 的 `createTextInput({ id, type, className, size, placeholder, value, name, ariaLabel, autocomplete })`。只传 `className` 时类名与旧写法完全一致。
 
 
 ### 3.5 通用状态

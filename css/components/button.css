@@ -1,0 +1,113 @@
+/* 按钮：唯一的外观规则。
+   新代码用 .btn--primary / .btn--secondary / .btn--danger / .btn--icon（各自自足，不需要再加基础类），尺寸 .btn--sm（32）/ 默认（36）/ .btn--lg（44）；触屏下最小 44。
+   .btn 这个类名暂不启用：单位计数器面板已把它当作独立类使用（style.css 里 #strategicOverlayPanel 与 .unit-counter-preview-actions 下的 .btn），该面板迁移后再收为基础类。
+   旧类名是别名，外观全部来自这里：btn-primary、btn-secondary、secondary-btn、danger-btn、app-dialog-btn、
+   sidebar-action-primary、sidebar-action-secondary、sidebar-tool-action-primary、sidebar-support-entry-btn、
+   scenario-context-action-btn。注意 .btn-primary 这个别名目前是次按钮外观，主按钮外观只给 .btn--primary 和下面列出的 ID。
+
+   暂放 overrides 层并保留原选择器的特异性：原先 style.css 末尾的这段覆盖压住了不少面板规则里的同名声明，
+   直接降到 components 层会让那些死声明复活。各面板迁到组件时删掉其中被压住的声明，全部清完后再改成 :where() 并移到 components 层。 */
+@layer overrides {
+
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--control-md);
+  min-height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--ink-900);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  box-shadow: none;
+  cursor: pointer;
+  transform: none;
+  letter-spacing: 0;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn) {
+  height: var(--control-compact);
+  min-height: var(--control-compact);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--ink-900);
+  box-shadow: none;
+  font-weight: 500;
+}
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):hover:not(:disabled) { background: var(--surface-sunken); border-color: var(--line-2); box-shadow: none; }
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):hover:not(:disabled) { background: var(--surface-sunken); border-color: var(--line-2); }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):active:not(:disabled) { background: var(--accent-soft); transform: none; box-shadow: none; }
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):active:not(:disabled) { background: var(--accent-soft); }
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn),
+body :is(.btn--primary, .app-dialog-btn-primary) {
+  background: var(--accent);
+  color: var(--surface-raised);
+  font-weight: 600;
+}
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn):hover:not(:disabled),
+body :is(.btn--primary, .app-dialog-btn-primary):hover:not(:disabled) { background: var(--accent-hover); }
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn { background: var(--accent); color: var(--surface-raised); }
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:hover:not(:disabled) { background: var(--accent-hover); }
+/* 侧栏的默认与悬停规则带 ID，修饰类在侧栏里要同等特异性才能生效。 */
+body :is(#leftSidebar, #rightSidebar) .btn--primary { background: var(--accent); color: var(--surface-raised); font-weight: 600; }
+body :is(#leftSidebar, #rightSidebar) .btn--primary:hover:not(:disabled) { background: var(--accent-hover); }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.btn--danger, .danger-btn, .is-danger),
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.btn--danger, .danger-btn, .is-danger) {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--line-1);
+}
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.btn--danger, .danger-btn, .is-danger):hover:not(:disabled),
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.btn--danger, .danger-btn, .is-danger):hover:not(:disabled) { background: var(--danger-soft); }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):disabled,
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):disabled {
+  background: var(--surface-sunken);
+  color: var(--ink-400);
+  border-color: var(--line-1);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+body .scenario-context-action-btn:is(.is-active, [aria-expanded="true"]) {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: none;
+}
+body :is(.app-dialog--warning, .app-dialog--error) .app-dialog-btn-primary {
+  background: var(--danger);
+  color: var(--surface-raised);
+  border-color: var(--danger);
+  box-shadow: none;
+}
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn, .btn--primary, .app-dialog-btn-primary):disabled,
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled {
+  background: var(--surface-sunken);
+  color: var(--ink-400);
+  border-color: var(--line-1);
+  cursor: not-allowed;
+}
+
+/* 尺寸修饰（现有别名不使用）。 */
+body :is(.btn--sm) { height: var(--control-compact); min-height: var(--control-compact); padding: 0 var(--space-2); }
+body :is(.btn--lg),
+body :is(#leftSidebar, #rightSidebar) .btn--lg { height: 44px; min-height: 44px; }
+body :is(.btn--icon),
+body :is(#leftSidebar, #rightSidebar) .btn--icon { width: auto; min-width: max(var(--hit-min), var(--control-md)); padding: 0; aspect-ratio: 1; }
+
+@media (pointer: coarse) {
+  body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn),
+  body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn) { min-height: 44px; }
+}
+
+} /* end @layer overrides */
