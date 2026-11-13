@@ -1,3 +1,4 @@
+import { createIndexUiRefreshScheduler } from "../js/core/renderer/index_ui_refresh_scheduler.js";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
@@ -352,28 +353,34 @@ test("final country-index flush refreshes restored WGI coverage through the exis
   });
   h.owner.render();
   assert.equal(h.nodes.thematicWgiCoverage.textContent, "Mapped: 1 · Source missing: 0 · Unmatched: 1");
-  const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const flushStart = rendererSource.indexOf("function flushPendingIndexUiRefresh() {");
-  const flushEnd = rendererSource.indexOf("\nfunction scheduleIndexUiRefresh(", flushStart);
   const toolbarSource = readFileSync(new URL("../js/ui/toolbar.js", import.meta.url), "utf8");
   const hookStart = toolbarSource.indexOf("  function renderSpecialZoneEditorUI() {");
   const hookEnd = toolbarSource.indexOf("  registerRuntimeHook(state, \"updateSpecialZoneEditorUIFn\"", hookStart);
-  assert.ok(flushStart >= 0 && flushEnd > flushStart && hookStart >= 0 && hookEnd > hookStart);
+  assert.ok(hookStart >= 0 && hookEnd > hookStart);
   let appearanceRefreshes = 0;
   let countryRefreshes = 0;
   const context = vm.createContext({
     runtimeState: h.state,
-    pendingIndexUiRefreshHandle: 1,
-    pendingIndexUiRefreshState: { renderCountryList: true },
     recordUiRefreshMetric() {}, callRuntimeHook,
     toggleWaterRegions: null, toggleOpenOceanRegions: null,
     renderAppearanceStyleControlsUi: () => { appearanceRefreshes += 1; h.owner.render(); },
     specialZoneEditorController: { renderSpecialZoneEditorUI() {} },
     specialZonesWorkbenchController: { renderSpecialZonesWorkbenchUi() {} }, updateToolUI() {},
   });
-  vm.runInContext(`${rendererSource.slice(flushStart, flushEnd)}
-    ${toolbarSource.slice(hookStart, hookEnd)}
-    this.flush = flushPendingIndexUiRefresh; this.refreshPanel = renderSpecialZoneEditorUI;`, context);
+  vm.runInContext(`${toolbarSource.slice(hookStart, hookEnd)}
+    this.refreshPanel = renderSpecialZoneEditorUI;`, context);
+  const tasks = [];
+  const scheduler = createIndexUiRefreshScheduler({
+    runtimeState: h.state,
+    setTimeout: callback => { tasks.push(callback); return tasks.length; },
+    recordUiRefreshMetric() {}, callRuntimeHook,
+  });
+  const flush = options => {
+    scheduler.queueIndexUiRefresh(options);
+    assert.equal(tasks.length, 1);
+    tasks.shift()();
+    assert.equal(tasks.length, 0);
+  };
   const oldPanelHook = readRegisteredRuntimeHookSource(h.state, "updateSpecialZoneEditorUIFn");
   const oldCountryHook = readRegisteredRuntimeHookSource(h.state, "renderCountryListFn");
   registerRuntimeHook(h.state, "updateSpecialZoneEditorUIFn", context.refreshPanel);
@@ -381,21 +388,18 @@ test("final country-index flush refreshes restored WGI coverage through the exis
   try {
     h.state.landDataFull = { features: [feature("AAA"), feature("BBB"), feature("ZZZ")] };
     assert.equal(h.nodes.thematicWgiCoverage.textContent, "Mapped: 1 · Source missing: 0 · Unmatched: 1");
-    context.flush();
+    flush({ renderCountryList: true });
     assert.equal(h.nodes.thematicWgiCoverage.textContent, "Mapped: 2 · Source missing: 0 · Unmatched: 1");
     assert.equal(appearanceRefreshes, 1);
     assert.equal(countryRefreshes, 1);
-    assert.equal(context.pendingIndexUiRefreshHandle, null);
-    assert.equal(context.pendingIndexUiRefreshState, null);
+    assert.equal(tasks.length, 0);
     assert.equal(h.loads.length, 0);
     assert.deepEqual(h.dirty, []);
     assert.deepEqual(h.refreshes, []);
-    context.pendingIndexUiRefreshState = { renderWaterRegionList: true };
-    context.flush();
+    flush({ renderWaterRegionList: true });
     assert.equal(appearanceRefreshes, 1, "water-only updates do not refresh appearance");
     h.state.styleConfig.thematic.enabled = false;
-    context.pendingIndexUiRefreshState = { renderCountryList: true };
-    context.flush();
+    flush({ renderCountryList: true });
     assert.equal(appearanceRefreshes, 1, "disabled WGI does not add appearance work");
     assert.equal(countryRefreshes, 2);
   } finally {

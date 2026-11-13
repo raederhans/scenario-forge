@@ -13,6 +13,17 @@ npm run test:e2e:smoke   # 浏览器冒烟
 npm run test:e2e:golden  # 黄金用户流程（约 20 分钟）
 ```
 
+浏览器测试入口：
+
+| 入口 | 范围 |
+| --- | --- |
+| `npm run test:e2e:golden` | `tests/e2e/golden/`：黄金用户流程，只通过 DOM 和 `js/core/app_test_api.js` 访问应用。 |
+| `npm run test:e2e:smoke`、`test:e2e:layer:<contract\|regression\|feature\|all>` | `tests/e2e/` 根目录的 spec，按 `tests/e2e/test-layer-manifest.json` 分层。清单是唯一来源：根目录每个 spec 恰好一条记录，`node tools/e2e_layering.mjs check`（`npm run verify:test:e2e-layers`）校验；各层的 Playwright 清单在运行时生成到 `.runtime/tests/e2e-lists/`。`layer:all` 就是清单里的全部根目录 spec，不含 `dev/`、`golden/`、`release/`、`ui_gallery/`。 |
+| `npm run test:e2e` | Playwright 默认范围：`tests/e2e/` 下除 `release/` 外的全部（CI 上再去掉 `dev/` 和 `@dev` 用例）。 |
+| `npm run test:e2e:pages-public-release-gate` | `tests/e2e/release/`，针对 `SCENARIO_FORGE_PAGES_URL` 指定的已发布站点；`:deployed` 变体默认指向线上 Pages。 |
+
+TNO 严格数据合约用 `npm run verify:tno-strict-contracts`（一次输出 strict、coverage ledger、Atlantropa 三份报告），`npm run verify:tno-coverage-chain` 在它之后再跑极地覆盖和分块合约测试。
+
 `dist/` 不签入。Pages 产物由 CI 用 `tools/build_pages_dist.py` 从源码构建，其中编辑器 JS 由 `tools/build_editor_bundle.mjs`（esbuild）打包到 `app/js/bundle/`；本地需要时运行 `npm run verify:pages-dist`。
 
 `tests/quarantine.json` 是 PR 上唯一的跳过清单，每一项都必须写明原因，修好或删掉后立即移除。nightly 用 `--with-slow` 额外运行慢测试，但仍跳过隔离项，只在出现新的破坏时报红；需要完整审计时手动用 `--all`（连隔离项一起跑）。perf-pr-gate 不再定时运行，只在 PR 和手动触发时测量。

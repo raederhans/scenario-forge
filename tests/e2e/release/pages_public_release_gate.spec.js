@@ -45,8 +45,10 @@ for (const { scenarioId, viewport, expectNativeBudgetFallback = false } of raste
       test.setTimeout(30000);
       await check?.close();
     });
-    test("cold startup and native references", async ({}, testInfo) => {
-      // JUSTIFY: one cold scenario startup and two complete native reference views.
+    // 冷启动和原生参考各占一条用例：两段合在一起时大视口 TNO 在 CI 上要 108–114 秒，
+    // 贴着 120 秒上限，runner 稍慢就会让 main 的部署失败。
+    test("cold startup", async ({}, testInfo) => {
+      // JUSTIFY: one cold scenario startup on the published bundle.
       test.setTimeout(120000);
       const { createRasterIntegrationCheck } = await import("../../../tools/verify_political_id_raster_integration.mjs");
       check = await createRasterIntegrationCheck({
@@ -54,6 +56,10 @@ for (const { scenarioId, viewport, expectNativeBudgetFallback = false } of raste
         published: true, recoverAssets: !expectNativeBudgetFallback, viewport, expectNativeBudgetFallback,
         output: testInfo.outputPath("raster-recovery"),
       });
+    });
+    test("native references", async () => {
+      // JUSTIFY: the first complete settled frame and two complete native reference views.
+      test.setTimeout(120000);
       await check.prepare();
     });
     test("timeout recovery and exact zoom", async () => {

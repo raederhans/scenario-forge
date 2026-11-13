@@ -78,9 +78,9 @@ jobs:
             sleep 1
           done
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
-          # Match the original serial suite's five stages, never the large
+          # Match the original serial suite's six stages, never the large
           # native fallback profile or the public deployed URL gate.
-          npm run test:e2e:pages-public-release-gate -- --grep 'public Pages raster tno_1962 (cold startup and native references|timeout recovery and exact zoom|paint and continuous brush history|normal startup cache baseline|persistent cache revisit)$' 2>&1 | tee .runtime/raster-release/regression.log
+          npm run test:e2e:pages-public-release-gate -- --grep 'public Pages raster tno_1962 (cold startup|native references|timeout recovery and exact zoom|paint and continuous brush history|normal startup cache baseline|persistent cache revisit)$' 2>&1 | tee .runtime/raster-release/regression.log
 
       - name: Upload regression evidence
         if: always()
