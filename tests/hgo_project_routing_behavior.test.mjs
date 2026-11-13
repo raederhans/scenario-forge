@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {FileManager} from '../js/core/file_manager.js';
 import {projectEditor,routeHgoProject} from '../js/core/hgo_project_routing.js';
 
 test('dispatch separates native, main and retired HGO before main normalization',async()=>{
@@ -9,9 +9,22 @@ test('dispatch separates native, main and retired HGO before main normalization'
   assert.equal(projectEditor({scenario:{id:'tno_1962'}}),'main');
   assert.equal(await routeHgoProject({schemaVersion:21}),null);
   await assert.rejects(()=>routeHgoProject({scenario:{id:'hgo_1936'}}),/Legacy HGO/);
-  const source=await readFile(new URL('../js/core/file_manager.js',import.meta.url),'utf8');
-  const body=source.slice(source.indexOf('static async importProjectData'));
-  assert.ok(body.indexOf('routeHgoProject(payload)')<body.indexOf('normalizeImportedProjectData(payload)'));
+});
+
+test('project import routes retired HGO projects away from the main import callback',async()=>{
+  let callbackRuns=0;
+  const errors=[];
+  const previousConsoleError=console.error;
+  console.error=()=>{};
+  try{
+    const result=await FileManager.importProjectData({scenario:{id:'hgo_1936'}},()=>{callbackRuns++;},{onError:error=>errors.push(error)});
+    assert.equal(result,false);
+  }finally{
+    console.error=previousConsoleError;
+  }
+  assert.equal(callbackRuns,0);
+  assert.equal(errors.length,1);
+  assert.match(String(errors[0]?.message||errors[0]),/Legacy HGO/);
 });
 
 test('invalid/native cross-origin handoff never touches storage or navigates',async()=>{

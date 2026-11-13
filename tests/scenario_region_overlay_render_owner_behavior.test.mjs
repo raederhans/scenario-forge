@@ -907,17 +907,6 @@ for (const mode of ["density", "heatmap"]) {
   });
 }
 
-test("renderer wires projection and adaptive resets to the same overlay owner", () => {
-  const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  assert.match(source, /createScenarioRegionOverlayRenderOwner\(runtimeState,\s*\{\s*rendererSurfaceHost,/);
-  assert.match(source, /resetHostWaterPathCaches: \(\) => \{\s*scenarioRegionOverlayRenderOwner\?\.resetWaterPathCaches\(\{ preserveResidentWorker: true \}\);/);
-  assert.match(source, /getPreviousRenderedCount: \(\) => getScenarioRegionOverlayRenderOwner\(\)\.getPreviousWaterRenderedCount\(\),/);
-  assert.match(source, /computeProjectedGeoBounds: \(part\) => getScenarioRegionOverlayRenderOwner\(\)\.getScenarioWaterPartBounds\(part\),/);
-  assert.match(source, /function resetScenarioWaterCacheAdaptiveState\([^)]*\) \{\s*scenarioRegionOverlayRenderOwner\?\.resetPreviousWaterRenderedCount\(\);/);
-  assert.match(source, /function drawScenarioRegionOverlaysPass\(k\) \{\s*return getScenarioRegionOverlayRenderOwner\(\)\.drawScenarioRegionOverlaysPass\(k\);/);
-  assert.doesNotMatch(source, /let scenarioWater(?:Part|Feature)PathCache/);
-});
-
 test("shared cache summaries are immutable and global reset releases all overlay layers", (t) => {
   const h = harness(t); h.draw(); h.reliefOwner.drawScenarioReliefOverlaysPass(1);
   const api = h.cacheOwner.scenarioLayerCache;

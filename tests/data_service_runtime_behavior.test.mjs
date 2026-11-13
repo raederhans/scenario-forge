@@ -96,6 +96,11 @@ const stubCatalogPayload = {
 };
 
 const patchedDataServiceSource = dataServiceSource
+  // data: URL 里的相对导入无法解析，指向真实的共享模块。
+  .replace(
+    'from "./json_clone.js";',
+    `from ${JSON.stringify(new URL("../js/core/json_clone.js", import.meta.url).href)};`,
+  )
   .replace(
     'import catalogPayload from "../../data/CATALOG.json" with { type: "json" };',
     `const catalogPayload = ${JSON.stringify(stubCatalogPayload)};`,

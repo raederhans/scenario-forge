@@ -2,7 +2,8 @@
 // selection and the recent-colors strip. Callers announce the change through
 // state/changes.js; panels are not called from here.
 
-const MAX_RECENT_COLORS = 4;
+// 面板最多显示 10 个最近颜色；所有入口共用这个上限。
+const MAX_RECENT_COLORS = 10;
 
 export function clearInspectorSelectionState(target) {
   const hadSelection = Boolean(target.selectedInspectorCountryCode);

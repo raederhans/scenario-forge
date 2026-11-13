@@ -15,6 +15,7 @@ import {
 } from "../core/state.js";
 import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
+import { pushRecentColorState } from "../core/state/actions/editor_input_actions.js";
 import { ColorManager } from "../core/color_manager.js";
 import {
   cancelActiveStrategicInteractionModes,
@@ -593,12 +594,7 @@ function previewHierarchyGroupHighlight(group, featureIds = []) {
 }
 
 function addRecentColor(color) {
-  if (!color || runtimeState.recentColors[0] === color) return;
-  runtimeState.recentColors = runtimeState.recentColors.filter((value) => value !== color);
-  runtimeState.recentColors.unshift(color);
-  if (runtimeState.recentColors.length > 10) {
-    runtimeState.recentColors = runtimeState.recentColors.slice(0, 10);
-  }
+  if (!pushRecentColorState(runtimeState, color)) return;
   callRuntimeHook(state, "updateRecentUI");
 }
 
