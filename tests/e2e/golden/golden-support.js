@@ -124,6 +124,71 @@ async function colorShareAround(page, { x, y }, hex, { radius = 6, tolerance = 6
   }, { encoded: png.toString("base64"), rgb: hexToRgb(hex), tolerance });
 }
 
+// Screenshot of the square around (x, y), for comparing what the user sees before and after.
+async function snapshotAround(page, { x, y }, { radius = 12 } = {}) {
+  return page.screenshot({ clip: { x: Math.round(x) - radius, y: Math.round(y) - radius, width: radius * 2 + 1, height: radius * 2 + 1 } });
+}
+
+// Share of pixels that differ by more than `tolerance` on any channel between two
+// same-sized PNG screenshots.
+async function pixelChangeShare(page, beforePng, afterPng, { tolerance = 12 } = {}) {
+  return page.evaluate(async ({ before, after, limit }) => {
+    const decode = async (encoded) => {
+      const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${encoded}`)).blob());
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const context = canvas.getContext("2d");
+      context.drawImage(bitmap, 0, 0);
+      bitmap.close();
+      return context.getImageData(0, 0, canvas.width, canvas.height).data;
+    };
+    const [a, b] = await Promise.all([decode(before), decode(after)]);
+    if (a.length !== b.length) throw new Error("snapshots differ in size");
+    let changed = 0;
+    for (let i = 0; i < a.length; i += 4) {
+      if (Math.abs(a[i] - b[i]) > limit || Math.abs(a[i + 1] - b[i + 1]) > limit || Math.abs(a[i + 2] - b[i + 2]) > limit) changed += 1;
+    }
+    return changed / (a.length / 4);
+  }, { before: beforePng.toString("base64"), after: afterPng.toString("base64"), limit: tolerance });
+}
+
+// Share of pixels in a whole PNG (e.g. an exported image) that match `hex`.
+async function colorShareInPng(page, png, hex, { tolerance = 6 } = {}) {
+  return page.evaluate(async ({ encoded, rgb, limit }) => {
+    const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${encoded}`)).blob());
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const context = canvas.getContext("2d");
+    context.drawImage(bitmap, 0, 0);
+    bitmap.close();
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let matching = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (Math.abs(pixels[i] - rgb[0]) <= limit
+        && Math.abs(pixels[i + 1] - rgb[1]) <= limit
+        && Math.abs(pixels[i + 2] - rgb[2]) <= limit) matching += 1;
+    }
+    return matching / (pixels.length / 4);
+  }, { encoded: png.toString("base64"), rgb: hexToRgb(hex), limit: tolerance });
+}
+
+// The app replaces most native <select>s with a button and a listbox; pick by option value.
+async function chooseStyledOption(page, button, value) {
+  await button.click();
+  const listId = await button.getAttribute("aria-controls");
+  await page.locator(`#${listId} [role="option"][data-value="${value}"]`).click();
+}
+
+// Save the project from the Project panel. Headless browsers cancel the Save As dialog,
+// so choose "Browser download" like a user without file-system access would.
+async function saveProjectFile(page, savePath) {
+  await page.locator("#inspectorSidebarTabProject").click();
+  await page.locator("#projectDownloadDestination").selectOption("browser");
+  const downloadPromise = page.waitForEvent("download", { timeout: 60_000 });
+  await page.locator("#downloadProjectBtn").click();
+  const download = await downloadPromise;
+  await download.saveAs(savePath);
+  return savePath;
+}
+
 // Count distinct coarse colors in the map area: a blank or failed render has very few.
 async function mapColorVariety(page) {
   const box = await page.locator("#mapContainer").boundingBox();
@@ -205,17 +270,22 @@ module.exports = {
   GOLDEN_APP_PATH,
   PROBE_LON_LAT,
   SCENARIO_IDS,
+  chooseStyledOption,
   closeScenarioGuide,
   collectPageErrors,
   colorShareAround,
+  colorShareInPng,
   fillAt,
   mapColorVariety,
   openApp,
   parkMouse,
+  pixelChangeShare,
   readStableLabels,
   readStatus,
+  saveProjectFile,
   screenPoint,
   selectFillTool,
+  snapshotAround,
   switchScenario,
   resetViewToWorld,
   waitForBackgroundIdle,

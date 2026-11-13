@@ -1,3 +1,4 @@
+@layer overrides {
 /* Editor workspace: one browser on the left, one context on the right. */
 /* Reserve final shell geometry before deferred controls are mounted. */
 .editor-workspace {
@@ -29,7 +30,13 @@
 /* The right-panel toggle is a panel switch like Project, not bare text. */
 .editor-project-bar #editorInspectorToggleBtn { flex: 0 0 auto; width: auto; padding: 6px 14px; border: 1px solid var(--line-1); border-radius: var(--radius-pill); background: var(--surface-raised); font-weight: 700; }
 .editor-project-bar #editorInspectorToggleBtn[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); border-color: transparent; }
+} /* end @layer overrides */
+
+@layer components {
 .editor-workspace .editor-retired-shell { display: none !important; }
+} /* end @layer components */
+
+@layer overrides {
 .editor-empty-hint { color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.7; margin: 8px 0; }
 .editor-selected-name { color: var(--text-primary); font-size: var(--fs-md); margin: 0 0 12px; line-height: 1.5; }
 .editor-project-bar #workspaceSaveStatus { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; font-size: var(--editor-meta-size); }
@@ -63,7 +70,13 @@
 .editor-workspace :is(.editor-nav-button, .appearance-tab-btn, .map-content-tab-btn):active:not(:disabled) { background-color: var(--accent-soft); }
 .editor-task-body { min-height: 0; flex: 1; overflow-y: auto; padding: 12px; }
 .editor-task-body, .editor-workspace #rightSidebarContent { overscroll-behavior-y: contain; scrollbar-gutter: stable; scrollbar-width: thin; }
+} /* end @layer overrides */
+
+@layer components {
 .editor-task-panel[hidden], .editor-property-panel[hidden], .editor-workspace [hidden] { display: none !important; }
+} /* end @layer components */
+
+@layer overrides {
 .editor-object-nav { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
 .editor-object-nav button { min-height: 34px; font-size: var(--fs-xs); padding: 6px 8px; }
 .editor-workspace .editor-object-section { padding: 0; margin: 0; border: 0; background: none; box-shadow: none; }
@@ -196,9 +209,15 @@
 .editor-workspace :is(#riverPaintNavigation, #riverPaintSearchInput, #riverPaintRiverSelect, #riverPaintLocationSelect, #riverPaintLocationGoBtn, #riverPaintLocationResults, #riverCellPicker)[hidden] { display: none; }
 .editor-workspace #riverCellSelect { width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
 .editor-workspace #riverCellPreview { width: 100%; height: 104px; background: var(--surface-panel); border-radius: var(--radius-sm); }
+} /* end @layer overrides */
+
+@layer panels {
 @media (max-width: 767px) {
   .editor-workspace .dock-group-mode:has(#riverPaintToggleBtn:not(:disabled)) { display: flex !important; }
 }
+} /* end @layer panels */
+
+@layer overrides {
 .editor-workspace #transportProjectSection { padding: 12px 0; border: 0; box-shadow: none; background: transparent; }
 .editor-workspace #transportProjectSection > summary { font-size: var(--fs-sm); }
 .editor-workspace #transportProjectSection > .inspector-panel-body { padding: 8px 0 0; }
@@ -207,7 +226,13 @@
 .app-select-search { width: 100%; box-sizing: border-box; position: sticky; top: 0; padding: 9px 10px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--surface-panel); font: inherit; z-index: calc(var(--z-map-overlay) - 9); }
 .app-select-group-heading { padding: 8px 10px 4px; font-size: var(--fs-xs); font-weight: 600; color: var(--text-tertiary); }
 .app-select-no-matches { padding: 12px; font-size: var(--fs-sm); color: var(--text-tertiary); }
+} /* end @layer overrides */
+
+@layer components {
 .app-select-menu [hidden] { display: none !important; }
+} /* end @layer components */
+
+@layer overrides {
 .transport-workbench-pack-details { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-subtle); font-size: var(--fs-sm); line-height: 1.5; }
 .transport-workbench-pack-details > summary { cursor: pointer; font-weight: 600; }
 @keyframes editor-context-enter {
@@ -636,3 +661,4 @@
   margin: var(--space-2) 0;
 }
 #rightSidebar .editor-property-notes p { font-size: var(--fs-xs); margin: var(--space-2) 0; }
+} /* end @layer overrides */

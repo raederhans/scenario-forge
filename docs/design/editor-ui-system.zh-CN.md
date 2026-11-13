@@ -73,10 +73,33 @@
 
 每类组件只有一套基础类，变体用修饰类。
 
+### 3.1 样式分层与目录
+
+- 全部样式按 `@layer tokens, base, components, panels, overrides` 排序，顺序声明在 `css/style.css` 第一行。层序决定胜负，层内才比特异性和先后。
+  - `tokens`：设计令牌（`:root` 自定义属性）。
+  - `base`：重置、全局元素、页面骨架（布局、侧栏外壳、滚动条、排版）。
+  - `components`：通用组件（卡片、输入与下拉、按钮、工具类、色块、提示气泡），以及 `css/components/` 下的文件。
+  - `panels`：某个面板专用的规则（交通工作台、特殊区域、导出工作台、检查器……）。
+  - `overrides`：`style.css` 末尾的收口覆盖、`editor-workspace.css`、`editor-shell.css`、`editor-tool-guidance.css`。面板迁到组件后，删掉它在这一层的对应覆盖，这一层只减不增。
+- **所有规则都必须在某一层里。** 未分层的规则压过一切分层规则，新增样式表时整个文件包在 `@layer <层名> { … }` 里。
+- 分层时按段落归层，但有 137 条规则为保持原有层叠结果放在了相邻层（原来靠高特异性压过后面的规则）；它们在源文件里就地用单独的 `@layer` 块包住。改这些规则时用画廊截图确认没有连带变化。
+- `!important` 在层里是反转的：越早的层里的 `!important` 越强。只在"隐藏 / 无障碍隐藏 / 降低动效"这类必须压过一切的场合用；新代码不加。
+- 通用规则用 `:where()` 包住选择器，把特异性降到 0，让面板规则不用堆选择器就能覆盖。
+- 目录：组件的 JS 放 `js/ui/components/`（工厂函数返回真实 DOM 节点，保留原生 `input` / `change` 事件），样式放 `css/components/`。`js/ui/` 下的旧路径（`styled_selects.js`、`app_dialog.js`、`toast.js`、`ui_icons.js`）只剩重导出，新代码直接从 `components/` 导入。
+- 对照物：`tests/e2e/ui_gallery/gallery.html` 摆出全部控件家族和状态，`npx playwright test tests/e2e/ui_gallery` 比对截图基线。改动组件样式前后都跑一次。
+
+### 3.2 命名规则
+
+- 基础类是名词（`.btn`、`.input`），变体用双连字符修饰（`.btn--primary`、`.btn--sm`），状态用 `is-*`（`is-active`、`is-selected`、`is-danger`）或 ARIA 属性（`aria-pressed`、`aria-selected`、`aria-expanded`）。
+- 面板专用的类以面板名开头（`transport-workbench-*`、`special-zone-*`），只写布局和面板特有的东西，外观继承基础类。
+- 旧类名（`btn-primary`、`sidebar-action-secondary`、`secondary-btn` 等）是别名：`index.html`、JS 和测试里照常使用，样式由基础规则统一提供，不再单独写外观。新代码用基础类。
+
+### 3.3 组件清单
+
 | 组件 | 基础类 | 变体 | 要点 |
 |---|---|---|---|
 | 按钮 | `.btn` | `--primary` `--secondary` `--ghost` `--danger` `--icon`，尺寸 `--sm` `--lg` | 主按钮每个面板最多一个；危险按钮默认 ghost 样式（红字），确认态才填充 |
-| 图标 | 内联 SVG（JS 里用 `js/ui/ui_icons.js` 的 `createUiIcon` / `setUiIcon`） | 16 / 20 px | 24 viewBox、`stroke-width: 1.6`、`currentColor`。不用 `<` `>` `-` `+` `v` `^` `▾` 等字符当图标 |
+| 图标 | 内联 SVG（JS 里用 `js/ui/components/ui_icons.js` 的 `createUiIcon` / `setUiIcon`） | 16 / 20 px | 24 viewBox、`stroke-width: 1.6`、`currentColor`。不用 `<` `>` `-` `+` `v` `^` `▾` 等字符当图标 |
 | 输入框 / 选择框 | `.field` + `.input` / `.app-select-button` | — | 高 36（侧栏密集区 32），`--surface-raised` 底，`--line-1` 描边，聚焦时 `--accent` 描边 + 外环 |
 | 分段控件 / 标签页 | `.segmented` | `--tabs`（下划线式，用于一级标签） | 一级导航用下划线标签；同级筛选用分段控件；不再用胶囊按钮当标签 |
 | 折叠分组 | `<details class="disclosure">`；属性页内用 `<details class="appearance-mini-section">` | — | 标题行 32 px（属性页一级 40 px），右侧 SVG chevron（`--icon-chevron-right` 遮罩）展开时转 90°；箭头只反映自身状态（`details[open] > summary`） |
@@ -89,6 +112,25 @@
 | 图层行 | `.editor-layer-row` > `.editor-layer-trigger` + `.editor-layer-visibility` | `is-layer-off` | 图标 16 px + 名称 + 状态点（跟随属性页状态条 tone）+ 眼睛开关（代理属性页里的总开关复选框，不另建状态） |
 | 文件上传 | `.file-dropzone` | — | 整块可点、可拖入；原生 input 透明铺满，显示已选文件名 |
 | 命令面板 | `js/ui/command_palette.js` | — | Ctrl/Cmd+K 打开；只代理点击已有按钮，不复制业务逻辑；分组：图层 / 对象 / 工具 / 项目 |
+
+### 3.4 按钮与文本输入的尺寸和状态
+
+| | 默认 | `--sm`（侧栏密集区自动套用） | `--lg` / 触屏 |
+|---|---|---|---|
+| 按钮高度 | 36（`--control-md`） | 32（`--control-compact`） | 44（`(pointer: coarse)` 下所有按钮最小 44） |
+| 图标按钮 | 正方形，边长同高度，最小 `--hit-min` | 同左 | 同左 |
+| 文本输入高度 | 36 | 32 | 最小 44 |
+
+| 状态 | 主按钮 | 次按钮 | 危险按钮 | 文本输入 |
+|---|---|---|---|---|
+| 默认 | `--accent` 底、白字、600 | `--surface-raised` 底、`--line-1` 边、`--ink-900` 字 | 透明底、`--danger` 字、`--line-1` 边 | `--surface-raised` 底、`--line-1` 边 |
+| 悬停 | `--accent-hover` 底 | `--surface-sunken` 底、`--line-2` 边 | `--danger-soft` 底 | — |
+| 按下 | — | `--accent-soft` 底 | — | — |
+| 聚焦 | 2 px `--accent` outline，偏移 2 | 同左 | 同左 | `--accent` 边 + 3 px `--accent` outline |
+| 禁用 | `--surface-sunken` 底、`--ink-400` 字、`not-allowed` | 同左 | 同左 | 浏览器默认禁用外观 |
+
+
+### 3.5 通用状态
 
 状态：所有可交互元素必须有 hover、`:focus-visible`（2 px 实色 `--accent` outline，对纸面底 ≥ 3:1；不得 `outline: none` 而无替代，半透明色不能作为唯一焦点指示）、disabled（`--ink-400`、不可点）、selected（`--accent-soft` + `--accent` 文字）。
 
