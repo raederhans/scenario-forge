@@ -2,12 +2,8 @@ const path = require("path");
 
 const PROJECT_ROOT = path.resolve(__dirname, "..", "..", "..", "..");
 const CITY_RUNTIME_CONSOLE_SPECS = Object.freeze([
-  "tests/e2e/city_label_i18n_redraw.spec.js",
-  "tests/e2e/city_lights_layer_regression.spec.js",
-  "tests/e2e/city_marker_visibility_regression.spec.js",
   "tests/e2e/city_points_urban_runtime.spec.js",
   "tests/e2e/city_reveal_plan_regression.spec.js",
-  "tests/e2e/city_urban_rendering_regression.spec.js",
   "tests/e2e/river_layer_regression.spec.js",
 ]);
 
