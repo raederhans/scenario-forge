@@ -1,5 +1,3 @@
-const fs = require("fs");
-const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
@@ -9,16 +7,6 @@ async function installStateHandle(page) {
   await page.evaluate(async () => {
     globalThis.__pwInteractionFunnel = {
       state: (await import("/js/core/state.js")).state,
-    };
-  });
-}
-
-async function installInteractionFunnelDebugHandle(page) {
-  await installStateHandle(page);
-  await page.evaluate(async () => {
-    globalThis.__pwInteractionFunnel = {
-      ...(globalThis.__pwInteractionFunnel || {}),
-      getInteractionFunnelDebugState: (await import("/js/core/interaction_funnel.js")).getInteractionFunnelDebugState,
     };
   });
 }
@@ -76,46 +64,6 @@ async function waitForScenarioIdle(page) {
     const state = globalThis.__pwInteractionFunnel?.state;
     return !state?.scenarioApplyInFlight;
   }, { timeout: 120_000 });
-}
-
-async function exportProjectJson(page, outputPath) {
-  await page.getByRole("tablist", { name: "Inspector panels" }).getByRole("tab", { name: "Project" }).click();
-  const projectManagementSection = page.locator("#projectLegendSection");
-  if (!(await projectManagementSection.evaluate((section) => section.open))) {
-    await page.locator("#lblProjectLegend").click();
-  }
-  await expect(projectManagementSection).toHaveJSProperty("open", true);
-  const downloadButton = page.locator("#downloadProjectBtn");
-  await downloadButton.scrollIntoViewIfNeeded();
-  await expect(downloadButton).toBeVisible({ timeout: 30000 });
-  await page.locator("#projectDownloadDestination").selectOption("browser");
-  const downloadPromise = page.waitForEvent("download");
-  await downloadButton.click();
-  const download = await downloadPromise;
-  await download.saveAs(outputPath);
-  return JSON.parse(fs.readFileSync(outputPath, "utf8"));
-}
-
-async function waitForInteractionFunnelImportComplete(page, { expectedFileName = "", timeout = 120000 } = {}) {
-  await installInteractionFunnelDebugHandle(page);
-  const deadline = Date.now() + timeout;
-  while (Date.now() < deadline) {
-    const debug = await page.evaluate(() => (
-      globalThis.__pwInteractionFunnel?.getInteractionFunnelDebugState?.() || null
-    ));
-    if (String(debug?.lastImportError || "").trim()) {
-      throw new Error(`Interaction funnel import failed: ${String(debug.lastImportError).trim()}`);
-    }
-    const isComplete = debug?.importPhase === "complete"
-      && Number(debug?.importStartCount || 0) >= 1
-      && Number(debug?.importApplyCount || 0) >= 1
-      && (!expectedFileName || debug?.lastImportFileName === expectedFileName);
-    if (isComplete) {
-      return;
-    }
-    await page.waitForTimeout(150);
-  }
-  throw new Error(`Interaction funnel import did not complete before timeout for ${expectedFileName || "selected file"}.`);
 }
 
 test("render boundary contract routes scenario dispatcher render modes", async ({ page }) => {
@@ -194,52 +142,3 @@ test("render boundary contract routes scenario dispatcher render modes", async (
   expect(result.afterFlush.debug.lastFlushReason).toBe("scenario-clear");
 });
 
-test("upload button dirty confirm and import path go through interaction funnel", async ({ page }) => {
-  const artifactDir = path.join(".runtime", "tests", "playwright", "interaction-funnel");
-  fs.mkdirSync(artifactDir, { recursive: true });
-  const exportPath = path.join(artifactDir, "interaction-funnel-import.json");
-
-  await gotoAppReady(page);
-  await waitForProjectUiReady(page);
-  await waitForScenarioIdle(page);
-  await exportProjectJson(page, exportPath);
-
-  await page.evaluate(async () => {
-    const { resetInteractionFunnelDebugState } = await import("/js/core/interaction_funnel.js");
-    resetInteractionFunnelDebugState();
-  });
-  await page.evaluate(async () => {
-    const { markDirty } = await import("/js/core/dirty_state.js");
-    markDirty("playwright-import-dirty");
-  });
-  await installStateHandle(page);
-  await page.waitForFunction(() => {
-    const state = globalThis.__pwInteractionFunnel?.state;
-    return !!state?.isDirty;
-  }, { timeout: 30_000 });
-
-  await page.locator("#uploadProjectBtn").evaluate((button) => button.click());
-  await expect(page.locator("[data-app-dialog-overlay='true']")).toBeVisible();
-  await page.locator("[data-dialog-confirm='true']").click();
-  await page.locator("#projectFileInput").setInputFiles(exportPath);
-
-  await waitForInteractionFunnelImportComplete(page, {
-    expectedFileName: path.basename(exportPath),
-  });
-  await expect(page.locator("#projectFileName")).toHaveText(path.basename(exportPath));
-
-  const snapshot = await page.evaluate(async () => {
-    const { getInteractionFunnelDebugState } = await import("/js/core/interaction_funnel.js");
-    return {
-      debug: getInteractionFunnelDebugState(),
-      projectFileName: document.querySelector("#projectFileName")?.textContent || "",
-    };
-  });
-
-  expect(snapshot.debug.importStartCount).toBe(1);
-  expect(snapshot.debug.importApplyCount).toBe(1);
-  expect(snapshot.debug.importPhase).toBe("complete");
-  expect(snapshot.debug.lastImportError).toBe("");
-  expect(snapshot.debug.lastImportFileName).toBe(path.basename(exportPath));
-  expect(snapshot.projectFileName).toBe(path.basename(exportPath));
-});

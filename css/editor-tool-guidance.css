@@ -1,3 +1,4 @@
+@layer overrides {
 .editor-tool-tooltip {
   position: fixed;
   z-index: calc(var(--z-toast) + 80);
@@ -16,3 +17,4 @@
 .editor-tool-tooltip[hidden], .editor-brush-pan-hint[hidden] { display: none; }
 .editor-tool-tooltip kbd { border: 1px solid color-mix(in srgb, var(--surface-raised) 33%, transparent); border-radius: var(--radius-xs); padding: 0 5px; font: inherit; }
 .editor-brush-pan-hint { flex: 0 0 100%; box-sizing: border-box; margin: 0; padding: 0 4px 2px; color: var(--text-secondary); font-size: var(--fs-xs); line-height: 1.5; text-align: center; }
+} /* end @layer overrides */

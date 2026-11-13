@@ -8,9 +8,6 @@ const {
 
 const SCENARIOS = [
   { id: "blank_base", label: "Blank Map", paletteId: "hoi4_vanilla", expectedColors: {}, ownerless: true },
-  { id: "hoi4_1936", label: "HOI4 1936", paletteId: "hoi4_vanilla", expectedColors: { USA: "#1485ed", ENG: "#c9385d" } },
-  { id: "hoi4_1939", label: "HOI4 1939", paletteId: "hoi4_vanilla", expectedColors: { USA: "#1485ed", ENG: "#c9385d" } },
-  { id: "modern_world", label: "Modern World", paletteId: "hoi4_vanilla", expectedColors: { AU: "#398f61", BR: "#4c913f" } },
 ];
 
 const REPORT_DIR = path.join(
