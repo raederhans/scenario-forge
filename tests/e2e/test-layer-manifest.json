@@ -3,6 +3,13 @@
   "scope": "tests/e2e/*.spec.js",
   "specs": [
     {
+      "specPath": "tests/e2e/map_drag_release.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "rendering",
+      "ownerHint": "renderer"
+    },
+    {
       "specPath": "tests/e2e/releasable_territory.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",
