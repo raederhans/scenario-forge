@@ -15,7 +15,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_JSON = REPO_ROOT / "package.json"
 PACKAGE_LOCK = REPO_ROOT / "package-lock.json"
 WORKFLOW_FILE = REPO_ROOT / ".github" / "workflows" / "perf-pr-gate.yml"
-MEASUREMENT_WORKFLOW_FILE = REPO_ROOT / ".github" / "workflows" / "perf-measure.yml"
 BASELINE_MD = REPO_ROOT / "docs" / "perf" / "baseline_2026-07-30.md"
 BASELINE_JSON = REPO_ROOT / "docs" / "perf" / "baseline_2026-07-30.json"
 BASELINE_RATIFICATION = REPO_ROOT / "docs" / "perf" / "baseline_2026-07-30-ratification.json"
