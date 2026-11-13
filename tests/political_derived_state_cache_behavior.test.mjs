@@ -135,11 +135,10 @@ test("renderer full color rebuild refreshes its matching derived baseline", () =
     replaceResolvedColorsState, bumpColorRevision,
     getPoliticalDerivedStateIdentity: () => identity,
     getCountryFillPaletteOwner: () => ({ invalidate() {} }),
-    getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
-    getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
+    notifyPaintContourColorsChanged() {},
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
     invalidateRenderPasses() {}, getPhysicalInputInvalidationPasses: passes => passes, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
-  }, ["notifyPaintContourColorsChanged"]);
+  });
   const rebuilt = rebuild();
   assert.equal(state.colors, rebuilt);
   assert.equal(state.colorRevision, 9);
@@ -167,11 +166,10 @@ test("renderer empty or fallback color sources cannot certify a derived baseline
       replaceResolvedColorsState, bumpColorRevision,
       getPoliticalDerivedStateIdentity: () => ["scene"],
       getCountryFillPaletteOwner: () => ({ invalidate() {} }),
-      getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
-      getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
+      notifyPaintContourColorsChanged() {},
       retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
       invalidateRenderPasses() {}, getPhysicalInputInvalidationPasses: passes => passes, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
-    }, ["notifyPaintContourColorsChanged"]);
+    });
     rebuild();
     assert.equal(refreshes, 0, fallback ? "fallback land source" : "empty source");
   }
@@ -193,12 +191,11 @@ test("identical color rebuilds retain the palette identity while real additions,
     getResolvedFeatureColor: (_feature, id) => resolved[id], replaceResolvedColorsState, bumpColorRevision,
     politicalDerivedStateCache: { refreshColors: value => refreshes.push(value) },
     getPoliticalDerivedStateIdentity: () => ["scene"], getCountryFillPaletteOwner: () => ({ invalidate() {} }),
-    getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
-    getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
+    notifyPaintContourColorsChanged() {},
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
     invalidateRenderPasses: passes => invalidations.push([...passes]), getPhysicalInputInvalidationPasses: passes => passes,
     recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
-  }, ["notifyPaintContourColorsChanged"]);
+  });
   assert.equal(rebuild(), originalColors, "normalization must not replace an identical resolved palette");
   assert.equal(state.colorRevision, 8);
   assert.equal(invalidations.flat().includes("political"), false);
