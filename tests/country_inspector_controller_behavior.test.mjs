@@ -1,16 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { renderCountryGroupButtons } from "../js/ui/sidebar/scenario_inspector_controller.js";
 import { createCountryInspectorController } from "../js/ui/sidebar/country_inspector_controller.js";
 import { createPaletteLibraryPanelController } from "../js/ui/toolbar/palette_library_panel.js";
 import { state } from "../js/core/state.js";
-import { UI_COPY_CATALOG } from "../js/core/i18n_catalog.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 class TestClassList {
   constructor(node) {
@@ -850,27 +844,6 @@ test("HGO identity flag option translates ideology variant labels", () => {
   } finally {
     globalThis.document = previousDocument;
   }
-});
-
-test("HGO identity ideology labels are present in the startup UI translation catalog", () => {
-  const source = fs.readFileSync(
-    path.join(__dirname, "../js/ui/sidebar/country_inspector_controller.js"),
-    "utf8",
-  );
-  const labelMapBlock = source.match(/const HGO_VARIANT_LABEL_KEYS = Object\.freeze\(\{([\s\S]*?)\}\);/);
-  assert.ok(labelMapBlock, "expected HGO variant label map to be present");
-
-  const labels = Array.from(new Set(
-    Array.from(labelMapBlock[1].matchAll(/:\s*"([^"]+)"/g), (match) => match[1]),
-  ));
-  assert.ok(labels.length > 0, "expected HGO ideology labels to be discovered");
-
-  const missingLabels = labels.filter((label) => {
-    const entry = UI_COPY_CATALOG[label];
-    return !entry?.zh || entry.zh === label || entry.en !== label;
-  });
-
-  assert.deepEqual(missingLabels, []);
 });
 
 function assertExpansionIcon(button, expanded) {

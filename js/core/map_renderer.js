@@ -1,3 +1,4 @@
+import { createIndexUiRefreshScheduler } from "./renderer/index_ui_refresh_scheduler.js";
 import { buildScenarioProjectMarkerEntries, drawScenarioProjectMarkers, hasVisibleScenarioProjectMarkers } from "./renderer/scenario_project_markers.js";
 import { resolveAtlantropaSeaFillColor } from "./scenario/atlantropa_sea_color.js";
 import { resolveInspectorDrillStep, resolveInspectorStepUp } from "./inspector_drilldown.js";
@@ -9,9 +10,9 @@ import { createPhysicalViewportCacheOwner } from "./renderer/physical_viewport_c
 import { planPhysicalViewportSurface } from "./renderer/physical_raster_surface.js";
 import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
 import { analyzeScenarioPoliticalDerivedStateCoverageChunked } from "./renderer/scenario_chunk_promotion_helpers.js";
-import { getPoliticalDisplayLegend, getPoliticalDisplayModeSignature } from "./political_display_mode.js";
-import { getThematicWgiLegend, getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
-import { getPopulationLegend, getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
+import { getPoliticalDisplayModeSignature } from "./political_display_mode.js";
+import { getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
+import { getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
 import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./population_spatial_runtime.js";
 import { samplePopulationDensityLonLat } from "./population_spatial_data.js";
 import { createPopulationHeatmapRenderOwner, getPopulationViewportDetailTileIds } from "./renderer/population_heatmap_render_owner.js";
@@ -78,7 +79,7 @@ import { createBrushInteractionSessionOwner } from "./renderer/brush_interaction
 import { createPhysicalIntensityPreviewOwner } from "./renderer/physical_intensity_preview_owner.js";
 import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
 import { createScenarioRegionOverlayRenderOwner } from "./renderer/scenario_region_overlay_render_owner.js";
-import { chooseMarineFocusBounds, createMarineInteriorAnchorResolver, drawMarineLabels, getMarineLabelMinScale, isMarineLabelEligible, shouldShowMarineRegionNames } from "./renderer/marine_label_owner.js";
+import { chooseMarineFocusBounds, createMarineLabelOwner, shouldShowMarineRegionNames } from "./renderer/marine_label_owner.js";
 import {
   createUrbanAdaptivePaintModel,
   getUrbanFeatureOwnerId,
@@ -143,11 +144,7 @@ import {
   getUrbanFeatureStableId,
   getCityCapitalScore,
   getCitySortWeight,
-  getCityCountryTierFromScenarioRecord,
-  getCityCountryVisibilityClass,
   isCityScenarioTagExcludedFromReveal,
-  getCityCountryRevealOverride,
-  getFallbackCityCountryTier,
   getCityRevealPhase,
   getCityRevealPhaseInterpolation,
   getCityRevealBucket,
@@ -163,8 +160,6 @@ import {
   getCityMarkerSizePx,
   CITY_COUNTRY_TIER_RANK,
   CITY_COUNTRY_CLASS_RANK,
-  CITY_PRIMARY_POWER_TAGS,
-  CITY_SECONDARY_POWER_TAGS,
   CITY_MARKER_SIZE_LIMITS_PX,
 } from "./renderer/city_reveal_policy.js";
 import {
@@ -250,12 +245,10 @@ import {
   isPoliticalRasterWorkerBitmapEnabled,
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
-import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
-import { createDeferredPanelRender } from "./deferred_panel_render.js";
 import { createSourceMetricsCache } from "./renderer/source_metrics_cache.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
-import { createLegendControlOwner } from "./renderer/legend_control_owner.js";
+import { createLegendRuntime } from "./renderer/legend_runtime.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import {
   getGeoFeatureDisplayLabel,
@@ -863,7 +856,6 @@ const getPixelRatioPolicy = lazyOwner(() => createPixelRatioPolicy({ runtimeStat
 let viewportReadModelOwner = null;
 const renderSnapshotOwner = createRenderSnapshotOwner();
 let rendererViewportUpdateOwner = null;
-let legendControlOwner = null;
 
 // --- owner 初始化区：getXxxOwner() 统一承载组装入口与依赖注入。 ---
 function markDevSelectionOverlayClean() {
@@ -919,28 +911,36 @@ const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   markInspectorClean: markInspectorOverlayClean,
 }));
 
-function getLegendControlOwner() {
-  if (legendControlOwner) return legendControlOwner;
-  const readLegendColors = createRevisionedLegendColorReader();
-  legendControlOwner = createLegendControlOwner({
-    getMapContainer: () => rendererSurfaceHost.getMapContainer(),
-    getViewportSize: () => ({ width: Number(runtimeState.width), height: Number(runtimeState.height) }),
-    getLanguage: () => String(runtimeState.currentLanguage || state.currentLanguage || ""),
-    getLegendModel: (uniqueColors, labels) => ({
-      colors: Array.isArray(uniqueColors) ? uniqueColors : readLegendColors(state),
-      specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
-      thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState) || getPoliticalDisplayLegend(runtimeState),
-      labelMap: labels || LegendManager.getLabels(state),
-    }),
-    getControlState: () => LegendManager.getControlState(state),
-    getControlLimits: () => LegendManager.getControlLimits(),
-    updateControlState: (patch) => LegendManager.updateControlState(state, patch),
-    toggleControlCollapsed: () => LegendManager.toggleControlCollapsed(state),
-    hideControl: () => LegendManager.hideControl(state),
-    clamp,
-  });
-  return legendControlOwner;
-}
+const {
+  cancelPendingIndexUiRefresh,
+  cancelPendingSidebarRefresh,
+  queueIndexUiRefresh,
+  refreshSpecialRegionSidebarRowsNow,
+  refreshWaterRegionSidebarRowsNow,
+  scheduleSidebarRefresh,
+} = createIndexUiRefreshScheduler({
+  runtimeState,
+  setTimeout: globalThis.setTimeout?.bind(globalThis),
+  clearTimeout: globalThis.clearTimeout?.bind(globalThis),
+  requestAnimationFrame: globalThis.requestAnimationFrame?.bind(globalThis),
+  cancelAnimationFrame: globalThis.cancelAnimationFrame?.bind(globalThis),
+  scheduleAfterPaint,
+  canonicalCountryCode,
+  collectCountryCodesForFeatureIds,
+  hasSelectedOrActiveCountryImpact,
+  notifyDevWorkspace,
+  recordUiRefreshMetric,
+  callRuntimeHook,
+  unwrapRuntimeHookResult,
+});
+
+const legendRuntime = createLegendRuntime({
+  state,
+  runtimeState,
+  getMapContainer: () => rendererSurfaceHost.getMapContainer(),
+  clamp,
+});
+export const renderLegend = legendRuntime.renderLegend;
 
 const getRendererSurfaceLifecycleOwner = lazyOwner(() => createRendererSurfaceLifecycleOwner({
   surfaceHost: rendererSurfaceHost,
@@ -1502,8 +1502,6 @@ const getUrbanCityPolicyOwner = lazyOwner(() => createUrbanCityPolicyOwner({
     getCityAnchor,
     getCityCanonicalId,
     getCityCapitalScore,
-    getCityCountryGroupKey,
-    getCityCountryProfileIndex,
     getCityEffectiveMinZoom,
     getCityFeatureAliases,
     getCityFeatureKey,
@@ -1996,6 +1994,24 @@ const getScenarioReliefOverlayRenderOwner = lazyOwner(() => createScenarioRelief
     nowMs,
     pathBoundsInScreen,
   },
+}));
+
+const getMarineLabelOwner = lazyOwner(() => createMarineLabelOwner({
+  state,
+  getContext: () => rendererSurfaceHost.getContext(),
+  getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+  getProjection: () => rendererSurfaceHost.getProjection(),
+  getD3: () => globalThis.d3,
+  isOpenOceanRenderable,
+  isWaterRegionRenderable,
+  getProjectedFeatureBounds,
+  projectedGeoBoundsInScreen,
+  collectSafeWaterRegionGeometryParts,
+  getScenarioWaterPartBounds: part => getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part),
+  getLabelPaintBounds: getTnoSceneLabelPaintBounds,
+  getGeoFeatureDisplayLabel,
+  recordRenderPerfMetric,
+  nowMs,
 }));
 
 const getCityLightsRenderOwner = lazyOwner(() => createCityLightsRenderOwner({
@@ -4156,7 +4172,6 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
 // --- 注释锚点：pass-through facade 章节 ---
 // --- 注释锚点：实际渲染实现（render implementation）章节 ---
 
-const cityCountryProfileCache = new WeakMap();
 const visibleFacilityHoverEntriesByFamily = {
   airport: [],
   port: [],
@@ -4171,12 +4186,6 @@ let facilityInfoCardCloseBtn = null;
 let facilityInfoCardMoreBtn = null;
 let facilityInfoCardExpanded = false;
 let facilityInfoCardAnchor = null;
-let pendingIndexUiRefreshHandle = null;
-let pendingIndexUiRefreshState = null;
-let deferredIndexUiRefreshHandle = null;
-let deferredIndexUiRefreshState = null;
-let pendingSidebarRefreshHandle = null;
-let pendingSidebarRefreshState = null;
 let secondarySpatialBuildHandle = null;
 let secondarySpatialPreparationVersion = 0;
 let pendingSecondarySpatialBuildReasons = new Set();
@@ -8010,7 +8019,7 @@ function ensureHybridLayers() {
   const svg = globalThis.d3.select(mapSvg);
 
   svg.select("g.legend-group").remove();
-  ensureLegendControlElement();
+  legendRuntime.ensureLegendControlElement();
 }
 
 function setCanvasSize({
@@ -8905,332 +8914,6 @@ function collectVisibleLandSpatialItems() {
 
 function rankCandidates(...args) {
   return getHitTestingOwner().rankCandidates(...args);
-}
-
-function cancelPendingIndexUiRefresh() {
-  if (deferredIndexUiRefreshHandle !== null && deferredIndexUiRefreshHandle !== undefined) {
-    if (typeof globalThis.cancelAnimationFrame === "function") {
-      globalThis.cancelAnimationFrame(deferredIndexUiRefreshHandle);
-    } else {
-      globalThis.clearTimeout(deferredIndexUiRefreshHandle);
-    }
-    deferredIndexUiRefreshHandle = null;
-  }
-  deferredIndexUiRefreshState = null;
-  if (pendingIndexUiRefreshHandle === null || pendingIndexUiRefreshHandle === undefined) {
-    pendingIndexUiRefreshState = null;
-    return;
-  }
-  globalThis.clearTimeout(pendingIndexUiRefreshHandle);
-  pendingIndexUiRefreshHandle = null;
-  pendingIndexUiRefreshState = null;
-}
-
-function flushPendingIndexUiRefresh() {
-  const pending = pendingIndexUiRefreshState;
-  pendingIndexUiRefreshHandle = null;
-  pendingIndexUiRefreshState = null;
-  if (!pending) return;
-  const refreshedScopes = [];
-  if (pending.renderCountryList && typeof runtimeState.renderCountryListFn === "function") {
-    runtimeState.renderCountryListFn();
-    refreshedScopes.push("country");
-  }
-  if (pending.renderCountryList && (runtimeState.styleConfig?.thematic?.enabled === true || runtimeState.styleConfig?.population?.enabled === true)) {
-    callRuntimeHook(runtimeState, "updateSpecialZoneEditorUIFn");
-  }
-  if (pending.renderWaterRegionList && typeof runtimeState.renderWaterRegionListFn === "function") {
-    runtimeState.renderWaterRegionListFn();
-    refreshedScopes.push("water");
-  }
-  if (pending.renderSpecialRegionList && typeof runtimeState.renderSpecialRegionListFn === "function") {
-    runtimeState.renderSpecialRegionListFn();
-    refreshedScopes.push("special");
-  }
-  if (pending.renderDevWorkspace) notifyDevWorkspace();
-  if (refreshedScopes.length) {
-    recordUiRefreshMetric("uiIndexFullRefresh", {
-      scope: refreshedScopes.length === 1 ? refreshedScopes[0] : "mixed",
-      refreshMode: "full",
-      fullRefreshReason: "full-index-rebuild",
-      refreshedScopes,
-    });
-  }
-}
-
-function scheduleIndexUiRefresh({
-  renderCountryList = false,
-  renderWaterRegionList = false,
-  renderSpecialRegionList = false,
-  renderDevWorkspace = false,
-} = {}) {
-  pendingIndexUiRefreshState = {
-    renderCountryList: !!(pendingIndexUiRefreshState?.renderCountryList || renderCountryList),
-    renderWaterRegionList: !!(pendingIndexUiRefreshState?.renderWaterRegionList || renderWaterRegionList),
-    renderSpecialRegionList: !!(pendingIndexUiRefreshState?.renderSpecialRegionList || renderSpecialRegionList),
-    renderDevWorkspace: !!(pendingIndexUiRefreshState?.renderDevWorkspace || renderDevWorkspace),
-  };
-  if (pendingIndexUiRefreshHandle !== null && pendingIndexUiRefreshHandle !== undefined) {
-    return;
-  }
-  const callback = () => {
-    if (pendingIndexUiRefreshHandle !== handle) return;
-    flushPendingIndexUiRefresh();
-  };
-  // Keep list/workspace work out of the map's animation-frame task.
-  const handle = globalThis.setTimeout(callback, 0);
-  pendingIndexUiRefreshHandle = handle;
-}
-
-function flushDeferredIndexUiRefresh() {
-  const pending = deferredIndexUiRefreshState;
-  deferredIndexUiRefreshHandle = null;
-  deferredIndexUiRefreshState = null;
-  if (!pending) return;
-  scheduleIndexUiRefresh(pending);
-}
-
-function scheduleIndexUiRefreshAfterCoarseFrame({
-  renderCountryList = false,
-  renderWaterRegionList = false,
-  renderSpecialRegionList = false,
-  renderDevWorkspace = false,
-} = {}) {
-  deferredIndexUiRefreshState = {
-    renderCountryList: !!(deferredIndexUiRefreshState?.renderCountryList || renderCountryList),
-    renderWaterRegionList: !!(deferredIndexUiRefreshState?.renderWaterRegionList || renderWaterRegionList),
-    renderSpecialRegionList: !!(deferredIndexUiRefreshState?.renderSpecialRegionList || renderSpecialRegionList),
-    renderDevWorkspace: !!(deferredIndexUiRefreshState?.renderDevWorkspace || renderDevWorkspace),
-  };
-  if (deferredIndexUiRefreshHandle !== null && deferredIndexUiRefreshHandle !== undefined) {
-    return;
-  }
-  const callback = () => {
-    if (deferredIndexUiRefreshHandle !== handle) return;
-    flushDeferredIndexUiRefresh();
-  };
-  const handle = typeof globalThis.requestAnimationFrame === "function"
-    ? globalThis.requestAnimationFrame(callback)
-    : globalThis.setTimeout(callback, 0);
-  deferredIndexUiRefreshHandle = handle;
-}
-
-function queueIndexUiRefresh(
-  refreshOptions,
-  scheduleUiMode = "immediate",
-) {
-  if (scheduleUiMode === "none") {
-    return;
-  }
-  if (scheduleUiMode === "deferred") {
-    scheduleIndexUiRefreshAfterCoarseFrame(refreshOptions);
-    return;
-  }
-  scheduleIndexUiRefresh(refreshOptions);
-}
-
-function normalizeSidebarRefreshIds(values) {
-  return Array.isArray(values)
-    ? values.map((value) => String(value || "").trim()).filter(Boolean)
-    : [];
-}
-
-function normalizeSidebarRefreshOwnerCodes(values) {
-  return Array.isArray(values)
-    ? values.map((value) => canonicalCountryCode(value)).filter(Boolean)
-    : [];
-}
-
-function refreshWaterRegionSidebarRowsNow(regionIds = [], { refreshInspector = true } = {}) {
-  const changedIds = normalizeSidebarRefreshIds(regionIds);
-  if (changedIds.length && typeof runtimeState.refreshWaterRegionListRowsFn === "function") {
-    const result = unwrapRuntimeHookResult(runtimeState.refreshWaterRegionListRowsFn({
-      regionIds: changedIds,
-      refreshInspector,
-    }));
-    const refreshMode = result?.refreshMode === "full" ? "full" : "row";
-    recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
-      scope: "water",
-      changedIds,
-      refreshMode,
-      fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
-      refreshInspector,
-    });
-    return;
-  }
-  if (typeof runtimeState.renderWaterRegionListFn === "function") {
-    runtimeState.renderWaterRegionListFn();
-    recordUiRefreshMetric("uiSidebarFullRefresh", {
-      scope: "water",
-      changedIds,
-      refreshMode: "full",
-      fullRefreshReason: changedIds.length ? "hook-unavailable" : "missing-changed-ids",
-    });
-  }
-}
-
-function refreshSpecialRegionSidebarRowsNow(regionIds = [], { refreshInspector = true } = {}) {
-  const changedIds = normalizeSidebarRefreshIds(regionIds);
-  if (changedIds.length && typeof runtimeState.refreshSpecialRegionListRowsFn === "function") {
-    const result = unwrapRuntimeHookResult(runtimeState.refreshSpecialRegionListRowsFn({
-      regionIds: changedIds,
-      refreshInspector,
-    }));
-    const refreshMode = result?.refreshMode === "full" ? "full" : "row";
-    recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
-      scope: "special",
-      changedIds,
-      refreshMode,
-      fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
-      refreshInspector,
-    });
-    return;
-  }
-  if (typeof runtimeState.renderSpecialRegionListFn === "function") {
-    runtimeState.renderSpecialRegionListFn();
-    recordUiRefreshMetric("uiSidebarFullRefresh", {
-      scope: "special",
-      changedIds,
-      refreshMode: "full",
-      fullRefreshReason: changedIds.length ? "hook-unavailable" : "missing-changed-ids",
-    });
-  }
-}
-
-function cancelPendingSidebarRefresh() {
-  if (pendingSidebarRefreshHandle === null || pendingSidebarRefreshHandle === undefined) {
-    pendingSidebarRefreshState = null;
-    return;
-  }
-  pendingSidebarRefreshHandle();
-  pendingSidebarRefreshHandle = null;
-  pendingSidebarRefreshState = null;
-}
-
-function flushPendingSidebarRefresh() {
-  const pending = pendingSidebarRefreshState;
-  pendingSidebarRefreshHandle = null;
-  pendingSidebarRefreshState = null;
-  if (!pending) return;
-  const countryCodes = Array.from(
-    new Set([
-      ...collectCountryCodesForFeatureIds(pending.featureIds),
-      ...pending.ownerCodes,
-    ])
-  );
-  const hasWaterRows = pending.waterRegionIds.length > 0;
-  const hasSpecialRows = pending.specialRegionIds.length > 0;
-  const hasCountryInspectorImpact = hasSelectedOrActiveCountryImpact(countryCodes);
-  const shouldRefreshPresetTree = !!pending.refreshPresetTree && hasCountryInspectorImpact;
-  if (hasWaterRows) {
-    if (typeof runtimeState.refreshWaterRegionListRowsFn === "function") {
-      const result = unwrapRuntimeHookResult(runtimeState.refreshWaterRegionListRowsFn({
-        regionIds: pending.waterRegionIds,
-        refreshInspector: true,
-      }));
-      const refreshMode = result?.refreshMode === "full" ? "full" : "row";
-      recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
-        scope: "water",
-        changedIds: pending.waterRegionIds.slice(),
-        refreshMode,
-        fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
-      });
-    } else if (typeof runtimeState.renderWaterRegionListFn === "function") {
-      runtimeState.renderWaterRegionListFn();
-      recordUiRefreshMetric("uiSidebarFullRefresh", {
-        scope: "water",
-        changedIds: pending.waterRegionIds.slice(),
-        refreshMode: "full",
-        fullRefreshReason: "hook-unavailable",
-      });
-    }
-  }
-  if (hasSpecialRows) {
-    if (typeof runtimeState.refreshSpecialRegionListRowsFn === "function") {
-      const result = unwrapRuntimeHookResult(runtimeState.refreshSpecialRegionListRowsFn({
-        regionIds: pending.specialRegionIds,
-        refreshInspector: true,
-      }));
-      const refreshMode = result?.refreshMode === "full" ? "full" : "row";
-      recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
-        scope: "special",
-        changedIds: pending.specialRegionIds.slice(),
-        refreshMode,
-        fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
-      });
-    } else if (typeof runtimeState.renderSpecialRegionListFn === "function") {
-      runtimeState.renderSpecialRegionListFn();
-      recordUiRefreshMetric("uiSidebarFullRefresh", {
-        scope: "special",
-        changedIds: pending.specialRegionIds.slice(),
-        refreshMode: "full",
-        fullRefreshReason: "hook-unavailable",
-      });
-    }
-  }
-  if (typeof runtimeState.refreshCountryListRowsFn === "function") {
-    runtimeState.refreshCountryListRowsFn({
-      countryCodes,
-      refreshInspector: hasCountryInspectorImpact,
-      refreshPresetTree: shouldRefreshPresetTree,
-    });
-    if (countryCodes.length > 0 || shouldRefreshPresetTree) {
-      recordUiRefreshMetric("uiSidebarRowRefresh", {
-        scope: "country",
-        changedIds: countryCodes,
-        refreshMode: "row",
-        refreshInspector: hasCountryInspectorImpact,
-        refreshPresetTree: shouldRefreshPresetTree,
-      });
-    }
-    return;
-  }
-  if (typeof runtimeState.renderCountryListFn === "function" && (countryCodes.length > 0 || shouldRefreshPresetTree)) {
-    runtimeState.renderCountryListFn();
-    recordUiRefreshMetric("uiSidebarFullRefresh", {
-      scope: "country",
-      changedIds: countryCodes,
-      refreshMode: "full",
-      fullRefreshReason: "hook-unavailable",
-      refreshPresetTree: shouldRefreshPresetTree,
-    });
-  }
-  if (shouldRefreshPresetTree && typeof runtimeState.renderPresetTreeFn === "function") {
-    runtimeState.renderPresetTreeFn();
-  }
-}
-
-function scheduleSidebarRefresh({
-  featureIds = [],
-  waterRegionIds = [],
-  specialRegionIds = [],
-  ownerCodes = [],
-  refreshPresetTree = false,
-} = {}) {
-  pendingSidebarRefreshState = {
-    featureIds: Array.from(new Set([
-      ...(pendingSidebarRefreshState?.featureIds || []),
-      ...normalizeSidebarRefreshIds(featureIds),
-    ])),
-    waterRegionIds: Array.from(new Set([
-      ...(pendingSidebarRefreshState?.waterRegionIds || []),
-      ...normalizeSidebarRefreshIds(waterRegionIds),
-    ])),
-    specialRegionIds: Array.from(new Set([
-      ...(pendingSidebarRefreshState?.specialRegionIds || []),
-      ...normalizeSidebarRefreshIds(specialRegionIds),
-    ])),
-    ownerCodes: Array.from(new Set([
-      ...(pendingSidebarRefreshState?.ownerCodes || []),
-      ...normalizeSidebarRefreshOwnerCodes(ownerCodes),
-    ])),
-    refreshPresetTree: !!(pendingSidebarRefreshState?.refreshPresetTree || refreshPresetTree),
-  };
-  if (pendingSidebarRefreshHandle !== null && pendingSidebarRefreshHandle !== undefined) {
-    return;
-  }
-  // Row refreshes run after the paint click's frame is on screen.
-  pendingSidebarRefreshHandle = scheduleAfterPaint(flushPendingSidebarRefresh, { withoutFrame: "timer" });
 }
 
 function setInteractionInfrastructureState(
@@ -10848,107 +10531,6 @@ function composeCityLabelTextModel() {
 
 const { getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel } = composeCityLabelTextModel();
 
-function getCityCountryGroupKey(feature) {
-  const props = feature?.properties || {};
-  const scenarioTag = getUrbanCityPolicyOwner().getCityScenarioTag(feature);
-  if (scenarioTag) return `tag:${scenarioTag}`;
-  const countryCode = String(props.__city_country_code || props.country_code || "").trim().toUpperCase();
-  if (countryCode) return `cc:${countryCode}`;
-  const hostFeatureId = String(props.__city_host_feature_id || props.host_feature_id || "").trim();
-  if (hostFeatureId) return `host:${hostFeatureId}`;
-  return `city:${getCityCanonicalId(feature) || getCityFeatureKey(feature)}`;
-}
-
-function getScenarioFeaturedTagSet() {
-  return new Set(
-    Array.isArray(runtimeState.activeScenarioManifest?.featured_tags)
-      ? runtimeState.activeScenarioManifest.featured_tags
-        .map((value) => String(value || "").trim().toUpperCase())
-        .filter(Boolean)
-      : []
-  );
-}
-
-function getCityCountryProfileIndex(cityCollection) {
-  if (!cityCollection?.features?.length) {
-    return new Map();
-  }
-  const cached = cityCountryProfileCache.get(cityCollection);
-  if (cached) {
-    return cached;
-  }
-
-  const profiles = new Map();
-  cityCollection.features.forEach((feature) => {
-    const props = feature?.properties || {};
-    const groupKey = getCityCountryGroupKey(feature);
-    let profile = profiles.get(groupKey);
-    if (!profile) {
-      profile = {
-        groupKey,
-        scenarioTag: getUrbanCityPolicyOwner().getCityScenarioTag(feature),
-        countryCode: String(props.__city_country_code || props.country_code || "").trim().toUpperCase(),
-        featureCount: 0,
-        hasCapital: false,
-        hasCountryCapital: false,
-        maxPopulation: 0,
-        maxTierWeight: 0,
-        controllerFeatureCount: 0,
-        countryClass: "micro",
-        classWeightBias: 0,
-        minQuotaFloorBoost: 0,
-      };
-      profiles.set(groupKey, profile);
-    }
-    profile.featureCount += 1;
-    profile.hasCapital = profile.hasCapital || !!props.__city_is_capital;
-    profile.hasCountryCapital = profile.hasCountryCapital || !!props.__city_is_country_capital;
-    profile.maxPopulation = Math.max(profile.maxPopulation, Math.max(0, Number(props.__city_population || 0)));
-    profile.maxTierWeight = Math.max(profile.maxTierWeight, getCityTierWeight(feature));
-  });
-
-  const featuredTags = getScenarioFeaturedTagSet();
-  const defaultCountry = String(runtimeState.activeScenarioManifest?.default_country || "")
-    .trim()
-    .toUpperCase();
-  profiles.forEach((profile) => {
-    const record = profile.scenarioTag ? runtimeState.scenarioCountriesByTag?.[profile.scenarioTag] : null;
-    const revealOverride = getCityCountryRevealOverride(record);
-    const isDefaultCountry = !!profile.scenarioTag && profile.scenarioTag === defaultCountry;
-    const isFeaturedCountry = !!record?.featured || featuredTags.has(profile.scenarioTag);
-    const isPrimaryPower = CITY_PRIMARY_POWER_TAGS.has(profile.scenarioTag);
-    const isSecondaryPower = CITY_SECONDARY_POWER_TAGS.has(profile.scenarioTag);
-    profile.controllerFeatureCount = Math.max(
-      0,
-      Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? profile.featureCount ?? 0) || 0
-    );
-    profile.countryTier = getCityCountryTierFromScenarioRecord(profile, record, {
-      defaultCountry,
-      featuredTags,
-    }) || getFallbackCityCountryTier(profile);
-    profile.countryClass = revealOverride.className || getCityCountryVisibilityClass(profile, record, {
-      defaultCountry,
-      featuredTags,
-    });
-    profile.countryClassRank = CITY_COUNTRY_CLASS_RANK[profile.countryClass] || 0;
-    profile.classWeightBias = Number(revealOverride.classWeightBias || 0);
-    profile.minQuotaFloorBoost = Number(revealOverride.minQuotaFloorBoost || 0);
-    profile.countryTierRank = CITY_COUNTRY_TIER_RANK[profile.countryTier] || 0;
-    profile.isDefaultCountry = isDefaultCountry;
-    profile.isFeaturedCountry = isFeaturedCountry;
-    profile.isPrimaryPower = isPrimaryPower;
-    profile.isSecondaryPower = isSecondaryPower;
-    profile.isPriorityCountry = (
-      isDefaultCountry
-      || isPrimaryPower
-      || isSecondaryPower
-    );
-  });
-
-  cityCountryProfileCache.set(cityCollection, profiles);
-  return profiles;
-}
-
 function getCityInterpolatedRevealBucket(entry, scale) {
   const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
   const currentBucket = getCityRevealBucket(entry, currentPhase.id);
@@ -12170,7 +11752,7 @@ function drawLabelsPassContent(k, { interactive = false } = {}) {
   drawBlankFeatureLabelsPass(k, { interactive });
   const occupiedBoxes = [];
   if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
-    drawOrdinaryMarineLabels(k, occupiedBoxes);
+    getMarineLabelOwner().drawOrdinaryMarineLabels(k, occupiedBoxes);
   }
   // Keep capitals beside their symbols. Overview country titles take priority
   // over ordinary city names; regional views favor the whole city layer.
@@ -12315,97 +11897,6 @@ function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
     centerX: (minX + maxX) / 2,
     centerY: (minY + maxY) / 2,
   }, { animate, pinWorldTop: true });
-}
-
-const resolveMarineInteriorAnchor = createMarineInteriorAnchorResolver();
-let marineLabelProjectionGeneration = null;
-let marineLabelAnchorCache = new WeakMap();
-let marineLabelCentroidInteriorCache = new WeakMap();
-
-function drawOrdinaryMarineLabels(k, occupiedBoxes) {
-  if (!runtimeState.showWaterRegions || !runtimeState.waterRegionsById?.size) return;
-  const startedAt = nowMs();
-  const context = rendererSurfaceHost.getContext();
-  const path = rendererSurfaceHost.getPathCanvas();
-  if (!context || typeof path?.centroid !== "function") return;
-  const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
-  if (!transform) return;
-  const generation = getProjectionGeometryGeneration(rendererSurfaceHost.getProjection());
-  if (generation !== marineLabelProjectionGeneration) {
-    marineLabelProjectionGeneration = generation;
-    marineLabelAnchorCache = new WeakMap();
-    marineLabelCentroidInteriorCache = new WeakMap();
-  }
-  const selectedId = String(runtimeState.selectedWaterRegionId || "");
-  const entries = [];
-  for (const [id, feature] of runtimeState.waterRegionsById) {
-    const minScale = getMarineLabelMinScale(feature);
-    if (!isMarineLabelEligible(feature, {
-      showWaterRegions: runtimeState.showWaterRegions,
-      openOceanRenderable: isOpenOceanRenderable(),
-    }) || (k < minScale && id !== selectedId)
-      || !isWaterRegionRenderable(feature)) continue;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id });
-    if (!projectedGeoBoundsInScreen(bounds)) continue;
-    const parts = collectSafeWaterRegionGeometryParts(feature);
-    let selectedPart = null;
-    let selectedPartBounds = null;
-    let largestArea = -1;
-    for (const part of parts) {
-      const partBounds = getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part);
-      if (!projectedGeoBoundsInScreen(partBounds)) continue;
-      const area = Math.max(0, partBounds.maxX - partBounds.minX) * Math.max(0, partBounds.maxY - partBounds.minY);
-      if (area > largestArea) {
-        selectedPart = part;
-        selectedPartBounds = partBounds;
-        largestArea = area;
-      }
-    }
-    if (!selectedPart) continue;
-    let anchors = marineLabelAnchorCache.get(feature);
-    if (!anchors) {
-      anchors = new WeakMap();
-      marineLabelAnchorCache.set(feature, anchors);
-    }
-    let centroid = anchors.get(selectedPart);
-    if (!centroid) {
-      centroid = path.centroid(selectedPart);
-      if (Array.isArray(centroid) && centroid.every(Number.isFinite)) anchors.set(selectedPart, centroid);
-    }
-    const projection = rendererSurfaceHost.getProjection();
-    if (typeof projection?.invert !== "function" || !globalThis.d3?.geoContains) continue;
-    const anchor = resolveMarineInteriorAnchor({
-      part: selectedPart, generation, centroid, bounds: selectedPartBounds, transform,
-      width: runtimeState.width, height: runtimeState.height,
-      paintBounds: getTnoSceneLabelPaintBounds(),
-      gridSize: id === selectedId ? 5 : 3,
-      contains: (point) => {
-        if (point === centroid && marineLabelCentroidInteriorCache.has(selectedPart)) {
-          return marineLabelCentroidInteriorCache.get(selectedPart);
-        }
-        const lonLat = projection.invert(point);
-        const isInside = Array.isArray(lonLat) && lonLat.every(Number.isFinite)
-          && globalThis.d3.geoContains(selectedPart, lonLat);
-        if (point === centroid) marineLabelCentroidInteriorCache.set(selectedPart, isInside);
-        return isInside;
-      },
-    });
-    if (!anchor) continue;
-    const screenPoint = [anchor[0] * transform.k + transform.x, anchor[1] * transform.k + transform.y];
-    entries.push({ id, feature, label: getGeoFeatureDisplayLabel(feature), anchor, screenPoint, area: largestArea });
-  }
-  let selectedDrawn = false;
-  const drawnCount = drawMarineLabels(entries, {
-    context, scale: k, width: runtimeState.width, height: runtimeState.height,
-    paintBounds: getTnoSceneLabelPaintBounds(),
-    language: runtimeState.currentLanguage, selectedId, occupiedBoxes,
-    onPlaced: (entry) => { if (entry.id === selectedId) selectedDrawn = true; },
-  });
-  recordRenderPerfMetric("drawMarineLabels", nowMs() - startedAt, {
-    candidateCount: entries.length,
-    drawnCount,
-    selectedVisible: selectedDrawn,
-  });
 }
 
 function renderPassToCache(passName, drawFn, transform, timings) {
@@ -13450,30 +12941,6 @@ function renderInspectorHighlightOverlay() {
   return getSelectionOverlayOwner().renderInspectorHighlightOverlay();
 }
 
-function ensureLegendControlElement() {
-  return getLegendControlOwner().ensureLegendControlElement();
-}
-
-export function renderLegend(uniqueColors = null, labels = null) {
-  return getLegendControlOwner().renderLegend(uniqueColors, labels);
-}
-
-// Both legends rescan every painted color after a color change, and the map legend
-// reads its own layout to place itself. Idle render passes refresh them after paint,
-// so a paint click's frame does not pay for it.
-let deferredLegendRender = null;
-function requestLegendRender() {
-  deferredLegendRender ||= createDeferredPanelRender({
-    render: () => {
-      renderLegend();
-      if (typeof runtimeState.updateLegendUI === "function") {
-        runtimeState.updateLegendUI();
-      }
-    },
-  });
-  deferredLegendRender.request();
-}
-
 function ensurePerfOverlayElement() {
   const cache = getRenderPassCacheState();
   if (!cache.perfOverlayEnabled || !rendererSurfaceHost.getMapContainer()) return null;
@@ -13628,7 +13095,7 @@ function render() {
   renderInspectorHighlightOverlayIfNeeded();
   renderHoverOverlayIfNeeded({ eventType: "render-frame" });
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
-    requestLegendRender();
+    legendRuntime.requestLegendRender();
   }
   updatePerfOverlay();
   if (startedAt > 0) {
@@ -15038,7 +14505,7 @@ function initMap({
   facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   runtimeState.refreshColorStateFn = refreshColorState;
   runtimeState.clearInspectorLandSelectionFn = clearInspectorLandSelection;
-  runtimeState.stepUpInspectorSelectionFn = stepUpInspectorSelection;
+  registerRuntimeHook(runtimeState, "stepUpInspectorSelectionFn", stepUpInspectorSelection);
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);
 

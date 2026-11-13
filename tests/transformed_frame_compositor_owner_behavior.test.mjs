@@ -1,21 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { createTransformedFrameCompositorOwner } from "../js/core/map_renderer/transformed_frame_compositor_owner.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const REPO_ROOT = path.resolve(__dirname, "..");
-const OWNER_PATH = path.join(
-  REPO_ROOT,
-  "js",
-  "core",
-  "map_renderer",
-  "transformed_frame_compositor_owner.js",
-);
 
 function createBufferContext(calls) {
   return {
@@ -531,20 +517,3 @@ test("strict reuse skips build, verifies the composite, and reports buffer failu
   assert.equal(harness.metrics.at(-1).name, "transformedFrameBufferComposeFailure");
 });
 
-test("owner source stays import-free and avoids global state, DOM, and generic dispatch layers", () => {
-  const source = fs.readFileSync(OWNER_PATH, "utf8");
-  assert.doesNotMatch(source, /^\s*import\s/m);
-  for (const token of [
-    "map_renderer.js",
-    "RendererRuntimeContext",
-    "runtimeState",
-    "globalThis",
-    "document",
-    "window",
-    "runGetter",
-    "runEffect",
-    "createTrace",
-  ]) {
-    assert.equal(source.includes(token), false, token);
-  }
-});

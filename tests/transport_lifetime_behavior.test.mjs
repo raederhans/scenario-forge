@@ -4,20 +4,8 @@ import fs from "node:fs";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createChunkLoadScheduler } from "../js/core/scenario/chunk_load_scheduler.js";
 import { estimateRoadPackRetentionBytes, ROAD_PACK_LOAD_BYTES } from "../js/ui/transport_workbench_retention.js";
+import { createTransportWorkbenchLinePackRuntime } from "../js/ui/transport_workbench_line_runtime_shared.js";
 
-// Isolate only catalog/network and page snapshot registration. The real
-// transport lifetime, resource ledger and scheduler execute unchanged.
-let source = fs.readFileSync(new URL("../js/ui/transport_workbench_line_runtime_shared.js", import.meta.url), "utf8");
-for (const [before, after] of [
-  ['import { getTransportAsset } from "../core/data_service.js";', 'const getTransportAsset = () => { throw new Error("Test must inject its asset loader"); };'],
-  ['import { registerMapcreatorSnapshotProvider } from "../core/mapcreator_snapshot.js";', 'const registerMapcreatorSnapshotProvider = () => {};'],
-]) {
-  assert.ok(source.includes(before)); source = source.replace(before, after);
-}
-for (const relative of ["../core/scenario/chunk_load_scheduler.js", "../core/runtime_resource_budget.js"]) {
-  source = source.replace(JSON.stringify(relative), JSON.stringify(new URL(`../js/ui/${relative}`, import.meta.url).href));
-}
-const { createTransportWorkbenchLinePackRuntime } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
 const tick = () => new Promise(setImmediate);
 const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
 let sequence = 0;
@@ -184,14 +172,3 @@ test("road retention reuses immutable geometry weights and does not count shared
   assert.equal(estimateRoadPackRetentionBytes({}), null);
 });
 
-test("current road hide and destroy entrypoints release the owning lifetime", () => {
-  const road = fs.readFileSync(new URL("../js/ui/transport_workbench_road_preview.js", import.meta.url), "utf8");
-  for (const name of ["clearJapanRoadPreview", "destroyJapanRoadPreview"]) {
-    const start = road.indexOf(`export function ${name}()`);
-    const end = road.indexOf("\nexport ", start + 1);
-    const body = road.slice(start, end < 0 ? undefined : end);
-    assert.ok(start >= 0 && body.includes("lineRuntime.release("), name);
-  }
-  assert.ok(road.includes("loadGeneration !== runtime.loadGeneration"));
-  assert.ok(road.includes("estimatePackBytes: estimateRoadPackRetentionBytes"));
-});

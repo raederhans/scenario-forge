@@ -1,4 +1,5 @@
 import { createVisibleFrameIdentityPolicy } from "../../js/core/renderer/visible_frame_identity_policy.js";
+import { createPoliticalFeaturePolicy } from "../../js/core/renderer/political_feature_policy.js";
 import {
   normalizeScenarioFeatureCollection,
   getScenarioFeatureCollectionIdentityList,
@@ -139,13 +140,6 @@ function createInitialVisualRegistryContinuationHarness({
     resolveRegistry: () => registryReady.resolve(),
     getSelectionCalls: () => selectionCalls,
   };
-}
-
-function sliceBetween(source, startMarker, endMarker) {
-  const start = source.indexOf(startMarker);
-  if (start < 0) return "";
-  const end = source.indexOf(endMarker, start + startMarker.length);
-  return end < 0 ? source.slice(start) : source.slice(start, end);
 }
 
 function loadVendorD3() {
@@ -422,162 +416,43 @@ function getCoordinateBounds(coordinates, bounds = {
   return bounds;
 }
 
-function extractRendererFunction(source, functionName) {
-  const startToken = `function ${functionName}`;
-  const start = source.indexOf(startToken);
-  assert.notEqual(start, -1, `${functionName} must exist`);
-  const parametersStart = source.indexOf("(", start + startToken.length);
-  assert.notEqual(parametersStart, -1, `${functionName} must have parameters`);
-  let parameterDepth = 0;
-  let parametersEnd = -1;
-  for (let index = parametersStart; index < source.length; index += 1) {
-    const char = source[index];
-    if (char === "(") parameterDepth += 1;
-    if (char === ")") {
-      parameterDepth -= 1;
-      if (parameterDepth === 0) {
-        parametersEnd = index;
-        break;
-      }
-    }
-  }
-  assert.notEqual(parametersEnd, -1, `${functionName} parameters must close`);
-  const bodyStart = source.indexOf("{", parametersEnd);
-  assert.notEqual(bodyStart, -1, `${functionName} must have a body`);
-  let depth = 0;
-  for (let index = bodyStart; index < source.length; index += 1) {
-    const char = source[index];
-    if (char === "{") depth += 1;
-    if (char === "}") {
-      depth -= 1;
-      if (depth === 0) {
-        return source.slice(start, index + 1);
-      }
-    }
-  }
-  assert.fail(`${functionName} body must close`);
-}
-
-function extractRendererPassSignatureBranch(source, passName) {
-  const marker = `if (passName === "${passName}") {`;
-  const start = source.indexOf(marker);
-  assert.notEqual(start, -1, `${passName} signature branch must exist`);
-  const next = source.indexOf("\n  if (passName ===", start + marker.length);
-  assert.notEqual(next, -1, `${passName} signature branch must end before the next pass branch`);
-  return source.slice(start, next);
-}
-
-function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerSource) {
-  const politicalPolicySource = readRepoFile("js", "core", "renderer", "political_feature_policy.js")
-    .replace(/^  /gm, "");
-  const functionNames = [
-    "isScenarioShellFeature",
-    "isRuntimeOnlyShellFallbackPoliticalFeature",
-    "isPoliticalShellUnderlayFeature",
-    "isPoliticalPrimaryUnderlayFeature",
-    "isPoliticalUnderlayFeature",
-    "hasPoliticalForegroundColorOverride",
-    "isPendingPoliticalColorEditFeature",
-    "isPoliticalForegroundFeature",
-    "getStableDrawOrderCache",
-    "getStablePoliticalDrawRank",
-    "orderPoliticalShellUnderlayFirst",
-    "shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature",
-    "isBaseGeographyScenarioFeature",
-    "isPoliticalVisualRenderableFeature",
-    "isPoliticalInteractionRenderableFeature",
-    "getRuntimePoliticalBaseCollection",
-  ];
-  const partialFillSource = extractRendererFunction(politicalPartialOwnerSource, "getPoliticalFeatureFillColor");
-  const source = `
-    const runtimeState = {
-      mapSemanticMode: "ownership",
-      activeScenarioId: "test",
-      colorRevision: 1,
-      colors: {},
-      visualOverrides: {},
-      renderPassCache: {
-        pendingPoliticalColorEditIds: new Set(),
-        pendingPoliticalColorEditRevision: 1,
-        pendingPoliticalColorEditScenarioId: "test",
-      },
-    };
-    const getFeatureId = (feature) => String(feature?.properties?.id || feature?.id || "").trim();
-    let stableDrawOrderCache = null;
-    let stablePaintOrderEnabled = false;
-    const isStablePaintOrderEnabled = () => stablePaintOrderEnabled;
-    const getSafeCanvasColor = (value, fallback = null) => (typeof value === "string" && value.trim() ? value : fallback);
-    const debugMode = "PROD";
-    const LAND_FILL_COLOR = "#f0f0f0";
-    const isAtlantropaSeaFeature = () => false;
-    const getAtlantropaSeaPoliticalFillColor = () => "#123456";
-    const getResolvedFeatureColor = (feature, id) => (
-      runtimeState.visualOverrides?.[id]
-      || feature?.properties?.fill
-      || ""
-    );
-    const getRenderPassCacheState = () => runtimeState.renderPassCache;
-    const getRuntimeState = () => runtimeState;
-    const getDebugMode = () => debugMode;
-    const landFillColor = LAND_FILL_COLOR;
-    const surface = { getPathCanvas: () => ({ bounds: () => [[0, 0], [1, 1]] }) };
-    const helper = {
-      isAtlantropaSeaFeature,
-      getAtlantropaSeaPoliticalFillColor,
-      getSafeCanvasColor,
-      getResolvedFeatureColor,
-      hashToColor: () => "#abcdef",
-    };
-    function hasPendingPoliticalColorEdit() {
-      const cache = getRenderPassCacheState();
-      return cache.pendingPoliticalColorEditIds instanceof Set
-        && cache.pendingPoliticalColorEditIds.size > 0
-        && String(cache.pendingPoliticalColorEditScenarioId || "") === String(runtimeState.activeScenarioId || "")
-        && Number(cache.pendingPoliticalColorEditRevision ?? -1) === Number(runtimeState.colorRevision || 0);
-    }
-    const isAtlantropaFieldDrivenFeature = () => false;
-    const isScenarioAtlantropaVisible = () => true;
-    const isAntarcticSectorFeature = () => false;
-    const isAtlantropaVisualSupportHelperFeature = () => false;
-    const isAtlantropaSupportHelperFeature = () => false;
-    ${functionNames.map((name) => extractRendererFunction(
-      politicalPolicySource.includes(`function ${name}(`) ? politicalPolicySource : rendererSource,
-      name,
-    )).join("\n")}
-    ${partialFillSource}
-    globalThis.__shellPolicyHarness = {
-      isScenarioShellFeature,
-      isRuntimeOnlyShellFallbackPoliticalFeature,
-      isPoliticalShellUnderlayFeature,
-      isPoliticalPrimaryUnderlayFeature,
-      isPoliticalUnderlayFeature,
-      hasPoliticalForegroundColorOverride,
-      isPendingPoliticalColorEditFeature,
-      isPoliticalForegroundFeature,
-      orderPoliticalShellUnderlayFirst,
-      getStablePoliticalDrawRank,
-      shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature,
-      isPoliticalVisualRenderableFeature,
-      isPoliticalInteractionRenderableFeature,
-      getRuntimePoliticalBaseCollection,
-      getPoliticalFeatureFillColor,
-      setColors: (value) => { runtimeState.colors = value || {}; },
-      setStablePaintOrderEnabled: (value) => { stablePaintOrderEnabled = !!value; },
-      setPoliticalSourceFeatures: (features) => { runtimeState.landData = { features }; },
-      setMapSemanticMode: (value) => { runtimeState.mapSemanticMode = value; },
-      setVisualOverrides: (value) => {
-        runtimeState.visualOverrides = value || {};
-      },
-      setPendingColorEditIds: (ids) => {
-        runtimeState.renderPassCache.pendingPoliticalColorEditIds = new Set(ids || []);
-      },
-    };
-  `;
-  const context = { globalThis: {} };
-  context.globalThis = context;
-  vm.createContext(context);
-  vm.runInContext(source, context);
-  return context.__shellPolicyHarness;
+// Real political feature policy over a mutable runtime state, with the
+// setters the scenario chunk contracts use to move between paint states.
+function createPoliticalPolicyFixture() {
+  const runtimeState = {
+    mapSemanticMode: "ownership",
+    activeScenarioId: "test",
+    colorRevision: 1,
+    visualOverrides: {},
+  };
+  const cache = {
+    pendingPoliticalColorEditIds: new Set(),
+    pendingPoliticalColorEditRevision: 1,
+    pendingPoliticalColorEditScenarioId: "test",
+  };
+  let stablePaintOrderEnabled = false;
+  const policy = createPoliticalFeaturePolicy(runtimeState, {
+    getSafeCanvasColor: (value, fallback = null) => (typeof value === "string" && value.trim() ? value : fallback),
+    hasPendingPoliticalColorEdit: () => cache.pendingPoliticalColorEditIds.size > 0
+      && String(cache.pendingPoliticalColorEditScenarioId || "") === String(runtimeState.activeScenarioId || "")
+      && Number(cache.pendingPoliticalColorEditRevision ?? -1) === Number(runtimeState.colorRevision || 0),
+    getRenderPassCacheState: () => cache,
+    getFeatureId: (feature) => String(feature?.properties?.id || feature?.id || "").trim(),
+    getFeatureCountryCodeNormalized: (feature) => String(feature?.properties?.cntr_code || "").trim().toUpperCase(),
+    isAtlantropaFieldDrivenFeature: () => false,
+    isInteractiveAtlantropaBooleanWeldIslandFeature: () => false,
+    isScenarioAtlantropaVisible: () => true,
+    isBaseGeographyScenarioFeature: (feature) => feature?.properties?.render_as_base_geography === true,
+    isStablePaintOrderEnabled: () => stablePaintOrderEnabled,
+  });
+  return {
+    ...policy,
+    setVisualOverrides: (value) => { runtimeState.visualOverrides = value || {}; },
+    setPendingColorEditIds: (ids) => { cache.pendingPoliticalColorEditIds = new Set(ids || []); },
+    setMapSemanticMode: (value) => { runtimeState.mapSemanticMode = value; },
+    setPoliticalSourceFeatures: (features) => { runtimeState.landData = { features }; },
+    setStablePaintOrderEnabled: (value) => { stablePaintOrderEnabled = !!value; },
+  };
 }
 
 function createFirstVisibleFrameGateHarness() {
@@ -1059,7 +934,6 @@ export {
   readRepoFile,
   createDeferredPromise,
   createInitialVisualRegistryContinuationHarness,
-  sliceBetween,
   loadVendorD3,
   createTimerGenerationController,
   createChunkLoadGenerationFixture,
@@ -1070,9 +944,7 @@ export {
   getFeatureId,
   getTopologyGeometryId,
   getCoordinateBounds,
-  extractRendererFunction,
-  extractRendererPassSignatureBranch,
-  createRendererShellPolicyHarness,
+  createPoliticalPolicyFixture,
   createFirstVisibleFrameGateHarness,
   getPolygonCoordinateSets,
   getRingSignedArea,

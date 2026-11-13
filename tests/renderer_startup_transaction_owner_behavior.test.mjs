@@ -111,9 +111,13 @@ test("startup defers only duplicate border derivation until the following setMap
       ensureHybridLayers: record("ensureHybridLayers"),
       refreshColorState() {}, clearInspectorLandSelection() {}, stepUpInspectorSelection() {}, recomputeDynamicBordersNow() {}, resolveSpecialZoneParentGroupTargetIds() {},
       registerRuntimeHook(target, name, callback) {
-        assert.equal(target, null);
-        assert.equal(name, "resolveSpecialZoneParentGroupTargetIdsFn");
-        assert.equal(callback, context.resolveSpecialZoneParentGroupTargetIds);
+        const expectedCallbacks = {
+          stepUpInspectorSelectionFn: context.stepUpInspectorSelection,
+          resolveSpecialZoneParentGroupTargetIdsFn: context.resolveSpecialZoneParentGroupTargetIds,
+        };
+        assert.ok(Object.hasOwn(expectedCallbacks, name), `unexpected runtime hook ${name}`);
+        assert.equal(callback, expectedCallbacks[name]);
+        if (name === "resolveSpecialZoneParentGroupTargetIdsFn") assert.equal(target, null);
         calls.push("registerRuntimeHook");
       },
       syncFacilityInfoCardVisibility() {},
@@ -151,7 +155,7 @@ test("startup defers only duplicate border derivation until the following setMap
   }
   assert.equal(count(deferredCalls, "fitProjection"), 2);
   assert.equal(count(deferredCalls, "initZoom"), 1);
-  assert.equal(count(deferredCalls, "registerRuntimeHook"), 1);
+  assert.equal(count(deferredCalls, "registerRuntimeHook"), 2);
   assert.ok(deferredCalls.indexOf("fitProjection") < deferredCalls.indexOf("initZoom"));
   assert.ok(deferredCalls.indexOf("initZoom") < deferredCalls.lastIndexOf("fitProjection"));
 });
