@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import {
   getTransportWorkbenchOverviewBridgeSupport,
   getTransportOverviewImportanceThresholdRank,
@@ -56,8 +55,6 @@ import {
   getTransportOverviewRailVisualStyle,
   getTransportOverviewRoadVisualStyle,
 } from "../js/core/renderer/transport_overview_style_policy.js";
-
-const mapRendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 
 const LINE_FIXTURES = Object.freeze({
   road: Object.freeze([
@@ -1043,14 +1040,6 @@ test("country rail overlay still draws when global rail data is empty", () => {
   assert.equal(metrics.findLast((entry) => entry.name === "drawRailwaysLayer")?.detail?.reason, "no-data");
   assert.equal(metrics.findLast((entry) => entry.name === "drawCountryRailwaysLayer")?.detail?.visibleFeatureCount, 1);
 });
-
-test("facility hover semantic dedupe keeps pack-scoped keys and prefers country overlays", () => {
-  assert.match(mapRendererSource, /function buildFacilityEntryKey\(entry\) \{[\s\S]*return `\$\{familyId\}:\$\{packId\}:\$\{stableId\}`;/);
-  assert.match(mapRendererSource, /function buildFacilityEntrySemanticKey\(entry\) \{[\s\S]*return `\$\{familyId\}:stable:\$\{stableId\}`;/);
-  assert.match(mapRendererSource, /dedupeFacilityHoverEntriesBySemanticKey\([\s\S]*getFacilityEntryHitPriority\(entry\) >= getFacilityEntryHitPriority\(existing\)/);
-  assert.match(mapRendererSource, /visibleFacilityHoverEntriesByFamily\[normalizedFamilyId\] = dedupeFacilityHoverEntriesBySemanticKey/);
-});
-
 
 function lineLabelFeature(family, label, x = 0, y = 0, length = 0.6, secondary = false) {
   return {

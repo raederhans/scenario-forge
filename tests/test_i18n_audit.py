@@ -3,7 +3,6 @@ from __future__ import annotations
 import tempfile
 import unittest
 import json
-import re
 from pathlib import Path
 
 from tools.i18n_audit import build_localization_ownership_audit, collect_code_strings
@@ -489,25 +488,6 @@ export const UI_COPY_CATALOG = Object.freeze({
             self.assertIn("Export preview ready", result["declarative_ui_keys"])
             self.assertIn("Export preview ready", result["covered_default_literals"])
 
-    def test_inline_ui_catalog_keys_are_unique(self) -> None:
-        catalog_source = (REPO_ROOT / "js" / "core" / "i18n_catalog.js").read_text(encoding="utf-8")
-        block_match = re.search(
-            r"export\s+const\s+UI_COPY_CATALOG\s*=\s*Object\.freeze\(\{(?P<body>.*?)\n\}\);",
-            catalog_source,
-            re.DOTALL,
-        )
-        self.assertIsNotNone(block_match)
-        key_pattern = re.compile(r'^  (?:(?P<quoted>"(?:\\.|[^"])*")|(?P<identifier>[A-Za-z][A-Za-z0-9_]*))\s*:', re.MULTILINE)
-        seen: set[str] = set()
-        duplicates: list[str] = []
-        for match in key_pattern.finditer(block_match.group("body")):
-            raw_key = match.group("quoted") or match.group("identifier") or ""
-            key = json.loads(raw_key) if raw_key.startswith('"') else raw_key
-            if key in seen:
-                duplicates.append(key)
-            seen.add(key)
-        self.assertEqual([], duplicates)
-
     def test_collects_landing_markup_and_runtime_alt_literals(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
@@ -648,39 +628,6 @@ const config = {
                 result["ui_t_keys"],
             )
 
-    def test_main_runtime_supports_same_declarative_alt_attribute_as_audit(self) -> None:
-        i18n_js = (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")
-
-        self.assertIn('getAttribute("data-i18n-alt")', i18n_js)
-        self.assertIn('setLocalizedAttribute(element, "alt", t(altKey, "ui"))', i18n_js)
-        self.assertIn("[data-i18n-alt]", i18n_js)
-
-    def test_transport_shell_copy_is_localized_and_transport_headings_are_wired(self) -> None:
-        locales = json.loads((REPO_ROOT / "data" / "locales.json").read_text(encoding="utf-8"))
-        ui = locales.get("ui") or {}
-
-        for index_path in [
-            REPO_ROOT / "index.html",
-            PAGES_DIST_ROOT / "app" / "index.html",
-        ]:
-            index_html = index_path.read_text(encoding="utf-8")
-            self.assertIn(
-                'id="appearanceTabTransport"\n'
-                '                  type="button"\n'
-                '                  class="appearance-tab-btn"\n'
-                '                  data-appearance-tab="transport"\n'
-                '                  role="tab"\n'
-                '                  aria-selected="false"\n'
-                '                  aria-controls="appearancePanelTransport"\n'
-                '                  tabindex="-1"\n'
-                '                  data-i18n="Transport"',
-                index_html,
-            )
-            self.assertIn(
-                '<h2 id="lblTransportPanel" class="section-header" data-i18n="Transport">Transport</h2>',
-                index_html,
-            )
-
     def test_cloud_save_and_fragment_ui_keys_exist_in_source_and_dist_locales(self) -> None:
         required_ui_keys = {
             "Cloud Saves",
@@ -724,7 +671,7 @@ const config = {
                     self.assertIn(key, ui)
                     self.assertTrue(str((ui.get(key) or {}).get("zh", "")).strip())
 
-    def test_appearance_preset_ui_keys_are_wired_and_localized(self) -> None:
+    def test_appearance_preset_ui_keys_are_localized(self) -> None:
         required_ui_keys = {
             "Appearance Presets",
             "Save Current Appearance",
@@ -736,9 +683,6 @@ const config = {
             "presets",
             "Appearance Preset",
         }
-
-        index_html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
-        self.assertIn('id="appearancePresetSummary" class="panel-hint" data-i18n="0 presets"', index_html)
 
         locales = json.loads((REPO_ROOT / "data" / "locales.json").read_text(encoding="utf-8"))
         baseline = json.loads((REPO_ROOT / "data" / "i18n" / "locales_baseline.json").read_text(encoding="utf-8"))

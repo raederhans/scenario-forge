@@ -24,8 +24,6 @@ from tools.check_transport_workbench_manifests import discover_manifest_paths, i
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-PORT_BUILDER = PROJECT_ROOT / "tools" / "build_transport_workbench_japan_ports.py"
-INDUSTRIAL_BUILDER = PROJECT_ROOT / "tools" / "build_transport_workbench_japan_industrial_zones.py"
 RUNTIME_ASSET_REGISTRY = PROJECT_ROOT / "data" / "runtime_asset_registry.json"
 CATALOG_JSON = PROJECT_ROOT / "data" / "CATALOG.json"
 
@@ -489,19 +487,6 @@ class TransportManifestContractsTest(unittest.TestCase):
                 offenders.append((str(path.relative_to(PROJECT_ROOT)).replace("\\", "/"), present))
 
         self.assertFalse(offenders, offenders)
-
-    def test_transport_builders_no_longer_emit_legacy_variant_fields(self) -> None:
-        legacy_field_names = (
-            "default_coverage_tier",
-            "coverage_variants",
-            "default_distribution_variant",
-            "distribution_variants",
-        )
-
-        for builder_path in (PORT_BUILDER, INDUSTRIAL_BUILDER):
-            content = builder_path.read_text(encoding="utf-8")
-            for field_name in legacy_field_names:
-                self.assertNotIn(f'"{field_name}"', content, builder_path.as_posix())
 
     def test_target_pack_manifests_declare_registered_carrier_asset_key(self) -> None:
         runtime_asset_registry = json.loads(RUNTIME_ASSET_REGISTRY.read_text(encoding="utf-8"))

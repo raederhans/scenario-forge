@@ -28,6 +28,8 @@ const STATE_BUS_EVENT_BY_HOOK_NAME = Object.freeze({
   updateScenarioReliefOverlayUIFn: "sidebar:update-scenario-relief-overlay",
   updateParentBorderCountryListFn: "sidebar:update-parent-border-country-list",
   updateSpecialZoneEditorUIFn: "toolbar:update-special-zone-editor",
+  updateSpecialZonesWorkbenchUIFn: "special-zones:update-workbench-ui",
+  updateSpecialZonesWorkbenchCurrentTargetUIFn: "special-zones:update-workbench-current-target-ui",
   updateStrategicOverlayUIFn: "strategic-overlay:update-ui",
   updateScenarioContextBarFn: "scenario:update-context-bar",
   updateWorkspaceStatusFn: "workspace:update-status",
@@ -110,6 +112,7 @@ export const STATE_BUS_EVENTS = Object.freeze({
 export const STATE_NOTIFICATION_HOOK_NAMES = Object.freeze(Object.keys(STATE_BUS_EVENT_BY_HOOK_NAME));
 
 export const STATE_HANDLER_HOOK_NAMES = Object.freeze([
+  "stepUpInspectorSelectionFn",
   "toggleLeftPanelFn",
   "toggleRightPanelFn",
   "toggleDockFn",

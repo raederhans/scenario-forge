@@ -21,6 +21,8 @@ async function service(load) {
     "const RUNTIME_ASSET_REGISTRY = {}; const RUNTIME_ASSET_URLS = {};");
   replace(/import \{\s*ensureMapcreatorSnapshotGlobal,\s*registerMapcreatorSnapshotProvider,\s*\} from "\.\/mapcreator_snapshot\.js";/,
     "const ensureMapcreatorSnapshotGlobal = () => {}; const registerMapcreatorSnapshotProvider = () => {};");
+  replace(/from "\.\/json_clone\.js";/,
+    `from ${JSON.stringify(new URL("../js/core/json_clone.js", import.meta.url).href)};`);
   try { return await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`); }
   finally { delete globalThis[key]; }
 }
