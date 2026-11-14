@@ -23,6 +23,13 @@ import {
 } from "./exact_after_settle_refresh_plans.js";
 import { preflightPrivateRenderPasses, prepareExactRenderPassesInSlices } from "../renderer/render_pipeline_passes.js";
 
+export function getTransformBucketSignature(transform) {
+  const k = Math.round(Number(transform?.k || 1) * 100);
+  const x = Math.round(Number(transform?.x || 0) / 64);
+  const y = Math.round(Number(transform?.y || 0) / 64);
+  return `${k}:${x}:${y}`;
+}
+
 function createExactAfterSettleScheduler({
   runtimeState,
   renderPassNames = [],
@@ -67,13 +74,6 @@ function createExactAfterSettleScheduler({
     return captureExactAfterSettleControllerState(runtimeState);
   }
 
-  function getTransformBucketSignature(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-    const k = Math.round(Number(transform?.k || 1) * 100);
-    const x = Math.round(Number(transform?.x || 0) / 64);
-    const y = Math.round(Number(transform?.y || 0) / 64);
-    return `${k}:${x}:${y}`;
-  }
-
   function getExactAfterSettleIdentity() {
     const context = getContext();
     const loadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
@@ -89,7 +89,7 @@ function createExactAfterSettleScheduler({
       colorRevision: Number(runtimeState.colorRevision || 0),
       contextFlagSignature: getVisibleContextFlagSignature(),
       zoomToken: Number(runtimeState.zoomGestureEndedAt || 0),
-      transformBucket: getTransformBucketSignature(),
+      transformBucket: getTransformBucketSignature(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity),
     };
   }
 

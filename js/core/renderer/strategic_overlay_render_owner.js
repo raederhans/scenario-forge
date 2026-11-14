@@ -16,7 +16,6 @@ export function createStrategicOverlayRenderOwner({
     getProjectionRenderSignature = () => "",
   } = helpers;
   const {
-    renderFrontlineOverlay = () => {},
     renderOperationGraphicsOverlay = () => {},
     renderOperationalLinesOverlay = () => {},
     renderSpecialZones = () => {},
@@ -25,19 +24,16 @@ export function createStrategicOverlayRenderOwner({
   } = renderers;
 
   let lastSpecialZonesOverlaySignature = "";
-  let lastFrontlineOverlaySignature = "";
   let lastOperationalLinesOverlaySignature = "";
   let lastOperationGraphicsOverlaySignature = "";
   let lastUnitCountersOverlaySignature = "";
 
   function markOverlaysDirty({
-    frontline = false,
     operationalLines = false,
     operationGraphics = false,
     unitCounters = false,
     specialZones = false,
   } = {}) {
-    if (frontline) setStrategicOverlayDirtyState(state, "frontlineOverlayDirty", true);
     if (operationalLines) setStrategicOverlayDirtyState(state, "operationalLinesDirty", true);
     if (operationGraphics) setStrategicOverlayDirtyState(state, "operationGraphicsDirty", true);
     if (unitCounters) setStrategicOverlayDirtyState(state, "unitCountersDirty", true);
@@ -46,7 +42,6 @@ export function createStrategicOverlayRenderOwner({
 
   function markAllOverlaysDirty() {
     markOverlaysDirty({
-      frontline: true,
       operationalLines: true,
       operationGraphics: true,
       unitCounters: true,
@@ -88,21 +83,6 @@ export function createStrategicOverlayRenderOwner({
     ].join("::");
   }
 
-  function getFrontlineOverlaySignature() {
-    return [
-      getOverlayProjectionSignature(),
-      String(state.activeScenarioId || ""),
-      0,
-      Number(state.scenarioShellOverlayRevision || 0),
-      Number(state.sovereigntyRevision || 0),
-      state.annotationView?.frontlineEnabled ? "1" : "0",
-      String(state.annotationView?.frontlineStyle || "clean"),
-      state.annotationView?.showFrontlineLabels ? "1" : "0",
-      String(state.annotationView?.labelPlacementMode || "midpoint"),
-      Number(state.zoomTransform?.k || 1).toFixed(3),
-    ].join("::");
-  }
-
   function getOperationGraphicsOverlaySignature() {
     return [
       getOverlayProjectionSignature(),
@@ -136,20 +116,6 @@ export function createStrategicOverlayRenderOwner({
     renderSpecialZones();
     setSpecialZonesOverlayDirtyState(state, false);
     lastSpecialZonesOverlaySignature = nextSignature;
-    return true;
-  }
-
-  function renderFrontlineOverlayIfNeeded({ force = false } = {}) {
-    if (!force && !state.frontlineOverlayDirty && state.renderPhase !== renderPhaseIdle) {
-      return false;
-    }
-    const nextSignature = getFrontlineOverlaySignature();
-    if (!force && !state.frontlineOverlayDirty && nextSignature === lastFrontlineOverlaySignature) {
-      return false;
-    }
-    renderFrontlineOverlay();
-    setStrategicOverlayDirtyState(state, "frontlineOverlayDirty", false);
-    lastFrontlineOverlaySignature = nextSignature;
     return true;
   }
 
@@ -204,7 +170,6 @@ export function createStrategicOverlayRenderOwner({
   return {
     markAllOverlaysDirty,
     markOverlaysDirty,
-    renderFrontlineOverlayIfNeeded,
     renderOperationGraphicsIfNeeded,
     renderOperationalLinesIfNeeded,
     renderSpecialZonesIfNeeded,
