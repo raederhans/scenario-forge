@@ -1,3 +1,4 @@
+import { frozenCopy } from "./frozen_copy.js";
 import { resolveDataUrl } from "../data_base_url.js";
 export const THEMATIC_HDI_LAYER_ID = "social_human_development_v1";
 export const THEMATIC_HDI_DATA_VERSION = "undp-hdr-2025:2023";
@@ -27,14 +28,6 @@ async function defaultFetchJson(url) {
 
 function requireCondition(condition, message) {
   if (!condition) throw new Error(`Invalid HDI data: ${message}`);
-}
-
-function frozenCopy(value) {
-  if (Array.isArray(value)) return Object.freeze(value.map(frozenCopy));
-  if (value && typeof value === "object") {
-    return Object.freeze(Object.fromEntries(Object.entries(value).map(([key, child]) => [key, frozenCopy(child)])));
-  }
-  return value;
 }
 
 function expectedNormalizedValue(metricId, raw) {

@@ -1,3 +1,4 @@
+import { TestClassList } from "./helpers/transport_right_deck_document.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -16,38 +17,6 @@ function rowValue(rows, label) {
   const row = rows.find(([candidate]) => candidate === label);
   assert.ok(row, `missing row: ${label}`);
   return row[1];
-}
-
-class TestClassList {
-  constructor(node) {
-    this.node = node;
-  }
-
-  add(...tokens) {
-    const values = new Set(String(this.node.className || "").split(/\s+/).filter(Boolean));
-    tokens.forEach((token) => values.add(token));
-    this.node.className = Array.from(values).join(" ");
-  }
-
-  remove(...tokens) {
-    const values = new Set(String(this.node.className || "").split(/\s+/).filter(Boolean));
-    tokens.forEach((token) => values.delete(token));
-    this.node.className = Array.from(values).join(" ");
-  }
-
-  contains(token) {
-    return String(this.node.className || "").split(/\s+/).includes(token);
-  }
-
-  toggle(token, force) {
-    const shouldAdd = force === undefined ? !this.contains(token) : !!force;
-    if (shouldAdd) {
-      this.add(token);
-    } else {
-      this.remove(token);
-    }
-    return shouldAdd;
-  }
 }
 
 function createTestDocument() {

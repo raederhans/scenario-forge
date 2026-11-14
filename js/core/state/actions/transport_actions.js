@@ -1,3 +1,4 @@
+import { getInheritedDataValue } from "./appearance_actions.js";
 // Canonical transport state mutations. Preview, render, persistence, and load effects remain with callers.
 
 import {
@@ -33,14 +34,6 @@ function cloneDetached(value) {
   if (!isStateTarget(value)) return value;
   if (typeof globalThis.structuredClone === "function") return globalThis.structuredClone(value);
   return JSON.parse(JSON.stringify(value));
-}
-
-function getInheritedDataValue(target, fieldName) {
-  for (let prototype = Object.getPrototypeOf(target); prototype; prototype = Object.getPrototypeOf(prototype)) {
-    const descriptor = Object.getOwnPropertyDescriptor(prototype, fieldName);
-    if (descriptor) return Object.hasOwn(descriptor, "value") ? descriptor.value : undefined;
-  }
-  return undefined;
 }
 
 function setOwnDataValue(target, fieldName, value) {

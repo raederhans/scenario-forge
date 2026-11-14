@@ -1,3 +1,4 @@
+import { createDeferredPromise as deferred } from "./helpers/deferred_promise.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -518,13 +519,6 @@ test("export workbench text layer list shows annotation family counts", (context
   const emptyItem = list.children.find((item) => item.dataset.exportTextLayerId === "svg-annotations");
   assert.equal(findMeta(emptyItem)?.textContent, "No strategic annotations currently visible");
 });
-
-function deferred() {
-  let resolve;
-  let reject;
-  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
-  return { promise, resolve, reject };
-}
 
 function createState() {
   return {

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { initToast, showToast } from "../js/ui/toast.js";
+import { initToast, showToast } from "../js/ui/components/toast.js";
 import { resetCountryColorsWithFeedback } from "../js/ui/sidebar.js";
 import { createAppearancePresetsOwner } from "../js/ui/toolbar/appearance_presets_owner.js";
 import { state, createDefaultAppearancePresetsState } from "../js/core/state.js";

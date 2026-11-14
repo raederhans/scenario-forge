@@ -1,17 +1,10 @@
+import { normalizeStringList as uniqueIds } from "../renderer/string_list_normalizers.js";
 import { state as runtimeState } from "../state.js";
 import {
   getFeatureOwnerCode,
   normalizeOwnerCode,
   shouldExcludeScenarioPoliticalFeature,
 } from "../sovereignty_manager.js";
-
-function uniqueIds(featureIds = []) {
-  return Array.from(new Set(
-    (Array.isArray(featureIds) ? featureIds : [])
-      .map((value) => String(value || "").trim())
-      .filter(Boolean)
-  ));
-}
 
 function filterEditableOwnershipFeatureIds(featureIds = []) {
   const requestedIds = uniqueIds(featureIds);

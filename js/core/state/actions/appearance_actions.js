@@ -34,7 +34,7 @@ function cloneDetached(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function getInheritedDataValue(target, fieldName) {
+export function getInheritedDataValue(target, fieldName) {
   for (let prototype = Object.getPrototypeOf(target); prototype; prototype = Object.getPrototypeOf(prototype)) {
     const descriptor = Object.getOwnPropertyDescriptor(prototype, fieldName);
     if (descriptor) return Object.hasOwn(descriptor, "value") ? descriptor.value : undefined;

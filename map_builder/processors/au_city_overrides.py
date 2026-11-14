@@ -1,6 +1,8 @@
 """Build stable city-level overrides for key Australian urban areas."""
 from __future__ import annotations
 
+from map_builder.geo.geometry_validity import make_valid as _make_valid_geom
+
 from dataclasses import dataclass
 import re
 
@@ -9,6 +11,7 @@ import pandas as pd
 from shapely.geometry import Point
 
 from map_builder import config as cfg
+from map_builder.geo.utils import sanitize_polygon_layer as _sanitize_polygon_layer
 from map_builder.geo.utils import ensure_crs
 from map_builder.io.fetch import fetch_or_load_vector_archive
 
@@ -62,36 +65,6 @@ def _normalize(text: object) -> str:
         return ""
     value = re.sub(r"[^a-z0-9]+", " ", value)
     return " ".join(value.split())
-
-
-def _make_valid_geom(geom):
-    if geom is None or geom.is_empty:
-        return None
-    try:
-        if hasattr(geom, "make_valid"):
-            geom = geom.make_valid()
-        else:
-            geom = geom.buffer(0)
-    except Exception:
-        try:
-            geom = geom.buffer(0)
-        except Exception:
-            return None
-    if geom is None or geom.is_empty:
-        return None
-    return geom
-
-
-def _sanitize_polygon_layer(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    if gdf.empty:
-        return gdf
-    clean = ensure_crs(gdf.copy())
-    clean["geometry"] = clean.geometry.apply(_make_valid_geom)
-    clean = clean[clean.geometry.notna() & ~clean.geometry.is_empty].copy()
-    if clean.empty:
-        return clean
-    clean = clean[clean.geometry.geom_type.isin(["Polygon", "MultiPolygon"])].copy()
-    return clean
 
 
 def _with_area_metric(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:

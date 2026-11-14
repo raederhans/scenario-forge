@@ -1,4 +1,4 @@
-import { setUiIcon } from "../ui_icons.js";
+import { setUiIcon } from "../components/ui_icons.js";
 import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 
 const SCENARIO_BAR_LEFT_OFFSET = 24;

@@ -1,3 +1,5 @@
+import { parseToggleParam } from "./data_loader/startup_url_params.js";
+import { getSearchParams } from "./data_loader/startup_url_params.js";
 import {
   compactIndexedCoreAssignmentPayload,
   compactIndexedTagAssignmentPayload,
@@ -28,23 +30,6 @@ let buildManifestPromise = null;
 
 function getNowIso() {
   return new Date().toISOString();
-}
-
-function getSearchParams(search = null) {
-  try {
-    const source = typeof search === "string" ? search : (globalThis.location?.search || "");
-    return new URLSearchParams(source);
-  } catch (_error) {
-    return new URLSearchParams();
-  }
-}
-
-function parseToggleParam(value, fallback = null) {
-  const normalized = String(value ?? "").trim().toLowerCase();
-  if (!normalized) return fallback;
-  if (["1", "true", "yes", "on"].includes(normalized)) return true;
-  if (["0", "false", "no", "off"].includes(normalized)) return false;
-  return fallback;
 }
 
 function normalizeText(value) {

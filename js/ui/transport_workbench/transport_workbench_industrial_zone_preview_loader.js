@@ -1,30 +1,10 @@
+import { createInitialRenderStats } from "./transport_workbench_preview_state.js";
+import { createInitialLoadState } from "./transport_workbench_preview_state.js";
 import { ensureTransportWorkbenchCarrierForManifest } from "./transport_workbench_carrier.js";
 import { getTransportAsset } from "../../core/data_service.js";
 
 export const INDUSTRIAL_PACK_MODE_PREVIEW = "preview";
 export const INDUSTRIAL_PACK_MODE_FULL = "full";
-
-function createInitialLoadState() {
-  return {
-    status: "idle",
-    error: null,
-    manifest: null,
-    audit: null,
-    previewStatus: "idle",
-    fullStatus: "idle",
-  };
-}
-
-function createInitialRenderStats() {
-  return {
-    renderMode: "inspect",
-    totalFeatures: 0,
-    visibleFeatures: 0,
-    filteredFeatures: 0,
-    visibleLabels: 0,
-    aggregateUnits: 0,
-  };
-}
 
 export function createJapanIndustrialZonePreviewRuntime(defaultManifestUrl) {
   return {

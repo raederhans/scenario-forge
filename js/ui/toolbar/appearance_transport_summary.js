@@ -1,4 +1,3 @@
-import { getTransportOverviewLineSummaryMeta } from "../../core/transport_capability_registry.js";
 import { getTransportOverviewFilteredFeatureCount } from "../../core/transport_overview_visibility_policy.js";
 
 const TRANSPORT_RENDER_METRIC_NAMES = Object.freeze({
@@ -59,7 +58,6 @@ function getTransportCollectionSummaryCache(collection) {
     features,
     length: features.length,
     filteredCounts: new Map(),
-    lineCoverage: new Map(),
   };
   transportSummaryCollectionCache.set(collection, next);
   return next;
@@ -190,31 +188,6 @@ export function formatTransportFamilyCountText(familyId, count, translate) {
   if (!nouns) return "";
   const noun = roundedCount === 1 ? nouns[0] : nouns[1];
   return `${roundedCount.toLocaleString()} ${translateUi(translate, noun)}`;
-}
-
-function getTransportLineClassCoverageState(familyId, collections) {
-  const meta = getTransportOverviewLineSummaryMeta(familyId);
-  const collection = getTransportFamilyCollection(familyId, collections);
-  const features = Array.isArray(collection?.features) ? collection.features : [];
-  if (!meta) return null;
-  const collectionCache = getTransportCollectionSummaryCache(collection);
-  const cacheKey = String(familyId || "").trim().toLowerCase();
-  if (collectionCache?.lineCoverage.has(cacheKey)) {
-    return collectionCache.lineCoverage.get(cacheKey);
-  }
-  const presentClasses = new Set();
-  features.forEach((feature) => {
-    const className = String(feature?.properties?.class || "").trim().toLowerCase();
-    if (meta.classOrder.includes(className)) presentClasses.add(className);
-  });
-  const orderedClasses = meta.classOrder.filter((className) => presentClasses.has(className));
-  const state = {
-    orderedClasses,
-    missingRoadSecondary: familyId === "road" && !presentClasses.has("primary") && !presentClasses.has("secondary"),
-    missingRailSecondary: familyId === "rail" && !presentClasses.has("secondary"),
-  };
-  collectionCache?.lineCoverage.set(cacheKey, state);
-  return state;
 }
 
 export function buildTransportFamilySummaryText({

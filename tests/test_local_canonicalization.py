@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from helpers.polygon_fixtures import _square
 import unittest
 from unittest.mock import patch
 
@@ -8,17 +9,6 @@ from shapely.geometry import Polygon
 
 from map_builder import country_feature_policies
 from map_builder.geo import local_canonicalization
-
-
-def _square(x: float, y: float, size: float = 1.0) -> Polygon:
-    return Polygon(
-        [
-            (x, y),
-            (x + size, y),
-            (x + size, y + size),
-            (x, y + size),
-        ]
-    )
 
 
 class _ExplodingGeometry:

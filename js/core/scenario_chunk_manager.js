@@ -1,3 +1,4 @@
+import { normalizeLayerKeyList as normalizeRequiredSemanticLayerList } from "./renderer/string_list_normalizers.js";
 import { getPoliticalLodRank, selectPoliticalLodFamilies } from "./scenario/political_lod_policy.js";
 import { getFeatureId } from "./feature_identity.js";
 
@@ -462,14 +463,6 @@ export function getVisibleScenarioChunkLayers({
 const DEFAULT_REQUIRED_SEMANTIC_LAYERS_BY_SCENARIO = Object.freeze({
   tno_1962: Object.freeze(["scenario_atlantropa", "water", "relief"]),
 });
-
-function normalizeRequiredSemanticLayerList(values = []) {
-  return Array.from(new Set(
-    (Array.isArray(values) ? values : [])
-      .map((value) => String(value || "").trim().toLowerCase())
-      .filter(Boolean)
-  ));
-}
 
 export function resolveRequiredScenarioSemanticLayers({
   scenarioId = "",

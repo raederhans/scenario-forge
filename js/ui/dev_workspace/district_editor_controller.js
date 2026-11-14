@@ -7,7 +7,7 @@ import {
   normalizeScenarioDistrictTag,
 } from "../../core/scenario/scenario_districts.js";
 import { t } from "../i18n.js";
-import { showToast } from "../toast.js";
+import { showToast } from "../components/toast.js";
 import { postDevScenarioMutation } from "./dev_mutation_service.js";
 const state = runtimeState;
 

@@ -1,3 +1,4 @@
+import { RecordingPath } from "./helpers/recording_path.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -144,13 +145,6 @@ test("pure coverage supports cancellation before and during a long mask", () => 
   assert.equal(checks, 4);
 });
 
-class RecordingPath {
-  commands = [];
-  moveTo(...args) { this.commands.push(["moveTo", ...args]); }
-  lineTo(...args) { this.commands.push(["lineTo", ...args]); }
-  closePath(...args) { this.commands.push(["closePath", ...args]); }
-  arc(...args) { this.commands.push(["arc", ...args]); }
-}
 function maskHarness(sample = () => 0) {
   const paths = [], reads = [], clears = [], transforms = [], draws = [];
   let canvas, transform, currentDraws = [];

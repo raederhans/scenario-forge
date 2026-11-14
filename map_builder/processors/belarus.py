@@ -5,6 +5,8 @@ historical strip for HOI4 1936 scenario ownership.
 """
 from __future__ import annotations
 
+from map_builder.geo.geometry_validity import make_valid as _make_valid_geom
+
 from pathlib import Path
 
 import geopandas as gpd
@@ -12,6 +14,7 @@ import pandas as pd
 from shapely.ops import unary_union
 
 from map_builder import config as cfg
+from map_builder.geo.utils import sanitize_polygon_layer as _sanitize_polygon_layer
 from map_builder.geo.utils import ensure_crs, pick_column, smart_island_cull
 from map_builder.io.fetch import fetch_ne_zip, fetch_or_load_geojson
 
@@ -63,36 +66,6 @@ def _data_dir() -> Path:
     path = Path(__file__).resolve().parents[2] / "data"
     path.mkdir(parents=True, exist_ok=True)
     return path
-
-
-def _make_valid_geom(geom):
-    if geom is None or geom.is_empty:
-        return None
-    try:
-        if hasattr(geom, "make_valid"):
-            geom = geom.make_valid()
-        else:
-            geom = geom.buffer(0)
-    except Exception:
-        try:
-            geom = geom.buffer(0)
-        except Exception:
-            return None
-    if geom is None or geom.is_empty:
-        return None
-    return geom
-
-
-def _sanitize_polygon_layer(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    if gdf.empty:
-        return gdf
-    clean = ensure_crs(gdf.copy())
-    clean["geometry"] = clean.geometry.apply(_make_valid_geom)
-    clean = clean[clean.geometry.notna() & ~clean.geometry.is_empty].copy()
-    if clean.empty:
-        return clean
-    clean = clean[clean.geometry.geom_type.isin(["Polygon", "MultiPolygon"])].copy()
-    return clean
 
 
 def _load_admin0_countries() -> gpd.GeoDataFrame:

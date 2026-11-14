@@ -1,7 +1,8 @@
+import { ensureHgoIdentitySettings } from "./hgo_identity_state.js";
 import { callRuntimeHook } from "../../core/state/index.js";
 import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
 import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
-import { setUiIcon } from "../ui_icons.js";
+import { setUiIcon } from "../components/ui_icons.js";
 import { formatModernPlaceName } from "../../core/renderer/modern_place_name.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
 import {
@@ -142,19 +143,6 @@ export function createCountryInspectorController({
 
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
 
-  const ensureHgoIdentitySettings = () => {
-    if (!runtimeState.hgoIdentity || typeof runtimeState.hgoIdentity !== "object") {
-      runtimeState.hgoIdentity = {};
-    }
-    runtimeState.hgoIdentity.enabled = runtimeState.hgoIdentity.enabled === true;
-    runtimeState.hgoIdentity.nameMode = runtimeState.hgoIdentity.nameMode === "hgo" ? "hgo" : "scenario";
-    runtimeState.hgoIdentity.showSuggestedAliases = runtimeState.hgoIdentity.showSuggestedAliases !== false;
-    if (!runtimeState.hgoIdentity.variantSelections || typeof runtimeState.hgoIdentity.variantSelections !== "object") {
-      runtimeState.hgoIdentity.variantSelections = {};
-    }
-    return runtimeState.hgoIdentity;
-  };
-
   const isCountryInspectorDetailsVisible = () => runtimeState.countryInspectorShowDetails === true;
 
   const setCountryInspectorDetailsVisible = (visible) => {
@@ -162,7 +150,7 @@ export function createCountryInspectorController({
   };
 
   const getCountryHgoIdentity = (countryState) => {
-    const settings = ensureHgoIdentitySettings();
+    const settings = ensureHgoIdentitySettings(runtimeState);
     if (!settings.enabled || typeof getHgoIdentity !== "function") return null;
     const countryCode = normalizeCountryCode(countryState?.code || countryState?.tag || "");
     return getHgoIdentity(countryState, {
@@ -173,7 +161,7 @@ export function createCountryInspectorController({
   };
 
   const getCountryInspectorDisplayName = (countryState, identity = null) => {
-    const settings = ensureHgoIdentitySettings();
+    const settings = ensureHgoIdentitySettings(runtimeState);
     if (settings.enabled && settings.nameMode === "hgo" && identity?.displayName) {
       return identity.displayName;
     }
@@ -277,7 +265,7 @@ export function createCountryInspectorController({
   const renderHgoIdentityControls = (countryStates = []) => {
     const host = list?.parentElement;
     if (!host) return;
-    const settings = ensureHgoIdentitySettings();
+    const settings = ensureHgoIdentitySettings(runtimeState);
     let controls = host.querySelector("[data-hgo-identity-controls]");
     if (!controls) {
       controls = document.createElement("div");
@@ -959,7 +947,7 @@ export function createCountryInspectorController({
       select.value = selectedOption?.key || "";
       select.addEventListener("change", function handleHgoVariantChange() {
         const nextKey = String(select.value || "").trim();
-        ensureHgoIdentitySettings();
+        ensureHgoIdentitySettings(runtimeState);
         setHgoIdentityVariantSelectionState(runtimeState, countryCode, nextKey);
         onHgoIdentitySettingsChange?.();
       });

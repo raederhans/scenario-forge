@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from helpers.polygon_fixtures import _polygon
 import unittest
 from pathlib import Path
 
@@ -15,17 +16,6 @@ from tools.patch_checked_in_urban_artifacts import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
-
-
-def _polygon(min_x: float, min_y: float, max_x: float, max_y: float) -> Polygon:
-    return Polygon(
-        [
-            (min_x, min_y),
-            (max_x, min_y),
-            (max_x, max_y),
-            (min_x, max_y),
-        ]
-    )
 
 
 class PatchCheckedInUrbanArtifactsTest(unittest.TestCase):

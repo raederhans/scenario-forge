@@ -5,7 +5,6 @@ import json
 import os
 import re
 import time
-import unicodedata
 import urllib.request
 import zipfile
 from datetime import datetime, timezone
@@ -17,6 +16,12 @@ import pandas as pd
 from shapely.geometry import shape
 
 from map_builder.transport_workbench_contracts import finalize_transport_manifest
+from tools.transport_workbench_japan_common import (
+    write_json,
+    file_sha256,
+    normalize_match_key,
+    load_route_mask as _load_route_mask,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -71,22 +76,6 @@ def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def write_json(path: Path, payload: Any, *, compact: bool = False) -> None:
-    if compact:
-        text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
-    else:
-        text = json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False)
-    path.write_text(text, encoding="utf-8")
-
-
-def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def bundle_sha256(paths: list[Path]) -> str:
     digest = hashlib.sha256()
     for path in sorted(paths):
@@ -97,15 +86,6 @@ def bundle_sha256(paths: list[Path]) -> str:
 
 def normalize_text(value: Any) -> str:
     return str(value or "").strip()
-
-
-def normalize_match_key(value: Any) -> str:
-    text = normalize_text(value)
-    if not text:
-        return ""
-    text = unicodedata.normalize("NFKC", text)
-    text = re.sub(r"\s+", " ", text)
-    return text.casefold()
 
 
 def parse_other_tags(raw_value: Any) -> dict[str, str]:
@@ -234,11 +214,7 @@ def ensure_geofabrik_archive(url: str, destination: Path) -> Path:
 
 
 def load_route_mask():
-    carrier = read_json(CARRIER_PATH)
-    route_mask = carrier.get("frames", {}).get("main", {}).get("routeMask")
-    if not route_mask:
-        raise SystemExit("Japan carrier routeMask is missing.")
-    return shape(route_mask)
+    return _load_route_mask(read_json(CARRIER_PATH))
 
 
 def feature_collection_payload(gdf: gpd.GeoDataFrame) -> dict[str, Any]:

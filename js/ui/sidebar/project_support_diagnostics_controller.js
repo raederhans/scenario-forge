@@ -1,3 +1,4 @@
+import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
 import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
@@ -302,18 +303,6 @@ export function createProjectSupportDiagnosticsController({
       cancelLabel: t("Cancel", "ui"),
       tone: "info",
     });
-  };
-
-  const getScenarioAuditBlockerCount = (summary = {}) => {
-    const flattened = Number(summary.blocker_count);
-    if (Number.isFinite(flattened)) {
-      return flattened;
-    }
-    return (
-      Number(summary.geometry_blocker_count || 0)
-      + Number(summary.topology_blocker_count || 0)
-      + Number(summary.scenario_rule_blocker_count || 0)
-    );
   };
 
   const createAuditValueRow = (label, value) => {

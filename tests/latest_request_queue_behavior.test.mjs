@@ -1,17 +1,8 @@
+import { createDeferredPromise as deferred } from "./helpers/deferred_promise.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createLatestRequestQueue } from "../js/ui/toolbar/latest_request_queue.js";
-
-function deferred() {
-  let resolve;
-  let reject;
-  const promise = new Promise((resolvePromise, rejectPromise) => {
-    resolve = resolvePromise;
-    reject = rejectPromise;
-  });
-  return { promise, resolve, reject };
-}
 
 async function nextTurn() {
   await new Promise((resolve) => setImmediate(resolve));

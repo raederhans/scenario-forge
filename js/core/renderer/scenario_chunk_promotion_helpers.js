@@ -1,3 +1,4 @@
+import { normalizeLayerKeyList as normalizeLayerKeySet } from "./string_list_normalizers.js";
 import { getFeatureId } from "../feature_identity.js";
 
 const POLITICAL_DERIVED_STATE_MISSING_SAMPLE_LIMIT = 8;
@@ -278,14 +279,6 @@ function normalizeStringSet(values = []) {
   return (Array.isArray(values) ? values : [])
     .map((value) => String(value || "").trim())
     .filter(Boolean);
-}
-
-function normalizeLayerKeySet(values = []) {
-  return Array.from(new Set(
-    (Array.isArray(values) ? values : [])
-      .map((value) => String(value || "").trim().toLowerCase())
-      .filter(Boolean)
-  ));
 }
 
 function normalizeResourceDescriptors(targetResources = [], resourceDescriptors = [], reason = "scenario-chunk-promotion") {

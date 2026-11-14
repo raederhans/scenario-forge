@@ -11,7 +11,7 @@ import {
   selectAppearancePresetState,
   upsertAppearancePresetState,
 } from "../../core/state/actions/appearance_preset_actions.js";
-import { showToast } from "../toast.js";
+import { showToast } from "../components/toast.js";
 
 function getPresetCountLabel(count, t) {
   const label = count === 1 ? "preset" : "presets";

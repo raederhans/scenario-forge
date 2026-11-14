@@ -1,3 +1,4 @@
+import { ensureHgoIdentitySettings as ensureHgoIdentityRuntimeState } from "./sidebar/hgo_identity_state.js";
 import { createStrategicPanelView } from "./sidebar/strategic_panel_view.js";
 import { setSelectedColorState } from "../core/state/actions/appearance_selection_actions.js";
 import { resolveDataUrl } from "../core/data_base_url.js";
@@ -63,8 +64,8 @@ import {
   releaseScenarioAuditPayload,
 } from "../core/scenario/scenario_resources.js";
 import { getDirectGeoLabel, getGeoFeatureDisplayLabel, t } from "./i18n.js";
-import { showToast } from "./toast.js";
-import { showAppDialog } from "./app_dialog.js";
+import { showToast } from "./components/toast.js";
+import { showAppDialog } from "./components/app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
 import { createSidebarLayoutController } from "./sidebar/sidebar_layout_controller.js";
 export { createResponsiveSidebarCollapseController } from "./sidebar/sidebar_layout_controller.js";
@@ -735,20 +736,8 @@ function initSidebar({ render } = {}) {
     status: "idle",
     error: "",
   };
-  const ensureHgoIdentityRuntimeState = () => {
-    if (!runtimeState.hgoIdentity || typeof runtimeState.hgoIdentity !== "object") {
-      runtimeState.hgoIdentity = {};
-    }
-    runtimeState.hgoIdentity.enabled = runtimeState.hgoIdentity.enabled === true;
-    runtimeState.hgoIdentity.nameMode = runtimeState.hgoIdentity.nameMode === "hgo" ? "hgo" : "scenario";
-    runtimeState.hgoIdentity.showSuggestedAliases = runtimeState.hgoIdentity.showSuggestedAliases !== false;
-    if (!runtimeState.hgoIdentity.variantSelections || typeof runtimeState.hgoIdentity.variantSelections !== "object") {
-      runtimeState.hgoIdentity.variantSelections = {};
-    }
-    return runtimeState.hgoIdentity;
-  };
   const resolveHgoIdentityForCountry = (countryState, options = {}) => {
-    const settings = ensureHgoIdentityRuntimeState();
+    const settings = ensureHgoIdentityRuntimeState(runtimeState);
     if (!hgoIdentityResolver) return null;
     const countryCode = normalizeCountryCode(countryState?.code || countryState?.tag || "");
     return hgoIdentityResolver.resolveIdentity(countryState, {
@@ -1250,7 +1239,7 @@ function initSidebar({ render } = {}) {
       renderList();
     },
     onHgoIdentitySettingsChange: () => {
-      const settings = ensureHgoIdentityRuntimeState();
+      const settings = ensureHgoIdentityRuntimeState(runtimeState);
       requestHgoIdentityAssetsForSettings(settings, ensureHgoIdentityAssetsLoaded);
       renderList();
       render();
@@ -1270,7 +1259,7 @@ function initSidebar({ render } = {}) {
 
   bindCountryInspectorEvents();
   requestHgoIdentityAssetsForSettings(
-    ensureHgoIdentityRuntimeState(),
+    ensureHgoIdentityRuntimeState(runtimeState),
     ensureHgoIdentityAssetsLoaded,
   );
 

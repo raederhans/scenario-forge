@@ -1,10 +1,4 @@
-function requireFunction(candidate, label) {
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label} must be a function.`);
-  }
-  return candidate;
-}
-
+import { requireFunction } from "../renderer/require_function.js";
 function requireString(candidate, label) {
   const value = String(candidate || "").trim();
   if (!value) {

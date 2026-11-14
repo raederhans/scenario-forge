@@ -471,11 +471,11 @@ test("successful GPU handoff retires legacy navigation while incomplete, vector 
       getTnoRasterSceneOwner: () => scene, tnoRasterSceneOwner: scene,
       politicalPassUsesDirectScene: false, navigationSceneOwner: legacy,
       overviewFrameOwner: { clear: () => { overviewClears++; } },
-      incrementPerfCounter() {}, ensureCompositeBufferCanvas: () => ({}),
+      incrementPerfCounter() {},
       getExactCompositeReuseOwner: () => ({ composeExact: () => ({ ok: true }) }),
       blitCompositeBufferToMain: () => { nativeBlits++; },
       exactCompositeReuseOwner: { invalidate: () => { reuseInvalidations++; } },
-      getRenderCacheOwner: () => ({ releaseObsoleteSceneSurfaces: ({ directPolitical }) => { assert.equal(directPolitical, true); released++; return 0; } }),
+      getRenderCacheOwner: () => ({ ensureCompositeBufferCanvas: () => ({}), releaseObsoleteSceneSurfaces: ({ directPolitical }) => { assert.equal(directPolitical, true); released++; return 0; } }),
     };
     vm.createContext(scope); vm.runInContext(source.slice(begin, end), scope);
     assert.equal(scope.composeCachedPasses([]), true);

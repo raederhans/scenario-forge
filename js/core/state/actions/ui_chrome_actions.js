@@ -1,3 +1,4 @@
+import { getInheritedDataValue } from "./appearance_actions.js";
 // Canonical UI chrome mutations. DOM, URL, focus, and persistence effects remain with callers.
 
 const BOOLEAN_UI_CHROME_FIELDS = Object.freeze([
@@ -50,14 +51,6 @@ function cloneRecord(value) {
   if (!isPlainRecord(value)) return {};
   if (typeof globalThis.structuredClone === "function") return globalThis.structuredClone(value);
   return JSON.parse(JSON.stringify(value));
-}
-
-function getInheritedDataValue(target, fieldName) {
-  for (let prototype = Object.getPrototypeOf(target); prototype; prototype = Object.getPrototypeOf(prototype)) {
-    const descriptor = Object.getOwnPropertyDescriptor(prototype, fieldName);
-    if (descriptor) return Object.hasOwn(descriptor, "value") ? descriptor.value : undefined;
-  }
-  return undefined;
 }
 
 function setOwnDataValue(target, fieldName, value) {

@@ -1,3 +1,4 @@
+import { createDeferredPromise as deferred } from "./helpers/deferred_promise.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { ensureThematicWgiData } from "../js/core/thematic/thematic_wgi_runtime.js";
@@ -16,13 +17,6 @@ function payload(metricId) {
   const { enabled, ...identity } = normalizeThematicWgiStyle();
   return { ...identity, ...(metricId ? { metricId } : {}), year: 2024, range: [0, 100], byIsoA3: { AAA: 0, BBB: null, CCC: 67 },
     counts: { features: 3, values: 2, missing: 1 } };
-}
-
-function deferred() {
-  let resolve;
-  let reject;
-  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
-  return { promise, resolve, reject };
 }
 
 test("content defaults contain detached transient thematic runtime", () => {

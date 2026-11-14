@@ -1,5 +1,5 @@
 import { UI_URL_STATE_KEYS } from "../ui_contract.js";
-import { setUiIcon } from "../ui_icons.js";
+import { setUiIcon } from "../components/ui_icons.js";
 
 export function createResponsiveSidebarCollapseController({ left, right, applyLeft, applyRight, getWidth }) {
   const desktop = { left, right };

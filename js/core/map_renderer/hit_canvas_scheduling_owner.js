@@ -1,3 +1,4 @@
+import { requireFunction } from "../renderer/require_named_function.js";
 const DEFAULT_RENDER_PHASE_IDLE = "idle";
 const DEFAULT_IDLE_TIMEOUT_MS = 0;
 
@@ -16,14 +17,6 @@ const REQUIRED_GETTER_NAMES = Object.freeze([
   "getScheduledHitCanvasBuildHandle",
   "getActiveScenarioId",
 ]);
-
-function requireFunction(source, name, label) {
-  const candidate = source?.[name];
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label}.${name} must be a function.`);
-  }
-  return candidate;
-}
 
 function normalizeReason(reason, defaultReason) {
   const normalized = String(reason || "").trim();

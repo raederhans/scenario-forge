@@ -1,3 +1,4 @@
+import { requireFunction } from "./require_function.js";
 import { drawWorldFrame } from "./world_frame_render.js";
 import {
   addRetainedPoliticalPath,
@@ -14,13 +15,6 @@ import {
   refreshDeferredPoliticalBackgroundGroups,
   POLITICAL_BACKGROUND_MERGED_PATH_BUDGET,
 } from "./political_background_build_helpers.js";
-
-function requireFunction(candidate, label) {
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label} must be a function.`);
-  }
-  return candidate;
-}
 
 export function createPoliticalBackgroundRenderOwner({
   surface,

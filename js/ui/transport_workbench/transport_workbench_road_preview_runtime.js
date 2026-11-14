@@ -1,3 +1,4 @@
+export { normalizeTransportWorkbenchSourceFlags as normalizeRoadSourceFlags } from "./transport_workbench_line_runtime_shared.js";
 import { normalizeTransportWorkbenchNumber as normalizeNumber } from "./transport_workbench_line_runtime_shared.js";
 
 // Pure decision logic for the Japan road workbench preview. No DOM, no carrier
@@ -56,14 +57,6 @@ export const ROAD_RENDER_PRIORITY = {
   trunk: 2,
   motorway: 3,
 };
-
-export function normalizeRoadSourceFlags(flags) {
-  if (Array.isArray(flags)) return flags.filter(Boolean).map((value) => String(value));
-  if (typeof flags === "string" && flags.trim()) {
-    return flags.split("|").map((value) => value.trim()).filter(Boolean);
-  }
-  return [];
-}
 
 export function getRoadVisibilityReason(feature, config, scale) {
   if (!config.roadClass?.includes(feature.roadClass)) return "class_filtered";

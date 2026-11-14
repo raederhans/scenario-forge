@@ -1,3 +1,4 @@
+import { createState } from "./helpers/layer_panel_state.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -20,27 +21,12 @@ import {
   listTransportOverviewCapabilityFamilyIds,
 } from "../js/core/transport_capability_registry.js";
 import {
-  createDefaultContentState,
-} from "../js/core/state/content_state.js";
-import {
   createDefaultStyleConfig,
-  createDefaultUiState,
 } from "../js/core/state/ui_state.js";
 import {
   buildLayerStatusDiagnostics,
 } from "../js/ui/toolbar/layer_status_diagnostics.js";
 import { normalizeThematicWgiStyle } from "../js/core/thematic/thematic_wgi_view_model.js";
-
-function createState(overrides = {}) {
-  return {
-    ...createDefaultContentState(),
-    ...createDefaultUiState(),
-    styleConfig: createDefaultStyleConfig(),
-    renderPerfMetrics: {},
-    zoomTransform: { k: 4 },
-    ...overrides,
-  };
-}
 
 test("layer panel contracts cover the visible foundation layers and status anchors", () => {
   const contracts = listLayerPanelContracts();

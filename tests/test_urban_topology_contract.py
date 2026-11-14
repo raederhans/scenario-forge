@@ -1,3 +1,4 @@
+from helpers.polygon_fixtures import _polygon
 import json
 
 import geopandas as gpd
@@ -9,17 +10,6 @@ from map_builder.geo.topology import build_topology
 
 def _empty_gdf() -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
-
-
-def _polygon(min_x: float, min_y: float, max_x: float, max_y: float) -> Polygon:
-    return Polygon(
-        [
-            (min_x, min_y),
-            (max_x, min_y),
-            (max_x, max_y),
-            (min_x, max_y),
-        ]
-    )
 
 
 def _political_gdf() -> gpd.GeoDataFrame:

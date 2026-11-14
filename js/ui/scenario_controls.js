@@ -20,7 +20,7 @@ import {
 import { loadScenarioRegistry } from "../core/scenario/scenario_resources.js";
 import { t } from "./i18n.js";
 import { bindSelectKeyboard, focusSelectedSelectOption } from "./styled_selects.js";
-import { showToast } from "./toast.js";
+import { showToast } from "./components/toast.js";
 import { createScenarioIntroCard } from "./scenario_intro_card.js";
 const state = runtimeState;
 let disposeActiveScenarioControls = null;
