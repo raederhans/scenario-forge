@@ -155,10 +155,6 @@ function getStartupDataPipelineOwner() {
   return startupDataPipelineOwner;
 }
 
-function getStartupScenarioBootOwner() {
-  return startupScenarioBootOwnerLoader.loadValueOnce();
-}
-
 async function tryScheduleStartupSampleProjectDeeplink() {
   if (!startupSampleProjectId) return false;
   return runOptionalStartupTask({
@@ -344,10 +340,6 @@ async function ensureStartupInitialScenarioChunkVisualReady({
   return result;
 }
 
-function hasDetailTopologyLoaded() {
-  return getDeferredDetailPromotionOwner().hasDetailTopologyLoaded();
-}
-
 async function ensureDetailTopologyReady({
   renderDispatcher = null,
   requireIdle = false,
@@ -366,10 +358,6 @@ async function ensureDetailTopologyReady({
     deferInteractionInfrastructure,
     flushPendingFocusRefresh,
   });
-}
-
-async function unlockStartupReadonlyWithDetail(renderDispatcher) {
-  return getDeferredDetailPromotionOwner().unlockStartupReadonlyWithDetail(renderDispatcher);
 }
 
 function scheduleStartupReadonlyUnlock(
@@ -394,7 +382,7 @@ async function finalizeReadyState(renderDispatcher) {
     !!String(runtimeState.activeScenarioId || "").trim()
     && runtimeState.startupInteractionMode === "readonly"
     && runtimeState.detailDeferred
-    && !hasDetailTopologyLoaded()
+    && !getDeferredDetailPromotionOwner().hasDetailTopologyLoaded()
   );
   const startupBootstrapStrategy = String(
     runtimeState.activeScenarioManifest?.startup_bootstrap_strategy || ""
@@ -602,7 +590,7 @@ async function bootstrap() {
 
     // Phase: 应用启动场景 | Input: scenarioBundlePromise + UI bootstrap promise | Output: active scenario state + source/recovery metadata。
     // UI bootstrap 与 scenario apply 并行启动，但 post-scenario UI replay 必须等 UI 绑定完成，避免控件用旧状态覆盖刚应用的场景。
-    const startupScenarioBoot = await getStartupScenarioBootOwner();
+    const startupScenarioBoot = await startupScenarioBootOwnerLoader.loadValueOnce();
     const {
       defaultScenarioBundle,
       scenarioBundleSource,

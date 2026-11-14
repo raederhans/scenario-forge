@@ -74,12 +74,6 @@ function assertStateTarget(target) {
   }
 }
 
-function assertPatch(patch, label) {
-  if (!patch || typeof patch !== "object" || Array.isArray(patch)) {
-    throw new TypeError(`[special_zone_actions] ${label} must be an object`);
-  }
-}
-
 function detachActionInputs(inputs) {
   return { ...inputs };
 }

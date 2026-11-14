@@ -190,10 +190,6 @@ function finishLocalizationIterator(iterator) {
   return step.value;
 }
 
-function buildScenarioCityNameSyncPatch(options) {
-  return finishLocalizationIterator(prepareScenarioCityNameSyncPatch(options));
-}
-
 function* buildScenarioGeoLocalization(target, { baseGeoLocales = target.baseGeoLocales, baseAliasMap = target.baseGeoAliasToStableKey } = {}) {
   baseGeoLocales = baseGeoLocales && typeof baseGeoLocales === "object" ? baseGeoLocales : {};
   baseAliasMap = baseAliasMap && typeof baseAliasMap === "object" ? baseAliasMap : {};

@@ -395,16 +395,6 @@ function renderScenarioTagInspectorDetails(container, row = null) {
   ]);
 }
 
-function selectScenarioCapitalEditorTag(tag, { clearSearch = false } = {}) {
-  runtimeState.devScenarioCapitalEditor = {
-    ...(runtimeState.devScenarioCapitalEditor || {}),
-    tag: normalizeScenarioTagInput(tag),
-    searchQuery: clearSearch ? "" : normalizeScenarioNameInput(runtimeState.devScenarioCapitalEditor?.searchQuery),
-    lastSaveMessage: "",
-    lastSaveTone: "",
-  };
-}
-
 function normalizeLocaleInput(value) {
   return String(value || "").trim();
 }
