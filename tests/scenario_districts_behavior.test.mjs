@@ -5,7 +5,7 @@ import {
   getScenarioDistrictCountryGrouping,
   normalizeGeoCountryCode,
   normalizeScenarioDistrictGroupsPayload,
-} from "../js/core/scenario_districts.js";
+} from "../js/core/scenario/scenario_districts.js";
 
 function referenceGrouping(payload, countryCode, featureEntries, owners = {}) {
   if (!payload || typeof payload !== "object") return null;

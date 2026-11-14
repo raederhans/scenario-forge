@@ -1,7 +1,7 @@
 import { getObjectIdentityToken } from "./object_identity.js";
 import { getPoliticalDisplayModeSignature } from "../political_display_mode.js";
-import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
-import { getPopulationSignature } from "../population_spatial_view_model.js";
+import { getThematicWgiSignature } from "../thematic/thematic_wgi_view_model.js";
+import { getPopulationSignature } from "../thematic/population_spatial_view_model.js";
 // Owns visible frame identity policy decisions; inputs remain live.
 export function createVisibleFrameIdentityPolicy(runtimeState, {
   areZoomTransformsEquivalent,

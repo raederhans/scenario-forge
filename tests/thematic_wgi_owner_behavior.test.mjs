@@ -4,11 +4,11 @@ import test, { beforeEach, afterEach } from "node:test";
 import { readFileSync } from "node:fs";
 
 import { createThematicWgiOwner } from "../js/ui/toolbar/thematic_wgi_owner.js";
-import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
-import { THEMATIC_WGI_SCENARIO_IDS } from "../js/core/thematic_wgi_data.js";
-import { THEMATIC_INDICATORS, getThematicIndicator } from "../js/core/thematic_indicator_catalog.js";
+import { normalizeThematicWgiStyle } from "../js/core/thematic/thematic_wgi_view_model.js";
+import { THEMATIC_WGI_SCENARIO_IDS } from "../js/core/thematic/thematic_wgi_data.js";
+import { THEMATIC_INDICATORS, getThematicIndicator } from "../js/core/thematic/thematic_indicator_catalog.js";
 import { UI_COPY_CATALOG } from "../js/core/i18n_catalog.js";
-import { ensureThematicWgiData } from "../js/core/thematic_wgi_runtime.js";
+import { ensureThematicWgiData } from "../js/core/thematic/thematic_wgi_runtime.js";
 
 class TestElement {
   constructor() {

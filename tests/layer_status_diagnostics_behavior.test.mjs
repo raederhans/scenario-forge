@@ -7,7 +7,7 @@ import {
   THEMATIC_WGI_MAIN_MAP_SUPPORT_LABEL,
   THEMATIC_HDI_MAIN_MAP_SUPPORT_LABEL,
   THEMATIC_MAIN_MAP_SUPPORT_LABEL,
-} from "../js/core/thematic_layer_catalog.js";
+} from "../js/core/thematic/thematic_layer_catalog.js";
 import {
   createDefaultContentState,
 } from "../js/core/state/content_state.js";

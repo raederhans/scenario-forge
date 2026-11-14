@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   buildTransportWorkbenchLayerOrderRows,
   createTransportWorkbenchLayerOrderOwner,
-} from "../js/ui/toolbar/transport_workbench_layer_order_owner.js";
+} from "../js/ui/transport_workbench/transport_workbench_layer_order_owner.js";
 
 class TestClassList {
   constructor(node) {

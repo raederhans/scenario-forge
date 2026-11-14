@@ -2,9 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { FileManager } from "../js/core/file_manager.js";
-import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
-import { normalizePopulationStyle } from "../js/core/population_spatial_view_model.js";
-import { THEMATIC_INDICATORS } from "../js/core/thematic_indicator_catalog.js";
+import { normalizeThematicWgiStyle } from "../js/core/thematic/thematic_wgi_view_model.js";
+import { normalizePopulationStyle } from "../js/core/thematic/population_spatial_view_model.js";
+import { THEMATIC_INDICATORS } from "../js/core/thematic/thematic_indicator_catalog.js";
 import { createDefaultStyleConfig, restoreImportedLayerVisibilityState, restoreImportedStyleConfigState } from "../js/core/state/ui_state.js";
 import {
   getInteractionFunnelDebugState,

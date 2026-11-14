@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   bindTransportWorkbenchEventOnce,
   createTransportWorkbenchEventOwner,
-} from "../js/ui/toolbar/transport_workbench_event_owner.js";
+} from "../js/ui/transport_workbench/transport_workbench_event_owner.js";
 
 class TestElement {
   constructor(tagName = "div") {

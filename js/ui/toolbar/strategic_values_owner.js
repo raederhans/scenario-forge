@@ -12,7 +12,7 @@ import {
   getStrategicValuesColorStops,
   getStrategicValuesViewModel,
   normalizeStrategicValuesStyle,
-} from "../../core/strategic_values_view_model.js";
+} from "../../core/thematic/strategic_values_view_model.js";
 
 const IDS = [
   "strategicValuesStatus", "strategicValuesSource", "toggleStrategicResourceMarkers",

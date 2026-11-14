@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   getStrategicBucketInspection, getStrategicValuesColorStops, getStrategicValuesViewModel,
   normalizeStrategicValuesStyle,
-} from "../js/core/strategic_values_view_model.js";
+} from "../js/core/thematic/strategic_values_view_model.js";
 
 function state(payload = null) {
   return {

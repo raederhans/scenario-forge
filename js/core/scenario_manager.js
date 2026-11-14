@@ -20,7 +20,7 @@ import {
 import {
   buildScenarioDistrictGroupByFeatureId,
   normalizeScenarioDistrictGroupsPayload,
-} from "./scenario_districts.js";
+} from "./scenario/scenario_districts.js";
 import { applyActivePaletteState, setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
 import {
@@ -32,7 +32,7 @@ import {
   evaluateScenarioDataHealth,
   hasUsablePoliticalTopology,
   scenarioNeedsDetailTopology,
-} from "./scenario_data_health.js";
+} from "./scenario/scenario_data_health.js";
 import {
   publishScenarioPaletteAndToolbarState,
   runPostRollbackRestoreEffects,
@@ -40,12 +40,12 @@ import {
   runPostScenarioClearEffects,
   runPostScenarioResetEffects,
   shouldSuppressChunkedPostApplyDataHealthSignals,
-} from "./scenario_post_apply_effects.js";
+} from "./scenario/scenario_post_apply_effects.js";
 import {
   setScenarioAuditUiState,
   syncScenarioUi,
-} from "./scenario_ui_sync.js";
-import { syncScenarioLocalizationState } from "./scenario_localization_state.js";
+} from "./scenario/scenario_ui_sync.js";
+import { syncScenarioLocalizationState } from "./scenario/scenario_localization_state.js";
 import {
   applyBlankScenarioPresentationDefaults,
   awaitInitialScenarioChunkVisualPromotion,
@@ -64,9 +64,9 @@ import {
   scenarioBundleHasChunkedData,
   scenarioSupportsChunkedRuntime,
   scenarioBundleUsesChunkedLayer,
-} from "./scenario_resources.js";
-import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario_recovery.js";
-import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario_rollback.js";
+} from "./scenario/scenario_resources.js";
+import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario/scenario_recovery.js";
+import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario/scenario_rollback.js";
 import { advanceScenarioApplyEpochState } from "./state/actions/renderer_transaction_diagnostics_actions.js";
 import {
   buildHoi4FarEastSovietOwnerBackfill,
@@ -80,7 +80,7 @@ import {
 } from "./scenario/lifecycle_runtime.js";
 import {
   createScenarioApplyPipeline,
-} from "./scenario_apply_pipeline.js";
+} from "./scenario/scenario_apply_pipeline.js";
 import {
   nextScenarioApplyEpoch,
   recordRenderInvariantWarning,

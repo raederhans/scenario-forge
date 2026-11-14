@@ -1,10 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ensureThematicWgiData } from "../js/core/thematic_wgi_runtime.js";
-import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
+import { ensureThematicWgiData } from "../js/core/thematic/thematic_wgi_runtime.js";
+import { normalizeThematicWgiStyle } from "../js/core/thematic/thematic_wgi_view_model.js";
 import { createDefaultContentState } from "../js/core/state/content_state.js";
 import { setThematicWgiStyleState } from "../js/core/state/actions/thematic_wgi_actions.js";
-import { THEMATIC_WGI_SCENARIO_IDS } from "../js/core/thematic_wgi_data.js";
+import { THEMATIC_WGI_SCENARIO_IDS } from "../js/core/thematic/thematic_wgi_data.js";
 const ruleOfLawId = "wgi_rule_of_law_score_0_100";
 
 function fixture() {

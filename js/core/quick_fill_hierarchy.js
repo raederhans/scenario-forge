@@ -1,9 +1,9 @@
 import { getMapDataBoundary } from "./map_data_boundary.js";
 // Semantic quick-fill membership. No rendering thresholds, DOM, or state writes.
 // Hierarchy payloads are immutable snapshots; replacing a snapshot invalidates the index.
-import { getEffectiveScenarioHierarchy } from "./scenario_hierarchy.js";
+import { getEffectiveScenarioHierarchy } from "./scenario/scenario_hierarchy.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
-import { normalizeScenarioDistrictGroupsPayload } from "./scenario_districts.js";
+import { normalizeScenarioDistrictGroupsPayload } from "./scenario/scenario_districts.js";
 
 const hierarchyIndexes = new WeakMap();
 const districtIndexes = new WeakMap();

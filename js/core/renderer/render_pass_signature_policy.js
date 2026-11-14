@@ -1,7 +1,7 @@
 import { getPoliticalDisplayModeSignature } from "../political_display_mode.js";
-import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
-import { getPopulationSignature } from "../population_spatial_view_model.js";
-import { getPopulationHeatmapSnapshot } from "../population_spatial_runtime.js";
+import { getThematicWgiSignature } from "../thematic/thematic_wgi_view_model.js";
+import { getPopulationSignature } from "../thematic/population_spatial_view_model.js";
+import { getPopulationHeatmapSnapshot } from "../thematic/population_spatial_runtime.js";
 import {
   normalizeIntensityFieldsState, normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig, normalizeUrbanStyleConfig,

@@ -2,8 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { normalizePopulationStyle, sumPopulationFeatures, getPopulationCountrySummary,
   resolvePopulationFeatureColor, getPopulationLegend, getPopulationViewModel, isPopulationActive,
-  POPULATION_DENSITY_COLORS, POPULATION_MISSING_COLOR, POPULATION_UNESTIMATED_COLOR } from "../js/core/population_spatial_view_model.js";
-import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION } from "../js/core/population_spatial_data.js";
+  POPULATION_DENSITY_COLORS, POPULATION_MISSING_COLOR, POPULATION_UNESTIMATED_COLOR } from "../js/core/thematic/population_spatial_view_model.js";
+import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION } from "../js/core/thematic/population_spatial_data.js";
 function fixture() {
   const geometry = "a".repeat(64);
   const row = (population, area, status = "ok", coverage = 1) => Object.freeze({ population, land_area_km2: area,

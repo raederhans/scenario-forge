@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { TRANSPORT_WORKBENCH_FAMILIES } from "../js/ui/toolbar/transport_workbench_descriptor.js";
+import { TRANSPORT_WORKBENCH_FAMILIES } from "../js/ui/transport_workbench/transport_workbench_descriptor.js";
 import { normalizeTransportWorkbenchUiState } from "../js/core/state_defaults.js";
-import { createTransportWorkbenchStateOwner } from "../js/ui/toolbar/transport_workbench_state_owner.js";
+import { createTransportWorkbenchStateOwner } from "../js/ui/transport_workbench/transport_workbench_state_owner.js";
 
 import {
   createTransportWorkbenchRightDeckOwner,
-} from "../js/ui/toolbar/transport_workbench_right_deck_owner.js";
+} from "../js/ui/transport_workbench/transport_workbench_right_deck_owner.js";
 
 class TestClassList {
   constructor(node) {

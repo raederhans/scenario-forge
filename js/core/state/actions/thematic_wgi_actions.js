@@ -1,4 +1,4 @@
-import { normalizeThematicWgiStyle } from "../../thematic_wgi_view_model.js";
+import { normalizeThematicWgiStyle } from "../../thematic/thematic_wgi_view_model.js";
 import { setAppearanceStyleGroupState, patchAppearanceStyleGroupState } from "./appearance_actions.js";
 
 export function createDefaultThematicWgiRuntimeState() {

@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { normalizeTransportWorkbenchDisplayConfigs } from "../js/core/state_defaults.js";
-import { normalizeTransportWorkbenchDensityConfig } from "../js/ui/toolbar/transport_workbench_config_owner.js";
-import { resolveTransportWorkbenchLabelSeparation } from "../js/ui/transport_workbench_density_helpers.js";
+import { normalizeTransportWorkbenchDensityConfig } from "../js/ui/transport_workbench/transport_workbench_config_owner.js";
+import { resolveTransportWorkbenchLabelSeparation } from "../js/ui/transport_workbench/transport_workbench_density_helpers.js";
 
 // State, the workbench config owner and the preview all clamp label separation
 // to the same 0.7–1.8 range; a value saved by one layer must survive the others.

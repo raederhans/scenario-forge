@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { loadPopulationData, POPULATION_LAYER_ID, POPULATION_DATA_VERSION,
   POPULATION_SCENARIO_IDS, normalizePopulationTile, samplePopulationDensityLonLat,
-  loadPopulationRasterTile, loadPopulationRasterTiles, lonLatToPopulationGrid } from "../js/core/population_spatial_data.js";
+  loadPopulationRasterTile, loadPopulationRasterTiles, lonLatToPopulationGrid } from "../js/core/thematic/population_spatial_data.js";
 
 const geometry = "a".repeat(64);
 function fixture() {

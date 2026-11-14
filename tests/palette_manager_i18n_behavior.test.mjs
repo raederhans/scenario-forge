@@ -7,7 +7,7 @@ import { createDefaultColorState } from "../js/core/state/color_state.js";
 import { createDefaultLocalesState } from "../js/core/state/content_state.js";
 import { getTooltipCountryContext, t } from "../js/core/i18n.js";
 import { getDirectGeoLabel } from "../js/ui/i18n.js";
-import { getLocalizedScenarioCountryName } from "../js/core/scenario_country_display.js";
+import { getLocalizedScenarioCountryName } from "../js/core/scenario/scenario_country_display.js";
 
 function resetPaletteI18nState() {
   Object.assign(runtimeState, createDefaultColorState());

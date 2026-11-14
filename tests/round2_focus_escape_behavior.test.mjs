@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { restoreFocusOrigin, restoreSurfaceTriggerFocus, rememberSurfaceTrigger, trapSurfaceTab } from "../js/ui/ui_contract.js";
 import { bindSelectKeyboard } from "../js/ui/styled_selects.js";
-import { createTransportWorkbenchEventOwner } from "../js/ui/toolbar/transport_workbench_event_owner.js";
+import { createTransportWorkbenchEventOwner } from "../js/ui/transport_workbench/transport_workbench_event_owner.js";
 import { createPaletteLibraryPanelController } from "../js/ui/toolbar/palette_library_panel.js";
 import { createLegendControlOwner } from "../js/core/renderer/legend_control_owner.js";
 import { createFacilitySurfaceOwner } from "../js/core/renderer/facility_surface.js";

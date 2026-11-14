@@ -5,7 +5,7 @@ import test from "node:test";
 import {
   THEMATIC_HDI_DATA_VERSION, THEMATIC_HDI_LAYER_ID, THEMATIC_HDI_METRIC_ID,
   THEMATIC_HDI_METRICS, isThematicHdiMetricSupported, loadThematicHdiData,
-} from "../js/core/thematic_hdi_data.js";
+} from "../js/core/thematic/thematic_hdi_data.js";
 
 const SCENARIOS = ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"];
 const IDS = THEMATIC_HDI_METRICS.map(({ id }) => id);

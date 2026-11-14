@@ -8,9 +8,9 @@ import {
 import {
   listDefaultThematicLayerSummaries,
   THEMATIC_LAYER_RENDER_DISABLED_REASON,
-} from "../../core/thematic_layer_catalog.js";
-import { isThematicWgiActive } from "../../core/thematic_wgi_view_model.js";
-import { isPopulationActive } from "../../core/population_spatial_view_model.js";
+} from "../../core/thematic/thematic_layer_catalog.js";
+import { isThematicWgiActive } from "../../core/thematic/thematic_wgi_view_model.js";
+import { isPopulationActive } from "../../core/thematic/population_spatial_view_model.js";
 
 const CONTRACT_GROUPS = Object.freeze(["appearance", "map-content", "transport", "workbench", "thematic"]);
 const WORKBENCH_ONLY_REASON = "Available in Transport Workbench only";

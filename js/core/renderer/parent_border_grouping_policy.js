@@ -1,6 +1,6 @@
 import { getMapDataBoundary } from "../map_data_boundary.js";
-import { getEffectiveScenarioHierarchyFromInputs } from "../scenario_hierarchy.js";
-import { getScenarioDistrictCountryGrouping } from "../scenario_districts.js";
+import { getEffectiveScenarioHierarchyFromInputs } from "../scenario/scenario_hierarchy.js";
+import { getScenarioDistrictCountryGrouping } from "../scenario/scenario_districts.js";
 
 const PARENT_BORDER_MIN_COVERAGE = 0.70;
 const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;

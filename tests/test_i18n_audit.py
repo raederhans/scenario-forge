@@ -610,7 +610,7 @@ Object.assign(translations.zh, { "chineseOnlyKey": "只有中文" });
             repo_root = Path(tmp_dir)
             self._write_repo_file(
                 repo_root,
-                "js/ui/toolbar/transport_workbench_descriptor.js",
+                "js/ui/transport_workbench/transport_workbench_descriptor.js",
                 """
 const config = {
   label: "Road classes",

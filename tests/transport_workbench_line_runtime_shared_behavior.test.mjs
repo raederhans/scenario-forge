@@ -7,7 +7,7 @@ import {
   findTransportWorkbenchDatasetNode,
   keepFirstTransportWorkbenchGridBucket,
   measureTransportWorkbenchProjectedLineLength,
-} from "../js/ui/transport_workbench_line_runtime_shared.js";
+} from "../js/ui/transport_workbench/transport_workbench_line_runtime_shared.js";
 
 test("line runtime shared helpers keep path and length output deterministic", () => {
   const geometry = {

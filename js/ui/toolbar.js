@@ -48,7 +48,7 @@ import {
   normalizeHexColor,
 } from "../core/palette_manager.js";
 import { buildExportArtifactPackage } from "../core/export_artifact_package.js";
-import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario_resources.js";
+import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario/scenario_resources.js";
 import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { createToolGuidance } from "./toolbar/tool_guidance.js";
@@ -110,7 +110,7 @@ import { createSpecialZonesWorkbenchController } from "./toolbar/special_zones_w
 import {
   createTransportWorkbenchController,
   TRANSPORT_WORKBENCH_INSPECTOR_TABS,
-} from "./toolbar/transport_workbench_controller.js";
+} from "./transport_workbench/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
 import { shouldShowDeveloperModeEntry } from "./toolbar/developer_mode_visibility.js";
 const state = runtimeState;

@@ -114,7 +114,7 @@ const label = t("Say \"hi\"", "ui");
             repo_root = Path(tmp_dir)
             self._write_repo_file(
                 repo_root,
-                "js/ui/toolbar/transport_workbench_descriptor.js",
+                "js/ui/transport_workbench/transport_workbench_descriptor.js",
                 """
 export const TRANSPORT_WORKBENCH_FAMILIES = [
   {

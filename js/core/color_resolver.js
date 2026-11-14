@@ -1,8 +1,8 @@
 import { isPoliticalDisplayModeActive, resolvePoliticalDisplayColor } from "./political_display_mode.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
-import { resolveThematicWgiFeatureColor } from "./thematic_wgi_view_model.js";
-import { resolvePopulationFeatureColor, normalizePopulationStyle, isPopulationActive, POPULATION_MISSING_COLOR } from "./population_spatial_view_model.js";
-import { normalizeStrategicValuesStyle, getStrategicValuesColorStops } from "./strategic_values_view_model.js";
+import { resolveThematicWgiFeatureColor } from "./thematic/thematic_wgi_view_model.js";
+import { resolvePopulationFeatureColor, normalizePopulationStyle, isPopulationActive, POPULATION_MISSING_COLOR } from "./thematic/population_spatial_view_model.js";
+import { normalizeStrategicValuesStyle, getStrategicValuesColorStops } from "./thematic/strategic_values_view_model.js";
 import {
   buildStrategicChoroplethColorInput,
   isStrategicChoroplethMetric,

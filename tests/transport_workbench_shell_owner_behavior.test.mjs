@@ -5,7 +5,7 @@ import {
   createTransportWorkbenchShellOwner,
   getTransportWorkbenchPackOptionsSignature,
   syncTransportWorkbenchPackSelectOptions,
-} from "../js/ui/toolbar/transport_workbench_shell_owner.js";
+} from "../js/ui/transport_workbench/transport_workbench_shell_owner.js";
 
 class TestSelect {
   constructor() {

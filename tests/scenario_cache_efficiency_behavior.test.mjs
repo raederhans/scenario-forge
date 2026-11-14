@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { state as appState } from "../js/core/state.js";
-import { captureScenarioApplyRollbackSnapshot } from "../js/core/scenario_rollback.js";
+import { captureScenarioApplyRollbackSnapshot } from "../js/core/scenario/scenario_rollback.js";
 import { createScenarioBundleRuntimeController } from "../js/core/scenario/bundle_runtime.js";
 import { createScenarioRollbackClone } from "../js/core/scenario/rollback_clone.js";
 import { trimScenarioBundleCache, SCENARIO_BUNDLE_CACHE_LIMIT, SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT } from "../js/core/scenario/bundle_cache.js";

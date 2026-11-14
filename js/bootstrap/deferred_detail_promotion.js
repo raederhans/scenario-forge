@@ -1,6 +1,6 @@
 import { callRuntimeHook } from "../core/state/index.js";
 import { loadDeferredDetailBundle } from "../core/data_loader.js";
-import { refreshScenarioDataHealth } from "../core/scenario_data_health.js";
+import { refreshScenarioDataHealth } from "../core/scenario/scenario_data_health.js";
 import {
   buildInteractionInfrastructureAfterStartup as buildInteractionInfrastructureAfterStartupDefault,
 } from "../core/map_renderer/public.js";
@@ -9,7 +9,7 @@ import {
   refreshMapDataForScenarioApply,
   setMapData,
 } from "../core/scenario/scenario_renderer_bridge.js";
-import { refreshScenarioShellOverlays } from "../core/scenario_shell_overlay.js";
+import { refreshScenarioShellOverlays } from "../core/scenario/scenario_shell_overlay.js";
 import { patchScenarioChunkLoadState } from "../core/state/actions/scenario_chunk_runtime_actions.js";
 import { setDefaultRuntimePoliticalTopologyState } from "../core/state/actions/scenario_chunk_promotion_actions.js";
 import { isScenarioRefreshSceneCurrent } from "../core/map_renderer/scenario_refresh_scope.js";

@@ -52,7 +52,7 @@ import {
   getCachedEffectiveCityCollection,
   selectLandFeatureById,
 } from "../core/map_renderer/public.js";
-import { applyCountryColor, resetCountryColors } from "../core/logic.js";
+import { applyCountryColor, resetCountryColors } from "../core/country_color_commands.js";
 import {
   buildPaletteColorSuggestionsForCountry,
   ensurePaletteAssetsLoaded,
@@ -64,7 +64,7 @@ import {
   ensureActiveScenarioOptionalLayerLoaded,
   loadScenarioAuditPayload,
   releaseScenarioAuditPayload,
-} from "../core/scenario_resources.js";
+} from "../core/scenario/scenario_resources.js";
 import { getDirectGeoLabel, getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { setUiIcon } from "./ui_icons.js";
@@ -98,7 +98,7 @@ import {
 import {
   getLocalizedScenarioCountryName,
   getScenarioCountryDisplayName,
-} from "../core/scenario_country_display.js";
+} from "../core/scenario/scenario_country_display.js";
 import { createHgoIdentityResolver } from "../core/hgo_identity_resolver.js";
 import { resolveDataAssetUrl } from "../core/runtime_asset_registry.js";
 import {

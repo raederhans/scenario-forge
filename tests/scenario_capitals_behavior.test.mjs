@@ -7,7 +7,7 @@ import { state as runtimeState } from "../js/core/state.js";
 import { commitBaseCitySupportData, setCurrentLanguage } from "../js/core/state/content_state.js";
 import { captureScenarioActivationState, restoreScenarioActivationState } from "../js/core/state/actions/scenario_activation_actions.js";
 import { captureScenarioPresentationState, restoreScenarioPresentationState } from "../js/core/state/actions/scenario_presentation_actions.js";
-import { syncScenarioLocalizationState } from "../js/core/scenario_localization_state.js";
+import { syncScenarioLocalizationState } from "../js/core/scenario/scenario_localization_state.js";
 import { getStrictGeoLabel, getPreferredGeoLabel } from "../js/core/i18n.js";
 import { createUrbanCityPolicyOwner } from "../js/core/renderer/urban_city_policy.js";
 import { createCityLabelTextModel } from "../js/core/renderer/city_label_text_model.js";

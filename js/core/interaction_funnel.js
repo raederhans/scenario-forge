@@ -68,7 +68,7 @@ function createNoopAsyncFalse() {
 
 function getScenarioResourcesModule() {
   if (!scenarioResourcesModulePromise) {
-    scenarioResourcesModulePromise = import("./scenario_resources.js");
+    scenarioResourcesModulePromise = import("./scenario/scenario_resources.js");
   }
   return scenarioResourcesModulePromise;
 }

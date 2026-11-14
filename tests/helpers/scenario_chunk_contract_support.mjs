@@ -27,7 +27,7 @@ import {
 import { createRenderCacheOwner } from "../../js/core/renderer/render_cache_owner.js";
 import { createColorResolutionStrategyOwner } from "../../js/core/renderer/color_resolution_strategy.js";
 import { buildSpatialGridSnapshot, getSpatialBucketKey } from "../../js/core/renderer/spatial_index_runtime_builders.js";
-import { isScenarioWaterLikeFeature } from "../../js/core/scenario_runtime_queries.js";
+import { isScenarioWaterLikeFeature } from "../../js/core/scenario/scenario_runtime_queries.js";
 import { applyScenarioChunkCityExternalEffectState } from "../../js/core/state/actions/scenario_presentation_actions.js";
 import {
   patchScenarioChunkLoadState,

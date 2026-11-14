@@ -16,8 +16,8 @@ import {
 import {
   formatScenarioFatalRecoveryMessage,
   getScenarioFatalRecoveryState,
-} from "../core/scenario_recovery.js";
-import { loadScenarioRegistry } from "../core/scenario_resources.js";
+} from "../core/scenario/scenario_recovery.js";
+import { loadScenarioRegistry } from "../core/scenario/scenario_resources.js";
 import { t } from "./i18n.js";
 import { bindSelectKeyboard, focusSelectedSelectOption } from "./styled_selects.js";
 import { showToast } from "./toast.js";

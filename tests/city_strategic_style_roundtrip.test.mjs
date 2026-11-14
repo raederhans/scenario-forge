@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { FileManager } from "../js/core/file_manager.js";
 import { normalizeCityLayerStyleConfig } from "../js/core/state_defaults.js";
 import { createDefaultStyleConfig, restoreImportedStyleConfigState } from "../js/core/state/ui_state.js";
-import { normalizeStrategicValuesStyle } from "../js/core/strategic_values_view_model.js";
+import { normalizeStrategicValuesStyle } from "../js/core/thematic/strategic_values_view_model.js";
 import { getCityEffectiveMinZoom, getCityRevealBucket } from "../js/core/renderer/city_reveal_policy.js";
 
 test("city hierarchy controls normalize valid selections and reject invalid values", () => {

@@ -14,7 +14,7 @@ import {
 } from "../js/core/state/content_state.js";
 import {
   prepareScenarioLocalizationState, syncScenarioLocalizationState, syncScenarioLocalizationStateAsync,
-} from "../js/core/scenario_localization_state.js";
+} from "../js/core/scenario/scenario_localization_state.js";
 import { state } from "../js/core/state.js";
 import { applyScenarioChunkCityExternalEffectState } from "../js/core/state/actions/scenario_presentation_actions.js";
 

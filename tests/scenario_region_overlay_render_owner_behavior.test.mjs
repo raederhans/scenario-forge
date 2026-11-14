@@ -6,8 +6,8 @@ import { createScenarioReliefOverlayRenderOwner } from "../js/core/renderer/scen
 import { readFileSync } from "node:fs";
 import { createScenarioRegionOverlayRenderOwner } from "../js/core/renderer/scenario_region_overlay_render_owner.js";
 import { createScenarioWaterCachePolicyOwner } from "../js/core/renderer/scenario_water_cache_policy_owner.js";
-import { isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "../js/core/population_spatial_view_model.js";
-import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION, POPULATION_YEAR } from "../js/core/population_spatial_data.js";
+import { isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "../js/core/thematic/population_spatial_view_model.js";
+import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION, POPULATION_YEAR } from "../js/core/thematic/population_spatial_data.js";
 
 function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget, actualWaterPolicy = false, oceanSurfacePattern = null, rasterPreparation = false, clockStep = 0, resourceBudget = null, pixelMasks = null, waterWorker = null } = {}) {
   const events = [];

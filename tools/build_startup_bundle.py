@@ -126,7 +126,7 @@ STARTUP_FAMILY_CONSUMER_MATRIX = {
             "js/core/startup_worker_client.js",
         ],
         "scenario_apply": [
-            "js/core/scenario_resources.js",
+            "js/core/scenario/scenario_resources.js",
             "js/core/scenario_manager.js",
         ],
     },
@@ -145,7 +145,7 @@ STARTUP_FAMILY_CONSUMER_MATRIX = {
     "geo_locale_patch": {
         "default_startup": [],
         "scenario_apply": [
-            "js/core/scenario_resources.js",
+            "js/core/scenario/scenario_resources.js",
             "js/core/scenario_manager.js",
         ],
     },

@@ -2,13 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { gunzipSync } from "node:zlib";
-import { loadThematicWgiData, THEMATIC_WGI_METRIC_ID, THEMATIC_WGI_METRICS } from "../js/core/thematic_wgi_data.js";
+import { loadThematicWgiData, THEMATIC_WGI_METRIC_ID, THEMATIC_WGI_METRICS } from "../js/core/thematic/thematic_wgi_data.js";
 import { resolveFeatureColor } from "../js/core/color_resolver.js";
 import {
   normalizeThematicWgiStyle, getThematicWgiLegend, getThematicWgiViewModel,
   getThematicWgiFeatureInspection, getThematicWgiSignature,
   getThematicWgiColor, THEMATIC_WGI_COLORS,
-} from "../js/core/thematic_wgi_view_model.js";
+} from "../js/core/thematic/thematic_wgi_view_model.js";
 import { drawThematicWgiExportLegend } from "../js/core/renderer/thematic_wgi_export_legend.js";
 import { createTooltipFixture } from "./helpers/isolated_tooltip_fixture.mjs";
 

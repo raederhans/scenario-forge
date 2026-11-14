@@ -3,7 +3,7 @@ import { state as runtimeState } from "../../core/state.js";
 import { normalizeScenarioGeoLocalePatchPayload } from "../../core/data_loader.js";
 import { getEffectiveCityCollection } from "../../core/map_renderer/public.js";
 import { getScenarioGeoLocalePatchDescriptor } from "../../core/scenario/shared.js";
-import { syncScenarioLocalizationState } from "../../core/scenario_localization_state.js";
+import { syncScenarioLocalizationState } from "../../core/scenario/scenario_localization_state.js";
 import { getFeatureOwnerCode } from "../../core/sovereignty_manager.js";
 import { t } from "../i18n.js";
 import { showToast } from "../toast.js";

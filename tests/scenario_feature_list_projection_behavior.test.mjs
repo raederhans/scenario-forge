@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { expandScenarioFeatureIds, projectScenarioFeatureIds } from "../js/core/scenario_hierarchy.js";
+import { expandScenarioFeatureIds, projectScenarioFeatureIds } from "../js/core/scenario/scenario_hierarchy.js";
 import { countryPresets, state } from "../js/core/state.js";
 import {
   getScenarioReleasableCountries,

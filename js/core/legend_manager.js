@@ -1,7 +1,7 @@
 import { getMapDataBoundary } from "./map_data_boundary.js";
 // Legend manager (Phase 13)
 
-import { getScenarioCountryDisplayName } from "./scenario_country_display.js";
+import { getScenarioCountryDisplayName } from "./scenario/scenario_country_display.js";
 import {
   DEFAULT_LEGEND_CONFIG,
   DEFAULT_LEGEND_CONTROL,

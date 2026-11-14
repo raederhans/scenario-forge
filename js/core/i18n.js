@@ -1,7 +1,7 @@
-import { getThematicWgiFeatureInspection, getThematicReferenceNote } from "./thematic_wgi_view_model.js";
-import { getPopulationTooltipLines } from "./population_spatial_presentation.js";
-import { getThematicIndicator, formatThematicIndicatorValue } from "./thematic_indicator_catalog.js";
-import { getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES } from "./strategic_values_view_model.js";
+import { getThematicWgiFeatureInspection, getThematicReferenceNote } from "./thematic/thematic_wgi_view_model.js";
+import { getPopulationTooltipLines } from "./thematic/population_spatial_presentation.js";
+import { getThematicIndicator, formatThematicIndicatorValue } from "./thematic/thematic_indicator_catalog.js";
+import { getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES } from "./thematic/strategic_values_view_model.js";
 // Translation helpers (Phase 13)
 import { state as runtimeState } from "./state.js";
 import { UI_COPY_CATALOG } from "./i18n_catalog.js";
@@ -10,7 +10,7 @@ import {
   getCountryCode as getSharedFeatureCountryCode,
   getFeatureId as getSharedFeatureId,
 } from "./feature_identity.js";
-import { getLocalizedScenarioCountryName } from "./scenario_country_display.js";
+import { getLocalizedScenarioCountryName } from "./scenario/scenario_country_display.js";
 const state = runtimeState;
 
 const US_LEGACY_ZONE_LABEL_RE = /(?:\bZone\s+\d+\b|第?\s*\d+\s*[区號号])/i;

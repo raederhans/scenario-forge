@@ -15,11 +15,11 @@ import { getFeatureOwnerCode } from "../core/sovereignty_manager.js";
 import {
   filterEditableOwnershipFeatureIds,
   summarizeOwnershipForFeatureIds,
-} from "../core/scenario_ownership_editor.js";
+} from "../core/scenario/scenario_ownership_editor.js";
 import { buildScenarioReleasableIndex, rebuildPresetState } from "../core/releasable_manager.js";
-import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
+import { getScenarioCountryDisplayName } from "../core/scenario/scenario_country_display.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
-import { syncScenarioLocalizationState } from "../core/scenario_localization_state.js";
+import { syncScenarioLocalizationState } from "../core/scenario/scenario_localization_state.js";
 import { buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { createSelectionOwnershipController } from "./dev_workspace/selection_ownership_controller.js";

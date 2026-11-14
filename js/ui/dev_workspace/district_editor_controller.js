@@ -5,7 +5,7 @@ import {
   getScenarioDistrictTagRecord,
   normalizeScenarioDistrictGroupsPayload,
   normalizeScenarioDistrictTag,
-} from "../../core/scenario_districts.js";
+} from "../../core/scenario/scenario_districts.js";
 import { t } from "../i18n.js";
 import { showToast } from "../toast.js";
 import { postDevScenarioMutation } from "./dev_mutation_service.js";

@@ -1,5 +1,5 @@
 import { callRuntimeHook } from "../../core/state/index.js";
-import { ensureActiveScenarioOptionalLayerLoaded } from "../../core/scenario_resources.js";
+import { ensureActiveScenarioOptionalLayerLoaded } from "../../core/scenario/scenario_resources.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import {
   normalizeTransportOverviewStyleConfig,

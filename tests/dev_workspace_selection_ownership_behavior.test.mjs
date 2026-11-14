@@ -1,5 +1,5 @@
 import { setFeatureOwnerCodes, resetFeatureOwnerCode, resetFeatureOwnerCodes, resetAllFeatureOwnersToCanonical } from "../js/core/sovereignty_manager.js";
-import { applyOwnerToFeatureIds, resetOwnersToScenarioBaselineForFeatureIds, applyOwnerControllerAssignmentsToFeatureIds, buildScenarioOwnershipSavePayload, filterEditableOwnershipFeatureIds, summarizeOwnershipForFeatureIds } from "../js/core/scenario_ownership_editor.js";
+import { applyOwnerToFeatureIds, resetOwnersToScenarioBaselineForFeatureIds, applyOwnerControllerAssignmentsToFeatureIds, buildScenarioOwnershipSavePayload, filterEditableOwnershipFeatureIds, summarizeOwnershipForFeatureIds } from "../js/core/scenario/scenario_ownership_editor.js";
 import { applyFeaturePaintState } from "../js/core/state/color_state.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry, undoHistory, redoHistory } from "../js/core/history_manager.js";
 import test from "node:test";

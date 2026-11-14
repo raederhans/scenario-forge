@@ -262,7 +262,7 @@ class HistoricalBundleTests(unittest.TestCase):
         self.assertEqual(bundle.hierarchy_override({}, {'HGO-S1': ['HGO-S1__a']}, global_hierarchy), {})
         script = '''
 import { readFileSync } from 'node:fs';
-import { getEffectiveScenarioHierarchyFromInputs } from './js/core/scenario_hierarchy.js';
+import { getEffectiveScenarioHierarchyFromInputs } from './js/core/scenario/scenario_hierarchy.js';
 const { base, override } = JSON.parse(readFileSync(0, 'utf8'));
 process.stdout.write(JSON.stringify(getEffectiveScenarioHierarchyFromInputs(base, override)));
 '''

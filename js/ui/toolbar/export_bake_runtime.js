@@ -1,9 +1,9 @@
 import { drawThematicWgiExportLegend } from "../../core/renderer/thematic_wgi_export_legend.js";
 import { drawPopulationExportLegend } from "../../core/renderer/population_export_legend.js";
-import { ensurePopulationData } from "../../core/population_spatial_runtime.js";
-import { isPopulationActive, getPopulationSignature, getPopulationViewModel } from "../../core/population_spatial_view_model.js";
-import { ensureThematicWgiData } from "../../core/thematic_wgi_runtime.js";
-import { isThematicWgiRequested, isThematicWgiActive, getThematicWgiSignature } from "../../core/thematic_wgi_view_model.js";
+import { ensurePopulationData } from "../../core/thematic/population_spatial_runtime.js";
+import { isPopulationActive, getPopulationSignature, getPopulationViewModel } from "../../core/thematic/population_spatial_view_model.js";
+import { ensureThematicWgiData } from "../../core/thematic/thematic_wgi_runtime.js";
+import { isThematicWgiRequested, isThematicWgiActive, getThematicWgiSignature } from "../../core/thematic/thematic_wgi_view_model.js";
 import { setExportBakeState } from "../../core/state/actions/export_workbench_actions.js";
 import { createExportError } from "./export_failure_handler.js";
 import {

@@ -21,10 +21,10 @@ import {
   THEMATIC_HDI_MAIN_MAP_SUPPORT_LABEL,
   THEMATIC_POPULATION_MAIN_MAP_SUPPORT_LABEL,
   THEMATIC_MAIN_MAP_SUPPORT_LABEL,
-} from "../js/core/thematic_layer_catalog.js";
-import { THEMATIC_WGI_LAYER_ID, THEMATIC_WGI_METRIC_ID, THEMATIC_WGI_METRICS, THEMATIC_WGI_SCENARIO_IDS } from "../js/core/thematic_wgi_data.js";
-import { THEMATIC_HDI_LAYER_ID, THEMATIC_HDI_METRIC_ID, THEMATIC_HDI_METRICS } from "../js/core/thematic_hdi_data.js";
-import { THEMATIC_POPULATION_LAYER_ID, THEMATIC_POPULATION_METRIC_ID, THEMATIC_POPULATION_METRICS } from "../js/core/thematic_population_data.js";
+} from "../js/core/thematic/thematic_layer_catalog.js";
+import { THEMATIC_WGI_LAYER_ID, THEMATIC_WGI_METRIC_ID, THEMATIC_WGI_METRICS, THEMATIC_WGI_SCENARIO_IDS } from "../js/core/thematic/thematic_wgi_data.js";
+import { THEMATIC_HDI_LAYER_ID, THEMATIC_HDI_METRIC_ID, THEMATIC_HDI_METRICS } from "../js/core/thematic/thematic_hdi_data.js";
+import { THEMATIC_POPULATION_LAYER_ID, THEMATIC_POPULATION_METRIC_ID, THEMATIC_POPULATION_METRICS } from "../js/core/thematic/thematic_population_data.js";
 import {
   resolveThematicLayerCatalogAssetKey,
   resolveThematicLayerCatalogUrl,

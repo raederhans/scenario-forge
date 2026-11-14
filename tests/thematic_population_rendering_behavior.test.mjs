@@ -2,16 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { gunzipSync } from "node:zlib";
-import { THEMATIC_POPULATION_METRICS } from "../js/core/thematic_population_data.js";
+import { THEMATIC_POPULATION_METRICS } from "../js/core/thematic/thematic_population_data.js";
 import {
   getThematicIndicator, loadThematicIndicatorData, formatThematicIndicatorValue,
-} from "../js/core/thematic_indicator_catalog.js";
-import { ensureThematicWgiData } from "../js/core/thematic_wgi_runtime.js";
+} from "../js/core/thematic/thematic_indicator_catalog.js";
+import { ensureThematicWgiData } from "../js/core/thematic/thematic_wgi_runtime.js";
 import { setThematicWgiStyleState } from "../js/core/state/actions/thematic_wgi_actions.js";
 import {
   normalizeThematicWgiStyle, getThematicWgiColor, getThematicWgiLegend,
   getThematicWgiFeatureInspection, getThematicWgiViewModel,
-} from "../js/core/thematic_wgi_view_model.js";
+} from "../js/core/thematic/thematic_wgi_view_model.js";
 import { resolveFeatureColor } from "../js/core/color_resolver.js";
 import { createTooltipFixture } from "./helpers/isolated_tooltip_fixture.mjs";
 import { drawThematicWgiExportLegend } from "../js/core/renderer/thematic_wgi_export_legend.js";

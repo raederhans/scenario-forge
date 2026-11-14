@@ -1,4 +1,4 @@
-import { getThematicWgiLegend } from "../thematic_wgi_view_model.js";
+import { getThematicWgiLegend } from "../thematic/thematic_wgi_view_model.js";
 
 function wrapText(ctx, text, width) {
   const lines = [];

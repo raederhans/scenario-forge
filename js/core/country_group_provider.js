@@ -1,6 +1,6 @@
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
-import { getEffectiveScenarioHierarchy, clipHierarchyGroupsToOwner } from "./scenario_hierarchy.js";
-import { normalizeScenarioDistrictGroupsPayload } from "./scenario_districts.js";
+import { getEffectiveScenarioHierarchy, clipHierarchyGroupsToOwner } from "./scenario/scenario_hierarchy.js";
+import { normalizeScenarioDistrictGroupsPayload } from "./scenario/scenario_districts.js";
 
 const hierarchyGroupsCache = new WeakMap();
 

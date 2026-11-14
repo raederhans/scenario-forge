@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createTransportWorkbenchApplyBridgeOwner } from "../js/ui/toolbar/transport_workbench_apply_bridge_owner.js";
+import { createTransportWorkbenchApplyBridgeOwner } from "../js/ui/transport_workbench/transport_workbench_apply_bridge_owner.js";
 
 test("apply button explains preview and local-only capabilities without changing their gates", () => {
   const owner = createTransportWorkbenchApplyBridgeOwner({ transportWorkbenchUi: { familyConfigs: {} } });

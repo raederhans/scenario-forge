@@ -4,7 +4,7 @@ import {
   createPopulationHeatmapRenderOwner, rasterizePopulationDensity, getPopulationViewportDetailTileIds,
   POPULATION_SCREEN_SAMPLE_BUDGET, POPULATION_EXPORT_SAMPLE_BUDGET,
 } from "../js/core/renderer/population_heatmap_render_owner.js";
-import { getPopulationDensityColor } from "../js/core/population_spatial_view_model.js";
+import { getPopulationDensityColor } from "../js/core/thematic/population_spatial_view_model.js";
 import { estimateExportRenderBytes } from "../js/core/renderer/export_render_budget.js";
 import { RENDER_PASS_NAMES, TRANSFORMED_FRAME_PASS_NAMES, INTERACTION_COMPOSITE_PASS_NAMES,
   filterEnabledRenderPassNames } from "../js/core/map_renderer/render_pass_catalog.js";

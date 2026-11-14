@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { formatScenarioStatusText } from '../js/core/scenario_manager.js';
-import { formatScenarioFatalRecoveryMessage } from '../js/core/scenario_recovery.js';
+import { formatScenarioFatalRecoveryMessage } from '../js/core/scenario/scenario_recovery.js';
 import { state } from '../js/core/state.js';
 
 test('scenario status names the active scenario in both normal and fatal status branches', () => {

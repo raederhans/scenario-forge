@@ -12,10 +12,10 @@ import { planPhysicalViewportSurface } from "./renderer/physical_raster_surface.
 import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
 import { analyzeScenarioPoliticalDerivedStateCoverageChunked } from "./renderer/scenario_chunk_promotion_helpers.js";
 import { getPoliticalDisplayModeSignature } from "./political_display_mode.js";
-import { getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
-import { getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
-import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./population_spatial_runtime.js";
-import { samplePopulationDensityLonLat } from "./population_spatial_data.js";
+import { getThematicWgiSignature, isThematicWgiActive } from "./thematic/thematic_wgi_view_model.js";
+import { getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./thematic/population_spatial_view_model.js";
+import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./thematic/population_spatial_runtime.js";
+import { samplePopulationDensityLonLat } from "./thematic/population_spatial_data.js";
 import { createPopulationHeatmapRenderOwner, getPopulationViewportDetailTileIds } from "./renderer/population_heatmap_render_owner.js";
 import { clearAllRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { getEditedRiverParentIds } from "./river_paint/partition_model.js";
@@ -35,7 +35,7 @@ import { applyFeaturePaintState } from "./state/color_state.js";
 import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCountryState, selectInspectorGroupState, selectInspectorFeatureState } from "./state/actions/editor_input_actions.js";
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
-import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
+import { normalizeStrategicValuesStyle } from "./thematic/strategic_values_view_model.js";
 import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
 import { createFillTargetPolicy } from './renderer/fill_target_policy.js';
@@ -258,7 +258,7 @@ import {
 } from "./i18n.js";
 import { markDirty } from "./dirty_state.js";
 import { perfIsEnabled, recordRenderSample } from "./perf_probe.js";
-import { getLocalizedScenarioCountryName, getScenarioCountryDisplayName } from "./scenario_country_display.js";
+import { getLocalizedScenarioCountryName, getScenarioCountryDisplayName } from "./scenario/scenario_country_display.js";
 import {
   SCENARIO_PRESENTATION_FEATURES,
   scenarioHasPresentationFeature,

@@ -71,7 +71,7 @@ STARTUP_SUPPORT_CONSUMER_MATRIX = {
     "geo_locale_patch": {
         "default_startup": [],
         "scenario_apply": [
-            "js/core/scenario_resources.js",
+            "js/core/scenario/scenario_resources.js",
             "js/core/scenario_manager.js",
         ],
     },

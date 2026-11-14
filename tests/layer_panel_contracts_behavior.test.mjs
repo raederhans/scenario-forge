@@ -29,7 +29,7 @@ import {
 import {
   buildLayerStatusDiagnostics,
 } from "../js/ui/toolbar/layer_status_diagnostics.js";
-import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
+import { normalizeThematicWgiStyle } from "../js/core/thematic/thematic_wgi_view_model.js";
 
 function createState(overrides = {}) {
   return {

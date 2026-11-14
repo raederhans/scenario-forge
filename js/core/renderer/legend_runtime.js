@@ -2,8 +2,8 @@ import { callRuntimeHook } from "../state/index.js";
 import { LegendManager, createRevisionedLegendColorReader } from "../legend_manager.js";
 import { createDeferredPanelRender } from "../deferred_panel_render.js";
 import { getPoliticalDisplayLegend } from "../political_display_mode.js";
-import { getThematicWgiLegend } from "../thematic_wgi_view_model.js";
-import { getPopulationLegend } from "../population_spatial_view_model.js";
+import { getThematicWgiLegend } from "../thematic/thematic_wgi_view_model.js";
+import { getPopulationLegend } from "../thematic/population_spatial_view_model.js";
 import { createLegendControlOwner } from "./legend_control_owner.js";
 
 export function createLegendRuntime({ state, runtimeState, getMapContainer, clamp }) {

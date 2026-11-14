@@ -1,5 +1,5 @@
 import { state } from "../core/state.js";
-import { getLocalizedScenarioCountryName } from "../core/scenario_country_display.js";
+import { getLocalizedScenarioCountryName } from "../core/scenario/scenario_country_display.js";
 import { t, getDirectGeoLabel } from "./i18n.js";
 
 export function createScenarioIntroCard(container) {
