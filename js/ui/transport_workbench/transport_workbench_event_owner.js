@@ -169,7 +169,7 @@ export function createTransportWorkbenchEventOwner({
           setInspectorTab(tabButton.dataset.transportInspectorTab || "inspect");
           const context = getRenderContext();
           renderShell(context);
-          renderInspector(context.family, context.config, context.compareHeld);
+          renderInspector(context.family, context.config);
         };
         tabButton.addEventListener("click", activateInspectorTab);
         tabButton.addEventListener("keydown", (event) => {

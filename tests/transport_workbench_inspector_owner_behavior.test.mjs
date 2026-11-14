@@ -470,7 +470,6 @@ test("inspector owner skips detail DOM rebuilds when the rendered model is uncha
       emptyCard,
       family: { id: "road", label: "Road" },
       config: { motorwayIdentitySource: "osm_only" },
-      compareHeld: false,
       previewSnapshot: { status: "error", error: "source missing" },
       dataContract: { governance: "data/transport/road.json" },
     };
@@ -494,7 +493,6 @@ test("inspector owner skips detail DOM rebuilds when the rendered model is uncha
     assert.equal(
       buildTransportWorkbenchInspectorRenderSignature({
         familyId: "road",
-        compareHeld: false,
         model: {
           rows: [["Pack status", "Road pack failed to load"]],
           stateCards: [],
@@ -502,7 +500,6 @@ test("inspector owner skips detail DOM rebuilds when the rendered model is uncha
       }),
       buildTransportWorkbenchInspectorRenderSignature({
         familyId: "road",
-        compareHeld: false,
         model: {
           rows: [["Pack status", "Road pack failed to load"]],
           stateCards: [],
@@ -510,7 +507,7 @@ test("inspector owner skips detail DOM rebuilds when the rendered model is uncha
       }),
     );
     // 行标签按语言翻译后渲染：同样内容切换语言后必须重建，不能复用旧语言的 DOM。
-    const sameRows = { familyId: "road", compareHeld: false, model: { rows: [["Loaded roads", "4706"]], stateCards: [] } };
+    const sameRows = { familyId: "road", model: { rows: [["Loaded roads", "4706"]], stateCards: [] } };
     assert.notEqual(
       buildTransportWorkbenchInspectorRenderSignature({ ...sameRows, language: "zh" }),
       buildTransportWorkbenchInspectorRenderSignature({ ...sameRows, language: "en" }),

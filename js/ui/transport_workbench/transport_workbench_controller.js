@@ -134,9 +134,9 @@ export function createTransportWorkbenchController({
     ensureUiState: () => ensureTransportWorkbenchUiState(),
     getCarrierMount: () => transportWorkbenchCarrierMount,
     getRenderContext: () => getTransportWorkbenchRenderContext(),
-    renderInspector: (family, config, compareHeld) => renderTransportWorkbenchInspector(family, config, compareHeld),
+    renderInspector: (family, config) => renderTransportWorkbenchInspector(family, config),
     renderLayerOrderPanel: () => renderTransportWorkbenchLayerOrderPanel(),
-    renderLensSections: (family, config, compareHeld) => renderTransportWorkbenchLensSections(family, config, compareHeld),
+    renderLensSections: (family, config) => renderTransportWorkbenchLensSections(family, config),
     syncPreviewControls: () => syncTransportWorkbenchPreviewControls(),
   });
 
@@ -159,7 +159,7 @@ export function createTransportWorkbenchController({
     moveLayerOrder: (draggedFamilyId, targetFamilyId) => transportWorkbenchStateOwner.moveLayerOrder(draggedFamilyId, targetFamilyId),
     markDirty: (reason) => markDirty(reason),
     getRenderContext: () => getTransportWorkbenchRenderContext(),
-    renderInspector: (family, config, compareHeld) => renderTransportWorkbenchInspector(family, config, compareHeld),
+    renderInspector: (family, config) => renderTransportWorkbenchInspector(family, config),
   });
 
   const getTransportWorkbenchDataContract = (familyId) => TRANSPORT_WORKBENCH_DATA_CONTRACTS[familyId] || null;
@@ -278,7 +278,7 @@ export function createTransportWorkbenchController({
       setActiveFamily: (familyId) => transportWorkbenchStateOwner.setActiveFamily(familyId),
       renderUi: () => renderTransportWorkbenchUi(),
       setInspectorTab: (tabId) => transportWorkbenchStateOwner.setInspectorTab(tabId),
-      renderInspector: (family, config, compareHeld) => renderTransportWorkbenchInspector(family, config, compareHeld),
+      renderInspector: (family, config) => renderTransportWorkbenchInspector(family, config),
       handlePopoverEscape: (event) => transportWorkbenchPopoverOwner.handleEscape(event),
     },
   });
@@ -357,8 +357,8 @@ export function createTransportWorkbenchController({
       pendingWorkbenchAllowCarrierPrep = false;
       const nextContext = getTransportWorkbenchRenderContext();
       if (!nextContext.isOpen) return;
-      renderTransportWorkbenchLensSections(nextContext.family, nextContext.config, nextContext.compareHeld);
-      renderTransportWorkbenchInspector(nextContext.family, nextContext.config, nextContext.compareHeld);
+      renderTransportWorkbenchLensSections(nextContext.family, nextContext.config);
+      renderTransportWorkbenchInspector(nextContext.family, nextContext.config);
       refreshTransportWorkbenchPreview(nextContext, { allowCarrierPrep: allowCarrierPrepForFrame });
     });
   };
@@ -420,28 +420,26 @@ export function createTransportWorkbenchController({
 
   const renderTransportWorkbenchLayerOrderPanel = () => transportWorkbenchLayerOrderOwner.render();
 
-  const renderTransportWorkbenchInspectorTabs = (family, config, compareHeld) => {
+  const renderTransportWorkbenchInspectorTabs = (family, config) => {
     transportWorkbenchRightDeckOwner.renderTabs({
       family,
       config,
-      compareHeld,
       activeTab: runtimeState.transportWorkbenchUi.activeInspectorTab,
     });
   };
 
-  const renderTransportWorkbenchLensSections = (family, config, compareHeld) => {
+  const renderTransportWorkbenchLensSections = (family, config) => {
     const previewSnapshot = getTransportWorkbenchFamilyPreviewSnapshot(family.id, config);
     const dataContract = getTransportWorkbenchDataContract(family.id);
     transportWorkbenchLensOwner.render({
       family,
       previewSnapshot,
       dataContract,
-      compareHeld,
       rightDeckLabel: t("Display / Aggregation / Labels / Coverage / Data", "ui"),
     });
   };
 
-  const renderTransportWorkbenchInspector = (family, config, compareHeld) => {
+  const renderTransportWorkbenchInspector = (family, config) => {
     if (transportWorkbenchInspectorDetails) {
       const inspectorEmptyCard = transportWorkbenchInspectorEmptyTitle?.parentElement || null;
       const dataContract = getTransportWorkbenchDataContract(family.id);
@@ -451,12 +449,11 @@ export function createTransportWorkbenchController({
         emptyCard: inspectorEmptyCard,
         family,
         config,
-        compareHeld,
         previewSnapshot,
         dataContract,
       });
     }
-    renderTransportWorkbenchInspectorTabs(family, config, compareHeld);
+    renderTransportWorkbenchInspectorTabs(family, config);
   };
 
   const syncTransportWorkbenchPreviewControls = () => {
@@ -468,7 +465,6 @@ export function createTransportWorkbenchController({
     const uiState = runtimeState.transportWorkbenchUi;
     const family = getTransportWorkbenchFamilyMeta();
     const isOpen = !!uiState.open;
-    const compareHeld = false;
     const familyConfig = getTransportWorkbenchWorkingConfig(family.id);
     const displayConfig = getTransportWorkbenchDisplayConfig(family.id);
     // context 是 shell、lens、inspect 和 preview 的共同输入，避免四处重复读取 runtimeState。
@@ -481,7 +477,6 @@ export function createTransportWorkbenchController({
       activePackId,
       activePackMeta,
       isOpen,
-      compareHeld,
       displayConfig,
       config,
     };
@@ -508,8 +503,8 @@ export function createTransportWorkbenchController({
     }
     const context = getTransportWorkbenchRenderContext();
     renderTransportWorkbenchShell(context);
-    renderTransportWorkbenchLensSections(context.family, context.config, context.compareHeld);
-    renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
+    renderTransportWorkbenchLensSections(context.family, context.config);
+    renderTransportWorkbenchInspector(context.family, context.config);
     refreshTransportWorkbenchPackGateReport(context.activePackId, { rerender: true });
     refreshTransportWorkbenchPreview(context);
   };

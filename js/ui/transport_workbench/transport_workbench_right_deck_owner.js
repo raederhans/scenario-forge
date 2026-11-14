@@ -546,8 +546,7 @@ export function createTransportWorkbenchRightDeckOwner({
     return card;
   };
 
-  // 单个 control 只负责 schema -> DOM -> config update；compareHeld 锁住交互，保留对比基线不被拖拽误写。
-  const renderControl = (familyId, control, config, compareHeld) => {
+  const renderControl = (familyId, control, config) => {
     const previewSnapshot = getPreviewSnapshot(familyId, config);
     const resolvedOptions = typeof control.options === "function"
       ? (control.options({ familyId, config, previewSnapshot }) || [])
@@ -565,11 +564,9 @@ export function createTransportWorkbenchRightDeckOwner({
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = !!config[control.key];
-      input.disabled = compareHeld;
       const text = document.createElement("span");
       text.textContent = translate(control.label);
       input.addEventListener("change", () => {
-        if (compareHeld) return;
         updateFamilyConfig(familyId, control.key, input.checked);
       });
       label.appendChild(input);
@@ -581,7 +578,6 @@ export function createTransportWorkbenchRightDeckOwner({
     if (control.type === "select") {
       const select = document.createElement("select");
       select.className = "select-input transport-workbench-select";
-      select.disabled = compareHeld;
       resolvedOptions.forEach((option) => {
         const optionNode = document.createElement("option");
         optionNode.value = option.value;
@@ -590,7 +586,6 @@ export function createTransportWorkbenchRightDeckOwner({
         select.appendChild(optionNode);
       });
       select.addEventListener("change", () => {
-        if (compareHeld) return;
         updateFamilyConfig(familyId, control.key, select.value);
       });
       field.appendChild(select);
@@ -607,7 +602,6 @@ export function createTransportWorkbenchRightDeckOwner({
       range.max = String(control.max);
       range.step = String(control.step || 1);
       range.value = String(config[control.key]);
-      range.disabled = compareHeld;
       const value = document.createElement("span");
       value.className = "transport-workbench-range-value";
       value.textContent = formatRangeValue(config[control.key], control);
@@ -615,7 +609,6 @@ export function createTransportWorkbenchRightDeckOwner({
         value.textContent = formatRangeValue(range.value, control);
       });
       range.addEventListener("change", () => {
-        if (compareHeld) return;
         updateFamilyConfig(familyId, control.key, Number(range.value));
       });
       rangeRow.appendChild(range);
@@ -643,9 +636,9 @@ export function createTransportWorkbenchRightDeckOwner({
           ? defaultValuesWhenEmpty
           : configuredValues;
         input.checked = effectiveValues.includes(option.value);
-        input.disabled = compareHeld || !!option.disabled;
+        input.disabled = !!option.disabled;
         input.addEventListener("change", () => {
-          if (compareHeld || option.disabled) return;
+          if (option.disabled) return;
           if (control.defaultAllWhenEmpty) {
             const nextValues = [...effectiveValues];
             const valueIndex = nextValues.indexOf(option.value);
@@ -672,7 +665,7 @@ export function createTransportWorkbenchRightDeckOwner({
     return field;
   };
 
-  const createSectionNode = (family, section, config, compareHeld) => {
+  const createSectionNode = (family, section, config) => {
     const visibleControls = (section.controls || []).filter((control) => (
       typeof control.showWhen !== "function" || control.showWhen(config)
     ));
@@ -716,13 +709,13 @@ export function createTransportWorkbenchRightDeckOwner({
       body.appendChild(description);
     }
     visibleControls.forEach((control) => {
-      body.appendChild(renderControl(family.id, control, config, compareHeld));
+      body.appendChild(renderControl(family.id, control, config));
     });
     details.appendChild(body);
     return details;
   };
 
-  const createShellCard = (family, tabId, config, compareHeld) => {
+  const createShellCard = (family, tabId, config) => {
     if (!TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id)) {
       return null;
     }
@@ -755,7 +748,6 @@ export function createTransportWorkbenchRightDeckOwner({
       label.textContent = translate(labelText);
       const select = document.createElement("select");
       select.className = "select-input transport-workbench-select";
-      select.disabled = compareHeld;
       options.forEach((option) => {
         const optionNode = document.createElement("option");
         optionNode.value = option.value;
@@ -764,7 +756,6 @@ export function createTransportWorkbenchRightDeckOwner({
         select.appendChild(optionNode);
       });
       select.addEventListener("change", () => {
-        if (compareHeld) return;
         onChange(select.value);
       });
       control.append(label, select);
@@ -781,7 +772,6 @@ export function createTransportWorkbenchRightDeckOwner({
       const input = document.createElement("input");
       input.type = "range";
       input.className = "transport-workbench-range";
-      input.disabled = compareHeld;
       input.min = String(min);
       input.max = String(max);
       input.step = String(step);
@@ -793,7 +783,6 @@ export function createTransportWorkbenchRightDeckOwner({
         valueNode.textContent = `${input.value}${unit}`;
       });
       input.addEventListener("change", () => {
-        if (compareHeld) return;
         onChange(Number(input.value));
       });
       row.append(input, valueNode);
@@ -808,11 +797,9 @@ export function createTransportWorkbenchRightDeckOwner({
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = !!checked;
-      input.disabled = compareHeld;
       const text = document.createElement("span");
       text.textContent = translate(labelText);
       input.addEventListener("change", () => {
-        if (compareHeld) return;
         onChange(input.checked);
       });
       toggle.append(input, text);
@@ -907,7 +894,7 @@ export function createTransportWorkbenchRightDeckOwner({
     return card;
   };
 
-  const appendAdvancedRange = (tabId, family, config, body, compareHeld) => {
+  const appendAdvancedRange = (tabId, family, config, body) => {
     const displayConfig = getDisplayConfig(family.id);
     const control = document.createElement("div");
     control.className = "transport-workbench-shell-control";
@@ -919,7 +906,6 @@ export function createTransportWorkbenchRightDeckOwner({
     const input = document.createElement("input");
     input.type = "range";
     input.className = "transport-workbench-range";
-    input.disabled = compareHeld;
     input.min = tabId === "aggregation" ? "24" : "0.7";
     input.max = tabId === "aggregation" ? "120" : "1.8";
     input.step = tabId === "aggregation" ? "2" : "0.05";
@@ -935,7 +921,6 @@ export function createTransportWorkbenchRightDeckOwner({
     const commitValue = () => {
       const nextValue = Number(input.value);
       valueText.textContent = formatValue(nextValue);
-      if (compareHeld) return;
       updateDisplayConfig(family.id, (draft) => {
         if (tabId === "aggregation") {
           draft.aggregation.thresholds.clusterRadiusPx = nextValue;
@@ -953,7 +938,7 @@ export function createTransportWorkbenchRightDeckOwner({
     body.appendChild(control);
   };
 
-  const renderTabSections = (family, config, compareHeld, tabId, mountNode) => {
+  const renderTabSections = (family, config, tabId, mountNode) => {
     if (!isElementLike(mountNode)) return;
     mountNode.replaceChildren();
     if (family.id === "layers") return;
@@ -962,12 +947,12 @@ export function createTransportWorkbenchRightDeckOwner({
     getSectionsForTab(family.id, tabId).forEach((section) => {
       const shellId = densityFamily && shellSectionIds[section.key];
       const node = shellId
-        ? createShellCard(family, shellId, config, compareHeld)
-        : createSectionNode(family, section, config, compareHeld);
+        ? createShellCard(family, shellId, config)
+        : createSectionNode(family, section, config);
       if (node) mountNode.appendChild(node);
     });
     if (tabId === "data") {
-      if (family.id === "port") mountNode.appendChild(createShellCard(family, "coverage", config, compareHeld));
+      if (family.id === "port") mountNode.appendChild(createShellCard(family, "coverage", config));
       const previewSnapshot = getPreviewSnapshot(family.id, config) || {};
       const editOverlayNode = createEditOverlayNode(family, previewSnapshot);
       if (editOverlayNode) mountNode.appendChild(editOverlayNode);
@@ -981,14 +966,14 @@ export function createTransportWorkbenchRightDeckOwner({
       advanced.appendChild(summary);
       const body = document.createElement("div");
       body.className = "transport-workbench-section-body transport-workbench-section-body-advanced";
-      appendAdvancedRange("aggregation", family, config, body, compareHeld);
-      appendAdvancedRange("labels", family, config, body, compareHeld);
+      appendAdvancedRange("aggregation", family, config, body);
+      appendAdvancedRange("labels", family, config, body);
       advanced.appendChild(body);
       mountNode.appendChild(advanced);
     }
   };
 
-  const renderTabs = ({ family, config, compareHeld, activeTab }) => {
+  const renderTabs = ({ family, config, activeTab }) => {
     const visibleTabs = family.id === "layers" ? [] : ["inspect", "display", "data"].filter((tabId) => (
       tabId === "inspect" || tabId === "data" || getSectionsForTab(family.id, tabId).some((section) => (
         (section.controls || []).some((control) => typeof control.showWhen !== "function" || control.showWhen(config))
@@ -1017,7 +1002,7 @@ export function createTransportWorkbenchRightDeckOwner({
       panel.hidden = tabId !== resolvedTab;
     });
     if (Object.prototype.hasOwnProperty.call(TAB_MOUNTS, resolvedTab)) {
-      renderTabSections(family, config, compareHeld, resolvedTab, mounts[resolvedTab]);
+      renderTabSections(family, config, resolvedTab, mounts[resolvedTab]);
     }
     return resolvedTab;
   };

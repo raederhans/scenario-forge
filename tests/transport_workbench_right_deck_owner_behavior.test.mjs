@@ -173,7 +173,7 @@ test("right deck owner commits toggle, select, range, and multi controls", () =>
     getPreviewSnapshot: () => ({ optionsReady: true }),
   });
 
-  const toggle = owner.renderControl("road", { type: "toggle", key: "visible", label: "Visible" }, { visible: false }, false);
+  const toggle = owner.renderControl("road", { type: "toggle", key: "visible", label: "Visible" }, { visible: false });
   const toggleInput = findByTag(toggle, "input");
   toggleInput.checked = true;
   toggleInput.dispatch("change");
@@ -183,12 +183,12 @@ test("right deck owner commits toggle, select, range, and multi controls", () =>
     key: "mode",
     label: "Mode",
     options: [{ value: "fast", label: "Fast" }, { value: "slow", label: "Slow" }],
-  }, { mode: "fast" }, false);
+  }, { mode: "fast" });
   const selectInput = findByTag(select, "select");
   selectInput.value = "slow";
   selectInput.dispatch("change");
 
-  const range = owner.renderControl("road", { type: "range", key: "opacity", label: "Opacity", min: 0, max: 1, step: 0.1 }, { opacity: 0.5 }, false);
+  const range = owner.renderControl("road", { type: "range", key: "opacity", label: "Opacity", min: 0, max: 1, step: 0.1 }, { opacity: 0.5 });
   const rangeInput = findByTag(range, "input");
   rangeInput.value = "0.7";
   rangeInput.dispatch("input");
@@ -200,7 +200,7 @@ test("right deck owner commits toggle, select, range, and multi controls", () =>
     key: "lanes",
     label: "Lanes",
     options: [{ value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" }],
-  }, { lanes: ["primary"] }, false);
+  }, { lanes: ["primary"] });
   const multiInputs = findAllByTag(multi, "input");
   multiInputs[1].checked = true;
   multiInputs[1].dispatch("change");
@@ -211,20 +211,6 @@ test("right deck owner commits toggle, select, range, and multi controls", () =>
     ["road", "opacity", 0.7, {}],
     ["road", "lanes", true, { appendValue: "secondary" }],
   ]);
-}));
-
-test("right deck owner keeps compare-held controls disabled and read-only", () => withTestDocument(() => {
-  const events = [];
-  const owner = createTransportWorkbenchRightDeckOwner({
-    updateFamilyConfig: (...args) => events.push(args),
-  });
-
-  const field = owner.renderControl("road", { type: "toggle", key: "visible", label: "Visible" }, { visible: true }, true);
-  const input = findByTag(field, "input");
-  assert.equal(input.disabled, true);
-  input.checked = false;
-  input.dispatch("change");
-  assert.deepEqual(events, []);
 }));
 
 test("right deck owner renders only the active control tab", () => withTestDocument(() => {
@@ -248,7 +234,6 @@ test("right deck owner renders only the active control tab", () => withTestDocum
   owner.renderTabs({
     family: { id: "road" },
     config: {},
-    compareHeld: false,
     activeTab: "display",
   });
 
@@ -270,7 +255,6 @@ test("right deck owner preserves section open state and toggle writes", () => wi
   owner.renderTabSections(
     { id: "road" },
     { visible: true },
-    false,
     "display",
     mount
   );
@@ -299,7 +283,6 @@ test("right deck owner updates advanced range text on input and commits on chang
   owner.renderTabSections(
     { id: "mineral_resources" },
     { aggregationClusterRadiusPx: 48 },
-    false,
     "display",
     mount
   );
@@ -314,58 +297,6 @@ test("right deck owner updates advanced range text on input and commits on chang
   advancedRange.dispatch("change");
 
   assert.deepEqual(events, [["mineral_resources", 64]]);
-}));
-
-test("right deck owner keeps density shell and advanced controls read-only while compare is held", () => withTestDocument(() => {
-  const events = [];
-  const mount = new TestElement("div");
-  const owner = createTransportWorkbenchRightDeckOwner({
-    getDisplayConfig: () => createDisplayConfig(),
-    updateDisplayConfig: (...args) => events.push(args),
-  });
-
-  owner.renderTabSections(
-    { id: "mineral_resources" },
-    { aggregationClusterRadiusPx: 48 },
-    true,
-    "display",
-    mount
-  );
-  const inputs = findAllByTag(mount, "input");
-  const selects = findAllByTag(mount, "select");
-  assert.equal(inputs.every((input) => input.disabled), true);
-  assert.equal(selects.every((select) => select.disabled), true);
-
-  const firstSelect = selects[0];
-  firstSelect.value = "square";
-  firstSelect.dispatch("change");
-  const advancedRange = inputs[inputs.length - 1];
-  advancedRange.value = "64";
-  advancedRange.dispatch("input");
-
-  assert.deepEqual(events, []);
-}));
-
-test("right deck owner keeps density label shell toggle read-only while compare is held", () => withTestDocument(() => {
-  const events = [];
-  const mount = new TestElement("div");
-  const owner = createTransportWorkbenchRightDeckOwner({
-    getDisplayConfig: () => createDisplayConfig(),
-    updateDisplayConfig: (...args) => events.push(args),
-  });
-
-  owner.renderTabSections(
-    { id: "mineral_resources" },
-    { labelSeparation: 1 },
-    true,
-    "display",
-    mount
-  );
-  const checkbox = findAllByTag(mount, "input").find((input) => input.type === "checkbox");
-  assert.equal(checkbox.disabled, true);
-  checkbox.checked = true;
-  checkbox.dispatch("change");
-  assert.deepEqual(events, []);
 }));
 
 test("right deck owner omits diagnostics body in the data tab", () => withTestDocument(() => {
@@ -383,7 +314,6 @@ test("right deck owner omits diagnostics body in the data tab", () => withTestDo
   owner.renderTabSections(
     { id: "road" },
     { visible: true },
-    false,
     "data",
     mount
   );
@@ -402,7 +332,7 @@ test("Data tab keeps source restrictions in collapsed pack details", () => withT
       dataRows: [],
     }),
   });
-  owner.renderTabSections({ id: "road" }, {}, false, "data", mount);
+  owner.renderTabSections({ id: "road" }, {}, "data", mount);
   const details = findAllByTag(mount, "details").find((node) => node.className === "transport-workbench-pack-details");
   assert.ok(details);
   assert.equal(details.open, false);
@@ -451,7 +381,6 @@ test("right deck owner renders preview data rows and selects rows without mutati
   owner.renderTabSections(
     { id: "road" },
     { visible: true },
-    false,
     "data",
     mount
   );
@@ -538,7 +467,6 @@ test("right deck owner marks point data rows with edit status", () => withTestDo
   owner.renderTabSections(
     { id: "airport" },
     {},
-    false,
     "data",
     mount
   );
@@ -601,7 +529,6 @@ test("right deck owner adds and removes airport edit overlay points from the dat
   owner.renderTabSections(
     { id: "airport" },
     {},
-    false,
     "data",
     mount
   );
@@ -646,12 +573,11 @@ test("right deck owner replaces the active mount when tab and family change", ()
     mounts: { display: displayMount, data: dataMount },
     getDisplayConfig: () => createDisplayConfig(),
   });
-  owner.renderTabs({ family: { id: "airport" }, config: {}, compareHeld: false, activeTab: "data" });
+  owner.renderTabs({ family: { id: "airport" }, config: {}, activeTab: "data" });
   assert.match(textOf(dataMount), /Facility Scope/);
   owner.renderTabs({
     family: { id: "road" },
     config: { showRefs: true, refClasses: ["motorway"], labelDensityPreset: "balanced", allowPrimaryRefsAtHighZoom: false },
-    compareHeld: false,
     activeTab: "labels",
   });
   assert.equal(displayButton.classList.contains("is-active"), true);
@@ -665,7 +591,7 @@ test("data tabs omit diagnostic sections and shell notes for every family", () =
   const owner = createTransportWorkbenchRightDeckOwner();
   for (const id of ["road", "rail", "airport", "port", "mineral_resources", "energy_facilities", "industrial_zones", "logistics_hubs"]) {
     const mount = new TestElement("div");
-    owner.renderTabSections({ id }, {}, false, "data", mount);
+    owner.renderTabSections({ id }, {}, "data", mount);
     assert.equal(findAllByClass(mount, "transport-workbench-section-body-diagnostics").length, 0);
     assert.equal(findAllByClass(mount, "transport-workbench-shell-note").length, 0);
     assert.match(textOf(mount), /Source and use/);
@@ -720,7 +646,7 @@ test("saved inspector tabs migrate through core restoration and workbench state"
 test("density display merges basic controls and exposes a single advanced group", () => withTestDocument(() => {
   const mount = new TestElement("div");
   const owner = createTransportWorkbenchRightDeckOwner({ getDisplayConfig: () => createDisplayConfig() });
-  owner.renderTabSections({ id: "port" }, {}, false, "display", mount);
+  owner.renderTabSections({ id: "port" }, {}, "display", mount);
   assert.equal(findAllByClass(mount, "transport-workbench-advanced").length, 1);
   assert.doesNotMatch(textOf(mount), /Current settings|Enabled|Disabled|Display Mode/);
   const headings = findAllByClass(mount, "transport-workbench-note-title").map((node) => node.textContent);

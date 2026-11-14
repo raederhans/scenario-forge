@@ -128,15 +128,15 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
             // Let the latest committed preview publish the pending status.
             if (previewLensRefreshPending) {
               previewLensRefreshPending = false;
-              renderLensSections(context.family, context.config, context.compareHeld);
+              renderLensSections(context.family, context.config);
             }
-            renderInspector(context.family, context.config, context.compareHeld);
+            renderInspector(context.family, context.config);
             return null;
           });
         }
         clearAllTransportWorkbenchFamilyPreviews();
         if (isRenderGenerationCurrent(candidateGeneration, context.family.id)) {
-          renderInspector(context.family, context.config, context.compareHeld);
+          renderInspector(context.family, context.config);
         }
         return null;
       })
@@ -149,7 +149,7 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
           clearAllTransportWorkbenchFamilyPreviews();
         }
         if (isRenderGenerationCurrent(candidateGeneration, context.family.id)) {
-          renderInspector(context.family, context.config, context.compareHeld);
+          renderInspector(context.family, context.config);
         }
         return null;
       });
@@ -216,8 +216,8 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
           if (!context?.isOpen || !shouldRefresh) {
             return;
           }
-          renderLensSections(context.family, context.config, context.compareHeld);
-          renderInspector(context.family, context.config, context.compareHeld);
+          renderLensSections(context.family, context.config);
+          renderInspector(context.family, context.config);
         });
       });
     });

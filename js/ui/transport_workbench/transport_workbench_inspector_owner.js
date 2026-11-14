@@ -260,7 +260,6 @@ function createStateCard(title, body, tone = "soft") {
 export function buildTransportWorkbenchInspectorModel({
   family,
   config = {},
-  compareHeld = false,
   previewSnapshot = {},
   dataContract = null,
   layerOrder = [],
@@ -678,7 +677,6 @@ function normalizeInspectorRenderEntry(entry) {
 
 export function buildTransportWorkbenchInspectorRenderSignature({
   familyId = "",
-  compareHeld = false,
   model = {},
   language = "",
 } = {}) {
@@ -688,7 +686,6 @@ export function buildTransportWorkbenchInspectorRenderSignature({
   return JSON.stringify({
     familyId: String(familyId || ""),
     language: String(language || ""),
-    compareHeld: !!compareHeld,
     stateCards: (model.stateCards || []).map((card) => [
       String(card?.title || ""),
       String(card?.body || ""),
@@ -773,7 +770,6 @@ export function createTransportWorkbenchInspectorOwner({
     emptyCard = null,
     family = null,
     config = {},
-    compareHeld = false,
     previewSnapshot = {},
     dataContract = null,
   } = {}) => {
@@ -783,13 +779,11 @@ export function createTransportWorkbenchInspectorOwner({
     const inspectorModel = buildInspectorModel({
       family,
       config,
-      compareHeld,
       previewSnapshot,
       dataContract,
     });
     const signature = buildTransportWorkbenchInspectorRenderSignature({
       familyId: family?.id,
-      compareHeld,
       model: inspectorModel,
       language: runtimeState.currentLanguage,
     });

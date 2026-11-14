@@ -148,7 +148,6 @@ test("transport workbench preview lifecycle owner batches selection listeners to
     isOpen: true,
     family: { id: "road" },
     config: { roadClass: ["motorway"] },
-    compareHeld: false,
   };
 
   const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
@@ -164,11 +163,11 @@ test("transport workbench preview lifecycle owner batches selection listeners to
       rafCallbacks.push(callback);
       return rafCallbacks.length;
     },
-    renderLensSections: (family, config, compareHeld) => {
-      lensCalls.push({ familyId: family.id, config, compareHeld });
+    renderLensSections: (family, config) => {
+      lensCalls.push({ familyId: family.id, config });
     },
-    renderInspector: (family, config, compareHeld) => {
-      inspectorCalls.push({ familyId: family.id, config, compareHeld });
+    renderInspector: (family, config) => {
+      inspectorCalls.push({ familyId: family.id, config });
     },
   });
 
@@ -181,10 +180,10 @@ test("transport workbench preview lifecycle owner batches selection listeners to
   assert.equal(rafCallbacks.length, 1);
   rafCallbacks.shift()();
   assert.deepEqual(lensCalls, [
-    { familyId: "road", config: { roadClass: ["motorway"] }, compareHeld: false },
+    { familyId: "road", config: { roadClass: ["motorway"] } },
   ]);
   assert.deepEqual(inspectorCalls, [
-    { familyId: "road", config: { roadClass: ["motorway"] }, compareHeld: false },
+    { familyId: "road", config: { roadClass: ["motorway"] } },
   ]);
 
   context = { ...context, family: { id: "port" } };
@@ -239,7 +238,6 @@ test("transport workbench preview lifecycle owner schedules carrier view sync as
       isOpen: true,
       family: { id: "airport" },
       config: { airportType: ["international"] },
-      compareHeld: false,
     }),
     getCarrierMount: () => ({}),
     getCarrierViewState: () => viewState,
@@ -298,8 +296,8 @@ test("transport workbench preview lifecycle owner skips stale preview generation
     renderFamilyPreview: (familyId, config, options) => new Promise((resolve) => {
       previewResolvers.push({ familyId, config, options, resolve });
     }),
-    renderInspector: (family, config, compareHeld) => {
-      inspectorCalls.push({ familyId: family.id, config, compareHeld });
+    renderInspector: (family, config) => {
+      inspectorCalls.push({ familyId: family.id, config });
     },
     setCarrierViewChangeListener: () => {},
     setFamilyPreviewSelectionListener: () => {},
@@ -310,13 +308,11 @@ test("transport workbench preview lifecycle owner skips stale preview generation
     isOpen: true,
     family: { id: "road" },
     config: { scope: "motorway_only" },
-    compareHeld: false,
   };
   const railContext = {
     isOpen: true,
     family: { id: "rail" },
     config: { scope: "mainline_only" },
-    compareHeld: true,
   };
 
   const stalePreview = owner.refreshPreview(roadContext, { allowCarrierPrep: false });
@@ -340,7 +336,6 @@ test("transport workbench preview lifecycle owner skips stale preview generation
     {
       familyId: "rail",
       config: { scope: "mainline_only" },
-      compareHeld: true,
     },
   ]);
 });
@@ -600,7 +595,7 @@ test("carrier view refresh preserves the initial preview status update without r
     renderFamilyPreview: async () => null,
     renderLensSections: (family) => lensCalls.push(family.id),
   });
-  const context = { isOpen: true, family: { id: "road" }, config: {}, compareHeld: false };
+  const context = { isOpen: true, family: { id: "road" }, config: {} };
   const initial = owner.refreshPreview(context);
   await flushMicrotasks();
   assert.deepEqual(lensCalls, []);
@@ -663,7 +658,6 @@ test("preview lifecycle owner starts selected pack preparation in parallel befor
     isOpen: true,
     family: { id: "road" },
     config: { activePackId: "japan_custom_road", scope: "all" },
-    compareHeld: false,
   };
 
   const refreshPromise = owner.refreshPreview(context);

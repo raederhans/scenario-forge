@@ -5,7 +5,6 @@ export function buildTransportWorkbenchLensModel({
   family = null,
   previewSnapshot = {},
   dataContract = null,
-  compareHeld = false,
   rightDeckLabel = "",
   translate = (label) => label,
   pickUiCopy = (_zh, en) => en,
@@ -29,7 +28,6 @@ export function buildTransportWorkbenchLensModel({
     family,
     previewSnapshot,
     dataContract,
-    compareHeld,
     rightDeckLabel,
   });
   return {
@@ -117,7 +115,6 @@ export function createTransportWorkbenchLensOwner({
     family = null,
     previewSnapshot = {},
     dataContract = null,
-    compareHeld = false,
     rightDeckLabel = "",
   } = {}) => {
     if (!mount) return { reused: false, cardCount: 0 };
@@ -126,7 +123,6 @@ export function createTransportWorkbenchLensOwner({
       family,
       previewSnapshot,
       dataContract,
-      compareHeld,
       rightDeckLabel,
       translate,
       pickUiCopy,
