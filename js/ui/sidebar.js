@@ -47,6 +47,8 @@ import {
   updateSelectedOperationGraphic,
   updateSelectedOperationalLine,
   updateSelectedUnitCounter,
+  getCachedEffectiveCityCollection,
+  selectLandFeatureById,
 } from "../core/map_renderer/public.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import {
@@ -73,7 +75,6 @@ import { createScenarioInspectorController, renderCountryGroupButtons } from "./
 import { createRegionalPresetController } from "./sidebar/regional_preset_controller.js";
 import { createCountryInspectorController } from "./sidebar/country_inspector_controller.js";
 import { createRegionSearchController } from "./sidebar/region_search_controller.js";
-import { getCachedEffectiveCityCollection, selectLandFeatureById } from "../core/map_renderer.js";
 import { isRenamedPlace, listRenamedPlacesInFeatures } from "../core/renderer/modern_place_name.js";
 import { createStrategicOverlayController } from "./sidebar/strategic_overlay_controller.js";
 import { createWaterSpecialRegionController } from "./sidebar/water_special_region_controller.js";
