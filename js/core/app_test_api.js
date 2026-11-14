@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "./state/index.js";
 // Stable, read-only test surface for end-to-end tests (tests/e2e/golden/).
 //
 // Golden flows talk to the app only through the DOM and this object, never through
@@ -91,7 +92,7 @@ function status() {
       x: Number(state.zoomTransform?.x || 0),
       y: Number(state.zoomTransform?.y || 0),
       k: Number(state.zoomTransform?.k || 1),
-      bounds: state.getViewportGeoBoundsFn?.() || null,
+      bounds: callRuntimeHook(state, "getViewportGeoBoundsFn") || null,
     },
     chunks: {
       idle: chunkIdle(loadState),

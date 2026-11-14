@@ -1,5 +1,6 @@
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 
 import {
   getTransportCapabilityDefaultOverviewConfig,
@@ -97,15 +98,13 @@ function createHarness(runtimeOverrides = {}) {
     styleConfig: {
       transportOverview: {},
     },
-    ensureContextLayerDataFn(layerRequest, options) {
-      contextLayerLoads.push({ layerRequest, options });
-      return Promise.resolve();
-    },
-    releaseDeferredContextBasePassFn(reason) {
-      releaseReasons.push(reason);
-    },
     ...runtimeOverrides,
   };
+  registerRuntimeHook(runtimeState, "ensureContextLayerDataFn", (layerRequest, options) => {
+    contextLayerLoads.push({ layerRequest, options });
+    return Promise.resolve();
+  });
+  registerRuntimeHook(runtimeState, "releaseDeferredContextBasePassFn", (reason) => releaseReasons.push(reason));
   const controller = createTransportAppearanceController({
     runtimeState,
     t: (value) => value,
@@ -234,4 +233,13 @@ test("transport appearance family toggles load registry data layers before dirty
       harness.cleanup();
     }
   }
+});
+
+const fixtureHookNames = ["ensureContextLayerDataFn", "releaseDeferredContextBasePassFn"];
+let savedHooks;
+beforeEach(() => {
+  savedHooks = fixtureHookNames.map((name) => [name, readRegisteredRuntimeHookSource(null, name)]);
+});
+afterEach(() => {
+  for (const [name, hook] of savedHooks) registerRuntimeHook(null, name, hook);
 });

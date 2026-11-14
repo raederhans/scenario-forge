@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../state/index.js";
 import { createPaintContourRuntime } from "./paint_contour_runtime.js";
 import { createBorderIdentityResolver } from "./border_identity.js";
 import { getParentMergedParents, resolveParentMergedBorderKeys, resolveParentMergedContourColor } from "./parent_merged_presentation.js";
@@ -118,7 +119,7 @@ export function createPaintContourAssembly({
       if (supported.length !== runtimeState.parentBorderSupportedCountries?.length
         || supported.some((key, index) => key !== runtimeState.parentBorderSupportedCountries[index])) {
         runtimeState.parentBorderSupportedCountries = supported;
-        runtimeState.updateParentBorderCountryListFn?.();
+        callRuntimeHook(runtimeState, "updateParentBorderCountryListFn");
       }
     }
     return classification;

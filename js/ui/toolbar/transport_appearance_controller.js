@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { ensureActiveScenarioOptionalLayerLoaded } from "../../core/scenario_resources.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import {
@@ -410,7 +411,7 @@ export function createTransportAppearanceController({
     transportPortCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRailCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRoadCard?.classList.toggle("opacity-60", !transportEnabled);
-    runtimeState.syncFacilityInfoCardVisibilityFn?.();
+    callRuntimeHook(runtimeState, "syncFacilityInfoCardVisibilityFn");
   };
 
   const applyTransportAppearanceMasterToggle = (nextEnabled) => {
@@ -421,7 +422,7 @@ export function createTransportAppearanceController({
     }
     setTransportMasterVisibilityState(runtimeState, normalized);
     if (normalized && hasVisibleTransportFamily()) {
-      runtimeState.releaseDeferredContextBasePassFn?.("transport-master-toggle");
+      callRuntimeHook(runtimeState, "releaseDeferredContextBasePassFn", "transport-master-toggle");
     }
     if (normalized) {
       for (const familyId of listTransportOverviewCapabilityFamilyIds()) {
@@ -434,7 +435,7 @@ export function createTransportAppearanceController({
   };
 
   const releaseDeferredContextForTransportToggle = (reason) => {
-    runtimeState.releaseDeferredContextBasePassFn?.(reason);
+    callRuntimeHook(runtimeState, "releaseDeferredContextBasePassFn", reason);
   };
 
   const hasVisibleTransportFamily = () => (
