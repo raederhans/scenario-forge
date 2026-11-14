@@ -1,3 +1,4 @@
+import { RecordingPath as RecordedPath } from "./helpers/recording_path.mjs";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
@@ -62,13 +63,6 @@ test("hit and political cancellation between unpack batches stops before bitmap 
     assert.equal(bitmaps.length, 0);
   }
 });
-class RecordedPath {
-  commands = [];
-  moveTo(...args) { this.commands.push(["moveTo", ...args]); }
-  lineTo(...args) { this.commands.push(["lineTo", ...args]); }
-  closePath(...args) { this.commands.push(["closePath", ...args]); }
-  arc(...args) { this.commands.push(["arc", ...args]); }
-}
 function harness(overrides = {}) {
   const draws = [], transforms = [], bitmaps = [], contextOptions = [];
   const kernel = createGeometryRasterWorkerKernel({

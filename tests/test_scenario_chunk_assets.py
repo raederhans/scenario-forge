@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from helpers.polygon_fixtures import _square
 import json
 from pathlib import Path
 import sys
@@ -15,15 +16,6 @@ from tools import build_scenario_chunk_assets, scenario_chunk_assets
 from tools.scenario_chunk_format import decode_political_chunk
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-
-
-def _square(x: float, y: float, size: float = 1.0) -> Polygon:
-    return Polygon([
-        (x, y),
-        (x + size, y),
-        (x + size, y + size),
-        (x, y + size),
-    ])
 
 
 def _bumped_square(x: float, y: float, size: float = 1.0, bump: float = 0.005) -> Polygon:

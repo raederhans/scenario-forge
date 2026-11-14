@@ -1,3 +1,4 @@
+import { createDeferredPromise } from "./helpers/deferred_promise.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -22,16 +23,6 @@ const REQUIRED_HELPER_NAMES = [
   "setBootState",
   "setStartupReadonlyState",
 ];
-
-function createDeferredPromise() {
-  let resolve;
-  let reject;
-  const promise = new Promise((promiseResolve, promiseReject) => {
-    resolve = promiseResolve;
-    reject = promiseReject;
-  });
-  return { promise, resolve, reject };
-}
 
 async function drainMicrotasks() {
   await Promise.resolve();

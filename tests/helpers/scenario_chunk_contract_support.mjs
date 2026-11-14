@@ -1,3 +1,4 @@
+import { createDeferredPromise } from "./deferred_promise.mjs";
 import { createVisibleFrameIdentityPolicy } from "../../js/core/renderer/visible_frame_identity_policy.js";
 import { createPoliticalFeaturePolicy } from "../../js/core/renderer/political_feature_policy.js";
 import {
@@ -47,16 +48,6 @@ const REPO_ROOT = process.cwd();
 
 function readRepoFile(...relativeParts) {
   return fs.readFileSync(path.join(REPO_ROOT, ...relativeParts), "utf8");
-}
-
-function createDeferredPromise() {
-  let resolve;
-  let reject;
-  const promise = new Promise((resolvePromise, rejectPromise) => {
-    resolve = resolvePromise;
-    reject = rejectPromise;
-  });
-  return { promise, resolve, reject };
 }
 
 function createInitialVisualRegistryContinuationHarness({

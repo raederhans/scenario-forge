@@ -1,3 +1,4 @@
+import { RecordingPath as Path } from "./helpers/recording_path.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
@@ -19,13 +20,6 @@ const feature = { type: "Feature", properties: { id: "region" }, geometry };
 function transport(updates) {
   const encoded = codec.pack(updates, { minCoordinateCount: 0 });
   return structuredClone(encoded.payload, { transfer: encoded.transferables });
-}
-class Path {
-  commands = [];
-  moveTo(...args) { this.commands.push(["moveTo", ...args]); }
-  lineTo(...args) { this.commands.push(["lineTo", ...args]); }
-  closePath(...args) { this.commands.push(["closePath", ...args]); }
-  arc(...args) { this.commands.push(["arc", ...args]); }
 }
 const compact = () => decodePackedRasterUpdates(transport([{ id: "region", feature }]))[0].feature;
 

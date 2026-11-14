@@ -1,3 +1,4 @@
+import { createDeferredPromise } from "./helpers/deferred_promise.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -5,16 +6,6 @@ import {
   isUiShellDebugMode,
   runUiShellDebugBoot,
 } from "../js/bootstrap/ui_shell_boot.js";
-
-function createDeferredPromise() {
-  let resolve;
-  let reject;
-  const promise = new Promise((promiseResolve, promiseReject) => {
-    resolve = promiseResolve;
-    reject = promiseReject;
-  });
-  return { promise, resolve, reject };
-}
 
 async function drainMicrotasks() {
   await Promise.resolve();

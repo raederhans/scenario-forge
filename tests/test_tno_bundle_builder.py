@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from helpers.polygon_fixtures import _square
 from collections import Counter
 from contextlib import nullcontext
 import json
@@ -57,15 +58,6 @@ from tools.patch_tno_1962_bundle import (
     validate_geo_locale_manual_overrides,
     write_bundle_stage,
 )
-
-
-def _square(x: float, y: float, size: float = 1.0) -> Polygon:
-    return Polygon([
-        (x, y),
-        (x + size, y),
-        (x + size, y + size),
-        (x, y + size),
-    ])
 
 
 def _decode_topology_arc(topology: dict, arc_index: int) -> list[tuple[float, float]]:

@@ -1,3 +1,4 @@
+import { walk, findFirst, findAll } from "./helpers/element_tree_queries.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 
@@ -195,29 +196,6 @@ function createTestDocument() {
   document.body = new TestElement("body");
   document.activeElement = document.body;
   return document;
-}
-
-function walk(node, visit) {
-  for (const child of node.children || []) {
-    visit(child);
-    walk(child, visit);
-  }
-}
-
-function findFirst(root, predicate) {
-  let result = null;
-  walk(root, (node) => {
-    if (!result && predicate(node)) result = node;
-  });
-  return result;
-}
-
-function findAll(root, predicate) {
-  const result = [];
-  walk(root, (node) => {
-    if (predicate(node)) result.push(node);
-  });
-  return result;
 }
 
 function datasetKeyFromSelector(selector) {

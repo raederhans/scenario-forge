@@ -1,3 +1,4 @@
+import { createState } from "./helpers/layer_panel_state.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -9,11 +10,7 @@ import {
   THEMATIC_MAIN_MAP_SUPPORT_LABEL,
 } from "../js/core/thematic/thematic_layer_catalog.js";
 import {
-  createDefaultContentState,
-} from "../js/core/state/content_state.js";
-import {
   createDefaultStyleConfig,
-  createDefaultUiState,
 } from "../js/core/state/ui_state.js";
 import {
   buildBathymetryDiagnostic,
@@ -25,17 +22,6 @@ import {
   resolveLayerStatusTone,
   sanitizeLayerStatusText,
 } from "../js/ui/toolbar/layer_status_diagnostics.js";
-
-function createState(overrides = {}) {
-  return {
-    ...createDefaultContentState(),
-    ...createDefaultUiState(),
-    styleConfig: createDefaultStyleConfig(),
-    renderPerfMetrics: {},
-    zoomTransform: { k: 4 },
-    ...overrides,
-  };
-}
 
 test("physical atlas status ignores skipped contours and dormant contour failures", () => {
   const state = createState({

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from helpers.polygon_fixtures import _square
 import json
 from pathlib import Path
 import tempfile
@@ -11,15 +12,6 @@ from topojson import Topology
 
 from map_builder.contracts import sha256_path
 from tools import check_scenario_contracts, scenario_chunk_assets
-
-
-def _square(x: float, y: float, size: float = 1.0) -> Polygon:
-    return Polygon([
-        (x, y),
-        (x + size, y),
-        (x + size, y + size),
-        (x, y + size),
-    ])
 
 
 def _synthetic_topojson(features: list[dict]) -> dict:
