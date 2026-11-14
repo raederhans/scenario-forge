@@ -611,18 +611,39 @@ test("activation prepares coverage without drawing over the current native frame
   assert.equal(f.owner.getDiagnostics().commits, 1);
 });
 
-test("activation preparation retains budget and producer failure fallbacks without painting", t => {
+test("activation preparation downgrades an over-cap viewport without fallback or premature painting", async t => {
   const oversized = fixture({ width: 7680, height: 4320 });
+  t.after(() => oversized.owner.dispose());
+  assert.equal(oversized.owner.prepare(), true);
+  const diagnostics = oversized.owner.getDiagnostics();
+  assert.ok(7680 * 4320 > diagnostics.budgets.hardViewportPixels);
+  assert.equal(diagnostics.downgraded, true);
+  assert.ok(diagnostics.level < 0);
+  assert.equal(diagnostics.displayState, "preparing");
+  assert.equal(diagnostics.fallbacks, 0);
+  assert.equal(diagnostics.failed, "");
+  assert.equal(oversized.blits.length, 0);
+  assert.equal(oversized.gpus[0].draws.length, 0);
+  await settleOneWorker(oversized);
+  assert.equal(oversized.owner.getPendingWorkCount(), 1);
+  assert.equal(oversized.requests.length, 2);
+  assert.equal(oversized.owner.getDiagnostics().commits, 0);
+  assert.equal(oversized.owner.getDiagnostics().fallbacks, 0);
+  assert.equal(oversized.blits.length, 0);
+  assert.equal(oversized.gpus[0].draws.length, 0);
+  assert.deepEqual(oversized.renders, []);
+});
+
+test("activation preparation retains producer failure fallback without painting", t => {
   const broken = fixture();
-  t.after(() => { oversized.owner.dispose(); broken.owner.dispose(); });
-  assert.equal(oversized.owner.prepare(), false);
-  assert.equal(oversized.owner.getDiagnostics().reason, "view-budget");
-  assert.equal(oversized.requests.length, 0);
-  assert.equal(oversized.gpus.length, 0);
+  t.after(() => broken.owner.dispose());
   broken.helpers.getSourceIdentity = () => { throw new Error("source failed"); };
   assert.equal(broken.owner.prepare(), false);
   assert.equal(broken.owner.getDiagnostics().failed, "source failed");
+  assert.equal(broken.owner.getDiagnostics().displayState, "fallback");
   assert.equal(broken.owner.getDiagnostics().reason, "producer-error");
+  assert.equal(broken.requests.length, 0);
+  assert.equal(broken.gpus.length, 0);
   assert.equal(broken.blits.length, 0);
 });
 
