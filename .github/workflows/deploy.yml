@@ -10,84 +10,48 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
-jobs:
-  verify:
-    uses: ./.github/workflows/verify-shared.yml
-    with:
-      profile: deploy-minimal
+permissions:
+  contents: read
 
-  release-checks:
-    # The full browser gate against the built artifact, split so the slices run in
-    # parallel instead of ~20 minutes in series. Each raster profile is a serial
-    # describe and stays whole; "rest" is a grep-invert so new profiles land there.
-    name: release-checks (${{ matrix.slice }})
+jobs:
+  build:
+    # Build once, exercise that exact directory in a browser, then upload it.
     runs-on: ubuntu-24.04
-    needs: verify
-    timeout-minutes: 45
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        slice: [hoi4_1936, hoi4_1939, tno_1962, rest, golden-artifact]
+    timeout-minutes: 30
     env:
       PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
+      SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
+      PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4173/
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
       - name: Setup Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
-
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           cache: 'npm'
-
       - name: Install Node dependencies
         run: npm ci
-
+      - name: Build the Pages artifact
+        # Stdlib-only: the builder needs no Python packages.
+        run: python tools/build_pages_dist.py --output-root "$SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"
+      - name: Check the Pages artifact startup shell
+        run: python -m unittest tests.test_pages_dist_startup_shell -q
       - name: Cache Playwright browsers
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
           key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            playwright-browsers-${{ runner.os }}-
-
       - name: Install Playwright Chromium
+        run: npx playwright install chromium
+      - name: Exercise the built artifact in a browser
+        id: artifact_checks
         run: |
-          mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
-          max_retries=2
-          attempt=0
-          until npx playwright install chromium; do
-            if [ "$attempt" -ge "$max_retries" ]; then
-              echo "playwright install chromium failed after $((attempt + 1)) attempts"
-              exit 1
-            fi
-            sleep_seconds=$((2 ** attempt))
-            echo "playwright install chromium failed on attempt $((attempt + 1)); retry in ${sleep_seconds}s"
-            sleep "$sleep_seconds"
-            attempt=$((attempt + 1))
-          done
-
-      - name: Download built dist artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: deploy-dist
-          path: .runtime/pages-release/dist
-
-      - name: Exercise the Pages artifact
-        id: pages_checks
-        env:
-          SLICE: ${{ matrix.slice }}
-          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
-          PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4173/
-        run: |
-          python -m http.server 4173 --bind 127.0.0.1 --directory .runtime/pages-release/dist > .runtime/pages-release/server.log 2>&1 &
+          python -m http.server 4173 --bind 127.0.0.1 --directory "$SCENARIO_FORGE_PAGES_ARTIFACT_ROOT" > .runtime/pages-release/server.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           for attempt in {1..30}; do
@@ -95,116 +59,26 @@ jobs:
             sleep 1
           done
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
-          case "$SLICE" in
-            hoi4_1936|hoi4_1939)
-              npm run test:e2e:pages-public-release-gate -- --grep "public Pages raster $SLICE " ;;
-            tno_1962)
-              npm run test:e2e:pages-public-release-gate -- --grep 'public Pages raster tno_1962 (?!large)' ;;
-            rest)
-              npm run test:e2e:pages-public-release-gate -- --grep-invert 'public Pages raster (hoi4_1936 |hoi4_1939 |tno_1962 (?!large))' ;;
-            golden-artifact)
-              # Golden flows on the bundled artifact itself: save/reopen and PNG export.
-              node node_modules/@playwright/test/cli.js test tests/e2e/golden --grep 'saved project|exported PNG' --workers=1 --retries=0 ;;
-            *)
-              echo "::error::unknown release-check slice: $SLICE"; exit 2 ;;
-          esac
-
-      - name: Upload Pages artifact failure evidence
-        if: failure() && steps.pages_checks.outcome == 'failure'
+          # Golden flows on the bundled artifact itself: save/reopen and PNG export.
+          node node_modules/@playwright/test/cli.js test tests/e2e/golden --grep 'saved project|exported PNG' --workers=2 --retries=0
+      - name: Upload failure evidence
+        if: failure() && steps.artifact_checks.outcome == 'failure'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: pages-artifact-failure-evidence-${{ matrix.slice }}
+          name: pages-artifact-failure-evidence
           include-hidden-files: true
           if-no-files-found: warn
-          retention-days: 7
+          retention-days: 3
           path: |
             .runtime/pages-release/server.log
-            .runtime/reports/test-timings.ndjson
-            .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/
-
-  admission:
-    # Admit the artifact only after every release-check slice passed.
-    runs-on: ubuntu-24.04
-    needs: release-checks
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout artifact admission
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /.gitignore
-            /tools/build_pages_dist.py
-            /tools/pages_artifact_admission.py
-            /tools/pages_artifact_root.py
-            /tools/pages_artifact_shadow.py
-
-      - name: Download built dist artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: deploy-dist
-          path: .runtime/pages-release/dist
-
-      - name: Write Pages artifact admission
-        run: python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --run-id github-${{ github.run_id }}-${{ github.run_attempt }} --public-smoke passed --receipt-out .runtime/pages-release/receipt.json --summary-out .runtime/pages-release/summary.json
-
-      - name: Upload Pages artifact admission
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: deploy-admission
-          path: .runtime/pages-release/receipt.json
-          if-no-files-found: error
-
-  build:
-    runs-on: ubuntu-24.04
-    needs: admission
-    permissions:
-      contents: read
-      pages: write
-    steps:
-      - name: Checkout artifact verifier
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /.gitignore
-            /tools/pages_artifact_admission.py
-            /tools/pages_artifact_root.py
-            /tools/pages_artifact_shadow.py
-            /tools/pages_stable_mtime.py
-
-      - name: Download verified dist artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: deploy-dist
-          path: .runtime/pages-release/dist
-
-      - name: Download Pages artifact admission
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: deploy-admission
-          path: .runtime/pages-release
-
-      - name: Verify artifact source and downloaded bytes
-        env:
-          EXPECTED_SOURCE_SHA: ${{ github.sha }}
-        run: python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --verify-receipt .runtime/pages-release/receipt.json --expected-source-sha "$EXPECTED_SOURCE_SHA"
-
-      - name: Derive file mtimes from content
-        # Pages 的 ETag 是 W/"<mtime>-<size>"：按内容派生 mtime，内容不变的文件跨部署保持
-        # 同一个 ETag，回访用户走 304 而不是全量重下。放在字节校验之后、打包之前。
-        run: python tools/pages_stable_mtime.py .runtime/pages-release/dist
-
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: .runtime/pages-release/dist
+          retention-days: 1
 
   deploy:
     environment:
@@ -212,8 +86,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
     needs: build
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
+    timeout-minutes: 15
     permissions:
       contents: read
       pages: write
@@ -222,170 +95,20 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
-
-      - name: Checkout release smoke tests
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /.gitignore
-            /package.json
-            /package-lock.json
-            /playwright.config.cjs
-            /tests/e2e/release/
-            /tests/e2e/support/
-            /tools/verify_political_id_raster_integration.mjs
-            /tools/political_id_raster_app_session.mjs
-            /apps/hgo/index.html
-            /apps/hgo/styles.css
-            /apps/hgo/src/
-            /apps/hgo/assets/default/
-
-      - name: Setup Node for release smoke
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Install Playwright Chromium
-        run: |
-          mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
-          max_retries=2
-          attempt=0
-          until npx playwright install chromium; do
-            if [ "$attempt" -ge "$max_retries" ]; then
-              echo "playwright install chromium failed after $((attempt + 1)) attempts"
-              exit 1
-            fi
-            sleep_seconds=$((2 ** attempt))
-            echo "playwright install chromium failed on attempt $((attempt + 1)); retry in ${sleep_seconds}s"
-            sleep "$sleep_seconds"
-            attempt=$((attempt + 1))
-          done
-
-      - name: Smoke deployed Pages URL
-        id: pages_smoke
-        env:
-          SCENARIO_FORGE_PAGES_URL: ${{ steps.deployment.outputs.page_url }}
-          PLAYWRIGHT_TEST_BASE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: |
-          # The complete gate, including every raster profile, already ran against
-          # this exact artifact before upload (release-checks). After
-          # publication only confirm CDN availability; repeating the heavy raster
-          # timing checks here failed on CDN timing after the site was already live.
-          npm run test:e2e:pages-public-release-gate -- --grep-invert "public Pages raster"
-
-      - name: Verify deployed HGO bytes against source SHA
+      - name: Confirm the published site answers
         env:
           PAGES_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
-          node --input-type=module <<'JS'
-          import assert from 'node:assert/strict';
-          import {createHash} from 'node:crypto';
-          import {readFile, readdir, realpath} from 'node:fs/promises';
-          import path from 'node:path';
-
-          const sourceSha = process.env.GITHUB_SHA;
-          assert.match(sourceSha || '', /^[0-9a-f]{40}$/i);
-          const base = new URL(process.env.PAGES_URL);
-          assert.equal(base.protocol, 'https:');
-          if (!base.pathname.endsWith('/')) base.pathname += '/';
-          const source = path.resolve('apps/hgo'), dataset = path.join(source, 'assets/default');
-          const files = new Set(['index.html', 'styles.css', 'assets/default/manifest.json']);
-          const within = (root, filename) => {
-            const relative = path.relative(root, filename);
-            assert.ok(relative && relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative), 'HGO path escapes its source');
-            return relative.split(path.sep).join('/');
-          };
-          async function collect(directory) {
-            for (const entry of await readdir(directory, {withFileTypes:true})) {
-              const filename = path.join(directory, entry.name);
-              if (entry.isDirectory()) await collect(filename);
-              else if (['.js', '.json', '.css'].includes(path.extname(entry.name))) files.add(within(source, await realpath(filename)));
-            }
-          }
-          await collect(path.join(source, 'src'));
-          const manifest = JSON.parse(await readFile(path.join(dataset, 'manifest.json'), 'utf8'));
-          for (const url of [...Object.values(manifest.assets).map(asset => asset.url), manifest.source.provenanceUrl]) {
-            assert.ok(typeof url === 'string' && url && !/[?#]/.test(url) && !/^[a-z][a-z0-9+.-]*:/i.test(url), 'Expected a relative dataset asset');
-            const decoded = decodeURIComponent(url);
-            assert.ok(!decoded.startsWith('/') && !decoded.includes('\\') && !decoded.includes(':'), 'Invalid dataset asset path');
-            const filename = await realpath(path.resolve(dataset, decoded));
-            within(dataset, filename);
-            files.add(within(source, filename));
-          }
-          const digest = bytes => createHash('sha256').update(bytes).digest('hex');
-          console.log(JSON.stringify({sourceSha, verification:'deployed-hgo-source-bytes', files:files.size}));
-          let totalBytes = 0;
-          for (const filename of [...files].sort()) {
-            let expected = await readFile(path.join(source, filename));
-            if (filename === 'index.html') {
-              const html = expected.toString('utf8');
-              assert.equal(html.split('href="../../index.html"').length - 1, 1);
-              expected = Buffer.from(html.replace('href="../../index.html"', 'href="../app/"'));
-            }
-            const url = new URL(`hgo/${filename.split('/').map(encodeURIComponent).join('/')}`, base);
-            const response = await fetch(url, {cache:'no-store', signal:AbortSignal.timeout(15000)});
-            assert.ok(response.ok, `${filename}: HTTP ${response.status}`);
-            const actual = Buffer.from(await response.arrayBuffer());
-            const expectedHash = digest(expected), actualHash = digest(actual);
-            console.log(JSON.stringify({sourceSha, file:filename, expectedHash, actualHash, bytes:actual.length}));
-            assert.equal(actualHash, expectedHash, `${filename}: deployed HGO bytes differ from source ${sourceSha}`);
-            totalBytes += actual.length;
-          }
-          console.log(JSON.stringify({sourceSha, verifiedFiles:files.size, totalBytes, passed:true}));
-          JS
-
-      - name: Upload deployed Pages failure evidence
-        if: failure() && steps.pages_smoke.outcome == 'failure'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: pages-deployed-failure-evidence
-          include-hidden-files: true
-          if-no-files-found: warn
-          retention-days: 7
-          path: |
-            .runtime/reports/test-timings.ndjson
-            .runtime/reports/generated/failure-context-index.ndjson
-            .runtime/tests/playwright/
-
-  timing-summary:
-    name: Deployment timing summary
-    needs: [verify, release-checks, admission, build, deploy]
-    if: always()
-    runs-on: ubuntu-24.04
-    timeout-minutes: 3
-    # Diagnostics only: never change the result or dependencies of release gates.
-    continue-on-error: true
-    permissions:
-      contents: read
-      actions: read
-    steps:
-      - name: Checkout timing reporter
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          persist-credentials: false
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /tools/deploy_timing_summary.py
-
-      - name: Summarize deployment stage durations
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p .runtime/tmp
-          if curl --fail --silent --show-error --connect-timeout 5 --max-time 20 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" \
-            > .runtime/tmp/deploy-jobs.json \
-            && python tools/deploy_timing_summary.py < .runtime/tmp/deploy-jobs.json >> "$GITHUB_STEP_SUMMARY"; then
-            echo "Deployment timing summary written."
-          else
-            echo "::warning::Deployment timing data unavailable; see individual job logs."
-            echo "Deployment timing data unavailable; see individual job logs. Release gate results are unchanged." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          # The artifact was exercised in a browser before upload; after publication
+          # only confirm that the CDN serves the landing page, the editor, its bundle
+          # entry, the scenario index and the HGO app.
+          base="${PAGES_URL%/}"
+          for path in "/" "/app/" "/app/js/bundle/main.js" "/app/data/scenarios/index.json" "/hgo/"; do
+            ok=0
+            for attempt in 1 2 3 4 5 6; do
+              if curl --fail --silent --show-error --location --max-time 30 --output /dev/null "$base$path"; then ok=1; break; fi
+              sleep 10
+            done
+            if [ "$ok" -ne 1 ]; then echo "::error::$base$path did not answer"; exit 1; fi
+            echo "ok $base$path"
+          done

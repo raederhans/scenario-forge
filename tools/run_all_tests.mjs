@@ -3,7 +3,7 @@
 //   node tools/run_all_tests.mjs node [--shard=1/2] [--with-slow | --all]
 //   node tools/run_all_tests.mjs python [--with-slow | --all]
 // Only entries in tests/quarantine.json are skipped (quarantine plus the slow lists).
-// --with-slow also runs the slow lists but still skips the quarantine (nightly).
+// --with-slow also runs the slow lists but still skips the quarantine (weekly run).
 // --all ignores the whole file, for a manual full audit.
 //
 // A few tests compare sources with the built Pages artifact. Unless

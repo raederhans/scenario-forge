@@ -1,5 +1,4 @@
 // 控件画廊截图基线：按版块、按 1440 / 375 两个宽度截图并与基线比对。
-// 不在 e2e 分层清单里（子目录不被 tools/e2e_layering.mjs 收录），只用
 // `npx playwright test tests/e2e/ui_gallery` 直接运行；基线按平台命名，目前只有 win32。
 // 更新基线：`npx playwright test tests/e2e/ui_gallery --update-snapshots`。
 const { test, expect } = require("@playwright/test");
