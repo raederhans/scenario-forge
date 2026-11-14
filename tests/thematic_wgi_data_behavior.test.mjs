@@ -11,7 +11,7 @@ import {
   getThematicWgiObservation,
   loadThematicWgiData,
   resolveThematicWgiJoinKey,
-} from "../js/core/thematic_wgi_data.js";
+} from "../js/core/thematic/thematic_wgi_data.js";
 
 const dataRoot = new URL("../data/thematic_layers/", import.meta.url);
 const manifest = JSON.parse(await readFile(new URL("political/wgi_state_capacity_v1/manifest.json", dataRoot)));

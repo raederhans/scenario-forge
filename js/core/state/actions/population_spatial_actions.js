@@ -1,4 +1,4 @@
-import { normalizePopulationStyle } from "../../population_spatial_view_model.js";
+import { normalizePopulationStyle } from "../../thematic/population_spatial_view_model.js";
 import { setAppearanceStyleGroupState, patchAppearanceStyleGroupState } from "./appearance_actions.js";
 import { resetThematicWgiRuntimeState } from "./thematic_wgi_actions.js";
 import { commitUiVisibilityState } from "./ui_visibility_actions.js";

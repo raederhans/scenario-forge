@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ensurePopulationData, ensurePopulationHeatmapData, getPopulationHeatmapSnapshot } from "../js/core/population_spatial_runtime.js";
-import { normalizePopulationStyle } from "../js/core/population_spatial_view_model.js";
+import { ensurePopulationData, ensurePopulationHeatmapData, getPopulationHeatmapSnapshot } from "../js/core/thematic/population_spatial_runtime.js";
+import { normalizePopulationStyle } from "../js/core/thematic/population_spatial_view_model.js";
 import { setPopulationStyleState } from "../js/core/state/actions/population_spatial_actions.js";
-import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION } from "../js/core/population_spatial_data.js";
+import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION } from "../js/core/thematic/population_spatial_data.js";
 const geometry = "a".repeat(64);
 function fixture() { return { activeScenarioId: "modern_world", activeScenarioManifest: { source: { runtime_topology_sha256: geometry } },
   styleConfig: { population: normalizePopulationStyle({ enabled: true }) }, scenarioBaselineOwnersByFeatureId: Object.freeze({ A: "AA" }) }; }

@@ -43,7 +43,7 @@ import {
 } from "./core/map_renderer/public.js";
 import { flushRenderBoundary, requestRender } from "./core/render_boundary.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "./core/state/index.js";
-import { runPostScenarioUiReplay } from "./core/scenario_post_apply_effects.js";
+import { runPostScenarioUiReplay } from "./core/scenario/scenario_post_apply_effects.js";
 import { t } from "./core/i18n.js";
 import {
   applyUiShellDebugTerritorySeed,

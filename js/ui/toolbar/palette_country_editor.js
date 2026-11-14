@@ -1,6 +1,6 @@
 import { getPaletteCountryTargets } from "../../core/palette_country_targets.js";
 import { normalizeHexColor } from "../../core/palette_manager.js";
-import { getScenarioCountryDisplayName } from "../../core/scenario_country_display.js";
+import { getScenarioCountryDisplayName } from "../../core/scenario/scenario_country_display.js";
 
 export function createPaletteCountryEditor({ state, host, applyColor }) {
   if (!host) return { render() {} };

@@ -2,13 +2,13 @@ import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core
 import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { createPopulationSpatialOwner, buildPopulationStatsCsv } from "../js/ui/toolbar/population_spatial_owner.js";
-import { getPopulationTooltipLines } from "../js/core/population_spatial_presentation.js";
+import { getPopulationTooltipLines } from "../js/core/thematic/population_spatial_presentation.js";
 import { drawPopulationExportLegend } from "../js/core/renderer/population_export_legend.js";
-import { ensurePopulationData, ensurePopulationHeatmapData } from "../js/core/population_spatial_runtime.js";
-import { normalizePopulationStyle } from "../js/core/population_spatial_view_model.js";
-import { POPULATION_MISSING_COLOR } from "../js/core/population_spatial_view_model.js";
+import { ensurePopulationData, ensurePopulationHeatmapData } from "../js/core/thematic/population_spatial_runtime.js";
+import { normalizePopulationStyle } from "../js/core/thematic/population_spatial_view_model.js";
+import { POPULATION_MISSING_COLOR } from "../js/core/thematic/population_spatial_view_model.js";
 import { resolveFeatureColor } from "../js/core/color_resolver.js";
-import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION } from "../js/core/population_spatial_data.js";
+import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION } from "../js/core/thematic/population_spatial_data.js";
 
 const geometry = "a".repeat(64);
 class Element {

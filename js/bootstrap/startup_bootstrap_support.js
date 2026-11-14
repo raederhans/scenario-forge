@@ -6,7 +6,7 @@ import {
   hydrateStoredViewSettings,
   setCurrentLanguage,
 } from "../core/state/content_state.js";
-import { hasScenarioRuntimeShellContract } from "../core/scenario_resources.js";
+import { hasScenarioRuntimeShellContract } from "../core/scenario/scenario_resources.js";
 import {
   getScenarioStartupBundleFilename,
   normalizeScenarioLocaleLanguage,

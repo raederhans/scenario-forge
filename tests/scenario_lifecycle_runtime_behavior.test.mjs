@@ -4,16 +4,16 @@ import { readFile } from "node:fs/promises";
 import { readJsonSource } from "./helpers/read_json_source.mjs";
 
 import { createScenarioLifecycleRuntime } from "../js/core/scenario/lifecycle_runtime.js";
-import { createScenarioApplyPipeline } from "../js/core/scenario_apply_pipeline.js";
+import { createScenarioApplyPipeline } from "../js/core/scenario/scenario_apply_pipeline.js";
 import { createScenarioOceanFillRestoreRuntime } from "../js/core/scenario/presentation_ocean_fill_restore.js";
 import {
   evaluateScenarioDataHealth,
   refreshScenarioDataHealth,
-} from "../js/core/scenario_data_health.js";
+} from "../js/core/scenario/scenario_data_health.js";
 import {
   captureScenarioApplyRollbackSnapshot,
   restoreScenarioApplyRollbackSnapshot,
-} from "../js/core/scenario_rollback.js";
+} from "../js/core/scenario/scenario_rollback.js";
 import {
   applyActivePaletteState,
   setActivePaletteSource,
@@ -22,7 +22,7 @@ import {
   hasPendingScenarioChunkWork,
   publishScenarioPaletteAndToolbarState,
   shouldSuppressChunkedPostApplyDataHealthSignals,
-} from "../js/core/scenario_post_apply_effects.js";
+} from "../js/core/scenario/scenario_post_apply_effects.js";
 import {
   createDefaultScenarioHydrationHealthGate,
 } from "../js/core/state/scenario_runtime_state.js";
@@ -46,7 +46,7 @@ import {
 } from "../js/core/state.js";
 import {
   resolveScenarioShellOwnerCode,
-} from "../js/core/scenario_shell_overlay.js";
+} from "../js/core/scenario/scenario_shell_overlay.js";
 
 const hookNames = new Set([
   ...STATE_NOTIFICATION_HOOK_NAMES,
@@ -1338,7 +1338,7 @@ test("default activation rollback restores localization, audit, and blank defaul
 test("deferred scenario metadata fake timer fences old scenario, epoch, and request while accepting the current request", async () => {
   const {
     scheduleScenarioDeferredBundleMetadataLoad,
-  } = await import("../js/core/scenario_resources.js");
+  } = await import("../js/core/scenario/scenario_resources.js");
   const originalSetTimeout = globalThis.setTimeout;
   const originalFetch = globalThis.fetch;
   const runCase = async ({
@@ -1451,7 +1451,7 @@ test("deferred scenario metadata fake timer fences old scenario, epoch, and requ
 test("deferred scenario metadata shares one fetch while a same-scenario retry owns the current commit lease", async () => {
   const {
     scheduleScenarioDeferredBundleMetadataLoad,
-  } = await import("../js/core/scenario_resources.js");
+  } = await import("../js/core/scenario/scenario_resources.js");
   const originalSetTimeout = globalThis.setTimeout;
   const originalFetch = globalThis.fetch;
 
@@ -1639,7 +1639,7 @@ test("deferred scenario metadata shares one fetch while a same-scenario retry ow
 test("deferred scenario metadata upgrades an ambient same-request lease with the manager currentness fence", async () => {
   const {
     scheduleScenarioDeferredBundleMetadataLoad,
-  } = await import("../js/core/scenario_resources.js");
+  } = await import("../js/core/scenario/scenario_resources.js");
   const originalSetTimeout = globalThis.setTimeout;
   const originalFetch = globalThis.fetch;
 

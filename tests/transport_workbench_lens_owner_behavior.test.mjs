@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   buildTransportWorkbenchLensRenderSignature,
   createTransportWorkbenchLensOwner,
-} from "../js/ui/toolbar/transport_workbench_lens_owner.js";
+} from "../js/ui/transport_workbench/transport_workbench_lens_owner.js";
 
 class TestClassList {
   constructor(node) {

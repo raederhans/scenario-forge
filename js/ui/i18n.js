@@ -674,7 +674,7 @@ async function toggleLanguage() {
     "refreshProjectAccountLanguageFn",
   ]);
   try {
-    const { ensureScenarioGeoLocalePatchForLanguage } = await import("../core/scenario_resources.js");
+    const { ensureScenarioGeoLocalePatchForLanguage } = await import("../core/scenario/scenario_resources.js");
     if (typeof ensureScenarioGeoLocalePatchForLanguage === "function") {
       await ensureScenarioGeoLocalePatchForLanguage(nextLang, { renderNow: false });
     }

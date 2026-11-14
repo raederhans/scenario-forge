@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   THEMATIC_POPULATION_DATA_VERSION, THEMATIC_POPULATION_LAYER_ID, THEMATIC_POPULATION_METRIC_ID,
   THEMATIC_POPULATION_METRICS, isThematicPopulationMetricSupported, loadThematicPopulationData,
-} from "../js/core/thematic_population_data.js";
+} from "../js/core/thematic/thematic_population_data.js";
 
 const SCENARIOS = ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"];
 const IDS = THEMATIC_POPULATION_METRICS.map(({ id }) => id);

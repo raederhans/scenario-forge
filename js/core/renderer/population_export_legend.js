@@ -1,4 +1,4 @@
-import { getPopulationLegend } from "../population_spatial_view_model.js";
+import { getPopulationLegend } from "../thematic/population_spatial_view_model.js";
 
 export function drawPopulationExportLegend(canvas, state) {
   const legend = getPopulationLegend(state);

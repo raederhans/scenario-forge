@@ -3,9 +3,9 @@ import { TNO_TAG_MIGRATION_VERSION } from "./country_code_aliases.js";
 import { verifyApprovedRiverPack } from "./river_paint/pilot_loader.js";
 import { normalizePaintMode } from "./map_editing_policy.js";
 import { normalizeRenderingStyleConfig } from "./renderer/display_quality_policy.js";
-import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
-import { normalizeThematicWgiStyle } from "./thematic_wgi_view_model.js";
-import { normalizePopulationStyle } from "./population_spatial_view_model.js";
+import { normalizeStrategicValuesStyle } from "./thematic/strategic_values_view_model.js";
+import { normalizeThematicWgiStyle } from "./thematic/thematic_wgi_view_model.js";
+import { normalizePopulationStyle } from "./thematic/population_spatial_view_model.js";
 import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
 import {

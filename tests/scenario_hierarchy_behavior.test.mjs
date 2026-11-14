@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   clipHierarchyGroupsToOwner, expandScenarioFeatureIds, getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs,
   projectScenarioFeatureIds,
-} from "../js/core/scenario_hierarchy.js";
+} from "../js/core/scenario/scenario_hierarchy.js";
 import { createQuickFillHierarchyResolver } from "../js/core/quick_fill_hierarchy.js";
 import { createParentBorderGroupingPolicy } from "../js/core/renderer/parent_border_grouping_policy.js";
 import { getQuickFillLevelModel } from "../js/ui/toolbar/quick_fill_level_controls.js";

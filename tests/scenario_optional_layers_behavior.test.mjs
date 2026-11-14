@@ -6,7 +6,7 @@ import {
   ensureActiveScenarioOptionalLayerLoaded,
   ensureActiveScenarioOptionalLayersForVisibility,
   loadScenarioOptionalLayerPayload,
-} from "../js/core/scenario_resources.js";
+} from "../js/core/scenario/scenario_resources.js";
 import { createScenarioBundleAssembler } from "../js/core/scenario/bundle_loader.js";
 import { createLayerFromPreset } from "../js/core/special_zone_layers.js";
 import {

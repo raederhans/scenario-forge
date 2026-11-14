@@ -1,7 +1,7 @@
 import { getCountryGroupSystems } from "../../core/country_group_provider.js";
 import { getMapDataBoundary } from "../../core/map_data_boundary.js";
 import { normalizePresetName } from "../../core/releasable_manager.js";
-import { getScenarioCountryDisplayName, getScenarioCountryOwnName } from "../../core/scenario_country_display.js";
+import { getScenarioCountryDisplayName, getScenarioCountryOwnName } from "../../core/scenario/scenario_country_display.js";
 import { normalizeCountryCodeAlias as normalizeCountryCode } from "../../core/country_code_aliases.js";
 
 // Country grouping, ordering and expansion selection read the live sidebar state.

@@ -15,7 +15,7 @@ import {
   THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON,
   THEMATIC_REAL_SOURCE_NOT_INGESTED_REASON,
   THEMATIC_MAIN_MAP_SUPPORT_LABEL,
-} from "../../core/thematic_layer_catalog.js";
+} from "../../core/thematic/thematic_layer_catalog.js";
 import {
   getLayerPanelContractById,
   getLayerPanelDisabledReason,

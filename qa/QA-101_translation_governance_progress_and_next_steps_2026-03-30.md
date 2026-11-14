@@ -61,7 +61,7 @@
 
 - 没有把实验性机器翻译替换成正式付费 provider。
 - 没有扩大机器翻译默认覆盖范围。
-- 没有修改 `js/core/scenario_manager.js`、`js/core/scenario_resources.js` 或其它 scenario 结构拆分相关文件。
+- 没有修改 `js/core/scenario_manager.js`、`js/core/scenario/scenario_resources.js` 或其它 scenario 结构拆分相关文件。
 - 没有改动 `data/locales.json` 的现有词条结果。
 - 没有把 review queue 直接回写进手工词典。
 

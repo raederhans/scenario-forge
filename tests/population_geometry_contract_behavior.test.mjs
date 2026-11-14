@@ -7,8 +7,8 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
-import { loadPopulationData, POPULATION_SCENARIO_IDS } from "../js/core/population_spatial_data.js";
-import { getPopulationGeometryVersion } from "../js/core/population_spatial_view_model.js";
+import { loadPopulationData, POPULATION_SCENARIO_IDS } from "../js/core/thematic/population_spatial_data.js";
+import { getPopulationGeometryVersion } from "../js/core/thematic/population_spatial_view_model.js";
 
 function readJson(file) {
   const raw = fs.readFileSync(file);

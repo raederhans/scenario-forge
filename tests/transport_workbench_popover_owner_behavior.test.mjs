@@ -3,7 +3,7 @@ import test from "node:test";
 
 import {
   createTransportWorkbenchPopoverOwner,
-} from "../js/ui/toolbar/transport_workbench_popover_owner.js";
+} from "../js/ui/transport_workbench/transport_workbench_popover_owner.js";
 
 class TestClassList {
   constructor(node) {

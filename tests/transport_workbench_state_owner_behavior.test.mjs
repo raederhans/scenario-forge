@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { getDefaultTransportWorkbenchPackIdForFamily } from "../js/core/transport_pack_resolver.js";
-import { createTransportWorkbenchStateOwner } from "../js/ui/toolbar/transport_workbench_state_owner.js";
+import { createTransportWorkbenchStateOwner } from "../js/ui/transport_workbench/transport_workbench_state_owner.js";
 
 function createOwner(initialUi = {}) {
   const runtimeState = { transportWorkbenchUi: initialUi };

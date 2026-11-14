@@ -1,6 +1,6 @@
-import { normalizeStrategicValuesStyle } from "../strategic_values_view_model.js";
-import { normalizeThematicWgiStyle } from "../thematic_wgi_view_model.js";
-import { normalizePopulationStyle } from "../population_spatial_view_model.js";
+import { normalizeStrategicValuesStyle } from "../thematic/strategic_values_view_model.js";
+import { normalizeThematicWgiStyle } from "../thematic/thematic_wgi_view_model.js";
+import { normalizePopulationStyle } from "../thematic/population_spatial_view_model.js";
 import { normalizeRenderingStyleConfig } from "../renderer/display_quality_policy.js";
 // UI state defaults.
 // 这里收口 overlay dirty 标记、可见性开关、workbench UI 和样式配置，

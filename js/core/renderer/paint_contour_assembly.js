@@ -3,14 +3,14 @@ import { createPaintContourRuntime } from "./paint_contour_runtime.js";
 import { createBorderIdentityResolver } from "./border_identity.js";
 import { getParentMergedParents, resolveParentMergedBorderKeys, resolveParentMergedContourColor } from "./parent_merged_presentation.js";
 import { getScenarioCountryTags } from "../state/actions/scenario_activation_actions.js";
-import { normalizeScenarioDistrictGroupsPayload } from "../scenario_districts.js";
+import { normalizeScenarioDistrictGroupsPayload } from "../scenario/scenario_districts.js";
 import { separatesPoliticalBorders } from "./political_border_policy.js";
 import { getRiverPaintRuntime } from "../river_paint/runtime.js";
 import { getMapDataBoundary } from "../map_data_boundary.js";
 import { normalizeMapSemanticMode } from "../state.js";
 import { isColorResolutionOceanFeature } from "./color_resolution_strategy.js";
-import { isThematicWgiActive } from "../thematic_wgi_view_model.js";
-import { isPopulationActive } from "../population_spatial_view_model.js";
+import { isThematicWgiActive } from "../thematic/thematic_wgi_view_model.js";
+import { isPopulationActive } from "../thematic/population_spatial_view_model.js";
 
 export function createPaintContourAssembly({
   runtimeState,

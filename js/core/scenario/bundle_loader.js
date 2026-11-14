@@ -19,7 +19,7 @@ import {
 } from "../scenario_chunk_manager.js";
 import {
   normalizeScenarioDistrictGroupsPayload,
-} from "../scenario_districts.js";
+} from "./scenario_districts.js";
 import {
   cacheBust,
   getScenarioGeoLocalePatchDescriptor,

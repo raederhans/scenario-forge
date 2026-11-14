@@ -1,4 +1,4 @@
-import { getEffectiveScenarioHierarchy } from "../../core/scenario_hierarchy.js";
+import { getEffectiveScenarioHierarchy } from "../../core/scenario/scenario_hierarchy.js";
 import { getQuickFillLevels, normalizeQuickFillScope } from "../../core/quick_fill_hierarchy.js";
 import { getCountryCode } from "../../core/feature_identity.js";
 

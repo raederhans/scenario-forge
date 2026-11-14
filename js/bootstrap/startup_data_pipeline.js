@@ -18,9 +18,9 @@ import {
   loadScenarioBundle,
   loadScenarioRegistry,
   validateScenarioRuntimeShellContract,
-} from "../core/scenario_resources.js";
-import { prepareScenarioLocalizationState } from "../core/scenario_localization_state.js";
-import { syncCountryUi } from "../core/scenario_ui_sync.js";
+} from "../core/scenario/scenario_resources.js";
+import { prepareScenarioLocalizationState } from "../core/scenario/scenario_localization_state.js";
+import { syncCountryUi } from "../core/scenario/scenario_ui_sync.js";
 import {
   SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS,
   SCENARIO_STARTUP_GEO_ALIASES_FILENAME,

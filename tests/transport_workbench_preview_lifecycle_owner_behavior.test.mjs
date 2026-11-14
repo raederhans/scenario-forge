@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { createTransportWorkbenchPreviewLifecycleOwner } from "../js/ui/toolbar/transport_workbench_preview_lifecycle_owner.js";
+import { createTransportWorkbenchPreviewLifecycleOwner } from "../js/ui/transport_workbench/transport_workbench_preview_lifecycle_owner.js";
 import {
   buildTransportWorkbenchProjectedLines,
   createTransportWorkbenchLinePathD,
@@ -10,13 +10,13 @@ import {
   normalizeTransportWorkbenchNumber,
   PACK_MODE_FULL,
   PACK_MODE_PREVIEW,
-} from "../js/ui/transport_workbench_line_runtime_shared.js";
-import { prepareTransportWorkbenchFamilyPreview } from "../js/ui/transport_workbench_family_preview.js";
+} from "../js/ui/transport_workbench/transport_workbench_line_runtime_shared.js";
+import { prepareTransportWorkbenchFamilyPreview } from "../js/ui/transport_workbench/transport_workbench_family_preview.js";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createChunkLoadScheduler } from "../js/core/scenario/chunk_load_scheduler.js";
 import {
   __transportWorkbenchPointPreviewTestInternals,
-} from "../js/ui/transport_workbench_point_preview_shared.js";
+} from "../js/ui/transport_workbench/transport_workbench_point_preview_shared.js";
 import {
   buildTransportWorkbenchPointSnapshot,
   createTransportWorkbenchEffectivePointPack,
@@ -24,7 +24,7 @@ import {
   getTransportWorkbenchPointPackPath,
   isTransportWorkbenchPointSinglePackPath,
   shouldUseTransportWorkbenchPointFullPack,
-} from "../js/ui/transport_workbench_point_preview_runtime.js";
+} from "../js/ui/transport_workbench/transport_workbench_point_preview_runtime.js";
 
 async function flushMicrotasks() {
   await Promise.resolve();

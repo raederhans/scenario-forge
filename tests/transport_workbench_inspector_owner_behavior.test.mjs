@@ -10,7 +10,7 @@ import {
   createTransportWorkbenchInspectorOwner,
   formatTransportWorkbenchManifestTimestamp,
   getTransportWorkbenchInspectorRowClassNames,
-} from "../js/ui/toolbar/transport_workbench_inspector_owner.js";
+} from "../js/ui/transport_workbench/transport_workbench_inspector_owner.js";
 
 function rowValue(rows, label) {
   const row = rows.find(([candidate]) => candidate === label);

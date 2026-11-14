@@ -6,7 +6,7 @@ import {
   getRoadVisibilityReason,
   getRoadStyle,
   getLabelClassGate,
-} from "../js/ui/transport_workbench_road_preview_runtime.js";
+} from "../js/ui/transport_workbench/transport_workbench_road_preview_runtime.js";
 
 // Characterization tests: lock the road preview's pure decision logic before/after
 // it is extracted out of transport_workbench_road_preview.js into the runtime layer.

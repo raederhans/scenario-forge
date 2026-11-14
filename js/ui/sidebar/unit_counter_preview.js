@@ -1,5 +1,5 @@
 import { normalizeCountryCodeAlias as normalizeCountryCode } from "../../core/country_code_aliases.js";
-import { getLocalizedScenarioCountryName } from "../../core/scenario_country_display.js";
+import { getLocalizedScenarioCountryName } from "../../core/scenario/scenario_country_display.js";
 import {
   DEFAULT_UNIT_COUNTER_PRESET_ID,
   getUnitCounterCatalogCategories,

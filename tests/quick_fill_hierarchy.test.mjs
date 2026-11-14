@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createQuickFillHierarchyResolver, normalizeQuickFillScope, getQuickFillLevels } from "../js/core/quick_fill_hierarchy.js";
 import { createFillTargetPolicy } from "../js/core/renderer/fill_target_policy.js";
-import { normalizeScenarioDistrictGroupsPayload, getScenarioDistrictCountryGrouping } from "../js/core/scenario_districts.js";
+import { normalizeScenarioDistrictGroupsPayload, getScenarioDistrictCountryGrouping } from "../js/core/scenario/scenario_districts.js";
 
 function fixture() {
   const features = ["a", "b", "c"].map((id) => ({ properties: { id, cntr_code: "CN", admin1_group: "direct" } }));

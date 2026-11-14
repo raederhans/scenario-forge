@@ -1,5 +1,5 @@
 import { callRuntimeHook } from "../core/state/index.js";
-import { loadScenarioBundle } from "../core/scenario_resources.js";
+import { loadScenarioBundle } from "../core/scenario/scenario_resources.js";
 import { applyScenarioBundleCommand } from "../core/scenario_dispatcher.js";
 import { normalizeScenarioId } from "../core/scenario/shared.js";
 import { applyScenarioOpeningView } from "../core/scenario/presentation_opening_view.js";

@@ -386,7 +386,7 @@ def apply_scenario_names(scenario_dir: Path, merges: Merges, feature_ids: set[st
 
 
 def record_scenario_feature_merges(manifest_path: Path, merges: Merges, applied: list[str]) -> None:
-    """Record scoped merges for js/core/scenario_hierarchy.js, which projects the shared hierarchy.
+    """Record scoped merges for js/core/scenario/scenario_hierarchy.js, which projects the shared hierarchy.
 
     Members are expressed in shared-hierarchy IDs: an earlier scoped merge that
     is merged again is replaced by its own members, and ``feature_redirects``
@@ -579,7 +579,7 @@ def add_scenario_member_aliases(payload: dict, merges: Merges) -> dict:
     """Members' own scenario names (plan ``scenario_member_names``) stay searchable on the merged feature.
 
     A scenario resolves the shared alias map, with its scoped merges remapped
-    (js/core/scenario_localization_state.js), so these point at the merged ID; an
+    (js/core/scenario/scenario_localization_state.js), so these point at the merged ID; an
     alias another feature already uses keeps its target.
     """
     entries = {entry.get("feature_id"): entry for entry in payload["entries"]}

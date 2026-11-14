@@ -4,7 +4,7 @@ import {
   hasExplicitScenarioAssignment,
   isScenarioWaterLikeFeature,
   shouldApplyHoi4FarEastSovietBackfill,
-} from "../scenario_runtime_queries.js";
+} from "./scenario_runtime_queries.js";
 import {
   recordScenarioPerfMetricState,
 } from "../state/scenario_runtime_state.js";

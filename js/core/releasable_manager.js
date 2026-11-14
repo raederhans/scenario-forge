@@ -2,7 +2,7 @@ import {
   expandScenarioFeatureIds,
   getEffectiveScenarioHierarchy,
   projectScenarioFeatureIds,
-} from "./scenario_hierarchy.js";
+} from "./scenario/scenario_hierarchy.js";
 import { countryPresets, state as runtimeState } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 const state = runtimeState;

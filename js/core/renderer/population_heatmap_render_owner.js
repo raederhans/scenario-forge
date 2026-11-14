@@ -1,5 +1,5 @@
-import { getPopulationDensityColor } from "../population_spatial_view_model.js";
-import { lonLatToPopulationGrid } from "../population_spatial_data.js";
+import { getPopulationDensityColor } from "../thematic/population_spatial_view_model.js";
+import { lonLatToPopulationGrid } from "../thematic/population_spatial_data.js";
 
 export const POPULATION_SCREEN_SAMPLE_BUDGET = 400_000;
 export const POPULATION_EXPORT_SAMPLE_BUDGET = 2_000_000;

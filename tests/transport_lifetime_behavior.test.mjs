@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createChunkLoadScheduler } from "../js/core/scenario/chunk_load_scheduler.js";
-import { estimateRoadPackRetentionBytes, ROAD_PACK_LOAD_BYTES } from "../js/ui/transport_workbench_retention.js";
-import { createTransportWorkbenchLinePackRuntime } from "../js/ui/transport_workbench_line_runtime_shared.js";
+import { estimateRoadPackRetentionBytes, ROAD_PACK_LOAD_BYTES } from "../js/ui/transport_workbench/transport_workbench_retention.js";
+import { createTransportWorkbenchLinePackRuntime } from "../js/ui/transport_workbench/transport_workbench_line_runtime_shared.js";
 
 const tick = () => new Promise(setImmediate);
 const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };

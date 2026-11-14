@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { resolveFeatureColor } from "../js/core/color_resolver.js";
-import { getStrategicFeatureInspection } from "../js/core/strategic_values_view_model.js";
+import { getStrategicFeatureInspection } from "../js/core/thematic/strategic_values_view_model.js";
 
 function fixture() {
   return {

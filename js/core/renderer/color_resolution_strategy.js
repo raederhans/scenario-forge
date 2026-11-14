@@ -1,6 +1,6 @@
 import { getMapDataBoundary } from "../map_data_boundary.js";
 import { resolveFeatureColor } from "../color_resolver.js";
-import { isScenarioWaterLikeFeature } from "../scenario_runtime_queries.js";
+import { isScenarioWaterLikeFeature } from "../scenario/scenario_runtime_queries.js";
 
 const BLANK_OWNERLESS_FEATURE_FILL_COLOR = "#d7d3c7";
 

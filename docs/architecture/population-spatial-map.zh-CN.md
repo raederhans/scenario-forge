@@ -49,4 +49,4 @@ python tools/data_health.py
 python -m unittest tests.test_data_catalog_contract
 ```
 
-核心代码分别为 `map_builder/population_spatial.py`、`js/core/population_spatial_data.js`、`js/core/population_spatial_runtime.js`、`js/core/population_spatial_view_model.js`、`js/core/renderer/population_heatmap_render_owner.js` 和 `js/ui/toolbar/population_spatial_owner.js`。产物位于 `data/thematic_layers/population/ghsl_population_2020_v1/`，详细守恒残差、覆盖状态和几何处理证据见其中 `audit.json`。
+核心代码分别为 `map_builder/population_spatial.py`、`js/core/thematic/population_spatial_data.js`、`js/core/thematic/population_spatial_runtime.js`、`js/core/thematic/population_spatial_view_model.js`、`js/core/renderer/population_heatmap_render_owner.js` 和 `js/ui/toolbar/population_spatial_owner.js`。产物位于 `data/thematic_layers/population/ghsl_population_2020_v1/`，详细守恒残差、覆盖状态和几何处理证据见其中 `audit.json`。

@@ -2,14 +2,14 @@ import { callRuntimeHook } from "../../core/state/index.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import { setThematicWgiStyleState } from "../../core/state/actions/thematic_wgi_actions.js";
 import { setPopulationStyleState } from "../../core/state/actions/population_spatial_actions.js";
-import { ensureThematicWgiData } from "../../core/thematic_wgi_runtime.js";
-import { THEMATIC_INDICATORS, getThematicIndicator } from "../../core/thematic_indicator_catalog.js";
+import { ensureThematicWgiData } from "../../core/thematic/thematic_wgi_runtime.js";
+import { THEMATIC_INDICATORS, getThematicIndicator } from "../../core/thematic/thematic_indicator_catalog.js";
 import {
   getThematicWgiLegend,
   getThematicWgiViewModel,
   normalizeThematicWgiStyle,
   isThematicWgiSelectionSupported,
-} from "../../core/thematic_wgi_view_model.js";
+} from "../../core/thematic/thematic_wgi_view_model.js";
 import { LegendManager } from "../../core/legend_manager.js";
 import { syncStyledSelect } from "../styled_selects.js";
 

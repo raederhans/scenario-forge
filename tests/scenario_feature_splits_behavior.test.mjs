@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getEffectiveScenarioHierarchyFromInputs, projectScenarioFeatureIds, expandScenarioFeatureIds } from "../js/core/scenario_hierarchy.js";
+import { getEffectiveScenarioHierarchyFromInputs, projectScenarioFeatureIds, expandScenarioFeatureIds } from "../js/core/scenario/scenario_hierarchy.js";
 import { migrateMergedFeatureProjectData, resolveFeatureMergeLineage } from "../js/core/feature_merge_migration.js";
 import { getScenarioImportValidFeatureIds } from "../js/core/interaction_funnel/import_trust_projection.js";
 import { countryPresets, state } from "../js/core/state.js";

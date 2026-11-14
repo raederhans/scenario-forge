@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import manifest from "../data/transport_layers/japan_road/manifest.json" with { type: "json" };
-import { getTransportWorkbenchFamilyPreviewConfig } from "../js/ui/transport_workbench_family_registry.js";
+import { getTransportWorkbenchFamilyPreviewConfig } from "../js/ui/transport_workbench/transport_workbench_family_registry.js";
 import { resolveTransportRoadFeatureMaturityProjection } from "../js/core/transport_capability_registry.js";
 
 const roadPreview = getTransportWorkbenchFamilyPreviewConfig("road");

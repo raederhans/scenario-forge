@@ -1,6 +1,6 @@
 import { createGeometryRasterWorkerClient } from "../geometry_raster_worker_client.js";
 import { getPoliticalDisplayModeSignature } from "../political_display_mode.js";
-import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
+import { getThematicWgiSignature } from "../thematic/thematic_wgi_view_model.js";
 import { packGeometryCooperatively } from "../cooperative_geometry_transport.js";
 import { createNavigationFrameOwner } from "./navigation_frame_owner.js";
 import { getObjectIdentityToken } from "./object_identity.js";

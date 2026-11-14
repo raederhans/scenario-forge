@@ -1,8 +1,8 @@
 import { callRuntimeHook } from "../../core/state/index.js";
 import { setPopulationStyleState } from "../../core/state/actions/population_spatial_actions.js";
-import { ensurePopulationData, ensurePopulationHeatmapData, getPopulationHeatmapSnapshot } from "../../core/population_spatial_runtime.js";
+import { ensurePopulationData, ensurePopulationHeatmapData, getPopulationHeatmapSnapshot } from "../../core/thematic/population_spatial_runtime.js";
 import { getPopulationViewModel, getPopulationLegend, getPopulationCountrySummary,
-  sumPopulationFeatures, normalizePopulationStyle } from "../../core/population_spatial_view_model.js";
+  sumPopulationFeatures, normalizePopulationStyle } from "../../core/thematic/population_spatial_view_model.js";
 import { getMapDataBoundary } from "../../core/map_data_boundary.js";
 import { LegendManager } from "../../core/legend_manager.js";
 import { syncStyledSelect } from "../styled_selects.js";
