@@ -37,9 +37,8 @@ import { callRuntimeHook } from "./state/index.js";
 import { migrateImportedProjectData } from "./sovereignty_manager.js";
 import { getTargetMainMapPackMeta } from "./transport_pack_resolver.js";
 import {
-  getTransportOverviewVisibilityField,
-  listTransportOverviewCapabilityFamilyIds,
-} from "./transport_capability_registry.js";
+  getTransportOverviewLayerVisibilityFields as getTransportOverviewVisibilityFields,
+} from "./state/appearance_preset_state.js";
 import { clearDirty } from "./dirty_state.js";
 import { projectEditor, routeHgoProject } from "./hgo_project_routing.js";
 import { buildExportArtifactManifest } from "./export_artifact_package.js";
@@ -144,12 +143,6 @@ function migrateLegacyPhysicalIntensityField(intensityFields, legacyField) {
       Math.max(0, Math.round(Number(legacyField.revision) || 0)),
     );
   });
-}
-
-function getTransportOverviewVisibilityFields() {
-  return listTransportOverviewCapabilityFamilyIds()
-    .map((familyId) => getTransportOverviewVisibilityField(familyId))
-    .filter(Boolean);
 }
 
 function buildTransportOverviewLayerVisibility(appState) {

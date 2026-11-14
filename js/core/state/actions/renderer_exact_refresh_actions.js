@@ -14,7 +14,7 @@ function assertStateTarget(target) {
   }
 }
 
-function createDefaultExactAfterSettleControllerState() {
+export function createDefaultExactAfterSettleControllerState() {
   return {
     generation: 0,
     phase: "idle",
