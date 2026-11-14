@@ -97,6 +97,45 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     finalizePendingExactAfterSettleRefreshAfterPaint: effects.finalizePendingExactAfterSettleRefreshAfterPaint,
   });
 
+  let gestureLedger = null;
+  let lastGestureLedger = null;
+  let gestureStartedAt = 0;
+  let lastPresentedAt = null;
+
+  function copyGestureLedger(ledger) {
+    return ledger ? { ...ledger, frameModes: { ...ledger.frameModes } } : null;
+  }
+
+  function observeGesturePhase() {
+    const phase = getRenderPhase();
+    if (!gestureLedger && phase === renderPhaseInteracting) {
+      gestureStartedAt = nowMs();
+      lastPresentedAt = null;
+      gestureLedger = { totalFrames: 0, frameModes: {}, presentedFrames: 0,
+        maxPresentationGapMs: 0, maxFrameMs: 0 };
+    } else if (gestureLedger && phase === renderPhaseIdle) {
+      const durationMs = Math.max(0, nowMs() - gestureStartedAt);
+      lastGestureLedger = gestureLedger;
+      gestureLedger = null;
+      recordRenderPerfMetric("gestureFrameLedger", durationMs, copyGestureLedger(lastGestureLedger));
+    }
+  }
+
+  function recordGestureFrame(frameMode, presented, totalMs, presentedAt) {
+    if (!gestureLedger) return;
+    gestureLedger.totalFrames += 1;
+    gestureLedger.frameModes[frameMode] = (gestureLedger.frameModes[frameMode] || 0) + 1;
+    gestureLedger.maxFrameMs = Math.max(gestureLedger.maxFrameMs, totalMs);
+    if (presented) {
+      gestureLedger.presentedFrames += 1;
+      if (lastPresentedAt !== null) {
+        gestureLedger.maxPresentationGapMs = Math.max(
+          gestureLedger.maxPresentationGapMs, presentedAt - lastPresentedAt);
+      }
+      lastPresentedAt = presentedAt;
+    }
+  }
+
   function drawNavigationFrame(includeSummary, { waitingWorker = false } = {}) {
     if (typeof effects.drawNavigationFrame !== "function") return null;
     const phase = getRenderPhase();
@@ -109,7 +148,9 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     incrementPerfCounter("drawCanvas");
     clearPoliticalPatchOverlayIfStale("drawCanvas-stale-overlay");
     cancelPoliticalPathWarmup("drawCanvas-navigation");
-    const totalMs = Math.max(0, nowMs() - Number(frameStart || 0));
+    const presentedAt = nowMs();
+    const totalMs = Math.max(0, presentedAt - Number(frameStart || 0));
+    recordGestureFrame("navigation", true, totalMs, presentedAt);
     commitLastFrame({ phase: getRenderPhase(), totalMs, timings: {}, transform,
       frameMode: "navigation", presented: true });
     markFirstVisibleFramePainted("navigation-frame");
@@ -130,7 +171,9 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
       const overviewDrawn = !!effects.drawOverviewFrameFallback?.(transform);
       if (overviewDrawn || drawLastGoodFrameFallback(transform)) {
         const frameMode = overviewDrawn ? "overview" : "last-good";
-        const totalMs = Math.max(0, nowMs() - startedAt);
+        const presentedAt = nowMs();
+        const totalMs = Math.max(0, presentedAt - startedAt);
+        recordGestureFrame(frameMode, true, totalMs, presentedAt);
         commitLastFrame({ phase: getRenderPhase(), totalMs, timings: {}, transform,
           frameMode, presented: true });
         incrementPerfCounter("frames");
@@ -138,12 +181,14 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
           branch: { drewFrame: true, usedLastGoodFallback: true, skippedCapture: true } }) : undefined;
       }
     }
+    recordGestureFrame("previous-pixels", false, 0, 0);
     return includeSummary ? createSummary({ status: "waiting-worker", frameMode: "previous-pixels" }) : undefined;
   }
 
   function drawCanvasFrameCore(options) {
     const includeSummary = options?.includeSummary === true;
     if (!isFrameSurfaceReady()) {
+      recordGestureFrame("none", false, 0, 0);
       return includeSummary
         ? createSummary({ status: "skipped-not-ready", frameMode: "none" })
         : undefined;
@@ -236,7 +281,9 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     }
 
     const commitPhase = getRenderPhase();
-    const totalMs = Math.max(0, nowMs() - Number(frameStart || 0));
+    const presentedAt = nowMs();
+    const totalMs = Math.max(0, presentedAt - Number(frameStart || 0));
+    recordGestureFrame(frameMode, drewFrame && !keptPreviousPixels, totalMs, presentedAt);
     commitLastFrame({
       phase: commitPhase,
       totalMs,
@@ -298,11 +345,19 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
   }
 
   function drawCanvasFrame(options) {
+    observeGesturePhase();
     try {
       return typeof effects.withValidatedCache === "function"
         ? effects.withValidatedCache(() => drawCanvasFrameCore(options))
         : drawCanvasFrameCore(options);
-    } finally { effects.afterFrame?.(); }
+    } finally {
+      effects.afterFrame?.();
+      observeGesturePhase();
+    }
   }
-  return Object.freeze({ drawCanvasFrame });
+  function getGestureLedger() {
+    observeGesturePhase();
+    return copyGestureLedger(lastGestureLedger);
+  }
+  return Object.freeze({ drawCanvasFrame, getGestureLedger });
 }
