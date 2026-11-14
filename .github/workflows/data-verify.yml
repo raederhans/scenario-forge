@@ -11,8 +11,8 @@ on:
       - 'data/**'
       - 'map_builder/**'
       - 'scenario_builder/**'
-      - 'tools/check_scenario_contracts.py'
-      - 'tools/check_transport_workbench_manifests.py'
+      # The validators import widely from tools/, so every Python tool counts.
+      - 'tools/**/*.py'
       - 'tools/political_id_raster_app_session.mjs'
       - 'tools/verify_political_id_raster_integration.mjs'
       - 'js/core/renderer/political_id_raster*'
