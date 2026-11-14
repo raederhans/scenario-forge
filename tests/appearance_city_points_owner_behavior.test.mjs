@@ -122,7 +122,6 @@ function createHarness(ids, runtimeOverrides = {}) {
 const CITY_POINT_NODE_IDS = [
   "toggleCityPoints",
   "cityPointsTheme",
-  "cityPointsThemeHint",
   "cityPointsMarkerScale",
   "cityPointsMarkerDensity",
   "cityPointsMarkerDensityHint",
@@ -149,7 +148,6 @@ test("city-points owner renders theme options and current style controls", () =>
   assert.equal(harness.nodes.cityPointsTheme.options[0].id, "optCityPointsThemeClassicGraphite");
   assert.equal(harness.nodes.cityPointsTheme.options[0].textContent, "ui:Graphite Signal");
   assert.equal(harness.nodes.cityPointsTheme.value, "atlas_ink");
-  assert.equal(harness.nodes.cityPointsThemeHint.textContent, "Cyan symbols with warm capital accents. Density and labels stay unchanged.");
   assert.equal(harness.nodes.cityPointsMarkerScale.value, "1.50");
   assert.equal(harness.nodes.cityPointsMarkerScaleValue.textContent, "1.50x");
   assert.equal(harness.nodes.cityPointsMarkerDensity.value, "1.25");

@@ -18,7 +18,6 @@ import {
 } from "../../core/thematic/thematic_layer_catalog.js";
 import {
   getLayerPanelContractById,
-  getLayerPanelDisabledReason,
   getLayerPanelUnsupportedReason,
   listBaseLayerStatusContracts,
   listTransportLayerPanelContracts,

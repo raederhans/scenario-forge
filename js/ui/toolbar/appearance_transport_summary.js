@@ -217,19 +217,6 @@ function getTransportLineClassCoverageState(familyId, collections) {
   return state;
 }
 
-export function getTransportLineClassCoverage(familyId, collections, translate) {
-  const coverageState = getTransportLineClassCoverageState(familyId, collections);
-  if (!coverageState?.orderedClasses?.length) return "";
-  const visibleClasses = coverageState.orderedClasses.join("/");
-  if (coverageState.missingRoadSecondary) {
-    return `${translateUi(translate, "Loaded classes:")} ${visibleClasses} (${translateUi(translate, "primary/secondary pending")})`;
-  }
-  if (coverageState.missingRailSecondary) {
-    return `${translateUi(translate, "Loaded classes:")} ${visibleClasses} (${translateUi(translate, "secondary full-only")})`;
-  }
-  return `${translateUi(translate, "Loaded classes:")} ${visibleClasses}`;
-}
-
 export function buildTransportFamilySummaryText({
   familyId,
   masterEnabled,

@@ -235,7 +235,6 @@ test("color disclosure opens by default, records toggles, and has no ownership b
   assert.ok(!nodes(h.root).some((node) => node.textContent === "Use Visual Color Brush"));
   h.view.paintMode = "visual";
   h.render(country());
-  assert.ok(!nodes(h.root).some((node) => node.textContent === "Return to Political Ownership Brush"));
   assert.ok(!h.calls.some(([name]) => name === "paintMode"));
 });
 

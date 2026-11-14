@@ -117,7 +117,6 @@ test("renderer supporting factories keep cache shapes aligned", () => {
   assert.equal(transient.scenarioDataGenerationReason, "init");
   assert.equal(sidebarPerf.counters.fullListRenders, 0);
   assert.equal(projectedBounds.projectedBoundsById.size, 0);
-  assert.equal(borderCache.cachedFrontlineMeshHash, "");
   assert.equal(borderCache.cachedParentBordersByCountry.size, 0);
   assert.equal(spatialIndex.landIndex.size, 0);
   assert.equal(spatialIndex.waterSpatialItems.length, 0);
@@ -529,17 +528,14 @@ test("spatial state ops preserve snapshot shapes across reset and apply", () => 
   assert.equal(state.spatialGrid, primaryGrid);
   assert.deepEqual(state.spatialGridMeta, { cols: 2 });
   assert.equal(state.spatialItemsById, primaryItemsById);
-  assert.equal(state.spatialIndex, null);
   assert.equal(state.waterSpatialItems, waterItems);
   assert.equal(state.waterSpatialGrid, waterGrid);
   assert.deepEqual(state.waterSpatialGridMeta, { cols: 1 });
   assert.equal(state.waterSpatialItemsById, waterItemsById);
-  assert.equal(state.waterSpatialIndex, null);
   assert.equal(state.specialSpatialItems, specialItems);
   assert.equal(state.specialSpatialGrid, specialGrid);
   assert.deepEqual(state.specialSpatialGridMeta, { cols: 3 });
   assert.equal(state.specialSpatialItemsById, specialItemsById);
-  assert.equal(state.specialSpatialIndex, null);
   assert.equal(state.secondarySpatialBuildPending, false);
   assert.equal(state.secondarySpatialLastReason, "secondary-spatial-apply");
 });

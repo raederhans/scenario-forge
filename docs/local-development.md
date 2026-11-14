@@ -63,12 +63,3 @@ The intended acceptance path is the existing `editing baseline fast` HOI4 1936 /
 
 Keep formal rebuilding on a fixed full source: `data/manifest.json` records derived outputs and checksums; `data/source_ledger.json` and transport manifests record upstream/cache requirements, recipes and build commands. Some raw inputs are ignored or `frozen_local_only` caches. Use their recorded provenance and existing `tools/check_source_ledger.py` validation when rebuilding data; the lightweight editor profile does not download them or substitute Pages packaging for raw-data regeneration.
 
-## Backend preview
-
-Open the local backend and community preview:
-
-```bat
-start_backend_preview.bat
-```
-
-This local mode stores preview backend data under `.runtime/backend/` on your machine. It is useful for trying Cloud Saves, public community posts, downloads, comments, reports, and admin moderation flows.

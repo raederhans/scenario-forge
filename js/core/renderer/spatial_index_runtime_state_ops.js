@@ -22,7 +22,6 @@ export function clearPrimaryIndexMaps(state) {
 export function resetPrimarySpatialState(state) {
   const defaults = createDefaultSpatialIndexState();
   state.spatialItems = defaults.spatialItems;
-  state.spatialIndex = defaults.spatialIndex;
   state.spatialGrid = defaults.spatialGrid;
   state.spatialGridMeta = defaults.spatialGridMeta;
   state.spatialItemsById = defaults.spatialItemsById;
@@ -35,12 +34,10 @@ export function resetSecondarySpatialState(state) {
   state.secondarySpatialLastReason = "";
   state.secondarySpatialPreservedDuringBuild = false;
   state.waterSpatialItems = defaults.waterSpatialItems;
-  state.waterSpatialIndex = defaults.waterSpatialIndex;
   state.waterSpatialGrid = defaults.waterSpatialGrid;
   state.waterSpatialGridMeta = defaults.waterSpatialGridMeta;
   state.waterSpatialItemsById = defaults.waterSpatialItemsById;
   state.specialSpatialItems = defaults.specialSpatialItems;
-  state.specialSpatialIndex = defaults.specialSpatialIndex;
   state.specialSpatialGrid = defaults.specialSpatialGrid;
   state.specialSpatialGridMeta = defaults.specialSpatialGridMeta;
   state.specialSpatialItemsById = defaults.specialSpatialItemsById;
@@ -66,7 +63,6 @@ export function applyPrimarySpatialSnapshot(state, {
   itemsById = new Map(),
 } = {}) {
   state.spatialItems = items;
-  state.spatialIndex = null;
   state.spatialGrid = grid;
   state.spatialGridMeta = gridMeta;
   state.spatialItemsById = itemsById;
@@ -96,12 +92,10 @@ export function applySecondarySpatialSnapshot(state, {
   state.secondarySpatialLastReason = String(reason || "secondary-spatial-apply");
   state.secondarySpatialPreservedDuringBuild = false;
   state.waterSpatialItems = Array.isArray(water.items) ? water.items : [];
-  state.waterSpatialIndex = null;
   state.waterSpatialGrid = water.grid instanceof Map ? water.grid : new Map();
   state.waterSpatialGridMeta = water.gridMeta ?? null;
   state.waterSpatialItemsById = water.itemsById instanceof Map ? water.itemsById : new Map();
   state.specialSpatialItems = Array.isArray(special.items) ? special.items : [];
-  state.specialSpatialIndex = null;
   state.specialSpatialGrid = special.grid instanceof Map ? special.grid : new Map();
   state.specialSpatialGridMeta = special.gridMeta ?? null;
   state.specialSpatialItemsById = special.itemsById instanceof Map ? special.itemsById : new Map();

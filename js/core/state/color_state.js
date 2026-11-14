@@ -34,7 +34,6 @@ export function createDefaultColorState() {
     runtimeNeighborGraph: [],
     runtimeCanonicalCountryByFeatureId: {},
     runtimePoliticalMetaSeed: null,
-    runtimePoliticalMetaReadyFromWorker: false,
     paintMode: "visual",
     activeSovereignCode: "",
     sovereignContrastWarnings: [],
@@ -79,14 +78,10 @@ export function createDefaultColorState() {
 
 export function createDefaultColorPresetState() {
   return {
-    isEditingPreset: false,
-    editingPresetRef: null,
-    editingPresetIds: new Set(),
     customPresets: {},
     presetsState: {},
     expandedInspectorContinents: new Set(),
     expandedInspectorReleaseParents: new Set(),
-    expandedPresetCountries: new Set(),
   };
 }
 

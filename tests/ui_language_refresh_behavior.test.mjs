@@ -2,7 +2,6 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createWaterSpecialRegionController } from "../js/ui/sidebar/water_special_region_controller.js";
-import { createProjectSupportDiagnosticsController } from "../js/ui/sidebar/project_support_diagnostics_controller.js";
 
 function createNode() {
   const classes = new Set();
@@ -152,47 +151,3 @@ test("water list uses short translated source aliases without fragment counts", 
   }
 });
 
-test("account language refresh updates mounted controls without replacing input or dialog state", () => {
-  const originalDocument = globalThis.document;
-  const nodes = new Map();
-  const ids = [
-    "backendAccountToggleBtn", "backendAccountPopover", "backendAccountCloseBtn",
-    "backendAccountPopoverTitle", "backendCloudStatus", "backendCloudUsername",
-    "backendCloudPassword", "backendCloudSaveTitle", "backendCloudRegisterBtn",
-    "backendCloudLoginBtn", "backendCloudLogoutBtn", "backendCloudSaveBtn",
-    "backendCloudPublishBtn", "backendCommunityRefreshBtn", "backendCommunityList",
-  ];
-  ids.forEach((id) => nodes.set(id, createNode()));
-  const hint = createNode();
-  nodes.get("backendAccountToggleBtn").parentElement = { querySelector: () => hint };
-  nodes.get("backendCloudStatus").dataset.localizationKey = "Cloud save created.";
-  nodes.get("backendCloudUsername").value = "user@example.com";
-  nodes.get("backendAccountPopover").classList.add("hidden");
-  const documentRef = {
-    getElementById: (id) => nodes.get(id) || null,
-    createElement: createNode,
-  };
-  globalThis.document = documentRef;
-  try {
-    let language = "zh";
-    const controller = createProjectSupportDiagnosticsController({
-      state: {},
-      documentRef,
-      helpers: {
-        t: (key) => language === "zh" ? `中:${key}` : key,
-        createEmptyNote: (value) => ({ textContent: value }),
-      },
-    });
-    language = "en";
-    controller.refreshProjectAccountLanguage();
-    assert.equal(nodes.get("backendAccountPopoverTitle").textContent, "Cloud Saves");
-    assert.equal(nodes.get("backendCloudStatus").textContent, "Cloud save created.");
-    assert.equal(nodes.get("backendCloudUsername").placeholder, "Username");
-    assert.equal(nodes.get("backendCloudUsername").value, "user@example.com");
-    assert.equal(nodes.get("backendAccountPopover").classList.contains("hidden"), true);
-    assert.equal(hint.textContent, "Account");
-    assert.equal(nodes.get("backendCommunityList").children[0].textContent, "No community saves yet");
-  } finally {
-    globalThis.document = originalDocument;
-  }
-});

@@ -2894,7 +2894,6 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
       colors: runtimeState.colors,
       currentTool: runtimeState.currentTool,
       interactionGranularity: runtimeState.interactionGranularity,
-      isEditingPreset: runtimeState.isEditingPreset,
       landData: runtimeState.landData,
       landIndex: runtimeState.landIndex,
       operationalLineEditor: runtimeState.operationalLineEditor,
@@ -2943,9 +2942,6 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
       getMapHoverInteractionOwner().setHoveredFacilityEntry(entry);
     },
     setSelectedFacilityEntry: getFacilityInteractionRuntime().setSelectedFacilityEntry,
-    togglePresetRegion: (landId) => {
-      if (typeof globalThis.togglePresetRegion === "function") globalThis.togglePresetRegion(landId);
-    },
   },
   services: {
     appendOperationalLineVertexFromEvent,
@@ -8673,12 +8669,10 @@ function buildRuntimePoliticalMeta() {
   const seedMatches = runtimePoliticalMetaSeedCoversTopology(seed, runtimeFeatureIds);
   if (seedMatches) {
     adoptRuntimePoliticalMeta(seed);
-    runtimeState.runtimePoliticalMetaReadyFromWorker = true;
     runtimeState.runtimePoliticalMetaSeed = null;
     return;
   }
   buildRuntimePoliticalMetaFallback();
-  runtimeState.runtimePoliticalMetaReadyFromWorker = false;
   runtimeState.runtimePoliticalMetaSeed = null;
 }
 
@@ -10698,7 +10692,7 @@ function replayNavigationLabels(transform) {
 }
 
 function applyRiverPaintCellById(parentId, cellId) {
-  if (runtimeState.startupReadonly || runtimeState.isEditingPreset || !runtimeState.riverPaint?.editMode) return false;
+  if (runtimeState.startupReadonly || !runtimeState.riverPaint?.editMode) return false;
   const runtime = getRiverPaintRuntime(runtimeState);
   const pack = runtime.getActivePack();
   const cell = runtime.getCellFeature(cellId);

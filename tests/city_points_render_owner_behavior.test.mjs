@@ -467,7 +467,7 @@ test("reveal plan invalidates for every changed normalized city configuration va
   const changes = {
     theme: "atlas_ink", markerDensity: 1.5, densityPreset: "compact", minSettlementRank: "large",
     labelDensity: "dense", color: "#123456", capitalColor: "#654321", opacity: 0.5, markerScale: 1.5,
-    showLabels: false, labelSize: 20, labelMinZoom: 4, showCapitalOverlay: false, capitalScale: 2,
+    showLabels: false, labelSize: 20, labelMinZoom: 4, showCapitalOverlay: false,
   };
   for (const [field, value] of Object.entries(changes)) {
     const before = builds;

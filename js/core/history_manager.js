@@ -348,7 +348,6 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   }
   if (hasAnnotationView) {
     for (const dirtyKey of [
-      "frontlineOverlayDirty",
       "operationalLinesDirty",
       "operationGraphicsDirty",
       "unitCountersDirty",

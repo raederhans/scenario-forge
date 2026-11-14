@@ -355,7 +355,6 @@ export function createDefaultScenarioRuntimeState({
     scenarioStrategicValuesRevision: 0,
     scenarioDistrictGroupsData: null,
     scenarioDistrictGroupByFeatureId: new Map(),
-    scenarioDistrictSharedTemplatesData: null,
     scenarioGeoLocalePatchData: null,
     scenarioCityOverridesData: null,
     scenarioImportAudit: null,

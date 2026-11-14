@@ -1,8 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getFocusableElements, getActiveModal } from "../js/ui/ui_contract.js";
+import { getFocusableElements } from "../js/ui/ui_contract.js";
 import { initShortcuts } from "../js/ui/shortcuts.js";
-import { showAppDialog } from "../js/ui/app_dialog.js";
 import { state } from "../js/core/state.js";
 import { FileManager } from "../js/core/file_manager.js";
 import { createProjectSupportDiagnosticsController } from "../js/ui/sidebar/project_support_diagnostics_controller.js";
@@ -71,7 +70,6 @@ function harness(context) {
     document: doc, window: win, HTMLElement: Node, Element: Node,
     requestAnimationFrame: win.requestAnimationFrame,
     getComputedStyle: node => ({ display: node.classList.contains("hidden") ? "none" : node.style.display || "block", visibility: node.style.visibility || "visible", zIndex: node.style.zIndex || "auto" }),
-    fetch: async () => ({ ok: true, json: async () => ({ user: null }) }),
   };
   for (const [key, value] of Object.entries(replacements)) {
     const descriptor = Object.getOwnPropertyDescriptor(globalThis, key);
@@ -86,13 +84,7 @@ function harness(context) {
   return { doc, win, add, key };
 }
 
-function accountController(h, overrides = {}) {
-  const trigger = h.add("button", h.doc.body, "backendAccountToggleBtn");
-  const modal = h.add("div", h.doc.body, "backendAccountPopover");
-  modal.setAttribute("aria-modal", "true"); modal.classList.add("hidden"); modal.style.zIndex = "85";
-  const first = h.add("button", modal, "backendAccountCloseBtn");
-  h.add("input", modal, "backendCloudUsername");
-  const last = h.add("button", modal);
+function projectController(h, overrides = {}) {
   const save = h.add("button", h.doc.body, "workspaceSaveBtn");
   const toasts = [];
   const controller = createProjectSupportDiagnosticsController({
@@ -100,7 +92,7 @@ function accountController(h, overrides = {}) {
     helpers: { t: text => text, legendManager: {}, mapRenderer: {}, fileManager: {}, showToast: (...args) => toasts.push(args), ...overrides },
   });
   controller.bindEvents();
-  return { trigger, modal, first, last, save, toasts };
+  return { save, toasts };
 }
 
 test("focus enumeration excludes hidden ancestors and closed details content, retaining summary", context => {
@@ -142,27 +134,6 @@ test("modal owns shortcuts until closed, and prevented events stay ignored", con
   assert.equal(state.currentTool, "fill"); assert.equal(history, 1); assert.equal(saves, 1);
 });
 
-test("account traps first/last focus, recaptures outside focus and restores trigger", context => {
-  const h = harness(context); const a = accountController(h);
-  a.trigger.focus(); a.trigger.dispatch("click");
-  assert.equal(h.doc.activeElement, a.first);
-  h.key("Tab", { shiftKey: true }); assert.equal(h.doc.activeElement, a.last);
-  h.key("Tab"); assert.equal(h.doc.activeElement, a.first);
-  a.trigger.focus(); h.key("Tab"); assert.equal(h.doc.activeElement, a.first);
-  assert.equal(h.key("Escape").defaultPrevented, true);
-  assert.equal(a.modal.classList.contains("hidden"), true); assert.equal(h.doc.activeElement, a.trigger);
-});
-
-test("confirmation above account handles Escape without closing account", async context => {
-  const h = harness(context); const a = accountController(h);
-  a.trigger.dispatch("click");
-  const pending = showAppDialog({ title: "Confirm" });
-  const overlay = h.doc.body.children.at(-1); overlay.style.zIndex = "160";
-  assert.notEqual(getActiveModal(), a.modal);
-  h.key("Escape"); assert.equal(await pending, false);
-  assert.equal(a.modal.classList.contains("hidden"), false); assert.equal(h.doc.activeElement, a.first);
-});
-
 test("Guide loops through visible controls and summary", context => {
   const h = harness(context);
   const guide = h.add("div"); guide.setAttribute("aria-modal", "true");
@@ -178,7 +149,7 @@ test("save failure is visible and restores busy/disabled; cancellation stays qui
   const h = harness(context);
   let rejectSave;
   const fileManager = { exportProject: () => new Promise((resolve, reject) => { rejectSave = reject; }) };
-  const a = accountController(h, { fileManager });
+  const a = projectController(h, { fileManager });
   const [pending] = a.save.dispatch("click");
   assert.equal(a.save.disabled, true); assert.equal(a.save.getAttribute("aria-busy"), "true");
   rejectSave(new Error("Disk full")); await pending;

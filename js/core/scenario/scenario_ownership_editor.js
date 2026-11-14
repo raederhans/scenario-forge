@@ -1,4 +1,3 @@
-import { ownershipEditingDisabledResult } from "../map_editing_policy.js";
 import { state as runtimeState } from "../state.js";
 import {
   getFeatureOwnerCode,
@@ -48,48 +47,6 @@ function filterEditableOwnershipFeatureIds(featureIds = []) {
   };
 }
 
-function applyOwnerToFeatureIds(targetIds = []) {
-  return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
-}
-
-function resetOwnersToScenarioBaselineForFeatureIds(targetIds = []) {
-  return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
-}
-
-function applyOwnerControllerAssignmentsToFeatureIds(assignmentsByFeatureId = {}) {
-  return ownershipEditingDisabledResult(Object.keys(assignmentsByFeatureId || {}).length);
-}
-
-function buildScenarioOwnershipSavePayload() {
-  const scenarioId = String(runtimeState.activeScenarioId || "").trim();
-  const baselineHash = String(runtimeState.scenarioBaselineHash || "").trim();
-  const landIndex = runtimeState.landIndex instanceof Map ? runtimeState.landIndex : null;
-  const owners = {};
-
-  if (landIndex && landIndex.size > 0) {
-    landIndex.forEach((feature, featureId) => {
-      const id = String(featureId || "").trim();
-      if (!id || shouldExcludeScenarioPoliticalFeature(feature, id)) return;
-      const ownerCode = normalizeOwnerCode(getFeatureOwnerCode(id));
-      if (!ownerCode) return;
-      owners[id] = ownerCode;
-    });
-  } else {
-    Object.entries(runtimeState.sovereigntyByFeatureId || {}).forEach(([featureId, ownerCode]) => {
-      const id = String(featureId || "").trim();
-      const normalizedOwnerCode = normalizeOwnerCode(ownerCode);
-      if (!id || !normalizedOwnerCode) return;
-      owners[id] = normalizedOwnerCode;
-    });
-  }
-
-  return {
-    scenarioId,
-    baselineHash,
-    owners,
-  };
-}
-
 function summarizeOwnershipForFeatureIds(featureIds = []) {
   const matchedIds = filterEditableOwnershipFeatureIds(featureIds).matchedIds;
   const owners = Array.from(new Set(
@@ -106,11 +63,7 @@ function summarizeOwnershipForFeatureIds(featureIds = []) {
 }
 
 export {
-  applyOwnerToFeatureIds,
-  applyOwnerControllerAssignmentsToFeatureIds,
-  buildScenarioOwnershipSavePayload,
   filterEditableOwnershipFeatureIds,
-  resetOwnersToScenarioBaselineForFeatureIds,
   summarizeOwnershipForFeatureIds,
 };
 

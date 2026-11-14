@@ -148,7 +148,7 @@ test("strategic view constructs controller elements and reuses the existing pane
   assert.equal(first.helpers.resolveUnitCounterCombatState({ organizationPct: 120 }).organizationPct, 100);
   const second = createView();
   assert.equal(first.elements.strategicOverlaySection, second.elements.strategicOverlaySection);
-  assert.equal(frontlineTabStack.children.length, 2);
+  assert.equal(frontlineTabStack.children.length, 1);
   first.elements.operationGraphicDeleteVertexBtn.dispatchEvent(new Event("pointerdown"));
   first.elements.operationGraphicDeleteVertexBtn.dispatchEvent(new Event("click"));
   assert.equal(deletes, 1);

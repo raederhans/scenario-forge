@@ -153,7 +153,7 @@ test("language toggle refreshes each directly scheduled UI hook once and retains
   const hookNames = [
     "updatePaintModeUIFn", "refreshSampleProjectBannerFn", "updateToolbarInputsFn", "updateDevWorkspaceUIFn",
     "renderPaletteFn", "renderCountryListFn", "renderPresetTreeFn", "updateParentBorderCountryListFn",
-    "renderWaterRegionListFn", "renderSpecialRegionListFn", "refreshProjectAccountLanguageFn", "renderNowFn",
+    "renderWaterRegionListFn", "renderSpecialRegionListFn", "renderNowFn",
     "ensureFullLocalizationDataReadyFn",
   ];
   const originals = hookNames.map((name) => [name, readRegisteredRuntimeHookSource(state, name)]);

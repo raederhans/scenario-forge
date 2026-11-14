@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-label="Plains campaign map preview">
-  <rect width="720" height="360" fill="#eee9d4"/>
-  <path d="M0 250c100-38 190-46 292-28 119 21 217-42 428-32v170H0z" fill="#c8c078"/>
-  <path d="M0 304c116-21 220-14 336-36 112-21 218 8 384-22v114H0z" fill="#8ca46c"/>
-  <path d="M76 106h214v90H76z" fill="#16b8d8" stroke="#161714" stroke-width="6"/>
-  <path d="M418 136h190v88H418z" fill="#b6ff2d" stroke="#161714" stroke-width="6"/>
-  <path d="M291 151h126" stroke="#161714" stroke-width="8" stroke-linecap="round"/>
-  <path d="M374 122l43 29-43 29z" fill="#161714"/>
-</svg>

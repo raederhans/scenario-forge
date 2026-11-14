@@ -79,7 +79,6 @@ from tools.check_scenario_contracts import (
     discover_scenario_dirs as discover_scenario_contract_dirs,
     inspect_scenario_contract as inspect_scenario_contract_report,
 )
-from map_backend import handle_backend_request
 
 # Define the range of ports to try
 PORT_START = 8000
@@ -2484,15 +2483,6 @@ def resolve_static_request_path(route: str, *, root: Path = ROOT) -> Path | None
             preferred_root=resolve_editor_source_path(root=root).parent,
             fallback_root=root,
         )
-    if normalized_route in {"/backend", "/backend/"}:
-        return root / "backend" / "index.html"
-    if normalized_route.startswith("/backend/"):
-        relative_path = normalized_route[len("/backend/"):]
-        return _resolve_prefixed_asset_path(
-            relative_path,
-            preferred_root=root / "backend",
-            fallback_root=root,
-        )
     landing_source_path = resolve_landing_source_path(root=root)
     landing_root = landing_source_path.parent
     if landing_root != root:
@@ -2647,7 +2637,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def _resolve_cache_headers(self) -> dict[str, str]:
         route = urlparse(self.path or "").path
-        if route.startswith("/__dev/") or route.startswith("/api/backend/"):
+        if route.startswith("/__dev/"):
             return {
                 "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
                 "Pragma": "no-cache",
@@ -2691,15 +2681,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self,
         status: int,
         payload: dict[str, object],
-        *,
-        extra_headers: list[tuple[str, str]] | None = None,
     ) -> None:
         body = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        for header_name, header_value in extra_headers or []:
-            self.send_header(header_name, header_value)
         self.end_headers()
         self.wfile.write(body)
 
@@ -2709,7 +2695,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def _resolve_static_gzip_target(self) -> Path | None:
         route = urlparse(self.path or "").path
-        if route.startswith("/__dev/") or route.startswith("/api/backend/"):
+        if route.startswith("/__dev/"):
             return None
         filesystem_path = self._resolve_static_path()
         if not filesystem_path.is_file():
@@ -2801,41 +2787,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         route = urlparse(self.path or "").path
-        try:
-            if route.startswith("/api/backend/"):
-                self._validate_same_origin_request()
-            backend_response = handle_backend_request(
-                "GET",
-                route,
-                headers=dict(self.headers.items()),
-                payload=None,
-                root=ROOT,
-            )
-            if backend_response is not None:
-                self._send_json(backend_response.status, backend_response.payload, extra_headers=backend_response.headers)
-                return
-        except DevServerError as error:
-            self._send_json(
-                error.status,
-                {
-                    "ok": False,
-                    "code": error.code,
-                    "message": error.message,
-                    "details": error.details,
-                },
-            )
-            return
-        except Exception as error:  # pragma: no cover - safety net
-            print(f"[backend] Unexpected backend failure: {error}", file=sys.stderr)
-            self._send_json(
-                500,
-                {
-                    "ok": False,
-                    "code": "internal_error",
-                    "message": "Unexpected backend failure.",
-                },
-            )
-            return
         diagnostics_match = SCENARIO_DIAGNOSTICS_ROUTE_RE.fullmatch(route)
         if diagnostics_match:
             try:
@@ -2883,20 +2834,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         try:
             self._validate_same_origin_request()
             payload = self._read_json_body()
-            backend_response = handle_backend_request(
-                "POST",
-                route,
-                headers=dict(self.headers.items()),
-                payload=payload,
-                root=ROOT,
-            )
-            if backend_response is not None:
-                self._send_json(
-                    backend_response.status,
-                    backend_response.payload,
-                    extra_headers=backend_response.headers,
-                )
-                return
             diagnostics_preview_match = SCENARIO_DIAGNOSTICS_PREVIEW_ROUTE_RE.fullmatch(route)
             if diagnostics_preview_match:
                 response = preview_scenario_safe_repair(diagnostics_preview_match.group("scenario_id"))

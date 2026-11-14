@@ -74,7 +74,7 @@ Focused checks:
 
 ```sh
 npm test
-npx playwright test tests/e2e/ownership_retirement.spec.js tests/e2e/ui_rework_mainline_shell_sidebar.spec.js --grep "ownership editing|desktop commands" --workers=1
+npm run test:e2e:golden
 ```
 
 The state-writer policy proofs and source-boundary contracts that this retirement

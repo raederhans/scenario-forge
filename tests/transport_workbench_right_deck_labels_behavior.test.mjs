@@ -160,7 +160,7 @@ for (const familyId of ["airport", "port"]) {
       addEditOverlayPoint: (...args) => events.push(["add", ...args]),
       updateEditOverlayPoint: (...args) => events.push(["update", ...args]),
     });
-    owner.renderTabSections({ id: familyId }, {}, false, "data", mount);
+    owner.renderTabSections({ id: familyId }, {}, "data", mount);
     const form = findAllByClass(mount, "transport-workbench-edit-overlay-form")[0];
     const inputs = findAllByTag(form, "input");
     const labels = findAllByTag(form, "label");

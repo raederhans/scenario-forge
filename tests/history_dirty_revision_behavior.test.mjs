@@ -13,7 +13,7 @@ function mount(t) {
     "visualOverrides", "waterRegionOverrides", "specialRegionOverrides", "sovereignBaseColors",
     "countryPalette", "styleConfig", "intensityFields", "appearancePresets", "annotationView",
     "operationalLines", "operationGraphics", "unitCounters", "specialZoneLayers",
-    "specialZoneMembershipBrushMode", "frontlineOverlayDirty", "operationalLinesDirty",
+    "specialZoneMembershipBrushMode", "operationalLinesDirty",
     "operationGraphicsDirty", "unitCountersDirty", "historyPast", "historyFuture",
     "isDirty", "dirtyRevision", "lastDirtyReason",
   ];
@@ -21,8 +21,6 @@ function mount(t) {
   const globals = new Map(["document", "addEventListener", "removeEventListener"]
     .map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   const listeners = new Map();
-  const indicator = { hidden: true, classList: { toggle(_name, hidden) { indicator.hidden = hidden; } }, setAttribute() {} };
-  globalThis.document = { getElementById: id => id === "appDirtyIndicator" ? indicator : null };
   globalThis.addEventListener = (type, listener) => listeners.set(type, listener);
   globalThis.removeEventListener = type => listeners.delete(type);
   Object.assign(state, {
@@ -42,7 +40,6 @@ function mount(t) {
     }
   });
   return {
-    indicator,
     protectedFromLeaving() {
       let prevented = false;
       const event = { preventDefault() { prevented = true; } };
@@ -73,7 +70,6 @@ for (const [domain, capture, apply, read] of [
     assert.equal(read(), original);
     assert.equal(state.isDirty, true);
     assert.equal(state.dirtyRevision, savedRevision + 1);
-    assert.equal(environment.indicator.hidden, false);
     assert.equal(environment.protectedFromLeaving(), true);
 
     clearDirty("project-export");

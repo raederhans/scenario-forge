@@ -100,7 +100,7 @@ function harness(context) {
 }
 
 for (const initialParentVisibility of [false, undefined, null, true]) {
-  test(`toolbar visibility writes preserve state and notification order (${initialParentVisibility})`, async context => {
+  test(`toolbar initialization preserves parent border visibility (${initialParentVisibility})`, async context => {
     const h = harness(context);
     const hookNames = new Set([...STATE_NOTIFICATION_HOOK_NAMES, ...STATE_HANDLER_HOOK_NAMES, ...STATE_INTERNAL_HANDLER_HOOK_NAMES]);
     const savedHooks = [...hookNames].map(name => [name, readRegisteredRuntimeHookSource(state, name)]);
@@ -115,39 +115,9 @@ for (const initialParentVisibility of [false, undefined, null, true]) {
     h.add("div", h.doc.body, "riverCellPicker");
     h.add("select", h.doc.body, "riverCellSelect");
     h.add("button", h.doc.body, "riverCellApplyBtn");
-    const toggle = h.add("input", h.doc.body, "toggleOpenOceanRegions");
     state.parentBordersVisible = initialParentVisibility;
-    state.showOpenOceanRegions = false;
-    state.allowOpenOceanSelect = false;
-    state.allowOpenOceanPaint = false;
-    state.hoveredWaterRegionId = "water";
-    state.hoveredSpecialRegionId = "special";
-    const calls = [];
-    const record = name => calls.push({
-      name,
-      visible: state.showOpenOceanRegions,
-      select: state.allowOpenOceanSelect,
-      paint: state.allowOpenOceanPaint,
-      water: state.hoveredWaterRegionId,
-      special: state.hoveredSpecialRegionId,
-    });
-    initToolbar({ render: () => record("render") });
+    initToolbar({ render: () => {} });
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(state.parentBordersVisible, initialParentVisibility !== false);
-    assert.equal(toggle.checked, false);
-    registerRuntimeHook(state, "updateWaterInteractionUIFn", () => record("interaction"));
-    registerRuntimeHook(state, "renderWaterRegionListFn", () => record("list"));
-    for (const checked of [true, false]) {
-      calls.length = 0;
-      const revision = state.dirtyRevision;
-      toggle.checked = checked;
-      toggle.fire("change");
-      assert.deepEqual(calls, ["interaction", "list", "render"].map(name => ({
-        name, visible: checked, select: checked, paint: checked,
-        water: checked ? "water" : null, special: "special",
-      })));
-      assert.equal(state.dirtyRevision, revision + 1);
-      assert.equal(state.lastDirtyReason, "toggle-open-ocean-regions");
-    }
   });
 }

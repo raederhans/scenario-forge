@@ -99,7 +99,6 @@ function createHarness({ applyEnabled = true, rejectApply = false, popoverHandle
   const context = {
     family: { id: "road" },
     config: { sentinel: true },
-    compareHeld: false,
   };
   const owner = createTransportWorkbenchEventOwner({
     documentRef,
@@ -127,7 +126,7 @@ function createHarness({ applyEnabled = true, rejectApply = false, popoverHandle
       setActiveFamily: (familyId) => events.push(`family:${familyId}`),
       renderUi: () => events.push("render-ui"),
       setInspectorTab: (tabId) => events.push(`tab:${tabId}`),
-      renderInspector: (family, config, compareHeld) => events.push(`inspector:${family.id}:${config.sentinel}:${compareHeld}`),
+      renderInspector: (family, config) => events.push(`inspector:${family.id}:${config.sentinel}`),
       handlePopoverEscape: (event) => {
         events.push(`popover-escape:${event.key}`);
         return popoverHandlesEscape;
@@ -215,10 +214,10 @@ test("transport workbench tabs support roving keyboard activation", async () => 
     "render-ui",
     "tab:inspect",
     "shell:road",
-    "inspector:road:true:false",
+    "inspector:road:true",
     "tab:data",
     "shell:road",
-    "inspector:road:true:false",
+    "inspector:road:true",
   ]);
 });
 
@@ -245,7 +244,7 @@ test("transport workbench event owner keeps preview controls, pack, family, and 
     "render-ui",
     "tab:data",
     "shell:road",
-    "inspector:road:true:false",
+    "inspector:road:true",
   ]);
 });
 

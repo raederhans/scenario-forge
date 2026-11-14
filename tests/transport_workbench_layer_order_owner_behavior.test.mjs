@@ -145,7 +145,6 @@ test("transport workbench layer order owner keeps drop side effects ordered", ()
     const context = {
       family: { id: "layers" },
       config: { sentinel: true },
-      compareHeld: false,
     };
     const owner = createTransportWorkbenchLayerOrderOwner({
       panel,
@@ -164,7 +163,7 @@ test("transport workbench layer order owner keeps drop side effects ordered", ()
         events.push("context");
         return context;
       },
-      renderInspector: (family, config, compareHeld) => events.push(`inspector:${family.id}:${config.sentinel}:${compareHeld}`),
+      renderInspector: (family, config) => events.push(`inspector:${family.id}:${config.sentinel}`),
     });
 
     owner.render();
@@ -179,7 +178,7 @@ test("transport workbench layer order owner keeps drop side effects ordered", ()
       "dirty:transport-workbench-layer-order",
       "context",
       "ensure",
-      "inspector:layers:true:false",
+      "inspector:layers:true",
     ]);
     assert.equal(list.children[0].dataset.layerFamily, "airport");
   } finally {
@@ -207,9 +206,9 @@ test("transport workbench layer order owner keeps inspector refresh unconditiona
       markDirty: (reason) => events.push(`dirty:${reason}`),
       getRenderContext: () => {
         events.push("context");
-        return { config: { sentinel: true }, compareHeld: true };
+        return { config: { sentinel: true } };
       },
-      renderInspector: (family, config, compareHeld) => events.push(`inspector:${family === undefined}:${config.sentinel}:${compareHeld}`),
+      renderInspector: (family, config) => events.push(`inspector:${family === undefined}:${config.sentinel}`),
     });
 
     owner.render();
@@ -222,7 +221,7 @@ test("transport workbench layer order owner keeps inspector refresh unconditiona
       "dirty:transport-workbench-layer-order",
       "context",
       "ensure",
-      "inspector:true:true:true",
+      "inspector:true:true",
     ]);
   } finally {
     globalThis.document = previousDocument;

@@ -106,8 +106,6 @@ function updateUIText() {
     ["lblScenarioHint", "Load a bundled historical setup and reset to its baseline."],
     ["lblScenarioSelect", "Scenario"],
     ["optScenarioNone", "None"],
-    ["optScenarioOwnership", "Ownership"],
-    ["optScenarioFrontline", "Frontline"],
     ["applyScenarioBtn", "Apply"],
     ["resetScenarioBtn", "Reset Changes To Baseline"],
     ["clearScenarioBtn", "Exit Scenario"],
@@ -671,7 +669,6 @@ async function toggleLanguage() {
     "updateWaterInteractionUIFn",
     "renderWaterRegionListFn",
     "renderSpecialRegionListFn",
-    "refreshProjectAccountLanguageFn",
   ]);
   try {
     const { ensureScenarioGeoLocalePatchForLanguage } = await import("../core/scenario/scenario_resources.js");

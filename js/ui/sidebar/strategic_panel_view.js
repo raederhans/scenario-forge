@@ -69,7 +69,6 @@ export function createStrategicPanelView({
       button.type = "button";
       button.className = buttonClassName;
       button.dataset.value = value;
-      button.dataset.frontlineStyleChoice = "true";
       button.textContent = t(label, "ui");
       shell.appendChild(button);
     });
@@ -165,93 +164,6 @@ export function createStrategicPanelView({
     runtimeState, countryNames, t, getDirectGeoLabel, getScenarioCountryMeta,
     ensureCountryPaletteColor, getDynamicCountryEntries, resolveUnitCounterCombatState,
   });
-
-  let frontlineOverlaySection = document.getElementById("frontlineOverlayPanel");
-  if (!frontlineOverlaySection && frontlineTabStack) {
-    frontlineOverlaySection = document.createElement("div");
-    frontlineOverlaySection.id = "frontlineOverlayPanel";
-    frontlineOverlaySection.className = "inspector-tool-card frontline-tab-card";
-
-    const statusRow = document.createElement("div");
-    statusRow.className = "frontline-status-row";
-
-    const statusTitleGroup = document.createElement("div");
-    statusTitleGroup.className = "frontline-status-copy";
-
-    const title = document.createElement("div");
-    title.className = "section-header sidebar-tool-title";
-    title.textContent = t("Derived Frontlines", "ui");
-
-    const statusPill = document.createElement("span");
-    statusPill.id = "frontlineEnabledStatus";
-    statusPill.className = "frontline-status-pill";
-    statusPill.textContent = t("Off", "ui");
-
-    statusTitleGroup.appendChild(title);
-    statusTitleGroup.appendChild(statusPill);
-
-    const statusHint = document.createElement("p");
-    statusHint.id = "frontlineStatusHint";
-    statusHint.className = "sidebar-tool-hint frontline-compact-hint";
-    statusHint.hidden = true;
-
-    statusRow.appendChild(statusTitleGroup);
-
-    const enableRow = buildRow();
-    const enableToggle = buildCheckboxLabel("frontlineEnabledToggle", "Enable derived frontlines", "toggle-label");
-    enableRow.appendChild(enableToggle);
-
-    const emptyState = document.createElement("div");
-    emptyState.id = "frontlineEmptyState";
-    emptyState.className = "inspector-empty-state frontline-empty-state";
-
-    const settings = document.createElement("div");
-    settings.id = "frontlineSettingsPanel";
-    settings.className = "frontline-settings-stack hidden";
-
-    const controlsHeader = document.createElement("div");
-    controlsHeader.className = "section-header mt-2";
-    controlsHeader.textContent = t("View", "ui");
-
-    const controlsRow = buildRow();
-    controlsRow.classList.add("frontline-compact-row");
-    const frontlineStyleField = buildSegmentedChoiceField("strategicFrontlineStyleSelect", [
-      ["clean", "Clean"],
-      ["dual-rail", "Dual Rail"],
-      ["teeth", "Teeth"],
-    ]);
-    const frontlineStyleSelect = frontlineStyleField.select;
-    const frontlineLabelToggle = buildCheckboxLabel("strategicFrontlineLabelsToggle", "Labels", "checkbox-row");
-    const frontlineLabelPlacement = buildSelect("strategicLabelPlacementSelect", [
-      ["midpoint", "Midpoint"],
-      ["centroid", "Centroid"],
-    ]);
-    frontlineLabelPlacement.classList.add("frontline-inline-select");
-    controlsRow.appendChild(frontlineStyleField.shell);
-    controlsRow.appendChild(frontlineLabelToggle);
-
-    const controlsAdvanced = document.createElement("details");
-    controlsAdvanced.className = "unit-counter-advanced-shell frontline-advanced-shell";
-    const controlsAdvancedSummary = document.createElement("summary");
-    controlsAdvancedSummary.className = "unit-counter-advanced-summary";
-    controlsAdvancedSummary.textContent = t("Advanced Label Placement", "ui");
-    const controlsAdvancedBody = document.createElement("div");
-    controlsAdvancedBody.className = "unit-counter-advanced-body";
-    controlsAdvancedBody.appendChild(frontlineLabelPlacement);
-    controlsAdvanced.appendChild(controlsAdvancedSummary);
-    controlsAdvanced.appendChild(controlsAdvancedBody);
-
-    settings.appendChild(controlsHeader);
-    settings.appendChild(controlsRow);
-    settings.appendChild(controlsAdvanced);
-
-    frontlineOverlaySection.appendChild(statusRow);
-    frontlineOverlaySection.appendChild(statusHint);
-    frontlineOverlaySection.appendChild(enableRow);
-    frontlineOverlaySection.appendChild(emptyState);
-    frontlineOverlaySection.appendChild(settings);
-    frontlineTabStack.appendChild(frontlineOverlaySection);
-  }
 
   let strategicOverlaySection = document.getElementById("strategicOverlayPanel");
   if (!strategicOverlaySection && frontlineTabStack) {
@@ -663,7 +575,6 @@ export function createStrategicPanelView({
       buttonClassName: "unit-counter-stat-preset-button",
     });
     unitCombatPresetField.shell.querySelectorAll("button").forEach((button) => {
-      button.removeAttribute("data-frontline-style-choice");
       button.dataset.unitCounterStatsPresetChoice = "true";
     });
     const unitRandomizeBtn = buildButton("unitCounterStatsRandomizeBtn", "Randomize");
@@ -907,15 +818,6 @@ export function createStrategicPanelView({
     document.body.appendChild(strategicCommandBar);
   }
 
-  const frontlineEnabledStatus = document.getElementById("frontlineEnabledStatus");
-  const frontlineStatusHint = document.getElementById("frontlineStatusHint");
-  const frontlineEnabledToggle = document.getElementById("frontlineEnabledToggle");
-  const frontlineEmptyState = document.getElementById("frontlineEmptyState");
-  const frontlineSettingsPanel = document.getElementById("frontlineSettingsPanel");
-  const strategicFrontlineStyleSelect = document.getElementById("strategicFrontlineStyleSelect");
-  const frontlineStyleChoiceButtons = Array.from(document.querySelectorAll("[data-frontline-style-choice]"));
-  const strategicFrontlineLabelsToggle = document.getElementById("strategicFrontlineLabelsToggle");
-  const strategicLabelPlacementSelect = document.getElementById("strategicLabelPlacementSelect");
   const strategicWorkspaceBackdropEl = document.getElementById("strategicWorkspaceBackdrop");
   const strategicCommandButtons = Array.from(document.querySelectorAll("#strategicCommandBar .strategic-command-btn"));
   const strategicOverlayOpenWorkspaceBtn = document.getElementById("strategicOverlayOpenWorkspaceBtn");
@@ -1000,15 +902,6 @@ export function createStrategicPanelView({
 
   return {
     elements: {
-      frontlineEnabledStatus,
-      frontlineStatusHint,
-      frontlineEnabledToggle,
-      frontlineEmptyState,
-      frontlineSettingsPanel,
-      strategicFrontlineStyleSelect,
-      frontlineStyleChoiceButtons,
-      strategicFrontlineLabelsToggle,
-      strategicLabelPlacementSelect,
       strategicOverlaySection,
       strategicWorkspaceBackdropEl,
       strategicOverlayOpenWorkspaceBtn,

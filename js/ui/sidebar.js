@@ -10,7 +10,6 @@ import {
   state as runtimeState,
   countryNames,
   defaultCountryPalette,
-  normalizeCityLayerStyleConfig,
   normalizeAnnotationView,
 } from "../core/state.js";
 import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
@@ -91,7 +90,6 @@ import {
   normalizeCountryCode,
   normalizePresetName,
   resolveFeatureIdsFromPresetSource,
-  rebuildPresetState,
 } from "../core/releasable_manager.js";
 import {
   getLocalizedScenarioCountryName,
@@ -611,8 +609,7 @@ function initSidebar({ render } = {}) {
   const resetBtn = document.getElementById("resetCountryColors");
   const leftSidebar = document.getElementById("leftSidebar");
   const sidebar = document.getElementById("rightSidebar");
-  const projectManagementStack = document.getElementById("projectManagementStack")
-    || document.getElementById("projectLegendStack");
+  const projectManagementStack = document.getElementById("projectManagementStack");
   const legendEditorStack = document.getElementById("legendEditorStack")
     || projectManagementStack;
   const diagnosticStack = document.getElementById("diagnosticStack");
@@ -674,7 +671,6 @@ function initSidebar({ render } = {}) {
   const scenarioReliefOverlayVisibilityHint = document.getElementById("scenarioReliefOverlayVisibilityHint");
   const specialRegionSearchInput = document.getElementById("specialRegionSearch");
   const specialRegionList = document.getElementById("specialRegionList");
-  const specialRegionLegendList = document.getElementById("specialRegionLegendList");
   const specialRegionInspectorEmpty = document.getElementById("specialRegionInspectorEmpty");
   const specialRegionInspectorSelected = document.getElementById("specialRegionInspectorSelected");
   const specialRegionInspectorDetailHint = document.getElementById("specialRegionInspectorDetailHint");
@@ -1291,14 +1287,12 @@ function initSidebar({ render } = {}) {
   let bindProjectSupportDiagnosticsEvents = () => {};
   let refreshLegendEditor = () => {};
   let refreshProjectSaveStatus = () => {};
-  let refreshProjectAccountLanguage = () => {};
   let renderScenarioAuditPanel = () => {};
 
   let bindStrategicOverlayEvents = () => {};
   let closeCounterEditorModal = () => {};
   let closeStrategicWorkspace = () => {};
   let cancelStrategicEditingModes = () => false;
-  let invalidateFrontlineOverlayState = () => {};
   let refreshStrategicOverlayUI = () => {};
   let getStrategicOverlayPerfCounters = () => ({});
 
@@ -1719,7 +1713,6 @@ function initSidebar({ render } = {}) {
       scenarioReliefOverlayVisibilityHint,
       specialRegionSearchInput,
       specialRegionList,
-      specialRegionLegendList,
       specialRegionInspectorEmpty,
       specialRegionInspectorSelected,
       specialRegionInspectorDetailHint,
@@ -1753,7 +1746,6 @@ function initSidebar({ render } = {}) {
     bindEvents: bindProjectSupportDiagnosticsEvents,
     refreshLegendEditor,
     refreshProjectSaveStatus,
-    refreshProjectAccountLanguage,
     renderScenarioAuditPanel,
   } = createProjectSupportDiagnosticsController({
     state,
@@ -1761,7 +1753,6 @@ function initSidebar({ render } = {}) {
       projectManagementStack,
       legendEditorStack,
       diagnosticStack,
-      rightSidebarContent,
     },
     helpers: {
       t,
@@ -1776,7 +1767,6 @@ function initSidebar({ render } = {}) {
       showAppDialog,
       showToast,
       importProjectThroughFunnel,
-      invalidateFrontlineOverlayState: () => invalidateFrontlineOverlayState(),
     },
   }));
 
@@ -1788,7 +1778,6 @@ function initSidebar({ render } = {}) {
     closeWorkspace: closeStrategicWorkspace,
     cancelEditingModes: cancelStrategicEditingModes,
     getPerfCounters: getStrategicOverlayPerfCounters,
-    invalidateFrontlineOverlayState,
     refreshUI: refreshStrategicOverlayUI,
   } = createStrategicOverlayController({
     state,
@@ -1820,7 +1809,6 @@ function initSidebar({ render } = {}) {
   registerRuntimeHook(state, "updateScenarioReliefOverlayUIFn", renderSpecialRegionInspectorUi);
   registerRuntimeHook(state, "updateLegendUI", refreshLegendEditor);
   registerRuntimeHook(state, "updateProjectSaveStatusFn", refreshProjectSaveStatus);
-  registerRuntimeHook(state, "refreshProjectAccountLanguageFn", refreshProjectAccountLanguage);
   registerRuntimeHook(state, "renderScenarioAuditPanelFn", renderScenarioAuditPanel);
   registerRuntimeHook(state, "updateStrategicOverlayUIFn", refreshStrategicOverlayUI);
   registerRuntimeHook(state, "getStrategicOverlayPerfCountersFn", getStrategicOverlayPerfCounters);

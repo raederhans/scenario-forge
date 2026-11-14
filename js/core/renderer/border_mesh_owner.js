@@ -153,7 +153,6 @@ export function createBorderMeshOwner({
   function rebuildDynamicBorders() {
     const startedAt = nowMs();
     incrementPerfCounter("dynamicBorderRebuilds");
-    patchBorderMeshCacheState(state, { cachedBorders: null });
     if (!isDynamicBordersEnabled()) {
       patchBorderMeshCacheState(state, { cachedDynamicBordersHash: null });
       setDynamicBordersDirtyState(state, false, "");

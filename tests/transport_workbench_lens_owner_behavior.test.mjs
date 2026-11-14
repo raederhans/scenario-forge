@@ -107,13 +107,11 @@ test("transport workbench lens owner reuses unchanged rendered lens output", () 
   const firstRender = owner.render({
     family,
     previewSnapshot: { status: "ready" },
-    compareHeld: false,
     rightDeckLabel: "Deck",
   });
   const secondRender = owner.render({
     family: { ...family },
     previewSnapshot: { status: "ready" },
-    compareHeld: false,
     rightDeckLabel: "Deck",
   });
 

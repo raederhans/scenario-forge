@@ -3,7 +3,7 @@ import test from "node:test";
 import { createPixelRatioPolicy } from "../js/core/renderer/pixel_ratio_policy.js";
 
 test("pixel ratio policy reads live display inputs and commits only stage transitions", () => {
-  const runtimeState = { dprStage: "idle", dprInteractiveScale: 0.72 };
+  const runtimeState = { dprStage: "idle" };
   let deviceDpr = 2;
   let clock = 40;
   const policy = createPixelRatioPolicy({ runtimeState, nowMs: () => ++clock, getDevicePixelRatio: () => deviceDpr });
@@ -17,7 +17,6 @@ test("pixel ratio policy reads live display inputs and commits only stage transi
   assert.equal(runtimeState.dprLastStageSwitchAt, 41);
   assert.equal(policy.getMaxDprForProfile("full"), 2);
   deviceDpr = 3;
-  runtimeState.dprInteractiveScale = 0.5;
   assert.equal(policy.getMaxDprForProfile("full"), 3);
   assert.equal(policy.getDisplayDpr("high", 1440, 1000), 2);
   assert.equal(policy.getMaxDprForProfile("balanced"), 1.5);

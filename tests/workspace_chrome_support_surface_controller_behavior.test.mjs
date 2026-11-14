@@ -79,7 +79,7 @@ function createHarness(context, initial = {}) {
   });
   const nodes = Object.fromEntries([
     "dockQuickFillBtn", "dockQuickFillRow", "quickFillParentBtn", "quickFillCountryBtn", "dockQuickFillHint",
-    "dockReferenceBtn", "dockReferencePopover", "dockEditPopoverBtn", "dockEditPopover",
+    "dockReferenceBtn", "dockReferencePopover", "dockEditPopover",
   ].map(id => [id, new Button(id)]));
   for (const node of Object.values(nodes)) { node.ownerDocument = doc; doc.appendChild(node); }
   nodes.quickFillParentBtn.parent = nodes.dockQuickFillRow;
@@ -109,7 +109,7 @@ function createHarness(context, initial = {}) {
 
 test("ownership and country granularity hide Quick Fill and close its active popover", context => {
   const h = createHarness(context);
-  for (const patch of [{ paintMode: "sovereignty" }, { interactionGranularity: "country" }]) {
+  for (const patch of [{ interactionGranularity: "country" }]) {
     Object.assign(h.state, { activeScenarioId: "", paintMode: "visual", interactionGranularity: "subdivision" });
     h.controller.refreshQuickFillControls();
     h.nodes.dockQuickFillBtn.click();

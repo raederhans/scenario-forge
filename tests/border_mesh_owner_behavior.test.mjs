@@ -39,7 +39,7 @@ function createTestOwner(state = {}) {
 
 test("dynamic border rebuild invalidates only when its revision hash changes", () => {
   const state = {
-    cachedBorders: {}, cachedDynamicBordersHash: "old",
+    cachedDynamicBordersHash: "old",
     sovereigntyRevision: 1, activeScenarioId: "scenario", scenarioShellOverlayRevision: 2,
     dynamicBordersDirty: true,
     get runtimePoliticalTopology() { throw new Error("must not build a mesh"); },
@@ -55,7 +55,6 @@ test("dynamic border rebuild invalidates only when its revision hash changes", (
     recordRenderPerfMetric: (name, duration, details) => metrics.push({ name, details }),
   } });
   assert.equal(owner.rebuildDynamicBorders(), true);
-  assert.equal(state.cachedBorders, null);
   assert.equal(state.dynamicBordersDirty, false);
   assert.deepEqual(invalidations, [["borders", "dynamic-borders"]]);
   const firstHash = state.cachedDynamicBordersHash;
@@ -73,9 +72,7 @@ test("dynamic border rebuild invalidates only when its revision hash changes", (
   }
   assert.equal(invalidations.length, 4);
   enabled = false;
-  state.cachedBorders = {};
   assert.equal(owner.rebuildDynamicBorders(), false);
-  assert.equal(state.cachedBorders, null);
   assert.equal(state.cachedDynamicBordersHash, null);
   assert.equal(state.dynamicBordersDirty, false);
   assert.equal(state.dynamicBordersDirtyReason, "");

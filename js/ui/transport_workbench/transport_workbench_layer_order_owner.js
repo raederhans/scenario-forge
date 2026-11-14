@@ -88,7 +88,7 @@ export function createTransportWorkbenchLayerOrderOwner({
         markDirty("transport-workbench-layer-order");
         const context = getRenderContext();
         render();
-        renderInspector(context.family, context.config, context.compareHeld);
+        renderInspector(context.family, context.config);
       });
 
       const handle = document.createElement("span");

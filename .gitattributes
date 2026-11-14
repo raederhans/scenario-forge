@@ -70,8 +70,6 @@ dist/app/**/*.json text eol=lf
 dist/app/**/*.md text eol=lf
 dist/app/**/*.svg text eol=lf
 dist/app/**/*.txt text eol=lf
-docs/active/**/*.md text eol=lf
-docs/archive/**/*.md text eol=lf
 tests/landing_page_behavior.test.mjs text eol=lf
 tools/svgo.landing.config.mjs text eol=lf
 

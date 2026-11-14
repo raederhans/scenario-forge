@@ -37,7 +37,6 @@ import {
 } from "./dev_workspace/dev_workspace_normalizers.js";
 const state = runtimeState;
 
-const DEV_WORKSPACE_STORAGE_KEY = "mapcreator_dev_workspace_expanded";
 
 function ui(key) {
   return t(key, "ui");
@@ -57,14 +56,6 @@ function formatUi(key, replacements = {}) {
 
 function localizeSelectionSummary(count) {
   return formatUi("{count} features selected.", { count });
-}
-
-function writeStoredExpanded(nextValue) {
-  try {
-    localStorage.setItem(DEV_WORKSPACE_STORAGE_KEY, nextValue ? "1" : "0");
-  } catch (_error) {
-    // Ignore storage failures in dev-only UI runtimeState.
-  }
 }
 
 function normalizeDevWorkspaceCategory(value) {
@@ -586,10 +577,9 @@ function bindButtonAction(button, action) {
   button.dataset.bound = "true";
 }
 
-function setExpandedState(nextValue, { bottomDock, panel, toggleBtn, persist = true } = {}) {
+function setExpandedState(nextValue, { bottomDock, panel, toggleBtn } = {}) {
   const expanded = !!nextValue;
   runtimeState.ui.devWorkspaceExpanded = expanded;
-  runtimeState.devSelectionModeEnabled = expanded;
   panel?.classList.toggle("is-hidden", !expanded);
   applyDevWorkspaceExpandedChrome({
     bottomDock,
@@ -597,9 +587,6 @@ function setExpandedState(nextValue, { bottomDock, panel, toggleBtn, persist = t
     expanded,
     updateDockCollapsedUi: runtimeState.updateDockCollapsedUiFn,
   });
-  if (persist) {
-    writeStoredExpanded(expanded);
-  }
   callRuntimeHook(runtimeState, "updateDevWorkspaceUIFn");
 }
 
@@ -994,7 +981,6 @@ function initDevWorkspace() {
     bottomDock,
     panel,
     toggleBtn,
-    persist: false,
   });
   renderWorkspace();
 }

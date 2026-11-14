@@ -271,7 +271,7 @@ const ACTION_NAMES = [
   "removeClickWaterRegionOverride", "setClickActiveSovereignCode", "setClickCountryColors",
   "setClickHoverOverlayDirty", "setClickSelectedColor", "setClickSelectedSpecialRegionId",
   "setClickSelectedWaterRegionId", "setFacilityInfoCardExpanded", "setHoveredFacilityEntry",
-  "setSelectedFacilityEntry", "togglePresetRegion",
+  "setSelectedFacilityEntry",
 ];
 
 function createTransactionHarness({ state: stateOverrides = {}, services: serviceOverrides = {}, actions: actionOverrides = {}, getClickState = null } = {}) {
@@ -282,7 +282,6 @@ function createTransactionHarness({ state: stateOverrides = {}, services: servic
     countryBaseColors: {},
     currentTool: "fill",
     interactionGranularity: "feature",
-    isEditingPreset: false,
     landData: { features: [] },
     landIndex: new Map([["land-1", { properties: { id: "land-1" } }]]),
     operationalLineEditor: null,
@@ -691,21 +690,6 @@ test("switching to select during land hydration inspects the refreshed land with
   for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
     assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
   }
-});
-
-test("preset admission after hydration delegates the refreshed land id only", async () => {
-  const harness = await createTransactionOwner({
-    state: { isEditingPreset: true },
-    services: {
-      getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
-    },
-  });
-  await harness.owner.handleClick({});
-  assert.deepEqual(
-    harness.trace.filter(([name]) => name === "togglePresetRegion"),
-    [["togglePresetRegion", "land-1"]],
-  );
-  assert.equal(traceNames(harness.trace).includes("setClickSelectedColor"), false);
 });
 
 test("a stale ownership-mode service cannot reactivate political editing", async () => {

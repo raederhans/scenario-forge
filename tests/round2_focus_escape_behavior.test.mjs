@@ -181,8 +181,6 @@ test("A-04 character shortcuts ignore options and listboxes but still work on fo
   const previous = Object.fromEntries(fields.map(key => [key, state[key]]));
   context.after(() => Object.assign(state, previous));
   Object.assign(state, { currentTool: "select", brushModeEnabled: false, selectedColor: "#112233", bootBlocking: false, startupReadonly: false });
-  const granularity = h.add("select", h.doc.body, "paintGranularitySelect");
-  granularity.options = [1, 2]; granularity.selectedIndex = 0; granularity.dispatchEvent = () => {};
   const swatch = h.add("button"); swatch.dataset.color = "#abcdef";
   const queryAll = h.doc.querySelectorAll.bind(h.doc);
   h.doc.querySelectorAll = selector => selector === "#paletteGrid .color-swatch" ? [swatch] : queryAll(selector);
@@ -190,9 +188,9 @@ test("A-04 character shortcuts ignore options and listboxes but still work on fo
   for (const role of ["option", "listbox"]) {
     const node = h.add("div"); node.setAttribute("role", role);
     const child = h.add("span", node); child.focus();
-    for (const key of ["f", "b", "g", "1"]) h.win.fire("keydown", { key, target: child });
+    for (const key of ["f", "b", "1"]) h.win.fire("keydown", { key, target: child });
     assert.equal(state.currentTool, "select", role); assert.equal(state.brushModeEnabled, false, role);
-    assert.equal(granularity.selectedIndex, 0, role); assert.equal(state.selectedColor, "#112233", role);
+    assert.equal(state.selectedColor, "#112233", role);
   }
   // 鼠标点过的工具按钮仍持有焦点：字母快捷键照常生效。
   const toolButton = h.add("button"); toolButton.focus();
@@ -201,7 +199,6 @@ test("A-04 character shortcuts ignore options and listboxes but still work on fo
   state.currentTool = "select";
   h.doc.body.focus(); h.win.fire("keydown", { key: "f", target: h.doc.body });
   assert.equal(state.currentTool, "fill");
-  h.win.fire("keydown", { key: "g", target: h.doc.body }); assert.equal(granularity.selectedIndex, 1);
   h.win.fire("keydown", { key: "1", target: h.doc.body }); assert.equal(state.selectedColor, "#abcdef");
 });
 

@@ -152,10 +152,6 @@ function resolveUi(ui = {}) {
 
 function resolveHooks(hooks = {}) {
   return {
-    invalidateFrontlineOverlayState:
-      typeof hooks.invalidateFrontlineOverlayState === "function"
-        ? hooks.invalidateFrontlineOverlayState
-        : null,
     refreshColorState:
       typeof hooks.refreshColorState === "function" ? hooks.refreshColorState : null,
     onProjectImportComplete:
@@ -380,7 +376,6 @@ async function applyImportedProjectState(data, { ui, hooks, request }) {
   if (request) request.isCurrent = isCurrent;
   const required = [{ name: "document-refresh", run: () => {
 
-    hooks.invalidateFrontlineOverlayState?.();
     callRuntimeHook(state, "clearExportBakeCacheFn");
   } }, { name: "scenario-runtime", run: ({ isCurrent: valid }) =>
     preparedImport.manager.completeScenarioProjectImport(preparedImport.preparedScenario, valid) },

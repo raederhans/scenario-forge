@@ -108,7 +108,6 @@ export function createAppearanceControlsController({
   const urbanToneBiasValue = document.getElementById("urbanToneBiasValue");
   const urbanAdaptiveTintStrengthValue = document.getElementById("urbanAdaptiveTintStrengthValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
-  const appearanceLayerFilter = document.getElementById("appearanceLayerFilter");
   const displayQuality = document.getElementById("displayQuality");
   const toggleCountryLabels = document.getElementById("toggleCountryLabels");
   const mapContentStack = document.getElementById("mapContentStack");
@@ -249,10 +248,8 @@ export function createAppearanceControlsController({
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
   const mapContentTabButtons = Array.from(document.querySelectorAll("[data-map-content-tab]"));
   const mapContentTabPanels = Array.from(document.querySelectorAll("[data-map-content-panel]"));
-  const appearanceFilterItems = Array.from(document.querySelectorAll("[data-appearance-filter-item]"));
   const appearanceSpecialZoneBtn = document.getElementById("appearanceSpecialZoneBtn");
   const recentContainer = document.getElementById("recentColors");
-  const dockRecentDivider = document.getElementById("dockRecentDivider");
   const parentBordersVisible = document.getElementById("parentBordersVisible");
   const parentBorderColor = document.getElementById("parentBorderColor");
   const parentBorderOpacity = document.getElementById("parentBorderOpacity");
@@ -434,14 +431,6 @@ export function createAppearanceControlsController({
     translateGeo,
     renderDirty: scheduleLayerRenderDirty,
   });
-
-  const applyAppearanceFilter = () => {
-    const query = String(appearanceLayerFilter?.value || "").trim().toLowerCase();
-    appearanceFilterItems.forEach((item) => {
-      const label = String(item.getAttribute("data-appearance-filter-label") || item.textContent || "").toLowerCase();
-      item.classList.toggle("hidden", !!query && !label.includes(query));
-    });
-  };
 
   const getTabArrowDirection = (button, key) => {
     const isVertical = button.closest?.('[role="tablist"]')?.getAttribute("aria-orientation") === "vertical";
@@ -626,7 +615,6 @@ export function createAppearanceControlsController({
     if (!recentContainer) return;
     recentContainer.replaceChildren();
     const visibleRecentColors = runtimeState.recentColors.slice(0, 10);
-    dockRecentDivider?.classList.toggle("hidden", visibleRecentColors.length === 0);
     visibleRecentColors.forEach((color) => {
       const normalized = normalizeHexColor(color);
       if (!normalized) return;
@@ -720,13 +708,6 @@ export function createAppearanceControlsController({
       });
       button.dataset.bound = "true";
     });
-
-    if (appearanceLayerFilter && !appearanceLayerFilter.dataset.bound) {
-      appearanceLayerFilter.addEventListener("input", () => {
-        applyAppearanceFilter();
-      });
-      appearanceLayerFilter.dataset.bound = "true";
-    }
 
     transportAppearanceController.bindEvents();
     textureOwner.bindEvents();
@@ -879,7 +860,6 @@ export function createAppearanceControlsController({
   setMapContentTab("ocean");
 
   return {
-    applyAppearanceFilter,
     bindEvents,
     clearReferenceImage: referenceOwner.clearReferenceImage,
     renderAppearanceStyleControlsUi,

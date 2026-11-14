@@ -437,29 +437,6 @@ export async function writeStartupCacheEntry({
   return record;
 }
 
-export async function deleteStartupCacheEntry(cacheKey, { search = null } = {}) {
-  if (!isStartupCacheEnabled(search) || !normalizeText(cacheKey)) {
-    return false;
-  }
-  const db = await openStartupCacheDb();
-  const transaction = db.transaction(STARTUP_CACHE_STORE_NAME, "readwrite");
-  const store = transaction.objectStore(STARTUP_CACHE_STORE_NAME);
-  store.delete(cacheKey);
-  await createTransactionDonePromise(transaction);
-  return true;
-}
-
-export async function clearStartupCache({ force = false, search = null } = {}) {
-  if (!force && shouldBypassStartupCache(search)) {
-    return false;
-  }
-  const db = await openStartupCacheDb();
-  const transaction = db.transaction(STARTUP_CACHE_STORE_NAME, "readwrite");
-  transaction.objectStore(STARTUP_CACHE_STORE_NAME).clear();
-  await createTransactionDonePromise(transaction);
-  return true;
-}
-
 export async function garbageCollectStartupCache({
   maxEntriesPerKind = 4,
   keepKinds = null,

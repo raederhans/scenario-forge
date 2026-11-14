@@ -212,10 +212,6 @@ export function createDevWorkspaceQuickbar(bottomDock) {
         <span class="dev-quick-label" data-i18n="Owner"></span>
         <span id="devQuickOwnerValue" class="dev-quick-value">--</span>
       </div>
-      <div class="dev-quick-meta">
-        <span class="dev-quick-label" data-i18n="Controller"></span>
-        <span id="devQuickControllerValue" class="dev-quick-value">--</span>
-      </div>
     </div>
     <div class="dev-workspace-quick-owner">
       <span class="dev-quick-label" data-i18n="Selection"></span>

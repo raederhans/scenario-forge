@@ -456,7 +456,6 @@ function createDefaultCityLayerStyleConfig() {
     labelSize: 11,
     labelMinZoom: 1.45,
     showCapitalOverlay: true,
-    capitalScale: 1.6,
   };
 }
 
@@ -510,7 +509,6 @@ function normalizeCityLayerStyleConfig(rawConfig) {
     showCapitalOverlay: raw.showCapitalOverlay === undefined
       ? defaults.showCapitalOverlay
       : !!raw.showCapitalOverlay,
-    capitalScale: clamp(toFiniteNumber(raw.capitalScale, defaults.capitalScale), 1, 3.5),
   };
 }
 
@@ -886,10 +884,6 @@ function normalizeDayNightStyleConfig(rawConfig) {
 
 function createDefaultAnnotationView() {
   return {
-    frontlineEnabled: false,
-    frontlineStyle: "clean",
-    showFrontlineLabels: false,
-    labelPlacementMode: "midpoint",
     unitRendererDefault: "game",
     unitCounterFixedScaleMultiplier: 1.5,
     showUnitLabels: true,
@@ -899,21 +893,9 @@ function createDefaultAnnotationView() {
 function normalizeAnnotationView(rawConfig) {
   const defaults = createDefaultAnnotationView();
   const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
-  const frontlineStyle = String(raw.frontlineStyle || defaults.frontlineStyle).trim().toLowerCase();
-  const labelPlacementMode = String(raw.labelPlacementMode || defaults.labelPlacementMode).trim().toLowerCase();
   const unitRendererDefault = String(raw.unitRendererDefault || defaults.unitRendererDefault).trim().toLowerCase();
 
   return {
-    frontlineEnabled: raw.frontlineEnabled === undefined ? defaults.frontlineEnabled : !!raw.frontlineEnabled,
-    frontlineStyle: ["clean", "dual-rail", "teeth"].includes(frontlineStyle)
-      ? frontlineStyle
-      : defaults.frontlineStyle,
-    showFrontlineLabels: raw.showFrontlineLabels === undefined
-      ? defaults.showFrontlineLabels
-      : !!raw.showFrontlineLabels,
-    labelPlacementMode: ["midpoint", "centroid"].includes(labelPlacementMode)
-      ? labelPlacementMode
-      : defaults.labelPlacementMode,
     unitRendererDefault: ["milstd", "game"].includes(unitRendererDefault)
       ? unitRendererDefault
       : defaults.unitRendererDefault,
@@ -1314,7 +1296,6 @@ function normalizeTransportWorkbenchUiState(rawUi) {
     previewCarrierId,
     previewMode: "bounded_zoom_pan",
     previewAssetId: String(raw.previewAssetId || defaultPreviewAssetId).trim() || defaultPreviewAssetId,
-    previewInteractionMode: "bounded_zoom_pan",
     previewCamera: {
       scale: toFiniteNumber(rawPreviewCamera.scale, 1) || 1,
       translateX: toFiniteNumber(rawPreviewCamera.translateX, 0),
@@ -1329,7 +1310,6 @@ function normalizeTransportWorkbenchUiState(rawUi) {
     familyConfigs,
     displayConfigs: normalizeTransportWorkbenchDisplayConfigs(raw.displayConfigs),
     sectionOpen,
-    shellPhase: "road-live-preview",
     restoreLeftDrawer: !!raw.restoreLeftDrawer,
     restoreRightDrawer: !!raw.restoreRightDrawer,
   };

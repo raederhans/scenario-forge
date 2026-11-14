@@ -846,7 +846,11 @@ test("required refresh failure preserves the committed import and blocks editing
     }
   };
 
+  const previousClearExportBakeCache = readRegisteredRuntimeHookSource(state, "clearExportBakeCacheFn");
   let failRefresh = true;
+  registerRuntimeHook(state, "clearExportBakeCacheFn", () => {
+    if (failRefresh) throw new Error("debug reset sentinel");
+  });
   try {
     const result = await importProjectThroughFunnel(
         {
@@ -860,9 +864,6 @@ test("required refresh failure preserves the committed import and blocks editing
             showAppDialog: async () => false,
           },
           hooks: {
-            invalidateFrontlineOverlayState: () => {
-              if (failRefresh) throw new Error("debug reset sentinel");
-            },
             onProjectImportError: () => assert.fail("committed import must not become a failure"),
           },
         }
@@ -881,6 +882,7 @@ test("required refresh failure preserves the committed import and blocks editing
     assert.equal(getInteractionFunnelDebugState().importPhase, "idle");
     assert.equal(getInteractionFunnelDebugState().lastImportError, "");
   } finally {
+    registerRuntimeHook(state, "clearExportBakeCacheFn", previousClearExportBakeCache);
     globalThis.document = previousDocument;
     globalThis.FileReader = previousFileReader;
   }

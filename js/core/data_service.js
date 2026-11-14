@@ -382,22 +382,6 @@ export async function getAsset(key, options = {}) {
   });
 }
 
-export async function getCatalogAsset(path, options = {}) {
-  const normalizedPath = normalizeCatalogPath(path);
-  const entry = resolveCatalogEntryByUrl(normalizedPath);
-  if (!entry) {
-    throw createDataServiceError("catalog-path-not-allowed", `[data_service] Catalog path is not registered: ${normalizedPath || "<empty>"}.`, {
-      kind: "catalog",
-      id: normalizedPath,
-      url: normalizedPath,
-    });
-  }
-  return loadJsonEntry("catalog", normalizedPath, normalizedPath, entry, {
-    ...options,
-    label: options.label || `catalog:${normalizedPath}`,
-  });
-}
-
 export async function getTransportAsset(path, options = {}) {
   const normalizedPath = normalizeCatalogPath(path);
   const entry = transportEntryByUrl.get(normalizedPath);
@@ -440,19 +424,6 @@ export function getStatusSnapshot() {
     updatedAt: lastUpdatedAt || 0,
     resources,
     totals,
-  };
-}
-
-export function getMetricsSnapshot() {
-  const resources = Object.fromEntries(
-    Array.from(metricsByRequestId.entries())
-      .sort(([leftKey], [rightKey]) => String(leftKey).localeCompare(String(rightKey)))
-      .map(([requestId, metrics]) => [requestId, cloneJsonLike(metrics)])
-  );
-  return {
-    schemaVersion: DATA_SERVICE_SCHEMA_VERSION,
-    updatedAt: lastUpdatedAt || 0,
-    resources,
   };
 }
 
