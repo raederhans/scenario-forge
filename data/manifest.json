@@ -366,7 +366,7 @@
       "sha256": "943d775896d7771800743a7da64fbc0a3cf1f116aa4ce33af23d8dea3c4c0298",
       "size_bytes": 8556219,
       "type": "locales",
-      "ui_entry_count": 2090
+      "ui_entry_count": 2643
     },
     "marine_regions.refined.source.geojson": {
       "artifact_class": "derived",
