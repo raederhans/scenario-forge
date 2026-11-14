@@ -1,11 +1,11 @@
-name: All tests nightly
+name: weekly
 
-# Runs every unit test including the slow lists in tests/quarantine.json, which
-# PRs skip (pr-verify.yml, job pr-tests). Quarantined tests stay skipped so the
-# run only goes red on new breakage; use --all by hand for a full audit.
+# Everything PRs skip: the slow unit lists in tests/quarantine.json, the remaining
+# browser specs, and the data and raster checks. Quarantined tests stay skipped so
+# the run only goes red on new breakage; use --all by hand for a full audit.
 on:
   schedule:
-    - cron: "37 19 * * *"
+    - cron: "37 19 * * 6"
   workflow_dispatch:
 
 permissions:
@@ -47,8 +47,8 @@ jobs:
           PYTEST_XDIST_AUTO_NUM_WORKERS: "2"
         run: node tools/run_all_tests.mjs ${{ matrix.suite }}
 
-  sample-guide-e2e:
-    # PRs run only the @golden-demo slice of this spec (verify-shared.yml, pr-smoke).
+  browser-specs:
+    # The specs outside tests/e2e/golden: sample guide and map drag release.
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -70,5 +70,8 @@ jobs:
           python -m pip install -r requirements-dev.lock.txt
           npm ci
           npx playwright install --with-deps chromium
-      - name: Run the sample guide spec
-        run: npm run test:e2e:sample-guide
+      - name: Run the remaining browser specs
+        run: node node_modules/@playwright/test/cli.js test tests/e2e/sample_guide_deeplink.spec.js tests/e2e/map_drag_release.spec.js --workers=1 --retries=0
+
+  data-verify:
+    uses: ./.github/workflows/data-verify.yml
