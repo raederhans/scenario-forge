@@ -294,6 +294,7 @@ export function createNavigationFrameOwner({
 
   function draw(context, transform, dpr, {
     detailSource = null, detailTransform = null, detailDpr = dpr,
+    renderPhase = "idle",
   } = {}) {
     if (!isValidCanvasSize(context?.canvas) || !isReady()
       || !isValidTransform(transform) || !(Number.isFinite(dpr) && dpr > 0)) return false;
@@ -309,6 +310,7 @@ export function createNavigationFrameOwner({
       || worldScaleX <= 0 || worldScaleY <= 0) return false;
     const worldMagnification = Math.max(worldScaleX, worldScaleY);
     const worldQualityOK = worldMagnification <= quality.worldMaxDevicePixelMagnification;
+    const gesture = renderPhase === "interacting" || renderPhase === "settling";
 
     let detail = null;
     if (detailSource !== context.canvas && isValidCanvasSize(detailSource) && isValidTransform(detailTransform)
@@ -320,9 +322,9 @@ export function createNavigationFrameOwner({
       const width = detailSource.width * magnification;
       const height = detailSource.height * magnification;
       if ([ratio, magnification, x, y, width, height].every(Number.isFinite)
-        && magnification > 0 && ratio >= quality.detailMinCssScaleRatio
+        && magnification > 0 && (gesture || (ratio >= quality.detailMinCssScaleRatio
         && ratio <= quality.detailMaxCssScaleRatio
-        && magnification <= quality.detailMaxDevicePixelMagnification) {
+        && magnification <= quality.detailMaxDevicePixelMagnification))) {
         detail = {
           ratio, magnification, x, y,
           coversViewport: x <= 0 && y <= 0
@@ -330,14 +332,14 @@ export function createNavigationFrameOwner({
         };
       }
     }
-    if (!worldQualityOK && !detail) {
+    if (!gesture && !worldQualityOK && !detail) {
       recordMetric("navigationFrameReject", 0, {
         reason: "raster-quality", worldMagnification,
         detailQualityOK: Boolean(detail), detailCoversViewport: Boolean(detail?.coversViewport),
       });
       return false;
     }
-    const detailOnly = !worldQualityOK && detail.coversViewport;
+    const detailOnly = !worldQualityOK && !!detail?.coversViewport;
     const edgeFilledByWorld = !worldQualityOK && !detailOnly;
     context.save();
     try {

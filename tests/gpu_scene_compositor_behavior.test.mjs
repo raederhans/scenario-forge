@@ -297,3 +297,33 @@ test("context loss prevents drawing and cleanup is idempotent", () => {
   scene.dispose(); scene.dispose(); gpu.dispose(); gpu.dispose();
   assert.equal(h.calls.some(call => call[0] === "loseContext"), false);
 });
+
+
+test("scene textures grow at high DPR and downsample only beyond the viewport hard cap", () => {
+  const h = harness(), scaledSources = [];
+  h.gl.getParameter = () => 16384;
+  h.canvas.ownerDocument = { createElement: () => ({ width: 0, height: 0,
+    getContext: () => ({ drawImage: (...args) => scaledSources.push(args) }) }) };
+  const scene = createGpuSceneCompositor({ canvas: h.canvas, maxTextureBytes: 160 * 1024 * 1024 });
+  for (const [width, height] of [[1920, 1080], [2520, 2288], [3840, 2160], [7680, 4320]]) {
+    const pixels = Math.min(width * height, 3840 * 2160);
+    const politicalBudget = Math.floor(80 * 1024 * 1024 * Math.max(1, pixels / 4_000_000));
+    scene.setTextureBudget(Math.max(160 * 1024 * 1024, politicalBudget + 44 * pixels));
+    const layers = Array.from({ length: 8 }, (_, i) => ({ name: `pass-${i}`, canvas: { width, height }, revision: 1,
+      transform: { a: 1.5, d: 1.25, e: -7, f: 11 } }));
+    h.calls.length = 0;
+    assert.equal(scene.render({ width, height, layers, reservedTextureBytes: 20 * 1024 * 1024 }), true);
+    const stats = scene.getStats();
+    assert.ok(stats.gpuTextureBytes + 20 * 1024 * 1024 <= stats.maxTextureBytes);
+    assert.equal(stats.downgraded, width === 7680);
+    assert.equal(scaledSources.length > 0, width === 7680);
+    assert.deepEqual(h.calls.find(call => call[0] === "uniform2f" && call[1] === "sourceSize").slice(2), [width, height]);
+    assert.deepEqual([...h.calls.find(call => call[0] === "uniformMatrix3fv")[3]], [1.5, 0, 0, 0, 1.25, 0, -7, 11, 1]);
+    const uploads = stats.textureUploads;
+    assert.equal(scene.render({ width, height, layers: layers.map(layer => ({ ...layer, canvas: undefined, retained: true })),
+      reservedTextureBytes: 20 * 1024 * 1024 }), true);
+    assert.equal(scene.getStats().textureUploads, uploads);
+    assert.equal(scene.getStats().downgraded, width === 7680);
+  }
+  scene.dispose();
+});

@@ -1,6 +1,12 @@
 const DEFAULT_TILE_SIZE = 512;
 const DEFAULT_MAX_PIXELS = 12 * 1024 * 1024;
 const RASTER_BOUNDS_PADDING = 4;
+export const RASTER_BUDGET_BASE_PIXELS = 4_000_000;
+export const RASTER_BUDGET_MAX_PIXELS = 3840 * 2160;
+
+export function scaleRasterViewportBudget(base, width, height) {
+  return Math.floor(base * Math.max(1, Math.min(width * height, RASTER_BUDGET_MAX_PIXELS) / RASTER_BUDGET_BASE_PIXELS));
+}
 
 const finite = (value) => Number.isFinite(value);
 
@@ -25,7 +31,7 @@ export function planPoliticalIdRasterView({
   offsetX = 0,
   offsetY = 0,
   tileSize = DEFAULT_TILE_SIZE,
-  maxPixels = DEFAULT_MAX_PIXELS,
+  maxPixels = scaleRasterViewportBudget(DEFAULT_MAX_PIXELS, width, height),
 } = {}) {
   const x = Number(transform?.x), y = Number(transform?.y), k = Number(transform?.k);
   if (![x, y, k, dpr, width, height, offsetX, offsetY, tileSize, maxPixels].every(finite)
@@ -35,61 +41,72 @@ export function planPoliticalIdRasterView({
 
   const physicalScale = k * dpr;
   if (!validPositive(physicalScale) || !finite(Math.log2(physicalScale))) return null;
-  const { level, density } = getDensity(physicalScale);
+  let { level, density } = getDensity(physicalScale);
+  const requestedLevel = level;
   if (!validPositive(density)) return null;
-  const scale = physicalScale / density;
-  const translateX = (x + offsetX) * dpr;
-  const translateY = (y + offsetY) * dpr;
-  // Include one output pixel around the visible bounds before snapping to tile
-  // boundaries. The adjacent edge tiles provide the required small guard band.
-  const minWorldX = (-translateX - 1) / scale;
-  const minWorldY = (-translateY - 1) / scale;
-  const maxWorldX = (width - translateX + 1) / scale;
-  const maxWorldY = (height - translateY + 1) / scale;
-  const gridX0 = Math.floor(minWorldX / tileSize);
-  const gridY0 = Math.floor(minWorldY / tileSize);
-  const gridX1 = Math.ceil(maxWorldX / tileSize);
-  const gridY1 = Math.ceil(maxWorldY / tileSize);
-  const columns = gridX1 - gridX0;
-  const rows = gridY1 - gridY0;
-  const rasterWidth = columns * tileSize;
-  const rasterHeight = rows * tileSize;
-  const pixelCount = rasterWidth * rasterHeight;
-  if (![gridX0, gridY0, gridX1, gridY1, rasterWidth, rasterHeight, pixelCount].every(Number.isSafeInteger)
-    || columns <= 0 || rows <= 0 || pixelCount > maxPixels) return null;
-
-  const originX = gridX0 * tileSize;
-  const originY = gridY0 * tileSize;
-  const tiles = [];
-  for (let gy = gridY0; gy < gridY1; gy += 1) {
-    for (let gx = gridX0; gx < gridX1; gx += 1) {
-      const tileOriginX = gx * tileSize;
-      const tileOriginY = gy * tileSize;
-      tiles.push({
-        key: `${level}:${dpr}:${gx}:${gy}`,
-        originX: tileOriginX,
-        originY: tileOriginY,
-        width: tileSize,
-        height: tileSize,
-        density,
-        level,
-      });
+  for (;;) {
+    const scale = physicalScale / density;
+    const translateX = (x + offsetX) * dpr;
+    const translateY = (y + offsetY) * dpr;
+    // Include one output pixel around the visible bounds before snapping to tile
+    // boundaries. The adjacent edge tiles provide the required small guard band.
+    const minWorldX = (-translateX - 1) / scale;
+    const minWorldY = (-translateY - 1) / scale;
+    const maxWorldX = (width - translateX + 1) / scale;
+    const maxWorldY = (height - translateY + 1) / scale;
+    const gridX0 = Math.floor(minWorldX / tileSize);
+    const gridY0 = Math.floor(minWorldY / tileSize);
+    const gridX1 = Math.ceil(maxWorldX / tileSize);
+    const gridY1 = Math.ceil(maxWorldY / tileSize);
+    const columns = gridX1 - gridX0;
+    const rows = gridY1 - gridY0;
+    const rasterWidth = columns * tileSize;
+    const rasterHeight = rows * tileSize;
+    const pixelCount = rasterWidth * rasterHeight;
+    if (![gridX0, gridY0, gridX1, gridY1, rasterWidth, rasterHeight, pixelCount].every(Number.isSafeInteger)
+      || columns <= 0 || rows <= 0) return null;
+    if (pixelCount > maxPixels) {
+      if (width * height <= RASTER_BUDGET_MAX_PIXELS || maxPixels < 4 * tileSize * tileSize) return null;
+      level -= 1;
+      density = 2 ** (level / 4);
+      continue;
     }
+
+    const originX = gridX0 * tileSize;
+    const originY = gridY0 * tileSize;
+    const tiles = [];
+    for (let gy = gridY0; gy < gridY1; gy += 1) {
+      for (let gx = gridX0; gx < gridX1; gx += 1) {
+        const tileOriginX = gx * tileSize;
+        const tileOriginY = gy * tileSize;
+        tiles.push({
+          key: `${level}:${dpr}:${gx}:${gy}`,
+          originX: tileOriginX,
+          originY: tileOriginY,
+          width: tileSize,
+          height: tileSize,
+          density,
+          level,
+        });
+      }
+    }
+    return {
+      density,
+      level,
+      maxPixels,
+      downgraded: level < requestedLevel,
+      scale,
+      originX,
+      originY,
+      width: rasterWidth,
+      height: rasterHeight,
+      outputX: originX * scale + translateX,
+      outputY: originY * scale + translateY,
+      outputWidth: rasterWidth * scale,
+      outputHeight: rasterHeight * scale,
+      tiles,
+    };
   }
-  return {
-    density,
-    level,
-    scale,
-    originX,
-    originY,
-    width: rasterWidth,
-    height: rasterHeight,
-    outputX: originX * scale + translateX,
-    outputY: originY * scale + translateY,
-    outputWidth: rasterWidth * scale,
-    outputHeight: rasterHeight * scale,
-    tiles,
-  };
 }
 
 function intersects(left, right) {
@@ -152,6 +169,7 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
   if (!Number.isSafeInteger(maxBytes) || maxBytes < 0) {
     throw new TypeError("maxBytes must be a non-negative safe integer.");
   }
+  const baseMaxBytes = maxBytes;
   const cache = new Map();
   const payloads = new WeakMap();
   let cpuBytes = 0;
@@ -315,5 +333,10 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     return [...cache.entries()].map(([key, entry]) => [key, entry.tile]);
   }
 
-  return Object.freeze({ maxBytes, get, peek, set, invalidate, clear, getStats, entries });
+  function setViewport(width, height) {
+    maxBytes = scaleRasterViewportBudget(baseMaxBytes, width, height);
+    makeRoom(0);
+  }
+
+  return Object.freeze({ get maxBytes() { return maxBytes; }, setViewport, get, peek, set, invalidate, clear, getStats, entries });
 }

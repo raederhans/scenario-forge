@@ -1,8 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createGpuSceneCompositor } from "../js/core/renderer/gpu_scene_compositor.js";
 import { createTnoRasterSceneOwner } from "../js/core/renderer/tno_raster_scene_owner.js";
 
-function harness() {
+function harness({ realCompositor = false } = {}) {
   const records = { frames: [], accounts: [], releases: [], gpuOptions: [], sceneOptions: [], colorBaselines: [] };
   const parent = { children: [], insertBefore(child, next) {
     const index = next ? this.children.indexOf(next) : this.children.length;
@@ -37,7 +38,21 @@ function harness() {
     resourceBudget: { update: (_owner, amount) => records.accounts.push(amount), release: owner => records.releases.push(owner) },
     createCompositor: options => {
       records.sceneOptions.push(options);
+      if (realCompositor) {
+        const gl = new Proxy({ canvas: options.canvas, getParameter: () => 16384,
+          getProgramParameter: () => true, isContextLost: () => false,
+          getUniformLocation: (_program, name) => name, getAttribLocation: () => 0,
+          getExtension: () => null,
+        }, { get(target, key) {
+          if (key in target) return target[key];
+          if (key === key.toUpperCase()) return key;
+          return () => key.startsWith("create") ? {} : undefined;
+        } });
+        options.canvas.getContext = () => gl;
+        return records.compositor = createGpuSceneCompositor(options);
+      }
       return records.compositor = { gl: {}, isAvailable: () => !lost,
+        setTextureBudget: bytes => { options.maxTextureBytes = bytes; },
         captureRetainedLayers: layers => layers.filter(layer => layer.canvas).map(layer => ({ name: `overview:${layer.name}`,
           sourceName: layer.name, revision: layer.revision, scaleX: 2, scaleY: 2 })),
         releaseRetainedLayers: () => {},
@@ -96,7 +111,7 @@ test("scene installs beside base surface and presents ordered device-pixel affin
   assert.deepEqual(frame.layers[0].transform, { a: 2, d: 2, e: -20, f: -60 });
   assert.deepEqual(h.records.direct.transform, { a: 2, d: 2, e: 100, f: 100 });
   assert.equal(frame.reservedTextureBytes, 1234);
-  assert.equal(h.records.gpuOptions[0].maxTextureBytes, 80 * 1024 * 1024);
+  assert.equal(h.records.gpuOptions[0].maxTextureBytes - h.records.gpuOptions[0].getReservedTextureBytes(), 80 * 1024 * 1024);
   assert.equal(h.records.sceneOptions[0].maxTextureBytes, 160 * 1024 * 1024);
   assert.equal(sceneCanvas.style.display, "block");
   assert.equal(h.map.style.visibility, "hidden");
@@ -228,7 +243,7 @@ test("scene budget includes other-pass textures while the political pool stays c
   assert.equal(h.owner.getDiagnostics().gpuTextureBytes, 104 * MiB);
   assert.equal(h.records.sceneOptions[0].maxTextureBytes, 160 * MiB);
   h.currentFrame.gpu = h.owner.ensureGpu({ maxTextureBytes: 160 * MiB });
-  assert.equal(h.records.gpuOptions.at(-1).maxTextureBytes, 80 * MiB, "scene capacity cannot expand the political pool");
+  assert.equal(h.records.gpuOptions.at(-1).maxTextureBytes - h.records.gpuOptions.at(-1).getReservedTextureBytes(), 56 * MiB, "scene reservations constrain the political pool");
   h.setPoliticalTextureBytes(56 * MiB);
   assert.equal(h.owner.present(h.transform), true, "104 + 56 MiB fits the exact combined cap");
   h.setPoliticalTextureBytes(56 * MiB + 1);
@@ -495,13 +510,14 @@ test("successful GPU handoff retires legacy navigation while incomplete, vector 
 test("political candidate admission reserves excess live scene textures without counting itself twice", () => {
   const h = harness(), MiB = 1024 * 1024;
   const reserve = h.records.gpuOptions[0].getReservedTextureBytes;
-  assert.equal(reserve(), 0);
+  const unusedCapacity = h.records.gpuOptions[0].maxTextureBytes - 80 * MiB;
+  assert.equal(reserve(), unusedCapacity);
   h.passes.get("base").canvas = { width: 4000, height: 4000 };
   h.passes.get("labels").canvas = { width: 4000, height: 4000 };
   assert.equal(h.owner.present(h.transform), true);
-  assert.equal(reserve(), 128000000 - 80 * MiB);
+  assert.equal(reserve(), unusedCapacity + 128000000 - 80 * MiB);
   h.setPoliticalTextureBytes(10 * MiB);
-  assert.equal(reserve(), 128000000 - 80 * MiB, "political and overview bytes are charged by their own owner");
+  assert.equal(reserve(), unusedCapacity + 128000000 - 80 * MiB, "political and overview bytes are charged by their own owner");
 });
 
 test("compose gates political publication on prepared layers and preserves the synchronous final boundary", async () => {
@@ -579,4 +595,49 @@ test("retained precision layers compose over overview with a shared device-pixel
     assert.equal(h.owner.getDiagnostics().presentationState, "retained");
     assert.equal(h.owner.getDiagnostics().textureUploads, before.textureUploads);
   }
+});
+
+
+test("scene and political budgets track viewport resizing and stop growing at 4K", () => {
+  const h = harness();
+  const options = h.records.gpuOptions[0];
+  for (const [width, height] of [[1920, 1080], [2520, 2288], [3840, 2160], [7680, 4320], [1920, 1080]]) {
+    h.map.width = width; h.map.height = height;
+    const factor = Math.max(1, Math.min(width * height, 3840 * 2160) / 4_000_000);
+    const diagnostics = h.owner.getDiagnostics();
+    assert.equal(diagnostics.budgets.politicalTextureBytes, Math.floor(80 * 1024 * 1024 * factor));
+    assert.equal(diagnostics.budgets.sceneTextureBytes, Math.max(160 * 1024 * 1024,
+      diagnostics.budgets.politicalTextureBytes + 44 * Math.min(width * height, 3840 * 2160)));
+    assert.equal(options.maxTextureBytes - options.getReservedTextureBytes(), diagnostics.budgets.politicalTextureBytes);
+  }
+  h.owner.dispose();
+});
+
+
+test("2520 by 2288 DPR 2 scene presents seven full-size passes plus political textures without downgrade", () => {
+  const h = harness({ realCompositor: true });
+  const width = 2520, height = 2288, transform = { x: 0, y: 0, k: 1 };
+  h.map.width = width; h.map.height = height;
+  h.passes.clear();
+  for (let index = 0; index < 7; index++) h.passes.set(`pass-${index}`, {
+    canvas: { width, height }, reference: transform, layout: { offsetX: 0, offsetY: 0 },
+  });
+  h.helpers.getActivePassNames = () => [...h.passes.keys(), "political"];
+  Object.assign(h.currentFrame, { transform, layout: { offsetX: 0, offsetY: 0 },
+    plan: { originX: 0, originY: 0, width, height, scale: 1,
+      outputX: 0, outputY: 0, outputWidth: width, outputHeight: height } });
+  const politicalBytes = Math.floor(80 * 1024 * 1024 * width * height / 4_000_000);
+  h.setPoliticalTextureBytes(politicalBytes);
+  assert.equal(h.owner.present(transform), true);
+  const diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.active, true);
+  assert.equal(diagnostics.fallbackReason, "");
+  assert.equal(diagnostics.downgraded, false);
+  assert.equal(diagnostics.textureScale, 1);
+  assert.equal(diagnostics.textureUploads, 7);
+  assert.equal(diagnostics.gpuTextureBytes, 7 * width * height * 4);
+  assert.equal(diagnostics.budgets.sceneTextureBytes, politicalBytes + 44 * width * height);
+  assert.equal(h.records.compositor.getStats().maxTextureBytes, diagnostics.budgets.sceneTextureBytes);
+  assert.equal(h.records.gpuOptions[0].maxTextureBytes - h.records.gpuOptions[0].getReservedTextureBytes(), politicalBytes);
+  h.owner.dispose();
 });

@@ -332,6 +332,37 @@ test("sharp partial details retain world pixels underneath uncovered edges", () 
   }), true, "oversized detail coverage tolerates pan while covering every target pixel");
 });
 
+test("gesture frames reuse world and detail bitmaps across wide zooms while idle keeps quality bounds", () => {
+  const f = fixture();
+  f.prepare();
+  f.flushAll();
+  const detail = { width: 800, height: 600 };
+  for (const renderPhase of ["interacting", "settling"]) {
+    for (const ratio of [0.25, 0.5, 2, 8]) {
+      const transform = { x: 40, y: -20, k: 8 };
+      const options = { renderPhase, detailSource: detail,
+        detailTransform: { x: 0, y: 0, k: 8 / ratio }, detailDpr: 1 };
+      f.destinationCalls.length = 0;
+      assert.equal(f.owner.draw(f.destination, transform, 2, options), true);
+      assert.deepEqual(f.destinationCalls.filter(([kind]) => kind === "drawImage"), [
+        ["drawImage", f.canvases[0], 0, 0], ["drawImage", detail, 0, 0],
+      ]);
+      assert.equal(f.metrics.at(-1).details.detailCssScaleRatio, ratio);
+      f.destinationCalls.length = 0;
+      assert.equal(f.owner.draw(f.destination, transform, 2, { ...options, renderPhase: "idle" }), false);
+      assert.deepEqual(f.destinationCalls, []);
+    }
+    assert.equal(f.owner.draw(f.destination, { x: 40, y: -20, k: 64 }, 2, { renderPhase }), true);
+    assert.deepEqual(f.destinationCalls.filter(([kind]) => kind === "drawImage"), [
+      ["drawImage", f.canvases[0], 0, 0],
+    ]);
+    f.destinationCalls.length = 0;
+    assert.equal(f.owner.draw(f.destination, { x: 40, y: -20, k: 64 }, 2, { renderPhase: "idle" }), false);
+    assert.deepEqual(f.destinationCalls, []);
+  }
+  f.owner.clear();
+});
+
 test("detail CSS ratio and device-pixel magnification enforce independent quality bounds", () => {
   for (const ratio of [0.8, 1.25]) {
     const f = fixture();

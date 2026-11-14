@@ -238,3 +238,47 @@ test("48 MiB retains 30/36/24 full-size LOD tiles and returns to the first view 
   cache.clear();
   assert.equal(cache.getStats().cpuBytes, 0);
 });
+
+
+test("2520 by 2288 physical pixels at DPR 2 retain the requested raster density", () => {
+  const options = { transform: { x: 17, y: -31, k: 1.01 }, dpr: 2, width: 2520, height: 2288 };
+  const plan = planPoliticalIdRasterView(options);
+  assert.ok(plan);
+  assert.equal(plan.level, 5);
+  assert.equal(plan.downgraded, false);
+  assert.ok(plan.maxPixels > 12 * 1024 * 1024);
+  assert.ok(plan.width * plan.height <= plan.maxPixels);
+  assert.ok(plan.outputX <= 0 && plan.outputY <= 0);
+  assert.ok(plan.outputX + plan.outputWidth >= options.width);
+  assert.ok(plan.outputY + plan.outputHeight >= options.height);
+});
+
+test("views beyond the hard budget select a lower density instead of a null plan", () => {
+  const options = { transform: { x: 17, y: -31, k: 1.01 }, dpr: 2, width: 7680, height: 4320 };
+  const plan = planPoliticalIdRasterView(options);
+  const fourK = planPoliticalIdRasterView({ ...options, width: 3840, height: 2160 });
+  assert.ok(plan);
+  assert.equal(fourK.downgraded, false);
+  assert.equal(plan.maxPixels, fourK.maxPixels);
+  assert.equal(plan.downgraded, true);
+  assert.ok(plan.level < fourK.level);
+  assert.ok(plan.scale > 1);
+  assert.ok(plan.width * plan.height <= plan.maxPixels);
+  assert.ok(plan.outputX <= 0 && plan.outputY <= 0);
+  assert.ok(plan.outputX + plan.outputWidth >= options.width);
+  assert.ok(plan.outputY + plan.outputHeight >= options.height);
+});
+
+test("CPU cache viewport budgets grow to 4K and shrink back to the original cap", () => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 100 });
+  cache.setViewport(1920, 1080);
+  assert.equal(cache.maxBytes, 100);
+  cache.setViewport(3840, 2160);
+  assert.equal(cache.maxBytes, 207);
+  cache.set("large", makeTile(160), descriptor);
+  cache.setViewport(7680, 4320);
+  assert.equal(cache.maxBytes, 207);
+  cache.setViewport(1920, 1080);
+  assert.equal(cache.maxBytes, 100);
+  assert.ok(cache.getStats().cpuBytes <= 100);
+});

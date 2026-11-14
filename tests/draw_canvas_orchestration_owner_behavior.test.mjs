@@ -42,7 +42,7 @@ function createHarness({
   dirtyFastPasses = "",
   activePassNames = ["background", "political"],
   activeScenarioId = "scenario-a",
-  nowValues = [1000, 1042],
+  nowValues = phase === "interacting" ? [1000, 1000, 1042] : [1000, 1042],
   onNow = null,
   onFirstVisible = null,
   onTransformed = null,
@@ -66,6 +66,9 @@ function createHarness({
   const times = [...nowValues];
   let nowCallIndex = 0;
   const mutators = Object.freeze({
+    setTransformed: (value) => {
+      transformed = value;
+    },
     setPhase: (nextPhase) => {
       currentPhase = nextPhase;
     },
@@ -179,8 +182,36 @@ function createHarness({
     return navigation({ phase: currentPhase, deferExact: currentDeferExact });
   };
   const owner = createDrawCanvasOrchestrationOwner({ constants: CONSTANTS, getters, effects });
-  return { calls, effectiveTransform, owner, rawTransform: currentRawTransform };
+  return { calls, effectiveTransform, owner, rawTransform: currentRawTransform, ...mutators };
 }
+
+test("gesture ledger counts frames and presentations and returns an independent completed snapshot", () => {
+  const { calls, owner, setPhase, setTransformed } = createHarness({
+    phase: "idle", firstVisible: true, transformed: true,
+    nowValues: [100, 101, 106, 120, 129, 140, 143, 160],
+  });
+  assert.equal(owner.getGestureLedger(), null);
+  setPhase("interacting");
+  owner.drawCanvasFrame();
+  owner.drawCanvasFrame();
+  setTransformed(false);
+  owner.drawCanvasFrame();
+  assert.equal(owner.getGestureLedger(), null);
+  setPhase("idle");
+  const ledger = owner.getGestureLedger();
+  assert.deepEqual(ledger, {
+    totalFrames: 3, frameModes: { fast: 2, "previous-pixels": 1 },
+    presentedFrames: 2, maxPresentationGapMs: 23, maxFrameMs: 9,
+  });
+  assert.deepEqual(calls.filter(([name, metric]) => name === "recordRenderPerfMetric"
+    && metric === "gestureFrameLedger"), [["recordRenderPerfMetric", "gestureFrameLedger", 60, ledger]]);
+  ledger.totalFrames = 99;
+  ledger.frameModes.fast = 99;
+  assert.equal(owner.getGestureLedger().totalFrames, 3);
+  assert.equal(owner.getGestureLedger().frameModes.fast, 2);
+  owner.drawCanvasFrame();
+  assert.equal(calls.filter(([, metric]) => metric === "gestureFrameLedger").length, 1);
+});
 
 test("valid overview publishes during coverage recovery without blocking on fine preparation or recapturing", () => {
   const { calls, owner }=createHarness({phase:"interacting",firstVisible:true,overview:true});
@@ -233,7 +264,7 @@ test("navigation frame presents requested transform before topology, worker and 
   }
   assert.ok(names(calls).includes("clearPoliticalPatchOverlayIfStale"));
   assert.ok(names(calls).includes("cancelPoliticalPathWarmup"));
-  assert.deepEqual(calls.at(-1), ["incrementPerfCounter", "frames"]);
+  assert.deepEqual(calls.filter(([name]) => name === "incrementPerfCounter").at(-1), ["incrementPerfCounter", "frames"]);
 });
 
 test("color recovery promotion selects exact frame before navigation", () => {
@@ -278,7 +309,7 @@ test("readiness failure returns before side effects and counters", () => {
   const { calls, owner } = createHarness({ ready: false });
   const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
 
-  assert.deepEqual(calls, [["isFrameSurfaceReady"]]);
+  assert.deepEqual(calls, [["getRenderPhase"], ["isFrameSurfaceReady"], ["getRenderPhase"]]);
   assert.equal(summary.status, "skipped-not-ready");
   assert.equal(summary.frameMode, "none");
   assert.equal(summary.drewFrame, false);
@@ -410,7 +441,7 @@ test("exact idle success commits the frame and updates counters", () => {
     frameMode: "exact",
     presented: true,
   });
-  assert.deepEqual(calls.at(-1), ["incrementPerfCounter", "frames"]);
+  assert.deepEqual(calls.filter(([name]) => name === "incrementPerfCounter").at(-1), ["incrementPerfCounter", "frames"]);
 });
 
 test("last-frame commit captures phase and updated transform", () => {

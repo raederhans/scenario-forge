@@ -5,7 +5,7 @@ export const POLITICAL_ID_RASTER_STATUS_EVENT = "political-id-raster-status";
 // Scenarios whose political layer defaults to the resident ID raster drawn
 // directly in the GPU scene. `political_render_mode=vector` (URL or storage)
 // still forces the vector path.
-const DIRECT_RASTER_SCENE_SCENARIO_IDS = new Set(["tno_1962", "hoi4_1936", "hoi4_1939"]);
+const DIRECT_RASTER_SCENE_SCENARIO_IDS = new Set(["tno_1962", "hoi4_1936", "hoi4_1939", "modern_world", "blank_base"]);
 export const isDirectRasterSceneScenario = (scenarioId) => DIRECT_RASTER_SCENE_SCENARIO_IDS.has(scenarioId);
 let previousStatus = "";
 
