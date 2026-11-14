@@ -1,8 +1,15 @@
+import { getCountryGroupSystems } from "../../core/country_group_provider.js";
+import { getMapDataBoundary } from "../../core/map_data_boundary.js";
+import { normalizePresetName } from "../../core/releasable_manager.js";
+import { getScenarioCountryDisplayName, getScenarioCountryOwnName } from "../../core/scenario_country_display.js";
 import { normalizeCountryCodeAlias as normalizeCountryCode } from "../../core/country_code_aliases.js";
 
 // Country grouping, ordering and expansion selection read the live sidebar state.
 // No DOM or renderer dependencies: both inspector and preset UI use this model.
-export function createCountryInspectorModel(runtimeState, t) {
+export function createCountryInspectorModel(runtimeState, t, {
+  countryNames = {},
+  getDirectGeoLabel = (label) => t(label, "geo"),
+} = {}) {
   function buildInspectorTopLevelCountryEntries(entries = []) {
     return (Array.isArray(entries) ? entries : []).filter(
       (entry) => !entry?.releasable
@@ -406,7 +413,206 @@ export function createCountryInspectorModel(runtimeState, t) {
   }
 
 
+  const normalizeCountryDisplayNameCandidate = (value) => {
+    const text = String(value ?? "").trim();
+    if (!text || /^(undefined|null)$/i.test(text)) return "";
+    return text;
+  };
+
+  const createCountryInspectorState = (entry, fallbackIndex = 0) => {
+    const inlineReleasableMeta = !!(entry?.releasable || String(entry?.entry_kind || entry?.entryKind || "").trim() === "releasable");
+    const scenarioMeta = inlineReleasableMeta
+      ? (entry || getScenarioCountryMeta(entry.code) || {})
+      : (getScenarioCountryMeta(entry.code) || entry || {});
+    const normalizedEntryCode = normalizeCountryCode(entry?.code || scenarioMeta.code || scenarioMeta.tag);
+    const fallbackDisplayName = normalizeCountryDisplayNameCandidate(
+      entry?.displayName
+      || entry?.name
+      || scenarioMeta?.preset_source?.name
+      || scenarioMeta?.presetSource?.name
+      || runtimeState.countryNames?.[normalizedEntryCode]
+      || countryNames[normalizedEntryCode]
+      || normalizedEntryCode
+    );
+    const scenarioDisplayName = normalizeCountryDisplayNameCandidate(
+      getScenarioCountryDisplayName(scenarioMeta, fallbackDisplayName)
+    );
+    const displayNameSource = scenarioDisplayName.toUpperCase() === normalizedEntryCode && fallbackDisplayName
+      ? fallbackDisplayName
+      : (scenarioDisplayName || fallbackDisplayName || normalizedEntryCode);
+    const displayName = displayNameSource === scenarioDisplayName && getScenarioCountryOwnName(scenarioMeta)
+      ? displayNameSource
+      : (getDirectGeoLabel(displayNameSource) || displayNameSource || normalizedEntryCode);
+    const name = normalizeCountryDisplayNameCandidate(displayNameSource || entry?.name || normalizedEntryCode) || normalizedEntryCode;
+    const lookupIso2 = resolveScenarioLookupCode(entry);
+    const inspectorDataCode = resolveInspectorDataCode(entry);
+    const presetLookupCode = resolveScenarioLookupCode(entry);
+    const groupLookupCode = resolveCountryGroupingCode(entry);
+    const groupingMeta = getCountryGroupingMeta(entry) || {};
+    const entryKind = String(scenarioMeta.entry_kind || entry.entryKind || "").trim();
+    const ownerFeatureCount = Number(
+      scenarioMeta.feature_count
+      ?? entry.ownerFeatureCount
+      ?? entry.featureCount
+      ?? 0
+    ) || 0;
+    const controllerFeatureCount = Number(
+      scenarioMeta.controller_feature_count
+      ?? entry.controllerFeatureCount
+      ?? 0
+    ) || 0;
+    const featureCount = ownerFeatureCount;
+    const continentId = String(
+      scenarioMeta.continent_id || scenarioMeta.continentId || groupingMeta.continentId || "continent_other"
+    );
+    const continentLabel = String(
+      scenarioMeta.continent_label || scenarioMeta.continentLabel || groupingMeta.continentLabel || "Other"
+    );
+    const subregionId = String(
+      scenarioMeta.subregion_id || scenarioMeta.subregionId || groupingMeta.subregionId || "subregion_unclassified"
+    );
+    const subregionLabel = String(
+      scenarioMeta.subregion_label || scenarioMeta.subregionLabel || groupingMeta.subregionLabel || "Unclassified"
+    );
+    const inspectorGroupMeta = resolveScenarioInspectorGroupMeta(entry);
+    const inspectorGroupId = inspectorGroupMeta.id;
+    const inspectorGroupLabel = inspectorGroupMeta.label;
+    const inspectorGroupAnchorId = inspectorGroupMeta.anchorId;
+    const topLevelGroupId = inspectorGroupId || continentId;
+    const topLevelGroupLabel = inspectorGroupLabel || continentLabel;
+    // 剧本大区可能在国家列表渲染之后才延迟加载完成，所以分组在读取时按当前数据计算，
+    // 并按数据对象身份缓存，避免缓存住只含现代行政区的旧结果。
+    let groupSystemsCacheKey = null;
+    let groupSystemsCache = [];
+    const readGroupSystems = () => {
+      if (scenarioMeta.releasable) return [];
+      const key = [
+        runtimeState.scenarioDistrictGroupsData, runtimeState.hierarchyData,
+        runtimeState.activeScenarioManifest, runtimeState.activeScenarioId, runtimeState.mapSemanticMode,
+      ];
+      if (groupSystemsCacheKey && key.every((value, index) => value === groupSystemsCacheKey[index])) return groupSystemsCache;
+      groupSystemsCacheKey = key;
+      groupSystemsCache = getCountryGroupSystems({
+        runtimeState,
+        ownerCode: normalizedEntryCode,
+        groupingCode: groupLookupCode,
+        getOwnerCode: (id) => getMapDataBoundary(runtimeState).reference.getScenarioGroupCode(id),
+      });
+      return groupSystemsCache;
+    };
+    // inspector 状态把 lookup/preset/grouping code 分开保存：
+    // 列表分组、预设读取和详情展示可能各自指向不同来源，不能在这里合并成一个 code。
+    return {
+      ...entry,
+      code: normalizedEntryCode || entry.code,
+      name,
+      displayName,
+      fallbackIndex,
+      lookupIso2,
+      inspectorDataCode,
+      presetLookupCode,
+      groupingCode: groupLookupCode,
+      presets: runtimeState.presetsState[presetLookupCode] || [],
+      get groupSystems() { return readGroupSystems(); },
+      get hierarchyGroups() { return readGroupSystems()[0]?.groups || []; },
+      continentId,
+      continentLabel,
+      continentDisplayLabel: getDirectGeoLabel(continentLabel) || continentLabel,
+      subregionId,
+      subregionLabel,
+      subregionDisplayLabel: getDirectGeoLabel(subregionLabel) || subregionLabel,
+      inspectorGroupId,
+      inspectorGroupLabel,
+      inspectorGroupAnchorId,
+      topLevelGroupId,
+      topLevelGroupLabel,
+      topLevelGroupDisplayLabel: getDirectGeoLabel(topLevelGroupLabel) || topLevelGroupLabel,
+      topLevelGroupAnchorId: inspectorGroupAnchorId,
+      quality: String(scenarioMeta.quality || entry.quality || "").trim(),
+      featureCount,
+      ownerFeatureCount,
+      controllerFeatureCount,
+      baseIso2: String(scenarioMeta.base_iso2 || entry.baseIso2 || "").trim().toUpperCase(),
+      releaseLookupIso2: String(
+        scenarioMeta.release_lookup_iso2
+        || entry.releaseLookupIso2
+        || ""
+      ).trim().toUpperCase(),
+      scenarioOnly: !!(scenarioMeta.scenario_only ?? entry.scenarioOnly),
+      releasable: !!(scenarioMeta.releasable ?? entry.releasable),
+      scenarioSubject: entryKind === "scenario_subject",
+      entryKind,
+      subjectKind: String(scenarioMeta.subject_kind || entry.subjectKind || "").trim().toLowerCase(),
+      parentOwnerTag: String(scenarioMeta.parent_owner_tag || entry.parentOwnerTag || "").trim().toUpperCase(),
+      parentOwnerTags: Array.isArray(scenarioMeta.parent_owner_tags)
+        ? scenarioMeta.parent_owner_tags.map((value) => String(value || "").trim().toUpperCase()).filter(Boolean)
+        : Array.isArray(entry.parentOwnerTags)
+          ? entry.parentOwnerTags
+          : [],
+      disabledRegionalPresetNames: (
+        Array.isArray(scenarioMeta.disabled_regional_preset_names)
+          ? scenarioMeta.disabled_regional_preset_names
+          : Array.isArray(entry.disabledRegionalPresetNames)
+            ? entry.disabledRegionalPresetNames
+            : []
+      )
+        .map((value) => normalizePresetName(value))
+        .filter(Boolean),
+      disabledRegionalPresetReason: String(
+        scenarioMeta.disabled_regional_preset_reason
+        || entry.disabledRegionalPresetReason
+        || ""
+      ).trim(),
+      syntheticOwner: !!(scenarioMeta.synthetic_owner ?? entry.syntheticOwner),
+      hiddenFromCountryList: !!(scenarioMeta.hidden_from_country_list ?? entry.hiddenFromCountryList),
+      featured: !!(scenarioMeta.featured ?? entry.featured),
+      catalogOrder: Number(scenarioMeta.catalog_order ?? entry.catalogOrder ?? Number.MAX_SAFE_INTEGER),
+      notes: String(scenarioMeta.notes || entry.notes || "").trim(),
+      defaultBoundaryVariantId: String(
+        scenarioMeta.default_boundary_variant_id
+        || entry.defaultBoundaryVariantId
+        || ""
+      ).trim().toLowerCase(),
+      selectedBoundaryVariantId: String(
+        scenarioMeta.selected_boundary_variant_id
+        || entry.selectedBoundaryVariantId
+        || ""
+      ).trim().toLowerCase(),
+      selectedBoundaryVariantLabel: String(
+        scenarioMeta.selected_boundary_variant_label
+        || entry.selectedBoundaryVariantLabel
+        || ""
+      ).trim(),
+      selectedBoundaryVariantDescription: String(
+        scenarioMeta.selected_boundary_variant_description
+        || entry.selectedBoundaryVariantDescription
+        || ""
+      ).trim(),
+      boundaryVariants: Array.isArray(scenarioMeta.boundary_variants)
+        ? scenarioMeta.boundary_variants
+        : Array.isArray(entry.boundaryVariants)
+          ? entry.boundaryVariants
+          : [],
+      companionActions: Array.isArray(scenarioMeta.companion_actions)
+        ? scenarioMeta.companion_actions
+        : Array.isArray(entry.companionActions)
+          ? entry.companionActions
+          : [],
+    };
+  };
+
+  const compareRelatedCountryStates = (a, b) => {
+    const catalogOrderDelta = Number(a?.catalogOrder ?? Number.MAX_SAFE_INTEGER)
+      - Number(b?.catalogOrder ?? Number.MAX_SAFE_INTEGER);
+    if (catalogOrderDelta !== 0) return catalogOrderDelta;
+    const featureDelta = Number(b?.featureCount || 0) - Number(a?.featureCount || 0);
+    if (featureDelta !== 0) return featureDelta;
+    return String(a?.displayName || "").localeCompare(String(b?.displayName || ""));
+  };
+
   return {
+    createCountryInspectorState,
+    compareRelatedCountryStates,
     getScenarioCountryMeta,
     getScenarioSubjectChildrenForParent,
     resolveScenarioInspectorGroupMeta,
