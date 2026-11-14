@@ -26,7 +26,6 @@ export function createSelectionOwnershipController({
   const devQuickSelectionValue = quickbar.querySelector("#devQuickSelectionValue");
   const devQuickTagValue = quickbar.querySelector("#devQuickTagValue");
   const devQuickOwnerValue = quickbar.querySelector("#devQuickOwnerValue");
-  const devQuickControllerValue = quickbar.querySelector("#devQuickControllerValue");
   const devQuickRemoveSelectedBtn = quickbar.querySelector("#devQuickRemoveSelectedBtn");
   const devSelectionToggleSelectedBtn = panel.querySelector("#devSelectionToggleSelectedBtn");
 
@@ -51,7 +50,6 @@ export function createSelectionOwnershipController({
     const ownerValue = selectionCount <= 0
       ? "--"
       : (selection.isMixedOwner ? selection.ownerCodes.join(", ") : (selection.currentOwnerCode || "--"));
-    const controllerValue = ownerValue;
 
     if (devQuickSelectionValue) {
       devQuickSelectionValue.textContent = localizeSelectionSummary(selectionCount);
@@ -61,9 +59,6 @@ export function createSelectionOwnershipController({
     }
     if (devQuickOwnerValue) {
       devQuickOwnerValue.textContent = ownerValue;
-    }
-    if (devQuickControllerValue) {
-      devQuickControllerValue.textContent = controllerValue;
     }
     if (devQuickRemoveSelectedBtn) {
       devQuickRemoveSelectedBtn.disabled = !hasActiveScenario || !resolveSelectedSelectionId() || !devSelectionToggleSelectedBtn;

@@ -4,12 +4,7 @@
 
 export function createDefaultBorderCacheState() {
   return {
-    cachedBorders: null,
     cachedCountryBorders: null,
-    cachedFrontlineMesh: null,
-    cachedFrontlineMeshHash: "",
-    cachedFrontlineLabelAnchors: [],
-    cachedFrontlineLabelAnchorsHash: "",
     cachedProvinceBorders: null,
     cachedProvinceBordersByCountry: new Map(),
     cachedLocalBorders: null,

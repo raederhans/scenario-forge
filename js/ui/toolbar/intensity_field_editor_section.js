@@ -1,8 +1,6 @@
 import {
   INTENSITY_FIELD_CHANNEL_IDS,
   INTENSITY_FIELD_GRID,
-  normalizeIntensityFieldsState,
-  updateIntensityFieldChannel,
 } from "../../core/state.js";
 import { createDefaultIntensityFieldToolState } from "../../core/state/renderer_runtime_state.js";
 import {

@@ -532,7 +532,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Apply Scenario": { zh: "\u5e94\u7528\u573a\u666f", en: "Apply Scenario" },
   "Select a country in Inspector": { zh: "\u5728 Inspector \u4e2d\u9009\u62e9\u56fd\u5bb6", en: "Select a country in Inspector" },
   "Use an active owner for political actions": { zh: "\u4f7f\u7528\u5f53\u524d\u6fc0\u6d3b\u5f52\u5c5e\u6267\u884c\u653f\u6cbb\u64cd\u4f5c", en: "Use an active owner for political actions" },
-  "Use Activate or Scenario Actions for ownership changes": { zh: "\u901a\u8fc7 Activate \u6216 Scenario Actions \u4fee\u6539\u5f52\u5c5e", en: "Use Activate or Scenario Actions for ownership changes" },
   "Historical only": { zh: "\u4ec5\u9650\u5386\u53f2\u6a21\u5f0f", en: "Historical only" },
   "Historical Light Density": { zh: "\u5386\u53f2\u706f\u5149\u5bc6\u5ea6", en: "Historical Light Density" },
   "Secondary City Retention": { zh: "\u6b21\u7ea7\u57ce\u5e02\u4fdd\u7559", en: "Secondary City Retention" },
@@ -735,7 +734,7 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Scenario overlays": { zh: "\u573a\u666f\u53e0\u52a0", en: "Scenario overlays" },
   "Borders + overlays": { zh: "\u8fb9\u754c + \u53e0\u52a0", en: "Borders + overlays" },
   "City and map labels from the labels pass": { zh: "\u6765\u81ea labels pass \u7684\u57ce\u5e02\u4e0e\u5730\u56fe\u6807\u7b7e", en: "City and map labels from the labels pass" },
-  "Frontlines, graphics, counters, and other SVG overlays": { zh: "\u524d\u7ebf\u3001\u56fe\u5f62\u3001\u8ba1\u6570\u5668\u548c\u5176\u4ed6 SVG \u53e0\u52a0", en: "Frontlines, graphics, counters, and other SVG overlays" },
+  "Operational lines, graphics, counters, and other SVG overlays": { zh: "作战线、图形、计数器和其他 SVG 叠加", en: "Operational lines, graphics, counters, and other SVG overlays" },
   "Color bake": { zh: "\u989c\u8272\u70d8\u7119", en: "Color bake" },
   "Base color and scenario fills": { zh: "\u57fa\u7840\u989c\u8272\u548c\u573a\u666f\u586b\u5145", en: "Base color and scenario fills" },
   "Line bake": { zh: "\u7ebf\u6761\u70d8\u7119", en: "Line bake" },
@@ -988,17 +987,17 @@ export const UI_COPY_CATALOG = Object.freeze({
     zh: "制作可发布的战略标注层。",
     en: "Build the publishable strategic layer.",
   },
-  "Contains derived frontlines, operational lines, operation graphics, and unit counters. These are project-local strategic annotations for export and handoff.": {
-    zh: "包含推导前线、作战线、作战图形和单位计数器。这些都是用于导出和交接的项目本地战略标注。",
-    en: "Contains derived frontlines, operational lines, operation graphics, and unit counters. These are project-local strategic annotations for export and handoff.",
+  "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff.": {
+    zh: "创建作战线、行动图形和单位计数器，作为项目内的战略标注用于导出和交接。",
+    en: "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff.",
   },
   "The political map needs readable conflict edges, arrows, planned operations, or visible unit counts.": {
     zh: "政治地图需要清晰的冲突边界、箭头、行动计划或单位数量时使用。",
     en: "The political map needs readable conflict edges, arrows, planned operations, or visible unit counts.",
   },
-  "Turn on derived frontlines first, then add operational lines and graphics, then place counters near the final composition.": {
-    zh: "先开启推导前线，再添加作战线和图形，最后按最终构图摆放单位计数器。",
-    en: "Turn on derived frontlines first, then add operational lines and graphics, then place counters near the final composition.",
+  "Open the strategic workspace, draw operational lines and graphics, then place unit counters and save the project.": {
+    zh: "打开战略工作区，绘制作战线和行动图形，再放置单位计数器并保存项目。",
+    en: "Open the strategic workspace, draw operational lines and graphics, then place unit counters and save the project.",
   },
   "Before export, make sure Strategic annotations are enabled and no line, label, or counter hides the country you want to show.": {
     zh: "导出前确认战略标注已开启，并且线条、标签或计数器没有遮住要展示的国家。",
@@ -1062,8 +1061,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     zh: "如果导出结果看起来不对，重新打开已保存的项目 JSON，修正可编辑状态，再从修正后的状态重新导出。",
     en: "If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.",
   },
-  "Derived Frontlines": { zh: "推导前线", en: "Derived Frontlines" },
-  "Enable derived frontlines": { zh: "启用推导前线", en: "Enable derived frontlines" },
   "Strategic Annotations": { zh: "战略标注", en: "Strategic Annotations" },
   "Project-local lines, graphics, and unit counters for export.": {
     zh: "用于导出的项目本地作战线、作战图形和单位计数器。",
@@ -1077,7 +1074,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Parcel Names": { zh: "地块名", en: "Parcel Names" },
   "Special zone notes": { zh: "特殊区备注", en: "Special zone notes" },
   "Strategic annotations": { zh: "战略标注", en: "Strategic annotations" },
-  Frontlines: { zh: "前线", en: "Frontlines" },
   "Operational lines": { zh: "作战线", en: "Operational lines" },
   "Operation graphics": { zh: "作战图形", en: "Operation graphics" },
   "Unit counters": { zh: "单位计数器", en: "Unit counters" },
@@ -1335,7 +1331,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Enable depth-based bathymetry presets.": {"zh": "启用基于深度数据的测深预设。", "en": "Enable depth-based bathymetry presets."},
   "Bathymetry": {"zh": "测深", "en": "Bathymetry"},
   "Bathymetry enabled · flat style selected": {"zh": "已启用测深 · 已选择纯色样式", "en": "Bathymetry enabled · flat style selected"},
-  "HGO Preview": {"zh": "HGO 预览", "en": "HGO Preview"},
   "Live working state": {"zh": "当前工作状态", "en": "Live working state"},
   "Thematic catalog unavailable": {"zh": "专题图层目录不可用", "en": "Thematic catalog unavailable"},
   "Preview metadata available": {"zh": "预览元数据可用", "en": "Preview metadata available"},

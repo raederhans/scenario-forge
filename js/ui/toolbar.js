@@ -38,7 +38,7 @@ import {
 import { captureHistoryState, canRedoHistory, canUndoHistory, getLatestHistoryEntry, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { setSelectedColorState } from "../core/state/actions/appearance_selection_actions.js";
-import { commitUiVisibilityState } from "../core/state/actions/ui_visibility_actions.js";
+import "../core/state/actions/ui_visibility_actions.js";
 import { setAppearanceVisibilityState } from "../core/state/actions/appearance_visibility_actions.js";
 import {
   buildPaletteQuickSwatches,
@@ -191,8 +191,6 @@ function initToolbar({ render } = {}) {
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
   const transportAppearanceWorkbenchBtn = document.getElementById("transportAppearanceWorkbenchBtn");
-  const toggleWaterRegions = document.getElementById("toggleWaterRegions");
-  const toggleOpenOceanRegions = document.getElementById("toggleOpenOceanRegions");
   const specialZoneEditorHint = document.getElementById("specialZoneEditorHint");
   const recentContainer = document.getElementById("recentColors");
   const paletteLibraryToggle = document.getElementById("paletteLibraryToggle");
@@ -202,11 +200,9 @@ function initToolbar({ render } = {}) {
   const paletteLibrarySearchClear = document.getElementById("paletteLibrarySearchClear");
   const paletteLibrarySummary = document.getElementById("paletteLibrarySummary");
   const paletteLibraryList = document.getElementById("paletteLibraryList");
-  const dockRecentDivider = document.getElementById("dockRecentDivider");
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
   const dockQuickFillBtn = document.getElementById("dockQuickFillBtn");
-  const colorModeSelect = document.getElementById("colorModeSelect");
   const bottomDock = document.getElementById("bottomDock");
   const dockCollapseBtn = document.getElementById("dockCollapseBtn");
   const dockHandleChevron = document.getElementById("dockHandleChevron");
@@ -249,7 +245,6 @@ function initToolbar({ render } = {}) {
   const scenarioGuideSampleProjectContinueBtn = document.getElementById("scenarioGuideSampleProjectContinueBtn");
   const scenarioGuideSampleProjectChoices = document.getElementById("scenarioGuideSampleProjectChoices");
   const scenarioGuideSampleProjectStatus = document.getElementById("scenarioGuideSampleProjectStatus");
-  const dockConfigGroup = document.getElementById("dockConfigGroup");
   const dockReferenceBtn = document.getElementById("dockReferenceBtn");
   const sampleProjectBanner = document.getElementById("sampleProjectBanner");
   const sampleProjectBannerTitle = document.getElementById("sampleProjectBannerTitle");
@@ -257,7 +252,6 @@ function initToolbar({ render } = {}) {
   const sampleProjectBannerOpenExportBtn = document.getElementById("sampleProjectBannerOpenExportBtn");
   const sampleProjectBannerDownloadOriginalLink = document.getElementById("sampleProjectBannerDownloadOriginalLink");
   const sampleProjectBannerDismissBtn = document.getElementById("sampleProjectBannerDismissBtn");
-  const dockEditPopoverBtn = document.getElementById("dockEditPopoverBtn");
   const dockReferencePopover = document.getElementById("dockReferencePopover");
   const dockEditPopover = document.getElementById("dockEditPopover");
   const devWorkspaceToggleBtn = document.getElementById("devWorkspaceToggleBtn");
@@ -306,15 +300,11 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchCoverageSections = document.getElementById("transportWorkbenchCoverageSections");
   const transportWorkbenchDataSections = document.getElementById("transportWorkbenchDataSections");
   const transportWorkbenchFamilyTabs = Array.from(document.querySelectorAll(".transport-workbench-family-tab"));
-  const paintGranularitySelect = document.getElementById("paintGranularitySelect");
-  const dockGranularityField = document.getElementById("dockGranularityField");
   const dockQuickFillRow = document.getElementById("dockQuickFillRow");
   const quickFillParentBtn = document.getElementById("quickFillParentBtn");
   const quickFillCountryBtn = document.getElementById("quickFillCountryBtn");
   const dockQuickFillHint = document.getElementById("dockQuickFillHint");
-  const paintModeSelect = document.getElementById("paintModeSelect");
   const paintModeVisualBtn = document.getElementById("paintModeVisualBtn");
-  const dockColorModeField = document.getElementById("dockColorModeField");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
   const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
   const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
@@ -342,8 +332,6 @@ function initToolbar({ render } = {}) {
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
-  const appearanceLayerFilter = document.getElementById("appearanceLayerFilter");
-  const appearanceFilterItems = Array.from(document.querySelectorAll("[data-appearance-filter-item]"));
   const appearanceSpecialZoneBtn = document.getElementById("appearanceSpecialZoneBtn");
   const specialZonePopover = document.getElementById("specialZonePopover");
   const specialZoneEditorInline = specialZonePopover?.dataset.inlineEditor === "true";
@@ -625,7 +613,6 @@ function initToolbar({ render } = {}) {
     openScenarioGuideSurface,
     closeScenarioGuideSurface,
     dockReferenceBtn,
-    dockEditPopoverBtn,
     dockQuickFillBtn,
     dockReferencePopover,
     dockEditPopover,
@@ -1057,7 +1044,6 @@ function initToolbar({ render } = {}) {
   const refreshPaintControlsLayout = () => {
     const isScenarioMode = !!runtimeState.activeScenarioId;
     const showBorderMaintenance = isScenarioMode;
-    const showGranularityField = !isScenarioMode;
     const primaryActionLabel = getPrimaryActionLabel();
 
     if (document.getElementById("labelPresetPolitical")) {
@@ -1066,22 +1052,6 @@ function initToolbar({ render } = {}) {
     if (presetPolitical) {
       presetPolitical.setAttribute("aria-label", primaryActionLabel);
       presetPolitical.setAttribute("title", primaryActionLabel);
-    }
-
-    if (dockGranularityField) {
-      dockGranularityField.classList.toggle("hidden", !showGranularityField);
-    }
-
-    if (dockColorModeField) {
-      dockColorModeField.classList.remove("hidden");
-    }
-    if (dockEditPopoverBtn) {
-      dockEditPopoverBtn.classList.remove("hidden");
-      dockEditPopoverBtn.setAttribute("aria-hidden", "false");
-    }
-    if (dockConfigGroup) {
-      dockConfigGroup.classList.remove("hidden");
-      dockConfigGroup.setAttribute("aria-hidden", "false");
     }
 
     if (recalculateBordersBtn) {
@@ -1306,15 +1276,9 @@ function initToolbar({ render } = {}) {
   const refreshPaintModeUi = () => {
     runtimeState.paintMode = normalizePaintMode(runtimeState.paintMode);
     runtimeState.ui.politicalEditingExpanded = false;
-    if (paintModeSelect) {
-      paintModeSelect.value = runtimeState.paintMode || "visual";
-    }
     if (paintModeVisualBtn) {
       paintModeVisualBtn.classList.add("is-active");
       paintModeVisualBtn.setAttribute("aria-pressed", "true");
-    }
-    if (paintGranularitySelect) {
-      paintGranularitySelect.value = runtimeState.interactionGranularity || "subdivision";
     }
     riverPaintControls.sync();
     refreshPaintControlsLayout();
@@ -1515,8 +1479,6 @@ function initToolbar({ render } = {}) {
   });
 
   function renderSpecialZoneEditorUI() {
-    if (toggleWaterRegions) toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
-    if (toggleOpenOceanRegions) toggleOpenOceanRegions.checked = !!runtimeState.showOpenOceanRegions;
     renderAppearanceStyleControlsUi();
     specialZoneEditorController.renderSpecialZoneEditorUI();
     specialZonesWorkbenchController.renderSpecialZonesWorkbenchUi();
@@ -1591,7 +1553,6 @@ function initToolbar({ render } = {}) {
     openSpecialZonePopover,
   });
   const {
-    applyAppearanceFilter,
     bindEvents: bindAppearanceControlEvents,
     clearReferenceImage,
     renderAppearanceStyleControlsUi,
@@ -1807,9 +1768,6 @@ function initToolbar({ render } = {}) {
     renderBorderUi();
     syncParentBorderVisibilityUI();
     renderOceanLakeControlsUi();
-    if (colorModeSelect) {
-      colorModeSelect.value = runtimeState.colorMode || "political";
-    }
     if (themeSelect) {
       syncPaletteSourceControls();
     }
@@ -1980,9 +1938,6 @@ function initToolbar({ render } = {}) {
     if (!button || button.dataset.bound === "true") return;
     button.addEventListener("click", () => {
       const nextMode = normalizePaintMode(button.dataset.paintMode);
-      if (paintModeSelect) {
-        paintModeSelect.value = nextMode;
-      }
       runtimeState.paintMode = nextMode;
       runtimeState.ui.politicalEditingExpanded = false;
       markDirty?.("paint-mode");
@@ -2001,15 +1956,6 @@ function initToolbar({ render } = {}) {
       toggleDock();
     });
     dockCollapseBtn.dataset.bound = "true";
-  }
-
-  if (dockEditPopoverBtn && !dockEditPopoverBtn.dataset.bound) {
-    dockEditPopoverBtn.setAttribute("aria-haspopup", "dialog");
-    dockEditPopoverBtn.setAttribute("aria-controls", "dockEditPopover");
-    dockEditPopoverBtn.addEventListener("click", () => {
-      openDockPopover("edit");
-    });
-    dockEditPopoverBtn.dataset.bound = "true";
   }
 
   bindQuickFillControls();
@@ -2047,35 +1993,6 @@ function initToolbar({ render } = {}) {
   renderTextureUI();
   renderDayNightUI();
 
-
-  if (toggleWaterRegions) {
-    toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
-    toggleWaterRegions.addEventListener("change", (event) => {
-      commitUiVisibilityState(runtimeState, { showWaterRegions: event.target.checked });
-      if (runtimeState.showWaterRegions) {
-        void ensureActiveScenarioOptionalLayerLoaded("water", { renderNow: true });
-      }
-      renderDirty("toggle-water-regions");
-    });
-  }
-
-  if (toggleOpenOceanRegions) {
-    toggleOpenOceanRegions.checked = !!runtimeState.showOpenOceanRegions;
-    toggleOpenOceanRegions.addEventListener("change", (event) => {
-      commitUiVisibilityState(runtimeState, {
-        allowOpenOceanSelect: !!event.target.checked,
-        allowOpenOceanPaint: !!event.target.checked,
-        showOpenOceanRegions: !!event.target.checked,
-      });
-      if (!runtimeState.showOpenOceanRegions) {
-        runtimeState.hoveredWaterRegionId = null;
-      }
-      callRuntimeHook(state, "updateWaterInteractionUIFn");
-      callRuntimeHook(state, "renderWaterRegionListFn");
-      renderDirty("toggle-open-ocean-regions");
-    });
-  }
-
   bindAppearanceControlEvents();
   bindOceanLakeControlEvents();
   specialZoneEditorController.bindSpecialZoneEditorEvents();
@@ -2101,35 +2018,6 @@ function initToolbar({ render } = {}) {
         presetPolitical.disabled = false;
         presetPolitical.classList.remove("is-loading");
       }
-    });
-  }
-
-  if (colorModeSelect) {
-    colorModeSelect.value = runtimeState.colorMode;
-    colorModeSelect.addEventListener("change", (event) => {
-      const value = String(event.target.value || "region");
-      runtimeState.colorMode = value === "political" ? "political" : "region";
-    });
-  }
-
-  if (paintGranularitySelect) {
-    paintGranularitySelect.value = runtimeState.interactionGranularity || "subdivision";
-    paintGranularitySelect.addEventListener("change", (event) => {
-      const value = String(event.target.value || "subdivision");
-      const requested = value === "country" ? "country" : "subdivision";
-      runtimeState.interactionGranularity = requested;
-      paintGranularitySelect.value = runtimeState.interactionGranularity;
-      callRuntimeHook(runtimeState, "updatePaintModeUIFn");
-    });
-  }
-
-  if (paintModeSelect) {
-    paintModeSelect.value = runtimeState.paintMode || "visual";
-    paintModeSelect.addEventListener("change", (event) => {
-      const value = String(event.target.value || "visual");
-      runtimeState.paintMode = normalizePaintMode(value);
-      callRuntimeHook(runtimeState, "updatePaintModeUIFn");
-      if (render) render();
     });
   }
 
@@ -2227,7 +2115,6 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateDockCollapsedUiFn", updateDockCollapsedUi);
   updateDockCollapsedUi();
   setAppearanceTabController("borders");
-  applyAppearanceFilter();
   refreshScenarioContextBar();
   renderRecentColors();
   renderParentBorderCountryList();

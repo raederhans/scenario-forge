@@ -436,7 +436,6 @@ test("export artifact manifest normalizes raw file entries", () => {
 
 test("export annotation family counts use strategic overlay selectors", () => {
   const selectorCounts = new Map([
-    [".frontline-overlay-layer path, .frontline-labels-layer .frontline-label", 3],
     [".operational-lines-layer .operational-line", 2],
     [".operation-graphics-layer .operation-graphic", 4],
     [".unit-counters-layer .unit-counter", 5],
@@ -446,16 +445,14 @@ test("export annotation family counts use strategic overlay selectors", () => {
   };
 
   assert.deepEqual(getExportAnnotationFamilyCounts(mapSvg), {
-    frontlines: 3,
     "operational-lines": 2,
     "operation-graphics": 4,
     "unit-counters": 5,
   });
   assert.deepEqual(getExportAnnotationCountSummary(mapSvg), {
-    count: 14,
-    summary: "Frontlines: 3 · Operational lines: 2 · Operation graphics: 4 · Unit counters: 5",
+    count: 11,
+    summary: "Operational lines: 2 · Operation graphics: 4 · Unit counters: 5",
     counts: {
-      frontlines: 3,
       "operational-lines": 2,
       "operation-graphics": 4,
       "unit-counters": 5,
@@ -465,7 +462,6 @@ test("export annotation family counts use strategic overlay selectors", () => {
 
 test("export workbench text layer list shows annotation family counts", (context) => {
   const selectorCounts = new Map([
-    [".frontline-overlay-layer path, .frontline-labels-layer .frontline-label", 3],
     [".unit-counters-layer .unit-counter", 5],
   ]);
   const mapSvg = {
@@ -515,7 +511,7 @@ test("export workbench text layer list shows annotation family counts", (context
   };
   const annotationItem = list.children.find((item) => item.dataset.exportTextLayerId === "svg-annotations");
   assert.ok(annotationItem, "strategic annotations should be listed as an export text layer");
-  assert.equal(findMeta(annotationItem)?.textContent, "Frontlines: 3 · Unit counters: 5");
+  assert.equal(findMeta(annotationItem)?.textContent, "Unit counters: 5");
 
   selectorCounts.clear();
   controller.renderExportWorkbenchTextElementList();

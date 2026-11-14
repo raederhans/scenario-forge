@@ -13,7 +13,6 @@ import { markDirty } from "../../core/dirty_state.js";
 import { resolveTransportManifestUrl } from "../../core/runtime_asset_registry.js";
 import {
   createTransportPackSourceGateReport,
-  getTargetMainMapPackMeta,
   getDefaultTransportWorkbenchPackIdForFamily,
   getTransportWorkbenchPackMeta,
 } from "../../core/transport_pack_resolver.js";

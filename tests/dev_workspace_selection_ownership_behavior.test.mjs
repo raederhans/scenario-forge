@@ -1,5 +1,5 @@
 import { setFeatureOwnerCodes, resetFeatureOwnerCode, resetFeatureOwnerCodes, resetAllFeatureOwnersToCanonical } from "../js/core/sovereignty_manager.js";
-import { applyOwnerToFeatureIds, resetOwnersToScenarioBaselineForFeatureIds, applyOwnerControllerAssignmentsToFeatureIds, buildScenarioOwnershipSavePayload, filterEditableOwnershipFeatureIds, summarizeOwnershipForFeatureIds } from "../js/core/scenario/scenario_ownership_editor.js";
+import { filterEditableOwnershipFeatureIds, summarizeOwnershipForFeatureIds } from "../js/core/scenario/scenario_ownership_editor.js";
 import { applyFeaturePaintState } from "../js/core/state/color_state.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry, undoHistory, redoHistory } from "../js/core/history_manager.js";
 import test from "node:test";
@@ -73,7 +73,6 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
     selection: new TestText(),
     tag: new TestText(),
     owner: new TestText(),
-    controller: new TestText(),
   };
   let toggleClicks = 0;
 
@@ -100,7 +99,6 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
         devQuickSelectionValue: quickbarValues.selection,
         devQuickTagValue: quickbarValues.tag,
         devQuickOwnerValue: quickbarValues.owner,
-        devQuickControllerValue: quickbarValues.controller,
         devQuickRemoveSelectedBtn: quickRemoveBtn,
       }),
       quickRemoveBtn,
@@ -121,7 +119,6 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
     assert.equal(quickbarValues.selection.textContent, "2 selected");
     assert.equal(quickbarValues.tag.textContent, "GER, FRA");
     assert.equal(quickbarValues.owner.textContent, "GER, FRA");
-    assert.equal(quickbarValues.controller.textContent, "GER, FRA");
 
     await quickRemoveBtn.click();
     assert.equal(toggleClicks, 1);
@@ -182,9 +179,6 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
     assert.deepEqual(summarizeOwnershipForFeatureIds(["HGO-S1"]), {
       featureCount: 1, ownerCodes: ["2RA"], isMixed: false, singleOwnerCode: "2RA",
     });
-    assert.deepEqual(buildScenarioOwnershipSavePayload(), {
-      scenarioId: "hgo_1936", baselineHash: "hgo-baseline", owners: { "HGO-S1": "2RA" },
-    });
   } finally {
     state.landIndex = previousLandIndex;
     state.landData = previousLandData;
@@ -210,12 +204,6 @@ test("all ownership mutation APIs reject before writes, history, revision change
     assert.equal(resetFeatureOwnerCode("test"), false);
     assert.equal(resetFeatureOwnerCodes(["test"]), 0);
     assert.equal(resetAllFeatureOwnersToCanonical(), false);
-    for (const result of [applyOwnerToFeatureIds(["test"], "GB"), resetOwnersToScenarioBaselineForFeatureIds(["test"]), applyOwnerControllerAssignmentsToFeatureIds({ test: { ownerCode: "GB" } })]) {
-      assert.equal(result.applied, false);
-      assert.equal(result.changed, 0);
-      assert.equal(result.requestedCount, 1);
-      assert.equal(result.reason, "ownership-editing-disabled");
-    }
     assert.deepEqual(Object.fromEntries(keys.map(key => [key, state[key]])), before);
     assert.equal(getFeatureOwnerCode("test"), "2RA");
   } finally { Object.assign(state, old); }

@@ -7,7 +7,6 @@ const {
   getAppUrl,
   getConfiguredAppOrigin,
 } = require("./playwright-app-paths");
-const { openProjectFrontlineSection } = require("./playwright-frontline-panel");
 const {
   waitForProjectImportSettled: waitForProjectImportSettledInternal,
   beginProjectImportWatch: beginProjectImportWatchInternal,
@@ -658,7 +657,6 @@ module.exports = {
   waitForProjectImportSettled,
   beginProjectImportWatch,
   waitForProjectImportCompletion,
-  openProjectFrontlineSection,
   waitForAppInteractive,
   isScenarioRuntimeReadyForPlaywright,
 };

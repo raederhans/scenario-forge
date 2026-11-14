@@ -91,16 +91,6 @@ function pickQuickSwatch(index) {
   return true;
 }
 
-function cyclePaintGranularity(direction = 1) {
-  const select = document.getElementById("paintGranularitySelect");
-  if (!select || !select.options?.length) return false;
-  const currentIndex = Math.max(0, select.selectedIndex);
-  const nextIndex = (currentIndex + direction + select.options.length) % select.options.length;
-  select.selectedIndex = nextIndex;
-  select.dispatchEvent(new Event("change", { bubbles: true }));
-  return true;
-}
-
 function allowShortcutDuringStartupReadonly({ key = "", modifier = false } = {}) {
   if (modifier) return false;
   return key === "+" || key === "=" || key === "-" || key === "_" || key === "0"
@@ -244,24 +234,9 @@ function initShortcuts() {
       toggleBrushMode();
       return;
     }
-    if (!modifier && lower === "g") {
-      event.preventDefault();
-      cyclePaintGranularity(1);
-      return;
-    }
     if (!modifier && lower === "i") {
       event.preventDefault();
       setCurrentTool("eyedropper");
-      return;
-    }
-    if (!modifier && key === "[") {
-      event.preventDefault();
-      cyclePaintGranularity(-1);
-      return;
-    }
-    if (!modifier && key === "]") {
-      event.preventDefault();
-      cyclePaintGranularity(1);
       return;
     }
     if (!modifier && /^[1-6]$/.test(key)) {

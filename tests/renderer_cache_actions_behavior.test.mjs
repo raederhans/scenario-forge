@@ -40,21 +40,18 @@ test("coastline publication retains all prepared containers and geometry identit
 });
 
 test("border cache patch publishes only explicit owned fields without copying values", () => {
-  const mesh = Object.freeze({ coordinates: Object.freeze([]) });
-  const target = { unrelated: "keep", cachedFrontlineMeshHash: "old" };
-  const patch = Object.assign(Object.create({ cachedBorders: "inherited" }), {
-    cachedDynamicBordersHash: undefined,
-    cachedFrontlineMesh: mesh,
+  const target = { unrelated: "keep" };
+  const patch = Object.assign(Object.create({ cachedDynamicBordersHash: "inherited" }), {
     unrelated: "replace",
   });
   patchBorderMeshCacheState(target, patch);
   assert.deepEqual(target, {
-    unrelated: "keep", cachedFrontlineMeshHash: "old",
-    cachedDynamicBordersHash: undefined,
-    cachedFrontlineMesh: mesh,
+    unrelated: "keep",
   });
-  assert.equal(target.cachedFrontlineMesh, mesh);
-  assert.equal(Object.hasOwn(target, "cachedBorders"), false);
+  assert.equal(Object.hasOwn(target, "cachedDynamicBordersHash"), false);
+  patchBorderMeshCacheState(target, { cachedDynamicBordersHash: undefined });
+  assert.equal(Object.hasOwn(target, "cachedDynamicBordersHash"), true);
+  assert.equal(target.cachedDynamicBordersHash, undefined);
 });
 
 test("border lifecycle actions preserve prepared values and cache identity", () => {

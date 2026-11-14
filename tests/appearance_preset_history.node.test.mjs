@@ -138,7 +138,6 @@ test("history undo and redo restore strategic overlay and special-zone snapshot 
 
   assert.equal(pushHistoryEntry({ before, after, meta: { kind: "strategic-overlay-edit" } }), true);
   Object.assign(fixtureState, {
-    frontlineOverlayDirty: false,
     operationalLinesDirty: false,
     operationGraphicsDirty: false,
     unitCountersDirty: false,
@@ -152,14 +151,12 @@ test("history undo and redo restore strategic overlay and special-zone snapshot 
   assert.deepEqual(fixtureState.unitCounters, before.unitCounters);
   assert.deepEqual(fixtureState.specialZoneLayers, before.specialZoneLayers);
   assert.equal(fixtureState.specialZoneMembershipBrushMode, before.specialZoneMembershipBrushMode);
-  assert.equal(fixtureState.frontlineOverlayDirty, true);
   assert.equal(fixtureState.operationalLinesDirty, true);
   assert.equal(fixtureState.operationGraphicsDirty, true);
   assert.equal(fixtureState.unitCountersDirty, true);
   assert.equal(fixtureState.specialZonesOverlayDirty, true);
 
   Object.assign(fixtureState, {
-    frontlineOverlayDirty: false,
     operationalLinesDirty: false,
     operationGraphicsDirty: false,
     unitCountersDirty: false,
@@ -172,7 +169,6 @@ test("history undo and redo restore strategic overlay and special-zone snapshot 
   assert.deepEqual(fixtureState.unitCounters, after.unitCounters);
   assert.deepEqual(fixtureState.specialZoneLayers, after.specialZoneLayers);
   assert.equal(fixtureState.specialZoneMembershipBrushMode, after.specialZoneMembershipBrushMode);
-  assert.equal(fixtureState.frontlineOverlayDirty, true);
   assert.equal(fixtureState.operationalLinesDirty, true);
   assert.equal(fixtureState.operationGraphicsDirty, true);
   assert.equal(fixtureState.unitCountersDirty, true);

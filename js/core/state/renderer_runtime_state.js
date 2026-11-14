@@ -270,9 +270,7 @@ export function createDefaultProjectedBoundsDiagnostics() {
 export function createDefaultRendererTransientRuntimeState() {
   return {
     dprStage: "idle",
-    dprInteractiveScale: 0.72,
     dprLastStageSwitchAt: 0,
-    TINY_AREA: 6,
     MOUSE_THROTTLE_MS: 16,
     lastMouseMoveTime: 0,
     hitCanvasDirty: true,

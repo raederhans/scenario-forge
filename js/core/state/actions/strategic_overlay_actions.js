@@ -381,8 +381,7 @@ export function patchStrategicOverlayEditorState(
 export function setStrategicOverlayDirtyState(target, dirtyKey, value = true) {
   assertStateTarget(target);
   if (
-    dirtyKey !== "frontlineOverlayDirty"
-    && dirtyKey !== "operationalLinesDirty"
+    dirtyKey !== "operationalLinesDirty"
     && dirtyKey !== "operationGraphicsDirty"
     && dirtyKey !== "unitCountersDirty"
   ) {
@@ -390,9 +389,7 @@ export function setStrategicOverlayDirtyState(target, dirtyKey, value = true) {
   }
   const inputs = detachActionInputs({ dirtyKey, value });
   const nextValue = Boolean(inputs.value);
-  if (inputs.dirtyKey === "frontlineOverlayDirty") {
-    target.frontlineOverlayDirty = nextValue;
-  } else if (inputs.dirtyKey === "operationalLinesDirty") {
+  if (inputs.dirtyKey === "operationalLinesDirty") {
     target.operationalLinesDirty = nextValue;
   } else if (inputs.dirtyKey === "operationGraphicsDirty") {
     target.operationGraphicsDirty = nextValue;

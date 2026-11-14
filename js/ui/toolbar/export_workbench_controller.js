@@ -26,12 +26,11 @@ const EXPORT_MAIN_LAYER_MODEL_BY_ID = new Map(EXPORT_MAIN_LAYER_VIEW_MODELS.map(
 const EXPORT_TEXT_LAYER_VIEW_MODELS = Object.freeze([
   Object.freeze({ id: "render-labels", name: "Render-pass labels", summary: "City and map labels from the labels pass" }),
   Object.freeze({ id: "special-zones", name: "Special zones", summary: "Layer-based special zone fills, patterns, and outlines" }),
-  Object.freeze({ id: "svg-annotations", name: "SVG annotations", summary: "Frontlines, graphics, counters, and other SVG overlays" }),
+  Object.freeze({ id: "svg-annotations", name: "SVG annotations", summary: "Operational lines, graphics, counters, and other SVG overlays" }),
 ]);
 const EXPORT_TEXT_LAYER_IDS = Object.freeze(EXPORT_TEXT_LAYER_VIEW_MODELS.map((layer) => layer.id));
 const EXPORT_TEXT_LAYER_MODEL_BY_ID = new Map(EXPORT_TEXT_LAYER_VIEW_MODELS.map((layer) => [layer.id, layer]));
 const EXPORT_ANNOTATION_FAMILY_VIEW_MODELS = Object.freeze([
-  Object.freeze({ id: "frontlines", label: "Frontlines", selector: ".frontline-overlay-layer path, .frontline-labels-layer .frontline-label" }),
   Object.freeze({ id: "operational-lines", label: "Operational lines", selector: ".operational-lines-layer .operational-line" }),
   Object.freeze({ id: "operation-graphics", label: "Operation graphics", selector: ".operation-graphics-layer .operation-graphic" }),
   Object.freeze({ id: "unit-counters", label: "Unit counters", selector: ".unit-counters-layer .unit-counter" }),

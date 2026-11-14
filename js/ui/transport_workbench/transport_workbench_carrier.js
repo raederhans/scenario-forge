@@ -1,5 +1,5 @@
 import { getAsset } from "../../core/data_service.js";
-import { t } from "../i18n.js";
+import "../i18n.js";
 
 const DEFAULT_ASSET_KEY = "transport_carrier:japan_corridor";
 

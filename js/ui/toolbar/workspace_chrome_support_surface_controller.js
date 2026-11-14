@@ -22,7 +22,6 @@ export function createWorkspaceChromeSupportSurfaceController({
   openScenarioGuideSurface,
   closeScenarioGuideSurface,
   dockReferenceBtn = null,
-  dockEditPopoverBtn = null,
   dockQuickFillBtn = null,
   dockReferencePopover = null,
   dockEditPopover = null,
@@ -142,7 +141,6 @@ export function createWorkspaceChromeSupportSurfaceController({
   };
 
   const getDockPopoverTrigger = (kind) => {
-    if (kind === "edit") return dockEditPopoverBtn;
     if (kind === "quickfill") return dockQuickFillBtn;
     return null;
   };
@@ -156,9 +154,7 @@ export function createWorkspaceChromeSupportSurfaceController({
     dockQuickFillRow?.classList.add("hidden");
     dockEditPopover?.setAttribute("aria-hidden", "true");
     dockQuickFillRow?.setAttribute("aria-hidden", "true");
-    dockEditPopoverBtn?.classList.remove("is-active");
     dockQuickFillBtn?.classList.remove("is-active");
-    dockEditPopoverBtn?.setAttribute("aria-expanded", "false");
     dockQuickFillBtn?.setAttribute("aria-expanded", "false");
     if (restoreFocus && activePopover) {
       restoreOverlayTriggerFocus?.(activePopover, activeTrigger);
@@ -171,12 +167,10 @@ export function createWorkspaceChromeSupportSurfaceController({
     if (!target) return;
     if (kind === "quickfill") {
       refreshQuickFillControls();
-      const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
       const isSubdivisionMode = String(state.interactionGranularity || "subdivision") !== "country";
       const activePolicy = getActiveQuickFillPolicy();
       if (
-        isOwnershipMode
-        || !isSubdivisionMode
+        !isSubdivisionMode
         || (activePolicy && !activePolicy.parentEnabled && !activePolicy.countryEnabled)
       ) {
         if (state.activeDockPopover === "quickfill") closeDockPopover();
@@ -231,12 +225,11 @@ export function createWorkspaceChromeSupportSurfaceController({
 
   const refreshQuickFillControls = () => {
     const isScenarioMode = !!state.activeScenarioId;
-    const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
     const isSubdivisionMode = String(state.interactionGranularity || "subdivision") !== "country";
     const activePolicy = getActiveQuickFillPolicy();
     const parentEnabled = !activePolicy || activePolicy.parentEnabled;
     const countryEnabled = !activePolicy || activePolicy.countryEnabled;
-    const isVisible = !isOwnershipMode && isSubdivisionMode;
+    const isVisible = isSubdivisionMode;
     const levelModel = quickFillLevels.refresh();
 
     if (dockQuickFillBtn) {
@@ -347,7 +340,7 @@ export function createWorkspaceChromeSupportSurfaceController({
       const target = event.target;
       if (!(target instanceof Element)) return;
       const insideDockPopover = target.closest(
-        "#dockEditPopover, #dockQuickFillRow, #dockEditPopoverBtn, #dockQuickFillBtn"
+        "#dockEditPopover, #dockQuickFillRow, #dockQuickFillBtn"
       );
       if (state.activeDockPopover && !insideDockPopover) {
         closeDockPopover();

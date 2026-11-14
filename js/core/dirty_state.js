@@ -3,11 +3,6 @@ import { commitChange } from "./state/changes.js";
 import { clearDirtyState, markDirtyState } from "./state/actions/ui_dirty_actions.js";
 
 function updateDirtyIndicator() {
-  const indicator = globalThis.document?.getElementById?.("appDirtyIndicator");
-  if (indicator) {
-    indicator.classList.toggle("hidden", !runtimeState.isDirty);
-    indicator.setAttribute("aria-hidden", runtimeState.isDirty ? "false" : "true");
-  }
   commitChange({ domains: ["dirty"], reason: "dirty-indicator" });
 }
 

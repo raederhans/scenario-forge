@@ -12,7 +12,6 @@ import {
   getSpecialZoneValidFeatureIds,
   getSpecialZoneStoryPreviewSteps,
   mutateSpecialZoneLayersState,
-  normalizeSpecialZoneLayersState,
   parseSpecialZoneMemberImportText,
   resolveSpecialZoneTopologyFingerprint,
   serializeSpecialZoneLayersState,

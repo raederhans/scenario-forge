@@ -6,7 +6,6 @@ export function createDefaultDevState() {
     devSelectedHit: null,
     devSelectionFeatureIds: new Set(),
     devSelectionOrder: [],
-    devSelectionModeEnabled: false,
     devSelectionLimit: 200,
     devSelectionOverlayDirty: true,
     devSelectionSortMode: "selection",

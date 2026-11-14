@@ -126,7 +126,7 @@ export function createRiverPaintRuntime(state, { geoContains = (feature, point) 
   }
   function refineHit(hit, lonLat) {
     syncScene();
-    if (hit?.targetType !== 'land' || !hit.id || state.isEditingPreset
+    if (hit?.targetType !== 'land' || !hit.id
       || !['fill', 'eraser', 'eyedropper'].includes(state.currentTool)) return hit;
     const editing = !!state.riverPaint?.editMode && state.interactionGranularity !== 'country';
     if (!editing && state.currentTool !== 'eyedropper') return hit;

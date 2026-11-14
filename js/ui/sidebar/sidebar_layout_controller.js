@@ -53,7 +53,6 @@ export function createSidebarLayoutController({
   const waterRegionList = document.getElementById("waterRegionList");
   const waterLegendList = document.getElementById("waterLegendList");
   const specialRegionList = document.getElementById("specialRegionList");
-  const specialRegionLegendList = document.getElementById("specialRegionLegendList");
   const selectedCountryActionsBody = selectedCountryActionsSection?.querySelector(".inspector-panel-body") || null;
   const inspectorSidebarTabButtons = Array.from(document.querySelectorAll("[data-inspector-tab]"));
   const inspectorSidebarTabPanels = Array.from(document.querySelectorAll("[data-inspector-panel]"));
@@ -257,7 +256,7 @@ export function createSidebarLayoutController({
   const syncAdaptiveInspectorHeights = () => {
     adaptiveInspectorHeightFrame = 0;
     if (document.body.classList.contains("editor-workspace")) {
-      [list, waterRegionList, waterLegendList, specialRegionList, specialRegionLegendList, presetTree].forEach(releaseAdaptiveInspectorHeight);
+      [list, waterRegionList, waterLegendList, specialRegionList, presetTree].forEach(releaseAdaptiveInspectorHeight);
       return;
     }
     applyAdaptiveInspectorHeight(
@@ -279,11 +278,6 @@ export function createSidebarLayoutController({
       specialRegionList,
       toViewportPixels(18),
       toViewportPixels(32)
-    );
-    applyAdaptiveInspectorHeight(
-      specialRegionLegendList,
-      96,
-      220
     );
     releaseAdaptiveInspectorHeight(presetTree);
     const hasOpenVisualAdjustments = !isSelectedActionsEmptyState() && isScenarioVisualAdjustmentsExpanded();

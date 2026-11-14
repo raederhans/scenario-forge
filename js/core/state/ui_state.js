@@ -68,7 +68,6 @@ export function createDefaultTransportWorkbenchUiState() {
     previewCarrierId: "japan",
     previewMode: "bounded_zoom_pan",
     previewAssetId: "japan_carrier_v3",
-    previewInteractionMode: "bounded_zoom_pan",
     previewCamera: {
       scale: 1,
       translateX: 0,
@@ -82,7 +81,6 @@ export function createDefaultTransportWorkbenchUiState() {
     sectionOpen: Object.fromEntries(
       TRANSPORT_WORKBENCH_RUNTIME_FAMILY_IDS.map((familyId) => [familyId, {}])
     ),
-    shellPhase: "road-live-preview",
     restoreLeftDrawer: false,
     restoreRightDrawer: false,
   };
@@ -289,7 +287,6 @@ export function createDefaultUiState() {
     hoverOverlayDirty: true,
     inspectorOverlayDirty: true,
     specialZonesOverlayDirty: true,
-    frontlineOverlayDirty: true,
     operationalLinesDirty: true,
     operationGraphicsDirty: true,
     unitCountersDirty: true,

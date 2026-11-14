@@ -92,8 +92,6 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
               countryPalette: {},
               sovereigntyByFeatureId: {},
               annotationView: {
-                frontlineEnabled: true,
-                frontlineStyle: "clean",
               },
               operationalLines: [{
                 id: "line-before",
@@ -117,7 +115,6 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
                 activeLayerId: "zone-a",
                 diagnostics: [],
               },
-              frontlineOverlayDirty: false,
               operationalLinesDirty: false,
               operationGraphicsDirty: false,
               unitCountersDirty: false,

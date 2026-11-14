@@ -77,7 +77,6 @@ export function createProjectSupportDiagnosticsController({
     showAppDialog,
     showToast,
     importProjectThroughFunnel,
-    invalidateFrontlineOverlayState,
   } = helpers;
 
   const {
@@ -725,7 +724,6 @@ export function createProjectSupportDiagnosticsController({
       },
       hooks: {
         refreshColorState: mapRenderer.refreshColorState,
-        invalidateFrontlineOverlayState,
         onProjectImportComplete: (summary) => {
           completeProjectImportStatus(summary);
           setLocalizedBackendCloudStatus("Community save loaded into the editor.");
@@ -1789,7 +1787,6 @@ export function createProjectSupportDiagnosticsController({
             },
             hooks: {
               refreshColorState: mapRenderer.refreshColorState,
-              invalidateFrontlineOverlayState,
               onProjectImportComplete: completeProjectImportStatus,
                 onProjectImportError: failProjectImportStatus,
                 onProjectImportRecoveryState: recovery => {

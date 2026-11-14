@@ -294506,10 +294506,6 @@
       "en": "Apply Visual Color to Core Territory",
       "zh": "将视觉颜色应用到核心领土"
     },
-    "Apply a scenario first, then enable the overlay when you want a derived frontline view.": {
-      "en": "Apply a scenario first, then enable the overlay when you want a derived frontline view.",
-      "zh": "先应用一个剧本，然后在需要衍生前线视图时启用该覆盖层。"
-    },
     "Apply a subtle overlay texture for a vintage map feel.": {
       "en": "Apply a subtle overlay texture for a vintage map feel.",
       "zh": "添加一层微妙的纹理覆盖，营造复古地图质感。"
@@ -295846,14 +295842,6 @@
       "en": "Density surface",
       "zh": "密度面"
     },
-    "Derived frontlines on.": {
-      "en": "Derived frontlines on.",
-      "zh": "已开启衍生前线。"
-    },
-    "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.": {
-      "en": "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.",
-      "zh": "派生前线保持为可选且仅限当前项目。只有在需要冲突视图时再启用。"
-    },
     "Desert & Bare": {
       "en": "Desert & Bare",
       "zh": "荒漠与裸地"
@@ -296122,10 +296110,6 @@
       "en": "Edit water region color",
       "zh": "编辑水域颜色"
     },
-    "Editing Preset": {
-      "en": "Editing Preset",
-      "zh": "正在编辑预设"
-    },
     "Editing Rules": {
       "en": "Editing Rules",
       "zh": "编辑规则"
@@ -296153,10 +296137,6 @@
     "Enable Experimental Ocean Styles to unlock advanced ocean textures.": {
       "en": "Enable Experimental Ocean Styles to unlock advanced ocean textures.",
       "zh": "启用“实验性海洋样式”后才能使用高级海洋纹理。"
-    },
-    "Enable Frontline Overlay": {
-      "en": "Enable Frontline Overlay",
-      "zh": "启用前线覆盖层"
     },
     "Enable bathymetry and wave presets for testing. May reduce pan and zoom performance.": {
       "en": "Enable bathymetry and wave presets for testing. May reduce pan and zoom performance.",
@@ -296529,10 +296509,6 @@
     "Frontline": {
       "en": "Frontline",
       "zh": "前线"
-    },
-    "Frontline Overlay": {
-      "en": "Frontline Overlay",
-      "zh": "前线覆盖层"
     },
     "Frontline is off": {
       "en": "Frontline is off",
@@ -299190,10 +299166,6 @@
       "en": "Return to",
       "zh": "返回"
     },
-    "Return to Political Ownership Brush": {
-      "en": "Return to Political Ownership Brush",
-      "zh": "返回政治归属画笔"
-    },
     "Review": {
       "en": "Review",
       "zh": "审查"
@@ -299421,10 +299393,6 @@
     "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.": {
       "en": "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
       "zh": "下方的场景操作会优先修改政治归属。只有在需要纯颜色调整时才打开视觉调整。"
-    },
-    "Scenario Actions change political ownership and dynamic borders. Use Color Only for color-only edits.": {
-      "en": "Scenario Actions change political ownership and dynamic borders. Use Color Only for color-only edits.",
-      "zh": "“剧本操作”会改变政治归属和动态边界。只调整视觉颜色时请使用“仅颜色”。"
     },
     "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.": {
       "en": "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.",
@@ -300530,10 +300498,6 @@
       "en": "This only removes the selected project-local strategic line.",
       "zh": "这只会移除当前项目中的所选战略线。"
     },
-    "This project is currently deriving frontlines from scenario control boundaries.": {
-      "en": "This project is currently deriving frontlines from scenario control boundaries.",
-      "zh": "当前项目正在根据剧本控制边界生成前线。"
-    },
     "This removes current paint overrides and, in political mode, restores ownership to its baseline. You can undo the clear from history.": {
       "en": "This removes current paint overrides and, in political mode, restores ownership to its baseline. You can undo the clear from history.",
       "zh": "这会移除当前绘制覆盖；在政治模式下，还会将归属恢复到其基线。你可以通过历史记录撤销清空。"
@@ -300801,10 +300765,6 @@
     "Use Activate Releasable or Reapply Core Territory in Scenario Actions.": {
       "en": "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
       "zh": "请在 Scenario Actions 中使用“激活可释放国”或“重新应用核心领土”。"
-    },
-    "Use Activate or Scenario Actions for ownership changes": {
-      "en": "Use Activate or Scenario Actions for ownership changes",
-      "zh": "使用“激活”或“剧本操作”进行归属变更"
     },
     "Use Country Color for Visual Actions": {
       "en": "Use Country Color for Visual Actions",
@@ -302406,10 +302366,6 @@
       "en": "Contains Download Project, Load Project, selected file status, and import safety checks.",
       "zh": "包含下载项目、加载项目、当前文件状态和导入安全检查。"
     },
-    "Contains derived frontlines, operational lines, operation graphics, and unit counters. These are project-local strategic annotations for export and handoff.": {
-      "en": "Contains derived frontlines, operational lines, operation graphics, and unit counters. These are project-local strategic annotations for export and handoff.",
-      "zh": "包含推导前线、作战线、作战图形和单位计数器。这些都是用于导出和交接的项目本地战略标注。"
-    },
     "Contains local image upload, opacity, scale, horizontal offset, and vertical offset controls. The project stores alignment values, while the image file must be uploaded again after reload.": {
       "en": "Contains local image upload, opacity, scale, horizontal offset, and vertical offset controls. The project stores alignment values, while the image file must be uploaded again after reload.",
       "zh": "包含本地图像上传、透明度、缩放、水平偏移和垂直偏移。项目会保存对齐参数，重新加载后仍需要再次上传图像文件。"
@@ -302469,10 +302425,6 @@
     "Depth Field": {
       "en": "Depth Field",
       "zh": "深度场"
-    },
-    "Derived Frontlines": {
-      "en": "Derived Frontlines",
-      "zh": "推导前线"
     },
     "Designation": {
       "en": "Designation",
@@ -302657,10 +302609,6 @@
     "Guide sections": {
       "en": "Guide sections",
       "zh": "指南分段"
-    },
-    "HGO Preview": {
-      "en": "HGO Preview",
-      "zh": "HGO 预览"
     },
     "HGO editor": {
       "en": "HGO editor",
@@ -303441,10 +303389,6 @@
     "Tungsten": {
       "en": "Tungsten",
       "zh": "钨"
-    },
-    "Turn on derived frontlines first, then add operational lines and graphics, then place counters near the final composition.": {
-      "en": "Turn on derived frontlines first, then add operational lines and graphics, then place counters near the final composition.",
-      "zh": "先开启推导前线，再添加作战线和图形，最后按最终构图摆放单位计数器。"
     },
     "UNDP human development · Scenario reference": {
       "en": "UNDP human development · Scenario reference",

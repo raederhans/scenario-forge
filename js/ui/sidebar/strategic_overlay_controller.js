@@ -15,7 +15,6 @@ import { loadDefenseLinePresets, buildScenarioDefenseLineEntries } from "../../c
 
 /**
  * Owns the strategic overlay workspace inside the sidebar:
- * - frontline overlay controls and refresh scheduling
  * - strategic workspace chrome and modal state
  * - operational line / operation graphic / unit counter editor interactions
  *
@@ -31,15 +30,6 @@ export function createStrategicOverlayController({
   helpers,
 }) {
   const {
-    frontlineEnabledStatus,
-    frontlineStatusHint,
-    frontlineEnabledToggle,
-    frontlineEmptyState,
-    frontlineSettingsPanel,
-    strategicFrontlineStyleSelect,
-    frontlineStyleChoiceButtons,
-    strategicFrontlineLabelsToggle,
-    strategicLabelPlacementSelect,
     strategicOverlaySection,
     strategicWorkspaceBackdropEl,
     strategicOverlayOpenWorkspaceBtn,
@@ -222,7 +212,6 @@ export function createStrategicOverlayController({
   });
 
   const STRATEGIC_OVERLAY_REFRESH_SCOPES = Object.freeze([
-    "frontlineControls",
     "operationalLines",
     "operationGraphics",
     "counterIdentity",
@@ -328,13 +317,6 @@ export function createStrategicOverlayController({
     return cancelled;
   };
 
-  const invalidateFrontlineOverlayState = () => {
-    state.frontlineOverlayDirty = true;
-    state.cachedFrontlineMesh = null;
-    state.cachedFrontlineMeshHash = "";
-    state.cachedFrontlineLabelAnchors = [];
-  };
-
   const refreshStrategicOverlayPublishStatus = () => {
     if (!strategicOverlayPublishStatus) return;
     const lineCount = Array.isArray(state.operationalLines) ? state.operationalLines.length : 0;
@@ -351,71 +333,6 @@ export function createStrategicOverlayController({
     }
     if (strategicOverlayPublishStatus.getAttribute("aria-label") !== nextLabel) {
       strategicOverlayPublishStatus.setAttribute("aria-label", nextLabel);
-    }
-  };
-
-  const applyFrontlineAnnotationViewPatch = (patch = {}, dirtyReason = "frontline-overlay") => {
-    const before = captureHistoryState({ strategicOverlay: true });
-    // frontline 配置最终都落到 annotationView，
-    // 这样渲染、历史记录和 UI 都围绕同一份状态工作。
-    state.annotationView = normalizeAnnotationView({
-      ...(state.annotationView || {}),
-      ...(patch && typeof patch === "object" ? patch : {}),
-    });
-    invalidateFrontlineOverlayState();
-    if (render) render();
-    refreshStrategicOverlayUI();
-    pushHistoryEntry({
-      before,
-      after: captureHistoryState({ strategicOverlay: true }),
-      meta: {
-        kind: "strategic-overlay-frontline",
-        dirtyReason,
-      },
-    });
-    markDirty(dirtyReason);
-  };
-
-  const refreshFrontlineTabUI = () => {
-    const annotationView = normalizeAnnotationView(state.annotationView);
-    const frontlineEnabled = !!annotationView.frontlineEnabled;
-    const hasScenario = !!state.activeScenarioId;
-    if (frontlineEnabledStatus) {
-      frontlineEnabledStatus.textContent = frontlineEnabled ? t("On", "ui") : t("Off", "ui");
-      frontlineEnabledStatus.classList.toggle("is-active", frontlineEnabled);
-    }
-    if (frontlineStatusHint) {
-      frontlineStatusHint.textContent = !hasScenario
-        ? t("Scenario required.", "ui")
-        : "";
-      frontlineStatusHint.hidden = hasScenario;
-    }
-    if (frontlineEnabledToggle) {
-      frontlineEnabledToggle.checked = frontlineEnabled;
-    }
-    if (frontlineEmptyState) {
-      frontlineEmptyState.classList.toggle("hidden", frontlineEnabled);
-    }
-    if (frontlineSettingsPanel) {
-      frontlineSettingsPanel.classList.toggle("hidden", !frontlineEnabled);
-    }
-    if (strategicFrontlineStyleSelect) {
-      strategicFrontlineStyleSelect.value = String(annotationView.frontlineStyle || "clean");
-      strategicFrontlineStyleSelect.disabled = !frontlineEnabled;
-    }
-    frontlineStyleChoiceButtons.forEach((button) => {
-      const isActive = String(button.dataset.value || "") === String(annotationView.frontlineStyle || "clean");
-      button.classList.toggle("is-active", isActive);
-      button.disabled = !frontlineEnabled;
-      button.setAttribute("aria-pressed", isActive ? "true" : "false");
-    });
-    if (strategicFrontlineLabelsToggle) {
-      strategicFrontlineLabelsToggle.checked = !!annotationView.showFrontlineLabels;
-      strategicFrontlineLabelsToggle.disabled = !frontlineEnabled;
-    }
-    if (strategicLabelPlacementSelect) {
-      strategicLabelPlacementSelect.value = String(annotationView.labelPlacementMode || "midpoint");
-      strategicLabelPlacementSelect.disabled = !frontlineEnabled || !annotationView.showFrontlineLabels;
     }
   };
 
@@ -484,10 +401,6 @@ export function createStrategicOverlayController({
     // 这样外层只要声明“哪块脏了”，而不是分别记住几十个局部刷新函数。
     ensureStrategicOverlayUiState();
     refreshStrategicOverlayPublishStatus();
-    if (hasStrategicOverlayScope(normalizedScopes, "frontlineControls")) {
-      recordStrategicOverlayPerfCounter("frontlineControls");
-      refreshFrontlineTabUI();
-    }
     if (hasStrategicOverlayScope(normalizedScopes, "workspaceChrome")) {
       recordStrategicOverlayPerfCounter("workspaceChrome");
       setStrategicWorkspaceModalState(
@@ -792,59 +705,6 @@ export function createStrategicOverlayController({
   };
 
   const bindEvents = () => {
-  if (frontlineEnabledToggle && !frontlineEnabledToggle.dataset.bound) {
-    frontlineEnabledToggle.addEventListener("change", (event) => {
-      const nextEnabled = !!event.target.checked;
-      applyFrontlineAnnotationViewPatch(
-        { frontlineEnabled: nextEnabled },
-        nextEnabled ? "frontline-enabled" : "frontline-disabled"
-      );
-    });
-    frontlineEnabledToggle.dataset.bound = "true";
-  }
-
-  if (strategicFrontlineStyleSelect && !strategicFrontlineStyleSelect.dataset.bound) {
-    strategicFrontlineStyleSelect.addEventListener("change", (event) => {
-      applyFrontlineAnnotationViewPatch(
-        { frontlineStyle: String(event.target.value || "clean") },
-        "frontline-style"
-      );
-    });
-    strategicFrontlineStyleSelect.dataset.bound = "true";
-  }
-  frontlineStyleChoiceButtons.forEach((button) => {
-    if (button.dataset.bound) return;
-    button.addEventListener("click", () => {
-      const nextStyle = String(button.dataset.value || "clean");
-      if (strategicFrontlineStyleSelect) {
-        strategicFrontlineStyleSelect.value = nextStyle;
-      }
-      applyFrontlineAnnotationViewPatch(
-        { frontlineStyle: nextStyle },
-        "frontline-style"
-      );
-    });
-    button.dataset.bound = "true";
-  });
-  if (strategicFrontlineLabelsToggle && !strategicFrontlineLabelsToggle.dataset.bound) {
-    strategicFrontlineLabelsToggle.addEventListener("change", (event) => {
-      applyFrontlineAnnotationViewPatch(
-        { showFrontlineLabels: !!event.target.checked },
-        "frontline-labels"
-      );
-    });
-    strategicFrontlineLabelsToggle.dataset.bound = "true";
-  }
-  if (strategicLabelPlacementSelect && !strategicLabelPlacementSelect.dataset.bound) {
-    strategicLabelPlacementSelect.addEventListener("change", (event) => {
-      applyFrontlineAnnotationViewPatch(
-        { labelPlacementMode: String(event.target.value || "midpoint") },
-        "frontline-label-placement"
-      );
-    });
-    strategicLabelPlacementSelect.dataset.bound = "true";
-  }
-
   if (strategicOverlayOpenWorkspaceBtn && !strategicOverlayOpenWorkspaceBtn.dataset.bound) {
     strategicOverlayOpenWorkspaceBtn.addEventListener("click", () => {
       const currentSection = String(state.strategicOverlayUi?.modalSection || "line");
@@ -1270,7 +1130,6 @@ export function createStrategicOverlayController({
     closeWorkspace,
     cancelEditingModes: cancelStrategicEditingModes,
     getPerfCounters,
-    invalidateFrontlineOverlayState,
     refreshUI: refreshStrategicOverlayUI,
   };
 }

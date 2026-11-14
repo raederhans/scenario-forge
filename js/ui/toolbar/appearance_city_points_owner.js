@@ -9,7 +9,6 @@ import {
   CITY_POINTS_THEME_OPTIONS,
   formatCityPointsDensityValue,
   getCityPointsLabelDensityHint,
-  getCityPointsThemeHint,
   getCityPointsThemeLabel,
   getCityPointsThemeMeta,
   getCityPointsThemeStyle,
@@ -31,7 +30,6 @@ function collectCityPointsNodes(documentRef) {
     cityPointsMinRank: documentRef.getElementById("cityPointsMinRank"),
     cityPointsHierarchyHint: documentRef.getElementById("cityPointsHierarchyHint"),
     cityPointsTheme: documentRef.getElementById("cityPointsTheme"),
-    cityPointsThemeHint: documentRef.getElementById("cityPointsThemeHint"),
     cityPointsMarkerScale: documentRef.getElementById("cityPointsMarkerScale"),
     cityPointsMarkerDensity: documentRef.getElementById("cityPointsMarkerDensity"),
     cityPointsMarkerDensityHint: documentRef.getElementById("cityPointsMarkerDensityHint"),
@@ -114,12 +112,6 @@ export function createAppearanceCityPointsOwner({
       : "Capitals have a separate symbol. Historical scenarios retain known ranks and can override them.";
     ensureCityPointsThemeOptions();
     if (nodes.cityPointsTheme) nodes.cityPointsTheme.value = String(cityPointsConfig.theme || "classic_graphite");
-    if (nodes.cityPointsThemeHint) {
-      nodes.cityPointsThemeHint.textContent = getCityPointsThemeHint(
-        cityPointsConfig.theme || "classic_graphite",
-        runtimeState.currentLanguage,
-      );
-    }
     if (nodes.cityPointsMarkerScale) nodes.cityPointsMarkerScale.value = Number(cityPointsConfig.markerScale || 1).toFixed(2);
     if (nodes.cityPointsMarkerScaleValue) nodes.cityPointsMarkerScaleValue.textContent = `${Number(cityPointsConfig.markerScale || 1).toFixed(2)}x`;
     if (nodes.cityPointsMarkerDensity) nodes.cityPointsMarkerDensity.value = Number(cityPointsConfig.markerDensity || 1).toFixed(2);

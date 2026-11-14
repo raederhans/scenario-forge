@@ -12,11 +12,7 @@ import {
   loadDeferredDetailBundle,
   normalizeCityText,
 } from "./data_loader.js";
-import {
-  getVisibleScenarioChunkLayers,
-  mergeScenarioChunkPayloads,
-  selectScenarioChunks,
-} from "./scenario_chunk_manager.js";
+import "./scenario_chunk_manager.js";
 import {
   buildScenarioDistrictGroupByFeatureId,
   normalizeScenarioDistrictGroupsPayload,

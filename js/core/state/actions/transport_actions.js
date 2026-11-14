@@ -125,13 +125,11 @@ export function commitTransportWorkbenchUiState(target, nextUiState = null) {
   target.transportWorkbenchUi.previewCarrierId = normalized.previewCarrierId;
   target.transportWorkbenchUi.previewMode = normalized.previewMode;
   target.transportWorkbenchUi.previewAssetId = normalized.previewAssetId;
-  target.transportWorkbenchUi.previewInteractionMode = normalized.previewInteractionMode;
   target.transportWorkbenchUi.previewCamera = normalized.previewCamera;
   target.transportWorkbenchUi.layerOrder = normalized.layerOrder;
   target.transportWorkbenchUi.familyConfigs = normalized.familyConfigs;
   target.transportWorkbenchUi.displayConfigs = normalized.displayConfigs;
   target.transportWorkbenchUi.sectionOpen = normalized.sectionOpen;
-  target.transportWorkbenchUi.shellPhase = normalized.shellPhase;
   target.transportWorkbenchUi.restoreLeftDrawer = normalized.restoreLeftDrawer;
   target.transportWorkbenchUi.restoreRightDrawer = normalized.restoreRightDrawer;
   delete target.transportWorkbenchUi.compareHeld;

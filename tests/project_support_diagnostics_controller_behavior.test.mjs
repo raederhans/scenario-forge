@@ -201,15 +201,6 @@ function getNodeText(node) {
   return [node?.textContent || "", ...(node?.children || []).map(getNodeText)].join(" ");
 }
 
-function createDirtyIndicator() {
-  return {
-    classList: {
-      toggle() {},
-    },
-    setAttribute() {},
-  };
-}
-
 function createController(projectSaveStatus, overrides = {}) {
   const elements = { projectSaveStatus, ...overrides.elements };
   const elementIds = {
@@ -246,7 +237,6 @@ function createController(projectSaveStatus, overrides = {}) {
       showAppDialog: async () => true,
       showToast: () => {},
       importProjectThroughFunnel: () => false,
-      invalidateFrontlineOverlayState: () => {},
       ...overrides.helpers,
     },
   });
@@ -438,7 +428,7 @@ test("project save status refreshes when dirty state changes", () => {
   const controller = createController(projectSaveStatus);
 
   globalThis.document = {
-    getElementById: (id) => (id === "appDirtyIndicator" ? createDirtyIndicator() : null),
+    getElementById: () => null,
   };
 
   try {

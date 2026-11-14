@@ -142,7 +142,6 @@ const CLICK_SELECTION_ACTION_NAMES = Object.freeze([
   "setFacilityInfoCardExpanded",
   "setHoveredFacilityEntry",
   "setSelectedFacilityEntry",
-  "togglePresetRegion"
 ]);
 
 export function createClickSelectionTransactionOwner({ constants = {}, getters = {}, effects = {}, services = {} } = {}) {
@@ -153,15 +152,14 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
   const getClickState = requireFunction(getters.getClickState, "getters.getClickState");
   const getSelectedFacilityEntry = requireFunction(getters.getSelectedFacilityEntry, "getters.getSelectedFacilityEntry");
   const handleRiverPaintClick = typeof services.handleRiverPaintClick === "function" ? services.handleRiverPaintClick : () => false;
-  const { clearClickHoverIds, consumeSuppressedBrushClick, removeClickCountryColors, removeClickWaterRegionOverride, setClickActiveSovereignCode, setClickCountryColors, setClickHoverOverlayDirty, setClickSelectedColor, setClickSelectedSpecialRegionId, setClickSelectedWaterRegionId, setFacilityInfoCardExpanded, setHoveredFacilityEntry, setSelectedFacilityEntry, togglePresetRegion } = requirePorts(effects, CLICK_SELECTION_ACTION_NAMES, "effects");
+  const { clearClickHoverIds, consumeSuppressedBrushClick, removeClickCountryColors, removeClickWaterRegionOverride, setClickActiveSovereignCode, setClickCountryColors, setClickHoverOverlayDirty, setClickSelectedColor, setClickSelectedSpecialRegionId, setClickSelectedWaterRegionId, setFacilityInfoCardExpanded, setHoveredFacilityEntry, setSelectedFacilityEntry } = requirePorts(effects, CLICK_SELECTION_ACTION_NAMES, "effects");
   const { appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, clearInspectorLandSelection, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, markDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resolveInteractionTargetIds, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
 
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();
     if (state.startupReadonly && (state.currentTool !== "select"
       || state.specialZoneEditor?.active || state.operationalLineEditor?.active
-      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active
-      || state.isEditingPreset)) {
+      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active)) {
       if (event?.preventDefault) event.preventDefault();
       blockStartupReadonlyInteraction();
       return;
@@ -411,13 +409,8 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       noteRenderAction("select-land", actionStart);
       return;
     }
-    if (!state.isEditingPreset && handleRiverPaintClick(landHit)) return;
+    if (handleRiverPaintClick(landHit)) return;
     const targetIds = resolveInteractionTargetIds(feature, landId);
-
-    if (state.isEditingPreset) {
-      togglePresetRegion(landId);
-      return;
-    }
 
     if (state.currentTool === "eyedropper") {
       // Sample persistent paint, never a heatmap/highlight rendered into colors.

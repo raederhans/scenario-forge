@@ -137,7 +137,6 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
         ])
       );
     });
-    uiState.shellPhase = "road-live-preview";
     uiState.restoreLeftDrawer = !!uiState.restoreLeftDrawer;
     uiState.restoreRightDrawer = !!uiState.restoreRightDrawer;
     return commitTransportWorkbenchUiState(runtimeState, uiState);
