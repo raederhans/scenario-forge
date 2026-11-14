@@ -363,8 +363,8 @@
       "geo_entry_count": 72674,
       "owner": "init_map_data.hierarchy_locales",
       "role": "locales",
-      "sha256": "6d5387573e239fd15fa406d473b5332deb68d1d97fe7c8860dff76ae614be973",
-      "size_bytes": 8559317,
+      "sha256": "943d775896d7771800743a7da64fbc0a3cf1f116aa4ce33af23d8dea3c4c0298",
+      "size_bytes": 8556219,
       "type": "locales",
       "ui_entry_count": 2090
     },
