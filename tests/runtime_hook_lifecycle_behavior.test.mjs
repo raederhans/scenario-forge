@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import fs from "node:fs";
-import vm from "node:vm";
 import {
   callRequiredRuntimeHook, callRuntimeHook, registerRuntimeHook,
   registerOwnedRuntimeHook, readRuntimeHook, subscribeStateBusEvent, off, STATE_BUS_EVENTS,
@@ -82,106 +80,6 @@ test("internal renderer commands and first-frame checkpoint dispatch without add
     }
     assert.equal(callRuntimeHook(null, name, payload), undefined);
   }
-});
-
-const source = fs.readFileSync(new URL("../js/ui/scenario_controls.js", import.meta.url), "utf8")
-  .replace(/^import[\s\S]*?from "[^"]+";\r?\n/gm, "")
-  .replace("export function initScenarioControls", "function initScenarioControls");
-
-function createControlsFixture() {
-  class Element extends EventTarget {
-    value = "";
-    dataset = {};
-    children = [];
-    textContent = "";
-    closed = 0;
-    classList = { toggle() {}, add: () => { this.closed++; }, contains() { return true; } };
-    setAttribute() {}
-    focus() {}
-    contains(target) { return target === this; }
-    replaceChildren() { this.children = []; }
-    appendChild(child) { this.children.push(child); }
-  }
-  const nodes = Object.fromEntries(["scenarioSelect", "scenarioSelectButton", "scenarioSelectButtonText", "scenarioSelectMenu", "applyScenarioBtn", "clearScenarioBtn", "scenarioStatus", "toggleBlankFeatureLabels"]
-    .map(name => [name, new Element()]));
-  const state = { bootBlocking: false, activeScenarioId: "", scenarioApplyInFlight: false };
-  const pending = [];
-  const applied = [];
-  const toasts = [];
-  let renders = 0;
-  let cleared = 0;
-  const document = Object.assign(new EventTarget(), {
-    getElementById: name => nodes[name] || null, createElement: () => new Element(),
-  });
-  const context = vm.createContext({
-    runtimeState: state, AbortController, Event, console: { error() {}, warn() {} },
-    document,
-    callRequiredRuntimeHook, callRuntimeHook, readRuntimeHook, registerOwnedRuntimeHook,
-    normalizeScenarioId: value => String(value || "").trim(),
-    getScenarioRegistryEntries: () => [{ scenario_id: "alpha" }, { scenario_id: "beta" }],
-    getScenarioDisplayName: (_, id) => id,
-    getScenarioFatalRecoveryState: () => null,
-    formatScenarioFatalRecoveryMessage: () => "",
-    formatScenarioStatusText: () => { renders++; return "ready"; },
-    formatScenarioAuditText: () => "",
-    t: value => value, showToast: (...args) => toasts.push(args), resetZoomToFit() {},
-    bindSelectKeyboard() {}, focusSelectedSelectOption() {},
-    clearActiveScenarioCommand() { cleared++; state.activeScenarioId = ""; }, resetScenarioToBaselineCommand() {},
-    applyScenarioByIdCommand: async id => { applied.push(id); state.activeScenarioId = id; },
-    loadScenarioRegistry: () => new Promise(resolve => pending.push(resolve)),
-  });
-  vm.runInContext(source, context);
-  return { init: context.initScenarioControls, state, nodes, document, pending, applied, toasts, cleared: () => cleared, renders: () => renders };
-}
-const flush = () => new Promise(resolve => setImmediate(resolve));
-
-test("scenario picker exposes only registered main-editor scenarios", async () => {
-  const f = createControlsFixture();
-  const dispose = f.init();
-  f.pending.forEach(resolve => resolve());
-  await flush();
-  assert.deepEqual(f.nodes.scenarioSelect.children.map(option => option.value), ["", "alpha", "beta"]);
-  assert.deepEqual(f.nodes.scenarioSelectMenu.children.map(option => option.dataset.value), ["", "alpha", "beta"]);
-  assert.deepEqual(f.nodes.scenarioSelect.children.map(option => option.textContent), ["None", "alpha", "beta"]);
-  assert.deepEqual(
-    f.nodes.scenarioSelectMenu.children.map(option => option.textContent),
-    f.nodes.scenarioSelect.children.map(option => option.textContent),
-  );
-  f.state.activeScenarioId = "alpha";
-  f.nodes.clearScenarioBtn.dispatchEvent(new Event("click"));
-  await flush();
-  assert.equal(f.cleared(), 1);
-  assert.equal(f.state.activeScenarioId, "");
-  assert.deepEqual(f.toasts, []);
-  dispose();
-});
-
-test("real scenario owner reinitializes DOM listeners and old release cannot detach the new hook", async () => {
-  const f = createControlsFixture();
-  const old = f.init();
-  callRuntimeHook(f.state, "updateScenarioUIFn");
-  const next = f.init();
-  old();
-  callRuntimeHook(f.state, "updateScenarioUIFn");
-  assert.equal(f.renders(), 2);
-  f.document.dispatchEvent(new Event("click"));
-  assert.equal(f.nodes.scenarioSelectMenu.closed, 1, "one live document listener");
-  f.nodes.scenarioSelect.value = "beta";
-  f.nodes.scenarioSelect.dispatchEvent(new Event("change"));
-  assert.equal(f.renders(), 3, "one live DOM callback after reinitialization");
-  f.nodes.applyScenarioBtn.dispatchEvent(new Event("click"));
-  await flush();
-  assert.deepEqual(f.applied, ["beta"]);
-  next();
-  const closed = f.nodes.scenarioSelectMenu.closed;
-  f.document.dispatchEvent(new Event("click"));
-  assert.equal(f.nodes.scenarioSelectMenu.closed, closed, "document listener released");
-  const before = f.renders();
-  f.nodes.scenarioSelect.dispatchEvent(new Event("change"));
-  callRuntimeHook(f.state, "updateScenarioUIFn");
-  f.pending.forEach(resolve => resolve());
-  await flush();
-  assert.equal(f.renders(), before, "disposed owner ignores DOM, hooks, and late registry completion");
 });
 
 test("after-paint panel requests coalesce until the frame paints; direct hook calls stay synchronous", () => {

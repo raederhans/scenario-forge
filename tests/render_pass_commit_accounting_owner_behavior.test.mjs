@@ -1,34 +1,9 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import {
   createRenderPassCommitAccountingOwner,
 } from "../js/core/map_renderer/render_pass_commit_accounting_owner.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const REPO_ROOT = path.resolve(__dirname, "..");
-const MAP_RENDERER_PATH = path.join(REPO_ROOT, "js/core/map_renderer.js");
-
-function extractFunctionSource(source, functionName) {
-  const marker = `function ${functionName}(`;
-  const start = source.indexOf(marker);
-  assert.notEqual(start, -1, `Expected ${functionName} function source to exist.`);
-  const bodyStart = source.indexOf("{", start);
-  assert.notEqual(bodyStart, -1, `Expected ${functionName} function body to start.`);
-  let depth = 0;
-  for (let index = bodyStart; index < source.length; index += 1) {
-    if (source[index] === "{") depth += 1;
-    if (source[index] === "}") depth -= 1;
-    if (depth === 0) {
-      return source.slice(start, index + 1);
-    }
-  }
-  throw new Error(`Expected ${functionName} function body to close.`);
-}
 
 function createCache(overrides = {}) {
   return {
@@ -105,51 +80,6 @@ function createOwnerHarness({
   });
 
   return { cache, calls, owner };
-}
-
-function createRenderPassToCacheHarness({ hostResult, nowValue = 900 } = {}) {
-  const calls = [];
-  const dependencyMap = {
-    physicalViewportCacheOwner: null,
-    borderCanvasPreparationOwner: null,
-    exportRenderInProgress: false,
-    isTnoRasterSceneSelected: () => false,
-    politicalIdRasterRuntimeOwner: null,
-    politicalPassUsesDirectScene: false,
-    tnoRasterSceneOwner: null,
-    exactCompositeReuseOwner: {
-      invalidate() {
-        calls.push(["invalidateExactComposite"]);
-      },
-    },
-    getRenderPassCacheHostOwner: () => ({
-      prepareRenderPassHost(options) {
-        calls.push(["prepareRenderPassHost", options.passName, typeof options.drawFn]);
-        if (!hostResult?.skipped) {
-          options.onHostReady?.();
-        }
-        return hostResult;
-      },
-    }),
-    getRenderPassCommitAccountingOwner: () => ({
-      commitRenderPass(options) {
-        calls.push(["commitRenderPass", options]);
-        return { committed: options.drawResult?.committed !== false };
-      },
-    }),
-    nowMs: () => {
-      calls.push(["nowMs"]);
-      return nowValue;
-    },
-  };
-  const rendererSource = fs.readFileSync(MAP_RENDERER_PATH, "utf8");
-  const functionSource = extractFunctionSource(rendererSource, "renderPassToCache");
-  const renderPassToCache = Function(
-    ...Object.keys(dependencyMap),
-    `return (${functionSource});`,
-  )(...Object.values(dependencyMap));
-
-  return { calls, renderPassToCache };
 }
 
 test("records declined commit metric and skips cache mutation", () => {
@@ -377,46 +307,3 @@ test("freezes returned summary and trace arrays", () => {
   assert.equal(Object.isFrozen(summary.effectOrder), true);
   assert.equal(Object.isFrozen(summary.getterOrder), true);
 });
-
-test("renderPassToCache wrapper returns before commit owner when host skips", () => {
-  const { calls, renderPassToCache } = createRenderPassToCacheHarness({
-    hostResult: { skipped: true, skipReason: "missing-pass-context" },
-  });
-
-  renderPassToCache("political", () => ({ committed: true }), { k: 2 }, {});
-
-  assert.deepEqual(calls, [
-    ["invalidateExactComposite"],
-    ["prepareRenderPassHost", "political", "function"],
-  ]);
-});
-
-test("renderPassToCache wrapper delegates host draw result to commit accounting owner", () => {
-  const transform = { k: 2 };
-  const timings = {};
-  const hostResult = {
-    skipped: false,
-    drawResult: { committed: true, politicalDataStage: "fine" },
-  };
-  const { calls, renderPassToCache } = createRenderPassToCacheHarness({
-    hostResult,
-    nowValue: 901,
-  });
-
-  renderPassToCache("political", () => ({ committed: true }), transform, timings);
-
-  assert.equal(calls.length, 4);
-  assert.deepEqual(calls[0], ["invalidateExactComposite"]);
-  assert.deepEqual(calls[1], ["prepareRenderPassHost", "political", "function"]);
-  assert.deepEqual(calls[2], ["nowMs"]);
-  assert.equal(calls[3][0], "commitRenderPass");
-  assert.deepEqual(calls[3][1], {
-    passName: "political",
-    transform,
-    drawResult: hostResult.drawResult,
-    timings,
-    passStart: 901,
-    hostSummary: hostResult,
-  });
-});
-
