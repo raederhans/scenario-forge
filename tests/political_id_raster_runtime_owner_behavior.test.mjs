@@ -146,7 +146,8 @@ function fixture({
 
 async function resolveAll(f, marker = "tile") {
   let index = 0, guard = 0;
-  while (guard++ < 100) {
+  const limit = f.requests.length + 100;
+  while (guard++ < limit) {
     await tick();
     if (index < f.requests.length) {
       const request = f.requests[index++];
@@ -155,7 +156,7 @@ async function resolveAll(f, marker = "tile") {
     }
     if (f.owner.getPendingWorkCount() === 0) break;
   }
-  assert.ok(guard < 100, "tile worker queue should settle without an unbounded pump");
+  assert.ok(guard <= limit, "tile worker queue should settle without an unbounded pump");
   await tick();
   return index;
 }
@@ -905,14 +906,14 @@ test("resident presentation reuses stable RGBA and accounts its retained surface
 });
 
 
-test("optional presentation budget falls back to full GPU without disabling valid raster", async t => {
+test("viewport budget admits retained presentation for a large raster view", async t => {
   const f = fixture({ displayMode: "raster", width:3800, height:2200 });
   t.after(() => f.owner.dispose());
   f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
   const d = f.owner.getDiagnostics();
   assert.equal(d.displayState, "accelerated");
-  assert.equal(d.presentation, "full-gpu");
-  assert.equal(d.presentationCache.retainedSurfaceBytes, 0);
+  assert.equal(d.presentation, "retained-regions");
+  assert.ok(d.presentationCache.retainedSurfaceBytes > 0);
   assert.equal(d.reason, "coverage-ready");
   assert.ok(d.gpu.outputSurfaceBytesEstimate < 80*1024*1024);
   assert.equal(d.nativeRefinements,0);
@@ -1808,3 +1809,21 @@ test("a first paint that changes foreground order still updates the retained pal
   }
   assert.equal(f.owner.getDiagnostics().sourcePreparation.committed, 1, "the foreground order is still committed");
 });
+
+
+for (const [width, height, downgraded] of [[2520, 2288, false], [3840, 2160, false], [7680, 4320, true]]) {
+  test(`direct DPR 2 raster publishes ${width} by ${height} without budget fallback`, async t => {
+    const f = fixture({ width, height, transform: { x: 17, y: -31, k: 1.01 }, displayMode: "raster", directPresentation: true });
+    t.after(() => f.owner.dispose());
+    f.state.dpr = 2;
+    assert.equal(f.owner.prepare(), true);
+    await resolveAll(f);
+    assert.ok(f.owner.draw());
+    const diagnostics = f.owner.getDiagnostics();
+    assert.equal(diagnostics.displayState, "accelerated");
+    assert.equal(diagnostics.downgraded, downgraded);
+    assert.equal(diagnostics.budgets.cpuBytes, f.cache.maxBytes);
+    assert.ok(diagnostics.budgets.gpuBytes > 80 * 1024 * 1024);
+    assert.ok(f.owner.getDirectFrame());
+  });
+}

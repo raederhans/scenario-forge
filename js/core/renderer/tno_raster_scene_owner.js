@@ -1,11 +1,10 @@
 import { createGpuSceneCompositor } from "./gpu_scene_compositor.js";
+import { scaleRasterViewportBudget, RASTER_BUDGET_MAX_PIXELS } from "./political_id_raster_cache.js";
 import { createPoliticalIdRasterGpu } from "./political_id_raster_gpu.js";
 
 const POLITICAL_TEXTURE_LIMIT = 80 * 1024 * 1024;
-// The original 80 MiB pool covered political textures alone. Direct scene
-// composition also retains the other passes as textures, so account those
-// together under a separate finite cap without enlarging the political pool.
 const SCENE_TEXTURE_LIMIT = 160 * 1024 * 1024;
+const POLITICAL_TEXTURE_HARD_LIMIT = scaleRasterViewportBudget(POLITICAL_TEXTURE_LIMIT, RASTER_BUDGET_MAX_PIXELS, 1);
 const validTransform = value => !!value && [value.x, value.y, value.k].every(Number.isFinite) && value.k > 0;
 const validLayout = value => !!value && [value.offsetX ?? 0, value.offsetY ?? 0].every(Number.isFinite);
 
@@ -73,6 +72,7 @@ export function createTnoRasterSceneOwner({
     const job = { snapshot, status: "pending" };
     publicationPreparation = job;
     preparationError = "";
+    compositor.setTextureBudget(sceneTextureBudget());
     compositor.prepareLayers({ layers: snapshot.passes.map(pass => ({ name: pass.name, canvas: pass.canvas, revision: pass.revision })),
       getReservedTextureBytes: () => politicalGpu?.getStats().gpuTextureBytes || 0,
       isCurrent: () => preparationCurrent(job), yieldControl: h.yieldControl, onProgress: account,
@@ -149,7 +149,7 @@ export function createTnoRasterSceneOwner({
     canvas.height = mapCanvas.height;
     mapCanvas.parentNode.insertBefore(canvas, mapCanvas.nextSibling);
     try {
-      compositor = createCompositor({ canvas, maxTextureBytes: SCENE_TEXTURE_LIMIT, onContextLost: contextLost });
+      compositor = createCompositor({ canvas, maxTextureBytes: sceneTextureBudget(), onContextLost: contextLost });
       account();
       return compositor;
     } catch (error) {
@@ -158,14 +158,22 @@ export function createTnoRasterSceneOwner({
       throw error;
     }
   }
+  function viewportBudget(base) {
+    return scaleRasterViewportBudget(base, mapCanvas.width, mapCanvas.height);
+  }
+  function sceneTextureBudget() {
+    const pixels = Math.min(mapCanvas.width * mapCanvas.height, RASTER_BUDGET_MAX_PIXELS);
+    return Math.max(SCENE_TEXTURE_LIMIT, viewportBudget(POLITICAL_TEXTURE_LIMIT) + 44 * pixels);
+  }
   function ensureGpu(options = {}) {
     try {
       const scene = ensureSurface();
-      politicalGpu = createGpu({ ...options, canvas, gl: scene.gl, maxTextureBytes: POLITICAL_TEXTURE_LIMIT,
+      politicalGpu = createGpu({ ...options, canvas, gl: scene.gl, maxTextureBytes: POLITICAL_TEXTURE_HARD_LIMIT,
         // Only nonpolitical textures come from the compositor, so this does not
         // recursively count the political owner's primary/overview/candidate.
-        getReservedTextureBytes: () => Math.max(0, (scene.getStats().gpuTextureBytes || 0)
-          - (SCENE_TEXTURE_LIMIT - POLITICAL_TEXTURE_LIMIT)),
+        getReservedTextureBytes: () => POLITICAL_TEXTURE_HARD_LIMIT - viewportBudget(POLITICAL_TEXTURE_LIMIT)
+          + Math.max(0, (scene.getStats().gpuTextureBytes || 0)
+            - (sceneTextureBudget() - viewportBudget(POLITICAL_TEXTURE_LIMIT))),
       });
       return politicalGpu;
     } catch (error) {
@@ -342,6 +350,7 @@ export function createTnoRasterSceneOwner({
     const start = performance.now();
     try {
       const reservedTextureBytes = politicalGpu.getStats().gpuTextureBytes;
+      compositor.setTextureBudget(sceneTextureBudget());
       if (compositor.render({ width, height, layers, reservedTextureBytes, preserveLayers: usingOverview || composedWithOverview }) === false) throw new Error("compositor rejected frame");
       if (!retain && publicationPreparation) {
         compositor.cancelPreparedLayers?.();
@@ -397,6 +406,11 @@ export function createTnoRasterSceneOwner({
   function getDiagnostics() {
     const stats = compositor?.getStats() || {};
     return {
+      budgets: { politicalTextureBytes: mapCanvas ? viewportBudget(POLITICAL_TEXTURE_LIMIT) : POLITICAL_TEXTURE_LIMIT,
+        sceneTextureBytes: mapCanvas ? sceneTextureBudget() : SCENE_TEXTURE_LIMIT,
+        hardSceneTextureBytes: POLITICAL_TEXTURE_HARD_LIMIT + 44 * RASTER_BUDGET_MAX_PIXELS,
+        hardViewportPixels: RASTER_BUDGET_MAX_PIXELS },
+      downgraded: stats.downgraded ?? false, textureScale: stats.textureScale ?? 1,
       active, frames: stats.frames || 0, textureUploads: stats.textureUploads || 0,
       bytes: (stats.gpuTextureBytes || 0) + (stats.outputSurfaceBytesEstimate || 0),
       gpuTextureBytes: stats.gpuTextureBytes || 0, outputSurfaceBytesEstimate: stats.outputSurfaceBytesEstimate || 0,

@@ -1,7 +1,7 @@
 import { createPoliticalIdRasterOverview } from "./political_id_raster_overview.js";
 import { createPoliticalIdRasterDisplayCache } from "./political_id_raster_display_cache.js";
 import { createPoliticalIdRasterSource } from "./political_id_raster_source.js";
-import { createPoliticalIdRasterCache, planPoliticalIdRasterView } from "./political_id_raster_cache.js";
+import { createPoliticalIdRasterCache, planPoliticalIdRasterView, scaleRasterViewportBudget, RASTER_BUDGET_MAX_PIXELS } from "./political_id_raster_cache.js";
 import { createPoliticalIdRasterGpu } from "./political_id_raster_gpu.js";
 import { createPoliticalIdRasterWorkerClient, POLITICAL_ID_ASSET_SAVE_MAX_BYTES } from "../political_id_raster_worker_client.js";
 import { createPoliticalIdRasterCoordinateSpace } from "./political_id_raster_coordinates.js";
@@ -11,6 +11,7 @@ import { queryPoliticalIdRasterCandidates } from "./political_id_raster_pick.js"
 import { yieldToBackground } from "../background_yield.js";
 
 const GPU_LIMIT = 80 * 1024 * 1024;
+const GPU_HARD_LIMIT = scaleRasterViewportBudget(GPU_LIMIT, RASTER_BUDGET_MAX_PIXELS, 1);
 const MAX_COLOR_DELTAS = 32;
 const NO_ENTRIES = Object.freeze([]);
 const projectionMethods = ["scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY", "precision", "clipAngle", "clipExtent"];
@@ -39,6 +40,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   directPresentation = false,
 }) {
   if (!["raster", "hybrid"].includes(displayMode)) throw new TypeError("Invalid raster display mode.");
+  let gpuLimit = GPU_LIMIT, maxPixels = 12 * 1024 * 1024;
   const persistent = displayMode === "raster";
   // Diagnostic A/B only; no persisted preference or change to auto eligibility.
   const displayCache = !directPresentation && persistent && new URLSearchParams(globalThis.location?.search || "").get("political_raster_present") !== "full"
@@ -541,13 +543,14 @@ export function createPoliticalIdRasterRuntimeOwner({
 
   function updatePlan() {
     const layout = h.getLayout();
+    const width = layout.pixelWidth ?? Math.floor(layout.paddedWidth * state.dpr);
+    const height = layout.pixelHeight ?? Math.floor(layout.paddedHeight * state.dpr);
+    cache.setViewport(width, height);
+    gpuLimit = scaleRasterViewportBudget(GPU_LIMIT, width, height);
+    maxPixels = Math.min(scaleRasterViewportBudget(12 * 1024 * 1024, width, height), Math.floor((cache.maxBytes - 1) / 4));
     plan = planPoliticalIdRasterView({ transform: coordinates?.mapTransform(state.zoomTransform) || state.zoomTransform, dpr: state.dpr,
-      width: layout.pixelWidth ?? Math.floor(layout.paddedWidth * state.dpr),
-      height: layout.pixelHeight ?? Math.floor(layout.paddedHeight * state.dpr),
+      width, height, maxPixels,
       offsetX: layout.offsetX || 0, offsetY: layout.offsetY || 0 });
-    // Direct IDs alone must leave room for exact edge coverage. Do not build a
-    // complete view that cannot coexist in the unchanged CPU cache budget.
-    if (plan && plan.width * plan.height * 4 >= cache.maxBytes) plan = null;
     const key = plan?.tiles.map(tile => tile.key).join("|") || "";
     if (key !== planKey) { attempted = new Set(); planKey = key; }
     // An obsolete view can finish only its current tile. There is no old-view
@@ -857,7 +860,8 @@ export function createPoliticalIdRasterRuntimeOwner({
   function ensureGpu() {
     if (gpu?.isAvailable()) return true;
     releaseGpu();
-    gpu = createGpu({ maxTextureBytes: GPU_LIMIT, onContextLost: () => {
+    gpu = createGpu({ maxTextureBytes: GPU_HARD_LIMIT,
+      getReservedTextureBytes: () => GPU_HARD_LIMIT - gpuLimit, onContextLost: () => {
       cancelGpuPreparation(); gpuAcceptedKey = "";
       directFrame = null; publishedBaselinePalette = null; publishedPalette = null; publishedEntries = [];
       overviewFrame = null; overviewBaselinePalette = null; overviewPalette = null; overviewEntries = [];
@@ -942,12 +946,12 @@ export function createPoliticalIdRasterRuntimeOwner({
       const estimate = tiles.reduce((sum, tile) => sum + (directPresentation ? tile.width * tile.height * 4 : tile.codes.byteLength)
         + Math.ceil(Math.max(1, tile.edgeIds.length) / 1024) * 1024 * 8, 0)
         // Base full-GPU estimate; optional retained output is admitted separately
-        // against the unchanged 80 MiB limit before allocation.
+        // against the current limit before allocation.
         + (directPresentation ? 0 : plan.width * plan.height * 4) + Math.ceil(snapshot.palette.length / 4096) * 4096;
-      if (estimate > GPU_LIMIT) { stats.fallbacks++; displayState = "fallback"; reason = "gpu-budget"; return null; }
+      if (estimate > gpuLimit) { stats.fallbacks++; displayState = "fallback"; reason = "gpu-budget"; return null; }
       // Keep legacy raster eligibility at large DPR: when the additional
       // retained surface would exceed the existing cap, use full GPU output.
-      const useRetained = !!displayCache && estimate + plan.width * plan.height * 4 <= GPU_LIMIT;
+      const useRetained = !!displayCache && estimate + plan.width * plan.height * 4 <= gpuLimit;
       if (!useRetained) displayCache?.reset();
       const startedAt = performance.now();
       const paletteKey = `${namespace}:${snapshot.paletteRevision}`;
@@ -1386,6 +1390,8 @@ export function createPoliticalIdRasterRuntimeOwner({
       presentationCache: displayCache?.getStats() || null, lastTiming: lastTiming && { ...lastTiming },
       firstRasterReadyMs, lastDrawTotalMs, nativeRefinements, refinementPending: refinementTimer !== null || forceNativeRefinement,
       sceneKey: snapshot?.sceneKey || "", level: plan?.level ?? null,
+      budgets: { maxPixels, cpuBytes: cache.maxBytes, gpuBytes: gpuLimit,
+        hardViewportPixels: RASTER_BUDGET_MAX_PIXELS }, downgraded: plan?.downgraded ?? false,
       view: committedPlan ? { ...committedPlan.transform, dpr: committedPlan.dpr } : null,
       paletteRevision: snapshot?.paletteRevision ?? 0, geometryRevision: snapshot?.geometryRevision ?? 0,
       assets: assetStore?.stats() || null, identity: identityBuilder.getStats(), assetError, assetTimeout,

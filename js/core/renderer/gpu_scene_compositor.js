@@ -1,3 +1,4 @@
+import { RASTER_BUDGET_MAX_PIXELS } from "./political_id_raster_cache.js";
 import { yieldToBackground } from "../background_yield.js";
 // Matrices map source pixels to output device pixels, including DPR. Layers
 // retain their own revision and camera reference; the caller owns that policy.
@@ -32,6 +33,7 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
     depth: false, stencil: false, preserveDrawingBuffer: false,
   });
   if (!gl) throw new Error("GPU scene compositor requires WebGL2.");
+  let textureScale = 1;
   const limit = gl.getParameter(gl.MAX_TEXTURE_SIZE);
   const textures = new Map(), shaders = [];
   let program, vao, buffer, disposed = false, lost = false;
@@ -51,7 +53,23 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
     onProgress();
   }
   const matches = (cached, layer) => cached && cached.canvas === layer.canvas && cached.revision === layer.revision
-    && cached.width === layer.canvas?.width && cached.height === layer.canvas?.height;
+    && cached.sourceWidth === layer.canvas?.width && cached.sourceHeight === layer.canvas?.height
+    && cached.width === textureSize(layer).width && cached.height === textureSize(layer).height;
+  const textureSize = layer => ({ width: Math.max(1, Math.floor(layer.canvas.width * textureScale)),
+    height: Math.max(1, Math.floor(layer.canvas.height * textureScale)) });
+  function updateTextureScale(width, height, layers, reserved, preserveLayers = false) {
+    textureScale = 1;
+    if (width * height <= RASTER_BUDGET_MAX_PIXELS) return;
+    const names = new Set(layers.map(layer => layer.name));
+    let fixedBytes = reserved;
+    for (const [name, cached] of textures) {
+      if (layers.some(layer => layer.name === name && layer.retained)
+        || (!names.has(name) && (cached.pinned || preserveLayers))) fixedBytes += cached.width * cached.height * 4;
+    }
+    const sourceBytes = layers.reduce((sum, layer) => sum + (!layer.retained && !layer.draw && layer.canvas
+      ? layer.canvas.width * layer.canvas.height * 4 : 0), 0);
+    if (sourceBytes > maxTextureBytes - fixedBytes) textureScale = Math.sqrt(Math.max(0, maxTextureBytes - fixedBytes) / sourceBytes);
+  }
   function allocateTexture() {
     const texture = gl.createTexture();
     if (!texture) throw new Error("GPU scene texture allocation failed.");
@@ -69,14 +87,23 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, layer.canvas);
-    Object.assign(cached, { canvas: layer.canvas, revision: layer.revision, width: layer.canvas.width, height: layer.canvas.height });
+    const { width, height } = textureSize(layer);
+    let source = layer.canvas;
+    if (width !== source.width || height !== source.height) {
+      source = typeof OffscreenCanvas === "function" ? new OffscreenCanvas(width, height) : canvas.ownerDocument.createElement("canvas");
+      source.width = width; source.height = height;
+      source.getContext("2d").drawImage(layer.canvas, 0, 0, width, height);
+    }
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
+    Object.assign(cached, { canvas: layer.canvas, revision: layer.revision, width, height,
+      sourceWidth: layer.canvas.width, sourceHeight: layer.canvas.height });
     textureUploads++;
   }
   async function prepareLayers({ layers = [], getReservedTextureBytes = () => 0, isCurrent = () => true,
     yieldControl = yieldToBackground, maxPasses = 3,
     onProgress = () => {} } = {}) {
     cancelPreparedLayers();
+    updateTextureScale(canvas.width, canvas.height, layers, getReservedTextureBytes());
     const job = { textures: new Map(), ready: false, onProgress };
     preparation = job;
     preparedPassCount = 0; preparedBytes = 0;
@@ -104,10 +131,11 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
         if (![layer.width, layer.height].every(value => Number.isSafeInteger(value) && value > 0 && value <= limit)) throw new RangeError("Invalid GPU canvas layer.");
         const reserved = getReservedTextureBytes();
         if (!Number.isFinite(reserved) || reserved < 0) throw new RangeError("Invalid reserved texture budget.");
-        const bytes = layer.width * layer.height * 4;
+        const size = textureSize(layer);
+        const bytes = size.width * size.height * 4;
         if (textureBytes(textures.values()) + privateBytes() + reserved + bytes > maxTextureBytes) continue;
         const started = performance.now();
-        const cached = { texture: allocateTexture(), width: layer.width, height: layer.height };
+        const cached = { texture: allocateTexture(), ...size };
         job.textures.set(layer.name, cached);
         uploadTexture(cached, layer);
         preparedPassCount++; preparedBytes += bytes;
@@ -170,6 +198,7 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
       if (!available()) throw new Error("GPU scene compositor is unavailable.");
       if (![width, height].every(value => Number.isSafeInteger(value) && value > 0 && value <= limit)) throw new RangeError("Invalid GPU scene size.");
       if (!Number.isFinite(reservedTextureBytes) || reservedTextureBytes < 0) throw new RangeError("Invalid reserved texture budget.");
+      updateTextureScale(width, height, layers, reservedTextureBytes, preserveLayers);
       const names = new Set();
       let bytes = reservedTextureBytes;
       // Validate the complete frame before replacing the visible output.
@@ -188,16 +217,23 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
         }
         if (typeof layer.revision !== "string" && !(typeof layer.revision === "number" && Number.isFinite(layer.revision))) throw new TypeError("GPU canvas layers require a revision.");
         if (!layer.canvas || ![layer.canvas.width, layer.canvas.height].every(value => Number.isSafeInteger(value) && value > 0 && value <= limit)) throw new RangeError("Invalid GPU canvas layer.");
-        bytes += layer.canvas.width * layer.canvas.height * 4;
+        const size = textureSize(layer);
+        bytes += size.width * size.height * 4;
       }
       for (const [name, cached] of textures) {
         if ((cached.pinned || preserveLayers) && !names.has(name)) bytes += cached.width * cached.height * 4;
       }
       const prepared = preparation?.ready ? preparation.textures : new Map();
+      let unusedPreparedBytes = 0;
       for (const [name, cached] of preparation?.textures || []) {
         if (!layers.some(layer => !layer.retained && layer.name === name && prepared.has(name) && matches(cached, layer))) {
-          bytes += cached.width * cached.height * 4;
+          unusedPreparedBytes += cached.width * cached.height * 4;
         }
+      }
+      bytes += unusedPreparedBytes;
+      if (bytes > maxTextureBytes && width * height > RASTER_BUDGET_MAX_PIXELS && unusedPreparedBytes) {
+        cancelPreparedLayers();
+        bytes -= unusedPreparedBytes;
       }
       if (bytes > maxTextureBytes) throw new RangeError("GPU scene texture budget exceeded.");
       const start = performance.now();
@@ -248,7 +284,6 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
         gl.useProgram(program);
         gl.bindVertexArray(vao);
         gl.activeTexture(gl.TEXTURE0);
-        const source = layer.canvas;
         let cached = textures.get(layer.name);
         if (!cached) {
           cached = { texture: gl.createTexture() };
@@ -259,17 +294,10 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         } else gl.bindTexture(gl.TEXTURE_2D, cached.texture);
-        if (!layer.retained && (cached.canvas !== source || cached.revision !== layer.revision || cached.width !== source.width || cached.height !== source.height)) {
-          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-          gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-          gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
-          Object.assign(cached, { canvas: source, revision: layer.revision, width: source.width, height: source.height });
-          textureUploads++;
-        }
+        if (!layer.retained && !matches(cached, layer)) uploadTexture(cached, layer);
         gl.uniform1i(uniforms.surface, 0);
         gl.uniform2f(uniforms.viewportSize, width, height);
-        gl.uniform2f(uniforms.sourceSize, cached.width, cached.height);
+        gl.uniform2f(uniforms.sourceSize, cached.sourceWidth ?? cached.width, cached.sourceHeight ?? cached.height);
         gl.uniformMatrix3fv(uniforms.transform, false, gpuAffineMatrix(layer.transform));
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }
@@ -318,7 +346,10 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
       return captured.map(value => ({ name: value.name, sourceName: value.layer.name, revision: value.layer.revision,
         scaleX: value.layer.canvas.width / value.width, scaleY: value.layer.canvas.height / value.height }));
     }
-    return { canvas, gl, render, prepareLayers, cancelPreparedLayers, captureRetainedLayers, releaseRetainedLayers, dispose, isAvailable: available, getStats: () => ({
+    return { canvas, gl, setTextureBudget: bytes => { maxTextureBytes = bytes; }, render, prepareLayers, cancelPreparedLayers, captureRetainedLayers, releaseRetainedLayers, dispose, isAvailable: available, getStats: () => ({
+      maxTextureBytes,
+      textureScale: Math.min(1, ...[...textures.values()].map(value => value.sourceWidth ? value.width / value.sourceWidth : 1)),
+      downgraded: [...textures.values()].some(value => value.sourceWidth > value.width || value.sourceHeight > value.height),
       frames, textureUploads, lastFrameMs, residentLayers: textures.size, contextLost: lost,
       gpuTextureBytes: textureBytes(textures.values()) + privateBytes(),
       privateTextureBytes: privateBytes(), preparedPassCount, preparedBytes, maxUploadTaskMs,
