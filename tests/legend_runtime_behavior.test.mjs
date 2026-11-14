@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
 import { createLegendRuntime } from "../js/core/renderer/legend_runtime.js";
 
 class Element {
@@ -65,6 +66,9 @@ function harness(t) {
     legendLabels: { "#ff0000": "Red" }, currentLanguage: "en",
   };
   const runtimeState = { width: 800, height: 600, currentLanguage: "en" };
+  const previousHook = readRegisteredRuntimeHookSource(runtimeState, "updateLegendUI");
+  registerRuntimeHook(runtimeState, "updateLegendUI", null);
+  t.after(() => registerRuntimeHook(runtimeState, "updateLegendUI", previousHook));
   const h = {
     state, runtimeState, container: null, containerReads: 0,
     creations: () => creations,
@@ -151,7 +155,7 @@ test("requests coalesce until the post-frame timer and call the current UI callb
   const h = harness(t);
   const s = scheduler(t);
   const calls = [];
-  h.runtimeState.updateLegendUI = () => calls.push("old");
+  registerRuntimeHook(h.runtimeState, "updateLegendUI", () => calls.push("old"));
   h.runtime.requestLegendRender();
   h.runtime.requestLegendRender();
   assert.equal(s.frames.length, 1);
@@ -164,10 +168,9 @@ test("requests coalesce until the post-frame timer and call the current UI callb
   assert.equal(s.frames.length, 0);
   assert.equal(s.timers.length, 1);
   h.container = new Element();
-  h.runtimeState.updateLegendUI = function () {
-    assert.equal(this, h.runtimeState);
+  registerRuntimeHook(h.runtimeState, "updateLegendUI", () => {
     calls.push(h.labels());
-  };
+  });
   s.runTimer();
   assert.deepEqual(calls, [["Red"]]);
   const element = h.container.children[0];
@@ -187,10 +190,10 @@ test("direct rendering leaves a queued refresh pending and requests inside its c
   const s = scheduler(t);
   h.container = new Element();
   let calls = 0;
-  h.runtimeState.updateLegendUI = () => {
+  registerRuntimeHook(h.runtimeState, "updateLegendUI", () => {
     calls++;
     if (calls === 1) h.runtime.requestLegendRender();
-  };
+  });
   h.runtime.requestLegendRender();
   h.runtime.renderLegend();
   assert.equal(calls, 0);

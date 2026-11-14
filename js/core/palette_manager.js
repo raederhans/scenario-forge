@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "./state/index.js";
 import { resolveDataUrl } from "./data_base_url.js";
 import { normalizeHexColor as normalizeSharedHexColor } from "./color_hex_utils.js";
 import { state as runtimeState, defaultCountryPalette, legacyDefaultCountryPalette } from "./state.js";
@@ -531,9 +532,7 @@ async function ensurePaletteAssetsLoaded(
 }
 
 function syncPaletteSourceControls() {
-  if (typeof runtimeState.updatePaletteSourceUIFn === "function") {
-    runtimeState.updatePaletteSourceUIFn();
-  }
+  callRuntimeHook(runtimeState, "updatePaletteSourceUIFn");
 }
 
 async function setActivePaletteSource(
@@ -570,17 +569,11 @@ async function setActivePaletteSource(
       overwriteCountryPalette,
       syncDefaultPalette,
     });
-    if (
-      publishObservers
-      && typeof runtimeState.renderPaletteFn === "function"
-    ) {
-      runtimeState.renderPaletteFn(runtimeState.currentPaletteTheme);
+    if (publishObservers) {
+      callRuntimeHook(runtimeState, "renderPaletteFn", runtimeState.currentPaletteTheme);
     }
-    if (
-      publishObservers
-      && typeof runtimeState.updatePaletteLibraryUIFn === "function"
-    ) {
-      runtimeState.updatePaletteLibraryUIFn();
+    if (publishObservers) {
+      callRuntimeHook(runtimeState, "updatePaletteLibraryUIFn");
     }
     if (publishObservers && syncUI) {
       syncPaletteSourceControls();

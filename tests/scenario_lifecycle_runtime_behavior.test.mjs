@@ -32,6 +32,11 @@ import {
 } from "../js/core/political_raster_worker_client.js";
 import {
   STATE_BUS_EVENTS,
+  STATE_NOTIFICATION_HOOK_NAMES,
+  STATE_HANDLER_HOOK_NAMES,
+  STATE_INTERNAL_HANDLER_HOOK_NAMES,
+  registerRuntimeHook,
+  readRegisteredRuntimeHookSource,
   off,
   subscribeStateBusEvent,
 } from "../js/core/state/index.js";
@@ -42,6 +47,17 @@ import {
 import {
   resolveScenarioShellOwnerCode,
 } from "../js/core/scenario_shell_overlay.js";
+
+const hookNames = new Set([
+  ...STATE_NOTIFICATION_HOOK_NAMES,
+  ...STATE_HANDLER_HOOK_NAMES,
+  ...STATE_INTERNAL_HANDLER_HOOK_NAMES,
+]);
+
+test.beforeEach((t) => {
+  const previousHooks = [...hookNames].map(name => [name, readRegisteredRuntimeHookSource(appState, name)]);
+  t.after(() => previousHooks.forEach(([name, hook]) => registerRuntimeHook(appState, name, hook)));
+});
 
 test("scenario shell explicit hints outrank inferred neighbor majority", () => {
   const ownerVotes = new Map([
@@ -98,7 +114,7 @@ function createLifecycleRuntime(runtimeState, overrides = {}) {
 }
 
 function createBaseState(overrides = {}) {
-  return {
+  const model = {
     activeScenarioId: "tno_1962",
     activeScenarioManifest: { scenario_id: "tno_1962" },
     activeScenarioMeshPack: {},
@@ -183,26 +199,28 @@ function createBaseState(overrides = {}) {
     renderProfile: "balanced",
     ...overrides,
   };
+  const hooks = Object.entries(model).filter(([key]) => hookNames.has(key));
+  hooks.forEach(([key, hook]) => registerRuntimeHook(model, key, hook));
+  return model;
 }
 
 function withAppStatePatch(patch, callback) {
   const previousValues = {};
   Object.keys(patch).forEach((key) => {
-    previousValues[key] = appState[key];
+    previousValues[key] = hookNames.has(key) ? readRegisteredRuntimeHookSource(appState, key) : appState[key];
   });
   applyAppStatePatch(patch);
   try {
     return callback();
   } finally {
-    Object.keys(previousValues).forEach((key) => {
-      appState[key] = previousValues[key];
-    });
+    applyAppStatePatch(previousValues);
   }
 }
 
 function applyAppStatePatch(patch) {
   Object.keys(patch).forEach((key) => {
-    appState[key] = patch[key];
+    if (hookNames.has(key)) registerRuntimeHook(appState, key, patch[key]);
+    else appState[key] = patch[key];
   });
 }
 
@@ -999,8 +1017,8 @@ test("real scenario detail staging returns a readiness patch without focus, UI, 
       focusCountryOverrideExpiresAt: 123,
     },
   });
-  model.updateScenarioUIFn = () => events.push("ui");
-  model.scheduleScenarioChunkRefreshFn = () => events.push("focus");
+  registerRuntimeHook(model, "updateScenarioUIFn", () => events.push("ui"));
+  registerRuntimeHook(model, "scheduleScenarioChunkRefreshFn", () => events.push("focus"));
 
   const result = await prepareScenarioDetailTopologyState({
     targetState: model,
@@ -2633,13 +2651,13 @@ test("scenario data health is committed before its warning toast is published", 
   });
   let toastCount = 0;
   let observedCommittedHealth = false;
-  appState.showToastFn = () => {
+  registerRuntimeHook(appState, "showToastFn", () => {
     toastCount += 1;
     observedCommittedHealth = (
       appState.scenarioDataHealth?.severity === "error"
       && appState.scenarioDataHealth?.expectedFeatureCount === 2500
     );
-  };
+  });
   try {
     const health = refreshScenarioDataHealth({ showWarningToast: true });
     assert.equal(toastCount, 1);
@@ -2647,7 +2665,7 @@ test("scenario data health is committed before its warning toast is published", 
     assert.equal(health.severity, "error");
     assert.equal(health.expectedFeatureCount, 2500);
   } finally {
-    appState.showToastFn = null;
+    registerRuntimeHook(appState, "showToastFn", null);
   }
 }));
 

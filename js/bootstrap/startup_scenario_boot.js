@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../core/state/index.js";
 import { loadScenarioBundle } from "../core/scenario_resources.js";
 import { applyScenarioBundleCommand } from "../core/scenario_dispatcher.js";
 import { normalizeScenarioId } from "../core/scenario/shared.js";
@@ -93,9 +94,7 @@ export function createStartupScenarioBootOwner({
     setBootState?.("scenario-apply");
     startBootMetric?.("scenario-apply");
     runtimeState.scenarioApplyInFlight = true;
-    if (typeof runtimeState.updateScenarioUIFn === "function") {
-      runtimeState.updateScenarioUIFn();
-    }
+    callRuntimeHook(runtimeState, "updateScenarioUIFn");
 
     try {
       await applyScenarioBundleCommand(defaultScenarioBundle, {
@@ -137,9 +136,7 @@ export function createStartupScenarioBootOwner({
       });
     } finally {
       runtimeState.scenarioApplyInFlight = false;
-      if (typeof runtimeState.updateScenarioUIFn === "function") {
-        runtimeState.updateScenarioUIFn();
-      }
+      callRuntimeHook(runtimeState, "updateScenarioUIFn");
     }
 
     if (!getSampleProjectIdFromUrl()) {

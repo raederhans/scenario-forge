@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../core/state/index.js";
 import { state as runtimeState } from "../core/state.js";
 import { setUiShellDebugTerritorySeededState } from "../core/state/actions/boot_actions.js";
 import { normalizeCountryCode, rebuildPresetState } from "../core/releasable_manager.js";
@@ -400,12 +401,8 @@ function revealUiShellDebugTerritoryPanels(documentRef = globalThis.document, st
     selectedCountryActionsSection.setAttribute("aria-hidden", "false");
     selectedCountryActionsSection.open = true;
   }
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
+  callRuntimeHook(state, "renderCountryListFn");
+  callRuntimeHook(state, "renderPresetTreeFn");
 }
 
 export {
