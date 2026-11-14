@@ -51,10 +51,6 @@ export function getAppearancePresetLayerVisibilityFields() {
   ];
 }
 
-export const APPEARANCE_PRESET_LAYER_VISIBILITY_FIELDS = Object.freeze(
-  getAppearancePresetLayerVisibilityFields(),
-);
-
 function cloneAppearanceValue(value) {
   if (value === undefined) return undefined;
   return JSON.parse(JSON.stringify(value));

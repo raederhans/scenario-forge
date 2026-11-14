@@ -68,10 +68,6 @@
 ## 多代理启动前必看文件
 - `lessons learned.md`
 - 当前任务对应的执行计划文档
-- 如果是 UI rework：
-  - `docs/UI_REWORK_EXECUTION_PLAN_01_FOUNDATION_AND_CONTRACTS_2026-04-05.md`
-  - `docs/UI_REWORK_EXECUTION_PLAN_02_MAINLINE_SHELL_AND_SIDEBAR_2026-04-05.md`
-  - `docs/UI_REWORK_EXECUTION_PLAN_03_SUPPORT_SURFACES_TRANSPORT_AND_HARDENING_2026-04-05.md`
 
 ## 收尾前最低验证要求
 - 相关改动文件 `lsp_diagnostics` 为 0
