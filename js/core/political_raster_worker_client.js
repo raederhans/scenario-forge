@@ -2,23 +2,6 @@
 // Protocol v4 carries scene/data generation identity through every reply.
 
 export const POLITICAL_RASTER_WORKER_PROTOCOL_VERSION = 4;
-export const POLITICAL_RASTER_WORKER_METRIC_NAMES = Object.freeze({
-  roundTripMs: "politicalRasterWorker.roundTripMs",
-  rasterMs: "politicalRasterWorker.rasterMs",
-  encodeMs: "politicalRasterWorker.encodeMs",
-  decodeMs: "politicalRasterWorker.decodeMs",
-  blitMs: "politicalRasterWorker.blitMs",
-  packetBuildMs: "politicalRasterWorker.packetBuildMs",
-  timeoutCount: "politicalRasterWorker.timeoutCount",
-  recycleCount: "politicalRasterWorker.recycleCount",
-  staleResponseCount: "politicalRasterWorker.staleResponseCount",
-  acceptedCount: "politicalRasterWorker.acceptedCount",
-  bitmapAcceptedCount: "politicalRasterWorker.bitmapAcceptedCount",
-  bitmapRejectedCount: "politicalRasterWorker.bitmapRejectedCount",
-  rejectedStaleCount: "politicalRasterWorker.rejectedStaleCount",
-  fallbackCount: "politicalRasterWorker.fallbackCount",
-});
-
 const POLITICAL_RASTER_WORKER_FLAG_QUERY_KEYS = Object.freeze([
   "political_raster_worker",
   "ENABLE_POLITICAL_RASTER_WORKER",
@@ -84,10 +67,6 @@ export function refreshPoliticalRasterWorkerFlag(search = globalThis.location?.s
   politicalRasterWorkerFlagCache.search = "";
   politicalRasterWorkerFlagCache.initialized = false;
   return ensurePoliticalRasterWorkerFlagCache(normalizedSearch);
-}
-
-export function isPoliticalRasterWorkerEnabled(search = globalThis.location?.search || "") {
-  return ensurePoliticalRasterWorkerFlagCache(search);
 }
 
 export function isPoliticalRasterWorkerBitmapEnabled(search = globalThis.location?.search || "") {

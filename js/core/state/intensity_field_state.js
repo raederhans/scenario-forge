@@ -148,15 +148,6 @@ export function serializeIntensityFieldsState(rawState) {
   };
 }
 
-export function bumpIntensityFieldChannelRevision(rawState, channelId) {
-  const fields = normalizeIntensityFieldsState(rawState);
-  const channel = fields.channels[channelId];
-  if (!channel) return fields;
-  channel.revision = (Math.max(0, Math.round(Number(channel.revision) || 0)) + 1);
-  bakeIntensityComposite(channel);
-  return fields;
-}
-
 export function updateIntensityFieldChannel(rawState, channelId, mutate) {
   const fields = normalizeIntensityFieldsState(rawState);
   const channel = fields.channels[channelId];

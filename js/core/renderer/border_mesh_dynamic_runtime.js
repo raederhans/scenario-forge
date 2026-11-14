@@ -40,40 +40,6 @@ export function buildOwnerBorderMesh({
   });
 }
 
-export function buildDynamicOwnerBorderMesh({
-  runtimeTopology,
-  ownershipContext,
-  shouldExcludeOwnerBorderEntity = () => false,
-  resolveOwnerBorderCode = () => '',
-  globalTopojson = globalThis.topojson,
-} = {}) {
-  return buildOwnerBorderMesh({
-    runtimeTopology,
-    ownershipContext,
-    excludeSea: true,
-    shouldExcludeOwnerBorderEntity,
-    resolveOwnerBorderCode,
-    globalTopojson,
-  });
-}
-
-export function countUnresolvedOwnerBorderEntities({
-  runtimeTopology,
-  ownershipContext = {},
-  shouldExcludeOwnerBorderEntity = () => false,
-  resolveOwnerBorderCode = () => '',
-} = {}) {
-  const geometries = runtimeTopology?.objects?.political?.geometries;
-  if (!Array.isArray(geometries) || !geometries.length) return 0;
-  let unresolvedCount = 0;
-  geometries.forEach((geometry) => {
-    if (shouldExcludeOwnerBorderEntity(geometry, { excludeSea: true })) return;
-    if (resolveOwnerBorderCode(geometry, ownershipContext)) return;
-    unresolvedCount += 1;
-  });
-  return unresolvedCount;
-}
-
 export function buildDetailAdmBorderMesh({
   topology,
   includedCountries,

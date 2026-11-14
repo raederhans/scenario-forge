@@ -62,10 +62,6 @@ function normalizeResourceFilter(resources) {
   return new Set(resources.map(normalizeResourceId).filter((resourceId) => RESOURCE_SET.has(resourceId)));
 }
 
-export function isStrategicResourceId(value) {
-  return RESOURCE_SET.has(normalizeResourceId(value));
-}
-
 export function shouldRenderStrategicResourceMarker(feature, options = {}) {
   const {
     showResourceMarkers = true,
