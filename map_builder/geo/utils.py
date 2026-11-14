@@ -9,6 +9,7 @@ from shapely.ops import transform
 from topojson import Topology
 
 from map_builder import config as cfg
+from map_builder.geo.geometry_validity import make_valid as _make_valid_geom
 
 
 def ensure_crs(gdf: gpd.GeoDataFrame, epsg: int = 4326) -> gpd.GeoDataFrame:
@@ -164,3 +165,15 @@ def smart_island_cull(
         return dissolved
 
     return filtered.reset_index(drop=True)
+
+
+def sanitize_polygon_layer(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if gdf.empty:
+        return gdf
+    clean = ensure_crs(gdf.copy())
+    clean["geometry"] = clean.geometry.apply(_make_valid_geom)
+    clean = clean[clean.geometry.notna() & ~clean.geometry.is_empty].copy()
+    if clean.empty:
+        return clean
+    clean = clean[clean.geometry.geom_type.isin(["Polygon", "MultiPolygon"])].copy()
+    return clean

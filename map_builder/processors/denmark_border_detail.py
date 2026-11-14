@@ -1,6 +1,8 @@
 """Denmark local border-detail refinement for North Schleswig."""
 from __future__ import annotations
 
+from map_builder.geo.geometry_validity import make_valid as _make_valid_geom
+
 import geopandas as gpd
 import pandas as pd
 from shapely.ops import unary_union
@@ -21,24 +23,6 @@ HISTORICAL_NAMES = {
 }
 MAX_DRIFT_KM2 = 0.5
 MAX_OVERLAP_KM2 = 0.05
-
-
-def _make_valid_geom(geom):
-    if geom is None or geom.is_empty:
-        return None
-    try:
-        if hasattr(geom, "make_valid"):
-            geom = geom.make_valid()
-        else:
-            geom = geom.buffer(0)
-    except Exception:
-        try:
-            geom = geom.buffer(0)
-        except Exception:
-            return None
-    if geom is None or geom.is_empty:
-        return None
-    return geom
 
 
 def _sanitize_polygon_layer(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:

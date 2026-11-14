@@ -1,6 +1,8 @@
 """Shared shell coverage repair helpers for managed detail countries."""
 from __future__ import annotations
 
+from map_builder.geo.geometry_validity import make_valid as _make_valid
+
 from dataclasses import dataclass
 
 import geopandas as gpd
@@ -65,24 +67,6 @@ def _ensure_epsg4326(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if gdf.crs.to_epsg() != 4326:
         return gdf.to_crs("EPSG:4326")
     return gdf
-
-
-def _make_valid(geom):
-    if geom is None or geom.is_empty:
-        return None
-    try:
-        if hasattr(geom, "make_valid"):
-            geom = geom.make_valid()
-        else:
-            geom = geom.buffer(0)
-    except Exception:
-        try:
-            geom = geom.buffer(0)
-        except Exception:
-            return None
-    if geom is None or geom.is_empty:
-        return None
-    return geom
 
 
 def _safe_unary_union(geometries: list) -> object | None:
