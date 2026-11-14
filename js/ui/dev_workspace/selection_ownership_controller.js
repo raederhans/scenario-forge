@@ -1,6 +1,6 @@
 import { state as runtimeState } from "../../core/state.js";
 import { t } from "../i18n.js";
-import { showToast } from "../toast.js";
+import { showToast } from "../components/toast.js";
 
 function ui(key) {
   return t(key, "ui");

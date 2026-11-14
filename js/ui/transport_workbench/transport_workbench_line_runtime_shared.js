@@ -1,3 +1,4 @@
+import { createInitialLoadState } from "./transport_workbench_preview_state.js";
 import { getTransportAsset } from "../../core/data_service.js";
 import { registerMapcreatorSnapshotProvider } from "../../core/mapcreator_snapshot.js";
 import { createChunkLoadScheduler } from "../../core/scenario/chunk_load_scheduler.js";
@@ -138,17 +139,6 @@ export function syncTransportWorkbenchSvgGroupOrder(group, orderedNodes) {
     }
     previousNode = node;
   });
-}
-
-function createInitialLoadState() {
-  return {
-    status: "idle",
-    error: null,
-    manifest: null,
-    audit: null,
-    previewStatus: "idle",
-    fullStatus: "idle",
-  };
 }
 
 export function getTransportWorkbenchPackPath(manifest, mode, key) {
@@ -456,4 +446,12 @@ export function createTransportWorkbenchLinePackRuntime(definition, {
     setActivePack,
     release,
   };
+}
+
+export function normalizeTransportWorkbenchSourceFlags(flags) {
+  if (Array.isArray(flags)) return flags.filter(Boolean).map((value) => String(value));
+  if (typeof flags === "string" && flags.trim()) {
+    return flags.split("|").map((value) => value.trim()).filter(Boolean);
+  }
+  return [];
 }

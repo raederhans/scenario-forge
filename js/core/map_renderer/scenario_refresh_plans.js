@@ -1,3 +1,5 @@
+import { normalizeLayerKeyList } from "../renderer/string_list_normalizers.js";
+import { normalizeStringList } from "../renderer/string_list_normalizers.js";
 import {
   DEFAULT_RENDER_INVALIDATION_PASSES,
   UNSUPPORTED_RENDER_PASS_INPUT_KEYS,
@@ -7,26 +9,6 @@ import {
   hasAnyTargetResource,
   resolveFirstFrameTargetResources,
 } from "./render_invalidation_catalog.js";
-
-function normalizeLayerKeyList(layerKeys = []) {
-  return Array.from(
-    new Set(
-      (Array.isArray(layerKeys) ? layerKeys : [])
-        .map((layerKey) => String(layerKey || "").trim().toLowerCase())
-        .filter(Boolean)
-    )
-  );
-}
-
-function normalizeStringList(values = []) {
-  return Array.from(
-    new Set(
-      (Array.isArray(values) ? values : [])
-        .map((value) => String(value || "").trim())
-        .filter(Boolean)
-    )
-  );
-}
 
 function createRendererRefreshPlan({
   source,

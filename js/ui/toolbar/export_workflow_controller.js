@@ -2,7 +2,7 @@ import { createExportBakeRuntime } from "./export_bake_runtime.js";
 import { normalizeExportWorkbenchUiState } from "../../core/state.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { buildExportArtifactPackage } from "../../core/export_artifact_package.js";
-import { showToast } from "../toast.js";
+import { showToast } from "../components/toast.js";
 import { showExportFailureToast } from "./export_failure_handler.js";
 import { buildBakePackMetadata, buildBakePackPackageFiles, buildExportArtifactProjectContext, buildExportArtifactScenarioContext, buildExportUiManifestSnapshot, buildPerLayerPackageFiles, getBakePackLayerIds } from "./export_artifact_model.js";
 import { createExportWorkbenchController } from "./export_workbench_controller.js";

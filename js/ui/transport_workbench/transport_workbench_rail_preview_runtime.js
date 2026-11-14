@@ -1,3 +1,4 @@
+export { normalizeTransportWorkbenchSourceFlags as normalizeRailSourceFlags } from "./transport_workbench_line_runtime_shared.js";
 import { normalizeTransportWorkbenchNumber as normalizeNumber } from "./transport_workbench_line_runtime_shared.js";
 
 // Pure decision logic for the Japan rail workbench preview. No DOM, no carrier
@@ -31,14 +32,6 @@ const STATION_IMPORTANCE_STYLE = {
   capital_core: { sizeMultiplier: 1.22, labelScale: 1.12, minLabelScale: 1.06 },
 };
 const INACTIVE_STATUS = new Set(["disused", "abandoned", "construction"]);
-
-export function normalizeRailSourceFlags(flags) {
-  if (Array.isArray(flags)) return flags.filter(Boolean).map((value) => String(value));
-  if (typeof flags === "string" && flags.trim()) {
-    return flags.split("|").map((value) => value.trim()).filter(Boolean);
-  }
-  return [];
-}
 
 export function normalizeRailLineClass(value) {
   const normalized = String(value || "").trim().toLowerCase();

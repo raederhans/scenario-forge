@@ -1,11 +1,5 @@
+import { requireFunction } from "./require_function.js";
 import { getSurfaceCoverage, intersectCoverage, transformCoverage } from "./cached_surface_coverage.js";
-
-function requireFunction(candidate, label) {
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label} must be a function.`);
-  }
-  return candidate;
-}
 
 function requirePassNames(candidate) {
   if (!Array.isArray(candidate) || candidate.length === 0) {

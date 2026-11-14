@@ -1,3 +1,4 @@
+import { frozenCopy } from "./frozen_copy.js";
 import { resolveDataUrl } from "../data_base_url.js";
 import countryCodeMapping from "../../../data/thematic_layers/wgi_country_code_mapping.json" with { type: "json" };
 import { normalizeCountryCodeAlias } from "../country_code_aliases.js";
@@ -37,14 +38,6 @@ async function defaultFetchJson(url) {
 
 function requireCondition(condition, message) {
   if (!condition) throw new Error(`Invalid WGI data: ${message}`);
-}
-
-function frozenCopy(value) {
-  if (Array.isArray(value)) return Object.freeze(value.map(frozenCopy));
-  if (value && typeof value === "object") {
-    return Object.freeze(Object.fromEntries(Object.entries(value).map(([key, child]) => [key, frozenCopy(child)])));
-  }
-  return value;
 }
 
 function normalizePayload(manifest, metrics, metricId) {

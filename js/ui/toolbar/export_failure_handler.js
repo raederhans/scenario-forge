@@ -3,7 +3,7 @@
 // 不负责导出流程、状态读写或 workbench UI 编排。
 
 import { t } from "../i18n.js";
-import { showToast } from "../toast.js";
+import { showToast } from "../components/toast.js";
 
 const EXPORT_FAILURE_KINDS = Object.freeze({
   ARTIFACT_FAILED: "artifact-failed",

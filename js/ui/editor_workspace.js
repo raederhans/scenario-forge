@@ -1,5 +1,5 @@
 import { createButton } from "./components/button.js";
-import { createUiIcon, setUiIcon } from "./ui_icons.js";
+import { createUiIcon, setUiIcon } from "./components/ui_icons.js";
 import { initCommandPalette } from "./command_palette.js";
 
 // The workspace moves existing controls so their business owners keep their

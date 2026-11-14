@@ -7,7 +7,7 @@ import {
 } from "../core/render_boundary.js";
 import { registerRuntimeHook } from "../core/state/index.js";
 import { initPresetState } from "../core/preset_state.js";
-import { initToast, showToast } from "../ui/toast.js";
+import { initToast, showToast } from "../ui/components/toast.js";
 
 function normalizeFlushReason(flushReason) {
   const normalized = String(flushReason || "").trim();

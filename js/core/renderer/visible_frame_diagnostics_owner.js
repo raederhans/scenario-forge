@@ -1,3 +1,4 @@
+import { requireFunction } from "./require_named_function.js";
 import { setFirstVisibleFramePaintedState } from "../state/actions/renderer_diagnostics_actions.js";
 
 const REQUIRED_EFFECT_NAMES = Object.freeze([
@@ -25,14 +26,6 @@ const STATUS_COUNTER_NAMES = Object.freeze({
   missing: "visibleFrameMissingCount",
   blocked: "visibleFrameBlockedCount",
 });
-
-function requireFunction(source, name, label) {
-  const candidate = source?.[name];
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label}.${name} must be a function.`);
-  }
-  return candidate;
-}
 
 function normalizeReason(reason, defaultReason) {
   const normalized = String(reason || "").trim();

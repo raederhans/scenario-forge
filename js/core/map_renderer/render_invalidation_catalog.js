@@ -1,13 +1,4 @@
-function normalizeStringList(values = []) {
-  return Array.from(
-    new Set(
-      (Array.isArray(values) ? values : [])
-        .map((value) => String(value || "").trim())
-        .filter(Boolean)
-    )
-  );
-}
-
+import { normalizeStringList } from "../renderer/string_list_normalizers.js";
 export const PASS_RESOURCE_MAP = Object.freeze({
   background: Object.freeze(["backgroundBuffer"]),
   physicalBase: Object.freeze(["physicalBaseBuffer"]),

@@ -1,18 +1,9 @@
+import { normalizeIterableStringList as normalizeStringList } from "../renderer/string_list_normalizers.js";
 import {
   EXACT_AFTER_SETTLE_ALWAYS_TARGET_PASSES,
   EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES,
   getExactAfterSettleDprRestorePasses,
 } from "../renderer/exact_after_settle_pass_catalog.js";
-
-function normalizeStringList(values = []) {
-  return Array.from(
-    new Set(
-      (Array.isArray(values) ? values : Array.from(values || []))
-        .map((value) => String(value || "").trim())
-        .filter(Boolean)
-    )
-  );
-}
 
 function createExactAfterSettleRefreshPlan({
   profile = null,

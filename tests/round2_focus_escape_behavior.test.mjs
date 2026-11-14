@@ -11,7 +11,7 @@ import { createFacilitySurfaceOwner } from "../js/core/renderer/facility_surface
 import { initShortcuts } from "../js/ui/shortcuts.js";
 import { state } from "../js/core/state.js";
 import { initToolbar } from "../js/ui/toolbar.js";
-import { showAppDialog } from "../js/ui/app_dialog.js";
+import { showAppDialog } from "../js/ui/components/app_dialog.js";
 
 class Node {
   constructor(tag, doc) {

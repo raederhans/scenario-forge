@@ -1,7 +1,7 @@
 import { createUnitCounterPreview } from "./unit_counter_preview.js";
 import { createButton } from "../components/button.js";
 import { createTextInput } from "../components/text_input.js";
-import { setUiIcon } from "../ui_icons.js";
+import { setUiIcon } from "../components/ui_icons.js";
 import { DEFAULT_UNIT_COUNTER_PRESET_ID, getUnitCounterCategoryLabel, getUnitCounterIconPathById } from "../../core/unit_counter_presets.js";
 
 export function createStrategicPanelView({

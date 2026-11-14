@@ -1,11 +1,5 @@
+import { requireFunction } from "../renderer/require_function.js";
 import { createFrameSummary as createSummary } from "./frame_summary.js";
-
-function requireFunction(candidate, label) {
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label} must be a function.`);
-  }
-  return candidate;
-}
 
 function requireConstant(candidate, label) {
   const value = String(candidate || "").trim();

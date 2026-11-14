@@ -2,8 +2,8 @@
 // styled_selects、app_dialog、toast 生成结构。悬停和聚焦只做标记（data-force），
 // 由截图 spec 通过 DevTools 协议强制伪类，页面本身不模拟交互。
 import { initStyledSelects } from "../../../js/ui/styled_selects.js";
-import { showAppDialog } from "../../../js/ui/app_dialog.js";
-import { initToast, showToast } from "../../../js/ui/toast.js";
+import { showAppDialog } from "../../../js/ui/components/app_dialog.js";
+import { initToast, showToast } from "../../../js/ui/components/toast.js";
 
 const STATE_LABELS = {
   default: "默认",

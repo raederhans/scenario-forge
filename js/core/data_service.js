@@ -1,3 +1,4 @@
+import { createResourceError as createDataServiceError } from "./data_loader/resource_error.js";
 import { cloneJsonLike } from "./json_clone.js";
 import catalogPayload from "../../data/CATALOG.json" with { type: "json" };
 import { loadMeasuredJsonResource } from "./data_loader.js";
@@ -41,13 +42,6 @@ function resolveEntryCachePolicy(entry, overridePolicy = "") {
   if (normalizedOverridePolicy) return normalizedOverridePolicy;
   const normalizedEntryPolicy = String(entry?.cachePolicy || "").trim();
   return normalizedEntryPolicy || "default";
-}
-
-function createDataServiceError(code, message, extra = {}) {
-  const error = new Error(message);
-  error.code = code;
-  Object.assign(error, extra);
-  return error;
 }
 
 function createRequestId(kind, id) {

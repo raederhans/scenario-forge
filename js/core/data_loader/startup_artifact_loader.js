@@ -1,3 +1,4 @@
+import { createResourceError as createDataLoaderError } from "./resource_error.js";
 import { resolveDataUrl } from "../data_base_url.js";
 import { resolveDataAssetUrl } from "../runtime_asset_registry.js";
 import {
@@ -61,16 +62,6 @@ export async function loadMeasuredJsonResource(
     signal = null,
   } = {}
 ) {
-  const createDataLoaderError = (
-    code,
-    message,
-    extra = {},
-  ) => {
-    const error = new Error(message);
-    error.code = code;
-    Object.assign(error, extra);
-    return error;
-  };
   if (!url) {
     throw createDataLoaderError("missing-url", `[data_loader] Missing URL for ${label}.`, {
       label,

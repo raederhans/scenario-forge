@@ -1,3 +1,4 @@
+import { requireFunction } from "../renderer/require_named_function.js";
 const DEFAULT_REASON = "renderer-transaction-reset";
 const REFRESH_RESET_REASON = "renderer-refresh-reset";
 const TOPOLOGY_CHANGED_REASON = "renderer-topology-changed";
@@ -27,14 +28,6 @@ const REQUIRED_EFFECT_NAMES = Object.freeze([
   "setHitCanvasDirty",
   "resetHitCanvasTopologyRevision",
 ]);
-
-function requireFunction(source, name, label) {
-  const candidate = source?.[name];
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label}.${name} must be a function.`);
-  }
-  return candidate;
-}
 
 function normalizeReason(reason, defaultReason) {
   const normalized = String(reason || "").trim();

@@ -1,3 +1,4 @@
+import { normalizeBorderColor } from "./toolbar/appearance_border_owner.js";
 import { createRiverPaintControls } from "./river_paint_controls.js";
 import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
@@ -47,11 +48,11 @@ import {
 } from "../core/palette_manager.js";
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario/scenario_resources.js";
 import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
-import { showToast } from "./toast.js";
+import { showToast } from "./components/toast.js";
 import { createToolGuidance } from "./toolbar/tool_guidance.js";
 import { createMobileEditingHintController } from "./toolbar/mobile_editing_hint_controller.js";
-import { createUiIcon, setUiIcon } from "./ui_icons.js";
-import { showAppDialog } from "./app_dialog.js";
+import { createUiIcon, setUiIcon } from "./components/ui_icons.js";
+import { showAppDialog } from "./components/app_dialog.js";
 import { createUiSurfaceUrlState } from "./ui_surface_url_state.js";
 import { loadPublicSampleProjectIntoRuntime } from "../core/sample_project_import_workflow.js";
 import { loadPublicSampleProjectList } from "../core/sample_project_registry.js";
@@ -1304,14 +1305,7 @@ function initToolbar({ render } = {}) {
   const normalizeOceanFillColor = (value) => {
     return normalizeHexColor(value, "#aadaff");
   };
-  const normalizeHexColor = (value, fallbackColor) => {
-    const candidate = String(value || "").trim();
-    if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate;
-    if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
-      return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`;
-    }
-    return fallbackColor;
-  };
+  const normalizeHexColor = normalizeBorderColor;
   if (!runtimeState.styleConfig.ocean || typeof runtimeState.styleConfig.ocean !== "object") {
     runtimeState.styleConfig.ocean = {};
   }

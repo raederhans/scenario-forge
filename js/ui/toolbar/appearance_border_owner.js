@@ -6,7 +6,7 @@ import {
   setAppearanceStyleGroupState,
 } from "../../core/state/actions/appearance_actions.js";
 
-function normalizeBorderColor(value, fallbackColor) {
+export function normalizeBorderColor(value, fallbackColor) {
   const candidate = String(value || "").trim();
   if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate;
   if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {

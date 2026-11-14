@@ -1,10 +1,4 @@
-function requireFunction(candidate, label) {
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label} must be a function.`);
-  }
-  return candidate;
-}
-
+import { requireFunction } from "./require_function.js";
 function createDeferredMetricPayload(featureCount) {
   return {
     featureCount,

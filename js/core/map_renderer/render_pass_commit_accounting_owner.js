@@ -1,3 +1,4 @@
+import { requireFunction } from "../renderer/require_named_function.js";
 const REQUIRED_EFFECT_NAMES = Object.freeze([
   "clearPassFullReferenceTransforms",
   "incrementPerfCounter",
@@ -15,14 +16,6 @@ const REQUIRED_GETTER_NAMES = Object.freeze([
   "getVisibleFrameIdentity",
   "nowMs",
 ]);
-
-function requireFunction(source, name, label) {
-  const candidate = source?.[name];
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label}.${name} must be a function.`);
-  }
-  return candidate;
-}
 
 function createTrace() {
   return {

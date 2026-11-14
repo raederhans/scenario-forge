@@ -1,3 +1,4 @@
+import { createInitialRenderStats } from "./transport_workbench_preview_state.js";
 import {
   ensureTransportWorkbenchCarrierForManifest,
   projectTransportWorkbenchCarrierPoint,
@@ -29,17 +30,6 @@ function createInitialLoadState() {
     singlePack: false,
     previewStatus: "idle",
     fullStatus: "idle",
-  };
-}
-
-function createInitialRenderStats() {
-  return {
-    renderMode: "inspect",
-    totalFeatures: 0,
-    visibleFeatures: 0,
-    filteredFeatures: 0,
-    visibleLabels: 0,
-    aggregateUnits: 0,
   };
 }
 

@@ -1,3 +1,4 @@
+import { requireFunction } from "../renderer/require_named_function.js";
 import {
   setClickHoverOverlayDirtyState,
   setHoveredFeatureIdsState,
@@ -29,14 +30,6 @@ const REQUIRED_EFFECT_NAMES = Object.freeze([
 ]);
 
 const REQUIRED_HELPER_NAMES = Object.freeze(["getFacilityKey"]);
-
-function requireFunction(source, name, label) {
-  const candidate = source?.[name];
-  if (typeof candidate !== "function") {
-    throw new TypeError(`${label}.${name} must be a function.`);
-  }
-  return candidate;
-}
 
 function createApi(source, names, label) {
   return Object.fromEntries(names.map((name) => [name, requireFunction(source, name, label)]));
