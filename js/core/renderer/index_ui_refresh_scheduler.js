@@ -308,8 +308,8 @@ export function createIndexUiRefreshScheduler({
         refreshPresetTree: shouldRefreshPresetTree,
       });
     }
-    if (shouldRefreshPresetTree && typeof runtimeState.renderPresetTreeFn === "function") {
-      runtimeState.renderPresetTreeFn();
+    if (shouldRefreshPresetTree) {
+      callRuntimeHook(runtimeState, "renderPresetTreeFn");
     }
   }
 

@@ -909,9 +909,7 @@ async function applyScenarioBundle(
     if (markDirtyReason) {
       markDirty(markDirtyReason);
     }
-    if (typeof runtimeState.triggerScenarioGuideFn === "function") {
-      runtimeState.triggerScenarioGuideFn();
-    }
+    callRuntimeHook(runtimeState, "triggerScenarioGuideFn");
 
     if (showToastOnComplete) {
       showToast(

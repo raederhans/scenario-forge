@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { state as runtimeState } from "../../core/state.js";
 import { normalizeScenarioGeoLocalePatchPayload } from "../../core/data_loader.js";
 import { getEffectiveCityCollection } from "../../core/map_renderer/public.js";
@@ -737,9 +738,7 @@ export function createScenarioTextEditorsController({
         }
         applyScenarioCountrySaveSuccess(result, built.payload);
         flushDevWorkspaceRender("dev-workspace-country-save");
-        if (typeof runtimeState.updateScenarioUIFn === "function") {
-          runtimeState.updateScenarioUIFn();
-        }
+        callRuntimeHook(runtimeState, "updateScenarioUIFn");
         showToast(ui("Country names saved."), {
           title: ui("Country Name Editor"),
           tone: "success",
@@ -788,9 +787,7 @@ export function createScenarioTextEditorsController({
         }
         applyScenarioCapitalSaveSuccess(result, built.payload);
         flushDevWorkspaceRender("dev-workspace-capital-save");
-        if (typeof runtimeState.updateScenarioUIFn === "function") {
-          runtimeState.updateScenarioUIFn();
-        }
+        callRuntimeHook(runtimeState, "updateScenarioUIFn");
         showToast(ui("Scenario capital saved."), {
           title: ui("Capital Editor"),
           tone: "success",

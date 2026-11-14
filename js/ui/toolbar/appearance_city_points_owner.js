@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { normalizeCityLayerStyleConfig } from "../../core/state.js";
 import {
   patchAppearanceStyleGroupState,
@@ -62,7 +63,7 @@ export function createAppearanceCityPointsOwner({
   const nodes = collectCityPointsNodes(documentRef);
 
   const persistCityViewSettings = () => {
-    runtimeState.persistViewSettingsFn?.();
+    callRuntimeHook(runtimeState, "persistViewSettingsFn");
   };
 
   const syncCityPointsConfig = () => {
@@ -179,7 +180,7 @@ export function createAppearanceCityPointsOwner({
       nodes.showModernPlaceNames.addEventListener("change", (event) => {
         // 检查器里的同名开关也转发到这里，状态只在外观这一处修改；改完让检查器同步勾选和今名对照。
         runtimeState.showModernPlaceNames = !!event.target.checked;
-        runtimeState.refreshCountryInspectorDetailFn?.();
+        callRuntimeHook(runtimeState, "refreshCountryInspectorDetailFn");
         renderDirty("city-points-modern-names-toggle");
       });
       nodes.showModernPlaceNames.dataset.bound = "true";
@@ -191,9 +192,7 @@ export function createAppearanceCityPointsOwner({
         if (runtimeState.showCityPoints) {
           // 城市点开关同时触发基础城市数据和 scenario optional layer；
           // 前者给普通城市标记，后者给剧本覆盖和首都提示。
-          if (typeof runtimeState.ensureBaseCityDataFn === "function") {
-            void runtimeState.ensureBaseCityDataFn({ reason: "toolbar-toggle", renderNow: true });
-          }
+          void callRuntimeHook(runtimeState, "ensureBaseCityDataFn", { reason: "toolbar-toggle", renderNow: true });
           void ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: true });
         }
         persistCityViewSettings();

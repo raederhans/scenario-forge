@@ -239,11 +239,11 @@ export function createAppearanceControlsController({
   const politicalDisplayModeOwner = createPoliticalDisplayModeOwner({ runtimeState, t });
   const thematicWgiOwner = createThematicWgiOwner({
     runtimeState, t, markDirty,
-    refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
+    refreshColorState: (options) => callRuntimeHook(runtimeState, "refreshColorStateFn", options),
   });
   const populationSpatialOwner = createPopulationSpatialOwner({
     runtimeState, t, markDirty,
-    refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
+    refreshColorState: (options) => callRuntimeHook(runtimeState, "refreshColorStateFn", options),
   });
   const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
@@ -273,9 +273,7 @@ export function createAppearanceControlsController({
   const ensureAppearancePresetLayerData = () => {
     if (runtimeState.showCityPoints) {
       const loadOptions = { reason: "appearance-preset-apply", renderNow: true };
-      if (typeof runtimeState.ensureBaseCityDataFn === "function") {
-        void runtimeState.ensureBaseCityDataFn(loadOptions);
-      }
+      void callRuntimeHook(runtimeState, "ensureBaseCityDataFn", loadOptions);
       if (typeof ensureActiveScenarioOptionalLayerLoaded === "function") {
         void ensureActiveScenarioOptionalLayerLoaded("cities", loadOptions);
       }
@@ -366,7 +364,7 @@ export function createAppearanceControlsController({
       // The political pass reads resolved colors, not the metric selector itself.
       // Refresh that cache before repainting a changed strategic lens.
       if (reason !== "strategic-resource-filter" && reason !== "toggle-strategic-resource-markers") {
-        runtimeState.refreshColorStateFn?.({ renderNow: false });
+        callRuntimeHook(runtimeState, "refreshColorStateFn", { renderNow: false });
       }
       scheduleLayerRenderDirty(reason);
     },
@@ -473,7 +471,7 @@ export function createAppearanceControlsController({
       panel.classList.toggle("hidden", !isActive);
       panel.hidden = !isActive;
     });
-    runtimeState.syncFacilityInfoCardVisibilityFn?.();
+    callRuntimeHook(runtimeState, "syncFacilityInfoCardVisibilityFn");
   };
 
   const moveAppearanceTabFocus = (currentButton, direction) => {
@@ -746,8 +744,8 @@ export function createAppearanceControlsController({
       toggleUrban.checked = !!runtimeState.showUrban;
       toggleUrban.addEventListener("change", (event) => {
         setAppearanceVisibilityState(runtimeState, "showUrban", event.target.checked);
-        if (runtimeState.showUrban && typeof runtimeState.ensureContextLayerDataFn === "function") {
-          void runtimeState.ensureContextLayerDataFn("urban", { reason: "toolbar-toggle", renderNow: true });
+        if (runtimeState.showUrban) {
+          void callRuntimeHook(runtimeState, "ensureContextLayerDataFn", "urban", { reason: "toolbar-toggle", renderNow: true });
         }
         scheduleLayerRenderDirty("toggle-urban");
       });

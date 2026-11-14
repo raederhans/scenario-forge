@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import { setThematicWgiStyleState } from "../../core/state/actions/thematic_wgi_actions.js";
 import { setPopulationStyleState } from "../../core/state/actions/population_spatial_actions.js";
@@ -168,7 +169,7 @@ export function createThematicWgiOwner({
         setAppearanceVisibilityState(runtimeState, "strategicChoroplethMetric", "");
         showLegend(runtimeState);
       }
-      runtimeState.persistViewSettingsFn?.();
+      callRuntimeHook(runtimeState, "persistViewSettingsFn");
       markDirty("toggle-thematic-wgi");
       refresh();
     });
@@ -179,7 +180,7 @@ export function createThematicWgiOwner({
       if (previous.metricId === metricId && isThematicWgiSelectionSupported(previous)) return;
       const style = normalizeThematicWgiStyle({ enabled: previous.enabled, metricId });
       setThematicWgiStyleState(runtimeState, style);
-      runtimeState.persistViewSettingsFn?.();
+      callRuntimeHook(runtimeState, "persistViewSettingsFn");
       markDirty("select-thematic-wgi-metric");
       refresh();
     });

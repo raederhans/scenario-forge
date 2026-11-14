@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 // Transport workbench apply bridge owner.
 // Owns workbench-to-main-map apply decisions and the side-effect sequence.
 
@@ -183,8 +184,8 @@ export function createTransportWorkbenchApplyBridgeOwner(runtimeState, {
     });
     const dataLayerKeys = Array.isArray(patch.dataLayerKeys) ? patch.dataLayerKeys : [];
     try {
-      if (dataLayerKeys.length && typeof runtimeState.ensureContextLayerDataFn === "function") {
-        await runtimeState.ensureContextLayerDataFn(
+      if (dataLayerKeys.length) {
+        await callRuntimeHook(runtimeState, "ensureContextLayerDataFn",
           dataLayerKeys.length === 1 ? dataLayerKeys[0] : dataLayerKeys,
           { reason: "transport-workbench-apply", renderNow: false },
         );
@@ -192,11 +193,9 @@ export function createTransportWorkbenchApplyBridgeOwner(runtimeState, {
     } finally {
       // 无论 preload 成功还是失败，都要把 workbench UI、dirty 状态和主图刷新推到同一出口，
       // 避免按钮状态已经切换而主图仍停在旧 family/pack。
-      runtimeState.updateTransportAppearanceUIFn?.();
+      callRuntimeHook(runtimeState, "updateTransportAppearanceUIFn");
       markDirty("transport-workbench-apply");
-      if (typeof runtimeState.renderNowFn === "function") {
-        runtimeState.renderNowFn("transport-workbench-apply");
-      }
+      callRuntimeHook(runtimeState, "renderNowFn", "transport-workbench-apply");
     }
     return true;
   };

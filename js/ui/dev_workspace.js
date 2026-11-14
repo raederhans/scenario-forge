@@ -1,5 +1,5 @@
 import { state as runtimeState } from "../core/state.js";
-import { registerRuntimeHook } from "../core/state/index.js";
+import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import {
   addFeatureToDevSelection,
   applyDevMacroFillCurrentCountry,
@@ -600,7 +600,7 @@ function setExpandedState(nextValue, { bottomDock, panel, toggleBtn, persist = t
   if (persist) {
     writeStoredExpanded(expanded);
   }
-  runtimeState.updateDevWorkspaceUIFn?.();
+  callRuntimeHook(runtimeState, "updateDevWorkspaceUIFn");
 }
 
 function copySelectionToClipboard(format, previewEl) {
@@ -611,7 +611,7 @@ function copySelectionToClipboard(format, previewEl) {
       title: ui("Selection Clipboard"),
       tone: "warning",
     });
-    runtimeState.updateDevWorkspaceUIFn?.();
+    callRuntimeHook(runtimeState, "updateDevWorkspaceUIFn");
     return;
   }
 
@@ -624,7 +624,7 @@ function copySelectionToClipboard(format, previewEl) {
       tone: "warning",
       duration: 4200,
     });
-    runtimeState.updateDevWorkspaceUIFn?.();
+    callRuntimeHook(runtimeState, "updateDevWorkspaceUIFn");
     return;
   }
 
@@ -635,7 +635,7 @@ function copySelectionToClipboard(format, previewEl) {
         title: ui("Selection copied"),
         tone: "success",
       });
-      runtimeState.updateDevWorkspaceUIFn?.();
+      callRuntimeHook(runtimeState, "updateDevWorkspaceUIFn");
     })
     .catch(() => {
       previewEl?.focus();
@@ -645,7 +645,7 @@ function copySelectionToClipboard(format, previewEl) {
         tone: "warning",
         duration: 4200,
       });
-      runtimeState.updateDevWorkspaceUIFn?.();
+      callRuntimeHook(runtimeState, "updateDevWorkspaceUIFn");
     });
 }
 

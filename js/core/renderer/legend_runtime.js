@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../state/index.js";
 import { LegendManager, createRevisionedLegendColorReader } from "../legend_manager.js";
 import { createDeferredPanelRender } from "../deferred_panel_render.js";
 import { getPoliticalDisplayLegend } from "../political_display_mode.js";
@@ -47,9 +48,7 @@ export function createLegendRuntime({ state, runtimeState, getMapContainer, clam
     deferredLegendRender ||= createDeferredPanelRender({
       render: () => {
         renderLegend();
-        if (typeof runtimeState.updateLegendUI === "function") {
-          runtimeState.updateLegendUI();
-        }
+        callRuntimeHook(runtimeState, "updateLegendUI");
       },
     });
     deferredLegendRender.request();

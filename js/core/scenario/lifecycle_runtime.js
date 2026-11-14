@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../state/index.js";
 import { getRiverPaintRuntime } from "../river_paint/runtime.js";
 import { setRiverPaintState } from "../state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../map_editing_policy.js";
@@ -66,9 +67,7 @@ function createScenarioLifecycleRuntime({
       next[countryCode] = false;
     });
     runtimeState.parentBorderEnabledByCountry = next;
-    if (typeof runtimeState.updateParentBorderCountryListFn === "function") {
-      runtimeState.updateParentBorderCountryListFn();
-    }
+    callRuntimeHook(runtimeState, "updateParentBorderCountryListFn");
   }
 
   function restoreParentBordersAfterScenario() {
@@ -78,9 +77,7 @@ function createScenarioLifecycleRuntime({
       };
     }
     runtimeState.scenarioParentBorderEnabledBeforeActivate = null;
-    if (typeof runtimeState.updateParentBorderCountryListFn === "function") {
-      runtimeState.updateParentBorderCountryListFn();
-    }
+    callRuntimeHook(runtimeState, "updateParentBorderCountryListFn");
   }
 
   function applyScenarioPaintMode() {
@@ -100,9 +97,7 @@ function createScenarioLifecycleRuntime({
       runtimeState.ui.politicalEditingExpanded = false;
       runtimeState.ui.scenarioVisualAdjustmentsOpen = false;
     }
-    if (typeof runtimeState.updatePaintModeUIFn === "function") {
-      runtimeState.updatePaintModeUIFn();
-    }
+    callRuntimeHook(runtimeState, "updatePaintModeUIFn");
   }
 
   function restorePaintModeAfterScenario() {
@@ -119,9 +114,7 @@ function createScenarioLifecycleRuntime({
       }
     }
     runtimeState.scenarioPaintModeBeforeActivate = null;
-    if (typeof runtimeState.updatePaintModeUIFn === "function") {
-      runtimeState.updatePaintModeUIFn();
-    }
+    callRuntimeHook(runtimeState, "updatePaintModeUIFn");
   }
 
   function resetToScenarioBaseline(
@@ -305,7 +298,7 @@ function createScenarioLifecycleRuntime({
       });
     }
     // Chunked scenarios never load the default detail topology; the base map does need it.
-    if (runtimeState.detailDeferred) void runtimeState.ensureDetailTopologyFn?.();
+    if (runtimeState.detailDeferred) void callRuntimeHook(runtimeState, "ensureDetailTopologyFn");
   }
 
   return {

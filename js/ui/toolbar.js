@@ -701,7 +701,7 @@ function initToolbar({ render } = {}) {
     quickFillCountryBtn,
     dockQuickFillHint,
     refreshPaintModeUi: () => {
-      if (typeof runtimeState.updatePaintModeUIFn === "function") runtimeState.updatePaintModeUIFn();
+      callRuntimeHook(runtimeState, "updatePaintModeUIFn");
     },
     t,
     exportWorkbenchOverlay,
@@ -725,9 +725,9 @@ function initToolbar({ render } = {}) {
     getFocusableElements,
     ensureTransportWorkbenchUiState,
     syncSupportSurfaceUrlState,
-    ensureRightPanelVisible: () => runtimeState.toggleRightPanelFn?.(true),
-    openExportWorkbench: (trigger = dockExportBtn) => runtimeState.openExportWorkbenchFn?.(trigger),
-    closeExportWorkbench: ({ restoreFocus = true } = {}) => runtimeState.closeExportWorkbenchFn?.({ restoreFocus }),
+    ensureRightPanelVisible: () => callRuntimeHook(runtimeState, "toggleRightPanelFn", true),
+    openExportWorkbench: (trigger = dockExportBtn) => callRuntimeHook(runtimeState, "openExportWorkbenchFn", trigger),
+    closeExportWorkbench: ({ restoreFocus = true } = {}) => callRuntimeHook(runtimeState, "closeExportWorkbenchFn", { restoreFocus }),
   });
   const {
     bindQuickFillControls,
@@ -997,7 +997,7 @@ function initToolbar({ render } = {}) {
     dismissButton: sampleProjectBannerDismissBtn,
     t,
     openExportWorkbench: (trigger = sampleProjectBannerOpenExportBtn) => (
-      runtimeState.openExportWorkbenchFn?.(resolveExportWorkbenchFocusReturnTrigger(trigger))
+      callRuntimeHook(runtimeState, "openExportWorkbenchFn", resolveExportWorkbenchFocusReturnTrigger(trigger))
     ),
   });
   const sampleProjectGuideCardController = createSampleProjectGuideCardController(runtimeState, {
@@ -1012,7 +1012,7 @@ function initToolbar({ render } = {}) {
     sampleListStatusNode: scenarioGuideSampleProjectStatus,
     t,
     openExportWorkbench: (trigger = scenarioGuideSampleProjectOpenExportBtn) => (
-      runtimeState.openExportWorkbenchFn?.(resolveExportWorkbenchFocusReturnTrigger(trigger))
+      callRuntimeHook(runtimeState, "openExportWorkbenchFn", resolveExportWorkbenchFocusReturnTrigger(trigger))
     ),
     continueWithDefaultGuide: () => {
       renderScenarioGuideSection("quick");
@@ -1375,9 +1375,7 @@ function initToolbar({ render } = {}) {
     }
     refreshScenarioContextBar();
     refreshWorkspaceStatus();
-    if (typeof runtimeState.renderPresetTreeFn === "function") {
-      runtimeState.renderPresetTreeFn();
-    }
+    callRuntimeHook(runtimeState, "renderPresetTreeFn");
   };
   const refreshDynamicBorderStatus = () => {
     if (dynamicBorderStatus) {
@@ -2163,7 +2161,7 @@ function initToolbar({ render } = {}) {
 
   if (developerModeBtn && !developerModeBtn.dataset.bound) {
     developerModeBtn.addEventListener("click", () => {
-      runtimeState.toggleDeveloperModeFn?.();
+      callRuntimeHook(runtimeState, "toggleDeveloperModeFn");
     });
     developerModeBtn.dataset.bound = "true";
   }
@@ -2178,9 +2176,7 @@ function initToolbar({ render } = {}) {
       runtimeState.paintMode = nextMode;
       runtimeState.ui.politicalEditingExpanded = false;
       markDirty?.("paint-mode");
-      if (typeof runtimeState.updatePaintModeUIFn === "function") {
-        runtimeState.updatePaintModeUIFn();
-      }
+      callRuntimeHook(runtimeState, "updatePaintModeUIFn");
       if (typeof render === "function") {
         render();
       }
@@ -2194,10 +2190,10 @@ function initToolbar({ render } = {}) {
     dockExportBtn.addEventListener("click", () => {
       const isOpen = !!(exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden"));
       if (isOpen) {
-        runtimeState.closeExportWorkbenchFn?.({ restoreFocus: true });
+        callRuntimeHook(runtimeState, "closeExportWorkbenchFn", { restoreFocus: true });
       } else {
         closeDockPopover?.({ restoreFocus: false, syncUrl: true });
-        runtimeState.openExportWorkbenchFn?.(dockExportBtn);
+        callRuntimeHook(runtimeState, "openExportWorkbenchFn", dockExportBtn);
       }
     });
     dockExportBtn.dataset.bound = "true";
@@ -2418,9 +2414,7 @@ function initToolbar({ render } = {}) {
       const requested = value === "country" ? "country" : "subdivision";
       runtimeState.interactionGranularity = requested;
       paintGranularitySelect.value = runtimeState.interactionGranularity;
-      if (typeof runtimeState.updatePaintModeUIFn === "function") {
-        runtimeState.updatePaintModeUIFn();
-      }
+      callRuntimeHook(runtimeState, "updatePaintModeUIFn");
     });
   }
 
@@ -2429,9 +2423,7 @@ function initToolbar({ render } = {}) {
     paintModeSelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "visual");
       runtimeState.paintMode = normalizePaintMode(value);
-      if (typeof runtimeState.updatePaintModeUIFn === "function") {
-        runtimeState.updatePaintModeUIFn();
-      }
+      callRuntimeHook(runtimeState, "updatePaintModeUIFn");
       if (render) render();
     });
   }

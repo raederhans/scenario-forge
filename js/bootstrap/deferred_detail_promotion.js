@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../core/state/index.js";
 import { loadDeferredDetailBundle } from "../core/data_loader.js";
 import { refreshScenarioDataHealth } from "../core/scenario_data_health.js";
 import {
@@ -86,13 +87,11 @@ export function createDeferredDetailPromotionOwner({
         focusCountryOverrideExpiresAt: Date.now() + 5000,
       });
     }
-    if (typeof runtimeState.scheduleScenarioChunkRefreshFn === "function") {
-      runtimeState.scheduleScenarioChunkRefreshFn({
-        reason,
-        delayMs: 0,
-        flushPending,
-      });
-    }
+    callRuntimeHook(runtimeState, "scheduleScenarioChunkRefreshFn", {
+      reason,
+      delayMs: 0,
+      flushPending,
+    });
   }
 
   function syncScenarioReadyUiAfterDetailPromotion() {
@@ -100,9 +99,7 @@ export function createDeferredDetailPromotionOwner({
       showWarningToast: false,
       showErrorToast: false,
     });
-    if (typeof runtimeState.updateScenarioUIFn === "function") {
-      runtimeState.updateScenarioUIFn();
-    }
+    callRuntimeHook(runtimeState, "updateScenarioUIFn");
   }
 
   function applyDetailPromotionMapRefresh({

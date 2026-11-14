@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 /**
  * Owns the water and special-region inspector panels inside the sidebar:
  * - water region filtering, detail, legend, batch color actions
@@ -622,9 +623,7 @@ export function createWaterSpecialRegionController({
       row.addEventListener("click", () => {
         runtimeState.selectedWaterRegionId = featureId;
         waterInspectorSection?.setAttribute("open", "");
-        if (typeof runtimeState.renderWaterRegionListFn === "function") {
-          runtimeState.renderWaterRegionListFn();
-        }
+        callRuntimeHook(runtimeState, "renderWaterRegionListFn");
         if (render) render();
       });
 
@@ -1302,7 +1301,7 @@ export function createWaterSpecialRegionController({
       const filters = doc.getElementById("editorWaterFilters");
       if (filters) filters.open = true;
       if (doc.defaultView.matchMedia("(max-width: 1023px)").matches) {
-        runtimeState.toggleLeftPanelFn?.(true);
+        callRuntimeHook(runtimeState, "toggleLeftPanelFn", true);
       } else if (doc.body.classList.contains("left-sidebar-collapsed")) {
         doc.getElementById("leftSidebarCollapseBtn")?.click();
       }

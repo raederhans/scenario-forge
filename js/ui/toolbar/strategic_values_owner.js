@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { setThematicWgiStyleState } from "../../core/state/actions/thematic_wgi_actions.js";
 import { setPopulationStyleState } from "../../core/state/actions/population_spatial_actions.js";
 import { patchAppearanceStyleGroupState } from "../../core/state/actions/appearance_actions.js";
@@ -35,7 +36,7 @@ export function createStrategicValuesOwner({
   const say = (en, cn) => zh() ? cn : en;
   const metricName = (id) => STRATEGIC_METRIC_NAMES[id]?.[zh() ? 1 : 0] || id;
   const setText = (id, value) => { if (nodes[id]) nodes[id].textContent = value; };
-  const persist = () => runtimeState.persistViewSettingsFn?.();
+  const persist = () => callRuntimeHook(runtimeState, "persistViewSettingsFn");
 
   const renderOptions = (node, entries) => {
     if (!node) return;

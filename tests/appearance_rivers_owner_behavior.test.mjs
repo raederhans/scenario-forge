@@ -1,5 +1,6 @@
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 
 import {
   createAppearanceRiversOwner,
@@ -70,12 +71,12 @@ function createHarness(runtimeOverrides = {}) {
         dashStyle: "dashed",
       },
     },
-    ensureContextLayerDataFn(layer, options) {
-      contextLayerLoads.push({ layer, options });
-      return Promise.resolve();
-    },
     ...runtimeOverrides,
   };
+  registerRuntimeHook(runtimeState, "ensureContextLayerDataFn", (layer, options) => {
+    contextLayerLoads.push({ layer, options });
+    return Promise.resolve();
+  });
   const owner = createAppearanceRiversOwner({
     runtimeState,
     clamp: (value, min, max) => Math.min(max, Math.max(min, value)),
@@ -179,4 +180,13 @@ test("rivers owner binds controls once and updates style state", () => {
     "rivers-outline-width",
     "rivers-dash",
   ]);
+});
+
+const fixtureHookNames = ["ensureContextLayerDataFn"];
+let savedHooks;
+beforeEach(() => {
+  savedHooks = fixtureHookNames.map((name) => [name, readRegisteredRuntimeHookSource(null, name)]);
+});
+afterEach(() => {
+  for (const [name, hook] of savedHooks) registerRuntimeHook(null, name, hook);
 });
