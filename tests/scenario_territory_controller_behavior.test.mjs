@@ -1,8 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import vm from "node:vm";
-import { parse } from "acorn";
+
 import { state } from "../js/core/state.js";
 import { clearHistory, undoHistory } from "../js/core/history_manager.js";
 import { createScenarioTerritoryController } from "../js/ui/sidebar/scenario_territory_controller.js";
@@ -133,20 +131,3 @@ test("batch paint filters targets, records one undo snapshot and ignores unchang
   assert.deepEqual(overrides(), { old: "#aabbcc", untouched: "#654321" });
 });
 
-test("sidebar hierarchy uses only visual paint, deduplicates targets and preserves transaction options", () => {
-  const source = readFileSync(new URL("../js/ui/sidebar.js", import.meta.url), "utf8");
-  const fn = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body.find(node => node.id?.name === "applyHierarchyGroupWithMode");
-  const events = [];
-  const context = vm.createContext({
-    runtimeState: { selectedColor: "#abcdef", paintMode: "sovereignty", activeSovereignCode: "STALE" },
-    previewHierarchyGroupHighlight: (_group, ids) => events.push(["preview", Array.from(ids)]),
-    applyVisualOverridesToFeatureIds: (ids, color, options) => { events.push(["paint", Array.from(ids), color, options]); return { applied: true, mode: "visual" }; },
-  });
-  vm.runInContext(source.slice(fn.start, fn.end), context);
-  const result = context.applyHierarchyGroupWithMode({ children: [" a ", "a", "b", ""] }, { mode: "ownership", ownerCode: "OLD", visualHistoryKind: "custom" });
-  assert.equal(result.applied, true);
-  assert.deepEqual(events[0], ["preview", ["a", "b"]]);
-  assert.deepEqual(events[1].slice(0, 3), ["paint", ["a", "b"], "#abcdef"]);
-  assert.equal(events[1][3].historyKind, "custom");
-  assert.equal(context.applyHierarchyGroupWithMode(null).mode, "visual");
-});

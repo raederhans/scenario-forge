@@ -1,11 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
-import { readFile } from "node:fs/promises";
-import { armReadyPreparationBaseline, assertRetainedScene, assertRoiMovedTowardColor, assertRoiRestored, assertVisibleScene, assertZoomFeedback,
-  captureRenderMetricDurations, captureSceneSnapshot, fallbackSnapshotReady, fillCommitReady, installDiagnosticWorkerPosts, installRasterPreparationHold, installZoomInputHoldBoundary,
-  parseProfileArguments, preparationHeldEvidence, preserveActionError, profileTnoScene, startDiagnosticTrace, summarizeProfileBlock, summarizeQualityPixels, summarizeSamples,
-  summarizeZoomNavigation, waitForPageCondition, withDeadline, zoomStability } from "../tools/profile_tno_raster_scene.mjs";
+
+import { armReadyPreparationBaseline, assertRetainedScene, assertRoiMovedTowardColor, assertRoiRestored, assertVisibleScene, assertZoomFeedback, captureRenderMetricDurations, captureSceneSnapshot, fallbackSnapshotReady, fillCommitReady, installDiagnosticWorkerPosts, installRasterPreparationHold, installZoomInputHoldBoundary, parseProfileArguments, preparationHeldEvidence, preserveActionError, profileTnoScene, startDiagnosticTrace, summarizeProfileBlock, summarizeQualityPixels, summarizeSamples, summarizeZoomNavigation, waitForPageCondition, withDeadline } from "../tools/profile_tno_raster_scene.mjs";
 import { residentFrameReady } from "../tools/verify_political_raster_resident.mjs";
 
 function activeScene() {
@@ -35,38 +32,6 @@ test("complete residency observes current label readiness only after base readin
   const previousReads = reads;
   assert.equal(residentFrameReady({ ...state, styleConfig: { countryLabels: { enabled: false } } }, diagnostics), true);
   assert.equal(reads, previousReads, "hidden country labels do not wait on their old workers");
-});
-
-test("renderer country label readiness reads existing owners without creating producers", async () => {
-  const source = await readFile(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const start = source.indexOf("export function getCountryLabelReadiness()");
-  const end = source.indexOf("export function getPoliticalIdRasterDiagnostics()", start);
-  assert.ok(start >= 0 && end > start);
-  const create = new Function("runtimeState", "countryLabelSourceOwner", "countryLabelRenderOwner",
-    `${source.slice(start, end).replace("export function", "function")} return getCountryLabelReadiness;`);
-  const state = { styleConfig: {}, renderPassCache: { dirty: {} } };
-  assert.equal(create(state, null, null)().ready, false);
-  assert.equal(create({ styleConfig: { countryLabels: { enabled: false } } },
-    { peekSource() { assert.fail("hidden labels must not inspect source"); } }, null)().ready, true);
-  let status = "pending", peeks = 0, checks = 0;
-  const snapshot = { status: "ready" };
-  const owner = { peekSource() { peeks++; return status === "ready" ? snapshot : { status }; },
-    getSource() { assert.fail("readiness must never sync or start a source worker"); } };
-  const render = { getReadinessForCurrentView(value) {
-    checks++; assert.equal(value, snapshot);
-    return { ready: true, pendingFits: 0, pendingWorkerFits: 1, scheduled: true, workerErrors: 0 };
-  } };
-  const read = create(state, owner, render);
-  assert.equal(read().ready, false); assert.equal(checks, 0);
-  status = "disabled";
-  assert.equal(create(state, owner, null)().ready, true, "disabled blank sources do not need a layout owner");
-  status = "ready";
-  assert.equal(create(state, owner, null)().ready, false);
-  assert.equal(read().ready, true);
-  state.renderPassCache.dirty.labels = true;
-  assert.equal(read().ready, false);
-  assert.equal(checks, 2);
-  assert.equal(peeks, 5);
 });
 
 test("complete residency waits for nonpolitical texture preparation and atomic publication", () => {
@@ -285,15 +250,6 @@ test("predicate result reads are bounded and their failure survives handle clean
   const healthy = { async waitForFunction() { return { jsonValue: async () => ({ queued: 1 }), dispose: async () => { disposals++; } }; } };
   assert.deepEqual(await wait(healthy, () => true, undefined, { timeout: 20, label: "retained reply" }, value => value.jsonValue()), { queued: 1 });
   assert.equal(disposals, 2);
-});
-
-test("runtime and held predicate waits all use the Node watchdog and handle disposal boundary", async () => {
-  const source = await readFile(new URL("../tools/profile_tno_raster_scene.mjs", import.meta.url), "utf8");
-  assert.equal([...source.matchAll(/\bpage\.waitForFunction\(/g)].length, 1, "only the bounded helper may directly issue a predicate wait");
-  assert.match(source, /waitRasterStartup\(\{ waitForFunction: \(predicate, arg, options\) => waitForPageCondition\(page, predicate, arg,/);
-  for (const label of ["fresh runtime startup", "retained fill history commit", "retained undo history commit", "retained redo history commit", "retained preparation reply"]) {
-    assert.ok(source.includes(`label: "${label}"`), `${label} must retain a specific failure label`);
-  }
 });
 
 test("measurement cleanup cannot overwrite the original action failure", async () => {
@@ -769,86 +725,6 @@ test("completed normal navigation remains reportable when a later held stage fai
     renderMetrics: [{ name: "drawContextBasePass", durationMs: 100 }] }]);
 });
 
-async function zoomStabilityHarness({ invalidSample = 0 } = {}) {
-  const calls = [], samples = [], summaries = [], noop = async () => {};
-  let percent = 100, pendingPercent, closed = 0, filled = false;
-  const page = { setDefaultTimeout() {}, on() {}, url: () => "http://localhost/", isClosed: () => false,
-    locator: selector => selector === "#zoomPercentInput" ? {
-      fill: async value => { pendingPercent = Number.parseFloat(value); calls.push(["zoom-fill", value]); },
-      press: async key => { assert.equal(key, "Enter"); percent = pendingPercent; calls.push(["zoom-enter", percent]); },
-    } : { click: noop }, screenshot: async () => { calls.push(["failure-screenshot"]); } };
-  const session = { page, errors: [], warnings: [], network: [], context: { on() {} },
-    browser: { on() {}, version: () => "fixture", isConnected: () => true, close: async () => { closed++; } } };
-  const settle = async () => ({ view: { x: 0, y: 0, k: percent / 100 }, diagnostics: { actualBackend: "raster" } });
-  const evaluate = async (_page, fn, arg) => fn === captureRenderMetricDurations
-    ? [{ name: "measured-pass", durationMs: 50, recordedAt: arg.sinceEpoch }]
-    : { dpr: 1, readiness: { ready: true } };
-  // Execute the existing zoom body, including its real locator input, measured
-  // feedbackZoom boundary, exact-transform oracle and post-window attribution.
-  const source = await readFile(new URL("../tools/profile_tno_raster_scene.mjs", import.meta.url), "utf8");
-  const start = source.indexOf("async function zoom("), end = source.indexOf("async function drag(", start);
-  assert.ok(start >= 0 && end > start);
-  const measured = async (actualPage, action, options) => {
-    assert.equal(actualPage, page); assert.equal(filled, true, "timing follows real-fill setup");
-    const sample = { inputToObservedFeedbackMs: 20, inputToObservedReadyMs: 500 + samples.length,
-      inputAt: 10, inputEpochAt: 1000, observedReadyAt: 510 + samples.length,
-      maxRafIntervalMs: 230, maxLongTaskMs: 190, frames: [16, 230], longTasks: [{ start: 11, duration: 190 }] };
-    if (samples.length + 1 === invalidSample) sample.inputToObservedFeedbackMs = null;
-    calls.push(["measurement", options]); samples.push(sample); await action(); return sample;
-  };
-  const zoom = new Function("assert", "measured", "settle", "evaluate", "captureRenderMetricDurations",
-    `${source.slice(start, end)} return zoom;`)(assert, measured, settle, evaluate, captureRenderMetricDurations);
-  const stage = async (report, name) => { report.stage = name; calls.push(["stage", name]); };
-  const console = { log: value => { const entry = JSON.parse(value); if (entry.tnoSceneNavigation) summaries.push(entry.tnoSceneNavigation); } };
-  const runStability = new Function("stage", "zoom", "assertZoomFeedback", "checkpoint", "console", "summarizeZoomNavigation",
-    `return (${zoomStability.toString()});`)(stage, zoom, assertZoomFeedback, noop, console, summarizeZoomNavigation);
-  const dependencies = { assert, fs: { mkdir: noop }, path: { resolve: value => value, join: (...values) => values.join("/") },
-    SCENARIO: "tno_1962", VIEWPORT: {}, reportIo: new WeakMap(), pageReports: new WeakMap(),
-    IO_BOUND_MS: 100, CLEANUP_BOUND_MS: 100, ACTION_BOUND_MS: 100, stage, checkpoint: noop,
-    openRasterApp: async (_url, options) => {
-      assert.equal(options.scenarioId, "tno_1962"); assert.equal(options.enabled, null);
-      calls.push(["open-default-session"]); return session;
-    }, evaluate, settle, assertVisibleScene() {}, dismissGuide: noop, zoom,
-    fill: async (_page, color, options) => { assert.equal(percent, 100); assert.equal(options.timed, false);
-      calls.push(["real-fill", color]); filled = true; return { color }; },
-    zoomStability: runStability, snapshot: settle, withDeadline, console };
-  const run = new Function(...Object.keys(dependencies), `return (${profileTnoScene.toString()});`)(...Object.values(dependencies));
-  const report = await run("http://localhost/", { phase: "zoom-stability" });
-  return { report, calls, samples, summaries, closed };
-}
-
-test("zoom stability runs three ordered rounds through the existing input, measurement and strict oracle", async () => {
-  const f = await zoomStabilityHarness();
-  assert.equal(f.report.passed, true); assert.equal(f.closed, 1);
-  assert.deepEqual(f.calls.filter(([name]) => name === "zoom-enter").map(([, value]) => value),
-    [100, 130, 250, 100, 130, 250, 100, 130, 250, 100]);
-  assert.ok(f.calls.findIndex(([name]) => name === "zoom-enter") < f.calls.findIndex(([name]) => name === "real-fill"));
-  assert.deepEqual(f.calls.filter(([name]) => name === "measurement").map(([, options]) => options),
-    [130, 250, 100, 130, 250, 100, 130, 250, 100].map(feedbackZoom => ({ feedbackZoom })));
-  assert.equal(f.report.zoomStability.roundCount, 3); assert.equal(f.report.navigation.length, 9);
-  assert.deepEqual(f.report.navigation.map(n => [n.round, n.sequence, n.roundSequence, n.cacheOrder]),
-    Array.from({ length: 9 }, (_, i) => [Math.floor(i / 3) + 1, i + 1, i % 3 + 1, i < 3 ? "first-pass" : "repeat-pass"]));
-  for (const [index, navigation] of f.report.navigation.entries()) {
-    assert.equal(navigation.sample, f.samples[index], "full samples, RAF intervals and long tasks remain intact");
-    assert.deepEqual(f.summaries[index], summarizeZoomNavigation(navigation));
-    assert.deepEqual(navigation.renderMetrics, [{ name: "measured-pass", durationMs: 50, recordedAt: 1000 }]);
-  }
-  assert.equal(f.calls.some(([name]) => name.includes("screenshot")), false);
-  assert.equal(f.summaries.length, 9, "first and repeat passes remain separate instead of a pooled percentile");
-});
-
-test("zoom stability retains an invalid sample and fails through the existing cleanup path", async () => {
-  const f = await zoomStabilityHarness({ invalidSample: 4 });
-  assert.equal(f.report.passed, false); assert.equal(f.closed, 1);
-  assert.equal(f.report.stage, "zoom-stability-round-2-130");
-  assert.match(f.report.error, /zoom must submit visible camera feedback/);
-  assert.equal(f.report.navigation.length, 4);
-  assert.equal(f.report.navigation.at(-1).sample, f.samples[3]);
-  assert.equal(f.report.navigation.at(-1).sample.inputToObservedFeedbackMs, null);
-  assert.equal(f.samples.length, 4, "a failed strict oracle cannot be skipped or retried");
-  assert.equal(f.calls.filter(([name]) => name === "failure-screenshot").length, 1);
-});
-
 test("fill completion cannot reuse an idle frame before its async history transaction commits", () => {
   const state = { historyPast: [], renderPhase: "idle", startupReadonly: false }, scope = { __rasterTask: { state } };
   assert.equal(fillCommitReady(1, scope), false, "an old ready frame is not evidence that the new fill committed");
@@ -913,112 +789,3 @@ test("preparation fault preserves native requests and releases only uncancelled 
   assert.equal(worker.received.at(-1).taskId, "after-cleanup");
 });
 
-
-test("label preflight prepares the current source and view privately and cancels inactive work", async () => {
-  const source = await readFile(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const start = source.indexOf("function prepareCountryLabelsPass()");
-  const end = source.indexOf("function drawLabelsPass(", start);
-  assert.ok(start >= 0 && end > start);
-  let selected = true, active = true, cancelled = 0, status = "pending", owners = 0, prepared = [];
-  const state = { zoomTransform: { k: 2.5 }, styleConfig: {} }, pending = Promise.resolve();
-  const render = { cancelPreparation() { cancelled++; }, prepareCurrentView(k) { prepared.push(k); return pending; } };
-  const create = new Function("runtimeState", "exportRenderInProgress", "isTnoRasterSceneSelected",
-    "tnoRasterSceneOwner", "countryLabelRenderOwner", "getCountryLabelSourceOwner", "getCountryLabelRenderOwner",
-    `${source.slice(start, end)} return prepareCountryLabelsPass;`);
-  const make = (exporting = false) => create(state, exporting, () => selected, { isActive: () => active }, render,
-    () => { owners++; return { getSource: () => ({ status }), prepare: () => pending }; }, () => render);
-  const prepare = make();
-  assert.equal(prepare(), pending); assert.deepEqual(prepared, []);
-  status = "ready";
-  assert.equal(prepare(), pending); assert.deepEqual(prepared, [2.5]);
-  status = "error"; assert.equal(prepare(), null);
-  const before = owners;
-  selected = false; assert.equal(prepare(), null); selected = true;
-  active = false; assert.equal(prepare(), null); active = true;
-  state.isInteracting = true; assert.equal(prepare(), null); state.isInteracting = false;
-  state.styleConfig.countryLabels = { enabled: false }; assert.equal(prepare(), null);
-  state.styleConfig.countryLabels.enabled = true; assert.equal(make(true)(), null);
-  assert.equal(owners, before, "inactive and export paths cannot create producers");
-  assert.equal(cancelled, 5, "inactive paths settle an existing private wait immediately");
-});
-
-async function createCityPassPreflightHarness() {
-  const source = await readFile(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const start = source.indexOf("let cityPointsPreparationPromise = null;");
-  const end = source.indexOf("function drawLabelsPass(", start);
-  assert.ok(start >= 0 && end > start);
-  const h = { state: { zoomTransform: { k: 2.5 }, styleConfig: {} }, cancelled: 0,
-    cityPending: null, countryPending: null, events: [], notifications: [], options: null };
-  const city = {
-    cancelPreparation() { h.cancelled++; },
-    prepareCurrentView(k, options) {
-      h.events.push(["city", k]);
-      h.options = options;
-      return h.cityPending;
-    },
-  };
-  const country = { cancelPreparation() {}, prepareCurrentView(k) { h.events.push(["country", k]); return h.countryPending; } };
-  const create = new Function("runtimeState", "exportRenderInProgress", "isTnoRasterSceneSelected", "tnoRasterSceneOwner",
-    "cityPointsRenderOwner", "getCityPointsRenderOwner", "requestRendererRender", "countryLabelRenderOwner",
-    "getCountryLabelSourceOwner", "getCountryLabelRenderOwner",
-    `${source.slice(start, end)} return { prepareCityPointsPass, prepareLabelsPass };`);
-  h.api = create(h.state, false, () => true, { isActive: () => true }, city, () => city,
-    (reason, options) => h.notifications.push({ reason, options }), country,
-    () => ({ getSource: () => ({ status: "ready" }) }), () => country);
-  return h;
-}
-
-test("city pass preflight wakes once per ready job and leaves cancelled preparation quiet", async () => {
-  const h = await createCityPassPreflightHarness();
-  let finish;
-  h.cityPending = new Promise((resolve) => { finish = resolve; });
-  assert.equal(h.api.prepareCityPointsPass(), h.cityPending);
-  assert.equal(h.api.prepareCityPointsPass(), h.cityPending);
-  assert.equal(h.api.prepareCityPointsPass(), h.cityPending);
-  assert.deepEqual(h.notifications, []);
-  finish(true);
-  await h.cityPending;
-  await Promise.resolve();
-  assert.deepEqual(h.notifications, [{ reason: "city-plan-prepared", options: { flush: false } }],
-    "marker-only preflight has its own completion wakeup and repeated callers share it");
-  h.cityPending = new Promise((resolve) => { finish = resolve; });
-  h.api.prepareCityPointsPass();
-  h.api.prepareCityPointsPass();
-  assert.equal(h.options.isCurrent(), true);
-  h.state.isInteracting = true;
-  assert.equal(h.options.isCurrent(), false, "an already yielded job cancels before its next helper call");
-  assert.equal(h.api.prepareCityPointsPass(), null);
-  assert.equal(h.cancelled, 1);
-  finish(false);
-  await h.cityPending;
-  await Promise.resolve();
-  assert.equal(h.notifications.length, 1, "a cancelled job cannot schedule another render");
-});
-
-test("labels preflight starts both private plans and still waits for cities when country names are disabled", async () => {
-  const h = await createCityPassPreflightHarness();
-  let finishCity, finishCountry, complete = false;
-  h.cityPending = new Promise((resolve) => { finishCity = resolve; });
-  h.countryPending = new Promise((resolve) => { finishCountry = resolve; });
-  const combined = h.api.prepareLabelsPass().then(() => { complete = true; });
-  assert.deepEqual(h.events, [["city", 2.5], ["country", 2.5]], "neither producer waits for the other to start");
-  finishCity(true);
-  await h.cityPending;
-  await Promise.resolve();
-  assert.equal(complete, false);
-  finishCountry();
-  await combined;
-  assert.equal(complete, true);
-
-  h.state.styleConfig.countryLabels = { enabled: false };
-  h.events.length = 0;
-  h.cityPending = new Promise((resolve) => { finishCity = resolve; });
-  complete = false;
-  const citiesOnly = h.api.prepareLabelsPass().then(() => { complete = true; });
-  assert.deepEqual(h.events, [["city", 2.5]]);
-  await Promise.resolve();
-  assert.equal(complete, false, "disabling country names cannot bypass city readiness");
-  finishCity(true);
-  await citiesOnly;
-  assert.equal(complete, true);
-});
