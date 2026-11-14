@@ -1,10 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { resolveDataAssetUrl } from "../js/core/data_loader.js";
 
 let loaderId = 0;
 async function fixture(check) {
-  const { loadContextLayerPack, resolveDataAssetUrl } = await import(
-    `../js/core/data_loader.js?rail-demand=${++loaderId}`
+  const { loadContextLayerPack } = await import(
+    `../js/core/data_loader/context_pack_loader.js?rail-demand=${++loaderId}`
   );
   const catalogUrl = resolveDataAssetUrl("transport_catalog:rail");
   const calls = [];
