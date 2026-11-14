@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createResponsiveSidebarCollapseController } from "../js/ui/sidebar.js";
+import { createResponsiveSidebarCollapseController } from "../js/ui/sidebar/sidebar_layout_controller.js";
 
 function setup(width, initial = { left: false, right: false }) {
   const visible = {};
