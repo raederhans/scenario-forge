@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createNavigationSceneOwner } from "../js/core/renderer/navigation_scene_owner.js";
+import { createNavigationFrameOwner } from "../js/core/renderer/navigation_frame_owner.js";
+import { createLabelDrawSnapshotOwner } from "../js/core/renderer/label_draw_snapshot.js";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createGeometryRasterWorkerClient } from "../js/core/geometry_raster_worker_client.js";
 
@@ -51,6 +53,63 @@ test("label preflight rejects before painting and detail uses its own data-gener
   f.owner.draw(transform);
   assert.equal(f.calls.draw[1][3].detailSource, undefined);
   assert.equal(old.width, 0);
+});
+
+test("gesture pans paint the base when viewport label snapshots cannot replay", () => {
+  const f = fixture({ renderPhase: "idle" });
+  const budget = createRuntimeResourceBudget();
+  const labels = createLabelDrawSnapshotOwner({ resourceBudget: budget });
+  const prepared = { x: 0, y: 0, k: 1 };
+  const target = { canvas: { width: 800, height: 600 } };
+  const paints = [];
+  for (const method of ["save", "restore", "setTransform", "fillRect", "clearRect"]) target[method] = () => {};
+  target.drawImage = (...args) => paints.push(args);
+  labels.capture("labels", {
+    canvas: target.canvas, getTransform: () => ({ a: 2, b: 0, c: 0, d: 2, e: 0, f: 0 }),
+    fillStyle: "#000", strokeStyle: "#fff", globalCompositeOperation: "source-over", fillText() {},
+  }, { transform: prepared, dpr: 2, signature: "labels" }, (context) => context.fillText("Town", 20, 30));
+  f.helpers.canDrawLabels = (transform) => labels.canReplay(["labels"], target, transform, 2, () => "labels");
+  f.helpers.drawLabels = () => assert.fail("unavailable labels must stay blank");
+  const jobs = [];
+  const frame = createNavigationFrameOwner({
+    getIdentity: () => "scene", resourceBudget: budget, schedule: (callback) => jobs.push(callback),
+    createCanvas: () => ({ width: 0, height: 0, getContext: () => target }),
+  });
+  frame.prepare({ bounds: [[0, 0], [400, 300]], backgroundColor: "#abc",
+    layers: [{ items: [1], drawItem: () => {} }] });
+  while (jobs.length) jobs.shift()();
+  const owner = createNavigationSceneOwner(f.state, {
+    surface: { getContext: () => target, getProjection: () => null },
+    helpers: f.helpers, createFrameOwner: () => frame, resourceBudget: budget,
+  });
+  for (const renderPhase of ["interacting", "settling"]) {
+    f.state.renderPhase = renderPhase;
+    for (const x of [-40, 40]) {
+      const transform = { ...prepared, x };
+      assert.equal(f.helpers.canDrawLabels(transform), false);
+      paints.length = 0;
+      assert.equal(owner.draw(transform), true);
+      assert.equal(paints.length, 1);
+      assert.ok(paints[0][0].width > 0);
+    }
+  }
+  f.state.renderPhase = "idle";
+  paints.length = 0;
+  assert.equal(owner.draw({ ...prepared, x: 40 }), false);
+  assert.deepEqual(paints, []);
+  owner.dispose();
+  labels.clear();
+});
+
+test("gesture label replay failure does not reject an already painted base", () => {
+  for (const renderPhase of ["interacting", "settling", "idle"]) {
+    const f = fixture({ renderPhase });
+    f.helpers.canDrawLabels = () => true;
+    f.helpers.drawLabels = () => false;
+    assert.equal(f.owner.draw({ x: 10, y: 0, k: 1 }), renderPhase !== "idle");
+    assert.equal(f.calls.draw.length, 1);
+    assert.equal(f.calls.draw[0][3].renderPhase, renderPhase);
+  }
 });
 
 function feature(id) {

@@ -418,14 +418,19 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     if (detailedFrame && (detailedFrame.identity !== getIdentity()
       || h.getDetailIdentity && detailedFrame.detailIdentity !== h.getDetailIdentity(detailedFrame.transform))) clearDetail();
     const detail = detailedFrame?.identity === getIdentity() ? detailedFrame : null;
-    if (h.canDrawLabels && !h.canDrawLabels(transform)) return false;
+    const gesture = state.renderPhase === "interacting" || state.renderPhase === "settling";
+    const canDrawLabels = !h.canDrawLabels || h.canDrawLabels(transform);
+    if (!gesture && !canDrawLabels) return false;
     const drawn = frame.draw(surface.getContext(), transform, state.dpr || 1, {
       detailSource: detail?.source,
       detailTransform: detail?.transform,
       detailDpr: detail?.dpr,
+      renderPhase: state.renderPhase,
     });
     if (!drawn) return false;
-    return h.drawLabels ? h.drawLabels(transform) : true;
+    if (!canDrawLabels) return true;
+    const labelsDrawn = h.drawLabels ? h.drawLabels(transform) : true;
+    return gesture || labelsDrawn;
   }
 
   function clear() {
