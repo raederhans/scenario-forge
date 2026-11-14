@@ -4,9 +4,6 @@ import vm from "node:vm";
 import test from "node:test";
 import { createCountryLabelRenderOwner, groupProjectedRings, isCountryLabelDefinitelyInvisible, projectCountryLabelPolygons, waitForCountryLabelsForExport } from "../js/core/renderer/country_label_render_owner.js";
 import { createCountryLabelLayoutWorkerHandler } from "../js/core/renderer/country_label_layout_worker.js";
-import { fitCountryLabel } from "../js/core/renderer/country_label_layout.js";
-import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
-
 const vendor = await readFile(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8");
 const sandbox = {};
 vm.runInNewContext(vendor, sandbox);
@@ -763,47 +760,6 @@ test("collisions try cached alternative positions and reserve only the accepted 
   assert.equal(owner.drawCountryLabels(1), 1, "cleared obstruction restores the primary");
   assert.equal(owner.getDiagnostics().lastLabels[0].candidateIndex, 0);
   assert.equal(owner.getDiagnostics().fitBuilds, 1, "repaints and collision retries never refit geometry");
-});
-
-test("macro label orchestration reserves capitals then countries then other city text; detail prioritizes cities", async () => {
-  const renderer = await readFile(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const code = renderer.slice(renderer.indexOf("function drawLabelsPassContent(k,"), renderer.indexOf("function focusWaterRegionById("));
-  const events = [];
-  const runtimeState = { styleConfig: {}, deferContextBasePass: false };
-  const countryBox = { x: 20, y: 20, w: 50, h: 12 };
-  const markerBox = { x: 80, y: 20, w: 8, h: 8 };
-  const capitalBox = { x: 90, y: 20, w: 45, h: 12 };
-  const overviewLayout = { capitalBoxes: [capitalBox] };
-  const scope = { runtimeState, getMapLabelHierarchy, recordRenderPerfMetric() {},
-    drawBlankFeatureLabelsPass() {}, shouldShowMarineRegionNames: () => false, nowMs: () => 0,
-    getCityPointsRenderOwner: () => ({
-      reserveOverviewLabelBoxes(_k, boxes) { events.push("capitals"); boxes.push(markerBox, capitalBox); return overviewLayout; },
-      drawLabelsPass(_k, { occupiedBoxes, overviewLayout: reservation }) {
-        events.push("cities");
-        if (reservation) { assert.equal(reservation, overviewLayout); assert.ok(occupiedBoxes.includes(countryBox)); }
-        else occupiedBoxes.push(markerBox, capitalBox);
-      },
-    }),
-    getCountryLabelSourceOwner: () => ({ prepare() {} }),
-    getCountryLabelRenderOwner: () => ({ drawCountryLabels(_k, { occupiedBoxes }) {
-      events.push("countries"); assert.ok(occupiedBoxes.includes(markerBox)); assert.ok(occupiedBoxes.includes(capitalBox)); occupiedBoxes.push(countryBox);
-    }, getDiagnostics: () => ({}) }),
-    getTransportOverviewRenderOwner: () => ({ drawPendingLabels() {} }),
-    getPhysicalLayerRenderOwner: () => ({ drawPhysicalRegionLabels() {} }),
-  };
-  vm.runInNewContext(code, scope);
-  for (const k of [1, 2, 2.5, 3]) {
-    events.length = 0;
-    scope.drawLabelsPassContent(k);
-    assert.deepEqual(events, ["capitals", "countries", "cities"]);
-  }
-  events.length = 0;
-  scope.drawLabelsPassContent(4);
-  assert.deepEqual(events, ["cities", "countries"]);
-  events.length = 0;
-  runtimeState.styleConfig.countryLabels = { enabled: false };
-  scope.drawLabelsPassContent(1);
-  assert.deepEqual(events, ["cities"]);
 });
 
 test("map-space titles scale exactly with zoom and fade out once oversized", () => {

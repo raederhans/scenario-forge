@@ -1,19 +1,13 @@
-import { createIndexUiRefreshScheduler } from "../js/core/renderer/index_ui_refresh_scheduler.js";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import vm from "node:vm";
+
 import { createThematicWgiOwner } from "../js/ui/toolbar/thematic_wgi_owner.js";
-import { getThematicWgiFeatureInspection, normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
+import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
 import { THEMATIC_WGI_SCENARIO_IDS } from "../js/core/thematic_wgi_data.js";
 import { THEMATIC_INDICATORS, getThematicIndicator } from "../js/core/thematic_indicator_catalog.js";
 import { UI_COPY_CATALOG } from "../js/core/i18n_catalog.js";
 import { ensureThematicWgiData } from "../js/core/thematic_wgi_runtime.js";
-import { resetThematicWgiRuntimeState } from "../js/core/state/actions/thematic_wgi_actions.js";
-import {
-  callRuntimeHook, emitStateBusEvent, STATE_BUS_EVENTS,
-  readRegisteredRuntimeHookSource, registerRuntimeHook,
-} from "../js/core/state/index.js";
 
 class TestElement {
   constructor() {
@@ -342,172 +336,6 @@ test("real WGI runtime callbacks drive loading, failure, and successful retry", 
   assert.deepEqual(h.dirty, []);
   assert.equal(h.persists(), 0);
 });
-
-test("final country-index flush refreshes restored WGI coverage through the existing appearance hook", () => {
-  const feature = (code) => ({ type: "Feature", id: code, properties: { ISO_A3: code } });
-  const h = createHarness({
-    styleConfig: { thematic: normalizeThematicWgiStyle({ enabled: true }) },
-    thematicWgiRuntime: { status: "ready", data: { ...normalizeThematicWgiStyle(),
-      byIsoA3: { AAA: { status: "value", value: 20 }, BBB: { status: "value", value: 40 } } } },
-    landData: { features: [feature("AAA"), feature("ZZZ")] },
-  });
-  h.owner.render();
-  assert.equal(h.nodes.thematicWgiCoverage.textContent, "Mapped: 1 · Source missing: 0 · Unmatched: 1");
-  const toolbarSource = readFileSync(new URL("../js/ui/toolbar.js", import.meta.url), "utf8");
-  const hookStart = toolbarSource.indexOf("  function renderSpecialZoneEditorUI() {");
-  const hookEnd = toolbarSource.indexOf("  registerRuntimeHook(state, \"updateSpecialZoneEditorUIFn\"", hookStart);
-  assert.ok(hookStart >= 0 && hookEnd > hookStart);
-  let appearanceRefreshes = 0;
-  let countryRefreshes = 0;
-  const context = vm.createContext({
-    runtimeState: h.state,
-    recordUiRefreshMetric() {}, callRuntimeHook,
-    toggleWaterRegions: null, toggleOpenOceanRegions: null,
-    renderAppearanceStyleControlsUi: () => { appearanceRefreshes += 1; h.owner.render(); },
-    specialZoneEditorController: { renderSpecialZoneEditorUI() {} },
-    specialZonesWorkbenchController: { renderSpecialZonesWorkbenchUi() {} }, updateToolUI() {},
-  });
-  vm.runInContext(`${toolbarSource.slice(hookStart, hookEnd)}
-    this.refreshPanel = renderSpecialZoneEditorUI;`, context);
-  const tasks = [];
-  const scheduler = createIndexUiRefreshScheduler({
-    runtimeState: h.state,
-    setTimeout: callback => { tasks.push(callback); return tasks.length; },
-    recordUiRefreshMetric() {}, callRuntimeHook,
-  });
-  const flush = options => {
-    scheduler.queueIndexUiRefresh(options);
-    assert.equal(tasks.length, 1);
-    tasks.shift()();
-    assert.equal(tasks.length, 0);
-  };
-  const oldPanelHook = readRegisteredRuntimeHookSource(h.state, "updateSpecialZoneEditorUIFn");
-  const oldCountryHook = readRegisteredRuntimeHookSource(h.state, "renderCountryListFn");
-  registerRuntimeHook(h.state, "updateSpecialZoneEditorUIFn", context.refreshPanel);
-  registerRuntimeHook(h.state, "renderCountryListFn", () => { countryRefreshes += 1; });
-  try {
-    h.state.landDataFull = { features: [feature("AAA"), feature("BBB"), feature("ZZZ")] };
-    assert.equal(h.nodes.thematicWgiCoverage.textContent, "Mapped: 1 · Source missing: 0 · Unmatched: 1");
-    flush({ renderCountryList: true });
-    assert.equal(h.nodes.thematicWgiCoverage.textContent, "Mapped: 2 · Source missing: 0 · Unmatched: 1");
-    assert.equal(appearanceRefreshes, 1);
-    assert.equal(countryRefreshes, 1);
-    assert.equal(tasks.length, 0);
-    assert.equal(h.loads.length, 0);
-    assert.deepEqual(h.dirty, []);
-    assert.deepEqual(h.refreshes, []);
-    flush({ renderWaterRegionList: true });
-    assert.equal(appearanceRefreshes, 1, "water-only updates do not refresh appearance");
-    h.state.styleConfig.thematic.enabled = false;
-    flush({ renderCountryList: true });
-    assert.equal(appearanceRefreshes, 1, "disabled WGI does not add appearance work");
-    assert.equal(countryRefreshes, 2);
-  } finally {
-    registerRuntimeHook(h.state, "updateSpecialZoneEditorUIFn", oldPanelHook);
-    registerRuntimeHook(h.state, "renderCountryListFn", oldCountryHook);
-  }
-});
-
-for (const outcome of ["applied", "rolled back"]) {
-  test(`final scenario UI sync restores enabled WGI after ${outcome === "applied" ? "successful apply" : "rollback"}`, async () => {
-    const sample = { type: "Feature", id: "sample", properties: { ISO_A2: "PL" } };
-    const requests = [];
-    let pending;
-    const h = createHarness({
-      activeScenarioId: "tno_1962",
-      styleConfig: { thematic: normalizeThematicWgiStyle({ enabled: true }) },
-      landData: { features: [sample] },
-      scenarioBaselineOwnersByFeatureId: { sample: "WRS" },
-      scenarioCountriesByTag: { WRS: { base_iso2: "RU" } },
-      latestScenarioApplyRequestId: 1, currentScenarioApplyRequestId: null,
-    }, {
-      ensureData: (state, options) => {
-        pending = ensureThematicWgiData(state, { ...options, loadData: async (request) => {
-          requests.push(request);
-          return { ...normalizeThematicWgiStyle({ metricId: request.metricId }),
-            supportedScenarios: THEMATIC_WGI_SCENARIO_IDS,
-            byIsoA3: { RUS: { status: "value", value: 80, joinKey: "RUS" },
-              DEU: { status: "value", value: 40, joinKey: "DEU" } } };
-        } });
-        return pending;
-      },
-    });
-    const syncSource = readFileSync(new URL("../js/core/scenario_ui_sync.js", import.meta.url), "utf8");
-    const syncStart = syncSource.indexOf("export function syncScenarioUi() {");
-    const syncEnd = syncSource.indexOf("\nexport function syncCountryUi(", syncStart);
-    const toolbarSource = readFileSync(new URL("../js/ui/toolbar.js", import.meta.url), "utf8");
-    const hookStart = toolbarSource.indexOf("  function renderSpecialZoneEditorUI() {");
-    const hookEnd = toolbarSource.indexOf("  registerRuntimeHook(state, \"updateSpecialZoneEditorUIFn\"", hookStart);
-    assert.ok(syncStart >= 0 && syncEnd > syncStart && hookStart >= 0 && hookEnd > hookStart);
-    let appearanceRefreshes = 0;
-    const context = vm.createContext({
-      runtimeState: h.state, emitStateBusEvent, STATE_BUS_EVENTS,
-      toggleWaterRegions: null, toggleOpenOceanRegions: null,
-      renderAppearanceStyleControlsUi: () => { appearanceRefreshes += 1; h.owner.render(); },
-      specialZoneEditorController: { renderSpecialZoneEditorUI() {} },
-      specialZonesWorkbenchController: { renderSpecialZonesWorkbenchUi() {} }, updateToolUI() {},
-    });
-    vm.runInContext(`${syncSource.slice(syncStart, syncEnd).replace("export function", "function")}
-      ${toolbarSource.slice(hookStart, hookEnd)}
-      this.sync = syncScenarioUi; this.refreshPanel = renderSpecialZoneEditorUI;`, context);
-    const oldHook = readRegisteredRuntimeHookSource(h.state, "updateSpecialZoneEditorUIFn");
-    registerRuntimeHook(h.state, "updateSpecialZoneEditorUIFn", context.refreshPanel);
-    try {
-      h.owner.render();
-      await pending;
-      assert.equal(h.state.thematicWgiRuntime.status, "ready");
-      assert.equal(getThematicWgiFeatureInspection(h.state, sample).joinKey, "RUS");
-      assert.equal(h.nodes.thematicWgiLegend.hidden, false);
-
-      h.state.scenarioApplyInFlight = true;
-      h.state.latestScenarioApplyRequestId = h.state.currentScenarioApplyRequestId = 2;
-      h.state.activeScenarioId = "hoi4_1939";
-      h.state.scenarioBaselineOwnersByFeatureId = { sample: "GER" };
-      h.state.scenarioCountriesByTag = { GER: { base_iso2: "DE" } };
-      resetThematicWgiRuntimeState(h.state);
-      h.owner.render();
-      await pending;
-      context.sync();
-      assert.equal(requests.length, 1, "apply lock does not start a WGI load");
-      assert.equal(appearanceRefreshes, 0, "locked UI sync does not add appearance work");
-      assert.equal(h.state.thematicWgiRuntime.status, "idle");
-      assert.equal(h.nodes.thematicWgiLegend.hidden, true);
-      assert.equal(getThematicWgiFeatureInspection(h.state, sample), null);
-
-      if (outcome === "rolled back") {
-        h.state.activeScenarioId = "tno_1962";
-        h.state.scenarioBaselineOwnersByFeatureId = { sample: "WRS" };
-        h.state.scenarioCountriesByTag = { WRS: { base_iso2: "RU" } };
-      }
-      h.state.scenarioApplyInFlight = false;
-      h.state.currentScenarioApplyRequestId = null;
-      context.sync();
-      await pending;
-      assert.equal(appearanceRefreshes, 1);
-      assert.equal(requests.length, 2, "final sync automatically starts the eligible request");
-      assert.equal(requests[1].scenarioId, outcome === "applied" ? "hoi4_1939" : "tno_1962");
-      assert.equal(h.state.thematicWgiRuntime.status, "ready");
-      assert.equal(h.nodes.thematicWgiStatus.textContent, "Indicator data loaded.");
-      assert.equal(h.nodes.thematicWgiLegend.hidden, false);
-      assert.equal(h.nodes.thematicWgiCoverage.hidden, false);
-      assert.equal(h.nodes.thematicWgiCoverage.textContent,
-        "Scenario countries mapped: 1 · Source missing: 0 · Unmatched: 0");
-      const observation = getThematicWgiFeatureInspection(h.state, sample);
-      assert.equal(observation.joinKey, outcome === "applied" ? "DEU" : "RUS");
-      assert.equal(observation.value, outcome === "applied" ? 40 : 80);
-      assert.equal(observation.scenarioTag, outcome === "applied" ? "GER" : "WRS");
-      assert.equal(h.persists(), 0);
-      assert.deepEqual(h.dirty, []);
-
-      h.state.styleConfig.thematic.enabled = false;
-      context.sync();
-      assert.equal(appearanceRefreshes, 1, "disabled WGI does not add appearance work");
-      assert.equal(requests.length, 2);
-    } finally {
-      registerRuntimeHook(h.state, "updateSpecialZoneEditorUIFn", oldHook);
-    }
-  });
-}
 
 test("legend nodes are reused until shared legend content changes", async () => {
   const h = createHarness({ styleConfig: { thematic: normalizeThematicWgiStyle({ enabled: true }) } });

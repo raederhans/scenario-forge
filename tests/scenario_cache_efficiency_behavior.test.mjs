@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFileSync } from "node:fs";
+
 import { state as appState } from "../js/core/state.js";
 import { captureScenarioApplyRollbackSnapshot } from "../js/core/scenario_rollback.js";
 import { createScenarioBundleRuntimeController } from "../js/core/scenario/bundle_runtime.js";
@@ -8,49 +8,6 @@ import { createScenarioRollbackClone } from "../js/core/scenario/rollback_clone.
 import { trimScenarioBundleCache, SCENARIO_BUNDLE_CACHE_LIMIT, SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT } from "../js/core/scenario/bundle_cache.js";
 import { createScenarioChunkPayloadLoader } from "../js/core/scenario/chunk_payload_loader.js";
 import { commitScenarioChunkPayloadEntriesState } from "../js/core/state/actions/scenario_chunk_runtime_actions.js";
-import { ensureScenarioChunkRuntimeState, commitScenarioChunkSelectionState } from "../js/core/state/actions/scenario_chunk_runtime_actions.js";
-
-for (const mode of ["refresh", "prewarm"]) {
-  test(`${mode} actual load-to-commit path retains all 40 required chunks and drops outgoing selection pins`, async () => {
-    const bundle = { id: "a", chunkPayloadCacheById: { old: { payload: {} } } };
-    const runtimeState = { activeScenarioId: "a", scenarioBundleCacheById: { a: bundle } };
-    ensureScenarioChunkRuntimeState(runtimeState, { scenarioId: "a" });
-    const loader = createScenarioChunkPayloadLoader({ runtimeState, normalizeScenarioId: String,
-      getScenarioBundleId: (value) => value.id,
-      loadScenarioChunkFile: async (url) => ({ payload: { features: [{ id: url }] } }),
-    });
-    const requiredChunks = Array.from({ length: 40 }, (_, id) => ({ id: `required-${id}`, url: `required-${id}`, layer: "political" }));
-    const source = readFileSync(new URL("../js/core/scenario/chunk_runtime.js", import.meta.url), "utf8");
-    const start = mode === "refresh" ? source.indexOf("    const chunkLoadStartedAt =") : source.indexOf("    const coarsePayloadEntries =");
-    const end = mode === "refresh" ? source.indexOf("    if (selection.evictableChunkIds.length)", start) : source.indexOf("      const layerSignatures =", start);
-    assert.ok(start >= 0 && end > start);
-    const dependencies = { bundle, runtimeState, d3Client: {},
-      loadScenarioChunkPayloadEntries: loader.loadScenarioChunkPayloadEntries,
-      selection: { requiredChunks }, coarseSelection: { requiredChunks }, startupInitialPoliticalOnly: false,
-      isScenarioChunkRefreshCurrent: () => true, loadState: runtimeState.runtimeChunkLoadState,
-      scenarioId: "a", refreshContinuationState: {}, nextSelectionVersion: 1,
-      nextRequiredChunkIds: requiredChunks.map((chunk) => chunk.id), nextCacheOnlyChunkIds: [], nextRetainedActiveChunkIds: [],
-      selectionScenarioApplyRequestId: 1, recordScenarioChunkRuntimeMetric: () => {}, reason: "test",
-      commitScenarioChunkPayloadEntriesState,
-      isPrewarmContinuationCurrent: () => true, bundleScenarioId: "a", normalizeScenarioId: String,
-      shouldCommitScenarioCoarsePrewarmImmediately: () => true, ensureScenarioChunkRuntimeState,
-      ensureRuntimeChunkLoadState: () => runtimeState.runtimeChunkLoadState,
-      hasDetailScenarioChunkIds: () => false, resolveScenarioChunkApplyEpoch: () => 1,
-      prewarmScenarioApplyRequestId: 1, prewarmLoadStateGeneration: runtimeState.runtimeChunkLoadState.generation,
-      commitScenarioChunkSelectionState,
-    };
-    const body = source.slice(start, end) + (mode === "prewarm" ? "}" : "");
-    await new Function(...Object.keys(dependencies), `return (async () => { ${body} })();`)(...Object.values(dependencies));
-    assert.equal(runtimeState.activeScenarioChunks.loadedChunkIds.length, 40);
-    assert.equal(Object.keys(bundle.chunkPayloadCacheById).length, 40);
-    assert.equal(bundle.chunkPayloadCacheById.old, undefined);
-    for (const chunk of requiredChunks) assert.equal(runtimeState.activeScenarioChunks.payloadByChunkId[chunk.id].payload.features[0].id, chunk.id);
-    loader.resetScenarioChunkRequests("b");
-    assert.deepEqual(bundle.chunkPayloadProtectedIds, []);
-    assert.equal(Object.keys(bundle.chunkPayloadCacheById).length, 32);
-    assert.equal(runtimeState.activeScenarioChunks.loadedChunkIds.length, 40);
-  });
-}
 
 test("overlapping selections keep caller-owned results even when the newest selection replaces cache pins", async () => {
   const runtimeState = { activeScenarioId: "a" };

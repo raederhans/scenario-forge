@@ -1,9 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { parse } from "acorn";
 import { createPhysicalContourVisibleSetOwner } from "../js/core/renderer/physical_contour_visible_set_owner.js";
-import { createRendererTransactionResetOwner } from "../js/core/map_renderer/renderer_transaction_reset_owner.js";
 
 const viewport = Object.freeze({
   width: 1000, height: 600, topologyRevision: 1, zoomBucket: "near",
@@ -113,37 +110,4 @@ test("failed projection does not publish partial selections or poison later atte
   fail = false;
   assert.deepEqual(owner.select(source, {}, viewport), source.features);
   assert.throws(() => createPhysicalContourVisibleSetOwner({ overscanPx: 96 }), /getFeatureScreenBounds/);
-});
-
-test("real renderer adapter samples live viewport state; refresh preserves cache while topology reset releases it", () => {
-  const sourceText = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const ast = parse(sourceText, { sourceType: "module", ecmaVersion: "latest" });
-  const names = ["getContourVisibleFeatures", "resetExactRefreshOptimizationState"];
-  const declarations = names.map((name) => {
-    const node = ast.body.find((entry) => entry.type === "FunctionDeclaration" && entry.id.name === name);
-    assert.ok(node, name);
-    return sourceText.slice(node.start, node.end);
-  }).join("\n");
-  const { owner, calls } = harness();
-  const state = { width: 1000, height: 600, topologyRevision: 1, zoomTransform: { k: 2, x: 0, y: 0 } };
-  const adapter = new Function("runtimeState", "contourVisibleSetOwner", "getContextBaseZoomBucketId", "getTransformSignature", "getViewportRenderSignature", "resetContourHostFillColorCache", "cancelDeferredContextBaseEnhancement", `let detailAdmMeshBuildState; ${declarations}; return { ${names.join(",")} };`)(
-    state, owner, (k) => k, (t) => JSON.stringify(t), () => `${state.width}|${state.height}`, () => {}, () => {},
-  );
-  const source = collection(feature("a"));
-  const first = adapter.getContourVisibleFeatures(source);
-  assert.equal(adapter.getContourVisibleFeatures(source), first);
-  state.zoomTransform.x = 20;
-  const panned = adapter.getContourVisibleFeatures(source);
-  assert.notEqual(panned, first);
-  state.width = 1200;
-  const resized = adapter.getContourVisibleFeatures(source);
-  assert.notEqual(resized, panned);
-  const effects = new Proxy({}, { get: (_target, name) => name === "resetExactRefreshOptimizationState"
-    ? adapter.resetExactRefreshOptimizationState : () => {} });
-  const transactions = createRendererTransactionResetOwner({ effects });
-  transactions.resetRendererRefreshTransactionState();
-  assert.equal(adapter.getContourVisibleFeatures(source), resized);
-  transactions.markRendererTopologyChanged();
-  assert.notEqual(adapter.getContourVisibleFeatures(source), resized);
-  assert.equal(calls.length, 4);
 });

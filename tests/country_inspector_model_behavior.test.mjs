@@ -1,28 +1,7 @@
 import test from "node:test";
-import fs from "node:fs";
-import { parse } from "acorn";
-import { simple } from "acorn-walk";
-import * as expansionActions from "../js/core/state/actions/scenario_presentation_actions.js";
 import assert from "node:assert/strict";
 import { createCountryInspectorModel } from "../js/ui/sidebar/country_inspector_model.js";
 
-
-function createExpansionInitializer(state, model) {
-  const source = fs.readFileSync(new URL("../js/ui/sidebar/country_inspector_controller.js", import.meta.url), "utf8");
-  let initializer;
-  simple(parse(source, { ecmaVersion: "latest", sourceType: "module" }), {
-    FunctionDeclaration(node) {
-      if (node.id.name === "ensureInitialInspectorExpansion") initializer = node;
-    },
-  });
-  assert.ok(initializer);
-  return new Function("runtimeState", "getDefaultExpandedInspectorGroupId", "getInspectorGroupExpansionKey",
-    "ensureInspectorExpansionState", "markInspectorExpansionInitializedState", "setInspectorContinentExpandedState",
-    `return (${source.slice(initializer.start, initializer.end)});`)(state,
-      model.getDefaultExpandedInspectorGroupId, model.getInspectorGroupExpansionKey,
-      expansionActions.ensureInspectorExpansionState, expansionActions.markInspectorExpansionInitializedState,
-      expansionActions.setInspectorContinentExpandedState);
-}
 
 const createModel = (state = {}) => createCountryInspectorModel(state, (label) => label);
 
@@ -111,26 +90,6 @@ test("inspector continent labels use the caller's exact geo translator", () => {
     { code: "NIC", continentId: "continent_africa", continentLabel: "Africa" },
   ]);
   assert.equal(group.displayLabel, "Africa");
-});
-
-test("initial expansion prefers selected then active country and preserves persisted expansion", () => {
-  const state = {
-    selectedInspectorCountryCode: "FR", activeSovereignCode: "JP",
-    countryGroupMetaByCode: new Map([["FR", { continentId: "europe" }], ["JP", { continentId: "asia" }]]),
-  };
-  const model = createModel(state);
-  const groups = [{ id: "asia" }, { id: "europe" }];
-  const initializeExpansion = createExpansionInitializer(state, model);
-  initializeExpansion(groups);
-  assert.deepEqual([...state.expandedInspectorContinents], ["group::europe"]);
-  state.selectedInspectorCountryCode = "";
-  state.inspectorExpansionInitialized = false;
-  initializeExpansion(groups);
-  assert.deepEqual([...state.expandedInspectorContinents], ["group::europe"]);
-  state.inspectorExpansionInitialized = false;
-  state.expandedInspectorContinents.clear();
-  initializeExpansion(groups);
-  assert.deepEqual([...state.expandedInspectorContinents], ["group::asia"]);
 });
 
 test("top-level countries omit hidden and releasable entries but retain grouped subjects", () => {

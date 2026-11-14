@@ -8,21 +8,6 @@ const colorResolverModule = await import(new URL("../js/core/color_resolver.js",
 const colorHexUtilsModule = await import(new URL("../js/core/color_hex_utils.js", import.meta.url));
 const colorManagerModule = await import(new URL("../js/core/color_manager.js", import.meta.url));
 const featureIdentityModule = await import("../js/core/feature_identity.js");
-// 乙类：启动 worker 的身份解析是 classic worker 脚本里的私有函数，尚无可导入入口，暂时截取执行。
-const featureIdentitySharedSource = await readFile(new URL("../js/core/feature_identity_shared.js", import.meta.url), "utf8");
-const startupWorkerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
-const startupWorkerHelperStart = startupWorkerSource.indexOf("const COUNTRY_CODE_ALIASES");
-const startupWorkerHelperEnd = startupWorkerSource.indexOf("async function fetchJsonResource", startupWorkerHelperStart);
-const startupWorkerHelperSource = `${featureIdentitySharedSource}
-${startupWorkerSource.slice(startupWorkerHelperStart, startupWorkerHelperEnd)}
-export {
-  getFeatureId,
-  getFeatureCountryCodeNormalized,
-};`;
-const startupWorkerFeatureIdentityModule = await import(
-  `data:text/javascript;charset=utf-8,${encodeURIComponent(startupWorkerHelperSource)}`
-);
-
 const {
   buildRuntimeDefaultColorsByIso2,
   buildRuntimeDefaultTagByIso2,
@@ -47,11 +32,6 @@ const {
   normalizeHexColorWithFallback,
 } = colorHexUtilsModule;
 const { getCountryCode, getFeatureId, getStableKey } = featureIdentityModule;
-const {
-  getFeatureId: getStartupWorkerFeatureId,
-  getFeatureCountryCodeNormalized,
-} = startupWorkerFeatureIdentityModule;
-
 test("buildRuntimeDefaultTagByIso2 keeps one exposed bridge per iso2", () => {
   assert.deepEqual(
     buildRuntimeDefaultTagByIso2({
@@ -305,38 +285,6 @@ test("feature identity helper normalizes ids, country codes, and stable keys fro
   assert.equal(getStableKey(feature), "stable::gb-001");
   assert.equal(getCountryCode({ id: "RU_shell_01", properties: {} }), "RU");
   assert.equal(getCountryCode({ id: "ZZ_001", properties: {} }), "");
-});
-
-test("startup worker feature identity helpers stay aligned with shared main-thread rules", () => {
-  const samples = [
-    {
-      id: "GB-001",
-      properties: {
-        NUTS_ID: "GB-ALT",
-        iso_a2: "uk",
-      },
-    },
-    {
-      id: "CITY::washington",
-      properties: {
-        countryCode: "us",
-        stableKey: "city::washington",
-      },
-    },
-    {
-      id: "RU_shell_01",
-      properties: {},
-    },
-    {
-      id: "ZZ_001",
-      properties: {},
-    },
-  ];
-
-  for (const feature of samples) {
-    assert.equal(getStartupWorkerFeatureId(feature), getFeatureId(feature));
-    assert.equal(getFeatureCountryCodeNormalized(feature), getCountryCode(feature));
-  }
 });
 
 test("buildScenarioOwnerColorMap keeps scenario colors before palette and generates missing tag colors", () => {

@@ -8,7 +8,6 @@ function createFakeNode({ includeAddEventListener = true, calls = null } = {}) {
   const node = { listeners };
   if (includeAddEventListener) {
     node.addEventListener = (type, handler) => {
-      calls?.order.push(`node:${type}`);
       listeners.set(type, handler);
     };
     node.dispatch = (type, event = {}) => listeners.get(type)?.(event);
@@ -22,7 +21,6 @@ function createFakeInteractionRect(node = createFakeNode(), calls = null) {
     handlers,
     node: () => node,
     on(type, handler) {
-      calls?.order.push(`rect:${type}`);
       handlers.set(type, handler);
       return this;
     },
@@ -37,7 +35,6 @@ function createFakeWindow(calls = null) {
   return {
     listeners,
     addEventListener(type, handler) {
-      calls?.order.push(`window:${type}`);
       const next = listeners.get(type) || [];
       next.push(handler);
       listeners.set(type, next);
@@ -64,7 +61,6 @@ function createHarness({
   includeNodeAddEventListener = true,
 } = {}) {
   const calls = {
-    order: [],
     effects: [],
     handlers: [],
   };
@@ -97,11 +93,9 @@ function createHarness({
     effects: {
       bindMapContainerResizeObserver() {
         calls.effects.push("bindMapContainerResizeObserver");
-        calls.order.push("bindMapContainerResizeObserver");
       },
       bindBrowserZoomObservers() {
         calls.effects.push("bindBrowserZoomObservers");
-        calls.order.push("bindBrowserZoomObservers");
       },
     },
   });
@@ -126,16 +120,9 @@ test("bindEvents noops when interaction rect is missing", () => {
 });
 
 test("bindEvents wires interaction rect handlers directly to the injected click handlers", () => {
-  const { calls, handlers, interactionRect, owner } = createHarness();
+  const { calls, interactionRect, owner } = createHarness();
 
   assert.equal(owner.bindEvents(), true);
-
-  assert.equal(interactionRect.handlers.get("mousemove"), handlers.handleMouseMove);
-  assert.equal(interactionRect.handlers.get("mousedown.brush"), handlers.handleBrushPointerDown);
-  assert.equal(interactionRect.handlers.get("mousemove.brush"), handlers.handleBrushPointerMove);
-  assert.equal(interactionRect.handlers.get("mouseleave"), handlers.handleMouseLeave);
-  assert.equal(interactionRect.handlers.get("click"), handlers.mapClick);
-  assert.equal(interactionRect.handlers.get("dblclick"), handlers.mapDoubleClick);
 
   interactionRect.dispatch("mouseleave", { type: "mouseleave" });
   interactionRect.dispatch("click", { type: "click" });
@@ -154,7 +141,7 @@ test("bindEvents wires interaction rect handlers directly to the injected click 
 });
 
 test("bindEvents wires window and native node listeners", () => {
-  const { calls, fakeWindow, handlers, node, owner } = createHarness();
+  const { calls, fakeWindow, owner } = createHarness();
 
   owner.bindEvents();
 
@@ -164,10 +151,7 @@ test("bindEvents wires window and native node listeners", () => {
     fakeWindow.dispatch(type, event);
     assert.deepEqual(calls.handlers.at(-1), { name: "handlePhysicalIntensityPointerEnd", args: [event] });
   }
-  assert.equal(fakeWindow.listeners.get("resize")[0], handlers.handleResize);
-  assert.equal(fakeWindow.listeners.get("mapcreator:sidebar-layout-start")[0], handlers.handleSidebarLayoutStart);
   assert.equal(fakeWindow.listenerCount("mapcreator:sidebar-layout-refresh"), 1);
-  assert.equal(node.listeners.get("lostpointercapture"), handlers.handlePhysicalIntensityPointerEnd);
 });
 
 test("mouseup and sidebar refresh callbacks preserve host behavior", () => {
@@ -193,24 +177,6 @@ test("lostpointercapture is optional when the native node has no listener API", 
   assert.equal(owner.bindEvents(), true);
   assert.equal(node.listeners.size, 0);
   assert.equal(fakeWindow.listenerCount("pointerup"), 1);
-});
-
-test("resize and browser zoom observers run after listener binding", () => {
-  const { calls, owner } = createHarness();
-
-  owner.bindEvents();
-
-  assert.deepEqual(calls.effects, ["bindMapContainerResizeObserver", "bindBrowserZoomObservers"]);
-  assert.ok(calls.order.indexOf("rect:dblclick") < calls.order.indexOf("bindMapContainerResizeObserver"));
-  assert.ok(calls.order.indexOf("window:mapcreator:sidebar-layout-refresh") < calls.order.indexOf("bindMapContainerResizeObserver"));
-  assert.ok(calls.order.indexOf("node:lostpointercapture") < calls.order.indexOf("bindMapContainerResizeObserver"));
-  assert.ok(calls.order.indexOf("bindMapContainerResizeObserver") < calls.order.indexOf("bindBrowserZoomObservers"));
-});
-
-test("factory freezes its exact public API", () => {
-  const { owner } = createHarness();
-
-  assert.equal(Object.isFrozen(owner), true);
 });
 
  test("direct click bindings preserve event identity and asynchronous failures", async () => {

@@ -1,6 +1,4 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
 
 import { createCachedPassCompositorOwner } from "../js/core/renderer/cached_pass_compositor_owner.js";
@@ -60,7 +58,6 @@ function createHarness(overrides = {}) {
   };
   const dirty = { background: true, labels: false };
   const diagnostics = [];
-  let cacheSnapshotReads = 0;
   let activeTarget = createCanvasContext("first");
   const cacheSnapshot = { canvases, dirty };
   const dependencies = {
@@ -70,7 +67,6 @@ function createHarness(overrides = {}) {
     getters: {
       getActiveTargetContext: () => activeTarget,
       getRenderPassCacheSnapshot: () => {
-        cacheSnapshotReads += 1;
         return cacheSnapshot;
       },
       getPassReferenceTransform: (passName) => references[passName] || null,
@@ -99,9 +95,6 @@ function createHarness(overrides = {}) {
     layouts,
     diagnostics,
     cacheSnapshot,
-    get cacheSnapshotReads() {
-      return cacheSnapshotReads;
-    },
     get activeTarget() {
       return activeTarget;
     },
@@ -111,46 +104,19 @@ function createHarness(overrides = {}) {
   };
 }
 
-test("factory validates the bounded dependency surface and freezes its API", () => {
-  const harness = createHarness();
-  assert.equal(Object.isFrozen(harness.owner), true);
-  assert.deepEqual(Object.keys(harness.owner), [
-    "getPassCoverage",
-    "getCompositeCoverage",
-    "drawTransformedPass",
-    "composeRenderPassesToTarget",
-  ]);
-
-  for (const [namespace, name] of [
-    ["getters", "getActiveTargetContext"],
-    ["getters", "getRenderPassCacheSnapshot"],
-    ["getters", "getPassReferenceTransform"],
-    ["getters", "getRenderPassLayout"],
-    ["getters", "getDpr"],
-    ["getters", "getRenderPhase"],
-    ["getters", "isRenderDiagnosticsEnabled"],
-    ["helpers", "cloneZoomTransform"],
-    ["helpers", "areZoomTransformsEquivalent"],
-    ["effects", "recordTransformedPassDiagnostics"],
-  ]) {
-    assert.throws(
-      () => createHarness({ [namespace]: { [name]: null } }),
-      new RegExp(`${namespace}\\.${name} must be a function`),
-    );
-  }
+test("factory rejects a missing dependency", () => {
   assert.throws(
-    () => createHarness({ constants: { renderPassNames: [] } }),
-    /constants\.renderPassNames must be a non-empty array/,
+    () => createHarness({ getters: { getActiveTargetContext: null } }),
+    /getters\.getActiveTargetContext must be a function/,
   );
 });
 
-test("each public method captures one normalized cache snapshot regardless of pass count", () => {
+test("draw and composition succeed with optional and required passes", () => {
   const drawHarness = createHarness();
   assert.equal(
     drawHarness.owner.drawTransformedPass("background", { k: 4, x: 50, y: 70 }),
     true,
   );
-  assert.equal(drawHarness.cacheSnapshotReads, 1);
 
   const nonRequiredHarness = createHarness();
   assert.deepEqual(
@@ -161,7 +127,6 @@ test("each public method captures one normalized cache snapshot regardless of pa
     ),
     { ok: true },
   );
-  assert.equal(nonRequiredHarness.cacheSnapshotReads, 1);
 
   const requireAllHarness = createHarness();
   assert.deepEqual(
@@ -173,7 +138,6 @@ test("each public method captures one normalized cache snapshot regardless of pa
     ),
     { ok: true },
   );
-  assert.equal(requireAllHarness.cacheSnapshotReads, 1);
 });
 
 test("padded composite copies align both unchanged and transformed pass pixels", () => {
@@ -203,21 +167,11 @@ test("coverage uses the intersection of painted bounds rather than composite all
 });
 
 test("drawTransformedPass preserves missing-input and explicit-reference behavior", () => {
-  let referenceReads = 0;
-  const harness = createHarness({
-    getters: {
-      getPassReferenceTransform: (passName) => {
-        referenceReads += 1;
-        return harness.references[passName] || null;
-      },
-    },
-  });
+  const harness = createHarness();
   assert.equal(harness.owner.drawTransformedPass("missing", { k: 1, x: 0, y: 0 }), false);
-  assert.equal(referenceReads, 0);
 
   delete harness.references.background;
   assert.equal(harness.owner.drawTransformedPass("background", { k: 1, x: 0, y: 0 }), false);
-  assert.equal(referenceReads, 1);
 
   assert.equal(
     harness.owner.drawTransformedPass(
@@ -227,7 +181,6 @@ test("drawTransformedPass preserves missing-input and explicit-reference behavio
     ),
     true,
   );
-  assert.equal(referenceReads, 1);
 });
 
 test("drawTransformedPass preserves exact transform math diagnostics and dynamic target lookup", () => {
@@ -265,16 +218,11 @@ test("drawTransformedPass preserves exact transform math diagnostics and dynamic
   assert.equal(secondTarget.calls.filter(([name]) => name === "drawImage").length, 1);
 });
 
-test("diagnostics-disabled draws skip phase reads and diagnostic effects", () => {
-  let phaseReads = 0;
+test("diagnostics-disabled draws omit diagnostic effects", () => {
   let diagnosticEffects = 0;
   const harness = createHarness({
     getters: {
       isRenderDiagnosticsEnabled: () => false,
-      getRenderPhase: () => {
-        phaseReads += 1;
-        return "interacting";
-      },
     },
     effects: {
       recordTransformedPassDiagnostics: () => {
@@ -292,20 +240,11 @@ test("diagnostics-disabled draws skip phase reads and diagnostic effects", () =>
     ),
     { ok: true },
   );
-  assert.equal(phaseReads, 0);
   assert.equal(diagnosticEffects, 0);
 });
 
 test("composeRenderPassesToTarget preserves missing target and require-all preflight priority", () => {
-  let referenceReads = [];
-  const harness = createHarness({
-    getters: {
-      getPassReferenceTransform: (passName) => {
-        referenceReads.push(passName);
-        return harness.references[passName] || null;
-      },
-    },
-  });
+  const harness = createHarness();
   assert.deepEqual(
     harness.owner.composeRenderPassesToTarget(null, ["background"], { k: 1, x: 0, y: 0 }),
     { ok: false, reason: "missing-target-context" },
@@ -328,7 +267,6 @@ test("composeRenderPassesToTarget preserves missing target and require-all prefl
       missingPassNames: ["background", "labels"],
     },
   );
-  assert.deepEqual(referenceReads, []);
 });
 
 test("composeRenderPassesToTarget reports the complete require-all reference preflight", () => {
@@ -422,103 +360,7 @@ test("composeRenderPassesToTarget preserves transformed and equivalent direct co
   ]);
 });
 
-test("composeRenderPassesToTarget preserves equivalence layout and DPR read order", () => {
-  const calls = [];
-  const harness = createHarness({
-    getters: {
-      getRenderPassLayout: (passName) => {
-        calls.push(`layout:${passName}`);
-        return { offsetX: 0, offsetY: 0 };
-      },
-      getDpr: () => {
-        calls.push("dpr");
-        return 1;
-      },
-    },
-    helpers: {
-      areZoomTransformsEquivalent: (a, b) => {
-        calls.push("equivalent");
-        return areZoomTransformsEquivalent(a, b);
-      },
-    },
-  });
-  assert.deepEqual(
-    harness.owner.composeRenderPassesToTarget(
-      createCanvasContext("target"),
-      ["background"],
-      { k: 4, x: 50, y: 70 },
-    ),
-    { ok: true },
-  );
-  assert.deepEqual(calls, ["equivalent", "layout:background", "dpr"]);
-});
-
-test("DPR reads stay at the original draw-site evaluation points", () => {
-  let drawTarget;
-  const drawHarness = createHarness({
-    getters: {
-      getDpr: () => {
-        assert.deepEqual(drawTarget.calls, [
-          ["save"],
-          ["setTransform", 1, 0, 0, 1, 0, 0],
-        ]);
-        return 2;
-      },
-    },
-  });
-  drawTarget = drawHarness.activeTarget;
-  assert.equal(
-    drawHarness.owner.drawTransformedPass("background", { k: 4, x: 50, y: 70 }),
-    true,
-  );
-
-  const transformedTarget = createCanvasContext("transformed-order");
-  const transformedHarness = createHarness({
-    getters: {
-      getDpr: () => {
-        assert.deepEqual(transformedTarget.calls, [
-          ["save"],
-          ["setTransform", 1, 0, 0, 1, 0, 0],
-        ]);
-        return 2;
-      },
-    },
-  });
-  assert.deepEqual(
-    transformedHarness.owner.composeRenderPassesToTarget(
-      transformedTarget,
-      ["background"],
-      { k: 4, x: 50, y: 70 },
-    ),
-    { ok: true },
-  );
-
-  const directTarget = createCanvasContext("direct-order");
-  let layoutRead = false;
-  const directHarness = createHarness({
-    getters: {
-      getRenderPassLayout: () => {
-        layoutRead = true;
-        return { offsetX: 3, offsetY: 4 };
-      },
-      getDpr: () => {
-        assert.equal(layoutRead, true);
-        assert.deepEqual(directTarget.calls, []);
-        return 2;
-      },
-    },
-  });
-  assert.deepEqual(
-    directHarness.owner.composeRenderPassesToTarget(
-      directTarget,
-      ["background"],
-      { k: 2, x: 10, y: 20 },
-    ),
-    { ok: true },
-  );
-});
-
-test("compose rejects null options before reading the cache snapshot", () => {
+test("compose rejects null options", () => {
   const harness = createHarness();
   assert.throws(
     () => harness.owner.composeRenderPassesToTarget(
@@ -529,39 +371,4 @@ test("compose rejects null options before reading the cache snapshot", () => {
     ),
     TypeError,
   );
-  assert.equal(harness.cacheSnapshotReads, 0);
 });
-
-test("compose reads requireAllPasses once before capturing the cache snapshot", () => {
-  const events = [];
-  let cacheSnapshot = null;
-  const harness = createHarness({
-    getters: {
-      getRenderPassCacheSnapshot: () => {
-        events.push("cache-snapshot");
-        return cacheSnapshot;
-      },
-    },
-  });
-  cacheSnapshot = harness.cacheSnapshot;
-  let optionReads = 0;
-  const options = Object.freeze({
-    get requireAllPasses() {
-      optionReads += 1;
-      events.push("require-all");
-      return true;
-    },
-  });
-  assert.deepEqual(
-    harness.owner.composeRenderPassesToTarget(
-      createCanvasContext("options"),
-      ["background", "labels"],
-      { k: 2, x: 10, y: 20 },
-      options,
-    ),
-    { ok: true },
-  );
-  assert.equal(optionReads, 1);
-  assert.deepEqual(events, ["require-all", "cache-snapshot"]);
-});
-

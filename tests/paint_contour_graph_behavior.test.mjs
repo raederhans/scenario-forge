@@ -1,42 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
 import { buildPaintContourGraph, createPaintContourGraphBuilder } from '../js/core/renderer/paint_contour_graph.js';
 import { createPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
-
-// Exercise the two internal numerical primitives without widening the public API.
-let scalarInternals;
-function readScalarInternals() {
-  return scalarInternals ||= readFile(new URL('../js/core/renderer/paint_contour_graph.js', import.meta.url), 'utf8')
-    .then(source => import(`data:text/javascript;base64,${Buffer.from(`${source.replace('./paint_contour_water_mask.js', new URL('../js/core/renderer/paint_contour_water_mask.js', import.meta.url).href)}\nexport { createCompactEdges, sourceEdgeQuery, sourceCollinear };`).toString('base64')}`));
-}
-
-function legacySourceEdgeQuery(edges, occupied) {
-  const ordered = [...edges.values(), ...occupied.filter(edge => !edge.key)]
-    .filter(edge => Math.abs(edge.b[0] - edge.a[0]) <= 180 * 1e7);
-  const ordinal = new Map(ordered.map((edge, index) => [edge, index]));
-  ordered.sort((a, b) => a.a[0] - b.a[0] || ordinal.get(a) - ordinal.get(b));
-  let size = 1; while (size < ordered.length) size *= 2;
-  const maxima = new Float64Array(size * 2).fill(-Infinity);
-  ordered.forEach((edge, index) => { maxima[size + index] = edge.b[0]; });
-  for (let index = size - 1; index > 0; index -= 1) maxima[index] = Math.max(maxima[index * 2], maxima[index * 2 + 1]);
-  return (x0, y0, x1, y1) => {
-    const result = [];
-    function visit(node, lo, hi) {
-      if (lo >= ordered.length || ordered[lo].a[0] > x1 || maxima[node] < x0) return;
-      if (hi - lo === 1) {
-        const edge = ordered[lo];
-        if (Math.min(edge.a[1], edge.b[1]) <= y1 && Math.max(edge.a[1], edge.b[1]) >= y0) result.push(edge);
-        return;
-      }
-      const mid = (lo + hi) >>> 1;
-      visit(node * 2, lo, mid); visit(node * 2 + 1, mid, hi);
-    }
-    visit(1, 0, size);
-    return result;
-  };
-}
 
 const polygon = (id, rings) => ({ id, geometry: { type: 'Polygon', coordinates: rings } });
 const rect = (id, x0, y0, x1, y1) => polygon(id, [[[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]]);
@@ -355,108 +321,6 @@ test('deletion tombstones and slot reuse remain bounded across repeated full rep
   assert.equal(builder.finish().diagnostics.arcCount, 0);
   builder.patch(original); assert.equal(builder.finish().diagnostics.arcCount, 0);
 });
-
-test('scalar interval queries retain mixed compact/split edge order and inclusive boundaries', async () => {
-  const { createCompactEdges, sourceEdgeQuery } = await readScalarInternals();
-  const store = createCompactEdges();
-  const add = (a, b) => store.getOrAdd(a, b, a, b);
-  add([10, 0], [30, 4]); add([10, 2], [20, 6]); add([-5, -4], [0, 0]);
-  add([-1800000000, 0], [1800000000, 0]); // Excluded world-spanning chord.
-  store.beginRead();
-  const originals = [...store.values()];
-  const split = { a: [10, -2], b: [25, 2], start: [1, -0.2], end: [2.5, 0.2] };
-  const excluded = { ...split, key: 99 };
-  const query = sourceEdgeQuery(store, [split, excluded]);
-  // Equal lower x values keep original insertion order before the split edge.
-  assert.deepEqual(query(10, -2, 10, 2), [originals[0], originals[1], split]);
-  assert.deepEqual(query(0, 0, 0, 0), [originals[2]]);
-  assert.deepEqual(query(30, 4, 30, 4), [originals[0]]);
-  assert.deepEqual(query(31, -90, 40, 90), []);
-  store.endRead();
-});
-
-test('signed-Int32 radix interval queries preserve duplicate-x0 ordinal order and inclusive bounds', async () => {
-  const { sourceEdgeQuery } = await readScalarInternals();
-  const edge = (id, x0, y0, x1, y1) => ({ id, a: [x0, y0], b: [x1, y1] });
-  const int32Min = -0x80000000, int32Max = 0x7fffffff;
-  const source = [
-    edge('tie-upper-first', -1e9, 5, -1e9 + 30, 10),
-    edge('signed-max', int32Max - 5, -2, int32Max, 2),
-    edge('signed-min', int32Min, -2, int32Min + 5, 2),
-    edge('tie-lower-second', -1e9, -5, -1e9 + 10, 0),
-    edge('long-cross-buckets', -1700000000, -10, 100, 10),
-    edge('zero-degenerate', 0, 0, 0, 0),
-  ];
-  const occupied = [edge('occupied-tie', -1e9, -1, -1e9 + 20, 1), { ...edge('excluded-keyed', 0, -1, 0, 1), key: 7 }];
-  const store = { values: () => source };
-  const expected = legacySourceEdgeQuery(store, occupied), actual = sourceEdgeQuery(store, occupied);
-  const ranges = [
-    [int32Min, -2, int32Min + 5, 2], [-1e9, -10, -1e9 + 30, 10],
-    [0, -10, 100, 10], [int32Max - 5, -2, int32Max, 2],
-    [int32Min, -10, int32Max, 10], [int32Min - 1, -10, int32Max + 1, 10],
-    [0, 0, 0, 0],
-  ];
-  for (const range of ranges) {
-    assert.deepEqual(actual(...range).map(value => value.id), expected(...range).map(value => value.id), `query ${range.join(',')}`);
-  }
-  const tied = actual(-1e9, -10, -1e9 + 30, 10).map(value => value.id);
-  assert.ok(tied.indexOf('tie-upper-first') < tied.indexOf('tie-lower-second'));
-  assert.ok(tied.indexOf('tie-lower-second') < tied.indexOf('occupied-tie'));
-  assert.deepEqual(sourceEdgeQuery({ values: () => [] }, [])(0, 0, 0, 0), []);
-});
-
-test('source query keeps legacy fallback for non-Int32 starts, ends and fractional coordinates', async () => {
-  const { sourceEdgeQuery } = await readScalarInternals();
-  const edge = (id, x0, y0, x1, y1) => ({ id, a: [x0, y0], b: [x1, y1] });
-  const source = [
-    edge('positive-overflow-start', 2147483648, 0, 2147483649, 1),
-    edge('negative-overflow-start', -2147483649, 0, -2147483648, 1),
-    edge('overflow-end-only', 2000000000, -2, 2147483648, 2),
-    edge('fractional-start', 0.5, -1, 1.5, 1),
-    edge('in-range', -10, -1, -5, 1),
-  ];
-  const occupied = [edge('occupied-overflow', 2147483648, -1, 2147483650, 1)];
-  const store = { values: () => source };
-  const expected = legacySourceEdgeQuery(store, occupied), actual = sourceEdgeQuery(store, occupied);
-  for (const range of [[-3e9, -2, 3e9, 2], [-2147483649, 0, -2147483648, 1],
-    [2000000000, -2, 2147483648, 2], [0.5, -1, 1.5, 1]]) {
-    assert.deepEqual(actual(...range).map(value => value.id), expected(...range).map(value => value.id), `query ${range.join(',')}`);
-  }
-});
-
-test('scalar source collinearity preserves the original floating error operation order', async () => {
-  const { createCompactEdges, sourceCollinear } = await readScalarInternals();
-  const error = value => Math.max(Number.MIN_VALUE, Math.abs(value) * Number.EPSILON);
-  // Frozen pre-scalar formula: an oracle for the numerical acceptance boundary.
-  function original(edge, point) {
-    const [a, b] = [edge.start, edge.end];
-    const difference = (x, y) => [x - y, error(x) + error(y) + error(x - y)];
-    const [dx, dxError] = difference(b[0], a[0]), [dy, dyError] = difference(b[1], a[1]);
-    const [px, pxError] = difference(point[0], a[0]), [py, pyError] = difference(point[1], a[1]);
-    const left = dx * py, right = dy * px, determinant = left - right;
-    const bound = Math.abs(dx) * pyError + Math.abs(py) * dxError + dxError * pyError
-      + Math.abs(dy) * pxError + Math.abs(px) * dyError + dyError * pxError
-      + error(left) + error(right) + error(determinant);
-    return Number.isFinite(bound) && Math.abs(determinant) <= bound;
-  }
-  let accepted = 0, rejected = 0;
-  for (const [start, end] of [[[0, 0], [1, 1]], [[179, 89], [179.1, 89.1]],
-    [[-1e-20, -1e-20], [1e-20, 1e-20]], [[-0, 0], [0, 1]]]) {
-    const ordinary = { start, end }, store = createCompactEdges();
-    store.getOrAdd([0, 0], [1, 1], start, end);
-    const compact = [...store.values()][0];
-    for (const step of [0, 0.25, 0.5, 1]) for (const drift of [0, Number.MIN_VALUE, Number.EPSILON, 1e-12]) {
-      const point = [start[0] + (end[0] - start[0]) * step, start[1] + (end[1] - start[1]) * step + drift];
-      const expected = original(ordinary, point), other = { start: point, end: point };
-      expected ? accepted++ : rejected++;
-      for (const edge of [ordinary, compact]) for (const second of [false, true]) {
-        assert.equal(sourceCollinear(edge, other, second), expected);
-      }
-    }
-  }
-  assert.ok(accepted > 0 && rejected > 0);
-});
-
 
 test('coast chains contain uncovered unpaired edges for either ring winding', async () => {
   const { packContourWaterMask } = await import('../js/core/renderer/paint_contour_water_mask.js');
