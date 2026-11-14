@@ -1739,7 +1739,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/index.html",
             ".nojekyll",
             "app/js/main.js",
-            "app/js/api/backend_client.js",
             "app/js/ui/sidebar/project_support_diagnostics_controller.js",
             "app/data/CATALOG.json",
             "app/data/scenarios/index.json",

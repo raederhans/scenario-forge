@@ -669,7 +669,6 @@ async function toggleLanguage() {
     "updateWaterInteractionUIFn",
     "renderWaterRegionListFn",
     "renderSpecialRegionListFn",
-    "refreshProjectAccountLanguageFn",
   ]);
   try {
     const { ensureScenarioGeoLocalePatchForLanguage } = await import("../core/scenario/scenario_resources.js");

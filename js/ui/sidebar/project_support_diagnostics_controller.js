@@ -1,4 +1,3 @@
-import { focusSurface, getActiveModal, trapSurfaceTab } from "../ui_contract.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
 import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
@@ -6,44 +5,7 @@ import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   createSpecialZonePatternPreviewStyle,
 } from "../../core/special_zone_layers.js";
-import {
-  addCommunityComment,
-  createBackendSave,
-  downloadCommunitySave,
-  listBackendSaves,
-  listCommunitySaves,
-  loginBackendUser,
-  logoutBackendUser,
-  publishBackendSave,
-  refreshBackendSession,
-  registerBackendUser,
-  reportCommunitySave,
-} from "../../api/backend_client.js";
 import { prepareProjectImportFile } from "../../core/project_package_io.js";
-
-function createBackendSessionProbe({
-  onProbing = () => {},
-  onAuthenticated = () => {},
-  onAnonymous = () => {},
-  onUnavailable = () => {},
-  onSettled = () => {},
-} = {}) {
-  let probePromise = null;
-  return function ensureProbed() {
-    if (probePromise) return;
-    onProbing();
-    probePromise = refreshBackendSession()
-      .then(onAuthenticated)
-      .catch((error) => {
-        if (error?.code === "auth_required" || error?.status === 401) {
-          onAnonymous();
-          return;
-        }
-        onUnavailable(error);
-      })
-      .finally(onSettled);
-  };
-}
 
 /**
  * Owns the project support and diagnostics panels inside the sidebar:
@@ -83,7 +45,6 @@ export function createProjectSupportDiagnosticsController({
     projectManagementStack,
     legendEditorStack,
     diagnosticStack,
-    rightSidebarContent,
   } = hosts;
 
   let projectSection = documentRef.getElementById("projectManagement");
@@ -132,15 +93,10 @@ export function createProjectSupportDiagnosticsController({
       ["recommended", "Project + metadata"],
       ["diagnostic", "Project + diagnostics"],
     ]);
-    const projectLoadSource = buildProjectSelect("projectLoadSource", "Load source", [
-      ["local", "Local project file"],
-      ["community", "Community save"],
-    ]);
     projectDownloadOptions.append(
       projectDownloadFormat.field,
       projectPackageContents.field,
-      projectDownloadDestination.field,
-      projectLoadSource.field
+      projectDownloadDestination.field
     );
 
     const downloadBtn = documentRef.createElement("button");
@@ -193,47 +149,6 @@ export function createProjectSupportDiagnosticsController({
     projectSaveStatus.classList.add("hidden");
     projectSaveStatus.textContent = "";
 
-    const accountDock = documentRef.createElement("div");
-    accountDock.className = "project-account-dock";
-
-    const accountHint = documentRef.createElement("span");
-    accountHint.className = "project-account-hint";
-    accountHint.textContent = t("Account", "ui");
-
-    const accountToggleBtn = documentRef.createElement("button");
-    accountToggleBtn.id = "backendAccountToggleBtn";
-    accountToggleBtn.type = "button";
-    accountToggleBtn.className = "project-account-toggle";
-    accountToggleBtn.setAttribute("aria-haspopup", "dialog");
-    accountToggleBtn.setAttribute("aria-expanded", "false");
-    accountToggleBtn.setAttribute("aria-controls", "backendAccountPopover");
-    accountToggleBtn.setAttribute("aria-label", t("Account and Cloud Saves", "ui"));
-    accountToggleBtn.title = t("Account and Cloud Saves", "ui");
-    accountToggleBtn.innerHTML = `
-      <svg class="project-account-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"></circle>
-        <path d="M5.5 20a6.5 6.5 0 0 1 13 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-      </svg>
-    `;
-    accountDock.append(accountHint, accountToggleBtn);
-
-    const accountPopover = documentRef.createElement("div");
-    accountPopover.id = "backendAccountPopover";
-    accountPopover.className = "project-account-popover hidden";
-    accountPopover.setAttribute("role", "dialog");
-    accountPopover.setAttribute("aria-label", t("Account and Cloud Saves", "ui"));
-    accountPopover.setAttribute("aria-modal", "true");
-
-    const accountBackdrop = documentRef.createElement("div");
-    accountBackdrop.id = "backendAccountBackdrop";
-    accountBackdrop.className = "project-account-backdrop hidden";
-    accountBackdrop.setAttribute("aria-hidden", "true");
-
-    const accountShelf = documentRef.createElement("div");
-    accountShelf.id = "rightSidebarAccountShelf";
-    accountShelf.className = "right-sidebar-account-shelf";
-    accountShelf.append(accountDock);
-
     actions.appendChild(downloadBtn);
     actions.appendChild(projectDownloadOptions);
     actions.appendChild(uploadBtn);
@@ -242,124 +157,7 @@ export function createProjectSupportDiagnosticsController({
     actions.appendChild(fileInput);
 
     projectSection.appendChild(actions);
-    {
-      const cloudSection = documentRef.createElement("div");
-      cloudSection.id = "backendCloudSection";
-      cloudSection.className = "project-account-panel";
-      cloudSection.hidden = true;
-
-      const cloudHeader = documentRef.createElement("div");
-      cloudHeader.className = "project-account-panel-header";
-
-      const cloudHeaderCopy = documentRef.createElement("div");
-      cloudHeaderCopy.className = "project-account-panel-copy";
-
-      const cloudTitle = documentRef.createElement("h2");
-      cloudTitle.className = "project-account-panel-title";
-      cloudTitle.id = "backendAccountPopoverTitle";
-      cloudTitle.textContent = t("Cloud Saves", "ui");
-      accountPopover.setAttribute("aria-labelledby", "backendAccountPopoverTitle");
-
-      const cloudStatus = documentRef.createElement("p");
-      cloudStatus.id = "backendCloudStatus";
-      cloudStatus.className = "project-account-panel-status";
-      cloudStatus.setAttribute("role", "status");
-      cloudStatus.setAttribute("aria-live", "polite");
-      cloudStatus.setAttribute("aria-atomic", "true");
-      cloudStatus.textContent = t("Local backend cloud saves are available after login.", "ui");
-      cloudStatus.dataset.localizationKey = "Local backend cloud saves are available after login.";
-      cloudHeaderCopy.append(cloudTitle, cloudStatus);
-
-      const closeAccountBtn = documentRef.createElement("button");
-      closeAccountBtn.id = "backendAccountCloseBtn";
-      closeAccountBtn.type = "button";
-      closeAccountBtn.className = "project-account-close-btn";
-      closeAccountBtn.setAttribute("aria-label", t("Close", "ui"));
-      closeAccountBtn.textContent = "×";
-      cloudHeader.append(cloudHeaderCopy, closeAccountBtn);
-
-      const cloudCredentialGrid = documentRef.createElement("div");
-      cloudCredentialGrid.className = "project-account-field-grid";
-
-      const cloudUsername = documentRef.createElement("input");
-      cloudUsername.id = "backendCloudUsername";
-      cloudUsername.type = "text";
-      cloudUsername.autocomplete = "username";
-      cloudUsername.placeholder = t("Username", "ui");
-      cloudUsername.className = "input project-account-input";
-
-      const cloudPassword = documentRef.createElement("input");
-      cloudPassword.id = "backendCloudPassword";
-      cloudPassword.type = "password";
-      cloudPassword.autocomplete = "current-password";
-      cloudPassword.placeholder = t("Password", "ui");
-      cloudPassword.className = "input project-account-input";
-
-      const cloudTitleInput = documentRef.createElement("input");
-      cloudTitleInput.id = "backendCloudSaveTitle";
-      cloudTitleInput.type = "text";
-      cloudTitleInput.placeholder = t("Save title", "ui");
-      cloudTitleInput.className = "input project-account-input project-account-title-input";
-      cloudCredentialGrid.append(cloudUsername, cloudPassword, cloudTitleInput);
-
-      const cloudActions = documentRef.createElement("div");
-      cloudActions.className = "project-account-actions";
-
-      const registerCloudBtn = documentRef.createElement("button");
-      registerCloudBtn.id = "backendCloudRegisterBtn";
-      registerCloudBtn.type = "button";
-      registerCloudBtn.className = "btn-secondary sidebar-support-entry-btn";
-      registerCloudBtn.textContent = t("Register", "ui");
-
-      const loginCloudBtn = documentRef.createElement("button");
-      loginCloudBtn.id = "backendCloudLoginBtn";
-      loginCloudBtn.type = "button";
-      loginCloudBtn.className = "btn-secondary sidebar-support-entry-btn";
-      loginCloudBtn.textContent = t("Login", "ui");
-
-      const logoutCloudBtn = documentRef.createElement("button");
-      logoutCloudBtn.id = "backendCloudLogoutBtn";
-      logoutCloudBtn.type = "button";
-      logoutCloudBtn.className = "btn-secondary sidebar-support-entry-btn";
-      logoutCloudBtn.textContent = t("Logout", "ui");
-
-      const saveCloudBtn = documentRef.createElement("button");
-      saveCloudBtn.id = "backendCloudSaveBtn";
-      saveCloudBtn.type = "button";
-      saveCloudBtn.className = "btn-primary sidebar-support-entry-btn";
-      saveCloudBtn.textContent = t("Save Cloud Copy", "ui");
-
-      const publishCloudBtn = documentRef.createElement("button");
-      publishCloudBtn.id = "backendCloudPublishBtn";
-      publishCloudBtn.type = "button";
-      publishCloudBtn.className = "btn-secondary sidebar-support-entry-btn";
-      publishCloudBtn.textContent = t("Publish Latest", "ui");
-
-      const refreshCommunityBtn = documentRef.createElement("button");
-      refreshCommunityBtn.id = "backendCommunityRefreshBtn";
-      refreshCommunityBtn.type = "button";
-      refreshCommunityBtn.className = "btn-secondary sidebar-support-entry-btn";
-      refreshCommunityBtn.textContent = t("Refresh Community", "ui");
-
-      cloudActions.append(
-        registerCloudBtn,
-        loginCloudBtn,
-        logoutCloudBtn,
-        saveCloudBtn,
-        publishCloudBtn,
-        refreshCommunityBtn
-      );
-
-      const communityList = documentRef.createElement("div");
-      communityList.id = "backendCommunityList";
-      communityList.className = "project-account-community-list";
-
-      cloudSection.append(cloudHeader, cloudCredentialGrid, cloudActions, communityList);
-      accountPopover.appendChild(cloudSection);
-    }
-    documentRef.body.append(accountBackdrop, accountPopover);
     projectManagementStack.appendChild(projectSection);
-    rightSidebarContent?.appendChild(accountShelf);
   }
 
   let legendSection = documentRef.getElementById("legendEditor");
@@ -439,26 +237,9 @@ export function createProjectSupportDiagnosticsController({
   const projectDownloadFormat = documentRef.getElementById("projectDownloadFormat");
   const projectDownloadDestination = documentRef.getElementById("projectDownloadDestination");
   const projectPackageContents = documentRef.getElementById("projectPackageContents");
-  const projectLoadSource = documentRef.getElementById("projectLoadSource");
   const projectFileInput = documentRef.getElementById("projectFileInput");
   const projectFileName = documentRef.getElementById("projectFileName");
   const projectSaveStatus = documentRef.getElementById("projectSaveStatus");
-  const backendCloudSection = documentRef.getElementById("backendCloudSection");
-  const backendCloudStatus = documentRef.getElementById("backendCloudStatus");
-  const backendAccountToggleBtn = documentRef.getElementById("backendAccountToggleBtn");
-  const backendAccountPopover = documentRef.getElementById("backendAccountPopover");
-  const backendAccountBackdrop = documentRef.getElementById("backendAccountBackdrop");
-  const backendAccountCloseBtn = documentRef.getElementById("backendAccountCloseBtn");
-  const backendCloudUsername = documentRef.getElementById("backendCloudUsername");
-  const backendCloudPassword = documentRef.getElementById("backendCloudPassword");
-  const backendCloudSaveTitle = documentRef.getElementById("backendCloudSaveTitle");
-  const backendCloudRegisterBtn = documentRef.getElementById("backendCloudRegisterBtn");
-  const backendCloudLoginBtn = documentRef.getElementById("backendCloudLoginBtn");
-  const backendCloudLogoutBtn = documentRef.getElementById("backendCloudLogoutBtn");
-  const backendCloudSaveBtn = documentRef.getElementById("backendCloudSaveBtn");
-  const backendCloudPublishBtn = documentRef.getElementById("backendCloudPublishBtn");
-  const backendCommunityRefreshBtn = documentRef.getElementById("backendCommunityRefreshBtn");
-  const backendCommunityList = documentRef.getElementById("backendCommunityList");
   const legendList = documentRef.getElementById("legendEditorList");
   const debugModeSelect = documentRef.getElementById("debug-mode-select");
   if (
@@ -476,160 +257,7 @@ export function createProjectSupportDiagnosticsController({
   const getScenarioAuditSummary = (auditPayload) => (
     auditPayload?.summary && typeof auditPayload.summary === "object" ? auditPayload.summary : {}
   );
-  let latestCloudSaveId = "";
-  let activeCloudUserKey = "";
-  let latestCloudSaveUserKey = "";
-  let latestCommunitySaves = [];
-  let backendCloudSessionMode = "hidden";
   let lastExpandedSpecialZoneDiagnosticsKey = "";
-
-  const setBackendCloudStatus = (message, localizationKey = "", suffix = "") => {
-    if (backendCloudStatus) {
-      backendCloudStatus.textContent = message;
-      backendCloudStatus.dataset.localizationKey = localizationKey;
-      backendCloudStatus.dataset.localizationSuffix = suffix;
-    }
-  };
-
-  const setLocalizedBackendCloudStatus = (key, suffix = "") =>
-    setBackendCloudStatus(`${t(key, "ui")}${suffix}`, key, suffix);
-
-  const refreshProjectAccountLanguage = () => {
-    const textById = [
-      ["backendAccountPopoverTitle", "Cloud Saves"],
-      ["backendCloudRegisterBtn", "Register"],
-      ["backendCloudLoginBtn", "Login"],
-      ["backendCloudLogoutBtn", "Logout"],
-      ["backendCloudSaveBtn", "Save Cloud Copy"],
-      ["backendCloudPublishBtn", "Publish Latest"],
-      ["backendCommunityRefreshBtn", "Refresh Community"],
-    ];
-    textById.forEach(([id, key]) => {
-      const element = documentRef.getElementById(id);
-      if (element) element.textContent = t(key, "ui");
-    });
-    const accountHint = backendAccountToggleBtn?.parentElement?.querySelector(".project-account-hint");
-    if (accountHint) accountHint.textContent = t("Account", "ui");
-    if (backendAccountToggleBtn) {
-      backendAccountToggleBtn.setAttribute("aria-label", t("Account and Cloud Saves", "ui"));
-      backendAccountToggleBtn.title = t("Account and Cloud Saves", "ui");
-    }
-    backendAccountPopover?.setAttribute("aria-label", t("Account and Cloud Saves", "ui"));
-    backendAccountCloseBtn?.setAttribute("aria-label", t("Close", "ui"));
-    if (backendCloudUsername) backendCloudUsername.placeholder = t("Username", "ui");
-    if (backendCloudPassword) backendCloudPassword.placeholder = t("Password", "ui");
-    if (backendCloudSaveTitle) backendCloudSaveTitle.placeholder = t("Save title", "ui");
-    const statusKey = backendCloudStatus?.dataset.localizationKey;
-    if (statusKey) setLocalizedBackendCloudStatus(statusKey, backendCloudStatus.dataset.localizationSuffix || "");
-    renderCommunitySaves(latestCommunitySaves);
-  };
-
-  const setBackendCloudSectionVisible = (visible) => {
-    if (backendCloudSection) {
-      backendCloudSection.hidden = !visible;
-    }
-  };
-
-  const setDisabled = (element, disabled) => {
-    if (element && typeof element === "object") {
-      element.disabled = !!disabled;
-    }
-  };
-
-  const setBackendCloudSessionState = (mode) => {
-    backendCloudSessionMode = mode;
-    const backendAvailable = mode === "anonymous" || mode === "authenticated";
-    const authenticated = mode === "authenticated";
-    setBackendCloudSectionVisible(backendAvailable || mode === "unavailable");
-    setDisabled(backendCloudUsername, !backendAvailable);
-    setDisabled(backendCloudPassword, !backendAvailable);
-    setDisabled(backendCloudRegisterBtn, !backendAvailable);
-    setDisabled(backendCloudLoginBtn, !backendAvailable);
-    setDisabled(backendCloudSaveTitle, !authenticated);
-    setDisabled(backendCloudLogoutBtn, !authenticated);
-    setDisabled(backendCloudSaveBtn, !authenticated);
-    setDisabled(backendCloudPublishBtn, !authenticated);
-    setDisabled(backendCommunityRefreshBtn, !backendAvailable);
-    renderCommunitySaves(latestCommunitySaves);
-  };
-
-  const resolveCloudUserKey = (user) => (
-    String(user?.id || user?.username || user?.displayName || "").trim()
-  );
-
-  const updateActiveCloudUser = (user) => {
-    const nextUserKey = resolveCloudUserKey(user);
-    if (nextUserKey && activeCloudUserKey && nextUserKey !== activeCloudUserKey) {
-      latestCloudSaveId = "";
-      latestCloudSaveUserKey = "";
-    }
-    activeCloudUserKey = nextUserKey;
-    return nextUserKey;
-  };
-
-  const clearActiveCloudUser = () => {
-    activeCloudUserKey = "";
-    latestCloudSaveId = "";
-    latestCloudSaveUserKey = "";
-  };
-
-  const ensureBackendSessionProbed = createBackendSessionProbe({
-    onProbing: () => setBackendCloudSessionState("probing"),
-    onAuthenticated: (payload) => {
-      updateActiveCloudUser(payload?.user);
-      setBackendCloudSessionState("authenticated");
-      setLocalizedBackendCloudStatus("Logged in as", ` ${payload?.user?.displayName || payload?.user?.username || ""}`);
-    },
-    onAnonymous: () => {
-      clearActiveCloudUser();
-      setBackendCloudSessionState("anonymous");
-    },
-    onUnavailable: (error) => {
-      clearActiveCloudUser();
-      setBackendCloudSessionState(error?.payload?.code ? "unavailable" : "hidden");
-      setLocalizedBackendCloudStatus("Local backend unavailable. Start the local dev server to use Cloud Saves.");
-    },
-    onSettled: () => {
-      if (backendCloudStatus?.dataset) {
-        backendCloudStatus.dataset.sessionChecked = "true";
-      }
-    },
-  });
-
-  const setBackendAccountPopoverOpen = (isOpen) => {
-    if (!backendAccountPopover || !backendAccountToggleBtn) return;
-    backendAccountPopover.classList.toggle("hidden", !isOpen);
-    backendAccountBackdrop?.classList.toggle("hidden", !isOpen);
-    document.body?.classList.toggle("project-account-dialog-open", !!isOpen);
-    backendAccountToggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    if (isOpen) {
-      void ensureBackendSessionProbed();
-      window.requestAnimationFrame?.(() => {
-        if (backendAccountPopover.classList.contains("hidden")) return;
-        // 用户名可用时直接聚焦它；会话探测期间禁用，就退回面板内第一个可聚焦元素。
-        if (backendCloudUsername && !backendCloudUsername.disabled && backendAccountPopover.contains(backendCloudUsername)) {
-          backendCloudUsername.focus?.();
-          if (backendAccountPopover.ownerDocument?.activeElement === backendCloudUsername) return;
-        }
-        focusSurface(backendAccountPopover);
-      });
-    } else {
-      backendAccountToggleBtn.focus?.();
-    }
-  };
-
-  const openBackendAccountPopover = () => setBackendAccountPopoverOpen(true);
-
-  const getBackendCredentials = () => ({
-    username: String(backendCloudUsername?.value || "").trim(),
-    password: String(backendCloudPassword?.value || ""),
-  });
-
-  const getCloudSaveTitle = () => (
-    String(backendCloudSaveTitle?.value || "").trim()
-    || String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "Map project").trim()
-    || "Map project"
-  );
 
   const confirmReplaceCurrentProject = async () => {
     if (!state.isDirty) return true;
@@ -644,25 +272,6 @@ export function createProjectSupportDiagnosticsController({
       cancelLabel: t("Stay on Current Map", "ui"),
       tone: "warning",
     });
-  };
-
-  const runExclusiveButtonTask = async (button, task, restore = null) => {
-    if (!button || button.dataset?.busy === "true") return false;
-    const wasDisabled = !!button.disabled;
-    button.disabled = true;
-    if (button.dataset) button.dataset.busy = "true";
-    try {
-      await task();
-      return true;
-    } finally {
-      if (button.dataset) delete button.dataset.busy;
-      button.disabled = wasDisabled;
-      if (typeof restore === "function") restore();
-    }
-  };
-
-  const restoreBackendCloudControls = () => {
-    setBackendCloudSessionState(backendCloudSessionMode);
   };
 
   const formatProjectPackagePreviewDetails = (preview) => {
@@ -693,122 +302,6 @@ export function createProjectSupportDiagnosticsController({
       cancelLabel: t("Cancel", "ui"),
       tone: "info",
     });
-  };
-
-  const resolveLatestCloudSaveId = async () => {
-    // 发布动作以“当前登录用户的最新保存”为边界；切换用户后清空缓存，避免复用上一位用户的 save id。
-    if (latestCloudSaveId && latestCloudSaveUserKey === activeCloudUserKey) return latestCloudSaveId;
-    const payload = await listBackendSaves();
-    const saves = Array.isArray(payload?.saves) ? payload.saves : [];
-    const latestSave = saves.find((save) => save?.id);
-    latestCloudSaveId = String(latestSave?.id || "");
-    latestCloudSaveUserKey = activeCloudUserKey;
-    return latestCloudSaveId;
-  };
-
-  const hydrateProjectFromCommunitySave = async (saveId) => {
-    // Community 下载结果重新包成 File/Blob 后走统一导入漏斗，保持确认弹窗、dirty 状态和渲染回调一致。
-    const payload = await downloadCommunitySave(saveId);
-    const project = payload?.save?.project;
-    if (!project || typeof project !== "object") {
-      throw new Error("Community save did not include a project payload.");
-    }
-    const filename = String(payload?.filename || "community-mapcreator-save.json");
-    const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
-    const file = typeof File === "function" ? new File([blob], filename, { type: "application/json" }) : blob;
-    const outcome = await importProjectThroughFunnel(file, {
-      ui: {
-        t,
-        showAppDialog,
-        showToast,
-      },
-      hooks: {
-        refreshColorState: mapRenderer.refreshColorState,
-        onProjectImportComplete: (summary) => {
-          completeProjectImportStatus(summary);
-          setLocalizedBackendCloudStatus("Community save loaded into the editor.");
-        },
-        onProjectImportError: (error) => {
-          const message = failProjectImportStatus(error);
-          setBackendCloudStatus(message);
-        },
-      },
-    });
-    if (outcome?.status === "committed-with-warnings") {
-      setLocalizedBackendCloudStatus("Community save loaded into the editor.", ` ${outcome.warnings.map(item => item.resource).join(", ")}`);
-    } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
-      setLocalizedBackendCloudStatus("Project import is already in progress.");
-    }
-  };
-
-  const renderCommunitySaves = (saves = []) => {
-    if (!backendCommunityList) return;
-    backendCommunityList.replaceChildren();
-    const normalizedSaves = Array.isArray(saves) ? saves : [];
-    latestCommunitySaves = normalizedSaves;
-    if (!normalizedSaves.length) {
-      backendCommunityList.appendChild(createEmptyNote(t("No community saves yet", "ui")));
-      return;
-    }
-    const authenticated = !!activeCloudUserKey;
-    normalizedSaves.forEach((save) => {
-      const row = document.createElement("div");
-      row.className = "scenario-audit-stack-row";
-      const title = document.createElement("span");
-      title.className = "body-text scenario-audit-key";
-      title.textContent = String(save?.title || "Community save");
-      const meta = document.createElement("span");
-      meta.className = "inspector-mini-label scenario-audit-note";
-      meta.textContent = String(save?.owner?.displayName || save?.owner?.username || "unknown");
-      const loadButton = document.createElement("button");
-      loadButton.type = "button";
-      loadButton.className = "btn-secondary";
-      loadButton.textContent = t("Load", "ui");
-      loadButton.addEventListener("click", async () => {
-        await runExclusiveButtonTask(loadButton, async () => {
-          try {
-            if (!(await confirmReplaceCurrentProject())) return;
-            await hydrateProjectFromCommunitySave(String(save.id || ""));
-            setLocalizedBackendCloudStatus("Community save import started.");
-          } catch (error) {
-            setBackendCloudStatus(String(error?.message || error || ""));
-          }
-        });
-      });
-      const commentButton = document.createElement("button");
-      commentButton.type = "button";
-      commentButton.className = "btn-secondary";
-      commentButton.disabled = !authenticated;
-      commentButton.textContent = t("Comment", "ui");
-      commentButton.addEventListener("click", async () => {
-        try {
-          await addCommunityComment(String(save.id || ""), "Tried this save locally.");
-          setLocalizedBackendCloudStatus("Comment posted.");
-        } catch (error) {
-          setBackendCloudStatus(String(error?.message || error || ""));
-        }
-      });
-      const reportButton = document.createElement("button");
-      reportButton.type = "button";
-      reportButton.className = "btn-secondary";
-      reportButton.disabled = !authenticated;
-      reportButton.textContent = t("Report", "ui");
-      reportButton.addEventListener("click", async () => {
-        try {
-          await reportCommunitySave(String(save.id || ""), "other", "Reported from the local editor.");
-          setLocalizedBackendCloudStatus("Report submitted for review.");
-        } catch (error) {
-          setBackendCloudStatus(String(error?.message || error || ""));
-        }
-      });
-      row.append(title, meta, loadButton, commentButton, reportButton);
-      backendCommunityList.appendChild(row);
-    });
-  };
-
-  const refreshCommunitySaves = async () => {
-    const payload = await listCommunitySaves();
-    renderCommunitySaves(Array.isArray(payload?.saves) ? payload.saves : []);
   };
 
   const getScenarioAuditBlockerCount = (summary = {}) => {
@@ -1727,16 +1220,6 @@ export function createProjectSupportDiagnosticsController({
 
     if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
       uploadProjectBtn.addEventListener("click", async () => {
-        if (String(projectLoadSource?.value || "local") === "community") {
-          openBackendAccountPopover();
-          try {
-            await refreshCommunitySaves();
-            setLocalizedBackendCloudStatus("Community saves refreshed.");
-          } catch (error) {
-            setBackendCloudStatus(String(error?.message || error || ""));
-          }
-          return;
-        }
         if (!(await confirmReplaceCurrentProject())) return;
         projectFileInput.click();
       });
@@ -1824,42 +1307,6 @@ export function createProjectSupportDiagnosticsController({
       projectFileInput.dataset.bound = "true";
     }
 
-    if (backendAccountToggleBtn && backendAccountPopover && !backendAccountToggleBtn.dataset.bound) {
-      backendAccountToggleBtn.addEventListener("click", () => {
-        const isOpen = !backendAccountPopover.classList.contains("hidden");
-        if (isOpen) {
-          setBackendAccountPopoverOpen(false);
-        } else {
-          openBackendAccountPopover();
-        }
-      });
-      backendAccountToggleBtn.dataset.bound = "true";
-    }
-
-    if (backendAccountBackdrop && !backendAccountBackdrop.dataset.bound) {
-      backendAccountBackdrop.addEventListener("click", () => setBackendAccountPopoverOpen(false));
-      backendAccountBackdrop.dataset.bound = "true";
-    }
-
-    if (backendAccountCloseBtn && !backendAccountCloseBtn.dataset.bound) {
-      backendAccountCloseBtn.addEventListener("click", () => setBackendAccountPopoverOpen(false));
-      backendAccountCloseBtn.dataset.bound = "true";
-    }
-
-    if (backendAccountPopover && !backendAccountPopover.dataset.escapeBound) {
-      document.addEventListener("keydown", (event) => {
-        if (event.defaultPrevented || backendAccountPopover.classList.contains("hidden")) return;
-        if (getActiveModal(document) !== backendAccountPopover) return;
-        if (event.key === "Escape") {
-          event.preventDefault();
-          setBackendAccountPopoverOpen(false);
-          return;
-        }
-        trapSurfaceTab(event, backendAccountPopover);
-      });
-      backendAccountPopover.dataset.escapeBound = "true";
-    }
-
     if (debugModeSelect && !debugModeSelect.dataset.bound) {
       debugModeSelect.value = String(state.debugMode || "PROD").toUpperCase();
       debugModeSelect.addEventListener("change", (event) => {
@@ -1868,115 +1315,10 @@ export function createProjectSupportDiagnosticsController({
       debugModeSelect.dataset.bound = "true";
     }
 
-    if (backendCloudRegisterBtn && !backendCloudRegisterBtn.dataset.bound) {
-      backendCloudRegisterBtn.addEventListener("click", async () => {
-        try {
-          const credentials = getBackendCredentials();
-          const payload = await registerBackendUser({
-            ...credentials,
-            displayName: credentials.username,
-          });
-          latestCloudSaveId = "";
-          latestCloudSaveUserKey = "";
-          updateActiveCloudUser(payload?.user);
-          setBackendCloudSessionState("authenticated");
-          setLocalizedBackendCloudStatus("Logged in as", ` ${payload?.user?.displayName || credentials.username}`);
-        } catch (error) {
-          setBackendCloudStatus(String(error?.message || error || ""));
-        }
-      });
-      backendCloudRegisterBtn.dataset.bound = "true";
-    }
-
-    if (backendCloudLoginBtn && !backendCloudLoginBtn.dataset.bound) {
-      backendCloudLoginBtn.addEventListener("click", async () => {
-        try {
-          const credentials = getBackendCredentials();
-          const payload = await loginBackendUser(credentials);
-          latestCloudSaveId = "";
-          latestCloudSaveUserKey = "";
-          updateActiveCloudUser(payload?.user);
-          setBackendCloudSessionState("authenticated");
-          setLocalizedBackendCloudStatus("Logged in as", ` ${payload?.user?.displayName || credentials.username}`);
-        } catch (error) {
-          setBackendCloudStatus(String(error?.message || error || ""));
-        }
-      });
-      backendCloudLoginBtn.dataset.bound = "true";
-    }
-
-    if (backendCloudLogoutBtn && !backendCloudLogoutBtn.dataset.bound) {
-      backendCloudLogoutBtn.addEventListener("click", async () => {
-        try {
-          await logoutBackendUser();
-          clearActiveCloudUser();
-          setBackendCloudSessionState("anonymous");
-          setLocalizedBackendCloudStatus("Logged out.");
-        } catch (error) {
-          setBackendCloudStatus(String(error?.message || error || ""));
-        }
-      });
-      backendCloudLogoutBtn.dataset.bound = "true";
-    }
-
-    if (backendCloudSaveBtn && !backendCloudSaveBtn.dataset.bound) {
-      backendCloudSaveBtn.addEventListener("click", async () => {
-        await runExclusiveButtonTask(backendCloudSaveBtn, async () => {
-          try {
-            const project = fileManager.buildProjectPayload?.(state);
-            if (!project) throw new Error("Project state is unavailable.");
-            const payload = await createBackendSave({
-              title: getCloudSaveTitle(),
-              description: String(state.activeScenarioId || ""),
-              project,
-            });
-            latestCloudSaveId = String(payload?.save?.id || "");
-            latestCloudSaveUserKey = activeCloudUserKey;
-            setLocalizedBackendCloudStatus("Cloud save created.");
-          } catch (error) {
-            setBackendCloudStatus(String(error?.message || error || ""));
-          }
-        }, restoreBackendCloudControls);
-      });
-      backendCloudSaveBtn.dataset.bound = "true";
-    }
-
-    if (backendCloudPublishBtn && !backendCloudPublishBtn.dataset.bound) {
-      backendCloudPublishBtn.addEventListener("click", async () => {
-        await runExclusiveButtonTask(backendCloudPublishBtn, async () => {
-          try {
-            const saveId = await resolveLatestCloudSaveId();
-            if (!saveId) throw new Error("Create a cloud save before publishing.");
-            await publishBackendSave(saveId);
-            await refreshCommunitySaves();
-            setLocalizedBackendCloudStatus("Latest cloud save published.");
-          } catch (error) {
-            setBackendCloudStatus(String(error?.message || error || ""));
-          }
-        }, restoreBackendCloudControls);
-      });
-      backendCloudPublishBtn.dataset.bound = "true";
-    }
-
-    if (backendCommunityRefreshBtn && !backendCommunityRefreshBtn.dataset.bound) {
-      backendCommunityRefreshBtn.addEventListener("click", async () => {
-        await runExclusiveButtonTask(backendCommunityRefreshBtn, async () => {
-          try {
-            await refreshCommunitySaves();
-            setLocalizedBackendCloudStatus("Community saves refreshed.");
-          } catch (error) {
-            setBackendCloudStatus(String(error?.message || error || ""));
-          }
-        }, restoreBackendCloudControls);
-      });
-      backendCommunityRefreshBtn.dataset.bound = "true";
-    }
-
   };
 
   return {
     bindEvents,
-    refreshProjectAccountLanguage,
     refreshProjectSaveStatus,
     refreshLegendEditor,
     renderScenarioAuditPanel,

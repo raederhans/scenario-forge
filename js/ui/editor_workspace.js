@@ -705,7 +705,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   help.append(helpButton, helpMenu);
   move("scenarioGuideBtn", topActions);
   topActions.append(help);
-  for (const id of ["btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
+  move("btnToggleLang", topActions);
   const strategyBtn = button("Edit annotations", "editorStrategicModeBtn", () => {
     const active = !documentRef.body.classList.contains("frontline-mode-active");
     setStrategicMode(active);

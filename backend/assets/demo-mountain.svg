@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-label="Mountain border map preview">
-  <rect width="720" height="360" fill="#e8eadb"/>
-  <path d="M0 248 90 150l75 86 98-148 125 160 102-96 84 64 146-130v274H0z" fill="#91a06b"/>
-  <path d="M0 290c92-26 158-18 250-48 106-34 188-22 300-65 70-27 113-46 170-48v231H0z" fill="#516948"/>
-  <path d="M62 255c92 6 153-26 239-12 91 14 143 59 242 42 72-12 106-48 161-39" fill="none" stroke="#161714" stroke-width="7" stroke-linecap="round"/>
-  <circle cx="534" cy="184" r="16" fill="#b6ff2d" stroke="#161714" stroke-width="5"/>
-</svg>

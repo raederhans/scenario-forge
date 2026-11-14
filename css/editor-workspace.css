@@ -43,10 +43,6 @@
 .editor-project-bar .editor-scenario-menu { position: relative; margin: 0; padding: 0; border: 0; background: transparent; flex-shrink: 0; }
 .editor-scenario-menu > summary { padding: 8px 12px; font-size: var(--fs-sm); cursor: pointer; }
 .editor-scenario-menu > .sidebar-details-body { position: absolute; top: 38px; left: 0; width: 300px; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--surface-panel); box-shadow: var(--shadow-2); }
-.editor-project-bar #rightSidebarAccountShelf { position: static; margin: 0; padding: 0; width: auto; border: 0; background: none; }
-.editor-project-bar .project-account-dock { padding: 0; gap: 0; }
-.editor-project-bar .project-account-hint { display: none; }
-.editor-project-bar .project-account-toggle { width: 34px; height: 34px; }
 .editor-workspace #leftSidebar { flex-basis: var(--editor-left-width); width: var(--editor-left-width); }
 .editor-workspace #rightSidebar { flex-basis: var(--editor-right-width); width: var(--editor-right-width); }
 .editor-workspace #leftSidebarContent, .editor-workspace #rightSidebarContent {
@@ -437,8 +433,7 @@
   .editor-workspace #countryList .country-select-row .country-children-toggle,
   .editor-workspace #countryList .country-select-main-btn,
   .editor-project-bar #editorInspectorToggleBtn,
-  .editor-project-bar #workspaceGithubLink,
-  .editor-project-bar .project-account-toggle {
+  .editor-project-bar #workspaceGithubLink {
     min-width: 44px;
     min-height: 44px;
   }

@@ -628,35 +628,8 @@ const config = {
                 result["ui_t_keys"],
             )
 
-    def test_cloud_save_and_fragment_ui_keys_exist_in_source_and_dist_locales(self) -> None:
-        required_ui_keys = {
-            "Cloud Saves",
-            "Cloud save created.",
-            "Comment",
-            "Comment posted.",
-            "Community save import started.",
-            "Community save loaded into the editor.",
-            "Community saves refreshed.",
-            "Latest cloud save published.",
-            "Load",
-            "Local backend cloud saves are available after login.",
-            "Local backend unavailable. Start the local dev server to use Cloud Saves.",
-            "Logged in as",
-            "Logged out.",
-            "Login",
-            "Logout",
-            "No community saves yet",
-            "Password",
-            "Publish Latest",
-            "Refresh Community",
-            "Register",
-            "Report",
-            "Report submitted for review.",
-            "Save Cloud Copy",
-            "Save title",
-            "Username",
-            "fragments",
-        }
+    def test_fragment_ui_key_exists_in_source_and_dist_locales(self) -> None:
+        required_ui_keys = {"fragments"}
 
         locales_paths = [REPO_ROOT / "data" / "locales.json"]
         dist_locales_path = PAGES_DIST_ROOT / "app" / "data" / "locales.json"

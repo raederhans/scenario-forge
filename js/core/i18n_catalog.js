@@ -935,10 +935,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     en: "The selected sample project could not be opened.",
   },
   Legend: { zh: "图例", en: "Legend" },
-  "Manage project files, loading choices, and account-backed saves.": {
-    zh: "管理项目文件、加载选择和账号保存。",
-    en: "Manage project files, loading choices, and account-backed saves.",
-  },
   "Edit the small project legend list for the current working map.": {
     zh: "编辑当前工作地图的小型图例列表。",
     en: "Edit the small project legend list for the current working map.",
@@ -950,12 +946,7 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Browser download": { zh: "浏览器下载", en: "Browser download" },
   "Browser downloads": { zh: "浏览器下载目录", en: "Browser downloads" },
   "Save As dialog": { zh: "另存为对话框", en: "Save As dialog" },
-  "Load source": { zh: "加载来源", en: "Load source" },
-  "Local project file": { zh: "本地项目文件", en: "Local project file" },
-  "Community save": { zh: "社区保存", en: "Community save" },
   "No file selected": { zh: "未选择文件", en: "No file selected" },
-  "Account": { zh: "账号", en: "Account" },
-  "Account and Cloud Saves": { zh: "账号与云保存", en: "Account and Cloud Saves" },
   "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.": {
     zh: "把项目工具当成发布检查清单：先保存项目，再补战略信息、对齐参考图，最后导出。",
     en: "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.",
@@ -1115,10 +1106,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Export target": { zh: "导出目标", en: "Export target" },
   "Generated": { zh: "生成时间", en: "Generated" },
   "Project import failed": { zh: "项目导入失败", en: "Project import failed" },
-  "Local load accepts project JSON or project ZIP packages. Community saves open from Account.": {
-    zh: "本地加载支持项目 JSON 或项目 ZIP 包。社区保存从账号入口打开。",
-    en: "Local load accepts project JSON or project ZIP packages. Community saves open from Account.",
-  },
   "Project saved": { zh: "项目已保存", en: "Project saved" },
   "Unsaved project changes.": { zh: "项目有未保存改动。", en: "Unsaved project changes." },
   "Exporting project file with appearance and transport settings.": { zh: "正在导出包含外观和交通设置的项目文件。", en: "Exporting project file with appearance and transport settings." },

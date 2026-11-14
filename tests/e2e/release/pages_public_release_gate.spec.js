@@ -129,16 +129,6 @@ async function readPublicReleaseGateState(page) {
   });
 }
 
-function isExpectedAnonymousBackendProbe(failure) {
-  try {
-    const url = new URL(String(failure?.url || ""));
-    return url.pathname === "/api/backend/auth/me"
-      && (failure.status === 401 || failure.status === 404);
-  } catch {
-    return false;
-  }
-}
-
 function isExpectedNavigationAbort(failure) {
   return failure?.status === "failed"
     && String(failure?.errorText || "") === "net::ERR_ABORTED"
@@ -164,33 +154,24 @@ function isExpectedLandingImageAbort(failure) {
   }
 }
 
-function filterUnexpectedConsoleIssues(consoleIssues, { ignoredAnonymousBackendProbeCount }) {
+function filterUnexpectedConsoleIssues(consoleIssues) {
   return consoleIssues.filter((issue) => {
     const text = String(issue?.text || "");
     if (/preload/i.test(text)) return false;
     if (/^\[map_renderer\] Removed \d+ D3-unsafe water geometry part\(s\): /i.test(text)) return false;
-    if (
-      ignoredAnonymousBackendProbeCount > 0
-      && /^Failed to load resource: the server responded with a status of (401|404)/i.test(text)
-    ) {
-      return false;
-    }
     return true;
   });
 }
 
 function summarizeReleaseSmokeIssues(consoleIssues, networkFailures) {
   const unexpectedNetworkFailures = networkFailures.filter((failure) => (
-    !isExpectedAnonymousBackendProbe(failure)
-    && !isExpectedNavigationAbort(failure)
+    !isExpectedNavigationAbort(failure)
     && !isExpectedLandingImageAbort(failure)
   ));
-  const ignoredAnonymousBackendProbeCount = networkFailures.length - unexpectedNetworkFailures.length;
-  const unexpectedConsoleIssues = filterUnexpectedConsoleIssues(consoleIssues, { ignoredAnonymousBackendProbeCount });
+  const unexpectedConsoleIssues = filterUnexpectedConsoleIssues(consoleIssues);
   return {
     unexpectedNetworkFailures,
     unexpectedConsoleIssues,
-    ignoredAnonymousBackendProbeCount,
   };
 }
 
@@ -302,7 +283,6 @@ async function readReleaseSmokeFailureContext({
       networkFailures,
       unexpectedConsoleIssues: issueSummary.unexpectedConsoleIssues,
       unexpectedNetworkFailures: issueSummary.unexpectedNetworkFailures,
-      ignoredAnonymousBackendProbeCount: issueSummary.ignoredAnonymousBackendProbeCount,
     },
   };
 }
@@ -508,7 +488,6 @@ test("public Pages release gate", async ({ browser, request }, testInfo) => {
           consoleIssueCount: diagnostics.consoleIssues.length,
           nativeGpuDiagnosticCount: nativeGpuDiagnostics.length,
           networkFailureCount: diagnostics.networkFailures.length,
-          ignoredAnonymousBackendProbeCount: result.issueSummary.ignoredAnonymousBackendProbeCount,
           releaseSmokeAttempts: attemptSummaries,
         }, null, 2));
         await context.close().catch(() => {});
