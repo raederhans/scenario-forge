@@ -1,3 +1,4 @@
+import { cloneRenderZoomTransform as defaultCloneZoomTransform } from "./render_transform_reuse_policy_owner.js";
 import { getGeometryRetentionWeights } from "./geometry_cache_budget.js";
 
 const DEFAULT_SCENARIO_WATER_CACHE_MODE_PARAM = "water_cache_mode";
@@ -14,14 +15,6 @@ const DEFAULT_SCENARIO_WATER_LOW_COMPLEXITY_COVERAGE_MAX = 0.2;
 const DEFAULT_SCENARIO_WATER_LOW_COMPLEXITY_PREV_RENDERED_MAX = 28;
 
 function toAllowedSet(value, defaultSet) { return value instanceof Set ? value : defaultSet; }
-
-function defaultCloneZoomTransform(transform = null) {
-  return {
-    x: Number(transform?.x || 0),
-    y: Number(transform?.y || 0),
-    k: Math.max(0.0001, Number(transform?.k || 1)),
-  };
-}
 
 function clampUnit(value) { return Math.max(0, Math.min(1, Number(value) || 0)); }
 

@@ -29,4 +29,3 @@ export const PANEL_HOOKS_BY_CHANGE_DOMAIN = Object.freeze({
   strategicOverlays: Object.freeze(["updateStrategicOverlayUIFn"]),
 });
 
-export const CHANGE_DOMAINS = Object.freeze(Object.keys(PANEL_HOOKS_BY_CHANGE_DOMAIN));

@@ -1,3 +1,4 @@
+import { cloneImportedUiValue as cloneImportedProjectValue } from "./state/ui_state.js";
 import { normalizePaintMode } from "./map_editing_policy.js";
 import { clearDirty } from "./dirty_state.js";
 import { getPhysicalContextLayerRequests } from "./state_defaults.js";
@@ -166,15 +167,6 @@ function resolveHooks(hooks = {}) {
   };
 }
 
-function cloneImportedProjectValue(value) {
-  if (value === null || value === undefined || typeof value !== "object") {
-    return value;
-  }
-  if (typeof globalThis.structuredClone === "function") {
-    return globalThis.structuredClone(value);
-  }
-  return JSON.parse(JSON.stringify(value));
-}
 
 function syncProjectImportUiState({ scenarioImportAudit, hooks, recovery = false }) {
   return syncProjectImportUiStateHelper({ scenarioImportAudit, hooks, recovery });

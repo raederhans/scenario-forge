@@ -192,11 +192,6 @@ export function formatTransportFamilyCountText(familyId, count, translate) {
   return `${roundedCount.toLocaleString()} ${translateUi(translate, noun)}`;
 }
 
-export function formatTransportLoadedAuxiliaryText(familyId, count, translate) {
-  const countText = formatTransportFamilyCountText(familyId, count, translate);
-  return countText ? `${countText} ${translateUi(translate, "loaded")}` : "";
-}
-
 function getTransportLineClassCoverageState(familyId, collections) {
   const meta = getTransportOverviewLineSummaryMeta(familyId);
   const collection = getTransportFamilyCollection(familyId, collections);
@@ -233,16 +228,6 @@ export function getTransportLineClassCoverage(familyId, collections, translate) 
     return `${translateUi(translate, "Loaded classes:")} ${visibleClasses} (${translateUi(translate, "secondary full-only")})`;
   }
   return `${translateUi(translate, "Loaded classes:")} ${visibleClasses}`;
-}
-
-export function buildTransportLineSummaryDetails(familyId, collections, translate) {
-  const meta = getTransportOverviewLineSummaryMeta(familyId);
-  if (!meta) return [];
-  return [
-    getTransportLineClassCoverage(familyId, collections, translate),
-    `${translateUi(translate, "Phase:")} ${translateUi(translate, meta.phaseText)}`,
-    `${translateUi(translate, "Source:")} ${translateUi(translate, meta.sourceText)}`,
-  ].filter(Boolean);
 }
 
 export function buildTransportFamilySummaryText({

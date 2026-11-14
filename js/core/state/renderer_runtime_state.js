@@ -10,12 +10,15 @@ import {
   normalizeRenderPassCacheState,
 } from "../renderer/render_pass_cache_state_normalizer.js";
 import {
+  createDefaultExactAfterSettleControllerState,
   captureExactAfterSettleControllerState as captureExactAfterSettleControllerActionState,
   ensureExactAfterSettleControllerState as ensureExactAfterSettleControllerActionState,
   isExactAfterSettleControllerActiveState as isExactAfterSettleControllerActiveActionState,
   isExactAfterSettleGenerationCurrentState as isExactAfterSettleGenerationCurrentActionState,
   resetExactAfterSettleControllerState as resetExactAfterSettleControllerActionState,
 } from "./actions/renderer_exact_refresh_actions.js";
+export { createDefaultExactAfterSettleControllerState };
+
 // 这里收口 map_renderer / sidebar 共享的运行时默认 shape，
 // 避免 defer 标记、pass cache、诊断缓存和交互基础设施状态再次漂移。
 
@@ -35,29 +38,6 @@ export function createDefaultIntensityFieldToolState() {
     brushRadiusDeg: 3,
     brushStrength: 1,
     selectedPointId: "",
-  };
-}
-
-export function createDefaultExactAfterSettleControllerState() {
-  return {
-    generation: 0,
-    phase: "idle",
-    startedAt: 0,
-    scheduledAt: 0,
-    applyStartedAt: 0,
-    applyFinishedAt: 0,
-    scenarioId: "",
-    selectionVersion: 0,
-    topologyRevision: 0,
-    dpr: 1,
-    pixelWidth: 0,
-    pixelHeight: 0,
-    colorRevision: 0,
-    contextFlagSignature: "",
-    zoomToken: 0,
-    transformBucket: "",
-    pendingPlan: null,
-    reason: "init",
   };
 }
 

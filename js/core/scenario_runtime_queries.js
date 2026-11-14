@@ -12,17 +12,6 @@ export function canonicalScenarioCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
 }
 
-export function extractScenarioCountryCodeFromId(value) {
-  const text = String(value || "").trim().toUpperCase();
-  if (!text) return "";
-  const prefix = text.split(/[-_]/)[0];
-  if (/^[A-Z]{2,3}$/.test(prefix)) {
-    return prefix;
-  }
-  const alphaPrefix = prefix.match(/^[A-Z]{2,3}/);
-  return alphaPrefix ? alphaPrefix[0] : "";
-}
-
 export function getRuntimeGeometryFeatureId(geometry) {
   return getSharedFeatureId(geometry, { fallback: "" });
 }

@@ -230,25 +230,6 @@ function normalizeLayerSummary(layer = {}, {
   });
 }
 
-export function createEmptyThematicLayerCatalogPreview({
-  status = "idle",
-  error = "",
-} = {}) {
-  return Object.freeze({
-    schemaVersion: 1,
-    generatedAt: "",
-    assetKey: "",
-    status: normalizeText(status, "idle"),
-    error: normalizeText(error),
-    layerCount: 0,
-    loadedManifestCount: 0,
-    sourcePolicyLegend: Object.freeze({}),
-    statusLegend: Object.freeze({}),
-    layers: Object.freeze([]),
-    summary: normalizeText(error, THEMATIC_CATALOG_PENDING_SUMMARY),
-  });
-}
-
 export function normalizeThematicLayerCatalogPayload(payload = defaultThematicLayerIndex, {
   assetKey = "",
   manifestByLayerId = {},
