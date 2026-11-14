@@ -1,9 +1,7 @@
 name: HGO native app
 
 on:
-  workflow_call:
-  push:
-    branches: [main]
+  pull_request:
     paths:
       - 'apps/hgo/**'
       - '.github/workflows/hgo-native.yml'

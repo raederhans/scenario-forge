@@ -29,7 +29,6 @@ EDITOR_INDEX = REPO_ROOT / "index.html"
 DIST_APP_INDEX = PAGES_DIST_ROOT / "app" / "index.html"
 DIST_APP_JS_ROOT = PAGES_DIST_ROOT / "app" / "js"
 DIST_MANIFEST = PAGES_DIST_ROOT / "pages-dist-manifest.json"
-VERIFY_SHARED_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "verify-shared.yml"
 HERO_SCENARIO_ASSETS = (
     ("blank", "blank_base", "hero-blank.svg", "hero-blank.json"),
     ("hoi4-1936", "hoi4_1936", "hero-hoi4-1936.svg", "hero-hoi4-1936.json"),

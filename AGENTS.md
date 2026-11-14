@@ -36,7 +36,7 @@
 
 ## 提交与 PR
 
-- 提交前运行 `npm test`；每个 PR 在 CI 上运行同一组检查，不按改动路径分流。
+- 提交前运行 `npm test`；每个 PR 在 CI 上运行同一组必需检查（`pr-verify`），不按改动路径分流；数据契约与栅格发布阶段（`data-verify`）不是必需检查，只在数据、构建器、Python 工具或政治栅格渲染文件变动时运行，每周再全量跑一次。
 - 推送功能分支、PR 合并、部署分别汇报。PR 等待最终提交的 `PR Verify Required`。遵守既有推送、合并和生产发布授权。
 - 具体用法见 [开发与交付](docs/development-and-delivery.zh-CN.md)。
 
