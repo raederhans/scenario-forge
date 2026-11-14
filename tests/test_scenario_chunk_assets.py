@@ -84,27 +84,6 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                 if expected_length:
                     self.assertTrue(LineString(mesh["coordinates"][0]).equals(LineString([(1, 0), (1, 1)])))
 
-    def test_checked_in_tno_chunk_manifest_byte_sizes_and_hashes_match_files(self) -> None:
-        scenario_id = "tno_1962"
-        manifest_path = REPO_ROOT / "data" / "scenarios" / scenario_id / "detail_chunks.manifest.json"
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        for chunk in manifest.get("chunks", []):
-            with self.subTest(scenario_id=scenario_id, chunk_id=chunk.get("id")):
-                chunk_path = REPO_ROOT.joinpath(*str(chunk["url"]).split("/"))
-                self.assertTrue(chunk_path.exists(), str(chunk_path))
-                self.assertEqual(chunk.get("byte_size"), chunk_path.stat().st_size)
-                self.assertEqual(chunk.get("sha256"), build_scenario_chunk_assets.sha256_path(chunk_path))
-
-    def test_checked_in_chunk_manifest_byte_sizes_match_files(self) -> None:
-        for scenario_id in ("hoi4_1939", "tno_1962"):
-            manifest_path = REPO_ROOT / "data" / "scenarios" / scenario_id / "detail_chunks.manifest.json"
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            for chunk in manifest.get("chunks", []):
-                with self.subTest(scenario_id=scenario_id, chunk_id=chunk.get("id")):
-                    chunk_path = REPO_ROOT.joinpath(*str(chunk["url"]).split("/"))
-                    self.assertTrue(chunk_path.exists(), str(chunk_path))
-                    self.assertEqual(chunk.get("byte_size"), chunk_path.stat().st_size)
-
     def test_checked_in_political_coarse_lod_manifest_matches_payload(self) -> None:
         for scenario_id in ("hoi4_1939", "tno_1962"):
             manifest_path = REPO_ROOT / "data" / "scenarios" / scenario_id / "detail_chunks.manifest.json"

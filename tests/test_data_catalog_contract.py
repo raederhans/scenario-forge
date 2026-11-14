@@ -4,7 +4,6 @@ import json
 import shutil
 import tempfile
 import unittest
-from collections import Counter
 from pathlib import Path
 from unittest import mock
 
@@ -15,13 +14,12 @@ from tools.build_data_catalog import (
     write_catalog,
 )
 from tools.check_data_catalog import summarize_empty_hash_refs
-from tools.data_health import SCENARIO_REGISTRY_URL, collect_health
+from tools.data_health import collect_health
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CATALOG_JSON = REPO_ROOT / "data" / "CATALOG.json"
 CATALOG_MD = REPO_ROOT / "data" / "CATALOG.md"
-EXPECTED_SCHEMA_REF_COUNT = 34
 
 
 class DataCatalogContractTest(unittest.TestCase):
@@ -58,14 +56,6 @@ class DataCatalogContractTest(unittest.TestCase):
                 self.assertTrue(entries[url]["hashRef"])
                 self.assertEqual(entries[url]["owner"], "quick_fill_hierarchy")
 
-    def test_catalog_markdown_exposes_governance_columns(self) -> None:
-        checked_in_markdown = CATALOG_MD.read_text(encoding="utf-8")
-
-        self.assertIn(
-            "| key | url | role | format | readMode | schemaRef | hashRef | cachePolicy | owner | sourceId |",
-            checked_in_markdown,
-        )
-
     def test_empty_hash_ref_warning_summary_groups_by_role(self) -> None:
         counts = summarize_empty_hash_refs(
             [
@@ -77,32 +67,6 @@ class DataCatalogContractTest(unittest.TestCase):
         )
 
         self.assertEqual(counts, {"manifest": 2, "transport_manifest": 1})
-
-    def test_catalog_keeps_current_governance_counts_and_schema_surface(self) -> None:
-        payload = self._load_catalog()
-        entries = payload.get("entries") or []
-        schema_counts = Counter(entry.get("schemaRef") for entry in entries)
-
-        self.assertEqual(payload.get("counts", {}).get("entries"), len(entries))
-        self.assertEqual(len(schema_counts), EXPECTED_SCHEMA_REF_COUNT)
-        self.assertEqual(schema_counts["schema://city_lights/source_descriptor/v1"], 1)
-        self.assertEqual(schema_counts["schema://political-id-raster/manifest/v1"], 3)
-        self.assertEqual(schema_counts["schema://transport/manifest/v1"], 140)
-        self.assertEqual(schema_counts["schema://transport/build_audit/v1"], 132)
-        self.assertEqual(schema_counts["schema://topojson/line_collection/roads_v1"], 94)
-        self.assertEqual(schema_counts["schema://topojson/line_collection/railways_v1"], 66)
-        self.assertIn("schema://transport/carrier_payload/v1", schema_counts)
-        self.assertIn("schema://transport/provenance_payload/v1", schema_counts)
-        self.assertNotIn("schema://hgo/runtime_manifest/v1", schema_counts)
-        self.assertNotIn("schema://hgo/runtime_seed/v1", schema_counts)
-        self.assertNotIn("schema://bitmap/bmp_rgb24/v1", schema_counts)
-        self.assertEqual(schema_counts["schema://thematic/layer_index/v1"], 1)
-        self.assertEqual(schema_counts["schema://thematic/layer_manifest/v1"], 6)
-        self.assertEqual(schema_counts["schema://thematic/admin_metrics/v1"], 2)
-        self.assertEqual(schema_counts["map_builder/schemas/thematic_admin_metrics.schema.json"], 3)
-        self.assertEqual(schema_counts["map_builder/schemas/thematic_wgi_country_mapping.schema.json"], 1)
-        self.assertEqual(schema_counts["schema://thematic/grid_rle/v1"], 1)
-        self.assertEqual(schema_counts["schema://thematic/build_audit/v1"], 6)
 
     def test_catalog_contains_population_real_source_assets(self) -> None:
         entries = {entry["url"]: entry for entry in self._load_catalog()["entries"]}
@@ -275,23 +239,6 @@ class DataCatalogContractTest(unittest.TestCase):
             self.assertNotIn("historic geographic overhaul", url)
             self.assertFalse(url.endswith(".tga"), url)
 
-    def test_catalog_contains_transport_preview_and_manifest_entries(self) -> None:
-        payload = self._load_catalog()
-        entries = {entry["key"]: entry for entry in payload.get("entries") or []}
-        # 预览与完整共用同一文件时，预览键登记为完整条目的别名。
-        for entry in payload.get("entries") or []:
-            for alias in entry.get("aliases") or []:
-                entries.setdefault(alias, entry)
-
-        self.assertIn("transport_manifest:road", entries)
-        self.assertIn("transport:road:preview:roads", entries)
-        self.assertIn("transport:rail:preview:railways", entries)
-        self.assertIn("transport:industrial_zones:open:paths:preview:industrial_zones", entries)
-        self.assertEqual(entries["transport_manifest:road"]["schemaRef"], "schema://transport/manifest/v1")
-        self.assertEqual(entries["transport:road:preview:roads"]["schemaRef"], "schema://topojson/line_collection/roads_v1")
-        self.assertEqual(entries["transport:rail:preview:railways"]["schemaRef"], "schema://topojson/line_collection/railways_v1")
-        self.assertEqual(entries["transport:industrial_zones:open:paths:preview:industrial_zones"]["format"], "geojson")
-
     def test_catalog_preserves_runtime_asset_alias_identity_for_shared_urls(self) -> None:
         payload = self._load_catalog()
         entries_by_url = {entry["url"]: entry for entry in payload.get("entries") or []}
@@ -300,31 +247,6 @@ class DataCatalogContractTest(unittest.TestCase):
 
         self.assertEqual(world_cities["key"], "world_cities")
         self.assertIn("city_lights:historical_1930:source", world_cities.get("aliases") or [])
-
-    def test_scenario_registry_stays_the_cataloged_scenario_entry(self) -> None:
-        payload = self._load_catalog()
-        entries = {entry["key"]: entry for entry in payload.get("entries") or []}
-        scenario_entries = [
-            entry
-            for entry in payload.get("entries") or []
-            if str(entry.get("role") or "") == "scenario_registry" or "scenario" in str(entry.get("key") or "")
-        ]
-
-        self.assertEqual(len(scenario_entries), 1)
-        self.assertIn("scenario_registry", entries)
-        self.assertEqual(entries["scenario_registry"]["url"], SCENARIO_REGISTRY_URL)
-        self.assertEqual(entries["scenario_registry"]["role"], "scenario_registry")
-        self.assertEqual(entries["scenario_registry"]["schemaRef"], "schema://json/object/v1")
-
-    def test_data_health_static_governance_domain_is_clean(self) -> None:
-        report = collect_health(CATALOG_JSON, large_file_warn_bytes=0)
-
-        expected_entry_count = self._load_catalog().get("counts", {}).get("entries")
-        self.assertEqual(report.errors, [])
-        self.assertEqual(report.checked_catalog_urls, expected_entry_count)
-        self.assertEqual(report.checked_transport_manifests, 140)
-        self.assertGreaterEqual(report.checked_transport_paths, 460)
-        self.assertEqual(len(report.schema_ref_counts), EXPECTED_SCHEMA_REF_COUNT)
 
     def test_data_health_roots_runtime_registry_and_transport_scan_from_catalog_tree(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

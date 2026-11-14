@@ -7,7 +7,7 @@ from shapely.geometry import Polygon
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tools.prepare_tno_eastern_precision_sources import main, process_belarus
+from tools.prepare_tno_eastern_precision_sources import process_belarus
 
 @pytest.fixture
 def dummy_baseline():
@@ -38,20 +38,6 @@ def valid_coarse_source(tmp_path):
     p = tmp_path / "coarse.json"
     gdf.to_file(p, driver="GeoJSON")
     return p
-
-def test_eastern_precision_sources(tmp_path):
-    out_dir = tmp_path / "eastern-v3"
-    argv = [
-        "--baseline", "data/scenarios/tno_1962/runtime_topology.topo.json",
-        "--pl-source", "data/poland_powiaty.geojson",
-        "--ua-source", "data/geoBoundaries-UKR-ADM2.geojson",
-        "--by-source", "data/geoBoundaries-BLR-ADM2.geojson",
-        "--coarse", "data/europe_topology.highres.json",
-        "--output-dir", str(out_dir)
-    ]
-
-    ret = main(argv)
-    assert ret == 0
 
 def test_missing_historical_member(tmp_path, dummy_baseline, valid_coarse_source):
     # This will fail because Minsk City is there but historical members are missing

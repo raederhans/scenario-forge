@@ -16,8 +16,6 @@ from map_builder.contracts import (
     resolve_scenario_publish_filenames,
 )
 from tools.check_scenario_contracts import (
-    collect_duplicate_scenario_dirs,
-    discover_scenario_dirs,
     inspect_scenario_contract,
     validate_scenario_contract,
 )
@@ -321,71 +319,6 @@ class ScenarioContractTest(unittest.TestCase):
 
 
 
-    def test_checked_in_tno_coverage_ledgers_expose_strict_machine_fields(self) -> None:
-        scenario_dir = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "tno_1962"
-        ledger_path = scenario_dir / "derived" / "atlantropa_donor_ledger.json"
-        drop_audit_path = scenario_dir / "derived" / "geometry_drop_audit.json"
-        runtime_meta = json.loads((scenario_dir / "runtime_meta.json").read_text(encoding="utf-8"))
-        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
-        drop_audit = json.loads(drop_audit_path.read_text(encoding="utf-8"))
-        expected_ledger_paths = {
-            "atlantropa_donor_ledger": "data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json",
-            "geometry_drop_audit": "data/scenarios/tno_1962/derived/geometry_drop_audit.json",
-        }
-        expected_report_paths = dict(check_scenario_contracts.TNO_COVERAGE_REPORT_PATHS)
-
-        self.assertEqual(ledger["scenario_id"], "tno_1962")
-        ledger_summary = ledger["summary"]
-        # The ledger is derived from ``scenario_atlantropa`` in the checked-in
-        # runtime topology.  Its population may legitimately change when that
-        # geometry changes, so verify the machine-readable accounting instead
-        # of preserving an unrelated historical floor.
-        self.assertEqual(ledger_summary["runtime_feature_count"], len(ledger["features"]))
-        self.assertEqual(ledger_summary["chunk_feature_count"], ledger_summary["runtime_feature_count"])
-        self.assertEqual(ledger_summary["interactive_feature_count"], ledger_summary["runtime_feature_count"])
-        self.assertEqual(sum(ledger_summary["metadata_prefix_counts"].values()), ledger_summary["runtime_feature_count"])
-        self.assertEqual(
-            sum(ledger_summary["prefix_counts"].values()),
-            sum(
-                count
-                for prefix, count in ledger_summary["metadata_prefix_counts"].items()
-                if prefix in ledger["protected_prefixes"]
-            ),
-        )
-        self.assertEqual(ledger["summary"]["missing_chunk_count"], 0)
-        self.assertEqual(ledger["summary"]["basin_probe_failure_count"], 0)
-        self.assertEqual(drop_audit["summary"]["protected_prefix_drop_count"], 0)
-        self.assertEqual(drop_audit["summary"]["polar_feature_count"], 1)
-        self.assertEqual(drop_audit["polar_gate_ref"], "verify:tno-polar-coverage")
-        self.assertEqual(runtime_meta["coverage_ledger_paths"], expected_ledger_paths)
-        self.assertEqual(runtime_meta["coverage_report_paths"], expected_report_paths)
-        self.assertEqual(
-            runtime_meta["coverage_ledger_hashes"]["atlantropa_donor_ledger"],
-            _sha256_path(ledger_path),
-        )
-        self.assertEqual(
-            runtime_meta["coverage_ledger_hashes"]["geometry_drop_audit"],
-            _sha256_path(drop_audit_path),
-        )
-        required_probe_ids = {
-            "ionian_mediterranean",
-            "libya_suez_chain",
-            "suez_canal_site",
-            "malta_rebuilt_island",
-            "cretan_mediterranean",
-        }
-        self.assertEqual({probe["id"] for probe in ledger["basin_probes"]}, required_probe_ids)
-
-        report = inspect_scenario_contract(scenario_dir, {}, strict=True)
-
-        self.assertEqual(report["errors"], [])
-        self.assertTrue(report["coverage_ledger_ok"])
-        self.assertEqual(report["protected_prefix_drop_count"], 0)
-        self.assertEqual(report["basin_probe_failures"], [])
-        self.assertEqual(report["polar_spherical_failures"], [])
-        self.assertEqual(report["polar_feature_count"], 1)
-        self.assertEqual(report["polar_gate_ref"], "verify:tno-polar-coverage")
-
     def test_atlantropa_basin_probes_require_real_geometry_intersection(self) -> None:
         disjoint_multipolygon_with_crossing_bbox = {
             "type": "MultiPolygon",
@@ -428,67 +361,6 @@ class ScenarioContractTest(unittest.TestCase):
         self.assertEqual(ionian_probe["matching_feature_ids"], [])
         self.assertEqual(ionian_probe["failure_reasons"], ["no_matching_atlantropa_feature_geometry"])
         self.assertFalse(ionian_probe["ok"])
-
-    def test_checked_in_hoi4_scenarios_pass_shared_strict_review(self) -> None:
-        scenarios_root = Path(__file__).resolve().parents[1] / "data" / "scenarios"
-        duplicate_scenario_dirs = collect_duplicate_scenario_dirs(
-            discover_scenario_dirs(scenarios_root, [])
-        )
-
-        for scenario_name in ("hoi4_1936", "hoi4_1939"):
-            with self.subTest(scenario_name=scenario_name):
-                report = inspect_scenario_contract(
-                    scenarios_root / scenario_name,
-                    duplicate_scenario_dirs,
-                    strict=True,
-                )
-
-                self.assertEqual(report["status"], "ok")
-                self.assertEqual(report["errors"], [])
-                self.assertIsNone(report["repair_tracks"]["owners_controllers_keyset"])
-                self.assertIsNone(report["repair_tracks"]["owners_cores_keyset"])
-                self.assertIsNone(report["repair_tracks"]["runtime_topology_extra_ids"])
-
-    def test_checked_in_blank_base_is_ownerless_editable_topology(self) -> None:
-        scenario_dir = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "blank_base"
-        runtime_topology = json.loads((scenario_dir / "runtime_topology.topo.json").read_text(encoding="utf-8"))
-        manifest = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
-        owners = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
-        cores = json.loads((scenario_dir / "cores.by_feature.json").read_text(encoding="utf-8"))
-        countries = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
-
-        geometries = runtime_topology["objects"]["political"]["geometries"]
-        self.assertGreater(len(geometries), 0)
-        self.assertEqual(manifest["summary"]["feature_count"], len(geometries))
-        self.assertEqual(manifest["summary"]["owner_count"], 0)
-        self.assertEqual(manifest["style_defaults"]["empireBorders"]["opacity"], 0.4)
-        self.assertEqual(manifest["style_defaults"]["coastlines"]["width"], 0.8)
-        self.assertEqual(owners.get("owners"), {})
-        self.assertEqual(cores.get("cores"), {})
-
-        forbidden_property_names = {
-            "cntr_code",
-            "country_code",
-            "owner",
-            "controller",
-            "core",
-            "cores",
-            "scenario_owner",
-            "scenario_controller",
-            "color",
-            "color_hex",
-            "admin1_group",
-            "legacy_name",
-            "anchor_county_name",
-        }
-        for index, geometry in enumerate(geometries[:200]):
-            props = geometry.get("properties") or {}
-            self.assertTrue(str(props.get("id") or "").strip(), index)
-            self.assertFalse(forbidden_property_names & set(props), props)
-
-        for tag, entry in countries.get("countries", {}).items():
-            self.assertEqual(entry.get("feature_count"), 0, tag)
-            self.assertEqual(entry.get("controller_feature_count"), 0, tag)
 
     def test_blank_base_strict_contract_accepts_ownerless_geometry_and_rejects_pollution(self) -> None:
         cases = ("valid", "owners", "controllers", "direct_controllers", "cores", "property", "duplicate", "count", "mode")

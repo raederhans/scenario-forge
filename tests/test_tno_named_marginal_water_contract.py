@@ -1,5 +1,4 @@
 ﻿import json
-import unittest
 from pathlib import Path
 
 from shapely.geometry import shape
@@ -286,11 +285,3 @@ def test_named_water_subtractions_remove_expected_overlap():
     assert failures == []
 
 
-class TnoNamedMarginalWaterContractTest(unittest.TestCase):
-    """Expose named-water split contracts through unittest discovery."""
-
-    def test_target_named_waters_exist_with_expected_contract(self):
-        test_target_named_waters_exist_with_expected_contract()
-
-    def test_named_water_subtractions_remove_expected_overlap(self):
-        test_named_water_subtractions_remove_expected_overlap()

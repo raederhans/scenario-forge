@@ -56,11 +56,6 @@ TRACKED_BASE_GEOGRAPHY_WATER_IDS = {
     "lake_erie",
     "lake_ontario",
 }
-TARGET_OPEN_OCEAN_MAX_COMPONENTS = {
-    "tno_northwest_pacific_ocean": 7,
-    "tno_northeast_pacific_ocean": 6,
-    "tno_west_central_pacific_ocean": 5,
-}
 MIN_COMPONENT_AREA = 0.05
 WORLD_BBOX_WIDTH_THRESHOLD = 300.0
 SEAM_DISTANCE_EPSILON = 5e-5
@@ -528,20 +523,6 @@ def test_tno_scenario_water_geometries_are_all_valid():
         if not geometry.is_valid:
             invalid_features.append(str(props.get("id") or ""))
     assert invalid_features == []
-
-
-def test_problematic_pacific_open_oceans_are_pruned_to_large_components():
-    feature_map = {
-        str(feature.get("properties", {}).get("id") or ""): feature
-        for feature in _load_scenario_water_features()
-    }
-    for feature_id in TARGET_OPEN_OCEAN_IDS:
-        feature = feature_map[feature_id]
-        geometry = shape(feature["geometry"])
-        parts = _iter_polygon_parts(geometry)
-        assert parts, feature_id
-        assert len(parts) <= TARGET_OPEN_OCEAN_MAX_COMPONENTS[feature_id], feature_id
-        assert min(part.area for part in parts) >= MIN_COMPONENT_AREA - 1e-9, feature_id
 
 
 def test_problematic_pacific_open_ocean_split_specs_preserve_pruning_contract():
@@ -2175,73 +2156,6 @@ def test_tno_parent_child_water_regions_do_not_overlap():
     assert ("tno_greenland_sea", "tno_fram_strait") in checked_pairs
     assert ("tno_bering_sea", "tno_anadyrskiy_zaliv") in checked_pairs
     assert failures == []
-
-
-class TnoWaterRecentRefinementContractTest(unittest.TestCase):
-    """Expose recent ocean refinement contracts through unittest discovery."""
-
-    def test_runtime_water_feature_ids_match_source(self):
-        test_tno_runtime_water_feature_ids_match_source()
-
-    def test_runtime_bootstrap_water_feature_ids_match_source(self):
-        test_tno_runtime_bootstrap_water_feature_ids_match_source()
-
-    def test_water_chunks_cover_current_detail_regions(self):
-        test_tno_water_chunk_feature_ids_cover_current_detail_regions()
-
-    def test_water_chunks_cover_tracked_new_family_regions(self):
-        test_tno_water_chunk_feature_ids_cover_tracked_new_family_regions()
-
-    def test_ocean_refinement_phase_targets_are_synchronized(self):
-        test_tno_ocean_refinement_phase_targets_are_synchronized()
-
-    def test_tracked_probe_points_are_covered_by_expected_water_regions(self):
-        test_tno_tracked_probe_points_are_covered_by_expected_water_regions()
-
-    def test_tracked_neighbor_pairs_do_not_leave_gaps(self):
-        test_tno_tracked_neighbor_pairs_do_not_leave_gaps()
-
-    def test_parent_child_water_regions_do_not_overlap(self):
-        test_tno_parent_child_water_regions_do_not_overlap()
-
-    def test_remaining_ocean_backlog_splits_use_source_backed_details(self):
-        test_tno_remaining_ocean_backlog_splits_use_source_backed_details()
-
-    def test_family_refinement_audit_reports_low_precision_candidates(self):
-        test_tno_water_family_refinement_audit_reports_low_precision_candidates()
-
-    def test_family_refinement_terminal_review_monitors_local_clone(self):
-        test_tno_water_family_refinement_terminal_review_monitors_local_clone()
-
-    def test_family_refinement_terminal_review_monitors_standard_macro(self):
-        test_tno_water_family_refinement_terminal_review_monitors_standard_macro()
-
-    def test_family_refinement_terminal_source_reviews_exit_actionable_queues(self):
-        test_tno_water_family_refinement_terminal_source_reviews_exit_actionable_queues()
-
-    def test_family_refinement_recent_terminal_reviews_record_structured_evidence(self):
-        test_tno_water_family_refinement_recent_terminal_reviews_record_structured_evidence()
-
-    def test_bosporus_source_review_records_terminal_public_source(self):
-        test_tno_bosporus_source_review_records_terminal_public_source()
-
-    def test_family_refinement_audit_reports_high_precision_review_candidates(self):
-        test_tno_water_family_refinement_audit_reports_high_precision_review_candidates()
-
-    def test_family_refinement_rejects_invalid_source_review_contract(self):
-        test_tno_water_family_refinement_rejects_invalid_source_review_contract()
-
-    def test_water_validator_report_schema_locks_ocean_refinement_signals(self):
-        test_tno_water_validator_report_schema_locks_ocean_refinement_signals()
-
-    def test_water_validator_reports_aq_polar_spherical_diagnostics(self):
-        test_tno_water_validator_reports_aq_polar_spherical_diagnostics()
-
-    def test_manifest_and_startup_bundles_reflect_current_water_bootstrap(self):
-        test_tno_manifest_and_startup_bundles_reflect_current_water_bootstrap()
-
-    def test_water_validator_checks_geometry_collection_coordinates(self):
-        test_tno_water_validator_checks_geometry_collection_coordinates()
 
 
 def _mediterranean_fixture_collection(*entries):

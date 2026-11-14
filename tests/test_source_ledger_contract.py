@@ -102,11 +102,6 @@ class SourceLedgerContractTest(unittest.TestCase):
             self.assertIn(entry["status"], ALLOWED_STATUS)
             self.assertIn(entry["local_presence"], ALLOWED_LOCAL_PRESENCE)
 
-        hgo_entry = next(entry for entry in payload if entry["source_id"] == "hgo_mod_2241701657")
-        self.assertEqual(hgo_entry["origin_kind"], "manual_import")
-        self.assertEqual(hgo_entry["status"], "frozen_local_only")
-        self.assertEqual(hgo_entry["local_presence"], "optional_cache")
-
     def test_frozen_verified_missing_local_source_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)

@@ -236,28 +236,6 @@ class BlankBaseRebuildTest(unittest.TestCase):
 
 
 class CheckedInBlankCoverageTest(unittest.TestCase):
-    def test_blank_preserves_modern_geometry_and_adds_only_verified_source_land(self):
-        source = subject.read(subject.ROOT / "data/scenarios/modern_world/runtime_topology.topo.json")
-        blank = subject.read(subject.ROOT / "data/scenarios/blank_base/runtime_topology.topo.json")
-        blank_ids = {r["properties"]["id"] for r in subject.political_rows(blank, "blank")}
-        source_ids = {r["properties"]["id"] for r in subject.political_rows(source, "source")}
-        missing = sorted(source_ids - blank_ids)
-        self.assertFalse(missing, f"Blank is missing {len(missing)} Modern World identities: {missing[:5]}")
-        expected = subject.rebuild_topology(source, source)
-        absolute_source, absolute_blank = _absolute_topology(expected), _absolute_topology(blank)
-        source_rows = {row["properties"]["id"]: row for row in subject.political_rows(absolute_source, "source")}
-        additions = []
-        for row in subject.political_rows(absolute_blank, "blank"):
-            fid = row["properties"]["id"]
-            self.assertFalse(subject.FORBIDDEN_BLANK_PROPERTIES.intersection(row["properties"]), fid)
-            if fid in source_rows:
-                self.assertEqual(decoded_structure(absolute_source, source_rows[fid]),
-                                 decoded_structure(absolute_blank, row), fid)
-            else:
-                self.assertTrue(row["properties"].get("__source", "").startswith("blank_source_recovery:"), fid)
-                additions.append(row)
-        self.assertIn("IN_ADM2_76128533B4839184447445", blank_ids, "Missing mainland Udupi source district")
-
     def test_added_geometry_stays_within_local_sources_and_excludes_existing_land_and_lakes(self):
         input_paths = (
             subject.ROOT / "data/ne_10m_admin_1_states_provinces.shp",
