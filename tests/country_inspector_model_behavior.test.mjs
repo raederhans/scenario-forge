@@ -5,6 +5,32 @@ import { createCountryInspectorModel } from "../js/ui/sidebar/country_inspector_
 
 const createModel = (state = {}) => createCountryInspectorModel(state, (label) => label);
 
+test("country state keeps separate lookups, owner counts and inline releasable metadata", () => {
+  const presets = [{ name: "Preset" }];
+  const model = createModel({
+    activeScenarioId: "example",
+    scenarioCountriesByTag: { CHI: {
+      tag: "CHI", name: "China", preset_lookup_code: "CN", release_lookup_iso2: "TW",
+      feature_count: 4, controller_feature_count: 8,
+    } },
+    presetsState: { CN: presets },
+    countryGroupMetaByCode: new Map([["TW", { continentId: "asia", continentLabel: "Asia" }]]),
+  });
+  const country = model.createCountryInspectorState({ code: "CHI" }, 3);
+  assert.equal(country.presetLookupCode, "CN");
+  assert.equal(country.inspectorDataCode, "TW");
+  assert.equal(country.groupingCode, "TW");
+  assert.equal(country.presets, presets);
+  assert.equal(country.featureCount, 4);
+  assert.equal(country.controllerFeatureCount, 8);
+  assert.equal(country.fallbackIndex, 3);
+  assert.equal(country.continentId, "asia");
+  const release = model.createCountryInspectorState({ code: "CHI", releasable: true, name: "Release", featureCount: 2 });
+  assert.equal(release.displayName, "Release");
+  assert.equal(release.featureCount, 2);
+  assert.deepEqual(release.groupSystems, []);
+});
+
 test("scenario grouping honors explicit metadata before TNO regional inference", () => {
   const state = {
     activeScenarioId: "tno_1962",

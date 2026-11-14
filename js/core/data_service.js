@@ -344,20 +344,6 @@ function resolveCatalogEntryByUrl(url) {
   return catalogEntryByUrl.get(normalizeCatalogPath(url)) || null;
 }
 
-export function getCatalogAssetMetadata(path) {
-  const normalizedPath = normalizeCatalogPath(path);
-  const entry = resolveCatalogEntryByUrl(normalizedPath);
-  if (!entry) return null;
-  return Object.freeze({
-    key: String(entry?.key || "").trim(),
-    url: normalizedPath,
-    role: String(entry?.role || "").trim(),
-    format: String(entry?.format || "").trim(),
-    readMode: String(entry?.readMode || "").trim(),
-    cachePolicy: String(entry?.cachePolicy || "").trim(),
-  });
-}
-
 export async function getAsset(key, options = {}) {
   const normalizedKey = String(key || "").trim();
   if (!normalizedKey) {

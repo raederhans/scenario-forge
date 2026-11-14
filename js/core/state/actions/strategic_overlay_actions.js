@@ -7,13 +7,6 @@ export const STRATEGIC_OVERLAY_COLLECTION_KEYS = Object.freeze([
   "unitCounters",
 ]);
 
-export const STRATEGIC_OVERLAY_DIRTY_KEYS = Object.freeze([
-  "frontlineOverlayDirty",
-  "operationalLinesDirty",
-  "operationGraphicsDirty",
-  "unitCountersDirty",
-]);
-
 export const STRATEGIC_OVERLAY_ENTITY_FIELD_KEYS = Object.freeze({
   operationalLines: Object.freeze([
     "kind", "label", "points", "stylePreset", "stroke", "width", "opacity",

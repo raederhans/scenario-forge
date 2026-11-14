@@ -1082,10 +1082,6 @@ export function getRenderTransactionGlobalName() {
   return GLOBAL_RENDER_TRANSACTION_DIAGNOSTICS_NAME;
 }
 
-export function getRenderTransactionFeatureCountForDiagnostics(value) {
-  return getFeatureCount(value);
-}
-
 export function getMergedPayloadStateForDiagnostics(value) {
   return getPayloadState(value);
 }

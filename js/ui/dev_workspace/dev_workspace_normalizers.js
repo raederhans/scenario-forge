@@ -12,10 +12,3 @@ export function normalizeScenarioColorInput(value) {
   return text.startsWith("#") ? text : `#${text}`;
 }
 
-export function sanitizeScenarioColorList(values = [], limit = 10) {
-  return Array.from(new Set(
-    (Array.isArray(values) ? values : [])
-      .map((value) => normalizeScenarioColorInput(value))
-      .filter((color) => /^#[0-9A-F]{6}$/.test(color))
-  )).slice(0, limit);
-}

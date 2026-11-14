@@ -36,18 +36,9 @@ export function resolveDataAssetUrl(key) {
   return url;
 }
 
-export function hasRuntimeAssetUrl(key) {
-  return !!RUNTIME_ASSET_URLS[normalizeRuntimeAssetKey(key)];
-}
-
 export function resolveScenarioRegistryUrl() {
   const scenarioRegistryKey = normalizeRuntimeAssetKey(RUNTIME_ASSET_REGISTRY?.scenario_registry_key || "scenario_registry");
   return resolveDataAssetUrl(scenarioRegistryKey);
-}
-
-export function resolveCountryFeaturePoliciesUrl() {
-  const policyKey = normalizeRuntimeAssetKey(RUNTIME_ASSET_REGISTRY?.country_feature_policies_key || "country_feature_policies");
-  return resolveDataAssetUrl(policyKey);
 }
 
 export function resolveTransportManifestUrl(familyId) {
