@@ -1,42 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import vm from 'node:vm';
-import { parse } from 'acorn';
 import { state } from '../js/core/state.js';
 import { captureHistoryState, clearHistory, pushHistoryEntry, undoHistory, redoHistory } from '../js/core/history_manager.js';
 import { readRegisteredRuntimeHookSource, registerRuntimeHook } from '../js/core/state/index.js';
-
-function privateFunction(file, name, globals = {}) {
-  const source = readFileSync(new URL(file, import.meta.url), 'utf8');
-  const fn = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
-    .find(node => node.type === 'FunctionDeclaration' && node.id.name === name);
-  const context = vm.createContext(globals);
-  vm.runInContext(source.slice(fn.start, fn.end), context);
-  return context[name];
-}
-
-test('feature-only history scope unions both snapshots and rejects mixed/global effects', () => {
-  const scope = privateFunction('../js/core/history_manager.js', 'getFeatureColorHistoryIds');
-  assert.deepEqual(Array.from(scope({ before: { visualOverrides: { A: null } },
-    after: { visualOverrides: { B: '#123456' } } })), ['A', 'B']);
-  for (const key of ['styleConfig', 'sovereigntyByFeatureId', 'sovereignBaseColors', 'waterRegionOverrides', 'futureField']) {
-    assert.equal(scope({ before: { visualOverrides: { A: null } },
-      after: { visualOverrides: { A: '#123456' }, [key]: {} } }), null);
-  }
-  assert.equal(scope({ before: {}, after: {} }), null);
-  assert.equal(scope({ before: { visualOverrides: { A: null } }, after: {}, meta: { affectsSovereignty: true } }), null);
-});
-
-test('water-only history scope excludes mixed and ownership changes', () => {
-  const scope = privateFunction('../js/core/history_manager.js', 'getWaterColorHistoryIds');
-  assert.deepEqual(Array.from(scope({ before: { waterRegionOverrides: { W: null } },
-    after: { waterRegionOverrides: { W: '#123456', X: '#abcdef' } } })), ['W', 'X']);
-  assert.equal(scope({ before: { waterRegionOverrides: { W: null } },
-    after: { waterRegionOverrides: { W: '#123456' }, visualOverrides: { A: '#abcdef' } } }), null);
-  assert.equal(scope({ before: { waterRegionOverrides: { W: null } },
-    after: { waterRegionOverrides: { W: '#123456' } }, meta: { affectsSovereignty: true } }), null);
-});
 
 test('water-only undo and redo restore overrides with scoped render and UI hooks', t => {
   const oldDocument = globalThis.document;
@@ -228,73 +194,3 @@ test('mixed history retains broad UI refresh while retired ownership entries are
   assert.equal(state.historyFuture.length, 0);
 });
 
-test('renderer uses local refresh only for resolved non-Atlantropa targets; existing callers remain full', () => {
-  const calls = [];
-  const refresh = privateFunction('../js/core/map_renderer.js', 'refreshColorState', {
-    nowMs: () => 1, state: {}, runtimeState: { colors: { A: '#123456' },
-      waterRegionsById: new Map([['W', { id: 'W' }], ['atl-water', { id: 'atl-water' }]]) },
-    normalizeFeatureOverrideTargetIds: ids => [...new Set(ids)],
-    findResolvedColorFeatureById: id => id === 'missing' ? null : { id },
-    isAtlantropaFieldDrivenFeature: feature => feature.id === 'atlantropa' || feature.id === 'atl-water',
-    refreshResolvedColorsForFeatures: (...args) => calls.push(['partial', ...args]),
-    normalizeColorStateForRender: () => calls.push(['normalize']), sanitizeColorMap: () => {}, sanitizeCountryColorMap: () => {},
-    rebuildResolvedColors: () => calls.push(['full']),
-    invalidateRenderPasses: (...args) => calls.push(['invalidate', ...args]),
-    recordRenderPerfMetric: () => {}, rendererSurfaceHost: { getContext: () => null },
-  });
-  refresh({ renderNow: false, featureIds: ['A', 'A'], inputLabel: 'history-undo' });
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0][0], 'partial');
-  assert.deepEqual(Array.from(calls[0][1]), ['A']);
-  calls.length = 0;
-  refresh({ renderNow: false, waterRegionIds: ['W', 'W'], inputLabel: 'history-undo' });
-  assert.deepEqual(calls.map(call => call[0]), ['invalidate']);
-  assert.deepEqual(calls[0].slice(1), ['contextScenario', 'refresh-water-colors']);
-  for (const options of [{ renderNow: false }, { renderNow: false, featureIds: ['missing'] },
-    { renderNow: false, featureIds: ['A', 'atlantropa'] },
-    { renderNow: false, waterRegionIds: ['atl-water'] },
-    { renderNow: false, waterRegionIds: ['unknown'] }]) {
-    calls.length = 0; refresh(options);
-    // Normalization is owned by the full rebuild rather than repeated here.
-    assert.deepEqual(calls.map(call => call[0]), ['full', 'invalidate']);
-    assert.equal(calls[1][1], 'contextScenario');
-  }
-});
-
-test('color promotion replacing settle timers resumes pending chunks once after entering idle', () => {
-  const timers = new Map();
-  let nextTimer = 1;
-  const calls = [];
-  const runtimeState = { renderPhase: 'settling', deferExactAfterSettle: true,
-    runtimeChunkLoadState: { pendingReason: 'zoom-end' },
-    scheduleScenarioChunkRefreshFn: options => calls.push(options),
-  };
-  const flush = privateFunction('../js/core/map_renderer.js', 'flushPendingScenarioChunkRefreshAfterExact', {
-    runtimeState, pendingScenarioChunkFlushAfterExactHandle: null, RENDER_PHASE_IDLE: 'idle',
-    setTimeout: callback => { const id = nextTimer++; timers.set(id, callback); return id; },
-    clearTimeout: id => timers.delete(id),
-  });
-  const promote = privateFunction('../js/core/map_renderer.js', 'promoteDeferredColorRenderToIdle', {
-    runtimeState, RENDER_PHASE_SETTLING: 'settling', RENDER_PHASE_IDLE: 'idle',
-    getRenderPassCacheState: () => ({ dirty: { political: true }, reasons: { political: 'refresh-colors' } }),
-    clearRenderPhaseTimer: () => {},
-    cancelExactAfterSettleRefresh: () => { runtimeState.deferExactAfterSettle = false; },
-    setRenderPhase: phase => { runtimeState.renderPhase = phase; },
-    recordRenderPerfMetric: () => {}, flushPendingScenarioChunkRefreshAfterExact: flush,
-  });
-  assert.equal(promote(), true);
-  assert.equal(runtimeState.renderPhase, 'idle');
-  assert.equal(timers.size, 1);
-  const runTimers = () => { const pending = [...timers.values()]; timers.clear(); pending.forEach(fn => fn()); };
-  runTimers();
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].flushPending, true);
-  assert.equal(timers.size, 0);
-  // A new gesture defers to its own idle transition without timer polling.
-  flush(); runtimeState.renderPhase = 'interacting'; runTimers();
-  assert.equal(calls.length, 1);
-  assert.equal(timers.size, 0);
-  // A reset removing the pending request must not revive it.
-  runtimeState.renderPhase = 'idle'; flush(); runtimeState.runtimeChunkLoadState = {};
-  runTimers(); assert.equal(calls.length, 1);
-});

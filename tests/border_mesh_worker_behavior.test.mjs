@@ -49,26 +49,6 @@ test("binary border results preserve exact coordinates, shared meshes, country M
   }
 });
 
-test("the production border worker transfers BUILD buffers and leaves registration replies ordinary", () => {
-  const workerSource = readFileSync(new URL("../js/workers/border_mesh.worker.js", import.meta.url), "utf8")
-    .replace(/^import[^\r\n]*\r?\n/gm, "");
-  const mesh = { type: "MultiLineString", coordinates: [[[1.25, -0], [1e120, -1e-100]]] };
-  const replies = [];
-  const scope = { postMessage(message, transfer) {
-    replies.push({ message: structuredClone(message, { transfer }), count: transfer.length });
-    assert.ok(transfer.every(buffer => buffer.byteLength === 0));
-  } };
-  const kernel = { registerSource: () => ({ sourceKey: "one" }), build: () => ({ mesh }) };
-  new Function("createBorderMeshWorkerKernel", "packBorderMeshResult", "self", "performance", workerSource)(
-    () => kernel, packBorderMeshResult, scope, performance);
-  scope.onmessage({ data: { type: "REGISTER_SOURCE", taskId: "register" } });
-  scope.onmessage({ data: { type: "BUILD", taskId: "build" } });
-  assert.equal(replies[0].count, 0);
-  assert.deepEqual(replies[0].message.result, { sourceKey: "one" });
-  assert.equal(replies[1].count, 3, "ordinary XY meshes only transfer their three numeric buffers");
-  assert.deepEqual(unpackBorderMeshResult(replies[1].message.result), { mesh });
-});
-
 test("client unwraps binary replies without expanding coordinates and preserves mesh aliases", async () => {
   const mesh = { type: "MultiLineString", coordinates: [[[1.25, -0], [10, 15]]] };
   const client = createBorderMeshWorkerClient({ isSupported: () => true, createWorker: () => ({

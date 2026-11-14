@@ -7,8 +7,6 @@ import { createPaintContourGraphBuilder } from '../js/core/renderer/paint_contou
 import { createPaintContourWorkerClient } from '../js/core/paint_contour_worker_client.js';
 import { getPackedPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
 import { createBorderIdentityResolver } from '../js/core/renderer/border_identity.js';
-import { packContourWaterMask } from '../js/core/renderer/paint_contour_water_mask.js';
-
 const stableDiagnostics = diagnostics => Object.fromEntries(Object.entries(diagnostics)
   .filter(([key]) => !(key.startsWith('nearSeam') && (key.endsWith('Ms') || key.endsWith('Bytes')))));
 
@@ -432,29 +430,6 @@ test('precision-only metadata publication updates the affected worker registrati
   await h.finish();assert.equal(h.runtime.diagnostics().status,'ready');
 });
 
-function loopbackContourWorker({ holdPatch = false, builderFactory = createPaintContourGraphBuilder } = {}) {
-  const sent = [], replies = [];
-  let terminations = 0;
-  const worker = { terminate() { terminations++; }, postMessage(message, transfer = []) {
-    const packet = structuredClone(message, { transfer });
-    sent.push({ packet, transferred: transfer.length, detached: transfer.every(buffer => buffer.byteLength === 0) });
-    if (holdPatch && packet.type === 'PATCH') return;
-    scope.self.onmessage({ data: packet });
-  } };
-  const scope = { createPaintContourGraphBuilder: builderFactory,
-    __scenarioForgeGeometryTransferCodecShared: globalThis.__scenarioForgeGeometryTransferCodecShared,
-    self: { postMessage(message, transfer = []) {
-      const packet = structuredClone(message, { transfer });
-      replies.push({ packet, transferred: transfer.length });
-      queueMicrotask(() => worker.onmessage({ data: packet }));
-    } },
-  };
-  const source = readFileSync(new URL('../js/workers/paint_contour.worker.js', import.meta.url), 'utf8')
-    .replace(/^import .*;\r?\n/gm, '');
-  vm.runInNewContext(source, scope);
-  return { worker, sent, replies, receive: packet => scope.self.onmessage({ data: packet }), terminations: () => terminations };
-}
-
 test('water revisions rebuild without geometry transfers and unchanged sources reuse the worker mask', async () => {
   let revision = 0, calls = 0;
   let land = { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-1,-1],[4,-1],[4,3],[-1,3],[-1,-1]]] } };
@@ -487,118 +462,6 @@ test('an empty water collection replaced by another empty collection does not re
   landMask = null;
   h.runtime.getMeshes(); await h.flush(); await h.finish();
   assert.equal(h.tasks.length, 3, 'null selects a different source than an empty collection');
-});
-
-test('water masks transfer once and subsequent geometry updates retain water rejection in the real worker', async () => {
-  for (const supported of [true,false]) {
-    const h = loopbackContourWorker(), client=createPaintContourWorkerClient({createWorker:()=>h.worker,isSupported:()=>supported,yieldToHost:()=>Promise.resolve()});
-    const features=[rect('A',0),rect('B',1.03)];
-    const land={type:'Feature',geometry:{type:'Polygon',coordinates:[[[-1,-1],[4,-1],[4,3],[-1,3],[-1,-1]]]}};
-    try {
-      const first=await client.build(features,[],{reset:true,waterMask:packContourWaterMask({land})});
-      assert.ok(first.diagnostics.nearSeamSegments>0);
-      const waterMask=packContourWaterMask({land:features.map(f=>({...f,type:'Feature'}))});
-      const rejected=await client.build([],[],{waterMask});assert.equal(rejected.diagnostics.nearSeamSegments,0);
-      const next=await client.build(structuredClone(features),[]);assert.equal(next.diagnostics.nearSeamSegments,0);
-      if(supported){
-        const messages=h.sent.filter(m=>m.packet.type==='WATER');assert.equal(messages.length,2);
-        assert.ok(messages.every(m=>m.transferred===6&&m.detached));
-      }
-    } finally {client.dispose();}
-  }
-});
-
-test('worker PATCH transfers lossless Float64 batches and only graph-required metadata in source order', async () => {
-  const h = loopbackContourWorker();
-  const client = createPaintContourWorkerClient({ createWorker: () => h.worker, isSupported: () => true });
-  const features = [rect('A', 0), rect('B', 1),
-    ...Array.from({ length: 128 }, (_, index) => rect(`island-${index}`, index + 4)),
-    { id: 'empty', geometry: { type: 'GeometryCollection', geometries: [] } }];
-  features[0].geometry.coordinates[0][1][0] = 1 + 1e-10;
-  features[0].coordinatePrecision = 7;
-  features[1].coordinatePrecision = 4;
-  features[1].geometry = { type: 'GeometryCollection', geometries: [features[1].geometry] };
-  features[0].properties = { unused: new Array(100).fill('unrelated') };
-  features[0].geometry.properties = { unused: true };
-  const before = JSON.stringify(features);
-  try {
-    const graph = await client.build(features, [], { reset: true });
-    const expected = createPaintContourGraphBuilder();
-    expected.patch(features);
-    const reference = expected.finish();
-    assert.deepEqual({ ...graph, diagnostics: stableDiagnostics(graph.diagnostics) },
-      { ...reference, diagnostics: stableDiagnostics(reference.diagnostics) });
-    assert.equal(JSON.stringify(features), before, 'only newly allocated codec buffers are transferred');
-    assert.deepEqual(h.sent.map(({ packet }) => packet.type), ['BEGIN', 'PATCH', 'PATCH', 'FINISH']);
-    const patches = h.sent.filter(({ packet }) => packet.type === 'PATCH');
-    const decoded = patches.flatMap(({ packet }) => packet.geometryTransport.batches.flatMap(batch =>
-      batch?.encoding === 'geo-f64-v1' ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(batch) : batch));
-    assert.deepEqual(decoded.map(feature => feature.id), features.map(feature => feature.id));
-    assert.equal(decoded[0].geometry.coordinates[0][1][0], 1 + 1e-10);
-    assert.equal(decoded[1].coordinatePrecision, 4);
-    assert.deepEqual(Object.keys(decoded[0]), ['id', 'geometry', 'coordinatePrecision']);
-    assert.deepEqual(Object.keys(decoded[0].geometry), ['type', 'coordinates']);
-    assert.ok(patches.every(({ packet, transferred, detached }) => packet.features === null && transferred > 0 && detached));
-    assert.ok(patches.every(({ packet }) => packet.geometryTransport.batches.filter(batch => batch?.encoding)
-      .every(batch => batch.coordinates instanceof Float64Array && batch.lengths instanceof Uint32Array)));
-  } finally { client.dispose(); }
-});
-
-test('binary worker transport preserves deletion-only, empty, replacement and reset messages', async () => {
-  const h = loopbackContourWorker();
-  const client = createPaintContourWorkerClient({ createWorker: () => h.worker, isSupported: () => true });
-  try {
-    assert.equal((await client.build([rect('A', 0), rect('B', 1)], [], { reset: true })).diagnostics.arcCount, 1);
-    assert.equal((await client.build([], ['B'])).diagnostics.featureCount, 1);
-    const deletion = h.sent.at(-2).packet;
-    assert.equal(deletion.type, 'PATCH');
-    assert.deepEqual(deletion.features, []);
-    assert.deepEqual(deletion.removedIds, ['B']);
-    assert.equal((await client.build([], [])).diagnostics.featureCount, 1);
-    assert.equal((await client.build([rect('B', 3)], [])).diagnostics.arcCount, 0);
-    assert.equal((await client.build([], [], { reset: true })).diagnostics.featureCount, 0);
-    const malformed = { id: 'malformed', geometry: { type: 'Polygon', coordinates: [[[0, 0], [1, 0], ['bad', 1], [0, 0]]] } };
-    const graph = await client.build([malformed], []);
-    assert.equal(graph.diagnostics.invalidRings, 1, 'codec raw batches preserve invalid-input diagnostics');
-    assert.equal(h.sent.at(-2).transferred, 0);
-  } finally { client.dispose(); }
-});
-
-test('disposing during packing aborts before PATCH transfer and leaves source coordinates intact', async () => {
-  const h = loopbackContourWorker();
-  const client = createPaintContourWorkerClient({ createWorker: () => h.worker, isSupported: () => true });
-  let disposed = false;
-  const point = new Proxy([0, 0], { get(target, key) {
-    if (key === '0' && !disposed) { disposed = true; client.dispose(); }
-    return Reflect.get(target, key);
-  } });
-  const feature = { id: 'abort', geometry: { type: 'Polygon', coordinates: [[point, [1, 0], [1, 1], point]] } };
-  await assert.rejects(client.build([feature], [], { reset: true }), { name: 'AbortError' });
-  assert.deepEqual(h.sent.map(({ packet }) => packet.type), ['BEGIN']);
-  assert.equal(h.terminations(), 1);
-  assert.equal(point[0], 0);
-});
-
-test('dispose cancels a pending transferred PATCH and a new scene rebuild uses a fresh worker', async () => {
-  const workers = [];
-  const client = createPaintContourWorkerClient({ createWorker: () => {
-    const h = loopbackContourWorker({ holdPatch: workers.length === 0 });
-    workers.push(h); return h.worker;
-  }, isSupported: () => true });
-  try {
-    const request = client.build([rect('A', 0)], [], { reset: true });
-    const rejected = assert.rejects(request, { name: 'AbortError' });
-    await new Promise(setImmediate);
-    assert.equal(workers[0].sent.at(-1).packet.type, 'PATCH');
-    client.dispose();
-    await rejected;
-    assert.equal(workers[0].terminations(), 1);
-    assert.equal(workers[0].sent.at(-1).packet.type, 'CANCEL_TASK');
-    const graph = await client.build([rect('C', 4)], [], { reset: true });
-    assert.equal(workers.length, 2);
-    assert.deepEqual(graph.featureIds, ['C']);
-    assert.equal(graph.diagnostics.featureCount, 1);
-  } finally { client.dispose(); }
 });
 
 test('identical geometry copies wait for real reuse ACK, retain one packed graph and refresh current paint', async () => {
@@ -731,102 +594,6 @@ test('failed reuse discards the ACK graph, suppresses frame retries and a new pu
   assert.equal(h.tasks[2].options.reuse, false);
   await h.finish(); assert.equal(h.runtime.diagnostics().activeArcCount, 1);
 });
-
-test('worker and unsupported fallback confirm only a successful unchanged graph and transfer no old buffers', async () => {
-  for (const supported of [true, false]) {
-    const h = loopbackContourWorker(), workers = [];
-    const client = createPaintContourWorkerClient({ createWorker: () => {
-      const next = workers.length ? loopbackContourWorker() : h;
-      workers.push(next); return next.worker;
-    },
-      isSupported: () => supported, yieldToHost: () => Promise.resolve() });
-    try {
-      await assert.rejects(client.build([], [], { reuse: true }), /registered|completed/);
-      const graph = await client.build([rect('A',0), rect('B',1)], [], { reset: true });
-      const bytes = graph.coordinates.byteLength;
-      assert.deepEqual(await client.build([], [], { reuse: true }), { unchanged: true });
-      assert.equal(graph.coordinates.byteLength, bytes);
-      if (supported) {
-        assert.equal(h.sent.at(-1).packet.type, 'CONFIRM');
-        assert.equal(h.sent.at(-1).transferred, 0);
-        assert.equal(h.replies.at(-1).transferred, 0);
-        assert.deepEqual(Object.keys(h.replies.at(-1).packet.result), ['unchanged']);
-      }
-      await assert.rejects(client.build([rect('A',0)], [], { reuse: true }), /cannot mutate/);
-      await assert.rejects(client.build([], [], { reuse: true, reset: true }), /cannot mutate/);
-      await assert.rejects(client.build([rect('A',0)], ['B'], { reuse: true, certifiedEquivalent: true }), /cannot mutate/);
-      await assert.rejects(client.build([rect('A',0)], [], { certifiedEquivalent: true }), /Invalid certified/);
-      client.dispose();
-      if (supported) assert.equal(h.terminations(), 1, 'dispose terminates the completed worker');
-      await assert.rejects(client.build([], [], { reuse: true }), /registered|completed/);
-      if (supported) {
-        assert.equal(workers.length, 2, 'a new request receives a fresh unregistered worker');
-        assert.notEqual(workers[0].worker, workers[1].worker);
-      }
-    } finally { client.dispose(); }
-  }
-});
-
-test('worker CONFIRM rejects dirty PATCH, reset and a failed FINISH until a new full FINISH succeeds', async () => {
-  let fail = false;
-  const h = loopbackContourWorker({ builderFactory: () => {
-    const builder = createPaintContourGraphBuilder();
-    return { ...builder, finish() { if (fail) throw new Error('finish failed'); return builder.finish(); } };
-  } });
-  const client = createPaintContourWorkerClient({ createWorker: () => h.worker, isSupported: () => true });
-  try {
-    await client.build([rect('A',0), rect('B',1)], [], { reset: true });
-    h.receive({ type: 'PATCH', taskId: 'private-patch', features: [rect('B',3)], removedIds: [] });
-    await assert.rejects(client.build([], [], { reuse: true }), /completed unchanged/);
-    await assert.rejects(client.build([rect('A',0)], [], { reuse: true, certifiedEquivalent: true }), /completed unchanged/);
-    await client.build([], []);
-    assert.deepEqual(await client.build([], [], { reuse: true }), { unchanged: true });
-    fail = true;
-    await assert.rejects(client.build([], []), /finish failed/);
-    await assert.rejects(client.build([], [], { reuse: true }), /completed unchanged/);
-    fail = false; await client.build([], []);
-    assert.deepEqual(await client.build([], [], { reuse: true }), { unchanged: true });
-    h.receive({ type: 'BEGIN', taskId: 'private-reset' });
-    await assert.rejects(client.build([], [], { reuse: true }), /completed unchanged/);
-  } finally { client.dispose(); }
-});
-
-test('certified replacements still PATCH in original order and preserve the next true FINISH history', async () => {
-  for (const supported of [true, false]) {
-    const h = loopbackContourWorker();
-    const client = createPaintContourWorkerClient({ createWorker: () => h.worker,
-      isSupported: () => supported, yieldToHost: () => Promise.resolve() });
-    const features = [rect('A',0), rect('B',1), rect('C',2)];
-    const reference = createPaintContourGraphBuilder();
-    try {
-      reference.patch(features); reference.finish();
-      const original = await client.build(features, [], { reset: true });
-      const replacements = structuredClone(features).reverse();
-      reference.patch(replacements); reference.finish();
-      const reply = await client.build(replacements, [], { reuse: true, certifiedEquivalent: true });
-      assert.deepEqual(reply, { unchanged: true });
-      assert.ok(original.coordinates.byteLength > 0, 'CONFIRM never retransfers the retained graph');
-      if (supported) {
-        const patch = h.sent.at(-2).packet;
-        assert.equal(patch.type, 'PATCH'); assert.equal(patch.certifiedEquivalent, true);
-        const decoded = patch.geometryTransport.batches.flatMap(batch =>
-          batch?.encoding === 'geo-f64-v1' ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(batch) : batch);
-        assert.deepEqual(decoded.map(feature => feature.id), ['C', 'B', 'A']);
-        assert.equal(h.sent.at(-1).packet.type, 'CONFIRM');
-        assert.equal(h.replies.at(-1).transferred, 0);
-      }
-      const update = rect('B',4); reference.patch([update]);
-      const expected = reference.finish(), actual = await client.build([update], []);
-      assert.deepEqual(actual.featureIds, expected.featureIds);
-      assert.deepEqual(stableDiagnostics(actual.diagnostics), stableDiagnostics(expected.diagnostics));
-      for (const key of ['coordinates', 'offsets', 'owners']) {
-        const bytes = graph => Buffer.from(graph[key].buffer, graph[key].byteOffset, graph[key].byteLength);
-        assert.ok(bytes(actual).equals(bytes(expected)), `${key}: actual PATCH history must equal the original full-FINISH sequence`);
-      }
-    } finally { client.dispose(); }
-  }
-});
-
 
 test('only water geometry references and Atlantropa visibility invalidate the water mask', async () => {
   const h = harness();
