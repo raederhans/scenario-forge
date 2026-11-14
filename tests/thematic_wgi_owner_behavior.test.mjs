@@ -1,5 +1,6 @@
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 import { readFileSync } from "node:fs";
 
 import { createThematicWgiOwner } from "../js/ui/toolbar/thematic_wgi_owner.js";
@@ -55,9 +56,9 @@ function createHarness(overrides = {}, options = {}) {
     styleConfig: {},
     strategicChoroplethMetric: "steel",
     featureColorOverrides: { country: "#abcdef" },
-    persistViewSettingsFn: () => { persists += 1; },
     ...overrides,
   };
+  registerRuntimeHook(state, "persistViewSettingsFn", () => { persists += 1; });
   const owner = createThematicWgiOwner({
     runtimeState: state,
     documentRef: {
@@ -612,4 +613,13 @@ test("WGI new strings agree across manual/catalog translations and option langua
   assert.equal(h.loads.length, 0);
   assert.equal(h.persists(), 0);
   assert.deepEqual(h.dirty, []);
+});
+
+const fixtureHookNames = ["persistViewSettingsFn"];
+let savedHooks;
+beforeEach(() => {
+  savedHooks = fixtureHookNames.map((name) => [name, readRegisteredRuntimeHookSource(null, name)]);
+});
+afterEach(() => {
+  for (const [name, hook] of savedHooks) registerRuntimeHook(null, name, hook);
 });

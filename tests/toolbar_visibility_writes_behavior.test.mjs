@@ -1,7 +1,8 @@
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
+import { STATE_NOTIFICATION_HOOK_NAMES, STATE_HANDLER_HOOK_NAMES, STATE_INTERNAL_HANDLER_HOOK_NAMES } from "../js/core/state/config.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { state } from "../js/core/state.js";
-import { registerRuntimeHook } from "../js/core/state/index.js";
 import { initToolbar } from "../js/ui/toolbar.js";
 class Node {
   constructor(tag, doc) {
@@ -101,8 +102,13 @@ function harness(context) {
 for (const initialParentVisibility of [false, undefined, null, true]) {
   test(`toolbar visibility writes preserve state and notification order (${initialParentVisibility})`, async context => {
     const h = harness(context);
-    const saved = { ...state, ui: { ...state.ui } };
-    context.after(() => Object.assign(state, saved));
+    const hookNames = new Set([...STATE_NOTIFICATION_HOOK_NAMES, ...STATE_HANDLER_HOOK_NAMES, ...STATE_INTERNAL_HANDLER_HOOK_NAMES]);
+    const savedHooks = [...hookNames].map(name => [name, readRegisteredRuntimeHookSource(state, name)]);
+    const saved = { ...Object.fromEntries(Object.entries(state).filter(([key]) => !hookNames.has(key))), ui: { ...state.ui } };
+    context.after(() => {
+      Object.assign(state, saved);
+      for (const [name, hook] of savedHooks) registerRuntimeHook(state, name, hook);
+    });
     context.mock.method(globalThis, "fetch", async () => ({ ok: true, json: async () => ({ samples: [] }) }));
     context.mock.timers.enable({ apis: ["setTimeout", "setInterval"] });
     context.after(async () => { await new Promise(resolve => setImmediate(resolve)); });
@@ -131,10 +137,6 @@ for (const initialParentVisibility of [false, undefined, null, true]) {
     assert.equal(toggle.checked, false);
     registerRuntimeHook(state, "updateWaterInteractionUIFn", () => record("interaction"));
     registerRuntimeHook(state, "renderWaterRegionListFn", () => record("list"));
-    context.after(() => {
-      registerRuntimeHook(state, "updateWaterInteractionUIFn", null);
-      registerRuntimeHook(state, "renderWaterRegionListFn", null);
-    });
     for (const checked of [true, false]) {
       calls.length = 0;
       const revision = state.dirtyRevision;

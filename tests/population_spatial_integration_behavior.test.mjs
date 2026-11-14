@@ -1,4 +1,5 @@
-import test from "node:test";
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
+import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { createPopulationSpatialOwner, buildPopulationStatsCsv } from "../js/ui/toolbar/population_spatial_owner.js";
 import { getPopulationTooltipLines } from "../js/core/population_spatial_presentation.js";
@@ -41,8 +42,9 @@ function harness({ fail = false, enabled = false } = {}) {
     activeScenarioManifest: { source: { runtime_topology_sha256: geometry } },
     scenarioBaselineOwnersByFeatureId: Object.freeze({ A: "AA", B: "AA", C: "BB", D: "CC" }),
     strategicChoroplethMetric: "steel", sovereignBaseColors: { AA: "#ffffff" }, visualOverrides: { A: "#000000" },
-    devSelectionOrder: ["A", "B", "B"], persistViewSettingsFn: () => { persists += 1; } };
+    devSelectionOrder: ["A", "B", "B"] };
   let persists = 0, calls = 0, failing = fail;
+  registerRuntimeHook(state, "persistViewSettingsFn", () => { persists += 1; });
   const dirty = [], downloads = [];
   const owner = createPopulationSpatialOwner({ runtimeState: state,
     documentRef: { getElementById: (id) => nodes[id] || null, createElement: () => new Element() },
@@ -145,4 +147,13 @@ test("population opacity uses a common neutral base and heatmap no-data cannot e
   assert.equal(color("C"), POPULATION_MISSING_COLOR, "transparent raster no-data leaves a neutral parcel");
   h.nodes.togglePopulation.checked = false; h.nodes.togglePopulation.dispatch("change");
   assert.equal(color("A"), "#123456"); assert.equal(color("B"), "#c0ffee"); assert.equal(color("C"), "#bd0026");
+});
+
+const fixtureHookNames = ["persistViewSettingsFn"];
+let savedHooks;
+beforeEach(() => {
+  savedHooks = fixtureHookNames.map((name) => [name, readRegisteredRuntimeHookSource(null, name)]);
+});
+afterEach(() => {
+  for (const [name, hook] of savedHooks) registerRuntimeHook(null, name, hook);
 });

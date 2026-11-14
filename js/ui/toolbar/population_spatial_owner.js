@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { setPopulationStyleState } from "../../core/state/actions/population_spatial_actions.js";
 import { ensurePopulationData, ensurePopulationHeatmapData, getPopulationHeatmapSnapshot } from "../../core/population_spatial_runtime.js";
 import { getPopulationViewModel, getPopulationLegend, getPopulationCountrySummary,
@@ -135,7 +136,7 @@ export function createPopulationSpatialOwner({ runtimeState, t = (key) => key, m
   };
   const update = (patch) => {
     setPopulationStyleState(runtimeState, { ...normalizePopulationStyle(runtimeState.styleConfig?.population), ...patch });
-    runtimeState.persistViewSettingsFn?.(); markDirty("population-style"); refresh();
+    callRuntimeHook(runtimeState, "persistViewSettingsFn"); markDirty("population-style"); refresh();
   };
   nodes.togglePopulation?.addEventListener("change", (event) => {
     update({ enabled: event.target.checked, ...(event.target.checked ? { dataVersion: normalizePopulationStyle().dataVersion } : {}) });

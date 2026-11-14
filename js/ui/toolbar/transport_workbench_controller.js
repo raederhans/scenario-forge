@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 // Transport workbench controller.
 // 这个模块负责 transport workbench 当前的状态归一、面板渲染、预览联动和事件委派，尚不声明完整应用链所有权。
 // toolbar.js 继续保留全局 overlay 协调、URL restore、顶层 chrome 和其他 support surface 的仲裁。
@@ -523,9 +524,7 @@ export function createTransportWorkbenchController({
     const willOpen = !!nextOpen;
     if (willOpen === wasOpen && !willOpen) {
       renderTransportWorkbenchUi();
-      if (typeof runtimeState.syncFacilityInfoCardVisibilityFn === "function") {
-        runtimeState.syncFacilityInfoCardVisibilityFn();
-      }
+      callRuntimeHook(runtimeState, "syncFacilityInfoCardVisibilityFn");
       return;
     }
     if (willOpen) {
@@ -536,10 +535,10 @@ export function createTransportWorkbenchController({
         restoreRightDrawer: document.body.classList.contains("right-drawer-open"),
       });
       resetTransportWorkbenchSectionState();
-      runtimeState.toggleLeftPanelFn?.(false);
-      runtimeState.toggleRightPanelFn?.(false);
-      runtimeState.closeDockPopoverFn?.({ restoreFocus: false });
-      runtimeState.closeExportWorkbenchFn?.({ restoreFocus: false });
+      callRuntimeHook(runtimeState, "toggleLeftPanelFn", false);
+      callRuntimeHook(runtimeState, "toggleRightPanelFn", false);
+      callRuntimeHook(runtimeState, "closeDockPopoverFn", { restoreFocus: false });
+      callRuntimeHook(runtimeState, "closeExportWorkbenchFn", { restoreFocus: false });
       closeTransportWorkbenchInfoPopover({ restoreFocus: false });
       closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
       if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
@@ -549,9 +548,7 @@ export function createTransportWorkbenchController({
     // section reset 可能补齐最新 uiState 结构，这里统一回读当前对象后再落 open 状态。
     uiState = transportWorkbenchStateOwner.setOpenState(willOpen);
     renderTransportWorkbenchUi();
-    if (typeof runtimeState.syncFacilityInfoCardVisibilityFn === "function") {
-      runtimeState.syncFacilityInfoCardVisibilityFn();
-    }
+    callRuntimeHook(runtimeState, "syncFacilityInfoCardVisibilityFn");
     if (willOpen) {
       focusOverlaySurface(transportWorkbenchPanel);
       return;
@@ -563,8 +560,8 @@ export function createTransportWorkbenchController({
     transportWorkbenchPreviewLifecycleOwner.dispose();
     closeTransportWorkbenchInfoPopover({ restoreFocus: false });
     closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
-    runtimeState.toggleLeftPanelFn?.(restoreState.restoreLeftDrawer);
-    runtimeState.toggleRightPanelFn?.(!restoreState.restoreLeftDrawer && restoreState.restoreRightDrawer);
+    callRuntimeHook(runtimeState, "toggleLeftPanelFn", restoreState.restoreLeftDrawer);
+    callRuntimeHook(runtimeState, "toggleRightPanelFn", !restoreState.restoreLeftDrawer && restoreState.restoreRightDrawer);
     if (restoreFocus) {
       restoreOverlayTriggerFocus(transportWorkbenchOverlay);
     }

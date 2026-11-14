@@ -1,5 +1,6 @@
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 
 import {
   createAppearanceCityPointsOwner,
@@ -81,6 +82,7 @@ function createHarness(ids, runtimeOverrides = {}) {
   const nodes = buildNodes(ids);
   const dirtyReasons = [];
   const optionalLayerLoads = [];
+  let persistViewSettingsCount = 0;
   const runtimeState = {
     currentLanguage: "en",
     showCityPoints: true,
@@ -98,12 +100,10 @@ function createHarness(ids, runtimeOverrides = {}) {
         showCapitalOverlay: false,
       },
     },
-    persistViewSettingsCount: 0,
-    persistViewSettingsFn() {
-      this.persistViewSettingsCount += 1;
-    },
     ...runtimeOverrides,
   };
+  registerRuntimeHook(runtimeState, "persistViewSettingsFn", () => { persistViewSettingsCount += 1; });
+  registerRuntimeHook(runtimeState, "ensureBaseCityDataFn", runtimeOverrides.ensureBaseCityDataFn);
   const owner = createAppearanceCityPointsOwner({
     runtimeState,
     t: (value, scope) => `${scope}:${value}`,
@@ -116,7 +116,7 @@ function createHarness(ids, runtimeOverrides = {}) {
     },
     documentRef: createTestDocument(nodes),
   });
-  return { dirtyReasons, nodes, optionalLayerLoads, owner, runtimeState };
+  return { dirtyReasons, nodes, optionalLayerLoads, owner, runtimeState, persists: () => persistViewSettingsCount };
 }
 
 const CITY_POINT_NODE_IDS = [
@@ -200,7 +200,7 @@ test("city-points palette changes preserve density size and label choices", () =
   assert.equal(harness.nodes.cityPointsOpacity.value, "50");
   assert.equal(harness.nodes.cityPointsLabelDensity.value, "dense");
   assert.equal(harness.nodes.cityPointsLabelSize.value, "16");
-  assert.equal(harness.runtimeState.persistViewSettingsCount, 1);
+  assert.equal(harness.persists(), 1);
   assert.deepEqual(harness.dirtyReasons, ["city-points-theme"]);
 });
 
@@ -223,7 +223,7 @@ test("city-points owner toggles visibility and requests city data when enabled",
   assert.deepEqual(harness.optionalLayerLoads, [
     { layerId: "cities", options: { renderNow: true } },
   ]);
-  assert.equal(harness.runtimeState.persistViewSettingsCount, 1);
+  assert.equal(harness.persists(), 1);
   assert.deepEqual(harness.dirtyReasons, ["toggle-city-points"]);
 });
 
@@ -275,4 +275,13 @@ test("city-points marker scale roundtrips back to one-to-one size", () => {
     "city-points-marker-scale",
     "city-points-marker-scale",
   ]);
+});
+
+const fixtureHookNames = ["persistViewSettingsFn", "ensureBaseCityDataFn"];
+let savedHooks;
+beforeEach(() => {
+  savedHooks = fixtureHookNames.map((name) => [name, readRegisteredRuntimeHookSource(null, name)]);
+});
+afterEach(() => {
+  for (const [name, hook] of savedHooks) registerRuntimeHook(null, name, hook);
 });

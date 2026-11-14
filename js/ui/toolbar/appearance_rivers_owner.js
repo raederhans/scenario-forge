@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { normalizeRiversStyleConfig } from "../../core/state.js";
 import {
   patchAppearanceStyleGroupState,
@@ -57,8 +58,8 @@ export function createAppearanceRiversOwner({
       nodes.toggle.checked = !!runtimeState.showRivers;
       nodes.toggle.addEventListener("change", (event) => {
         setAppearanceVisibilityState(runtimeState, "showRivers", event.target.checked);
-        if (runtimeState.showRivers && typeof runtimeState.ensureContextLayerDataFn === "function") {
-          void runtimeState.ensureContextLayerDataFn("rivers", { reason: "toolbar-toggle", renderNow: true });
+        if (runtimeState.showRivers) {
+          void callRuntimeHook(runtimeState, "ensureContextLayerDataFn", "rivers", { reason: "toolbar-toggle", renderNow: true });
         }
         renderDirty("toggle-rivers");
       });

@@ -1,4 +1,5 @@
-import test from "node:test";
+import { registerRuntimeHook, readRegisteredRuntimeHookSource } from "../js/core/state/index.js";
+import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { createWaterSpecialRegionController } from "../js/ui/sidebar/water_special_region_controller.js";
 
@@ -124,8 +125,8 @@ test("lake settings entry reveals and focuses settings without enabling lake int
       const toggle = node("input");
       const state = {
         styleConfig: { lakes: { interactive: false } }, selectedWaterRegionId: "existing-sea",
-        toggleLeftPanelFn: (open) => calls.push(["left-drawer", open]),
       };
+      registerRuntimeHook(state, "toggleLeftPanelFn", (open) => calls.push(["left-drawer", open]));
       const controller = createWaterSpecialRegionController({
         runtimeState: state,
         elements: { waterInspectorEmpty: empty, waterInspectorLakeInteractionToggle: toggle },
@@ -401,4 +402,13 @@ test("one list render reuses visible features and names while filters and scope 
     Array.prototype.sort = originalSort;
     globalThis.document = originalDocument;
   }
+});
+
+const fixtureHookNames = ["toggleLeftPanelFn"];
+let savedHooks;
+beforeEach(() => {
+  savedHooks = fixtureHookNames.map((name) => [name, readRegisteredRuntimeHookSource(null, name)]);
+});
+afterEach(() => {
+  for (const [name, hook] of savedHooks) registerRuntimeHook(null, name, hook);
 });

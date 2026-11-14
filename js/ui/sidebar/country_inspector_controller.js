@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
 import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
 import { setUiIcon } from "../ui_icons.js";
@@ -522,9 +523,7 @@ export function createCountryInspectorController({
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.open = true;
     }
-    if (typeof runtimeState.updatePaintModeUIFn === "function") {
-      runtimeState.updatePaintModeUIFn();
-    }
+    callRuntimeHook(runtimeState, "updatePaintModeUIFn");
     flushSidebarRender(`sidebar-inspector-country:${normalized}`);
     if (requiresListRebuild) {
       renderList();
@@ -1296,12 +1295,8 @@ export function createCountryInspectorController({
       );
     }
     renderCountryInspectorDetail();
-    if (typeof runtimeState.renderPresetTreeFn === "function") {
-      runtimeState.renderPresetTreeFn();
-    }
-    if (typeof runtimeState.updateWorkspaceStatusFn === "function") {
-      runtimeState.updateWorkspaceStatusFn();
-    }
+    callRuntimeHook(runtimeState, "renderPresetTreeFn");
+    callRuntimeHook(runtimeState, "updateWorkspaceStatusFn");
     scheduleAdaptiveInspectorHeights();
     restoreInspectorFocus(restoreFocus || preservedFocusTarget);
   };
@@ -1335,12 +1330,10 @@ export function createCountryInspectorController({
     if (refreshInspector) {
       renderCountryInspectorDetail();
     }
-    if (refreshPresetTree && typeof runtimeState.renderPresetTreeFn === "function") {
-      runtimeState.renderPresetTreeFn();
+    if (refreshPresetTree) {
+      callRuntimeHook(runtimeState, "renderPresetTreeFn");
     }
-    if (typeof runtimeState.updateWorkspaceStatusFn === "function") {
-      runtimeState.updateWorkspaceStatusFn();
-    }
+    callRuntimeHook(runtimeState, "updateWorkspaceStatusFn");
     scheduleAdaptiveInspectorHeights();
   };
 
@@ -1348,9 +1341,7 @@ export function createCountryInspectorController({
     if (searchInput && !searchInput.dataset.bound) {
       searchInput.addEventListener("input", () => {
         renderList();
-        if (typeof runtimeState.renderPresetTreeFn === "function") {
-          runtimeState.renderPresetTreeFn();
-        }
+        callRuntimeHook(runtimeState, "renderPresetTreeFn");
       });
       searchInput.dataset.bound = "true";
     }

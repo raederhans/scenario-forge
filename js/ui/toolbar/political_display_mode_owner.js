@@ -1,3 +1,4 @@
+import { callRuntimeHook } from "../../core/state/index.js";
 import { getPoliticalDisplayLegend, isPoliticalDisplayModeSupported } from "../../core/political_display_mode.js";
 import { setPoliticalDisplayModeState } from "../../core/state/actions/political_display_mode_actions.js";
 import { LegendManager } from "../../core/legend_manager.js";
@@ -46,7 +47,7 @@ export function createPoliticalDisplayModeOwner({ runtimeState, t = (key) => key
 
   select?.addEventListener("change", () => {
     setPoliticalDisplayModeState(runtimeState, select.value);
-    runtimeState.refreshColorStateFn?.({ renderNow: true });
+    callRuntimeHook(runtimeState, "refreshColorStateFn", { renderNow: true });
     LegendManager.showControl(runtimeState);
     render();
   });
