@@ -19,8 +19,6 @@ const RENDERER_SURFACE_HANDLE_DEFINITIONS = Object.freeze([
   ["zoomBehavior", "getZoomBehavior", "setZoomBehavior"],
   ["viewportGroup", "getViewportGroup", "setViewportGroup"],
   ["strategicDefs", "getStrategicDefs", "setStrategicDefs"],
-  ["frontlineOverlayGroup", "getFrontlineOverlayGroup", "setFrontlineOverlayGroup"],
-  ["frontlineLabelsGroup", "getFrontlineLabelsGroup", "setFrontlineLabelsGroup"],
   ["operationalLinesGroup", "getOperationalLinesGroup", "setOperationalLinesGroup"],
   ["operationGraphicsGroup", "getOperationGraphicsGroup", "setOperationGraphicsGroup"],
   ["operationGraphicsEditorGroup", "getOperationGraphicsEditorGroup", "setOperationGraphicsEditorGroup"],

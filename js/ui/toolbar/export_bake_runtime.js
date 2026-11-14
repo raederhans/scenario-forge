@@ -137,8 +137,6 @@ export function createExportBakeRuntime({
   };
 
   const SVG_ANNOTATION_VIEWPORT_SELECTOR = [
-    ".frontline-overlay-layer",
-    ".frontline-labels-layer",
     ".operational-lines-layer",
     ".operation-graphics-layer",
     ".unit-counters-layer",
