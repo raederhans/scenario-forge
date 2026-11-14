@@ -41,7 +41,7 @@ TNO 严格数据合约用 `npm run verify:tno-strict-contracts`（一次输出 s
 | Job | 内容 |
 | --- | --- |
 | `checks` | 构建一次 Pages 产物并做启动壳检查；Quick Fill 层级数据与审计、数据目录健康检查、Pages 源码引用检查；全部 Node 与 Python 单元测试。 |
-| `golden` | 黄金用户流程（2 个分片，每片 2 个 worker）：启动、5 个场景切换与填色、撤销重做、保存后重新打开、PNG 导出、性能预算，以及界面面板（`golden_ui_flows.spec.js`：外观页签、交通工作台、特殊区域、导出工作台图层、语言切换、检查器取色、命令面板）和首页流程。只通过 DOM 和 `js/core/app_test_api.js` 访问应用。 |
+| `golden` | 黄金用户流程（按内容分成 scenarios、editing、panels 三组，各 1 个 worker）：启动、5 个场景切换与填色、撤销重做、保存后重新打开、PNG 导出、性能预算，以及界面面板（`golden_ui_flows.spec.js`：外观页签、交通工作台、特殊区域、导出工作台图层、语言切换、检查器取色、命令面板）和首页流程。只通过 DOM 和 `js/core/app_test_api.js` 访问应用。 |
 | `PR Verify Required` | 汇总以上 job，任一失败即失败；这是唯一的 required check。 |
 
 另外有三个不属于 required check 的工作流：`data-verify.yml`（5 个场景的严格数据合约、交通清单校验、TNO 栅格发布阶段）只在 `data/`、构建器或政治栅格渲染文件变动时运行；`hgo-native.yml` 只在 `apps/hgo/` 变动时运行；`weekly.yml` 每周运行慢测试、其余浏览器 spec 和完整的 `data-verify`。三者都可以从 Actions 手动触发。CI 不测量性能。

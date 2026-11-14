@@ -55,14 +55,22 @@ jobs:
 
   golden:
     # Golden user flows (tests/e2e/golden): the behavior safety net. Each editor flow
-    # cold-starts the app, so they are spread over two runners with two workers each.
-    name: golden (${{ matrix.shard }})
+    # cold-starts the app and software rendering already uses every core, so a second
+    # worker only makes each flow slower. The flows are split by hand into three
+    # groups of similar length instead.
+    name: golden (${{ matrix.group }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
-        shard: ["1/2", "2/2"]
+        include:
+          - group: scenarios
+            args: tests/e2e/golden/golden_flows.spec.js --grep "startup reaches|first map click|switching scenario then filling|starting on blank_base"
+          - group: editing
+            args: tests/e2e/golden/golden_flows.spec.js --grep-invert "startup reaches|first map click|switching scenario then filling|starting on blank_base"
+          - group: panels
+            args: tests/e2e/golden/golden_ui_flows.spec.js tests/e2e/golden/landing_flows.spec.js
     env:
       PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
     steps:
@@ -92,7 +100,7 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install chromium
       - name: Run golden flows
-        run: node node_modules/@playwright/test/cli.js test tests/e2e/golden --fully-parallel --shard="${{ matrix.shard }}" --workers=2
+        run: node node_modules/@playwright/test/cli.js test ${{ matrix.args }} --workers=1
       - name: Upload golden failure context
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

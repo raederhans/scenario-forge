@@ -60,7 +60,7 @@ jobs:
           done
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
           # Golden flows on the bundled artifact itself: save/reopen and PNG export.
-          node node_modules/@playwright/test/cli.js test tests/e2e/golden --grep 'saved project|exported PNG' --workers=2 --retries=0
+          node node_modules/@playwright/test/cli.js test tests/e2e/golden --grep 'saved project|exported PNG' --workers=1 --retries=0
       - name: Upload failure evidence
         if: failure() && steps.artifact_checks.outcome == 'failure'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
