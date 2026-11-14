@@ -1,3 +1,4 @@
+import { cloneImportedUiValue as cloneImportedProjectValue } from "../state/ui_state.js";
 import { rebuildPresetState } from "../releasable_manager.js";
 import { requestRender } from "../render_boundary.js";
 import { state } from "../state.js";
@@ -39,14 +40,4 @@ export function syncProjectImportUiState({ scenarioImportAudit, hooks, recovery 
   emitStateBusEvent(STATE_BUS_EVENTS.RENDER_PRESET_TREE);
   emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_LEGEND_UI);
   emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);
-}
-
-function cloneImportedProjectValue(value) {
-  if (value === null || value === undefined || typeof value !== "object") {
-    return value;
-  }
-  if (typeof globalThis.structuredClone === "function") {
-    return globalThis.structuredClone(value);
-  }
-  return JSON.parse(JSON.stringify(value));
 }

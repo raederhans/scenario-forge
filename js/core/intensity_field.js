@@ -367,24 +367,3 @@ export function extractFieldRectPatch(channel, rect) {
   return { x, y, width, height, values };
 }
 
-export function applyFieldRectPatch(channel, patch) {
-  const target = bakeIntensityComposite(channel, { x: 0, y: 0, width: 0, height: 0 });
-  const x = clampNumber(Math.round(patch?.x || 0), 0, INTENSITY_FIELD_GRID.columns - 1);
-  const y = clampNumber(Math.round(patch?.y || 0), 0, INTENSITY_FIELD_GRID.rows - 1);
-  const width = clampNumber(Math.round(patch?.width || 0), 0, INTENSITY_FIELD_GRID.columns - x);
-  const height = clampNumber(Math.round(patch?.height || 0), 0, INTENSITY_FIELD_GRID.rows - y);
-  const values = Array.isArray(patch?.values) ? patch.values : [];
-  let cursor = 0;
-  for (let row = y; row < y + height; row += 1) {
-    for (let column = x; column < x + width; column += 1) {
-      target.grid.base[getGridIndex(column, row)] = clampNumber(
-        toFiniteNumber(values[cursor], INTENSITY_FIELD_GRID.neutral),
-        INTENSITY_FIELD_GRID.min,
-        INTENSITY_FIELD_GRID.max,
-      );
-      cursor += 1;
-    }
-  }
-  bakeIntensityComposite(target, { x, y, width, height });
-  return target;
-}

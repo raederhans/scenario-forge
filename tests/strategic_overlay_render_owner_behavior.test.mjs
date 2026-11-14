@@ -7,14 +7,10 @@ test("strategic overlay render owner renders dirty overlays once per signature",
   const calls = [];
   const state = {
     annotationView: {
-      frontlineEnabled: true,
-      frontlineStyle: "clean",
-      showFrontlineLabels: true,
       showUnitLabels: true,
       unitRendererDefault: "game",
     },
     dirtyRevision: 1,
-    frontlineOverlayDirty: true,
     operationGraphics: [{ id: "opg_1" }],
     operationGraphicsDirty: true,
     operationGraphicsEditor: { active: false, points: [], selectedId: "" },
@@ -38,7 +34,6 @@ test("strategic overlay render owner renders dirty overlays once per signature",
       getProjectionRenderSignature: () => "projection-a",
     },
     renderers: {
-      renderFrontlineOverlay: () => calls.push("frontline"),
       renderOperationGraphicsOverlay: () => calls.push("operationGraphics"),
       renderOperationalLinesOverlay: () => calls.push("operationalLines"),
       renderSpecialZones: () => calls.push("specialZones"),
@@ -46,24 +41,21 @@ test("strategic overlay render owner renders dirty overlays once per signature",
     },
   });
 
-  assert.equal(owner.renderFrontlineOverlayIfNeeded(), true);
   assert.equal(owner.renderOperationalLinesIfNeeded(), true);
   assert.equal(owner.renderOperationGraphicsIfNeeded(), true);
   assert.equal(owner.renderUnitCountersIfNeeded(), true);
   assert.equal(owner.renderSpecialZonesIfNeeded(), true);
-  assert.deepEqual(calls, ["frontline", "operationalLines", "operationGraphics", "unitCounters", "specialZones"]);
-  assert.equal(state.frontlineOverlayDirty, false);
+  assert.deepEqual(calls, ["operationalLines", "operationGraphics", "unitCounters", "specialZones"]);
   assert.equal(state.operationalLinesDirty, false);
   assert.equal(state.operationGraphicsDirty, false);
   assert.equal(state.unitCountersDirty, false);
   assert.equal(state.specialZonesOverlayDirty, false);
 
-  assert.equal(owner.renderFrontlineOverlayIfNeeded(), false);
   assert.equal(owner.renderOperationalLinesIfNeeded(), false);
   assert.equal(owner.renderOperationGraphicsIfNeeded(), false);
   assert.equal(owner.renderUnitCountersIfNeeded(), false);
   assert.equal(owner.renderSpecialZonesIfNeeded(), false);
-  assert.equal(calls.length, 5);
+  assert.equal(calls.length, 4);
 });
 
 test("strategic overlay render owner force renders and skips non-idle dynamic overlays", () => {
@@ -81,7 +73,6 @@ test("strategic overlay render owner force renders and skips non-idle dynamic ov
       getProjectionRenderSignature: () => "projection-b",
     },
     renderers: {
-      renderFrontlineOverlay: () => calls.push("frontline"),
       renderOperationGraphicsOverlay: () => calls.push("operationGraphics"),
       renderOperationalLinesOverlay: () => calls.push("operationalLines"),
       renderUnitCountersOverlay: () => calls.push("unitCounters"),
@@ -92,7 +83,6 @@ test("strategic overlay render owner force renders and skips non-idle dynamic ov
     },
   });
 
-  assert.equal(owner.renderFrontlineOverlayIfNeeded(), false);
   assert.equal(owner.renderOperationalLinesIfNeeded(), false);
   assert.equal(owner.renderOperationGraphicsIfNeeded(), false);
   assert.equal(owner.renderUnitCountersIfNeeded(), false);
@@ -143,7 +133,6 @@ test("strategic overlay render owner materializes an empty visible counter layer
 
 test("strategic overlay render owner dirty API stays strategic-only", () => {
   const state = {
-    frontlineOverlayDirty: false,
     hoverOverlayDirty: false,
     inspectorOverlayDirty: false,
     operationGraphicsDirty: false,
@@ -154,7 +143,6 @@ test("strategic overlay render owner dirty API stays strategic-only", () => {
   const owner = createStrategicOverlayRenderOwner({ state });
 
   owner.markOverlaysDirty({
-    frontline: true,
     hover: true,
     inspector: true,
     operationGraphics: true,
@@ -163,7 +151,6 @@ test("strategic overlay render owner dirty API stays strategic-only", () => {
     unitCounters: true,
   });
 
-  assert.equal(state.frontlineOverlayDirty, true);
   assert.equal(state.operationalLinesDirty, true);
   assert.equal(state.operationGraphicsDirty, true);
   assert.equal(state.unitCountersDirty, true);

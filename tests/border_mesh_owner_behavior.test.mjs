@@ -234,33 +234,6 @@ test("opening owner refresh reports readiness and invalidates without building m
   ]);
 });
 
-test("getFrontlineMesh remains disabled after control layer retirement", () => {
-  const state = {
-    activeScenarioId: "tno_1962",
-    annotationView: { frontlineEnabled: true },
-    runtimePoliticalTopology: { objects: { political: {} } },
-    scenarioBaselineOwnersByFeatureId: Object.freeze({ A: "GER", B: "USA" }),
-    sovereigntyByFeatureId: { A: "STALE", B: "STALE" },
-    scenarioAutoShellOwnerByFeatureId: {},
-    scenarioShellOverlayRevision: 1,
-    sovereigntyRevision: 4,
-    cachedFrontlineMesh: { type: "MultiLineString", coordinates: [] },
-    cachedFrontlineMeshHash: "stale",
-  };
-
-  const { owner } = createTestOwner(state);
-
-  assert.deepEqual(owner.getFrontlineOwnershipContext(), {
-    ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
-    shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
-    scenarioActive: true,
-    viewMode: "ownership",
-  });
-  assert.equal(owner.getFrontlineMesh(), null);
-  assert.equal(state.cachedFrontlineMesh, null);
-  assert.equal(state.cachedFrontlineMeshHash, "");
-});
-
 function createSourceCountryOwner(state, { onCountry = () => {}, excluded = feature => feature.properties?.excluded } = {}) {
   return createBorderMeshOwner({ state, helpers: {
     getFeatureId: feature => feature.id,

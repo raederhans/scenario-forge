@@ -14,8 +14,6 @@ const ROOT_CHILD_ORDER = Object.freeze([
 ]);
 
 const VIEWPORT_GROUP_ORDER = Object.freeze([
-  "frontline-overlay-layer",
-  "frontline-labels-layer",
   "operational-lines-layer",
   "operation-graphics-layer",
   "operation-graphics-editor-layer",
@@ -31,8 +29,6 @@ const SETTER_ORDER = Object.freeze([
   "setMapSvg",
   "setViewportGroup",
   "setStrategicDefs",
-  "setFrontlineOverlayGroup",
-  "setFrontlineLabelsGroup",
   "setOperationalLinesGroup",
   "setOperationGraphicsGroup",
   "setOperationGraphicsEditorGroup",
@@ -176,8 +172,6 @@ function createSurfaceHost(mapContainer) {
     handles,
     getMapContainer: () => mapContainer,
     setDevSelectionGroup: setter("setDevSelectionGroup", "devSelectionGroup"),
-    setFrontlineLabelsGroup: setter("setFrontlineLabelsGroup", "frontlineLabelsGroup"),
-    setFrontlineOverlayGroup: setter("setFrontlineOverlayGroup", "frontlineOverlayGroup"),
     setHoverGroup: setter("setHoverGroup", "hoverGroup"),
     setInspectorHighlightGroup: setter("setInspectorHighlightGroup", "inspectorHighlightGroup"),
     setIntensityFieldPreviewGroup: setter("setIntensityFieldPreviewGroup", "intensityFieldPreviewGroup"),
@@ -248,7 +242,6 @@ test("creates and registers SVG root groups in the expected order", () => {
   assert.deepEqual(childClassNames(surfaceHost.handles.viewportGroup.element), VIEWPORT_GROUP_ORDER);
   assert.equal(surfaceHost.handles.operationGraphicsEditorGroup.element.style["pointer-events"], "all");
   assert.equal(surfaceHost.handles.unitCountersGroup.element.style["pointer-events"], "all");
-  assert.equal(surfaceHost.handles.frontlineOverlayGroup.element.getAttribute("role"), "img");
   assert.equal(surfaceHost.handles.interactionRect.element.getAttribute("fill"), "transparent");
   assert.equal(surfaceHost.handles.interactionRect.element.style["pointer-events"], "all");
   assert.equal(surfaceHost.handles.interactionRect.element.lowerCallCount, 1);

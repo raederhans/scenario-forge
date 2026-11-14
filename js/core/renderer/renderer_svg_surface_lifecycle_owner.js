@@ -2,20 +2,6 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 
 const VIEWPORT_GROUP_DEFINITIONS = Object.freeze([
   {
-    selector: "g.frontline-overlay-layer",
-    className: "frontline-overlay-layer",
-    setter: "setFrontlineOverlayGroup",
-    pointerEvents: "none",
-    label: "Strategic frontline overlay",
-  },
-  {
-    selector: "g.frontline-labels-layer",
-    className: "frontline-labels-layer",
-    setter: "setFrontlineLabelsGroup",
-    pointerEvents: "none",
-    label: "Strategic frontline labels",
-  },
-  {
     selector: "g.operational-lines-layer",
     className: "operational-lines-layer",
     setter: "setOperationalLinesGroup",
@@ -166,8 +152,6 @@ export function createRendererSvgSurfaceLifecycleOwner({
   const hostApi = Object.freeze({
     getMapContainer: requireFunction(host, "getMapContainer", "surfaceHost"),
     setDevSelectionGroup: requireFunction(host, "setDevSelectionGroup", "surfaceHost"),
-    setFrontlineLabelsGroup: requireFunction(host, "setFrontlineLabelsGroup", "surfaceHost"),
-    setFrontlineOverlayGroup: requireFunction(host, "setFrontlineOverlayGroup", "surfaceHost"),
     setHoverGroup: requireFunction(host, "setHoverGroup", "surfaceHost"),
     setInspectorHighlightGroup: requireFunction(host, "setInspectorHighlightGroup", "surfaceHost"),
     setIntensityFieldPreviewGroup: requireFunction(host, "setIntensityFieldPreviewGroup", "surfaceHost"),

@@ -1,30 +1,35 @@
 import test from "node:test";
-import fs from "node:fs";
-import { parse } from "acorn";
-import { simple } from "acorn-walk";
-import * as expansionActions from "../js/core/state/actions/scenario_presentation_actions.js";
 import assert from "node:assert/strict";
 import { createCountryInspectorModel } from "../js/ui/sidebar/country_inspector_model.js";
 
 
-function createExpansionInitializer(state, model) {
-  const source = fs.readFileSync(new URL("../js/ui/sidebar/country_inspector_controller.js", import.meta.url), "utf8");
-  let initializer;
-  simple(parse(source, { ecmaVersion: "latest", sourceType: "module" }), {
-    FunctionDeclaration(node) {
-      if (node.id.name === "ensureInitialInspectorExpansion") initializer = node;
-    },
-  });
-  assert.ok(initializer);
-  return new Function("runtimeState", "getDefaultExpandedInspectorGroupId", "getInspectorGroupExpansionKey",
-    "ensureInspectorExpansionState", "markInspectorExpansionInitializedState", "setInspectorContinentExpandedState",
-    `return (${source.slice(initializer.start, initializer.end)});`)(state,
-      model.getDefaultExpandedInspectorGroupId, model.getInspectorGroupExpansionKey,
-      expansionActions.ensureInspectorExpansionState, expansionActions.markInspectorExpansionInitializedState,
-      expansionActions.setInspectorContinentExpandedState);
-}
-
 const createModel = (state = {}) => createCountryInspectorModel(state, (label) => label);
+
+test("country state keeps separate lookups, owner counts and inline releasable metadata", () => {
+  const presets = [{ name: "Preset" }];
+  const model = createModel({
+    activeScenarioId: "example",
+    scenarioCountriesByTag: { CHI: {
+      tag: "CHI", name: "China", preset_lookup_code: "CN", release_lookup_iso2: "TW",
+      feature_count: 4, controller_feature_count: 8,
+    } },
+    presetsState: { CN: presets },
+    countryGroupMetaByCode: new Map([["TW", { continentId: "asia", continentLabel: "Asia" }]]),
+  });
+  const country = model.createCountryInspectorState({ code: "CHI" }, 3);
+  assert.equal(country.presetLookupCode, "CN");
+  assert.equal(country.inspectorDataCode, "TW");
+  assert.equal(country.groupingCode, "TW");
+  assert.equal(country.presets, presets);
+  assert.equal(country.featureCount, 4);
+  assert.equal(country.controllerFeatureCount, 8);
+  assert.equal(country.fallbackIndex, 3);
+  assert.equal(country.continentId, "asia");
+  const release = model.createCountryInspectorState({ code: "CHI", releasable: true, name: "Release", featureCount: 2 });
+  assert.equal(release.displayName, "Release");
+  assert.equal(release.featureCount, 2);
+  assert.deepEqual(release.groupSystems, []);
+});
 
 test("scenario grouping honors explicit metadata before TNO regional inference", () => {
   const state = {
@@ -111,26 +116,6 @@ test("inspector continent labels use the caller's exact geo translator", () => {
     { code: "NIC", continentId: "continent_africa", continentLabel: "Africa" },
   ]);
   assert.equal(group.displayLabel, "Africa");
-});
-
-test("initial expansion prefers selected then active country and preserves persisted expansion", () => {
-  const state = {
-    selectedInspectorCountryCode: "FR", activeSovereignCode: "JP",
-    countryGroupMetaByCode: new Map([["FR", { continentId: "europe" }], ["JP", { continentId: "asia" }]]),
-  };
-  const model = createModel(state);
-  const groups = [{ id: "asia" }, { id: "europe" }];
-  const initializeExpansion = createExpansionInitializer(state, model);
-  initializeExpansion(groups);
-  assert.deepEqual([...state.expandedInspectorContinents], ["group::europe"]);
-  state.selectedInspectorCountryCode = "";
-  state.inspectorExpansionInitialized = false;
-  initializeExpansion(groups);
-  assert.deepEqual([...state.expandedInspectorContinents], ["group::europe"]);
-  state.inspectorExpansionInitialized = false;
-  state.expandedInspectorContinents.clear();
-  initializeExpansion(groups);
-  assert.deepEqual([...state.expandedInspectorContinents], ["group::asia"]);
 });
 
 test("top-level countries omit hidden and releasable entries but retain grouped subjects", () => {

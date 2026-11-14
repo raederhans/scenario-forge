@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import fs from "node:fs";
-import { parse } from "acorn";
 import { createRenderPassSignaturePolicy } from "../js/core/renderer/render_pass_signature_policy.js";
 import { RENDER_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.js";
 import { commitPhysicalContourDisplayState } from "../js/core/state/actions/content_load_actions.js";
@@ -22,8 +20,6 @@ function createHarness(overrides = {}) {
     getViewportRenderSignature: () => `${state.width}:${state.height}`,
     getPhysicalLandMaskInfo: () => ({ maskSource: "land", maskFeatureCount: 3 }),
     getScenarioRuntimeTopologySignatureToken: () => "topology",
-
-
 
     rendererSurfaceHost: { getProjection: () => live.projection },
     getContextBaseZoomBucketId: (k) => Math.floor(k),
@@ -352,27 +348,6 @@ test("explicit transforms, fallback pass identity and day/night delegation retai
   assert.equal(state.zoomTransform.k, 2);
 });
 
-test("entrypoint delegates default transform resolution once to the signature policy", () => {
-  const source = fs.readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
-  for (const [name, args] of [
-    ["getPoliticalPassStaticSignature", []],
-    ["getRenderPassTransformSignature", ["unknown"]],
-    ["getRenderPassSignature", ["unknown"]],
-  ]) {
-    const { state, policy } = createHarness();
-    let reads = 0;
-    Object.defineProperty(state, "zoomTransform", { get() { reads++; return undefined; } });
-    const node = ast.body.find(n => n.type === "FunctionDeclaration" && n.id.name === name);
-    const invoke = new Function("runtimeState", "getRenderPassSignaturePolicy", "getRenderPassLayout", "getTnoScenePaintOverscanPx", `${source.slice(node.start, node.end)}; return ${name};`)(state, () => policy, () => ({ pixelWidth: 800, pixelHeight: 600, offsetX: 0, offsetY: 0, dpr: 1 }), () => 0);
-    const expected = policy[name](...args) + (name === "getRenderPassSignature" ? "|surface:800:600:0:0:1|paint-margin:0" : "");
-    const directReads = reads;
-    reads = 0;
-    assert.equal(invoke(...args), expected);
-    assert.equal(reads, directReads, name);
-  }
-});
-
 for (const [field, value] of Object.entries({
   contourColor: "#123456", contourOpacity: 0.2, contourMajorWidth: 2, contourMinorWidth: 1,
   contourMajorIntervalM: 1500, contourMinorIntervalM: 500, contourMinorVisible: false,
@@ -431,7 +406,6 @@ for (const [preset, beforeZoom, afterZoom] of [["balanced", 3.1, 3.3], ["terrain
     assert.equal(policy.getRenderPassSignature("political"), before.political);
   });
 }
-
 
 test("bathymetry style changes invalidate the background signature", () => {
   const { state, policy } = createHarness();

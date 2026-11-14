@@ -81,7 +81,8 @@ import {
   getUrbanFeatureOwnerId,
 } from "./renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
-import { formatCityVictoryPoints } from "./renderer/modern_place_name.js";
+import { createPerfOverlay } from "./renderer/perf_overlay.js";
+import { createCityGeometryPresentation } from "./renderer/city_geometry_presentation.js";
 import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
@@ -341,7 +342,7 @@ import {
 } from "./map_renderer/click_selection_transaction_owner.js";
 import { createRendererTransactionResetOwner } from "./map_renderer/renderer_transaction_reset_owner.js";
 import { createScenarioRefreshRuntime } from "./map_renderer/scenario_refresh_runtime.js";
-import { createExactAfterSettleScheduler } from "./map_renderer/exact_after_settle_scheduler.js";
+import { createExactAfterSettleScheduler, getTransformBucketSignature } from "./map_renderer/exact_after_settle_scheduler.js";
 import {
   CANVAS_LAYER_NAMES,
   clearCanvasLayer,
@@ -732,7 +733,7 @@ const renderDiag = {
   waterHit: null,
 };
 const urbanGeoCentroidCache = new WeakMap();
-let cityAnchorCache = new WeakMap();
+const perfOverlay = createPerfOverlay();
 const urbanFeatureIndexCache = {
   sourceRef: null,
   byId: new Map(),
@@ -811,7 +812,7 @@ const getVisibleFrameIdentityPolicy = lazyOwner(() => createVisibleFrameIdentity
     getRenderPassCacheState,
     getRenderPassSignature,
     getResolvedColorCountForSceneSnapshot,
-    getTransformBucketSignature,
+    getTransformBucketSignature: (transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) => getTransformBucketSignature(transform),
     rendererSurfaceHost,
   }));
 
@@ -985,9 +986,7 @@ const getRendererFitProjectionOwner = lazyOwner(() => createRendererFitProjectio
     getRenderableLandFeatures,
   },
   effects: {
-    resetCityAnchorCache: () => {
-      cityAnchorCache = new WeakMap();
-    },
+    resetCityAnchorCache: cityGeometryPresentation.resetCityAnchorCache,
     rebuildProjectedBoundsCache,
     buildSpatialIndex,
     setHitCanvasDirty: () => {
@@ -1460,7 +1459,6 @@ const getStrategicOverlayRenderOwner = lazyOwner(() => createStrategicOverlayRen
     getProjectionRenderSignature,
   },
   renderers: {
-    renderFrontlineOverlay,
     renderOperationGraphicsOverlay: () => getStrategicOverlayHelpersOwner().renderOperationGraphicsOverlay(),
     renderOperationalLinesOverlay: () => getStrategicOverlayHelpersOwner().renderOperationalLinesOverlay(),
     renderSpecialZones: () => getStrategicOverlayHelpersOwner().renderSpecialZones(),
@@ -1495,7 +1493,7 @@ const getUrbanCityPolicyOwner = lazyOwner(() => createUrbanCityPolicyOwner({
     compareCityRevealEntries,
     defaultCityCountryClassRank: CITY_COUNTRY_CLASS_RANK.micro,
     defaultCityCountryTierRank: CITY_COUNTRY_TIER_RANK.D,
-    getCityAnchor,
+    getCityAnchor: cityGeometryPresentation.getCityAnchor,
     getCityCanonicalId,
     getCityCapitalScore,
     getCityEffectiveMinZoom,
@@ -1511,14 +1509,14 @@ const getUrbanCityPolicyOwner = lazyOwner(() => createUrbanCityPolicyOwner({
     getCityPriorityCountryReserveBudget,
     getCityPriorityCountryReserveRank,
     getCityRevealPhase,
-    getCityScreenPoint,
+    getCityScreenPoint: cityGeometryPresentation.getCityScreenPoint,
     getCitySortWeight,
     getCityTier,
     getCityTierWeight,
     getCityViewportCenterDistanceNorm,
     getDefaultCityMinZoomForTier,
     getUrbanFeatureStableId,
-    isCityAnchorInViewport,
+    isCityAnchorInViewport: cityGeometryPresentation.isCityAnchorInViewport,
     getCityPaintOverscanPx: () => Math.max(48, getTnoScenePaintOverscanPx("labels")),
     isCityLabelEligibleForPhase,
     isCityScenarioTagExcludedFromReveal,
@@ -1575,7 +1573,7 @@ function getCityPointsRenderOwner() {
       drawCityLabelsFromEntries: (...args) => getCityLabelOwner().drawCityLabelsFromEntries(...args),
       getCityMarkerRenderStyle,
       getCityMarkerSizePx,
-      getCityTooltipText,
+      getCityTooltipText: cityGeometryPresentation.getCityTooltipText,
       getCityVisualCapitalState,
       getEffectiveCityCollection: (...args) => getEffectiveCityCollection(...args),
       getHoverEntryHitPriority: getFacilityEntryHitPriority,
@@ -2032,11 +2030,11 @@ const getCityLightsRenderOwner = lazyOwner(() => createCityLightsRenderOwner({
       return canvas;
     },
     estimateProjectedAreaPx,
-    getCityAnchor,
+    getCityAnchor: cityGeometryPresentation.getCityAnchor,
     getCityCanonicalId,
     getCityCapitalScore,
-    getCityGeoCoordinates,
-    getCityScreenPoint,
+    getCityGeoCoordinates: cityGeometryPresentation.getCityGeoCoordinates,
+    getCityScreenPoint: cityGeometryPresentation.getCityScreenPoint,
     getDefaultZoomTransform: () => globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 },
     getEffectiveCityCollection,
     getFeatureGeoCentroid,
@@ -3817,7 +3815,7 @@ const getPoliticalPartialRepaintOwner = lazyOwner(() => createPoliticalPartialRe
     getPoliticalPassViewportOverscanPx,
     collectVisibleLandSpatialItemsWithStats,
     cloneZoomTransform,
-    getTransformBucketSignature,
+    getTransformBucketSignature: (transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) => getTransformBucketSignature(transform),
     getIslandNeighborGraph,
     ensurePoliticalRasterWorkerMetrics: () => ensurePoliticalRasterWorkerMetrics(globalThis),
   },
@@ -4363,13 +4361,6 @@ function getTransformSignature(transform = runtimeState.zoomTransform || globalT
     Number(runtimeState.height || 0),
     Number(runtimeState.dpr || 1).toFixed(2),
   ].join("|");
-}
-
-function getTransformBucketSignature(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  const k = Math.round(Number(transform?.k || 1) * 100);
-  const x = Math.round(Number(transform?.x || 0) / 64);
-  const y = Math.round(Number(transform?.y || 0) / 64);
-  return `${k}:${x}:${y}`;
 }
 
 function noteRenderAction(label, startedAt = null) {
@@ -6941,7 +6932,6 @@ function recordInteractionRecoveryTaskMetric(taskKey, durationMs, details = {}, 
 }
 
 function markOverlaysDirty({
-  frontline = false,
   operationalLines = false,
   operationGraphics = false,
   unitCounters = false,
@@ -6950,7 +6940,6 @@ function markOverlaysDirty({
   hover = false,
 } = {}) {
   getStrategicOverlayRenderOwner().markOverlaysDirty({
-    frontline,
     operationalLines,
     operationGraphics,
     unitCounters,
@@ -6975,10 +6964,6 @@ function getOverlayProjectionSignature() {
 
 function renderSpecialZonesIfNeeded({ force = false } = {}) {
   getStrategicOverlayRenderOwner().renderSpecialZonesIfNeeded({ force });
-}
-
-function renderFrontlineOverlayIfNeeded({ force = false } = {}) {
-  getStrategicOverlayRenderOwner().renderFrontlineOverlayIfNeeded({ force });
 }
 
 function renderOperationGraphicsIfNeeded({ force = false } = {}) {
@@ -7827,11 +7812,6 @@ function createSvgElement() {
 }
 
 function ensureHybridLayers() {
-  const legacySpecialZones = document.getElementById("specialZonesSvg");
-  if (legacySpecialZones) legacySpecialZones.remove();
-  const legacyLegend = document.getElementById("legendSvg");
-  if (legacyLegend) legacyLegend.remove();
-
   const legacyColorCanvas = document.getElementById("colorCanvas");
   const legacyLineCanvas = document.getElementById("lineCanvas");
 
@@ -10401,143 +10381,18 @@ const getEffectiveCityCollection = (...args) => getUrbanCityPolicyOwner().getEff
 // 只读已合并好的城市集合，不在调用方同步触发合并（检查器等 UI 读名称用）。
 const getCachedEffectiveCityCollection = () => getUrbanCityPolicyOwner().getCachedEffectiveCityCollection();
 
-function getCityAnchor(feature) {
-  if (!feature || !rendererSurfaceHost.getProjection()) return null;
-  const cached = cityAnchorCache.get(feature);
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  let anchor = null;
-  const geometry = feature.geometry;
-  if (geometry?.type === "Point" && Array.isArray(geometry.coordinates) && geometry.coordinates.length >= 2) {
-    const projected = rendererSurfaceHost.getProjection()(geometry.coordinates);
-    if (Array.isArray(projected) && projected.every((value) => Number.isFinite(Number(value)))) {
-      anchor = projected;
-    }
-  } else if (geometry?.type === "MultiPoint" && Array.isArray(geometry.coordinates) && geometry.coordinates.length) {
-    const projectedPoints = geometry.coordinates
-      .map((coords) => rendererSurfaceHost.getProjection()(coords))
-      .filter((point) => Array.isArray(point) && point.every((value) => Number.isFinite(Number(value))));
-    if (projectedPoints.length) {
-      const [sumX, sumY] = projectedPoints.reduce(
-        (acc, point) => [acc[0] + Number(point[0]), acc[1] + Number(point[1])],
-        [0, 0]
-      );
-      anchor = [sumX / projectedPoints.length, sumY / projectedPoints.length];
-    }
-  }
-
-  if (!anchor && rendererSurfaceHost.getPathCanvas()?.centroid) {
-    const centroid = rendererSurfaceHost.getPathCanvas().centroid(feature);
-    if (Array.isArray(centroid) && centroid.every((value) => Number.isFinite(Number(value)))) {
-      anchor = centroid;
-    }
-  }
-
-  if (!anchor && globalThis.d3?.geoCentroid) {
-    const geoCentroid = globalThis.d3.geoCentroid(feature);
-    const projected = Array.isArray(geoCentroid) ? rendererSurfaceHost.getProjection()(geoCentroid) : null;
-    if (Array.isArray(projected) && projected.every((value) => Number.isFinite(Number(value)))) {
-      anchor = projected;
-    }
-  }
-
-  cityAnchorCache.set(feature, anchor);
-  return anchor;
-}
-
-function getCityScreenPoint(anchor, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  if (!Array.isArray(anchor) || anchor.length < 2) return null;
-  const scale = Math.max(0.0001, Number(transform?.k || 1));
-  const x = Number(anchor[0]);
-  const y = Number(anchor[1]);
-  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
-  return [
-    (x * scale) + Number(transform?.x || 0),
-    (y * scale) + Number(transform?.y || 0),
-  ];
-}
-
-function getCityGeoCoordinates(feature) {
-  const geometry = feature?.geometry;
-  if (geometry?.type === "Point" && Array.isArray(geometry.coordinates) && geometry.coordinates.length >= 2) {
-    const lon = Number(geometry.coordinates[0]);
-    const lat = Number(geometry.coordinates[1]);
-    if (Number.isFinite(lon) && Number.isFinite(lat)) {
-      return [normalizeLongitude(lon), clamp(lat, -89.999, 89.999)];
-    }
-  }
-  if (geometry?.type === "MultiPoint" && Array.isArray(geometry.coordinates) && geometry.coordinates.length) {
-    const points = geometry.coordinates
-      .map((coords) => [Number(coords?.[0]), Number(coords?.[1])])
-      .filter((coords) => coords.every((value) => Number.isFinite(value)));
-    if (points.length) {
-      const sums = points.reduce((acc, coords) => [acc[0] + coords[0], acc[1] + coords[1]], [0, 0]);
-      return [
-        normalizeLongitude(sums[0] / points.length),
-        clamp(sums[1] / points.length, -89.999, 89.999),
-      ];
-    }
-  }
-  return getFeatureGeoCentroid(feature);
-}
-
-function isCityAnchorInViewport(anchor, { padding = 24, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity } = {}) {
-  const screenPoint = getCityScreenPoint(anchor, transform);
-  if (!screenPoint) return false;
-  return (
-    screenPoint[0] >= -padding
-    && screenPoint[0] <= runtimeState.width + padding
-    && screenPoint[1] >= -padding
-    && screenPoint[1] <= runtimeState.height + padding
-  );
-}
-
-function getCityCapitalDescriptor(entry) {
-  if (entry?.feature?.properties?.__city_is_country_capital) {
-    return runtimeState.currentLanguage === "zh" ? "\u9996\u90fd" : "Capital";
-  }
-  if (entry?.feature?.properties?.__city_is_admin_capital) {
-    return runtimeState.currentLanguage === "zh" ? "\u884c\u653f\u4e2d\u5fc3" : "Administrative capital";
-  }
-  return "";
-}
-
-function getCityTooltipText(entry) {
-  const fullLabel = getCityDisplayLabel(entry?.feature);
-  const props = entry?.feature?.properties || {};
-  const hostFeatureId = String(props.__city_host_feature_id || "").trim();
-  const hostFeature = hostFeatureId ? runtimeState.landIndex?.get(hostFeatureId) : null;
-  const countryCode = String(
-    (hostFeature ? getDisplayOwnerCode(hostFeature, hostFeatureId) : "")
-      || props.__city_scenario_tag
-      || props.__city_country_code
-      || props.country_code
-      || ""
-  ).trim().toUpperCase();
-  const countryDisplayName = getLocalizedScenarioCountryName(
-    runtimeState.scenarioCountriesByTag?.[countryCode],
-    runtimeState.countryNames?.[countryCode] || countryCode,
-    (name) => t(name, "geo"),
-  );
-  const lines = [fullLabel];
-  const victoryPoints = formatCityVictoryPoints(
-    props.__city_scenario_victory_points,
-    props.__city_scenario_vp_name,
-    getCityDisplayLabel(entry?.feature, { showModernPlaceNames: false }),
-    runtimeState.currentLanguage,
-  );
-  if (victoryPoints) lines.push(victoryPoints);
-  const capitalDescriptor = getCityCapitalDescriptor(entry);
-  if (capitalDescriptor) {
-    lines.push(capitalDescriptor);
-  }
-  if (countryDisplayName) {
-    lines.push(countryCode ? `${countryDisplayName} (${countryCode})` : countryDisplayName);
-  }
-  return renderTooltipText({ lines: lines.filter(Boolean) });
-}
+const cityGeometryPresentation = createCityGeometryPresentation({
+  state: runtimeState,
+  surfaceHost: rendererSurfaceHost,
+  getCityDisplayLabel,
+  getDisplayOwnerCode,
+  getLocalizedScenarioCountryName,
+  getFeatureGeoCentroid,
+  normalizeLongitude,
+  clamp,
+  t,
+  renderTooltipText,
+});
 
 const getCityPaintStyleModel = lazyOwner(() => createCityPaintStyleModel(runtimeState, {
     getResolvedFeatureColor, computeUrbanAdaptivePaintFromHostColor,
@@ -12727,24 +12582,6 @@ function getLandFeatureIdFromEvent(event, eventType = "unit-counter-hit") {
   return hit?.targetType === "land" ? String(hit.id || "") : "";
 }
 
-function renderFrontlineOverlay() {
-  if (!rendererSurfaceHost.getFrontlineOverlayGroup() || !rendererSurfaceHost.getFrontlineLabelsGroup() || !rendererSurfaceHost.getPathSvg()) return;
-  if (!runtimeState.annotationView?.frontlineEnabled) {
-    runtimeState.cachedFrontlineMesh = null;
-    runtimeState.cachedFrontlineMeshHash = "";
-  } else {
-    // Derived frontlines were retired with the control layer; the mesh owner
-    // clears legacy mesh state and always returns null, including old saves.
-    getBorderMeshOwner().getFrontlineMesh();
-  }
-  runtimeState.cachedFrontlineLabelAnchors = [];
-  runtimeState.cachedFrontlineLabelAnchorsHash = "";
-  rendererSurfaceHost.getFrontlineOverlayGroup().selectAll("*").remove();
-  rendererSurfaceHost.getFrontlineLabelsGroup().selectAll("*").remove();
-  rendererSurfaceHost.getFrontlineOverlayGroup().attr("aria-hidden", "true");
-  rendererSurfaceHost.getFrontlineLabelsGroup().attr("aria-hidden", "true");
-}
-
 function renderOperationGraphicsEditorOverlay() {
   return getOperationGraphicsEditorRenderOwner().renderOperationGraphicsEditorOverlay((event, datum, points) => {
     event.stopPropagation();
@@ -12772,116 +12609,6 @@ function renderHoverOverlay() {
 
 function renderInspectorHighlightOverlay() {
   return getSelectionOverlayOwner().renderInspectorHighlightOverlay();
-}
-
-function ensurePerfOverlayElement() {
-  const cache = getRenderPassCacheState();
-  if (!cache.perfOverlayEnabled || !rendererSurfaceHost.getMapContainer()) return null;
-  if (cache.overlayElement && rendererSurfaceHost.getMapContainer().contains(cache.overlayElement)) {
-    return cache.overlayElement;
-  }
-  const element = document.createElement("pre");
-  element.id = "perf-overlay";
-  element.style.position = "absolute";
-  element.style.top = "12px";
-  element.style.right = "12px";
-  element.style.zIndex = "5";
-  element.style.maxWidth = "360px";
-  element.style.margin = "0";
-  element.style.padding = "10px 12px";
-  element.style.borderRadius = "10px";
-  element.style.background = "rgba(15, 23, 42, 0.84)";
-  element.style.color = "#e2e8f0";
-  element.style.font = "11px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-  element.style.whiteSpace = "pre-wrap";
-  element.style.pointerEvents = "none";
-  element.style.boxShadow = "0 8px 30px rgba(15, 23, 42, 0.28)";
-  rendererSurfaceHost.getMapContainer().appendChild(element);
-  cache.overlayElement = element;
-  return element;
-}
-
-function updatePerfOverlay() {
-  const cache = getRenderPassCacheState();
-  if (!cache.perfOverlayEnabled) {
-    if (cache.overlayElement?.remove) {
-      cache.overlayElement.remove();
-    }
-    cache.overlayElement = null;
-    return;
-  }
-  const overlay = ensurePerfOverlayElement();
-  if (!overlay) return;
-  const frame = cache.lastFrame || {};
-  const sidebarPerf = getSidebarPerfState();
-  const invalidations = RENDER_PASS_NAMES.map((passName) => {
-    const reason = cache.reasons?.[passName] || "-";
-    const dirtyFlag = cache.dirty?.[passName] ? "*" : "";
-    return `${passName}:${reason}${dirtyFlag}`;
-  }).join(" | ");
-  const timingEntries = Object.entries(frame.timings || {})
-    .map(([name, value]) => `${name}=${Number(value || 0).toFixed(1)}ms`)
-    .join(", ");
-  const renderPerf = runtimeState.renderPerfMetrics || {};
-  const scenarioPerf = runtimeState.scenarioPerfMetrics || {};
-  const contextScenarioReasonSnapshot = resolveContextScenarioReasonSnapshot({ cache, renderPerf });
-  const opEntries = [
-    ["setMapData", renderPerf.setMapData?.durationMs],
-    ["firstPaint", renderPerf.setMapDataFirstPaint?.durationMs],
-    ["contextBaseReady", renderPerf.setMapDataContextBaseReady?.durationMs],
-    ["hitReady", renderPerf.setMapDataHitCanvasReady?.durationMs],
-    ["settleFast", renderPerf.settleFastFrame?.durationMs],
-    ["settleExact", renderPerf.settleExactRefresh?.durationMs],
-    ["ctxBaseExact", renderPerf.contextBaseExactRefresh?.durationMs],
-    ["buildSpatialIndex", renderPerf.buildSpatialIndex?.durationMs],
-    ["rebuildStaticMeshes", renderPerf.rebuildStaticMeshes?.durationMs],
-    ["rebuildDynamicBorders", renderPerf.rebuildDynamicBorders?.durationMs],
-    ["physicalClip", renderPerf.applyPhysicalLandClipMask?.durationMs],
-    ["oceanClip", renderPerf.applyOceanClipMask?.durationMs],
-    ["contextBase", renderPerf.drawContextBasePass?.durationMs],
-    ["labels", renderPerf.drawLabelsPass?.durationMs],
-    ["contextScenario", renderPerf.drawContextScenarioPass?.durationMs],
-    ["hitCanvas", renderPerf.buildHitCanvas?.durationMs],
-    ["bgMerge", renderPerf.drawScenarioPoliticalBackgroundEntries?.durationMs],
-    ["politicalBg", renderPerf.drawPoliticalBackgroundFillsPass?.durationMs],
-    ["politicalFill", renderPerf.drawPoliticalFeatureFillLoop?.durationMs],
-    ["politicalStroke", renderPerf.drawPoliticalFeatureStrokeLoop?.durationMs],
-    ["bgCacheBuild", renderPerf.scenarioPoliticalBackgroundCacheBuild?.durationMs],
-    ["bgCacheReplay", renderPerf.scenarioPoliticalBackgroundCacheReplay?.durationMs],
-    ["relief", renderPerf.drawScenarioReliefOverlaysLayer?.durationMs],
-    ["scenarioLoad", scenarioPerf.loadScenarioBundle?.durationMs],
-    ["scenarioApply", scenarioPerf.applyScenarioBundle?.durationMs],
-  ]
-    .filter(([, value]) => Number.isFinite(Number(value)))
-    .map(([name, value]) => `${name}=${Number(value || 0).toFixed(1)}ms`)
-    .join(", ");
-  const contextBreakdownEntries = Object.entries(renderPerf.contextBreakdown || {})
-    .map(([name, value]) => {
-      const duration = Number(value?.durationMs || 0).toFixed(1);
-      const callCount = Number(value?.callCount || 0);
-      return `${name}=${duration}ms${callCount > 1 ? `#${callCount}` : ""}`;
-    })
-    .join(", ");
-  const coverageDebug = runtimeState.debugCountryCoverage || {};
-  const backgroundBuild = renderPerf.scenarioPoliticalBackgroundCacheBuild || {};
-  overlay.textContent = [
-    `phase=${frame.phase || runtimeState.renderPhase} total=${Number(frame.totalMs || 0).toFixed(1)}ms`,
-    `action=${cache.lastAction || "-"} ${Number(cache.lastActionDurationMs || 0).toFixed(1)}ms`,
-    `transform=${getTransformSignature(frame.transform || runtimeState.zoomTransform)}`,
-    `passes ${timingEntries || "none"}`,
-    `contextBreakdown ${contextBreakdownEntries || "none"}`,
-    `ops ${opEntries || "none"}`,
-    `ctxReuse skip=${renderPerf.contextBaseReuseSkipped ? "yes" : "no"} scale=${Number(renderPerf.contextBaseReuseScaleRatio?.scaleRatio || 0).toFixed(4)} dist=${Number(renderPerf.contextBaseReuseDistancePx?.distancePx || 0).toFixed(2)}px`,
-    `ctxScenario reuse=${cache.counters.contextScenarioReuseCount || 0} exact=${cache.counters.contextScenarioExactRefreshCount || 0} reason=${contextScenarioReasonSnapshot.displayReason} cacheReason=${contextScenarioReasonSnapshot.cacheReason} perfReason=${contextScenarioReasonSnapshot.perfReason} mismatchWarn=${cache.counters.contextScenarioReasonMismatchWarnings || 0}`,
-    `coverage countries=${Number(coverageDebug.totalCountries || 0)} detail=${Number(coverageDebug.detailCountries || 0)} primary=${Number(coverageDebug.primaryCountries || 0)} priorityGap=${Array.isArray(coverageDebug.priorityCountryGaps) ? coverageDebug.priorityCountryGaps.length : 0}`,
-    `projBounds total=${Number(renderPerf.projectedBoundsDiagnostics?.total || 0)} reasons=${JSON.stringify(renderPerf.projectedBoundsDiagnostics?.byReason || {})}`,
-    `partial applied=${!!renderPerf.politicalPartialRepaint?.applied} reason=${renderPerf.politicalPartialRepaint?.fallbackReason || "-"} dirty=${Number(renderPerf.politicalPartialRepaint?.dirtyFeatureCount || 0)} candidates=${Number(renderPerf.politicalPartialRepaint?.candidateCount || 0)} misses=${Number(renderPerf.politicalPartialRepaint?.pathCacheMisses || 0)} coverage=${Number(renderPerf.politicalPartialRepaint?.viewportCoverage || 0).toFixed(4)}`,
-    `bgPaths entries=${Number(backgroundBuild.entryCount || 0)} built=${Number(backgroundBuild.builtPathCount || 0)} reused=${Number(backgroundBuild.reusedPathCount || 0)} previous=${Number(backgroundBuild.reusedPreviousPathCount || 0)} cache=${Number(backgroundBuild.pathCacheSizeBefore || 0)}->${Number(backgroundBuild.pathCacheSizeAfter || 0)} reset=${backgroundBuild.pathCacheResetReason || "-"}`,
-    `bgGroups built=${Number(backgroundBuild.builtGroupMergeCount || 0)} reused=${Number(backgroundBuild.reusedGroupMergeCount || 0)}`,
-    `invalidations ${invalidations}`,
-    `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} ctxBase=${cache.counters.contextBasePassRenders || 0} labels=${cache.counters.labelPassRenders || 0} ctxScenario=${cache.counters.contextScenarioPassRenders || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
-    `sidebar list=${sidebarPerf.counters.fullListRenders || 0} rows=${sidebarPerf.counters.rowRefreshes || 0} detail=${sidebarPerf.counters.inspectorRenders || 0} preset=${sidebarPerf.counters.presetTreeRenders || 0} legend=${sidebarPerf.counters.legendRenders || 0}`,
-  ].join("\n");
 }
 
 function render() {
@@ -12919,7 +12646,6 @@ function render() {
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();
   }
-  renderFrontlineOverlayIfNeeded();
   renderOperationalLinesIfNeeded();
   renderOperationGraphicsIfNeeded();
   renderUnitCountersIfNeeded();
@@ -12930,7 +12656,23 @@ function render() {
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
     legendRuntime.requestLegendRender();
   }
-  updatePerfOverlay();
+  const perfOverlayCache = getRenderPassCacheState();
+  const perfOverlayVisible = perfOverlayCache.perfOverlayEnabled && rendererSurfaceHost.getMapContainer();
+  perfOverlay.updatePerfOverlay(rendererSurfaceHost.getMapContainer(), {
+    cache: perfOverlayCache,
+    sidebarPerf: perfOverlayVisible ? getSidebarPerfState() : null,
+    passNames: RENDER_PASS_NAMES,
+    renderPerf: runtimeState.renderPerfMetrics || {},
+    scenarioPerf: runtimeState.scenarioPerfMetrics || {},
+    contextScenarioReasonSnapshot: perfOverlayVisible
+      ? resolveContextScenarioReasonSnapshot({ cache: perfOverlayCache, renderPerf: runtimeState.renderPerfMetrics || {} })
+      : null,
+    coverageDebug: runtimeState.debugCountryCoverage || {},
+    renderPhase: runtimeState.renderPhase,
+    transformSignature: perfOverlayVisible
+      ? getTransformSignature(perfOverlayCache.lastFrame?.transform || runtimeState.zoomTransform)
+      : "",
+  });
   if (startedAt > 0) {
     recordRenderSample(nowMs() - startedAt, {
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
@@ -14337,7 +14079,6 @@ function initMap({
   facilityInfoCardCloseBtn = document.getElementById("facilityInfoCardCloseBtn");
   facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   runtimeState.refreshColorStateFn = refreshColorState;
-  runtimeState.clearInspectorLandSelectionFn = clearInspectorLandSelection;
   registerRuntimeHook(runtimeState, "stepUpInspectorSelectionFn", stepUpInspectorSelection);
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);

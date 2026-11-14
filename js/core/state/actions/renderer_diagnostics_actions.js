@@ -486,12 +486,7 @@ export function resetProjectedBoundsDiagnosticsState(
     byReason: {},
   },
 ) {
-  assertStateTarget(target);
-  if (!diagnostics || typeof diagnostics !== "object" || Array.isArray(diagnostics)) {
-    throw new TypeError("[renderer_diagnostics_actions] diagnostics must be an object");
-  }
-  writeProjectedBoundsDiagnosticsOwnDataProperty(target, diagnostics);
-  return true;
+  return setProjectedBoundsDiagnosticsState(target, diagnostics);
 }
 
 export function setProjectedBoundsDiagnosticsState(

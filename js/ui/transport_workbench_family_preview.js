@@ -129,12 +129,6 @@ export async function warmTransportWorkbenchFamilyPreview(familyId, options = {}
   return handler.warm(options);
 }
 
-export function clearTransportWorkbenchFamilyPreview(familyId) {
-  const handler = getFamilyHandler(familyId);
-  if (!handler?.clear) return;
-  handler.clear();
-}
-
 export function clearAllTransportWorkbenchFamilyPreviews() {
   forEachPreviewHandler((_familyId, handler) => {
     handler.clear?.();

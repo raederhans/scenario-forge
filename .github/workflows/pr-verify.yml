@@ -48,6 +48,7 @@ jobs:
           node tools/audit_quick_fill.mjs
           python tools/data_health.py
           python tools/check_pages_source_graph.py
+          node tools/check_import_boundaries.mjs
       - name: Run the Node suite (tests/quarantine.json lists the only exclusions)
         run: node tools/run_all_tests.mjs node
       - name: Run the Python suite

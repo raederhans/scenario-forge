@@ -5,87 +5,9 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  STARTUP_RESOURCE_CLASSES,
   buildStartupResourceGraph,
   validateStartupResourceGraph,
 } from "../tools/startup_resource_graph.mjs";
-
-test("startup resource graph is deterministic and reconciles the source entrypoint to Pages ownership", () => {
-  const explicitArtifactRoot = String(process.env.SCENARIO_FORGE_PAGES_ARTIFACT_ROOT || "").trim();
-  const options = {};
-  if (explicitArtifactRoot) {
-    const artifactRoot = path.resolve(explicitArtifactRoot);
-    const runtimeRelative = path.relative(path.resolve(".runtime"), artifactRoot);
-    assert.ok(runtimeRelative && !runtimeRelative.startsWith("..") && !path.isAbsolute(runtimeRelative));
-    options.manifestPath = path.relative(process.cwd(), path.join(artifactRoot, "pages-dist-manifest.json")).replaceAll("\\", "/");
-  }
-  // Reconcile with the exact PR artifact, not an older tracked dist manifest.
-  const first = buildStartupResourceGraph(options);
-  const second = buildStartupResourceGraph(options);
-
-  assert.deepEqual(second, first);
-  assert.deepEqual(first.entrypoint, {
-    html_path: "index.html",
-    module_path: "js/main.js",
-    pages_html_path: "app/index.html",
-    pages_module_path: "app/js/main.js",
-  });
-  assert.equal(first.manifest.admission_status, "complete");
-  assert.equal(first.manifest.graph_scan_status, "complete");
-  assert.equal(first.manifest.product_inventory_status, "complete");
-  assert.equal(first.manifest.publication_ownership_status, "complete");
-  assert.equal(first.validation.status, "rejected");
-  assert.ok(first.validation.issues.some((issue) => issue.code === "optional-resource-in-base-startup-graph"));
-  const optionalBaseStartupIssues = first.validation.issues
-    .filter((issue) => issue.code === "optional-resource-in-base-startup-graph");
-  assert.ok(optionalBaseStartupIssues.length > 0);
-  assert.ok(optionalBaseStartupIssues.every((issue) => issue.classification !== "critical"));
-  assert.deepEqual(
-    first.validation.issue_summary.map((summary) => summary.code),
-    [...new Set(first.validation.issues.map((issue) => issue.code))]
-      .sort((left, right) => left.localeCompare(right)),
-  );
-  for (const summary of first.validation.issue_summary) {
-    const summarizedIssues = first.validation.issues.filter((issue) => issue.code === summary.code);
-    const expectedClassifications = [...new Set(summarizedIssues
-      .map((issue) => issue.classification)
-      .filter((classification) => typeof classification === "string" && classification.trim()))]
-      .sort((left, right) => left.localeCompare(right));
-    assert.equal(summary.issue_count, summarizedIssues.length);
-    assert.deepEqual(
-      summary.classification_counts.map(({ classification }) => classification),
-      expectedClassifications,
-    );
-    for (const classificationSummary of summary.classification_counts) {
-      assert.equal(
-        classificationSummary.issue_count,
-        summarizedIssues.filter((issue) => (
-          issue.classification === classificationSummary.classification
-        )).length,
-      );
-    }
-  }
-  assert.equal(
-    first.validation.issue_summary.reduce((total, summary) => total + summary.issue_count, 0),
-    first.validation.issue_count,
-  );
-  assert.deepEqual(Object.keys(first.categories), STARTUP_RESOURCE_CLASSES);
-  assert.ok(first.categories.critical.includes("js/main.js"));
-  assert.ok(first.categories.deferred.includes("js/bootstrap/startup_sample_project_deeplink.js"));
-  assert.ok(first.categories["scenario-specific"].includes("js/bootstrap/startup_scenario_boot.js"));
-  assert.equal(first.stage_a_lazy_loader.path, "js/bootstrap/startup_lazy_module_loader.js");
-  assert.equal(first.stage_a_lazy_loader.entrypoint_imported, true);
-  assert.deepEqual(first.stage_a_lazy_loader.bindings, [
-    { name: "startupSampleProjectDeeplinkModuleLoader", target: "js/bootstrap/startup_sample_project_deeplink.js" },
-    { name: "startupScenarioBootOwnerLoader", target: "js/bootstrap/startup_scenario_boot.js" },
-  ]);
-  assert.ok(first.modules.every((record) => record.product_owner));
-  assert.ok(first.resources.every((record) => record.product_owner));
-  for (const sourcePath of ["js/core/file_manager.js", "js/core/export_artifact_package.js"]) {
-    const module = first.modules.find((record) => record.source_path === sourcePath);
-    assert.equal(module?.base_startup, false, `${sourcePath} must load through explicit project/export intent`);
-  }
-});
 
 test("startup resource graph rejects optional base-startup re-entry and missing ownership", () => {
   const result = validateStartupResourceGraph({

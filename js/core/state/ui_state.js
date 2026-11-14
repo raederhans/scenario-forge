@@ -355,7 +355,7 @@ export function createDefaultUiChromeState() {
   };
 }
 
-function cloneImportedUiValue(value) {
+export function cloneImportedUiValue(value) {
   if (value === null || value === undefined || typeof value !== "object") {
     return value;
   }

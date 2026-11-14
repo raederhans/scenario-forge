@@ -38,7 +38,7 @@ const BASE_LAYER_VISIBILITY_FIELDS = Object.freeze([
   "showSpecialZones",
 ]);
 
-function getTransportOverviewLayerVisibilityFields() {
+export function getTransportOverviewLayerVisibilityFields() {
   return listTransportOverviewCapabilityFamilyIds()
     .map((familyId) => getTransportOverviewVisibilityField(familyId))
     .filter(Boolean);

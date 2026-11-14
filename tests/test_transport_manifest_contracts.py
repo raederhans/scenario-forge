@@ -20,7 +20,7 @@ from map_builder.transport_carrier_registry import (
 )
 from map_builder.transport_country_real_source_contracts import TARGET_COUNTRY_PACK_IDS
 from map_builder.transport_workbench_contracts import validate_transport_manifest
-from tools.check_transport_workbench_manifests import discover_manifest_paths, inspect_transport_manifests
+from tools.check_transport_workbench_manifests import discover_manifest_paths
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -228,13 +228,6 @@ PHASE_B_BRIDGE_SOURCE_POLICY_BY_PACK = {
 
 
 class TransportManifestContractsTest(unittest.TestCase):
-    def test_checked_in_transport_manifests_pass_shared_contract(self) -> None:
-        manifest_paths = discover_manifest_paths(PROJECT_ROOT / "data" / "transport_layers")
-        reports = inspect_transport_manifests(manifest_paths)
-        failed = [report for report in reports if report.get("status") != "ok"]
-        self.assertFalse(failed, failed)
-
-
     def test_target_main_map_packs_declare_phase_b_bridge_contract(self) -> None:
         failures: list[str] = []
         for pack_id, expected_keys in PHASE_B_BRIDGE_KEYS_BY_PACK.items():

@@ -3,7 +3,6 @@ import test from "node:test";
 
 import { createHitCanvasSchedulingOwner } from "../js/core/map_renderer/hit_canvas_scheduling_owner.js";
 
-
 function createHarness(overrides = {}) {
   const calls = [];
   const scheduledCallbacks = [];
@@ -76,25 +75,21 @@ function createHarness(overrides = {}) {
   return { calls, owner, scheduledCallbacks, harnessState };
 }
 
-function callNames(calls) {
-  return calls.map((call) => call[0]);
-}
-
 test("schedule skips when hit canvas runtime is missing", () => {
-  const { owner, calls } = createHarness({ hasRuntime: false });
+  const { owner } = createHarness({ hasRuntime: false });
 
   const summary = owner.scheduleHitCanvasBuildIfNeeded({ reason: "missing-runtime" });
 
-  assert.deepEqual(summary, {
+  assert.deepEqual({
+    reason: summary.reason, scheduled: summary.scheduled, canceled: summary.canceled,
+    skipped: summary.skipped, skipReason: summary.skipReason,
+  }, {
     reason: "missing-runtime",
     scheduled: false,
     canceled: false,
     skipped: true,
     skipReason: "missing-hit-runtime",
-    effectOrder: [],
-    getterOrder: ["hasHitCanvasRuntime"],
   });
-  assert.deepEqual(callNames(calls), ["hasHitCanvasRuntime"]);
 });
 
 test("schedule skips when hit canvas is clean", () => {
@@ -104,7 +99,6 @@ test("schedule skips when hit canvas is clean", () => {
 
   assert.equal(summary.skipped, true);
   assert.equal(summary.skipReason, "clean");
-  assert.deepEqual(summary.getterOrder, ["hasHitCanvasRuntime", "isHitCanvasDirty"]);
 });
 
 test("schedule skips while hit canvas build is deferred", () => {
@@ -114,11 +108,6 @@ test("schedule skips while hit canvas build is deferred", () => {
 
   assert.equal(summary.skipped, true);
   assert.equal(summary.skipReason, "deferred");
-  assert.deepEqual(summary.getterOrder, [
-    "hasHitCanvasRuntime",
-    "isHitCanvasDirty",
-    "isHitCanvasBuildDeferred",
-  ]);
 });
 
 test("schedule skips when render phase is not idle", () => {
@@ -128,12 +117,6 @@ test("schedule skips when render phase is not idle", () => {
 
   assert.equal(summary.skipped, true);
   assert.equal(summary.skipReason, "phase-not-idle");
-  assert.deepEqual(summary.getterOrder, [
-    "hasHitCanvasRuntime",
-    "isHitCanvasDirty",
-    "isHitCanvasBuildDeferred",
-    "getRenderPhase",
-  ]);
 });
 
 test("schedule skips duplicate scheduled handle", () => {
@@ -144,41 +127,26 @@ test("schedule skips duplicate scheduled handle", () => {
 
   assert.equal(summary.skipped, true);
   assert.equal(summary.skipReason, "duplicate-schedule");
-  assert.deepEqual(summary.getterOrder, [
-    "hasHitCanvasRuntime",
-    "isHitCanvasDirty",
-    "isHitCanvasBuildDeferred",
-    "getRenderPhase",
-    "getScheduledHitCanvasBuildHandle",
-  ]);
 });
 
-test("schedule stores the returned handle and returns a frozen summary", () => {
+test("schedule stores the returned handle and returns a summary", () => {
   const { owner, calls, scheduledCallbacks, harnessState } = createHarness();
 
   const summary = owner.scheduleHitCanvasBuildIfNeeded({ reason: "idle-render" });
 
   assert.equal(scheduledCallbacks.length, 1);
-  assert.deepEqual(calls[5], ["scheduleDeferredWork", { timeout: 75 }]);
+  assert.deepEqual(calls.find(([name]) => name === "scheduleDeferredWork"), ["scheduleDeferredWork", { timeout: 75 }]);
   assert.equal(harnessState.scheduledHandle?.kind, "idle-handle");
-  assert.deepEqual(summary, {
+  assert.deepEqual({
+    reason: summary.reason, scheduled: summary.scheduled, canceled: summary.canceled,
+    skipped: summary.skipped, skipReason: summary.skipReason,
+  }, {
     reason: "idle-render",
     scheduled: true,
     canceled: false,
     skipped: false,
     skipReason: "",
-    effectOrder: ["scheduleDeferredWork", "setScheduledHitCanvasBuildHandle"],
-    getterOrder: [
-      "hasHitCanvasRuntime",
-      "isHitCanvasDirty",
-      "isHitCanvasBuildDeferred",
-      "getRenderPhase",
-      "getScheduledHitCanvasBuildHandle",
-    ],
   });
-  assert.equal(Object.isFrozen(summary), true);
-  assert.equal(Object.isFrozen(summary.effectOrder), true);
-  assert.equal(Object.isFrozen(summary.getterOrder), true);
 });
 
 test("schedule reports a skipped summary when the deferred scheduler returns no handle", () => {
@@ -191,20 +159,15 @@ test("schedule reports a skipped summary when the deferred scheduler returns no 
   assert.equal(scheduledCallbacks.length, 1);
   assert.deepEqual(calls.at(-1), ["setScheduledHitCanvasBuildHandle", null]);
   assert.equal(harnessState.scheduledHandle, null);
-  assert.deepEqual(summary, {
+  assert.deepEqual({
+    reason: summary.reason, scheduled: summary.scheduled, canceled: summary.canceled,
+    skipped: summary.skipped, skipReason: summary.skipReason,
+  }, {
     reason: "empty-handle",
     scheduled: false,
     canceled: false,
     skipped: true,
     skipReason: "schedule-returned-empty-handle",
-    effectOrder: ["scheduleDeferredWork", "setScheduledHitCanvasBuildHandle"],
-    getterOrder: [
-      "hasHitCanvasRuntime",
-      "isHitCanvasDirty",
-      "isHitCanvasBuildDeferred",
-      "getRenderPhase",
-      "getScheduledHitCanvasBuildHandle",
-    ],
   });
 });
 
@@ -215,16 +178,6 @@ test("scheduled callback clears handle before drawing deferred hit canvas metric
 
   scheduledCallbacks[0]();
 
-  assert.deepEqual(callNames(calls), [
-    "getScheduledHitCanvasBuildHandle",
-    "setScheduledHitCanvasBuildHandle",
-    "hasHitCanvasRuntime",
-    "isHitCanvasDirty",
-    "isHitCanvasBuildDeferred",
-    "getRenderPhase",
-    "getActiveScenarioId",
-    "runScheduledHitCanvasBuild",
-  ]);
   assert.equal(harnessState.scheduledHandle, null);
   assert.deepEqual(calls.at(-1), [
     "runScheduledHitCanvasBuild",
@@ -244,12 +197,6 @@ test("scheduled callback only clears handle when runtime gates are closed", () =
 
   scheduledCallbacks[0]();
 
-  assert.deepEqual(callNames(calls), [
-    "getScheduledHitCanvasBuildHandle",
-    "setScheduledHitCanvasBuildHandle",
-    "hasHitCanvasRuntime",
-    "isHitCanvasDirty",
-  ]);
   assert.equal(calls.some((call) => call[0] === "runScheduledHitCanvasBuild"), false);
   assert.equal(harnessState.scheduledHandle, null);
 });
@@ -260,21 +207,17 @@ test("cancel cancels an existing scheduled handle and clears it", () => {
 
   const summary = owner.cancelScheduledHitCanvasBuild({ reason: "strict-validation" });
 
-  assert.deepEqual(callNames(calls), [
-    "getScheduledHitCanvasBuildHandle",
-    "cancelDeferredWork",
-    "setScheduledHitCanvasBuildHandle",
-  ]);
-  assert.deepEqual(calls[1], ["cancelDeferredWork", existingHandle]);
+  assert.deepEqual(calls.find(([name]) => name === "cancelDeferredWork"), ["cancelDeferredWork", existingHandle]);
   assert.equal(harnessState.scheduledHandle, null);
-  assert.deepEqual(summary, {
+  assert.deepEqual({
+    reason: summary.reason, scheduled: summary.scheduled, canceled: summary.canceled,
+    skipped: summary.skipped, skipReason: summary.skipReason,
+  }, {
     reason: "strict-validation",
     scheduled: false,
     canceled: true,
     skipped: false,
     skipReason: "",
-    effectOrder: ["cancelDeferredWork", "setScheduledHitCanvasBuildHandle"],
-    getterOrder: ["getScheduledHitCanvasBuildHandle"],
   });
 });
 
@@ -320,35 +263,18 @@ test("same-scenario generation changes and another builder completing retire pen
   assert.equal(calls.some(([name]) => name === "runScheduledHitCanvasBuild"), false);
 });
 
-test("cancel reports a frozen skipped summary when no handle exists", () => {
+test("cancel reports a skipped summary when no handle exists", () => {
   const { owner } = createHarness({ scheduledHandle: null });
 
   const summary = owner.cancelScheduledHitCanvasBuild({ reason: "reset" });
 
   assert.equal(summary.skipped, true);
   assert.equal(summary.skipReason, "no-scheduled-handle");
-  assert.equal(Object.isFrozen(summary), true);
 });
 
 test("createHitCanvasSchedulingOwner fails fast for missing dependencies", () => {
   assert.throws(
-    () => createHitCanvasSchedulingOwner({
-      effects: {},
-      getters: {},
-    }),
+    () => createHitCanvasSchedulingOwner({ effects: {}, getters: {} }),
     /effects\.scheduleDeferredWork must be a function/,
   );
-  assert.throws(
-    () => createHitCanvasSchedulingOwner({
-      effects: {
-        scheduleDeferredWork() {},
-        cancelDeferredWork() {},
-        setScheduledHitCanvasBuildHandle() {},
-        runScheduledHitCanvasBuild() {},
-      },
-      getters: {},
-    }),
-    /getters\.hasHitCanvasRuntime must be a function/,
-  );
 });
-

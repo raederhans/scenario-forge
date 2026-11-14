@@ -1,9 +1,6 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import test from "node:test";
-import vm from "node:vm";
 
-import { parse } from "acorn";
+import test from "node:test";
 
 import { createViewportReadModelOwner } from "../js/core/renderer/viewport_read_model_owner.js";
 
@@ -19,97 +16,6 @@ function createZoomIdentity() {
     translate(x, y) {
       return { x, y, k: 1 };
     },
-  };
-}
-
-function extractMapRendererFunction(functionName) {
-  const source = fs.readFileSync(
-    new URL("../js/core/map_renderer.js", import.meta.url),
-    "utf8",
-  );
-  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
-  const declaration = ast.body.find((node) => (
-    node.type === "FunctionDeclaration" && node.id?.name === functionName
-  ));
-  assert.ok(declaration, `map_renderer must define ${functionName}`);
-  return source.slice(declaration.start, declaration.end);
-}
-
-function createCompositionHarness() {
-  const featureA = createFeature("A");
-  const featureB = createFeature("B");
-  const skippedFeature = createFeature("SKIP");
-  const runtimeState = {
-    width: 800,
-    height: 600,
-    dpr: 1,
-    zoomTransform: { x: 10, y: 20, k: 2 },
-    landData: { features: [featureA, featureB, skippedFeature] },
-  };
-  const projectedBoundsById = new Map([
-    ["A", { minX: 10, minY: 20, maxX: 30, maxY: 40 }],
-    ["B", { minX: -5, minY: 50, maxX: 80, maxY: 120 }],
-    ["SKIP", { minX: -500, minY: -500, maxX: 500, maxY: 500 }],
-  ]);
-  const calls = { projected: [], skipped: [], renderable: 0, translated: [] };
-  const projection = {
-    scale: () => 123.4567,
-    translate: () => [10.3333, -20.6666],
-    invert: ([x, y]) => [x - 100, y - 200],
-  };
-  const zoomIdentity = {
-    x: 0,
-    y: 0,
-    k: 1,
-    translate(x, y) {
-      calls.translated.push({ x, y });
-      return { x, y, k: 1 };
-    },
-  };
-  let capturedOptions = null;
-  const context = {
-    MAP_PAN_PADDING_PX: 50,
-    runtimeState,
-    rendererSurfaceHost: {
-      getPathSvg: () => ({}),
-      getProjection: () => projection,
-    },
-    getFeatureId: (feature) => feature.id,
-    getProjectedFeatureBounds: (feature, options) => {
-      calls.projected.push({ id: feature.id, options });
-      return projectedBoundsById.get(feature.id) || null;
-    },
-    getLogicalCanvasDimensions: () => [800, 600],
-    shouldSkipFeature: (feature, width, height, options) => {
-      calls.skipped.push({ id: feature.id, width, height, options });
-      return feature.id === "SKIP";
-    },
-    getRenderableLandFeatures: () => {
-      calls.renderable += 1;
-      return [featureB];
-    },
-
-
-    createViewportReadModelOwner: (options) => {
-      capturedOptions = options;
-      return createViewportReadModelOwner(options);
-    },
-    globalThis: { d3: { zoomIdentity } },
-  };
-  const source = [
-    "let viewportReadModelOwner = null;",
-    extractMapRendererFunction("getViewportReadModelOwner"),
-    "globalThis.getViewportReadModelOwner = getViewportReadModelOwner;",
-  ].join("\n");
-  vm.createContext(context);
-  vm.runInContext(source, context);
-  return {
-    calls,
-    context,
-    featureA,
-    featureB,
-    getCapturedOptions: () => capturedOptions,
-    getOwner: () => context.globalThis.getViewportReadModelOwner(),
   };
 }
 
@@ -392,52 +298,3 @@ test("projection signature reads fresh snapshots and preserves numeric coercion"
   assert.equal(reads, 6);
 });
 
-test("map_renderer composes viewport reads through numeric snapshots and live value capabilities", () => {
-  const harness = createCompositionHarness();
-  const owner = harness.getOwner();
-  const options = harness.getCapturedOptions();
-
-  assert.equal(Object.hasOwn(options, "state"), false);
-  assert.equal(Object.hasOwn(options, "helpers"), false);
-  assert.equal(Object.hasOwn(options.capabilities, "getProjectionRenderSignature"), false);
-  const projectionSnapshot = options.capabilities.getProjectionSnapshot();
-  assert.equal(projectionSnapshot.scale, 123.4567);
-  assert.deepEqual(Array.from(projectionSnapshot.translate), [10.3333, -20.6666]);
-  assert.equal(owner.getProjectionRenderSignature(), "123.457|10.333|-20.667");
-  assert.equal(owner.getZoomPercent(), "200%");
-  assert.deepEqual(owner.calculatePanExtent(), [[-55, -30], [130, 170]]);
-  assert.deepEqual(
-    owner.getProjectedRenderableContentBounds(),
-    { minX: -5, minY: 50, maxX: 80, maxY: 120, width: 85, height: 70 },
-  );
-
-  const panSnapshots = options.capabilities.getPanContentBoundsSnapshots();
-  const renderableSnapshots = options.capabilities.getProjectedRenderableContentBoundsSnapshots();
-  assert.deepEqual(Array.from(panSnapshots, (snapshot) => ({ ...snapshot })), [
-    { minX: 10, minY: 20, maxX: 30, maxY: 40 },
-    { minX: -5, minY: 50, maxX: 80, maxY: 120 },
-  ]);
-  assert.deepEqual(
-    Array.from(renderableSnapshots, (snapshot) => ({ ...snapshot })),
-    [{ minX: -5, minY: 50, maxX: 80, maxY: 120 }],
-  );
-  assert.ok(panSnapshots.every((snapshot) => snapshot !== harness.featureA && snapshot !== harness.featureB));
-  assert.deepEqual(harness.calls.skipped.map(({ id }) => id), ["A", "B", "SKIP", "A", "B", "SKIP"]);
-  assert.equal(harness.calls.renderable, 2);
-
-  harness.context.runtimeState.zoomTransform = { x: 30, y: 40, k: 3 };
-  harness.context.runtimeState.width = 640;
-  assert.equal(owner.getViewportRenderSignature(), "640|600|1");
-  assert.equal(owner.getZoomPercent(), "300%");
-  harness.context.rendererSurfaceHost.getProjection = () => ({
-    scale: () => 42.1234,
-    translate: () => [5.4321, 6.5432],
-  });
-  assert.equal(owner.getProjectionRenderSignature(), "42.123|5.432|6.543");
-  harness.context.rendererSurfaceHost.getProjection = () => null;
-  assert.equal(owner.getProjectionRenderSignature(), "projection:na");
-
-  harness.context.runtimeState.landData = { features: [] };
-  assert.equal(owner.getCenteredFitZoomTransform(), harness.context.globalThis.d3.zoomIdentity);
-  assert.deepEqual(harness.calls.translated, []);
-});

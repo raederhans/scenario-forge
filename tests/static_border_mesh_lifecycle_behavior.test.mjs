@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+
 import {
   createStaticBorderMeshLifecycle,
   getCoastlineDecisionSignature,
@@ -171,20 +171,6 @@ test("early private Worker result cannot publish after cancellation or source re
     }
     assert.equal(commits, 0);
     assert.equal(h.events.some(([name]) => name === "snapshot" || name === "render"), false);
-  }
-});
-
-test("host private launch gate preserves input, render-phase and recovery ownership blockers", () => {
-  const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const body = source.match(/function canStartPrivateBorderMeshPreparation\(\) \{([\s\S]*?)\n\}/)?.[1];
-  assert.ok(body);
-  const allowed = new Function("runtimeState", "RENDER_PHASE_IDLE", "exportRenderInProgress = false", body);
-  const state = { renderPhase: "idle", isInteracting: false, activeInteractionRecoveryTaskKey: "", deferExactAfterSettle: true,
-    exactAfterSettleController: { phase: "awaiting-paint" } };
-  assert.equal(allowed(state, "idle"), true);
-  assert.equal(allowed(state, "idle", true), false, "export retains the native recovery gate");
-  for (const change of [{ renderPhase: "interacting" }, { isInteracting: true }, { activeInteractionRecoveryTaskKey: "another-task" }]) {
-    assert.equal(allowed({ ...state, ...change }, "idle"), false);
   }
 });
 

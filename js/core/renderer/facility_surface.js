@@ -1,4 +1,4 @@
-import { getActiveModal, restoreFocusOrigin } from "../../ui/ui_contract.js";
+import { getActiveModal, restoreFocusOrigin } from "../../shared/dom_focus.js";
 
 export function shouldBlockUnderlyingMapSelectionForFacility(entry, allowUnderlyingMapSelection = false) {
   const familyId = String(entry?.familyId || "").trim().toLowerCase();

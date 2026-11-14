@@ -82,6 +82,10 @@ export {
   renderLegend,
   RENDER_PASS_NAMES,
 
+  // Queries used by the sidebar.
+  getCachedEffectiveCityCollection,
+  selectLandFeatureById,
+
   // Viewport.
   focusWaterRegionById,
   focusGeoBounds,

@@ -843,13 +843,4 @@ export function getTransportWorkbenchCarrierOverlayRoots() {
   };
 }
 
-export function getTransportWorkbenchCarrierAssetState() {
-  return {
-    assetKey: activeAssetKey,
-    carrierId: String(asset?.carrier_id || ""),
-    country: String(asset?.country || asset?.carrier_id || ""),
-    frameIds: Object.keys(frameContexts),
-  };
-}
-
 export { resolveTransportWorkbenchCarrierFrame };

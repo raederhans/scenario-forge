@@ -355,33 +355,6 @@ export function createSerializableStartupLocalizationPayload({ locales = null, g
   };
 }
 
-export function createSerializableStartupScenarioBootstrapPayload({
-  manifest = null,
-  bundleLevel = "bootstrap",
-  countriesPayload = null,
-  ownersPayload = null,
-  coresPayload = null,
-  geoLocalePatchPayload = null,
-  runtimeTopologyPayload = null,
-  runtimePoliticalMeta = null,
-  source = null,
-} = {}) {
-  const featureIds = Array.isArray(runtimePoliticalMeta?.featureIds)
-    ? runtimePoliticalMeta.featureIds
-    : [];
-  return {
-    manifest: clonePlainObject(manifest),
-    bundleLevel: normalizeCacheKeyPart(bundleLevel, "bootstrap"),
-    countriesPayload: clonePlainObject(countriesPayload),
-    ownersPayload: compactIndexedTagAssignmentPayload(ownersPayload, featureIds, "owners"),
-    coresPayload: compactIndexedCoreAssignmentPayload(coresPayload, featureIds),
-    geoLocalePatchPayload: clonePlainObject(geoLocalePatchPayload),
-    runtimeTopologyPayload: clonePlainObject(runtimeTopologyPayload),
-    runtimePoliticalMeta: compactRuntimePoliticalMeta(runtimePoliticalMeta),
-    source: clonePlainObject(source),
-  };
-}
-
 export function createSerializableStartupScenarioBootstrapCorePayload({
   manifest = null,
   bundleLevel = "bootstrap",

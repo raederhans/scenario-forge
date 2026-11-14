@@ -190,10 +190,6 @@ class ScenarioMaterializationServiceTest(unittest.TestCase):
         self.assertEqual(created["display_name_zh"], "新国家")
         self.assertEqual(created["parent_owner_tag"], "AAA")
 
-    def test_geo_locale_materializer_no_longer_imports_dev_server_registry(self) -> None:
-        source = Path(scenario_geo_locale_materializer.__file__).read_text(encoding="utf-8")
-        self.assertNotIn("from tools import dev_server", source)
-
     def test_apply_mutation_and_materialize_in_locked_context_materializes_political_patch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)

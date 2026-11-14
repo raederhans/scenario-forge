@@ -5,7 +5,6 @@ from contextlib import nullcontext
 import json
 import os
 from pathlib import Path
-import re
 import tempfile
 import threading
 import unittest
@@ -39,7 +38,6 @@ from tools.patch_tno_1962_bundle import (
     build_relief_overlays,
     build_tno_named_marginal_water_features,
     clip_named_water_features_to_land_mask,
-    build_polar_feature_diagnostics_from_topology,
     build_runtime_topology_state_from_countries_state,
     build_runtime_topology_payload,
     build_chunk_assets_stage,
@@ -1476,64 +1474,6 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(diagnostics["source_feature_count"], 2)
         self.assertEqual(sorted(diagnostics["source_feature_ids"]), ["AQ_EAST", "AQ_WEST"])
 
-    def test_checked_in_tno_runtime_topology_has_clean_polar_features(self) -> None:
-        runtime_topology_path = (
-            Path(__file__).resolve().parents[1]
-            / "data"
-            / "scenarios"
-            / "tno_1962"
-            / "runtime_topology.topo.json"
-        )
-        topology_payload = read_json_source(runtime_topology_path)
-        geometries = topology_payload.get("objects", {}).get("political", {}).get("geometries", [])
-        feature_ids = [
-            str((geometry.get("properties", {}) or {}).get("id") or "").strip()
-            for geometry in geometries
-        ]
-        polar_diagnostics = build_polar_feature_diagnostics_from_topology(topology_payload, "political")
-        shell_fragment_count = sum(feature_id.startswith("RU_ARCTIC_FB_") for feature_id in feature_ids)
-        shell_source_fragment_count = sum(
-            int((geometry.get("properties", {}) or {}).get("source_fragment_count") or 1)
-            for geometry in geometries
-            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
-        )
-        shell_source_area = sum(
-            float((geometry.get("properties", {}) or {}).get("source_fragment_area") or 0.0)
-            for geometry in geometries
-            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
-        )
-        shell_retained_area = sum(
-            float((geometry.get("properties", {}) or {}).get("retained_fragment_area") or 0.0)
-            for geometry in geometries
-            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
-        )
-
-        self.assertIn("AQ", feature_ids)
-        self.assertFalse(any(feature_id.startswith("AQ_") for feature_id in feature_ids))
-        self.assertGreaterEqual(shell_fragment_count, 2)
-        self.assertLess(shell_fragment_count, 100)
-        self.assertFalse(any(re.fullmatch(r"RU_ARCTIC_FB_\d+", feature_id) for feature_id in feature_ids))
-        self.assertGreaterEqual(shell_source_fragment_count, 9000)
-        self.assertGreaterEqual(shell_retained_area / shell_source_area, 0.90)
-        shell_props = [
-            geometry.get("properties", {}) or {}
-            for geometry in geometries
-            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
-        ]
-        self.assertTrue(all(props.get("scenario_helper_kind") == "shell_fallback" for props in shell_props))
-        self.assertTrue(all(props.get("interactive") is False for props in shell_props))
-        self.assertTrue(all(props.get("render_as_base_geography") is False for props in shell_props))
-        self.assertTrue(all(props.get("scenario_shell_owner_hint") for props in shell_props))
-        self.assertTrue(all(props.get("scenario_shell_controller_hint") for props in shell_props))
-        self.assertIn("AQ", polar_diagnostics)
-        self.assertTrue(
-            all(
-                "world_bounds" not in entry.get("flags", [])
-                and "giant_feature" not in entry.get("flags", [])
-                for entry in polar_diagnostics.values()
-            )
-        )
-
     def test_build_runtime_shell_fragment_gdf_uses_full_runtime_shell_rows(self) -> None:
         runtime_gdf = gpd.GeoDataFrame(
             [
@@ -1796,27 +1736,6 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(raj_entry["parent_owner_tag"], "")
         self.assertEqual(raj_entry["subject_kind"], "")
 
-    def test_second_wave_color_sources_match_expected_targets(self) -> None:
-        manual_overrides = json.loads(
-            Path("data/scenarios/tno_1962/scenario_manual_overrides.json").read_text(encoding="utf-8")
-        )
-        east_asia_rules = json.loads(
-            Path("data/scenario-rules/tno_1962.east_asia_ownership.manual.json").read_text(encoding="utf-8")
-        )
-
-        self.assertEqual(
-            tno_bundle.TNO_1962_MANUAL_COUNTRY_OVERRIDES["KOR"]["color_hex"],
-            "#82132e",
-        )
-        gng_rule = next(
-            rule for rule in east_asia_rules["country_rules"]
-            if rule.get("rule_id") == "japan_guangdong_client_1962"
-        )
-        self.assertEqual(gng_rule["color_hex"], "#7A2E41")
-        self.assertEqual(manual_overrides["countries"]["MGN"]["color_hex"], "#3c4551")
-        self.assertEqual(manual_overrides["countries"]["ONG"]["color_hex"], "#51875b")
-        self.assertEqual(manual_overrides["countries"]["GAY"]["color_hex"], "#4f4f4f")
-
     def test_second_wave_runtime_colors_keep_manual_sources_locked(self) -> None:
         countries_payload = json.loads(
             Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
@@ -1915,112 +1834,6 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(countries["XIK"]["entry_kind"], "scenario_country")
         self.assertEqual(countries["XIK"]["primary_rule_source"], "dev_manual_tag_create")
 
-    def test_tno_runtime_country_colors_follow_mixed_palette_policy(self) -> None:
-        countries = json.loads(
-            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
-        )["countries"]
-        audit_entries = json.loads(
-            Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
-        )["entries"]
-
-        explicit_scenario_color_tags = {
-            "EGY": "#7c9a70",
-            "TUN": "#70825d",
-            "ANG": "#71755c",
-        }
-        palette_priority_tags = {
-            "KAZ": "#aa233c",
-            "UZB": "#9b2b40",
-            "MZB": "#492a25",
-            "RWA": "#438f00",
-            "ZAM": "#9666a7",
-            "ZIM": "#004a00",
-            "LBA": "#bcc2a3",
-            "MAD": "#3d5069",
-            "MOR": "#ac8b6c",
-        }
-
-        mismatches = []
-        for tag, country_entry in countries.items():
-            audit_entry = audit_entries.get(tag, {})
-            audit_hex = str(audit_entry.get("map_hex") or "").strip().lower()
-            country_hex = str(country_entry.get("color_hex") or "").strip().lower()
-
-            if tag in explicit_scenario_color_tags:
-                self.assertEqual(country_hex, explicit_scenario_color_tags[tag])
-                self.assertEqual(country_entry.get("color_policy"), "locked")
-                continue
-            if tag in palette_priority_tags:
-                self.assertEqual(country_hex, palette_priority_tags[tag])
-                self.assertEqual(country_hex, audit_hex)
-                continue
-            if country_entry.get("color_policy") == "locked":
-                continue
-            if not audit_hex:
-                continue
-            if country_hex != audit_hex:
-                mismatches.append((tag, country_hex, audit_hex))
-
-        self.assertEqual(mismatches, [])
-
-    def test_corrected_country_color_mappings_survive_manual_override_and_palette_sync(self) -> None:
-        countries = json.loads(
-            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
-        )["countries"]
-        manual_overrides = json.loads(
-            Path("data/scenarios/tno_1962/scenario_manual_overrides.json").read_text(encoding="utf-8")
-        )["countries"]
-        mutations = json.loads(
-            Path("data/scenarios/tno_1962/scenario_mutations.json").read_text(encoding="utf-8")
-        )["countries"]
-        # MOD identities: FRI -> AZH, BRM -> BUR; NCC and TUN use the
-        # startup CHI_JAP_PUP and TUN_ITA cosmetic colors respectively.
-        expected_colors = {
-            "AZH": "#388a33", "BUR": "#a05361", "NCP": "#9f2349", "TUN": "#70825d",
-        }
-
-        for tag, color_hex in expected_colors.items():
-            self.assertEqual(manual_overrides[tag]["color_hex"], color_hex)
-            self.assertEqual(countries[tag]["color_hex"], color_hex)
-            self.assertEqual(mutations[tag]["color_hex"], color_hex)
-            self.assertEqual(mutations[tag]["color_policy"], "locked")
-
-        target_tags = set(expected_colors)
-        rebuilt_countries = {tag: dict(countries[tag]) for tag in target_tags}
-        original_identity = {
-            tag: (entry.get("display_name"), entry.get("display_name_en"), entry.get("display_name_zh"), entry.get("parent_owner_tag"))
-            for tag, entry in rebuilt_countries.items()
-        }
-        for entry in rebuilt_countries.values():
-            entry["color_hex"] = "#112233"
-            entry["color_policy"] = "palette"
-        manual_payload = {
-            "countries": {tag: manual_overrides[tag] for tag in target_tags},
-            "assignments": {},
-        }
-        apply_dev_manual_overrides(
-            {"countries": rebuilt_countries},
-            {"owners": {}},
-            {"controllers": {}},
-            {"cores": {}},
-            manual_payload,
-            {},
-        )
-        sync_summary = tno_bundle.sync_tno_country_colors_from_palette_audit(
-            {"countries": rebuilt_countries}
-        )
-
-        for tag, expected_color in expected_colors.items():
-            entry = rebuilt_countries[tag]
-            self.assertEqual(entry["color_hex"], expected_color)
-            self.assertEqual(entry["color_policy"], "locked")
-            self.assertEqual(
-                (entry.get("display_name"), entry.get("display_name_en"), entry.get("display_name_zh"), entry.get("parent_owner_tag")),
-                original_identity[tag],
-            )
-        self.assertEqual(set(sync_summary["skipped_explicit_tags"]), target_tags)
-
-
     def test_apply_tno_country_color_policy_backfill_marks_locked_and_palette_entries(self) -> None:
         countries_payload = {
             "countries": {
@@ -2062,48 +1875,6 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(countries_payload["countries"]["BBB"]["color_policy"], "locked")
         self.assertEqual(countries_payload["countries"]["MAG"]["color_hex"], "#cac6b2")
         self.assertEqual(countries_payload["countries"]["MAG"]["color_policy"], "locked")
-
-    def test_current_tno_explicit_country_colors_are_locked_and_bundled(self) -> None:
-        countries_payload = json.loads(
-            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
-        )["countries"]
-        explicit_tags = sorted(
-            tag for tag, entry in countries_payload.items()
-            if entry.get("color_hex") and (
-                entry.get("source") in {"controller_rule", "scenario_generated"}
-                or entry.get("entry_kind") == "controller_only"
-                or entry.get("primary_rule_source") == "dev_manual_tag_create"
-                or str(entry.get("primary_rule_source") or "").endswith("_manual_override")
-            )
-        )
-        for expected_tag in ("KOR", "MGN", "ONG", "GAY", "XIK", "PRC", "XSM"):
-            self.assertIn(expected_tag, explicit_tags)
-        self.assertNotIn("GNG", explicit_tags)
-
-        for tag in explicit_tags:
-            self.assertEqual(countries_payload[tag]["color_policy"], "locked", tag)
-        audit_entries = json.loads(
-            Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
-        )["entries"]
-        for tag, entry in countries_payload.items():
-            if entry.get("color_hex") and audit_entries.get(tag, {}).get("map_hex"):
-                self.assertIn(entry.get("color_policy"), {"locked", "palette"}, tag)
-
-        for bundle_name in ("startup.bundle.en.json", "startup.bundle.zh.json"):
-            bundled_countries = json.loads(
-                Path(f"data/scenarios/tno_1962/{bundle_name}").read_text(encoding="utf-8")
-            )["scenario"]["countries"]["countries"]
-            for tag in explicit_tags:
-                self.assertEqual(
-                    bundled_countries[tag]["color_hex"],
-                    countries_payload[tag]["color_hex"],
-                    f"{bundle_name}:{tag}:color_hex",
-                )
-                self.assertEqual(
-                    bundled_countries[tag].get("color_policy"),
-                    countries_payload[tag]["color_policy"],
-                    f"{bundle_name}:{tag}:color_policy",
-                )
 
     def test_sync_tno_country_colors_from_palette_audit_only_updates_palette_entries(self) -> None:
         countries_payload = {

@@ -1,20 +1,9 @@
 {
   "_readme": "Tests skipped by tools/run_all_tests.mjs. Every entry needs a reason; remove it once fixed or deleted. PRs also skip the slow lists; the weekly run takes the slow lists (--with-slow) but still honours the quarantine, so it only goes red on new breakage. --all ignores this file for a manual full audit. A key with :: deselects one test.",
-  "node": {
-    "tests/startup_resource_graph_contract.test.mjs": "Defaults to the stale tracked dist/ manifest when no fresh Pages artifact is supplied."
-  },
+  "node": {},
   "python": {
     "tests/test_source_ledger_contract.py::SourceLedgerContractTest::test_checked_in_source_ledger_entries_keep_required_checker_fields": "data/source_ledger.json:482 起六个条目缺少 provenance_sidecar；仓库和生成器均无符合 tools/check_source_ledger.py:97-105 哈希契约的 sidecar，不可编造路径。",
-    "tests/test_tno_eastern_precision_sources.py::test_eastern_precision_sources": "CI 缺少输入源 data/geoBoundaries-UKR-ADM2.geojson，tools/prepare_tno_eastern_precision_sources.py:314-316 的输入存在性检查抛出 FileNotFoundError；需提供可复现的源数据准备步骤或改用合成输入。",
-    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_checked_in_tno_runtime_topology_has_clean_polar_features": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_current_tno_explicit_country_colors_are_locked_and_bundled": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_tno_runtime_country_colors_follow_mixed_palette_policy": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_tno_water_geometries.py::test_problematic_pacific_open_oceans_are_pruned_to_large_components": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_tno_water_geometries.py::test_tno_tracked_neighbor_pairs_do_not_leave_gaps": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_tno_water_geometries.py::TnoWaterRecentRefinementContractTest::test_tracked_neighbor_pairs_do_not_leave_gaps": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_blank_base_rebuild.py::CheckedInBlankCoverageTest::test_blank_preserves_modern_geometry_and_adds_only_verified_source_land": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_corrected_country_color_mappings_survive_manual_override_and_palette_sync": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift.",
-    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_second_wave_color_sources_match_expected_targets": "Pins a data snapshot that later content batches (#324 gap fill, TNO/HOI4 refinement #350-#359) changed on purpose; slow, so PRs never caught the drift."
+    "tests/test_tno_water_geometries.py::test_tno_tracked_neighbor_pairs_do_not_leave_gaps": "入库 TNO 水域在被跟踪的相邻对之间存在缝隙；可能是真实数据缺陷，尚未判定是修几何还是更新相邻关系。"
   },
   "pythonSlow": {
     "_reason": "Each takes more than about 10 s on a fast workstation (roughly 2x on a 4-core CI runner); the weekly run takes them.",

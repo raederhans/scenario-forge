@@ -12,7 +12,6 @@ import {
 import {
   buildDetailAdmBorderMesh as buildDetailAdmBorderMeshRuntime,
   buildDynamicBorderHash,
-  getDynamicBorderOwnershipContext,
   simplifyCoastlineMesh as simplifyCoastlineMeshRuntime,
 } from "./border_mesh_dynamic_runtime.js";
 import {
@@ -208,16 +207,6 @@ export function createBorderMeshOwner({
       enabled,
     });
     return enabled;
-  }
-
-  function getFrontlineMesh() {
-    patchBorderMeshCacheState(state, { cachedFrontlineMesh: null });
-    patchBorderMeshCacheState(state, { cachedFrontlineMeshHash: "" });
-    return null;
-  }
-
-  function getFrontlineOwnershipContext() {
-    return getDynamicBorderOwnershipContext(state);
   }
 
   const buildDetailAdmBorderMesh = (topology, includedCountries) =>
@@ -445,8 +434,6 @@ export function createBorderMeshOwner({
     reconcileDetailAdmBorders,
     rebuildDynamicBorders,
     refreshScenarioOpeningOwnerBorders,
-    getFrontlineOwnershipContext,
-    getFrontlineMesh,
     buildDetailAdmBorderMesh,
     getSourceCountrySets,
     prepareSourceCountrySets,

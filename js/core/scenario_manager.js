@@ -376,19 +376,6 @@ function normalizeScenarioFeatureCollection(payload) {
   };
 }
 
-function setScenarioViewMode(
-  viewMode,
-  {
-    renderNow = true,
-    markDirtyReason = "",
-  } = {}
-) {
-  void viewMode;
-  void renderNow;
-  void markDirtyReason;
-  return false;
-}
-
 async function prepareScenarioDetailTopologyState({
   targetState = runtimeState,
   loadDetailBundle = loadDeferredDetailBundle,
@@ -1542,5 +1529,4 @@ export {
   normalizeScenarioId,
   prepareScenarioDetailTopologyState,
   resetToScenarioBaseline,
-  setScenarioViewMode,
 };

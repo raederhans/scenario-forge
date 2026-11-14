@@ -1,5 +1,4 @@
 import test from "node:test";
-import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import {
   createPopulationHeatmapRenderOwner, rasterizePopulationDensity, getPopulationViewportDetailTileIds,
@@ -156,20 +155,4 @@ test("detail refinement selection uses projected viewport locations and caps dow
   assert.deepEqual(getPopulationViewportDetailTileIds(state, { projection }), []);
   state.zoomTransform.k = 4;
   assert.deepEqual(getPopulationViewportDetailTileIds(state, { projection: { invert: () => [Infinity, 0] } }), []);
-});
-
-
-test("current renderer river partition painting and hit routing yield to active thematic or population views", () => {
-  const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const body = source.match(/function hasVisibleRiverPartitions\(\) \{([\s\S]*?)\n\}/)?.[1];
-  const enabled = source.match(/const getRiverPaintRenderOwner = lazyOwner\([\s\S]*?isEnabled: \(\) => ([^\n]+),/)?.[1];
-  const state = { strategicChoroplethMetric: "" };
-  const visible = new Function("runtimeState", "debugMode", "isThematicWgiActive", "isPopulationActive", "getRiverPaintRuntime", body);
-  const paintEnabled = new Function("runtimeState", "debugMode", "isThematicWgiActive", "isPopulationActive", `return ${enabled};`);
-  for (const thematic of [false, true]) for (const population of [false, true]) {
-    const args = [state, "PROD", () => thematic, () => population];
-    assert.equal(visible(...args, () => ({ getActivePack: () => ({}) })), !thematic && !population);
-    assert.equal(paintEnabled(...args), !thematic && !population);
-  }
-  assert.equal(visible(state, "PROD", () => false, () => false, () => ({ getActivePack: () => null })), false);
 });

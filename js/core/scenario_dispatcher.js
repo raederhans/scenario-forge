@@ -3,7 +3,6 @@ import {
   applyScenarioById,
   clearActiveScenario,
   resetToScenarioBaseline,
-  setScenarioViewMode,
 } from "./scenario_manager.js";
 import { flushRenderBoundary, requestRender } from "./render_boundary.js";
 
@@ -52,15 +51,6 @@ export async function applyScenarioByIdCommand(scenarioId, options = {}) {
   const result = await applyScenarioById(normalizedScenarioId, scenarioOptions);
   finalizeRenderMode(renderMode, `scenario-apply:${normalizedScenarioId || "unknown"}`);
   return result;
-}
-
-export function setScenarioViewModeCommand(viewMode, options = {}) {
-  const { renderMode, scenarioOptions } = splitCommandOptions(options);
-  const changed = setScenarioViewMode(viewMode, scenarioOptions);
-  if (changed) {
-    finalizeRenderMode(renderMode, `scenario-view:${String(viewMode || "ownership")}`);
-  }
-  return changed;
 }
 
 export function resetScenarioToBaselineCommand(options = {}) {
