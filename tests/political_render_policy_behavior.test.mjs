@@ -8,8 +8,8 @@ const eligibility = (scenarioId) => getPoliticalIdRasterEligibility({
   requested: true, exporting: false, debugMode: "PROD", firstVisible: true, riverPartitions: 0, scenarioId,
 });
 
-test("TNO and HOI4 scenarios default to the resident GPU raster", () => {
-  for (const scenarioId of ["tno_1962", "hoi4_1936", "hoi4_1939"]) {
+test("built-in scenarios default to the resident GPU raster", () => {
+  for (const scenarioId of ["tno_1962", "hoi4_1936", "hoi4_1939", "modern_world", "blank_base"]) {
     const policy = read(scenarioId);
     assert.equal(policy.mode, "auto", scenarioId);
     assert.equal(policy.effectiveMode, "raster", scenarioId);
@@ -19,8 +19,8 @@ test("TNO and HOI4 scenarios default to the resident GPU raster", () => {
   }
 });
 
-test("other scenarios keep the vector path by default", () => {
-  for (const scenarioId of ["", "modern_world", "blank_base", "unknown_scenario"]) {
+test("unknown scenarios keep the vector path by default", () => {
+  for (const scenarioId of ["", "unknown_scenario"]) {
     const policy = read(scenarioId);
     assert.equal(policy.effectiveMode, "vector", scenarioId);
     assert.equal(policy.requested, false, scenarioId);
