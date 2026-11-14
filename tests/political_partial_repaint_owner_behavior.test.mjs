@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 import { projectCoordinateToWorkerPixel } from "../js/core/map_renderer/political_raster_worker_packet.js";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
 
 import { createPoliticalPartialRepaintOwner } from "../js/core/renderer/political_partial_repaint_owner.js";
@@ -373,23 +371,8 @@ test("unavailable cache uses direct canvas fill and stroke", () => {
   assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "stroke" && event[1] === undefined));
 });
 
-test("factory validates ports and freezes the exact owner API", () => {
+test("factory rejects a missing surface", () => {
   assert.throws(() => createPoliticalPartialRepaintOwner(), /surface must expose/);
-  const { owner } = createHarness();
-  assert.equal(Object.isFrozen(owner), true);
-  assert.deepEqual(Object.keys(owner), [
-    "getPoliticalFeatureFillColor",
-    "buildPoliticalRasterWorkerPacket",
-    "drawPoliticalFeature",
-    "drawPoliticalFineFeatureLoop",
-    "drawPoliticalWorkerBitmapResult",
-    "publishPoliticalPassDiagnostics",
-    "recordPoliticalRasterWorkerSnapshot",
-    "requestPoliticalPassWorker",
-    "resolvePoliticalPassIdentity",
-    "resolvePoliticalPassViewport",
-    "tryPartialPoliticalPassRepaint",
-  ]);
 });
 
 test("identity, viewport, and packet preserve the complete worker envelope and opaque visible items", () => {

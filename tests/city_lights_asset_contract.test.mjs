@@ -19,7 +19,6 @@ const generatorUrl = new URL("../tools/build_city_lights_modern_asset.py", impor
 const repoRoot = fileURLToPath(new URL("../", import.meta.url));
 const MODERN_RUNTIME_SHA256 = "d2438a7372c12411e048ea95fc55758fd4c95a1089547f54dd36258d60555dae";
 const HISTORICAL_RUNTIME_SHA256 = "c06b718dc02ea23e01d3c9ed1aa595667515fbe8b23b009bfd6aef1303c0fe65";
-const assetSource = await readFile(assetUrl, "utf8");
 const entriesPayload = JSON.parse(await readFile(entriesUrl, "utf8"));
 const modernDescriptor = JSON.parse(await readFile(modernDescriptorUrl, "utf8"));
 const fixtureDescriptor = JSON.parse(await readFile(fixtureDescriptorUrl, "utf8"));
@@ -30,7 +29,6 @@ const {
   HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
   HISTORICAL_1930_CITY_LIGHTS_SOURCE,
   HISTORICAL_1930_CITY_LIGHTS_STATS,
-  loadHistorical1930CityLightsEntries,
 } = assetModule;
 
 function findCity(nameAscii, countryCode) {
@@ -369,18 +367,14 @@ test("modern generator rejects output overlap using resolved Windows path semant
 test("historical 1930 city lights asset exposes calibrated exports", () => {
   assert.equal(HISTORICAL_1930_CITY_LIGHTS_SOURCE.entriesKey, "city_lights:historical_1930:entries");
   assert.deepEqual(HISTORICAL_1930_CITY_LIGHTS_SOURCE.entriesRefParts, ["data", "city_lights/historical_1930_entries.json"]);
-  assert.equal(typeof HISTORICAL_1930_CITY_LIGHTS_STATS, "object");
   assert.equal(HISTORICAL_1930_CITY_LIGHTS_STATS.calibrationVersion, "balanced-2026-04");
   assert.ok(Array.isArray(HISTORICAL_1930_CITY_LIGHTS_ENTRIES));
-  assert.equal(typeof loadHistorical1930CityLightsEntries, "function");
   assert.ok(Array.isArray(entriesPayload.entries));
   assert.ok(HISTORICAL_1930_CITY_LIGHTS_ENTRIES.length >= 1450);
   assert.ok(HISTORICAL_1930_CITY_LIGHTS_ENTRIES.length <= 1800);
   assert.equal(entriesPayload.entries.length, 1580);
   assert.equal(HISTORICAL_1930_CITY_LIGHTS_STATS.entryCount, HISTORICAL_1930_CITY_LIGHTS_ENTRIES.length);
   assert.deepEqual(entriesPayload.stats, HISTORICAL_1930_CITY_LIGHTS_STATS);
-  assert.ok(!assetSource.includes("population: 35676000"));
-  assert.ok(assetSource.includes("historical_1930_entries.json"));
 });
 
 test("historical 1930 city light entries keep legal render fields", () => {

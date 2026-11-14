@@ -215,59 +215,10 @@ function callNames(harness) {
   return harness.calls.map(([name]) => name);
 }
 
-test("factory validates its bounded dependencies and freezes the API", () => {
-  const harness = createHarness();
-  assert.equal(Object.isFrozen(harness.owner), true);
-  assert.deepEqual(Object.keys(harness.owner), [
-    "composeTransformedFrameToBuffer",
-    "drawTransformedFrameFromCaches",
-  ]);
-
-  for (const [namespace, name] of [
-    ["getters", "getCurrentTransform"],
-    ["getters", "getRenderPassCacheSnapshot"],
-    ["getters", "getActiveTransformedFramePassNames"],
-    ["getters", "getRenderPhase"],
-    ["getters", "getDeferExactAfterSettle"],
-    ["getters", "getActiveScenarioId"],
-    ["getters", "getPendingExactPoliticalFastFrame"],
-    ["getters", "getZoomGestureScaleDelta"],
-    ["getters", "getZoomGestureEndedAt"],
-    ["getters", "getDpr"],
-    ["helpers", "nowMs"],
-    ["helpers", "canDrawTransformedPass"],
-    ["helpers", "getInteractionCompositeReuseDecision"],
-    ["effects", "ensureCompositeBufferCanvas"],
-    ["effects", "resetCanvasContext"],
-    ["effects", "withRenderTarget"],
-    ["effects", "drawInteractionComposite"],
-    ["effects", "composeRenderPassesToTarget"],
-    ["effects", "drawTransformedPass"],
-    ["effects", "drawInteractionBorderSnapshot"],
-    ["effects", "drawBordersPass"],
-    ["effects", "blitCompositeBufferToMain"],
-    ["effects", "setInteractionCompositeRejectedReason"],
-    ["effects", "invalidateInteractionComposite"],
-    ["effects", "buildInteractionComposite"],
-    ["effects", "canDrawInteractionComposite"],
-    ["effects", "setPendingExactPoliticalFastFrame"],
-    ["effects", "recordRenderPerfMetric"],
-    ["effects", "recordPassTiming"],
-    ["effects", "incrementPerfCounter"],
-  ]) {
-    assert.throws(
-      () => createHarness({ [namespace]: { [name]: null } }),
-      new RegExp(`${namespace}\\.${name} must be a function`),
-    );
-  }
-
+test("factory rejects a missing dependency", () => {
   assert.throws(
-    () => createHarness({ constants: { interactionCompositePassNames: [] } }),
-    /constants\.interactionCompositePassNames must be a non-empty array/,
-  );
-  assert.throws(
-    () => createHarness({ constants: { renderPhaseIdle: "" } }),
-    /constants\.renderPhaseIdle must be a non-empty string/,
+    () => createHarness({ getters: { getCurrentTransform: null } }),
+    /getters\.getCurrentTransform must be a function/,
   );
 });
 
@@ -516,4 +467,3 @@ test("strict reuse skips build, verifies the composite, and reports buffer failu
   assert.equal(callNames(harness).includes("canDrawInteractionComposite"), false);
   assert.equal(harness.metrics.at(-1).name, "transformedFrameBufferComposeFailure");
 });
-

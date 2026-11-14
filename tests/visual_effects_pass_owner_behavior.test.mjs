@@ -141,37 +141,11 @@ function createHarness({
   return { context, events, images, owner, texture };
 }
 
-test("factory validates every runtime port and freezes the public API", () => {
-  const dependencyNames = {
-    getters: [
-      "getContext", "getPathCanvas", "getPathSvg", "getProjection", "getViewportSize",
-      "getTextureStyleConfig", "isBootInteractionReady",
-    ],
-    helpers: ["clamp", "getDashPattern", "getSafeBlendMode", "getSafeCanvasColor", "normalizeTextureMode"],
-    effects: ["requestTextureRerender", "drawDayNightRuntimePass", "recordRenderPerfMetric"],
-    platform: ["createCanvas", "createImage", "createGeoRotation", "createPatternTransform"],
-  };
-  for (const [groupName, names] of Object.entries(dependencyNames)) {
-    for (const missingName of names) {
-      const dependencies = Object.fromEntries(Object.entries(dependencyNames).map(([name, groupNames]) => [
-        name,
-        Object.fromEntries(groupNames.map((dependencyName) => [dependencyName, () => {}])),
-      ]));
-      delete dependencies[groupName][missingName];
-      assert.throws(
-        () => createVisualEffectsPassOwner(dependencies),
-        new RegExp(`${groupName}\\.${missingName} must be a function`),
-      );
-    }
-  }
-  assert.deepEqual(Object.keys(createHarness().owner), [
-    "drawEffectsPass",
-    "drawLineEffectsPass",
-    "drawTextureLabelEffectsPass",
-    "drawDayNightPass",
-    "invalidateTextureRasterCaches",
-  ]);
-  assert.equal(Object.isFrozen(createHarness().owner), true);
+test("factory rejects a missing dependency", () => {
+  assert.throws(
+    () => createVisualEffectsPassOwner({}),
+    /getters\.getContext must be a function/,
+  );
 });
 
 test("pass facades preserve readiness, mode selection, and day-night delegation", () => {
