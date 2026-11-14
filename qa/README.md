@@ -8,10 +8,6 @@ This directory is the project's long-lived QA knowledge base, not a dump for run
   Active and historical execution notes that are still useful as implementation context.
 - `HGO_reference_reports_2026-03-08/`
   Reference handbooks for `historic geographic overhaul` reuse work.
-- `archive/pre_ui_execution/`
-  Archived execution notes from the pre-UI phase.
-- `archive/pre_ui_plans/`
-  Archived planning and diagnostic documents migrated from the legacy `qa_reports/` tree.
 
 ## What Belongs Here
 
