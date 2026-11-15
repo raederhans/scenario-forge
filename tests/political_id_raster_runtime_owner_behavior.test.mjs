@@ -1752,6 +1752,9 @@ test("published and overview palettes replay explicit dirty IDs and fall back to
   const overviewFactory = makeGpuFactory(), primaryFactory = makeGpuFactory();
   const createGpu = options => {
     const gpu = primaryFactory.createGpu(options);
+    // Primary-GPU tile handles, as the real GPU module hands out.
+    const handles = new Map();
+    gpu.getTileHandle = tile => handles.get(tile) || handles.set(tile, { tile }).get(tile);
     gpu.createOverview = ({ tiles, palette, revision }) => {
       const child = overviewFactory.createGpu({ onContextLost() {} });
       child.setPalette(palette, revision); child.setTiles(tiles); return child;
@@ -1769,6 +1772,8 @@ test("published and overview palettes replay explicit dirty IDs and fall back to
   f.owner.draw(); await resolveAll(f); f.owner.draw();
   const gpu = primaryFactory.instances[0], overview = f.owner.getOverviewFrame();
   assert.ok(f.owner.getDirectFrame()); assert.ok(overview);
+  assert.ok(f.owner.getDirectFrame().drawTiles.length > 0, "the published frame carries primary-GPU draw handles");
+  assert.equal(overview.drawTiles, undefined, "the overview GPU draws its own reduced tiles, not the primary frame's handles");
   const rgba = color => [1, 3, 5].map(index => parseInt(color.slice(index, index + 2), 16)).concat(255);
   const assertPalette = bytes => {
     for (const [code, id] of [[1, "a"], [2, "b"], [3, "c"]]) {

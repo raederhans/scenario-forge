@@ -1515,8 +1515,10 @@ export function createPoliticalIdRasterRuntimeOwner({
     if (!reduced) { overviewReason = "cpu-budget"; dropStaleOverview(); return; }
     const overviewGpu = gpu.createOverview({ tiles: reduced.tiles, palette: staged.palette, revision: staged.paletteKey });
     if (!overviewGpu) { overviewReason = "gpu-budget"; dropStaleOverview(); return; }
+    // The overview GPU owns its own reduced tiles: the primary frame's draw handles
+    // are not resident there and must not be inherited.
     overviewFrame = { ...staged.frame, gpu: overviewGpu, plan: reduced.plan, sourceFrame: staged.frame,
-      presentationState: "overview", geometryCurrent: false };
+      drawTiles: undefined, presentationState: "overview", geometryCurrent: false };
     overviewCommitted = staged.committed;
     overviewEntries = staged.entries; overviewPalette = staged.palette.slice(); overviewBaselinePalette = overviewPalette; overviewPaletteKey = staged.paletteKey;
     overviewColorState = staged.colorState;
