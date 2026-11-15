@@ -306,7 +306,8 @@ export function createTnoRasterSceneOwner({
   // being prepared, the same partial composition stays on screen but the call
   // reports false so the caller keeps requesting the exact frame. Hiding here
   // would expose whatever the 2D canvas last painted, typically a startup frame.
-  function present(transform, { refresh = true, allowPartialPasses = false, holdPartialUntilExact = false, navigationSnapshot = null } = {}) {
+  function present(transform, { refresh = true, allowPartialPasses = false, holdPartialUntilExact = false,
+    navigationSnapshot = refresh ? null : h.getNavigationSnapshot?.() } = {}) {
     const partialAllowed = allowPartialPasses || holdPartialUntilExact;
     composedWithOverview = false;
     let uncoveredPass = false;

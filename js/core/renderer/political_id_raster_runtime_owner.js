@@ -728,6 +728,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         task.upload = job;
         navigationUpload = job;
         const tile = cache.peek(descriptor.key);
+        pump();
         const current = () => navigationProducing && navigationUpload === job && job.epoch === epoch
           && gpu === job.gpu && navigationSourceCurrent();
         job.handle = await gpu.prepareTile({ tile, palette: snapshot.palette, signal: job.controller.signal,
@@ -754,7 +755,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     }).finally(() => {
       if (navigationTask === task) navigationTask = null;
       if (navigationUpload === task.upload) navigationUpload = null;
-      if (!task.upload && navigationProducing && navigationUploadAvailable && plan
+      if ((!task.upload || task.upload.handle) && navigationProducing && navigationUploadAvailable && plan
         && plan.tiles.some(tile => cache.peek(tile.key) && !tileRecords.get(tile.key)?.gpuHandle)) scheduleNavigationWork();
     });
   }

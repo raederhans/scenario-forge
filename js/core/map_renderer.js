@@ -3223,6 +3223,7 @@ function getTnoRasterSceneOwner() {
       requestRender: reason => requestRendererRender(reason),
       yieldControl: yieldToMain,
       getDirectFrame: () => politicalIdRasterRuntimeOwner?.getDirectFrame(),
+      getNavigationSnapshot: () => politicalIdRasterRuntimeOwner?.getNavigationSnapshot(),
       getOverviewFrame: () => politicalIdRasterRuntimeOwner?.getOverviewFrame(),
       capturePublishedColorBaseline: options => politicalIdRasterRuntimeOwner?.capturePublishedColorBaseline(options),
       ensurePassCoverage: transform => {
@@ -10640,7 +10641,7 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
   if (!exportRenderInProgress && isTnoRasterSceneSelected()) {
     const scene = getTnoRasterSceneOwner();
     if (scene.preparePublication?.(currentTransform) === false) {
-      scene.present(currentTransform, { refresh: false });
+      scene.present(currentTransform, { refresh: false, holdPartialUntilExact: true });
       return false;
     }
     const staged = politicalIdRasterRuntimeOwner?.getDiagnostics().stagedPending;
@@ -10650,7 +10651,7 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
       if (politicalIdRasterRuntimeOwner.getDiagnostics().stagedRejectionReason === "stale-candidate") {
         queueMicrotask(() => requestRendererRender("scene-candidate-rejected"));
       }
-      tnoRasterSceneOwner?.present(currentTransform, { refresh: false });
+      tnoRasterSceneOwner?.present(currentTransform, { refresh: false, holdPartialUntilExact: true });
       return false;
     }
     if (getTnoRasterSceneOwner().present(currentTransform)) {

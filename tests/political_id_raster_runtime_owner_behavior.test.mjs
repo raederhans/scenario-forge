@@ -44,6 +44,28 @@ function completeNavigationTile(request) {
   request.resolve(tile);
 }
 
+test("continuous input keeps production running while a navigation upload yields", async t => {
+  const f = await navigationFixture(t), gpu = f.owner.getDirectFrame().gpu;
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await waitForNavigation(() => f.requests.some(request => !request.settled));
+  completeNavigationTile(f.requests.find(request => !request.settled));
+  await waitForNavigation(() => gates.length > 0);
+  assert.ok(f.requests.some(request => !request.settled), "worker produces the next tile while upload yields");
+  const uploads = gpu.getStats().tileUploads;
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  completeNavigationTile(f.requests.find(request => !request.settled));
+  await navigationTick();
+  gates.shift()();
+  await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 1);
+  await waitForNavigation(() => gates.length > 0);
+  gates.shift()();
+  await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 2);
+  assert.deepEqual(f.renders, []);
+});
+
 test("navigation admission and upload yield past the input frame and unchanged snapshots reuse their lists", async t => {
   const f = await navigationFixture(t), gpu = f.owner.getDirectFrame().gpu;
   assert.equal(f.owner.getDiagnostics().stageTimingsEnabled, false);
@@ -132,15 +154,20 @@ test("navigation publishes one ready tile while other visible tiles remain pendi
   assert.ok(frame.drawTiles.every(handle => !gpu.hasTileHandle(handle)));
 });
 
-test("waiting for an exact candidate preserves navigation coverage through CPU eviction and private GPU preparation", async t => {
+test("continuous navigation closes visible gaps and preserves coverage through exact and scene preparation", async t => {
   const f = await navigationFixture(t);
   const gpu = f.owner.getDirectFrame().gpu;
+  const publicationGates = [];
   const map = { width: 900, height: 600, style: {}, parentNode: { insertBefore() {} },
     ownerDocument: { createElement: () => ({ style: {}, setAttribute() {}, remove() {} }) } };
   const scene = createTnoRasterSceneOwner({ surface: { getMapCanvas: () => map },
-    helpers: { getActivePassNames: () => ["political"], getDirectFrame: () => f.owner.getDirectFrame(), getDpr: () => 1 },
+    helpers: { getActivePassNames: () => ["political"], getDirectFrame: () => f.owner.getDirectFrame(),
+      getNavigationSnapshot: () => f.owner.getNavigationSnapshot(), getDpr: () => 1,
+      getCurrentTransform: () => f.state.zoomTransform,
+      getPreparationIdentity: () => f.owner.getStagedFrameIdentity() || f.owner.getDirectFrame() },
     createGpu: () => gpu,
     createCompositor: () => ({ isAvailable: () => true, setTextureBudget() {}, dispose() {},
+      prepareLayers: () => new Promise(resolve => publicationGates.push(resolve)), cancelPreparedLayers() {},
       getStats: () => ({}), render: ({ layers, width, height }) => {
         for (const layer of layers) layer.draw({ width, height });
         return true;
@@ -151,6 +178,15 @@ test("waiting for an exact candidate preserves navigation coverage through CPU e
   assert.equal(scene.present(f.state.zoomTransform), true);
   f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
   f.owner.updateNavigationDemand(f.state.zoomTransform);
+  const gaps = [];
+  const sampleCoverage = () => {
+    assert.equal(scene.presentNavigation(f.state.zoomTransform, f.owner.getNavigationSnapshot(),
+      { refresh: false, allowPartialPasses: true }), true);
+    const gap = scene.getDiagnostics().politicalUncoveredRatio;
+    if (gaps.length) assert.ok(gap <= gaps.at(-1), "ready tiles reduce the visible gap on the next input frame");
+    gaps.push(gap);
+  };
+  sampleCoverage();
   for (let i = 0; i < 8; i++) {
     await navigationTick();
     const request = f.requests.find(value => !value.settled);
@@ -159,12 +195,16 @@ test("waiting for an exact candidate preserves navigation coverage through CPU e
       completeNavigationTile(request);
       await waitForNavigation(() => gpu.getStats().tileUploads > uploads);
     }
+    f.state.zoomTransform = { ...f.state.zoomTransform, x: f.state.zoomTransform.x + 1 };
     f.owner.updateNavigationDemand(f.state.zoomTransform);
+    sampleCoverage();
   }
   await navigationTick();
   const navigation = f.owner.getNavigationSnapshot();
   assert.equal(scene.presentNavigation(f.state.zoomTransform, navigation, { refresh: false, allowPartialPasses: true }), true);
   assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+  assert.ok(gaps[0] > 0);
+  assert.equal(gaps.at(-1), 0);
   const retainedHandles = [...navigation.drawTiles];
   const checkWaitingCoverage = () => {
     assert.equal(scene.presentNavigation(f.state.zoomTransform, f.owner.getNavigationSnapshot(),
@@ -173,6 +213,9 @@ test("waiting for an exact candidate preserves navigation coverage through CPU e
     assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
     assert.ok(retainedHandles.every(handle => gpu.hasTileHandle(handle)));
     assert.ok(retainedHandles.every(handle => gpu.releaseTile(handle) === false));
+    assert.equal(scene.present(f.state.zoomTransform, { refresh: false, holdPartialUntilExact: true }), false);
+    assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+    assert.equal(scene.isActive(), true);
   };
   f.cache.clear();
   checkWaitingCoverage();
@@ -195,6 +238,13 @@ test("waiting for an exact candidate preserves navigation coverage through CPU e
   }
   assert.equal(f.owner.getDiagnostics().gpuPreparation.ready, true);
   assert.ok(f.owner.draw().staged);
+  checkWaitingCoverage();
+  assert.equal(scene.preparePublication(f.state.zoomTransform), false);
+  checkWaitingCoverage();
+  assert.equal(scene.getDiagnostics().publicationPending, true);
+  publicationGates.shift()(true);
+  await Promise.resolve();
+  assert.equal(scene.preparePublication(f.state.zoomTransform), true);
   checkWaitingCoverage();
   assert.equal(f.owner.publishDirectFrame(), true);
   assert.equal(f.owner.getNavigationSnapshot(), null);
@@ -234,6 +284,7 @@ test("cross-density settling publishes the new exact frame and final sibling sna
     helpers: {
       getActivePassNames: () => ["political", ...passes.keys()],
       getDirectFrame: () => f.owner.getDirectFrame(), getDpr: () => 1,
+      getNavigationSnapshot: () => f.owner.getNavigationSnapshot(),
       getCurrentTransform: () => f.state.zoomTransform,
       getPreparationIdentity: () => f.owner.getStagedFrameIdentity() || f.owner.getDirectFrame(),
       getPassCanvas: name => passes.get(name).canvas,
