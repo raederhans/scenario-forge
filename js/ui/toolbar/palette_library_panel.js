@@ -581,6 +581,8 @@ function createPaletteLibraryPanelController({
     if (!paletteLibraryList || !runtimeState.paletteLibraryOpen) return;
     paletteLibraryList.style.height = "auto";
     paletteLibraryList.style.maxHeight = "";
+    // 所在页签隐藏时 scrollHeight 为 0，写死 0px 会让切过来后的列表一直不可见；交给 CSS 的 auto + 上限。
+    if (paletteLibraryList.offsetParent === null) return;
     const scrollHeight = Number(paletteLibraryList.scrollHeight || 0);
     const maximumHeight = readPaletteLibraryBlockSize("--palette-library-list-max-block", PALETTE_LIBRARY_HEIGHT_CAP);
     const nextHeight = resolveAdaptivePaletteLibraryHeight(scrollHeight, maximumHeight);
