@@ -4,6 +4,33 @@ import { getMapLabelHierarchy, getCountryLabelOpacity } from "../js/core/rendere
 
 const activeState = { showCityPoints: true, styleConfig: {} };
 
+test("priority retains direction inside the band and switches at its boundaries", () => {
+  for (const initial of [true, false]) {
+    let previous = initial;
+    for (const k of [2.95, 3.05, 2.95, 3.05]) {
+      const hierarchy = getMapLabelHierarchy(k, activeState, previous);
+      assert.equal(hierarchy.preferCountries, initial);
+      const direct = getMapLabelHierarchy(k, activeState);
+      assert.deepEqual(hierarchy, { ...direct, preferCountries: initial });
+      previous = hierarchy.preferCountries;
+    }
+  }
+  assert.equal(getMapLabelHierarchy(3.149, activeState, true).preferCountries, true);
+  assert.equal(getMapLabelHierarchy(3.15, activeState, true).preferCountries, false);
+  assert.equal(getMapLabelHierarchy(2.851, activeState, false).preferCountries, false);
+  assert.equal(getMapLabelHierarchy(2.85, activeState, false).preferCountries, true);
+  for (const k of [0, 1.8, 2.5, 2.84, 3.16, 4, 6, 16]) {
+    for (const previous of [true, false]) {
+      assert.deepEqual(getMapLabelHierarchy(k, activeState, previous), getMapLabelHierarchy(k, activeState));
+    }
+  }
+  assert.equal(getMapLabelHierarchy(2.95, activeState).preferCountries, true);
+  assert.equal(getMapLabelHierarchy(3.05, activeState).preferCountries, false);
+  assert.equal(getMapLabelHierarchy(2.95, {
+    styleConfig: { countryLabels: { enabled: false } },
+  }, true).preferCountries, false);
+});
+
 test("world to local zoom steadily transfers visual priority from countries to city names", () => {
   assert.deepEqual(getMapLabelHierarchy(1, activeState), { cityOpacity: 0, capitalOpacity: 0.5, countryOpacity: 1, preferCountries: true });
   assert.deepEqual(getMapLabelHierarchy(1.8, activeState), getMapLabelHierarchy(1, activeState));

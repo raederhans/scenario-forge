@@ -1,6 +1,6 @@
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 
-export function getMapLabelHierarchy(k, state = {}) {
+export function getMapLabelHierarchy(k, state = {}, previousPreferCountries) {
   const numericScale = Number(k);
   const scale = Number.isFinite(numericScale) ? Math.max(0, numericScale) : 1;
   const countryLabelsEnabled = state.styleConfig?.countryLabels?.enabled !== false;
@@ -14,7 +14,9 @@ export function getMapLabelHierarchy(k, state = {}) {
     cityOpacity: cityTextEnabled ? (countryLabelsEnabled ? cityProgress : 1) : 0,
     capitalOpacity: cityTextEnabled ? (countryLabelsEnabled ? 0.5 + cityProgress * 0.5 : 1) : 0,
     countryOpacity: cityTextEnabled ? 1 - countryProgress : 1,
-    preferCountries: countryLabelsEnabled && scale <= 3,
+    preferCountries: countryLabelsEnabled && (previousPreferCountries === true
+      ? scale < 3.15
+      : previousPreferCountries === false ? scale <= 2.85 : scale <= 3),
   };
 }
 
