@@ -3,6 +3,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 import { openRasterApp, waitRasterStartup, waitRasterView } from "./political_id_raster_app_session.mjs";
+import { scaleRasterViewportBudget, RASTER_BUDGET_MAX_PIXELS } from "../js/core/renderer/political_id_raster_cache.js";
 
 export function readSettledRasterFrame({ zoom, captureReference = false, precise = true, settleOnly = false } = {}) {
   const needPrecise = !captureReference && precise;
@@ -64,6 +65,19 @@ const MAX_CHANGED_PIXEL_RATIO = 0.01;
 const MAX_ZOOM_CHANNEL_ERROR = 2;
 
 // Tolerated differences still print their diagnostics so unexplained mismatches stay visible in CI logs.
+// Raster budgets scale with the viewport up to a 3840x2160 ceiling. Usage must stay
+// inside the budget the runtime reports, and that budget inside the scaled ceiling.
+const RASTER_CPU_BYTES_CEILING = scaleRasterViewportBudget(48 * 1024 * 1024, RASTER_BUDGET_MAX_PIXELS, 1);
+const RASTER_GPU_BYTES_CEILING = scaleRasterViewportBudget(80 * 1024 * 1024, RASTER_BUDGET_MAX_PIXELS, 1);
+function assertWithinRasterBudgets(diagnostics) {
+  const { cpuBytes, gpuBytes } = diagnostics.budgets;
+  assert.ok(cpuBytes <= RASTER_CPU_BYTES_CEILING, `CPU budget ${cpuBytes}`);
+  assert.ok(gpuBytes <= RASTER_GPU_BYTES_CEILING, `GPU budget ${gpuBytes}`);
+  assert.ok(diagnostics.cpuBytes <= cpuBytes, `CPU ${diagnostics.cpuBytes} of ${cpuBytes}`);
+  const gpuUsed = (diagnostics.gpu?.gpuTextureBytes || 0) + (diagnostics.gpu?.outputSurfaceBytesEstimate || 0);
+  assert.ok(gpuUsed <= gpuBytes, `GPU ${gpuUsed} of ${gpuBytes}`);
+}
+
 function assertPixelsClose(changed, total, message, details, maximum = 0, maxChannelError = 255) {
   if (changed) console.warn(JSON.stringify({ rasterPixelMismatch: message, changed, total, details }));
   assert.ok(changed / total <= MAX_CHANGED_PIXEL_RATIO && maximum <= maxChannelError,
@@ -340,7 +354,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
         assert.equal(diagnostics.reason, "view-budget");
         assert.equal(diagnostics.builds, 0);
         assert.equal(session.network.length, 0, "a rejected pixel plan must not download raster coverage");
-        assert.ok(diagnostics.cpuBytes <= 48 * 1024 * 1024); assert.equal(diagnostics.assetHits, 0);
+        assertWithinRasterBudgets(diagnostics); assert.equal(diagnostics.assetHits, 0);
       } else if (requirePrebuiltAssets) assert.ok(diagnostics.assetHits > 0, "must use pregenerated coverage");
       else assert.ok(diagnostics.assetHits + diagnostics.builds > 0, "the viewport must have validated asset or Worker coverage");
       assert.equal(diagnostics.failed, ""); assert.equal(diagnostics.assetError, "");
@@ -457,9 +471,8 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     });
     assert.ok(storage.bytes <= 64 * 1024 * 1024);
     for (const d of [...report.views.map(view => view.diagnostics), diagnostics]) {
-      assert.ok(d.cpuBytes <= 48 * 1024 * 1024);
+      assertWithinRasterBudgets(d);
       assert.ok(d.assets.memoryBytes <= d.assets.memoryMaxBytes);
-      assert.ok((d.gpu?.gpuTextureBytes || 0) + (d.gpu?.outputSurfaceBytesEstimate || 0) <= 80 * 1024 * 1024);
     }
     assert.deepEqual(session.errors, []);
     return { diagnostics, storage };
