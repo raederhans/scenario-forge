@@ -13,6 +13,7 @@ import { yieldToBackground } from "../background_yield.js";
 const GPU_LIMIT = 80 * 1024 * 1024;
 const GPU_HARD_LIMIT = scaleRasterViewportBudget(GPU_LIMIT, RASTER_BUDGET_MAX_PIXELS, 1);
 const MAX_COLOR_DELTAS = 32;
+const TILE_EVENT_LIMIT = 256;
 const NO_ENTRIES = Object.freeze([]);
 const projectionMethods = ["scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY", "precision", "clipAngle", "clipExtent"];
 
@@ -46,6 +47,12 @@ export function createPoliticalIdRasterRuntimeOwner({
   const displayCache = !directPresentation && persistent && new URLSearchParams(globalThis.location?.search || "").get("political_raster_present") !== "full"
     ? createDisplayCache() : null;
   let tileDependencies = new WeakMap(), lastTiming = null;
+  let tileEventsEnabled = false, nextTileEventId = 0, tileEventIds = new WeakMap();
+  const tileEvents = new Map();
+  function recordTileUpload(tile, uploadSubmittedAt) {
+    const event = tileEvents.get(tileEventIds.get(tile));
+    if (event && event.uploadSubmittedAt === null) event.uploadSubmittedAt = uploadSubmittedAt;
+  }
   const worker = client || createPoliticalIdRasterWorkerClient();
   if (assetStore === undefined) assetStore = globalThis.indexedDB
     ? worker.assetStore || createPoliticalIdRasterAssetStore() : null;
@@ -297,6 +304,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const startedAt = performance.now();
       gpuPreparationStats.started++; gpuPreparationStats.lastPath = "preparing";
       job.promise = gpu.prepareFrame({ tiles, palette: snapshot.palette, signal: job.controller.signal,
+        onTileUploadSubmitted: tileEventsEnabled ? recordTileUpload : undefined,
         isCurrent: () => gpuCandidateCurrent(job), onProgress: account,
         ...(h.yieldGpuPreparation ? { yieldTask: h.yieldGpuPreparation } : {}),
       }).then(handle => {
@@ -518,7 +526,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         if (!directPresentation) {
           const retained = new Set(cache.entries().map(([, tile]) => tile));
           gpuTiles = gpuTiles.filter(tile => retained.has(tile));
-          if (gpu?.isAvailable()) gpu.setTiles(gpuTiles);
+          if (gpu?.isAvailable()) gpu.setTiles(gpuTiles, tileEventsEnabled ? recordTileUpload : undefined);
         }
       }
       if (changedNamespace || next.geometryRevision !== snapshot?.geometryRevision) {
@@ -789,6 +797,12 @@ export function createPoliticalIdRasterRuntimeOwner({
     attempted.add(descriptor.key);
     const controller = new AbortController();
     const task = { controller, epoch, descriptor, existingTile };
+    if (tileEventsEnabled) {
+      task.tileEventId = ++nextTileEventId;
+      tileEvents.set(task.tileEventId, { id: task.tileEventId, ...descriptor, namespace, epoch,
+        requestedAt: performance.now(), cpuReadyAt: null, uploadSubmittedAt: null });
+      if (tileEvents.size > TILE_EVENT_LIMIT) tileEvents.delete(tileEvents.keys().next().value);
+    }
     const entries = snapshot.entries.filter(entry => intersectsTile(entry.bounds, descriptor, 4 + state.dpr))
       .map(entry => ({ ...entry, strokeCode: h.hasStroke?.(entry.feature) === false ? 0 : entry.code }));
     // Bound D3's resampling error in physical raster pixels at every LOD.
@@ -814,7 +828,12 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (!matchesTileRegion(tile, descriptor)) {
         throw new Error("Political ID tile response does not match its requested region.");
       }
-      cache.set(descriptor.key, tile, descriptor);
+      const cached = cache.set(descriptor.key, tile, descriptor);
+      const event = tileEvents.get(task.tileEventId);
+      if (cached && event) {
+        event.cpuReadyAt = performance.now();
+        tileEventIds.set(tile, task.tileEventId);
+      }
       // Conservative contributor set from the validated build/asset identity.
       // It includes fill and stroke contributors, never a second ID namespace.
       if (displayCache) tileDependencies.set(tile, Uint32Array.from(entries, entry => entry.code));
@@ -957,7 +976,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const paletteKey = `${namespace}:${snapshot.paletteRevision}`;
       if (!directPresentation) gpu.setPalette(snapshot.palette, paletteKey);
       const paletteDoneAt = performance.now();
-      if (!directPresentation) gpu.setTiles(tiles);
+      if (!directPresentation) gpu.setTiles(tiles, tileEventsEnabled ? recordTileUpload : undefined);
       // Shared GPU residents keep lightweight descriptors; the bounded CPU LRU
       // alone owns direct tile payloads while a new candidate is prepared.
       gpuTiles = directPresentation ? [] : tiles;
@@ -1047,13 +1066,14 @@ export function createPoliticalIdRasterRuntimeOwner({
         frameTiming = gpuPreparation.handle.commit({ palette: staged.palette, revision: staged.paletteKey });
         gpuPreparation = null; gpuPreparationStats.committed++; gpuPreparationStats.lastPath = "asynchronous-committed";
       } else if (gpu.setFrame) {
-        frameTiming = gpu.setFrame({ tiles: staged.tiles, palette: staged.palette, revision: staged.paletteKey });
+        frameTiming = gpu.setFrame({ tiles: staged.tiles, palette: staged.palette, revision: staged.paletteKey,
+          onTileUploadSubmitted: tileEventsEnabled ? recordTileUpload : undefined });
       } else {
         if (gpu.canSetFrame && !gpu.canSetFrame({ tiles: staged.tiles, palette: staged.palette })) return reject("gpu-budget");
         const plannedAt = performance.now();
         gpu.setPalette(staged.palette, staged.paletteKey);
         const paletteDoneAt = performance.now();
-        gpu.setTiles(staged.tiles);
+        gpu.setTiles(staged.tiles, tileEventsEnabled ? recordTileUpload : undefined);
         frameTiming = { planningMs: plannedAt - startedAt, paletteUploadMs: paletteDoneAt - plannedAt,
           tileBindingMs: performance.now() - paletteDoneAt };
       }
@@ -1378,7 +1398,13 @@ export function createPoliticalIdRasterRuntimeOwner({
       } catch (error) { failProducer(error); return false; }
     },
     getPendingWorkCount: () => Number(!!active) + Number(!!sourcePreparation) + Number(gpuPreparation?.status === "pending"),
-    getDiagnostics: () => ({ displayMode, persistent, directPresentation, ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
+    getDiagnostics: ({ tileEvents: enabled } = {}) => {
+      if (enabled !== undefined) {
+        tileEventsEnabled = enabled;
+        if (!enabled) { tileEvents.clear(); tileEventIds = new WeakMap(); }
+      }
+      return { displayMode, persistent, directPresentation, ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
+      tileEventsEnabled, tileEventLimit: TILE_EVENT_LIMIT, tileEvents: [...tileEvents.values()].map(event => ({ ...event })),
       worker: worker.getStats?.() || null,
       pending: Number(!!active) + Number(!!sourcePreparation) + Number(gpuPreparation?.status === "pending"),
       gpuPreparation: { ...gpuPreparationStats, pending: gpuPreparation?.status === "pending", ready: gpuPreparation?.status === "ready" },
@@ -1406,7 +1432,8 @@ export function createPoliticalIdRasterRuntimeOwner({
         scheduled: assetRecoveryTimer !== null, coveredProbes: coveredAssetProbes,
         retryInMs: Math.max(0, nextAssetProbeAt - performance.now()) },
       pathCacheEstimatedBytes, canonicalCoordinates: !!coordinates, gutter,
-      accounting: "typed-array-texture-and-surface-estimates-excludes-JS-and-driver" }),
+      accounting: "typed-array-texture-and-surface-estimates-excludes-JS-and-driver" };
+    },
     loseContextForValidation: () => gpu?.loseContextForValidation(),
     dispose() {
       if (disposed) return;
@@ -1425,6 +1452,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       displayCache?.dispose();
       tileDependencies = new WeakMap();
       tileIdentities = new WeakMap();
+      tileEvents.clear(); tileEventIds = new WeakMap();
       committedPlan = null;
       renderedCoverage = null;
       snapshot = null; sourceGeneration++; colorDeltas = [];

@@ -275,7 +275,7 @@ export function createPoliticalIdRasterGpu({
         resident.delete(token);
       }
     }
-    function uploadTile({ tile, existing, upload, neighbors, shape, bytes }) {
+    function uploadTile({ tile, existing, upload, neighbors, shape, bytes }, onTileUploadSubmitted) {
       if (existing) return existing;
       const ids = new Uint32Array(shape.width * shape.height), weights = new Float32Array(ids.length);
       ids.set(upload.edgeIds); weights.set(upload.edgeWeights);
@@ -288,23 +288,24 @@ export function createPoliticalIdRasterGpu({
         const resource = { textures: allocated, neighbors, edgeWidth: shape.width, bytes,
           originX: tile.originX || 0, originY: tile.originY || 0, width: tile.width, height: tile.height };
         tileUploads++;
+        onTileUploadSubmitted?.(tile, performance.now());
         return resource;
       } catch (error) {
         for (const handle of allocated) removeTexture(handle);
         throw error;
       }
     }
-    function uploadTiles(plans) {
-      for (const plan of plans) if (!plan.existing) resident.set(plan.token, uploadTile(plan));
+    function uploadTiles(plans, onTileUploadSubmitted) {
+      for (const plan of plans) if (!plan.existing) resident.set(plan.token, uploadTile(plan, onTileUploadSubmitted));
     }
-    function setTiles(tiles) {
+    function setTiles(tiles, onTileUploadSubmitted) {
       cancelPendingFrame();
       const plans = planTiles(tiles);
       checkTileBudget(plans);
       releaseReplacedTiles(plans);
-      uploadTiles(plans);
+      uploadTiles(plans, onTileUploadSubmitted);
     }
-    function setFrame({ tiles, palette, revision }) {
+    function setFrame({ tiles, palette, revision, onTileUploadSubmitted }) {
       assertAvailable();
       cancelPendingFrame();
       if (!(palette instanceof Uint8Array) || palette.length % 4 || palette.length < 4) {
@@ -323,11 +324,11 @@ export function createPoliticalIdRasterGpu({
       releaseReplacedTiles(plans);
       setPalette(palette, revision);
       const paletteAt = performance.now();
-      uploadTiles(plans);
+      uploadTiles(plans, onTileUploadSubmitted);
       return { planningMs: plannedAt - startedAt, paletteUploadMs: paletteAt - plannedAt,
         tileBindingMs: performance.now() - paletteAt };
     }
-    async function prepareFrame({ tiles, palette, signal, isCurrent = () => true, onProgress = () => {},
+    async function prepareFrame({ tiles, palette, signal, isCurrent = () => true, onProgress = () => {}, onTileUploadSubmitted,
       yieldTask = () => new Promise(resolve => setTimeout(resolve, 0)) }) {
       assertAvailable();
       if (!(palette instanceof Uint8Array) || palette.length < 4 || palette.length % 4) throw new TypeError("Palette must contain packed RGBA bytes.");
@@ -366,7 +367,7 @@ export function createPoliticalIdRasterGpu({
             preparedFrameBudgetRejects++;
             return null;
           }
-          const resource = uploadTile(plan);
+          const resource = uploadTile(plan, onTileUploadSubmitted);
           if (!plan.existing) { job.created.add(resource); job.bytes += resource.bytes; preparedFrameUploads++; stats.uploadedTiles++; }
           job.tiles.set(plan.token, resource);
           onProgress();

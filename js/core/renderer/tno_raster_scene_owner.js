@@ -1,6 +1,7 @@
 import { createGpuSceneCompositor } from "./gpu_scene_compositor.js";
 import { scaleRasterViewportBudget, RASTER_BUDGET_MAX_PIXELS } from "./political_id_raster_cache.js";
 import { createPoliticalIdRasterGpu } from "./political_id_raster_gpu.js";
+import { getUncoveredRectangles, getUncoveredRatio } from "./political_id_raster_coverage.js";
 
 const POLITICAL_TEXTURE_LIMIT = 80 * 1024 * 1024;
 const SCENE_TEXTURE_LIMIT = 160 * 1024 * 1024;
@@ -21,6 +22,7 @@ export function createTnoRasterSceneOwner({
   let colorBaselineFrame = null, composedWithOverview = false, partialPasses = false;
   let lastPresentationState = "unavailable";
   let publicationPreparation = null, preparationError = "";
+  let politicalUncoveredRatio = null, passUncoveredRatios = {}, sceneIncompleteRatio = null;
 
   function cancelPublicationPreparation() {
     publicationPreparation = null;
@@ -222,6 +224,59 @@ export function createTnoRasterSceneOwner({
         && background.x + background.width >= rect.x + rect.width - 1e-6
         && background.y + background.height >= rect.y + rect.height - 1e-6));
   }
+  function measureCoverage(frame, passes, names, transform, dpr, clip) {
+    const viewport = { x: 0, y: 0, width: mapCanvas.width, height: mapCanvas.height };
+    const regions = new Map(names.map(name => [name, []]));
+    function addScene(sceneFrame, scenePasses, sceneNames, sceneClip) {
+      function add(name, rect) {
+        if (!regions.has(name)) return;
+        if (sceneClip) {
+          const right = Math.min(rect.x + rect.width, Math.ceil(sceneClip.x + sceneClip.width));
+          const bottom = Math.min(rect.y + rect.height, Math.ceil(sceneClip.y + sceneClip.height));
+          rect.x = Math.max(rect.x, Math.floor(sceneClip.x));
+          rect.y = Math.max(rect.y, Math.floor(sceneClip.y));
+          rect.width = Math.max(0, right - rect.x); rect.height = Math.max(0, bottom - rect.y);
+        }
+        regions.get(name).push(rect);
+      }
+      for (const name of sceneNames) {
+        if (name === "political") {
+          const plan = sceneFrame.plan, ratio = transform.k / sceneFrame.transform.k;
+          const scale = plan.scale * ratio;
+          const x = (plan.outputX - plan.originX * plan.scale - (sceneFrame.layout.offsetX || 0) * dpr) * ratio
+            + (transform.x - sceneFrame.transform.x * ratio) * dpr;
+          const y = (plan.outputY - plan.originY * plan.scale - (sceneFrame.layout.offsetY || 0) * dpr) * ratio
+            + (transform.y - sceneFrame.transform.y * ratio) * dpr;
+          for (const tile of plan.tiles || []) add(name, {
+            x: tile.originX * scale + x, y: tile.originY * scale + y,
+            width: tile.width * scale, height: tile.height * scale,
+          });
+        } else {
+          const pass = scenePasses.get(name);
+          // A pass without a retained snapshot contributes no coverage.
+          if (!pass) continue;
+          const scale = transform.k / pass.reference.k;
+          add(name, {
+            x: (transform.x - (pass.reference.x + (pass.layout.offsetX || 0)) * scale) * dpr,
+            y: (transform.y - (pass.reference.y + (pass.layout.offsetY || 0)) * scale) * dpr,
+            width: pass.width * scale, height: pass.height * scale,
+          });
+        }
+      }
+    }
+    if (composedWithOverview) addScene(overview.frame, overview.passes, overview.names);
+    addScene(frame, passes, names, clip);
+    const missing = [];
+    const ratios = {};
+    for (const [name, rectangles] of regions) {
+      const gaps = getUncoveredRectangles(rectangles, viewport);
+      ratios[name] = gaps.reduce((sum, rect) => sum + rect.width * rect.height, 0) / (viewport.width * viewport.height);
+      missing.push(...gaps);
+    }
+    politicalUncoveredRatio = ratios.political;
+    passUncoveredRatios = ratios;
+    sceneIncompleteRatio = 1 - getUncoveredRatio(missing, viewport);
+  }
   // allowPartialPasses: while the view moves, a retained pass texture that no
   // longer covers the viewport is composed over its painted extent and the
   // uncovered edge stays empty until the exact frame after the gesture.
@@ -384,6 +439,7 @@ export function createTnoRasterSceneOwner({
       fallbackReason = "";
       view = { x: transform.x, y: transform.y, k: transform.k, dpr, width, height };
       account();
+      measureCoverage(frame, passSnapshots, names, transform, dpr, clip);
       return !(uncoveredPass && !allowPartialPasses);
     } catch (error) {
       cancelPublicationPreparation();
@@ -423,6 +479,7 @@ export function createTnoRasterSceneOwner({
       presentationState: active ? lastPresentationState : "unavailable",
       publishedEpoch: published?.frame?.epoch ?? null, publications, retainedFrames,
       usingOverview, composedWithOverview, partialPasses, overviewReady: !!overview,
+      politicalUncoveredRatio, passUncoveredRatios: { ...passUncoveredRatios }, sceneIncompleteRatio,
       publicationPending: ["pending", "ready"].includes(publicationPreparation?.status), preparationError,
       preparedPassCount: stats.preparedPassCount || 0, preparedBytes: stats.preparedBytes || 0,
       privateTextureBytes: stats.privateTextureBytes || 0, maxUploadTaskMs: stats.maxUploadTaskMs || 0,
