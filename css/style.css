@@ -3135,7 +3135,10 @@ body.frontline-mode-active:not(.strategic-workspace-open) .strategic-command-bar
   position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
   flex: 1 1 240px;
 }
 
@@ -3145,10 +3148,10 @@ body.frontline-mode-active:not(.strategic-workspace-open) .strategic-command-bar
 }
 
 .country-group-system-toggle .frontline-segmented-choice {
-  height: 32px;
-  min-height: 32px;
-  padding: 0 6px;
-  line-height: 14px;
+  height: var(--control-compact);
+  min-height: var(--control-compact);
+  padding: 0 var(--space-2);
+  line-height: var(--type-control-leading);
   white-space: normal;
 }
 
@@ -3162,24 +3165,27 @@ body.frontline-mode-active:not(.strategic-workspace-open) .strategic-command-bar
 }
 
 .frontline-segmented-choice {
-  min-height: 38px;
+  min-height: var(--control-compact);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--line-1);
-  background:
-    linear-gradient(180deg, var(--surface-panel), rgba(237, 232, 221, 0.96));
-  color: var(--ink-900);
-  font-size: var(--fs-xs);
-  font-weight: 700;
+  border: 0;
+  background: transparent;
+  color: var(--ink-500);
+  font-size: var(--type-control);
+  font-weight: var(--type-control-weight);
   letter-spacing: 0;
   text-transform: none;
+  box-shadow: none;
+}
+
+.frontline-segmented-choice:hover:not(:disabled) {
+  background: var(--surface-raised);
 }
 
 .frontline-segmented-choice.is-active {
-  border-color: rgba(127, 29, 29, 0.32);
-  background:
-    linear-gradient(180deg, rgba(77, 27, 20, 0.94), rgba(57, 24, 19, 0.94));
-  color: #f6f0e5;
-  box-shadow: var(--shadow-1);
+  background: var(--surface-raised);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: none;
 }
 
 .frontline-segmented-choice:disabled {
@@ -13024,7 +13030,7 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
 :where(.editor-project-bar button:is([aria-pressed="true"], [aria-expanded="true"])) { background: var(--accent-soft); color: var(--accent); }
 :where(.editor-project-bar #workspaceSaveBtn) { background: var(--accent); color: var(--surface-raised); }
 :where(.editor-project-bar #workspaceSaveBtn:hover) { background: var(--accent-hover); }
-:where(.zoom-controls button, .bottom-dock button:not(.color-swatch), .scenario-context-bar button, .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn, .scenario-context-action-btn):not(:where(.editor-project-bar *)) {
+:where(.zoom-controls button, .bottom-dock button:not(.color-swatch):not(.dock-segment-btn), .scenario-context-bar button, .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn, .scenario-context-action-btn):not(:where(.editor-project-bar *)) {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -13042,7 +13048,7 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   box-shadow: none;
   cursor: pointer;
 }
-:where(.zoom-controls button, .bottom-dock button:not(.color-swatch), .scenario-context-bar button, .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn, .scenario-context-action-btn):where(:hover:not(:disabled):not([aria-disabled="true"])):not(:where(.editor-project-bar *)) {
+:where(.zoom-controls button, .bottom-dock button:not(.color-swatch):not(.dock-segment-btn), .scenario-context-bar button, .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn, .scenario-context-action-btn):where(:hover:not(:disabled):not([aria-disabled="true"])):not(:where(.editor-project-bar *)) {
   background: var(--surface-raised);
   border-color: var(--line-2);
   box-shadow: none;
