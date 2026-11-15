@@ -301,11 +301,22 @@ function buildContextFacilityEntries(
       reason: !projection ? "no-projection" : "no-data",
     };
   }
-  const targetCanvas = context?.canvas || null;
-  const viewportWidth = Number(targetCanvas?.width || 0);
-  const viewportHeight = Number(targetCanvas?.height || 0);
   const zoomTransform = getCurrentZoomTransform();
   const padding = 36;
+  // The target context maps projected coordinates to device pixels, including
+  // the device pixel ratio and the pass canvas's overscan offset. Clip against
+  // what that canvas actually paints instead of assuming it equals the viewport.
+  const targetCanvas = context?.canvas || null;
+  const matrix = typeof context?.getTransform === "function" ? context.getTransform() : null;
+  const clip = targetCanvas?.width > 0 && targetCanvas?.height > 0
+    && matrix && matrix.a > 0 && matrix.d > 0 && !matrix.b && !matrix.c
+    ? {
+      minX: (-matrix.e) / matrix.a - padding / zoomTransform.k,
+      maxX: (targetCanvas.width - matrix.e) / matrix.a + padding / zoomTransform.k,
+      minY: (-matrix.f) / matrix.d - padding / zoomTransform.k,
+      maxY: (targetCanvas.height - matrix.f) / matrix.d + padding / zoomTransform.k,
+    }
+    : null;
   const entries = [];
   // 这里先在世界坐标下收集候选，再补齐 screen 坐标与 stableSortKey。
   // 后面的 density、hover、label 都共享这份 entry，避免不同 pass 各自做一套筛选。
@@ -322,13 +333,7 @@ function buildContextFacilityEntries(
     const y = projected[1];
     const screenX = (x * zoomTransform.k) + zoomTransform.x;
     const screenY = (y * zoomTransform.k) + zoomTransform.y;
-    if (
-      viewportWidth > 0
-      && viewportHeight > 0
-      && (screenX < -padding || screenX > viewportWidth + padding || screenY < -padding || screenY > viewportHeight + padding)
-    ) {
-      return;
-    }
+    if (clip && (x < clip.minX || x > clip.maxX || y < clip.minY || y > clip.maxY)) return;
     entries.push({
       x,
       y,
