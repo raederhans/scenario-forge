@@ -1,3 +1,45 @@
+export function buildTransportLineViewportIndex(features, getBounds) {
+  const cellSize = 128;
+  const cells = new Map();
+  const bounds = features.map(getBounds);
+  let minCellX = Infinity;
+  let minCellY = Infinity;
+  let maxCellX = -Infinity;
+  let maxCellY = -Infinity;
+  bounds.forEach(([[minX, minY], [maxX, maxY]], index) => {
+    const left = Math.floor(minX / cellSize);
+    const right = Math.floor(maxX / cellSize);
+    const top = Math.floor(minY / cellSize);
+    const bottom = Math.floor(maxY / cellSize);
+    minCellX = Math.min(minCellX, left);
+    maxCellX = Math.max(maxCellX, right);
+    minCellY = Math.min(minCellY, top);
+    maxCellY = Math.max(maxCellY, bottom);
+    for (let x = left; x <= right; x += 1) {
+      for (let y = top; y <= bottom; y += 1) {
+        const key = `${x},${y}`;
+        if (!cells.has(key)) cells.set(key, []);
+        cells.get(key).push(index);
+      }
+    }
+  });
+  return {
+    query({ minX, minY, maxX, maxY }) {
+      const visited = new Set();
+      for (let x = Math.max(minCellX, Math.floor(minX / cellSize)); x <= Math.min(maxCellX, Math.floor(maxX / cellSize)); x += 1) {
+        for (let y = Math.max(minCellY, Math.floor(minY / cellSize)); y <= Math.min(maxCellY, Math.floor(maxY / cellSize)); y += 1) {
+          for (const index of cells.get(`${x},${y}`) || []) visited.add(index);
+        }
+      }
+      const indices = [...visited].filter((index) => {
+        const [[left, top], [right, bottom]] = bounds[index];
+        return left <= maxX && right >= minX && top <= maxY && bottom >= minY;
+      }).sort((left, right) => left - right);
+      return { features: indices.map((index) => features[index]), visitedFeatureCount: visited.size };
+    },
+  };
+}
+
 export function getTransportLineLabelGridSize(labelDensity) {
   switch (String(labelDensity || "").trim().toLowerCase()) {
     case "dense":
