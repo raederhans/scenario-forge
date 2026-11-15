@@ -31,6 +31,15 @@ test("tile records progress without retaining payloads or changing identity for 
   const requested = f.owner.getDiagnostics().tileRecords;
   assert.ok(requested.length > 0);
   assert.ok(requested.every(record => record.state === "requested"));
+  for (const record of requested) {
+    assert.deepEqual(record.storageRect, { minX: record.coreRect.minX - 1, minY: record.coreRect.minY - 1,
+      maxX: record.coreRect.maxX + 1, maxY: record.coreRect.maxY + 1 });
+    assert.match(record.sourceStamp.rasterizationVariant, /^halo-1-v1:/);
+  }
+  const packet = f.requests[0].packet;
+  assert.equal(packet.width, 514); assert.equal(packet.height, 514);
+  assert.equal(packet.originX, packet.storageRect.minX);
+  assert.equal(packet.originY, packet.storageRect.minY);
   for (let guard = 0; guard < 100; guard++) {
     const request = f.requests.find(value => !value.settled);
     if (!request) break;

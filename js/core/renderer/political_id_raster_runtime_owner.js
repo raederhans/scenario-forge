@@ -18,6 +18,11 @@ const NO_ENTRIES = Object.freeze([]);
 const projectionMethods = ["scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY", "precision", "clipAngle", "clipExtent"];
 
 function matchesTileRegion(tile, descriptor) {
+  if (descriptor.storageRect) {
+    const { minX, minY, maxX, maxY } = descriptor.storageRect;
+    return !!tile && tile.originX === minX && tile.originY === minY
+      && tile.width === maxX - minX && tile.height === maxY - minY;
+  }
   return !!tile && tile.width === descriptor.width && tile.height === descriptor.height
     && tile.originX === descriptor.originX && tile.originY === descriptor.originY;
 }
@@ -223,14 +228,14 @@ export function createPoliticalIdRasterRuntimeOwner({
     if (!snapshot || !plan || disposed) { tileRecords.clear(); return; }
     const sourceStamp = { namespace, geometryEpoch: epoch, mappingRevision: snapshot.mappingRevision,
       projectionSignature: coordinates?.signature || fittedProjectionKey, dpr: state.dpr,
-      rasterizationVariant: `core-v1:gutter=${gutter}:stroke=${0.75 * state.dpr}` };
+      rasterizationVariant: `${directPresentation ? "halo-1-v1" : "core-v1"}:gutter=${gutter}:stroke=${0.75 * state.dpr}` };
     const stampKey = JSON.stringify(sourceStamp);
     if (tileRecordStampKey !== stampKey) { tileRecords.clear(); tileRecordStampKey = stampKey; }
     for (const descriptor of plan.tiles) {
       if (tileRecords.has(descriptor.key)) continue;
       const { key, level, density, originX, originY, width, height } = descriptor;
       const coreRect = { minX: originX, minY: originY, maxX: originX + width, maxY: originY + height };
-      tileRecords.set(key, { key, sourceStamp, level, density, coreRect, storageRect: { ...coreRect },
+      tileRecords.set(key, { key, sourceStamp, level, density, coreRect, storageRect: { ...(descriptor.storageRect || coreRect) },
         worldRect: { minX: originX / density, minY: originY / density,
           maxX: (originX + width) / density, maxY: (originY + height) / density },
         state: "requested", cpuCacheKey: key, gpuHandle: null, requestedAt: performance.now(),
@@ -267,7 +272,8 @@ export function createPoliticalIdRasterRuntimeOwner({
         + (assets?.memoryBytes || 0) + (presentation?.paletteSnapshotBytes || 0) + dependencyBytes,
       gpuTextures: graphics?.gpuTextureBytes || 0,
       workerSurfaces: (directPresentation ? 0 : graphics?.outputSurfaceBytesEstimate || 0) + (presentation?.retainedSurfaceBytes || 0)
-        + (active ? (active.descriptor.width + 2 * gutter) * (active.descriptor.height + 2 * gutter) * 4 : 0),
+        + (active ? (active.descriptor.width + 2 * (gutter + Number(directPresentation)))
+          * (active.descriptor.height + 2 * (gutter + Number(directPresentation))) * 4 : 0),
       workerGeometry: workerStats?.residentGeometryBytes ?? (active ? null : 0),
       decodeTransient: assets?.pendingBytes || 0,
       projectedPaths: workerStats?.pathBytes ?? pathCacheEstimatedBytes });
@@ -593,6 +599,14 @@ export function createPoliticalIdRasterRuntimeOwner({
     plan = planPoliticalIdRasterView({ transform: coordinates?.mapTransform(state.zoomTransform) || state.zoomTransform, dpr: state.dpr,
       width, height, maxPixels,
       offsetX: layout.offsetX || 0, offsetY: layout.offsetY || 0 });
+    if (directPresentation && plan) {
+      for (const descriptor of plan.tiles) {
+        const { originX, originY, width, height } = descriptor;
+        descriptor.key += ":halo-1-v1";
+        descriptor.coreRect = { minX: originX, minY: originY, maxX: originX + width, maxY: originY + height };
+        descriptor.storageRect = { minX: originX - 1, minY: originY - 1, maxX: originX + width + 1, maxY: originY + height + 1 };
+      }
+    }
     const key = plan?.tiles.map(tile => tile.key).join("|") || "";
     if (key !== planKey) { attempted = new Set(); planKey = key; }
     syncTileRecords();
@@ -838,13 +852,16 @@ export function createPoliticalIdRasterRuntimeOwner({
         requestedAt: performance.now(), cpuReadyAt: null, uploadSubmittedAt: null });
       if (tileEvents.size > TILE_EVENT_LIMIT) tileEvents.delete(tileEvents.keys().next().value);
     }
-    const entries = snapshot.entries.filter(entry => intersectsTile(entry.bounds, descriptor, 4 + state.dpr))
+    const storage = descriptor.storageRect;
+    const sampling = storage ? { ...descriptor, originX: storage.minX, originY: storage.minY,
+      width: storage.maxX - storage.minX, height: storage.maxY - storage.minY } : descriptor;
+    const entries = snapshot.entries.filter(entry => intersectsTile(entry.bounds, sampling, 4 + state.dpr))
       .map(entry => ({ ...entry, strokeCode: h.hasStroke?.(entry.feature) === false ? 0 : entry.code }));
     // Bound D3's resampling error in physical raster pixels at every LOD.
     // The worker scales base-space precision by density when rebuilding paths.
     const options = coordinates ? { ...coordinates.projectionOptions,
       precision: coordinates.projectionOptions.precision / descriptor.density } : projectionOptions();
-    const packet = { ...descriptor, entries, projectionOptions: options,
+    const packet = { ...sampling, entries, projectionOptions: options,
       geometryNamespace: namespace, gutter, strokeWidth: 0.75 * state.dpr };
     // The validated identity covers exactly these contributors, including the
     // stroke margin. Avoid copying unrelated scene IDs into every Worker task.
@@ -862,6 +879,10 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (controller.signal.aborted || epoch !== task.epoch) { stats.staleResults++; return; }
       if (!matchesTileRegion(tile, descriptor)) {
         throw new Error("Political ID tile response does not match its requested region.");
+      }
+      if (descriptor.coreRect) {
+        tile.coreRect = { ...descriptor.coreRect };
+        tile.storageRect = { ...descriptor.storageRect };
       }
       const cached = cache.set(descriptor.key, tile, descriptor);
       const event = tileEvents.get(task.tileEventId);

@@ -30,6 +30,7 @@ in vec2 tilePixel;
 uniform int smoothColors;
 uniform int edgeWidth;
 uniform int paletteWidth;
+uniform vec2 sampleOffset;
 out vec4 color;
 ivec2 address(uint offset, int width) {
   return ivec2(int(offset % uint(width)), int(offset / uint(width)));
@@ -56,8 +57,8 @@ vec4 resolve(ivec2 pixel) {
   return mixed;
 }
 void main() {
-  if (smoothColors == 0) { color = resolve(ivec2(floor(tilePixel))); return; }
-  vec2 sampleAt = tilePixel + vec2(0.5);
+  if (smoothColors == 0) { color = resolve(ivec2(floor(tilePixel + sampleOffset))); return; }
+  vec2 sampleAt = tilePixel + (sampleOffset - vec2(0.5));
   ivec2 base = ivec2(floor(sampleAt));
   vec2 weight = fract(sampleAt);
   color = mix(mix(resolve(base), resolve(base + ivec2(1, 0)), weight.x),
@@ -202,7 +203,7 @@ export function createPoliticalIdRasterGpu({
     gl.enableVertexAttribArray(location);
     gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0);
     const uniforms = Object.fromEntries(
-      ["viewportSize", "origin", "extent", "edgeWidth", "paletteWidth", "transform", "smoothColors"].map(name => [name, gl.getUniformLocation(program, name)]),
+      ["viewportSize", "origin", "extent", "edgeWidth", "paletteWidth", "transform", "smoothColors", "sampleOffset"].map(name => [name, gl.getUniformLocation(program, name)]),
     );
     for (const [unit, name] of ["codes", "edgeIds", "edgeWeights", "palette"].entries()) {
       gl.uniform1i(gl.getUniformLocation(program, name), unit);
@@ -257,15 +258,17 @@ export function createPoliticalIdRasterGpu({
     }
     // A resident texture is reusable when the tile and its gutter neighbors are unchanged.
     function matchResidentTile(tile, tiles) {
-      const x = tile.originX || 0, y = tile.originY || 0;
-      const neighbors = sharedGl ? tiles.filter(other => other !== tile
+      const x = tile.coreRect?.minX ?? (tile.originX || 0), y = tile.coreRect?.minY ?? (tile.originY || 0);
+      const width = tile.coreRect ? tile.coreRect.maxX - x : tile.width;
+      const height = tile.coreRect ? tile.coreRect.maxY - y : tile.height;
+      const neighbors = sharedGl && !tile.coreRect ? tiles.filter(other => other !== tile
         && (other.originX || 0) <= x + tile.width && (other.originX || 0) + other.width >= x
         && (other.originY || 0) <= y + tile.height && (other.originY || 0) + other.height >= y) : [];
       const token = tokenOf(tile);
       const neighborTokens = neighbors.map(tokenOf);
       const candidate = resident.get(token);
       const existing = candidate && candidate.originX === x && candidate.originY === y
-        && candidate.width === tile.width && candidate.height === tile.height
+        && candidate.width === width && candidate.height === height
         && candidate.neighbors.length === neighborTokens.length
         && candidate.neighbors.every((value, index) => value === neighborTokens[index]) ? candidate : null;
       return { neighbors, token, neighborTokens, existing };
@@ -286,7 +289,7 @@ export function createPoliticalIdRasterGpu({
       const release = () => { for (const end of releases.splice(0)) end(); };
       try {
         reserve(sourceCodes.byteLength + tile.edgeIds.byteLength + tile.edgeWeights.byteLength);
-        const upload = sharedGl ? paddedTile(tile, neighbors, reserve) : {
+        const upload = sharedGl && !tile.coreRect ? paddedTile(tile, neighbors, reserve) : {
           width: tile.width, height: tile.height, codes: sourceCodes, edgeIds: tile.edgeIds, edgeWeights: tile.edgeWeights };
         const shape = dimensions(upload.edgeIds.length);
         if (upload.width > limit || upload.height > limit) throw new RangeError("ID raster data exceeds this GPU texture limit.");
@@ -315,8 +318,12 @@ export function createPoliticalIdRasterGpu({
         allocated.push(texture(gl.R32UI, upload.width, upload.height, gl.RED_INTEGER, gl.UNSIGNED_INT, upload.codes));
         allocated.push(texture(gl.R32UI, shape.width, shape.height, gl.RED_INTEGER, gl.UNSIGNED_INT, ids));
         allocated.push(texture(gl.R32F, shape.width, shape.height, gl.RED, gl.FLOAT, weights));
+        const core = tile.coreRect;
         const resource = { textures: allocated, neighbors, edgeWidth: shape.width, bytes,
-          originX: tile.originX || 0, originY: tile.originY || 0, width: tile.width, height: tile.height };
+          originX: core?.minX ?? (tile.originX || 0), originY: core?.minY ?? (tile.originY || 0),
+          width: core ? core.maxX - core.minX : tile.width, height: core ? core.maxY - core.minY : tile.height,
+          sampleOffsetX: core ? core.minX - tile.originX : Number(!!sharedGl),
+          sampleOffsetY: core ? core.minY - tile.originY : Number(!!sharedGl) };
         tileUploads++;
         onTileUploadSubmitted?.(tile, performance.now());
         return resource;
@@ -470,16 +477,10 @@ export function createPoliticalIdRasterGpu({
       const shape = dimensions(palette.length / 4);
       let bytes = shape.width * shape.height * 4 + reservedTextureBytes();
       for (const tile of tiles) {
-        const x = tile.originX || 0, y = tile.originY || 0;
-        const neighbors = sharedGl ? tiles.filter(other => other !== tile
-          && (other.originX || 0) <= x + tile.width && (other.originX || 0) + other.width >= x
-          && (other.originY || 0) <= y + tile.height && (other.originY || 0) + other.height >= y) : [];
-        const existing = resident.get(tileTokens.get(tile));
-        const neighborTokens = neighbors.map(value => tileTokens.get(value));
-        if (existing && existing.neighbors.length === neighborTokens.length
-          && existing.neighbors.every((value, index) => value === neighborTokens[index])) bytes += existing.bytes;
+        const { neighbors, existing } = matchResidentTile(tile, tiles);
+        if (existing) bytes += existing.bytes;
         else {
-          const upload = sharedGl ? paddedTile(tile, neighbors) : tile;
+          const upload = sharedGl && !tile.coreRect ? paddedTile(tile, neighbors) : tile;
           const edge = dimensions(upload.edgeIds.length);
           bytes += upload.codes.byteLength + edge.width * edge.height * 8;
         }
@@ -530,6 +531,7 @@ export function createPoliticalIdRasterGpu({
         }
         gl.uniform2f(uniforms.origin, resource.originX, resource.originY);
         gl.uniform2f(uniforms.extent, resource.width, resource.height);
+        gl.uniform2f(uniforms.sampleOffset, resource.sampleOffsetX, resource.sampleOffsetY);
         gl.uniform1i(uniforms.edgeWidth, resource.edgeWidth);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }

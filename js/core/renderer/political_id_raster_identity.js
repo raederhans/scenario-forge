@@ -54,7 +54,10 @@ function normalizeDescriptor(descriptor) {
     || !Number.isSafeInteger(width * height) || width * height > 0xffffffff) invalid("tile dimensions/origin are invalid.");
   if (!Number.isFinite(density) || density <= 0) invalid("density must be finite and positive.");
   if (level !== undefined && !Number.isSafeInteger(level)) invalid("level must be a safe integer when supplied.");
-  return [originX, originY, width, height, density, level ?? null];
+  const shape = [originX, originY, width, height, density, level ?? null];
+  if (descriptor.coreRect) shape.push("halo-1-v1", ...[descriptor.coreRect, descriptor.storageRect]
+    .map(rect => [rect.minX, rect.minY, rect.maxX, rect.maxY]));
+  return shape;
 }
 
 function normalizeGeometry(geometry, ancestors = new Set()) {
