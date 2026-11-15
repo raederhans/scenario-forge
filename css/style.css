@@ -10788,7 +10788,6 @@ details.card > summary {
 
 #countryList .country-select-main-btn {
   display: flex;
-  align-items: center;
   width: 100%;
   min-width: 0;
   padding: 0;
