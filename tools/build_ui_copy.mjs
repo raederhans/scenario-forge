@@ -32,7 +32,8 @@ function main() {
   const catalog = buildCatalog(JSON.parse(readFileSync(sourceUrl, "utf8")));
   const output = `${prefix}${JSON.stringify(catalog, null, 2)});\n`;
   if (process.argv.includes("--check")) {
-    const current = existsSync(catalogUrl) ? readFileSync(catalogUrl, "utf8") : "";
+    // Windows 检出可能把换行转成 CRLF，比较前统一为 LF。
+    const current = existsSync(catalogUrl) ? readFileSync(catalogUrl, "utf8").replace(/\r\n/g, "\n") : "";
     if (current === output) return;
     const previous = current ? JSON.parse(current.slice(current.indexOf("Object.freeze(") + 14, current.lastIndexOf(");"))) : {};
     const keys = [...new Set([...Object.keys(previous), ...Object.keys(catalog)])].sort()
