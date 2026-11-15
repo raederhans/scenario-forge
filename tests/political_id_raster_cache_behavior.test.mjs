@@ -109,6 +109,23 @@ test("unknown dirty bounds conservatively clear cache and clear resets retained 
 const descriptor = { originX: 0, originY: 0, width: 8, height: 8, density: 1 };
 const filledTile = (value, length = 64) => ({ ...makeTile(length * 4), codes: new Uint32Array(length).fill(value) });
 
+test("decode overlap and upload reservations share the CPU cap", () => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 400 });
+  const old = filledTile(3), next = filledTile(4);
+  cache.set("old", old, descriptor);
+  cache.set("next", next, descriptor);
+  const release = cache.reserveTransient(100);
+  assert.ok(cache.getStats().cpuBytes <= 400);
+  assert.deepEqual(old.codes, new Uint32Array(64).fill(3));
+  const transient = cache.getTransientStats();
+  assert.equal(transient.transientBytes, 100);
+  assert.ok(transient.peakTransientBytes >= 356);
+  assert.ok(transient.peakCpuBytes <= 400);
+  release();
+  assert.equal(cache.getTransientStats().transientBytes, 0);
+  assert.ok(cache.getStats().cpuBytes <= 300);
+});
+
 test("cold constant codes retain tile identity while reads materialize one stable hot array", () => {
   const cache = createPoliticalIdRasterCache({ maxBytes: 400 });
   const old = filledTile(0xffffffff), next = filledTile(7);
