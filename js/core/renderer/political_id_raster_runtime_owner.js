@@ -249,7 +249,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const tile = cache.peek(key);
       const prepared = gpuPreparation?.status === "ready" ? gpuPreparation.handle.getTileHandle?.(tile) : null;
       const resident = tile ? gpu?.getTileHandle?.(tile) : null;
-      record.gpuHandle = prepared || resident || (gpu?.hasTileHandle?.(record.gpuHandle) ? record.gpuHandle : null);
+      record.gpuHandle = resident || (gpu?.hasTileHandle?.(record.gpuHandle) ? record.gpuHandle : null) || prepared;
       record.state = record.gpuHandle ? "gpu-ready" : tile ? "cpu-ready" : "requested";
       if (tile && record.cpuReadyAt === null) record.cpuReadyAt = performance.now();
       if (!tile && !record.gpuHandle && !demanded.has(key)) tileRecords.delete(key);

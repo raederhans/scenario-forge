@@ -3,6 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
 import { createPoliticalIdRasterGpu } from "../js/core/renderer/political_id_raster_gpu.js";
+import { createTnoRasterSceneOwner } from "../js/core/renderer/tno_raster_scene_owner.js";
 import { createPoliticalIdRasterCache, planPoliticalIdRasterView } from "../js/core/renderer/political_id_raster_cache.js";
 import { bindRenderBoundary, requestRender, markRenderBoundaryFlushed, getRenderBoundaryDebugState } from "../js/core/render_boundary.js";
 
@@ -82,6 +83,74 @@ test("navigation publishes one ready tile while other visible tiles remain pendi
   assert.equal(f.owner.getNavigationSnapshot(), null);
   assert.equal(gpu.getStats().residentTiles, f.owner.getDirectFrame().plan.tiles.length);
   assert.ok(frame.drawTiles.every(handle => !gpu.hasTileHandle(handle)));
+});
+
+test("waiting for an exact candidate preserves navigation coverage through CPU eviction and private GPU preparation", async t => {
+  const f = await navigationFixture(t);
+  const gpu = f.owner.getDirectFrame().gpu;
+  const map = { width: 900, height: 600, style: {}, parentNode: { insertBefore() {} },
+    ownerDocument: { createElement: () => ({ style: {}, setAttribute() {}, remove() {} }) } };
+  const scene = createTnoRasterSceneOwner({ surface: { getMapCanvas: () => map },
+    helpers: { getActivePassNames: () => ["political"], getDirectFrame: () => f.owner.getDirectFrame(), getDpr: () => 1 },
+    createGpu: () => gpu,
+    createCompositor: () => ({ isAvailable: () => true, setTextureBudget() {}, dispose() {},
+      getStats: () => ({}), render: ({ layers, width, height }) => {
+        for (const layer of layers) layer.draw({ width, height });
+        return true;
+      } }),
+  });
+  t.after(() => scene.dispose());
+  scene.ensureGpu();
+  assert.equal(scene.present(f.state.zoomTransform), true);
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  for (let i = 0; i < 8; i++) {
+    await navigationTick();
+    const request = f.requests.find(value => !value.settled);
+    if (request) completeNavigationTile(request);
+    await navigationTick();
+    f.owner.updateNavigationDemand(f.state.zoomTransform);
+  }
+  await navigationTick();
+  const navigation = f.owner.getNavigationSnapshot();
+  assert.equal(scene.presentNavigation(f.state.zoomTransform, navigation, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+  const retainedHandles = [...navigation.drawTiles];
+  const checkWaitingCoverage = () => {
+    assert.equal(scene.presentNavigation(f.state.zoomTransform, f.owner.getNavigationSnapshot(),
+      { refresh: false, holdPartialUntilExact: true }), false);
+    assert.equal(scene.isActive(), true);
+    assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+    assert.ok(retainedHandles.every(handle => gpu.hasTileHandle(handle)));
+    assert.ok(retainedHandles.every(handle => gpu.releaseTile(handle) === false));
+  };
+  f.cache.clear();
+  checkWaitingCoverage();
+  f.state.zoomTransform = { x: -1100, y: -100, k: 1 };
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.owner.prepareSource();
+  checkWaitingCoverage();
+  for (let guard = 0; guard < 100 && !f.owner.getDiagnostics().gpuPreparation.pending; guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) completeNavigationTile(request);
+    await tick();
+    checkWaitingCoverage();
+  }
+  assert.equal(f.owner.getDiagnostics().gpuPreparation.pending, true);
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    gates.shift()?.();
+    await tick();
+    checkWaitingCoverage();
+  }
+  assert.equal(f.owner.getDiagnostics().gpuPreparation.ready, true);
+  assert.ok(f.owner.draw().staged);
+  checkWaitingCoverage();
+  assert.equal(f.owner.publishDirectFrame(), true);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  assert.ok(retainedHandles.every(handle => !gpu.hasTileHandle(handle)));
+  assert.equal(scene.present(f.state.zoomTransform), true);
+  assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
 });
 
 test("moving demand keeps useful same-source work and chooses the latest visible gap next", async t => {
