@@ -560,3 +560,33 @@ test("atlas loader exposes error state for render-owner gating", async () => {
     globalThis.Image = previousImage;
   }
 });
+
+test("facility candidates are clipped to what the target canvas paints at any device pixel ratio", () => {
+  const point = (name, x, y) => ({
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [x, y] },
+    properties: { stable_key: `airport:clip:${name}`, importance_rank: 3, name },
+  });
+  // Logical viewport 400x250 at zoom {x: 20, y: 30, k: 2}; the pass canvas adds 60px of overscan per side.
+  const features = [
+    point("inside", 50, 50),            // screen x 120
+    point("left-overscan", -30, 50),    // screen x -40
+    point("left-outside", -63, 50),     // screen x -106, past overscan + padding
+    point("right-overscan", 210, 50),   // screen x 440
+    point("right-outside", 243, 50),    // screen x 506, past overscan + padding
+    point("top-overscan", 50, -35),     // screen y -40
+    point("bottom-outside", 50, 162),   // screen y 354, past overscan + padding
+  ];
+  const visibleNames = (dpr) => {
+    const harness = createFacilityRenderOwnerHarness({ k: 2, features, projection: ([x, y]) => [x, y] });
+    const overscan = 60;
+    harness.context.canvas = { width: (400 + overscan * 2) * dpr, height: (250 + overscan * 2) * dpr };
+    harness.context.getTransform = () => ({ a: dpr * 2, b: 0, c: 0, d: dpr * 2,
+      e: dpr * (overscan + 20), f: dpr * (overscan + 30) });
+    harness.owner.drawAirportsLayer(2);
+    return harness.hoverUpdates.at(-1).entries.map((entry) => entry.properties.name).sort();
+  };
+  const expected = ["inside", "left-overscan", "right-overscan", "top-overscan"];
+  assert.deepEqual(visibleNames(1), expected);
+  assert.deepEqual(visibleNames(2), expected);
+});
