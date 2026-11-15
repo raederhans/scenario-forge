@@ -408,7 +408,7 @@ export function createCityPointsRenderOwner({
       if (!prepared || !current()) return false;
       const cityCollection = prepared.collection;
       const plan = cityCollection?.features?.length
-        ? await prepareCityRevealPlan(cityCollection, scale, transform, config, { ...options, isCurrent: current })
+        ? await prepareCityRevealPlan(cityCollection, scale, transform, config, { ...options, isCurrent: current, projection: currentProjection })
         : { markerEntries: [], labelEntries: [] };
       if (!plan || !current()) return false;
       // Source and plan become visible together, after both private stages.
@@ -428,7 +428,7 @@ export function createCityPointsRenderOwner({
     const key = [...baseKey, !!runtimeState.deferExactAfterSettle];
     if (usePrepared && !sameViewKey(preparedRevealPlan?.key, baseKey)) return null;
     if (!usePrepared && !sameViewKey(lastRevealPlan?.key, key)) {
-      lastRevealPlan = { key, plan: buildCityRevealPlan(cityCollection, scale, transform, config) };
+      lastRevealPlan = { key, plan: buildCityRevealPlan(cityCollection, scale, transform, config, { projection }) };
     }
     const template = usePrepared ? preparedRevealPlan.plan : lastRevealPlan.plan;
     // Label placement writes fields onto entries. Copy only the selected

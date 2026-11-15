@@ -16,6 +16,7 @@ import {
   CITY_PRIMARY_POWER_TAGS, CITY_SECONDARY_POWER_TAGS,
 } from "./city_reveal_policy.js";
 import { yieldToBackground } from "../background_yield.js";
+import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 
 // Yield after every merge write, including tail copies: a large sorted run
 // must remain interruptible even when the comparator always prefers one side.
@@ -103,6 +104,56 @@ export function createUrbanCityPolicyOwner({
   } = helpers;
 
   const cityCountryProfileCache = new WeakMap();
+  let cityCandidateGrid = null;
+
+  function* getCityViewportCandidates(cityCollection, transform, padding, projection) {
+    const features = cityCollection.features;
+    const generation = getProjectionGeometryGeneration(projection);
+    const revision = Number(state?.cityLayerRevision || 0);
+    const cellSize = 128;
+    if (!cityCandidateGrid || cityCandidateGrid.collection !== cityCollection
+      || cityCandidateGrid.features !== features || cityCandidateGrid.length !== features.length
+      || cityCandidateGrid.revision !== revision || cityCandidateGrid.projection !== projection
+      || cityCandidateGrid.generation !== generation) {
+      const cells = new Map();
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (let index = 0; index < features.length; index += 1) {
+        if (index in features) {
+          const anchor = getCityAnchor(features[index]);
+          if (anchor) {
+            const x = Math.floor(Number(anchor[0]) / cellSize);
+            const y = Math.floor(Number(anchor[1]) / cellSize);
+            const key = `${x}:${y}`;
+            if (!cells.has(key)) cells.set(key, []);
+            cells.get(key).push(index);
+            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+          }
+        }
+        yield;
+      }
+      cityCandidateGrid = { collection: cityCollection, features, length: features.length,
+        revision, projection, generation, cells, minX, minY, maxX, maxY };
+    }
+    const grid = cityCandidateGrid;
+    const k = Math.max(0.0001, Number(transform?.k || 1));
+    const tx = Number(transform?.x || 0), ty = Number(transform?.y || 0);
+    const left = Math.max(grid.minX, Math.floor((-padding - tx) / k / cellSize) - 1);
+    const right = Math.min(grid.maxX, Math.floor((state.width + padding - tx) / k / cellSize) + 1);
+    const top = Math.max(grid.minY, Math.floor((-padding - ty) / k / cellSize) - 1);
+    const bottom = Math.min(grid.maxY, Math.floor((state.height + padding - ty) / k / cellSize) + 1);
+    const indices = [];
+    for (let x = left; x <= right; x += 1) {
+      for (let y = top; y <= bottom; y += 1) {
+        for (const index of grid.cells.get(`${x}:${y}`) || []) {
+          indices.push(index);
+          yield;
+        }
+        yield;
+      }
+    }
+    return yield* stableSortCityEntries(indices, (left, right) => left - right);
+  }
 
   function getCityCountryGroupKey(feature) {
     const props = feature?.properties || {};
@@ -433,7 +484,7 @@ export function createUrbanCityPolicyOwner({
     });
   }
 
-  function* iterateCityRevealPlan(cityCollection, scale, transform, config, includeDeferredLabels = false) {
+  function* iterateCityRevealPlan(cityCollection, scale, transform, config, includeDeferredLabels = false, projection = null) {
     const phase = getCityRevealPhase(scale);
     const countryProfiles = getCityCountryProfileIndex(cityCollection);
     const urbanIndex = getUrbanFeatureIndex();
@@ -535,7 +586,12 @@ export function createUrbanCityPolicyOwner({
       };
     const unsortedCandidates = [];
     const features = cityCollection.features;
-    for (let index = 0, length = features.length; index < length; index += 1) {
+    const candidateIndices = projection
+      ? yield* getCityViewportCandidates(cityCollection, transform, paintOverscanPx, projection)
+      : null;
+    const visitedCandidateCount = candidateIndices ? candidateIndices.length : features.length;
+    for (let offset = 0; offset < visitedCandidateCount; offset += 1) {
+      const index = candidateIndices ? candidateIndices[offset] : offset;
       if (index in features) {
         const entry = createCandidateEntry(features[index]);
         if (entry) unsortedCandidates.push(entry);
@@ -639,17 +695,19 @@ export function createUrbanCityPolicyOwner({
       markerEntries,
       labelEntries,
       candidateEntries,
+      visitedCandidateCount,
     };
   }
 
-  function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
-    const iterator = iterateCityRevealPlan(cityCollection, scale, transform, config);
+  function buildCityRevealPlan(cityCollection, scale, transform, config = {}, { projection = null } = {}) {
+    const iterator = iterateCityRevealPlan(cityCollection, scale, transform, config, false, projection);
     let step;
     do { step = iterator.next(); } while (!step.done);
     return step.value;
   }
 
   async function prepareCityRevealPlan(cityCollection, scale, transform, config = {}, {
+    projection = null,
     signal, isCurrent = () => true, yieldControl = yieldCityPlanningTask,
     nowMs = () => globalThis.performance?.now?.() ?? Date.now(), sliceBudgetMs = 4, workBatch = 512,
   } = {}) {
@@ -658,7 +716,7 @@ export function createUrbanCityPolicyOwner({
     // Do not start a cold collection scan in the caller's render task.
     await yieldControl();
     if (!current()) return null;
-    const iterator = iterateCityRevealPlan(cityCollection, scale, transform, config, true);
+    const iterator = iterateCityRevealPlan(cityCollection, scale, transform, config, true, projection);
     const batchLimit = Math.max(1, Number(workBatch) || 512);
     const timeLimit = Math.max(0.1, Number(sliceBudgetMs) || 4);
     let started = nowMs(), work = 0;
