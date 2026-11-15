@@ -3,7 +3,6 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 import { openRasterApp, waitRasterStartup, waitRasterView } from "./political_id_raster_app_session.mjs";
-import { scaleRasterViewportBudget, RASTER_BUDGET_MAX_PIXELS } from "../js/core/renderer/political_id_raster_cache.js";
 
 export function readSettledRasterFrame({ zoom, captureReference = false, precise = true, settleOnly = false } = {}) {
   const needPrecise = !captureReference && precise;
@@ -65,10 +64,12 @@ const MAX_CHANGED_PIXEL_RATIO = 0.01;
 const MAX_ZOOM_CHANNEL_ERROR = 2;
 
 // Tolerated differences still print their diagnostics so unexplained mismatches stay visible in CI logs.
-// Raster budgets scale with the viewport up to a 3840x2160 ceiling. Usage must stay
-// inside the budget the runtime reports, and that budget inside the scaled ceiling.
-const RASTER_CPU_BYTES_CEILING = scaleRasterViewportBudget(48 * 1024 * 1024, RASTER_BUDGET_MAX_PIXELS, 1);
-const RASTER_GPU_BYTES_CEILING = scaleRasterViewportBudget(80 * 1024 * 1024, RASTER_BUDGET_MAX_PIXELS, 1);
+// Raster budgets scale with the viewport from a 4,000,000-pixel baseline up to a 3840x2160
+// ceiling (political_id_raster_cache.js). Usage must stay inside the budget the runtime
+// reports, and that budget inside the scaled ceiling.
+const RASTER_BUDGET_SCALE_CEILING = (3840 * 2160) / 4_000_000;
+const RASTER_CPU_BYTES_CEILING = Math.floor(48 * 1024 * 1024 * RASTER_BUDGET_SCALE_CEILING);
+const RASTER_GPU_BYTES_CEILING = Math.floor(80 * 1024 * 1024 * RASTER_BUDGET_SCALE_CEILING);
 function assertWithinRasterBudgets(diagnostics) {
   const { cpuBytes, gpuBytes } = diagnostics.budgets;
   assert.ok(cpuBytes <= RASTER_CPU_BYTES_CEILING, `CPU budget ${cpuBytes}`);
