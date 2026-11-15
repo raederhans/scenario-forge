@@ -119,6 +119,59 @@ function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], re
     setProjectionIdentity(value) { projectionIdentity = value; }, setViewportWidth(value) { viewportWidth = value; } };
 }
 
+test("font family invalidation retains other language fits and metrics", () => {
+  const { owner, state } = createHarness();
+  owner.drawCountryLabels(1);
+  state.language = "zh";
+  owner.drawCountryLabels(1);
+  assert.equal(owner.getDiagnostics().fitBuilds, 2);
+  assert.equal(owner.clearTextCache(["Interface Sans"]), false);
+  owner.drawCountryLabels(1);
+  assert.equal(owner.getDiagnostics().fitBuilds, 2);
+  assert.equal(owner.clearTextCache(["'map garamond'"]), true);
+  owner.drawCountryLabels(1);
+  assert.equal(owner.getDiagnostics().fitBuilds, 2);
+  assert.equal(owner.getDiagnostics().metricBuilds, 2);
+  state.language = "en";
+  owner.drawCountryLabels(1);
+  assert.equal(owner.getDiagnostics().fitBuilds, 3);
+  assert.equal(owner.getDiagnostics().metricBuilds, 3);
+  owner.clearTextCache(["Map Noto Serif SC"]);
+  owner.drawCountryLabels(1);
+  assert.equal(owner.getDiagnostics().fitBuilds, 3);
+  state.language = "zh";
+  owner.drawCountryLabels(1);
+  assert.equal(owner.getDiagnostics().fitBuilds, 4);
+  owner.clearTextCache();
+  owner.drawCountryLabels(1);
+  state.language = "en";
+  owner.drawCountryLabels(1);
+  assert.equal(owner.getDiagnostics().fitBuilds, 6);
+  assert.equal(owner.getDiagnostics().metricBuilds, 6);
+});
+
+test("family invalidation rejects pending worker fits without rebuilding geometry", () => {
+  const callbacks = [], messages = [];
+  let worker;
+  const handle = createCountryLabelLayoutWorkerHandler();
+  const { owner } = createHarness({ helperOptions: {
+    onInvalidate() {}, scheduleWork: callback => callbacks.push(callback),
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  const stale = handle(messages.shift());
+  owner.clearTextCache(["Map Garamond"]);
+  worker.onmessage({ data: stale });
+  assert.equal(owner.getDiagnostics().fitBuilds, 0);
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages[0].polygons, undefined);
+  worker.onmessage({ data: handle(messages.shift()) });
+  assert.equal(owner.getDiagnostics().fitBuilds, 1);
+  assert.equal(owner.getDiagnostics().geometryBuilds, 1);
+});
+
 test("current-view readiness includes scheduled fits but does not wait for offscreen worker requests", () => {
   const callbacks = [], messages = [];
   const { owner, state, source, fitCalls } = createHarness({ helperOptions: {

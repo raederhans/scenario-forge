@@ -942,12 +942,38 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       deferredPreparation = null;
       cancelPrivatePreparation();
     },
-    clearTextCache() {
+    clearTextCache(fontFamilies) {
+      if (fontFamilies) {
+        const normalize = family => family.trim().replace(/^(['"])(.*)\1$/, "$2").toLowerCase();
+        const families = new Set(fontFamilies.map(normalize));
+        const fonts = new Set([ENGLISH_FONT, CHINESE_FONT].filter(font =>
+          font.split(",").some(family => families.has(normalize(family)))));
+        if (!fonts.size) return false;
+        if (fonts.has(deferredPreparation?.fitView.font)) deferredPreparation = null;
+        if (fonts.has(privatePreparation?.view?.font)) cancelPrivatePreparation();
+        for (const key of glyphMetrics.keys()) {
+          if (fonts.has(key.split("\n")[0])) glyphMetrics.delete(key);
+        }
+        for (const entry of geometryCache?.entries || []) {
+          for (const key of entry.fits.keys()) {
+            if (fonts.has(key.split("\n")[2])) entry.fits.delete(key);
+          }
+        }
+        for (const [id, request] of workerRequests) {
+          if (!fonts.has(request.view.font)) continue;
+          clearRequestTimeout(request.timeout);
+          workerRequests.delete(id);
+          request.slot.pending--;
+          request.entry.workerPending.delete(request.key);
+        }
+        return true;
+      }
       deferredPreparation = null;
       cancelPrivatePreparation();
       textGeneration += 1;
       glyphMetrics.clear();
       for (const entry of geometryCache?.entries || []) entry.fits.clear();
+      return true;
     },
     isReadyForCurrentView: () => getPendingFitsForCurrentView() === 0 && diagnostics.workerErrors === 0,
     getReadinessForCurrentView(source) {

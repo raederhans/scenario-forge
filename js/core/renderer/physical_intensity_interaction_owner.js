@@ -38,8 +38,15 @@ export function createPhysicalIntensityInteractionOwner({
     if (physicalIntensityRenderFrame !== null) return;
     physicalIntensityRenderFrame = requestAnimationFrame(() => {
       physicalIntensityRenderFrame = null;
+      flushPendingPointBake(physicalIntensityDragSession);
       requestInteractionRender(reason);
     });
+  }
+
+  function flushPendingPointBake(session) {
+    if (!session?.pendingPointBake) return;
+    bakeIntensityComposite(getPhysicalIntensityChannel(session.channelId));
+    session.pendingPointBake = false;
   }
 
   function createIntensityPoint(channel, lonLat, tool) {
@@ -71,9 +78,7 @@ export function createPhysicalIntensityInteractionOwner({
     releaseSessionPointer(current);
     if (!current.changed) return false;
     const channel = getPhysicalIntensityChannel(current.channelId);
-    if (current.subMode === "points") {
-      bakeIntensityComposite(channel);
-    }
+    flushPendingPointBake(current);
     channel.revision = Math.max(0, Math.round(Number(channel.revision) || 0)) + 1;
     const after = captureHistoryState({ intensityFieldChannels: [current.channelId] });
     pushHistoryEntry({
@@ -141,7 +146,7 @@ export function createPhysicalIntensityInteractionOwner({
       point.lat = clamp(lonLat[1], -90, 90);
     }
     channel.enabled = true;
-    bakeIntensityComposite(channel);
+    current.pendingPointBake = true;
     current.changed = true;
     schedulePhysicalIntensityRender(current.channelId, "physical-intensity-point-drag");
     refreshPhysicalIntensityUi();
@@ -179,6 +184,7 @@ export function createPhysicalIntensityInteractionOwner({
       before: captureHistoryState({ intensityFieldChannels: [tool.channelId] }),
       rollbackChannel: structuredClone(channel),
       changed: false,
+      pendingPointBake: false,
       pointId: "",
       selectedPointId: tool.selectedPointId,
       pointDragMode: "move",
