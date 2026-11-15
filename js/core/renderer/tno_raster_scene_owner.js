@@ -23,6 +23,8 @@ export function createTnoRasterSceneOwner({
   let lastPresentationState = "unavailable";
   let publicationPreparation = null, preparationError = "";
   let politicalUncoveredRatio = null, passUncoveredRatios = {}, sceneIncompleteRatio = null;
+  let coverageCache = null, coverageCalculations = 0, stageTimingsEnabled = false;
+  const coverageTiming = { count: 0, totalMs: 0, maxMs: 0, taskKind: "present" };
 
   function cancelPublicationPreparation() {
     publicationPreparation = null;
@@ -225,6 +227,18 @@ export function createTnoRasterSceneOwner({
         && background.y + background.height >= rect.y + rect.height - 1e-6));
   }
   function measureCoverage(frame, passes, names, transform, dpr, clip) {
+    const frameKey = value => {
+      const plan = value.plan;
+      return [value.revision, value.epoch, value.transform, value.layout, value.dpr,
+        plan.scale, plan.originX, plan.originY, plan.outputX, plan.outputY,
+        (plan.tiles || []).map(tile => [tile.originX, tile.originY, tile.width, tile.height])];
+    };
+    const key = JSON.stringify([transform.x, transform.y, transform.k, dpr, mapCanvas.width, mapCanvas.height,
+      frameKey(frame), [...passes], names, [...revisions], clip, composedWithOverview,
+      composedWithOverview ? [frameKey(overview.frame), [...overview.passes], overview.names] : null]);
+    if (coverageCache?.key === key) return coverageCache.result;
+    const started = stageTimingsEnabled ? performance.now() : 0;
+    coverageCalculations++;
     const viewport = { x: 0, y: 0, width: mapCanvas.width, height: mapCanvas.height };
     const regions = new Map(names.map(name => [name, []]));
     function addScene(sceneFrame, scenePasses, sceneNames, sceneClip) {
@@ -273,9 +287,16 @@ export function createTnoRasterSceneOwner({
       ratios[name] = gaps.reduce((sum, rect) => sum + rect.width * rect.height, 0) / (viewport.width * viewport.height);
       missing.push(...gaps);
     }
-    politicalUncoveredRatio = ratios.political;
-    passUncoveredRatios = ratios;
-    sceneIncompleteRatio = 1 - getUncoveredRatio(missing, viewport);
+    const result = { politicalUncoveredRatio: ratios.political, passUncoveredRatios: ratios,
+      sceneIncompleteRatio: 1 - getUncoveredRatio(missing, viewport) };
+    coverageCache = { key, result };
+    if (stageTimingsEnabled) {
+      const ms = performance.now() - started;
+      coverageTiming.count++; coverageTiming.totalMs += ms; coverageTiming.maxMs = Math.max(coverageTiming.maxMs, ms);
+      h.recordMetric?.("politicalIdRasterCoverage", ms, { taskKind: "present", revision: frame.revision,
+        tileKeys: (frame.plan.tiles || []).map(tile => tile.key), tileCount: frame.plan.tiles?.length || 0 });
+    }
+    return result;
   }
   // allowPartialPasses: while the view moves, a retained pass texture that no
   // longer covers the viewport is composed over its painted extent and the
@@ -285,14 +306,16 @@ export function createTnoRasterSceneOwner({
   // being prepared, the same partial composition stays on screen but the call
   // reports false so the caller keeps requesting the exact frame. Hiding here
   // would expose whatever the 2D canvas last painted, typically a startup frame.
-  function present(transform, { refresh = true, allowPartialPasses = false, holdPartialUntilExact = false } = {}) {
+  function present(transform, { refresh = true, allowPartialPasses = false, holdPartialUntilExact = false,
+    navigationSnapshot = refresh ? null : h.getNavigationSnapshot?.() } = {}) {
     const partialAllowed = allowPartialPasses || holdPartialUntilExact;
     composedWithOverview = false;
     let uncoveredPass = false;
     if (publicationPreparation && !preparationCurrent(publicationPreparation, { identity: !refresh })) cancelPublicationPreparation();
     if (disposed) return hide("disposed");
     if (!compositor?.isAvailable() || surface.getMapCanvas() !== mapCanvas) return hide("surface-unavailable");
-    let frame = h.getDirectFrame();
+    const navigation = navigationSnapshot && published;
+    let frame = navigation ? navigationSnapshot : h.getDirectFrame();
     if (!frame || frame.complete === false || frame.gpu !== politicalGpu || !frame.gpu?.isAvailable()) return hide("direct-frame-unavailable");
     if (!validTransform(transform) || !validTransform(frame.transform) || !validLayout(frame.layout)
       || !Number.isFinite(frame.dpr) || frame.dpr <= 0) return hide("invalid-direct-frame");
@@ -308,13 +331,16 @@ export function createTnoRasterSceneOwner({
       compositor.releaseRetainedLayers?.([...overview.passes.values()].map(pass => pass.textureName));
       overview = null;
     }
-    const retainPrimary = published?.frame === frame && (!refresh || frame.presentationState === "retained");
+    const preparedCoverage = publicationPreparation && publicationPreparation.status !== "pending"
+      && samePublication(publicationPreparation.snapshot, snapshotPublication(transform), { identity: false });
+    const retainPrimary = !!navigation || published?.frame === frame
+      && (!refresh || frame.presentationState === "retained" && !preparedCoverage);
     const primaryCoverage = coverage(frame, retainPrimary ? published.passes : null, transform, dpr);
     const overviewCoverage = overview && coverage(overview.frame, overview.passes, transform, dpr);
     const primaryCovers = covers(primaryCoverage, width, height);
-    composedWithOverview = !!overview && retainPrimary && !primaryCovers
+    composedWithOverview = !navigation && !!overview && retainPrimary && !primaryCovers
       && coversTogether(primaryCoverage, overviewCoverage, width, height);
-    usingOverview = !composedWithOverview && !!overview && !primaryCovers && covers(overviewCoverage, width, height);
+    usingOverview = !navigation && !composedWithOverview && !!overview && !primaryCovers && covers(overviewCoverage, width, height);
     if (usingOverview) frame = overview.frame;
     const plan = frame.plan;
     if (!plan || ![plan.scale, plan.originX, plan.originY, plan.width, plan.height,
@@ -341,8 +367,6 @@ export function createTnoRasterSceneOwner({
     // can refresh only uncovered passes. Read their canvases/revisions after it
     // returns so a successful refresh is included in this same presentation.
     try {
-      const preparedCoverage = publicationPreparation && publicationPreparation.status !== "pending"
-        && samePublication(publicationPreparation.snapshot, snapshotPublication(transform), { identity: false });
       if (!retain && !preparedCoverage && h.ensurePassCoverage?.(transform) === false) return hide("pass-coverage");
     } catch (error) {
       return hide(`pass-coverage: ${error.message}`);
@@ -382,7 +406,11 @@ export function createTnoRasterSceneOwner({
     if (!Array.isArray(names) || !names.includes("political")) return hide("political-pass-inactive");
     for (const name of names) {
       if (name === "political") {
-        layers.push({ name, clip, draw: output => frame.gpu.drawLayer({ ...output, transform: directTransform }) });
+        layers.push({ name, clip, draw: output => {
+          if (frame.drawTiles) frame.gpu.setDrawTiles(frame.drawTiles, frame.revision ?? frame);
+          if (navigation) frame.gpu.setPalette(frame.palette, frame.paletteKey);
+          frame.gpu.drawLayer({ ...output, transform: directTransform });
+        } });
         continue;
       }
       const saved = retain ? retainedScene.passes.get(name) : null;
@@ -407,6 +435,11 @@ export function createTnoRasterSceneOwner({
         transform: layerTransform, clip,
       });
     }
+    const measuredCoverage = measureCoverage(frame, passSnapshots, names, transform, dpr, clip);
+    if (navigation && measuredCoverage.politicalUncoveredRatio > 0) {
+      if (!partialAllowed) return hide("direct-frame-coverage");
+      uncoveredPass = true;
+    }
     const start = performance.now();
     try {
       const reservedTextureBytes = politicalGpu.getStats().gpuTextureBytes;
@@ -416,7 +449,7 @@ export function createTnoRasterSceneOwner({
         compositor.cancelPreparedLayers?.();
         publicationPreparation = { snapshot: snapshotPublication(transform), status: "consumed" };
       }
-      if (colorBaselineFrame !== frame) {
+      if (!navigation && colorBaselineFrame !== frame) {
         h.capturePublishedColorBaseline?.({ overview: usingOverview });
         colorBaselineFrame = frame;
       }
@@ -439,8 +472,8 @@ export function createTnoRasterSceneOwner({
       fallbackReason = "";
       view = { x: transform.x, y: transform.y, k: transform.k, dpr, width, height };
       account();
-      measureCoverage(frame, passSnapshots, names, transform, dpr, clip);
-      return !(uncoveredPass && !allowPartialPasses);
+      ({ politicalUncoveredRatio, passUncoveredRatios, sceneIncompleteRatio } = measuredCoverage);
+      return !(uncoveredPass && !allowPartialPasses) && !(retain && holdPartialUntilExact);
     } catch (error) {
       cancelPublicationPreparation();
       account();
@@ -464,7 +497,8 @@ export function createTnoRasterSceneOwner({
     fallbackReason = "disposed";
     view = null;
   }
-  function getDiagnostics() {
+  function getDiagnostics({ stageTimings } = {}) {
+    if (stageTimings !== undefined) stageTimingsEnabled = stageTimings;
     const stats = compositor?.getStats() || {};
     return {
       budgets: { politicalTextureBytes: mapCanvas ? viewportBudget(POLITICAL_TEXTURE_LIMIT) : POLITICAL_TEXTURE_LIMIT,
@@ -480,10 +514,13 @@ export function createTnoRasterSceneOwner({
       publishedEpoch: published?.frame?.epoch ?? null, publications, retainedFrames,
       usingOverview, composedWithOverview, partialPasses, overviewReady: !!overview,
       politicalUncoveredRatio, passUncoveredRatios: { ...passUncoveredRatios }, sceneIncompleteRatio,
+      coverageCalculations, stageTimingsEnabled, stageTimings: { coverage: { ...coverageTiming } },
       publicationPending: ["pending", "ready"].includes(publicationPreparation?.status), preparationError,
       preparedPassCount: stats.preparedPassCount || 0, preparedBytes: stats.preparedBytes || 0,
       privateTextureBytes: stats.privateTextureBytes || 0, maxUploadTaskMs: stats.maxUploadTaskMs || 0,
     };
   }
-  return { ensureGpu, preparePublication, cancelPublicationPreparation, present, notePassCommit, clear, dispose, getDiagnostics, isActive: () => active };
+  return { ensureGpu, preparePublication, cancelPublicationPreparation, present,
+    presentNavigation: (transform, navigationSnapshot, options) => present(transform, { ...options, navigationSnapshot }),
+    notePassCommit, clear, dispose, getDiagnostics, isActive: () => active };
 }

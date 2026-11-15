@@ -16,6 +16,43 @@ function coverageHarness(dpr = 2) {
   return { ...h, transform };
 }
 
+test("coverage reuses unchanged presentation and invalidates camera viewport pass and navigation revisions", t => {
+  const h = coverageHarness(1);
+  t.after(() => h.owner.dispose());
+  assert.equal(h.owner.getDiagnostics().stageTimingsEnabled, false);
+  h.owner.getDiagnostics({ stageTimings: true });
+  assert.equal(h.owner.present(h.transform), true);
+  const initial = h.owner.getDiagnostics().coverageCalculations;
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial);
+  const moved = { ...h.transform, x: 25 };
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 1);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.25);
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 1);
+  h.map.width = 125;
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 2);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.2);
+  h.owner.notePassCommit("labels");
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 3);
+  const snapshot = { ...h.currentFrame, revision: 1 };
+  snapshot.gpu.setPalette = () => {};
+  assert.equal(h.owner.presentNavigation(moved, snapshot, { allowPartialPasses: true }), true);
+  const navigation = h.owner.getDiagnostics().coverageCalculations;
+  assert.equal(navigation, initial + 4);
+  assert.equal(h.owner.presentNavigation(moved, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, navigation);
+  snapshot.revision++;
+  assert.equal(h.owner.presentNavigation(moved, snapshot, { allowPartialPasses: true }), true);
+  const diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.coverageCalculations, navigation + 1);
+  assert.equal(diagnostics.stageTimings.coverage.count, diagnostics.coverageCalculations);
+  assert.equal(diagnostics.stageTimings.coverage.taskKind, "present");
+});
+
 test("complete coverage reports zero gaps and failed presentations preserve the last measurement", () => {
   const h = coverageHarness();
   assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, null);
@@ -66,6 +103,45 @@ test("committed tile holes remain missing while transparent valid tiles count as
   assert.equal(h.owner.present(h.transform), true);
   assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0);
   assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0);
+  h.owner.dispose();
+});
+
+test("navigation tile unions reduce political gaps independently of retained sibling passes", () => {
+  const h = coverageHarness(1);
+  const lists = [];
+  h.currentFrame.gpu.setDrawTiles = handles => lists.push(handles);
+  h.currentFrame.gpu.setPalette = () => {};
+  h.currentFrame.drawTiles = ["exact"];
+  assert.equal(h.owner.present(h.transform), true);
+  const baselines = h.records.colorBaselines.length;
+  const transform = { ...h.transform, x: 25 };
+  const snapshot = { ...h.currentFrame, transform, exactForView: false,
+    plan: { ...h.currentFrame.plan, tiles: [
+      { originX: 0, originY: 0, width: 25, height: 50 },
+      { originX: 75, originY: 0, width: 25, height: 50 },
+    ] }, drawTiles: ["left", "right"] };
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.5);
+  assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0.75);
+  assert.equal(h.owner.getDiagnostics().partialPasses, true);
+  assert.deepEqual(lists.at(-1), snapshot.drawTiles);
+  snapshot.plan.tiles.push({ originX: 25, originY: 0, width: 25, height: 50 });
+  snapshot.drawTiles.push("middle-left");
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.25);
+  snapshot.plan.tiles.push({ originX: 50, originY: 0, width: 25, height: 50 });
+  snapshot.drawTiles.push("middle-right");
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0);
+  assert.equal(h.owner.getDiagnostics().passUncoveredRatios.base, 0.25);
+  assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0.25);
+  assert.equal(h.records.colorBaselines.length, baselines);
+  assert.equal(h.owner.getDiagnostics().publications, 1);
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { holdPartialUntilExact: true }), false);
+  assert.equal(h.owner.isActive(), true);
+  assert.equal(h.owner.present(h.transform), true);
+  assert.deepEqual(lists.at(-1), ["exact"]);
+  assert.equal(h.owner.getDiagnostics().partialPasses, false);
   h.owner.dispose();
 });
 
@@ -198,6 +274,41 @@ function publicationHarness() {
   return { ...h, jobs, requests, setIdentity: value => identity = value,
     setSceneIdentity: value => sceneIdentity = value, setTransform: value => transform = value };
 }
+
+test("ready sibling publication replaces retained pass snapshots at the final camera", async t => {
+  const h = publicationHarness();
+  t.after(() => h.owner.dispose());
+  assert.equal(h.owner.present(h.transform), true);
+  h.currentFrame.presentationState = "retained";
+  for (const [name, pass] of h.passes) {
+    pass.reference = { ...h.transform };
+    pass.layout = { offsetX: 0, offsetY: 0 };
+    h.owner.notePassCommit(name);
+  }
+  assert.equal(h.owner.preparePublication(h.transform), false);
+  assert.equal(h.owner.present(h.transform, { refresh: false }), true);
+  assert.equal(h.records.frames.at(-1).layers.at(-1).revision, 0);
+  h.jobs[0].resolve(true); await Promise.resolve();
+  assert.equal(h.owner.preparePublication(h.transform), true);
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.getDiagnostics().presentationState, "published");
+  assert.equal(h.owner.getDiagnostics().publicationPending, false);
+  for (const layer of h.records.frames.at(-1).layers.filter(layer => !layer.draw)) {
+    assert.equal(layer.revision, 1);
+    assert.equal(layer.retained, undefined);
+    assert.deepEqual(layer.transform, { a: 1, d: 1, e: 0, f: 0 });
+  }
+});
+
+test("a fully covered retained scene without a navigation snapshot does not complete an exact wait", t => {
+  const h = coverageHarness();
+  t.after(() => h.owner.dispose());
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.presentNavigation(h.transform, null, { refresh: false, holdPartialUntilExact: true }), false);
+  assert.equal(h.owner.isActive(), true);
+  assert.equal(h.owner.getDiagnostics().partialPasses, false);
+  assert.equal(h.owner.getDiagnostics().presentationState, "retained");
+});
 
 test("publication coverage is captured once, retained navigation stays usable and ready identity is consumed once", async () => {
   const h = publicationHarness();

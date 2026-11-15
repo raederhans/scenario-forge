@@ -109,6 +109,79 @@ test("unknown dirty bounds conservatively clear cache and clear resets retained 
 const descriptor = { originX: 0, originY: 0, width: 8, height: 8, density: 1 };
 const filledTile = (value, length = 64) => ({ ...makeTile(length * 4), codes: new Uint32Array(length).fill(value) });
 
+test("bounded admission defers cold compression and preserves the CPU cap", t => {
+  const tasks = new Map();
+  let nextTask = 0;
+  t.mock.method(globalThis, "setTimeout", run => { tasks.set(++nextTask, run); return nextTask; });
+  t.mock.method(globalThis, "clearTimeout", id => tasks.delete(id));
+  const cache = createPoliticalIdRasterCache({ maxBytes: 1100 });
+  t.after(() => cache.clear());
+  for (let i = 0; i < 4; i++) cache.set(String(i), filledTile(i), descriptor);
+  assert.equal(cache.set("large", filledTile(9, 200), descriptor, { compressionBudget: 1 }), true);
+  const admitted = cache.getCompressionStats();
+  assert.equal(admitted.compressionAttempts, 1);
+  assert.ok(admitted.pending > 0);
+  assert.ok(cache.getStats().cpuBytes <= cache.maxBytes);
+  assert.ok(cache.getStats().evictions > 0);
+  const bytes = cache.getStats().cpuBytes;
+  while (tasks.size) {
+    const [id, run] = tasks.entries().next().value;
+    tasks.delete(id); run();
+    assert.ok(cache.getStats().cpuBytes <= cache.maxBytes);
+  }
+  assert.equal(cache.getCompressionStats().pending, 0);
+  assert.ok(cache.getCompressionStats().deferredCompressions > 0);
+  assert.ok(cache.getStats().cpuBytes < bytes);
+  assert.ok(cache.get("large").codes.every(code => code === 9));
+});
+
+test("zero compression budget admits through LRU eviction without scanning codes", t => {
+  const tasks = [];
+  t.mock.method(globalThis, "setTimeout", run => { tasks.push(run); return tasks.length; });
+  t.mock.method(globalThis, "clearTimeout", () => {});
+  const cache = createPoliticalIdRasterCache({ maxBytes: 600 });
+  cache.set("old", filledTile(1), descriptor);
+  cache.set("retained", filledTile(2), descriptor);
+  assert.equal(cache.set("new", filledTile(3), descriptor, { compressionBudget: 0 }), true);
+  assert.equal(cache.getCompressionStats().compressionAttempts, 0);
+  assert.equal(cache.peek("old"), undefined);
+  assert.equal(cache.getStats().cpuBytes, 512);
+  cache.clear();
+  assert.equal(cache.getCompressionStats().pending, 0);
+});
+
+test("an upload reservation never evicts cached tiles", () => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 600 });
+  // Incompressible codes: compaction cannot make room, only eviction could.
+  const noisy = seed => ({ ...makeTile(64 * 4), codes: Uint32Array.from({ length: 64 }, (_, i) => (i * 2654435761 + seed) >>> 0) });
+  cache.set("first", noisy(1), descriptor);
+  cache.set("second", noisy(2), descriptor);
+  const before = cache.getStats();
+  const release = cache.reserveTransient(10_000);
+  assert.ok(cache.peek("first") && cache.peek("second"), "tiles being uploaded stay resident");
+  assert.equal(cache.getStats().tileCount, before.tileCount);
+  assert.equal(cache.getStats().evictions, before.evictions);
+  release();
+  assert.equal(cache.getStats().cpuBytes, before.cpuBytes);
+});
+
+test("decode overlap and upload reservations share the CPU cap", () => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 400 });
+  const old = filledTile(3), next = filledTile(4);
+  cache.set("old", old, descriptor);
+  cache.set("next", next, descriptor);
+  const release = cache.reserveTransient(100);
+  assert.ok(cache.getStats().cpuBytes <= 400);
+  assert.deepEqual(old.codes, new Uint32Array(64).fill(3));
+  const transient = cache.getTransientStats();
+  assert.equal(transient.transientBytes, 100);
+  assert.ok(transient.peakTransientBytes >= 356);
+  assert.ok(transient.peakCpuBytes <= 400);
+  release();
+  assert.equal(cache.getTransientStats().transientBytes, 0);
+  assert.ok(cache.getStats().cpuBytes <= 300);
+});
+
 test("cold constant codes retain tile identity while reads materialize one stable hot array", () => {
   const cache = createPoliticalIdRasterCache({ maxBytes: 400 });
   const old = filledTile(0xffffffff), next = filledTile(7);

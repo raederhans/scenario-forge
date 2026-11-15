@@ -27,9 +27,12 @@ function isValidTile(tile, descriptor) {
     || tile.edgeIds.length !== tile.edgeWeights.length) return false;
 
   if (descriptor != null) {
+    const storage = descriptor.storageRect;
     if (typeof descriptor !== "object"
-      || descriptor.originX !== tile.originX || descriptor.originY !== tile.originY
-      || descriptor.width !== tile.width || descriptor.height !== tile.height
+      || (storage ? storage.minX !== tile.originX || storage.minY !== tile.originY
+        || storage.maxX - storage.minX !== tile.width || storage.maxY - storage.minY !== tile.height
+        : descriptor.originX !== tile.originX || descriptor.originY !== tile.originY
+          || descriptor.width !== tile.width || descriptor.height !== tile.height)
       || (descriptor.density != null && (!Number.isFinite(descriptor.density) || descriptor.density <= 0))) {
       return false;
     }
@@ -130,7 +133,8 @@ export function queryPoliticalIdRasterCandidates({
         return result("invalid", [], "mixed-density");
       }
     }
-    normalizedTiles.push(tile);
+    normalizedTiles.push({ tile, core: descriptor?.coreRect || tile.coreRect || {
+      minX: tile.originX, minY: tile.originY, maxX: tile.originX + tile.width, maxY: tile.originY + tile.height } });
   }
   if (queryDensity == null) queryDensity = 1;
   if (!Number.isFinite(queryDensity) || queryDensity <= 0) {
@@ -141,21 +145,19 @@ export function queryPoliticalIdRasterCandidates({
   if (!Number.isFinite(samplesPerPixel) || samplesPerPixel <= 0) return result("invalid", [], "invalid-sampling");
   if (samplesPerPixel < MIN_PICK_DENSITY) return result("missing", [], "coarse-density");
 
-  const containing = normalizedTiles.filter((tile) => point.x >= tile.originX
-    && point.y >= tile.originY
-    && point.x < tile.originX + tile.width
-    && point.y < tile.originY + tile.height);
+  const containing = normalizedTiles.filter(({ core }) => point.x >= core.minX
+    && point.y >= core.minY && point.x < core.maxX && point.y < core.maxY);
   if (containing.length === 0) return result("missing", [], "outside-tiles");
   if (containing.length > 1) return result("invalid", [], "overlapping-tiles");
 
-  const tile = containing[0];
+  const { tile, core } = containing[0];
   const centerX = Math.floor(point.x - tile.originX);
   const centerY = Math.floor(point.y - tile.originY);
   // Always inspect at least 3x3 pixels for an interior classification, even if
   // the caller asks for no additional boundary candidates.
   const radius = Math.max(1, guardPixels);
-  if (centerX - radius < 0 || centerY - radius < 0
-    || centerX + radius >= tile.width || centerY + radius >= tile.height) {
+  if (Math.floor(point.x) - radius < core.minX || Math.floor(point.y) - radius < core.minY
+    || Math.floor(point.x) + radius >= core.maxX || Math.floor(point.y) + radius >= core.maxY) {
     return result("missing", [], "tile-seam");
   }
 

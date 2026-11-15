@@ -3,10 +3,427 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
 import { createPoliticalIdRasterGpu } from "../js/core/renderer/political_id_raster_gpu.js";
+import { createTnoRasterSceneOwner } from "../js/core/renderer/tno_raster_scene_owner.js";
 import { createPoliticalIdRasterCache, planPoliticalIdRasterView } from "../js/core/renderer/political_id_raster_cache.js";
 import { bindRenderBoundary, requestRender, markRenderBoundaryFlushed, getRenderBoundaryDebugState } from "../js/core/render_boundary.js";
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
+
+const navigationTick = () => new Promise(resolve => setTimeout(resolve, 5));
+async function waitForNavigation(predicate) {
+  for (let i = 0; i < 40 && !predicate(); i++) await navigationTick();
+  assert.ok(predicate(), "navigation host tasks completed");
+}
+
+async function navigationFixture(t) {
+  let confirmations = 0;
+  const f = fixture({ width: 900, height: 600, transform: { x: -100, y: -100, k: 1 },
+    directPresentation: true, displayMode: "raster", autoPublish: false, createGpu: measuredGpu,
+    commitPublishedColorEdit: () => { confirmations++; } });
+  t.after(() => f.owner.dispose());
+  f.h.yieldGpuPreparation = tick;
+  f.owner.draw();
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) {
+      const tile = makeTile(request.packet);
+      tile.codes = new Uint32Array(tile.width * tile.height);
+      request.resolve(tile);
+    }
+    await tick();
+  }
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+  f.renders.length = 0;
+  return { ...f, confirmations: () => confirmations };
+}
+
+function completeNavigationTile(request) {
+  const tile = makeTile(request.packet);
+  tile.codes = new Uint32Array(tile.width * tile.height);
+  request.resolve(tile);
+}
+
+test("continuous input keeps production running while a navigation upload yields", async t => {
+  const f = await navigationFixture(t), gpu = f.owner.getDirectFrame().gpu;
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await waitForNavigation(() => f.requests.some(request => !request.settled));
+  completeNavigationTile(f.requests.find(request => !request.settled));
+  await waitForNavigation(() => gates.length > 0);
+  assert.ok(f.requests.some(request => !request.settled), "worker produces the next tile while upload yields");
+  const uploads = gpu.getStats().tileUploads;
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  completeNavigationTile(f.requests.find(request => !request.settled));
+  await navigationTick();
+  gates.shift()();
+  await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 1);
+  await waitForNavigation(() => gates.length > 0);
+  gates.shift()();
+  await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 2);
+  assert.deepEqual(f.renders, []);
+});
+
+test("navigation admission and upload yield past the input frame and unchanged snapshots reuse their lists", async t => {
+  const f = await navigationFixture(t), gpu = f.owner.getDirectFrame().gpu;
+  assert.equal(f.owner.getDiagnostics().stageTimingsEnabled, false);
+  f.owner.getDiagnostics({ stageTimings: true, tileEvents: true });
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  const uploads = gpu.getStats().tileUploads;
+  const compression = f.cache.getCompressionStats().compressionAttempts;
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  const first = f.owner.getNavigationSnapshot();
+  const before = f.owner.getDiagnostics();
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  assert.equal(f.owner.getNavigationSnapshot(), first);
+  assert.equal(f.owner.getDiagnostics().snapshotBuilds, before.snapshotBuilds);
+  assert.equal(f.owner.getDiagnostics().tileRecordUpdates, before.tileRecordUpdates);
+  assert.equal(gpu.getStats().tileUploads, uploads);
+  assert.equal(f.cache.getCompressionStats().compressionAttempts, compression);
+  await navigationTick();
+  const request = f.requests.at(-1), count = f.cache.getStats().tileCount;
+  completeNavigationTile(request);
+  await Promise.resolve(); await Promise.resolve();
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  f.owner.getNavigationSnapshot();
+  assert.equal(f.cache.getStats().tileCount, count);
+  assert.equal(gpu.getStats().tileUploads, uploads);
+  assert.equal(f.cache.getCompressionStats().compressionAttempts, compression);
+  for (let i = 0; i < 20 && gpu.getStats().tileUploads === uploads; i++) await navigationTick();
+  assert.equal(gpu.getStats().tileUploads, uploads + 1);
+  assert.deepEqual(f.renders, []);
+  const ready = f.owner.getNavigationSnapshot();
+  assert.notEqual(ready.drawTiles, first.drawTiles);
+  f.state.zoomTransform = { ...f.state.zoomTransform, x: -1201 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  const moved = f.owner.getNavigationSnapshot();
+  assert.equal(moved.drawTiles, ready.drawTiles);
+  const diagnostics = f.owner.getDiagnostics();
+  assert.equal(diagnostics.stageTimings.admission.tasks["host-task"].count, 1);
+  assert.equal(diagnostics.stageTimings.upload.tasks["host-task"].count, 1);
+  assert.ok(diagnostics.stageTimings.snapshot.tasks.present.count > 0);
+  const event = diagnostics.tileEvents.find(event => event.cpuReadyAt !== null);
+  assert.equal(event.stages.admission.taskKind, "host-task");
+  assert.equal(event.stages.upload.taskKind, "host-task");
+});
+
+test("navigation publishes one ready tile while other visible tiles remain pending and preserves exact publication", async t => {
+  const f = await navigationFixture(t);
+  const committed = f.owner.getDiagnostics().view;
+  const frame = f.owner.getDirectFrame(), gpu = frame.gpu;
+  const confirmations = f.confirmations(), uploads = gpu.getStats().tileUploads;
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  assert.equal(f.owner.updateNavigationDemand(f.state.zoomTransform), true);
+  assert.equal(f.requests.filter(request => !request.settled).length, 0);
+  await navigationTick();
+  const first = f.requests.at(-1);
+  assert.equal(first.packet.coreRect.minX, 1536);
+  assert.equal(first.packet.coreRect.minY, 0);
+  completeNavigationTile(first);
+  await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 1);
+  const snapshot = f.owner.getNavigationSnapshot();
+  assert.ok(snapshot.plan.tiles.some(tile => tile.originX === 1536 && tile.originY === 0));
+  gpu.setDrawTiles(snapshot.drawTiles);
+  assert.equal(gpu.getStats().drawTiles, frame.drawTiles.length + 1);
+  assert.equal(gpu.getStats().tileUploads, uploads + 1);
+  assert.equal(f.requests.filter(request => !request.settled).length, 1);
+  assert.deepEqual(f.renders, []);
+  assert.deepEqual(f.owner.getDiagnostics().view, committed);
+  assert.equal(f.confirmations(), confirmations);
+  assert.equal(f.owner.getDirectFrame(), frame);
+  completeNavigationTile(f.requests.at(-1));
+  await navigationTick(); await tick();
+  assert.equal(gpu.getStats().tileUploads, uploads + 1);
+  assert.deepEqual(f.renders, []);
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 2);
+  assert.equal(gpu.getStats().tileUploads, uploads + 2);
+  assert.deepEqual(f.renders, []);
+  f.owner.draw();
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) completeNavigationTile(request);
+    await tick();
+  }
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  assert.equal(gpu.getStats().residentTiles, f.owner.getDirectFrame().plan.tiles.length);
+  assert.ok(frame.drawTiles.every(handle => !gpu.hasTileHandle(handle)));
+});
+
+test("continuous navigation closes visible gaps and preserves coverage through exact and scene preparation", async t => {
+  const f = await navigationFixture(t);
+  const gpu = f.owner.getDirectFrame().gpu;
+  const publicationGates = [];
+  const map = { width: 900, height: 600, style: {}, parentNode: { insertBefore() {} },
+    ownerDocument: { createElement: () => ({ style: {}, setAttribute() {}, remove() {} }) } };
+  const scene = createTnoRasterSceneOwner({ surface: { getMapCanvas: () => map },
+    helpers: { getActivePassNames: () => ["political"], getDirectFrame: () => f.owner.getDirectFrame(),
+      getNavigationSnapshot: () => f.owner.getNavigationSnapshot(), getDpr: () => 1,
+      getCurrentTransform: () => f.state.zoomTransform,
+      getPreparationIdentity: () => f.owner.getStagedFrameIdentity() || f.owner.getDirectFrame() },
+    createGpu: () => gpu,
+    createCompositor: () => ({ isAvailable: () => true, setTextureBudget() {}, dispose() {},
+      prepareLayers: () => new Promise(resolve => publicationGates.push(resolve)), cancelPreparedLayers() {},
+      getStats: () => ({}), render: ({ layers, width, height }) => {
+        for (const layer of layers) layer.draw({ width, height });
+        return true;
+      } }),
+  });
+  t.after(() => scene.dispose());
+  scene.ensureGpu();
+  assert.equal(scene.present(f.state.zoomTransform), true);
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  const gaps = [];
+  const sampleCoverage = () => {
+    assert.equal(scene.presentNavigation(f.state.zoomTransform, f.owner.getNavigationSnapshot(),
+      { refresh: false, allowPartialPasses: true }), true);
+    const gap = scene.getDiagnostics().politicalUncoveredRatio;
+    if (gaps.length) assert.ok(gap <= gaps.at(-1), "ready tiles reduce the visible gap on the next input frame");
+    gaps.push(gap);
+  };
+  sampleCoverage();
+  for (let i = 0; i < 8; i++) {
+    await navigationTick();
+    const request = f.requests.find(value => !value.settled);
+    if (request) {
+      const uploads = gpu.getStats().tileUploads;
+      completeNavigationTile(request);
+      await waitForNavigation(() => gpu.getStats().tileUploads > uploads);
+    }
+    f.state.zoomTransform = { ...f.state.zoomTransform, x: f.state.zoomTransform.x + 1 };
+    f.owner.updateNavigationDemand(f.state.zoomTransform);
+    sampleCoverage();
+  }
+  await navigationTick();
+  const navigation = f.owner.getNavigationSnapshot();
+  assert.equal(scene.presentNavigation(f.state.zoomTransform, navigation, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+  assert.ok(gaps[0] > 0);
+  assert.equal(gaps.at(-1), 0);
+  const retainedHandles = [...navigation.drawTiles];
+  const checkWaitingCoverage = () => {
+    assert.equal(scene.presentNavigation(f.state.zoomTransform, f.owner.getNavigationSnapshot(),
+      { refresh: false, holdPartialUntilExact: true }), false);
+    assert.equal(scene.isActive(), true);
+    assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+    assert.ok(retainedHandles.every(handle => gpu.hasTileHandle(handle)));
+    assert.ok(retainedHandles.every(handle => gpu.releaseTile(handle) === false));
+    assert.equal(scene.present(f.state.zoomTransform, { refresh: false, holdPartialUntilExact: true }), false);
+    assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+    assert.equal(scene.isActive(), true);
+  };
+  f.cache.clear();
+  checkWaitingCoverage();
+  f.state.zoomTransform = { x: -1100, y: -100, k: 1 };
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.owner.prepareSource();
+  checkWaitingCoverage();
+  for (let guard = 0; guard < 100 && !f.owner.getDiagnostics().gpuPreparation.pending; guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) completeNavigationTile(request);
+    await tick();
+    checkWaitingCoverage();
+  }
+  assert.equal(f.owner.getDiagnostics().gpuPreparation.pending, true);
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    gates.shift()?.();
+    await tick();
+    checkWaitingCoverage();
+  }
+  assert.equal(f.owner.getDiagnostics().gpuPreparation.ready, true);
+  assert.ok(f.owner.draw().staged);
+  checkWaitingCoverage();
+  assert.equal(scene.preparePublication(f.state.zoomTransform), false);
+  checkWaitingCoverage();
+  assert.equal(scene.getDiagnostics().publicationPending, true);
+  publicationGates.shift()(true);
+  await Promise.resolve();
+  assert.equal(scene.preparePublication(f.state.zoomTransform), true);
+  checkWaitingCoverage();
+  assert.equal(f.owner.publishDirectFrame(), true);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  assert.ok(retainedHandles.every(handle => !gpu.hasTileHandle(handle)));
+  assert.equal(scene.present(f.state.zoomTransform), true);
+  assert.equal(scene.getDiagnostics().politicalUncoveredRatio, 0);
+});
+
+test("moving demand keeps useful same-source work and chooses the latest visible gap next", async t => {
+  const f = await navigationFixture(t);
+  const epoch = f.owner.getDirectFrame().epoch;
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  const first = f.requests.at(-1);
+  f.state.zoomTransform = { x: -1800, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  assert.equal(first.signal.aborted, false);
+  completeNavigationTile(first);
+  await waitForNavigation(() => f.owner.getNavigationSnapshot().plan.tiles.some(tile => tile.originX === 1536 && tile.originY === 0));
+  assert.equal(first.signal.aborted, false);
+  assert.equal(f.owner.getNavigationSnapshot().epoch, epoch);
+  assert.ok(f.owner.getNavigationSnapshot().plan.tiles.some(tile => tile.originX === 1536 && tile.originY === 0));
+  assert.equal(f.requests.at(-1).packet.coreRect.minX, 2048);
+  assert.equal(f.requests.at(-1).packet.coreRect.minY, 0);
+});
+
+test("cross-density settling publishes the new exact frame and final sibling snapshots after navigation tiles", async t => {
+  const f = await navigationFixture(t), initialFrame = f.owner.getDirectFrame(), gpu = initialFrame.gpu;
+  const frames = [], publishedFrames = [], preparations = [];
+  const map = { width: 900, height: 600, style: {}, parentNode: { insertBefore() {} },
+    ownerDocument: { createElement: () => ({ style: {}, setAttribute() {}, remove() {} }) } };
+  const passes = new Map(["contextScenario", "borders"].map(name => [name, {
+    canvas: { width: 4000, height: 4000 }, reference: { ...f.state.zoomTransform }, layout: { offsetX: 0, offsetY: 0 },
+  }]));
+  const scene = createTnoRasterSceneOwner({ surface: { getMapCanvas: () => map },
+    helpers: {
+      getActivePassNames: () => ["political", ...passes.keys()],
+      getDirectFrame: () => f.owner.getDirectFrame(), getDpr: () => 1,
+      getNavigationSnapshot: () => f.owner.getNavigationSnapshot(),
+      getCurrentTransform: () => f.state.zoomTransform,
+      getPreparationIdentity: () => f.owner.getStagedFrameIdentity() || f.owner.getDirectFrame(),
+      getPassCanvas: name => passes.get(name).canvas,
+      getPassReferenceTransform: name => passes.get(name).reference,
+      getPassLayout: name => passes.get(name).layout,
+      capturePublishedColorBaseline: () => publishedFrames.push(f.owner.getDirectFrame()),
+    },
+    createGpu: () => gpu,
+    createCompositor: () => ({ isAvailable: () => true, setTextureBudget() {}, dispose() {},
+      getStats: () => ({}), cancelPreparedLayers() {},
+      prepareLayers: async ({ layers }) => { preparations.push(layers); return true; },
+      render: frame => {
+        frames.push(frame);
+        for (const layer of frame.layers) layer.draw?.({ width: frame.width, height: frame.height });
+        return true;
+      },
+    }),
+  });
+  t.after(() => scene.dispose());
+  scene.ensureGpu();
+  assert.equal(scene.present(f.state.zoomTransform), true);
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await waitForNavigation(() => f.requests.some(request => !request.settled));
+  const uploads = gpu.getStats().tileUploads;
+  completeNavigationTile(f.requests.find(request => !request.settled));
+  await waitForNavigation(() => gpu.getStats().tileUploads > uploads);
+  const navigation = f.owner.getNavigationSnapshot();
+  assert.equal(scene.presentNavigation(f.state.zoomTransform, navigation, { refresh: false, allowPartialPasses: true }), true);
+  const oldHandles = [...navigation.drawTiles];
+
+  f.state.zoomTransform = { x: -600, y: -50, k: 0.5 };
+  assert.equal(f.owner.updateNavigationDemand(f.state.zoomTransform), false);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.owner.prepareSource();
+  for (let i = 0; i < 100 && !f.owner.getDiagnostics().gpuPreparation.ready; i++) {
+    const request = f.requests.find(request => !request.settled);
+    if (request) completeNavigationTile(request);
+    for (const resume of gates.splice(0)) resume();
+    await navigationTick();
+  }
+  assert.equal(f.owner.getDiagnostics().gpuPreparation.ready, true);
+  assert.equal(f.owner.getDirectFrame(), initialFrame);
+  assert.ok(oldHandles.every(handle => gpu.hasTileHandle(handle)));
+  assert.ok(f.owner.draw().staged);
+  for (const [name, pass] of passes) {
+    pass.reference = { ...f.state.zoomTransform };
+    scene.notePassCommit(name);
+  }
+  assert.equal(scene.preparePublication(f.state.zoomTransform), false);
+  await Promise.resolve();
+  assert.equal(scene.preparePublication(f.state.zoomTransform), true);
+  assert.ok(preparations.at(-1).every(layer => layer.revision === 1));
+  assert.equal(f.owner.publishDirectFrame(), true);
+  const exact = f.owner.getDirectFrame();
+  assert.notEqual(exact, initialFrame);
+  assert.ok(exact.plan.level < initialFrame.plan.level);
+  assert.deepEqual(exact.transform, f.state.zoomTransform);
+  assert.equal(scene.present(f.state.zoomTransform), true);
+  assert.equal(publishedFrames.at(-1), exact);
+  assert.equal(scene.getDiagnostics().publications, 2);
+  assert.equal(scene.getDiagnostics().presentationState, "published");
+  assert.equal(scene.getDiagnostics().publicationPending, false);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  assert.ok(oldHandles.every(handle => !gpu.hasTileHandle(handle)));
+  assert.ok(exact.drawTiles.every(handle => !oldHandles.includes(handle)));
+  for (const layer of frames.at(-1).layers.filter(layer => !layer.draw)) {
+    assert.equal(layer.revision, 1);
+    assert.equal(layer.retained, undefined);
+    assert.deepEqual(layer.transform, { a: 1, d: 1, e: 0, f: 0 });
+  }
+  for (const pass of passes.values()) pass.reference = initialFrame.transform;
+  assert.equal(scene.present(f.state.zoomTransform, { refresh: false }), true);
+  for (const layer of frames.at(-1).layers.filter(layer => !layer.draw)) {
+    assert.equal(layer.revision, 1);
+    assert.equal(layer.retained, true);
+    assert.deepEqual(layer.transform, { a: 1, d: 1, e: 0, f: 0 });
+  }
+});
+
+test("source replacement revokes navigation work and rejects its late result", async t => {
+  const f = await navigationFixture(t);
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  const old = f.requests.at(-1);
+  f.identity.sceneKey = "scene-b";
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  await navigationTick();
+  assert.equal(old.signal.aborted, true);
+  const builds = f.owner.getDiagnostics().builds;
+  completeNavigationTile(old);
+  await navigationTick();
+  assert.equal(f.owner.getDiagnostics().builds, builds);
+  assert.ok(f.owner.getDiagnostics().tileRecords.every(record => record.sourceStamp.namespace.startsWith("scene-b|")));
+});
+
+test("cross-density navigation keeps the complete-frame path", async t => {
+  const f = await navigationFixture(t);
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  const active = f.requests.at(-1);
+  const count = f.requests.length;
+  f.state.zoomTransform = { x: -1200, y: -100, k: 0.5 };
+  assert.equal(f.owner.updateNavigationDemand(f.state.zoomTransform), false);
+  completeNavigationTile(active);
+  await navigationTick();
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  assert.equal(f.requests.length, count);
+  assert.deepEqual(f.renders, []);
+});
+
+test("palette edits during a navigation upload preserve geometry and publish current colors without edit confirmation", async t => {
+  const f = await navigationFixture(t);
+  let releaseUpload;
+  f.h.yieldGpuPreparation = () => new Promise(resolve => { releaseUpload = resolve; });
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  completeNavigationTile(f.requests.at(-1));
+  await waitForNavigation(() => typeof releaseUpload === "function");
+  assert.equal(typeof releaseUpload, "function");
+  const epoch = f.owner.getDirectFrame().epoch, confirmations = f.confirmations();
+  f.features[0].color = "#abcdef";
+  f.identity.colorVersion++;
+  f.identity.directFrameKey = "recolored";
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  releaseUpload();
+  await tick();
+  const snapshot = f.owner.getNavigationSnapshot();
+  assert.equal(snapshot.epoch, epoch);
+  assert.deepEqual([...snapshot.palette.slice(4, 8)], [0xab, 0xcd, 0xef, 255]);
+  assert.equal(f.confirmations(), confirmations);
+  assert.deepEqual(f.renders, []);
+});
 
 function measuredGpu(options = {}) {
   const canvas = { width: 1, height: 1, addEventListener() {}, removeEventListener() {} };
@@ -21,6 +438,55 @@ function measuredGpu(options = {}) {
   canvas.getContext = () => gl;
   return createPoliticalIdRasterGpu({ ...options, canvas });
 }
+
+test("tile records progress without retaining payloads or changing identity for palette edits", async t => {
+  const f = fixture({ directPresentation: true, displayMode: "raster", autoPublish: false, createGpu: measuredGpu });
+  t.after(() => f.owner.dispose());
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.owner.draw();
+  const requested = f.owner.getDiagnostics().tileRecords;
+  assert.ok(requested.length > 0);
+  assert.ok(requested.every(record => record.state === "requested"));
+  for (const record of requested) {
+    assert.deepEqual(record.storageRect, { minX: record.coreRect.minX - 1, minY: record.coreRect.minY - 1,
+      maxX: record.coreRect.maxX + 1, maxY: record.coreRect.maxY + 1 });
+    assert.match(record.sourceStamp.rasterizationVariant, /^halo-1-v1:/);
+  }
+  const packet = f.requests[0].packet;
+  assert.equal(packet.width, 514); assert.equal(packet.height, 514);
+  assert.equal(packet.originX, packet.storageRect.minX);
+  assert.equal(packet.originY, packet.storageRect.minY);
+  for (let guard = 0; guard < 100; guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (!request) break;
+    const tile = makeTile(request.packet);
+    tile.codes = new Uint32Array(tile.width * tile.height);
+    request.resolve(tile);
+    await tick();
+  }
+  assert.ok(f.owner.getDiagnostics().tileRecords.every(record => record.state === "cpu-ready"));
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    gates.shift()?.(); await tick();
+  }
+  const ready = f.owner.getDiagnostics().tileRecords;
+  assert.ok(ready.every(record => record.state === "gpu-ready"));
+  assert.equal(f.owner.getDirectFrame(), null);
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+  f.features[0].color = "#abcdef"; f.identity.colorVersion++;
+  f.owner.draw();
+  const recolored = f.owner.getDiagnostics().tileRecords;
+  assert.deepEqual(recolored.map(record => record.sourceStamp), ready.map(record => record.sourceStamp));
+  assert.deepEqual(recolored.map(record => record.gpuHandle), ready.map(record => record.gpuHandle));
+  const containsPayload = value => ArrayBuffer.isView(value) || (value && typeof value === "object"
+    && Object.values(value).some(containsPayload));
+  assert.equal(containsPayload(recolored), false);
+  f.cache.clear();
+  assert.ok(f.owner.getDiagnostics().tileRecords.every(record => record.state === "gpu-ready"));
+  f.owner.dispose();
+  assert.deepEqual(f.owner.getDiagnostics().tileRecords, []);
+});
 
 for (const asynchronous of [false, true]) test(`tile diagnostics record accepted CPU data and real ${asynchronous ? "asynchronous" : "synchronous"} uploads`, async t => {
   const f = fixture({ directPresentation: true, displayMode: "raster", createGpu: options => {
@@ -236,6 +702,7 @@ function fixture({
       commitPublishedColorEdit,
       recordMetric: (...args) => metrics.push(args),
       requestRender: (reason) => { renders.push(reason); requestRenderEffect?.(reason); },
+      requestNavigationRender: () => renders.push("navigation-ready"),
     },
     client,
     cache,
@@ -1285,6 +1752,9 @@ test("published and overview palettes replay explicit dirty IDs and fall back to
   const overviewFactory = makeGpuFactory(), primaryFactory = makeGpuFactory();
   const createGpu = options => {
     const gpu = primaryFactory.createGpu(options);
+    // Primary-GPU tile handles, as the real GPU module hands out.
+    const handles = new Map();
+    gpu.getTileHandle = tile => handles.get(tile) || handles.set(tile, { tile }).get(tile);
     gpu.createOverview = ({ tiles, palette, revision }) => {
       const child = overviewFactory.createGpu({ onContextLost() {} });
       child.setPalette(palette, revision); child.setTiles(tiles); return child;
@@ -1302,6 +1772,8 @@ test("published and overview palettes replay explicit dirty IDs and fall back to
   f.owner.draw(); await resolveAll(f); f.owner.draw();
   const gpu = primaryFactory.instances[0], overview = f.owner.getOverviewFrame();
   assert.ok(f.owner.getDirectFrame()); assert.ok(overview);
+  assert.ok(f.owner.getDirectFrame().drawTiles.length > 0, "the published frame carries primary-GPU draw handles");
+  assert.equal(overview.drawTiles, undefined, "the overview GPU draws its own reduced tiles, not the primary frame's handles");
   const rgba = color => [1, 3, 5].map(index => parseInt(color.slice(index, index + 2), 16)).concat(255);
   const assertPalette = bytes => {
     for (const [code, id] of [[1, "a"], [2, "b"], [3, "c"]]) {

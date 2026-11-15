@@ -3211,6 +3211,7 @@ function getTnoRasterSceneOwner() {
     resourceBudget: pageResourceBudget,
     helpers: {
       getActivePassNames: getActiveRenderPassNames,
+      recordMetric: recordRenderPerfMetric,
       getPassCanvas: name => getRenderPassCacheState().canvases?.[name],
       getPassReferenceTransform,
       getPassLayout: getRenderPassLayout,
@@ -3222,6 +3223,7 @@ function getTnoRasterSceneOwner() {
       requestRender: reason => requestRendererRender(reason),
       yieldControl: yieldToMain,
       getDirectFrame: () => politicalIdRasterRuntimeOwner?.getDirectFrame(),
+      getNavigationSnapshot: () => politicalIdRasterRuntimeOwner?.getNavigationSnapshot(),
       getOverviewFrame: () => politicalIdRasterRuntimeOwner?.getOverviewFrame(),
       capturePublishedColorBaseline: options => politicalIdRasterRuntimeOwner?.capturePublishedColorBaseline(options),
       ensurePassCoverage: transform => {
@@ -3775,10 +3777,9 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
       const directScene = isTnoRasterSceneSelected();
       const gesture = runtimeState.renderPhase === RENDER_PHASE_INTERACTING
         || runtimeState.renderPhase === RENDER_PHASE_SETTLING;
+      if (!exportRenderInProgress && directScene && gesture) politicalIdRasterRuntimeOwner?.updateNavigationDemand(transform);
       const drawn = !exportRenderInProgress && (directScene
-        ? !!tnoRasterSceneOwner?.present(transform, { refresh: false,
-          // Moving views keep the vector path's contract: transform what is
-          // painted, refill the uncovered edges in the exact frame afterwards.
+        ? !!tnoRasterSceneOwner?.presentNavigation(transform, politicalIdRasterRuntimeOwner?.getNavigationSnapshot(), { refresh: false,
           allowPartialPasses: gesture,
           // Between the gesture and the exact frame the partial frame stays up.
           holdPartialUntilExact: !gesture })
@@ -10640,7 +10641,7 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
   if (!exportRenderInProgress && isTnoRasterSceneSelected()) {
     const scene = getTnoRasterSceneOwner();
     if (scene.preparePublication?.(currentTransform) === false) {
-      scene.present(currentTransform, { refresh: false });
+      scene.present(currentTransform, { refresh: false, holdPartialUntilExact: true });
       return false;
     }
     const staged = politicalIdRasterRuntimeOwner?.getDiagnostics().stagedPending;
@@ -10650,7 +10651,7 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
       if (politicalIdRasterRuntimeOwner.getDiagnostics().stagedRejectionReason === "stale-candidate") {
         queueMicrotask(() => requestRendererRender("scene-candidate-rejected"));
       }
-      tnoRasterSceneOwner?.present(currentTransform, { refresh: false });
+      tnoRasterSceneOwner?.present(currentTransform, { refresh: false, holdPartialUntilExact: true });
       return false;
     }
     if (getTnoRasterSceneOwner().present(currentTransform)) {
@@ -13319,7 +13320,7 @@ export function getPoliticalIdRasterDiagnostics(options) {
   return { ...current, ...policy, passes, asyncWork: getRendererAsyncWorkStatus(),
     canvasResources: getRenderCacheOwner().getSurfaceDiagnostics(),
     scene: { active: false, frames: 0, textureUploads: 0, bytes: 0,
-      ...tnoRasterSceneOwner?.getDiagnostics(), failure: tnoRasterSceneFailure,
+      ...tnoRasterSceneOwner?.getDiagnostics(options), failure: tnoRasterSceneFailure,
       borderCanvas: borderCanvasPreparationOwner?.getStats(),
       physicalCanvas: { ...physicalViewportCacheOwner?.getStats(), fullWorld: false, pending: !!physicalViewportCacheOwner?.getPendingPromise() } },
     waterPreparation: scenarioRegionOverlayRenderOwner?.getPreparationDiagnostics(),

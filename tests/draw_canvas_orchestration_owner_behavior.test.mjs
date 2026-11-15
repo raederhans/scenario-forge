@@ -5,6 +5,7 @@ import { createDrawCanvasOrchestrationOwner } from "../js/core/map_renderer/draw
 import { createOverviewFrameOwner } from "../js/core/renderer/overview_frame_owner.js";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createRenderPipelinePassesOwner } from "../js/core/renderer/render_pipeline_passes.js";
+import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
 
 const CONSTANTS = Object.freeze({
   renderPhaseIdle: "idle",
@@ -179,7 +180,7 @@ function createHarness({
   };
   if (navigation) effects.drawNavigationFrame = (transform) => {
     calls.push(["drawNavigationFrame", transform]);
-    return navigation({ phase: currentPhase, deferExact: currentDeferExact });
+    return navigation({ phase: currentPhase, deferExact: currentDeferExact, transform });
   };
   const owner = createDrawCanvasOrchestrationOwner({ constants: CONSTANTS, getters, effects });
   return { calls, effectiveTransform, owner, rawTransform: currentRawTransform, ...mutators };
@@ -243,15 +244,48 @@ test("quality-rejected navigation waits without publishing partial pixels then r
   assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).frameMode, "exact");
 });
 
-test("navigation frame presents requested transform before topology, worker and coverage work", () => {
+test("navigation frame presents while scheduling bounded tile work before exact pass preparation", async t => {
+  const state = { zoomTransform: { x: 2000, y: 2000, k: 2 }, dpr: 1 };
+  const requests = [], resident = new Map();
+  const gpu = { isAvailable: () => true, setPalette() {}, dispose() {},
+    setTiles: tiles => { for (const tile of tiles) resident.set(tile, {}); },
+    getTileHandle: tile => resident.get(tile), hasTileHandle: handle => [...resident.values()].includes(handle),
+    getStats: () => ({ gpuTextureBytes: 0 }),
+  };
+  const raster = createPoliticalIdRasterRuntimeOwner({ state, directPresentation: true, displayMode: "raster",
+    surface: { getProjection: () => ({}) }, createGpu: () => gpu,
+    client: { available: () => true, dispose() {}, request: (packet, { signal }) => new Promise(resolve => requests.push({ packet, signal, resolve })) },
+    helpers: { isEnabled: () => true, getLayout: () => ({ pixelWidth: 100, pixelHeight: 100 }),
+      getFeatures: () => [], getFeatureId: feature => feature.id, getBounds: () => null, resolveColor: () => "#123456",
+      getSourceIdentity: () => ({ sceneKey: "s", projectionKey: "p", coverageKey: "c", version: 1, colorVersion: 1 }),
+    }, effects: { requestRender() {}, requestNavigationRender() {} },
+  });
+  t.after(() => raster.dispose());
+  raster.draw();
+  for (let index = 0; index < requests.length; index++) {
+    const { packet, resolve } = requests[index];
+    resolve({ ...packet, codes: new Uint32Array(packet.width * packet.height), edgeIds: new Uint32Array(), edgeWeights: new Float32Array() });
+    await new Promise(resolve => setImmediate(resolve));
+  }
+  assert.ok(raster.draw().staged);
+  assert.equal(raster.publishDirectFrame(), true);
+  const previousRequests = requests.length;
   const { calls, owner, rawTransform } = createHarness({
-    phase: "interacting", navigation: () => true,
+    phase: "interacting", navigation: ({ transform }) => {
+      state.zoomTransform = transform;
+      assert.equal(raster.updateNavigationDemand(transform), true);
+      return true;
+    },
     prepareAsyncFrame: () => true,
   });
   const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
   assert.equal(summary.status, "drawn");
   assert.equal(summary.frameMode, "navigation");
   assert.equal(summary.drewFrame, true);
+  assert.equal(requests.length, previousRequests);
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(requests.length, previousRequests + 1);
+  assert.equal(requests.at(-1).signal.aborted, false);
   assert.deepEqual(calls.find((call) => call[0] === "drawNavigationFrame"),
     ["drawNavigationFrame", rawTransform]);
   assert.deepEqual(calls.find((call) => call[0] === "commitLastFrame")?.[1], {

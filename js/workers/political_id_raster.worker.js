@@ -196,6 +196,10 @@ export function createPoliticalIdRasterWorkerRuntime({
         isCancelled,
       });
       if (!task.cancelled) {
+        if (packet.coreRect) {
+          tile.coreRect = { ...packet.coreRect };
+          tile.storageRect = { ...packet.storageRect };
+        }
         Object.assign(tile.stats ||= {}, {
           pathBuilds, pathCacheHits, pathCacheEntries: localCache.size,
           pathCacheEstimatedBytes: localEstimatedBytes,

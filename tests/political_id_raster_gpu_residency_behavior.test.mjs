@@ -28,6 +28,109 @@ const tile = (originX, code = 1) => ({ originX, originY: 0, width: 1, height: 1,
 const palette = Uint8Array.of(0, 0, 0, 0, 255, 0, 0, 255);
 
 const hostTick = () => new Promise(resolve => setImmediate(resolve));
+
+test("draw selection reuses an unchanged revision and residency changes revoke cached handles", async t => {
+  const h = harness(), read = recordFrames(h), released = [];
+  const gpu = createPoliticalIdRasterGpu({ gl: h.gl, onTileReleased: handle => released.push(handle) });
+  t.after(() => gpu.dispose());
+  const first = tile(0), second = tile(4);
+  gpu.setFrame({ tiles: [first], palette, revision: 1 });
+  const handle = gpu.getTileHandle(first), handles = [handle];
+  gpu.setDrawTiles(handles, 1);
+  const before = read(gpu), builds = gpu.getStats().drawListBuilds;
+  for (let i = 0; i < 20; i++) {
+    assert.equal(gpu.hasTileHandle(handle), true);
+    gpu.setDrawTiles(handles, 1);
+    assert.deepEqual(read(gpu), before);
+  }
+  assert.equal(gpu.getStats().drawListBuilds, builds);
+  gpu.setDrawTiles(handles, 2);
+  assert.equal(gpu.getStats().drawListBuilds, builds + 1);
+  const pending = await gpu.prepareFrame({ tiles: [second], palette, yieldTask: hostTick });
+  pending.commit({ palette, revision: 2 });
+  assert.equal(gpu.hasTileHandle(handle), false);
+  assert.ok(released.includes(handle));
+  assert.throws(() => gpu.setDrawTiles(handles, 2), /not resident/);
+  assert.equal(gpu.hasTileHandle(gpu.getTileHandle(second)), true);
+});
+
+test("single tile publication retains resources and draw selection reuses uploads", async t => {
+  const h = harness(), read = recordFrames(h), gpu = createPoliticalIdRasterGpu({ gl: h.gl });
+  t.after(() => gpu.dispose());
+  const first = tile(0), second = tile(3, 2);
+  gpu.setFrame({ tiles: [first], palette, revision: 1 });
+  const firstHandle = gpu.getTileHandle(first), before = read(gpu);
+  const pending = await gpu.prepareTile({ tile: second, palette, yieldTask: hostTick });
+  const secondHandle = pending.getTileHandle(second);
+  assert.deepEqual(read(gpu), before);
+  pending.commit({ palette, revision: 1 });
+  assert.equal(gpu.getStats().residentTiles, 2);
+  assert.deepEqual(read(gpu), before);
+  gpu.setDrawTiles([secondHandle]);
+  assert.equal(read(gpu).length, 1);
+  const uploads = gpu.getStats().tileUploads;
+  gpu.setDrawTiles([firstHandle]);
+  assert.deepEqual(read(gpu), before);
+  assert.equal(gpu.getStats().tileUploads, uploads);
+  assert.equal(gpu.releaseTile(firstHandle), false);
+  assert.equal(gpu.releaseTile(secondHandle), true);
+  assert.equal(gpu.getStats().residentTiles, 1);
+  assert.deepEqual(read(gpu), before);
+});
+
+test("failed single tile upload preserves drawing and releases private textures", async t => {
+  const h = harness(), read = recordFrames(h), gpu = createPoliticalIdRasterGpu({ gl: h.gl });
+  t.after(() => gpu.dispose());
+  gpu.setFrame({ tiles: [tile(0)], palette, revision: 1 });
+  const before = read(gpu), bytes = gpu.getStats().gpuTextureBytes;
+  h.gl.texImage2D = () => { throw new Error("upload failed"); };
+  await assert.rejects(gpu.prepareTile({ tile: tile(3), palette, yieldTask: hostTick }), /upload failed/);
+  assert.deepEqual(read(gpu), before);
+  assert.equal(gpu.getStats().gpuTextureBytes, bytes);
+  assert.equal(gpu.getStats().pendingTextureBytes, 0);
+  assert.equal(h.calls.filter(call => call[0] === "deleteTexture").length, 1);
+});
+
+test("a new sampling layout for a resident tile preserves its currently drawn handle", async t => {
+  const h = harness(), read = recordFrames(h), gpu = createPoliticalIdRasterGpu({ gl: h.gl });
+  t.after(() => gpu.dispose());
+  const center = tile(0), neighbor = tile(1, 2);
+  gpu.setFrame({ tiles: [center, neighbor], palette, revision: 1 });
+  const oldHandle = gpu.getTileHandle(center), neighborHandle = gpu.getTileHandle(neighbor), before = read(gpu);
+  const prepared = await gpu.prepareTile({ tile: center, palette, yieldTask: hostTick });
+  const nextHandle = prepared.getTileHandle(center);
+  prepared.commit({ palette, revision: 1 });
+  assert.notEqual(nextHandle, oldHandle);
+  assert.deepEqual(read(gpu), before);
+  assert.equal(gpu.getStats().residentTiles, 3);
+  assert.equal(gpu.releaseTile(oldHandle), false);
+  gpu.setDrawTiles([nextHandle]);
+  assert.equal(gpu.releaseTile(oldHandle), true);
+  assert.equal(gpu.releaseTile(neighborHandle), true);
+  assert.equal(gpu.getStats().residentTiles, 1);
+});
+
+test("private upload scratch is charged to the CPU budget and released after submission", async t => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 100 });
+  const h = harness();
+  const gpu = createPoliticalIdRasterGpu({ gl: h.gl, reserveUploadBytes: cache.reserveTransient });
+  t.after(() => gpu.dispose());
+  const charges = [];
+  h.gl.texImage2D = () => charges.push([gpu.getStats().uploadTransientBytes, cache.getStats().cpuBytes]);
+  const pending = await gpu.prepareTile({ tile: tile(0), palette, yieldTask: hostTick });
+  assert.ok(charges.every(([scratch, total]) => scratch === 80 && total === 80));
+  assert.equal(cache.getStats().cpuBytes, 0);
+  assert.equal(gpu.getStats().pendingTextureBytes, 44);
+  pending.cancel();
+  assert.equal(gpu.getStats().pendingTextureBytes, 0);
+  // Scratch beyond the cap is still charged, but an upload is never refused for it.
+  const release = cache.reserveTransient(60);
+  const crowded = await gpu.prepareTile({ tile: tile(3), palette, yieldTask: hostTick });
+  assert.equal(cache.getStats().cpuBytes, 60);
+  crowded.cancel();
+  release();
+  assert.equal(cache.getStats().cpuBytes, 0);
+});
 function recordFrames(h) {
   const bound = new Map(), pixels = new Map(), frames = [];
   let unit = 0;
@@ -214,6 +317,59 @@ function gutterOracle(tile, neighbors) {
   edgeWeights.set(tile.edgeWeights); edgeWeights.set(weights, tile.edgeWeights.length);
   return { width, height, codes, edgeIds, edgeWeights };
 }
+
+test("self-contained halo uploads match the frame oracle regardless of arrival order", async () => {
+  const a = { ...tile(0), width: 2, height: 2, codes: Uint32Array.of(1, 0x80000000, 1, 2),
+    edgeIds: Uint32Array.of(2, 1, 2), edgeWeights: Float32Array.of(0, 0.25, 0.75) };
+  const b = { ...a, originX: 2, codes: Uint32Array.of(0x80000000, 2, 1, 0) };
+  const originals = [a, b];
+  const halos = originals.map(value => ({ ...gutterOracle(value, originals.filter(other => other !== value)),
+    originX: value.originX - 1, originY: -1,
+    coreRect: { minX: value.originX, minY: 0, maxX: value.originX + 2, maxY: 2 },
+    storageRect: { minX: value.originX - 1, minY: -1, maxX: value.originX + 3, maxY: 3 } }));
+  function capture() {
+    const h = harness(), uploads = [];
+    h.gl.texImage2D = (...args) => uploads.push({ width: args[3], height: args[4], data: args.at(-1).slice() });
+    return { ...h, uploads, gpu: createPoliticalIdRasterGpu({ gl: h.gl }) };
+  }
+  let oldReads = 0;
+  for (const value of originals) {
+    const codes = value.codes;
+    Object.defineProperty(value, "codes", { get() { oldReads++; return codes; } });
+  }
+  const old = capture(); old.gpu.setTiles(originals);
+  const whole = capture(); whole.gpu.setTiles(halos);
+  assert.deepEqual(whole.uploads, old.uploads);
+  for (const order of [[0, 1], [1, 0]]) {
+    const single = capture(), uploaded = new Map();
+    single.gpu.setPalette(palette, 1); single.uploads.length = 0;
+    for (const index of order) {
+      const handle = await single.gpu.prepareTile({ tile: halos[index], palette, yieldTask: hostTick });
+      uploaded.set(index, single.uploads.splice(0));
+      handle.commit({ palette, revision: 1 });
+    }
+    assert.deepEqual([...uploaded.get(0), ...uploaded.get(1)], whole.uploads);
+    const uploads = single.gpu.getStats().tileUploads;
+    single.gpu.setTiles(halos);
+    assert.equal(single.gpu.getStats().tileUploads, uploads, "arrival of a neighbor never rebuilds an existing texture");
+    for (const value of halos) {
+      const resource = single.gpu.getTileHandle(value);
+      assert.equal(resource.width, 2); assert.equal(resource.height, 2);
+      assert.equal(resource.sampleOffsetX, 1); assert.equal(resource.sampleOffsetY, 1);
+    }
+    single.gpu.dispose();
+  }
+  let reads = 0;
+  for (const value of halos) {
+    const codes = value.codes;
+    Object.defineProperty(value, "codes", { get() { reads++; return codes; } });
+  }
+  const cold = capture(); cold.gpu.setTiles(halos);
+  assert.equal(reads, 2, "one payload read per tile; no neighbor materialization or padding copy");
+  assert.ok(reads < oldReads, `payload reads decrease from ${oldReads} to ${reads}`);
+  assert.equal(cold.gpu.getStats().gpuTextureBytes, whole.gpu.getStats().gpuTextureBytes);
+  cold.gpu.dispose(); whole.gpu.dispose(); old.gpu.dispose();
+});
 
 test("gutter uploads visit compressed neighbors once and preserve the original overlap and edge bytes", () => {
   const make = (originX, originY, width, height, code) => ({ originX, originY, width, height,

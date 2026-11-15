@@ -172,8 +172,26 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
   const baseMaxBytes = maxBytes;
   const cache = new Map();
   const payloads = new WeakMap();
+  const listeners = new Set(), deferredCompression = new Set();
+  let compressionTask = null;
+  let compressionAttempts = 0, compressedPayloads = 0, deferredCompressions = 0;
   let cpuBytes = 0;
   let evictions = 0;
+  let transientBytes = 0, peakTransientBytes = 0, peakCpuBytes = 0;
+
+  function chargeTransient(bytes) {
+    transientBytes += bytes;
+    peakTransientBytes = Math.max(peakTransientBytes, transientBytes);
+    peakCpuBytes = Math.max(peakCpuBytes, cpuBytes + transientBytes);
+    return () => { transientBytes -= bytes; };
+  }
+
+  // Upload scratch lives for one task. It counts against later admissions, but it
+  // never evicts: the tiles in the cache are the ones being uploaded, and losing
+  // one mid-preparation leaves its frame unpublished until the view changes.
+  function reserveTransient(bytes) {
+    return chargeTransient(bytes);
+  }
 
   function remove(key, evicted = false) {
     const entry = cache.get(key);
@@ -181,6 +199,8 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     cache.delete(key);
     cpuBytes -= entry.bytes;
     entry.payload?.keys.delete(key);
+    if (entry.payload && !entry.payload.keys.size) deferredCompression.delete(entry.payload);
+    for (const listener of listeners) listener(key);
     if (evicted) evictions += 1;
     return true;
   }
@@ -208,33 +228,58 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
 
   function compact(payload) {
     if (!payload?.codes || !payload.compressible) return false;
+    compressionAttempts++;
     const plan = planCodeCompression(payload.codes);
     if (!plan) { payload.compressible = false; return false; }
     // Encoding and decoding briefly need both representations. Reserve that
     // overlap inside the same cap, rather than hiding a second allocation.
-    if (payload.rawBytes + plan.bytes > maxBytes || cpuBytes + plan.bytes > maxBytes) return false;
+    if (payload.rawBytes + plan.bytes > maxBytes || cpuBytes + transientBytes + plan.bytes > maxBytes) return false;
+    const release = chargeTransient(plan.bytes);
     const packed = compressCodes(payload.codes, plan);
     payload.codes = null;
     payload.packed = packed;
     resizePayload(payload, packed.bytes);
+    release();
+    compressedPayloads++;
     return true;
   }
 
-  function makeRoom(additionalBytes, protectedPayload = null, materializing = false) {
+  function scheduleCompression() {
+    if (compressionTask || !deferredCompression.size) return;
+    const task = { idle: typeof globalThis.requestIdleCallback === "function", id: null };
+    compressionTask = task;
+    const run = () => {
+      compressionTask = null;
+      const payload = deferredCompression.values().next().value;
+      deferredCompression.delete(payload);
+      if (payload?.keys.size) { compact(payload); deferredCompressions++; }
+      scheduleCompression();
+    };
+    task.id = task.idle ? globalThis.requestIdleCallback(run) : setTimeout(run, 0);
+  }
+
+  function makeRoom(additionalBytes, protectedPayload = null, materializing = false, compressionBudget = Infinity) {
     // Every alias has its own conservative byte charge. Recompute the decode
     // reservation after eviction, since removing an alias also reduces it.
     const reservation = () => additionalBytes * (materializing ? protectedPayload.keys.size : 1);
-    while (cpuBytes + reservation() > maxBytes) {
+    while (cpuBytes + transientBytes + reservation() > maxBytes) {
       const visited = new Set();
       for (const entry of cache.values()) {
         if ((protectedPayload && entry.payload === protectedPayload) || visited.has(entry.payload)) continue;
         visited.add(entry.payload);
-        compact(entry.payload);
-        if (cpuBytes + reservation() <= maxBytes) return true;
+        if (entry.payload?.codes && entry.payload.compressible) {
+          if (compressionBudget > 0) { compressionBudget--; compact(entry.payload); }
+          else deferredCompression.add(entry.payload);
+        }
+        if (cpuBytes + transientBytes + reservation() <= maxBytes) return true;
       }
       // Incompressible coverage still uses the original LRU eviction policy.
-      const oldest = [...cache].find(([, entry]) => entry.payload !== protectedPayload
-        || !materializing || protectedPayload.keys.size > 1);
+      let oldest;
+      for (const entry of cache) {
+        if (entry[1].payload !== protectedPayload || !materializing || protectedPayload.keys.size > 1) {
+          oldest = entry; break;
+        }
+      }
       if (!oldest) return false;
       remove(oldest[0], true);
     }
@@ -249,9 +294,11 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     if (payload.keys.size && !makeRoom(payload.codeBytes, payload, true)) {
       throw new RangeError("Political ID raster decode exceeds the CPU byte budget.");
     }
+    const release = chargeTransient(payload.keys.size ? payload.codeBytes * payload.keys.size : 0);
     payload.codes = decompressCodes(packed, payload.length);
     payload.packed = null;
     resizePayload(payload, payload.codeBytes);
+    release();
     return payload.codes;
   }
 
@@ -271,7 +318,7 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     return payload;
   }
 
-  function set(key, tile, descriptor) {
+  function set(key, tile, descriptor, { compressionBudget = Infinity } = {}) {
     const normalizedKey = String(key ?? "");
     const known = tile && payloads.get(tile);
     const rawBytes = known?.rawBytes ?? byteLengthOf(tile);
@@ -283,10 +330,13 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     // Oversized entries are never retained, even transiently in the LRU.
     if (rawBytes > maxBytes) return false;
     const payload = getPayload(tile, rawBytes);
-    if (!makeRoom(bytes, payload)) return false;
+    const fits = makeRoom(bytes, payload, false, compressionBudget);
+    scheduleCompression();
+    if (!fits) return false;
     cache.set(normalizedKey, { tile, descriptor: { ...descriptor }, bytes, payload });
     payload?.keys.add(normalizedKey);
     cpuBytes += bytes;
+    for (const listener of listeners) listener(normalizedKey);
     return cache.has(normalizedKey);
   }
 
@@ -303,7 +353,7 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     const removed = [];
     for (const [key, entry] of cache) {
       const { descriptor } = entry;
-      const padding = RASTER_BOUNDS_PADDING / descriptor.density;
+      const padding = (RASTER_BOUNDS_PADDING + (descriptor.storageRect ? 1 : 0)) / descriptor.density;
       const tileBounds = {
         minX: descriptor.originX / descriptor.density - padding,
         minY: descriptor.originY / descriptor.density - padding,
@@ -320,13 +370,21 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
   }
 
   function clear() {
+    if (compressionTask) {
+      if (compressionTask.idle) globalThis.cancelIdleCallback(compressionTask.id);
+      else clearTimeout(compressionTask.id);
+      compressionTask = null;
+    }
+    deferredCompression.clear();
+    const keys = [...cache.keys()];
     for (const entry of cache.values()) entry.payload?.keys.clear();
     cache.clear();
     cpuBytes = 0;
+    for (const key of keys) for (const listener of listeners) listener(key);
   }
 
   function getStats() {
-    return { cpuBytes, tileCount: cache.size, evictions };
+    return { cpuBytes: cpuBytes + transientBytes, tileCount: cache.size, evictions };
   }
 
   function entries() {
@@ -334,9 +392,14 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
   }
 
   function setViewport(width, height) {
-    maxBytes = scaleRasterViewportBudget(baseMaxBytes, width, height);
+    const next = scaleRasterViewportBudget(baseMaxBytes, width, height);
+    if (next === maxBytes) return;
+    maxBytes = next;
     makeRoom(0);
   }
 
-  return Object.freeze({ get maxBytes() { return maxBytes; }, setViewport, get, peek, set, invalidate, clear, getStats, entries });
+  return Object.freeze({ get maxBytes() { return maxBytes; }, setViewport, get, peek, set, invalidate, clear, getStats, entries,
+    subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); },
+    getCompressionStats: () => ({ compressionAttempts, compressedPayloads, deferredCompressions, pending: deferredCompression.size }),
+    reserveTransient, getTransientStats: () => ({ transientBytes, peakTransientBytes, peakCpuBytes }) });
 }
