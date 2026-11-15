@@ -52,6 +52,7 @@
 - 字号沿用五档刻度 `--fs-xs 12 / --fs-sm 13 / --fs-md 14 / --fs-lg 16 / --fs-xl 18`，再加 `--fs-2xl 22`（对话框标题）。
 - 字重只用 400 / 500 / 600 / 700。正文 400，控件文字与标签 500，标题 600，数值强调 700。不再使用 650、760、800。
 - 行高：正文 1.45，控件 1.2，标题 1.25。中文环境 `:lang(zh)` 正文行高 1.6、不加字距。
+- 普通控件文字 `letter-spacing: 0`。
 - 大小写：按钮与标题一律句式大小写（"Apply color to scope"），不用 Title Case；全大写只用于 `--fs-xs` 的分组眉标，且加 `letter-spacing: .06em`。
 
 ### 2.3 间距、尺寸、圆角
@@ -84,6 +85,7 @@
 - **所有规则都必须在某一层里。** 未分层的规则压过一切分层规则，新增样式表时整个文件包在 `@layer <层名> { … }` 里。
 - 分层时按段落归层，但有 137 条规则为保持原有层叠结果放在了相邻层（原来靠高特异性压过后面的规则）；它们在源文件里就地用单独的 `@layer` 块包住。改这些规则时用画廊截图确认没有连带变化。
 - `!important` 在层里是反转的：越早的层里的 `!important` 越强。只在"隐藏 / 无障碍隐藏 / 降低动效"这类必须压过一切的场合用；新代码不加。
+- 组件和面板样式以组件类为作用域，不依赖 `#leftSidebar`、`#mapContentStack` 等所在栏。二级折叠用 `data-level="2"` 或 `.disclosure--nested` 显式标记，不按 DOM 深度推断。
 - 通用规则用 `:where()` 包住选择器，把特异性降到 0，让面板规则不用堆选择器就能覆盖。
 - 目录：组件的 JS 放 `js/ui/components/`（工厂函数返回真实 DOM 节点，保留原生 `input` / `change` 事件），样式放 `css/components/`。`js/ui/` 下的旧路径（`styled_selects.js`、`app_dialog.js`、`toast.js`、`ui_icons.js`）只剩重导出，新代码直接从 `components/` 导入。
 - 对照物：`tests/e2e/ui_gallery/gallery.html` 摆出全部控件家族和状态，`npx playwright test tests/e2e/ui_gallery` 比对截图基线。改动组件样式前后都跑一次。
@@ -101,7 +103,7 @@
 | 按钮 | `.btn--*`（`.btn` 暂不启用，见 3.4） | `--primary` `--secondary` `--danger` `--icon`，尺寸 `--sm` `--lg` | 主按钮每个面板最多一个；危险按钮默认 ghost 样式（红字），确认态才填充 |
 | 图标 | 内联 SVG（JS 里用 `js/ui/components/ui_icons.js` 的 `createUiIcon` / `setUiIcon`） | 16 / 20 px | 24 viewBox、`stroke-width: 1.6`、`currentColor`。不用 `<` `>` `-` `+` `v` `^` `▾` 等字符当图标 |
 | 输入框 / 选择框 | `.field` + `.input` / `.app-select-button` | — | 高 36（侧栏密集区 32），`--surface-raised` 底，`--line-1` 描边，聚焦时 `--accent` 描边 + 外环 |
-| 分段控件 / 标签页 | `.segmented` | `--tabs`（下划线式，用于一级标签） | 一级导航用下划线标签；同级筛选用分段控件；不再用胶囊按钮当标签 |
+| 分段控件 / 标签页 | `.segmented` | `--tabs`（下划线式，用于一级标签） | 一级导航用下划线标签；同级筛选用分段控件：`--surface-sunken` 轨道、选中项 `--surface-raised` 滑块、`--accent` 字与 600 字重；不再用胶囊按钮当标签 |
 | 折叠分组 | `<details class="disclosure">`；属性页内用 `<details class="appearance-mini-section">` | — | 标题行 32 px（属性页一级 40 px），右侧 SVG chevron（`--icon-chevron-right` 遮罩）展开时转 90°；箭头只反映自身状态（`details[open] > summary`） |
 | 键值表 | `.kv` | — | 标签 `--fs-xs` `--ink-500` 句式大小写，值 `--fs-sm` `--ink-900`；ID/颜色值用等宽 |
 | 列表行 | `.list-row` | `is-selected` | 最小高 32，整行可点，选中为 `--accent-soft` 底 + 左侧 2 px 铜色条 |
@@ -112,6 +114,14 @@
 | 图层行 | `.editor-layer-row` > `.editor-layer-trigger` + `.editor-layer-visibility` | `is-layer-off` | 图标 16 px + 名称 + 状态点（跟随属性页状态条 tone）+ 眼睛开关（代理属性页里的总开关复选框，不另建状态） |
 | 文件上传 | `.file-dropzone` | — | 整块可点、可拖入；原生 input 透明铺满，显示已选文件名 |
 | 命令面板 | `js/ui/command_palette.js` | — | Ctrl/Cmd+K 打开；只代理点击已有按钮，不复制业务逻辑；分组：图层 / 对象 / 工具 / 项目 |
+| 顶栏控件 | 菜单触发器、视图开关、图标按钮 | — | 高 36；菜单触发器为透明底，右侧 16 px chevron-down；项目、检查器视图开关选中为 `--accent-soft` 底与 `--accent` 字；图标按钮为正方形 |
+| 复选框 / 单选 | 原生 input | — | 16×16，`accent-color: var(--accent)` |
+| 颜色输入 | 原生颜色 input + hex 值 | — | 侧栏 32×40，与 hex 值组成复合字段 |
+| 搜索框 | `.search-field` | — | 输入框内 16 px 搜索图标，沿用文本输入尺寸 |
+| 计数徽标 | `.count-badge` | — | 12/600，`tabular-nums`，`--surface-sunken` 底与 `--ink-500` 字 |
+| 关闭按钮 | `.btn--icon.btn--sm` | — | X 图标，位于右上角，不占主按钮额度 |
+| 浮层外壳 | `.overlay-panel` / `.overlay-header` / `.overlay-footer` | — | 统一组织浮层正文、头部和页脚 |
+| 提示气泡 | `.tooltip` | — | 12 px，墨色底反色字，圆角 12，内边距 8/12 |
 
 ### 3.4 按钮与文本输入的尺寸和状态
 
@@ -139,6 +149,10 @@
 ### 3.5 通用状态
 
 状态：所有可交互元素必须有 hover、`:focus-visible`（2 px 实色 `--accent` outline，对纸面底 ≥ 3:1；不得 `outline: none` 而无替代，半透明色不能作为唯一焦点指示）、disabled（`--ink-400`、不可点）、selected（`--accent-soft` + `--accent` 文字）。
+
+- 列表行、菜单项和图标开关选中时使用 `--accent-soft`；分段控件选中使用 `--surface-raised` 滑块与 `--accent` 字、600 字重。
+- 悬停分两类：侧栏和面板内用 `--surface-sunken` 底，按钮另加 `--line-2` 边；地图浮层上用不透明 `--surface-raised` 底与 `--line-2` 边，不加阴影。标签、折叠标题、列表行、选择框都要有悬停反馈。
+- 贴边的菜单项、列表行和整行按钮，焦点 outline 偏移为 -2 px。
 
 ## 4. 壳层排版
 
@@ -294,7 +308,7 @@ L1 菜单表面
 
 排版角色统一引用现有字号，不新增字号档位。
 
-建议约定：`--type-<role>` **只表示字号**，搭配 `--type-<role>-weight`、`--type-<role>-leading`、`--type-<role>-color` 使用。不得有的角色存字号、有的角色存整条 `font` 简写。
+`--type-<role>` **只表示字号**，搭配 `--type-<role>-weight`、`--type-<role>-leading`、`--type-<role>-color` 使用。不得有的角色存字号、有的角色存整条 `font` 简写。
 
 | 角色令牌 | 字号映射 | 字重 | 行高 | 颜色 | 适用位置 |
 |---|---|---:|---:|---|---|

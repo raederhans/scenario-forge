@@ -37,8 +37,8 @@
 } /* end @layer components */
 
 @layer overrides {
-.editor-empty-hint { color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.7; margin: 8px 0; }
-.editor-selected-name { color: var(--text-primary); font-size: var(--fs-md); margin: 0 0 12px; line-height: 1.5; }
+.editor-empty-hint { color: var(--type-help-color); font-size: var(--type-help); line-height: var(--type-help-leading); margin: 8px 0; font-weight: var(--type-help-weight); letter-spacing: 0; }
+.editor-selected-name { font-weight: 600; color: var(--text-primary); font-size: var(--fs-md); margin: 0 0 12px; line-height: 1.5; }
 .editor-project-bar #workspaceSaveStatus { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; font-size: var(--editor-meta-size); }
 .editor-project-bar .editor-scenario-menu { position: relative; margin: 0; padding: 0; border: 0; background: transparent; flex-shrink: 0; }
 .editor-scenario-menu > summary { padding: 8px 12px; font-size: var(--fs-sm); cursor: pointer; }
@@ -134,10 +134,10 @@
 .editor-workspace .editor-property-segments { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; }
 .editor-workspace .editor-property-segments .editor-nav-button { flex: 0 0 auto; width: auto; }
 .editor-workspace .editor-property-segments .editor-nav-button[aria-selected="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
-.editor-properties-title { font-size: var(--fs-md); line-height: 1.5; margin: 0; font-weight: 600; }
+.editor-properties-title { font-size: var(--type-page-title); line-height: var(--type-page-title-leading); margin: 0; font-weight: var(--type-page-title-weight); color: var(--type-page-title-color); letter-spacing: 0; }
 .editor-properties-title:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: var(--radius-sm); }
 .editor-properties-body { padding: 16px; }
-.editor-group-heading { font-size: var(--fs-xs); font-weight: 600; color: var(--text-tertiary); margin: 12px 8px 6px; letter-spacing: 0; text-transform: none; }
+.editor-group-heading { font-size: var(--type-eyebrow); font-weight: var(--type-eyebrow-weight); color: var(--type-eyebrow-color); margin: 12px 8px 6px; letter-spacing: 0; text-transform: none; line-height: var(--type-eyebrow-leading); }
 .editor-layer-list { display: flex; flex-direction: column; gap: 3px; }
 .editor-workspace #leftSidebar .editor-layer-list > button { width: 100%; text-align: left; min-height: 36px; font-size: var(--fs-sm); letter-spacing: 0; padding: 8px 12px; border-radius: var(--radius-sm); border: 0; justify-content: flex-start; }
 .editor-workspace #leftSidebar .editor-layer-list > button.is-active { background: var(--accent-soft); color: var(--accent); }
@@ -154,8 +154,6 @@
 .editor-property-panel .appearance-day-night-card { padding: 14px 0; border: 0; border-bottom: 1px solid var(--border-subtle); border-radius: 0; background: transparent; box-shadow: none; }
 .editor-property-panel .appearance-day-night-advanced { padding: 14px 0; border: 0; border-radius: 0; background: transparent; }
 .editor-property-panel .sidebar-shell-anchor { display: none; }
-.editor-property-panel .sidebar-group-label, .editor-property-panel .range-label, .editor-property-panel .toggle-label { font-size: var(--fs-sm); line-height: 1.5; letter-spacing: 0; text-transform: none; }
-.editor-property-panel .sidebar-tool-hint, .editor-property-panel .layer-status-strip, .editor-property-panel .city-points-advanced-hint { font-size: var(--fs-xs); line-height: 1.5; }
 .editor-property-panel .city-points-panel-body { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
 .editor-property-panel .city-symbol-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .editor-property-panel .city-symbol-legend > * { white-space: normal; word-break: normal; }
@@ -178,7 +176,7 @@
 .editor-workspace input[type="range"] { min-height: var(--hit-min); cursor: pointer; }
 .editor-workspace input[type="range"]:disabled { cursor: default; }
 .editor-workspace :is(button, input, select) { font-family: inherit; }
-.editor-workspace :is(.sidebar-shell-heading, .sidebar-field-label, .sidebar-group-label, .appearance-tab-btn) { letter-spacing: 0; text-transform: none; }
+.editor-workspace .appearance-tab-btn { letter-spacing: 0; text-transform: none; }
 .editor-workspace .editor-task-panel > .color-library-card { padding: 0; border: 0; background: none; }
 .editor-workspace #bottomDock { bottom: 16px; border-radius: var(--radius-lg); gap: 8px; padding: 8px; width: min(820px, calc(100% - 24px)); max-width: calc(100% - 24px); }
 .editor-workspace #bottomDock.is-collapsed { width: 54px; height: 54px; padding: 4px; }
@@ -476,10 +474,9 @@
 }
 
 /* ── 属性页三级层级（W1）────────────────────────────────────────────
-   页标题 16/600 → 分组 13/600 墨色 + 上分隔线 → 字段 13/400 次级墨色 → 说明 12/400。
+   页标题 16/600 → 分组 13/600 墨色 + 上分隔线 → 字段 13/500 次级墨色 → 说明 12/400。
    控件从左栏搬进右栏后，旧规则按"所在侧栏"生效；这里按层级重新定义，
    用 #rightSidebar 前缀压过 #appearancePanelBorders、#legendProjectSection 等旧 ID 规则。 */
-.editor-workspace .editor-properties-title { font-size: var(--fs-lg); }
 
 /* 旧 ID 卡片外壳在属性页里去框，和其他属性页一样是连续纸面。 */
 #rightSidebar .editor-property-panel > :is(#legendProjectSection, #frontlineProjectSection, #transportProjectSection, #exportProjectSection) {
@@ -489,7 +486,7 @@
 /* 分组（静态）：上分隔线 + 标题。 */
 #rightSidebar .editor-property-panel .appearance-control-card { padding: 16px 0 20px; }
 #rightSidebar .editor-property-panel :is(.appearance-control-card-title, .appearance-prop-heading) {
-  margin: 0 0 12px; font-size: var(--fs-sm); font-weight: 600; line-height: 1.4; color: var(--ink-900);
+  margin: 0 0 12px; font-size: var(--type-section-title); font-weight: var(--type-section-title-weight); line-height: var(--type-section-title-leading); color: var(--type-section-title-color);
   letter-spacing: 0; text-transform: none;
 }
 
@@ -501,7 +498,7 @@
 #rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) > summary {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   min-height: 40px; margin: 0; padding: 8px 0; border: 0; background: transparent;
-  font-size: var(--fs-sm); font-weight: 600; line-height: 1.4; color: var(--ink-900); letter-spacing: 0;
+  font-size: var(--type-section-title); font-weight: var(--type-section-title-weight); line-height: var(--type-section-title-leading); color: var(--type-section-title-color); letter-spacing: 0;
 }
 #rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) > summary:hover { color: var(--accent); }
 #rightSidebar .editor-property-panel > * details:not([data-promoted-layer-panel]) > summary::after { color: var(--ink-500); }
@@ -512,18 +509,11 @@
   margin: 8px 0 0; border-top: 0; border-left: 2px solid var(--line-1); padding-left: 12px;
 }
 #rightSidebar .editor-property-panel :is(details:not([data-promoted-layer-panel]), .appearance-control-card) details:not([data-promoted-layer-panel]) > summary {
-  min-height: 32px; padding: 4px 0; font-size: var(--fs-xs); color: var(--ink-500); justify-content: flex-start;
+  min-height: 32px; padding: 4px 0; font-size: var(--type-group-title); color: var(--type-group-title-color); justify-content: flex-start; font-weight: var(--type-group-title-weight); line-height: var(--type-group-title-leading); letter-spacing: 0;
 }
 #rightSidebar .editor-property-panel :is(details:not([data-promoted-layer-panel]), .appearance-control-card) details:not([data-promoted-layer-panel]) > summary::after { order: -1; float: none; margin: 0; }
 #rightSidebar .editor-property-panel :is(details:not([data-promoted-layer-panel]), .appearance-control-card) details:not([data-promoted-layer-panel]) > :not(summary) { padding: 4px 0 8px; }
 
-/* 字段：标签统一常规字重、次级墨色，和分组标题拉开。 */
-#rightSidebar .editor-property-panel :is(.range-label, .toggle-label, .sidebar-group-label) {
-  font-size: var(--fs-sm); font-weight: 400; line-height: 1.45; color: var(--ink-700);
-}
-#rightSidebar .editor-property-panel :is(.body-text, .panel-hint, .sidebar-tool-hint, .sidebar-help-copy) {
-  font-size: var(--fs-xs); font-weight: 400; line-height: 1.5; color: var(--ink-500);
-}
 
 /* 交通四族的标题行：名称 + 状态两行，与其他折叠分组同级。 */
 #rightSidebar .editor-property-panel .transport-family-summary-title { font-size: var(--fs-sm); font-weight: 600; }
@@ -615,7 +605,7 @@
 /* W3 收尾：模式参数区不再套白框；专题页 h3 与其他分组标题同级；未用 .range-input 的滑块跟随强调色。 */
 #rightSidebar .editor-property-panel .ml-5.space-y-2 { padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
 #rightSidebar .editor-property-panel :is(.appearance-control-card > h3, .strategic-values-heading > h3) {
-  margin: 0 0 12px; font-size: var(--fs-sm); font-weight: 600; line-height: 1.4; color: var(--ink-900);
+  margin: 0 0 12px; font-size: var(--type-section-title); font-weight: var(--type-section-title-weight); line-height: var(--type-section-title-leading); color: var(--type-section-title-color); letter-spacing: 0;
 }
 #rightSidebar .editor-property-panel input[type="range"] { accent-color: var(--accent); }
 
@@ -638,8 +628,11 @@
 
 .editor-property-notes {
   background: var(--surface-sunken);
-  color: var(--text-secondary);
-  font-size: var(--fs-xs);
+  color: var(--type-help-color);
+  font-size: var(--type-help);
+  font-weight: var(--type-help-weight);
+  line-height: var(--type-help-leading);
+  letter-spacing: 0;
   padding: var(--space-3);
   margin-bottom: var(--space-4);
   border-bottom: 1px solid var(--line-1);
