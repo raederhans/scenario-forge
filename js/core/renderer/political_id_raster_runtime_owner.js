@@ -673,8 +673,9 @@ export function createPoliticalIdRasterRuntimeOwner({
     job?.handle?.cancel();
   }
 
-  function stopNavigationProduction() {
+  function stopNavigationProduction(resumeExact = false) {
     navigationProducing = false;
+    if (resumeExact && active) active.resumeExact = true;
     cancelNavigationUpload();
   }
 
@@ -1116,7 +1117,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (disposed) return;
       account();
       if (navigationProducing) { scheduleNavigationWork(); return; }
-      if (task.navigation && !navigationDemand) return;
+      if (task.navigation && !navigationDemand && !task.resumeExact) return;
       // Complete one latest viewport before requesting a repaint, avoiding a
       // full vector redraw for every tile that becomes available.
       pump();
@@ -1172,7 +1173,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
 
   function prepare() {
-    stopNavigationProduction();
+    stopNavigationProduction(true);
     stagedFrame = null;
     if (!usable()) { directFrame = null; displayState = "fallback"; reason = failed ? "producer-error" : "unavailable"; return false; }
     try {
@@ -1191,7 +1192,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
 
   function draw() {
-    stopNavigationProduction();
+    stopNavigationProduction(true);
     stagedFrame = null;
     const drawStartedAt = performance.now();
     if (!usable()) { directFrame = null; displayState = "fallback"; reason = failed ? "producer-error" : "unavailable"; return null; }
@@ -1654,7 +1655,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     },
     isSourcePreparing: () => !!sourcePreparation,
     prepareSource: () => {
-      stopNavigationProduction();
+      stopNavigationProduction(true);
       if (!usable()) return false;
       try {
         if (syncSource()) {

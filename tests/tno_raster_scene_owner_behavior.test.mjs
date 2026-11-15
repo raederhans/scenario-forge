@@ -275,6 +275,41 @@ function publicationHarness() {
     setSceneIdentity: value => sceneIdentity = value, setTransform: value => transform = value };
 }
 
+test("ready sibling publication replaces retained pass snapshots at the final camera", async t => {
+  const h = publicationHarness();
+  t.after(() => h.owner.dispose());
+  assert.equal(h.owner.present(h.transform), true);
+  h.currentFrame.presentationState = "retained";
+  for (const [name, pass] of h.passes) {
+    pass.reference = { ...h.transform };
+    pass.layout = { offsetX: 0, offsetY: 0 };
+    h.owner.notePassCommit(name);
+  }
+  assert.equal(h.owner.preparePublication(h.transform), false);
+  assert.equal(h.owner.present(h.transform, { refresh: false }), true);
+  assert.equal(h.records.frames.at(-1).layers.at(-1).revision, 0);
+  h.jobs[0].resolve(true); await Promise.resolve();
+  assert.equal(h.owner.preparePublication(h.transform), true);
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.getDiagnostics().presentationState, "published");
+  assert.equal(h.owner.getDiagnostics().publicationPending, false);
+  for (const layer of h.records.frames.at(-1).layers.filter(layer => !layer.draw)) {
+    assert.equal(layer.revision, 1);
+    assert.equal(layer.retained, undefined);
+    assert.deepEqual(layer.transform, { a: 1, d: 1, e: 0, f: 0 });
+  }
+});
+
+test("a fully covered retained scene without a navigation snapshot does not complete an exact wait", t => {
+  const h = coverageHarness();
+  t.after(() => h.owner.dispose());
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.presentNavigation(h.transform, null, { refresh: false, holdPartialUntilExact: true }), false);
+  assert.equal(h.owner.isActive(), true);
+  assert.equal(h.owner.getDiagnostics().partialPasses, false);
+  assert.equal(h.owner.getDiagnostics().presentationState, "retained");
+});
+
 test("publication coverage is captured once, retained navigation stays usable and ready identity is consumed once", async () => {
   const h = publicationHarness();
   assert.equal(h.owner.present(h.transform), true);

@@ -330,7 +330,10 @@ export function createTnoRasterSceneOwner({
       compositor.releaseRetainedLayers?.([...overview.passes.values()].map(pass => pass.textureName));
       overview = null;
     }
-    const retainPrimary = !!navigation || published?.frame === frame && (!refresh || frame.presentationState === "retained");
+    const preparedCoverage = publicationPreparation && publicationPreparation.status !== "pending"
+      && samePublication(publicationPreparation.snapshot, snapshotPublication(transform), { identity: false });
+    const retainPrimary = !!navigation || published?.frame === frame
+      && (!refresh || frame.presentationState === "retained" && !preparedCoverage);
     const primaryCoverage = coverage(frame, retainPrimary ? published.passes : null, transform, dpr);
     const overviewCoverage = overview && coverage(overview.frame, overview.passes, transform, dpr);
     const primaryCovers = covers(primaryCoverage, width, height);
@@ -363,8 +366,6 @@ export function createTnoRasterSceneOwner({
     // can refresh only uncovered passes. Read their canvases/revisions after it
     // returns so a successful refresh is included in this same presentation.
     try {
-      const preparedCoverage = publicationPreparation && publicationPreparation.status !== "pending"
-        && samePublication(publicationPreparation.snapshot, snapshotPublication(transform), { identity: false });
       if (!retain && !preparedCoverage && h.ensurePassCoverage?.(transform) === false) return hide("pass-coverage");
     } catch (error) {
       return hide(`pass-coverage: ${error.message}`);
@@ -471,7 +472,7 @@ export function createTnoRasterSceneOwner({
       view = { x: transform.x, y: transform.y, k: transform.k, dpr, width, height };
       account();
       ({ politicalUncoveredRatio, passUncoveredRatios, sceneIncompleteRatio } = measuredCoverage);
-      return !(uncoveredPass && !allowPartialPasses) && !(navigation && holdPartialUntilExact);
+      return !(uncoveredPass && !allowPartialPasses) && !(retain && holdPartialUntilExact);
     } catch (error) {
       cancelPublicationPreparation();
       account();
