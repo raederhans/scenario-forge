@@ -29,6 +29,31 @@ const palette = Uint8Array.of(0, 0, 0, 0, 255, 0, 0, 255);
 
 const hostTick = () => new Promise(resolve => setImmediate(resolve));
 
+test("draw selection reuses an unchanged revision and residency changes revoke cached handles", async t => {
+  const h = harness(), read = recordFrames(h), released = [];
+  const gpu = createPoliticalIdRasterGpu({ gl: h.gl, onTileReleased: handle => released.push(handle) });
+  t.after(() => gpu.dispose());
+  const first = tile(0), second = tile(4);
+  gpu.setFrame({ tiles: [first], palette, revision: 1 });
+  const handle = gpu.getTileHandle(first), handles = [handle];
+  gpu.setDrawTiles(handles, 1);
+  const before = read(gpu), builds = gpu.getStats().drawListBuilds;
+  for (let i = 0; i < 20; i++) {
+    assert.equal(gpu.hasTileHandle(handle), true);
+    gpu.setDrawTiles(handles, 1);
+    assert.deepEqual(read(gpu), before);
+  }
+  assert.equal(gpu.getStats().drawListBuilds, builds);
+  gpu.setDrawTiles(handles, 2);
+  assert.equal(gpu.getStats().drawListBuilds, builds + 1);
+  const pending = await gpu.prepareFrame({ tiles: [second], palette, yieldTask: hostTick });
+  pending.commit({ palette, revision: 2 });
+  assert.equal(gpu.hasTileHandle(handle), false);
+  assert.ok(released.includes(handle));
+  assert.throws(() => gpu.setDrawTiles(handles, 2), /not resident/);
+  assert.equal(gpu.hasTileHandle(gpu.getTileHandle(second)), true);
+});
+
 test("single tile publication retains resources and draw selection reuses uploads", async t => {
   const h = harness(), read = recordFrames(h), gpu = createPoliticalIdRasterGpu({ gl: h.gl });
   t.after(() => gpu.dispose());

@@ -16,6 +16,43 @@ function coverageHarness(dpr = 2) {
   return { ...h, transform };
 }
 
+test("coverage reuses unchanged presentation and invalidates camera viewport pass and navigation revisions", t => {
+  const h = coverageHarness(1);
+  t.after(() => h.owner.dispose());
+  assert.equal(h.owner.getDiagnostics().stageTimingsEnabled, false);
+  h.owner.getDiagnostics({ stageTimings: true });
+  assert.equal(h.owner.present(h.transform), true);
+  const initial = h.owner.getDiagnostics().coverageCalculations;
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial);
+  const moved = { ...h.transform, x: 25 };
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 1);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.25);
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 1);
+  h.map.width = 125;
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 2);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.2);
+  h.owner.notePassCommit("labels");
+  assert.equal(h.owner.present(moved, { refresh: false, allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, initial + 3);
+  const snapshot = { ...h.currentFrame, revision: 1 };
+  snapshot.gpu.setPalette = () => {};
+  assert.equal(h.owner.presentNavigation(moved, snapshot, { allowPartialPasses: true }), true);
+  const navigation = h.owner.getDiagnostics().coverageCalculations;
+  assert.equal(navigation, initial + 4);
+  assert.equal(h.owner.presentNavigation(moved, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().coverageCalculations, navigation);
+  snapshot.revision++;
+  assert.equal(h.owner.presentNavigation(moved, snapshot, { allowPartialPasses: true }), true);
+  const diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.coverageCalculations, navigation + 1);
+  assert.equal(diagnostics.stageTimings.coverage.count, diagnostics.coverageCalculations);
+  assert.equal(diagnostics.stageTimings.coverage.taskKind, "present");
+});
+
 test("complete coverage reports zero gaps and failed presentations preserve the last measurement", () => {
   const h = coverageHarness();
   assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, null);

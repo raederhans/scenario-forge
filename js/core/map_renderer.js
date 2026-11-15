@@ -3211,6 +3211,7 @@ function getTnoRasterSceneOwner() {
     resourceBudget: pageResourceBudget,
     helpers: {
       getActivePassNames: getActiveRenderPassNames,
+      recordMetric: recordRenderPerfMetric,
       getPassCanvas: name => getRenderPassCacheState().canvases?.[name],
       getPassReferenceTransform,
       getPassLayout: getRenderPassLayout,
@@ -3345,7 +3346,6 @@ function getPoliticalIdRasterRuntimeOwner() {
     effects: {
       recordMetric: recordRenderPerfMetric,
       commitPublishedColorEdit: clearPendingPoliticalColorEdit,
-      requestNavigationRender: () => requestRendererRender("political-id-navigation-ready", { visual: true }),
       requestRender: reason => {
         invalidateRenderPasses(["political"], reason);
         requestRendererRender(reason, { visual: true });
@@ -13319,7 +13319,7 @@ export function getPoliticalIdRasterDiagnostics(options) {
   return { ...current, ...policy, passes, asyncWork: getRendererAsyncWorkStatus(),
     canvasResources: getRenderCacheOwner().getSurfaceDiagnostics(),
     scene: { active: false, frames: 0, textureUploads: 0, bytes: 0,
-      ...tnoRasterSceneOwner?.getDiagnostics(), failure: tnoRasterSceneFailure,
+      ...tnoRasterSceneOwner?.getDiagnostics(options), failure: tnoRasterSceneFailure,
       borderCanvas: borderCanvasPreparationOwner?.getStats(),
       physicalCanvas: { ...physicalViewportCacheOwner?.getStats(), fullWorld: false, pending: !!physicalViewportCacheOwner?.getPendingPromise() } },
     waterPreparation: scenarioRegionOverlayRenderOwner?.getPreparationDiagnostics(),
