@@ -79,8 +79,8 @@ export function createScenarioInspectorController({
     const card = document.createElement("button");
     card.type = "button";
     card.className = parentReturn
-      ? "scenario-action-card scenario-navigation-card scenario-parent-return-btn"
-      : "scenario-action-card";
+      ? "list-row scenario-action-card scenario-navigation-card scenario-parent-return-btn"
+      : "list-row scenario-action-card";
     card.addEventListener("click", () => selectInspectorCountry(countryState.code));
     const copy = document.createElement("div");
     copy.className = "scenario-action-card-copy";

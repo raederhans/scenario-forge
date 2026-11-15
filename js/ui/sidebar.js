@@ -1148,7 +1148,7 @@ function initSidebar({ render } = {}) {
   const createInspectorActionButton = (label, onClick) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "inspector-item-btn";
+    button.className = "list-row inspector-item-btn";
     button.textContent = label;
     button.addEventListener("click", onClick);
     return button;

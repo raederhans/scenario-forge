@@ -322,7 +322,7 @@ export function createRegionalPresetController(runtimeState, {
       const baselineDisabled = !!normalizedName && disabledNames.includes(normalizedName);
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "inspector-item-btn";
+      button.className = "list-row inspector-item-btn";
       button.textContent = preset.name;
       button.disabled = baselineDisabled;
       if (baselineDisabled) {

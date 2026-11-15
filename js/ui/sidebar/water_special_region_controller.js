@@ -619,7 +619,7 @@ export function createWaterSpecialRegionController({
     overrideEntries.forEach(({ featureId, feature, color }) => {
       const row = document.createElement("button");
       row.type = "button";
-      row.className = "scenario-action-card";
+      row.className = "list-row scenario-action-card";
       row.addEventListener("click", () => {
         runtimeState.selectedWaterRegionId = featureId;
         waterInspectorSection?.setAttribute("open", "");
@@ -810,7 +810,7 @@ export function createWaterSpecialRegionController({
         const childId = getWaterFeatureId(childFeature);
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "inspector-item-btn";
+        button.className = "list-row inspector-item-btn";
         button.addEventListener("click", () => {
           selectWaterRegionFromHierarchy(childId);
         });
@@ -891,7 +891,7 @@ export function createWaterSpecialRegionController({
       if (!featureId) return;
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "inspector-item-btn";
+      button.className = "list-row inspector-item-btn";
       button.dataset.regionId = featureId;
       button.dataset.regionIds = memberIds.join("|");
       button.dataset.regionScope = "water";
@@ -1207,7 +1207,7 @@ export function createWaterSpecialRegionController({
       if (!featureId) return;
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "inspector-item-btn";
+      button.className = "list-row inspector-item-btn";
       button.dataset.regionId = featureId;
       button.dataset.regionScope = "special";
       button.classList.toggle("is-active", featureId === runtimeState.selectedSpecialRegionId);

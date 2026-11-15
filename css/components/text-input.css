@@ -15,7 +15,7 @@ body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input
   padding-block: 0;
   font-size: var(--fs-sm);
   font-weight: 400;
-  padding-inline: var(--space-3);
+  padding-inline: var(--input-padding-start, var(--space-3)) var(--space-3);
   box-shadow: none;
 }
 body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput),

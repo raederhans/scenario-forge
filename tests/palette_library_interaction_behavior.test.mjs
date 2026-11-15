@@ -90,3 +90,28 @@ test("Enter applies a focused color variant exactly once, like a normal row", t 
   assert.equal(prevented, 2, "suppress the native button click after keyboard apply");
   assert.equal(state.selectedColor, "#112233");
 });
+
+test("palette list measured while its tab is hidden is not pinned to zero height", t => {
+  const previousOpen = state.paletteLibraryOpen;
+  const originalRaf = globalThis.requestAnimationFrame;
+  const originalCancel = globalThis.cancelAnimationFrame;
+  t.after(() => {
+    state.paletteLibraryOpen = previousOpen;
+    globalThis.requestAnimationFrame = originalRaf;
+    globalThis.cancelAnimationFrame = originalCancel;
+  });
+  state.paletteLibraryOpen = true;
+  globalThis.requestAnimationFrame = callback => { callback(); return 1; };
+  globalThis.cancelAnimationFrame = () => {};
+  const list = { dataset: {}, style: {}, offsetParent: null, scrollHeight: 0 };
+  const controller = createPaletteLibraryPanelController({ paletteLibraryList: list });
+
+  controller.handleResize();
+  assert.equal(list.style.height, "auto", "hidden list keeps its natural height");
+  assert.equal(list.style.maxHeight, "");
+
+  list.offsetParent = {};
+  list.scrollHeight = 200;
+  controller.handleResize();
+  assert.equal(list.style.height, "200px", "visible list still fits its content");
+});
