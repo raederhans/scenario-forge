@@ -22,6 +22,46 @@ function measuredGpu(options = {}) {
   return createPoliticalIdRasterGpu({ ...options, canvas });
 }
 
+test("tile records progress without retaining payloads or changing identity for palette edits", async t => {
+  const f = fixture({ directPresentation: true, displayMode: "raster", autoPublish: false, createGpu: measuredGpu });
+  t.after(() => f.owner.dispose());
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.owner.draw();
+  const requested = f.owner.getDiagnostics().tileRecords;
+  assert.ok(requested.length > 0);
+  assert.ok(requested.every(record => record.state === "requested"));
+  for (let guard = 0; guard < 100; guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (!request) break;
+    const tile = makeTile(request.packet);
+    tile.codes = new Uint32Array(tile.width * tile.height);
+    request.resolve(tile);
+    await tick();
+  }
+  assert.ok(f.owner.getDiagnostics().tileRecords.every(record => record.state === "cpu-ready"));
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    gates.shift()?.(); await tick();
+  }
+  const ready = f.owner.getDiagnostics().tileRecords;
+  assert.ok(ready.every(record => record.state === "gpu-ready"));
+  assert.equal(f.owner.getDirectFrame(), null);
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+  f.features[0].color = "#abcdef"; f.identity.colorVersion++;
+  f.owner.draw();
+  const recolored = f.owner.getDiagnostics().tileRecords;
+  assert.deepEqual(recolored.map(record => record.sourceStamp), ready.map(record => record.sourceStamp));
+  assert.deepEqual(recolored.map(record => record.gpuHandle), ready.map(record => record.gpuHandle));
+  const containsPayload = value => ArrayBuffer.isView(value) || (value && typeof value === "object"
+    && Object.values(value).some(containsPayload));
+  assert.equal(containsPayload(recolored), false);
+  f.cache.clear();
+  assert.ok(f.owner.getDiagnostics().tileRecords.every(record => record.state === "gpu-ready"));
+  f.owner.dispose();
+  assert.deepEqual(f.owner.getDiagnostics().tileRecords, []);
+});
+
 for (const asynchronous of [false, true]) test(`tile diagnostics record accepted CPU data and real ${asynchronous ? "asynchronous" : "synchronous"} uploads`, async t => {
   const f = fixture({ directPresentation: true, displayMode: "raster", createGpu: options => {
     const gpu = measuredGpu(options);

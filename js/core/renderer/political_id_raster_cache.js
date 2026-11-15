@@ -174,6 +174,19 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
   const payloads = new WeakMap();
   let cpuBytes = 0;
   let evictions = 0;
+  let transientBytes = 0, peakTransientBytes = 0, peakCpuBytes = 0;
+
+  function chargeTransient(bytes) {
+    transientBytes += bytes;
+    peakTransientBytes = Math.max(peakTransientBytes, transientBytes);
+    peakCpuBytes = Math.max(peakCpuBytes, cpuBytes + transientBytes);
+    return () => { transientBytes -= bytes; };
+  }
+
+  function reserveTransient(bytes) {
+    if (!makeRoom(bytes)) throw new RangeError("Political ID raster upload exceeds the CPU byte budget.");
+    return chargeTransient(bytes);
+  }
 
   function remove(key, evicted = false) {
     const entry = cache.get(key);
@@ -212,11 +225,13 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     if (!plan) { payload.compressible = false; return false; }
     // Encoding and decoding briefly need both representations. Reserve that
     // overlap inside the same cap, rather than hiding a second allocation.
-    if (payload.rawBytes + plan.bytes > maxBytes || cpuBytes + plan.bytes > maxBytes) return false;
+    if (payload.rawBytes + plan.bytes > maxBytes || cpuBytes + transientBytes + plan.bytes > maxBytes) return false;
+    const release = chargeTransient(plan.bytes);
     const packed = compressCodes(payload.codes, plan);
     payload.codes = null;
     payload.packed = packed;
     resizePayload(payload, packed.bytes);
+    release();
     return true;
   }
 
@@ -224,13 +239,13 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     // Every alias has its own conservative byte charge. Recompute the decode
     // reservation after eviction, since removing an alias also reduces it.
     const reservation = () => additionalBytes * (materializing ? protectedPayload.keys.size : 1);
-    while (cpuBytes + reservation() > maxBytes) {
+    while (cpuBytes + transientBytes + reservation() > maxBytes) {
       const visited = new Set();
       for (const entry of cache.values()) {
         if ((protectedPayload && entry.payload === protectedPayload) || visited.has(entry.payload)) continue;
         visited.add(entry.payload);
         compact(entry.payload);
-        if (cpuBytes + reservation() <= maxBytes) return true;
+        if (cpuBytes + transientBytes + reservation() <= maxBytes) return true;
       }
       // Incompressible coverage still uses the original LRU eviction policy.
       const oldest = [...cache].find(([, entry]) => entry.payload !== protectedPayload
@@ -249,9 +264,11 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     if (payload.keys.size && !makeRoom(payload.codeBytes, payload, true)) {
       throw new RangeError("Political ID raster decode exceeds the CPU byte budget.");
     }
+    const release = chargeTransient(payload.keys.size ? payload.codeBytes * payload.keys.size : 0);
     payload.codes = decompressCodes(packed, payload.length);
     payload.packed = null;
     resizePayload(payload, payload.codeBytes);
+    release();
     return payload.codes;
   }
 
@@ -326,7 +343,7 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
   }
 
   function getStats() {
-    return { cpuBytes, tileCount: cache.size, evictions };
+    return { cpuBytes: cpuBytes + transientBytes, tileCount: cache.size, evictions };
   }
 
   function entries() {
@@ -338,5 +355,6 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     makeRoom(0);
   }
 
-  return Object.freeze({ get maxBytes() { return maxBytes; }, setViewport, get, peek, set, invalidate, clear, getStats, entries });
+  return Object.freeze({ get maxBytes() { return maxBytes; }, setViewport, get, peek, set, invalidate, clear, getStats, entries,
+    reserveTransient, getTransientStats: () => ({ transientBytes, peakTransientBytes, peakCpuBytes }) });
 }

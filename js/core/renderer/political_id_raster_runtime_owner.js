@@ -49,9 +49,13 @@ export function createPoliticalIdRasterRuntimeOwner({
   let tileDependencies = new WeakMap(), lastTiming = null;
   let tileEventsEnabled = false, nextTileEventId = 0, tileEventIds = new WeakMap();
   const tileEvents = new Map();
+  const tileRecords = new Map();
+  let tileRecordStampKey = "";
   function recordTileUpload(tile, uploadSubmittedAt) {
     const event = tileEvents.get(tileEventIds.get(tile));
     if (event && event.uploadSubmittedAt === null) event.uploadSubmittedAt = uploadSubmittedAt;
+    const record = [...tileRecords.values()].find(record => cache.peek(record.cpuCacheKey) === tile);
+    if (record) record.uploadSubmittedAt = uploadSubmittedAt;
   }
   const worker = client || createPoliticalIdRasterWorkerClient();
   if (assetStore === undefined) assetStore = globalThis.indexedDB
@@ -215,7 +219,37 @@ export function createPoliticalIdRasterRuntimeOwner({
     }, Math.max(0, nextAssetProbeAt - performance.now()));
   }
 
+  function syncTileRecords() {
+    if (!snapshot || !plan || disposed) { tileRecords.clear(); return; }
+    const sourceStamp = { namespace, geometryEpoch: epoch, mappingRevision: snapshot.mappingRevision,
+      projectionSignature: coordinates?.signature || fittedProjectionKey, dpr: state.dpr,
+      rasterizationVariant: `core-v1:gutter=${gutter}:stroke=${0.75 * state.dpr}` };
+    const stampKey = JSON.stringify(sourceStamp);
+    if (tileRecordStampKey !== stampKey) { tileRecords.clear(); tileRecordStampKey = stampKey; }
+    for (const descriptor of plan.tiles) {
+      if (tileRecords.has(descriptor.key)) continue;
+      const { key, level, density, originX, originY, width, height } = descriptor;
+      const coreRect = { minX: originX, minY: originY, maxX: originX + width, maxY: originY + height };
+      tileRecords.set(key, { key, sourceStamp, level, density, coreRect, storageRect: { ...coreRect },
+        worldRect: { minX: originX / density, minY: originY / density,
+          maxX: (originX + width) / density, maxY: (originY + height) / density },
+        state: "requested", cpuCacheKey: key, gpuHandle: null, requestedAt: performance.now(),
+        cpuReadyAt: null, uploadSubmittedAt: null });
+    }
+    const demanded = new Set(plan.tiles.map(tile => tile.key));
+    for (const [key, record] of tileRecords) {
+      const tile = cache.peek(key);
+      const prepared = gpuPreparation?.status === "ready" ? gpuPreparation.handle.getTileHandle?.(tile) : null;
+      const resident = tile ? gpu?.getTileHandle?.(tile) : null;
+      record.gpuHandle = prepared || resident || (gpu?.hasTileHandle?.(record.gpuHandle) ? record.gpuHandle : null);
+      record.state = record.gpuHandle ? "gpu-ready" : tile ? "cpu-ready" : "requested";
+      if (tile && record.cpuReadyAt === null) record.cpuReadyAt = performance.now();
+      if (!tile && !record.gpuHandle && !demanded.has(key)) tileRecords.delete(key);
+    }
+  }
+
   function account() {
+    syncTileRecords();
     if (saveCandidate && tileIdentities.get(cache.peek(saveCandidate.cacheKey)) !== saveCandidate.identity) {
       dropSaveCandidate();
     }
@@ -304,7 +338,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const startedAt = performance.now();
       gpuPreparationStats.started++; gpuPreparationStats.lastPath = "preparing";
       job.promise = gpu.prepareFrame({ tiles, palette: snapshot.palette, signal: job.controller.signal,
-        onTileUploadSubmitted: tileEventsEnabled ? recordTileUpload : undefined,
+        onTileUploadSubmitted: recordTileUpload,
         isCurrent: () => gpuCandidateCurrent(job), onProgress: account,
         ...(h.yieldGpuPreparation ? { yieldTask: h.yieldGpuPreparation } : {}),
       }).then(handle => {
@@ -526,7 +560,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         if (!directPresentation) {
           const retained = new Set(cache.entries().map(([, tile]) => tile));
           gpuTiles = gpuTiles.filter(tile => retained.has(tile));
-          if (gpu?.isAvailable()) gpu.setTiles(gpuTiles, tileEventsEnabled ? recordTileUpload : undefined);
+          if (gpu?.isAvailable()) gpu.setTiles(gpuTiles, recordTileUpload);
         }
       }
       if (changedNamespace || next.geometryRevision !== snapshot?.geometryRevision) {
@@ -561,6 +595,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       offsetX: layout.offsetX || 0, offsetY: layout.offsetY || 0 });
     const key = plan?.tiles.map(tile => tile.key).join("|") || "";
     if (key !== planKey) { attempted = new Set(); planKey = key; }
+    syncTileRecords();
     // An obsolete view can finish only its current tile. There is no old-view
     // queue, and a return to that region can reuse the accepted geometry tile.
     return plan;
@@ -880,6 +915,11 @@ export function createPoliticalIdRasterRuntimeOwner({
     if (gpu?.isAvailable()) return true;
     releaseGpu();
     gpu = createGpu({ maxTextureBytes: GPU_HARD_LIMIT,
+      reserveUploadBytes: bytes => {
+        const release = cache.reserveTransient(bytes);
+        account();
+        return () => { release(); account(); };
+      },
       getReservedTextureBytes: () => GPU_HARD_LIMIT - gpuLimit, onContextLost: () => {
       cancelGpuPreparation(); gpuAcceptedKey = "";
       directFrame = null; publishedBaselinePalette = null; publishedPalette = null; publishedEntries = [];
@@ -976,7 +1016,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const paletteKey = `${namespace}:${snapshot.paletteRevision}`;
       if (!directPresentation) gpu.setPalette(snapshot.palette, paletteKey);
       const paletteDoneAt = performance.now();
-      if (!directPresentation) gpu.setTiles(tiles, tileEventsEnabled ? recordTileUpload : undefined);
+      if (!directPresentation) gpu.setTiles(tiles, recordTileUpload);
       // Shared GPU residents keep lightweight descriptors; the bounded CPU LRU
       // alone owns direct tile payloads while a new candidate is prepared.
       gpuTiles = directPresentation ? [] : tiles;
@@ -1067,13 +1107,13 @@ export function createPoliticalIdRasterRuntimeOwner({
         gpuPreparation = null; gpuPreparationStats.committed++; gpuPreparationStats.lastPath = "asynchronous-committed";
       } else if (gpu.setFrame) {
         frameTiming = gpu.setFrame({ tiles: staged.tiles, palette: staged.palette, revision: staged.paletteKey,
-          onTileUploadSubmitted: tileEventsEnabled ? recordTileUpload : undefined });
+          onTileUploadSubmitted: recordTileUpload });
       } else {
         if (gpu.canSetFrame && !gpu.canSetFrame({ tiles: staged.tiles, palette: staged.palette })) return reject("gpu-budget");
         const plannedAt = performance.now();
         gpu.setPalette(staged.palette, staged.paletteKey);
         const paletteDoneAt = performance.now();
-        gpu.setTiles(staged.tiles, tileEventsEnabled ? recordTileUpload : undefined);
+        gpu.setTiles(staged.tiles, recordTileUpload);
         frameTiming = { planningMs: plannedAt - startedAt, paletteUploadMs: paletteDoneAt - plannedAt,
           tileBindingMs: performance.now() - paletteDoneAt };
       }
@@ -1399,11 +1439,16 @@ export function createPoliticalIdRasterRuntimeOwner({
     },
     getPendingWorkCount: () => Number(!!active) + Number(!!sourcePreparation) + Number(gpuPreparation?.status === "pending"),
     getDiagnostics: ({ tileEvents: enabled } = {}) => {
+      syncTileRecords();
       if (enabled !== undefined) {
         tileEventsEnabled = enabled;
         if (!enabled) { tileEvents.clear(); tileEventIds = new WeakMap(); }
       }
       return { displayMode, persistent, directPresentation, ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
+      tileRecords: [...tileRecords.values()].map(record => ({ ...record,
+        sourceStamp: { ...record.sourceStamp }, coreRect: { ...record.coreRect },
+        storageRect: { ...record.storageRect }, worldRect: { ...record.worldRect } })),
+      cpuTransient: cache.getTransientStats(),
       tileEventsEnabled, tileEventLimit: TILE_EVENT_LIMIT, tileEvents: [...tileEvents.values()].map(event => ({ ...event })),
       worker: worker.getStats?.() || null,
       pending: Number(!!active) + Number(!!sourcePreparation) + Number(gpuPreparation?.status === "pending"),

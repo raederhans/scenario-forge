@@ -28,6 +28,82 @@ const tile = (originX, code = 1) => ({ originX, originY: 0, width: 1, height: 1,
 const palette = Uint8Array.of(0, 0, 0, 0, 255, 0, 0, 255);
 
 const hostTick = () => new Promise(resolve => setImmediate(resolve));
+
+test("single tile publication retains resources and draw selection reuses uploads", async t => {
+  const h = harness(), read = recordFrames(h), gpu = createPoliticalIdRasterGpu({ gl: h.gl });
+  t.after(() => gpu.dispose());
+  const first = tile(0), second = tile(3, 2);
+  gpu.setFrame({ tiles: [first], palette, revision: 1 });
+  const firstHandle = gpu.getTileHandle(first), before = read(gpu);
+  const pending = await gpu.prepareTile({ tile: second, palette, yieldTask: hostTick });
+  const secondHandle = pending.getTileHandle(second);
+  assert.deepEqual(read(gpu), before);
+  pending.commit({ palette, revision: 1 });
+  assert.equal(gpu.getStats().residentTiles, 2);
+  assert.deepEqual(read(gpu), before);
+  gpu.setDrawTiles([secondHandle]);
+  assert.equal(read(gpu).length, 1);
+  const uploads = gpu.getStats().tileUploads;
+  gpu.setDrawTiles([firstHandle]);
+  assert.deepEqual(read(gpu), before);
+  assert.equal(gpu.getStats().tileUploads, uploads);
+  assert.equal(gpu.releaseTile(firstHandle), false);
+  assert.equal(gpu.releaseTile(secondHandle), true);
+  assert.equal(gpu.getStats().residentTiles, 1);
+  assert.deepEqual(read(gpu), before);
+});
+
+test("failed single tile upload preserves drawing and releases private textures", async t => {
+  const h = harness(), read = recordFrames(h), gpu = createPoliticalIdRasterGpu({ gl: h.gl });
+  t.after(() => gpu.dispose());
+  gpu.setFrame({ tiles: [tile(0)], palette, revision: 1 });
+  const before = read(gpu), bytes = gpu.getStats().gpuTextureBytes;
+  h.gl.texImage2D = () => { throw new Error("upload failed"); };
+  await assert.rejects(gpu.prepareTile({ tile: tile(3), palette, yieldTask: hostTick }), /upload failed/);
+  assert.deepEqual(read(gpu), before);
+  assert.equal(gpu.getStats().gpuTextureBytes, bytes);
+  assert.equal(gpu.getStats().pendingTextureBytes, 0);
+  assert.equal(h.calls.filter(call => call[0] === "deleteTexture").length, 1);
+});
+
+test("a new sampling layout for a resident tile preserves its currently drawn handle", async t => {
+  const h = harness(), read = recordFrames(h), gpu = createPoliticalIdRasterGpu({ gl: h.gl });
+  t.after(() => gpu.dispose());
+  const center = tile(0), neighbor = tile(1, 2);
+  gpu.setFrame({ tiles: [center, neighbor], palette, revision: 1 });
+  const oldHandle = gpu.getTileHandle(center), neighborHandle = gpu.getTileHandle(neighbor), before = read(gpu);
+  const prepared = await gpu.prepareTile({ tile: center, palette, yieldTask: hostTick });
+  const nextHandle = prepared.getTileHandle(center);
+  prepared.commit({ palette, revision: 1 });
+  assert.notEqual(nextHandle, oldHandle);
+  assert.deepEqual(read(gpu), before);
+  assert.equal(gpu.getStats().residentTiles, 3);
+  assert.equal(gpu.releaseTile(oldHandle), false);
+  gpu.setDrawTiles([nextHandle]);
+  assert.equal(gpu.releaseTile(oldHandle), true);
+  assert.equal(gpu.releaseTile(neighborHandle), true);
+  assert.equal(gpu.getStats().residentTiles, 1);
+});
+
+test("private upload scratch is charged to the CPU budget and released after submission", async t => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 100 });
+  const h = harness();
+  const gpu = createPoliticalIdRasterGpu({ gl: h.gl, reserveUploadBytes: cache.reserveTransient });
+  t.after(() => gpu.dispose());
+  const charges = [];
+  h.gl.texImage2D = () => charges.push([gpu.getStats().uploadTransientBytes, cache.getStats().cpuBytes]);
+  const pending = await gpu.prepareTile({ tile: tile(0), palette, yieldTask: hostTick });
+  assert.ok(charges.every(([scratch, total]) => scratch === 80 && total === 80));
+  assert.equal(cache.getStats().cpuBytes, 0);
+  assert.equal(gpu.getStats().pendingTextureBytes, 44);
+  pending.cancel();
+  assert.equal(gpu.getStats().pendingTextureBytes, 0);
+  const release = cache.reserveTransient(60);
+  await assert.rejects(gpu.prepareTile({ tile: tile(3), palette, yieldTask: hostTick }), /CPU byte budget/);
+  assert.equal(cache.getStats().cpuBytes, 60);
+  release();
+  assert.equal(cache.getStats().cpuBytes, 0);
+});
 function recordFrames(h) {
   const bound = new Map(), pixels = new Map(), frames = [];
   let unit = 0;
