@@ -240,12 +240,34 @@ function getGeoFeatureDisplayLabel(feature, fallback = "") {
   ).trim();
 }
 
-function t(key, type = "geo") {
+const missingUiKeys = new Set();
+
+function getMissingUiKeys() {
+  return Array.from(missingUiKeys, (entry) => JSON.parse(entry));
+}
+
+function clearMissingUiKeys() {
+  missingUiKeys.clear();
+}
+
+function t(key, type = "geo", params) {
   if (!key) return "";
-  // geo 文案优先走 runtime locale / alias 真相源；
-  // UI 文案则先看 runtime 注入，再退回静态 catalog，保证启动期和完整加载后共用同一套调用入口。
-  const entry = type === "geo" ? resolveGeoLocaleEntry(key) : runtimeState.locales?.[type]?.[key];
   const lang = runtimeState.currentLanguage === "zh" ? "zh" : "en";
+  if (type === "ui") {
+    if (!Object.hasOwn(UI_COPY_CATALOG, key)) {
+      missingUiKeys.add(JSON.stringify({ key, language: lang }));
+      return key;
+    }
+    let text = UI_COPY_CATALOG[key][lang];
+    if (typeof text === "object") {
+      const form = new Intl.PluralRules(lang).select(params?.count);
+      text = text[form] ?? text.other;
+    }
+    return params ? text.replace(/\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (match, name) => (
+      Object.hasOwn(params, name) ? String(params[name]) : match
+    )) : text;
+  }
+  const entry = type === "geo" ? resolveGeoLocaleEntry(key) : runtimeState.locales?.[type]?.[key];
   if (entry?.[lang] || entry?.en) {
     return entry?.[lang] || entry?.en || key;
   }
@@ -491,6 +513,8 @@ function clearStartupSupportKeyUsageAuditReport() {
 }
 
 export {
+  getMissingUiKeys,
+  clearMissingUiKeys,
   clearStartupSupportKeyUsageAuditReport,
   consumeStartupSupportKeyUsageAuditReport,
   getStartupSupportKeyUsageAuditReport,

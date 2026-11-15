@@ -54,7 +54,7 @@ def run_hierarchy_locale_stage(
             project_root / "tools" / "generate_hierarchy.py",
             project_root / "tools" / "geo_key_normalizer.py",
             project_root / "tools" / "translate_manager.py",
-            project_root / "data" / "i18n" / "manual_ui.json",
+            project_root / "data" / "i18n" / "ui_copy.json",
             project_root / "data" / "i18n" / "manual_geo_overrides.json",
             project_root / "data" / "i18n" / "europe_geo_seeds.json",
             baseline_locales_path,

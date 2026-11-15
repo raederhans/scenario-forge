@@ -41,7 +41,7 @@ UI_COPY_CATALOG_BLOCK_RE = re.compile(
     r"""export\s+const\s+UI_COPY_CATALOG\s*=\s*Object\.freeze\(\{(?P<body>.*?)\n\}\);""",
     re.DOTALL,
 )
-UI_COPY_CATALOG_QUOTED_KEY_RE = re.compile(r"""^\s*"(?P<text>(?:\\.|[^"])*)"\s*:""", re.MULTILINE)
+UI_COPY_CATALOG_QUOTED_KEY_RE = re.compile(r"""^  "(?P<text>(?:\\.|[^"])*)"\s*:\s*\{""", re.MULTILINE)
 UI_COPY_CATALOG_IDENTIFIER_KEY_RE = re.compile(r"""^\s*(?P<text>[A-Za-z][A-Za-z0-9_]*)\s*:\s*\{""", re.MULTILINE)
 TEXT_ASSIGN_LITERAL_RE = re.compile(
     r"""\b(?:textContent|innerText)\s*=\s*(['\"])(?P<text>(?:\\.|(?!\1).)*)\1""",
@@ -354,7 +354,7 @@ def build_localization_ownership_audit(
 ) -> dict:
     ui_locale = locales.get("ui") or {}
     geo_locale = locales.get("geo") or {}
-    manual_ui_path = repo_root / "data" / "i18n" / "manual_ui.json"
+    ui_copy_path = repo_root / "data" / "i18n" / "ui_copy.json"
     manual_geo_path = repo_root / "data" / "i18n" / "manual_geo_overrides.json"
     baseline_path = repo_root / "data" / "i18n" / "locales_baseline.json"
     catalog_path = repo_root / "js" / "core" / "i18n_catalog.js"
@@ -421,7 +421,7 @@ def build_localization_ownership_audit(
     return {
         "summary": {
             "ui_locale_entries": len(ui_locale),
-            "manual_ui_entries": json_mapping_count(manual_ui_path),
+            "ui_copy_entries": json_mapping_count(ui_copy_path),
             "catalog_ui_entries": len(code_strings["catalog_ui_keys"]),
             "geo_locale_entries": len(geo_locale),
             "manual_geo_entries": json_mapping_count(manual_geo_path),
@@ -438,9 +438,9 @@ def build_localization_ownership_audit(
                 **file_audit_entry(locales_path, repo_root),
                 "entry_count": len(ui_locale),
             },
-            "manual_ui": {
-                **file_audit_entry(manual_ui_path, repo_root),
-                "entry_count": json_mapping_count(manual_ui_path),
+            "ui_copy": {
+                **file_audit_entry(ui_copy_path, repo_root),
+                "entry_count": json_mapping_count(ui_copy_path),
             },
             "runtime_catalog": {
                 **file_audit_entry(catalog_path, repo_root),
@@ -779,7 +779,7 @@ def render_markdown(report: dict) -> str:
     lines.append("## Localization Ownership Audit")
     summary = ownership["summary"]
     lines.append(f"- UI locale entries: {summary['ui_locale_entries']}")
-    lines.append(f"- Manual UI entries: {summary['manual_ui_entries']}")
+    lines.append(f"- UI copy source entries: {summary['ui_copy_entries']}")
     lines.append(f"- Runtime catalog entries: {summary['catalog_ui_entries']}")
     lines.append(f"- GEO locale entries: {summary['geo_locale_entries']}")
     lines.append(f"- Manual GEO override entries: {summary['manual_geo_entries']}")

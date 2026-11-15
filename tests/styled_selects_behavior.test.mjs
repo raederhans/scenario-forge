@@ -325,10 +325,10 @@ test("long styled select searches groups and keeps native value and keyboard con
     labelText.textContent = "Renamed field";
     syncStyledSelect(select);
     assert.equal(button.getAttribute("aria-label"), "Renamed field", "a changed label is read on every refresh");
-    labelText.setAttribute("data-i18n", "Actual field key");
+    labelText.setAttribute("data-i18n", "Indicator");
     syncStyledSelect(select);
-    assert.equal(button.getAttribute("data-i18n-aria-label"), "Actual field key", "visual label keys remain discoverable outside the shell");
-    assert.equal(button.getAttribute("aria-label"), "Actual field key");
+    assert.equal(button.getAttribute("data-i18n-aria-label"), "Indicator", "visual label keys remain discoverable outside the shell");
+    assert.equal(button.getAttribute("aria-label"), "Indicator");
     assert.ok(["label", "value", "selected", "data-i18n-aria-label"].every((name) => observerOptions.attributeFilter.includes(name)));
     const writesBeforeOwnMutation = countWrites(shell);
     mutationCallback([{ type: "attributes", target: button, attributeName: "aria-label" }]);
@@ -347,7 +347,7 @@ test("long styled select searches groups and keeps native value and keyboard con
     const makeDynamicSelect = () => {
       const dynamicSelect = makeNode(document, "select");
       dynamicSelect.classList.add("select-input");
-      dynamicSelect.setAttribute("data-i18n-aria-label", "Actual field key");
+      dynamicSelect.setAttribute("data-i18n-aria-label", "Indicator");
       const dynamicOption = makeNode(document, "option");
       dynamicOption.value = "dynamic";
       dynamicOption.textContent = "Dynamic option";
@@ -399,23 +399,23 @@ test("long styled select searches groups and keeps native value and keyboard con
       setCurrentLanguage(state, "zh");
       applyBaseLocalizationSnapshot(state, { uiLocales: {
         ...originalLocales?.ui,
-        "Actual field key": { en: "Field", zh: "字段" },
+        "Indicator": { en: "Indicator", zh: "指标" },
         "Search options": { en: "Search options", zh: "搜索选项" },
-        "No matching options": { en: "No matching options", zh: "无匹配选项" },
+        "No matching options": { en: "No matching options", zh: "没有匹配的选项" },
       } });
       const buildsBeforeLanguage = list.writes.replaceChildren;
       syncStyledSelect(select);
-      assert.equal(button.getAttribute("aria-label"), "字段");
+      assert.equal(button.getAttribute("aria-label"), "指标");
       assert.equal(search.placeholder, "搜索选项");
       assert.equal(search.getAttribute("aria-label"), "搜索选项");
-      assert.equal(noMatches.textContent, "无匹配选项");
+      assert.equal(noMatches.textContent, "没有匹配的选项");
       assert.equal(list.writes.replaceChildren, buildsBeforeLanguage, "translated shell strings alone do not rebuild options");
       alpha.textContent = "翻译后的 Alpha";
       select.value = "updated-alpha";
       syncStyledSelect(select);
       assert.equal(button.children[0].textContent, "翻译后的 Alpha");
-      assert.equal(accessibleName(button), "字段 翻译后的 Alpha");
-      assert.equal(accessibleName(list), "字段");
+      assert.equal(accessibleName(button), "指标 翻译后的 Alpha");
+      assert.equal(accessibleName(list), "指标");
       assert.equal(list.children[0].children[1].textContent, "翻译后的 Alpha", "translated option text reaches the menu");
 
       const dynamicSelect = makeDynamicSelect();
@@ -430,7 +430,7 @@ test("long styled select searches groups and keeps native value and keyboard con
       mutationCallback([{ type: "childList", target: dynamicContainer, addedNodes: [dynamicSelect] }]);
       await Promise.resolve();
       assert.equal(dynamicSelect.dataset.appSelectEnhanced, "true", "new select containers are still enhanced after initialization");
-      assert.equal(dynamicSelect.parentNode.children[1].getAttribute("aria-label"), "字段", "new selects read the current language even without a language change");
+      assert.equal(dynamicSelect.parentNode.children[1].getAttribute("aria-label"), "指标", "new selects read the current language even without a language change");
     } finally {
       setCurrentLanguage(state, originalLanguage);
       applyBaseLocalizationSnapshot(state, { uiLocales: originalLocales.ui, geoLocales: originalLocales.geo });

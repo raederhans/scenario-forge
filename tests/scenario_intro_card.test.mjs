@@ -25,7 +25,7 @@ class Element {
 }
 
 const registry = JSON.parse(readFileSync(new URL("../data/scenarios/index.json", import.meta.url), "utf8"));
-const translations = JSON.parse(readFileSync(new URL("../data/i18n/manual_ui.json", import.meta.url), "utf8"));
+const translations = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL("../data/i18n/ui_copy.json", import.meta.url), "utf8"))).map(([key, entry]) => [key, entry.zh]));
 const presentation = registry.scenarios.find((entry) => entry.scenario_id === "hoi4_1936").presentation;
 function setup() {
   const document = new EventTarget();

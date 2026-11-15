@@ -581,7 +581,7 @@ test("unavailable RL version is preserved on render and explicit recovery retain
 });
 
 test("WGI new strings agree across manual/catalog translations and option language refresh preserves selection", () => {
-  const manual = JSON.parse(readFileSync(new URL("../data/i18n/manual_ui.json", import.meta.url), "utf8"));
+  const manual = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL("../data/i18n/ui_copy.json", import.meta.url), "utf8"))).map(([key, entry]) => [key, entry.zh]));
   for (const key of ["Country indicators", "Indicator", "Show thematic shading",
     "Country indicators · Scenario reference", "UNDP human development · Scenario reference",
     "WDI population · Scenario reference",
