@@ -98,9 +98,11 @@ test("private upload scratch is charged to the CPU budget and released after sub
   assert.equal(gpu.getStats().pendingTextureBytes, 44);
   pending.cancel();
   assert.equal(gpu.getStats().pendingTextureBytes, 0);
+  // Scratch beyond the cap is still charged, but an upload is never refused for it.
   const release = cache.reserveTransient(60);
-  await assert.rejects(gpu.prepareTile({ tile: tile(3), palette, yieldTask: hostTick }), /CPU byte budget/);
+  const crowded = await gpu.prepareTile({ tile: tile(3), palette, yieldTask: hostTick });
   assert.equal(cache.getStats().cpuBytes, 60);
+  crowded.cancel();
   release();
   assert.equal(cache.getStats().cpuBytes, 0);
 });

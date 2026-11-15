@@ -109,6 +109,21 @@ test("unknown dirty bounds conservatively clear cache and clear resets retained 
 const descriptor = { originX: 0, originY: 0, width: 8, height: 8, density: 1 };
 const filledTile = (value, length = 64) => ({ ...makeTile(length * 4), codes: new Uint32Array(length).fill(value) });
 
+test("an upload reservation never evicts cached tiles", () => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 600 });
+  // Incompressible codes: compaction cannot make room, only eviction could.
+  const noisy = seed => ({ ...makeTile(64 * 4), codes: Uint32Array.from({ length: 64 }, (_, i) => (i * 2654435761 + seed) >>> 0) });
+  cache.set("first", noisy(1), descriptor);
+  cache.set("second", noisy(2), descriptor);
+  const before = cache.getStats();
+  const release = cache.reserveTransient(10_000);
+  assert.ok(cache.peek("first") && cache.peek("second"), "tiles being uploaded stay resident");
+  assert.equal(cache.getStats().tileCount, before.tileCount);
+  assert.equal(cache.getStats().evictions, before.evictions);
+  release();
+  assert.equal(cache.getStats().cpuBytes, before.cpuBytes);
+});
+
 test("decode overlap and upload reservations share the CPU cap", () => {
   const cache = createPoliticalIdRasterCache({ maxBytes: 400 });
   const old = filledTile(3), next = filledTile(4);

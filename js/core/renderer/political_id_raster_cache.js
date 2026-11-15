@@ -183,8 +183,10 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     return () => { transientBytes -= bytes; };
   }
 
+  // Upload scratch lives for one task. It counts against later admissions, but it
+  // never evicts: the tiles in the cache are the ones being uploaded, and losing
+  // one mid-preparation leaves its frame unpublished until the view changes.
   function reserveTransient(bytes) {
-    if (!makeRoom(bytes)) throw new RangeError("Political ID raster upload exceeds the CPU byte budget.");
     return chargeTransient(bytes);
   }
 
