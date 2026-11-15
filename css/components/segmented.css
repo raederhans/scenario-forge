@@ -1,0 +1,64 @@
+@layer components {
+:where(.segmented) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+}
+:where(.segmented > button, .segmented--tabs > button) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: var(--hit-min);
+  height: var(--control-compact);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-500);
+  font-family: inherit;
+  font-size: var(--type-control);
+  font-weight: var(--type-control-weight);
+  line-height: var(--type-control-leading);
+  letter-spacing: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+:where(.segmented > button:hover:not(:disabled):not([aria-disabled="true"])) {
+  background: var(--surface-raised);
+}
+:where(.segmented > button:is(.is-active, [aria-pressed="true"], [aria-selected="true"])) {
+  background: var(--surface-raised);
+  color: var(--accent);
+  font-weight: 600;
+}
+:where(.bottom-dock .segmented > button) { height: var(--control-md); flex: 0 0 auto; }
+:where(.segmented--tabs) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line-1);
+  border-radius: 0;
+  background: transparent;
+}
+:where(.segmented--tabs > button) {
+  height: var(--control-md);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+}
+:where(.segmented--tabs > button:hover:not(:disabled):not([aria-disabled="true"])) {
+  background: var(--surface-sunken);
+}
+:where(.segmented--tabs > button:is(.is-active, [aria-pressed="true"], [aria-selected="true"])) {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+}

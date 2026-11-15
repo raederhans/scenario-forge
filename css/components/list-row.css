@@ -1,7 +1,7 @@
 @layer components {
 :where(.list-row) {
   box-sizing: border-box;
-  min-height: var(--control-compact);
+  min-height: var(--row-min);
   padding: var(--space-1h) var(--space-2);
   border: 0;
   border-bottom: 1px solid var(--line-1);

@@ -59,7 +59,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   backButton.hidden = true;
   backButton.setAttribute("aria-label", t("Back", "ui"));
   backButton.dataset.i18nAriaLabel = "Back";
-  const segments = make("nav", "editor-property-segments", "", "editorPropertySegments");
+  const segments = make("nav", "editor-property-segments segmented--tabs", "", "editorPropertySegments");
   segments.setAttribute("role", "tablist");
   const segmentButtons = new Map();
   const segmentProperties = new Map();
@@ -228,7 +228,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     onNavigate(key);
   };
 
-  const nav = make("nav", "editor-task-nav", "", "editorTaskNav");
+  const nav = make("nav", "editor-task-nav segmented--tabs", "", "editorTaskNav");
   nav.setAttribute("aria-label", t("Workspace", "ui"));
   nav.dataset.i18nAriaLabel = "Workspace";
   const taskBody = make("div", "editor-task-body");
@@ -274,7 +274,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     tasks.set(key, { host, button: btn });
   }
 
-  const objectNav = make("div", "editor-object-nav");
+  const objectNav = make("div", "editor-object-nav segmented");
   const objectHost = tasks.get("objects").host;
   objectHost.append(objectNav);
   const objectEntries = [];
@@ -568,11 +568,13 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     projectBtn.setAttribute("aria-controls", "editorProperty-project");
     projectBtn.addEventListener("click", () => showProperty("project", { syncTab: false, reveal: true }));
   }
+  setUiIcon(get("scenarioIntroButton"), "info", { doc: documentRef });
   top.prepend(make("a", "editor-brand", "Scenario Forge"));
   top.querySelector("a").href = "../";
   const scenario = get("lblScenario")?.closest("details");
   if (scenario) {
     scenario.classList.add("editor-scenario-menu");
+    scenario.querySelector("summary").append(createUiIcon("chevron-down", { doc: documentRef }));
     top.append(scenario);
     const closeScenarioMenu = ({ restoreFocus = false } = {}) => {
       if (get("scenarioSelectButton")?.getAttribute("aria-expanded") === "true") get("scenarioSelectButton").click();

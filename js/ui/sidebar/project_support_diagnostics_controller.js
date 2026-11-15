@@ -1,3 +1,4 @@
+import { createUiIcon } from "../components/ui_icons.js";
 import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
@@ -1091,7 +1092,7 @@ export function createProjectSupportDiagnosticsController({
     const previousButton = document.createElement("button");
     previousButton.type = "button";
     previousButton.className = "legend-editor-page-btn";
-    previousButton.textContent = "‹";
+    previousButton.appendChild(createUiIcon("chevron-left", { doc: document }));
     previousButton.ariaLabel = t("Previous page", "ui");
     previousButton.disabled = pageIndex <= 0;
     previousButton.addEventListener("click", () => {
@@ -1107,7 +1108,7 @@ export function createProjectSupportDiagnosticsController({
     const nextButton = document.createElement("button");
     nextButton.type = "button";
     nextButton.className = "legend-editor-page-btn";
-    nextButton.textContent = "›";
+    nextButton.appendChild(createUiIcon("chevron-right", { doc: document }));
     nextButton.ariaLabel = t("Next page", "ui");
     nextButton.disabled = pageIndex >= pageCount - 1;
     nextButton.addEventListener("click", () => {

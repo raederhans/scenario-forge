@@ -10,8 +10,7 @@ body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input
   min-height: var(--control-md);
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background-color: var(--surface-raised);
-  color: var(--ink-900);
+
   padding-block: 0;
   font-size: var(--fs-sm);
   font-weight: 400;
@@ -25,14 +24,14 @@ body.editor-workspace :is(.input--sm, #riverPaintSearchInput.input--sm) { height
 body.editor-workspace :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput):focus,
 body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput):focus {
   border-color: var(--accent);
-  outline: 3px solid var(--accent);
-  outline-offset: 0;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
   box-shadow: none;
 }
-@media (pointer: coarse) {
-  body.editor-workspace :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput),
-  body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput) { min-height: 44px; }
-  body.editor-workspace :is(.input--sm, #riverPaintSearchInput.input--sm) { min-height: 44px; }
-}
+
 
 } /* end @layer overrides */
+
+@layer components {
+:where(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search) { background: var(--surface-raised); color: var(--ink-900); }
+}

@@ -193,6 +193,7 @@ function createController(projectSaveStatus, overrides = {}) {
       getElementById: (id) => nodesById.get(id) || null,
       querySelectorAll: selector => [...nodesById.values()].filter(node => node?.getAttribute?.("aria-modal") === "true" && selector === '[aria-modal="true"]'),
       createElement: (...args) => globalThis.document.createElement(...args),
+      createElementNS: (_namespace, tagName) => createElementNode(tagName),
       addEventListener: (...args) => globalThis.document.addEventListener(...args),
       get body() { return globalThis.document.body; },
     },
@@ -793,7 +794,7 @@ test("legend editor paginates sidebar rows at ten items and caps at thirty", () 
     assert.equal(firstPageRows[9].children[1].placeholder, "Category 10");
 
     const nextButton = collectNodes(legendList, (node) =>
-      node.className === "legend-editor-page-btn" && node.textContent === "›"
+      node.className.split(/\s+/).includes("legend-editor-page-btn") && node.ariaLabel === "Next page"
     )[0];
     assert.ok(nextButton);
     nextButton.listeners.click();
@@ -804,13 +805,13 @@ test("legend editor paginates sidebar rows at ten items and caps at thirty", () 
     assert.equal(secondPageRows[9].children[1].placeholder, "Category 20");
 
     const secondNextButton = collectNodes(legendList, (node) =>
-      node.className === "legend-editor-page-btn" && node.textContent === "›"
+      node.className.split(/\s+/).includes("legend-editor-page-btn") && node.ariaLabel === "Next page"
     )[0];
     secondNextButton.listeners.click();
 
     const thirdPageRows = collectNodes(legendList, (node) => node.className === "legend-row");
     const disabledNextButton = collectNodes(legendList, (node) =>
-      node.className === "legend-editor-page-btn" && node.textContent === "›"
+      node.className.split(/\s+/).includes("legend-editor-page-btn") && node.ariaLabel === "Next page"
     )[0];
     assert.equal(thirdPageRows.length, 10);
     assert.equal(thirdPageRows[0].children[1].placeholder, "Category 21");

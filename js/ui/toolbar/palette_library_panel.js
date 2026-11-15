@@ -346,6 +346,7 @@ function createPaletteLibraryPanelController({
 
     const details = document.createElement("details");
     details.className = "palette-library-variant-details";
+    details.dataset.level = "2";
     details.addEventListener("toggle", () => {
       syncPaletteLibraryRowFocus();
       scheduleAdaptivePaletteLibraryHeight();
@@ -550,7 +551,7 @@ function createPaletteLibraryPanelController({
       return;
     }
     paletteLibraryGroupingControls = document.createElement("div");
-    paletteLibraryGroupingControls.className = "palette-library-grouping-toggle";
+    paletteLibraryGroupingControls.className = "palette-library-grouping-toggle segmented";
     paletteLibraryGroupingControls.setAttribute("role", "group");
     paletteLibraryGroupingControls.setAttribute("aria-label", t("Palette grouping", "ui"));
 

@@ -1,3 +1,4 @@
+import { createUiIcon } from "../components/ui_icons.js";
 // Layer-based Special Zones workbench controller.
 // 这个控制器只管理 special zone layer UI；toolbar.js 继续负责弹层、焦点和跨面板仲裁。
 
@@ -432,7 +433,8 @@ function createSpecialZonesWorkbenchController({
       row.className = "special-zone-layer-row";
       row.dataset.layerId = layer.id;
       if (layer.id === activeId) row.classList.add("is-active");
-      const visibility = createButton(layer.visible ? "◉" : "○", "secondary-btn special-zone-visibility");
+      const visibility = createButton("", "secondary-btn special-zone-visibility");
+      visibility.appendChild(createUiIcon(layer.visible ? "eye" : "eye-off"));
       visibility.setAttribute("aria-label", translate(layer.visible ? "Hide" : "Show"));
       visibility.setAttribute("aria-pressed", String(layer.visible));
       visibility.addEventListener("click", () => updateState({ action: "updateLayer", layerId: layer.id, patch: { visible: !layer.visible } }, "special-zone-layer-visible"));
