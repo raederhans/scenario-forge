@@ -85,6 +85,38 @@ test("first use creates owners once and subsequent use retains them", (t) => {
   assert.equal(subscriptions[0][0], "loadingdone");
 });
 
+test("font loading events filter families and merge refreshes within a frame", (t) => {
+  const frames = [];
+  let loadingdone;
+  replaceGlobal(t, "requestAnimationFrame", callback => frames.push(callback));
+  replaceGlobal(t, "document", { fonts: {
+    status: "loading", ready: Promise.resolve(),
+    addEventListener: (name, callback) => { loadingdone = callback; },
+  } });
+  const { runtime, renders } = createHarness({ showCityPoints: false,
+    styleConfig: { countryLabels: { enabled: true } } });
+  runtime.drawLabelsPassContent(2);
+  const refreshCount = () => renders.filter(reason => reason === "country-label-fonts").length;
+  loadingdone({ fontfaces: [{ family: "Interface Sans" }] });
+  frames.shift()();
+  assert.equal(refreshCount(), 0);
+  loadingdone({ fontfaces: [{ family: '"Map Garamond"' }] });
+  loadingdone({ fontfaces: [{ family: "Map Noto Serif SC" }] });
+  assert.equal(frames.length, 1);
+  assert.equal(refreshCount(), 0);
+  frames.shift()();
+  assert.equal(refreshCount(), 1);
+  loadingdone({ fontfaces: [] });
+  frames.shift()();
+  assert.equal(refreshCount(), 1);
+  loadingdone({ fontfaces: [{ family: "Interface Sans" }] });
+  loadingdone({});
+  loadingdone({ fontfaces: [{ family: "Interface Sans" }] });
+  assert.equal(frames.length, 1);
+  frames.shift()();
+  assert.equal(refreshCount(), 2);
+});
+
 test("reset cancels old city preparation after scene and data replacement", async () => {
   const { runtime, state, renders, metrics } = createHarness({
     worldCitiesData: { type: "FeatureCollection", features: [{ type: "Feature", id: "first",
