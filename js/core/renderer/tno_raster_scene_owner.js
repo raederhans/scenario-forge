@@ -226,7 +226,12 @@ export function createTnoRasterSceneOwner({
   // longer covers the viewport is composed over its painted extent and the
   // uncovered edge stays empty until the exact frame after the gesture.
   // Repainting the pass instead re-runs its full producer on every input frame.
-  function present(transform, { refresh = true, allowPartialPasses = false } = {}) {
+  // holdPartialUntilExact: after the gesture, while the exact frame is still
+  // being prepared, the same partial composition stays on screen but the call
+  // reports false so the caller keeps requesting the exact frame. Hiding here
+  // would expose whatever the 2D canvas last painted, typically a startup frame.
+  function present(transform, { refresh = true, allowPartialPasses = false, holdPartialUntilExact = false } = {}) {
+    const partialAllowed = allowPartialPasses || holdPartialUntilExact;
     composedWithOverview = false;
     let uncoveredPass = false;
     if (publicationPreparation && !preparationCurrent(publicationPreparation, { identity: !refresh })) cancelPublicationPreparation();
@@ -270,7 +275,7 @@ export function createTnoRasterSceneOwner({
     if (!composedWithOverview && (left > 1e-6 || top > 1e-6 || right < width - 1e-6 || bottom < height - 1e-6)) {
       // Past the resident tiles a moving view keeps the drawn part in place;
       // hiding the scene would show the 2D canvas's stale fallback frame.
-      if (!allowPartialPasses) return hide("direct-frame-coverage");
+      if (!partialAllowed) return hide("direct-frame-coverage");
       uncoveredPass = true;
     }
     // Cache canvases belong to the candidate producer and can change between
@@ -338,7 +343,7 @@ export function createTnoRasterSceneOwner({
       if (!composedWithOverview && (layerTransform.e > 1e-6 || layerTransform.f > 1e-6
         || layerTransform.e + source.width * scale < width - 1e-6
         || layerTransform.f + source.height * scale < height - 1e-6)) {
-        if (!(allowPartialPasses && saved)) return hide("pass-coverage");
+        if (!(partialAllowed && saved)) return hide("pass-coverage");
         uncoveredPass = true;
       }
       const revision = saved?.revision ?? (revisions.get(name) || 0);
@@ -379,7 +384,7 @@ export function createTnoRasterSceneOwner({
       fallbackReason = "";
       view = { x: transform.x, y: transform.y, k: transform.k, dpr, width, height };
       account();
-      return true;
+      return !(uncoveredPass && !allowPartialPasses);
     } catch (error) {
       cancelPublicationPreparation();
       account();

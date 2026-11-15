@@ -410,6 +410,18 @@ test("a moving view composes retained passes and political tiles over their pain
   assert.equal(h.owner.getDiagnostics().partialPasses, false);
   assert.equal(h.owner.present({ ...h.transform, x: 1000 }), false);
   assert.equal(h.owner.getDiagnostics().fallbackReason, "direct-frame-coverage");
+  // Waiting for the exact frame after the gesture: the partial frame stays on
+  // screen instead of the stale 2D canvas, and the caller is told to keep asking.
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.present(panned, moving), true);
+  const framesBeforeHold = h.records.frames.length;
+  assert.equal(h.owner.present({ ...h.transform, x: 1000 }, { refresh: false, holdPartialUntilExact: true }), false);
+  diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.active, true);
+  assert.equal(diagnostics.partialPasses, true);
+  assert.equal(diagnostics.fallbackReason, "");
+  assert.equal(h.map.style.visibility, "hidden", "the 2D canvas stays covered");
+  assert.equal(h.records.frames.length, framesBeforeHold + 1);
   assert.equal(h.owner.present(h.transform), true);
   diagnostics = h.owner.getDiagnostics();
   assert.equal(diagnostics.partialPasses, false, "the exact frame publishes complete coverage");
