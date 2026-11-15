@@ -2,8 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createPhysicalIntensityInteractionOwner } from "../js/core/renderer/physical_intensity_interaction_owner.js";
 import { createMapInteractionEventBindingOwner } from "../js/core/renderer/map_interaction_event_binding_owner.js";
+import { bakeIntensityComposite } from "../js/core/intensity_field.js";
 
-function harness() {
+function harness(bake = () => {}) {
   const calls = [], frames = [];
   const state = { intensityFields: { channels: { physicalAtlas: { enabled: false, points: [], revision: 0 } } } };
   const tool = { active: true, channelId: "physicalAtlas", subMode: "paint", brushRadiusDeg: 3, brushStrength: 2 };
@@ -19,7 +20,7 @@ function harness() {
     getPhysicalIntensityChannel: channel, getIntensityFieldTargetPasses: () => [],
     invalidateRenderPasses: record("invalidate"), requestInteractionRender: record("render"),
     refreshPhysicalIntensityUi: record("ui"), clamp: (v,a,b) => Math.max(a, Math.min(b,v)),
-    INTENSITY_FIELD_GRID: { min: 0, max: 5 }, bakeIntensityComposite: record("bake"),
+    INTENSITY_FIELD_GRID: { min: 0, max: 5 }, bakeIntensityComposite: (target) => { calls.push(["bake"]); bake(target); },
     captureHistoryState: () => { calls.push(["history-capture"]); return structuredClone(channel()); },
     pushHistoryEntry: record("history"), suppressNextClick: record("suppress"),
     getMapLonLatFromEvent: (event) => event.lonLat,
@@ -94,7 +95,88 @@ test("existing point selection is unchanged until drag, including wrapped radius
     else assert.deepEqual([point.lon, point.lat], [180,-90]);
     h.owner.handlePhysicalIntensityPointerEnd(h.event());
     assert.equal(h.channel().revision, 1);
-    assert.equal(h.calls.filter(([n]) => n === "bake").length, 2, "drag preview and commit both bake");
+    assert.equal(h.calls.filter(([n]) => n === "bake").length, 1, "commit flushes the pending drag once");
+  }
+});
+
+function pointDragHarness(dragMode = "move") {
+  const h = harness(bakeIntensityComposite);
+  h.tool.subMode = "points";
+  h.tool.selectedPointId = "previous";
+  h.channel().points.push({ id: "p", lon: 0, lat: 0, strength: 2, radiusDeg: 8, falloff: "smooth" });
+  bakeIntensityComposite(h.channel());
+  h.mode.hit = { point: h.channel().points[0], mode: dragMode };
+  return h;
+}
+
+test("multiple point moves in each frame bake once before rendering", () => {
+  const h = pointDragHarness();
+  h.owner.handlePhysicalIntensityPointerDown(h.event());
+  for (const positions of [[[2, 3], [4, 5], [6, 7]], [[8, 9], [10, 11]]]) {
+    h.calls.length = 0;
+    for (const position of positions) h.owner.handlePhysicalIntensityPointerMove(h.event(position));
+    assert.equal(h.calls.filter(([name]) => name === "bake").length, 0);
+    assert.equal(h.frames.length, 1);
+    const expected = structuredClone(h.channel());
+    bakeIntensityComposite(expected);
+    h.frames.shift()();
+    assert.deepEqual(h.calls.slice(-2).map(([name]) => name), ["bake", "render"]);
+    assert.equal(h.calls.filter(([name]) => name === "bake").length, 1);
+    assert.deepEqual(h.channel(), expected);
+  }
+  h.owner.handlePhysicalIntensityPointerEnd(h.event());
+  assert.equal(h.calls.filter(([name]) => name === "bake").length, 1, "clean commit does not rebake");
+});
+
+test("point completion flushes the final grid and preserves the undo entry", () => {
+  for (const dragMode of ["move", "radius"]) {
+    for (const end of ["pointerup", "lost-buttons"]) {
+      const h = pointDragHarness(dragMode);
+      const before = structuredClone(h.channel());
+      h.owner.handlePhysicalIntensityPointerDown(h.event());
+      h.owner.handlePhysicalIntensityPointerMove(h.event([2, 3]));
+      h.owner.handlePhysicalIntensityPointerMove(h.event([12, 15]));
+      const expected = structuredClone(h.channel());
+      bakeIntensityComposite(expected);
+      expected.revision += 1;
+      if (end === "pointerup") h.owner.handlePhysicalIntensityPointerEnd({ ...h.event(), type: end });
+      else h.owner.handlePhysicalIntensityPointerMove(h.event([12, 15], 0));
+      assert.deepEqual(h.channel(), expected);
+      assert.equal(h.calls.filter(([name]) => name === "bake").length, 1);
+      const history = h.calls.filter(([name]) => name === "history");
+      assert.equal(history.length, 1);
+      assert.deepEqual(history[0][1], {
+        kind: "physical-intensity-point", before, after: expected,
+        meta: { reason: end === "pointerup" ? "physical-intensity-field-commit" : "physical-intensity-pointer-lost-buttons", affectsIntensityField: true },
+      });
+      h.frames.shift()();
+      assert.equal(h.calls.filter(([name]) => name === "bake").length, 1);
+      assert.deepEqual(h.channel(), expected);
+    }
+  }
+});
+
+test("point cancellation discards pending work across frames and subsequent sessions", () => {
+  for (const cancel of ["pointercancel", "direct"]) {
+    const h = pointDragHarness();
+    const before = structuredClone(h.channel());
+    h.owner.handlePhysicalIntensityPointerDown(h.event());
+    h.owner.handlePhysicalIntensityPointerMove(h.event([10, 20]));
+    if (cancel === "pointercancel") h.owner.handlePhysicalIntensityPointerEnd({ ...h.event(), type: cancel });
+    else h.owner.cancelPhysicalIntensitySession();
+    assert.deepEqual(h.channel(), before);
+    assert.equal(h.tool.selectedPointId, "previous");
+    h.frames.shift()();
+    assert.equal(h.calls.filter(([name]) => name === "bake").length, 0);
+    assert.equal(h.calls.filter(([name]) => name === "history").length, 0);
+    h.mode.hit = { point: h.channel().points[0], mode: "move" };
+    h.owner.handlePhysicalIntensityPointerDown(h.event());
+    h.owner.handlePhysicalIntensityPointerMove(h.event([30, 40]));
+    h.frames.shift()();
+    assert.equal(h.calls.filter(([name]) => name === "bake").length, 1);
+    const expected = structuredClone(h.channel());
+    bakeIntensityComposite(expected);
+    assert.deepEqual(h.channel(), expected);
   }
 });
 

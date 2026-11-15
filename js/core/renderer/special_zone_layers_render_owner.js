@@ -1,3 +1,4 @@
+import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import {
   buildSpecialZoneRenderFeatures,
   normalizeSpecialZoneLayersState,
@@ -66,6 +67,12 @@ export function createSpecialZoneLayersRenderOwner({
   } = helpers;
 
   const outlineCache = new Map();
+  const layerPaths = new Map();
+  const patternSignatures = new WeakMap();
+  let indexedTopology;
+  let indexedGeneration;
+  let geometryIndex;
+  let renderedGroup;
 
   function getSpecialZonesGroup() {
     return groupGetters.getSpecialZonesGroup?.() || null;
@@ -185,6 +192,9 @@ export function createSpecialZoneLayersRenderOwner({
       .attr("patternTransform", (d) => `${getPatternTransform(runtimeState.zoomTransform)} rotate(${getSpecialZonePatternDefinition(d.pattern)?.rotation || 0})`);
 
     merged.each(function renderPatternDefinition(d) {
+      const signature = JSON.stringify([d.pattern, d.stroke, d.strokeWidth]);
+      if (patternSignatures.get(this) === signature) return;
+      patternSignatures.set(this, signature);
       const patternSelection = globalThis.d3.select(this);
       patternSelection.selectAll("*").remove();
       const stroke = d.stroke;
@@ -285,35 +295,77 @@ export function createSpecialZoneLayersRenderOwner({
     const features = getEffectiveSpecialZonesFeatureCollection().features;
     renderPatternDefs(features);
     const topology = getActiveTopology();
-    const geometryIndex = buildGeometryIndex(topology);
+    const topologyGeneration = getProjectionGeometryGeneration(topology);
+    if (!geometryIndex || indexedTopology !== topology || indexedGeneration !== topologyGeneration) {
+      geometryIndex = buildGeometryIndex(topology);
+      indexedTopology = topology;
+      indexedGeneration = topologyGeneration;
+    }
+    const featuresByLayer = new Map();
+    features.forEach((feature) => {
+      const id = getFeatureLayerId(feature);
+      if (!featuresByLayer.has(id)) featuresByLayer.set(id, []);
+      featuresByLayer.get(id).push(feature);
+    });
+    const projection = pathSVG.projection?.();
+    const projectionGeneration = getProjectionGeometryGeneration(projection);
+    if (renderedGroup !== group) {
+      layerPaths.clear();
+      renderedGroup = group;
+    }
     const entries = normalized.layers.filter((layer) => layer.visible).map((layer) => {
       const collection = {
         type: "FeatureCollection",
-        features: features.filter((feature) => getFeatureLayerId(feature) === layer.id),
+        features: featuresByLayer.get(layer.id) || [],
         properties: { __specialZoneLayerId: layer.id, __specialZoneLayerStyle: layer.style },
       };
       const outline = getLayerOutlineFeature(layer, geometryIndex, topology);
       return { layer, collection, outline: outline || collection, fallback: !outline };
     });
-    group.selectAll("path.special-zone, path.special-zone-pattern, path.special-zone-outline").remove();
+    const visibleIds = new Set(entries.map(({ layer }) => layer.id));
+    for (const [id, cached] of layerPaths) {
+      if (!visibleIds.has(id)) {
+        cached.nodes.forEach((node) => node.remove());
+        layerPaths.delete(id);
+      }
+    }
     entries.forEach(({ layer, collection, outline, fallback }) => {
       const style = layer.style;
-      group.append("path")
+      let cached = layerPaths.get(layer.id);
+      const geometries = collection.features.map((feature) => feature.geometry);
+      const members = collection.features.map((feature) => feature.properties.sourceFeatureId).join("|");
+      const outlineGeometry = fallback ? null : JSON.stringify(outline.geometry || outline);
+      if (!cached) {
+        cached = { nodes: [group.append("path"), group.append("path"), group.append("path")] };
+        layerPaths.set(layer.id, cached);
+      } else {
+        cached.nodes.forEach((node) => node.raise());
+      }
+      if (cached.pathSVG !== pathSVG || cached.projection !== projection
+        || cached.projectionGeneration !== projectionGeneration || cached.members !== members
+        || cached.geometries.length !== geometries.length
+        || geometries.some((geometry, index) => geometry !== cached.geometries[index])
+        || cached.outline !== outlineGeometry || cached.topologyGeneration !== topologyGeneration) {
+        cached.fillPath = pathSVG(collection);
+        cached.outlinePath = fallback ? cached.fillPath : pathSVG(outline);
+        Object.assign(cached, { pathSVG, projection, projectionGeneration, members, geometries, outline: outlineGeometry, topologyGeneration });
+      }
+      cached.nodes[0]
         .attr("class", "special-zone")
-        .attr("d", pathSVG(collection))
+        .attr("d", cached.fillPath)
         .attr("fill", style.fill)
         .attr("fill-opacity", style.pattern === "outlineOnly" ? 0 : style.fillOpacity)
         .attr("stroke", "none");
-      group.append("path")
+      cached.nodes[1]
         .attr("class", "special-zone-pattern")
-        .attr("d", pathSVG(collection))
+        .attr("d", cached.fillPath)
         .attr("fill", ["solid", "outlineOnly"].includes(style.pattern) ? "none" : `url(#${getPatternDefId(collection, style)})`)
         .attr("fill-opacity", style.patternOpacity)
         .attr("stroke", "none")
         .attr("pointer-events", "none");
-      group.append("path")
+      cached.nodes[2]
         .attr("class", "special-zone-outline")
-        .attr("d", pathSVG(outline))
+        .attr("d", cached.outlinePath)
         .attr("fill", "none")
         .attr("stroke", style.stroke)
         .attr("stroke-opacity", style.strokeOpacity)

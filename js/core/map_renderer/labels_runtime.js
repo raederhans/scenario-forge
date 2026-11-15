@@ -467,13 +467,23 @@ export function createLabelsRuntime({
         },
       },
     });
-    const refreshFonts = () => {
-      countryLabelRenderOwner?.clearTextCache();
-      invalidateRenderPasses("labels", "country-label-fonts");
-      requestRendererRender("country-label-fonts", { flush: false });
+    let fontRefreshScheduled = false;
+    let pendingFontFamilies = new Set();
+    const refreshFonts = (event) => {
+      if (!event?.fontfaces) pendingFontFamilies = null;
+      else for (const face of event.fontfaces) pendingFontFamilies?.add(face.family);
+      if (fontRefreshScheduled) return;
+      fontRefreshScheduled = true;
+      requestAnimationFrame(() => {
+        const families = pendingFontFamilies;
+        pendingFontFamilies = new Set();
+        fontRefreshScheduled = false;
+        if (!countryLabelRenderOwner.clearTextCache(families && [...families])) return;
+        invalidateRenderPasses("labels", "country-label-fonts");
+        requestRendererRender("country-label-fonts", { flush: false });
+      });
     };
     if (globalThis.document?.fonts) {
-      if (document.fonts.status === "loading") document.fonts.ready.then(refreshFonts);
       document.fonts.addEventListener?.("loadingdone", refreshFonts);
     }
     return countryLabelRenderOwner;
