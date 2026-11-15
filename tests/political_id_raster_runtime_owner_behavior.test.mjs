@@ -8,6 +8,159 @@ import { bindRenderBoundary, requestRender, markRenderBoundaryFlushed, getRender
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
+const navigationTick = () => new Promise(resolve => setTimeout(resolve, 5));
+
+async function navigationFixture(t) {
+  let confirmations = 0;
+  const f = fixture({ width: 900, height: 600, transform: { x: -100, y: -100, k: 1 },
+    directPresentation: true, displayMode: "raster", autoPublish: false, createGpu: measuredGpu,
+    commitPublishedColorEdit: () => { confirmations++; } });
+  t.after(() => f.owner.dispose());
+  f.h.yieldGpuPreparation = tick;
+  f.owner.draw();
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) {
+      const tile = makeTile(request.packet);
+      tile.codes = new Uint32Array(tile.width * tile.height);
+      request.resolve(tile);
+    }
+    await tick();
+  }
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+  f.renders.length = 0;
+  return { ...f, confirmations: () => confirmations };
+}
+
+function completeNavigationTile(request) {
+  const tile = makeTile(request.packet);
+  tile.codes = new Uint32Array(tile.width * tile.height);
+  request.resolve(tile);
+}
+
+test("navigation publishes one ready tile while other visible tiles remain pending and preserves exact publication", async t => {
+  const f = await navigationFixture(t);
+  const committed = f.owner.getDiagnostics().view;
+  const frame = f.owner.getDirectFrame(), gpu = frame.gpu;
+  const confirmations = f.confirmations(), uploads = gpu.getStats().tileUploads;
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  assert.equal(f.owner.updateNavigationDemand(f.state.zoomTransform), true);
+  assert.equal(f.requests.filter(request => !request.settled).length, 0);
+  await navigationTick();
+  const first = f.requests.at(-1);
+  assert.equal(first.packet.coreRect.minX, 1536);
+  assert.equal(first.packet.coreRect.minY, 0);
+  completeNavigationTile(first);
+  await navigationTick(); await tick();
+  const snapshot = f.owner.getNavigationSnapshot();
+  assert.ok(snapshot.plan.tiles.some(tile => tile.originX === 1536 && tile.originY === 0));
+  gpu.setDrawTiles(snapshot.drawTiles);
+  assert.equal(gpu.getStats().drawTiles, frame.drawTiles.length + 1);
+  assert.equal(gpu.getStats().tileUploads, uploads + 1);
+  assert.equal(f.requests.filter(request => !request.settled).length, 1);
+  assert.deepEqual(f.renders, ["navigation-ready"]);
+  assert.deepEqual(f.owner.getDiagnostics().view, committed);
+  assert.equal(f.confirmations(), confirmations);
+  assert.equal(f.owner.getDirectFrame(), frame);
+  completeNavigationTile(f.requests.at(-1));
+  await navigationTick(); await tick();
+  assert.equal(gpu.getStats().tileUploads, uploads + 1);
+  assert.deepEqual(f.renders, ["navigation-ready"]);
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick(); await tick();
+  assert.equal(gpu.getStats().tileUploads, uploads + 2);
+  assert.deepEqual(f.renders, ["navigation-ready", "navigation-ready"]);
+  f.owner.draw();
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) completeNavigationTile(request);
+    await tick();
+  }
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  assert.equal(gpu.getStats().residentTiles, f.owner.getDirectFrame().plan.tiles.length);
+  assert.ok(frame.drawTiles.every(handle => !gpu.hasTileHandle(handle)));
+});
+
+test("moving demand keeps useful same-source work and chooses the latest visible gap next", async t => {
+  const f = await navigationFixture(t);
+  const epoch = f.owner.getDirectFrame().epoch;
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  const first = f.requests.at(-1);
+  f.state.zoomTransform = { x: -1800, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  assert.equal(first.signal.aborted, false);
+  completeNavigationTile(first);
+  await navigationTick(); await tick();
+  assert.equal(first.signal.aborted, false);
+  assert.equal(f.owner.getNavigationSnapshot().epoch, epoch);
+  assert.ok(f.owner.getNavigationSnapshot().plan.tiles.some(tile => tile.originX === 1536 && tile.originY === 0));
+  assert.equal(f.requests.at(-1).packet.coreRect.minX, 2048);
+  assert.equal(f.requests.at(-1).packet.coreRect.minY, 0);
+});
+
+test("source replacement revokes navigation work and rejects its late result", async t => {
+  const f = await navigationFixture(t);
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  const old = f.requests.at(-1);
+  f.identity.sceneKey = "scene-b";
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  await navigationTick();
+  assert.equal(old.signal.aborted, true);
+  const builds = f.owner.getDiagnostics().builds;
+  completeNavigationTile(old);
+  await navigationTick();
+  assert.equal(f.owner.getDiagnostics().builds, builds);
+  assert.ok(f.owner.getDiagnostics().tileRecords.every(record => record.sourceStamp.namespace.startsWith("scene-b|")));
+});
+
+test("cross-density navigation keeps the complete-frame path", async t => {
+  const f = await navigationFixture(t);
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  const active = f.requests.at(-1);
+  const count = f.requests.length;
+  f.state.zoomTransform = { x: -1200, y: -100, k: 0.5 };
+  assert.equal(f.owner.updateNavigationDemand(f.state.zoomTransform), false);
+  completeNavigationTile(active);
+  await navigationTick();
+  assert.equal(f.owner.getNavigationSnapshot(), null);
+  assert.equal(f.requests.length, count);
+  assert.deepEqual(f.renders, []);
+});
+
+test("palette edits during a navigation upload preserve geometry and publish current colors without edit confirmation", async t => {
+  const f = await navigationFixture(t);
+  let releaseUpload;
+  f.h.yieldGpuPreparation = () => new Promise(resolve => { releaseUpload = resolve; });
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await navigationTick();
+  completeNavigationTile(f.requests.at(-1));
+  await navigationTick();
+  assert.equal(typeof releaseUpload, "function");
+  const epoch = f.owner.getDirectFrame().epoch, confirmations = f.confirmations();
+  f.features[0].color = "#abcdef";
+  f.identity.colorVersion++;
+  f.identity.directFrameKey = "recolored";
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  releaseUpload();
+  await tick();
+  const snapshot = f.owner.getNavigationSnapshot();
+  assert.equal(snapshot.epoch, epoch);
+  assert.deepEqual([...snapshot.palette.slice(4, 8)], [0xab, 0xcd, 0xef, 255]);
+  assert.equal(f.confirmations(), confirmations);
+  assert.deepEqual(f.renders, ["navigation-ready"]);
+});
+
 function measuredGpu(options = {}) {
   const canvas = { width: 1, height: 1, addEventListener() {}, removeEventListener() {} };
   const gl = new Proxy({ canvas, getParameter: () => 4096, getProgramParameter: () => true,
@@ -285,6 +438,7 @@ function fixture({
       commitPublishedColorEdit,
       recordMetric: (...args) => metrics.push(args),
       requestRender: (reason) => { renders.push(reason); requestRenderEffect?.(reason); },
+      requestNavigationRender: () => renders.push("navigation-ready"),
     },
     client,
     cache,

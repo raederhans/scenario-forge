@@ -572,7 +572,7 @@ export function createPoliticalIdRasterGpu({
       canSetFrame, createOverview, draw, drawLayer, readPixelsForValidation, dispose,
       isAvailable: () => !disposed && !lost && !gl.isContextLost(),
       getStats: () => ({
-        tileUploads, paletteUploads, draws, residentTiles: resident.size, contextLost: lost,
+        tileUploads, paletteUploads, draws, residentTiles: resident.size, drawTiles: drawTiles.size, contextLost: lost,
         gpuTextureBytes: primaryTextureBytes() + (overview?.getStats().gpuTextureBytes || 0),
         overviewTextureBytes: overview?.getStats().gpuTextureBytes || 0,
         pendingTextureBytes: pendingTextureBytes(), pendingFrameReady: !!pendingFrame?.ready,

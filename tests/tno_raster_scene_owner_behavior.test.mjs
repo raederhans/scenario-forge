@@ -69,6 +69,45 @@ test("committed tile holes remain missing while transparent valid tiles count as
   h.owner.dispose();
 });
 
+test("navigation tile unions reduce political gaps independently of retained sibling passes", () => {
+  const h = coverageHarness(1);
+  const lists = [];
+  h.currentFrame.gpu.setDrawTiles = handles => lists.push(handles);
+  h.currentFrame.gpu.setPalette = () => {};
+  h.currentFrame.drawTiles = ["exact"];
+  assert.equal(h.owner.present(h.transform), true);
+  const baselines = h.records.colorBaselines.length;
+  const transform = { ...h.transform, x: 25 };
+  const snapshot = { ...h.currentFrame, transform, exactForView: false,
+    plan: { ...h.currentFrame.plan, tiles: [
+      { originX: 0, originY: 0, width: 25, height: 50 },
+      { originX: 75, originY: 0, width: 25, height: 50 },
+    ] }, drawTiles: ["left", "right"] };
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.5);
+  assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0.75);
+  assert.equal(h.owner.getDiagnostics().partialPasses, true);
+  assert.deepEqual(lists.at(-1), snapshot.drawTiles);
+  snapshot.plan.tiles.push({ originX: 25, originY: 0, width: 25, height: 50 });
+  snapshot.drawTiles.push("middle-left");
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.25);
+  snapshot.plan.tiles.push({ originX: 50, originY: 0, width: 25, height: 50 });
+  snapshot.drawTiles.push("middle-right");
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { allowPartialPasses: true }), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0);
+  assert.equal(h.owner.getDiagnostics().passUncoveredRatios.base, 0.25);
+  assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0.25);
+  assert.equal(h.records.colorBaselines.length, baselines);
+  assert.equal(h.owner.getDiagnostics().publications, 1);
+  assert.equal(h.owner.presentNavigation(transform, snapshot, { holdPartialUntilExact: true }), false);
+  assert.equal(h.owner.isActive(), true);
+  assert.equal(h.owner.present(h.transform), true);
+  assert.deepEqual(lists.at(-1), ["exact"]);
+  assert.equal(h.owner.getDiagnostics().partialPasses, false);
+  h.owner.dispose();
+});
+
 function harness({ realCompositor = false } = {}) {
   const records = { frames: [], accounts: [], releases: [], gpuOptions: [], sceneOptions: [], colorBaselines: [] };
   const parent = { children: [], insertBefore(child, next) {

@@ -285,14 +285,15 @@ export function createTnoRasterSceneOwner({
   // being prepared, the same partial composition stays on screen but the call
   // reports false so the caller keeps requesting the exact frame. Hiding here
   // would expose whatever the 2D canvas last painted, typically a startup frame.
-  function present(transform, { refresh = true, allowPartialPasses = false, holdPartialUntilExact = false } = {}) {
+  function present(transform, { refresh = true, allowPartialPasses = false, holdPartialUntilExact = false, navigationSnapshot = null } = {}) {
     const partialAllowed = allowPartialPasses || holdPartialUntilExact;
     composedWithOverview = false;
     let uncoveredPass = false;
     if (publicationPreparation && !preparationCurrent(publicationPreparation, { identity: !refresh })) cancelPublicationPreparation();
     if (disposed) return hide("disposed");
     if (!compositor?.isAvailable() || surface.getMapCanvas() !== mapCanvas) return hide("surface-unavailable");
-    let frame = h.getDirectFrame();
+    const navigation = navigationSnapshot && published;
+    let frame = navigation ? navigationSnapshot : h.getDirectFrame();
     if (!frame || frame.complete === false || frame.gpu !== politicalGpu || !frame.gpu?.isAvailable()) return hide("direct-frame-unavailable");
     if (!validTransform(transform) || !validTransform(frame.transform) || !validLayout(frame.layout)
       || !Number.isFinite(frame.dpr) || frame.dpr <= 0) return hide("invalid-direct-frame");
@@ -308,13 +309,13 @@ export function createTnoRasterSceneOwner({
       compositor.releaseRetainedLayers?.([...overview.passes.values()].map(pass => pass.textureName));
       overview = null;
     }
-    const retainPrimary = published?.frame === frame && (!refresh || frame.presentationState === "retained");
+    const retainPrimary = !!navigation || published?.frame === frame && (!refresh || frame.presentationState === "retained");
     const primaryCoverage = coverage(frame, retainPrimary ? published.passes : null, transform, dpr);
     const overviewCoverage = overview && coverage(overview.frame, overview.passes, transform, dpr);
     const primaryCovers = covers(primaryCoverage, width, height);
-    composedWithOverview = !!overview && retainPrimary && !primaryCovers
+    composedWithOverview = !navigation && !!overview && retainPrimary && !primaryCovers
       && coversTogether(primaryCoverage, overviewCoverage, width, height);
-    usingOverview = !composedWithOverview && !!overview && !primaryCovers && covers(overviewCoverage, width, height);
+    usingOverview = !navigation && !composedWithOverview && !!overview && !primaryCovers && covers(overviewCoverage, width, height);
     if (usingOverview) frame = overview.frame;
     const plan = frame.plan;
     if (!plan || ![plan.scale, plan.originX, plan.originY, plan.width, plan.height,
@@ -352,6 +353,17 @@ export function createTnoRasterSceneOwner({
       e: (plan.outputX - plan.originX * plan.scale - offsetX * dpr) * ratio + dx * dpr,
       f: (plan.outputY - plan.originY * plan.scale - offsetY * dpr) * ratio + dy * dpr,
     };
+    if (navigation) {
+      const rectangles = plan.tiles.map(tile => ({
+        x: tile.originX * directTransform.a + directTransform.e,
+        y: tile.originY * directTransform.d + directTransform.f,
+        width: tile.width * directTransform.a, height: tile.height * directTransform.d,
+      }));
+      if (getUncoveredRatio(rectangles, { x: 0, y: 0, width, height }) > 0) {
+        if (!partialAllowed) return hide("direct-frame-coverage");
+        uncoveredPass = true;
+      }
+    }
     const layers = [];
     if (composedWithOverview) {
       const background = overview.frame, backgroundPlan = background.plan;
@@ -382,7 +394,11 @@ export function createTnoRasterSceneOwner({
     if (!Array.isArray(names) || !names.includes("political")) return hide("political-pass-inactive");
     for (const name of names) {
       if (name === "political") {
-        layers.push({ name, clip, draw: output => frame.gpu.drawLayer({ ...output, transform: directTransform }) });
+        layers.push({ name, clip, draw: output => {
+          if (frame.drawTiles) frame.gpu.setDrawTiles(frame.drawTiles);
+          if (navigation) frame.gpu.setPalette(frame.palette, frame.paletteKey);
+          frame.gpu.drawLayer({ ...output, transform: directTransform });
+        } });
         continue;
       }
       const saved = retain ? retainedScene.passes.get(name) : null;
@@ -416,7 +432,7 @@ export function createTnoRasterSceneOwner({
         compositor.cancelPreparedLayers?.();
         publicationPreparation = { snapshot: snapshotPublication(transform), status: "consumed" };
       }
-      if (colorBaselineFrame !== frame) {
+      if (!navigation && colorBaselineFrame !== frame) {
         h.capturePublishedColorBaseline?.({ overview: usingOverview });
         colorBaselineFrame = frame;
       }
@@ -440,7 +456,7 @@ export function createTnoRasterSceneOwner({
       view = { x: transform.x, y: transform.y, k: transform.k, dpr, width, height };
       account();
       measureCoverage(frame, passSnapshots, names, transform, dpr, clip);
-      return !(uncoveredPass && !allowPartialPasses);
+      return !(uncoveredPass && !allowPartialPasses) && !(navigation && holdPartialUntilExact);
     } catch (error) {
       cancelPublicationPreparation();
       account();
@@ -485,5 +501,7 @@ export function createTnoRasterSceneOwner({
       privateTextureBytes: stats.privateTextureBytes || 0, maxUploadTaskMs: stats.maxUploadTaskMs || 0,
     };
   }
-  return { ensureGpu, preparePublication, cancelPublicationPreparation, present, notePassCommit, clear, dispose, getDiagnostics, isActive: () => active };
+  return { ensureGpu, preparePublication, cancelPublicationPreparation, present,
+    presentNavigation: (transform, navigationSnapshot, options) => present(transform, { ...options, navigationSnapshot }),
+    notePassCommit, clear, dispose, getDiagnostics, isActive: () => active };
 }

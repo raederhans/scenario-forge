@@ -3345,6 +3345,7 @@ function getPoliticalIdRasterRuntimeOwner() {
     effects: {
       recordMetric: recordRenderPerfMetric,
       commitPublishedColorEdit: clearPendingPoliticalColorEdit,
+      requestNavigationRender: () => requestRendererRender("political-id-navigation-ready", { visual: true }),
       requestRender: reason => {
         invalidateRenderPasses(["political"], reason);
         requestRendererRender(reason, { visual: true });
@@ -3775,10 +3776,9 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
       const directScene = isTnoRasterSceneSelected();
       const gesture = runtimeState.renderPhase === RENDER_PHASE_INTERACTING
         || runtimeState.renderPhase === RENDER_PHASE_SETTLING;
+      if (!exportRenderInProgress && directScene && gesture) politicalIdRasterRuntimeOwner?.updateNavigationDemand(transform);
       const drawn = !exportRenderInProgress && (directScene
-        ? !!tnoRasterSceneOwner?.present(transform, { refresh: false,
-          // Moving views keep the vector path's contract: transform what is
-          // painted, refill the uncovered edges in the exact frame afterwards.
+        ? !!tnoRasterSceneOwner?.presentNavigation(transform, politicalIdRasterRuntimeOwner?.getNavigationSnapshot(), { refresh: false,
           allowPartialPasses: gesture,
           // Between the gesture and the exact frame the partial frame stays up.
           holdPartialUntilExact: !gesture })
