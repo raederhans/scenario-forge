@@ -13311,9 +13311,9 @@ export function getRendererAsyncWorkStatus() {
   };
 }
 
-export function getPoliticalIdRasterDiagnostics() {
+export function getPoliticalIdRasterDiagnostics(options) {
   const reason = getPoliticalIdRasterEligibilityReason();
-  const current = politicalIdRasterRuntimeOwner?.getDiagnostics();
+  const current = politicalIdRasterRuntimeOwner?.getDiagnostics(options);
   const policy = readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId });
   const passes = politicalPassOrchestratorOwner?.getDiagnostics() || {};
   return { ...current, ...policy, passes, asyncWork: getRendererAsyncWorkStatus(),

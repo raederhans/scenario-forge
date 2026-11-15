@@ -2,10 +2,122 @@ import { createPoliticalIdRasterDisplayCache } from "../js/core/renderer/politic
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
+import { createPoliticalIdRasterGpu } from "../js/core/renderer/political_id_raster_gpu.js";
 import { createPoliticalIdRasterCache, planPoliticalIdRasterView } from "../js/core/renderer/political_id_raster_cache.js";
 import { bindRenderBoundary, requestRender, markRenderBoundaryFlushed, getRenderBoundaryDebugState } from "../js/core/render_boundary.js";
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
+
+function measuredGpu(options = {}) {
+  const canvas = { width: 1, height: 1, addEventListener() {}, removeEventListener() {} };
+  const gl = new Proxy({ canvas, getParameter: () => 4096, getProgramParameter: () => true,
+    isContextLost: () => false, getExtension: () => null,
+    getUniformLocation: (_program, name) => name, getAttribLocation: () => 0,
+  }, { get(target, key) {
+    if (key in target) return target[key];
+    if (key === key.toUpperCase()) return key;
+    return () => key.startsWith("create") ? {} : undefined;
+  } });
+  canvas.getContext = () => gl;
+  return createPoliticalIdRasterGpu({ ...options, canvas });
+}
+
+for (const asynchronous of [false, true]) test(`tile diagnostics record accepted CPU data and real ${asynchronous ? "asynchronous" : "synchronous"} uploads`, async t => {
+  const f = fixture({ directPresentation: true, displayMode: "raster", createGpu: options => {
+    const gpu = measuredGpu(options);
+    if (!asynchronous) return { ...gpu, prepareFrame: undefined };
+    return gpu;
+  } });
+  t.after(() => f.owner.dispose());
+  f.h.yieldGpuPreparation = tick;
+  assert.equal(f.owner.getDiagnostics().tileEventsEnabled, false);
+  assert.deepEqual(f.owner.getDiagnostics().tileEvents, []);
+  f.owner.getDiagnostics({ tileEvents: true });
+  f.owner.draw();
+  const requested = f.owner.getDiagnostics().tileEvents[0];
+  assert.ok(Number.isFinite(requested.requestedAt));
+  assert.equal(requested.cpuReadyAt, null);
+  assert.equal(requested.uploadSubmittedAt, null);
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) {
+      const tile = makeTile(request.packet);
+      tile.codes = new Uint32Array(tile.width * tile.height);
+      request.resolve(tile);
+    }
+    await tick();
+  }
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+  const ready = f.owner.getDiagnostics().tileEvents;
+  assert.ok(ready.every(event => event.cpuReadyAt >= event.requestedAt));
+  if (!asynchronous) assert.ok(ready.every(event => event.uploadSubmittedAt === null));
+  else assert.ok(ready.every(event => event.uploadSubmittedAt >= event.cpuReadyAt));
+  assert.ok(f.owner.draw());
+  const uploaded = f.owner.getDiagnostics().tileEvents;
+  assert.ok(uploaded.every(event => event.uploadSubmittedAt !== null && event.uploadSubmittedAt >= event.cpuReadyAt));
+  assert.ok(f.owner.draw());
+  assert.deepEqual(f.owner.getDiagnostics().tileEvents, uploaded);
+  uploaded[0].cpuReadyAt = -1;
+  assert.notEqual(f.owner.getDiagnostics().tileEvents[0].cpuReadyAt, -1);
+  assert.deepEqual(f.owner.getDiagnostics({ tileEvents: false }).tileEvents, []);
+  assert.ok(f.owner.draw());
+  assert.deepEqual(f.owner.getDiagnostics().tileEvents, []);
+});
+
+test("tile event storage is disabled by default, bounded when enabled, and rejects late ready results", async t => {
+  const f = fixture();
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  await resolveAll(f);
+  assert.deepEqual(f.owner.getDiagnostics().tileEvents, []);
+  const limit = f.owner.getDiagnostics({ tileEvents: true }).tileEventLimit;
+  for (let index = 0; index <= limit; index++) {
+    f.identity.sceneKey = `diagnostic-scene-${index}`;
+    f.identity.version++;
+    f.owner.draw();
+  }
+  const events = f.owner.getDiagnostics().tileEvents;
+  assert.equal(events.length, limit);
+  assert.equal(events[0].namespace.includes("diagnostic-scene-0"), false);
+  const current = f.requests.at(-1);
+  for (const request of f.requests) if (!request.settled && request !== current) request.resolve(makeTile(request.packet));
+  await tick();
+  assert.ok(f.owner.getDiagnostics().tileEvents.every(event => event.cpuReadyAt === null && event.uploadSubmittedAt === null));
+  current.resolve(makeTile(current.packet));
+  await tick();
+  const accepted = f.owner.getDiagnostics().tileEvents.filter(event => event.cpuReadyAt !== null);
+  assert.equal(accepted.length, 1);
+  assert.equal(accepted[0].id, events.at(-1).id);
+  f.owner.getDiagnostics({ tileEvents: false });
+  assert.deepEqual(f.owner.getDiagnostics().tileEvents, []);
+});
+
+test("GPU upload callbacks report only completed new uploads across both paths", async t => {
+  const gpu = measuredGpu();
+  t.after(() => gpu.dispose());
+  const events = [], onTileUploadSubmitted = (tile, time) => events.push({ tile, time });
+  const palette = Uint8Array.of(0, 0, 0, 0);
+  const first = { originX: 0, originY: 0, width: 1, height: 1,
+    codes: new Uint32Array(1), edgeIds: new Uint32Array(), edgeWeights: new Float32Array() };
+  gpu.setFrame({ tiles: [first], palette, revision: 1, onTileUploadSubmitted });
+  assert.equal(events.length, 1);
+  assert.equal(events[0].tile, first);
+  assert.ok(Number.isFinite(events[0].time));
+  gpu.setTiles([first], onTileUploadSubmitted);
+  const reused = await gpu.prepareFrame({ tiles: [first], palette, onTileUploadSubmitted, yieldTask: tick });
+  reused.commit({ palette, revision: 1 });
+  assert.equal(events.length, 1);
+  const next = { ...first, originX: 2 };
+  const prepared = await gpu.prepareFrame({ tiles: [first, next], palette, onTileUploadSubmitted, yieldTask: tick });
+  assert.equal(events.length, 2);
+  assert.equal(events[1].tile, next);
+  assert.ok(events[1].time >= events[0].time);
+  prepared.commit({ palette, revision: 1 });
+  gpu.setFrame({ tiles: [first, next], palette, revision: 1, onTileUploadSubmitted });
+  assert.equal(events.length, 2);
+  assert.throws(() => gpu.setFrame({ tiles: [{ ...first, codes: new Uint32Array() }], palette, onTileUploadSubmitted }), /Invalid/);
+  assert.equal(events.length, 2);
+});
 
 function feature(id, bounds, color = "#123456") {
   return { id, bounds, color, geometry: { type: "Polygon", coordinates: [] } };
