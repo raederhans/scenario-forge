@@ -403,7 +403,7 @@ function createPaletteLibraryPanelController({
 
     const row = document.createElement("button");
     row.type = "button";
-    row.className = "palette-library-row";
+    row.className = "list-row palette-library-row";
     row.dataset.color = entry.color;
     row.dataset.tag = entry.sourceTag;
     row.dataset.iso2 = entry.mappedIso2 || "";

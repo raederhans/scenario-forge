@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="css/components/app-dialog.css" />
     <link rel="stylesheet" href="css/components/button.css" />
     <link rel="stylesheet" href="css/components/text-input.css" />
+    <link rel="stylesheet" href="css/components/list-row.css" />
     <link rel="stylesheet" href="css/map-label-fonts.css" />
     <link rel="stylesheet" href="css/editor-workspace.css" />
     <link rel="stylesheet" href="css/editor-shell.css" />
@@ -2336,8 +2337,9 @@
                 </select>
                 <div id="paletteLibrarySources" class="palette-library-sources hidden" hidden role="tablist" aria-label="Palette Source" data-i18n-aria-label="Palette Source"></div>
               </div>
-              <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch" data-i18n="Search Colors">Search Colors</label>
-              <div class="palette-library-search-row mt-2">
+              <label id="lblPaletteSearch" class="visually-hidden" for="paletteLibrarySearch" data-i18n="Search Colors">Search Colors</label>
+              <div class="search-field palette-library-search-row">
+                <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>
                 <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search countries or colors" data-i18n-placeholder="Search countries or colors" class="input palette-library-search-input" />
                 <button id="paletteLibrarySearchClear" type="button" class="palette-library-search-clear hidden" data-i18n-aria-label="Clear color search" aria-label="Clear color search"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-close"><path d="M6 6l12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
               </div>
@@ -2636,7 +2638,7 @@
               <div class="inspector-search-shell">
                 <div class="card-flat inspector-search-block">
                   <label id="lblCountrySearch" class="visually-hidden" for="countrySearch" data-i18n="Search Countries">Search Countries</label>
-                  <div class="inspector-search-input-row">
+                  <div class="search-field inspector-search-input-row">
                     <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
                       <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -2712,7 +2714,7 @@
               </div>
               <div class="card-flat inspector-search-block">
                 <label id="lblSpecialRegionSearch" class="visually-hidden" for="specialRegionSearch" data-i18n="Search Special Regions">Search Special Regions</label>
-                <div class="inspector-search-input-row">
+                <div class="search-field inspector-search-input-row">
                   <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
                     <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -2834,7 +2836,7 @@
               </div>
               <div class="card-flat inspector-search-block">
                 <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch" data-i18n="Search Water Regions">Search Water Regions</label>
-                <div class="inspector-search-input-row">
+                <div class="search-field inspector-search-input-row">
                   <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
                     <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>

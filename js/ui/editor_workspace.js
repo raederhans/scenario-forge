@@ -477,7 +477,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       // 预设、项目加载等会直接改复选框的 checked 而不派发 change；它们都会刷新属性页里的状态条，借这里同步眼睛开关。
       new MutationObserver(() => { syncStatus(); scheduleVisibilityRefresh(); }).observe(host, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["data-status-tone"] });
       syncStatus();
-      const row = make("div", "editor-layer-row");
+      const row = make("div", "list-row editor-layer-row");
       row.dataset.layerKey = key;
       row.append(btn);
       tabs.append(row);

@@ -113,7 +113,10 @@ test("parent and child navigation retain labels, swatches, and country targets",
   h.render(country({ scenarioSubject: true, parentOwnerTags: [" pp "] }));
   const cards = nodes(h.root).filter((node) => node.tagName === "button" && node.className.includes("scenario-action-card"));
   assert.equal(cards.length, 2);
-  assert.equal(cards[0].className, "scenario-action-card scenario-navigation-card scenario-parent-return-btn");
+  assert.deepEqual(
+    cards[0].className.split(/\s+/).sort(),
+    ["list-row", "scenario-action-card", "scenario-navigation-card", "scenario-parent-return-btn"],
+  );
   assert.ok(nodes(cards[0]).some((node) => node.textContent === "Return to Parent"));
   assert.ok(nodes(cards[1]).some((node) => node.textContent === "(CC) · Subject"));
   assert.equal(nodes(cards[1]).find((node) => node.tagName === "span").style.backgroundColor, "#abcdef");

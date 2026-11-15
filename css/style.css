@@ -62,14 +62,12 @@
   --dur-enter: 140ms;
   --ease: cubic-bezier(.2, 0, 0, 1);
   --fs-2xl: 1.375rem;
-
   /* 编辑器五档字号刻度，最小字号为 12px。 */
   --fs-xs: 0.75rem;
   --fs-sm: 0.8125rem;
   --fs-md: 0.875rem;
   --fs-lg: 1rem;
   --fs-xl: 1.125rem;
-
   --lh-control: 1.2;
   --lh-title: 1.25;
   --lh-body: 1.45;
@@ -118,7 +116,6 @@
   --type-value-weight: 400;
   --type-value-leading: var(--lh-control);
   --type-value-color: var(--ink-900);
-
   --bg-app: var(--surface-app);
   --bg-surface: var(--surface-raised);
   --bg-input: var(--surface-sunken);
@@ -1267,7 +1264,7 @@ input[type="range"].range-input {
 .appearance-stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-5);
 }
 
 .appearance-card {
@@ -1337,11 +1334,7 @@ details.appearance-subsection[open] > summary::after,
 .appearance-subsection-stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-#appearancePanelBorders .appearance-subsection-stack {
-  gap: 10px;
+  gap: var(--space-5);
 }
 
 #appearancePanelBorders .appearance-mini-section > summary::after {
@@ -1388,10 +1381,6 @@ details.appearance-subsection[open] > summary::after,
 #mapContentStack .map-content-panel > .space-y-3,
 #mapContentStack .appearance-mini-section > .rivers-panel {
   margin-top: 0;
-}
-
-.appearance-layer-tab-panel .appearance-subsection-stack {
-  gap: 0;
 }
 
 .appearance-control-card {
@@ -1468,7 +1457,7 @@ details.appearance-subsection[open] > summary::after,
 }
 
 .appearance-ocean-grid {
-  gap: 12px;
+  gap: var(--space-5);
 }
 
 .appearance-day-night-stack {
@@ -1645,10 +1634,10 @@ details.appearance-subsection[open] > summary::after,
   line-height: 1.35;
 }
 
-.layer-status-strip {
+:where(.layer-status-strip) {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-2);
   min-height: 15px;
   margin: 6px 0 10px;
   color: var(--type-meta-color);
@@ -1664,28 +1653,26 @@ details.appearance-subsection[open] > summary::after,
   flex: 0 0 7px;
   width: 7px;
   height: 7px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   background: var(--ink-500);
-  box-shadow: var(--shadow-1);
+  box-shadow: none;
 }
 
 .layer-status-strip.is-active {
-  color: #166534;
+  color: var(--success);
 }
 
 .layer-status-strip[data-status-tone="active"]::before {
-  background: #16a34a;
-  box-shadow: var(--shadow-1);
+  background: var(--success);
 }
 
 .layer-status-strip.is-warning {
-  color: #92400e;
+  color: var(--warning);
 }
 
 .layer-status-strip[data-status-tone="warning"]::before,
 .layer-status-strip[data-status-tone="pending"]::before {
-  background: #d97706;
-  box-shadow: var(--shadow-1);
+  background: var(--warning);
 }
 
 .layer-status-strip.is-muted {
@@ -1693,17 +1680,15 @@ details.appearance-subsection[open] > summary::after,
 }
 
 .layer-status-strip[data-status-tone="disabled"] {
-  color: #991b1b;
+  color: var(--danger);
 }
 
 .layer-status-strip[data-status-tone="disabled"]::before {
-  background: #dc2626;
-  box-shadow: var(--shadow-1);
+  background: var(--danger);
 }
 
 .layer-status-strip[data-status-tone="muted"]::before {
   background: var(--ink-500);
-  box-shadow: var(--shadow-1);
 }
 
 .appearance-control-card-title + .layer-status-strip,
@@ -1801,7 +1786,7 @@ details.appearance-subsection[open] > summary::after,
 .rivers-panel-stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-5);
 }
 
 #mapContentStack .rivers-panel-stack {
@@ -2680,10 +2665,6 @@ details.card[open] > summary::after {
 
 .sidebar-details-card {
   padding-top: 18px;
-}
-
-.sidebar-secondary-card {
-  opacity: 0.94;
 }
 
 .palette-library-secondary-note {
@@ -6313,13 +6294,6 @@ body.counter-editor-modal-open {
   position: relative;
   z-index: calc(var(--z-map-overlay) - 9);
   width: 100%;
-  background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel)),
-    var(--surface-raised);
-  border-color: var(--line-1);
-  box-shadow: var(--shadow-1);
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
 }
 
 .inspector-search-input-row {
@@ -6327,7 +6301,6 @@ body.counter-editor-modal-open {
   align-items: center;
   gap: 10px;
   min-width: 0;
-  min-height: 36px;
 }
 
 .inspector-search-icon {
@@ -8460,7 +8433,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   box-shadow: var(--shadow-1);
 }
 
-.country-select-row,
 .country-row,
 .preset-row,
 .legend-row {
@@ -8590,33 +8562,17 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 }
 
 .country-select-row {
+  width: 100%;
+  gap: var(--space-2);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   justify-content: stretch;
   align-items: center;
-  background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
   text-align: left;
   cursor: pointer;
   position: relative;
   min-width: 0;
-  box-shadow: var(--shadow-1);
   transition: border-color var(--transition-fast), background var(--transition-fast);
-}
-
-.country-select-row:hover {
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 98%, transparent), color-mix(in srgb, var(--surface-panel) 88%, transparent));
-  border-color: var(--line-2);
-  box-shadow: var(--shadow-1);
-  transform: none;
-}
-
-.country-select-row.is-selected {
-  border-color: color-mix(in srgb, var(--accent) 26%, transparent);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, transparent), color-mix(in srgb, var(--accent-soft) 84%, transparent));
-  box-shadow: var(--shadow-1);
 }
 
 .country-select-row.is-active-owner {
@@ -8840,11 +8796,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   flex: 0 0 auto;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
-}
-
-.selected-land-country-quick-card {
-  border-color: color-mix(in srgb, var(--accent) 18%, transparent);
-  background: var(--surface-raised);
 }
 
 .country-select-identity-line {
@@ -9255,17 +9206,11 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  padding: 9px 11px;
   font-family: inherit;
   font-size: var(--type-control);
   line-height: var(--type-control-leading);
-  border: 1px solid color-mix(in srgb, var(--accent) 11%, transparent);
-  border-radius: var(--radius-md);
-  background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
   color: var(--type-control-color);
   text-align: left;
-  box-shadow: var(--shadow-1);
   transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
   font-weight: var(--type-control-weight);
   letter-spacing: 0;
@@ -9273,13 +9218,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 button.scenario-action-card {
   cursor: pointer;
-}
-
-button.scenario-action-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 20%, transparent);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 98%, transparent), color-mix(in srgb, var(--surface-panel) 88%, transparent));
-  box-shadow: var(--shadow-1);
 }
 
 .scenario-navigation-card {
@@ -9328,11 +9266,7 @@ button.scenario-action-card:hover {
 .inspector-item-btn {
   width: 100%;
   text-align: left;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--bg-surface);
   color: var(--type-control-color);
-  padding: 9px 11px;
   font-family: inherit;
   font-size: var(--type-control);
   line-height: var(--type-control-leading);
@@ -9342,8 +9276,7 @@ button.scenario-action-card:hover {
   letter-spacing: 0;
 }
 
-.inspector-accordion-btn:hover,
-.inspector-item-btn:hover {
+.inspector-accordion-btn:hover {
   background: color-mix(in srgb, var(--surface-panel) 90%, transparent);
   border-color: color-mix(in srgb, var(--accent) 18%, transparent);
 }
@@ -9681,8 +9614,6 @@ button.scenario-action-card:hover {
 }
 
 .inspector-item-btn.is-active {
-  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
   color: var(--color-accent);
 }
 
@@ -10217,7 +10148,6 @@ select.app-select-native:disabled {
   letter-spacing: 0;
 }
 
-
 .app-select-button,
 body.editor-workspace :is(.app-select-button, #riverPaintSearchInput.app-select-button).app-select-button,
 body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.app-select-button, #riverPaintSearchInput.app-select-button).app-select-button {
@@ -10307,7 +10237,7 @@ details.appearance-subsection > *:not(summary),
 }
 
 #appearancePanelBorders .appearance-mini-section > *:not(summary) {
-  padding: 0 12px 13px;
+  padding: 0 0 var(--space-4);
 }
 
 .appearance-mini-section-subtle > summary.section-header {
@@ -10323,8 +10253,9 @@ details.appearance-subsection > *:not(summary),
 }
 
 .appearance-layer-tab-panel .appearance-mini-section > *:not(summary),
-#mapContentStack .appearance-mini-section > *:not(summary) {
-  padding: 2px 6px 15px;
+#mapContentStack .appearance-mini-section > *:not(summary),
+.editor-property-panel .appearance-mini-section > *:not(summary) {
+  padding: 0 0 var(--space-4);
 }
 
 .appearance-layer-tab-panel .appearance-mini-section .ml-5,
@@ -10350,7 +10281,6 @@ details.appearance-subsection > *:not(summary),
   background-repeat: no-repeat;
   background-position: right 11px center;
   background-size: 14px 14px;
-  box-shadow: var(--shadow-1);
   color: var(--text-primary);
   cursor: pointer;
   font-weight: 600;
@@ -10512,11 +10442,6 @@ details.card > summary {
 .inspector-search-input.input {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 10px 6px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
 }
 
 #countryInspectorSection,
@@ -10647,11 +10572,6 @@ details.card > summary {
   margin: 0 0 12px;
 }
 
-#countryInspectorSection .inspector-search-block {
-  border-radius: var(--radius-sm);
-  padding: 9px 12px;
-}
-
 #countryInspectorSection .select-input,
 #selectedCountryActionsSection .select-input,
 #specialRegionInspectorSection .select-input,
@@ -10669,7 +10589,6 @@ details.card > summary {
   overflow: visible;
 }
 
-#countryList.inspector-scroll,
 #presetTree.inspector-scroll {
   padding: 4px 3px 8px;
   border-radius: var(--radius-sm);
@@ -10677,28 +10596,9 @@ details.card > summary {
   scrollbar-gutter: stable;
 }
 
-#specialRegionInspectorSection .inspector-detail-section,
-#waterInspectorSection .inspector-detail-section {
-  border-color: var(--line-1);
-  border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
-  box-shadow: var(--shadow-1);
-}
-
-#waterInspectorSection .water-filter-card {
-  padding: 12px;
-}
-
 #specialRegionInspectorSection .inspector-search-block,
 #waterInspectorSection .inspector-search-block {
   margin-top: 10px;
-}
-
-#countryInspectorDetail,
-#waterInspectorDetail,
-#specialRegionInspectorDetail {
-  margin-top: 16px;
 }
 
 .dock-icon-btn,
@@ -10888,6 +10788,7 @@ details.card > summary {
 
 #countryList .country-select-main-btn {
   display: flex;
+  align-items: center;
   width: 100%;
   min-width: 0;
   padding: 0;
@@ -12761,9 +12662,9 @@ input[type="checkbox"].checkbox-input {
 .gap-2 { gap: 8px; }
 .gap-3 { gap: 12px; }
 .mt-2 { margin-top: 8px; }
-.mt-3 { margin-top: 12px; }
-.mt-4 { margin-top: 16px; }
-.ml-5 { margin-left: 20px; }
+.mt-3:where(:not(.editor-property-panel *)) { margin-top: 12px; }
+.mt-4:where(:not(.editor-property-panel *)) { margin-top: 16px; }
+.ml-5:where(:not(.editor-property-panel *)) { margin-left: 20px; }
 .w-full { width: 100%; }
 .relative { position: relative; }
 /* Use .hidden for conditional elements inside an already active panel. */
@@ -12821,10 +12722,6 @@ input[type="checkbox"].checkbox-input {
 }
 
 .palette-library {
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-card);
-  background: var(--surface-raised);
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -12989,7 +12886,7 @@ input[type="checkbox"].checkbox-input {
   padding: 0 4px 0 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
 }
 
 .palette-library-list::-webkit-scrollbar {
@@ -13007,9 +12904,6 @@ input[type="checkbox"].checkbox-input {
 
 .palette-library-section {
   flex: 0 0 auto;
-  border: 1px solid var(--line-1);
-  border-radius: var(--radius-sm);
-  background: var(--surface-raised);
   overflow: hidden;
 }
 
@@ -13075,10 +12969,10 @@ input[type="checkbox"].checkbox-input {
 }
 
 .palette-library-section-list {
-  padding: 0 6px 6px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
 }
 
 .palette-library-row-shell {
@@ -13092,31 +12986,16 @@ input[type="checkbox"].checkbox-input {
   display: grid;
   grid-template-columns: var(--color-swatch-size) minmax(0, 1fr);
   gap: 10px;
-  align-items: start;
+  align-items: center;
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  padding: 8px 10px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-btn);
-  background: var(--surface-raised);
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.15s ease;
-}
-
-.palette-library-row:hover {
-  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
-  transform: translateY(-1px);
 }
 
 .palette-library-row:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-}
-
-.palette-library-row.is-selected {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-1);
 }
 
 .palette-library-row .color-swatch {

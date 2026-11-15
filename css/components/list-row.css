@@ -1,0 +1,34 @@
+@layer components {
+:where(.list-row) {
+  box-sizing: border-box;
+  min-height: var(--control-compact);
+  padding: var(--space-1h) var(--space-2);
+  border: 0;
+  border-bottom: 1px solid var(--line-1);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+:where(.list-row:hover) { background: var(--surface-sunken); }
+:where(.list-row.is-selected, .list-row.is-active, .list-row[aria-selected="true"], .list-row[aria-pressed="true"], .list-row:has(> .editor-layer-trigger.is-active)) {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+:where(.list-row .color-swatch, .list-row .country-row-actions, .list-row .country-select-side) {
+  flex-shrink: 0;
+  align-self: center;
+}
+:where(.search-field) {
+  position: relative;
+  --input-padding-start: 32px;
+}
+:where(.search-field > .inspector-search-icon) {
+  position: absolute;
+  left: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+}

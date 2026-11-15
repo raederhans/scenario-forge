@@ -554,7 +554,7 @@ export function createCountryInspectorController({
     let childrenToggle = null;
 
     const row = document.createElement("div");
-    row.className = "country-select-row";
+    row.className = "list-row country-select-row";
     String(rowClassName || "").split(/\s+/).filter(Boolean).forEach((className) => {
       row.classList.add(className);
     });

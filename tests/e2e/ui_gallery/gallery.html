@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../../../css/components/app-dialog.css" />
   <link rel="stylesheet" href="../../../css/components/button.css" />
   <link rel="stylesheet" href="../../../css/components/text-input.css" />
+  <link rel="stylesheet" href="../../../css/components/list-row.css" />
   <link rel="stylesheet" href="../../../css/map-label-fonts.css" />
   <link rel="stylesheet" href="../../../css/editor-workspace.css" />
   <link rel="stylesheet" href="../../../css/editor-shell.css" />
@@ -140,7 +141,7 @@
     <div data-specimen="transport edit-overlay-input"><div class="transport-workbench-panel"><input type="text" class="text-input transport-workbench-edit-overlay-input" value="A7" /></div></div>
     <aside id="rightSidebar" class="sidebar-right gallery-ctx">
       <div data-specimen="#rightSidebar .input"><input type="text" class="input" placeholder="Layer name" /></div>
-      <div data-specimen="inspector-search-input"><div class="inspector-search-shell"><div class="card-flat inspector-search-block"><div class="inspector-search-input-row"><svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg><input type="text" placeholder="Search country or code..." class="input inspector-search-input" data-gallery-target /></div></div></div></div>
+      <div data-specimen="inspector-search-input"><div class="inspector-search-shell"><div class="card-flat inspector-search-block"><div class="search-field inspector-search-input-row"><svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg><input type="text" placeholder="Search country or code..." class="input inspector-search-input" data-gallery-target /></div></div></div></div>
       <div data-specimen="palette-library-search-input"><input type="text" class="input palette-library-search-input" placeholder="Search palette" /></div>
       <div data-specimen="special-zone-workbench-field text"><div class="special-zone-workbench-card special-zone-style-card"><label class="special-zone-workbench-field"><span>Name</span><input type="text" value="Saar territory" data-gallery-target /></label></div></div>
       <div data-specimen="special-zone-member-drawer-search"><input type="search" class="input special-zone-member-drawer-search" placeholder="Search parcels" /></div>
@@ -219,15 +220,16 @@
 
   <!-- ───────── 列表项 ───────── -->
   <section class="gallery-section" data-gallery-section="list-rows">
+    <div data-specimen=".list-row" data-states="default hover selected"><button type="button" class="list-row" aria-selected="false" data-gallery-target>France</button></div>
     <h2 class="gallery-heading">列表项（每行：默认 / 悬停 / 聚焦 / 选中）</h2>
     <aside id="rightSidebar" class="sidebar-right gallery-ctx">
-      <div data-specimen="country-select-row" data-states="default hover focus selected"><div class="country-select-row"><button type="button" class="country-select-main country-select-main-btn" aria-pressed="false" data-gallery-target><div class="country-select-title">France</div><div class="country-select-meta">FRA · 96 parcels</div></button></div></div>
-      <div data-specimen="palette-library-row" data-states="default hover focus selected"><div class="palette-library-row-shell"><button type="button" class="palette-library-row" aria-pressed="false" data-gallery-target><span class="color-swatch" style="background-color:#4a6b8a"></span><span class="palette-library-meta u-min-0"><span class="palette-library-title u-truncate">Germany</span><span class="palette-library-subtitle">GER · HOI4</span></span></button></div></div>
+      <div data-specimen="country-select-row" data-states="default hover focus selected"><div class="list-row country-select-row"><button type="button" class="country-select-main country-select-main-btn" aria-pressed="false" data-gallery-target><div class="country-select-title">France</div><div class="country-select-meta">FRA · 96 parcels</div></button></div></div>
+      <div data-specimen="palette-library-row" data-states="default hover focus selected"><div class="palette-library-row-shell"><button type="button" class="list-row palette-library-row" aria-pressed="false" data-gallery-target><span class="color-swatch" style="background-color:#4a6b8a"></span><span class="palette-library-meta u-min-0"><span class="palette-library-title u-truncate">Germany</span><span class="palette-library-subtitle">GER · HOI4</span></span></button></div></div>
       <div data-specimen="special-zone-member-drawer-row" data-states="default hover focus"><dialog open class="special-zone-member-drawer gallery-inline-dialog"><div class="special-zone-member-drawer-list"><button type="button" class="special-zone-member-drawer-row" data-gallery-target>Alsace · FRA-1234</button></div></dialog></div>
     </aside>
     <aside id="leftSidebar" class="sidebar sidebar-left gallery-ctx">
-      <div data-specimen="#leftSidebar editor-layer-row" data-states="default hover focus selected"><div class="editor-layer-row"><button type="button" class="editor-layer-trigger" data-gallery-target>Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer">◉</button></div></div>
-      <div data-specimen="#leftSidebar editor-layer-visibility"><div class="editor-layer-row"><button type="button" class="editor-layer-trigger">Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer" data-gallery-target>◉</button></div></div>
+      <div data-specimen="#leftSidebar editor-layer-row" data-states="default hover focus selected"><div class="list-row editor-layer-row"><button type="button" class="editor-layer-trigger" data-gallery-target>Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer">◉</button></div></div>
+      <div data-specimen="#leftSidebar editor-layer-visibility"><div class="list-row editor-layer-row"><button type="button" class="editor-layer-trigger">Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer" data-gallery-target>◉</button></div></div>
     </aside>
     <div class="transport-workbench-panel gallery-ctx">
       <div data-specimen="transport-workbench-data-row-button" data-states="default hover focus selected"><button type="button" class="transport-workbench-data-row-button" aria-pressed="false">A7 · Motorway</button></div>
