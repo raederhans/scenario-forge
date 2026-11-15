@@ -56,7 +56,7 @@ function mount(t, nodes = new Map()) {
   });
 }
 
-test("declarative refresh avoids equal DOM writes while translating new nodes and changed locale data", (t) => {
+test("declarative refresh avoids equal DOM writes while translating new nodes and ignoring stale locale data", (t) => {
   mount(t);
   const node = new TranslationElement({
     "data-i18n": "Tools", "data-i18n-placeholder": "Tools", "data-i18n-title": "Tools",
@@ -78,8 +78,10 @@ test("declarative refresh avoids equal DOM writes while translating new nodes an
   assert.equal(dynamicChild.textContent, "边界");
   applyBaseLocalizationSnapshot(state, { uiLocales: { ...state.locales.ui, Tools: { ...state.locales.ui.Tools, zh: "绘图工具" } } });
   applyDeclarativeTranslations(node);
-  assert.equal(node.textContent, "绘图工具");
-  assert.equal(node.getAttribute("placeholder"), "绘图工具");
+  assert.equal(node.textContent, "工具");
+  assert.equal(node.getAttribute("placeholder"), "工具");
+  assert.equal(node.textWrites, 1);
+  assert.equal(node.attributeWrites, 4);
   setCurrentLanguage(state, "en");
   applyDeclarativeTranslations(dynamicChild);
   assert.equal(dynamicChild.textContent, "Borders");
@@ -135,7 +137,7 @@ test("UI refresh preserves an armed confirmation label and restores the idle lab
   assert.equal(button.textWrites, 0);
   delete button.dataset.confirmState;
   updateUIText();
-  assert.equal(button.textContent, "重置国家颜色");
+  assert.equal(button.textContent, "重置国家配色");
   assert.equal(button.textWrites, 1);
 });
 

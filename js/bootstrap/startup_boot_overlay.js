@@ -1,3 +1,4 @@
+import { t } from "../core/i18n.js";
 import { state as runtimeState } from "../core/state.js";
 import {
   commitStartupReadonlyStateFields,
@@ -113,21 +114,6 @@ const BOOT_COPY = {
   },
 };
 
-const STARTUP_READONLY_COPY = {
-  en: {
-    pending: "Detailed interactions are still loading. Pan and zoom remain available.",
-    loading: "Preparing detailed interactions. The map is view-only for a moment.",
-    failed: "Detailed interactions are unavailable right now. The map stays view-only until the detail layer recovers.",
-    healthGate: "Scenario data is being held in safe mode. The map stays view-only until startup recovery finishes.",
-  },
-  zh: {
-    pending: "细分交互仍在加载中。当前可平移缩放，但保持只读。",
-    loading: "正在准备细分交互。当前地图暂时只读。",
-    failed: "细分交互暂时不可用。在细分图层恢复前，地图将保持只读。",
-    healthGate: "场景数据已切换到安全模式。在启动恢复完成前，地图将保持只读。",
-  },
-};
-
 function getBootCopy(phase = runtimeState.bootPhase) {
   const language = getBootLanguage();
   const copy = BOOT_COPY[language]?.[phase] || BOOT_COPY.en[phase] || BOOT_COPY.en.shell;
@@ -159,11 +145,6 @@ function getBootDom() {
   };
 }
 
-function getStartupReadonlyCopy() {
-  const language = getBootLanguage();
-  return STARTUP_READONLY_COPY[language] || STARTUP_READONLY_COPY.en;
-}
-
 export function resolveStartupInteractionMode() {
   const search = globalThis.location?.search || "";
   if (search && globalThis.URLSearchParams) {
@@ -184,17 +165,16 @@ export function createStartupBootOverlayController() {
   let bootMetricsLogged = false;
 
   const getStartupReadonlyMessage = () => {
-    const copy = getStartupReadonlyCopy();
     if (runtimeState.startupReadonlyReason === "detail-promotion-failed") {
-      return copy.failed;
+      return t("startup.readonly.failed", "ui");
     }
     if (runtimeState.startupReadonlyReason === "scenario-health-gate") {
-      return copy.healthGate;
+      return t("startup.readonly.healthGate", "ui");
     }
     if (runtimeState.startupReadonlyUnlockInFlight) {
-      return copy.loading;
+      return t("startup.readonly.loading", "ui");
     }
-    return copy.pending;
+    return t("startup.readonly.pending", "ui");
   };
 
   const getBootProgressWindow = (phase = runtimeState.bootPhase) => {

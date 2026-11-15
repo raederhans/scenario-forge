@@ -1,3 +1,4 @@
+import { getMissingUiKeys, clearMissingUiKeys } from "./i18n.js";
 import { callRuntimeHook } from "./state/index.js";
 // Stable, read-only test surface for end-to-end tests (tests/e2e/golden/).
 //
@@ -184,6 +185,8 @@ export function installAppTestApi(target = globalThis) {
     labels,
     politicalBackend,
     internals,
+    getMissingUiKeys,
+    clearMissingUiKeys,
   });
 }
 

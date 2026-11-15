@@ -54,7 +54,7 @@ test("main quick guide remains independent while the HGO guide links to its own 
 });
 
 test("new workspace labels agree across runtime and manual catalogs without changing generic Color", () => {
-  const manual = JSON.parse(readFileSync(new URL("../data/i18n/manual_ui.json", import.meta.url), "utf8"));
+  const manual = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL("../data/i18n/ui_copy.json", import.meta.url), "utf8"))).map(([key, entry]) => [key, entry.zh]));
   const keys = ["Save project", "Export image", "Not saved yet", "Unsaved changes", "Project downloaded",
     "Advanced settings", "Paint mode color", "Ownership", "Close panels", "3. Set the active owner",
     "4. Set the active owner", "4. Edit, style, then save", "5. Edit, style, then save"];

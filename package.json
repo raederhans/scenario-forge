@@ -7,7 +7,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node tools/run_all_tests.mjs node && node tools/run_all_tests.mjs python",
+    "i18n:build": "node tools/build_ui_copy.mjs",
+    "i18n:check": "node tools/build_ui_copy.mjs --check",
+    "test": "npm run i18n:check && node tools/run_all_tests.mjs node && node tools/run_all_tests.mjs python",
     "test:node": "node tools/run_all_tests.mjs node",
     "test:python": "node tools/run_all_tests.mjs python",
     "test:e2e:golden": "node node_modules/@playwright/test/cli.js test tests/e2e/golden --workers=1",

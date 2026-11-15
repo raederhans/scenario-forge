@@ -49,3 +49,8 @@ TNO 严格数据合约用 `npm run verify:tno-strict-contracts`（一次输出 s
 交互性能（真实首帧、settled 后 30 s 长帧尾巴、拖拽中最长帧、缩放/平移 settled）用本地探针测量：先运行 `python tools/dev_server.py --port <端口>`，再运行 `MAPCREATOR_DEV_PORT=<端口> npm run perf:interaction -- --scenarios hoi4_1936 --runs 3`；`--url-query political_render_mode=vector` 之类的参数可以做对照。默认用真实 GPU，结果写到 `.runtime/reports/generated/perf-interaction/`。CI 用软件渲染，这几个指标的绝对值在 CI 上没有可比性，所以只在本地对照测量。
 
 保存工作到功能分支无需先追平 `main`。准备合并时再 fetch 目标分支并确认最终提交的 required check；合并后的 Pages 发布独立验收。
+
+界面文案以 `data/i18n/ui_copy.json` 为唯一编辑源；修改现有文案只改 `en`、`zh` 的值，保留键和调用点。
+新文案先在该文件添加条目，可用 `note` 说明语境，占位符写作 `{name}`，英文复数用 `one` / `other` 对象。
+编辑后运行 `npm run i18n:build`，不要手改生成的 `js/core/i18n_catalog.js`。
+运行 `python tools/translate_manager.py --ui-only` 同步 `data/locales.json` 的 UI 段；`npm run i18n:check` 检查产物一致性，也会随 `npm test` 执行。

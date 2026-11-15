@@ -12,7 +12,7 @@ from tools.translate_manager import (
     build_translation_source_audit,
     collect_ui_keys,
     contains_cjk,
-    load_ui_copy_catalog_translations,
+    load_ui_copy,
     load_palette_geo_names,
     load_palette_geo_names_for_ids,
     parse_palette_ids,
@@ -206,24 +206,23 @@ const translations = {
             self.assertNotIn("productPreviewAlt", keys)
             self.assertNotIn("Scenario Forge product preview", keys)
 
-    def test_load_ui_copy_catalog_translations_reuses_existing_runtime_copy(self) -> None:
+    def test_load_ui_copy_preserves_display_values_and_plural_forms(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            self._write_repo_file(
-                repo_root,
-                "js/core/i18n_catalog.js",
-                """
-export const UI_COPY_CATALOG = Object.freeze({
-  "Atlas Ink": { zh: "\\u56fe\\u96c6\\u58a8\\u84dd", en: "Atlas Ink" },
-  Guide: { zh: "\\u6307\\u5357", en: "Guide" },
-});
-                """.strip(),
-            )
-
-            translations = load_ui_copy_catalog_translations(repo_root)
-
-            self.assertEqual(translations["Atlas Ink"], "图集墨蓝")
-            self.assertEqual(translations["Guide"], "指南")
+            self._write_repo_file(repo_root, "data/i18n/ui_copy.json", """
+{
+  "Atlas Ink": {"zh": "图集墨蓝", "en": "Atlas Ink", "note": "色板"},
+  "Guide": {"zh": "指南", "en": "Display guide"},
+  "Count": {"zh": "{count} 项", "en": {"one": "{count} item", "other": "{count} items"}}
+}
+""")
+            translations = load_ui_copy(repo_root)
+            self.assertEqual(translations["Atlas Ink"], {"zh": "图集墨蓝", "en": "Atlas Ink"})
+            self.assertEqual(translations["Guide"], {"zh": "指南", "en": "Display guide"})
+            self.assertEqual(translations["Count"], {
+                "zh": "{count} 项", "en": {"one": "{count} item", "other": "{count} items"},
+            })
+            self.assertEqual(list(translations), ["Atlas Ink", "Count", "Guide"])
 
     def test_contains_cjk_uses_shared_cjk_detection(self) -> None:
         self.assertTrue(contains_cjk("阿尔法"))
@@ -274,7 +273,7 @@ export const UI_COPY_CATALOG = Object.freeze({
         audit = build_translation_source_audit(
             ui_payload={"Apply": {"en": "Apply", "zh": "应用"}},
             geo_payload={"Poland": {"en": "Poland", "zh": "波兰"}},
-            ui_sources={"Apply": "manual_ui"},
+            ui_sources={"Apply": "ui_copy"},
             geo_sources={"Poland": "geo_seed"},
             baseline_locales_path=Path("data/i18n/locales_baseline.json"),
             machine_translate_enabled=False,
@@ -285,7 +284,7 @@ export const UI_COPY_CATALOG = Object.freeze({
 
         self.assertEqual(audit["baseline_locales_path"], "data/i18n/locales_baseline.json")
         self.assertEqual(audit["machine_translation_provider"], "experimental_google_web")
-        self.assertEqual(audit["ui"]["source_counts"]["manual_ui"], 1)
+        self.assertEqual(audit["ui"]["source_counts"]["ui_copy"], 1)
         self.assertEqual(audit["geo"]["source_counts"]["geo_seed"], 1)
         self.assertEqual(audit["geo"]["english_fallback_count"], 0)
 
@@ -300,7 +299,7 @@ export const UI_COPY_CATALOG = Object.freeze({
                 "Unknown": {"en": "Unknown", "zh": "Unknown"},
             },
             ui_sources={
-                "Apply": "manual_ui",
+                "Apply": "ui_copy",
                 "Broken": "english_fallback",
             },
             geo_sources={

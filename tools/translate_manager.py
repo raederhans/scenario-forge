@@ -24,529 +24,6 @@ except ImportError:
         ) from exc
 
 
-DEFAULT_MANUAL_UI_DICT = {
-    "0 colors": "0 种颜色",
-    "1930s Electrification Proxy": "1930年代电气化代理",
-    "Active Owner": "当前属主",
-    "Advanced": "高级",
-    "Adaptive": "自适应",
-    "Adaptive Strength": "自适应强度",
-    "Aggregation": "聚合",
-    "Appearance": "外观",
-    "Apply a subtle overlay texture for a vintage map feel.": "添加一层微妙的纹理覆盖，营造复古地图质感。",
-    "Auto-Fill": "自动填充",
-    "Balanced": "均衡",
-    "Bathymetry Contours": "测深等深线",
-    "Bathymetry Soft": "柔和测深",
-    "Blend Mode": "混合模式",
-    "Brush": "画笔",
-    "Capital Highlight Color": "首都高亮颜色",
-    "City Lights": "城市灯光",
-    "City Points": "城市点位",
-    "Classic Graphite": "经典石墨",
-    "Clean": "纯净",
-    "Clear All": "全部清除",
-    "Clear color search": "清空颜色搜索",
-    "Clear Water Override": "清除水域覆盖",
-    "Collapse quick dock": "折叠快捷编辑栏",
-    "Color": "颜色",
-    "Color Library": "颜色库",
-    "Context Layers": "上下文图层",
-    "Contour Strength": "等高线强度",
-    "Controls how many labels can appear per viewport at mid/high zoom.": "控制在中高缩放级别下每个视口可显示的标签数量。",
-    "Coverage": "覆盖范围",
-    "Distribution": "分布",
-    "Network": "网络",
-    "Core Sharpness (Modern only)": "核心锐度（仅现代）",
-    "Corridor Strength (Modern only)": "通道强度（仅现代）",
-    "Current context": "当前上下文",
-    "Current tool": "当前工具",
-    "Custom Fill": "自定义填充",
-    "Custom Stroke": "自定义描边",
-    "Custom color": "自定义颜色",
-    "Dash": "虚线",
-    "Data": "数据",
-    "Day / Night": "昼夜",
-    "Dense": "密集",
-    "Diagnostics": "诊断",
-    "Display": "显示",
-    "Disputed Fill": "争议区填充",
-    "Disputed Stroke": "争议区描边",
-    "Double-click quick fill scope": "双击快速填充范围",
-    "Draft Grid": "草稿网格",
-    "Editing Rules": "编辑规则",
-    "Enable All": "全部启用",
-    "Enable Day / Night Cycle": "启用昼夜循环",
-    "Eraser tool": "橡皮擦工具",
-    "Eyedropper tool": "吸管工具",
-    "Fill Color": "填充颜色",
-    "Fill Opacity": "填充不透明度",
-    "Fill tool": "填充工具",
-    "Finish": "完成",
-    "Flat Blue": "纯蓝",
-    "Fill": "填充",
-    "Grain": "颗粒",
-    "Graticule": "经纬网",
-    "Eraser": "橡皮擦",
-    "Eyedropper": "吸管",
-    "Export Map": "导出地图",
-    "Highlight Capitals": "高亮首都",
-    "History": "历史记录",
-    "HOI4 Library": "HOI4 图标库",
-    "HOI4 Vanilla": "钢铁雄心4原版",
-    "Download Snapshot": "下载快照",
-    "Inspect": "检查",
-    "Inspector": "检查器",
-    "Intensity": "强度",
-    "Label": "标签",
-    "Label Density": "标签密度",
-    "Label Size": "标签大小",
-    "Label Step": "标签步长",
-    "Lake Fill Color": "湖泊填充颜色",
-    "Layer Order": "图层顺序",
-    "Layers": "图层",
-    "Latitude Tilt": "纬度倾斜",
-    "Link Lakes To Ocean": "将湖泊连通到海洋",
-    "Live config": "实时配置",
-    "Live UTC sync updates once per minute.": "实时 UTC 同步每分钟更新一次。",
-    "Load a bundled historical setup and reset to its baseline.": "加载内置历史设定，并可重置回其基线。",
-    "Longitude Offset": "经度偏移",
-    "Major Step": "主步长",
-    "Manual": "手动",
-    "Manual Zones": "手动区域",
-    "Marker Scale": "标记缩放",
-    "Min Area (px)": "最小面积（像素）",
-    "Minor Step": "次步长",
-    "Modern": "现代",
-    "No supported countries in current dataset.": "当前数据集中没有受支持的国家。",
-    "Ocean": "海洋",
-    "Old Paper": "旧纸张",
-    "Outline Color": "轮廓颜色",
-    "Outline Width": "轮廓宽度",
-    "Panels": "面板",
-    "Paper Scale": "纸张缩放",
-    "Parent Unit Borders": "上级单元边界",
-    "Point Color": "点颜色",
-    "Point Opacity": "点不透明度",
-    "Point Size": "点大小",
-    "Political Editing": "政治编辑",
-    "Population / City Boost (Modern only)": "人口亮度增强（仅限现代）",
-    "Population Boost Strength (Modern only)": "人口增强强度（仅限现代）",
-    "Project & Legend": "项目与图例",
-    "Legend": "图例",
-    "Manage project files, loading choices, and account-backed saves.": "管理项目文件、加载选择和账号保存。",
-    "Edit the small project legend list for the current working map.": "编辑当前工作地图的小型图例列表。",
-    "File type": "文件类型",
-    "Editable project JSON": "可编辑项目 JSON",
-    "Project ZIP package": "项目 ZIP 包",
-    "Project ZIP package downloaded.": "项目 ZIP 包已下载。",
-    "Project export cancelled.": "项目导出已取消。",
-    "Project file downloaded.": "项目文件已下载。",
-    "Project saved": "项目已保存",
-    "Download to": "下载到",
-    "Browser downloads": "浏览器下载目录",
-    "Save As dialog": "另存为对话框",
-    "Load source": "加载来源",
-    "Local project file": "本地项目文件",
-    "Community save": "社区保存",
-    "Account": "账号",
-    "Account and Cloud Saves": "账号与云保存",
-    "Quick edit dock": "快捷编辑栏",
-    "Redo": "重做",
-    "Reference Image": "参考图像",
-    "Reorder transport layers": "重排运输图层",
-    "Review focus": "审阅重点",
-    "Rivers": "河流",
-    "Roll": "旋转",
-    "Scale": "缩放",
-    "Search Water Regions": "搜索水域",
-    "Selected color preview": "已选颜色预览",
-    "Shadow Opacity": "阴影不透明度",
-    "Show City Labels": "显示城市标签",
-    "Show Parent Borders By Country": "按国家显示上级边界",
-    "Show Scenario Relief Overlays": "显示剧本地形覆盖",
-    "Single-click: one subdivision | Double-click: parent": "单击：单个子区域 | 双击：父级区域",
-    "Sparse": "稀疏",
-    "Start Draw": "开始绘制",
-    "Stroke Width": "描边宽度",
-    "Style": "样式",
-    "Style Preset": "样式预设",
-    "Texture Opacity (Modern only)": "背景夜光不透明度（仅现代）",
-    "Texture Overlay": "纹理覆盖",
-    "Toggle left panel": "切换左侧面板",
-    "Toggle right panel": "切换右侧面板",
-    "Tools": "工具",
-    "Filters": "筛选",
-    "Group": "分组",
-    "Twilight Width": "晨昏带宽度",
-    "Type": "类型",
-    "UTC Sync": "UTC 同步",
-    "UTC Time": "UTC 时间",
-    "Undo": "撤销",
-    "Undo Vertex": "撤销顶点",
-    "Urban Areas": "城市区域",
-    "Use Activate or Scenario Actions for ownership changes": "使用“激活”或“剧本操作”进行归属变更",
-    "Visual Adjustments": "视觉调整",
-    "Visual Color brush": "视觉颜色画笔",
-    "Apply a scenario first, then enable the overlay when you want a derived frontline view.": "先应用一个剧本，然后在需要衍生前线视图时启用该覆盖层。",
-    "Anchor: Province / Free": "锚点：省份 / 自由",
-    "Attached counters will fall back to province or free anchors.": "附属计数器将回退到省份锚点或自由锚点。",
-    "Choose a line type below or from the bottom command bar to begin drawing.": "在下方或底部命令栏中选择线型以开始绘制。",
-    "Click the map to place vertices. Double-click or press Finish to commit the operational line.": "单击地图放置顶点。双击或按“完成”以提交作战线。",
-    "Counter Label": "计数器标签",
-    "Counter fill color": "计数器填充色",
-    "Counter fill swatch": "计数器填充色样本",
-    "Counters should read like map pieces first. Keep only unit, nation, echelon, and label in the fast path.": "计数器应首先像地图棋子一样易读。在快速路径中只保留单位、国家、梯队和标签。",
-    "Delete Counter": "删除计数器",
-    "Delete Line": "删除线条",
-    "Delete Graphic": "删除图形",
-    "Delete the selected operation graphic?": "删除所选行动图形？",
-    "Delete the selected operational line?": "删除所选作战线？",
-    "Delete the selected unit counter?": "删除所选单位计数器？",
-    "Development quick actions": "开发快捷操作",
-    "Developer mode": "开发模式",
-    "Enable Frontline Overlay": "启用前线覆盖层",
-    "Allow Open-Ocean Paint": "允许为开放海洋上色",
-    "Allow Open-Ocean Selection": "允许选中开放海洋",
-    "Allow macro open-ocean regions to receive paint, eraser, and eyedropper actions.": "允许对宏观开放海洋区域使用上色、橡皮和吸管操作。",
-    "Edit Config": "编辑配置",
-    "Editing Scope": "编辑范围",
-    "Exit developer mode": "退出开发模式",
-    "Expand quick dock": "展开快捷栏",
-    "Filter context layers": "筛选上下文图层",
-    "Filter layers...": "筛选图层...",
-    "Frontline Overlay": "前线覆盖层",
-    "Frontline is off": "前线已关闭",
-    "Frontline rendering is disabled until you explicitly enable it for this project.": "在你为此项目显式启用前，前线渲染处于禁用状态。",
-    "Full Counter Preview": "完整计数器预览",
-    "Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.": "游戏渲染器保留更简洁的计数器样式，并使用简短的内部代码或缩写。",
-    "Inspector panels": "检查器面板",
-    "Airport": "机场",
-    "Airport controls reserved": "机场控件预留中",
-    "Airport facility lens": "机场设施透镜",
-    "Airport workbench shell": "机场工作台外壳",
-    "Apply to Main Map": "应用到主地图",
-    "Awaiting real family schema": "等待真实家族结构",
-    "Baseline compare unavailable": "该家族暂不支持基线对比",
-    "Baseline": "基线",
-    "Bounded zoom/pan": "受限缩放/平移",
-    "Close": "关闭",
-    "Close transport workbench": "关闭运输工作台",
-    "Compare": "对比",
-    "Labels": "标签",
-    "Language": "语言",
-    "Context Lens": "上下文透镜",
-    "Current working state": "当前工作状态",
-    "Detailed baseline not defined for this family": "该家族尚未定义详细基线",
-    "Energy Facilities": "能源设施",
-    "Energy controls reserved": "能源控件预留中",
-    "Energy facility lens": "能源设施透镜",
-    "Energy facility workbench shell": "能源设施工作台外壳",
-    "History and Color": "历史与颜色",
-    "Family": "家族",
-    "Future draw stack": "未来绘制堆栈",
-    "Future family mapping": "后续家族映射",
-    "Hold to Compare Baseline": "按住以对比基线",
-    "Industrial Zones": "工业区",
-    "Industrial controls reserved": "工业控件预留中",
-    "Industrial zone lens": "工业区透镜",
-    "Industrial zone workbench shell": "工业区工作台外壳",
-    "Info": "信息",
-    "Japan": "日本",
-    "Japan rail adapter": "日本铁路适配器",
-    "Japan road adapter": "日本道路适配器",
-    "Japan preview": "日本预览",
-    "Japan transport workbench carrier": "日本运输工作台载体预览",
-    "Map zoom controls": "地图缩放控件",
-    "Map Actions": "地图操作",
-    "Mineral Resources": "矿产资源",
-    "Mineral controls reserved": "矿产控件预留中",
-    "Mineral resource lens": "矿产资源透镜",
-    "Mineral resource workbench shell": "矿产资源工作台外壳",
-    "No operation graphics": "没有行动图形",
-    "No operational lines": "没有作战线",
-    "No unit counters": "没有单位计数器",
-    "Off": "关闭",
-    "On": "开启",
-    "Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.": "确认家族结构后，这里将承载参数分组、预览切换和地图应用控件。",
-    "Open transport workbench": "打开运输工作台",
-    "Open section help": "打开分区帮助",
-    "Overview": "概览",
-    "Operation Graphics": "行动图形",
-    "Operation graphics and unit counters stay in the same frontline workspace and remain project-local.": "行动图形和单位计数器保留在同一前线工作区内，并且仅保存在当前项目中。",
-    "Operation graphics and unit counters stay project-local.": "行动图形和单位计数器仅保存在当前项目中。",
-    "Operational Lines": "作战线",
-    "Operational line stroke": "作战线描边",
-    "Placed Counters": "已放置计数器",
-    "Port": "港口",
-    "Port controls reserved": "港口控件预留中",
-    "Port facility lens": "港口设施透镜",
-    "Port workbench shell": "港口工作台外壳",
-    "Recent colors": "最近颜色",
-    "Rail": "铁路",
-    "Rail inspector": "铁路检查器",
-    "Rail workbench": "铁路工作台",
-    "Reset zoom": "重置缩放",
-    "Reset View": "重置视图",
-    "Road": "道路",
-    "Road corridor lens": "道路走廊透镜",
-    "Road controls reserved": "道路控件预留中",
-    "Road inspector": "道路检查器",
-    "Road workbench": "道路工作台",
-    "The live slice stays on motorway, trunk, primary, and dedicated reference labels. Links are carried for review but stay filtered by default.": "当前 live 预览聚焦高速公路、主干道、一级道路和独立参考标签。连接线会保留给审查使用，但默认继续过滤。",
-    "This family stays live in the workbench, and its main-map bridge follows its current capability.": "这个 family 会继续在工作台中保持 live，主地图桥接能力则按当前 capability 决定。",
-    "Sample": "样本",
-    "Section glossary": "分区术语表",
-    "Showing baseline snapshot": "显示基线快照中",
-    "Show Labels": "显示标签",
-    "Show Parent Unit Borders": "显示父级单元边界",
-    "Show scenario guide": "显示剧本指南",
-    "Status": "状态",
-    "Stroke Opacity": "描边不透明度",
-    "Tone Bias": "色调偏移",
-    "Transport families": "运输家族",
-    "Transport Visual Mode": "运输视觉模式",
-    "Transport workbench": "运输工作台",
-    "Aggregation shell": "聚合外壳",
-    "Audit and manifest stay read-only here so tuning and source truth do not get mixed.": "这里的审计和清单保持只读，避免调参与事实源混在一起。",
-    "Coverage shell": "覆盖范围外壳",
-    "Disabled": "已禁用",
-    "Display / Aggregation / Labels / Coverage / Data": "显示 / 聚合 / 标签 / 覆盖范围 / 数据",
-    "Choose whether transport emphasizes distribution, network structure, or coverage reach.": "选择 transport 更强调分布、网络骨架还是覆盖范围。",
-    "Drag rows to define transport layer order. Availability follows the selected family and current runtime data.": "拖动各行来定义 transport 图层顺序。当前可用性会跟随所选 family 和运行时数据。",
-    "Enabled": "已启用",
-    "Label shell": "标签外壳",
-    "No audit payload yet": "尚无审计载荷",
-    "No controls in this tab": "这个标签页里还没有控件",
-    "The control deck now binds the new display schema on the right side while the left column stays contextual.": "控制面板现在在右侧绑定新的显示配置，左侧列只保留上下文。",
-    "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current state.": "使用中间排序板调整 8 个 transport families 的绘制顺序。左侧负责上下文，右侧负责状态查看。",
-    "Drag rows to define the transport layer order. Live transport families stay available here, and the board remains local to the workbench.": "拖动各行来定义 transport 图层顺序。已启用的 transport families 会在这里保持可用，这个排序板仍只作用于工作台。",
-    "Loads on demand from the Japan road geometry and reference-label packs": "按需加载日本道路几何和参考标签数据包。",
-    "Overall road reference-label opacity.": "道路参考标签的整体不透明度。",
-    "Reference labels stay in a dedicated pack focused on motorway and national route numbers.": "参考标签保持在独立数据包中，重点覆盖高速公路和国家级路线编号。",
-    "Turns road reference labels on or off.": "打开或关闭道路参考标签。",
-    "These controls style the live rail preview and the shared rail overview bridge.": "这些控件会同时调整 live 铁路预览和共享铁路总览桥接。",
-    "Waiting for the Japan rail lines and major-station packs": "等待日本铁路线路和主要车站数据包。",
-    "Waiting for the Japan mineral resource pack manifest": "等待日本矿产资源数据包清单。",
-    "Waiting for the Japan energy facility pack manifest": "等待日本能源设施数据包清单。",
-    "Waiting for the Japan industrial land pack manifest": "等待日本工业用地数据包清单。",
-    "Workbench preview only": "仅工作台预览",
-    "Workbench runtime state": "工作台运行时状态",
-    "Workbench-only family": "仅工作台 family",
-    "Local layer board": "本地图层排序板",
-    "Workbench notes": "工作台说明",
-    "Workbench mode shell": "工作台模式外壳",
-    "Waiting for real road packs": "等待真实道路数据包",
-    "Selected line can be restyled, relabeled, or deleted. Use the map to compose new lines.": "可重新设置所选线条的样式、标签或删除它。使用地图来绘制新线条。",
-    "Strategic Overlay": "战略覆盖层",
-    "Style & Labels": "样式与标签",
-    "Symbol / Code": "符号 / 代码",
-    "These are separate from political frontlines and act as your single-line battle planning layer.": "这些线条独立于政治前线，用作你的单线作战规划层。",
-    "This only removes the selected project-local strategic line.": "这只会移除当前项目中的所选战略线。",
-    "This project is currently deriving frontlines from scenario control boundaries.": "当前项目正在根据剧本控制边界生成前线。",
-    "This removes the selected project-local counter from the map.": "这会从地图中移除当前项目中的所选计数器。",
-    "Toggle development workspace": "切换开发工作区",
-    "Turn it on when you want to derive conflict lines from the active scenario.": "当你想从当前剧本派生冲突线时再打开它。",
-    "Unit Counters": "单位计数器",
-    "Use short intent lines and quiet captions so arrows support the frontline instead of overpowering it.": "使用简短的意图线和低调标签，让箭头辅助前线而不是压过前线。",
-    "Use the bottom command bar for fast entry, or start drawing here for the selected line type.": "可使用底部命令栏快速开始，或在此为所选线型开始绘制。",
-    "Workspace status": "工作区状态",
-    "Appearance sections": "外观分区",
-    "Collapse scenario context": "收起剧本上下文",
-    "Day and night mode": "昼夜模式",
-    "Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters.": "先应用场景，再使用 Frontline。这个区块同时管理 derived conflict overlay 和 project-local strategic workspace，用于 operational lines、graphics 和 unit counters。",
-    "Warmth": "暖色度",
-    "Wasteland Fill": "荒地填充",
-    "Wasteland Stroke": "荒地描边",
-    "Wave Hachure": "波纹排线",
-    "Wear": "磨损",
-    "Auto-Fill Countries": "自动填充国家",
-    "Clear Map": "清空地图",
-    "Clear Scope Overrides": "清除范围 override",
-    "Country Colors": "国家配色",
-    "Reset Country Colors": "重置国家配色",
-    "Reset Colors": "重置颜色",
-    "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.": "没有匹配颜色。清空搜索，或尝试国家名称、ISO-2 代码、来源标签。",
-    "Search...": "搜索...",
-    "Search Countries": "搜索国家",
-    "Search countries": "搜索国家",
-    "Current Tool": "当前工具",
-    "Recent": "最近使用",
-    "Color Palette": "调色板",
-    "Custom": "自定义",
-    "Texture": "纹理",
-    "Overlay": "覆盖层",
-    "Map Style": "地图样式",
-    "Scenario Forge": "Scenario Forge",
-    "Internal Borders": "内部边界",
-    "Empire Borders": "帝国边界",
-    "Coastlines": "海岸线",
-    "Width": "宽度",
-    "Opacity": "不透明度",
-    "Format": "格式",
-    "Color Mode": "配色模式",
-    "By Region": "按地区",
-    "By Neighbor (Political)": "按邻接（政治）",
-    "Paint Granularity": "涂色粒度",
-    "By Subdivision": "按子区域",
-    "By Country": "按国家",
-    "Special Zones": "特殊区域",
-    "Project Management": "项目管理",
-    "Save the current map state as a project file or restore one from disk. Loading a project replaces the current working state, and the app asks before continuing when the saved scenario baseline differs from the current assets.": "把当前地图状态保存成 project file，或从磁盘恢复既有项目。加载项目会替换当前 working state；如果保存时的 scenario baseline 和当前 assets 不一致，系统会先弹出确认提示。",
-    "Download Project": "下载项目",
-    "Load Project": "加载项目",
-    "Jump To Parent": "跳到父级",
-    "Batch Actions": "批量操作",
-    "Apply Scope": "应用范围",
-    "Apply Current Color To Scope": "将当前颜色应用到范围",
-    "Selected File": "已选文件",
-    "Selected Region Only": "仅所选区域",
-    "Same Group": "同一分组",
-    "Same Parent": "同一父级",
-    "Same Type": "同一类型",
-    "No file selected": "未选择文件",
-    "Legend Editor": "图例编辑器",
-    "Paint the map first, then rename each color entry here. Empty names clear the label, and the current legend list is kept inside this working session.": "先给地图上色，再在这里重命名每个颜色条目。清空名称会移除该标签，而当前 legend 列表会保留在这次 working session 里。",
-    "Debug Mode": "调试模式",
-    "Use diagnostics to inspect geometry and artifact behavior.": "使用诊断视图检查几何与异常行为。",
-    "View": "视图",
-    "Normal View": "正常视图",
-    "1. Geometry Check (Pink/Green)": "1. 几何检查（粉/绿）",
-    "2. Artifact Hunter (Red Giants)": "2. 伪影猎人（红色巨物）",
-    "3. Island Detector (Orange)": "3. 岛屿检测（橙色）",
-    "4. ID Stability": "4. ID 稳定性",
-    "--- Presets ---": "--- 预设 ---",
-    "--- Provinces/Regions ---": "--- 省/区域 ---",
-    "Edit": "编辑",
-    "Cancel": "取消",
-    "Save": "保存",
-    "Copy": "复制",
-    "Editing Preset": "正在编辑预设",
-    "Invalid project file. Please select a valid map_project.json.": "项目文件无效，请选择有效的 map_project.json。",
-    "Unable to read the selected file.": "无法读取所选文件。",
-    "Region": "区域",
-    "Region Details": "区域详情",
-    "Source": "来源",
-    "Unknown Region": "未知区域",
-    "Paint Meaning": "上色含义",
-    "Visual": "视觉",
-    "Sovereignty": "主权",
-    "Active Sovereign": "当前主权国",
-    "None selected": "未选择",
-    "Set Active": "设为当前",
-    "Active": "已设为主权",
-    "Recalculate Borders": "重算边界",
-    "Borders up to date": "边界已更新",
-    "Borders need recalculation": "边界需要重算",
-    "Dynamic borders disabled": "动态边界已禁用",
-    "Physical Regions": "地貌区域",
-    "Visual Preset": "视觉预设",
-    "Political Clean": "政治优先",
-    "Terrain Rich": "地貌优先",
-    "Political Clean keeps only the clearest landform cues over political fills.": "政治优先模式只保留最清晰的地貌结构提示，尽量不干扰国家底色。",
-    "Terrain Rich pushes the atlas and contour layer for the strongest relief read.": "地貌优先模式会强化图集和等高线，让地形起伏最明显。",
-    "Terrain Atlas": "地貌图集",
-    "Terrain Contours": "地形等高线",
-    "Atlas + Contours": "图集 + 等高线",
-    "Atlas Only": "仅图集",
-    "Contours Only": "仅等高线",
-    "Atlas Intensity": "图集强度",
-    "Rainforest Emphasis": "雨林强调",
-    "Balanced keeps terrain visible while staying cleaner over political fills.": "均衡模式会保留地貌存在感，同时尽量避免把政治底色弄脏。",
-    "High Relief Mountains": "高起伏山地",
-    "Mountain Hills": "山麓丘陵",
-    "Upland Plateaus": "高地高原",
-    "Badlands & Canyon": "恶地与峡谷",
-    "Plains Lowlands": "平原低地",
-    "Basins & Valleys": "盆地与河谷",
-    "Wetlands & Delta": "湿地与三角洲",
-    "Temperate Forest": "温带森林",
-    "Tropical Rainforest": "热带雨林",
-    "Grassland & Steppe": "草原与草甸草原",
-    "Desert & Bare": "荒漠与裸地",
-    "Tundra & Ice": "苔原与冰雪",
-    "Show Minor Contours": "显示次级等高线",
-    "Contour Color": "等高线颜色",
-    "Contour Opacity": "等高线不透明度",
-    "Major Width": "主等高线宽度",
-    "Minor Width": "次等高线宽度",
-    "Major Interval (m)": "主等高距（米）",
-    "Minor Interval (m)": "次等高距（米）",
-    "Low-Relief Cutoff (m)": "低起伏截止高度（米）",
-    "Apply": "应用",
-    "All Groups": "所有分组",
-    "All Sources": "所有来源",
-    "All Types": "所有类型",
-    "Has Override": "已有 override",
-    "Overrides Only": "仅显示 override",
-    "Delete Selected": "删除所选",
-    "Dismiss notification": "关闭通知",
-    "Discard and Load": "丢弃并加载",
-    "Exit Scenario": "退出剧本",
-    "Import cancelled": "导入已取消",
-    "Invalid zoom": "缩放无效",
-    "Keep Current Colors": "保留当前颜色",
-    "Load Anyway": "仍然加载",
-    "Project import cancelled because the saved scenario baseline does not match the current assets.": "由于保存的剧本基线与当前资源不匹配，项目导入已取消。",
-    "Quick Actions": "快捷操作",
-    "Macro ocean regions are currently available in the inspector and map picking.": "当前可在检视器选择和地图拾取中使用宏观海洋区域。",
-    "Macro ocean regions currently accept paint, eraser, and eyedropper actions.": "当前可对宏观海洋区域使用上色、橡皮和吸管操作。",
-    "Only show water regions that currently have an explicit override.": "只显示当前存在显式 override 的水域。",
-    "Colors reset": "颜色已重置",
-    "regions": "个区域",
-    "overrides": "个 override",
-    "Country colors were reset.": "国家颜色已重置。",
-    "Country colors were restored.": "国家颜色已恢复。",
-    "Reset Changes To Baseline": "重置更改到基线",
-    "Scenario": "剧本",
-    "Scenario Baseline Mismatch": "剧本基线不匹配",
-    "Scenario cleared": "剧本已退出",
-    "Scenario cleared.": "剧本已退出。",
-    "Scenario failed": "剧本加载失败",
-    "Scenario loaded": "剧本已加载",
-    "Scenario reset": "剧本已重置",
-    "Scenario reset to baseline.": "剧本已重置为基线。",
-    "Unable to apply scenario.": "无法应用剧本。",
-    "Critical checks": "关键检查",
-    "Target This Country": "将此国家设为目标",
-    "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.": "该保存项目基于不同的剧本基线创建。只有在你接受按当前资源加载它时，才继续。",
-    "When off, macro ocean regions can be inspected but ignore paint, eraser, and eyedropper actions.": "关闭后，宏观海洋区域仍可查看，但会忽略上色、橡皮和吸管操作。",
-    "When off, macro ocean regions stay hidden from inspector selection and map picking.": "关闭后，宏观海洋区域不会出现在检视器选择和地图拾取中。",
-    "This removes manual color changes from the current map. You can undo the reset from the toast that follows.": "这会移除当前地图中的手动颜色修改。你可以通过随后出现的提示撤销这次重置。",
-    "Current tool, paint mode, and map actions": "当前工具、绘制模式与地图操作",
-    "Skip to map workspace": "跳转到地图工作区",
-    "Undo applied": "已撤销",
-    "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.": "关闭后，当前剧本的海岸线、盆地等高线和纹理覆盖层将被隐藏。",
-    "Workspace": "工作区",
-    "Zoom percentage must be between 100% and 5000%.": "缩放百分比必须在 100% 到 5000% 之间。",
-    "Scenario relief overlays are currently visible. Cached relief stays visible during pan and zoom, then redraws exactly after the view settles.": "当前剧本的地形覆盖层处于可见状态。平移和缩放期间会继续显示缓存纹理，并在视图稳定后进行精确重绘。",
-    "Coastal Accent": "海岸强调",
-    "Available only in the TNO 1962 scenario.": "仅在 TNO 1962 剧本中可用。",
-    "Experimental Bathymetry": "实验性测深",
-    "Enable data-driven bathymetry presets for testing. May reduce pan and zoom performance.": "启用数据驱动的测深预设以供测试，可能降低平移和缩放性能。",
-    "Enable Experimental Bathymetry to unlock data-driven depth presets.": "启用“实验性测深”后才能使用数据驱动的深度预设。",
-    "Available when Experimental Bathymetry is enabled.": "启用“实验性测深”后可用。",
-    "Bathymetry Soft emphasizes depth bands while keeping contours subtle.": "柔和测深预设强调深度色带，等高线仅作辅助。",
-    "Bathymetry Contours emphasizes contour lines while bands stay in the background.": "测深等高线预设强调轮廓线，色带退到背景层。",
-    "Bathymetry Debug": "测深调试",
-    "Flat Blue keeps the ocean fill clean with no bathymetry overlay.": "纯蓝模式仅保留干净的海洋底色，不叠加测深效果。",
-    "Data Source": "数据来源",
-    "Bands": "色带",
-    "Contours": "等高线",
-    "Advanced high-zoom tuning for nearshore fill and scenario contour exit thresholds.": "用于近岸色带与场景等高线退出阈值的高缩放调优。",
-    "Nearshore Fill Exit": "近岸色带退出",
-    "Mid-depth Fill Exit": "中层色带退出",
-    "Deep Fill Exit": "深水色带退出",
-    "Synthetic Contour Exit": "合成等高线退出",
-    "Shallow Scenario Contour Exit": "浅层场景等高线退出",
-    "Dev": "开发",
-    "Color Rule": "颜色规则",
-    "Quick Fill": "快速填充",
-    "Reference palettes stay available here without crowding the primary editing panels.": "参考调色板会保留在这里，不会挤占主要编辑面板。",
-    "Selection": "选择",
-    "e.g. Buffer Zone A...": "例如：缓冲区 A...",
-}
-
 DEFAULT_MANUAL_GEO_OVERRIDES = {
     "United States": "\u7f8e\u56fd",
     "United States of America": "\u7f8e\u56fd",
@@ -664,13 +141,12 @@ DEFAULT_MANUAL_GEO_OVERRIDES = {
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 I18N_DATA_DIR = BASE_DIR / "data" / "i18n"
-DEFAULT_MANUAL_UI_PATH = I18N_DATA_DIR / "manual_ui.json"
 DEFAULT_MANUAL_GEO_OVERRIDES_PATH = I18N_DATA_DIR / "manual_geo_overrides.json"
 DEFAULT_EUROPE_GEO_SEEDS_PATH = I18N_DATA_DIR / "europe_geo_seeds.json"
 DEFAULT_BASELINE_LOCALES_PATH = I18N_DATA_DIR / "locales_baseline.json"
 EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER = "experimental_google_web"
 TRANSLATION_SOURCE_ORDER = (
-    "manual_ui",
+    "ui_copy",
     "manual_geo_override",
     "geo_seed",
     "baseline_reuse",
@@ -699,7 +175,6 @@ def load_string_map(path: Path, fallback: dict[str, str]) -> dict[str, str]:
     return payload or dict(fallback)
 
 
-MANUAL_UI_DICT = load_string_map(DEFAULT_MANUAL_UI_PATH, DEFAULT_MANUAL_UI_DICT)
 MANUAL_GEO_OVERRIDES = load_string_map(DEFAULT_MANUAL_GEO_OVERRIDES_PATH, DEFAULT_MANUAL_GEO_OVERRIDES)
 EUROPE_GEO_SEEDS = load_string_map(DEFAULT_EUROPE_GEO_SEEDS_PATH, DEFAULT_EUROPE_GEO_SEEDS)
 
@@ -730,26 +205,6 @@ SCENARIO_METADATA_FIELDS = ("bookmark_name", "bookmarkName", "bookmark_descripti
 TOOLTIP_ADMIN_FIELDS = ("admin1_group", "constituent_country")
 UNICODE_ESCAPE_RE = re.compile(r"\\u([0-9a-fA-F]{4})")
 HEX_ESCAPE_RE = re.compile(r"\\x([0-9a-fA-F]{2})")
-UI_COPY_CATALOG_RE = re.compile(
-    r"export\s+const\s+UI_COPY_CATALOG\s*=\s*Object\.freeze\(\{(?P<body>.*?)\}\);",
-    re.DOTALL,
-)
-UI_COPY_CATALOG_ENTRY_RE = re.compile(
-    r"""
-    ^[ \t]*(?P<key>"(?:\\.|[^"\\\r\n])+"|[A-Za-z_][A-Za-z0-9_]*)
-    \s*:\s*
-    \{
-      \s*"?zh"?:\s*"(?P<zh>(?:\\.|[^"\\])*)"
-      \s*,\s*"?en"?:\s*"(?P<en>(?:\\.|[^"\\])*)"
-      \s*,?\s*
-    \}
-    """,
-    re.MULTILINE | re.VERBOSE,
-)
-
-
-
-
 def decode_js_string(text: str) -> str:
     value = text.strip()
     value = value.replace(r"\'", "'").replace(r'\"', '"')
@@ -956,7 +411,7 @@ def should_drop_geo_entry(
 
 
 def collect_ui_keys(repo_root: Path) -> list[str]:
-    keys = set(MANUAL_UI_DICT.keys())
+    keys = set()
     source_roots = [repo_root / "js", repo_root / "index.html"]
 
     files = []
@@ -992,35 +447,9 @@ def collect_ui_keys(repo_root: Path) -> list[str]:
     return sorted(keys)
 
 
-def load_ui_copy_catalog_translations(repo_root: Path) -> dict[str, str]:
-    catalog_path = repo_root / "js" / "core" / "i18n_catalog.js"
-    if not catalog_path.exists():
-        return {}
-    try:
-        content = catalog_path.read_text(encoding="utf-8")
-    except UnicodeDecodeError:
-        return {}
-
-    object_match = UI_COPY_CATALOG_RE.search(content)
-    scan_source = object_match.group("body") if object_match else content
-    payload: dict[str, str] = {}
-    for match in UI_COPY_CATALOG_ENTRY_RE.finditer(scan_source):
-        raw_key = str(match.group("key") or "").strip()
-        if raw_key.startswith('"') and raw_key.endswith('"'):
-            raw_key = raw_key[1:-1]
-        key = decode_js_string(raw_key)
-        zh_value = decode_js_string(match.group("zh") or "")
-        en_value = decode_js_string(match.group("en") or "")
-        if not key or not zh_value:
-            continue
-        payload[key] = zh_value
-        if en_value:
-            payload.setdefault(en_value, zh_value)
-    return payload
-
-
-# Backward-compatible public name; the source is now the standalone catalog.
-load_inline_ui_translations = load_ui_copy_catalog_translations
+def load_ui_copy(repo_root: Path) -> dict:
+    source = json.loads((repo_root / "data" / "i18n" / "ui_copy.json").read_text(encoding="utf-8"))
+    return {key: {"en": source[key]["en"], "zh": source[key]["zh"]} for key in sorted(source)}
 
 
 def parse_country_codes(raw_value: str | None) -> set[str]:
@@ -1493,15 +922,6 @@ def resolve_zh(
     stable_to_primary: dict,
     resolved_primary_zh: dict | None = None,
 ) -> tuple[str, str]:
-    if section == "ui" and key in MANUAL_UI_DICT:
-        return MANUAL_UI_DICT[key], "manual_ui"
-    if section == "ui" and en_value in MANUAL_UI_DICT:
-        return MANUAL_UI_DICT[en_value], "manual_ui"
-    if section == "ui":
-        inline_zh = inline_ui_translations.get(key) or inline_ui_translations.get(en_value)
-        if inline_zh and not is_missing_like(inline_zh, en_value):
-            return inline_zh, "inline_ui_reuse"
-
     if section == "geo" and key in EUROPE_GEO_SEEDS:
         return EUROPE_GEO_SEEDS[key], "geo_seed"
     if section == "geo" and en_value in EUROPE_GEO_SEEDS:
@@ -1568,38 +988,6 @@ def resolve_zh(
     if translated:
         return translated, "machine_translation"
     return en_value, "english_fallback"
-
-
-def merge_ui(
-    current_ui: dict,
-    baseline_ui: dict,
-    discovered_ui_keys: list[str],
-    inline_ui_translations: dict[str, str],
-    translator: MachineTranslator,
-) -> tuple[dict, dict]:
-    current_normalized = {key: normalize_entry(key, value) for key, value in (current_ui or {}).items()}
-    baseline_normalized = {key: normalize_entry(key, value) for key, value in (baseline_ui or {}).items()}
-    keys = set(discovered_ui_keys) | set(current_normalized.keys()) | set(baseline_normalized.keys()) | set(MANUAL_UI_DICT.keys())
-    merged = {}
-    source_map = {}
-
-    for key in sorted(keys):
-        existing = current_normalized.get(key) or baseline_normalized.get(key) or {"en": key, "zh": key}
-        zh, source = resolve_zh(
-            section="ui",
-            key=key,
-            en_value=existing["en"],
-            current_existing=current_normalized,
-            baseline_existing=baseline_normalized,
-            inline_ui_translations=inline_ui_translations,
-            translator=translator,
-            alias_to_stable={},
-            stable_to_primary={},
-            resolved_primary_zh={},
-        )
-        merged[key] = {"en": existing.get("en", key), "zh": zh}
-        source_map[key] = source
-    return merged, source_map
 
 
 def merge_geo(
@@ -1905,7 +1293,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--ui-only",
         action="store_true",
-        help="Sync UI translations from manual/catalog/source keys without changing geo data or using the network.",
+        help="Sync UI translations from ui_copy.json without changing geo data or using the network.",
     )
     parser.add_argument(
         "--topology",
@@ -2112,8 +1500,6 @@ def sync_translations(
     geo_names |= set(EUROPE_GEO_SEEDS.keys())
     geo_names = sorted(geo_names)
     alias_to_stable, stable_to_primary, search_only_aliases = load_geo_aliases(geo_aliases_path)
-    discovered_ui_keys = collect_ui_keys(base_dir)
-    inline_ui_translations = load_ui_copy_catalog_translations(base_dir)
     translator = MachineTranslator(
         enabled=machine_translate_enabled,
         delay_seconds=translator_delay_seconds,
@@ -2123,13 +1509,8 @@ def sync_translations(
         provider_name=machine_translation_provider,
     )
 
-    ui_payload, ui_sources = merge_ui(
-        current_locales.get("ui", {}),
-        baseline_locales.get("ui", {}),
-        discovered_ui_keys,
-        inline_ui_translations,
-        translator,
-    )
+    ui_payload = load_ui_copy(base_dir)
+    ui_sources = {key: "ui_copy" for key in ui_payload}
     geo_payload, geo_sources = merge_geo(
         geo_names=geo_names,
         current_geo=current_locales.get("geo", {}),
@@ -2233,18 +1614,8 @@ def sync_translations(
 def sync_ui_translations(output_path: Path, repo_root: Path = BASE_DIR) -> dict:
     """Regenerate the UI section without rebuilding unrelated geographic data."""
     current = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
-    ui, _sources = merge_ui(
-        current.get("ui", {}),
-        {},
-        collect_ui_keys(repo_root),
-        load_ui_copy_catalog_translations(repo_root),
-        MachineTranslator(enabled=False),
-    )
-    # Retain existing entry order so a UI-only sync does not move the large
-    # geographic section or shuffle already reviewed UI translations.
-    ordered_ui = {key: ui[key] for key in current.get("ui", {})}
-    ordered_ui.update({key: value for key, value in ui.items() if key not in ordered_ui})
-    payload = {**current, "ui": ordered_ui}
+    ui = load_ui_copy(repo_root)
+    payload = {**current, "ui": ui}
     write_json_atomic(output_path, payload)
     return {"ui_keys": len(ui), "output_path": path_to_report_string(output_path)}
 
