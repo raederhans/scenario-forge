@@ -13,6 +13,10 @@ body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input
   background-color: var(--surface-raised);
   color: var(--ink-900);
   padding-block: 0;
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  padding-inline: var(--space-3);
+  box-shadow: none;
 }
 body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput),
 /* 基础选择器里的 #riverPaintSearchInput 让整条规则有 ID 级特异性；这里用 :is() 带一个同类的 ID 分支，
