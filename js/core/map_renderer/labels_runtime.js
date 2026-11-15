@@ -103,6 +103,9 @@ export function createLabelsRuntime({
   };
 
   let cityPointsRenderOwner = null;
+  let previousPreferCountries;
+  let labelScenarioId = runtimeState.activeScenarioId;
+  let labelSceneGeneration = runtimeState.sceneGeneration;
 
   const getUrbanCityPolicyOwner = lazyOwner(() => createUrbanCityPolicyOwner({
     state: runtimeState,
@@ -479,6 +482,7 @@ export function createLabelsRuntime({
         pendingFontFamilies = new Set();
         fontRefreshScheduled = false;
         if (!countryLabelRenderOwner.clearTextCache(families && [...families])) return;
+        previousPreferCountries = undefined;
         invalidateRenderPasses("labels", "country-label-fonts");
         requestRendererRender("country-label-fonts", { flush: false });
       });
@@ -530,6 +534,14 @@ export function createLabelsRuntime({
   }
 
   function drawLabelsPassContent(k, { interactive = false } = {}) {
+    if (labelScenarioId !== runtimeState.activeScenarioId
+      || labelSceneGeneration !== runtimeState.sceneGeneration) {
+      previousPreferCountries = undefined;
+      labelScenarioId = runtimeState.activeScenarioId;
+      labelSceneGeneration = runtimeState.sceneGeneration;
+    }
+    const hierarchy = getMapLabelHierarchy(k, runtimeState, previousPreferCountries);
+    previousPreferCountries = hierarchy.preferCountries;
     drawBlankFeatureLabelsPass(k, { interactive });
     const occupiedBoxes = [];
     if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
@@ -538,7 +550,7 @@ export function createLabelsRuntime({
     // Keep capitals beside their symbols. Overview country titles take priority
     // over ordinary city names; regional views favor the whole city layer.
     const countryLabelsFirst = !interactive && !runtimeState.deferContextBasePass
-      && getMapLabelHierarchy(k, runtimeState).preferCountries;
+      && hierarchy.preferCountries;
     let overviewLayout = null;
     if (countryLabelsFirst) {
       overviewLayout = getCityPointsRenderOwner().reserveOverviewLabelBoxes(k, occupiedBoxes);
@@ -558,6 +570,7 @@ export function createLabelsRuntime({
       drawPendingTransportLabels(k, { occupiedBoxes });
       drawPhysicalRegionLabels(k, { occupiedBoxes });
     }
+    return hierarchy;
   }
 
   async function ensureCountryLabelsReadyForExport(passNames) {
@@ -619,6 +632,7 @@ export function createLabelsRuntime({
   }
 
   function reset() {
+    previousPreferCountries = undefined;
     cancelCityPreparation();
     countryLabelRenderOwner?.cancelPreparation();
     cityPointsPreparationPromise = null;
@@ -647,7 +661,10 @@ export function createLabelsRuntime({
     cancelCityPreparation,
     reset,
     assertCountryLabelsReadyForExport,
-    resetCityAnchorCache: (...args) => getCityGeometryPresentation().resetCityAnchorCache(...args),
+    resetCityAnchorCache: (...args) => {
+      previousPreferCountries = undefined;
+      return getCityGeometryPresentation().resetCityAnchorCache(...args);
+    },
     getCityAnchor: (...args) => getCityGeometryPresentation().getCityAnchor(...args),
     getCityGeoCoordinates: (...args) => getCityGeometryPresentation().getCityGeoCoordinates(...args),
     getCityScreenPoint: (...args) => getCityGeometryPresentation().getCityScreenPoint(...args),
