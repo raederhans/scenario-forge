@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createLabelsRuntime } from "../js/core/map_renderer/labels_runtime.js";
+import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
 
 function createHarness(overrides = {}, context = null) {
   const state = {
@@ -52,6 +53,56 @@ function replaceGlobal(t, name, value) {
     else delete globalThis[name];
   });
 }
+
+test("label priority survives zoom oscillation and switches on monotonic boundary crossings", () => {
+  const { runtime, state } = createHarness({
+    styleConfig: { cityPoints: {}, countryLabels: { enabled: true } },
+  });
+  for (const [scales, expected] of [
+    [[1, 2.85, 2.95, 3.05, 2.95, 3.05, 3.149], true],
+    [[3.15, 4, 6, 3.05, 2.95, 3.05, 2.95, 2.851], false],
+    [[2.85, 2.5, 1], true],
+  ]) {
+    for (const k of scales) {
+      const hierarchy = runtime.drawLabelsPassContent(k);
+      assert.equal(hierarchy.preferCountries, expected);
+      assert.deepEqual(hierarchy, { ...getMapLabelHierarchy(k, state), preferCountries: expected });
+      if (k < 2.85 || k > 3.15) {
+        assert.deepEqual(hierarchy, getMapLabelHierarchy(k, state));
+      }
+    }
+  }
+});
+
+test("runtime, scene and anchor cache resets restore direct zoom priority", () => {
+  const { runtime, state } = createHarness({
+    styleConfig: { cityPoints: {}, countryLabels: { enabled: true } },
+  });
+  for (const reset of [
+    () => runtime.reset(),
+    () => { state.activeScenarioId = "replacement"; },
+    () => { state.sceneGeneration = 1; },
+    () => runtime.resetCityAnchorCache(),
+  ]) {
+    assert.equal(runtime.drawLabelsPassContent(2).preferCountries, true);
+    assert.equal(runtime.drawLabelsPassContent(3.05).preferCountries, true);
+    reset();
+    assert.equal(runtime.drawLabelsPassContent(3.05).preferCountries, false);
+  }
+  runtime.drawLabelsPassContent(4);
+  assert.equal(runtime.drawLabelsPassContent(2.95).preferCountries, false);
+  runtime.reset();
+  assert.equal(runtime.drawLabelsPassContent(2.95).preferCountries, true);
+});
+
+test("interactive zoom crossings update the priority used by the next settled pass", () => {
+  const { runtime } = createHarness({ styleConfig: { countryLabels: { enabled: true } } });
+  runtime.drawLabelsPassContent(2);
+  runtime.drawLabelsPassContent(4, { interactive: true });
+  assert.equal(runtime.drawLabelsPassContent(2.95).preferCountries, false);
+  runtime.drawLabelsPassContent(2, { interactive: true });
+  assert.equal(runtime.drawLabelsPassContent(3.05).preferCountries, true);
+});
 
 test("creation and readiness observation leave owners, DOM and workers uninitialized", (t) => {
   const unexpected = () => assert.fail("initialization touched an external resource");
