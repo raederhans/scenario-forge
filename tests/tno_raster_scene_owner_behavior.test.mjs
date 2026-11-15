@@ -3,6 +3,72 @@ import assert from "node:assert/strict";
 import { createGpuSceneCompositor } from "../js/core/renderer/gpu_scene_compositor.js";
 import { createTnoRasterSceneOwner } from "../js/core/renderer/tno_raster_scene_owner.js";
 
+function coverageHarness(dpr = 2) {
+  const h = harness(), transform = { x: 0, y: 0, k: 1 };
+  h.setDpr(dpr);
+  h.map.width = 100 * dpr; h.map.height = 50 * dpr;
+  const tile = { originX: 0, originY: 0, width: h.map.width, height: h.map.height };
+  Object.assign(h.currentFrame, { transform, dpr, layout: { offsetX: 0, offsetY: 0 },
+    plan: { ...tile, scale: 1, outputX: 0, outputY: 0, outputWidth: tile.width, outputHeight: tile.height, tiles: [tile] } });
+  for (const pass of h.passes.values()) Object.assign(pass, {
+    reference: transform, layout: { offsetX: 0, offsetY: 0 }, canvas: { width: tile.width, height: tile.height },
+  });
+  return { ...h, transform };
+}
+
+test("complete coverage reports zero gaps and failed presentations preserve the last measurement", () => {
+  const h = coverageHarness();
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, null);
+  assert.equal(h.owner.present(h.transform), true);
+  const diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.politicalUncoveredRatio, 0);
+  assert.deepEqual(diagnostics.passUncoveredRatios, { base: 0, political: 0, labels: 0 });
+  assert.equal(diagnostics.sceneIncompleteRatio, 0);
+  h.fail(new Error("presentation failed"));
+  assert.equal(h.owner.present({ ...h.transform, x: 25 }, { refresh: false, allowPartialPasses: true }), false);
+  assert.deepEqual(h.owner.getDiagnostics().passUncoveredRatios, diagnostics.passUncoveredRatios);
+  assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0);
+  h.owner.dispose();
+});
+
+test("partial gesture coverage follows device-pixel geometry and unions shared pass gaps", () => {
+  for (const dpr of [1, 1.25, 2]) {
+    const h = coverageHarness(dpr);
+    h.map.height = 100 * dpr;
+    h.currentFrame.plan.height = h.currentFrame.plan.outputHeight = 100 * dpr;
+    h.currentFrame.plan.tiles[0].height = 100 * dpr;
+    for (const pass of h.passes.values()) pass.canvas.height = 100 * dpr;
+    assert.equal(h.owner.present(h.transform), true);
+    assert.equal(h.owner.present({ ...h.transform, x: 25, y: 10 }, { refresh: false, allowPartialPasses: true }), true);
+    const diagnostics = h.owner.getDiagnostics();
+    const expected = (100 * 100 - 75 * 90) / (100 * 100);
+    assert.equal(diagnostics.politicalUncoveredRatio, expected);
+    assert.deepEqual(diagnostics.passUncoveredRatios, { base: expected, political: expected, labels: expected });
+    assert.ok(Math.abs(diagnostics.sceneIncompleteRatio - expected) < 1e-12);
+    assert.equal(h.owner.present({ ...h.transform, x: 25, y: 10 }, { refresh: false, holdPartialUntilExact: true }), false);
+    assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, expected);
+    h.owner.dispose();
+  }
+});
+
+test("committed tile holes remain missing while transparent valid tiles count as covered", () => {
+  const h = coverageHarness();
+  h.currentFrame.plan.tiles = [
+    { originX: 0, originY: 0, width: 200, height: 20 },
+    { originX: 0, originY: 80, width: 200, height: 20 },
+    { originX: 0, originY: 20, width: 20, height: 60 },
+    { originX: 180, originY: 20, width: 20, height: 60 },
+  ];
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0.48);
+  assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0.48);
+  h.currentFrame.plan.tiles.push({ originX: 20, originY: 20, width: 160, height: 60, codes: new Uint32Array(160 * 60) });
+  assert.equal(h.owner.present(h.transform), true);
+  assert.equal(h.owner.getDiagnostics().politicalUncoveredRatio, 0);
+  assert.equal(h.owner.getDiagnostics().sceneIncompleteRatio, 0);
+  h.owner.dispose();
+});
+
 function harness({ realCompositor = false } = {}) {
   const records = { frames: [], accounts: [], releases: [], gpuOptions: [], sceneOptions: [], colorBaselines: [] };
   const parent = { children: [], insertBefore(child, next) {
