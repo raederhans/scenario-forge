@@ -1,3 +1,4 @@
+import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { ensureTransportOverviewStyleConfigState } from "../state/ui_state.js";
 import {
   normalizeTransportOverviewVisualMode,
@@ -37,6 +38,7 @@ import {
 } from "./transport_overview_style_policy.js";
 import {
   buildTransportOverviewLineStrokeSpecs,
+  buildTransportLineViewportIndex,
   getTransportLineFeatureLabelAnchor,
   getTransportLineLabelGridSize,
   getTransportOverviewRailLabelText,
@@ -65,6 +67,7 @@ export function createTransportOverviewRenderOwner({
     getLineMidpointFromCoordinates,
     getMultiLineLabelAnchor,
     getPathCanvas = () => null,
+    getPath2D = () => globalThis.Path2D,
     getProjection = () => null,
     invalidateRenderPasses = null,
     mixCanvasColors,
@@ -78,6 +81,7 @@ export function createTransportOverviewRenderOwner({
   let projection = null;
   let transportFacilityIconAtlasRenderQueued = false;
   let pendingLabelBatches = [];
+  const lineIndexes = new WeakMap();
 
   function resetLabelCandidates() {
     pendingLabelBatches = [];
@@ -243,7 +247,64 @@ function collectTransportCountryOverlayMetric(metricName, familyId, reason) {
   });
 }
 
-function drawTransportOverviewLineStroke(features, { strokeStyle, lineWidth, opacity, dash = [] } = {}) {
+function prepareViewportLines(collection, visualStyle, strategy, k, widthFloorPx) {
+  const canvas = context?.canvas;
+  const matrix = typeof context?.getTransform === "function" ? context.getTransform() : null;
+  if (!(canvas?.width > 0 && canvas?.height > 0 && matrix)) {
+    return { features: collection.features, paths: null, counts: { visitedFeatureCount: collection.features.length, indexBuildFeatureCount: 0, pathBuildCount: 0 } };
+  }
+  const inverse = matrix.inverse();
+  const corners = [[0, 0], [canvas.width, 0], [0, canvas.height], [canvas.width, canvas.height]]
+    .map(([x, y]) => [inverse.a * x + inverse.c * y + inverse.e, inverse.b * x + inverse.d * y + inverse.f]);
+  const maxWidth = Math.max(widthFloorPx + 0.7, ...Object.entries(visualStyle)
+    .filter(([key]) => key.endsWith("Width"))
+    .map(([, value]) => value * strategy.widthMultiplier)) / Math.max(0.0001, Number(k || 1));
+  const padding = maxWidth / 2;
+  const clip = {
+    minX: Math.min(...corners.map(([x]) => x)) - padding,
+    maxX: Math.max(...corners.map(([x]) => x)) + padding,
+    minY: Math.min(...corners.map(([, y]) => y)) - padding,
+    maxY: Math.max(...corners.map(([, y]) => y)) + padding,
+  };
+  const generation = getProjectionGeometryGeneration(projection);
+  let cached = lineIndexes.get(collection);
+  let indexBuildFeatureCount = 0;
+  if (!cached || cached.generation !== generation || cached.features !== collection.features || cached.featureCount !== collection.features.length) {
+    cached = {
+      generation,
+      features: collection.features,
+      featureCount: collection.features.length,
+      index: buildTransportLineViewportIndex(collection.features, (feature) => pathCanvas.bounds(feature)),
+      paths: new WeakMap(),
+    };
+    lineIndexes.set(collection, cached);
+    indexBuildFeatureCount = collection.features.length;
+  }
+  const result = cached.index.query(clip);
+  return {
+    features: result.features,
+    paths: cached.paths,
+    counts: { visitedFeatureCount: result.visitedFeatureCount, indexBuildFeatureCount, pathBuildCount: 0 },
+  };
+}
+
+function getTransportLinePath(feature, viewport) {
+  if (viewport.paths.has(feature)) return viewport.paths.get(feature);
+  const Path = getPath2D();
+  const path = new Path();
+  const previousContext = pathCanvas.context();
+  try {
+    pathCanvas.context(path);
+    pathCanvas(feature);
+  } finally {
+    pathCanvas.context(previousContext);
+  }
+  viewport.paths.set(feature, path);
+  viewport.counts.pathBuildCount += 1;
+  return path;
+}
+
+function drawTransportOverviewLineStroke(features, { strokeStyle, lineWidth, opacity, dash = [] } = {}, viewport = null) {
   if (!features.length || !(opacity > 0) || !(lineWidth > 0)) return;
   context.save();
   context.globalAlpha = opacity;
@@ -255,8 +316,12 @@ function drawTransportOverviewLineStroke(features, { strokeStyle, lineWidth, opa
   try {
     features.forEach((feature) => {
       context.beginPath();
-      pathCanvas(feature);
-      context.stroke();
+      if (viewport?.paths) {
+        context.stroke(getTransportLinePath(feature, viewport));
+      } else {
+        pathCanvas(feature);
+        context.stroke();
+      }
     });
   } finally {
     context.setLineDash([]);
@@ -264,7 +329,7 @@ function drawTransportOverviewLineStroke(features, { strokeStyle, lineWidth, opa
   }
 }
 
-function drawTransportOverviewLineSet(features, style, { baseOpacity, strategy, k, widthFloorPx = 0.75 } = {}) {
+function drawTransportOverviewLineSet(features, style, { baseOpacity, strategy, k, widthFloorPx = 0.75, viewport = null } = {}) {
   if (!features.length) return;
   const strokeSpecs = buildTransportOverviewLineStrokeSpecs(style, {
     baseOpacity,
@@ -272,7 +337,7 @@ function drawTransportOverviewLineSet(features, style, { baseOpacity, strategy, 
     k,
     widthFloorPx,
   });
-  strokeSpecs.forEach((strokeSpec) => drawTransportOverviewLineStroke(features, strokeSpec));
+  strokeSpecs.forEach((strokeSpec) => drawTransportOverviewLineStroke(features, strokeSpec, viewport));
 }
 
 function getCurrentZoomTransform() {
@@ -901,13 +966,14 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     visualMode: getTransportOverviewVisualMode(),
   });
   const visualStyle = getTransportOverviewRailVisualStyle(railConfig.primaryColor, railConfig.visualStrength);
+  const viewport = prepareViewportLines(collection, visualStyle, strategy, k, 1.05);
   const featuresByClass = {
     secondary: [],
     regional: [],
     mainline: [],
   };
   const labelCandidates = [];
-  collection.features.forEach((feature) => {
+  viewport.features.forEach((feature) => {
     const properties = feature?.properties || {};
     const lineClass = getIncludedTransportOverviewLineClass("rail", feature, strategy);
     if (!lineClass) return;
@@ -921,8 +987,9 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
       return;
     }
 
+    if (!strategy.labelsEnabled || !railConfig.labelsEnabled) return;
     const label = getTransportOverviewRailLabelText(properties, railConfig.labelMode);
-    if (!label || !railConfig.labelsEnabled || typeof projection !== "function") return;
+    if (!label || typeof projection !== "function") return;
     const anchorGeo = getTransportLineFeatureLabelAnchor(feature, {
       getLineMidpointFromCoordinates,
       getMultiLineLabelAnchor,
@@ -981,6 +1048,7 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
       interactive: !!interactive,
       skipped: true,
       reason: "filtered",
+      ...viewport.counts,
     });
     drawCountryRailwaysLayer(k, { interactive });
     return;
@@ -998,6 +1066,7 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     baseOpacity: baseRailOpacity,
     strategy,
     k,
+    viewport,
     widthFloorPx: 0.78,
   });
   drawTransportOverviewLineSet(featuresByClass.regional, {
@@ -1011,6 +1080,7 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     baseOpacity: baseRailOpacity,
     strategy,
     k,
+    viewport,
     widthFloorPx: 0.9,
   });
   drawTransportOverviewLineSet(featuresByClass.mainline, {
@@ -1023,6 +1093,7 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     baseOpacity: baseRailOpacity,
     strategy,
     k,
+    viewport,
     widthFloorPx: 1.05,
   });
 
@@ -1037,6 +1108,7 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     visibleFeatureCount,
     labelCount: 0,
     labelsDeferred: true,
+    ...viewport.counts,
     interactive: !!interactive,
     skipped: false,
   });
@@ -1090,13 +1162,14 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
     visualMode: getTransportOverviewVisualMode(),
   });
   const visualStyle = getTransportOverviewRoadVisualStyle(roadConfig.primaryColor, roadConfig.visualStrength);
+  const viewport = prepareViewportLines(collection, visualStyle, strategy, k, 1.1);
   const featuresByClass = {
     secondary: [],
     primary: [],
     trunk: [],
     motorway: [],
   };
-  collection.features.forEach((feature) => {
+  viewport.features.forEach((feature) => {
     const roadClass = getIncludedTransportOverviewLineClass("road", feature, strategy);
     if (!roadClass) return;
     if (roadClass === "motorway") {
@@ -1118,6 +1191,7 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
       interactive: !!interactive,
       skipped: true,
       reason: "filtered",
+      ...viewport.counts,
     });
     drawCountryRoadsLayer(k, { interactive });
     return;
@@ -1135,6 +1209,7 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
     baseOpacity: baseRoadOpacity,
     strategy,
     k,
+    viewport,
     widthFloorPx: 0.68,
   });
   drawTransportOverviewLineSet(featuresByClass.primary, {
@@ -1148,6 +1223,7 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
     baseOpacity: baseRoadOpacity,
     strategy,
     k,
+    viewport,
     widthFloorPx: 0.78,
   });
   drawTransportOverviewLineSet(featuresByClass.trunk, {
@@ -1161,6 +1237,7 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
     baseOpacity: baseRoadOpacity,
     strategy,
     k,
+    viewport,
     widthFloorPx: 0.95,
   });
   drawTransportOverviewLineSet(featuresByClass.motorway, {
@@ -1173,6 +1250,7 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
     baseOpacity: baseRoadOpacity,
     strategy,
     k,
+    viewport,
     widthFloorPx: 1.1,
   });
 
@@ -1217,6 +1295,7 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
     visibleFeatureCount,
     labelCount: 0,
     labelsDeferred: true,
+    ...viewport.counts,
     interactive: !!interactive,
     skipped: false,
   });
@@ -1293,12 +1372,13 @@ function drawCountryRailwaysLayer(k, { interactive = false } = {}) {
     });
     return;
   }
+  const viewport = prepareViewportLines(collection, visualStyle, strategy, k, 1.05);
   const featuresByClass = {
     secondary: [],
     regional: [],
     mainline: [],
   };
-  collection.features.forEach((feature) => {
+  viewport.features.forEach((feature) => {
     const lineClass = getIncludedTransportOverviewLineClass("rail", feature, strategy);
     if (!lineClass) return;
     if (lineClass === "mainline") featuresByClass.mainline.push(feature);
@@ -1314,6 +1394,7 @@ function drawCountryRailwaysLayer(k, { interactive = false } = {}) {
       interactive: !!interactive,
       skipped: true,
       reason: "filtered",
+      ...viewport.counts,
     });
     return;
   }
@@ -1325,7 +1406,7 @@ function drawCountryRailwaysLayer(k, { interactive = false } = {}) {
     innerWidth: visualStyle.secondaryWidth,
     opacity: visualStyle.secondaryOpacity,
     dashPx: visualStyle.secondaryDashPx,
-  }, { baseOpacity: baseRailOpacity, strategy, k, widthFloorPx: 0.78 });
+  }, { baseOpacity: baseRailOpacity, strategy, k, viewport, widthFloorPx: 0.78 });
   drawTransportOverviewLineSet(featuresByClass.regional, {
     casingStroke: visualStyle.regionalCasingStroke,
     innerStroke: visualStyle.regionalStroke,
@@ -1333,17 +1414,18 @@ function drawCountryRailwaysLayer(k, { interactive = false } = {}) {
     innerWidth: visualStyle.regionalWidth,
     opacity: visualStyle.regionalOpacity,
     dashPx: visualStyle.regionalDashPx,
-  }, { baseOpacity: baseRailOpacity, strategy, k, widthFloorPx: 0.9 });
+  }, { baseOpacity: baseRailOpacity, strategy, k, viewport, widthFloorPx: 0.9 });
   drawTransportOverviewLineSet(featuresByClass.mainline, {
     casingStroke: visualStyle.mainlineCasingStroke,
     innerStroke: visualStyle.mainlineStroke,
     casingWidth: visualStyle.mainlineCasingWidth,
     innerWidth: visualStyle.mainlineWidth,
     opacity: visualStyle.mainlineOpacity,
-  }, { baseOpacity: baseRailOpacity, strategy, k, widthFloorPx: 1.05 });
+  }, { baseOpacity: baseRailOpacity, strategy, k, viewport, widthFloorPx: 1.05 });
   collectContextMetric("drawCountryRailwaysLayer", nowMs() - startedAt, {
     featureCount,
     visibleFeatureCount,
+    ...viewport.counts,
     labelCount: 0,
     interactive: !!interactive,
     skipped: false,
@@ -1399,13 +1481,14 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
     visualMode: getTransportOverviewVisualMode(),
   });
   const visualStyle = getTransportOverviewRoadVisualStyle(roadConfig.primaryColor, roadConfig.visualStrength);
+  const viewport = prepareViewportLines(collection, visualStyle, strategy, k, 1.1);
   const featuresByClass = {
     secondary: [],
     primary: [],
     trunk: [],
     motorway: [],
   };
-  collection.features.forEach((feature) => {
+  viewport.features.forEach((feature) => {
     const roadClass = getIncludedTransportOverviewLineClass("road", feature, strategy);
     if (!roadClass) return;
     if (roadClass === "motorway") featuresByClass.motorway.push(feature);
@@ -1422,6 +1505,7 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
       interactive: !!interactive,
       skipped: true,
       reason: "filtered",
+      ...viewport.counts,
     });
     return;
   }
@@ -1433,7 +1517,7 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
     innerWidth: visualStyle.secondaryWidth,
     opacity: visualStyle.secondaryOpacity,
     dashPx: visualStyle.secondaryDashPx,
-  }, { baseOpacity: baseRoadOpacity, strategy, k, widthFloorPx: 0.68 });
+  }, { baseOpacity: baseRoadOpacity, strategy, k, viewport, widthFloorPx: 0.68 });
   drawTransportOverviewLineSet(featuresByClass.primary, {
     casingStroke: visualStyle.primaryCasingStroke,
     innerStroke: visualStyle.primaryStroke,
@@ -1441,7 +1525,7 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
     innerWidth: visualStyle.primaryWidth,
     opacity: visualStyle.primaryOpacity,
     dashPx: visualStyle.primaryDashPx,
-  }, { baseOpacity: baseRoadOpacity, strategy, k, widthFloorPx: 0.78 });
+  }, { baseOpacity: baseRoadOpacity, strategy, k, viewport, widthFloorPx: 0.78 });
   drawTransportOverviewLineSet(featuresByClass.trunk, {
     casingStroke: visualStyle.trunkCasingStroke,
     innerStroke: visualStyle.trunkStroke,
@@ -1449,14 +1533,14 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
     innerWidth: visualStyle.trunkWidth,
     opacity: visualStyle.trunkOpacity,
     dashPx: visualStyle.trunkDashPx,
-  }, { baseOpacity: baseRoadOpacity, strategy, k, widthFloorPx: 0.95 });
+  }, { baseOpacity: baseRoadOpacity, strategy, k, viewport, widthFloorPx: 0.95 });
   drawTransportOverviewLineSet(featuresByClass.motorway, {
     casingStroke: visualStyle.motorwayCasingStroke,
     innerStroke: visualStyle.motorwayStroke,
     casingWidth: visualStyle.motorwayCasingWidth,
     innerWidth: visualStyle.motorwayWidth,
     opacity: visualStyle.motorwayOpacity,
-  }, { baseOpacity: baseRoadOpacity, strategy, k, widthFloorPx: 1.1 });
+  }, { baseOpacity: baseRoadOpacity, strategy, k, viewport, widthFloorPx: 1.1 });
 
   const labelsEnabled = !!roadConfig.labelsEnabled && strategy.labelsEnabled && typeof projection === "function";
   if (labelsEnabled && Array.isArray(labelCollection?.features) && labelCollection.features.length) {
@@ -1487,6 +1571,7 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
   collectContextMetric("drawCountryRoadsLayer", nowMs() - startedAt, {
     featureCount,
     visibleFeatureCount,
+    ...viewport.counts,
     labelCount: 0,
     labelsDeferred: true,
     interactive: !!interactive,
