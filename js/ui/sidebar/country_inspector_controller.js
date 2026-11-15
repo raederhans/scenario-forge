@@ -323,7 +323,7 @@ export function createCountryInspectorController({
     controls.appendChild(topRow);
 
     const modeRow = document.createElement("div");
-    modeRow.className = "hgo-identity-mode-row";
+    modeRow.className = "hgo-identity-mode-row segmented";
     [
       ["scenario", t("Scenario names", "ui")],
       ["hgo", t("HGO names", "ui")],

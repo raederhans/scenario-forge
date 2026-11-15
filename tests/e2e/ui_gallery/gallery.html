@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="../../../css/components/button.css" />
   <link rel="stylesheet" href="../../../css/components/text-input.css" />
   <link rel="stylesheet" href="../../../css/components/list-row.css" />
+  <link rel="stylesheet" href="../../../css/components/segmented.css" />
+  <link rel="stylesheet" href="../../../css/components/states.css" />
   <link rel="stylesheet" href="../../../css/map-label-fonts.css" />
   <link rel="stylesheet" href="../../../css/editor-workspace.css" />
   <link rel="stylesheet" href="../../../css/editor-shell.css" />
@@ -88,8 +90,8 @@
       <div data-specimen="dock-tool-btn.is-active"><button type="button" class="btn-tool dock-tool-btn is-active" aria-pressed="true"><span>Eraser</span></button></div>
       <div data-specimen="dock-icon-btn"><button type="button" class="dock-icon-btn" aria-label="Undo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="M9 7 5 11l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5 11h9a5 5 0 0 1 0 10h-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg></button></div>
       <div data-specimen="dock-action-icon-btn-primary"><button type="button" class="dock-icon-btn dock-action-icon-btn dock-action-icon-btn-primary" aria-label="Apply"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="m5 12 5 5 9-10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
-      <div data-specimen="dock-segment-btn"><div class="dock-segmented-control"><button type="button" class="dock-segment-btn" aria-pressed="false">River cells</button></div></div>
-      <div data-specimen="dock-segment-btn[aria-pressed]"><div class="dock-segmented-control"><button type="button" class="dock-segment-btn is-active" aria-pressed="true">Color</button></div></div>
+      <div data-specimen="dock-segment-btn"><div class="dock-segmented-control segmented"><button type="button" class="dock-segment-btn" aria-pressed="false">River cells</button></div></div>
+      <div data-specimen="dock-segment-btn[aria-pressed]"><div class="dock-segmented-control segmented"><button type="button" class="dock-segment-btn is-active" aria-pressed="true">Color</button></div></div>
       <div data-specimen="dock-handle-btn"><button type="button" class="dock-handle-btn" aria-label="Collapse dock"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
     </div>
     <div class="zoom-controls gallery-ctx">
@@ -111,7 +113,7 @@
     <aside id="rightSidebar" class="sidebar-right gallery-ctx"><section class="editor-property-panel"><div class="special-zone-layers-workbench"><div class="special-zone-workbench-card">
       <div data-specimen="special-zone secondary-btn"><button type="button" class="secondary-btn">New region</button></div>
       <div data-specimen="special-zone-member-edit"><button type="button" class="secondary-btn special-zone-member-edit">Edit members</button></div>
-      <div data-specimen="special-zone-layer-row"><div class="special-zone-layer-row is-active"><button type="button" class="secondary-btn special-zone-visibility" aria-pressed="true" aria-label="Hide">◉</button><button type="button" class="secondary-btn special-zone-layer-select" aria-pressed="true" data-gallery-target><span class="special-zone-pattern-choice-preview" style="background-color:#d9c27a"></span><span>Demilitarized zone · Custom Zone · 12 parcels</span></button></div></div>
+      <div data-specimen="special-zone-layer-row"><div class="special-zone-layer-row is-active"><button type="button" class="secondary-btn special-zone-visibility" aria-pressed="true" aria-label="Hide"><span data-gallery-icon="eye"></span></button><button type="button" class="secondary-btn special-zone-layer-select" aria-pressed="true" data-gallery-target><span class="special-zone-pattern-choice-preview" style="background-color:#d9c27a"></span><span>Demilitarized zone · Custom Zone · 12 parcels</span></button></div></div>
       <div data-specimen="special-zone-member-chip"><div class="special-zone-member-chip-list"><button type="button" class="special-zone-member-chip">Alsace</button><button type="button" class="secondary-btn special-zone-member-overflow-btn">+8</button></div></div>
     </div></div></section></aside>
   </section>
@@ -228,8 +230,8 @@
       <div data-specimen="special-zone-member-drawer-row" data-states="default hover focus"><dialog open class="special-zone-member-drawer gallery-inline-dialog"><div class="special-zone-member-drawer-list"><button type="button" class="special-zone-member-drawer-row" data-gallery-target>Alsace · FRA-1234</button></div></dialog></div>
     </aside>
     <aside id="leftSidebar" class="sidebar sidebar-left gallery-ctx">
-      <div data-specimen="#leftSidebar editor-layer-row" data-states="default hover focus selected"><div class="list-row editor-layer-row"><button type="button" class="editor-layer-trigger" data-gallery-target>Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer">◉</button></div></div>
-      <div data-specimen="#leftSidebar editor-layer-visibility"><div class="list-row editor-layer-row"><button type="button" class="editor-layer-trigger">Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer" data-gallery-target>◉</button></div></div>
+      <div data-specimen="#leftSidebar editor-layer-row" data-states="default hover focus selected"><div class="list-row editor-layer-row"><button type="button" class="editor-layer-trigger" data-gallery-target>Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer"><span data-gallery-icon="eye"></span></button></div></div>
+      <div data-specimen="#leftSidebar editor-layer-visibility"><div class="list-row editor-layer-row"><button type="button" class="editor-layer-trigger">Rivers</button><button type="button" class="editor-layer-visibility" aria-label="Hide layer" data-gallery-target><span data-gallery-icon="eye"></span></button></div></div>
     </aside>
     <div class="transport-workbench-panel gallery-ctx">
       <div data-specimen="transport-workbench-data-row-button" data-states="default hover focus selected"><button type="button" class="transport-workbench-data-row-button" aria-pressed="false">A7 · Motorway</button></div>
@@ -269,6 +271,20 @@
     <div class="map-legend gallery-ctx"><div class="legend-special-zone-section"><h4 class="legend-section-title">Special Zone Layers</h4><div class="legend-row legend-row-special-zone"><span class="legend-swatch legend-swatch-special-zone" style="background-color:#d9c27a"></span><span class="legend-special-zone-label">Demilitarized zone</span></div></div></div>
   </section>
 
+
+  <section class="gallery-section" data-gallery-section="control-states">
+    <h2 class="gallery-heading">控件形状与交互状态</h2>
+    <div data-specimen="segmented" data-states="default hover focus selected disabled"><div class="segmented" role="group"><button type="button" aria-pressed="false" data-gallery-target>常规</button><button type="button" aria-pressed="false">大洲</button></div></div>
+    <div data-specimen="segmented--tabs" data-states="default hover focus selected disabled"><nav class="segmented--tabs" role="tablist"><button type="button" role="tab" aria-selected="false" data-gallery-target>检查器</button><button type="button" role="tab" aria-selected="false">图层设置</button></nav></div>
+    <div data-specimen="floating-buttons" data-states="default hover focus selected disabled"><div class="dock-icon-row"><button class="dock-tool-btn" type="button" aria-label="放大" aria-pressed="false" data-gallery-target><span data-gallery-icon="plus"></span></button><button class="dock-icon-btn" type="button" aria-label="缩小"><span data-gallery-icon="minus"></span></button></div></div>
+    <div data-specimen="disclosure-level-1" data-states="default hover focus open"><details class="editor-disclosure"><summary>名称与显示</summary><p>名称</p></details></div>
+    <div data-specimen="disclosure-level-2" data-states="default hover focus open"><details class="editor-disclosure" data-level="2"><summary>高级选项</summary><p>显示</p></details></div>
+    <div data-specimen="disabled-controls" data-states="default"><div><button type="button" class="btn--secondary" disabled>禁用</button><button type="button" class="btn--secondary" aria-disabled="true">禁用</button><input type="text" class="input" disabled aria-label="禁用输入" value="禁用" /><details class="editor-disclosure"><summary aria-disabled="true">禁用</summary></details></div></div>
+  </section>
+  <script type="module">
+    import { createUiIcon } from "../../../js/ui/components/ui_icons.js";
+    document.querySelectorAll("[data-gallery-icon]").forEach((node) => node.replaceWith(createUiIcon(node.dataset.galleryIcon)));
+  </script>
   <script type="module" src="gallery.js"></script>
 </body>
 </html>

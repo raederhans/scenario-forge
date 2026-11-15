@@ -1,0 +1,38 @@
+@layer components {
+:where(button, input, select, summary, [role="tab"]) {
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+:where(button, input, select, summary, [role="tab"]):is(:disabled, [aria-disabled="true"]) {
+  color: var(--ink-400);
+  background: var(--surface-sunken);
+  cursor: not-allowed;
+}
+:where(button, input, select, textarea, summary, [role="tab"]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+:where([role="menuitem"], [role="option"], .list-row, .list-row button, .app-select-option):focus-visible {
+  outline-offset: -2px;
+}
+:where(.app-select-button:hover:not(:disabled):not([aria-disabled="true"])) { background: var(--surface-sunken); border-color: var(--line-2); }
+:where(summary:hover:not([aria-disabled="true"])) { background: var(--surface-sunken); }
+:where(input[type="checkbox"], input[type="radio"]) {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+@media (pointer: coarse) {
+  :where(:root) {
+    --control-sm: 44px;
+    --control-compact: 44px;
+    --control-md: 44px;
+    --control-lg: 44px;
+    --hit-min: 44px;
+    --row-min: 44px;
+  }
+  :where(button, summary, select, input:not([type="checkbox"]):not([type="radio"]), [role="tab"], [role="option"], label:has(> input[type="checkbox"]), label:has(> input[type="radio"])) {
+    min-width: var(--hit-min);
+    min-height: var(--hit-min);
+  }
+}
+}

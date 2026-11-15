@@ -78,6 +78,7 @@ export function createStrategicPanelView({
     const shell = document.createElement("details");
     shell.id = id;
     shell.className = "unit-counter-detail-group";
+    shell.dataset.level = "2";
     shell.open = !!open;
     const summary = document.createElement("summary");
     summary.className = "unit-counter-detail-group-summary";
@@ -349,6 +350,7 @@ export function createStrategicPanelView({
 
     const graphicsAdvanced = document.createElement("details");
     graphicsAdvanced.className = "unit-counter-advanced-shell frontline-advanced-shell mt-2";
+    graphicsAdvanced.dataset.level = "2";
     const graphicsAdvancedSummary = document.createElement("summary");
     graphicsAdvancedSummary.className = "unit-counter-advanced-summary";
     graphicsAdvancedSummary.textContent = t("Graphic Style Controls", "ui");
