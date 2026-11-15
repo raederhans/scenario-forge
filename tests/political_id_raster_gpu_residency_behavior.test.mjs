@@ -291,6 +291,59 @@ function gutterOracle(tile, neighbors) {
   return { width, height, codes, edgeIds, edgeWeights };
 }
 
+test("self-contained halo uploads match the frame oracle regardless of arrival order", async () => {
+  const a = { ...tile(0), width: 2, height: 2, codes: Uint32Array.of(1, 0x80000000, 1, 2),
+    edgeIds: Uint32Array.of(2, 1, 2), edgeWeights: Float32Array.of(0, 0.25, 0.75) };
+  const b = { ...a, originX: 2, codes: Uint32Array.of(0x80000000, 2, 1, 0) };
+  const originals = [a, b];
+  const halos = originals.map(value => ({ ...gutterOracle(value, originals.filter(other => other !== value)),
+    originX: value.originX - 1, originY: -1,
+    coreRect: { minX: value.originX, minY: 0, maxX: value.originX + 2, maxY: 2 },
+    storageRect: { minX: value.originX - 1, minY: -1, maxX: value.originX + 3, maxY: 3 } }));
+  function capture() {
+    const h = harness(), uploads = [];
+    h.gl.texImage2D = (...args) => uploads.push({ width: args[3], height: args[4], data: args.at(-1).slice() });
+    return { ...h, uploads, gpu: createPoliticalIdRasterGpu({ gl: h.gl }) };
+  }
+  let oldReads = 0;
+  for (const value of originals) {
+    const codes = value.codes;
+    Object.defineProperty(value, "codes", { get() { oldReads++; return codes; } });
+  }
+  const old = capture(); old.gpu.setTiles(originals);
+  const whole = capture(); whole.gpu.setTiles(halos);
+  assert.deepEqual(whole.uploads, old.uploads);
+  for (const order of [[0, 1], [1, 0]]) {
+    const single = capture(), uploaded = new Map();
+    single.gpu.setPalette(palette, 1); single.uploads.length = 0;
+    for (const index of order) {
+      const handle = await single.gpu.prepareTile({ tile: halos[index], palette, yieldTask: hostTick });
+      uploaded.set(index, single.uploads.splice(0));
+      handle.commit({ palette, revision: 1 });
+    }
+    assert.deepEqual([...uploaded.get(0), ...uploaded.get(1)], whole.uploads);
+    const uploads = single.gpu.getStats().tileUploads;
+    single.gpu.setTiles(halos);
+    assert.equal(single.gpu.getStats().tileUploads, uploads, "arrival of a neighbor never rebuilds an existing texture");
+    for (const value of halos) {
+      const resource = single.gpu.getTileHandle(value);
+      assert.equal(resource.width, 2); assert.equal(resource.height, 2);
+      assert.equal(resource.sampleOffsetX, 1); assert.equal(resource.sampleOffsetY, 1);
+    }
+    single.gpu.dispose();
+  }
+  let reads = 0;
+  for (const value of halos) {
+    const codes = value.codes;
+    Object.defineProperty(value, "codes", { get() { reads++; return codes; } });
+  }
+  const cold = capture(); cold.gpu.setTiles(halos);
+  assert.equal(reads, 2, "one payload read per tile; no neighbor materialization or padding copy");
+  assert.ok(reads < oldReads, `payload reads decrease from ${oldReads} to ${reads}`);
+  assert.equal(cold.gpu.getStats().gpuTextureBytes, whole.gpu.getStats().gpuTextureBytes);
+  cold.gpu.dispose(); whole.gpu.dispose(); old.gpu.dispose();
+});
+
 test("gutter uploads visit compressed neighbors once and preserve the original overlap and edge bytes", () => {
   const make = (originX, originY, width, height, code) => ({ originX, originY, width, height,
     codes: new Uint32Array(width * height).fill(code), edgeIds: Uint32Array.of(2, 1, 2),

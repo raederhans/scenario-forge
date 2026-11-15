@@ -320,7 +320,7 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     const removed = [];
     for (const [key, entry] of cache) {
       const { descriptor } = entry;
-      const padding = RASTER_BOUNDS_PADDING / descriptor.density;
+      const padding = (RASTER_BOUNDS_PADDING + (descriptor.storageRect ? 1 : 0)) / descriptor.density;
       const tileBounds = {
         minX: descriptor.originX / descriptor.density - padding,
         minY: descriptor.originY / descriptor.density - padding,
