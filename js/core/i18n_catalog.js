@@ -2402,7 +2402,7 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Current layer style"
   },
   "Current lens": {
-    "zh": "当前镜头",
+    "zh": "当前视图",
     "en": "Current lens"
   },
   "Current map does not include this action's detail features. Load detail topology and try again.": {
