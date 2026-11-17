@@ -1257,7 +1257,6 @@ input[type="range"].range-input {
 #leftSidebar .appearance-tab-panel > .mt-3,
 #leftSidebar .appearance-tab-panel > .space-y-3,
 #leftSidebar .appearance-tab-panel > .appearance-subsection-stack,
-#leftSidebar .appearance-tab-panel > .appearance-ocean-grid,
 #leftSidebar .appearance-tab-panel > .appearance-day-night-stack {
   margin-top: 0;
 }
@@ -1377,7 +1376,6 @@ details.appearance-subsection[open] > summary::after,
   margin-top: 10px;
 }
 
-#mapContentStack .map-content-panel > .appearance-ocean-grid,
 #mapContentStack .map-content-panel > .appearance-day-night-stack,
 #mapContentStack .map-content-panel > .space-y-3,
 #mapContentStack .appearance-mini-section > .rivers-panel {

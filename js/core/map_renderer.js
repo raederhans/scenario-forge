@@ -32,6 +32,7 @@ import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
+import { commitFeaturePaint } from "./feature_paint_commands.js";
 import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCountryState, selectInspectorGroupState, selectInspectorFeatureState } from "./state/actions/editor_input_actions.js";
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
@@ -2948,7 +2949,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     appendOperationGraphicVertexFromEvent,
     appendSpecialZoneVertexFromEvent,
     applyFacilityInfoCardState: getFacilityInteractionRuntime().applyFacilityInfoCardState,
-    applyFeatureVisualOverrideTransaction,
+    commitVisualFeaturePaint,
     applyVisualSubdivisionFill,
     applyWaterRegionFill,
     blockStartupReadonlyInteraction,
@@ -3764,7 +3765,7 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
       ? !!getGeometryRasterRuntimeOwner().preparePolitical({ force: true })
       : getGeometryRasterRuntimeOwner().prepareFrame(),
     requiresExactFrame: () => navigationExactRefreshNeeded,
-    isScenePublicationPending: () => !!tnoRasterSceneOwner?.getDiagnostics().publicationPending,
+    isScenePublicationPending: () => !!tnoRasterSceneOwner?.getPresentationState().publicationPending,
     withValidatedCache: (callback) => getRenderCacheOwner().withValidatedCache(callback),
     incrementPerfCounter,
     clearPoliticalPatchOverlayIfStale,
@@ -7052,7 +7053,7 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
   if (!rendererSurfaceHost.getPoliticalPatchContext()?.canvas || !rendererSurfaceHost.getProjection() || !rendererSurfaceHost.getPathCanvas()) return deferPreview("preview-surface-unavailable");
   const resolvedFeatures = ids.map((id) => ({ id, feature: findResolvedColorFeatureById(id) })).filter((entry) => entry.feature?.geometry);
   if (!resolvedFeatures.length) return deferPreview("no-preview-features");
-  const retainedScene = tnoRasterSceneOwner?.getDiagnostics();
+  const retainedScene = tnoRasterSceneOwner?.getPresentationState();
   const features = retainedScene?.active ? resolvedFeatures.filter(({ id }) =>
     !politicalIdRasterRuntimeOwner?.matchesPublishedColor(id, { overview: retainedScene.usingOverview })) : resolvedFeatures;
   if (!features.length) {
@@ -7274,9 +7275,7 @@ function applyFeatureVisualOverrideTransaction(targetIds, selectedColor, {
 } = {}) {
   const resolvedIds = normalizeFeatureOverrideTargetIds(targetIds);
   if (!resolvedIds.length) return [];
-  // Import/legacy writes are normalized once before this canonical transaction.
-  // Both override maps below stay in sync, so a paint need not copy them again.
-
+  // Brush hits update paint and preview here; the stroke owner commits history.
   applyFeaturePaintState(runtimeState, resolvedIds,
     remove ? null : getSafeCanvasColor(selectedColor, defaultColor), { remove });
   refreshResolvedColorsForFeatures(resolvedIds, {
@@ -7286,6 +7285,20 @@ function applyFeatureVisualOverrideTransaction(targetIds, selectedColor, {
     coalescePatchPreview,
   });
   return resolvedIds;
+}
+
+function commitVisualFeaturePaint(targetIds, color, { kind, dirtyReason = kind, gesture = null, inputStartedAt = 0 } = {}) {
+  return commitFeaturePaint([{ ids: targetIds, color }], {
+    kind: String(kind || "interaction"),
+    dirtyReason,
+    gesture,
+    recordUnchanged: true,
+    refresh: (featureIds) => refreshResolvedColorsForFeatures(featureIds, {
+      renderNow: false,
+      inputStartedAt,
+      inputLabel: kind || (color === null ? "erase-feature-color" : "fill-feature-color"),
+    }),
+  });
 }
 
 function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) {
@@ -10644,11 +10657,11 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
       scene.present(currentTransform, { refresh: false, holdPartialUntilExact: true });
       return false;
     }
-    const staged = politicalIdRasterRuntimeOwner?.getDiagnostics().stagedPending;
+    const staged = politicalIdRasterRuntimeOwner?.getPublicationState().stagedPending;
     if (staged && !politicalIdRasterRuntimeOwner.publishDirectFrame()) {
       scene.cancelPublicationPreparation?.();
       invalidateRenderPasses(["political"], "scene-candidate-rejected");
-      if (politicalIdRasterRuntimeOwner.getDiagnostics().stagedRejectionReason === "stale-candidate") {
+      if (politicalIdRasterRuntimeOwner.getPublicationState().stagedRejectionReason === "stale-candidate") {
         queueMicrotask(() => requestRendererRender("scene-candidate-rejected"));
       }
       tnoRasterSceneOwner?.present(currentTransform, { refresh: false, holdPartialUntilExact: true });
@@ -10673,7 +10686,7 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
     // preparation, rebuild that pass through the existing producer before using
     // the 2D compositor; never present a blank political layer as a fallback.
     if (politicalPassUsesDirectScene) {
-      tnoRasterSceneFailure = tnoRasterSceneOwner.getDiagnostics().fallbackReason || "scene-unavailable";
+      tnoRasterSceneFailure = tnoRasterSceneOwner.getPresentationState().fallbackReason || "scene-unavailable";
     }
   }
   if (!exportRenderInProgress) tnoRasterSceneOwner?.clear();
@@ -12393,21 +12406,10 @@ function eraseVisualOverridesForIds(targetIds, { kind, dirtyReason } = {}) {
   const actionStart = nowMs();
   const resolvedIds = normalizeFeatureOverrideTargetIds(targetIds);
   if (!resolvedIds.length) return false;
-  const historyBefore = captureHistoryState({
-    featureIds: resolvedIds,
-  });
-  applyFeatureVisualOverrideTransaction(resolvedIds, null, {
-    remove: true,
-    inputStartedAt: actionStart,
-    inputLabel: kind || "erase-feature-color",
-  });
-  markDirty(dirtyReason || kind || "erase-feature-color");
-  commitHistoryEntry({
+  commitVisualFeaturePaint(resolvedIds, null, {
     kind: kind || "erase-feature-color",
-    before: historyBefore,
-    after: captureHistoryState({
-      featureIds: resolvedIds,
-    }),
+    dirtyReason: dirtyReason || kind || "erase-feature-color",
+    inputStartedAt: actionStart,
   });
   if (rendererSurfaceHost.getContext()) {
     render();
@@ -12574,21 +12576,11 @@ function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-fea
   const color = getSafeCanvasColor(selectedColor, LAND_FILL_COLOR);
   const historyGesture = gesture ? { ...gesture, color, scenarioId: String(runtimeState.activeScenarioId || "") } : null;
   if (historyGesture?.type === "leaf-click") lastQuickFillLeafClick = historyGesture;
-  const historyBefore = captureHistoryState({
-    featureIds: resolvedIds,
-  });
-  applyFeatureVisualOverrideTransaction(resolvedIds, color, {
-    inputStartedAt: actionStart,
-    inputLabel: kind || "fill-feature-color",
-  });
-  markDirty(dirtyReason);
-  commitHistoryEntry({
+  commitVisualFeaturePaint(resolvedIds, color, {
     kind,
+    dirtyReason,
     gesture: historyGesture,
-    before: historyBefore,
-    after: captureHistoryState({
-      featureIds: resolvedIds,
-    }),
+    inputStartedAt: actionStart,
   });
   addRecentColor(color);
   requestInteractionRender(kind);

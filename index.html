@@ -193,176 +193,6 @@
             </div>
             <div class="appearance-stack mt-4">
               <section
-                id="appearancePanelOcean"
-                class="card-flat appearance-subsection map-content-panel"
-                aria-labelledby="lblOcean"
-              >
-                <h2 id="lblOcean" class="section-header" data-i18n="Ocean">Ocean</h2>
-                <div class="appearance-ocean-grid mt-3">
-                  <section class="appearance-control-card" aria-labelledby="lblOceanSurfaceCard">
-                    <h3 id="lblOceanSurfaceCard" class="appearance-control-card-title" data-i18n="Surface Colors">Surface Colors</h3>
-                    <div class="appearance-control-card-stack">
-                      <div class="flex items-center justify-between gap-3">
-                        <label id="lblOceanFillColor" class="range-label" for="oceanFillColor" data-i18n="Fill Color">Fill Color</label>
-                        <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
-                      </div>
-                      <label class="toggle-label">
-                        <input id="oceanRegionNamesToggle" type="checkbox" class="checkbox-input" />
-                        <span data-i18n="Show Sea Names">Show Sea Names</span>
-                      </label>
-                      <label class="toggle-label">
-                        <input id="lakeLinkToOcean" type="checkbox" class="checkbox-input" checked />
-                        <span id="lblLakeLinkToOcean" data-i18n="Link Lakes To Ocean">Link Lakes To Ocean</span>
-                      </label>
-                      <div class="flex items-center justify-between gap-3">
-                        <label id="lblLakeFillColor" class="range-label" for="lakeFillColor" data-i18n="Lake Fill Color">Lake Fill Color</label>
-                        <input id="lakeFillColor" type="color" value="#aadaff" class="color-input" />
-                      </div>
-                      <label class="toggle-label">
-                        <input id="lake-outline-toggle" type="checkbox" class="checkbox-input" checked />
-                        <span data-i18n="Large Lake Outlines">Large Lake Outlines</span>
-                      </label>
-                      <div id="oceanCoastalAccentRow" class="space-y-2 hidden">
-                        <label class="toggle-label">
-                          <input id="oceanCoastalAccentToggle" type="checkbox" class="checkbox-input" checked />
-                          <span id="lblOceanCoastalAccent" data-i18n="Coastal Accent">Coastal Accent</span>
-                        </label>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section class="appearance-control-card" aria-labelledby="lblOceanStyleCard">
-                    <h3 id="lblOceanStyleCard" class="appearance-control-card-title" data-i18n="Bathymetry">Bathymetry</h3>
-                    <div class="appearance-control-card-stack">
-                      <label class="toggle-label">
-                        <input id="oceanAdvancedStylesToggle" type="checkbox" checked class="checkbox-input" />
-                        <span id="lblOceanAdvancedStylesToggle" data-i18n="Show">Show</span>
-                      </label>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect" data-i18n="Style">Style</label>
-                        </div>
-                        <select id="oceanStyleSelect" class="select-input mt-2">
-                          <option id="optOceanFlat" value="flat" selected data-i18n="Flat Blue">Flat Blue</option>
-                          <option id="optOceanBathymetrySoft" value="bathymetry_soft" selected disabled data-i18n="Bathymetry Soft">Bathymetry Soft</option>
-                          <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled data-i18n="Bathymetry Contours">Bathymetry Contours</option>
-                        </select>
-                      </div>
-                      <p data-page-note class="sidebar-tool-hint" data-i18n="Global oceans">Global oceans</p>
-                      <p class="sidebar-tool-hint" data-i18n="Scenario depth is schematic">Scenario depth is schematic</p>
-                      <details data-level="2" class="appearance-mini-section appearance-mini-section-subtle">
-                        <summary class="section-header" data-i18n="Depth legend and sources">Depth legend and sources</summary>
-                        <div class="sidebar-tool-hint mt-2">
-                          <p data-page-note data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
-                          <p data-page-note data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
-                          <p><span data-i18n="Regional depth bins">Regional depth bins</span>:
-                            <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
-                            <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
-                            <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
-                            <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
-                          </p>
-                          <p data-page-note data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
-                        </div>
-                      </details>
-                    </div>
-                  </section>
-
-                  <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Bathymetry details">Bathymetry details</summary>
-                    <section class="appearance-control-card" aria-labelledby="lblOceanTextureCard">
-                      <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Bathymetry tuning">Bathymetry tuning</h3>
-                      <div class="appearance-control-card-stack">
-                        <div>
-                          <div class="range-row">
-                            <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity" data-i18n="Bathymetry opacity">Bathymetry opacity</label>
-                            <span id="oceanTextureOpacityValue" class="range-value">90%</span>
-                          </div>
-                          <input id="oceanTextureOpacity" type="range" min="0" max="100" value="90" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblOceanScale" class="range-label" for="oceanTextureScale" data-i18n="Depth contrast">Depth contrast</label>
-                            <span id="oceanTextureScaleValue" class="range-value">1.25x</span>
-                          </div>
-                          <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="125" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength" data-i18n="Bathymetry contour strength">Bathymetry contour strength</label>
-                            <span id="oceanContourStrengthValue" class="range-value">0%</span>
-                          </div>
-                          <input id="oceanContourStrength" type="range" min="0" max="100" value="0" class="range-input" />
-                        </div>
-                      </div>
-                    </section>
-                  </details>
-
-                  <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Local adjustment: depth field">Local adjustment: depth field</summary>
-                    <section class="appearance-control-card" aria-labelledby="lblOceanDepthFieldCard">
-                      <h3 id="lblOceanDepthFieldCard" class="appearance-control-card-title" data-i18n="Depth Field">Depth Field</h3>
-                      <div class="appearance-control-card-stack">
-                        <label class="toggle-label">
-                          <input id="oceanDepthFieldEnabled" type="checkbox" class="checkbox-input" />
-                          <span id="lblOceanDepthFieldEnabled" data-i18n="Enable Channel">Enable Channel</span>
-                        </label>
-                        <div class="flex items-center justify-between gap-2">
-                          <button id="oceanDepthFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
-                          <button id="oceanDepthFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
-                          <button id="oceanDepthFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
-                          <button id="oceanDepthFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblOceanDepthFieldWeight" class="range-label" for="oceanDepthFieldWeight" data-i18n="Strength">Strength</label>
-                            <span id="oceanDepthFieldWeightValue" class="range-value">100%</span>
-                          </div>
-                          <input id="oceanDepthFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblOceanDepthFieldRadius" class="range-label" for="oceanDepthFieldRadius" data-i18n="Radius">Radius</label>
-                            <span id="oceanDepthFieldRadiusValue" class="range-value">≈ 333 km</span>
-                          </div>
-                          <input id="oceanDepthFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
-                        </div>
-                        <div class="flex items-center justify-between gap-2">
-                          <button id="oceanDepthFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
-                        </div>
-                        <div class="range-row">
-                          <span id="lblOceanDepthFieldPointCount" class="range-label" data-i18n="Points">Points</span>
-                          <span id="oceanDepthFieldPointCount" class="range-value">0</span>
-                        </div>
-                        <div id="oceanDepthFieldPointList" class="space-y-2"></div>
-                      </div>
-                    </section>
-                  </details>
-                  <details id="oceanBathymetryDebugDetails" class="appearance-mini-section dev-only">
-                    <summary id="lblOceanBathymetryDebug" class="section-header" data-i18n="Bathymetry Debug">Bathymetry Debug</summary>
-                    <div class="space-y-3 mt-3">
-                      <p id="oceanBathymetryDebugHint" class="sidebar-tool-hint">
-                        Data source, rendering backend and loaded tiles.
-                      </p>
-                      <div>
-                        <div class="range-row">
-                          <span id="lblOceanBathymetrySource" class="range-label" data-i18n="Data Source">Data Source</span>
-                          <span id="oceanBathymetrySourceValue" class="range-value">None</span>
-                        </div>
-                        <div class="range-row mt-2">
-                          <span id="lblOceanBathymetryBands" class="range-label" data-i18n="Backend">Backend</span>
-                          <span id="oceanBathymetryBandsValue" class="range-value">0</span>
-                        </div>
-                        <div class="range-row mt-2">
-                          <span id="lblOceanBathymetryContours" class="range-label" data-i18n="Loaded tiles">Loaded tiles</span>
-                          <span id="oceanBathymetryContoursValue" class="range-value">0</span>
-                        </div>
-                      </div>
-                    </div>
-                  </details>
-                </div>
-              </section>
-
-              <section
                 id="appearancePanelBorders"
                 class="card-flat appearance-subsection appearance-tab-panel is-active"
                 data-appearance-panel="borders"
@@ -2596,6 +2426,186 @@
           <span id="rightSidebarCollapseIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-right"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
         </button>
         <div id="rightSidebarContent" class="sidebar-sections inspector-sidebar-sections">
+          <div id="editorPropertiesBody" class="editor-properties-body">
+            <section
+              id="editorProperty-data-map-content-panel-ocean"
+              class="editor-property-panel"
+              aria-label="Ocean"
+              data-i18n-aria-label="Ocean"
+              hidden
+            >
+              <section
+                id="appearancePanelOcean"
+                data-map-content-panel="ocean"
+                role="tabpanel"
+                aria-labelledby="mapContentTabOcean"
+              >
+                <h2 id="lblOcean" class="section-header" data-i18n="Ocean">Ocean</h2>
+                <div class="appearance-ocean-grid mt-3">
+                  <section class="appearance-control-card" aria-labelledby="lblOceanSurfaceCard">
+                    <h3 id="lblOceanSurfaceCard" class="appearance-control-card-title" data-i18n="Surface Colors">Surface Colors</h3>
+                    <div class="appearance-control-card-stack">
+                      <div class="flex items-center justify-between gap-3">
+                        <label id="lblOceanFillColor" class="range-label" for="oceanFillColor" data-i18n="Fill Color">Fill Color</label>
+                        <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
+                      </div>
+                      <label class="toggle-label">
+                        <input id="oceanRegionNamesToggle" type="checkbox" class="checkbox-input" />
+                        <span data-i18n="Show Sea Names">Show Sea Names</span>
+                      </label>
+                      <label class="toggle-label">
+                        <input id="lakeLinkToOcean" type="checkbox" class="checkbox-input" checked />
+                        <span id="lblLakeLinkToOcean" data-i18n="Link Lakes To Ocean">Link Lakes To Ocean</span>
+                      </label>
+                      <div class="flex items-center justify-between gap-3">
+                        <label id="lblLakeFillColor" class="range-label" for="lakeFillColor" data-i18n="Lake Fill Color">Lake Fill Color</label>
+                        <input id="lakeFillColor" type="color" value="#aadaff" class="color-input" />
+                      </div>
+                      <label class="toggle-label">
+                        <input id="lake-outline-toggle" type="checkbox" class="checkbox-input" checked />
+                        <span data-i18n="Large Lake Outlines">Large Lake Outlines</span>
+                      </label>
+                      <div id="oceanCoastalAccentRow" class="space-y-2 hidden">
+                        <label class="toggle-label">
+                          <input id="oceanCoastalAccentToggle" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblOceanCoastalAccent" data-i18n="Coastal Accent">Coastal Accent</span>
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="appearance-control-card" aria-labelledby="lblOceanStyleCard">
+                    <h3 id="lblOceanStyleCard" class="appearance-control-card-title" data-i18n="Bathymetry">Bathymetry</h3>
+                    <div class="appearance-control-card-stack">
+                      <label class="toggle-label">
+                        <input id="oceanAdvancedStylesToggle" type="checkbox" checked class="checkbox-input" />
+                        <span id="lblOceanAdvancedStylesToggle" data-i18n="Show">Show</span>
+                      </label>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect" data-i18n="Style">Style</label>
+                        </div>
+                        <select id="oceanStyleSelect" class="select-input mt-2">
+                          <option id="optOceanFlat" value="flat" selected data-i18n="Flat Blue">Flat Blue</option>
+                          <option id="optOceanBathymetrySoft" value="bathymetry_soft" selected disabled data-i18n="Bathymetry Soft">Bathymetry Soft</option>
+                          <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled data-i18n="Bathymetry Contours">Bathymetry Contours</option>
+                        </select>
+                      </div>
+                      <p data-page-note class="sidebar-tool-hint" data-i18n="Global oceans">Global oceans</p>
+                      <p class="sidebar-tool-hint" data-i18n="Scenario depth is schematic">Scenario depth is schematic</p>
+                      <details data-level="2" class="appearance-mini-section appearance-mini-section-subtle">
+                        <summary class="section-header" data-i18n="Depth legend and sources">Depth legend and sources</summary>
+                        <div class="sidebar-tool-hint mt-2">
+                          <p data-page-note data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
+                          <p data-page-note data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
+                          <p><span data-i18n="Regional depth bins">Regional depth bins</span>:
+                            <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
+                            <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
+                            <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
+                            <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
+                          </p>
+                          <p data-page-note data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
+                        </div>
+                      </details>
+                    </div>
+                  </section>
+
+                  <details class="appearance-mini-section">
+                    <summary class="section-header" data-i18n="Bathymetry details">Bathymetry details</summary>
+                    <section class="appearance-control-card" aria-labelledby="lblOceanTextureCard">
+                      <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Bathymetry tuning">Bathymetry tuning</h3>
+                      <div class="appearance-control-card-stack">
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity" data-i18n="Bathymetry opacity">Bathymetry opacity</label>
+                            <span id="oceanTextureOpacityValue" class="range-value">90%</span>
+                          </div>
+                          <input id="oceanTextureOpacity" type="range" min="0" max="100" value="90" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanScale" class="range-label" for="oceanTextureScale" data-i18n="Depth contrast">Depth contrast</label>
+                            <span id="oceanTextureScaleValue" class="range-value">1.25x</span>
+                          </div>
+                          <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="125" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength" data-i18n="Bathymetry contour strength">Bathymetry contour strength</label>
+                            <span id="oceanContourStrengthValue" class="range-value">0%</span>
+                          </div>
+                          <input id="oceanContourStrength" type="range" min="0" max="100" value="0" class="range-input" />
+                        </div>
+                      </div>
+                    </section>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary class="section-header" data-i18n="Local adjustment: depth field">Local adjustment: depth field</summary>
+                    <section class="appearance-control-card" aria-labelledby="lblOceanDepthFieldCard">
+                      <h3 id="lblOceanDepthFieldCard" class="appearance-control-card-title" data-i18n="Depth Field">Depth Field</h3>
+                      <div class="appearance-control-card-stack">
+                        <label class="toggle-label">
+                          <input id="oceanDepthFieldEnabled" type="checkbox" class="checkbox-input" />
+                          <span id="lblOceanDepthFieldEnabled" data-i18n="Enable Channel">Enable Channel</span>
+                        </label>
+                        <div class="flex items-center justify-between gap-2">
+                          <button id="oceanDepthFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
+                          <button id="oceanDepthFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
+                          <button id="oceanDepthFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
+                          <button id="oceanDepthFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanDepthFieldWeight" class="range-label" for="oceanDepthFieldWeight" data-i18n="Strength">Strength</label>
+                            <span id="oceanDepthFieldWeightValue" class="range-value">100%</span>
+                          </div>
+                          <input id="oceanDepthFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanDepthFieldRadius" class="range-label" for="oceanDepthFieldRadius" data-i18n="Radius">Radius</label>
+                            <span id="oceanDepthFieldRadiusValue" class="range-value">≈ 333 km</span>
+                          </div>
+                          <input id="oceanDepthFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                          <button id="oceanDepthFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
+                        </div>
+                        <div class="range-row">
+                          <span id="lblOceanDepthFieldPointCount" class="range-label" data-i18n="Points">Points</span>
+                          <span id="oceanDepthFieldPointCount" class="range-value">0</span>
+                        </div>
+                        <div id="oceanDepthFieldPointList" class="space-y-2"></div>
+                      </div>
+                    </section>
+                  </details>
+                  <details id="oceanBathymetryDebugDetails" class="appearance-mini-section dev-only">
+                    <summary id="lblOceanBathymetryDebug" class="section-header" data-i18n="Bathymetry Debug">Bathymetry Debug</summary>
+                    <div class="space-y-3 mt-3">
+                      <p id="oceanBathymetryDebugHint" class="sidebar-tool-hint" data-i18n="Data source, rendering backend and loaded tiles.">
+                        Data source, rendering backend and loaded tiles.
+                      </p>
+                      <div>
+                        <div class="range-row">
+                          <span id="lblOceanBathymetrySource" class="range-label" data-i18n="Data Source">Data Source</span>
+                          <span id="oceanBathymetrySourceValue" class="range-value">None</span>
+                        </div>
+                        <div class="range-row mt-2">
+                          <span id="lblOceanBathymetryBands" class="range-label" data-i18n="Backend">Backend</span>
+                          <span id="oceanBathymetryBandsValue" class="range-value">0</span>
+                        </div>
+                        <div class="range-row mt-2">
+                          <span id="lblOceanBathymetryContours" class="range-label" data-i18n="Loaded tiles">Loaded tiles</span>
+                          <span id="oceanBathymetryContoursValue" class="range-value">0</span>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </section>
+            </section>
+          </div>
           <div class="inspector-sidebar-tab-row" role="tablist" aria-label="Inspector panels" data-i18n-aria-label="Inspector panels">
             <button
               id="inspectorSidebarTabInspector"

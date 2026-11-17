@@ -250,7 +250,7 @@ test("readonlyModifiers rejects missing extra symbol nested function and nonbool
 
 const SERVICE_NAMES = [
   "appendOperationalLineVertexFromEvent", "appendOperationGraphicVertexFromEvent",
-  "appendSpecialZoneVertexFromEvent", "applyFacilityInfoCardState", "applyFeatureVisualOverrideTransaction",
+  "appendSpecialZoneVertexFromEvent", "applyFacilityInfoCardState", "commitVisualFeaturePaint",
   "applyVisualSubdivisionFill", "applyWaterRegionFill", "blockStartupReadonlyInteraction", "captureHistoryState",
   "commitHistoryEntry", "dismissOnboardingHint", "ensureLeafDetailReady", "getFeatureCountryCodeNormalized",
   "getFeaturePaintColor", "getHitFromEvent", "getHoveredFacilityEntryFromEvent", "getIntensityFieldTool",
@@ -409,7 +409,7 @@ test("select land syncs the inspector without loading detail, painting or record
   assert.deepEqual(harness.trace.filter(([name]) => name === "requestInteractionRender"), [
     ["requestInteractionRender", "select-land"],
   ]);
-  for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
+  for (const forbidden of ["applyVisualSubdivisionFill", "commitVisualFeaturePaint", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
     assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
   }
 });
@@ -687,7 +687,7 @@ test("switching to select during land hydration inspects the refreshed land with
   await pending;
   const sync = harness.trace.find(([name]) => name === "syncInspectorCountryToLandSelection");
   assert.equal(sync[2], "land-2");
-  for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
+  for (const forbidden of ["applyVisualSubdivisionFill", "commitVisualFeaturePaint", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
     assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
   }
 });
@@ -736,14 +736,14 @@ test("country eraser removes feature paint, preserving reference and base colors
     },
   });
   await harness.owner.handleClick({});
-  assert.deepEqual(harness.trace.find(([name]) => name === "applyFeatureVisualOverrideTransaction"), [
-    "applyFeatureVisualOverrideTransaction", ["land-1", "land-2"], null,
-    { remove: true, inputStartedAt: 17, inputLabel: "erase-country-color" },
+  assert.deepEqual(harness.trace.find(([name]) => name === "commitVisualFeaturePaint"), [
+    "commitVisualFeaturePaint", ["land-1", "land-2"], null,
+    { kind: "erase-country-color", inputStartedAt: 17 },
   ]);
   assert.equal(traceNames(harness.trace).includes("removeClickCountryColors"), false);
-  assert.deepEqual(harness.trace.filter(([name]) => name === "captureHistoryState").map(([, scope]) => scope), [
-    { featureIds: ["land-1", "land-2"] }, { featureIds: ["land-1", "land-2"] },
-  ]);
+  assert.equal(traceNames(harness.trace).includes("captureHistoryState"), false);
+  assert.equal(traceNames(harness.trace).includes("commitHistoryEntry"), false);
+  assert.equal(traceNames(harness.trace).includes("markDirty"), false);
 });
 
 test("incomplete country selection warns without painting, history or palette mutation", async () => {
@@ -757,7 +757,7 @@ test("incomplete country selection warns without painting, history or palette mu
     });
     await harness.owner.handleClick({});
     assert.equal(traceNames(harness.trace).at(-1), "warnIncompletePaintTargets");
-    for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickCountryColors", "removeClickCountryColors", "captureHistoryState", "markDirty", "commitHistoryEntry"]) {
+    for (const forbidden of ["applyVisualSubdivisionFill", "commitVisualFeaturePaint", "setClickCountryColors", "removeClickCountryColors", "captureHistoryState", "markDirty", "commitHistoryEntry"]) {
       assert.equal(traceNames(harness.trace).includes(forbidden), false);
     }
   }

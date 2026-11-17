@@ -88,7 +88,7 @@ const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
   "appendOperationGraphicVertexFromEvent",
   "appendSpecialZoneVertexFromEvent",
   "applyFacilityInfoCardState",
-  "applyFeatureVisualOverrideTransaction",
+  "commitVisualFeaturePaint",
   "applyVisualSubdivisionFill",
   "applyWaterRegionFill",
   "blockStartupReadonlyInteraction",
@@ -153,7 +153,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
   const getSelectedFacilityEntry = requireFunction(getters.getSelectedFacilityEntry, "getters.getSelectedFacilityEntry");
   const handleRiverPaintClick = typeof services.handleRiverPaintClick === "function" ? services.handleRiverPaintClick : () => false;
   const { clearClickHoverIds, consumeSuppressedBrushClick, removeClickCountryColors, removeClickWaterRegionOverride, setClickActiveSovereignCode, setClickCountryColors, setClickHoverOverlayDirty, setClickSelectedColor, setClickSelectedSpecialRegionId, setClickSelectedWaterRegionId, setFacilityInfoCardExpanded, setHoveredFacilityEntry, setSelectedFacilityEntry } = requirePorts(effects, CLICK_SELECTION_ACTION_NAMES, "effects");
-  const { appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, clearInspectorLandSelection, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, markDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resolveInteractionTargetIds, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
+  const { appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, commitVisualFeaturePaint, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, clearInspectorLandSelection, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, markDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resolveInteractionTargetIds, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
 
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();
@@ -428,15 +428,9 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     const countryScope = state.interactionGranularity === "country";
     if (state.currentTool === "eraser") {
       const kind = countryScope ? "erase-country-color" : "erase-feature-color";
-      const before = captureHistoryState({ featureIds: targetIds });
-      applyFeatureVisualOverrideTransaction(targetIds, null, {
-        remove: true,
+      commitVisualFeaturePaint(targetIds, null, {
+        kind,
         inputStartedAt: actionStart,
-        inputLabel: kind,
-      });
-      markDirty(kind);
-      commitHistoryEntry({
-        kind, before, after: captureHistoryState({ featureIds: targetIds }),
       });
       requestInteractionRender("click-erase");
       refreshSidebarAfterPaint({ featureIds: targetIds });

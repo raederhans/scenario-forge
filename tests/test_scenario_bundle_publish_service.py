@@ -36,7 +36,7 @@ class ScenarioBundlePublishServiceTest(unittest.TestCase):
             self.assertEqual(record.call_args.kwargs["published_paths"], [scenario_dir / "runtime_topology.topo.json.gz"])
 
     def test_tno_publish_selects_storage_and_keeps_plain_checkpoint(self) -> None:
-        from tools import patch_tno_1962_bundle as tno
+        from map_builder import scenario_bundle_publish_service as publisher
         import json
 
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -55,11 +55,11 @@ class ScenarioBundlePublishServiceTest(unittest.TestCase):
             def write_json(path, value):
                 path.write_text(json.dumps(value))
 
-            with (patch.object(tno, "resolve_scenario_publish_filenames", return_value=[runtime.name, "manifest.json", "audit.json"]),
-                  patch.object(tno.scenario_bundle_platform, "resolve_scenario_publish_filenames", return_value=[runtime.name, "manifest.json", "audit.json"]),
-                  patch.object(tno, "write_runtime_topology_source",
+            with (patch.object(publisher, "resolve_scenario_publish_filenames", return_value=[runtime.name, "manifest.json", "audit.json"]),
+                  patch.object(publisher.scenario_bundle_platform, "resolve_scenario_publish_filenames", return_value=[runtime.name, "manifest.json", "audit.json"]),
+                  patch.object(publisher, "write_runtime_topology_source",
                                side_effect=lambda directory, value: write_runtime_topology_source(directory, value, max_bytes=200))):
-                tno._publish_tno_checkpoint_bundle(
+                publisher.publish_tno_checkpoint_bundle(
                     scenario_dir, checkpoint_dir, "test",
                     load_checkpoint_json=lambda directory, name: read_json_source(directory / name), write_json=write_json,
                 )
@@ -173,7 +173,7 @@ class ScenarioBundlePublishServiceTest(unittest.TestCase):
 
     def test_scenario_data_publish_binds_existing_gzip_runtime_without_republishing_it(self) -> None:
         import json
-        from tools import patch_tno_1962_bundle as tno
+        from map_builder import scenario_bundle_publish_service as publisher
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -190,10 +190,10 @@ class ScenarioBundlePublishServiceTest(unittest.TestCase):
             for name in filenames:
                 value = manifest if name == "manifest.json" else {"source": manifest["source"], "manifest_subset": manifest}
                 (checkpoint_dir / name).write_text(json.dumps(value))
-            with (patch.object(tno, "resolve_scenario_publish_filenames", return_value=filenames),
-                  patch.object(tno.scenario_bundle_platform, "resolve_scenario_publish_filenames", return_value=filenames),
-                  patch.object(tno, "write_runtime_topology_source") as runtime_writer):
-                tno._publish_tno_checkpoint_bundle(scenario_dir, checkpoint_dir, "scenario_data",
+            with (patch.object(publisher, "resolve_scenario_publish_filenames", return_value=filenames),
+                  patch.object(publisher.scenario_bundle_platform, "resolve_scenario_publish_filenames", return_value=filenames),
+                  patch.object(publisher, "write_runtime_topology_source") as runtime_writer):
+                publisher.publish_tno_checkpoint_bundle(scenario_dir, checkpoint_dir, "scenario_data",
                     load_checkpoint_json=lambda directory, name: read_json_source(directory / name),
                     write_json=lambda path, value: path.write_text(json.dumps(value)))
             runtime_writer.assert_not_called()
@@ -305,6 +305,8 @@ class ScenarioBundlePublishServiceTest(unittest.TestCase):
                 stack.enter_context(patch.object(tno, "build_chunk_assets_stage", side_effect=chunks))
                 stack.enter_context(patch.object(tno, "build_and_write_scenario_chunk_assets", side_effect=chunk_builder))
                 stack.enter_context(patch.object(tno, "write_runtime_topology_source",
+                    side_effect=lambda directory, value: write_runtime_topology_source(directory, value, max_bytes=200)))
+                stack.enter_context(patch.object(scenario_bundle_publish_service, "write_runtime_topology_source",
                     side_effect=lambda directory, value: write_runtime_topology_source(directory, value, max_bytes=200)))
                 stack.enter_context(patch.object(tno, "build_bootstrap_runtime_topology", return_value=empty_topology))
                 stack.enter_context(patch.object(tno, "apply_safe_scenario_contract_repairs", side_effect=repair))

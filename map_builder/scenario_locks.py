@@ -9,6 +9,8 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
+from map_builder.json_source import read_json_source
+
 LOCKS_ROOT = Path(".runtime") / "locks" / "scenario"
 LOCK_FILENAME_SUFFIX = ".lock.json"
 _SCENARIO_LOCK_GUARD = threading.RLock()
@@ -135,3 +137,131 @@ def scenario_build_lock(
                     lock_path.unlink(missing_ok=True)
             else:
                 _SCENARIO_LOCK_DEPTHS[lock_key] = depth - 1
+
+
+CHECKPOINT_BUILD_LOCK_FILENAME = ".build.lock"
+_CHECKPOINT_BUILD_LOCK_GUARD = threading.RLock()
+_CHECKPOINT_BUILD_LOCK_DEPTHS: dict[str, int] = {}
+_CHECKPOINT_BUILD_LOCK_OWNERS: dict[str, tuple[int, int, str]] = {}
+_CHECKPOINT_BUILD_LOCK_TRANSACTIONS: ContextVar[dict[str, str]] = ContextVar(
+    "checkpoint_build_lock_transactions",
+    default={},
+)
+
+
+
+def _read_checkpoint_lock(path: Path) -> dict:
+    payload = read_json_source(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected checkpoint lock object: {path}")
+    return payload
+
+
+@contextmanager
+def checkpoint_build_lock(
+    checkpoint_dir: Path,
+    *,
+    stage: str = "all",
+    holder: str = "patch_tno_1962_bundle",
+    transaction_id: str | None = None,
+) -> object:
+    checkpoint_dir = checkpoint_dir.resolve()
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    lock_path = checkpoint_dir / CHECKPOINT_BUILD_LOCK_FILENAME
+    lock_key = str(checkpoint_dir)
+    thread_id = threading.get_ident()
+    normalized_holder = str(holder)
+    inherited_transactions = _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get()
+    inherited_transaction_id = inherited_transactions.get(lock_key)
+    normalized_transaction_id = str(
+        transaction_id or inherited_transaction_id or f"{normalized_holder}:{thread_id}:{uuid.uuid4().hex}"
+    ).strip()
+    owner_identity = (os.getpid(), thread_id, normalized_transaction_id)
+    with _CHECKPOINT_BUILD_LOCK_GUARD:
+        depth = _CHECKPOINT_BUILD_LOCK_DEPTHS.get(lock_key, 0)
+        current_owner = _CHECKPOINT_BUILD_LOCK_OWNERS.get(lock_key)
+        if depth > 0 and current_owner == owner_identity:
+            _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = depth + 1
+            acquired_here = False
+        else:
+            lock_payload = {
+                "pid": os.getpid(),
+                "thread_id": thread_id,
+                "holder": normalized_holder,
+                "transaction_id": normalized_transaction_id,
+                "stage": stage,
+                "cwd": str(Path(__file__).resolve().parents[1]),
+                "checkpoint_dir": str(checkpoint_dir),
+                "acquired_at": datetime.now(timezone.utc).isoformat(),
+            }
+            if depth > 0:
+                existing_lock = None
+                if lock_path.exists():
+                    try:
+                        existing_lock = _read_checkpoint_lock(lock_path)
+                    except Exception:
+                        existing_lock = lock_path.read_text(encoding="utf-8", errors="ignore").strip() or None
+                raise RuntimeError(
+                    "another build is in progress for checkpoint "
+                    f"{checkpoint_dir} (lock: {lock_path}, holder: {existing_lock!r})"
+                )
+            try:
+                with lock_path.open("x", encoding="utf-8", newline="\n") as handle:
+                    json.dump(lock_payload, handle, ensure_ascii=False, indent=2)
+                    handle.write("\n")
+            except FileExistsError as exc:
+                existing_lock = None
+                existing_pid: int | None = None
+                if lock_path.exists():
+                    try:
+                        existing_lock = _read_checkpoint_lock(lock_path)
+                    except Exception:
+                        existing_lock = lock_path.read_text(encoding="utf-8", errors="ignore").strip() or None
+                if isinstance(existing_lock, dict):
+                    try:
+                        existing_pid = int(existing_lock.get("pid"))
+                    except (TypeError, ValueError):
+                        existing_pid = None
+                if existing_pid is not None and existing_pid > 0 and not _pid_is_alive(existing_pid):
+                    lock_path.unlink(missing_ok=True)
+                    try:
+                        with lock_path.open("x", encoding="utf-8", newline="\n") as handle:
+                            json.dump(lock_payload, handle, ensure_ascii=False, indent=2)
+                            handle.write("\n")
+                    except FileExistsError as retry_exc:
+                        holder_after_retry = None
+                        if lock_path.exists():
+                            try:
+                                holder_after_retry = _read_checkpoint_lock(lock_path)
+                            except Exception:
+                                holder_after_retry = lock_path.read_text(encoding="utf-8", errors="ignore").strip() or None
+                        raise RuntimeError(
+                            "another build is in progress for checkpoint "
+                            f"{checkpoint_dir} (lock: {lock_path}, holder: {holder_after_retry!r})"
+                        ) from retry_exc
+                else:
+                    raise RuntimeError(
+                        "another build is in progress for checkpoint "
+                        f"{checkpoint_dir} (lock: {lock_path}, holder: {existing_lock!r})"
+                    ) from exc
+            _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = 1
+            _CHECKPOINT_BUILD_LOCK_OWNERS[lock_key] = owner_identity
+            acquired_here = True
+        current_transactions = dict(_CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get())
+        current_transactions[lock_key] = normalized_transaction_id
+        _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.set(current_transactions)
+    try:
+        yield
+    finally:
+        with _CHECKPOINT_BUILD_LOCK_GUARD:
+            depth = _CHECKPOINT_BUILD_LOCK_DEPTHS.get(lock_key, 0)
+            if depth <= 1:
+                _CHECKPOINT_BUILD_LOCK_DEPTHS.pop(lock_key, None)
+                _CHECKPOINT_BUILD_LOCK_OWNERS.pop(lock_key, None)
+                current_transactions = dict(_CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get())
+                current_transactions.pop(lock_key, None)
+                _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.set(current_transactions)
+                if acquired_here:
+                    lock_path.unlink(missing_ok=True)
+            else:
+                _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = depth - 1

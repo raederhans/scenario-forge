@@ -5,6 +5,19 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
+from map_builder import scenario_bundle_platform
+from map_builder.scenario_bundle_publish_service import resolve_tno_checkpoint_dir
+from map_builder.scenario_locks import checkpoint_build_lock
+from map_builder.contracts import (
+    SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+)
 from map_builder.scenario_build_session import (
     ensure_scenario_build_session,
     record_published_target,
@@ -124,10 +137,8 @@ def publish_scenario_outputs_in_locked_context(
             status=501,
         )
 
-    from tools import patch_tno_1962_bundle as tno_bundle
-
-    resolved_checkpoint_dir = checkpoint_dir or tno_bundle.resolve_default_checkpoint_dir(scenario_dir)
-    with tno_bundle._checkpoint_build_lock(
+    resolved_checkpoint_dir = checkpoint_dir or resolve_tno_checkpoint_dir(scenario_dir)
+    with checkpoint_build_lock(
         resolved_checkpoint_dir,
         stage=f"publish_{normalized_target.replace('-', '_')}",
     ):
@@ -136,10 +147,10 @@ def publish_scenario_outputs_in_locked_context(
                 scenario_dir=scenario_dir,
                 checkpoint_dir=resolved_checkpoint_dir,
                 filenames=[
-                    tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-                    tno_bundle.CHECKPOINT_GEO_LOCALE_FILENAME,
-                    tno_bundle.CHECKPOINT_GEO_LOCALE_EN_FILENAME,
-                    tno_bundle.CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+                    SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
+                    SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
+                    SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+                    SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
                 ],
             )
             results["geoLocale"] = {
@@ -155,14 +166,14 @@ def publish_scenario_outputs_in_locked_context(
             )
 
         if normalized_target in {"startup-support-assets", "startup-assets", "all"}:
-            tno_bundle.scenario_bundle_platform.require_startup_support_stage_checkpoints(resolved_checkpoint_dir)
+            scenario_bundle_platform.require_startup_support_stage_checkpoints(resolved_checkpoint_dir)
             published_support_paths = _tno_copy_checkpoint_artifacts(
                 scenario_dir=scenario_dir,
                 checkpoint_dir=resolved_checkpoint_dir,
                 filenames=[
-                    tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-                    tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME,
-                    tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+                    SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
+                    SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
+                    SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
                 ],
             )
             results["startupSupportAssets"] = {
@@ -178,13 +189,13 @@ def publish_scenario_outputs_in_locked_context(
             )
 
         if normalized_target in {"startup-bundle-assets", "startup-assets", "all"}:
-            tno_bundle.scenario_bundle_platform.require_startup_bundle_stage_checkpoints(resolved_checkpoint_dir)
+            scenario_bundle_platform.require_startup_bundle_stage_checkpoints(resolved_checkpoint_dir)
             published_startup_paths = _tno_copy_checkpoint_artifacts(
                 scenario_dir=scenario_dir,
                 checkpoint_dir=resolved_checkpoint_dir,
                 filenames=[
-                    tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
-                    tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+                    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+                    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
                 ],
             )
             results["startupBundleAssets"] = {
@@ -211,8 +222,8 @@ def publish_scenario_outputs_in_locked_context(
             }
 
         if normalized_target in {"chunk-assets", "all"}:
-            tno_bundle.scenario_bundle_platform.require_chunk_stage_checkpoints(resolved_checkpoint_dir)
-            tno_bundle.scenario_bundle_platform.require_chunk_stage_publish_inputs(scenario_dir)
+            scenario_bundle_platform.require_chunk_stage_checkpoints(resolved_checkpoint_dir)
+            scenario_bundle_platform.require_chunk_stage_publish_inputs(scenario_dir)
             published_chunk_paths = [
                 scenario_dir / "detail_chunks.manifest.json",
                 scenario_dir / "chunks",

@@ -497,6 +497,10 @@ export function createTnoRasterSceneOwner({
     fallbackReason = "disposed";
     view = null;
   }
+  function getPresentationState() {
+    return { active, usingOverview, fallbackReason,
+      publicationPending: ["pending", "ready"].includes(publicationPreparation?.status) };
+  }
   function getDiagnostics({ stageTimings } = {}) {
     if (stageTimings !== undefined) stageTimingsEnabled = stageTimings;
     const stats = compositor?.getStats() || {};
@@ -506,21 +510,21 @@ export function createTnoRasterSceneOwner({
         hardSceneTextureBytes: POLITICAL_TEXTURE_HARD_LIMIT + 44 * RASTER_BUDGET_MAX_PIXELS,
         hardViewportPixels: RASTER_BUDGET_MAX_PIXELS },
       downgraded: stats.downgraded ?? false, textureScale: stats.textureScale ?? 1,
-      active, frames: stats.frames || 0, textureUploads: stats.textureUploads || 0,
+      ...getPresentationState(), frames: stats.frames || 0, textureUploads: stats.textureUploads || 0,
       bytes: (stats.gpuTextureBytes || 0) + (stats.outputSurfaceBytesEstimate || 0),
       gpuTextureBytes: stats.gpuTextureBytes || 0, outputSurfaceBytesEstimate: stats.outputSurfaceBytesEstimate || 0,
-      lastFrameMs: stats.lastFrameMs || 0, totalFrameMs, fallbackReason, view: view ? { ...view } : null,
+      lastFrameMs: stats.lastFrameMs || 0, totalFrameMs, view: view ? { ...view } : null,
       presentationState: active ? lastPresentationState : "unavailable",
       publishedEpoch: published?.frame?.epoch ?? null, publications, retainedFrames,
-      usingOverview, composedWithOverview, partialPasses, overviewReady: !!overview,
+      composedWithOverview, partialPasses, overviewReady: !!overview,
       politicalUncoveredRatio, passUncoveredRatios: { ...passUncoveredRatios }, sceneIncompleteRatio,
       coverageCalculations, stageTimingsEnabled, stageTimings: { coverage: { ...coverageTiming } },
-      publicationPending: ["pending", "ready"].includes(publicationPreparation?.status), preparationError,
+      preparationError,
       preparedPassCount: stats.preparedPassCount || 0, preparedBytes: stats.preparedBytes || 0,
       privateTextureBytes: stats.privateTextureBytes || 0, maxUploadTaskMs: stats.maxUploadTaskMs || 0,
     };
   }
   return { ensureGpu, preparePublication, cancelPublicationPreparation, present,
     presentNavigation: (transform, navigationSnapshot, options) => present(transform, { ...options, navigationSnapshot }),
-    notePassCommit, clear, dispose, getDiagnostics, isActive: () => active };
+    notePassCommit, clear, dispose, getPresentationState, getDiagnostics, isActive: () => active };
 }

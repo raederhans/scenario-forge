@@ -22,6 +22,7 @@ from tools.extract_scenario_atlantropa import (
     split_topology_payload as split_atlantropa_topology_payload,
     update_manifest as update_atlantropa_manifest,
 )
+from map_builder import scenario_locks, scenario_bundle_publish_service
 from tools import patch_tno_1962_bundle as tno_bundle
 from tools.patch_tno_1962_bundle import (
     ATLANTROPA_REGION_CONFIGS,
@@ -2598,7 +2599,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             with tno_bundle._checkpoint_build_lock(checkpoint_dir):
                 self.assertTrue(lock_path.exists())
-                with tno_bundle._checkpoint_build_lock(checkpoint_dir):
+                with scenario_locks.checkpoint_build_lock(checkpoint_dir):
                     self.assertTrue(lock_path.exists())
 
             self.assertFalse(lock_path.exists())
@@ -2642,7 +2643,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with patch.object(tno_bundle, "_pid_is_alive", return_value=True):
+            with patch.object(scenario_locks, "_pid_is_alive", return_value=True):
                 with self.assertRaisesRegex(RuntimeError, "another build is in progress"):
                     with tno_bundle._checkpoint_build_lock(checkpoint_dir):
                         self.fail("lock acquisition should have been blocked")
@@ -2657,7 +2658,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with patch.object(tno_bundle, "_pid_is_alive", return_value=False):
+            with patch.object(scenario_locks, "_pid_is_alive", return_value=False):
                 with tno_bundle._checkpoint_build_lock(checkpoint_dir):
                     self.assertTrue(lock_path.exists())
 
@@ -2931,7 +2932,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 self.assertEqual(target_dir.name, tno_bundle.SCENARIO_ID)
                 return errors
 
-            with patch.object(tno_bundle, "validate_publish_bundle_dir", side_effect=fake_validate_publish_bundle_dir):
+            with patch.object(tno_bundle.scenario_contracts, "validate_publish_bundle_dir", side_effect=fake_validate_publish_bundle_dir):
                 filtered = tno_bundle.validate_tno_publish_checkpoint_dir(checkpoint_dir)
 
         self.assertEqual(len(validation_dirs), 1)
@@ -2960,7 +2961,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 validation_dirs.append(target_dir)
                 return []
 
-            with patch.object(tno_bundle, "validate_publish_bundle_dir", side_effect=fake_validate_publish_bundle_dir):
+            with patch.object(tno_bundle.scenario_contracts, "validate_publish_bundle_dir", side_effect=fake_validate_publish_bundle_dir):
                 errors = tno_bundle.validate_tno_publish_checkpoint_dir(checkpoint_dir)
 
         self.assertEqual(errors, [])
@@ -3779,7 +3780,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             with (
                 patch.object(
-                    tno_bundle,
+                    scenario_bundle_publish_service,
                     "_load_active_server_metadata",
                     return_value={
                         "pid": 12345,
@@ -3787,7 +3788,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                         "url": "http://127.0.0.1:8810",
                     },
                 ),
-                patch.object(tno_bundle, "_pid_is_alive", return_value=True),
+                patch.object(scenario_bundle_publish_service, "_pid_is_alive", return_value=True),
             ):
                 with self.assertRaisesRegex(RuntimeError, "live dev server"):
                     write_bundle_stage(

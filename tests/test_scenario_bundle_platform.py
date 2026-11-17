@@ -19,6 +19,37 @@ def _load_json(path: Path) -> dict:
 
 
 class ScenarioBundlePlatformTest(unittest.TestCase):
+    def test_default_checkpoint_io_preserves_compact_utf8_and_relief_precision(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            checkpoint_dir = Path(tmp_dir)
+            scenario_bundle_platform.write_checkpoint_json(
+                checkpoint_dir,
+                "payload.json",
+                {"name": "海", "values": [float("nan"), -0.0, 1.123456789]},
+            )
+            self.assertEqual(
+                (checkpoint_dir / "payload.json").read_bytes(),
+                '{"name":"海","values":[null,-0.0,1.123456789]}'.encode("utf-8"),
+            )
+            self.assertEqual(
+                scenario_bundle_platform.load_checkpoint_json(checkpoint_dir, "payload.json"),
+                {"name": "海", "values": [None, -0.0, 1.123456789]},
+            )
+            scenario_bundle_platform.write_checkpoint_json(
+                checkpoint_dir,
+                "relief_overlays.geojson",
+                {
+                    "type": "Feature",
+                    "properties": {"height": 1.123456789},
+                    "geometry": {"type": "Point", "coordinates": [1.123456789, -0.0]},
+                },
+            )
+            self.assertEqual(
+                (checkpoint_dir / "relief_overlays.geojson").read_bytes(),
+                b'{"type":"Feature","properties":{"height":1.123456789},'
+                b'"geometry":{"type":"Point","coordinates":[1.123457,-0.0]}}',
+            )
+
     def test_checkpoint_artifact_loop_writes_and_loads_json_and_gdf_payloads(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             checkpoint_dir = Path(tmp_dir) / "checkpoint"

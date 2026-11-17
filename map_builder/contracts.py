@@ -8,6 +8,7 @@ across entry scripts.
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 from dataclasses import dataclass
@@ -691,6 +692,15 @@ SCENARIO_BUNDLE_STAGE_DESCRIPTORS: tuple[StageDescriptor, ...] = (
     ),
 )
 
+MANUAL_SYNC_POLICY_BACKUP_CONTINUE = "backup-continue"
+MANUAL_SYNC_POLICY_WARN_CONTINUE = "warn-continue"
+MANUAL_SYNC_POLICY_STRICT_BLOCK = "strict-block"
+MANUAL_SYNC_POLICY_CHOICES = [
+    MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+    MANUAL_SYNC_POLICY_WARN_CONTINUE,
+    MANUAL_SYNC_POLICY_STRICT_BLOCK,
+]
+
 SCENARIO_PUBLISH_SCOPE_POLAR_RUNTIME = "polar_runtime"
 SCENARIO_PUBLISH_SCOPE_SCENARIO_DATA = "scenario_data"
 SCENARIO_PUBLISH_SCOPE_ALL = "all"
@@ -896,6 +906,36 @@ def normalize_scenario_contract_tag(raw_value: object) -> str:
     # contract tag 进入 snapshot fingerprint 前先收敛成稳定 ID，避免大小写或符号差异制造伪漂移。
     text = "".join(ch for ch in str(raw_value or "").strip().upper() if ch.isalnum())
     return text
+
+
+def normalize_scenario_core_tags(raw_value: object) -> list[str]:
+    if raw_value is None:
+        return []
+    if isinstance(raw_value, str):
+        text = raw_value.strip()
+        if not text:
+            return []
+        if text[:1] in "[({" and text[-1:] in "])}":
+            try:
+                parsed = ast.literal_eval(text)
+            except (SyntaxError, ValueError):
+                parsed = None
+            if parsed is not None and parsed is not raw_value:
+                return normalize_scenario_core_tags(parsed)
+        normalized = normalize_scenario_contract_tag(text)
+        return [normalized] if normalized else []
+    if isinstance(raw_value, (list, tuple, set)):
+        tags: list[str] = []
+        seen: set[str] = set()
+        for item in raw_value:
+            for tag in normalize_scenario_core_tags(item):
+                if tag in seen:
+                    continue
+                seen.add(tag)
+                tags.append(tag)
+        return tags
+    normalized = normalize_scenario_contract_tag(raw_value)
+    return [normalized] if normalized else []
 
 
 def resolve_scenario_contract_profile(scenario_id: str) -> ScenarioContractProfile:

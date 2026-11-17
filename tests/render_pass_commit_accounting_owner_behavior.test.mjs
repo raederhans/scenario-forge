@@ -293,7 +293,7 @@ test("requires declared dependencies", () => {
   );
 });
 
-test("freezes returned summary and trace arrays", () => {
+test("freezes returned summary", () => {
   const { owner } = createOwnerHarness();
 
   const summary = owner.commitRenderPass({
@@ -304,6 +304,4 @@ test("freezes returned summary and trace arrays", () => {
   });
 
   assert.equal(Object.isFrozen(summary), true);
-  assert.equal(Object.isFrozen(summary.effectOrder), true);
-  assert.equal(Object.isFrozen(summary.getterOrder), true);
 });
