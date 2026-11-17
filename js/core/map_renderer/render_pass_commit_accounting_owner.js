@@ -1,28 +1,4 @@
 import { requireFunction } from "../renderer/require_named_function.js";
-const REQUIRED_EFFECT_NAMES = Object.freeze([
-  "clearPassFullReferenceTransforms",
-  "incrementPerfCounter",
-  "recordPassTiming",
-  "recordRenderPerfMetric",
-  "schedulePoliticalPathWarmup",
-  "setPassFullReferenceTransform",
-  "setPassReferenceTransform",
-]);
-
-const REQUIRED_GETTER_NAMES = Object.freeze([
-  "getPassCounterNames",
-  "getRenderPassCacheState",
-  "getRenderPassSignature",
-  "getVisibleFrameIdentity",
-  "nowMs",
-]);
-
-function createTrace() {
-  return {
-    effectOrder: [],
-    getterOrder: [],
-  };
-}
 
 function createSummary({
   passName,
@@ -34,7 +10,6 @@ function createSummary({
   timingRecorded = false,
   politicalFineCacheReady = false,
   hostSummary = null,
-  trace,
 }) {
   return Object.freeze({
     passName,
@@ -46,28 +21,22 @@ function createSummary({
     timingRecorded: Boolean(timingRecorded),
     politicalFineCacheReady: Boolean(politicalFineCacheReady),
     hostSummary,
-    effectOrder: Object.freeze([...(trace?.effectOrder || [])]),
-    getterOrder: Object.freeze([...(trace?.getterOrder || [])]),
   });
 }
 
 export function createRenderPassCommitAccountingOwner({ effects = {}, getters = {} } = {}) {
-  const effectApi = Object.fromEntries(
-    REQUIRED_EFFECT_NAMES.map((name) => [name, requireFunction(effects, name, "effects")]),
-  );
-  const getterApi = Object.fromEntries(
-    REQUIRED_GETTER_NAMES.map((name) => [name, requireFunction(getters, name, "getters")]),
-  );
-
-  function runEffect(trace, name, ...args) {
-    trace.effectOrder.push(name);
-    return effectApi[name](...args);
-  }
-
-  function runGetter(trace, name, ...args) {
-    trace.getterOrder.push(name);
-    return getterApi[name](...args);
-  }
+  const clearPassFullReferenceTransforms = requireFunction(effects, "clearPassFullReferenceTransforms", "effects");
+  const incrementPerfCounter = requireFunction(effects, "incrementPerfCounter", "effects");
+  const recordPassTiming = requireFunction(effects, "recordPassTiming", "effects");
+  const recordRenderPerfMetric = requireFunction(effects, "recordRenderPerfMetric", "effects");
+  const schedulePoliticalPathWarmup = requireFunction(effects, "schedulePoliticalPathWarmup", "effects");
+  const setPassFullReferenceTransform = requireFunction(effects, "setPassFullReferenceTransform", "effects");
+  const setPassReferenceTransform = requireFunction(effects, "setPassReferenceTransform", "effects");
+  const getPassCounterNames = requireFunction(getters, "getPassCounterNames", "getters");
+  const getRenderPassCacheState = requireFunction(getters, "getRenderPassCacheState", "getters");
+  const getRenderPassSignature = requireFunction(getters, "getRenderPassSignature", "getters");
+  const getVisibleFrameIdentity = requireFunction(getters, "getVisibleFrameIdentity", "getters");
+  const nowMs = requireFunction(getters, "nowMs", "getters");
 
   function commitRenderPass({
     passName,
@@ -77,15 +46,12 @@ export function createRenderPassCommitAccountingOwner({ effects = {}, getters = 
     passStart = 0,
     hostSummary = null,
   } = {}) {
-    const trace = createTrace();
     const normalizedPassName = String(passName || "");
     if (drawResult && typeof drawResult === "object" && drawResult.committed === false) {
       const reason = String(drawResult.reason || "draw-declined-commit");
-      runEffect(
-        trace,
-        "recordRenderPerfMetric",
+      recordRenderPerfMetric(
         "renderPassCommitSkipped",
-        runGetter(trace, "nowMs") - Number(passStart || 0),
+        nowMs() - Number(passStart || 0),
         { passName: normalizedPassName, reason },
       );
       return createSummary({
@@ -93,15 +59,14 @@ export function createRenderPassCommitAccountingOwner({ effects = {}, getters = 
         skipped: true,
         skipReason: reason,
         hostSummary,
-        trace,
       });
     }
 
-    const cache = runGetter(trace, "getRenderPassCacheState");
-    runEffect(trace, "setPassReferenceTransform", normalizedPassName, transform);
+    const cache = getRenderPassCacheState();
+    setPassReferenceTransform(normalizedPassName, transform);
     let politicalFineCacheReady = false;
     if (normalizedPassName === "political") {
-      const identity = runGetter(trace, "getVisibleFrameIdentity", transform);
+      const identity = getVisibleFrameIdentity(transform);
       const politicalDataStage = String(drawResult?.politicalDataStage || identity.politicalDataStage || "unknown");
       const fullPoliticalReady = !!(drawResult?.fullPoliticalReady ?? identity.fullPoliticalReady);
       // political pass 的 full reference 只在 fine cache 可用时保留，避免 coarse 帧污染后续复用判断。
@@ -113,26 +78,20 @@ export function createRenderPassCommitAccountingOwner({ effects = {}, getters = 
       cache.politicalPassFullReady = fullPoliticalReady;
       cache.politicalPassFineCacheReady = politicalFineCacheReady;
       if (politicalFineCacheReady) {
-        runEffect(trace, "setPassFullReferenceTransform", normalizedPassName, transform);
+        setPassFullReferenceTransform(normalizedPassName, transform);
       } else {
-        runEffect(trace, "clearPassFullReferenceTransforms", [normalizedPassName]);
+        clearPassFullReferenceTransforms([normalizedPassName]);
       }
     }
 
-    cache.signatures[normalizedPassName] = runGetter(
-      trace,
-      "getRenderPassSignature",
-      normalizedPassName,
-      transform,
-    );
+    cache.signatures[normalizedPassName] = getRenderPassSignature(normalizedPassName, transform);
     cache.dirty[normalizedPassName] = false;
     if (normalizedPassName === "political" && politicalFineCacheReady) {
       cache.partialPoliticalDirtyIds.clear();
-      runEffect(trace, "schedulePoliticalPathWarmup", transform);
+      schedulePoliticalPathWarmup(transform);
     }
-    runEffect(trace, "recordPassTiming", timings, normalizedPassName, passStart);
-    runGetter(trace, "getPassCounterNames", normalizedPassName)
-      .forEach((counterName) => runEffect(trace, "incrementPerfCounter", counterName));
+    recordPassTiming(timings, normalizedPassName, passStart);
+    getPassCounterNames(normalizedPassName).forEach((counterName) => incrementPerfCounter(counterName));
     if (normalizedPassName === "contextScenario") {
       cache.counters.contextScenarioReuseCount = 0;
     }
@@ -145,7 +104,6 @@ export function createRenderPassCommitAccountingOwner({ effects = {}, getters = 
       timingRecorded: true,
       politicalFineCacheReady,
       hostSummary,
-      trace,
     });
   }
 

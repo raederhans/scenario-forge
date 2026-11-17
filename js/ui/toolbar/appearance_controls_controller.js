@@ -113,11 +113,6 @@ export function createAppearanceControlsController({
   const mapContentStack = document.getElementById("mapContentStack");
   const mapContentPanelSpecs = [
     {
-      panel: document.getElementById("appearancePanelOcean"),
-      tabId: "ocean",
-      labelledBy: "mapContentTabOcean",
-    },
-    {
       panel: document.getElementById("appearancePanelDayNight"),
       tabId: "daynight",
       labelledBy: "mapContentTabDayNight",

@@ -1,20 +1,4 @@
 import { requireFunction } from "../renderer/require_named_function.js";
-const REQUIRED_EFFECT_NAMES = Object.freeze([
-  "ensureRenderPassCanvas",
-  "prepareTargetContext",
-  "withRenderTarget",
-]);
-
-const REQUIRED_GETTER_NAMES = Object.freeze([
-  "getRenderPassLayout",
-]);
-
-function createTrace() {
-  return {
-    effectOrder: [],
-    getterOrder: [],
-  };
-}
 
 function createSummary({
   passName,
@@ -25,7 +9,6 @@ function createSummary({
   drawResult,
   skipped = false,
   skipReason = "",
-  trace,
 }) {
   return Object.freeze({
     passName,
@@ -36,28 +19,14 @@ function createSummary({
     drawResult,
     skipped: Boolean(skipped),
     skipReason: String(skipReason || ""),
-    effectOrder: Object.freeze([...(trace?.effectOrder || [])]),
-    getterOrder: Object.freeze([...(trace?.getterOrder || [])]),
   });
 }
 
 export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = {}) {
-  const effectApi = Object.fromEntries(
-    REQUIRED_EFFECT_NAMES.map((name) => [name, requireFunction(effects, name, "effects")]),
-  );
-  const getterApi = Object.fromEntries(
-    REQUIRED_GETTER_NAMES.map((name) => [name, requireFunction(getters, name, "getters")]),
-  );
-
-  function runEffect(trace, name, ...args) {
-    trace.effectOrder.push(name);
-    return effectApi[name](...args);
-  }
-
-  function runGetter(trace, name, ...args) {
-    trace.getterOrder.push(name);
-    return getterApi[name](...args);
-  }
+  const ensureRenderPassCanvas = requireFunction(effects, "ensureRenderPassCanvas", "effects");
+  const prepareTargetContext = requireFunction(effects, "prepareTargetContext", "effects");
+  const withRenderTarget = requireFunction(effects, "withRenderTarget", "effects");
+  const getRenderPassLayout = requireFunction(getters, "getRenderPassLayout", "getters");
 
   function prepareRenderPassHost({
     passName,
@@ -79,21 +48,18 @@ export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = 
         return nativeSummary.drawResult;
       });
       return nativeSummary || createSummary({ passName, k: Number(transform?.k || 1),
-        drawInvoked: true, drawResult, trace: createTrace() });
+        drawInvoked: true, drawResult });
     }
-    const trace = createTrace();
     const normalizedPassName = String(passName || "");
-    const passCanvas = runEffect(trace, "ensureRenderPassCanvas", normalizedPassName);
+    const passCanvas = ensureRenderPassCanvas(normalizedPassName);
     if (!passCanvas) {
       return createSummary({
         passName: normalizedPassName,
         skipped: true,
         skipReason: "missing-pass-canvas",
-        trace,
       });
     }
 
-    trace.effectOrder.push("getContext2D");
     const passContext = typeof passCanvas.getContext === "function"
       ? passCanvas.getContext("2d")
       : null;
@@ -103,12 +69,10 @@ export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = 
         hasPassCanvas: true,
         skipped: true,
         skipReason: "missing-pass-context",
-        trace,
       });
     }
 
     if (typeof onHostReady === "function") {
-      trace.effectOrder.push("onHostReady");
       onHostReady({
         passName: normalizedPassName,
         passCanvas,
@@ -116,15 +80,14 @@ export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = 
       });
     }
 
-    const layout = runGetter(trace, "getRenderPassLayout", normalizedPassName);
+    const layout = getRenderPassLayout(normalizedPassName);
     let k = null;
     let drawInvoked = false;
     let drawResult;
 
     // host owner 只准备 canvas/context/scale，并把真实绘制交回 drawFn；提交与缓存 accounting 留给后续 owner。
-    runEffect(trace, "withRenderTarget", passContext, () => {
-      k = runEffect(trace, "prepareTargetContext", passContext, transform, layout);
-      trace.effectOrder.push("drawFn");
+    withRenderTarget(passContext, () => {
+      k = prepareTargetContext(passContext, transform, layout);
       drawInvoked = true;
       drawResult = drawFn(k);
       return drawResult;
@@ -137,7 +100,6 @@ export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = 
       hasPassContext: true,
       drawInvoked,
       drawResult,
-      trace,
     });
   }
 

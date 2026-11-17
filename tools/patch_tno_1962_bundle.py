@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import ast
 import copy
 import csv
 import hashlib
@@ -12,12 +11,9 @@ import re
 import shutil
 import sys
 import tempfile
-import threading
 import uuid
 from collections import Counter, deque
 from contextlib import contextmanager
-from contextvars import ContextVar
-from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
 import geopandas as gpd
@@ -43,10 +39,9 @@ from map_builder.geo.water_geometry import compile_water_feature_collection, rep
 from map_builder.geo.water_region_authority import compile_named_water_regions
 from map_builder.geo.water_validation import validate_water_runtime
 from map_builder.geo.utils import build_named_topology
-from map_builder.io.readers import read_json_strict
-from map_builder.io.writers import write_bytes_atomic, write_json_atomic
+from map_builder.io.writers import write_json_atomic
 from map_builder.json_source import (
-    json_source_sha256, portable_gzip_bytes, read_json_bytes, resolve_json_source_path, write_runtime_topology_source,
+    json_source_sha256, read_json_bytes, resolve_json_source_path, write_runtime_topology_source,
 )
 from map_builder.content_addressed_artifact_cache import (
     ArtifactCacheError,
@@ -60,7 +55,41 @@ from map_builder.scenario_build_session import (
     record_stage_outputs,
     stable_stage_signature,
 )
-from map_builder.scenario_locks import scenario_build_lock
+# Keep legacy builder imports available while shared behavior lives in map_builder.
+from map_builder.scenario_locks import (
+    CHECKPOINT_BUILD_LOCK_FILENAME,
+    checkpoint_build_lock as _checkpoint_build_lock,
+    scenario_build_lock,
+)
+from map_builder.scenario_bundle_platform import (
+    load_json,
+    round_geojson_coordinates,
+    sanitize_jsonable,
+    utc_timestamp,
+    write_json,
+)
+from map_builder.scenario_geo_locale_materializer import (
+    build_locale_specific_geo_locale_payload,
+    ensure_geo_locale_variant_checkpoints,
+    normalize_locale_override_entry,
+    validate_geo_locale_checkpoint,
+    validate_geo_locale_manual_overrides,
+)
+from map_builder.scenario_bundle_publish_service import (
+    MANUAL_SYNC_BACKUP_ROOT,
+    MANUAL_SYNC_REPORT_DIR,
+    RUNTIME_ACTIVE_SERVER_METADATA_PATH,
+    _bind_runtime_source_payload,
+    _ensure_scenario_publish_target_offline,
+    _load_active_server_metadata,
+    _refresh_rebound_runtime_snapshot,
+    _sync_published_json_gzip,
+    build_tno_publish_service_kwargs as _build_bundle_publish_service_kwargs,
+    detect_unsynced_manual_edits,
+    publish_tno_checkpoint_bundle as _publish_tno_checkpoint_bundle,
+    resolve_tno_checkpoint_dir as resolve_default_checkpoint_dir,
+    validate_tno_publish_checkpoint_dir,
+)
 from map_builder import scenario_bundle_platform
 from map_builder import scenario_bundle_publish_service
 from map_builder import scenario_publish_service
@@ -71,6 +100,12 @@ from map_builder.scenario_rebuild_planner import (
     resolve_tno_rebuild_plan,
 )
 from map_builder.contracts import (
+    MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+    MANUAL_SYNC_POLICY_WARN_CONTINUE,
+    MANUAL_SYNC_POLICY_STRICT_BLOCK,
+    MANUAL_SYNC_POLICY_CHOICES,
+    normalize_scenario_contract_tag as normalize_tag,
+    normalize_scenario_core_tags as normalize_core_tags,
     SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME,
@@ -113,7 +148,6 @@ from tools.atlantropa_island_alignment import fit_bbox_alignment
 from tools.atlantropa_identity import reconcile_island_identity, IslandIdentityError
 from tools import check_scenario_contracts as scenario_contracts
 from tools.check_scenario_contracts import apply_safe_scenario_contract_repairs, write_tno_coverage_ledgers
-from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
 from tools.validate_tno_water_geometries import (
     collect_d3_spherical_metrics,
@@ -134,7 +168,6 @@ TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
 TNO_PALETTE_AUDIT_PATH = ROOT / "data/palette-maps/tno.audit.json"
 WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
 DEFAULT_STARTUP_TOPOLOGY_URL = "data/europe_topology.runtime_political_v1.json"
-CHECKPOINT_BUILD_LOCK_FILENAME = ".build.lock"
 TNO_QYZYLORDA_INLAND_WATER_ID = "tno_qyzylorda_inland_water"
 TNO_QYZYLORDA_INLAND_WATER_SOURCE_FEATURE_ID = "KAZ-3197"
 TNO_QYZYLORDA_INLAND_WATER_PROBE = Point(63.38183, 45.97802)
@@ -177,14 +210,6 @@ PUBLISH_SCOPE_CHOICES = [
     PUBLISH_SCOPE_SCENARIO_DATA,
     PUBLISH_SCOPE_ALL,
 ]
-MANUAL_SYNC_POLICY_BACKUP_CONTINUE = "backup-continue"
-MANUAL_SYNC_POLICY_WARN_CONTINUE = "warn-continue"
-MANUAL_SYNC_POLICY_STRICT_BLOCK = "strict-block"
-MANUAL_SYNC_POLICY_CHOICES = [
-    MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
-    MANUAL_SYNC_POLICY_WARN_CONTINUE,
-    MANUAL_SYNC_POLICY_STRICT_BLOCK,
-]
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("africa", ROOT / "data/scenario-rules/tno_1962.africa_ownership.manual.json"),
     ("east_asia", ROOT / "data/scenario-rules/tno_1962.east_asia_ownership.manual.json"),
@@ -194,126 +219,7 @@ REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
 ]
 MODERN_WORLD_COUNTRIES_PATH = ROOT / "data/scenarios/modern_world/countries.json"
 MANUAL_OVERRIDE_FILENAME = "scenario_manual_overrides.json"
-MANUAL_SYNC_REPORT_DIR = ROOT / ".runtime" / "reports" / "generated" / "manual-sync"
-MANUAL_SYNC_BACKUP_ROOT = ROOT / ".runtime" / "backups" / "scenario-rebuild"
 STARTUP_BUNDLE_REPORT_PATH = ROOT / ".runtime" / "reports" / "generated" / "startup_bundle_report.json"
-_CHECKPOINT_BUILD_LOCK_GUARD = threading.RLock()
-_CHECKPOINT_BUILD_LOCK_DEPTHS: dict[str, int] = {}
-_CHECKPOINT_BUILD_LOCK_OWNERS: dict[str, tuple[int, int, str]] = {}
-_CHECKPOINT_BUILD_LOCK_TRANSACTIONS: ContextVar[dict[str, str]] = ContextVar(
-    "checkpoint_build_lock_transactions",
-    default={},
-)
-
-
-@contextmanager
-def _checkpoint_build_lock(
-    checkpoint_dir: Path,
-    *,
-    stage: str = STAGE_ALL,
-    holder: str = "patch_tno_1962_bundle",
-    transaction_id: str | None = None,
-) -> object:
-    checkpoint_dir = checkpoint_dir.resolve()
-    checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    lock_path = checkpoint_dir / CHECKPOINT_BUILD_LOCK_FILENAME
-    lock_key = str(checkpoint_dir)
-    thread_id = threading.get_ident()
-    normalized_holder = str(holder)
-    inherited_transactions = _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get()
-    inherited_transaction_id = inherited_transactions.get(lock_key)
-    normalized_transaction_id = str(
-        transaction_id or inherited_transaction_id or f"{normalized_holder}:{thread_id}:{uuid.uuid4().hex}"
-    ).strip()
-    owner_identity = (os.getpid(), thread_id, normalized_transaction_id)
-    with _CHECKPOINT_BUILD_LOCK_GUARD:
-        depth = _CHECKPOINT_BUILD_LOCK_DEPTHS.get(lock_key, 0)
-        current_owner = _CHECKPOINT_BUILD_LOCK_OWNERS.get(lock_key)
-        if depth > 0 and current_owner == owner_identity:
-            _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = depth + 1
-            acquired_here = False
-        else:
-            lock_payload = {
-                "pid": os.getpid(),
-                "thread_id": thread_id,
-                "holder": normalized_holder,
-                "transaction_id": normalized_transaction_id,
-                "stage": stage,
-                "cwd": str(ROOT),
-                "checkpoint_dir": str(checkpoint_dir),
-                "acquired_at": datetime.now(timezone.utc).isoformat(),
-            }
-            if depth > 0:
-                existing_lock = None
-                if lock_path.exists():
-                    try:
-                        existing_lock = load_json(lock_path)
-                    except Exception:
-                        existing_lock = lock_path.read_text(encoding="utf-8", errors="ignore").strip() or None
-                raise RuntimeError(
-                    "another build is in progress for checkpoint "
-                    f"{checkpoint_dir} (lock: {lock_path}, holder: {existing_lock!r})"
-                )
-            try:
-                with lock_path.open("x", encoding="utf-8", newline="\n") as handle:
-                    json.dump(lock_payload, handle, ensure_ascii=False, indent=2)
-                    handle.write("\n")
-            except FileExistsError as exc:
-                existing_lock = None
-                existing_pid: int | None = None
-                if lock_path.exists():
-                    try:
-                        existing_lock = load_json(lock_path)
-                    except Exception:
-                        existing_lock = lock_path.read_text(encoding="utf-8", errors="ignore").strip() or None
-                if isinstance(existing_lock, dict):
-                    try:
-                        existing_pid = int(existing_lock.get("pid"))
-                    except (TypeError, ValueError):
-                        existing_pid = None
-                if existing_pid is not None and existing_pid > 0 and not _pid_is_alive(existing_pid):
-                    lock_path.unlink(missing_ok=True)
-                    try:
-                        with lock_path.open("x", encoding="utf-8", newline="\n") as handle:
-                            json.dump(lock_payload, handle, ensure_ascii=False, indent=2)
-                            handle.write("\n")
-                    except FileExistsError as retry_exc:
-                        holder_after_retry = None
-                        if lock_path.exists():
-                            try:
-                                holder_after_retry = load_json(lock_path)
-                            except Exception:
-                                holder_after_retry = lock_path.read_text(encoding="utf-8", errors="ignore").strip() or None
-                        raise RuntimeError(
-                            "another build is in progress for checkpoint "
-                            f"{checkpoint_dir} (lock: {lock_path}, holder: {holder_after_retry!r})"
-                        ) from retry_exc
-                else:
-                    raise RuntimeError(
-                        "another build is in progress for checkpoint "
-                        f"{checkpoint_dir} (lock: {lock_path}, holder: {existing_lock!r})"
-                    ) from exc
-            _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = 1
-            _CHECKPOINT_BUILD_LOCK_OWNERS[lock_key] = owner_identity
-            acquired_here = True
-        current_transactions = dict(_CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get())
-        current_transactions[lock_key] = normalized_transaction_id
-        _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.set(current_transactions)
-    try:
-        yield
-    finally:
-        with _CHECKPOINT_BUILD_LOCK_GUARD:
-            depth = _CHECKPOINT_BUILD_LOCK_DEPTHS.get(lock_key, 0)
-            if depth <= 1:
-                _CHECKPOINT_BUILD_LOCK_DEPTHS.pop(lock_key, None)
-                _CHECKPOINT_BUILD_LOCK_OWNERS.pop(lock_key, None)
-                current_transactions = dict(_CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get())
-                current_transactions.pop(lock_key, None)
-                _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.set(current_transactions)
-                if acquired_here:
-                    lock_path.unlink(missing_ok=True)
-            else:
-                _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = depth - 1
 
 
 @contextmanager
@@ -325,15 +231,6 @@ def _scenario_build_session_lock(scenario_dir: Path) -> object:
         holder="patch_tno_1962_bundle",
     ):
         yield
-
-
-def resolve_default_checkpoint_dir(scenario_dir: Path = SCENARIO_DIR) -> Path:
-    session = ensure_scenario_build_session(
-        scenario_id=SCENARIO_ID,
-        scenario_dir=scenario_dir,
-        root=ROOT,
-    )
-    return Path(session["buildDir"])
 
 
 def _record_checkpoint_stage_outputs(
@@ -615,7 +512,6 @@ def _stage_signature_is_current(
         ):
             return False
     return True
-RUNTIME_ACTIVE_SERVER_METADATA_PATH = ROOT / ".runtime" / "dev" / "active_server.json"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
     Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
@@ -5640,68 +5536,6 @@ CONTEXT_LAND_MASK_PROTECTED_AOI_KEYS = (
 CONTEXT_LAND_MASK_PROTECTED_AOI_MARGIN_DEG = 0.35
 
 
-def utc_timestamp() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-
-
-def load_json(path: Path) -> dict:
-    payload = read_json_strict(path)
-    if not isinstance(payload, dict):
-        raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
-    return payload
-
-
-def _pid_is_alive(pid: int) -> bool:
-    try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    except OSError:
-        return False
-    return True
-
-
-def _load_active_server_metadata(path: Path = RUNTIME_ACTIVE_SERVER_METADATA_PATH) -> dict[str, object] | None:
-    if not path.exists():
-        return None
-    try:
-        payload = load_json(path)
-    except Exception:
-        return None
-    return payload if isinstance(payload, dict) else None
-
-
-def _ensure_scenario_publish_target_offline(
-    scenario_dir: Path,
-    metadata_path: Path | None = None,
-) -> None:
-    metadata_path = metadata_path or RUNTIME_ACTIVE_SERVER_METADATA_PATH
-    metadata = _load_active_server_metadata(metadata_path)
-    if not metadata:
-        return
-    raw_pid = metadata.get("pid")
-    try:
-        pid = int(raw_pid)
-    except (TypeError, ValueError):
-        return
-    if pid <= 0 or not _pid_is_alive(pid):
-        return
-    raw_cwd = str(metadata.get("cwd") or "").strip()
-    if not raw_cwd:
-        return
-    server_root = Path(raw_cwd).resolve()
-    target_dir = scenario_dir.resolve()
-    if not target_dir.is_relative_to(server_root):
-        return
-    raise RuntimeError(
-        "Scenario data publish is blocked because a live dev server is serving this workspace. "
-        f"Stop the local dev server or close browser tabs using {metadata.get('url') or 'the active preview'}, "
-        f"then retry publishing {target_dir}."
-    )
-
-
 _mediterranean_template_water_gdf: gpd.GeoDataFrame | None = None
 _global_water_regions_feature_index: dict[str, dict] | None = None
 _marine_regions_feature_collection_cache: dict[tuple[str, str], dict] = {}
@@ -6287,30 +6121,6 @@ def apply_tno_named_water_exclusions(named_features: list[dict]) -> list[dict]:
     ]
 
 
-def sanitize_jsonable(value):
-    if isinstance(value, float) and math.isnan(value):
-        return None
-    if isinstance(value, dict):
-        return {key: sanitize_jsonable(inner) for key, inner in value.items()}
-    if isinstance(value, list):
-        return [sanitize_jsonable(item) for item in value]
-    return value
-
-
-def write_json(path: Path, payload: dict) -> None:
-    sanitized = sanitize_jsonable(payload)
-    if path.name == "relief_overlays.geojson":
-        sanitized = round_geojson_coordinates(sanitized, decimals=6)
-    write_json_atomic(
-        path,
-        sanitized,
-        ensure_ascii=False,
-        separators=(",", ":"),
-        allow_nan=False,
-        indent=None,
-    )
-
-
 def collect_gdf_feature_ids(gdf: gpd.GeoDataFrame) -> set[str]:
     if "id" not in gdf.columns:
         raise ValueError("GeoDataFrame is missing required 'id' column.")
@@ -6319,37 +6129,6 @@ def collect_gdf_feature_ids(gdf: gpd.GeoDataFrame) -> set[str]:
         for value in gdf["id"].tolist()
         if str(value).strip()
     }
-
-
-def round_geojson_coordinates(payload: object, decimals: int = 6) -> object:
-    if isinstance(payload, list):
-        if payload and all(isinstance(value, (int, float)) for value in payload):
-            rounded = []
-            for value in payload:
-                if isinstance(value, int):
-                    rounded.append(value)
-                else:
-                    rounded.append(round(value, decimals))
-            return rounded
-        return [round_geojson_coordinates(item, decimals=decimals) for item in payload]
-    if isinstance(payload, dict):
-        next_payload = dict(payload)
-        if "coordinates" in next_payload:
-            next_payload["coordinates"] = round_geojson_coordinates(next_payload["coordinates"], decimals=decimals)
-        if "geometries" in next_payload and isinstance(next_payload["geometries"], list):
-            next_payload["geometries"] = [
-                round_geojson_coordinates(item, decimals=decimals)
-                for item in next_payload["geometries"]
-            ]
-        if "features" in next_payload and isinstance(next_payload["features"], list):
-            next_payload["features"] = [
-                round_geojson_coordinates(item, decimals=decimals)
-                for item in next_payload["features"]
-            ]
-        if "geometry" in next_payload and next_payload["geometry"] is not None:
-            next_payload["geometry"] = round_geojson_coordinates(next_payload["geometry"], decimals=decimals)
-        return next_payload
-    return payload
 
 
 def marine_regions_named_water_snapshot_path(scenario_dir: Path) -> Path:
@@ -6848,41 +6627,6 @@ CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME = CONTRACT_CHECKPOINT_WATER_REGIONS
 PUBLISH_FILENAMES_BY_SCOPE = CONTRACT_PUBLISH_FILENAMES_BY_SCOPE
 
 
-def normalize_locale_override_entry(source: object) -> dict[str, str] | None:
-    if not isinstance(source, dict):
-        return None
-    en = str(source.get("en") or source.get("name_en") or source.get("label_en") or "").strip()
-    zh = str(source.get("zh") or source.get("name_zh") or source.get("label_zh") or source.get("name_cn") or "").strip()
-    entry: dict[str, str] = {}
-    if en:
-        entry["en"] = en
-    if zh:
-        entry["zh"] = zh
-    return entry or None
-
-
-def round_geojson_coordinates(payload: object, decimals: int = 6) -> object:
-    if isinstance(payload, list):
-        if payload and all(isinstance(value, (int, float)) for value in payload):
-            rounded: list[object] = []
-            for value in payload:
-                if isinstance(value, float):
-                    rounded.append(round(value, decimals))
-                else:
-                    rounded.append(value)
-            return rounded
-        return [round_geojson_coordinates(item, decimals=decimals) for item in payload]
-    if isinstance(payload, dict):
-        rounded = {}
-        for key, value in payload.items():
-            if key in {"coordinates", "geometries", "features", "geometry"}:
-                rounded[key] = round_geojson_coordinates(value, decimals=decimals)
-            else:
-                rounded[key] = value
-        return rounded
-    return payload
-
-
 def clamp_antimeridian_coordinate(value: float, *, epsilon: float = 0.001) -> float:
     if -180.0 - epsilon <= value < -180.0:
         return -180.0
@@ -6912,41 +6656,6 @@ def clamp_geojson_longitudes(payload: object, *, epsilon: float = 0.001) -> obje
     return payload
 
 
-def build_locale_specific_geo_locale_payload(payload: dict, language: str) -> dict:
-    normalized_language = "zh" if str(language or "").strip().lower() == "zh" else "en"
-    language_geo: dict[str, dict[str, str]] = {}
-    raw_geo = payload.get("geo", {}) if isinstance(payload, dict) else {}
-    for feature_id, raw_entry in raw_geo.items():
-        entry = normalize_locale_override_entry(raw_entry)
-        if not entry:
-            continue
-        value = str(entry.get(normalized_language) or "").strip()
-        if not value:
-            continue
-        language_geo[str(feature_id)] = {normalized_language: value}
-    locale_payload = {
-        key: value
-        for key, value in payload.items()
-        if key != "audit"
-    }
-    locale_payload["geo"] = language_geo
-    return locale_payload
-
-
-def ensure_geo_locale_variant_checkpoints(checkpoint_dir: Path) -> None:
-    base_payload = load_checkpoint_json(checkpoint_dir, CHECKPOINT_GEO_LOCALE_FILENAME)
-    write_checkpoint_json(
-        checkpoint_dir,
-        CHECKPOINT_GEO_LOCALE_EN_FILENAME,
-        build_locale_specific_geo_locale_payload(base_payload, "en"),
-    )
-    write_checkpoint_json(
-        checkpoint_dir,
-        CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
-        build_locale_specific_geo_locale_payload(base_payload, "zh"),
-    )
-
-
 def resolve_publish_filenames(scope: str) -> tuple[str, ...]:
     return resolve_scenario_publish_filenames(scope)
 
@@ -6957,67 +6666,6 @@ def ensure_legacy_capital_hints_checkpoint(checkpoint_dir: Path) -> None:
     if capital_hints_path.exists() or not city_overrides_path.exists():
         return
     shutil.copy2(city_overrides_path, capital_hints_path)
-
-
-def _bind_runtime_source_payload(payload: dict, runtime_url: str, runtime_sha256: str, *, filename: str) -> dict:
-    payload = copy.deepcopy(payload)
-    payload["source"] = {**payload.get("source", {}), "runtime_topology_sha256": runtime_sha256}
-    if filename == "manifest.json":
-        payload["runtime_topology_url"] = runtime_url
-    elif filename == "audit.json":
-        if "runtime_topology_path" in payload:
-            payload["runtime_topology_path"] = runtime_url
-    else:
-        subset = payload.get("manifest_subset")
-        if isinstance(subset, dict):
-            subset["runtime_topology_url"] = runtime_url
-            subset["source"] = {**subset.get("source", {}), "runtime_topology_sha256": runtime_sha256}
-    return payload
-
-
-def _sync_published_json_gzip(path: Path) -> None:
-    sidecar = path.with_name(path.name + ".gz")
-    if sidecar.exists() or path.name in {CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME}:
-        write_bytes_atomic(sidecar, portable_gzip_bytes(path.read_bytes()))
-
-
-def _refresh_rebound_runtime_snapshot(directory: Path, manifest: dict, runtime_sha256: str) -> None:
-    snapshot_path = directory / "build_snapshot.json"
-    if not snapshot_path.exists():
-        return
-    # Rebinding changes only source storage and startup metadata. Preserve the
-    # frozen geometry/counts and refresh precisely these byte identities before
-    # the publish validator reads the checkpoint snapshot.
-    from map_builder.contracts import build_scenario_snapshot_payload
-
-    previous = load_json(snapshot_path)
-    input_sha = {**previous.get("input_sha", {}), CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME: runtime_sha256}
-    output_sha = dict(previous.get("output_sha", {}))
-    for filename in (CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME):
-        for name in (filename, filename + ".gz"):
-            path = directory / name
-            if path.exists():
-                output_sha[name] = json_source_sha256(path)
-    snapshot = build_scenario_snapshot_payload(
-        scenario_id=str(previous["scenario_id"]), profile_id=str(previous["profile"]),
-        input_sha=input_sha, output_sha=output_sha,
-        feature_count=int(previous.get("feature_count", 0)), water_count=int(previous.get("water_count", 0)),
-        chunk_count=int(previous.get("chunk_count", 0)), generated_at=str(previous.get("generated_at", "")),
-        environment=previous.get("environment"), durations=previous.get("durations"), report_paths=previous.get("report_paths"),
-        contract_version=previous["contract_version"], builder_version=previous["builder_version"],
-    )
-    write_json(snapshot_path, snapshot)
-    _sync_published_json_gzip(snapshot_path)
-    manifest["snapshot_fingerprint"] = snapshot["snapshot_fingerprint"]
-    write_json(directory / "manifest.json", manifest)
-    _sync_published_json_gzip(directory / "manifest.json")
-    audit_path = directory / "audit.json"
-    if audit_path.exists():
-        audit = load_json(audit_path)
-        audit["snapshot_fingerprint"] = snapshot["snapshot_fingerprint"]
-        audit["source"] = {**audit.get("source", {}), "build_snapshot_sha256": json_source_sha256(snapshot_path)}
-        write_json(audit_path, audit)
-        _sync_published_json_gzip(audit_path)
 
 
 def _normalize_plain_runtime_checkpoint_manifest(checkpoint_dir: Path) -> None:
@@ -7061,34 +6709,6 @@ def hydrate_publish_checkpoint_from_scenario(
                 shutil.copy2(source_path, target_path)
     _normalize_plain_runtime_checkpoint_manifest(checkpoint_dir)
     ensure_legacy_capital_hints_checkpoint(checkpoint_dir)
-
-
-def validate_tno_publish_checkpoint_dir(checkpoint_dir: Path) -> list[str]:
-    validation_dir = checkpoint_dir
-    temp_dir: tempfile.TemporaryDirectory[str] | None = None
-    previous_contract_root = scenario_contracts.PROJECT_ROOT
-    try:
-        if checkpoint_dir.resolve() != SCENARIO_DIR.resolve():
-            # The strict scenario validator selects TNO-specific checks from the
-            # directory name. Validate external checkpoints through a temporary
-            # data/scenarios/tno_1962 root so manifest URLs resolve to the
-            # checkpoint files instead of the checked-in scenario directory.
-            temp_dir = tempfile.TemporaryDirectory(prefix="tno-publish-validate-", dir=str(checkpoint_dir.parent))
-            validation_root = Path(temp_dir.name)
-            validation_dir = validation_root / "data" / "scenarios" / SCENARIO_ID
-            shutil.copytree(checkpoint_dir, validation_dir, dirs_exist_ok=True)
-            base_topology_source = ROOT / "data" / "europe_topology.json"
-            base_topology_target = validation_root / "data" / "europe_topology.json"
-            base_topology_target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(base_topology_source, base_topology_target)
-            scenario_contracts.PROJECT_ROOT = validation_root
-        errors = validate_publish_bundle_dir(validation_dir)
-    finally:
-        scenario_contracts.PROJECT_ROOT = previous_contract_root
-        if temp_dir is not None:
-            temp_dir.cleanup()
-
-    return errors
 
 
 def validate_tno_prechunk_publish_checkpoint_dir(checkpoint_dir: Path) -> list[str]:
@@ -7353,38 +6973,6 @@ def record_runtime_topology_stage_signature(scenario_dir: Path, checkpoint_dir: 
     )
 
 
-def validate_geo_locale_manual_overrides(geo_locale_payload: dict, manual_overrides_payload: dict) -> None:
-    geo = geo_locale_payload.get("geo", {}) if isinstance(geo_locale_payload, dict) else {}
-    manual_geo_raw = manual_overrides_payload.get("geo", {}) if isinstance(manual_overrides_payload, dict) else {}
-    missing_feature_ids: list[str] = []
-    mismatched_feature_ids: list[str] = []
-    for raw_feature_id, raw_entry in manual_geo_raw.items():
-        feature_id = str(raw_feature_id or "").strip()
-        expected_entry = normalize_locale_override_entry(raw_entry)
-        if not feature_id or not expected_entry:
-            continue
-        actual_entry = normalize_locale_override_entry(geo.get(feature_id))
-        if actual_entry is None:
-            missing_feature_ids.append(feature_id)
-            continue
-        if actual_entry != expected_entry:
-            mismatched_feature_ids.append(feature_id)
-    if missing_feature_ids or mismatched_feature_ids:
-        details: list[str] = []
-        if missing_feature_ids:
-            details.append(f"missing={missing_feature_ids[:20]}")
-        if mismatched_feature_ids:
-            details.append(f"mismatched={mismatched_feature_ids[:20]}")
-        raise ValueError("Geo locale checkpoint does not reflect manual overrides: " + "; ".join(details))
-
-
-def validate_geo_locale_checkpoint(checkpoint_dir: Path, manual_overrides_path: Path) -> None:
-    geo_locale_payload = load_checkpoint_json(checkpoint_dir, CHECKPOINT_GEO_LOCALE_FILENAME)
-    manual_overrides_payload = load_json(manual_overrides_path) if manual_overrides_path.exists() else {}
-    validate_geo_locale_manual_overrides(geo_locale_payload, manual_overrides_payload)
-    ensure_geo_locale_variant_checkpoints(checkpoint_dir)
-
-
 def default_scenario_manual_overrides_payload(scenario_id: str) -> dict[str, object]:
     return {
         "version": 1,
@@ -7636,40 +7224,6 @@ def compact_written_json_hash(payload: object) -> str:
 
 def file_content_hash(path: Path) -> str:
     return json_source_sha256(path)
-
-
-def normalize_tag(raw: object) -> str:
-    return "".join(char for char in str(raw or "").strip().upper() if char.isalnum())
-
-
-def normalize_core_tags(raw_value: object) -> list[str]:
-    if raw_value is None:
-        return []
-    if isinstance(raw_value, str):
-        text = raw_value.strip()
-        if not text:
-            return []
-        if text[:1] in "[({" and text[-1:] in "])}":
-            try:
-                parsed = ast.literal_eval(text)
-            except (SyntaxError, ValueError):
-                parsed = None
-            if parsed is not None and parsed is not raw_value:
-                return normalize_core_tags(parsed)
-        normalized = normalize_tag(text)
-        return [normalized] if normalized else []
-    if isinstance(raw_value, (list, tuple, set)):
-        tags: list[str] = []
-        seen: set[str] = set()
-        for item in raw_value:
-            for tag in normalize_core_tags(item):
-                if tag in seen:
-                    continue
-                seen.add(tag)
-                tags.append(tag)
-        return tags
-    normalized = normalize_tag(raw_value)
-    return [normalized] if normalized else []
 
 
 def normalize_feature_core_map(feature_map: dict[str, object]) -> dict[str, list[str]]:
@@ -14066,111 +13620,6 @@ def _build_manual_sync_file_report(filename: str, scenario_payload: dict, checkp
         normalize_core_tags=normalize_core_tags,
         normalize_locale_override_entry=normalize_locale_override_entry,
     )
-
-
-def detect_unsynced_manual_edits(
-    scenario_dir: Path,
-    checkpoint_dir: Path,
-    manual_sources: dict[str, Path],
-    policy: str = MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
-    report_dir: Path | None = None,
-    backup_root: Path | None = None,
-) -> dict[str, object]:
-    return scenario_bundle_platform.detect_unsynced_manual_edits(
-        scenario_dir,
-        checkpoint_dir,
-        manual_sources,
-        scenario_id=SCENARIO_ID,
-        policy=policy,
-        load_json=load_json,
-        write_json=write_json,
-        utc_timestamp=utc_timestamp,
-        normalize_core_tags=normalize_core_tags,
-        normalize_locale_override_entry=normalize_locale_override_entry,
-        report_dir=report_dir or MANUAL_SYNC_REPORT_DIR,
-        backup_root=backup_root or MANUAL_SYNC_BACKUP_ROOT,
-        backup_continue_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
-        strict_block_policy=MANUAL_SYNC_POLICY_STRICT_BLOCK,
-    )
-
-
-def _publish_tno_checkpoint_bundle(
-    scenario_dir: Path,
-    checkpoint_dir: Path,
-    publish_scope: str,
-    *,
-    load_checkpoint_json,
-    write_json,
-) -> None:
-    """Keep checkpoints plain while publishing the canonical storage format."""
-    filenames = resolve_scenario_publish_filenames(publish_scope)
-    runtime_path = None
-    if CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME in filenames:
-        runtime_path = write_runtime_topology_source(
-            scenario_dir, load_checkpoint_json(checkpoint_dir, CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME),
-        )
-    else:
-        existing_runtime = resolve_json_source_path(scenario_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME)
-        if existing_runtime.exists():
-            runtime_path = existing_runtime
-    runtime_url = f"data/scenarios/{SCENARIO_ID}/{runtime_path.name}" if runtime_path is not None else ""
-    runtime_sha256 = json_source_sha256(runtime_path) if runtime_path is not None else ""
-    binding_filenames = {"manifest.json", "audit.json", CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME}
-
-    def write_published_json(path: Path, payload: dict) -> None:
-        if runtime_path is not None:
-            if path.name == CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME:
-                return
-            if path.name in binding_filenames:
-                payload = _bind_runtime_source_payload(payload, runtime_url, runtime_sha256, filename=path.name)
-        write_json(path, payload)
-        if runtime_path is not None and path.name in binding_filenames:
-            _sync_published_json_gzip(path)
-
-    scenario_bundle_platform.publish_checkpoint_bundle(
-        scenario_dir, checkpoint_dir, publish_scope,
-        load_checkpoint_json=load_checkpoint_json, write_json=write_published_json,
-    )
-    if runtime_path is not None:
-        # Narrow polar-runtime publishes omit these files from their checkpoint
-        # scope but must still bind the existing manifest to the new source.
-        for filename in binding_filenames:
-            path = scenario_dir / filename
-            if filename not in filenames and path.exists():
-                write_published_json(path, load_json(path))
-        manifest_path = scenario_dir / "manifest.json"
-        if manifest_path.exists():
-            _refresh_rebound_runtime_snapshot(scenario_dir, load_json(manifest_path), runtime_sha256)
-
-
-def _build_bundle_publish_service_kwargs(
-    *,
-    publish_scope: str,
-    manual_sync_policy: str,
-    validate_publish_checkpoint_dir=validate_tno_publish_checkpoint_dir,
-) -> dict[str, object]:
-    return {
-        "publish_scope": publish_scope,
-        "manual_sync_policy": manual_sync_policy,
-        "scenario_id": SCENARIO_ID,
-        "scenario_data_scope": PUBLISH_SCOPE_SCENARIO_DATA,
-        "all_scope": PUBLISH_SCOPE_ALL,
-        "manual_source_filenames": {
-            "scenario_manual_overrides": MANUAL_OVERRIDE_FILENAME,
-            "geo_name_overrides": "geo_name_overrides.manual.json",
-            "district_groups": "district_groups.manual.json",
-        },
-        "validate_publish_bundle_dir": validate_publish_checkpoint_dir,
-        "ensure_publish_target_offline": _ensure_scenario_publish_target_offline,
-        "validate_geo_locale_checkpoint": validate_geo_locale_checkpoint,
-        "require_startup_stage_checkpoints": scenario_bundle_platform.require_startup_stage_checkpoints,
-        "detect_unsynced_manual_edits": detect_unsynced_manual_edits,
-        "publish_checkpoint_bundle": _publish_tno_checkpoint_bundle,
-        "load_checkpoint_json": load_checkpoint_json,
-        "write_json": write_json,
-        "resolve_publish_filenames": resolve_scenario_publish_filenames,
-        "root": ROOT,
-    }
 
 
 def write_bundle_stage(

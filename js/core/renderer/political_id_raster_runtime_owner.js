@@ -1635,7 +1635,11 @@ export function createPoliticalIdRasterRuntimeOwner({
     return query;
   }
 
-  return Object.freeze({ prepare, draw, publishDirectFrame, updateNavigationDemand, getNavigationSnapshot, queryPoint, getDirectFrame, getOverviewFrame, capturePublishedColorBaseline, matchesPublishedColor, noteNativePartialRepaint,
+  function getPublicationState() {
+    return { stagedPending: !!stagedFrame, stagedRejectionReason };
+  }
+
+  return Object.freeze({ prepare, draw, publishDirectFrame, getPublicationState, updateNavigationDemand, getNavigationSnapshot, queryPoint, getDirectFrame, getOverviewFrame, capturePublishedColorBaseline, matchesPublishedColor, noteNativePartialRepaint,
     // draw() can rebuild the wrapper during a continuation without changing its
     // content. Use the existing exact GPU key plus bounded presentation values.
     getStagedFrameIdentity: () => stagedFrame ? JSON.stringify([stagedFrame.gpuKey, stagedFrame.paletteKey,
@@ -1698,7 +1702,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       sourcePreparation: { ...sourcePreparationStats, pending: !!sourcePreparation }, failed, selected: h.isEnabled(), displayState, reason, deferredForegroundOrder,
       presentation: directPresentation ? "direct-gpu" : displayCache?.getStats().retainedSurfaceBytes ? "retained-regions" : "full-gpu",
       overview: { ready: !!overviewFrame, reason: overviewReason, textureBytes: overviewFrame?.gpu.getStats().gpuTextureBytes || 0 },
-      stagedPending: !!stagedFrame, stagedRejectionReason, stagedRejections,
+      ...getPublicationState(), stagedRejections,
       publishedFrame: directFrame ? { state: directFrame.presentationState, epoch: directFrame.epoch, sourceVersion: directFrame.sourceVersion } : null,
       presentationCache: displayCache?.getStats() || null, lastTiming: lastTiming && { ...lastTiming },
       firstRasterReadyMs, lastDrawTotalMs, nativeRefinements, refinementPending: refinementTimer !== null || forceNativeRefinement,

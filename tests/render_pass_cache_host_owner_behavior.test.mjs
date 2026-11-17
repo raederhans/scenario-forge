@@ -79,8 +79,6 @@ test("skips without a pass canvas before context layout or draw", () => {
     drawResult: undefined,
     skipped: true,
     skipReason: "missing-pass-canvas",
-    effectOrder: ["ensureRenderPassCanvas"],
-    getterOrder: [],
   });
   assert.equal(drawCount, 0);
 });
@@ -122,8 +120,6 @@ test("skips without a 2d context before layout or draw", () => {
   assert.equal(summary.hasPassCanvas, true);
   assert.equal(summary.hasPassContext, false);
   assert.equal(summary.drawInvoked, false);
-  assert.deepEqual(summary.effectOrder, ["ensureRenderPassCanvas", "getContext2D"]);
-  assert.deepEqual(summary.getterOrder, []);
   assert.deepEqual(events, ["getContext:2d"]);
 });
 
@@ -150,15 +146,6 @@ test("prepares target inside render target and returns draw result unchanged", (
   assert.equal(summary.drawInvoked, true);
   assert.equal(summary.drawResult, drawResult);
   assert.equal(summary.skipped, false);
-  assert.deepEqual(summary.effectOrder, [
-    "ensureRenderPassCanvas",
-    "getContext2D",
-    "onHostReady",
-    "withRenderTarget",
-    "prepareTargetContext",
-    "drawFn",
-  ]);
-  assert.deepEqual(summary.getterOrder, ["getRenderPassLayout"]);
   assert.deepEqual(events, [
     "ensure:political",
     "getContext:2d",
@@ -192,7 +179,7 @@ test("requires declared dependencies and draw callback", () => {
   );
 });
 
-test("freezes returned summary and trace arrays", () => {
+test("freezes returned summary", () => {
   const { owner } = createOwner();
 
   const summary = owner.prepareRenderPassHost({
@@ -202,8 +189,6 @@ test("freezes returned summary and trace arrays", () => {
   });
 
   assert.equal(Object.isFrozen(summary), true);
-  assert.equal(Object.isFrozen(summary.effectOrder), true);
-  assert.equal(Object.isFrozen(summary.getterOrder), true);
 });
 
 test("direct host avoids allocation and native continuation retains full host semantics", () => {

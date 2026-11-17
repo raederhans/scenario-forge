@@ -5,6 +5,15 @@ import subprocess
 import sys
 from pathlib import Path
 
+from map_builder.contracts import (
+    SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME as CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME as CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME as CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+    SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+)
+from map_builder.scenario_bundle_platform import load_checkpoint_json, load_json, write_checkpoint_json
 from map_builder.scenario_build_session import (
     ensure_scenario_build_session,
     record_stage_outputs,
@@ -15,6 +24,86 @@ from map_builder.scenario_geo_locale_registry import (
 from map_builder.scenario_service_errors import ScenarioServiceError
 
 NON_TNO_GEO_LOCALE_CHECKPOINT_FILENAME = "geo_locale_patch.json"
+
+
+def normalize_locale_override_entry(source: object) -> dict[str, str] | None:
+    if not isinstance(source, dict):
+        return None
+    en = str(source.get("en") or source.get("name_en") or source.get("label_en") or "").strip()
+    zh = str(source.get("zh") or source.get("name_zh") or source.get("label_zh") or source.get("name_cn") or "").strip()
+    entry: dict[str, str] = {}
+    if en:
+        entry["en"] = en
+    if zh:
+        entry["zh"] = zh
+    return entry or None
+
+
+def build_locale_specific_geo_locale_payload(payload: dict, language: str) -> dict:
+    normalized_language = "zh" if str(language or "").strip().lower() == "zh" else "en"
+    language_geo: dict[str, dict[str, str]] = {}
+    raw_geo = payload.get("geo", {}) if isinstance(payload, dict) else {}
+    for feature_id, raw_entry in raw_geo.items():
+        entry = normalize_locale_override_entry(raw_entry)
+        if not entry:
+            continue
+        value = str(entry.get(normalized_language) or "").strip()
+        if not value:
+            continue
+        language_geo[str(feature_id)] = {normalized_language: value}
+    locale_payload = {
+        key: value
+        for key, value in payload.items()
+        if key != "audit"
+    }
+    locale_payload["geo"] = language_geo
+    return locale_payload
+
+
+def ensure_geo_locale_variant_checkpoints(checkpoint_dir: Path) -> None:
+    base_payload = load_checkpoint_json(checkpoint_dir, CHECKPOINT_GEO_LOCALE_FILENAME)
+    write_checkpoint_json(
+        checkpoint_dir,
+        CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+        build_locale_specific_geo_locale_payload(base_payload, "en"),
+    )
+    write_checkpoint_json(
+        checkpoint_dir,
+        CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+        build_locale_specific_geo_locale_payload(base_payload, "zh"),
+    )
+
+
+def validate_geo_locale_manual_overrides(geo_locale_payload: dict, manual_overrides_payload: dict) -> None:
+    geo = geo_locale_payload.get("geo", {}) if isinstance(geo_locale_payload, dict) else {}
+    manual_geo_raw = manual_overrides_payload.get("geo", {}) if isinstance(manual_overrides_payload, dict) else {}
+    missing_feature_ids: list[str] = []
+    mismatched_feature_ids: list[str] = []
+    for raw_feature_id, raw_entry in manual_geo_raw.items():
+        feature_id = str(raw_feature_id or "").strip()
+        expected_entry = normalize_locale_override_entry(raw_entry)
+        if not feature_id or not expected_entry:
+            continue
+        actual_entry = normalize_locale_override_entry(geo.get(feature_id))
+        if actual_entry is None:
+            missing_feature_ids.append(feature_id)
+            continue
+        if actual_entry != expected_entry:
+            mismatched_feature_ids.append(feature_id)
+    if missing_feature_ids or mismatched_feature_ids:
+        details: list[str] = []
+        if missing_feature_ids:
+            details.append(f"missing={missing_feature_ids[:20]}")
+        if mismatched_feature_ids:
+            details.append(f"mismatched={mismatched_feature_ids[:20]}")
+        raise ValueError("Geo locale checkpoint does not reflect manual overrides: " + "; ".join(details))
+
+
+def validate_geo_locale_checkpoint(checkpoint_dir: Path, manual_overrides_path: Path) -> None:
+    geo_locale_payload = load_checkpoint_json(checkpoint_dir, CHECKPOINT_GEO_LOCALE_FILENAME)
+    manual_overrides_payload = load_json(manual_overrides_path) if manual_overrides_path.exists() else {}
+    validate_geo_locale_manual_overrides(geo_locale_payload, manual_overrides_payload)
+    ensure_geo_locale_variant_checkpoints(checkpoint_dir)
 
 
 def default_manual_geo_payload(scenario_id: str) -> dict[str, object]:
@@ -167,12 +256,12 @@ def materialize_scenario_geo_locale(
             refresh_named_water_snapshot=False,
         )
         checkpoint_paths = [
-            resolved_checkpoint_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-            resolved_checkpoint_dir / tno_bundle.CHECKPOINT_GEO_LOCALE_FILENAME,
-            resolved_checkpoint_dir / tno_bundle.CHECKPOINT_GEO_LOCALE_EN_FILENAME,
-            resolved_checkpoint_dir / tno_bundle.CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
-            resolved_checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
-            resolved_checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+            resolved_checkpoint_dir / SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
+            resolved_checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
+            resolved_checkpoint_dir / CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+            resolved_checkpoint_dir / CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+            resolved_checkpoint_dir / SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+            resolved_checkpoint_dir / SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
         ]
         record_stage_outputs(
             build_dir=resolved_checkpoint_dir,

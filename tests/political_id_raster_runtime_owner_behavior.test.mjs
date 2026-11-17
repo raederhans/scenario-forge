@@ -142,10 +142,12 @@ test("navigation publishes one ready tile while other visible tiles remain pendi
   assert.equal(gpu.getStats().tileUploads, uploads + 2);
   assert.deepEqual(f.renders, []);
   f.owner.draw();
+  // Navigation tile admission still crosses a timer task after settling.
+  // Let that host task run before checking whether exact preparation is complete.
   for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
     const request = f.requests.find(value => !value.settled);
     if (request) completeNavigationTile(request);
-    await tick();
+    await navigationTick();
   }
   assert.ok(f.owner.draw().staged);
   assert.equal(f.owner.publishDirectFrame(), true);
@@ -1853,8 +1855,10 @@ test("published compatibility rejects DPR and layout changes during preparation"
 test("direct candidates stay staged until whole-scene publication and reject stale commits", async t => {
   const f = fixture({ displayMode: "raster", directPresentation: true, autoPublish: false });
   t.after(() => f.owner.dispose());
+  assert.equal(f.owner.getPublicationState().stagedPending, false);
   f.owner.draw(); await resolveAll(f);
   assert.equal(f.owner.draw().staged, true);
+  assert.equal(f.owner.getPublicationState().stagedPending, true);
   assert.equal(f.owner.getDirectFrame(), null);
   assert.equal(f.gpus[0].tileSets.length, 0);
   const sceneIdentity = f.owner.getStagedFrameIdentity();
@@ -1862,6 +1866,7 @@ test("direct candidates stay staged until whole-scene publication and reject sta
   assert.equal(f.owner.draw().staged, true);
   assert.equal(f.owner.getStagedFrameIdentity(), sceneIdentity, "equivalent draw wrappers retain exact scene preparation identity");
   assert.equal(f.owner.publishDirectFrame(), true);
+  assert.equal(f.owner.getPublicationState().stagedPending, false);
   assert.equal(f.owner.getStagedFrameIdentity(), null);
   const first = f.owner.getDirectFrame();
   f.features[0].geometry = { type: "Polygon", coordinates: [[[]]] }; f.identity.version++;
@@ -1873,6 +1878,8 @@ test("direct candidates stay staged until whole-scene publication and reject sta
   assert.equal(f.gpus[0].tileSets.length, 1, "yielding between render passes keeps published political tiles");
   f.identity.colorVersion++;
   assert.equal(f.owner.publishDirectFrame(), false);
+  assert.equal(f.owner.getPublicationState().stagedPending, false);
+  assert.equal(f.owner.getPublicationState().stagedRejectionReason, "stale-candidate");
   assert.equal(f.owner.getDirectFrame(), first);
   assert.equal(f.gpus[0].tileSets.length, 1);
   assert.equal(f.owner.draw().staged, true);

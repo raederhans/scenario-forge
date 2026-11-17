@@ -316,6 +316,7 @@ test("publication coverage is captured once, retained navigation stays usable an
   let coverageCalls = 0;
   h.helpers.ensurePassCoverage = () => { coverageCalls++; h.owner.notePassCommit("labels"); return true; };
   assert.equal(h.owner.preparePublication(h.transform), false);
+  assert.equal(h.owner.getPresentationState().publicationPending, true);
   assert.equal(h.jobs[0].options.layers.at(-1).revision, 1);
   assert.equal(h.jobs[0].options.getReservedTextureBytes(), 1234);
   h.setPoliticalTextureBytes(4000);
@@ -324,7 +325,7 @@ test("publication coverage is captured once, retained navigation stays usable an
   assert.equal(h.owner.present(h.transform, { refresh: false }), true);
   assert.equal(h.records.frames.at(-1).layers.at(-1).revision, 0);
   h.jobs[0].resolve(true); await Promise.resolve();
-  assert.equal(h.owner.getDiagnostics().publicationPending, true, "ready private data is still awaiting publication");
+  assert.equal(h.owner.getPresentationState().publicationPending, true, "ready private data is still awaiting publication");
   assert.equal(h.owner.preparePublication(h.transform), true);
   assert.equal(h.jobs.length, 1);
   h.setIdentity("published-1");
@@ -332,7 +333,7 @@ test("publication coverage is captured once, retained navigation stays usable an
   assert.equal(h.owner.present(h.transform), true);
   assert.equal(coverageCalls, 1, "final presentation must not repaint after snapshot validation");
   assert.equal(h.records.frames.at(-1).layers.at(-1).revision, 1);
-  assert.equal(h.owner.getDiagnostics().publicationPending, false);
+  assert.equal(h.owner.getPresentationState().publicationPending, false);
   assert.equal(h.owner.preparePublication(h.transform), true);
   assert.equal(h.jobs.length, 1, "consumed publication does not restart preparation");
 });
@@ -361,7 +362,7 @@ test("publication snapshots cancel on revision, camera, DPR, surface, layout, or
     mutate(h);
     assert.equal(h.jobs[0].options.isCurrent(), false, name);
     h.jobs[0].resolve(false); await Promise.resolve();
-    assert.equal(h.owner.getDiagnostics().publicationPending, false, name);
+    assert.equal(h.owner.getPresentationState().publicationPending, false, name);
     assert.ok(h.records.cancels > 0, name);
     if (["revision", "canvas", "reference", "layout", "order", "candidate", "source"].includes(name)) {
       assert.equal(h.owner.present(h.transform, { refresh: false }), true, `${name}: old published navigation stays available`);
@@ -671,7 +672,7 @@ test("successful GPU handoff retires legacy navigation while incomplete, vector 
       runtimeState: { zoomTransform: { k: 1, x: 0, y: 0 } },
       exportRenderInProgress: mode === "export",
       isTnoRasterSceneSelected: () => mode !== "vector",
-      politicalIdRasterRuntimeOwner: { getDiagnostics: () => ({ stagedPending: false }) },
+      politicalIdRasterRuntimeOwner: { getPublicationState: () => ({ stagedPending: false }) },
       getTnoRasterSceneOwner: () => scene, tnoRasterSceneOwner: scene,
       politicalPassUsesDirectScene: false, navigationSceneOwner: legacy,
       overviewFrameOwner: { clear: () => { overviewClears++; } },
@@ -723,7 +724,7 @@ test("compose gates political publication on prepared layers and preserves the s
     rendererSurfaceHost: { getContext: () => ({ canvas: {} }) },
     runtimeState: { zoomTransform: { k: 1, x: 0, y: 0 } }, exportRenderInProgress: false,
     isTnoRasterSceneSelected: () => true, getTnoRasterSceneOwner: () => scene, tnoRasterSceneOwner: scene,
-    politicalIdRasterRuntimeOwner: { getDiagnostics: () => ({ stagedPending: true }),
+    politicalIdRasterRuntimeOwner: { getPublicationState: () => ({ stagedPending: true }),
       publishDirectFrame: () => { calls.push("publish-political"); return true; } },
     politicalPassUsesDirectScene: false, navigationSceneOwner: null, incrementPerfCounter() {},
     exactCompositeReuseOwner: null, getRenderCacheOwner: () => ({ releaseObsoleteSceneSurfaces: () => 0 }),

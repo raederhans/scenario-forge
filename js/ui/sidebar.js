@@ -2,7 +2,7 @@ import { ensureHgoIdentitySettings as ensureHgoIdentityRuntimeState } from "./si
 import { createStrategicPanelView } from "./sidebar/strategic_panel_view.js";
 import { setSelectedColorState } from "../core/state/actions/appearance_selection_actions.js";
 import { resolveDataUrl } from "../core/data_base_url.js";
-import { applyFeaturePaintState } from "../core/state/color_state.js";
+import { commitFeaturePaint } from "../core/feature_paint_commands.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
 import { findCountryGroupForFeature, getGroupDisplayLabel, getHierarchyGroupsForCode as getGeographicHierarchyGroups } from "../core/country_group_provider.js";
@@ -394,25 +394,14 @@ function applyVisualOverridesToFeatureIds(
   }
 
   const colorToApply = color || runtimeState.selectedColor;
-  const before = captureHistoryState({
-    featureIds: normalizedTargetIds,
-  });
-  applyFeaturePaintState(runtimeState, normalizedTargetIds, colorToApply);
-
-  refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
-  if (render) render();
-  if (addToRecent) {
-    addRecentColor(colorToApply);
-  }
-  markDirty(dirtyReason);
-  pushHistoryEntry({
+  commitFeaturePaint([{ ids: normalizedTargetIds, color: colorToApply }], {
     kind: historyKind,
-    before,
-    after: captureHistoryState({
-      featureIds: normalizedTargetIds,
-    }),
-    meta: {
-      affectsSovereignty: false,
+    dirtyReason,
+    recordUnchanged: true,
+    refresh: (featureIds) => {
+      refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
+      if (render) render();
+      if (addToRecent) addRecentColor(colorToApply);
     },
   });
   return {
@@ -462,22 +451,13 @@ function clearVisualOverridesForFeatureIds(
     };
   }
 
-  const before = captureHistoryState({
-    featureIds: changedIds,
-  });
-  applyFeaturePaintState(runtimeState, changedIds, null, { remove: true });
-
-  refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
-  if (render) render();
-  markDirty(dirtyReason);
-  pushHistoryEntry({
+  commitFeaturePaint([{ ids: changedIds, color: null }], {
     kind: historyKind,
-    before,
-    after: captureHistoryState({
-      featureIds: changedIds,
-    }),
-    meta: {
-      affectsSovereignty: false,
+    dirtyReason,
+    recordUnchanged: true,
+    refresh: (featureIds) => {
+      refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
+      if (render) render();
     },
   });
   return {

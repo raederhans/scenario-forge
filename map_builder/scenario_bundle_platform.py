@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import math
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable
 from map_builder.json_source import resolve_json_source_path
+from map_builder.io.readers import read_json_strict
+from map_builder.io.writers import write_json_atomic
 
 from map_builder.contracts import (
     SCENARIO_COUNTRIES_STAGE_ARTIFACTS,
@@ -21,6 +25,63 @@ from map_builder.contracts import (
 )
 
 
+def utc_timestamp() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def load_json(path: Path) -> dict:
+    payload = read_json_strict(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
+    return payload
+
+
+def sanitize_jsonable(value):
+    if isinstance(value, float) and math.isnan(value):
+        return None
+    if isinstance(value, dict):
+        return {key: sanitize_jsonable(inner) for key, inner in value.items()}
+    if isinstance(value, list):
+        return [sanitize_jsonable(item) for item in value]
+    return value
+
+
+def round_geojson_coordinates(payload: object, decimals: int = 6) -> object:
+    if isinstance(payload, list):
+        if payload and all(isinstance(value, (int, float)) for value in payload):
+            rounded: list[object] = []
+            for value in payload:
+                if isinstance(value, float):
+                    rounded.append(round(value, decimals))
+                else:
+                    rounded.append(value)
+            return rounded
+        return [round_geojson_coordinates(item, decimals=decimals) for item in payload]
+    if isinstance(payload, dict):
+        rounded = {}
+        for key, value in payload.items():
+            if key in {"coordinates", "geometries", "features", "geometry"}:
+                rounded[key] = round_geojson_coordinates(value, decimals=decimals)
+            else:
+                rounded[key] = value
+        return rounded
+    return payload
+
+
+def write_json(path: Path, payload: dict) -> None:
+    sanitized = sanitize_jsonable(payload)
+    if path.name == "relief_overlays.geojson":
+        sanitized = round_geojson_coordinates(sanitized, decimals=6)
+    write_json_atomic(
+        path,
+        sanitized,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        allow_nan=False,
+        indent=None,
+    )
+
+
 def checkpoint_path(checkpoint_dir: Path, filename: str) -> Path:
     return checkpoint_dir / filename
 
@@ -30,7 +91,7 @@ def write_checkpoint_json(
     filename: str,
     payload: dict,
     *,
-    write_json: Callable[[Path, dict], None],
+    write_json: Callable[[Path, dict], None] = write_json,
 ) -> None:
     path = checkpoint_path(checkpoint_dir, filename)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -57,7 +118,7 @@ def load_checkpoint_json(
     checkpoint_dir: Path,
     filename: str,
     *,
-    load_json: Callable[[Path], object],
+    load_json: Callable[[Path], object] = load_json,
 ) -> dict:
     path = checkpoint_path(checkpoint_dir, filename)
     if not path.exists():

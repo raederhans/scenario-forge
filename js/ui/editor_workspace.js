@@ -2,8 +2,8 @@ import { createButton } from "./components/button.js";
 import { createUiIcon, setUiIcon } from "./components/ui_icons.js";
 import { initCommandPalette } from "./command_palette.js";
 
-// The workspace moves existing controls so their business owners keep their
-// element references, event handlers, and native form contracts.
+// Reuse panes already mounted in the workspace. Remaining legacy panes move
+// with their element references, event handlers, and native form contracts.
 export function initEditorWorkspace({ documentRef = document, initialSearch = globalThis.location?.search || "", t, setSidebarTab, setStrategicMode, toggleInspector, revealProperties = () => {}, onNavigate = () => {} } = {}) {
   const get = (id) => documentRef.getElementById(id);
   const left = get("leftSidebarContent");
@@ -106,8 +106,8 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   propertyHeading.append(backButton, title, notesButton);
   propertyHeader.append(segments, propertyHeading);
   right.prepend(propertyHeader);
-  const properties = make("div", "editor-properties-body", "", "editorPropertiesBody");
-  right.append(properties);
+  const properties = get("editorPropertiesBody") || make("div", "editor-properties-body", "", "editorPropertiesBody");
+  if (properties.parentNode !== right) right.append(properties);
   const propertyEntries = new Map();
   const layerEntries = [];
   const propertyHistory = [];
@@ -170,11 +170,13 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     }
   };
   const addProperty = (key, label, nodes, task = "") => {
-    const host = make("section", "editor-property-panel", "", `editorProperty-${key}`);
+    const host = get(`editorProperty-${key}`) || make("section", "editor-property-panel", "", `editorProperty-${key}`);
     host.setAttribute("aria-label", t(label, "ui"));
     host.dataset.i18nAriaLabel = label;
-    for (const node of nodes.filter(Boolean)) host.append(node);
-    properties.append(host);
+    for (const node of nodes.filter(Boolean)) {
+      if (node.parentNode !== host) host.append(node);
+    }
+    if (host.parentNode !== properties) properties.append(host);
     collectNotes(host, key);
     const segment = key === "project" ? null : task === "layers" ? "layers" : "inspector";
     propertyEntries.set(key, { host, label, task, segment });

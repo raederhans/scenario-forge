@@ -301,6 +301,48 @@ for (const [section, key, segment] of [
   });
 }
 
+for (const section of ["data-map-content-panel-ocean", "panel-ocean"]) {
+  test(`pre-mounted ocean controls retain their values and events through ${section} navigation`, (context) => {
+    let body;
+    let host;
+    let input;
+    let inputEvents = 0;
+    const h = mount(context, `?section=${section}`, { prepare: ({ add, documentRef }) => {
+      body = add("editorPropertiesBody", documentRef.getElementById("rightSidebarContent"));
+      body.className = "editor-properties-body";
+      host = add("editorProperty-data-map-content-panel-ocean", body, "section");
+      host.className = "editor-property-panel";
+      host.hidden = true;
+      const panel = documentRef.getElementById("panel-ocean");
+      host.append(panel);
+      input = add("oceanFillColor", panel, "input");
+      input.value = "#aadaff";
+      input.addEventListener("input", () => { inputEvents++; });
+    } });
+
+    expectProperty(h, "data-map-content-panel-ocean", "Layers");
+    assert.equal(h.get("editorPropertiesBody"), body);
+    assert.equal(h.documentRef.querySelectorAll("#editorPropertiesBody").length, 1);
+    assert.equal(h.get("editorProperty-data-map-content-panel-ocean"), host);
+    assert.equal(h.documentRef.querySelectorAll(`#${host.id}`).length, 1);
+    assert.equal(host.contains(input), true);
+    assert.equal(input.value, "#aadaff");
+    input.value = "#123456";
+    input.dispatchEvent(new Event("input"));
+    assert.equal(inputEvents, 1);
+
+    h.get("layer-borders").click();
+    assert.equal(host.hidden, true);
+    h.get("layer-ocean").click();
+    expectProperty(h, "data-map-content-panel-ocean", "Layers");
+    assert.equal(h.get("panel-ocean").hidden, false);
+    assert.equal(h.get("oceanFillColor"), input);
+    assert.equal(input.value, "#123456");
+    input.dispatchEvent(new Event("input"));
+    assert.equal(inputEvents, 2);
+  });
+}
+
 test("Back restores the previous segment, focus and scroll, then hides when history is empty", (context) => {
   const h = mount(context);
   const back = h.get("editorPropertiesBackBtn");
