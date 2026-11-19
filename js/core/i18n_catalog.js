@@ -677,6 +677,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "附属计数器将回退到省份锚点或自由锚点。",
     "en": "Attached counters will fall back to province or free anchors."
   },
+  "Attack": {
+    "zh": "进攻",
+    "en": "Attack"
+  },
   "Audit and manifest stay read-only here so tuning and source truth do not get mixed.": {
     "zh": "审计和清单在这里保持只读状态，因此调整和源事实不会混淆。",
     "en": "Audit and manifest stay read-only here so tuning and source truth do not get mixed."
@@ -2565,6 +2569,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "默认颜色",
     "en": "Default color"
   },
+  "Defensive Line": {
+    "zh": "防御线",
+    "en": "Defensive Line"
+  },
   "Delete": {
     "zh": "删除",
     "en": "Delete"
@@ -3136,6 +3144,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Enabled · waiting for data": {
     "zh": "已启用 · 等待数据",
     "en": "Enabled · waiting for data"
+  },
+  "Encirclement": {
+    "zh": "包围",
+    "en": "Encirclement"
   },
   "Energy Facilities": {
     "zh": "能源设施",
@@ -5749,6 +5761,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "原生矢量兼容",
     "en": "Native vector compatibility"
   },
+  "Naval": {
+    "zh": "海军",
+    "en": "Naval"
+  },
   "Navigation": {
     "zh": "导航",
     "en": "Navigation"
@@ -6180,6 +6196,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Off": {
     "zh": "关闭",
     "en": "Off"
+  },
+  "Offensive Line": {
+    "zh": "进攻线",
+    "en": "Offensive Line"
   },
   "Official Japan source defines active network boundaries.": {
     "zh": "日本官方来源定义了活动网络边界。",
@@ -7753,6 +7773,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "限制进入/环境风险",
     "en": "Restricted access / environmental risk"
   },
+  "Retreat": {
+    "zh": "撤退",
+    "en": "Retreat"
+  },
   "Retry": {
     "zh": "重试",
     "en": "Retry"
@@ -9257,6 +9281,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "空间索引",
     "en": "Spatial Index"
   },
+  "Spearhead Line": {
+    "zh": "突击线",
+    "en": "Spearhead Line"
+  },
   "Special": {
     "zh": "特殊",
     "en": "Special"
@@ -9564,6 +9592,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Summary scope": {
     "zh": "汇总范围",
     "en": "Summary scope"
+  },
+  "Supply": {
+    "zh": "补给",
+    "en": "Supply"
   },
   "Suppress short primary": {
     "zh": "抑制短初级",
@@ -9924,6 +9956,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "The world three years before the Second World War. Germany is rearming and about to remilitarise the Rhineland, Italy is at war in Ethiopia, and Spain is months from civil war. In Asia, Japan holds Manchukuo while China remains divided among the Nationalist government, the Communists and regional warlords.": {
     "zh": "第二次世界大战爆发前三年的世界。德国正在重整军备，即将进驻莱茵兰；意大利正在入侵埃塞俄比亚，西班牙数月后将陷入内战。在亚洲，日本扶植的满洲国已经建立，中国仍分裂为国民政府、中共与各地军阀。",
     "en": "The world three years before the Second World War. Germany is rearming and about to remilitarise the Rhineland, Italy is at war in Ethiopia, and Spain is months from civil war. In Asia, Japan holds Manchukuo while China remains divided among the Nationalist government, the Communists and regional warlords."
+  },
+  "Theater": {
+    "zh": "战区",
+    "en": "Theater"
   },
   "Thematic": {
     "zh": "专题",

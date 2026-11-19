@@ -152,14 +152,18 @@ test("language toggle refreshes each directly scheduled UI hook once and retains
   globalThis.localStorage = { setItem: (...args) => persisted.push(args) };
   assert.equal(state.activeScenarioId, "", "isolated test starts without an active scenario");
   const calls = new Map();
+  let overlayRefreshOptions;
   const hookNames = [
     "updatePaintModeUIFn", "refreshSampleProjectBannerFn", "updateToolbarInputsFn", "updateDevWorkspaceUIFn",
     "renderPaletteFn", "renderCountryListFn", "renderPresetTreeFn", "updateParentBorderCountryListFn",
     "renderWaterRegionListFn", "renderSpecialRegionListFn", "renderNowFn",
-    "ensureFullLocalizationDataReadyFn",
+    "ensureFullLocalizationDataReadyFn", "updateStrategicOverlayUIFn",
   ];
   const originals = hookNames.map((name) => [name, readRegisteredRuntimeHookSource(state, name)]);
-  hookNames.forEach((name) => registerRuntimeHook(state, name, () => calls.set(name, (calls.get(name) || 0) + 1)));
+  hookNames.forEach((name) => registerRuntimeHook(state, name, (options) => {
+    calls.set(name, (calls.get(name) || 0) + 1);
+    if (name === "updateStrategicOverlayUIFn") overlayRefreshOptions = options;
+  }));
   t.after(() => {
     originals.forEach(([name, callback]) => registerRuntimeHook(state, name, callback));
     globalThis.localStorage = originalStorage;
@@ -169,6 +173,7 @@ test("language toggle refreshes each directly scheduled UI hook once and retains
   calls.clear();
   await toggleLanguage();
   for (const name of hookNames) assert.equal(calls.get(name), 1, `${name} in toggleLanguage`);
+  assert.deepEqual(overlayRefreshOptions, { scopes: ["operationalLines", "operationGraphics"] });
   assert.equal(state.currentLanguage, "en");
   assert.deepEqual(persisted, [
     ["scenario_forge_language", "en"],

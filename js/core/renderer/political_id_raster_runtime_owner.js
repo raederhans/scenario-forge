@@ -246,6 +246,14 @@ export function createPoliticalIdRasterRuntimeOwner({
     }, Math.max(0, nextAssetProbeAt - performance.now()));
   }
 
+  function setTileRecordHandle(record, handle) {
+    if (record.gpuHandle === handle) return;
+    handleRecordKeys.delete(record.gpuHandle);
+    record.gpuHandle = handle;
+    if (handle) handleRecordKeys.set(handle, record.key);
+    navigationRevision++; navigationSnapshot = null;
+  }
+
   function syncTileRecords(taskKind = "producer") {
     if (!snapshot || !plan || disposed) {
       tileRecords.clear(); handleRecordKeys.clear(); dirtyTileKeys.clear();
@@ -284,13 +292,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (tile) tileRecordKeys.set(tile, key);
       const prepared = gpuPreparation?.status === "ready" ? gpuPreparation.handle.getTileHandle?.(tile) : null;
       const resident = tile ? gpu?.getTileHandle?.(tile) : null;
-      const previousHandle = record.gpuHandle;
-      record.gpuHandle = resident || (gpu?.hasTileHandle?.(record.gpuHandle) ? record.gpuHandle : null) || prepared;
-      if (record.gpuHandle !== previousHandle) {
-        handleRecordKeys.delete(previousHandle);
-        if (record.gpuHandle) handleRecordKeys.set(record.gpuHandle, key);
-        navigationRevision++; navigationSnapshot = null;
-      }
+      setTileRecordHandle(record, resident || (gpu?.hasTileHandle?.(record.gpuHandle) ? record.gpuHandle : null) || prepared);
       record.state = record.gpuHandle ? "gpu-ready" : tile ? "cpu-ready" : "requested";
       if (tile && record.cpuReadyAt === null) record.cpuReadyAt = performance.now();
       if (!tile && !record.gpuHandle && !demandedTileKeys.has(key)) tileRecords.delete(key);
@@ -709,6 +711,17 @@ export function createPoliticalIdRasterRuntimeOwner({
     });
   }
 
+  function releaseOffscreenNavigationTiles() {
+    if (!gpu?.releaseTile) return;
+    const published = new Set(directFrame?.drawTiles || []);
+    for (const record of tileRecords.values()) {
+      if (!record.gpuHandle || demandedTileKeys.has(record.key) || published.has(record.gpuHandle)) continue;
+      // The GPU also protects the currently drawn list and any prepared frame.
+      // A tile becomes reclaimable only after presentation has stopped using it.
+      gpu.releaseTile(record.gpuHandle);
+    }
+  }
+
   function scheduleNavigationWork() {
     if (!navigationProducing || navigationTask || navigationUpload || !usable()) return;
     const task = {};
@@ -718,7 +731,9 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (!navigationProducing || !usable() || !syncSource()) return;
       if (!updatePlan(navigationDemand.transform) || plan.level !== navigationDemand.level) return;
       navigationDemand.plan = plan;
+      navigationDemand.planKey = planKey;
       updateViewIdentity();
+      releaseOffscreenNavigationTiles();
       syncTileRecords("host-task");
       const descriptor = navigationTiles().find(tile => cache.peek(tile.key) && !tileRecords.get(tile.key)?.gpuHandle);
       if (descriptor && navigationUploadAvailable && ensureGpu()) {
@@ -743,6 +758,11 @@ export function createPoliticalIdRasterRuntimeOwner({
         if (job.handle) {
           if (paletteVersion !== h.getSourceIdentity().colorVersion) updateSourceColors(h.getSourceIdentity());
           job.handle.commit({ palette: snapshot.palette, revision: `${namespace}:${snapshot.paletteRevision}:${paletteVersion}` });
+          // CPU admission can evict this tile while its upload yields. The
+          // committed GPU handle is authoritative even without a cached payload.
+          const handle = gpu.getTileHandle(tile), record = tileRecords.get(descriptor.key);
+          if (record) setTileRecordHandle(record, handle);
+          else if (handle) gpu.releaseTile(handle);
           dirtyTileKeys.add(descriptor.key);
           syncTileRecords("host-task");
           account();
@@ -773,7 +793,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     const layout = h.getLayout();
     const demandKey = JSON.stringify([transform.x, transform.y, transform.k, layout, state.dpr]);
     if (navigationDemand?.key !== demandKey) {
-      navigationDemand = { key: demandKey, transform: { ...transform }, layout: { ...layout }, level: target.level, plan: target };
+      navigationDemand = { key: demandKey, transform: { ...transform }, layout: { ...layout }, level: target.level, plan: target, planKey };
       navigationSnapshot = null;
     }
     cancelGpuPreparation();
@@ -789,11 +809,15 @@ export function createPoliticalIdRasterRuntimeOwner({
     const paletteKey = `${namespace}:${snapshot.paletteRevision}:${paletteVersion}`;
     if (navigationSnapshot?.revision === navigationRevision && navigationSnapshot.paletteKey === paletteKey) return navigationSnapshot;
     const started = stageTimingsEnabled ? performance.now() : 0;
-    if (navigationTileSnapshot?.revision !== navigationRevision || navigationTileSnapshot.level !== navigationDemand.level) {
-      const records = [...tileRecords.values()].filter(record => record.level === navigationDemand.level && gpu.hasTileHandle(record.gpuHandle));
+    if (navigationTileSnapshot?.revision !== navigationRevision || navigationTileSnapshot.level !== navigationDemand.level
+      || navigationTileSnapshot.planKey !== navigationDemand.planKey) {
+      const demanded = new Set(navigationDemand.plan.tiles.map(tile => tile.key));
+      const published = new Set(directFrame?.drawTiles || []);
+      const records = [...tileRecords.values()].filter(record => record.level === navigationDemand.level && gpu.hasTileHandle(record.gpuHandle)
+        && (demanded.has(record.key) || published.has(record.gpuHandle)));
       if (!records.length) return null;
       snapshotBuilds++;
-      navigationTileSnapshot = { revision: navigationRevision, level: navigationDemand.level, sourceStamp: records[0].sourceStamp,
+      navigationTileSnapshot = { revision: navigationRevision, level: navigationDemand.level, planKey: navigationDemand.planKey, sourceStamp: records[0].sourceStamp,
         tiles: records.map(record => ({ key: record.key,
           originX: record.coreRect.minX, originY: record.coreRect.minY,
           width: record.coreRect.maxX - record.coreRect.minX, height: record.coreRect.maxY - record.coreRect.minY,

@@ -12,6 +12,7 @@ import {
 } from "./strategic_overlay/unit_counter_render_helpers.js";
 import { patchStrategicOverlayEditorState } from "../../core/state/actions/strategic_overlay_actions.js";
 import { loadDefenseLinePresets, buildScenarioDefenseLineEntries } from "../../core/scenario/defense_line_presets.js";
+import { OPERATIONAL_LINE_KIND_LABELS, OPERATION_GRAPHIC_KIND_LABELS } from "./strategic_overlay/type_labels.js";
 
 /**
  * Owns the strategic overlay workspace inside the sidebar:
@@ -144,6 +145,13 @@ export function createStrategicOverlayController({
     showToast,
     DEFAULT_UNIT_COUNTER_PRESET_ID,
   } = helpers;
+
+  const formatOverlayListLabel = (entry, kindLabels) => {
+    const kind = String(entry.kind || "");
+    const kindLabel = Object.hasOwn(kindLabels, kind) ? t(kindLabels[kind], "ui") : kind;
+    const label = String(entry.label || "").trim();
+    return label ? (kindLabel ? `${label} (${kindLabel})` : label) : (kindLabel || String(entry.id || ""));
+  };
 
   let defenseLinePayload;
   let defenseLineLoading = false;
@@ -443,7 +451,9 @@ export function createStrategicOverlayController({
     const operationalLineOpacity = hasSelectedOperationalLine && !isOperationalLineDrawing
       ? Number(selectedOperationalLine?.opacity ?? 1)
       : (Number.isFinite(Number(operationalLineEditor.opacity)) ? Number(operationalLineEditor.opacity) : Number(selectedOperationalLine?.opacity ?? 1));
-    if (operationalLineKindSelect) operationalLineKindSelect.value = operationalLineKind;
+    syncSelectOptions(operationalLineKindSelect, Object.entries(OPERATIONAL_LINE_KIND_LABELS).map(([value, label]) => ({ value, label: t(label, "ui") })), {
+      value: operationalLineKind,
+    });
     if (operationalLineLabelInput) operationalLineLabelInput.value = String(operationalLineEditor.label || selectedOperationalLine?.label || "");
     if (operationalLineStrokeInput) operationalLineStrokeInput.value = operationalLineStroke || "#7f1d1d";
     if (operationalLineWidthInput) operationalLineWidthInput.value = String(Number(operationalLineWidth || 0).toFixed(1).replace(/\.0$/, ""));
@@ -454,7 +464,7 @@ export function createStrategicOverlayController({
       { value: "", label: t("No operational lines", "ui") },
       ...(state.operationalLines || []).map((line) => ({
         value: String(line.id || ""),
-        label: `${String(line.label || line.kind || line.id || "").trim()} (${line.kind})`,
+        label: formatOverlayListLabel(line, OPERATIONAL_LINE_KIND_LABELS),
       })),
     ], {
       value: selectedOperationalLineId,
@@ -511,9 +521,9 @@ export function createStrategicOverlayController({
     const operationOpacity = useSelectedGraphicValues
       ? Number(selectedGraphic?.opacity ?? 1)
       : (Number.isFinite(Number(operationEditor.opacity)) ? Number(operationEditor.opacity) : Number(selectedGraphic?.opacity ?? 1));
-    if (operationGraphicKindSelect) {
-      operationGraphicKindSelect.value = operationKind;
-    }
+    syncSelectOptions(operationGraphicKindSelect, Object.entries(OPERATION_GRAPHIC_KIND_LABELS).map(([value, label]) => ({ value, label: t(label, "ui") })), {
+      value: operationKind,
+    });
     if (operationGraphicLabelInput) {
       operationGraphicLabelInput.value = String(operationEditor.label || "");
     }
@@ -533,7 +543,7 @@ export function createStrategicOverlayController({
       { value: "", label: t("No operation graphics", "ui") },
       ...(state.operationGraphics || []).map((graphic) => ({
         value: String(graphic.id || ""),
-        label: `${String(graphic.label || graphic.kind || graphic.id || "").trim()} (${graphic.kind})`,
+        label: formatOverlayListLabel(graphic, OPERATION_GRAPHIC_KIND_LABELS),
       })),
     ], {
       value: selectedGraphicId,

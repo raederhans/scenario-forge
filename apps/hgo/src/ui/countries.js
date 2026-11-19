@@ -49,28 +49,35 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
   function countryRows(){
     if(!vm.ready)return;
     const countries=session.listCountries(search.value||'',{includeEmpty:showEmpty.checked});
-    list.replaceChildren();
+    const previous=[...list.children],byTag=new Map(previous.map(node=>[node.dataset.country,node])),rows=[];
     for(const country of countries.slice(0,100)){
-      const button=make('button',null,'country-row');button.type='button';button.dataset.country=country.tag;
+      let button=byTag.get(country.tag);
+      if(!button){
+        button=make('button',null,'country-row');button.type='button';button.dataset.country=country.tag;
+        button.append(make('span',null,'country-swatch'),make('span'),make('span',null,'country-counts'));
+      }
       button.setAttribute('aria-pressed',String(selected?.tag===country.tag));
-      const swatch=make('span',null,'country-swatch');
+      const [swatch,title,counts]=button.children;
       if(/^#[0-9a-f]{6}$/i.test(country.color||''))swatch.style.backgroundColor=country.color;
-      const title=make('span');title.textContent=`${country.tag} · ${country.name||country.tag}`;
-      const counts=make('span',null,'country-counts');counts.textContent=`${text('states')}: ${country.stateCount} · ${text('overrides')}: ${country.overrideCount} · ${country.color}`;
-      button.append(swatch,title,counts);list.append(button);
+      title.textContent=`${country.tag} · ${country.name||country.tag}`;
+      counts.textContent=`${text('states')}: ${country.stateCount} · ${text('overrides')}: ${country.overrideCount} · ${country.color}`;
+      rows.push(button);
     }
+    if(rows.length!==previous.length||rows.some((row,i)=>row!==previous[i]))list.replaceChildren(...rows);
     empty.hidden=countries.length>0&&countries.length<=100;
     empty.textContent=countries.length>100?(String(getLanguage()).startsWith('zh')?`显示前 100 / ${countries.length} 个国家，请搜索缩小范围。`:`Showing 100 of ${countries.length} countries. Search to narrow the list.`):text('none');
   }
   function coreRows(){
-    coreList.replaceChildren();
-    if(!vm.ready||!selected||!selected.stateCount){coreEmpty.hidden=true;return;}
+    if(!vm.ready||!selected||!selected.stateCount){coreList.replaceChildren();coreEmpty.hidden=true;return;}
+    const previous=[...coreList.children],byTag=new Map(previous.map(node=>[node.dataset.target,node])),rows=[];
     const candidates=session.listCoreCandidates(selected.tag,coreSearch.value||'');
     for(const candidate of candidates.slice(0,100)){
-      const button=make('button',null,'country-core-row');button.type='button';button.dataset.target=candidate.target||candidate.tag;
+      const target=candidate.target||candidate.tag;
+      const button=byTag.get(target)||make('button',null,'country-core-row');button.type='button';button.dataset.target=target;
       button.textContent=`${candidate.tag||candidate.target} · ${candidate.name||candidate.tag||candidate.target} · ${text('states')}: ${candidate.stateCount}`;
-      coreList.append(button);
+      rows.push(button);
     }
+    if(rows.length!==previous.length||rows.some((row,i)=>row!==previous[i]))coreList.replaceChildren(...rows);
     coreEmpty.hidden=candidates.length>0&&candidates.length<=100;
     coreEmpty.textContent=candidates.length>100?(String(getLanguage()).startsWith('zh')?`显示前 100 / ${candidates.length} 个候选，请搜索缩小范围。`:`Showing 100 of ${candidates.length} candidates. Search to narrow the list.`):text('noCores');
   }
@@ -94,7 +101,7 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
     coreSearch.disabled=!vm.ready||!selected||!selected.stateCount;
     for(const node of [...list.children,...coreList.children])node.disabled=!vm.ready;
     section.hidden=!preview;
-    const changed=!!preview&&previewRevision!==vm.countryRevision;
+    const changed=!!preview&&previewRevision!==vm.documentRevision;
     stale.hidden=completed||!changed;
     completedHint.hidden=!completed;
     existing.hidden=!preview||preview.targetBefore===0;
@@ -138,7 +145,7 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
   listen(unify,'click',()=>attempt(()=>applyColor(true)));
   listen(refresh,'click',()=>attempt(()=>chooseTarget(preview.target,true)));
   listen(confirm,'click',()=>attempt(()=>{
-    if(!preview||previewRevision!==vm.countryRevision||completed)return;
+    if(!preview||previewRevision!==vm.documentRevision||completed)return;
     session.commitTransfer(preview,{color:targetColor.value,name:targetName.value,overridePaint:override.checked});
     // Keep a read-only result, without offering to repeat the completed step.
     completed=true;updateControls();
