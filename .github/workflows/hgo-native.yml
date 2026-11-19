@@ -5,6 +5,8 @@ on:
     paths:
       - 'apps/hgo/**'
       - '.github/workflows/hgo-native.yml'
+      - 'package.json'
+      - 'package-lock.json'
   workflow_dispatch:
 
 permissions:
@@ -14,6 +16,8 @@ jobs:
   native-app:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.runtime/browser/ms-playwright
     defaults:
       run:
         working-directory: apps/hgo
@@ -25,6 +29,8 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /apps/hgo/
+            /package.json
+            /package-lock.json
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
@@ -39,6 +45,12 @@ jobs:
         run: npm run test:python
       - name: Engine and UI behavior tests
         run: npm test
+      - name: Install browser test dependencies
+        run: |
+          npm ci --prefix ../..
+          node ../../node_modules/playwright/cli.js install --with-deps chromium
+      - name: Browser pixels and country transfer flow
+        run: npm run test:browser
       - name: Validate committed native data
         run: npm run validate:data
       - name: Source boundary

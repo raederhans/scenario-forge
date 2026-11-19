@@ -136,7 +136,7 @@ export function createRenderer(canvas, dataset) {
     gl.uniform1i(gl.getUniformLocation(program,'waterOwner'),ownerIndex.get('WTR')||0);
     const palette=new Uint8Array(rows*256*4), selection=new Uint8Array(rows*256);
     let selectedStates=[];
-    let ownerDocument=null,ownerRevision;
+    let ownerDocument=null,ownerRevision,paletteDocument=null,paletteRevision,selectedIds=null;
     const uniformNames=['size','viewport','center','scale','borders','borderWidth','borderOpacity','borderColor','pixelRatio','thematic','metricNeutral'];
     const baseUniforms=Object.fromEntries(uniformNames.map(k=>[k,gl.getUniformLocation(program,k)]));
     const hasVisualizations=layers=>layers.terrain||layers.rivers||layers.nightLights||layers.dayNight||
@@ -180,7 +180,26 @@ export function createRenderer(canvas, dataset) {
           gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,textures[1]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RG_INTEGER,gl.UNSIGNED_SHORT,stateCodes);
         }
         ownerDocument=document;ownerRevision=revision;
-        selectedStates=[...selected].map(id=>stateById.get(String(id))).filter(s=>Array.isArray(s?.anchor)&&s.anchor.length===2&&s.anchor.every(Number.isFinite)&&Number.isFinite(s.pixelCount)&&s.pixelCount>0);for(let i=1;i<dataset.core.provinceIds.length;i++){if(dataset.core.provinceStateIds[i]===null)continue;const id=String(dataset.core.provinceStateIds[i]),c=document.color(id);palette[i*4]=parseInt(c.slice(1,3),16);palette[i*4+1]=parseInt(c.slice(3,5),16);palette[i*4+2]=parseInt(c.slice(5,7),16);palette[i*4+3]=255;selection[i]=selected.has(id)?255:0;} gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,textures[2]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RGBA,gl.UNSIGNED_BYTE,palette);gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,textures[3]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RED,gl.UNSIGNED_BYTE,selection);
+        // View/tool changes do not change these tables. Keep their lifetimes
+        // separate so selecting never uploads colors and painting never uploads selection.
+        const colorRevision=document.revision;
+        if(paletteDocument!==document||paletteRevision!==colorRevision||!Number.isFinite(colorRevision)){
+          for(let i=1;i<dataset.core.provinceIds.length;i++){
+            if(dataset.core.provinceStateIds[i]===null)continue;
+            const c=document.color(String(dataset.core.provinceStateIds[i]));
+            palette[i*4]=parseInt(c.slice(1,3),16);palette[i*4+1]=parseInt(c.slice(3,5),16);palette[i*4+2]=parseInt(c.slice(5,7),16);palette[i*4+3]=255;
+          }
+          gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,textures[2]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RGBA,gl.UNSIGNED_BYTE,palette);
+          paletteDocument=document;paletteRevision=colorRevision;
+        }
+        if(!selectedIds||selectedIds.size!==selected.size||[...selected].some(id=>!selectedIds.has(id))){
+          selectedStates=[...selected].map(id=>stateById.get(String(id))).filter(s=>Array.isArray(s?.anchor)&&s.anchor.length===2&&s.anchor.every(Number.isFinite)&&Number.isFinite(s.pixelCount)&&s.pixelCount>0);
+          for(let i=1;i<dataset.core.provinceIds.length;i++){
+            if(dataset.core.provinceStateIds[i]!==null)selection[i]=selected.has(String(dataset.core.provinceStateIds[i]))?255:0;
+          }
+          gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,textures[3]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RED,gl.UNSIGNED_BYTE,selection);
+          selectedIds=new Set(selected);
+        }
       },
       draw(view,layers,pixelRatio=1,solar) {
         const visualized=hasVisualizations(layers);

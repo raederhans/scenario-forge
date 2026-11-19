@@ -619,6 +619,9 @@ function updateUIText() {
     "updateScenarioUIFn",
     "renderScenarioAuditPanelFn",
   ]);
+  callRuntimeHook(state, "updateStrategicOverlayUIFn", {
+    scopes: ["operationalLines", "operationGraphics"],
+  });
 }
 
 async function toggleLanguage() {

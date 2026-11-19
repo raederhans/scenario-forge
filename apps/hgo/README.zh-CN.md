@@ -56,7 +56,17 @@ python -B apps/hgo/tools/build_app.py --output .runtime/dist/hgo
 
 默认独立包位于 `.runtime/dist/hgo`，返回链接按仓库根目录提供服务时的路径生成。放到其他目录或单独托管时，用 `--main-url` 指定主编辑器地址。
 
-PR 中的纯 HGO 修改只选择 HGO 独立检查；同时修改主应用或发布桥接时，保留对应主应用检查。PR gate 会等待被选中的 HGO job 完成，网站发布仍走统一 Pages 构建。GPU 与真实浏览器行为仍需独立运行时检验，静态边界检查不代表这一层已经通过。
+每个 PR 都运行主仓库的必需检查；涉及 HGO、独立工作流或根目录 npm 依赖时，还会运行 HGO 独立检查，网站发布仍走统一 Pages 构建。HGO 独立工作流通过 Chromium 软件 WebGL 验证原生 PNG 像素、颜色与边界、上下文恢复及国家面板的转移流程。真实显卡的视觉对比和性能测量仍需单独验收，静态边界检查不代表这些检查已经通过。
+
+在 `apps/hgo` 下运行浏览器契约：
+
+```sh
+npm ci --prefix ../..
+node ../../node_modules/playwright/cli.js install chromium
+npm run test:browser
+```
+
+Playwright 仅为仓库开发依赖，不进入浏览器应用包。若使用已有 Chromium，可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定可执行文件。
 
 数据重建命令、资产格式和 Python 接口见 [英文技术说明](README.md)。
 

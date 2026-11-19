@@ -44,11 +44,16 @@ node tools/check_boundary.mjs ../../.runtime/dist/hgo-preview
 # Python tests and complete dataset validation need the data-tool dependencies below
 npm run test:python
 npm run validate:data
+
+# Browser contracts use the repository's development-only Playwright dependency
+npm ci --prefix ../..
+node ../../node_modules/playwright/cli.js install chromium
+npm run test:browser
 ```
 
 `build_app(source_dir, output_dir, main_url='../../../index.html')` can also be imported by the parent Pages builder, which uses `dist/hgo` and `../app/`. The default return link assumes the repository root is served and the package is at `.runtime/dist/hgo`; set `--main-url` when hosting it elsewhere. The packer verifies declared lengths, transport SHA-256, gzip size, provenance and revision. It publishes the HTML/CSS/modules, the default manifest's closure, and the optional visualization catalog's declared asset/provenance closure. It rejects output inside the source, output containing the source, undeclared asset traversal and existing outputs containing unowned files. Its build receipt permits subsequent replacement of its own output.
 
-`check_boundary.mjs` checks static browser imports, HTML/CSS resources, declared asset paths and known main-state globals. It is a dependency boundary check, not a JavaScript security sandbox or GPU runtime test. The dedicated workflow runs synthetic data tests, Node behavior tests, data validation and standalone packaging without downloading the mod. Browser/GPU checks remain a separate integration step.
+`check_boundary.mjs` checks static browser imports, HTML/CSS resources, declared asset paths and known main-state globals. It is a dependency boundary check, not a JavaScript security sandbox or GPU runtime test. The dedicated workflow runs synthetic data tests, Node behavior tests, data validation, standalone packaging and browser contracts without downloading the mod. The browser contracts verify native PNG pixels, color and border rendering, context recovery, and the country-panel transfer flow in Chromium with software WebGL. Physical GPU visual comparisons and performance measurements remain separate. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to use an existing local Chromium executable instead of Playwright's installed browser.
 
 ## Rebuild native data
 

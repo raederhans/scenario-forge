@@ -15,11 +15,11 @@ async function waitForNavigation(predicate) {
   assert.ok(predicate(), "navigation host tasks completed");
 }
 
-async function navigationFixture(t) {
+async function navigationFixture(t, options = {}) {
   let confirmations = 0;
   const f = fixture({ width: 900, height: 600, transform: { x: -100, y: -100, k: 1 },
     directPresentation: true, displayMode: "raster", autoPublish: false, createGpu: measuredGpu,
-    commitPublishedColorEdit: () => { confirmations++; } });
+    commitPublishedColorEdit: () => { confirmations++; }, ...options });
   t.after(() => f.owner.dispose());
   f.h.yieldGpuPreparation = tick;
   f.owner.draw();
@@ -63,6 +63,70 @@ test("continuous input keeps production running while a navigation upload yields
   await waitForNavigation(() => gates.length > 0);
   gates.shift()();
   await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 2);
+  assert.deepEqual(f.renders, []);
+});
+
+test("navigation publishes an uploaded tile after CPU LRU eviction during its upload", async t => {
+  const f = await navigationFixture(t, { cache: createPoliticalIdRasterCache({ maxBytes: 8 * 1024 * 1024 }) });
+  const gpu = f.owner.getDirectFrame().gpu, gates = [];
+  f.cache.clear();
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  f.state.zoomTransform = { x: -1200, y: -100, k: 1 };
+  f.owner.updateNavigationDemand(f.state.zoomTransform);
+  await waitForNavigation(() => f.requests.some(request => !request.settled));
+  const completeLargeTile = request => {
+    const tile = makeTile(request.packet);
+    tile.codes = Uint32Array.from({ length: tile.width * tile.height }, (_, index) => 1 + index % 2);
+    tile.edgeIds = new Uint32Array(400_000);
+    tile.edgeWeights = new Float32Array(400_000);
+    request.resolve(tile);
+  };
+  const first = f.requests.find(request => !request.settled);
+  completeLargeTile(first);
+  await waitForNavigation(() => gates.length > 0);
+  assert.ok(f.cache.peek(first.packet.key));
+  const second = f.requests.find(request => !request.settled);
+  completeLargeTile(second);
+  await waitForNavigation(() => !f.cache.peek(first.packet.key));
+  const uploads = gpu.getStats().tileUploads;
+  gates.shift()();
+  await waitForNavigation(() => gpu.getStats().tileUploads === uploads + 1);
+  const navigation = f.owner.getNavigationSnapshot();
+  const index = navigation.plan.tiles.findIndex(tile => tile.key === first.packet.key);
+  assert.ok(index >= 0, "the GPU-ready tile stays in the navigation list without its CPU payload");
+  assert.equal(gpu.hasTileHandle(navigation.drawTiles[index]), true);
+  assert.equal(f.owner.getDiagnostics().tileRecords.find(record => record.key === first.packet.key).state, "gpu-ready");
+  assert.equal(f.requests.filter(request => request.packet.key === first.packet.key).length, 1);
+});
+
+test("long same-density navigation reclaims offscreen tiles and can return to released regions", async t => {
+  const f = await navigationFixture(t), frame = f.owner.getDirectFrame(), gpu = frame.gpu;
+  let maxResidentTiles = gpu.getStats().residentTiles;
+  const visit = async x => {
+    f.state.zoomTransform = { x, y: -100, k: 1 };
+    const keys = planPoliticalIdRasterView({ transform: f.state.zoomTransform, dpr: 1, width: 900, height: 600 })
+      .tiles.map(tile => `${tile.key}:halo-1-v1`);
+    for (let guard = 0; guard < 40; guard++) {
+      f.owner.updateNavigationDemand(f.state.zoomTransform);
+      const navigation = f.owner.getNavigationSnapshot();
+      gpu.setDrawTiles(navigation.drawTiles, navigation.revision);
+      if (keys.every(key => navigation.plan.tiles.some(tile => tile.key === key))) break;
+      const request = f.requests.find(request => !request.settled);
+      if (request) completeNavigationTile(request);
+      await navigationTick();
+    }
+    const navigation = f.owner.getNavigationSnapshot();
+    assert.ok(keys.every(key => navigation.plan.tiles.some(tile => tile.key === key)), "all tiles in the latest viewport become drawable");
+    assert.ok(frame.drawTiles.every(handle => gpu.hasTileHandle(handle)), "the last exact publication stays available");
+    assert.equal(f.owner.getDirectFrame(), frame);
+    assert.equal(gpu.getStats().preparedFrameBudgetRejects, 0);
+    maxResidentTiles = Math.max(maxResidentTiles, gpu.getStats().residentTiles);
+  };
+  for (let step = 1; step <= 60; step++) await visit(-100 - step * 512);
+  assert.ok(maxResidentTiles <= frame.drawTiles.length + 10, "residency is bounded by the exact frame and nearby navigation tiles");
+  const uploads = gpu.getStats().tileUploads;
+  await visit(-1200);
+  assert.ok(gpu.getStats().tileUploads > uploads, "returning to a released region uploads its tiles again");
   assert.deepEqual(f.renders, []);
 });
 

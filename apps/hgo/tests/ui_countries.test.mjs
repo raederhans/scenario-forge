@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createCountryPanel} from '../src/ui/countries.js';
+import {createHgoSession} from '../src/session.js';
+import {validateCore} from '../src/data/dataset.js';
 
 class Node {
   constructor(tag,doc){this.tagName=tag.toUpperCase();this.ownerDocument=doc;this.children=[];this.dataset={};this.style={};this.value='';this.checked=false;this.hidden=false;this.disabled=false;this.events=new Map();this.attributes={};this.textContent='';}
@@ -24,7 +26,7 @@ function harness({count=2,closed=false}={}){
     commitTransfer(...args){calls.push(['commit',...args]);},focusState(id){calls.push(['focus',id]);}};
   const panel=createCountryPanel({root,session,onError:error=>errors.push(error)});
   const find=id=>{const visit=n=>n.id===id?n:n.children.map(visit).find(Boolean);return visit(root);};
-  const render=(revision=0,ready=true,generation=1)=>{session.revision=revision;panel.render({countryRevision:revision,ready,projectGeneration:generation});};
+  const render=(revision=0,ready=true,generation=1)=>{session.revision=revision;panel.render({documentRevision:revision,countryRevision:`${revision}:0:en`,ready,projectGeneration:generation});};
   const choose=()=>find('country-list').fire('click',find('country-list').children[0].children[1]);
   const preview=(index=0)=>find('country-core-list').fire('click',find('country-core-list').children[index]);
   return {panel,root,details,find,render,choose,preview,countries,calls,errors,session,doc};
@@ -81,6 +83,16 @@ test('collapsed panels defer country queries, cap rows, and stable renders keep 
   h.find('country-search').value='BBB149';h.find('country-search').fire('input');assert.equal(h.find('country-list').children.length,1);
 });
 
+test('country and core rows survive document edits while counts and colors update',()=>{
+  const h=harness();h.render();h.choose();
+  const row=h.find('country-list').children[0],core=h.find('country-core-list').children[0];
+  h.countries[0].overrideCount=2;h.countries[0].color='#abcdef';h.render(1);
+  assert.equal(h.find('country-list').children[0],row);
+  assert.equal(h.find('country-core-list').children[0],core);
+  assert.match(row.children[2].textContent,/Paint overrides: 2/);
+  assert.equal(row.children[0].style.backgroundColor,'#abcdef');
+});
+
 test('zero-state parents are explicit and replacement projects reset panel state',()=>{
   const h=harness();h.countries[0].stateCount=0;h.render();h.find('country-show-empty').checked=true;h.find('country-show-empty').fire('change');h.choose();
   assert.equal(h.find('country-core-search').disabled,true);assert.equal(h.find('country-unify-overrides').disabled,true);
@@ -116,4 +128,47 @@ test('refreshing a now-active target adopts its authoritative color and name',()
   h.render(1);h.find('country-refresh-preview').fire('click');
   assert.equal(h.find('country-target-color').value,'#998877');assert.equal(h.find('country-target-name').value,'Existing name');
   assert.equal(h.find('country-target-color').disabled,true);assert.equal(h.find('country-target-name').disabled,true);
+});
+
+test('real session previews can commit, become stale after edits, and reset when a project is opened',()=>{
+  const doc={documentElement:{lang:'en'},createElement:tag=>new Node(tag,doc)};
+  const root=new Node('div',doc),handlers=new Map(),frames=new Map();let serial=0,panel;
+  const gl=new Proxy({NO_ERROR:0,getParameter:()=>8192,getShaderParameter:()=>true,getProgramParameter:()=>true,getError:()=>0,getExtension:()=>null},{get:(t,k)=>k in t?t[k]:k.toUpperCase()===k?++serial:()=>({})});
+  const win={devicePixelRatio:1,requestAnimationFrame:fn=>{const id=++serial;frames.set(id,fn);return id;},cancelAnimationFrame:id=>frames.delete(id),addEventListener(){},removeEventListener(){}};
+  const canvas={width:400,height:200,clientWidth:400,clientHeight:200,ownerDocument:{defaultView:win},getContext:()=>gl,addEventListener:(n,f)=>handlers.set(n,f),removeEventListener:n=>handlers.delete(n)};
+  const states=[1,2,3].map(id=>({id,name:`State ${id}`,entityTag:'FRA',coreTags:id<3?['COR']:[],anchor:[id-.5,.5],bounds:[id-1,0,id,1],pixelCount:1}));
+  const core={schemaVersion:1,states,entities:[{tag:'FRA',name:'France',color:'#25489b'}],provinceIds:[null,1,2,3],provinceStateIds:[null,1,2,3]};
+  const dataset={manifest:{id:'country-panel',revision:'1',coordinateSpace:{width:3,height:1}},core,ids:new Uint16Array([1,2,3]),...validateCore(core,3,1)};
+  const errors=[];
+  const session=createHgoSession({canvas,overlayCanvas:{width:400,height:200,getContext:()=>({clearRect(){}})},dataset,onChange:vm=>panel?.render(vm),onError:error=>errors.push(error)});
+  panel=createCountryPanel({root,session,onError:error=>errors.push(error)});
+  const find=id=>{const visit=n=>n.id===id?n:n.children.map(visit).find(Boolean);return visit(root);};
+  const choose=()=>find('country-list').fire('click',find('country-list').children.find(n=>n.dataset.country==='FRA'));
+  const preview=()=>find('country-core-list').fire('click',find('country-core-list').children[0]);
+  try{
+    panel.render(session.getViewModel());choose();preview();
+    assert.equal(typeof session.getViewModel().countryRevision,'string');
+    assert.equal(find('country-stale').hidden,true);
+    assert.equal(find('country-confirm-transfer').disabled,false,'a fresh numeric document revision matches the session model');
+    find('country-target-name').value='Corsica';find('country-target-color').value='#abcdef';
+    session.setDisplayOption('nameLanguage','zh');
+    assert.equal(find('country-confirm-transfer').disabled,false,'presentation changes do not invalidate ownership previews');
+    session.paintStates([3],'#112233');
+    assert.equal(find('country-confirm-transfer').disabled,true);
+    find('country-confirm-transfer').fire('click');
+    assert.deepEqual(session.serializeDocument().owners,{});
+    find('country-refresh-preview').fire('click');
+    assert.equal(find('country-target-name').value,'Corsica');assert.equal(find('country-target-color').value,'#abcdef');
+    assert.equal(find('country-confirm-transfer').disabled,false);
+    find('country-confirm-transfer').fire('click');
+    assert.deepEqual(session.serializeDocument().owners,{'1':'COR','2':'COR'});
+    assert.equal(find('country-completed').hidden,false);
+    session.undo();
+    assert.deepEqual(session.serializeDocument().owners,{});
+    assert.deepEqual(session.serializeDocument().paint,{'3':'#112233'},'transfer is one undo step');
+    choose();preview();assert.equal(find('country-confirm-transfer').disabled,false);
+    session.loadDocument(session.serializeDocument());
+    assert.equal(find('country-preview').hidden,true);
+    assert.deepEqual(errors,[]);
+  }finally{panel.dispose();session.dispose();}
 });

@@ -53,7 +53,7 @@ export function createHgoSession({canvas,overlayCanvas,dataset,overlayCatalogUrl
   let paintScope='state',pendingClick=null,spacePan=false,brushPoints=[],lastPointerWasDrag=false;
   let viewDirty=false,exporting=false,projectGeneration=0,viewNotificationPending=false;
   function listen(target,event,handler,options){target.addEventListener(event,handler,options);listeners.push(()=>target.removeEventListener(event,handler,options));}
-  function model(){return {ready:ready&&!disposed,dirty:document.dirty||viewDirty,tool,color,paintScope,countryRevision:`${document.revision}:${visualizationRevision}:${layers.nameLanguage}`,ownerRevision:document.ownerRevision,projectGeneration,selection:[...selection].map(id=>{const s=dataset.stateById.get(id);return {id:s.id,name:names.name('state',s,layers.nameLanguage,{customName:document.labels[id]}),customLabel:document.labels[id]||'',entityTag:document.owner(id),originalEntityTag:s.entityTag,color:document.color(id)};}),canUndo:document.canUndo,canRedo:document.canRedo,zoom:view.scale,layers:{...layers},visualizations:visualizationModel(),stats:{stateCount:dataset.core.states.length,provinceCount:dataset.core.provinceIds.length-1},status};}
+  function model(){return {ready:ready&&!disposed,dirty:viewDirty||document.dirty,tool,color,paintScope,documentRevision:document.revision,countryRevision:`${document.revision}:${visualizationRevision}:${layers.nameLanguage}`,ownerRevision:document.ownerRevision,projectGeneration,selection:[...selection].map(id=>{const s=dataset.stateById.get(id);return {id:s.id,name:names.name('state',s,layers.nameLanguage,{customName:document.labels[id]}),customLabel:document.labels[id]||'',entityTag:document.owner(id),originalEntityTag:s.entityTag,color:document.color(id)};}),canUndo:document.canUndo,canRedo:document.canRedo,zoom:view.scale,layers:{...layers},visualizations:visualizationModel(),stats:{stateCount:dataset.core.states.length,provinceCount:dataset.core.provinceIds.length-1},status};}
   function emit(){viewNotificationPending=false;if(!disposed)onChange(model());}
   function draw(){
     raf=0;if(!ready||disposed)return;
@@ -72,7 +72,7 @@ export function createHgoSession({canvas,overlayCanvas,dataset,overlayCatalogUrl
     }catch(e){onError(e);}
   }
   function schedule(){if(!raf&&!disposed&&ready)raf=win.requestAnimationFrame(draw);}
-  // Only wheel view notifications wait for paint. A synchronous action publishes
+  // Wheel and pan view notifications wait for paint. A synchronous action publishes
   // the latest complete model and consumes any pending view notification.
   function changed(palette=false,deferViewNotification=false){if(disposed)return;if(palette&&ready)renderer.update(document,selection);schedule();if(deferViewNotification&&ready)viewNotificationPending=true;else emit();}
   function resize(){if(disposed)return;const ratio=Math.min(win.devicePixelRatio||1,2);for(const c of [canvas,overlayCanvas]){const w=Math.max(1,Math.round(canvas.clientWidth*ratio)),h=Math.max(1,Math.round(canvas.clientHeight*ratio));if(c.width!==w)c.width=w;if(c.height!==h)c.height=h;}schedule();}
@@ -128,7 +128,7 @@ export function createHgoSession({canvas,overlayCanvas,dataset,overlayCatalogUrl
     const [x,y]=position(e);
     if(Math.hypot(x-drag.x,y-drag.y)>4)drag.moved=true;
     if(drag.pan||(drag.moved&&tool!=='paint')){
-      view.x-=(x-drag.lastX)/view.scale;view.y-=(y-drag.lastY)/view.scale;viewDirty=true;changed();
+      view.x-=(x-drag.lastX)/view.scale;view.y-=(y-drag.lastY)/view.scale;viewDirty=true;changed(false,true);
     }else if(drag.moved&&tool==='paint'){
       if(!drag.brush){document.beginPaintStroke(color);drag.brush=true;}
       if(brushPoints.length>=256)flushBrush();

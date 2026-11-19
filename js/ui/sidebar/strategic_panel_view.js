@@ -3,6 +3,7 @@ import { createButton } from "../components/button.js";
 import { createTextInput } from "../components/text_input.js";
 import { setUiIcon } from "../components/ui_icons.js";
 import { DEFAULT_UNIT_COUNTER_PRESET_ID, getUnitCounterCategoryLabel, getUnitCounterIconPathById } from "../../core/unit_counter_presets.js";
+import { OPERATIONAL_LINE_KIND_LABELS, OPERATION_GRAPHIC_KIND_LABELS } from "./strategic_overlay/type_labels.js";
 
 export function createStrategicPanelView({
   frontlineTabStack, runtimeState, countryNames, t, getDirectGeoLabel,
@@ -220,12 +221,7 @@ export function createStrategicPanelView({
     operationalLineHeader.textContent = t("Operational Lines", "ui");
     const operationalLineRow = buildRow();
     operationalLineRow.classList.add("frontline-compact-row", "strategic-line-primary-row");
-    const operationalLineKindSelect = buildSelect("operationalLineKindSelect", [
-      ["frontline", "Frontline"],
-      ["offensive_line", "Offensive Line"],
-      ["spearhead_line", "Spearhead Line"],
-      ["defensive_line", "Defensive Line"],
-    ]);
+    const operationalLineKindSelect = buildSelect("operationalLineKindSelect", Object.entries(OPERATIONAL_LINE_KIND_LABELS));
     const operationalLineLabelInput = buildInput("operationalLineLabelInput", "Label");
     operationalLineRow.appendChild(operationalLineKindSelect);
     operationalLineRow.appendChild(operationalLineLabelInput);
@@ -273,14 +269,7 @@ export function createStrategicPanelView({
     graphicsHeader.textContent = t("Operation Graphics", "ui");
     const graphicsRow = buildRow();
     graphicsRow.classList.add("frontline-compact-row", "strategic-graphics-primary-row");
-    const graphicsKindSelect = buildSelect("operationGraphicKindSelect", [
-      ["attack", "Attack"],
-      ["retreat", "Retreat"],
-      ["supply", "Supply"],
-      ["naval", "Naval"],
-      ["encirclement", "Encirclement"],
-      ["theater", "Theater"],
-    ]);
+    const graphicsKindSelect = buildSelect("operationGraphicKindSelect", Object.entries(OPERATION_GRAPHIC_KIND_LABELS));
     const graphicsLabelInput = buildInput("operationGraphicLabelInput", "Label");
     graphicsRow.appendChild(graphicsKindSelect);
     graphicsRow.appendChild(graphicsLabelInput);

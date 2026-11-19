@@ -675,6 +675,10 @@
     "en": "Attached counters will fall back to province or free anchors.",
     "zh": "附属计数器将回退到省份锚点或自由锚点。"
   },
+  "Attack": {
+    "en": "Attack",
+    "zh": "进攻"
+  },
   "Audit and manifest stay read-only here so tuning and source truth do not get mixed.": {
     "en": "Audit and manifest stay read-only here so tuning and source truth do not get mixed.",
     "zh": "审计和清单在这里保持只读状态，因此调整和源事实不会混淆。"
@@ -2563,6 +2567,10 @@
     "en": "Default color",
     "zh": "默认颜色"
   },
+  "Defensive Line": {
+    "en": "Defensive Line",
+    "zh": "防御线"
+  },
   "Delete": {
     "en": "Delete",
     "zh": "删除"
@@ -3134,6 +3142,10 @@
   "Enabled · waiting for data": {
     "en": "Enabled · waiting for data",
     "zh": "已启用 · 等待数据"
+  },
+  "Encirclement": {
+    "en": "Encirclement",
+    "zh": "包围"
   },
   "Energy Facilities": {
     "en": "Energy Facilities",
@@ -5747,6 +5759,10 @@
     "en": "Native vector compatibility",
     "zh": "原生矢量兼容"
   },
+  "Naval": {
+    "en": "Naval",
+    "zh": "海军"
+  },
   "Navigation": {
     "en": "Navigation",
     "zh": "导航"
@@ -6178,6 +6194,10 @@
   "Off": {
     "en": "Off",
     "zh": "关闭"
+  },
+  "Offensive Line": {
+    "en": "Offensive Line",
+    "zh": "进攻线"
   },
   "Official Japan source defines active network boundaries.": {
     "en": "Official Japan source defines active network boundaries.",
@@ -7751,6 +7771,10 @@
     "en": "Restricted access / environmental risk",
     "zh": "限制进入/环境风险"
   },
+  "Retreat": {
+    "en": "Retreat",
+    "zh": "撤退"
+  },
   "Retry": {
     "en": "Retry",
     "zh": "重试"
@@ -9255,6 +9279,10 @@
     "en": "Spatial Index",
     "zh": "空间索引"
   },
+  "Spearhead Line": {
+    "en": "Spearhead Line",
+    "zh": "突击线"
+  },
   "Special": {
     "en": "Special",
     "zh": "特殊"
@@ -9562,6 +9590,10 @@
   "Summary scope": {
     "en": "Summary scope",
     "zh": "汇总范围"
+  },
+  "Supply": {
+    "en": "Supply",
+    "zh": "补给"
   },
   "Suppress short primary": {
     "en": "Suppress short primary",
@@ -9922,6 +9954,10 @@
   "The world three years before the Second World War. Germany is rearming and about to remilitarise the Rhineland, Italy is at war in Ethiopia, and Spain is months from civil war. In Asia, Japan holds Manchukuo while China remains divided among the Nationalist government, the Communists and regional warlords.": {
     "en": "The world three years before the Second World War. Germany is rearming and about to remilitarise the Rhineland, Italy is at war in Ethiopia, and Spain is months from civil war. In Asia, Japan holds Manchukuo while China remains divided among the Nationalist government, the Communists and regional warlords.",
     "zh": "第二次世界大战爆发前三年的世界。德国正在重整军备，即将进驻莱茵兰；意大利正在入侵埃塞俄比亚，西班牙数月后将陷入内战。在亚洲，日本扶植的满洲国已经建立，中国仍分裂为国民政府、中共与各地军阀。"
+  },
+  "Theater": {
+    "en": "Theater",
+    "zh": "战区"
   },
   "Thematic": {
     "en": "Thematic",

@@ -360,13 +360,13 @@
     "locales.json": {
       "artifact_class": "publish",
       "description": "Published locale bundle for UI and geo labels.",
-      "geo_entry_count": 72674,
+      "geo_entry_count": 73430,
       "owner": "init_map_data.hierarchy_locales",
       "role": "locales",
-      "sha256": "db8edb56e83ba9d28e7c4005c1f00b5fc0e3251b7a1e73e2d70953db0463ef4f",
-      "size_bytes": 8594790,
+      "sha256": "88970b55d0b53076dda1d9a95fad090ad1bbfa78d85ac8b9f7dee40bcb37c6d7",
+      "size_bytes": 8595455,
       "type": "locales",
-      "ui_entry_count": 2830
+      "ui_entry_count": 2839
     },
     "marine_regions.refined.source.geojson": {
       "artifact_class": "derived",

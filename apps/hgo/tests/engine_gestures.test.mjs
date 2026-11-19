@@ -99,6 +99,23 @@ test('wheel bursts publish one latest view per frame while state and anchored zo
   s.dispose();
 });
 
+test('pan bursts update the view immediately and publish once per frame',()=>{
+  const h=harness(),s=h.session;s.setTool('pan');flushFrame(h);h.models.length=0;
+  const before=s.serializeDocument().view;
+  h.event('pointerdown',.5,.5);
+  for(let i=1;i<=60;i++)h.event('pointermove',.5+i/100,.5);
+  assert.equal(h.models.length,0);
+  assert.equal(h.frames.size,1);
+  assert.equal(s.getViewModel().dirty,true);
+  flushFrame(h);
+  assert.equal(h.models.length,1);
+  h.event('pointerup',1.1,.5);
+  assert.ok(Math.abs(s.serializeDocument().view.x-(before.x-.6))<1e-9);
+  assert.deepEqual(s.serializeDocument().paint,{});
+  s.markSaved();assert.equal(s.getViewModel().dirty,false);
+  s.dispose();
+});
+
 test('synchronous actions consume pending wheel notifications without a duplicate next frame',()=>{
   const h=harness(),s=h.session;flushFrame(h);
   for(const action of [()=>s.zoomBy(.9),()=>s.fit(),()=>s.setSelection([1]),
