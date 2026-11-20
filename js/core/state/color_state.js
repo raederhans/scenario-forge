@@ -61,6 +61,7 @@ export function createDefaultColorState() {
     colorMode: "political",
     selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],
     legendLabels: {},
+    countryNameOverrides: {},
     legendConfig: {
       mode: "direct-area",
       continent: "all",

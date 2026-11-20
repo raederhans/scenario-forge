@@ -1,4 +1,5 @@
 import { getMapDataBoundary } from '../map_data_boundary.js';
+import { getCountryNameOverride } from '../country_name_overrides.js';
 import { getFeatureId } from '../feature_identity.js';
 import { getObjectIdentityToken } from './object_identity.js';
 import { getParentMergedParents } from './parent_merged_presentation.js';
@@ -23,7 +24,7 @@ function eligible(feature) {
 
 export function createCountryLabelSourceOwner({ state, topojson = globalThis.topojson, geoArea = globalThis.d3?.geoArea,
   geoContains = globalThis.d3?.geoContains, geoBounds = globalThis.d3?.geoBounds,
-  ensureSources, getCountryName = code => state.countryNames?.[code] || code,
+  ensureSources, getCountryName = code => getCountryNameOverride(state, code) || state.countryNames?.[code] || code,
   isEligible = () => true, onChange = () => {},
   createWorker = () => new Worker(new URL('../../workers/country_label_geometry.worker.js', import.meta.url), { type: 'module' }),
   isWorkerSupported = () => typeof Worker === 'function',
@@ -74,6 +75,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   function currentNameKey() {
     return JSON.stringify([state.currentLanguage, getObjectIdentityToken(state.scenarioCountriesByTag),
       getObjectIdentityToken(state.countryNames), getObjectIdentityToken(state.locales?.geo),
+      getObjectIdentityToken(state.countryNameOverrides),
       getObjectIdentityToken(state.geoAliasToStableKey)]);
   }
 

@@ -2672,6 +2672,11 @@
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
               <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
                 <div id="countryInspectorSelected" class="hidden">
+                  <label class="field-label">
+                    <span data-i18n="Country display name">Country display name</span>
+                    <input id="countryNameOverride" class="input" type="text" autocomplete="off" />
+                  </label>
+                  <div><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span></div>
                   <button id="resetCountryOverrides" type="button" class="sidebar-action-secondary mt-2" disabled>
                     <span data-i18n="Restore original country color">Restore original country color</span>
                     <span data-reset-count>(0)</span>

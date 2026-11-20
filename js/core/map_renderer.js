@@ -9925,6 +9925,7 @@ async function ensureCountryLabelsReadyForExport(passNames) { return labelsRunti
 export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
 export function getPlacedMapLabels() { return labelsRuntime.getPlacedMapLabels(); }
 export function getVisibleMapLabels() { return labelsRuntime.getVisibleMapLabels(); }
+export function getCountryLabelStatus(code) { return labelsRuntime.getCountryLabelStatus(code); }
 
 export function getCountryLabelReadiness() { return labelsRuntime.getCountryLabelReadiness(); }
 

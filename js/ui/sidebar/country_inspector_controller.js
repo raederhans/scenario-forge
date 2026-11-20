@@ -1,4 +1,7 @@
 import { ensureHgoIdentitySettings } from "./hgo_identity_state.js";
+import { getCountryNameOverride, setCountryNameOverride } from "../../core/country_name_overrides.js";
+import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
+import { commitChange } from "../../core/state/changes.js";
 import { callRuntimeHook, on, STATE_BUS_EVENTS } from "../../core/state/index.js";
 import { getCountryMemberIds, getCountryOverrideIds, resetCountryOverrides } from "../../core/country_override_reset_command.js";
 import { showAppDialog } from "../components/app_dialog.js";
@@ -78,6 +81,7 @@ export function createCountryInspectorController({
   selectedCountryActionsSection,
   countryInspectorDetail,
   countryInspectorSelected,
+  getCountryLabelStatus,
   countryInspectorColorRow,
   countryInspectorColorSwatch,
   countryInspectorColorInput,
@@ -165,6 +169,8 @@ export function createCountryInspectorController({
   };
 
   const getCountryInspectorDisplayName = (countryState, identity = null) => {
+    const override = getCountryNameOverride(runtimeState, countryState?.code);
+    if (override) return override;
     const settings = ensureHgoIdentitySettings(runtimeState);
     if (settings.enabled && settings.nameMode === "hgo" && identity?.displayName) {
       return identity.displayName;
@@ -1194,6 +1200,15 @@ export function createCountryInspectorController({
   };
 
   const resetButton = countryInspectorSelected?.querySelector("#resetCountryOverrides");
+  const nameInput = countryInspectorSelected?.querySelector("#countryNameOverride");
+  const statusText = countryInspectorSelected?.querySelector("#countryLabelStatus");
+  function updateLabelStatus() {
+    const code = runtimeState.selectedInspectorCountryCode;
+    if (code && statusText) {
+      const text = t(getCountryLabelStatus(code), "ui");
+      if (statusText.textContent !== text) statusText.textContent = text;
+    }
+  }
   const resetCount = resetButton?.querySelector("[data-reset-count]");
   const updateResetCount = () => {
     if (!resetButton) return;
@@ -1256,6 +1271,14 @@ export function createCountryInspectorController({
     }
 
     renderHgoIdentityDetail(countryState);
+    if (nameInput && (nameInput !== document.activeElement || nameInput.dataset.code !== selectedCode ||
+      nameInput.dataset.language !== runtimeState.currentLanguage)) {
+      nameInput.dataset.code = selectedCode;
+      nameInput.dataset.language = runtimeState.currentLanguage;
+      nameInput.defaultValue = getCountryInspectorDisplayName(countryState, getCountryHgoIdentity(countryState));
+      nameInput.value = nameInput.defaultValue;
+    }
+    updateLabelStatus();
     renderInspectorBreadcrumb(countryState);
     renderInspectorModernPlaceNames(countryState);
     renderCountryLocateButton(selectedCode);
@@ -1364,6 +1387,29 @@ export function createCountryInspectorController({
   };
 
   const bindEvents = () => {
+    if (nameInput && !nameInput.dataset.bound) {
+      nameInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.isComposing) {
+          event.preventDefault();
+          nameInput.blur();
+        }
+      });
+      nameInput.addEventListener("blur", () => {
+        const { code, language } = nameInput.dataset;
+        if (nameInput.value === nameInput.defaultValue) return;
+        const before = captureHistoryState({ countryNameOverrides: true });
+        if (!setCountryNameOverride(runtimeState, code, language, nameInput.value)) {
+          nameInput.value = nameInput.defaultValue;
+          return;
+        }
+        pushHistoryEntry({ kind: "country-name", before, after: captureHistoryState({ countryNameOverrides: true }) });
+        markDirty("country-name");
+        flushSidebarRender("country-name");
+        commitChange({ domains: ["countryList"], reason: "country-name" });
+      });
+      on("labels:drawn", updateLabelStatus);
+      nameInput.dataset.bound = "true";
+    }
     if (resetButton && !resetButton.dataset.bound) {
       on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateResetCount);
       resetButton.addEventListener("click", async () => {

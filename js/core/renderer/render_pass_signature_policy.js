@@ -330,6 +330,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.annotationView?.showMapLabels !== false,
         getObjectIdentityToken(runtimeState.scenarioCountriesByTag),
         getObjectIdentityToken(runtimeState.countryNames),
+        getObjectIdentityToken(runtimeState.countryNameOverrides),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
         countryLabels?.enabled !== false

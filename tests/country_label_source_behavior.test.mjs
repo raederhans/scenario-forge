@@ -30,6 +30,21 @@ function fixture(extra = {}, helpers = {}) {
   return { owner, state, bundle, payload };
 }
 
+test('renaming and clearing republish the default country label without rebuilding geometry', async () => {
+  const { state, owner } = fixture({ countryNames: { AAA: 'Original' } }, { getCountryName: undefined });
+  await owner.prepare();
+  const original = owner.getSource().countries.find(country => country.countryCode === 'AAA');
+  assert.equal(original.name, 'Original');
+  for (const [overrides, name] of [[{ AAA: { en: 'New' } }, 'New'], [{}, 'Original']]) {
+    state.countryNameOverrides = overrides;
+    assert.equal(owner.peekSource().status, 'pending');
+    const country = owner.getSource().countries.find(entry => entry.countryCode === 'AAA');
+    assert.equal(country.feature.properties.label, name);
+    assert.equal(country.geometry, original.geometry);
+  }
+  owner.dispose();
+});
+
 test('readiness peeks never prepare or replace a source and detect stale scene and names', async () => {
   let yields = 0, changes = 0;
   const { owner, state } = fixture({}, { isWorkerSupported: () => false,

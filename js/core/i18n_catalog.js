@@ -528,6 +528,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "锚点：省份 / 自由",
     "en": "Anchor: Province / Free"
   },
+  "Annexed (all regions painted in other countries’ colors)": {
+    "zh": "已被吞并（全部地块涂成他国颜色）",
+    "en": "Annexed (all regions painted in other countries’ colors)"
+  },
   "Antarctica": {
     "zh": "南极洲",
     "en": "Antarctica"
@@ -735,6 +739,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Automatic (raster for TNO)": {
     "zh": "自动（TNO 优先栅格）",
     "en": "Automatic (raster for TNO)"
+  },
+  "Automatic country name": {
+    "zh": "自动国名",
+    "en": "Automatic country name"
   },
   "Autonomous Region": {
     "zh": "自治区域",
@@ -2304,6 +2312,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "国家颜色已恢复。",
     "en": "Country colors were restored."
   },
+  "Country display name": {
+    "zh": "国家显示名称",
+    "en": "Country display name"
+  },
   "Country file": {
     "zh": "国家文件",
     "en": "Country file"
@@ -2335,6 +2347,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Country names": {
     "zh": "国家名称",
     "en": "Country names"
+  },
+  "Country names are off": {
+    "zh": "国名已关闭",
+    "en": "Country names are off"
   },
   "Coverage": {
     "zh": "覆盖范围",
@@ -2856,6 +2872,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "显示画质",
     "en": "Display quality"
   },
+  "Displayed": {
+    "zh": "已显示",
+    "en": "Displayed"
+  },
   "Disputed": {
     "zh": "争议区",
     "en": "Disputed"
@@ -2891,6 +2911,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Disused": {
     "zh": "停用",
     "en": "Disused"
+  },
+  "Does not fit or is obscured in this view": {
+    "zh": "当前视图放不下或被遮挡",
+    "en": "Does not fit or is obscured in this view"
   },
   "Dominion": {
     "zh": "统治",
@@ -7855,6 +7879,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Replace with imported ids": {
     "zh": "用导入 ID 替换",
     "en": "Replace with imported ids"
+  },
+  "Replaced by manual map text": {
+    "zh": "有手动地图文字代替",
+    "en": "Replaced by manual map text"
   },
   "Report": {
     "zh": "举报",

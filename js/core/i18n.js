@@ -1,3 +1,4 @@
+import { getCountryNameOverride } from "./country_name_overrides.js";
 import { getThematicWgiFeatureInspection, getThematicReferenceNote } from "./thematic/thematic_wgi_view_model.js";
 import { getPopulationTooltipLines } from "./thematic/population_spatial_presentation.js";
 import { getThematicIndicator, formatThematicIndicatorValue } from "./thematic/thematic_indicator_catalog.js";
@@ -341,7 +342,7 @@ function getTooltipCountryContext(feature) {
     ? normalizeTooltipCountryCode(runtimeState.scenarioBaselineOwnersByFeatureId?.[featureId] || "")
     : "";
   const countryCode = scenarioBaselineCode || getTooltipFeatureCountryCode(feature, { useIdFallback: true });
-  const countryDisplayName = getLocalizedScenarioCountryName(
+  const countryDisplayName = getCountryNameOverride(runtimeState, countryCode) || getLocalizedScenarioCountryName(
     runtimeState.scenarioCountriesByTag?.[countryCode],
     runtimeState.countryNames?.[countryCode] || countryCode,
     getDirectGeoLabel,

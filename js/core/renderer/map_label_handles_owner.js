@@ -1,3 +1,4 @@
+import { getCountryNameOverride } from "../country_name_overrides.js";
 import { patchStrategicOverlayEditorState } from "../state/actions/strategic_overlay_actions.js";
 import { requestRender } from "../render_boundary.js";
 import { t } from "../i18n.js";
@@ -11,7 +12,7 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 function makePreview(doc, label, state) {
   const language = state.currentLanguage || "en";
   const country = state.scenarioCountriesByTag?.[label.countryCode];
-  const name = label.text || (country ? getLocalizedScenarioCountryName(country,
+  const name = label.text || getCountryNameOverride(state, label.countryCode) || (country ? getLocalizedScenarioCountryName(country,
     state.countryNames?.[label.countryCode] || label.countryCode, name => t(name, "geo")) : label.fallbackName);
   const title = label.uppercase == null ? displayText(name, language)
     : label.uppercase ? name.toLocaleUpperCase("en") : name;

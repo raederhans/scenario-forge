@@ -6,6 +6,7 @@ export {
   initMap,
   getPoliticalIdRasterDiagnostics,
   getVisibleMapLabels,
+  getCountryLabelStatus,
   getPlacedMapLabels,
   getCountryLabelReadiness,
   setPoliticalIdRasterTrialEnabled,
