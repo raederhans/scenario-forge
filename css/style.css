@@ -2349,6 +2349,13 @@ details.card[open]:not(.editor-scenario-menu) > summary::after {
   display: none;
 }
 
+@media (max-width: 767px) {
+  .map-legend-control:not(.is-collapsed) {
+    min-width: min(180px, 50vw);
+    max-width: min(50vw, calc(100% - 16px));
+  }
+}
+
 .map-legend-resize-handle {
   position: absolute;
   z-index: calc(var(--z-map-overlay) - 8);

@@ -11,7 +11,7 @@ export const DEFAULT_LEGEND_CONFIG = Object.freeze({
 
 export const DEFAULT_LEGEND_CONTROL = Object.freeze({
   visible: true,
-  collapsed: false,
+  collapsed: null,
   xRatio: 0.02,
   yRatio: 0.72,
   width: 240,
@@ -82,7 +82,7 @@ export function normalizeLegendControl(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
     visible: source.visible !== false,
-    collapsed: !!source.collapsed,
+    collapsed: source.collapsed == null ? DEFAULT_LEGEND_CONTROL.collapsed : !!source.collapsed,
     xRatio: clampNumber(source.xRatio, DEFAULT_LEGEND_CONTROL.xRatio, 0, 1),
     yRatio: clampNumber(source.yRatio, DEFAULT_LEGEND_CONTROL.yRatio, 0, 1),
     width: Math.round(clampNumber(
