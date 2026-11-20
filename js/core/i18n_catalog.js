@@ -2885,6 +2885,34 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "双击快速填色",
     "en": "Double-Click Quick Fill"
   },
+  "Double-click fill: whole country (no parent) · {count} regions": {
+    "zh": "双击填充：整国（无上级区域）· {count} 个地块",
+    "en": {
+      "one": "Double-click fill: whole country (no parent) · {count} region",
+      "other": "Double-click fill: whole country (no parent) · {count} regions"
+    }
+  },
+  "Double-click fill: whole country · {count} regions": {
+    "zh": "双击填充：整个国家 · {count} 个地块",
+    "en": {
+      "one": "Double-click fill: whole country · {count} region",
+      "other": "Double-click fill: whole country · {count} regions"
+    }
+  },
+  "Double-click fill: {count} regions (parent region)": {
+    "zh": "双击填充：{count} 个地块（上级区域）",
+    "en": {
+      "one": "Double-click fill: {count} region (parent region)",
+      "other": "Double-click fill: {count} regions (parent region)"
+    }
+  },
+  "Double-click fill: {count} regions ({group})": {
+    "zh": "双击填充：{count} 个地块（{group}）",
+    "en": {
+      "one": "Double-click fill: {count} region ({group})",
+      "other": "Double-click fill: {count} regions ({group})"
+    }
+  },
   "Double-click quick fill scope": {
     "zh": "双击快速填充范围",
     "en": "Double-click quick fill scope"

@@ -1302,6 +1302,7 @@ const getMapHoverInteractionOwner = lazyOwner(() => createMapHoverInteractionOwn
     isFacilityDetailsSurfaceActive: getFacilityInteractionRuntime().isFacilityDetailsSurfaceActive,
     getHoveredCityTooltipEntry: labelsRuntime.getHoveredCityTooltipEntry,
     getTooltipTextForFeature: getTooltipText,
+    getFillTargetPolicy,
     getFeatureForHit: (hit) => {
       const id = hit?.id;
       if (!id) return null;
