@@ -30,6 +30,12 @@ const VIEWPORT_GROUP_DEFINITIONS = Object.freeze([
     label: "Strategic unit counters",
   },
   {
+    selector: "g.map-label-handles",
+    className: "map-label-handles",
+    pointerEvents: "none",
+    label: "Map label handles",
+  },
+  {
     selector: "g.special-zones-layer",
     className: "special-zones-layer",
     setter: "setSpecialZonesGroup",
@@ -199,7 +205,9 @@ export function createRendererSvgSurfaceLifecycleOwner({
         selectOrAppend(viewportGroup, definition.selector, "g", definition.className),
         definition,
       );
-      handles[definition.setter.replace(/^set/, "").replace(/^\w/, (letter) => letter.toLowerCase())] = hostApi[definition.setter](group);
+      if (definition.setter) {
+        handles[definition.setter.replace(/^set/, "").replace(/^\w/, (letter) => letter.toLowerCase())] = hostApi[definition.setter](group);
+      }
     }
 
     const intensityFieldPreviewGroup = hostApi.setIntensityFieldPreviewGroup(

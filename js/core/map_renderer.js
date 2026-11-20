@@ -251,6 +251,7 @@ import { isScenarioStrategicValuesUsable } from "./scenario/strategic_values.js"
 import { createColorResolutionStrategyOwner, isColorResolutionOceanFeature } from "./renderer/color_resolution_strategy.js";
 import { createStrategicOverlayHelpersOwner } from "./renderer/strategic_overlay_helpers.js";
 import { createStrategicOverlayRenderOwner } from "./renderer/strategic_overlay_render_owner.js";
+import { renderMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
 import { createPoliticalCollectionOwner } from "./renderer/political_collection_owner.js";
 import { createContextLayerResolverOwner } from "./renderer/context_layer_resolver.js";
@@ -2912,6 +2913,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
       specialZoneEditor: runtimeState.specialZoneEditor,
       startupReadonly: runtimeState.startupReadonly,
       unitCounterEditor: runtimeState.unitCounterEditor,
+      mapLabelEditor: runtimeState.mapLabelEditor,
       waterRegionsById: runtimeState.waterRegionsById,
       waterRegionsData: runtimeState.waterRegionsData,
     }),
@@ -2981,6 +2983,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     noteRenderAction,
     nowMs,
     placeUnitCounterFromEvent,
+    placeMapLabelFromEvent: event => getStrategicOverlayRuntimeOwner().placeMapLabelFromEvent(event),
     queueTooltipUpdate,
     refreshSidebarAfterPaint,
     refreshSpecialRegionSidebarRowsNow,
@@ -3916,6 +3919,7 @@ const getStrategicOverlayRuntimeOwner = lazyOwner(() => createStrategicOverlayRu
     ensureSpecialZoneEditorState,
     ensureUnitCounterCounter,
     ensureUnitCounterEditorState,
+    resolveBorderIdentity,
     getDisplayOwnerCode,
     getFeatureOwnerCode,
     getHitFromEvent,
@@ -10407,7 +10411,12 @@ function drawBordersPass(k, { interactive = false } = {}) {
 }
 
 function drawLabelsPass(k, { interactive = false } = {}) {
-  return recordLabelPass("labels", () => labelsRuntime.drawLabelsPassContent(k, { interactive }));
+  const result = recordLabelPass("labels", () => labelsRuntime.drawLabelsPassContent(k, { interactive }));
+  if (!exportRenderInProgress) renderMapLabelHandles({
+    group: rendererSurfaceHost.getMapSvg()?.querySelector(".map-label-handles"),
+    state, placed: labelsRuntime.getPlacedMapLabels(), k, projection: rendererSurfaceHost.getProjection(), handleClick,
+  });
+  return result;
 }
 
 function recordLabelPass(passName, draw) {

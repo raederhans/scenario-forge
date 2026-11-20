@@ -34,7 +34,7 @@ export const STRATEGIC_OVERLAY_EDITOR_FIELD_KEYS = Object.freeze({
     "active", "mode", "collection", "points", "kind", "label", "stylePreset", "stroke",
     "width", "opacity", "selectedId", "selectedVertexIndex", "counter",
   ]),
-  mapLabelEditor: Object.freeze(["active", "selectedId", "counter"]),
+  mapLabelEditor: Object.freeze(["active", "selectedId", "draggingId", "counter"]),
   unitCounterEditor: Object.freeze([
     "active", "renderer", "label", "sidc", "symbolCode", "nationTag", "nationSource",
     "presetId", "iconId", "unitType", "echelon", "subLabel", "strengthText", "layoutAnchor",

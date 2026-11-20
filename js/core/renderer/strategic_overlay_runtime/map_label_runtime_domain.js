@@ -33,7 +33,7 @@ export function placeMapLabel(options) {
   const id = `map_label_${counter}`;
   const label = normalizeMapLabel({ ...options, size: options.size ?? 18 / (state.zoomTransform?.k || 1) }, id);
   if (!label) return false;
-  commitLabels("place-map-label", [...state.mapLabels, label], { counter: counter + 1, selectedId: id });
+  commitLabels("place-map-label", [...state.mapLabels, label], { active: false, counter: counter + 1, selectedId: id });
   return id;
 }
 

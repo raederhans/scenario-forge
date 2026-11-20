@@ -150,6 +150,7 @@ function requestHgoIdentityAssetsForSettings(settings, loadAssets) {
 // Batch 5: sidebar controllers consume a curated renderer helper surface so
 // renderer API drift stays visible in one place instead of hiding in namespace imports.
 const mapRenderer = Object.freeze({
+  focusGeoBounds,
   cancelActiveStrategicInteractionModes,
   cancelOperationGraphicDraw,
   cancelOperationalLineDraw,

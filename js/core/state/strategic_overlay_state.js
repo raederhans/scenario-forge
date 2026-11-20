@@ -47,7 +47,7 @@ export function normalizeMapLabel(raw, id) {
 }
 
 export function createDefaultMapLabelEditorState() {
-  return { active: false, selectedId: null, counter: 1 };
+  return { active: false, selectedId: null, draggingId: null, counter: 1 };
 }
 
 export function createDefaultUnitCounterEditorState({

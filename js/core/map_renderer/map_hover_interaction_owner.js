@@ -196,7 +196,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     });
   }
   function setMapInteractionCursor(nextCursor = "") {
-    surfaceHost.getInteractionRect()?.style("cursor", nextCursor || null);
+    surfaceHost.getInteractionRect()?.style("cursor", state.mapLabelEditor?.active ? "crosshair" : nextCursor || null);
   }
   function clearUnderlyingHoverForFacilityEntry(entry) {
     if (!getterApi.shouldBlockUnderlyingSelectionForFacility(entry)) return false;

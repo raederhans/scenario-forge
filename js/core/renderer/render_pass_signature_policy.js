@@ -325,6 +325,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         getObjectIdentityToken(runtimeState.mapLabels),
+        `map-label-dragging:${runtimeState.mapLabelEditor?.draggingId || ""}`,
         runtimeState.annotationView?.showMapLabels !== false,
         getObjectIdentityToken(runtimeState.scenarioCountriesByTag),
         getObjectIdentityToken(runtimeState.countryNames),

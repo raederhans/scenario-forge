@@ -125,6 +125,7 @@ const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
   "markDirty",
   "noteRenderAction",
   "nowMs",
+  "placeMapLabelFromEvent",
   "placeUnitCounterFromEvent",
   "queueTooltipUpdate",
   "refreshSidebarAfterPaint",
@@ -172,7 +173,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     let state = getClickState();
     if (state.startupReadonly && (state.currentTool !== "select"
       || state.specialZoneEditor?.active || state.operationalLineEditor?.active
-      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active)) {
+      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active || state.mapLabelEditor?.active)) {
       if (event?.preventDefault) event.preventDefault();
       blockStartupReadonlyInteraction();
       return;
@@ -194,6 +195,10 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     }
     if (state.operationGraphicsEditor?.active) {
       appendOperationGraphicVertexFromEvent(event);
+      return;
+    }
+    if (state.mapLabelEditor?.active) {
+      services.placeMapLabelFromEvent(event);
       return;
     }
     if (state.unitCounterEditor?.active) {
