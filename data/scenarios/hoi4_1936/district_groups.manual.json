@@ -4356,15 +4356,17 @@
           "name_zh": "埃姆兰-马祖伦",
           "feature_ids": [
             "PL_MRG_c908eb11c602",
+            "PL_POW_2207",
+            "PL_POW_2209__SPLIT_REST",
+            "PL_POW_2210__SPLIT_REST",
+            "PL_POW_2216",
             "PL_POW_2801",
             "PL_POW_2802",
-            "PL_POW_2803",
             "PL_POW_2804",
             "PL_POW_2805",
             "PL_POW_2807",
             "PL_POW_2808",
             "PL_POW_2811",
-            "PL_POW_2812",
             "PL_POW_2813",
             "PL_POW_2815",
             "PL_POW_2816",
@@ -5009,6 +5011,28 @@
             "PL_POW_3212"
           ]
         },
+        "state_85": {
+          "district_id": "state_85",
+          "name_en": "Danzig",
+          "name_zh": "但泽",
+          "feature_ids": [
+            "PL_POW_2201",
+            "PL_POW_2212",
+            "PL_POW_2263"
+          ]
+        },
+        "state_762": {
+          "district_id": "state_762",
+          "name_en": "Katowice",
+          "name_zh": "卡托维兹",
+          "feature_ids": [
+            "PL_POW_2405",
+            "PL_POW_2411",
+            "PL_POW_2462",
+            "PL_POW_2466",
+            "PL_POW_2478"
+          ]
+        },
         "state_763": {
           "district_id": "state_763",
           "name_en": "Königsberg",
@@ -5028,6 +5052,15 @@
             "RU_RAY_50074027B85308151104910",
             "RU_RAY_50074027B93509676978918",
             "RU_RAY_50074027B93803510078780"
+          ]
+        },
+        "state_807": {
+          "district_id": "state_807",
+          "name_en": "Gdynia",
+          "name_zh": "格丁尼亚",
+          "feature_ids": [
+            "PL_POW_2203",
+            "PL_POW_3031"
           ]
         },
         "state_909": {
@@ -8663,6 +8696,15 @@
     "POL": {
       "tag": "POL",
       "districts": {
+        "state_5": {
+          "district_id": "state_5",
+          "name_en": "Ermland-Masuren",
+          "name_zh": "埃姆兰-马祖伦",
+          "feature_ids": [
+            "PL_POW_2803",
+            "PL_POW_2812"
+          ]
+        },
         "state_10": {
           "district_id": "state_10",
           "name_en": "Warsaw",
@@ -8692,10 +8734,7 @@
           "name_zh": "但泽",
           "feature_ids": [
             "PL_MRG_727dd6268093__SPLIT_REST",
-            "PL_POW_2201",
-            "PL_POW_2212",
-            "PL_POW_2262",
-            "PL_POW_2263"
+            "PL_POW_2262"
           ]
         },
         "state_86": {
@@ -8970,23 +9009,19 @@
             "PL_POW_2402",
             "PL_POW_2403",
             "PL_POW_2404",
-            "PL_POW_2405",
             "PL_POW_2406",
             "PL_POW_2407",
             "PL_POW_2409",
             "PL_POW_2410",
-            "PL_POW_2411",
             "PL_POW_2413",
             "PL_POW_2414",
             "PL_POW_2415",
             "PL_POW_2416",
             "PL_POW_2417",
             "PL_POW_2461",
-            "PL_POW_2462",
             "PL_POW_2463",
             "PL_POW_2464",
             "PL_POW_2465",
-            "PL_POW_2466",
             "PL_POW_2467",
             "PL_POW_2468",
             "PL_POW_2469",
@@ -8995,8 +9030,7 @@
             "PL_POW_2473",
             "PL_POW_2475",
             "PL_POW_2476",
-            "PL_POW_2477",
-            "PL_POW_2478"
+            "PL_POW_2477"
           ]
         },
         "state_784": {
@@ -9027,13 +9061,7 @@
             "PL_POW_0413",
             "PL_POW_0415",
             "PL_POW_0461",
-            "PL_POW_0463",
-            "PL_POW_2203",
-            "PL_POW_2207",
-            "PL_POW_2209__SPLIT_REST",
-            "PL_POW_2210__SPLIT_REST",
-            "PL_POW_2216",
-            "PL_POW_3031"
+            "PL_POW_0463"
           ]
         }
       }
@@ -9807,28 +9835,22 @@
             "MDA-1622",
             "MDA-1623",
             "MDA-1627",
-            "MDA-1628",
             "MDA-1629",
             "MDA-1630",
             "MDA-1632",
             "MDA-1633",
             "MDA-1634",
             "MDA-1635",
-            "MDA-1637",
-            "MDA-1638",
             "MDA-1639",
             "MDA-1640",
             "MDA-1642",
             "MDA-1643",
             "MDA-1644",
-            "MDA-1645",
             "MDA-1646",
             "MDA-1647",
             "MDA-1648",
             "MDA-1649",
-            "MDA-1650",
             "MDA-1651",
-            "MDA-1652",
             "MDA-1653"
           ]
         },
@@ -10516,6 +10538,19 @@
             "RU_RAY_50074027B59422198546785",
             "RU_RAY_50074027B65962797819795",
             "RU_RAY_50074027B93515874590251"
+          ]
+        },
+        "state_78": {
+          "district_id": "state_78",
+          "name_en": "Bessarabia",
+          "name_zh": "比萨拉比亚",
+          "feature_ids": [
+            "MDA-1628",
+            "MDA-1637",
+            "MDA-1638",
+            "MDA-1645",
+            "MDA-1650",
+            "MDA-1652"
           ]
         },
         "state_137": {
