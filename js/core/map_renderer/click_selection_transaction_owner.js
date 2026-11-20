@@ -169,8 +169,16 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
   const { clearClickHoverIds, consumeSuppressedBrushClick, removeClickCountryColors, removeClickWaterRegionOverride, setClickActiveSovereignCode, setClickCountryColors, setClickHoverOverlayDirty, setClickSelectedColor, setClickSelectedSpecialRegionId, setClickSelectedWaterRegionId, setFacilityInfoCardExpanded, setHoveredFacilityEntry, setSelectedFacilityEntry } = requirePorts(effects, CLICK_SELECTION_ACTION_NAMES, "effects");
   const { appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, commitVisualFeaturePaint, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, clearInspectorLandSelection, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, markDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resolveInteractionTargetIds, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
 
+  let pickingGesture = false;
+
+  function isColorPick(tool, event) {
+    return tool === "eyedropper" || (!!event?.altKey && (tool === "fill" || tool === "eraser"));
+  }
+
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();
+    if (event?.detail >= 2 && pickingGesture) return;
+    pickingGesture = false;
     if (state.startupReadonly && (state.currentTool !== "select"
       || state.specialZoneEditor?.active || state.operationalLineEditor?.active
       || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active || state.mapLabelEditor?.active)) {
@@ -281,8 +289,8 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     }
     updateDevSelectedHit(hit);
     if (!state.startupReadonly && handleSpecialZoneMembershipClick(hit, event)) return;
-    const shouldPickColor = () => state.currentTool === "eyedropper"
-      || (readonlyModifiers.altKey && (state.currentTool === "fill" || state.currentTool === "eraser"));
+    pickingGesture = isColorPick(state.currentTool, event);
+
     if (target.kind === "special") {
       const specialFeature = state.specialRegionsById.get(id);
       if (!specialFeature) return;
@@ -297,7 +305,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
         noteRenderAction("select-special", actionStart);
         return;
       }
-      if (shouldPickColor()) {
+      if (pickingGesture) {
         const picked = getSpecialRegionColor(id, specialFeature);
         if (picked) setClickSelectedColor(picked, { updateSwatch: true });
         noteRenderAction("eyedropper-special", actionStart);
@@ -331,18 +339,18 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
         return;
       }
       if (state.currentTool === "select") clearInspectorLandSelection();
-      if (shouldPickColor()) {
-        const picked = getWaterRegionColor(id);
-        if (picked) setClickSelectedColor(picked, { updateSwatch: true });
-        requestInteractionRender("eyedropper-water");
-        noteRenderAction("eyedropper-water", actionStart);
-        return;
-      }
       const macroOceanSelectionOnly =
         isMacroOceanWaterRegion(waterFeature) && !isOpenOceanPaintEnabled();
       if (macroOceanSelectionOnly) {
         requestInteractionRender("click-select-open-ocean");
         noteRenderAction("click-select-open-ocean", actionStart);
+        return;
+      }
+      if (pickingGesture) {
+        const picked = getWaterRegionColor(id);
+        if (picked) setClickSelectedColor(picked, { updateSwatch: true });
+        requestInteractionRender("eyedropper-water");
+        noteRenderAction("eyedropper-water", actionStart);
         return;
       }
       if (state.currentTool === "select") {
@@ -429,7 +437,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       noteRenderAction("select-land", actionStart);
       return;
     }
-    const pickColor = shouldPickColor();
+    const pickColor = isColorPick(state.currentTool, event);
     if (handleRiverPaintClick(landHit, { pickColor })) return;
     if (pickColor) {
       // Sample persistent paint, never a heatmap/highlight rendered into colors.
@@ -475,6 +483,13 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
 
   }
 
+  function handleDoubleClickFill(event) {
+    if (pickingGesture || isColorPick(getClickState().currentTool, event)) {
+      event?.preventDefault?.();
+      return;
+    }
+    return services.fillFromDoubleClick(event);
+  }
 
-  return Object.freeze({ handleClick });
+  return Object.freeze({ handleClick, handleDoubleClickFill });
 }

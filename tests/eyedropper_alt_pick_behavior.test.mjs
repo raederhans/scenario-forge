@@ -41,7 +41,7 @@ function clickHarness(currentTool, targetType, previousTool, color = colors[targ
       getFeaturePaintColor: () => color,
       getSpecialRegionColor: () => color,
       getWaterRegionColor: () => color,
-      isMacroOceanWaterRegion: () => true,
+      isMacroOceanWaterRegion: () => false,
       resolveInteractionTargetIds: () => [id],
       commitHistoryEntry: record("history"),
       commitVisualFeaturePaint: record("erase land"),

@@ -16,12 +16,13 @@ export function getHistoryActionLabel(direction, entry) {
   const kind = entry?.kind;
   let action;
   if (paintKinds.has(kind) || eraseKinds.has(kind)) {
-    const before = entry.before.visualOverrides || {};
-    const after = entry.after.visualOverrides || {};
-    const ids = new Set([...Object.keys(before), ...Object.keys(after)]);
     let count = 0;
-    for (const id of ids) {
-      if ((before[id] ?? null) !== (after[id] ?? null)) count++;
+    for (const field of ["visualOverrides", "waterRegionOverrides", "riverPaintOverrides"]) {
+      const before = entry.before[field] || {};
+      const after = entry.after[field] || {};
+      for (const id of new Set([...Object.keys(before), ...Object.keys(after)])) {
+        if ((before[id] ?? null) !== (after[id] ?? null)) count++;
+      }
     }
     action = t(paintKinds.has(kind) ? "Paint {count} regions" : "Erase paint from {count} regions", "ui", { count });
   } else if (["inspector-country-color", "palette-country-color", "palette-library-apply-owner-color"].includes(kind)) {
