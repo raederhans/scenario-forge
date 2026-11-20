@@ -11,7 +11,7 @@
     "city_overrides.json": "3f27e0b463baf95aec3143a0695a2ef98ac3796a3026fba75c76d0f43a76f0e0",
     "cores.by_feature.json": "231357e2d5eee56649862603bc7e9f191420b8beea807f9f5ca2d427727f382c",
     "countries.json": "1cfdd186cfeaf7810ab03e9bbb2bd3e9ab3d3347119ba792df277ba642d9c795",
-    "geo_locale_patch.json": "22e39c12d095b293a74848c0079cbed82a3516bfaaa90de58dc1586b9a28c1d8",
+    "geo_locale_patch.json": "9962184f88b67e15f2490f7e576adb3ebe87323934b89c212bc5552fb72abcf4",
     "owners.by_feature.json": "c639eec0cf513079c677de56c89db4b3000a0cd2e31c560aaab397a63c77c2b2",
     "runtime_topology.topo.json": "48215cc527e437d17634e994c5698b5706f9166cee9b59b90dc370b0367aee3b",
     "special_zone_layers.json": "2dc725d3ccaa7453286f8381e6b4c151e53a7274e730ca6ce84eee17563080f0"
@@ -20,6 +20,6 @@
   "profile": "lightweight_base",
   "report_paths": {},
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "2d129847297a2495adf9c986ac7a6cd71e1fb4813c5ba9a38856a4fa411ded97",
+  "snapshot_fingerprint": "131c371029968738c7a138ea45e3e7125d8eee36022c5a17eda38af429323ef6",
   "water_count": 0
 }
