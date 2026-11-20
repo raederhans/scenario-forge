@@ -1261,6 +1261,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "中间派共和制",
     "en": "Centrist republic"
   },
+  "Change {country} color": {
+    "zh": "修改 {country} 颜色",
+    "en": "Change color of {country}"
+  },
   "Changes to this order stay in the workbench.": {
     "zh": "此顺序的更改仅保留在工作台中。",
     "en": "Changes to this order stay in the workbench."
@@ -1744,6 +1748,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Close scenario introduction": {
     "zh": "关闭剧本简介",
     "en": "Close scenario introduction"
+  },
+  "Close to {country}'s color. Painting will create a border.": {
+    "zh": "接近{country}颜色，涂上会形成国界",
+    "en": "Close to {country}'s color. Painting will create a border."
   },
   "Close transport workbench": {
     "zh": "关闭交通工作台",
@@ -3208,6 +3216,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Erase": {
     "zh": "擦除",
     "en": "Erase"
+  },
+  "Erase paint from {count} regions": {
+    "zh": "擦除 {count} 个地块的填色",
+    "en": {
+      "one": "Erase paint from {count} region",
+      "other": "Erase paint from {count} regions"
+    }
   },
   "Eraser": {
     "zh": "橡皮擦",
@@ -6625,6 +6640,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "绘制水域以创建覆盖列表。",
     "en": "Paint water regions to create an override list."
   },
+  "Paint {count} regions": {
+    "zh": "填色 {count} 个地块",
+    "en": {
+      "one": "Paint {count} region",
+      "other": "Paint {count} regions"
+    }
+  },
   "Paints with this country's current color; can be undone.": {
     "zh": "按本国当前颜色涂色；可撤销",
     "en": "Paints with this country's current color; can be undone."
@@ -7508,6 +7530,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Redo": {
     "zh": "重做",
     "en": "Redo"
+  },
+  "Redo: {action}": {
+    "zh": "重做：{action}",
+    "en": "Redo: {action}"
   },
   "Reduce the visible hub set while keeping the logistics layer point-based.": {
     "zh": "减少可见枢纽集，同时保持物流层基于点。",
@@ -10429,6 +10455,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已撤销",
     "en": "Undo applied"
   },
+  "Undo: {action}": {
+    "zh": "撤销：{action}",
+    "en": "Undo: {action}"
+  },
   "Union with layer": {
     "zh": "与图层并集",
     "en": "Union with layer"
@@ -10672,6 +10702,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Use when": {
     "zh": "使用场景",
     "en": "Use when"
+  },
+  "Use {country}'s color": {
+    "zh": "改用{country}颜色",
+    "en": "Use {country}'s color"
   },
   "User guide": {
     "zh": "使用指南",
@@ -10952,6 +10986,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Width": {
     "zh": "宽度",
     "en": "Width"
+  },
+  "Will merge into {country}": {
+    "zh": "将并入{country}",
+    "en": "Will merge into {country}"
   },
   "Workbench inspector tabs": {
     "zh": "工作台检查器选项卡",

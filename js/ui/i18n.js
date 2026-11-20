@@ -1,5 +1,6 @@
 // UI translation runtime hooks and DOM refresh helpers.
 import { state as runtimeState } from "../core/state.js";
+import { getHistoryActionLabel } from "../core/history_action_labels.js";
 import { callRuntimeHook, callRuntimeHooks } from "../core/state/index.js";
 import {
   clearStartupSupportKeyUsageAuditReport,
@@ -18,6 +19,14 @@ import {
 } from "../core/i18n.js";
 
 const state = runtimeState;
+
+export function updateHistoryButton(button, direction, entry) {
+  if (!button) return;
+  button.disabled = !entry;
+  const label = getHistoryActionLabel(direction, entry);
+  button.setAttribute("title", label);
+  button.setAttribute("aria-label", label);
+}
 
 function setLocalizedText(element, localizedText) {
   const semanticChild = element.querySelector?.(":scope > .sidebar-anchor-title, :scope > .sidebar-section-title, :scope > .sidebar-support-title, :scope > .sidebar-appendix-title, :scope > .sidebar-tool-title");
@@ -535,8 +544,6 @@ function updateUIText() {
     ["toolEraserBtn", "Eraser tool"],
     ["toolEyedropperBtn", "Eyedropper tool"],
     ["brushModeBtn", "Brush"],
-    ["undoBtn", "Undo"],
-    ["redoBtn", "Redo"],
     ["zoomInBtn", "Zoom in"],
     ["zoomOutBtn", "Zoom out"],
     ["dockReferenceBtn", "Reference"],
