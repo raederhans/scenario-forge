@@ -847,14 +847,14 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
             const countryOpacity = getCountryLabelOpacity(hierarchy, group.area * k ** 2, viewport.width * viewport.height);
             const alpha = getVisibilityAlpha(fit.fontSize * k) * countryOpacity * opacity;
             if (alpha < 0.05) continue;
-            const inkBoxes = fit.glyphs.filter((glyph) => glyph.text.trim()).map((glyph) => {
-              const box = glyph.box;
-              return screenBox({
-                x: glyph.x + (box.x - glyph.x) * sizeScale,
-                y: glyph.y + (box.y - glyph.y) * sizeScale,
-                w: box.w * sizeScale, h: box.h * sizeScale,
-              }, transform, 0);
-            });
+            const bounds = screenBox(fit.bounds, { x: 0, y: 0, k: 1 }, 0);
+            const offsetX = (bounds.x + bounds.w / 2) * (1 - sizeScale);
+            const offsetY = (bounds.y + bounds.h / 2) * (1 - sizeScale);
+            const glyphs = fit.glyphs.filter((glyph) => glyph.text.trim());
+            const inkBoxes = glyphs.map(({ box }) => screenBox({
+              x: box.x * sizeScale + offsetX, y: box.y * sizeScale + offsetY,
+              w: box.w * sizeScale, h: box.h * sizeScale,
+            }, transform, 0));
             // Titles may run past the edge like printed map lettering; only
             // a title with no ink in the paint area is skipped.
             if (!inkBoxes.length || inkBoxes.some((box) => ![box.x, box.y, box.w, box.h].every(Number.isFinite))
@@ -869,7 +869,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
               reason = "Collision";
               continue;
             }
-            placement = { fit, alpha, boxes, inkBoxes };
+            placement = { fit, alpha, boxes, inkBoxes, glyphs, offsetX, offsetY };
             break;
           }
           if (placement || (groupIndex === 0 && dominantOnly && groupOnScreen)) break;
@@ -878,7 +878,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
           reject(entry, text, primaryFit.fontSize * sizeScale * k, reason, visibleArea);
           continue;
         }
-        const { fit, alpha, boxes, inkBoxes } = placement;
+        const { fit, alpha, boxes, inkBoxes, glyphs, offsetX, offsetY } = placement;
         occupiedBoxes.push(...boxes);
         const fontSize = fit.fontSize * sizeScale;
         context.font = `${fontWeight(font)} ${fontSize}px ${font}`;
@@ -888,12 +888,11 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
         const colors = getCountryLabelColors(entry.countryCode);
         context.strokeStyle = colors.stroke;
         context.fillStyle = colors.fill;
-        const glyphs = fit.glyphs.filter((glyph) => glyph.text.trim());
         // Stroke every glyph before filling so a halo never covers a neighbor.
         for (const paint of ["strokeText", "fillText"]) {
           for (const glyph of glyphs) {
             context.save();
-            context.translate(glyph.x, glyph.y);
+            context.translate(glyph.x * sizeScale + offsetX, glyph.y * sizeScale + offsetY);
             context.rotate(glyph.angle);
             context[paint](glyph.text, 0, 0);
             context.restore();

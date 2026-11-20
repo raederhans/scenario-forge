@@ -61,6 +61,7 @@ export function createLabelsRuntime({
   normalizeLongitude,
   getDisplayOwnerCode,
   resolveBorderIdentity,
+  getBorderPaletteRevision,
   getResolvedFeatureColor,
   getSignedHashUnit,
   collectContextMetric,
@@ -403,16 +404,10 @@ export function createLabelsRuntime({
     const path = rendererSurfaceHost.getPathCanvas();
     if (!runtimeState.landData?.features?.length || !context || !path) return;
     const visibleItems = collectVisibleLandSpatialItems();
-    const items = Array.isArray(visibleItems) && visibleItems.length
-      ? visibleItems
-      : runtimeState.landData.features.map((feature, index) => ({
-        feature,
-        id: getFeatureId(feature) || `feature-${index}`,
-      }));
-    const candidates = items.map(item => {
-      const feature = item.feature || item;
-      return { feature, id: item.id, area: path.area(feature) };
-    }).sort((a, b) => b.area - a.area);
+    const items = visibleItems ?? runtimeState.landData.features.map((feature, index) => ({
+      feature,
+      id: getFeatureId(feature) || `feature-${index}`,
+    }));
     const { x: tx = 0, y: ty = 0 } = runtimeState.zoomTransform || {};
     const fontSize = 11 / k;
     context.save();
@@ -422,15 +417,27 @@ export function createLabelsRuntime({
     context.lineWidth = 1.8 / k;
     context.strokeStyle = "rgba(248, 250, 252, 0.82)";
     context.fillStyle = "rgba(31, 41, 55, 0.86)";
-    for (const { feature, id } of candidates) {
+    const height = fontSize + context.lineWidth;
+    const candidates = [];
+    for (const item of items) {
+      const feature = item.feature || item;
+      const bounds = item.minX != null ? item : getProjectedFeatureBounds(feature);
+      if (!bounds) continue;
+      const w = bounds.maxX - bounds.minX, h = bounds.maxY - bounds.minY;
+      if (h < height || w <= context.lineWidth) continue;
+      if (bounds.maxX * k + tx < 0 || bounds.maxY * k + ty < 0
+        || bounds.minX * k + tx > runtimeState.width || bounds.minY * k + ty > runtimeState.height) continue;
+      candidates.push({ feature, id: item.id, bounds, area: w * h });
+    }
+    candidates.sort((a, b) => b.area - a.area);
+    const candidateLimit = Math.ceil(300 * k);
+    for (const { feature, id, bounds } of candidates.slice(0, candidateLimit)) {
       const label = getBlankFeatureLabel(feature, id || getFeatureId(feature));
       if (!label) continue;
+      const width = context.measureText(label).width + context.lineWidth;
+      if (width > bounds.maxX - bounds.minX) continue;
       const [x, y] = path.centroid(feature);
       if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-      const bounds = getProjectedFeatureBounds(feature);
-      if (!bounds) continue;
-      const width = context.measureText(label).width + context.lineWidth;
-      const height = fontSize + context.lineWidth;
       const left = x - width / 2;
       const top = y - height / 2;
       if (left < bounds.minX || top < bounds.minY || left + width > bounds.maxX || top + height > bounds.maxY) continue;
@@ -445,7 +452,7 @@ export function createLabelsRuntime({
   let countryLabelSourceOwner = null;
   let countryLabelRenderOwner = null;
   let lastCountryLabels = [];
-  const coverage = createCountryLabelCoverageOwner({ state: runtimeState, resolveBorderIdentity,
+  const coverage = createCountryLabelCoverageOwner({ state: runtimeState, resolveBorderIdentity, getBorderPaletteRevision,
     peekSource: () => countryLabelSourceOwner?.peekSource() });
 
   let placedBounds = new Map();

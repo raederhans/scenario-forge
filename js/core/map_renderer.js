@@ -2091,6 +2091,7 @@ const {
   ensurePaintContoursReady,
   getPaintContourDiagnostics,
   resolveBorderIdentity,
+  getBorderPaletteRevision,
   getClassifiedBorderMeshes,
   disposePaintContoursIfCreated,
   notifyPaintContourSourcePublished,
@@ -9866,6 +9867,7 @@ function getPhysicalExactRefreshPasses() {
 
 const labelsRuntime = createLabelsRuntime({
   resolveBorderIdentity,
+  getBorderPaletteRevision,
   runtimeState,
   rendererSurfaceHost,
   TEXTURE_LABEL_SERIF_STACK,
