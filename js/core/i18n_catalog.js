@@ -2021,6 +2021,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "无剧本继续",
     "en": "Continue without scenario"
   },
+  "Continuing will discard unsaved changes to the current map.": {
+    "zh": "继续操作将丢弃当前地图尚未保存的更改。",
+    "en": "Continuing will discard unsaved changes to the current map."
+  },
   "Continuous Cycle": {
     "zh": "连续循环",
     "en": "Continuous Cycle"
@@ -2768,6 +2772,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Discard and Load": {
     "zh": "丢弃并加载",
     "en": "Discard and Load"
+  },
+  "Discard and continue": {
+    "zh": "丢弃并继续",
+    "en": "Discard and continue"
   },
   "Dismiss": {
     "zh": "关闭",
@@ -8108,6 +8116,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Save and restore the complete working state.": {
     "zh": "保存和恢复完整工作状态。",
     "en": "Save and restore the complete working state."
+  },
+  "Save first": {
+    "zh": "先保存",
+    "en": "Save first"
   },
   "Save or load your map state as a project file.": {
     "zh": "将当前地图状态保存或加载为项目文件。",

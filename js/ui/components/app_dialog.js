@@ -17,6 +17,7 @@ function showAppDialog({
   details = "",
   confirmLabel = "",
   cancelLabel = "",
+  secondaryLabel = "",
   tone = "info",
 } = {}) {
   const normalizedTitle = String(title || "").trim();
@@ -97,7 +98,16 @@ function showAppDialog({
   confirmButton.dataset.dialogConfirm = "true";
   confirmButton.textContent = String(confirmLabel || "").trim() || t("Continue", "ui");
 
-  footer.append(cancelButton, confirmButton);
+  footer.appendChild(cancelButton);
+  let secondaryButton;
+  if (secondaryLabel) {
+    secondaryButton = document.createElement("button");
+    secondaryButton.type = "button";
+    secondaryButton.className = "app-dialog-btn app-dialog-btn-secondary";
+    secondaryButton.textContent = secondaryLabel;
+    footer.appendChild(secondaryButton);
+  }
+  footer.appendChild(confirmButton);
   dialog.appendChild(footer);
   overlay.appendChild(dialog);
   document.body.appendChild(overlay);
@@ -113,7 +123,7 @@ function showAppDialog({
       overlay.remove();
       activeDialogController = null;
       restoreFocusOrigin(previouslyFocused);
-      resolve(!!result);
+      resolve(result === "secondary" ? "secondary" : !!result);
     };
 
     const handleKeydown = (event) => {
@@ -136,6 +146,7 @@ function showAppDialog({
     overlay.addEventListener("click", handleOverlayClick);
     document.addEventListener("keydown", handleKeydown, true);
     cancelButton.addEventListener("click", () => cleanup(false));
+    secondaryButton?.addEventListener("click", () => cleanup("secondary"));
     confirmButton.addEventListener("click", () => cleanup(true));
     globalThis.requestAnimationFrame(() => {
       focusSurface(dialog);
