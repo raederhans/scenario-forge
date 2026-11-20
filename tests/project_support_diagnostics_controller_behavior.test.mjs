@@ -841,9 +841,19 @@ test("project download failure is shown in project status", async () => {
   });
 
   controller.bindEvents();
-  await downloadProjectBtn.listeners.click();
+  assert.equal(await downloadProjectBtn.listeners.click(), false);
 
   assert.equal(projectSaveStatus.textContent, "Save dialog failed");
+});
+
+test("cancelled save dialog returns false to callers", async () => {
+  const status = createStatusNode();
+  const controller = createController(status, {
+    helpers: { fileManager: { exportProject: async () => false } },
+  });
+  controller.bindEvents();
+  assert.equal(await state.runProjectSaveFn(), false);
+  assert.equal(status.textContent, "Project export cancelled.");
 });
 
 test("local project zip load unwraps editable project before import funnel", async () => {

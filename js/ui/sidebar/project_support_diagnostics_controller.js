@@ -1,3 +1,4 @@
+import { registerRuntimeHook } from "../../core/state/index.js";
 import { createUiIcon } from "../components/ui_icons.js";
 import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
@@ -8,6 +9,16 @@ import {
   createSpecialZonePatternPreviewStyle,
 } from "../../core/special_zone_layers.js";
 import { prepareProjectImportFile } from "../../core/project_package_io.js";
+
+export async function confirmDiscardDirtyWork(state, showAppDialog, options) {
+  if (!state.isDirty) return true;
+  const choice = await showAppDialog({ ...options, tone: "warning" });
+  if (!options.secondaryLabel) return choice;
+  if (choice === "secondary") return true;
+  if (choice !== true) return false;
+  const revision = state.dirtyRevision;
+  return await state.runProjectSaveFn?.() === true && state.dirtyRevision === revision;
+}
 
 /**
  * Owns the project support and diagnostics panels inside the sidebar:
@@ -261,20 +272,16 @@ export function createProjectSupportDiagnosticsController({
   );
   let lastExpandedSpecialZoneDiagnosticsKey = "";
 
-  const confirmReplaceCurrentProject = async () => {
-    if (!state.isDirty) return true;
-    return showAppDialog({
-      title: t("Load Project", "ui"),
-      message: t("You have unsaved changes. Loading a project will replace the current map.", "ui"),
-      details: t(
-        "Continue only if you are ready to discard the current working state or have already exported it.",
-        "ui"
-      ),
-      confirmLabel: t("Discard and Load", "ui"),
-      cancelLabel: t("Stay on Current Map", "ui"),
-      tone: "warning",
-    });
-  };
+  const confirmReplaceCurrentProject = () => confirmDiscardDirtyWork(state, showAppDialog, {
+    title: t("Load Project", "ui"),
+    message: t("You have unsaved changes. Loading a project will replace the current map.", "ui"),
+    details: t(
+      "Continue only if you are ready to discard the current working state or have already exported it.",
+      "ui"
+    ),
+    confirmLabel: t("Discard and Load", "ui"),
+    cancelLabel: t("Stay on Current Map", "ui"),
+  });
 
   const formatProjectPackagePreviewDetails = (preview) => {
     if (!preview) return "";
@@ -1181,7 +1188,7 @@ export function createProjectSupportDiagnosticsController({
       projectDownloadFormat.dataset.packageContentsBound = "true";
     }
     const exportProject = async () => {
-      if (projectExportBusy) return;
+      if (projectExportBusy) return false;
       projectExportBusy = true;
       const buttons = [downloadProjectBtn, workspaceSaveBtn].filter(Boolean);
       const disabledStates = buttons.map((button) => button.disabled);
@@ -1194,14 +1201,17 @@ export function createProjectSupportDiagnosticsController({
           packageContents: projectPackageContents?.value || "recommended",
         });
         refreshProjectSaveStatus(exported === false ? t("Project export cancelled.", "ui") : "");
+        return exported === true;
       } catch (error) {
         refreshProjectSaveStatus(String(error?.message || error || ""));
         showToast(String(error?.message || error || t("Unknown error", "ui")), { title: t("Project save failed", "ui"), tone: "error" });
+        return false;
       } finally {
         projectExportBusy = false;
         buttons.forEach((button, index) => { button.disabled = disabledStates[index]; button.ariaBusy = "false"; });
       }
     };
+    registerRuntimeHook(state, "runProjectSaveFn", exportProject);
     [downloadProjectBtn, workspaceSaveBtn].forEach((button) => {
       if (!button || button.dataset.bound) return;
       button.addEventListener("click", exportProject);

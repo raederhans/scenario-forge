@@ -2,6 +2,7 @@ import { exitSpecialZoneMembershipToolState } from "../core/state/actions/specia
 import {
   STATE_BUS_EVENTS,
   callRuntimeHook,
+  readRuntimeHook,
   emitStateBusEvent,
 } from "../core/state/index.js";
 import { state as runtimeState } from "../core/state.js";
@@ -9,6 +10,7 @@ import { setSelectedColorState } from "../core/state/actions/appearance_selectio
 import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
+import { showToast } from "./components/toast.js";
 import { t } from "./i18n.js";
 import { getActiveModal } from "./ui_contract.js";
 import {
@@ -97,6 +99,19 @@ function allowShortcutDuringStartupReadonly({ key = "", modifier = false } = {})
     || key === "Shift" || key === " " || key === "Escape";
 }
 
+async function saveProject() {
+  try {
+    const save = readRuntimeHook(runtimeState, "runProjectSaveFn");
+    if (save) await save();
+    else await FileManager.exportProject(runtimeState);
+  } catch (error) {
+    showToast(String(error?.message || error || t("Unknown error", "ui")), {
+      title: t("Project save failed", "ui"),
+      tone: "error",
+    });
+  }
+}
+
 function initShortcuts() {
   if (document.body?.dataset.shortcutsBound === "true") return;
 
@@ -167,8 +182,7 @@ function initShortcuts() {
 
     if (modifier && lower === "s") {
       event.preventDefault();
-      FileManager.exportProject(runtimeState);
-      return;
+      return saveProject();
     }
 
     if (modifier && lower === "z") {
