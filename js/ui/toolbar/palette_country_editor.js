@@ -46,7 +46,7 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
       ? (zh() ? `${ids.size} 个地区 · 改色会覆盖局部涂色，可撤销` : `${ids.size} regions · Replaces local paint; undo available`)
       : (zh() ? "选择国家" : "Choose a country");
   }
-  function commit(raw) {
+  async function commit(raw) {
     const color = normalizeHexColor(raw);
     if (!color) {
       hex.setCustomValidity(zh() ? "请输入有效的十六进制颜色" : "Enter a valid hexadecimal color");
@@ -54,7 +54,7 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
       return;
     }
     const match = findNearCountryColor(state, color, select.value);
-    const result = applyColor(color, select.value);
+    const result = await applyColor(color, select.value);
     if (result?.status !== "applied") { render(); return; }
     picker.value = hex.value = color;
     hex.setCustomValidity("");

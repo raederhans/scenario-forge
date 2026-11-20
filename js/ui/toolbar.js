@@ -1201,8 +1201,8 @@ function initToolbar({ render } = {}) {
 
   const { applyColor: applyPaletteLibraryOperation } = composePaletteLibraryOperation();
 
-  const applyPaletteLibraryColor = (rawColor) => {
-    const result = applyPaletteLibraryOperation(rawColor);
+  const applyPaletteLibraryColor = async (rawColor) => {
+    const result = await applyPaletteLibraryOperation(rawColor);
     if (result.status === "no-target") {
       showToast(t("Select or hover a land feature first.", "ui"), {
         title: t("Color Library", "ui"),
@@ -1431,9 +1431,9 @@ function initToolbar({ render } = {}) {
   const paletteCountryEditor = createPaletteCountryEditor({
     state: runtimeState,
     host: paletteLibraryPanel,
-    applyColor: (color, countryCode) => {
+    applyColor: async (color, countryCode) => {
       if (!countryCode) return { status: "no-target" };
-      const result = applyPaletteLibraryOperation(color, { countryCode });
+      const result = await applyPaletteLibraryOperation(color, { countryCode });
       if (result.status === "applied") {
         addRecentColor(result.color);
         updateSwatchUI();
