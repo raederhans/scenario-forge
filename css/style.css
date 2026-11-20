@@ -2222,6 +2222,15 @@ details.card[open]:not(.editor-scenario-menu) > summary::after {
   box-shadow: var(--shadow-1);
 }
 
+#mapContainer[data-project-drop-label]::after {
+  content: attr(data-project-drop-label);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  background: color-mix(in srgb, var(--surface-raised) 78%, transparent);
+  font-weight: 600;
+}
+
 /* A light halo keeps the inspector outline readable on dark fills and dark ocean alike. */
 #mapContainer .inspector-highlight-layer {
   filter: drop-shadow(0 0 0.75px color-mix(in srgb, var(--surface-raised) 70%, transparent));

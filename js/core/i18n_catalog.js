@@ -2965,6 +2965,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "正在绘制顶点。",
     "en": "Drawing vertices."
   },
+  "Drop to open project": {
+    "zh": "松开以打开项目",
+    "en": "Drop to open project"
+  },
   "Duplicate layer": {
     "zh": "复制图层",
     "en": "Duplicate layer"

@@ -131,6 +131,7 @@ export const STATE_HANDLER_HOOK_NAMES = Object.freeze([
   "runZoomResetFn",
   "runToolSelectionFn",
   "runBrushModeToggleFn",
+  "runProjectImportFileFn",
   "runHistoryActionFn",
   "setIntensityFieldToolFn",
   "persistViewSettingsFn",

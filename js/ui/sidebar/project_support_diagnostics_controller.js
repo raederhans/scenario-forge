@@ -1,3 +1,5 @@
+import { bindProjectFileDrop } from "../project_file_drop.js";
+import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { createUiIcon } from "../components/ui_icons.js";
 import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
@@ -1208,91 +1210,95 @@ export function createProjectSupportDiagnosticsController({
       button.dataset.bound = "true";
     });
 
+    const importProjectFile = async (file) => {
+      if (file && !(await confirmReplaceCurrentProject())) return;
+      projectImportController?.abort();
+      const importController = new AbortController();
+      projectImportController = importController;
+      if (!file) {
+        projectImportController = null;
+        if (projectFileName) {
+          if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
+          projectFileName.textContent = t("No file selected", "ui");
+        }
+        refreshProjectSaveStatus(t("No file selected", "ui"));
+        return;
+      }
+      if (projectFileName) {
+        if (projectFileName.dataset) projectFileName.dataset.projectFileState = "selected";
+        projectFileName.textContent = file.name;
+      }
+      refreshProjectSaveStatus(t("Project import started. Appearance and transport settings will be restored from the file.", "ui"));
+      lastProjectImportSummary = null;
+      try {
+        const { file: importFile, preview, projectPayload } = await prepareProjectImportFile(file, {
+          materializeFile: false,
+          signal: importController.signal,
+        });
+        if (importController.signal.aborted) return;
+        const confirmed = await confirmProjectPackagePreview(preview);
+        if (importController.signal.aborted) return;
+        if (!confirmed) {
+          refreshProjectSaveStatus(t("Project import cancelled.", "ui"));
+          return;
+        }
+        const outcome = await importProjectThroughFunnel(importFile, {
+          projectPayload,
+          fileName: file.name,
+          signal: importController.signal,
+          ui: {
+            t,
+            showAppDialog,
+            showToast,
+          },
+          hooks: {
+            refreshColorState: mapRenderer.refreshColorState,
+            onProjectImportComplete: completeProjectImportStatus,
+            onProjectImportError: failProjectImportStatus,
+            onProjectImportRecoveryState: recovery => {
+              if (projectImportController && projectImportController !== importController) return;
+              if (recovery.phase === "complete") refreshProjectSaveStatus();
+              else if (recovery.warnings.length) refreshProjectSaveStatus(
+                `${t("Project imported", "ui")}: ${recovery.warnings.map(item => item.resource).join(", ")}`
+              );
+            },
+          },
+        });
+        if (importController.signal.aborted) return;
+        if (outcome?.status === "committed-with-warnings") {
+          refreshProjectSaveStatus(`${t("Project imported", "ui")}: ${outcome.warnings.map(item => item.resource).join(", ")}`);
+        } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
+          refreshProjectSaveStatus(t("Project import is already in progress.", "ui"));
+        }
+      } catch (error) {
+        if (importController.signal.aborted) return;
+        const message = String(error?.message || error || "");
+        refreshProjectSaveStatus(message);
+        if (typeof showToast === "function") {
+          showToast(message, {
+            title: t("Project import failed", "ui"),
+            tone: "error",
+          });
+        }
+      } finally {
+        if (projectImportController === importController) {
+          projectImportController = null;
+        }
+      }
+    };
+    registerRuntimeHook(state, "runProjectImportFileFn", importProjectFile);
+    bindProjectFileDrop(documentRef.getElementById("mapContainer"), state, t);
+
     if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
-      uploadProjectBtn.addEventListener("click", async () => {
-        if (!(await confirmReplaceCurrentProject())) return;
-        projectFileInput.click();
-      });
+      uploadProjectBtn.addEventListener("click", () => projectFileInput.click());
       uploadProjectBtn.dataset.bound = "true";
     }
 
     if (projectFileInput && !projectFileInput.dataset.bound) {
-      projectFileInput.addEventListener("change", async () => {
-        projectImportController?.abort();
-        const importController = new AbortController();
-        projectImportController = importController;
+      projectFileInput.addEventListener("change", () => {
         const file = projectFileInput.files?.[0];
-        if (!file) {
-          projectImportController = null;
-          if (projectFileName) {
-            if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
-            projectFileName.textContent = t("No file selected", "ui");
-          }
-          refreshProjectSaveStatus(t("No file selected", "ui"));
-          return;
-        }
-        if (projectFileName) {
-          if (projectFileName.dataset) projectFileName.dataset.projectFileState = "selected";
-          projectFileName.textContent = file.name;
-        }
-        refreshProjectSaveStatus(t("Project import started. Appearance and transport settings will be restored from the file.", "ui"));
-        lastProjectImportSummary = null;
-        try {
-          const { file: importFile, preview, projectPayload } = await prepareProjectImportFile(file, {
-            materializeFile: false,
-            signal: importController.signal,
-          });
-          if (importController.signal.aborted) return;
-          const confirmed = await confirmProjectPackagePreview(preview);
-          if (importController.signal.aborted) return;
-          if (!confirmed) {
-            refreshProjectSaveStatus(t("Project import cancelled.", "ui"));
-            return;
-          }
-          const outcome = await importProjectThroughFunnel(importFile, {
-            projectPayload,
-            fileName: file.name,
-            signal: importController.signal,
-            ui: {
-              t,
-              showAppDialog,
-              showToast,
-            },
-            hooks: {
-              refreshColorState: mapRenderer.refreshColorState,
-              onProjectImportComplete: completeProjectImportStatus,
-                onProjectImportError: failProjectImportStatus,
-                onProjectImportRecoveryState: recovery => {
-                  if (projectImportController && projectImportController !== importController) return;
-                  if (recovery.phase === "complete") refreshProjectSaveStatus();
-                  else if (recovery.warnings.length) refreshProjectSaveStatus(
-                    `${t("Project imported", "ui")}: ${recovery.warnings.map(item => item.resource).join(", ")}`
-                  );
-                },
-            },
-          });
-          if (importController.signal.aborted) return;
-          if (outcome?.status === "committed-with-warnings") {
-            refreshProjectSaveStatus(`${t("Project imported", "ui")}: ${outcome.warnings.map(item => item.resource).join(", ")}`);
-          } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
-            refreshProjectSaveStatus(t("Project import is already in progress.", "ui"));
-          }
-        } catch (error) {
-          if (importController.signal.aborted) return;
-          const message = String(error?.message || error || "");
-          refreshProjectSaveStatus(message);
-          if (typeof showToast === "function") {
-            showToast(message, {
-              title: t("Project import failed", "ui"),
-              tone: "error",
-            });
-          }
-        } finally {
-          if (projectImportController === importController) {
-            projectFileInput.value = "";
-            projectImportController = null;
-          }
-        }
+        projectFileInput.value = "";
+        return callRuntimeHook(state, "runProjectImportFileFn", file);
       });
       projectFileInput.dataset.bound = "true";
     }
