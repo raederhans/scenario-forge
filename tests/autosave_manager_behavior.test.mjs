@@ -20,6 +20,7 @@ function setup(t, options = {}) {
     list: () => [...records.values()],
     put: t.mock.fn(record => records.set(record.scenarioId, record)),
     remove: id => records.delete(id),
+    edit: visit => visit([...records.values()], { put: storage.put, delete: storage.remove }),
   };
   const manager = startAutosave({ storage, page, ...options });
   t.after(manager.dispose);
@@ -134,7 +135,7 @@ test("dismissing recovery preserves fresh snapshots and defers the prompt until 
   await manager.recover();
   assert.equal(dialog.mock.callCount(), 1);
   assert.equal(importProject.mock.callCount(), 0);
-  assert.deepEqual([...records.keys()], ["valid", "latest"]);
+  assert.deepEqual([...records.keys()], ["valid", `latest@${NOW - 60_000}`]);
 
   manager.dispose();
   const nextSession = startAutosave({ storage, page, dialog, importProject });

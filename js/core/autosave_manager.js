@@ -39,6 +39,11 @@ const indexedStorage = {
   put: record => transact("readwrite", store => store.put(record)),
   remove: id => transact("readwrite", store => store.delete(id)),
   list: () => transact("readonly", store => store.getAll()),
+  edit: visit => transact("readwrite", store => {
+    const request = store.getAll();
+    request.onsuccess = () => visit(request.result, store);
+    return request;
+  }),
 };
 
 export function startAutosave({
@@ -70,7 +75,7 @@ export function startAutosave({
     const payload = new Blob([JSON.stringify(FileManager.buildProjectPayload(state))]);
     if (payload.size > 64 * 1024 * 1024) return;
     const record = {
-      scenarioId, payload, savedAt: Date.now(),
+      scenarioId, payload, savedAt: Date.now(), projectFileStem: state.projectFileStem,
       scenarioName: getScenarioDisplayName(state.activeScenarioManifest, scenarioId, t) || t("No scenario active", "ui"),
     };
     return useStorage(() => storage.put(record));
@@ -120,9 +125,23 @@ export function startAutosave({
       confirmLabel: t("Restore", "ui"),
       cancelLabel: t("Not now", "ui"),
     });
-    if (!restore) return;
+    if (!restore) {
+      if (!newest.deferred) {
+        await useStorage(() => storage.edit((snapshots, store) => {
+          const deferred = { ...newest, scenarioId: `${newest.scenarioId}@${newest.savedAt}`, deferred: true };
+          store.put(deferred);
+          const current = snapshots.find(record => record.scenarioId === newest.scenarioId);
+          if (current?.savedAt === newest.savedAt) store.delete(newest.scenarioId);
+          const previous = snapshots.filter(record => record.deferred && record.scenarioId !== deferred.scenarioId);
+          for (const record of [...previous, deferred].sort((a, b) => b.savedAt - a.savedAt).slice(3)) {
+            store.delete(record.scenarioId);
+          }
+        }));
+      }
+      return;
+    }
     const outcome = await importProject(null, {
-      fileName: "autosave.json",
+      fileName: newest.projectFileStem ? `${newest.projectFileStem}.json` : "",
       projectPayload: JSON.parse(await newest.payload.text()),
       ui: { t, showAppDialog: dialog, showToast: (...args) => callRuntimeHook(state, "showToastFn", ...args) },
       hooks: { refreshColorState: options => callRuntimeHook(state, "refreshColorStateFn", options) },
