@@ -122,6 +122,30 @@ function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], re
     setProjectionIdentity(value) { projectionIdentity = value; }, setViewportWidth(value) { viewportWidth = value; } };
 }
 
+test("automatic lettering scales the painted font, alpha and collision boxes while reusing the fit", () => {
+  const { owner, state, context, fitCalls } = createHarness({ names: ["Brazil"] });
+  function paint() {
+    const boxes = [];
+    context.events.length = 0;
+    assert.equal(owner.drawCountryLabels(1, { occupiedBoxes: boxes }), 1);
+    const fills = context.events.filter(([event]) => event === "fill");
+    return { boxes, text: fills.map(([, text]) => text).join(""), font: fills[0][2], alpha: fills[0][3] };
+  }
+  const original = paint();
+  assert.equal(original.text, "BRAZIL");
+  state.styleConfig.countryLabels = { sizeScale: 0.75, opacity: 0.5 };
+  const styled = paint();
+  assert.match(styled.font, / 9px /);
+  assert.equal(styled.alpha, original.alpha * 0.5);
+  assert.equal(styled.boxes[0].w - 3, (original.boxes[0].w - 3) * 0.75);
+  assert.equal(styled.boxes[0].h - 3, (original.boxes[0].h - 3) * 0.75);
+  assert.equal(fitCalls.length, 1);
+  state.styleConfig.countryLabels.uppercase = false;
+  assert.equal(owner.isReadyForCurrentView(), false);
+  assert.equal(paint().text, "Brazil");
+  assert.equal(owner.isReadyForCurrentView(), true);
+});
+
 test("manual lettering excludes an overlapping automatic title", () => {
   const { owner, context } = createHarness();
   const occupiedBoxes = [];

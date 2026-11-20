@@ -2303,6 +2303,14 @@
     "en": "Country indicators · Scenario reference",
     "zh": "国家统计专题 · 剧本参考"
   },
+  "Country name opacity": {
+    "en": "Country name opacity",
+    "zh": "国名不透明度"
+  },
+  "Country name size": {
+    "en": "Country name size",
+    "zh": "国名字号倍率"
+  },
   "Country names": {
     "en": "Country names",
     "zh": "国家名称"
@@ -10603,6 +10611,10 @@
   "Upsert District": {
     "en": "Upsert District",
     "zh": "新增或更新分区"
+  },
+  "Uppercase English country names": {
+    "en": "Uppercase English country names",
+    "zh": "英文国名全大写"
   },
   "Urban Areas": {
     "en": "Urban Areas",

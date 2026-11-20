@@ -54,7 +54,7 @@ import {
   serializeSpecialZoneLayersState,
 } from "./special_zone_layers.js";
 import { normalizeMapLabel } from "./state/strategic_overlay_state.js";
-import { normalizeOpenOceanLayerVisibility } from "./state/ui_state.js";
+import { normalizeCountryLabelStyle, normalizeOpenOceanLayerVisibility } from "./state/ui_state.js";
 import {
   captureUiVisibilityState,
   commitUiVisibilityState,
@@ -558,7 +558,7 @@ class FileManager {
         ocean: appState.styleConfig?.ocean || null,
         lakes: normalizeLakeStyleConfig(appState.styleConfig?.lakes),
         cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
-        countryLabels: { enabled: appState.styleConfig?.countryLabels?.enabled !== false },
+        countryLabels: normalizeCountryLabelStyle(appState.styleConfig?.countryLabels),
         strategicValues: normalizeStrategicValuesStyle(appState.styleConfig?.strategicValues),
         thematic: normalizeThematicWgiStyle(appState.styleConfig?.thematic),
         population: normalizePopulationStyle(appState.styleConfig?.population),

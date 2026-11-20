@@ -2309,6 +2309,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "国家统计专题 · 剧本参考",
     "en": "Country indicators · Scenario reference"
   },
+  "Country name opacity": {
+    "zh": "国名不透明度",
+    "en": "Country name opacity"
+  },
+  "Country name size": {
+    "zh": "国名字号倍率",
+    "en": "Country name size"
+  },
   "Country names": {
     "zh": "国家名称",
     "en": "Country names"
@@ -10601,6 +10609,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets.": {
     "zh": "上传图像，先调透明度保证可读，再调缩放，最后微调水平和垂直偏移。",
     "en": "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets."
+  },
+  "Uppercase English country names": {
+    "zh": "英文国名全大写",
+    "en": "Uppercase English country names"
   },
   "Upsert District": {
     "zh": "新增或更新分区",
