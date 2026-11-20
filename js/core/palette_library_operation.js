@@ -63,7 +63,7 @@ export function createPaletteLibraryOperation({
       || state.countryPalette?.[target.ownerCode]
       || state.resolvedDefaultCountryPalette?.[target.ownerCode]
       || state.colors?.[featureIds[0]]);
-    return withCountryColorReplacement(state, target.ownerCode, oldColor, color, commit, dialog);
+    return withCountryColorReplacement(state, target.ownerCode, oldColor, color, commit, dialog, countryIds);
 
     function commit(replacement) {
       const historyScope = { ...replacement };

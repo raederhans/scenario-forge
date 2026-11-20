@@ -21,9 +21,13 @@ function replacementScope(target, oldColor) {
   };
 }
 
-export function withCountryColorReplacement(target, country, oldColor, newColor, commit, dialog = showAppDialog) {
+export function withCountryColorReplacement(target, country, oldColor, newColor, commit, dialog = showAppDialog, countryIds = []) {
   if (!oldColor || oldColor === newColor) return commit(null);
   const scope = replacementScope(target, oldColor);
+  if (countryIds.length && scope.featureIds.length) {
+    const members = new Set(countryIds);
+    scope.featureIds = scope.featureIds.filter(id => !members.has(id));
+  }
   if (!scope.featureIds.length) return commit(null);
   const message = t("Also update {count} regions painted in {country}'s old color?", "ui", {
     count: scope.featureIds.length,

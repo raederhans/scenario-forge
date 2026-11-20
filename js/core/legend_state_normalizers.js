@@ -138,7 +138,7 @@ export function getLegendPaintColors(appState) {
   return colors;
 }
 
-export function getLegendEditorEntries(appState, getFeatureArea, getCountryName) {
+function rankLegendEditorColors(appState, getFeatureArea) {
   const tags = getScenarioCountryTags(appState.scenarioCountriesByTag);
   const resolveOwner = createBorderIdentityResolver({
     sovereignBaseColors: appState.sovereignBaseColors,
@@ -170,8 +170,33 @@ export function getLegendEditorEntries(appState, getFeatureArea, getCountryName)
   return [...totals.values()].sort((a, b) => b[weight] - a[weight]).slice(0, 200).map(entry => {
     const [owner] = [...entry.owners.keys()].sort((a, b) =>
       entry.owners.get(b)[weight] - entry.owners.get(a)[weight] || a.localeCompare(b));
-    return { color: entry.color, countryName: owner ? getCountryName(appState, owner) : "" };
+    return { color: entry.color, owner };
   });
+}
+
+const editorRankings = new WeakMap();
+
+export function getLegendEditorEntries(appState, getFeatureArea, getCountryName) {
+  let ranking;
+  if (Number.isFinite(appState.colorRevision)) {
+    const inputs = [
+      appState.colorRevision, appState.colors, appState.sovereignBaseColors, appState.visualOverrides,
+      appState.sceneGeneration, appState.scenarioDataGeneration, appState.activeScenarioId,
+      appState.topologyRevision, appState.landIndex, appState.mapSemanticMode,
+      appState.scenarioCountriesByTag, appState.scenarioBaselineOwnersByFeatureId, appState.scenarioAutoShellOwnerByFeatureId,
+      appState.riverPaint, appState.scenarioBaselineHash, getFeatureArea,
+    ];
+    const cached = editorRankings.get(appState);
+    if (cached && inputs.every((value, index) => value === cached.inputs[index])) {
+      ranking = cached.ranking;
+    } else {
+      ranking = rankLegendEditorColors(appState, getFeatureArea);
+      editorRankings.set(appState, { inputs, ranking });
+    }
+  } else {
+    ranking = rankLegendEditorColors(appState, getFeatureArea);
+  }
+  return ranking.map(({ color, owner }) => ({ color, countryName: owner ? getCountryName(appState, owner) : "" }));
 }
 
 export function filterLegendEditorEntries(entries, labels, query) {
