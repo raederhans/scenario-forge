@@ -10478,8 +10478,12 @@ function focusWaterRegionById(id) {
   const bounds = chooseMarineFocusBounds(focusParts.map((entry) => entry.bounds));
   if (!bounds || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
   const focusPart = focusParts.find((entry) => entry.bounds === bounds)?.part;
-  const projection = rendererSurfaceHost.getProjection();
   const geoBounds = focusPart && globalThis.d3.geoBounds ? globalThis.d3.geoBounds(focusPart) : null;
+  return focusRegionBounds(bounds, focusPart, geoBounds, { animate: true });
+}
+
+function focusRegionBounds(bounds, geometry, geoBounds, options) {
+  const projection = rendererSurfaceHost.getProjection();
   const wrapsDateLine = Array.isArray(geoBounds) && Number(geoBounds[0]?.[0]) > Number(geoBounds[1]?.[0]);
   const midLatitude = geoBounds ? (Number(geoBounds[0][1]) + Number(geoBounds[1][1])) / 2 : 0;
   const worldLeft = wrapsDateLine ? projection?.([-179.9, midLatitude]) : null;
@@ -10489,23 +10493,23 @@ function focusWaterRegionById(id) {
   const worldWidth = Math.abs(Number(worldRight?.[0]) - Number(worldLeft?.[0]));
   const wrappedWidth = wrapsDateLine ? Math.abs(worldWidth - Math.abs(Number(west?.[0]) - Number(east?.[0]))) : 0;
   if (wrapsDateLine && !(wrappedWidth > 0 && Number.isFinite(wrappedWidth))) return false;
-  const geoCenter = wrapsDateLine && globalThis.d3.geoCentroid ? globalThis.d3.geoCentroid(focusPart) : null;
+  const geoCenter = wrapsDateLine && globalThis.d3.geoCentroid ? globalThis.d3.geoCentroid(geometry) : null;
   const wrappedCenter = geoCenter && projection ? projection(geoCenter) : null;
   if (wrapsDateLine && (!wrappedCenter || !wrappedCenter.every(Number.isFinite))) return false;
   const extentX = Math.max(1, wrapsDateLine ? wrappedWidth : bounds.maxX - bounds.minX);
   const extentY = Math.max(1, bounds.maxY - bounds.minY);
   const centerX = wrapsDateLine ? wrappedCenter[0] : (bounds.minX + bounds.maxX) / 2;
   const centerY = wrapsDateLine ? wrappedCenter[1] : (bounds.minY + bounds.maxY) / 2;
-  return focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate: true });
+  return focusProjectedBounds({ extentX, extentY, centerX, centerY }, options);
 }
 
-function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate, pinWorldTop = false }) {
+function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate, pinWorldTop = false, maxScale = MAX_ZOOM_SCALE }) {
   const interactionRect = rendererSurfaceHost.getInteractionRect();
   const zoomBehavior = rendererSurfaceHost.getZoomBehavior();
   if (!interactionRect?.node() || !zoomBehavior || !globalThis.d3?.zoomIdentity
     || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
   const fitScale = Math.min(runtimeState.width * 0.72 / extentX, runtimeState.height * 0.72 / extentY);
-  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, fitScale));
+  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, maxScale, fitScale));
   const node = interactionRect.node();
   updateZoomTranslateExtent();
   // zoom.transform 不经过平移范围约束；先按 translateExtent 约束，避免视角越过世界边缘。
@@ -10538,15 +10542,18 @@ function pinTransformToWorldTop(transform) {
   return globalThis.d3.zoomIdentity.translate(transform.x, transform.y - topOnScreen).scale(transform.k);
 }
 
-function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
+function focusGeoBounds([west, south, east, north], { animate = false, geometry, maxScale } = {}) {
   const projection = rendererSurfaceHost.getProjection();
   if (!projection || !globalThis.d3?.geoPath) return false;
-  const bounds = globalThis.d3.geoPath(projection).bounds({
+  const bounds = globalThis.d3.geoPath(projection).bounds(geometry || {
     type: "Polygon",
     coordinates: [[[west, north], [east, north], [east, south], [west, south], [west, north]]],
   });
   if (!bounds.flat().every(Number.isFinite)) return false;
   const [[minX, minY], [maxX, maxY]] = bounds;
+  if (geometry) {
+    return focusRegionBounds({ minX, minY, maxX, maxY }, geometry, [[west, south], [east, north]], { animate, maxScale });
+  }
   return focusProjectedBounds({
     extentX: Math.max(1, maxX - minX),
     extentY: Math.max(1, maxY - minY),

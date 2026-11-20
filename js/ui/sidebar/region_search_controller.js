@@ -1,6 +1,14 @@
+export function focusLandFeatures(features, focusGeoBounds) {
+  const collection = { type: "FeatureCollection", features };
+  const bounds = globalThis.d3.geoBounds(collection).flat();
+  if (bounds.every(Number.isFinite)) {
+    focusGeoBounds(bounds, { animate: true, maxScale: 8, geometry: collection });
+  }
+}
+
 export function createRegionSearchController({
   documentRef, state, t, getFeatureOwnerCode, getFeatureLabel,
-  selectLandFeatureById, maxResults = 30,
+  selectLandFeatureById, focusGeoBounds, maxResults = 30,
 }) {
   const tr = (key) => t(key, "ui");
   let country = "";
@@ -35,6 +43,8 @@ export function createRegionSearchController({
   function select(index) {
     const { id, label } = matches[index];
     if (selectLandFeatureById(id)) {
+      const feature = state.landIndex.get(id);
+      if (feature?.geometry) focusLandFeatures([feature], focusGeoBounds);
       status.textContent = tr("Selected {name}").replace("{name}", `${label} (${id})`);
       input.value = label;
       close();

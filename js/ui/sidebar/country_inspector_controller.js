@@ -5,6 +5,8 @@ import { clearInspectorSelectionState, selectInspectorCountryState } from "../..
 import { setUiIcon } from "../components/ui_icons.js";
 import { formatModernPlaceName } from "../../core/renderer/modern_place_name.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
+import { getMapDataBoundary } from "../../core/map_data_boundary.js";
+import { focusLandFeatures } from "./region_search_controller.js";
 import {
   ensureInspectorExpansionState,
   markInspectorExpansionInitializedState,
@@ -69,6 +71,7 @@ const HGO_VARIANT_LABEL_SUFFIXES = Object.freeze(
 
 export function createCountryInspectorController({
   runtimeState,
+  focusGeoBounds,
   list,
   searchInput,
   selectedCountryActionsSection,
@@ -1184,6 +1187,32 @@ export function createCountryInspectorController({
     }
   };
 
+  const getLoadedCountryFeatures = (code) => {
+    const reference = getMapDataBoundary(runtimeState).reference;
+    const ids = runtimeState.activeScenarioId
+      ? reference.getScenarioGroupFeatureIds(code)
+      : reference.getGeographicCountryFeatureIds(code);
+    return ids.map((id) => runtimeState.landIndex?.get(id)).filter((feature) => feature?.geometry);
+  };
+
+  let locateButton;
+  const renderCountryLocateButton = (code) => {
+    if (!locateButton) {
+      locateButton = document.createElement("button");
+      locateButton.type = "button";
+      locateButton.className = "sidebar-action-secondary mt-2";
+      locateButton.dataset.i18n = "Locate on Map";
+      locateButton.addEventListener("click", () => {
+        const features = getLoadedCountryFeatures(runtimeState.selectedInspectorCountryCode);
+        locateButton.disabled = !features.length;
+        if (features.length) focusLandFeatures(features, focusGeoBounds);
+      });
+      countryInspectorSelected.appendChild(locateButton);
+    }
+    locateButton.textContent = t("Locate on Map", "ui");
+    locateButton.disabled = !getLoadedCountryFeatures(code).length;
+  };
+
   const renderCountryInspectorDetail = () => {
     if (!countryInspectorSelected) return;
     incrementSidebarCounter?.("inspectorRenders");
@@ -1222,6 +1251,7 @@ export function createCountryInspectorController({
     renderHgoIdentityDetail(countryState);
     renderInspectorBreadcrumb(countryState);
     renderInspectorModernPlaceNames(countryState);
+    renderCountryLocateButton(selectedCode);
 
     if (countryInspectorColorRow) {
       countryInspectorColorRow.classList.add("hidden");
