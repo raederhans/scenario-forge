@@ -238,6 +238,7 @@ export function createPaintContourAssembly({
     ensurePaintContoursReady,
     getPaintContourDiagnostics,
     resolveBorderIdentity,
+    getBorderPaletteRevision,
     getClassifiedBorderMeshes,
     disposePaintContoursIfCreated,
     notifyPaintContourSourcePublished,

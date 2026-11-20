@@ -1,7 +1,8 @@
 import { getParentMergedParents } from './parent_merged_presentation.js';
 
-export function createCountryLabelCoverageOwner({ state, peekSource, resolveBorderIdentity }) {
-  let members = null, countries, parents;
+export function createCountryLabelCoverageOwner({ state, peekSource, resolveBorderIdentity,
+  getBorderPaletteRevision = () => state.sovereignBaseColors }) {
+  let members = null, countries, parents, paletteRevision;
   const identityById = new Map();
   const countsByCode = new Map();
   const suppressed = new Set();
@@ -40,10 +41,12 @@ export function createCountryLabelCoverageOwner({ state, peekSource, resolveBord
   function getSuppressedCodes() {
     const source = state.activeScenarioId && peekSource();
     const current = source?.status === 'ready' ? source.memberIndex : null;
-    if (members !== current || countries !== state.scenarioCountriesByTag) {
+    const revision = current && getBorderPaletteRevision();
+    if (members !== current || countries !== state.scenarioCountriesByTag || paletteRevision !== revision) {
       invalidate();
       members = current;
       countries = state.scenarioCountriesByTag;
+      paletteRevision = revision;
       if (members) {
         parents = getParentMergedParents(countries);
         for (const code of members.memberCountByCode.keys()) countsByCode.set(code, new Map());
@@ -61,6 +64,10 @@ export function createCountryLabelCoverageOwner({ state, peekSource, resolveBord
     },
     notifyColorsChanged(ids) {
       if (!members || countries !== state.scenarioCountriesByTag) return;
+      if (paletteRevision !== getBorderPaletteRevision()) {
+        invalidate();
+        return;
+      }
       for (const id of ids) {
         const code = members.groupCodeById.get(id);
         if (code) update(id, code);
