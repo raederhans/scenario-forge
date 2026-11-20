@@ -98,6 +98,7 @@ const state = runtimeState;
 function composePaletteLibraryOperation() {
   const stateAccess = createPaletteLibraryStateAccess(runtimeState);
   const owner = createPaletteLibraryOperation({
+    state: runtimeState,
     getApplyTarget: stateAccess.getApplyTarget,
     getOwnerFeatureIds: stateAccess.getOwnerFeatureIds,
     getCountryFeatureIds: (code) => [...(getPaletteCountryTargets(runtimeState).get(code) || [])],

@@ -1,4 +1,7 @@
 import { normalizeHexColor } from "./palette_manager.js";
+import { getLegendPaintColors } from "./legend_state_normalizers.js";
+import { getMapDataBoundary } from "./map_data_boundary.js";
+import { migrateLegendColorState } from "./state/actions/legend_actions.js";
 
 // The composition root supplies history, refresh, and synchronous paint selection.
 // Recent-color feedback and the final render follow the applied result.
@@ -8,6 +11,7 @@ import { normalizeHexColor } from "./palette_manager.js";
  * or applied after committing the existing synchronous color/history sequence.
  */
 export function createPaletteLibraryOperation({
+  state,
   getApplyTarget,
   getOwnerFeatureIds,
   getCountryFeatureIds = getOwnerFeatureIds,
@@ -58,6 +62,9 @@ export function createPaletteLibraryOperation({
       : { ownerCodes: [target.ownerCode] };
     const kind = explicitCountry ? "palette-country-color" : isFeature ? "palette-library-apply-color" : "palette-library-apply-owner-color";
     const before = captureHistoryState(historyScope);
+    const oldColor = !isFeature && normalizeHexColor(state.sovereignBaseColors?.[target.ownerCode]
+      || state.colors?.[featureIds[0]]
+      || state.resolvedDefaultCountryPalette?.[target.ownerCode]);
     if (isFeature) {
       applyFeatureColor(featureIds, color);
     } else {
@@ -69,6 +76,16 @@ export function createPaletteLibraryOperation({
       refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
     } else {
       refreshColorState({ renderNow: false });
+    }
+    if (oldColor && oldColor !== color && (state.legendLabels?.[oldColor] || state.legendColorOrder?.includes(oldColor))) {
+      const boundary = getMapDataBoundary(state);
+      const used = getLegendPaintColors(state).has(oldColor) || boundary.reference.getScenarioFeatureIds().some(id =>
+        !Object.hasOwn(state.colors || {}, id) && boundary.paint.resolveFeatureColor(id).color === oldColor);
+      if (!used) {
+        Object.assign(before, captureHistoryState({ legend: true }));
+        historyScope.legend = true;
+        migrateLegendColorState(state, oldColor, color);
+      }
     }
     markDirty(kind);
     pushHistoryEntry({

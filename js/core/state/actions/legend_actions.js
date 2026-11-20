@@ -29,3 +29,13 @@ export function setLegendLabelState(target, color, text) {
   else delete labels[color];
   patchLegendState(target, { legendLabels: labels });
 }
+
+export function migrateLegendColorState(target, oldColor, newColor) {
+  const labels = { ...target.legendLabels };
+  if (!labels[newColor] && labels[oldColor]) labels[newColor] = labels[oldColor];
+  delete labels[oldColor];
+  patchLegendState(target, {
+    legendLabels: labels,
+    legendColorOrder: normalizeColorOrder((target.legendColorOrder || []).map(color => color === oldColor ? newColor : color)),
+  });
+}

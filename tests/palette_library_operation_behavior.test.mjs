@@ -75,6 +75,7 @@ function createOperationHarness(state) {
   const events = [];
   const history = [];
   const operation = createPaletteLibraryOperation({
+    state,
     ...createPaletteLibraryStateAccess(state),
     captureHistoryState(scope) {
       events.push(["capture", structuredClone(scope)]);
