@@ -14,7 +14,7 @@
         {
           "suffix": "PANGSANG",
           "name_en": "Township Pangsang",
-          "name_zh": "Pangsang镇区",
+          "name_zh": "邦康镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -26,7 +26,7 @@
         {
           "suffix": "MONGMAO",
           "name_en": "Township Mongmao",
-          "name_zh": "Mongmao镇区",
+          "name_zh": "勐冒镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -38,7 +38,7 @@
         {
           "suffix": "PANGWAUN",
           "name_en": "Township Pangwaun",
-          "name_zh": "Pangwaun镇区",
+          "name_zh": "邦弯镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -50,7 +50,7 @@
         {
           "suffix": "NARPHAN",
           "name_en": "Township Narphan",
-          "name_zh": "Narphan镇区",
+          "name_zh": "纳攀镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -62,7 +62,7 @@
         {
           "suffix": "HOPANG",
           "name_en": "Township Hopang",
-          "name_zh": "Hopang镇区",
+          "name_zh": "户板镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -74,7 +74,7 @@
         {
           "suffix": "LAUKKAING",
           "name_en": "Township Laukkaing",
-          "name_zh": "Laukkaing镇区",
+          "name_zh": "老街镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -86,7 +86,7 @@
         {
           "suffix": "KONKYAN",
           "name_en": "Township Konkyan",
-          "name_zh": "Konkyan镇区",
+          "name_zh": "公坚镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -114,7 +114,7 @@
         {
           "suffix": "SITTWE",
           "name_en": "Township Sittwe",
-          "name_zh": "Sittwe镇区",
+          "name_zh": "实兑镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -126,7 +126,7 @@
         {
           "suffix": "KYAUKPYU",
           "name_en": "Township Kyaukpyu",
-          "name_zh": "Kyaukpyu镇区",
+          "name_zh": "皎漂镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -138,7 +138,7 @@
         {
           "suffix": "MUNAUNG",
           "name_en": "Township Munaung",
-          "name_zh": "Munaung镇区",
+          "name_zh": "马瑙镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -166,7 +166,7 @@
         {
           "suffix": "HAKHA",
           "name_en": "Township Hakha",
-          "name_zh": "Hakha镇区",
+          "name_zh": "哈卡镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -178,7 +178,7 @@
         {
           "suffix": "TEDIM",
           "name_en": "Township Tedim",
-          "name_zh": "Tedim镇区",
+          "name_zh": "德顶镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -190,7 +190,7 @@
         {
           "suffix": "PALETWA",
           "name_en": "Township Paletwa",
-          "name_zh": "Paletwa镇区",
+          "name_zh": "百力瓦镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -202,7 +202,7 @@
         {
           "suffix": "FALAM",
           "name_en": "Township Falam",
-          "name_zh": "Falam镇区",
+          "name_zh": "法兰镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -214,7 +214,7 @@
         {
           "suffix": "MINDAT",
           "name_en": "Township Mindat",
-          "name_zh": "Mindat镇区",
+          "name_zh": "敏达镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -226,7 +226,7 @@
         {
           "suffix": "MATUPI",
           "name_en": "Township Matupi",
-          "name_zh": "Matupi镇区",
+          "name_zh": "马图皮镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -238,7 +238,7 @@
         {
           "suffix": "KANPETLET",
           "name_en": "Township Kanpetlet",
-          "name_zh": "Kanpetlet镇区",
+          "name_zh": "甘佩莱镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -250,7 +250,7 @@
         {
           "suffix": "TONZANG",
           "name_en": "Township Tonzang",
-          "name_zh": "Tonzang镇区",
+          "name_zh": "敦藏镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -262,7 +262,7 @@
         {
           "suffix": "THANTLANG",
           "name_en": "Township Thantlang",
-          "name_zh": "Thantlang镇区",
+          "name_zh": "丹兰镇区",
           "polygon_source": {
             "path": "modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson",
             "property": "shapeID",
@@ -290,7 +290,7 @@
         {
           "suffix": "MYITKYINA",
           "name_en": "Myitkyina strongpoint",
-          "name_zh": "Myitkyina据点",
+          "name_zh": "密支那据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -330,7 +330,7 @@
         {
           "suffix": "WAINGMAW",
           "name_en": "Waingmaw strongpoint",
-          "name_zh": "Waingmaw据点",
+          "name_zh": "威茂据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -369,8 +369,8 @@
         },
         {
           "suffix": "BHAMO_GARRISON",
-          "name_en": "Bhamo_Garrison strongpoint",
-          "name_zh": "Bhamo_Garrison据点",
+          "name_en": "Bhamo garrison strongpoint",
+          "name_zh": "八莫驻军据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -410,7 +410,7 @@
         {
           "suffix": "PUTAO",
           "name_en": "Putao strongpoint",
-          "name_zh": "Putao据点",
+          "name_zh": "葡萄据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -450,7 +450,7 @@
         {
           "suffix": "MACHANBAW",
           "name_en": "Machanbaw strongpoint",
-          "name_zh": "Machanbaw据点",
+          "name_zh": "马江包据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -490,7 +490,7 @@
         {
           "suffix": "NAWNGMUN",
           "name_en": "Nawngmun strongpoint",
-          "name_zh": "Nawngmun据点",
+          "name_zh": "瑙蒙据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -530,7 +530,7 @@
         {
           "suffix": "KHAUNGLANHPU",
           "name_en": "Khaunglanhpu strongpoint",
-          "name_zh": "Khaunglanhpu据点",
+          "name_zh": "考兰普据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -570,7 +570,7 @@
         {
           "suffix": "TANAI",
           "name_en": "Tanai strongpoint",
-          "name_zh": "Tanai据点",
+          "name_zh": "达奈据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -610,7 +610,7 @@
         {
           "suffix": "MOHNYIN",
           "name_en": "Mohnyin strongpoint",
-          "name_zh": "Mohnyin据点",
+          "name_zh": "莫宁据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -650,7 +650,7 @@
         {
           "suffix": "MOGAUNG",
           "name_en": "Mogaung strongpoint",
-          "name_zh": "Mogaung据点",
+          "name_zh": "孟拱据点",
           "polygon": {
             "type": "Polygon",
             "coordinates": [

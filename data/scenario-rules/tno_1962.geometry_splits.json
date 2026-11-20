@@ -103,8 +103,8 @@
       "parts": [
         {
           "suffix": "CHI",
-          "name_en": "CHI",
-          "name_zh": "CHI",
+          "name_en": "Republic of China",
+          "name_zh": "中华民国",
           "polygon": {
             "type": "MultiPolygon",
             "coordinates": [
@@ -186,8 +186,8 @@
       ],
       "remainder": {
         "suffix": "REST",
-        "name_en": "SHX",
-        "name_zh": "SHX"
+        "name_en": "Shanxi",
+        "name_zh": "晋陕行政公署"
       },
       "sources": [
         "TNO states 2411,2413,2414; retained 956,2415,2416,622,2410",
@@ -210,8 +210,8 @@
       "parts": [
         {
           "suffix": "CHI",
-          "name_en": "CHI",
-          "name_zh": "CHI",
+          "name_en": "Republic of China",
+          "name_zh": "中华民国",
           "polygon": {
             "type": "MultiPolygon",
             "coordinates": [
@@ -293,8 +293,8 @@
       ],
       "remainder": {
         "suffix": "REST",
-        "name_en": "SHX",
-        "name_zh": "SHX"
+        "name_en": "Shanxi",
+        "name_zh": "晋陕行政公署"
       },
       "sources": [
         "TNO states 2411,2413,2414; retained 956,2415,2416,622,2410",
@@ -317,8 +317,8 @@
       "parts": [
         {
           "suffix": "CHI",
-          "name_en": "CHI",
-          "name_zh": "CHI",
+          "name_en": "Republic of China",
+          "name_zh": "中华民国",
           "polygon": {
             "type": "MultiPolygon",
             "coordinates": [
@@ -400,8 +400,8 @@
       ],
       "remainder": {
         "suffix": "REST",
-        "name_en": "SHX",
-        "name_zh": "SHX"
+        "name_en": "Shanxi",
+        "name_zh": "晋陕行政公署"
       },
       "sources": [
         "TNO states 2411,2413,2414; retained 956,2415,2416,622,2410",
@@ -424,8 +424,8 @@
       "parts": [
         {
           "suffix": "KLT",
-          "name_en": "KLT",
-          "name_zh": "KLT",
+          "name_en": "Kalat and Makran",
+          "name_zh": "卡拉特与马克兰",
           "polygon": {
             "type": "MultiPolygon",
             "coordinates": [
@@ -527,8 +527,8 @@
       ],
       "remainder": {
         "suffix": "REST",
-        "name_en": "PAK",
-        "name_zh": "PAK"
+        "name_en": "Pakistan",
+        "name_zh": "巴基斯坦共和国"
       },
       "sources": [
         "TNO states 444,445,749,1533,1534,1891,1892,1893; retained 929,1889,1890",
@@ -551,8 +551,8 @@
       "parts": [
         {
           "suffix": "UTL",
-          "name_en": "UTL",
-          "name_zh": "UTL",
+          "name_en": "Turkestan Legion",
+          "name_zh": "突厥斯坦军团",
           "polygon": {
             "type": "Polygon",
             "coordinates": [
@@ -588,8 +588,8 @@
       ],
       "remainder": {
         "suffix": "REST",
-        "name_en": "TKM",
-        "name_zh": "TKM"
+        "name_en": "Turkmenistan",
+        "name_zh": "土库曼共和国"
       },
       "sources": [
         "TNO states 2205 Gowurdak, 2204 Chardzhou",
@@ -607,8 +607,8 @@
       "parts": [
         {
           "suffix": "BKU",
-          "name_en": "BKU",
-          "name_zh": "BKU",
+          "name_en": "Mosul and Kirkuk",
+          "name_zh": "摩苏尔与基尔库克",
           "polygon": {
             "type": "MultiPolygon",
             "coordinates": [
@@ -666,8 +666,8 @@
       ],
       "remainder": {
         "suffix": "REST",
-        "name_en": "KUR",
-        "name_zh": "KUR"
+        "name_en": "Iraq",
+        "name_zh": "伊拉克共和国"
       },
       "sources": [
         "TNO state 1334: Khanaqin/Kifri -> BKU; state 1778: Baqubah -> IRQ",

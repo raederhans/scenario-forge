@@ -52070,52 +52070,52 @@
       "zh": "罗马"
     },
     "id::CN_MRG_20fbce9fead7__SPLIT_CHI": {
-      "en": "Chengguxian · CHI",
-      "zh": "城固县 · CHI"
+      "en": "Chengguxian · Republic of China",
+      "zh": "城固县 · 中华民国"
     },
     "id::CN_MRG_20fbce9fead7__SPLIT_REST": {
-      "en": "Chengguxian · SHX",
-      "zh": "城固县 · SHX"
+      "en": "Chengguxian · Shanxi",
+      "zh": "城固县 · 晋陕行政公署"
     },
     "id::CN_MRG_3811ff27587a__SPLIT_CHI": {
-      "en": "Nanzhengxian · CHI",
-      "zh": "南郑县 · CHI"
+      "en": "Nanzhengxian · Republic of China",
+      "zh": "南郑县 · 中华民国"
     },
     "id::CN_MRG_3811ff27587a__SPLIT_REST": {
-      "en": "Nanzhengxian · SHX",
-      "zh": "南郑县 · SHX"
+      "en": "Nanzhengxian · Shanxi",
+      "zh": "南郑县 · 晋陕行政公署"
     },
     "id::CN_MRG_b59c07833274__SPLIT_CHI": {
-      "en": "Luonanxian · CHI",
-      "zh": "洛南县 · CHI"
+      "en": "Luonanxian · Republic of China",
+      "zh": "洛南县 · 中华民国"
     },
     "id::CN_MRG_b59c07833274__SPLIT_REST": {
-      "en": "Luonanxian · SHX",
-      "zh": "洛南县 · SHX"
+      "en": "Luonanxian · Shanxi",
+      "zh": "洛南县 · 晋陕行政公署"
     },
     "id::IRQ-3243__SPLIT_BKU": {
-      "en": "Diyala · BKU",
-      "zh": "迪亚拉 · BKU"
+      "en": "Diyala · Mosul and Kirkuk",
+      "zh": "迪亚拉 · 摩苏尔与基尔库克"
     },
     "id::IRQ-3243__SPLIT_REST": {
-      "en": "Diyala · KUR",
-      "zh": "迪亚拉 · KUR"
+      "en": "Diyala · Iraq",
+      "zh": "迪亚拉 · 伊拉克共和国"
     },
     "id::PAK-1108__SPLIT_KLT": {
-      "en": "Baluchistan · KLT",
-      "zh": "俾路支省 · KLT"
+      "en": "Baluchistan · Kalat and Makran",
+      "zh": "俾路支省 · 卡拉特与马克兰"
     },
     "id::PAK-1108__SPLIT_REST": {
-      "en": "Baluchistan · PAK",
-      "zh": "俾路支省 · PAK"
+      "en": "Baluchistan · Pakistan",
+      "zh": "俾路支省 · 巴基斯坦共和国"
     },
     "id::PA_ADM1_PAN-1337__SPLIT_PCZ": {
       "en": "Colón · Panama Canal Zone",
-      "zh": "冒号 · 巴拿马运河区"
+      "zh": "科隆 · 巴拿马运河区"
     },
     "id::PA_ADM1_PAN-1337__SPLIT_REST": {
       "en": "Colón · Panama",
-      "zh": "冒号 · 巴拿马"
+      "zh": "科隆 · 巴拿马"
     },
     "id::PA_ADM1_PAN-1340__SPLIT_PCZ": {
       "en": "Panamá · Panama Canal Zone",
@@ -52126,12 +52126,12 @@
       "zh": "巴拿马 · 巴拿马"
     },
     "id::TKM-359__SPLIT_REST": {
-      "en": "Chardzhou · TKM",
-      "zh": "查德周 · TKM"
+      "en": "Chardzhou · Turkmenistan",
+      "zh": "查尔朱 · 土库曼共和国"
     },
     "id::TKM-359__SPLIT_UTL": {
-      "en": "Chardzhou · UTL",
-      "zh": "查德周 · UTL"
+      "en": "Chardzhou · Turkestan Legion",
+      "zh": "查尔朱 · 突厥斯坦军团"
     },
     "mediterranean_sea": {
       "en": "Mediterranean Sea",
