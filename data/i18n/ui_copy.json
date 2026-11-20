@@ -5467,6 +5467,50 @@
     "en": "Map labels",
     "zh": "地图标签"
   },
+  "Automatic": {
+    "en": "Automatic",
+    "zh": "自动"
+  },
+  "Bound country": {
+    "en": "Bound country",
+    "zh": "绑定国家"
+  },
+  "Dark": {
+    "en": "Dark",
+    "zh": "深色"
+  },
+  "Enter name": {
+    "en": "Enter name",
+    "zh": "输入名称"
+  },
+  "Font size": {
+    "en": "Font size",
+    "zh": "字号"
+  },
+  "Label text": {
+    "en": "Label text",
+    "zh": "文字内容"
+  },
+  "Letter spacing": {
+    "en": "Letter spacing",
+    "zh": "字距"
+  },
+  "Map lettering": {
+    "en": "Map lettering",
+    "zh": "地图文字"
+  },
+  "Place label": {
+    "en": "Place label",
+    "zh": "放置文字"
+  },
+  "Rotation": {
+    "en": "Rotation",
+    "zh": "旋转"
+  },
+  "map labels": {
+    "en": "map labels",
+    "zh": "文字"
+  },
   "Map mode": {
     "en": "Map mode",
     "zh": "地图模式"

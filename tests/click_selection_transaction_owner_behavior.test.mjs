@@ -257,7 +257,7 @@ const SERVICE_NAMES = [
   "getSafeCanvasColor", "getSpecialRegionColor", "getWaterRegionColor", "handleSpecialZoneMembershipClick",
   "isDoubleClickBatchEligible", "isFacilityDetailsSurfaceActive",
   "isMacroOceanWaterRegion", "isOpenOceanPaintEnabled", "markDirty",
-  "noteRenderAction", "nowMs", "placeUnitCounterFromEvent", "queueTooltipUpdate",
+  "noteRenderAction", "nowMs", "placeMapLabelFromEvent", "placeUnitCounterFromEvent", "queueTooltipUpdate",
   "refreshSidebarAfterPaint",
   "refreshSpecialRegionSidebarRowsNow", "refreshWaterRegionSidebarRowsNow", "renderHoverOverlayIfNeeded",
   "requestInteractionRender", "resolveInteractionTargetIds", "scheduleDynamicBorderRecompute",

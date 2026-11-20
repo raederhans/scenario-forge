@@ -6,7 +6,10 @@ export function drawManualMapLabels({ state, ctx, projection, k, getCountryName,
   const drawn = new Map();
   const language = state.currentLanguage || "en";
   const transform = { x: state.zoomTransform?.x || 0, y: state.zoomTransform?.y || 0, k };
+  const draggingId = state.mapLabelEditor?.draggingId || "";
   for (const label of state.mapLabels) {
+    // 拖动中的文字由 SVG 预览显示，Canvas 暂不绘制。
+    if (draggingId && label.id === draggingId) continue;
     const name = label.text || (label.countryCode && (state.scenarioCountriesByTag?.[label.countryCode]
       ? getCountryName(label.countryCode) : label.fallbackName));
     const title = label.uppercase == null ? displayText(name, language)

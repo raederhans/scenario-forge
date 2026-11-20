@@ -195,13 +195,14 @@ export function createStrategicPanelView({
     publishStatus.setAttribute("aria-live", "polite");
     publishStatus.setAttribute("aria-atomic", "true");
     publishStatus.title = t("Project export saves Strategic annotations.", "ui");
-    publishStatus.textContent = `0 ${t("lines", "ui")} · 0 ${t("graphics", "ui")} · 0 ${t("counters", "ui")} · ${t("Export as Strategic annotations", "ui")}`;
+    publishStatus.textContent = `0 ${t("lines", "ui")} · 0 ${t("graphics", "ui")} · 0 ${t("counters", "ui")} · 0 ${t("map labels", "ui")} · ${t("Export as Strategic annotations", "ui")}`;
 
     const workspaceIconCloseBtn = buildButton("strategicOverlayIconCloseBtn", "Close");
     workspaceIconCloseBtn.classList.add("secondary", "strategic-workspace-icon-close", "hidden");
     headerCopy.appendChild(title);
     headerCopy.appendChild(hint);
     headerCopy.appendChild(publishStatus);
+    headerCopy.appendChild(buildButton("mapLabelSectionToggle", "Map lettering"));
     headerRow.appendChild(headerCopy);
     headerRow.appendChild(workspaceIconCloseBtn);
 
@@ -771,6 +772,41 @@ export function createStrategicPanelView({
     strategicOverlaySection.appendChild(accordionLines);
     strategicOverlaySection.appendChild(accordionGraphics);
     strategicOverlaySection.appendChild(accordionCounters);
+    const lettering = document.createElement("section");
+    lettering.id = "mapLabelSection";
+    lettering.hidden = true;
+    const place = buildButton("mapLabelPlace", "Place label");
+    const list = buildSelect("mapLabelList", []);
+    list.size = 4;
+    list.setAttribute("aria-label", t("Map lettering", "ui"));
+    const fields = document.createElement("div");
+    fields.id = "mapLabelFields";
+    const addField = (key, caption, control) => {
+      const field = document.createElement("label");
+      field.className = "mt-2 flex items-center gap-2";
+      control.dataset.labelField = key;
+      field.append(t(caption, "ui"), control);
+      fields.appendChild(field);
+    };
+    const text = document.createElement("textarea");
+    text.placeholder = t("Enter name", "ui");
+    addField("text", "Label text", text);
+    addField("countryCode", "Bound country", buildSelect("mapLabelCountry", []));
+    for (const [key, caption, min, max, step] of [
+      ["size", "Font size", 0.12, 512, 0.01],
+      ["rotation", "Rotation", -90, 90, 1],
+      ["tracking", "Letter spacing", 0, 1, 0.01],
+    ]) {
+      const range = document.createElement("input");
+      Object.assign(range, { type: "range", min, max, step });
+      addField(key, caption, range);
+    }
+    addField("colorMode", "Color", buildSelect("mapLabelColor", [
+      ["auto", "Automatic"], ["dark", "Dark"], ["light", "Light"],
+    ]));
+    fields.appendChild(buildButton("mapLabelDelete", "Delete"));
+    lettering.append(place, list, fields);
+    strategicOverlaySection.appendChild(lettering);
     frontlineTabStack.appendChild(strategicOverlaySection);
   }
 
@@ -893,6 +929,8 @@ export function createStrategicPanelView({
 
   return {
     elements: {
+      mapLabelSection: document.getElementById("mapLabelSection"),
+      mapLabelSectionToggle: document.getElementById("mapLabelSectionToggle"),
       strategicOverlaySection,
       strategicWorkspaceBackdropEl,
       strategicOverlayOpenWorkspaceBtn,

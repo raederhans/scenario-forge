@@ -728,6 +728,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "自动填充视觉色",
     "en": "Auto-Fill Visuals"
   },
+  "Automatic": {
+    "zh": "自动",
+    "en": "Automatic"
+  },
   "Automatic (raster for TNO)": {
     "zh": "自动（TNO 优先栅格）",
     "en": "Automatic (raster for TNO)"
@@ -1071,6 +1075,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Borders up to date": {
     "zh": "边界已更新",
     "en": "Borders up to date"
+  },
+  "Bound country": {
+    "zh": "绑定国家",
+    "en": "Bound country"
   },
   "Boundary Variants": {
     "zh": "边界变体",
@@ -2504,6 +2512,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "大坝",
     "en": "Dam"
   },
+  "Dark": {
+    "zh": "深色",
+    "en": "Dark"
+  },
   "Dash": {
     "zh": "虚线",
     "en": "Dash"
@@ -3252,6 +3264,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "输入简短代码，例如 HQ、ARM 或 INF。",
     "en": "Enter a short code such as HQ, ARM or INF."
   },
+  "Enter name": {
+    "zh": "输入名称",
+    "en": "Enter name"
+  },
   "Enter owner tag (e.g. GER, FRA, BRA)": {
     "zh": "输入归属标签（如 GER、FRA、BRA）",
     "en": "Enter owner tag (e.g. GER, FRA, BRA)"
@@ -3750,6 +3766,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Flat Blue keeps the ocean fill clean with no bathymetry overlay.": {
     "zh": "纯蓝模式仅保留干净的海洋底色，不叠加测深效果。",
     "en": "Flat Blue keeps the ocean fill clean with no bathymetry overlay."
+  },
+  "Font size": {
+    "zh": "字号",
+    "en": "Font size"
   },
   "For 1936, 1939 and TNO. Detail is restored after navigation.": {
     "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。",
@@ -4710,6 +4730,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "标签分离",
     "en": "Label separation"
   },
+  "Label text": {
+    "zh": "文字内容",
+    "en": "Label text"
+  },
   "Labels": {
     "zh": "标签",
     "en": "Labels"
@@ -4897,6 +4921,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Less fields": {
     "zh": "收起字段",
     "en": "Less fields"
+  },
+  "Letter spacing": {
+    "zh": "字距",
+    "en": "Letter spacing"
   },
   "Level 1 region": {
     "zh": "1级区域",
@@ -5468,6 +5496,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Map labels": {
     "zh": "地图标签",
     "en": "Map labels"
+  },
+  "Map lettering": {
+    "zh": "地图文字",
+    "en": "Map lettering"
   },
   "Map mode": {
     "zh": "地图模式",
@@ -6860,6 +6892,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "试点范围停留在高速公路、主干道和主干道上。",
     "en": "Pilot scope stays on motorway, trunk, and primary."
   },
+  "Place label": {
+    "zh": "放置文字",
+    "en": "Place label"
+  },
   "Placed Counters": {
     "zh": "已放置计数器",
     "en": "Placed Counters"
@@ -8051,6 +8087,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Rotate preview 90 degrees": {
     "zh": "将预览旋转 90 度",
     "en": "Rotate preview 90 degrees"
+  },
+  "Rotation": {
+    "zh": "旋转",
+    "en": "Rotation"
   },
   "Royal Violet": {
     "zh": "王室紫标",
@@ -11271,6 +11311,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "major stations Phase B": {
     "zh": "主要车站 Phase B",
     "en": "major stations Phase B"
+  },
+  "map labels": {
+    "zh": "文字",
+    "en": "map labels"
   },
   "members in current layer": {
     "zh": "当前图层成员",
