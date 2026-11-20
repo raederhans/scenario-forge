@@ -327,10 +327,10 @@ def build(scenario_id: str):
                   sudetenland(data), "1938 年 10 月慕尼黑协定后并入德国；采用 CZ 中 GER 持有地块，约 21700 平方公里，排除 BOM 保护国"),
             layer("preset-bohemia-moravia", "occupation", "Protectorate of Bohemia and Moravia", "波希米亚-摩拉维亚保护国",
                   bohemia_moravia(data), "1939 年 3 月德国占领；采用 CZ 中保护国 BOM 持有地块，排除苏台德和波兰持有部分"),
-            # 克莱佩达县约 4786 km²，未超过历史梅梅尔地区约 2657 km² 的三倍。
+            # 切出的梅梅尔与波格根约 3335 km²，接近历史梅梅尔地区约 2848 km²。
             layer("preset-memel", "claim", "Memel Territory (annexed 1939)", "梅梅尔地区（1939 年并入）",
                   [fid for fid in data.owned_by("GER") if data.props(fid).get("cntr_code") == "LT"],
-                  "1939 年 3 月德国从立陶宛并入梅梅尔；采用德属克莱佩达县地块近似，约 4786 平方公里"),
+                  "1939 年 3 月德国从立陶宛并入梅梅尔；按克莱佩达市与区、内林加、希卢泰、帕盖吉艾切出，约 3335 平方公里"),
             layer("preset-albania-occupation", "occupation", "Italian-occupied Albania", "意占阿尔巴尼亚",
                   [fid for fid in data.features if data.props(fid).get("cntr_code") == "AL"],
                   "1939 年 4 月意大利入侵；按现代 AL 地块覆盖阿尔巴尼亚，剧本保留 ALB 标签"),

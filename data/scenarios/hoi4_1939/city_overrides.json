@@ -23752,7 +23752,8 @@
       "aliases": [
         "Memel",
         "Klaipėda"
-      ]
+      ],
+      "host_feature_id": "LT023__SPLIT_MEMEL"
     },
     "CITY::ne::1159134177": {
       "city_id": "CITY::ne::1159134177",
@@ -26769,6 +26770,21 @@
       "city_id": "CITY::ne::1159139551",
       "stable_key": "id::CITY::ne::1159139551",
       "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::593959": {
+      "city_id": "CITY::gn::593959",
+      "stable_key": "id::CITY::gn::593959",
+      "host_feature_id": "LT027__SPLIT_REST"
+    },
+    "CITY::gn::597989": {
+      "city_id": "CITY::gn::597989",
+      "stable_key": "id::CITY::gn::597989",
+      "host_feature_id": "LT023__SPLIT_REST"
+    },
+    "CITY::gn::599506": {
+      "city_id": "CITY::gn::599506",
+      "stable_key": "id::CITY::gn::599506",
+      "host_feature_id": "LT023__SPLIT_MEMEL"
     }
   },
   "audit": {

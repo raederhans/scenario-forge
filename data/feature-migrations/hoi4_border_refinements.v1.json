@@ -14,6 +14,14 @@
       "LT011__SPLIT_WILNO",
       "LT011__SPLIT_REST"
     ],
+    "LT023": [
+      "LT023__SPLIT_MEMEL",
+      "LT023__SPLIT_REST"
+    ],
+    "LT027": [
+      "LT027__SPLIT_POGEGEN",
+      "LT027__SPLIT_REST"
+    ],
     "MDA-1652": [
       "MDA-1652__SPLIT_LEFT",
       "MDA-1652__SPLIT_RIGHT"

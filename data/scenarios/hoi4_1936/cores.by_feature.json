@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "a29e7c20e042c2725f1551f7bf9c110a240f9cee8b7d41b7192346bb0345e6ad",
+  "baseline_hash": "06b23583499ed21160520fee8d6d6b14aa2f66c68f26f1d0c00f42b047f2fa52",
   "cores": {
     "AD_ADM1_AND-4876": [
       "AND"
@@ -17284,7 +17284,10 @@
     "LT022": [
       "LIT"
     ],
-    "LT023": [
+    "LT023__SPLIT_MEMEL": [
+      "LIT"
+    ],
+    "LT023__SPLIT_REST": [
       "LIT"
     ],
     "LT024": [
@@ -17296,7 +17299,10 @@
     "LT026": [
       "LIT"
     ],
-    "LT027": [
+    "LT027__SPLIT_POGEGEN": [
+      "LIT"
+    ],
+    "LT027__SPLIT_REST": [
       "LIT"
     ],
     "LT028": [
@@ -45362,7 +45368,7 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_8083": [
-      "SOV"
+      "FIN"
     ],
     "RU_ARCTIC_FB_8084": [
       "SOV"
@@ -57353,7 +57359,7 @@
       "UKR"
     ],
     "UA_RAY_74538382B35313257426644": [
-      "UKR"
+      "ROM"
     ],
     "UA_RAY_74538382B36501884751905": [
       "UKR"

@@ -7889,7 +7889,8 @@
           "name_en": "Memel",
           "name_zh": "梅梅尔",
           "feature_ids": [
-            "LT023"
+            "LT023__SPLIT_MEMEL",
+            "LT023__SPLIT_REST"
           ]
         },
         "state_189": {
@@ -7898,7 +7899,8 @@
           "name_zh": "萨莫吉希亚",
           "feature_ids": [
             "LT026",
-            "LT027",
+            "LT027__SPLIT_POGEGEN",
+            "LT027__SPLIT_REST",
             "LT028"
           ]
         },
@@ -11012,7 +11014,6 @@
             "RO212",
             "RO215",
             "UA_RAY_74538382B19402975726216",
-            "UA_RAY_74538382B31362091857930",
             "UA_RAY_74538382B32943992723151",
             "UA_RAY_74538382B46813680897661",
             "UA_RAY_74538382B50216081867244",
@@ -11027,12 +11028,7 @@
             "UA_SHELL_FB_064",
             "UA_SHELL_FB_065",
             "UA_SHELL_FB_069",
-            "UA_SHELL_FB_093",
-            "UA_SHELL_FB_553",
-            "UA_SHELL_FB_566",
-            "UA_SHELL_FB_577",
-            "UA_SHELL_FB_588",
-            "UA_SHELL_FB_599"
+            "UA_SHELL_FB_093"
           ]
         },
         "state_81": {
@@ -11074,6 +11070,21 @@
             "RO123",
             "RO124",
             "RO311"
+          ]
+        },
+        "state_198": {
+          "district_id": "state_198",
+          "name_en": "Vinnytsia",
+          "name_zh": "文尼察",
+          "feature_ids": [
+            "UA_RAY_74538382B31362091857930",
+            "UA_RAY_74538382B35313257426644",
+            "UA_SHELL_FB_068",
+            "UA_SHELL_FB_553",
+            "UA_SHELL_FB_566",
+            "UA_SHELL_FB_577",
+            "UA_SHELL_FB_588",
+            "UA_SHELL_FB_599"
           ]
         },
         "state_211": {
@@ -23394,7 +23405,6 @@
             "UA_RAY_74538382B30351514928450",
             "UA_RAY_74538382B32839428556025",
             "UA_RAY_74538382B34820599431847",
-            "UA_RAY_74538382B35313257426644",
             "UA_RAY_74538382B37791268598116",
             "UA_RAY_74538382B40749537195929",
             "UA_RAY_74538382B6752863603231",
@@ -23412,7 +23422,6 @@
             "UA_SHELL_FB_056",
             "UA_SHELL_FB_063",
             "UA_SHELL_FB_066",
-            "UA_SHELL_FB_068",
             "UA_SHELL_FB_070",
             "UA_SHELL_FB_074",
             "UA_SHELL_FB_075",

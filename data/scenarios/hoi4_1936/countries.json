@@ -3803,7 +3803,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "finnish_aland",
-        "finnish_karelia"
+        "finnish_karelia",
+        "finland_terijoki_coast"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
@@ -7793,12 +7794,12 @@
       "color_hex": "#dbdb77",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 11,
+      "controller_feature_count": 13,
       "display_name": "Republic of Lithuania",
       "display_name_en": "Republic of Lithuania",
       "display_name_zh": "立陶宛共和国",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 13,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -10813,19 +10814,19 @@
       "color_hex": "#d7c448",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 117,
+      "controller_feature_count": 119,
       "display_name": "Kingdom of Romania",
       "display_name_en": "Kingdom of Romania",
       "display_name_zh": "罗马尼亚王国",
       "entry_kind": "",
-      "feature_count": 117,
+      "feature_count": 119,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "RO",
-      "notes": "Right-bank half of the Camenca source parcel belonged to Romanian Bessarabia.",
+      "notes": "Khotyn lies on the Bessarabian (Romanian) bank of the Dniester until 1940.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "romania_bessarabia_1936",
@@ -10834,7 +10835,8 @@
       "rule_sources": [
         "romania_bessarabia_1936",
         "southern_dobruja",
-        "bessarabia_camenca_right_bank"
+        "bessarabia_camenca_right_bank",
+        "romanian_northern_bessarabia_khotyn"
       ],
       "ruling_ideology": "democratic",
       "ruling_ideology_source": "game_history",
@@ -13630,12 +13632,12 @@
       "color_hex": "#972c31",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 744,
+      "controller_feature_count": 742,
       "display_name": "Ukrainian SSR",
       "display_name_en": "Ukrainian SSR",
       "display_name_zh": "乌克兰苏维埃社会主义共和国",
       "entry_kind": "scenario_subject",
-      "feature_count": 744,
+      "feature_count": 742,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [

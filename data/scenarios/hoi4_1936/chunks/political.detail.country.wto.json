@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "features": [
     {
-      "id": 21074,
+      "id": 21072,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2155__SPLIT_WTO",
@@ -285,7 +285,7 @@
       }
     },
     {
-      "id": 21076,
+      "id": 21074,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2156__SPLIT_WTO",
@@ -352,7 +352,7 @@
       }
     },
     {
-      "id": 21078,
+      "id": 21076,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2173__SPLIT_WTO",

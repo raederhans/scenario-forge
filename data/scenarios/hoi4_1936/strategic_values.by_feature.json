@@ -1,6 +1,6 @@
 {
   "as_of_date": "1936.1.1.12",
-  "baseline_hash": "a29e7c20e042c2725f1551f7bf9c110a240f9cee8b7d41b7192346bb0345e6ad",
+  "baseline_hash": "06b23583499ed21160520fee8d6d6b14aa2f66c68f26f1d0c00f42b047f2fa52",
   "bucket_by_feature": {
     "AD_ADM1_AND-4876": "s165",
     "AD_ADM1_AND-4877": "s165",
@@ -5763,11 +5763,13 @@
     "LT011__SPLIT_WILNO": "s11",
     "LT021": "s814",
     "LT022": "s11",
-    "LT023": "s188",
+    "LT023__SPLIT_MEMEL": "s188",
+    "LT023__SPLIT_REST": "s188",
     "LT024": "s814",
     "LT025": "s815",
     "LT026": "s189",
-    "LT027": "s189",
+    "LT027__SPLIT_POGEGEN": "s189",
+    "LT027__SPLIT_REST": "s189",
     "LT028": "s189",
     "LT029": "s815",
     "LU_ADM1_LUX-906": "s8",

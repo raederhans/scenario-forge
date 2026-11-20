@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 336,
-    "feature_count": 21116,
+    "feature_count": 21118,
     "water_count": 0
   },
   "controller_changes": [],
@@ -25879,19 +25879,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "CEY"
-    },
-    {
-      "country_code": "LT",
-      "critical": true,
-      "feature_id": "LT023",
-      "feature_name": "Klaipėdos apskritis",
-      "from_tag": "LIT",
-      "notes": "Memel transfer to Germany in March 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_germany_memel",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
     },
     {
       "country_code": "MA",
@@ -201582,10 +201569,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 777,
+      "controller_feature_count": 792,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 777,
+      "feature_count": 792,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202375,10 +202362,10 @@
     "LIT": {
       "base_iso2": "LT",
       "continent_label": "Europe",
-      "controller_feature_count": 10,
+      "controller_feature_count": 11,
       "display_name": "Lithuania",
       "entry_kind": "",
-      "feature_count": 10,
+      "feature_count": 11,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203359,10 +203346,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 117,
+      "controller_feature_count": 119,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 117,
+      "feature_count": 119,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -205350,41 +205337,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "e6035afefb0bebec20bb58f97ce4447eabf9543deba2e5ff85b82599519dc7ab",
+  "snapshot_fingerprint": "38ab66469f2be8f635ba8efb8c1758a85718ce8fb5b6d1d32705bb19a715b967",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "3715d3a4e07754868782a220b4fa8daee948bfa9603fb9afdfdb4e312a120aee",
-    "detail_chunk_manifest_sha256": "80796e9c72c8bd1b4347c87f9e73c883d6940fce517694588c03f4d24de11fdc",
+    "build_snapshot_sha256": "7821a3cb7c693235eef276b87954186a7a7a63c4a6af14218d3b636757a5e3e2",
+    "detail_chunk_manifest_sha256": "18f0ac165347c48602d816c5f05505ed4aa0926850c1efe04d49a21952ed0937",
     "runtime_bootstrap_topology_sha256": "87bede3074fad428a40e028c276cf5588b809afa8b63775f0bf6984f526f6179",
-    "runtime_topology_sha256": "39599949211b95bd552663ef84a0b747fa6640edfbdf3a1d23801e91d7644b6f"
+    "runtime_topology_sha256": "523b600d9e01b4857cc0e0f1a05f1b6d1fdf13ffd0c18a7887d8b9a4d60630b2"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15386,
+    "changed_feature_count": 15385,
     "controller_count": 328,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 21116,
+    "feature_count": 21118,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14939,
+    "manual_reviewed_feature_count": 14938,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 328,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,
-      "manual_reviewed": 14939
+      "manual_reviewed": 14938
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15363
+      "manual_rule": 15362
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

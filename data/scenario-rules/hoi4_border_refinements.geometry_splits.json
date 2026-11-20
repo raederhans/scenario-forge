@@ -266,6 +266,74 @@
         "https://www.openstreetmap.org/relation/20437275"
       ],
       "notes": "Třinec and Jablunkov administrative districts approximate the Frýdek-Místek part of Zaolzie (Polish October 1938–September 1939)."
+    },
+    {
+      "id": "memel_territory",
+      "feature_ids": [
+        "LT023"
+      ],
+      "parts": [
+        {
+          "suffix": "MEMEL",
+          "name_en": "Memel Territory",
+          "name_zh": "梅梅尔地区",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "lt_klaipeda_city",
+              "lt_klaipeda_dist",
+              "lt_neringa",
+              "lt_silute"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Kretinga and Skuodas",
+        "name_zh": "克雷廷加与斯库奥达斯",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/1014347",
+        "https://www.openstreetmap.org/relation/1203043",
+        "https://www.openstreetmap.org/relation/1078733",
+        "https://www.openstreetmap.org/relation/1203041"
+      ],
+      "notes": "Klaipėda city and district, Neringa and Šilutė approximate the Memel Territory (Kreise Memel and Heydekrug); Palanga, Kretinga and Skuodas were never part of it."
+    },
+    {
+      "id": "memel_pogegen",
+      "feature_ids": [
+        "LT027"
+      ],
+      "parts": [
+        {
+          "suffix": "POGEGEN",
+          "name_en": "Pogegen (Memel Territory)",
+          "name_zh": "波格根（梅梅尔地区）",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "lt_pagegiai"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Tauragė County (rest)",
+        "name_zh": "陶拉格县（其余）",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/1002044"
+      ],
+      "notes": "Pagėgiai municipality approximates Kreis Pogegen, the Memel Territory part north of the Neman now in Tauragė County."
     }
   ],
   "omitted": [
