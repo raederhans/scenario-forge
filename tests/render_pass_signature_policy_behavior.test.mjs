@@ -48,6 +48,19 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test("only enabled country labels read the current suppression signature", () => {
+  let suppression = '', reads = 0;
+  const { state, policy } = createHarness({ getCountryLabelSuppressionSignature() { reads++; return suppression; } });
+  const before = policy.getRenderPassSignature("labels");
+  suppression = 'B';
+  assert.notEqual(policy.getRenderPassSignature("labels"), before);
+  state.styleConfig.countryLabels = { enabled: false };
+  const disabled = policy.getRenderPassSignature("labels");
+  suppression = '';
+  assert.equal(policy.getRenderPassSignature("labels"), disabled);
+  assert.equal(reads, 2);
+});
+
 test("country label visibility invalidates labels without invalidating political fill", () => {
   const { state, policy } = createHarness();
   const labels = policy.getRenderPassSignature("labels");

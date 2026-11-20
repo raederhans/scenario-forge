@@ -236,6 +236,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     getTransform = () => state.zoomTransform || { x: 0, y: 0, k: 1 },
     getLanguage = () => state.currentLanguage || state.language || "en",
     getCountryLabelSource = () => null,
+    isCountryLabelSuppressed = () => false,
     getCountryLabelColors = () => ({ fill: "#172b35", stroke: "rgba(255, 252, 241, 0.4)" }),
     getD3 = () => globalThis.d3,
   } = getters;
@@ -554,6 +555,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
   }
 
   function getViewFitRequest(entry, view, onInvisible = null) {
+    if (isCountryLabelSuppressed(entry.countryCode)) return null;
     const text = displayText(view.records.get(entry.countryCode)?.name, view.language);
     if (!text) return null;
     const key = getFitKey(text, view.language, view.font);
@@ -916,7 +918,9 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     if (source?.status !== "ready") return 1;
     if (!geometryCache || geometryCache.sourceToken !== source.sourceToken
       || geometryCache.revision !== source.revision || geometryCache.projection !== getProjection()
-      || geometryCache.identity !== getProjectionIdentity()) return Math.max(1, source.countries?.length || 0);
+      || geometryCache.identity !== getProjectionIdentity()) {
+      return source.countries?.length ? source.countries.filter(record => !isCountryLabelSuppressed(record.countryCode)).length : 1;
+    }
     const language = String(getLanguage() || "en");
     const font = language.startsWith("zh") ? CHINESE_FONT : ENGLISH_FONT;
     const records = new Map((source.countries || []).map((record) => [record.countryCode, record]));
@@ -924,6 +928,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const viewport = getViewportSize();
     const paintBounds = getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height };
     return geometryCache.entries.reduce((count, entry) => {
+      if (isCountryLabelSuppressed(entry.countryCode)) return count;
       const text = displayText(records.get(entry.countryCode)?.name, language);
       if (!text) return count;
       if (!entry.polygons) return count + 1;

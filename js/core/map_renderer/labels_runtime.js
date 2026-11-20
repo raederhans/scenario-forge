@@ -6,6 +6,7 @@ import { createUrbanAdaptivePaintModel } from "../renderer/urban_adaptive_paint_
 import { createCityLabelTextModel } from "../renderer/city_label_text_model.js";
 import { createCityGeometryPresentation } from "../renderer/city_geometry_presentation.js";
 import { createCountryLabelSourceOwner } from "../renderer/country_label_source.js";
+import { createCountryLabelCoverageOwner } from "../renderer/country_label_coverage.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "../renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "../renderer/urban_layer_render_owner.js";
 import {
@@ -54,6 +55,7 @@ export function createLabelsRuntime({
   clamp,
   normalizeLongitude,
   getDisplayOwnerCode,
+  resolveBorderIdentity,
   getResolvedFeatureColor,
   getSignedHashUnit,
   collectContextMetric,
@@ -423,6 +425,14 @@ export function createLabelsRuntime({
 
   let countryLabelSourceOwner = null;
   let countryLabelRenderOwner = null;
+  const coverage = createCountryLabelCoverageOwner({ state: runtimeState, resolveBorderIdentity,
+    peekSource: () => countryLabelSourceOwner?.peekSource() });
+
+  let suppressedCodes = new Set();
+  function observeCountryLabelSource(source) {
+    suppressedCodes = coverage.getSuppressedCodes();
+    return source;
+  }
 
   function getCountryLabelSourceOwner() {
     countryLabelSourceOwner ||= createCountryLabelSourceOwner({
@@ -454,7 +464,8 @@ export function createLabelsRuntime({
         getPaintBounds: getLabelPaintBounds,
         getTransform: () => runtimeState.zoomTransform,
         getLanguage: () => runtimeState.currentLanguage || "en",
-        getCountryLabelSource: () => getCountryLabelSourceOwner().getSource(),
+        getCountryLabelSource: () => observeCountryLabelSource(getCountryLabelSourceOwner().getSource()),
+        isCountryLabelSuppressed: code => suppressedCodes.has(code),
         getCountryLabelColors: (code) => {
           const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
           return Number.isFinite(luminance) && luminance < 0.18
@@ -610,7 +621,7 @@ export function createLabelsRuntime({
     if (!source || source.status !== "ready" || !countryLabelRenderOwner) {
       return { expected, ready: false, sourceStatus: source?.status || "uninitialized" };
     }
-    const readiness = countryLabelRenderOwner.getReadinessForCurrentView(source);
+    const readiness = countryLabelRenderOwner.getReadinessForCurrentView(observeCountryLabelSource(source));
     return { expected, ...readiness, sourceStatus: source.status,
       ready: readiness.ready && !runtimeState.renderPassCache?.dirty?.labels };
   }
@@ -649,6 +660,9 @@ export function createLabelsRuntime({
     ensureCountryLabelsReadyForExport,
     getVisibleMapLabels,
     getCountryLabelReadiness,
+    getCountryLabelSuppressionSignature: coverage.getSignature,
+    notifyCountryLabelColorsChanged: coverage.notifyColorsChanged,
+    invalidateCountryLabelCoverage: coverage.invalidate,
     drawUrbanLayer,
     getUrbanCityPolicyOwner,
     getFeatureGeoCentroid,

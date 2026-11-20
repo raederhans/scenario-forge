@@ -78,6 +78,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   getBorderAppearanceRevision = () => runtimeState.colorRevision || 0,
   getPaintContourRevision = () => runtimeState.colorRevision || 0,
   getPoliticalBorderRevision = () => 0,
+  getCountryLabelSuppressionSignature = () => "",
 }) {
   let observedTopologyRevision = Number(runtimeState.topologyRevision || 0);
   const topologyRevisionByPass = new Map();
@@ -325,7 +326,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.activeScenarioId || "",
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
-        runtimeState.styleConfig?.countryLabels?.enabled !== false ? "country-labels:on" : "country-labels:off",
+        runtimeState.styleConfig?.countryLabels?.enabled !== false
+          ? `country-labels:on:${getCountryLabelSuppressionSignature()}` : "country-labels:off",
         runtimeState.showWaterRegions ? "marine:on" : "marine:off",
         runtimeState.showOpenOceanRegions || runtimeState.allowOpenOceanPaint ? "open-ocean-labels:on" : "open-ocean-labels:off",
         `marine-selected:${String(runtimeState.selectedWaterRegionId || "")}`,

@@ -277,6 +277,9 @@ test('complete coarse world dissolves provinces by immutable reference, independ
   const source = owner.getSource();
   assert.equal(source.status, 'ready');
   assert.deepEqual(source.countries.map(c => c.countryCode), ['AAA', 'BBB']);
+  assert.deepEqual([...source.memberIndex.groupCodeById], [['one', 'AAA'], ['two', 'AAA'], ['three', 'BBB']]);
+  assert.deepEqual([...source.memberIndex.memberCountByCode], [['AAA', 2], ['BBB', 1]]);
+  assert.throws(() => source.memberIndex.groupCodeById.clear(), TypeError);
   assert.equal(source.countries[0].geometry.coordinates.length, 1);
   const points = source.countries[0].geometry.coordinates[0][0];
   assert.ok(points.some(p => p[0] === 0) && points.some(p => p[0] === 2));
@@ -285,6 +288,7 @@ test('complete coarse world dissolves provinces by immutable reference, independ
   state.landData = { features: [feature('one', 80)] }; state.topologyDetail = {};
   state.runtimePoliticalTopology = {}; state.scenarioShellOverlayRevision = 9;
   assert.equal(owner.getSource().countries, source.countries);
+  assert.equal(owner.peekSource().memberIndex, source.memberIndex);
   assert.equal(owner.getSource().sourceToken, source.sourceToken);
 });
 
