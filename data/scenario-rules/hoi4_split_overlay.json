@@ -10570,6 +10570,76 @@
       ],
       "cores": "keep",
       "color_hex": "#3657c4"
+    },
+    {
+      "id": "germany_interwar_frontier_counties",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GER",
+      "select": {
+        "feature_ids": [
+          "PL_POW_2201",
+          "PL_POW_2203",
+          "PL_POW_2207",
+          "PL_POW_2209__SPLIT_REST",
+          "PL_POW_2210__SPLIT_REST",
+          "PL_POW_2212",
+          "PL_POW_2216",
+          "PL_POW_2263",
+          "PL_POW_3031",
+          "PL_POW_2405",
+          "PL_POW_2411",
+          "PL_POW_2462",
+          "PL_POW_2466",
+          "PL_POW_2478"
+        ]
+      },
+      "only_from_owners": [
+        "POL"
+      ],
+      "notes": "1919-1939 German side of the frontier: Bütow, Schlochau, Marienwerder, Marienburg and the Vistula Spit outside the Free City, Stolp, Stuhm, Flatow, and western Upper Silesia (Gleiwitz, Ratibor, Beuthen, Hindenburg). County-level approximation; Lauenburg stays merged with the corridor until the merge group is split."
+    },
+    {
+      "id": "poland_interwar_soldau_lobau",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "POL",
+      "select": {
+        "feature_ids": [
+          "PL_POW_2803",
+          "PL_POW_2812"
+        ]
+      },
+      "only_from_owners": [
+        "GER"
+      ],
+      "notes": "Soldau (Działdowo) and the Löbau/Neumark area were Polish from 1920."
+    },
+    {
+      "id": "moldavian_assr_left_bank",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SOV",
+      "select": {
+        "feature_ids": [
+          "MDA-1628",
+          "MDA-1637",
+          "MDA-1638",
+          "MDA-1645",
+          "MDA-1650",
+          "MDA-1652"
+        ]
+      },
+      "only_from_owners": [
+        "ROM"
+      ],
+      "notes": "Left bank of the Dniester formed the Moldavian ASSR inside the Soviet Union until 1940. MDA-1645 is the Rîbnița area despite its source name; MDA-1650 covers Tiraspol/Slobozia with a sliver of Bender."
     }
   ]
 }

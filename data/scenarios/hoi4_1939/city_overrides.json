@@ -8079,7 +8079,7 @@
       "city_id": "CITY::ne::1159151327",
       "stable_key": "id::CITY::ne::1159151327",
       "display_name": {
-        "en": "Chungking",
+        "en": "Chongqing",
         "zh": "重庆"
       },
       "host_feature_id": "CN_CITY_17275852B61145215456285",
@@ -8152,7 +8152,7 @@
       "host_feature_id": "MMR-3269",
       "stable_key": "id::CITY::ne::1159151477",
       "display_name": {
-        "en": "Rangoon",
+        "en": "Yangon",
         "zh": "仰光"
       },
       "aliases": [
@@ -8628,7 +8628,7 @@
       "city_id": "CITY::ne::1159150969",
       "stable_key": "id::CITY::ne::1159150969",
       "display_name": {
-        "en": "Alma-Ata",
+        "en": "Almaty",
         "zh": "阿拉木图"
       },
       "host_feature_id": "KAZ-4829",
@@ -8641,8 +8641,8 @@
       "city_id": "CITY::ne::1159151595",
       "stable_key": "id::CITY::ne::1159151595",
       "display_name": {
-        "en": "Peking",
-        "zh": "北京"
+        "en": "Beijing",
+        "zh": "北平"
       },
       "host_feature_id": "CN_CITY_17275852B40522342172572",
       "aliases": [
@@ -8804,7 +8804,7 @@
       "stable_key": "id::CITY::ne::1159149849",
       "display_name": {
         "en": "Coquilhatville",
-        "zh": "科基拉维尔"
+        "zh": "科基亚维尔"
       },
       "host_feature_id": "CD_ADM1_COD-1461",
       "aliases": [
@@ -9004,7 +9004,7 @@
       "city_id": "CITY::ne::1159149707",
       "stable_key": "id::CITY::ne::1159149707",
       "display_name": {
-        "en": "Danzig",
+        "en": "Gdańsk",
         "zh": "但泽"
       },
       "host_feature_id": "PL_POW_2261",
@@ -9044,7 +9044,7 @@
       "city_id": "CITY::ne::1159150573",
       "stable_key": "id::CITY::ne::1159150573",
       "display_name": {
-        "en": "Salisbury",
+        "en": "Harare",
         "zh": "索尔兹伯里"
       },
       "host_feature_id": "ZW_ADM1_ZWE-525",
@@ -9232,7 +9232,7 @@
       "city_id": "CITY::ne::1159149997",
       "stable_key": "id::CITY::ne::1159149997",
       "display_name": {
-        "en": "Bathurst",
+        "en": "Banjul",
         "zh": "巴瑟斯特"
       },
       "host_feature_id": "GM_ADM1_GMB-2153",
@@ -9303,7 +9303,7 @@
       "city_id": "CITY::ne::1159150007",
       "stable_key": "id::CITY::ne::1159150007",
       "display_name": {
-        "en": "Trivandrum",
+        "en": "Thiruvananthapuram",
         "zh": "特里凡得琅"
       },
       "host_feature_id": "IN_ADM2_76128533B33162455176756",
@@ -9354,8 +9354,8 @@
       "city_id": "CITY::ne::1159151083",
       "stable_key": "id::CITY::ne::1159151083",
       "display_name": {
-        "en": "Brunei Town",
-        "zh": "文莱城"
+        "en": "Bandar Seri Begawan",
+        "zh": "斯里巴加湾市"
       },
       "host_feature_id": "BN_ADM1_BRN-1182",
       "aliases": [
@@ -9450,7 +9450,7 @@
       "city_id": "CITY::ne::1159150427",
       "stable_key": "id::CITY::ne::1159150427",
       "display_name": {
-        "en": "Usumbura",
+        "en": "Bujumbura",
         "zh": "乌松布拉"
       },
       "host_feature_id": "BI_ADM1_BDI-3364",
@@ -9481,7 +9481,7 @@
       "city_id": "CITY::ne::1159149913",
       "stable_key": "id::CITY::ne::1159149913",
       "display_name": {
-        "en": "Dairen",
+        "en": "Dalian",
         "zh": "大连"
       },
       "host_feature_id": "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG",
@@ -9494,7 +9494,7 @@
       "city_id": "CITY::ne::1159151495",
       "stable_key": "id::CITY::ne::1159151495",
       "display_name": {
-        "en": "Kiev",
+        "en": "Kyiv",
         "zh": "基辅"
       },
       "host_feature_id": "UA_RAY_74538382B60890943260132",
@@ -9552,7 +9552,7 @@
       "city_id": "CITY::ne::1159150813",
       "stable_key": "id::CITY::ne::1159150813",
       "display_name": {
-        "en": "Frunze",
+        "en": "Bishkek",
         "zh": "伏龙芝"
       },
       "host_feature_id": "KGZ-1115",
@@ -9583,7 +9583,7 @@
       "city_id": "CITY::ne::1159150567",
       "stable_key": "id::CITY::ne::1159150567",
       "display_name": {
-        "en": "Ashkhabad",
+        "en": "Ashgabat",
         "zh": "阿什哈巴德"
       },
       "host_feature_id": "TKM-352",
@@ -9596,7 +9596,7 @@
       "city_id": "CITY::ne::1159150609",
       "stable_key": "id::CITY::ne::1159150609",
       "display_name": {
-        "en": "Stalinabad",
+        "en": "Dushanbe",
         "zh": "斯大林纳巴德"
       },
       "host_feature_id": "TJK-5491",
@@ -9726,7 +9726,7 @@
       "city_id": "CITY::ne::1159137065",
       "stable_key": "id::CITY::ne::1159137065",
       "display_name": {
-        "en": "Ordzhonikidze",
+        "en": "Vladikavkaz",
         "zh": "奥尔忠尼启则"
       },
       "host_feature_id": "RU_RAY_50074027B27316284331880",
@@ -9775,7 +9775,7 @@
       "city_id": "CITY::ne::1159147043",
       "stable_key": "id::CITY::ne::1159147043",
       "display_name": {
-        "en": "Kalgan",
+        "en": "Zhangjiakou",
         "zh": "张家口"
       },
       "host_feature_id": "CN_CITY_17275852B66003162693266",
@@ -9797,7 +9797,7 @@
       "city_id": "CITY::ne::1159151385",
       "stable_key": "id::CITY::ne::1159151385",
       "display_name": {
-        "en": "Nanking",
+        "en": "Nanjing",
         "zh": "南京"
       },
       "host_feature_id": "CN_CITY_17275852B45149819427590",
@@ -9810,7 +9810,7 @@
       "city_id": "CITY::ne::1159151367",
       "stable_key": "id::CITY::ne::1159151367",
       "display_name": {
-        "en": "Hankow",
+        "en": "Wuhan",
         "zh": "汉口"
       },
       "host_feature_id": "CN_CITY_17275852B52250123531455",
@@ -9823,7 +9823,7 @@
       "city_id": "CITY::ne::1159151331",
       "stable_key": "id::CITY::ne::1159151331",
       "display_name": {
-        "en": "Canton",
+        "en": "Guangzhou",
         "zh": "广州"
       },
       "host_feature_id": "CN_CITY_17275852B38988280096574",
@@ -9948,7 +9948,7 @@
       "city_id": "CITY::ne::1159150715",
       "stable_key": "id::CITY::ne::1159150715",
       "display_name": {
-        "en": "Mogadiscio",
+        "en": "Mogadishu",
         "zh": "摩加迪休"
       },
       "host_feature_id": "SO_ADM1_83879307B32896531038690",
@@ -9961,7 +9961,7 @@
       "city_id": "CITY::ne::1159149187",
       "stable_key": "id::CITY::ne::1159149187",
       "display_name": {
-        "en": "Baroda",
+        "en": "Vadodara",
         "zh": "巴罗达"
       },
       "host_feature_id": "IN_ADM2_76128533B33151011563565",
@@ -10145,7 +10145,7 @@
       "city_id": "CITY::ne::1159150163",
       "stable_key": "id::CITY::ne::1159150163",
       "display_name": {
-        "en": "Pondicherry",
+        "en": "Puducherry",
         "zh": "本地治里"
       },
       "host_feature_id": "IN_ADM2_76128533B29873478326363",

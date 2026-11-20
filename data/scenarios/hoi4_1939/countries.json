@@ -4252,19 +4252,19 @@
       "color_hex": "#3c3c3c",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 673,
+      "controller_feature_count": 685,
       "display_name": "German Reich",
       "display_name_en": "German Reich",
       "display_name_zh": "德意志国",
       "entry_kind": "",
-      "feature_count": 673,
+      "feature_count": 685,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "DE",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
+      "notes": "1919-1939 German side of the frontier: Bütow, Schlochau, Marienwerder, Marienburg and the Vistula Spit outside the Free City, Stolp, Stuhm, Flatow, and western Upper Silesia (Gleiwitz, Ratibor, Beuthen, Hindenburg). County-level approximation; Lauenburg stays merged with the corridor until the merge group is split.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "germany_frontier_1936",
@@ -4276,7 +4276,8 @@
         "germany_sudetenland_1939",
         "bohemia_moravia_protectorate_1939",
         "1939_germany_memel",
-        "liberec_return"
+        "liberec_return",
+        "germany_interwar_frontier_counties"
       ],
       "ruling_ideology": "fascism",
       "ruling_ideology_source": "game_history",
@@ -10402,19 +10403,19 @@
       "color_hex": "#d6668b",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 255,
+      "controller_feature_count": 243,
       "display_name": "Republic of Poland",
       "display_name_en": "Republic of Poland",
       "display_name_zh": "波兰共和国",
       "entry_kind": "",
-      "feature_count": 255,
+      "feature_count": 243,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "PL",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
+      "notes": "Soldau (Działdowo) and the Löbau/Neumark area were Polish from 1920.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "poland_kresy_1936",
@@ -10422,7 +10423,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "poland_kresy_1936",
-        "1939_poland_zaolzie"
+        "1939_poland_zaolzie",
+        "poland_interwar_soldau_lobau"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
@@ -11116,12 +11118,12 @@
       "color_hex": "#d7c448",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 103,
+      "controller_feature_count": 97,
       "display_name": "Kingdom of Romania",
       "display_name_en": "Kingdom of Romania",
       "display_name_zh": "罗马尼亚王国",
       "entry_kind": "",
-      "feature_count": 103,
+      "feature_count": 97,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -12147,19 +12149,19 @@
       "color_hex": "#7d0d18",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 10922,
+      "controller_feature_count": 10928,
       "display_name": "Union of Soviet Socialist Republics",
       "display_name_en": "Union of Soviet Socialist Republics",
       "display_name_zh": "苏维埃社会主义共和国联盟",
       "entry_kind": "",
-      "feature_count": 10922,
+      "feature_count": 10928,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "RU",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Left bank of the Dniester formed the Moldavian ASSR inside the Soviet Union until 1940. MDA-1645 is the Rîbnița area despite its source name; MDA-1650 covers Tiraspol/Slobozia with a sliver of Bender.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "soviet_union",
@@ -12167,7 +12169,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "soviet_union",
-        "sakhalin_north"
+        "sakhalin_north",
+        "moldavian_assr_left_bank"
       ],
       "ruling_ideology": "communism",
       "ruling_ideology_source": "game_history",

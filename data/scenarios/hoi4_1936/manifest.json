@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
-  "baseline_hash": "864d4b9108b1eb61cd054252a77b8e457187dd7f71813623fd8dafbbd9037cf3",
+  "baseline_hash": "b377db19795824946b84fddd9eb4f0fa91501ac30d567d53706f2ae3459fc16e",
   "bookmark_date": "1936.1.1.12",
   "bookmark_description": "GATHERING_STORM_DESC",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -2586,6 +2586,14 @@
     }
   },
   "mesh_pack_url": "data/scenarios/hoi4_1936/mesh_pack.json",
+  "opening_view": {
+    "bounds": [
+      -12,
+      34,
+      48,
+      63
+    ]
+  },
   "owners_url": "data/scenarios/hoi4_1936/owners.by_feature.json",
   "palette_id": "hoi4_vanilla",
   "performance_hints": {
@@ -2606,10 +2614,10 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "cbd5d4f2d7083a479ecf7d31f1b0faaef7d725474134c414906cc3482737d211",
+  "snapshot_fingerprint": "6fc2e31c49a20e57da9d77a101a77475fafbb7790c94d0358d7125efcd3dbf38",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "c282bf3118df7018a6e946bc6500a54db1e23afc4ed9212f29ccd3f847b0cfc2",
+    "detail_chunk_manifest_sha256": "18968096c0238b3eed2e818b4e007197f2083caedd3e54f4d86520b0974f6f43",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5"
   },
@@ -2662,13 +2670,5 @@
     "synthetic_owner_feature_count": 23,
     "topology_blocker_count": 0
   },
-  "version": 2,
-  "opening_view": {
-    "bounds": [
-      -12,
-      34,
-      48,
-      63
-    ]
-  }
+  "version": 2
 }

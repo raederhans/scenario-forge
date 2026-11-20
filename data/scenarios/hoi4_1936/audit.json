@@ -200784,10 +200784,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 618,
+      "controller_feature_count": 630,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 618,
+      "feature_count": 630,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202291,10 +202291,10 @@
     "POL": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 254,
+      "controller_feature_count": 242,
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 254,
+      "feature_count": 242,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202579,10 +202579,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 103,
+      "controller_feature_count": 97,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 103,
+      "feature_count": 97,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202873,10 +202873,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 10922,
+      "controller_feature_count": 10928,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 10922,
+      "feature_count": 10928,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204561,11 +204561,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "cbd5d4f2d7083a479ecf7d31f1b0faaef7d725474134c414906cc3482737d211",
+  "snapshot_fingerprint": "6fc2e31c49a20e57da9d77a101a77475fafbb7790c94d0358d7125efcd3dbf38",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "4a75b02c19a74881701d3e0257e2531b7d554d6e709f12ad6f9ac0d369d6f86a",
-    "detail_chunk_manifest_sha256": "c282bf3118df7018a6e946bc6500a54db1e23afc4ed9212f29ccd3f847b0cfc2",
+    "build_snapshot_sha256": "7b2bc6e9e3711904a296cacc214840014f25d0904d4be6c0198ed6836bae9e5f",
+    "detail_chunk_manifest_sha256": "18968096c0238b3eed2e818b4e007197f2083caedd3e54f4d86520b0974f6f43",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5"
   },
