@@ -7410,6 +7410,10 @@
     "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.",
     "zh": "已导入项目：{scenario}。已恢复 {colors} 条上色记录和 {owners} 条归属记录。"
   },
+  "Project name (optional)": {
+    "en": "Project name (optional)",
+    "zh": "项目名（可选）"
+  },
   "Project only": {
     "en": "Project only",
     "zh": "仅项目"

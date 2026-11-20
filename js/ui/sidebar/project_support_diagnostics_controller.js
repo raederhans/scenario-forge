@@ -249,6 +249,7 @@ export function createProjectSupportDiagnosticsController({
   let projectExportBusy = false;
   const uploadProjectBtn = documentRef.getElementById("uploadProjectBtn");
   const projectDownloadFormat = documentRef.getElementById("projectDownloadFormat");
+  const projectName = documentRef.getElementById("projectName");
   const projectDownloadDestination = documentRef.getElementById("projectDownloadDestination");
   const projectPackageContents = documentRef.getElementById("projectPackageContents");
   const projectFileInput = documentRef.getElementById("projectFileInput");
@@ -441,6 +442,7 @@ export function createProjectSupportDiagnosticsController({
     return message;
   };
   const refreshProjectSaveStatus = (message = "") => {
+    if (projectName && projectName.value !== (state.projectName || "")) projectName.value = state.projectName || "";
     // 保存状态只读 dirty contract 与最近一次项目事务，避免各按钮各自拼接状态文案。
     const lastChange = String(state.lastDirtyReason || "").trim();
     if (workspaceSaveStatus) {
@@ -1183,6 +1185,13 @@ export function createProjectSupportDiagnosticsController({
 
   const bindEvents = () => {
     refreshProjectSaveStatus();
+    if (projectName && !projectName.dataset.bound) {
+      projectName.addEventListener("input", () => {
+        state.projectName = projectName.value;
+        markDirty("project-name");
+      });
+      projectName.dataset.bound = "true";
+    }
     syncProjectPackageContentAvailability();
     if (projectDownloadFormat?.dataset && !projectDownloadFormat.dataset.packageContentsBound) {
       projectDownloadFormat.addEventListener?.("change", syncProjectPackageContentAvailability);

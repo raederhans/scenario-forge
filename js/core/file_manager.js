@@ -1,3 +1,4 @@
+import { buildDefaultFileStem } from "./file_name_policy.js";
 import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
 import { TNO_TAG_MIGRATION_VERSION } from "./country_code_aliases.js";
 import { verifyApprovedRiverPack } from "./river_paint/pilot_loader.js";
@@ -513,6 +514,7 @@ class FileManager {
     // 这里宁可集中做一次 normalize，也不要让读取方承担多套历史字段和 UI 派生状态。
     const payload = {
       schemaVersion: appState.riverPaint?.pack ? 23 : 22,
+      projectName: appState.projectName || "",
       ...(appState.riverPaint?.pack ? { riverPaint: normalizeRiverPaintState(appState.riverPaint) } : {}),
       sovereignBaseColors: appState.sovereignBaseColors || {},
       visualOverrides: appState.visualOverrides || {},
@@ -644,21 +646,26 @@ class FileManager {
     return true;
   }
 
-  static async buildProjectDownloadPayload(payload, { format = "json", packageContents = "recommended" } = {}) {
+  static async buildProjectDownloadPayload(payload, { format = "json", packageContents = "recommended" } = {}, projectFileStem = "") {
     const normalizedFormat = String(format || "json").trim().toLowerCase();
+    const suffix = normalizedFormat === "zip" ? ".zip" : ".json";
+    const filename = buildDefaultFileStem({
+      projectName: payload.projectName, projectFileStem, activeScenarioId: payload.scenario?.id,
+    }, new Date(payload.timestamp ?? Date.now()), suffix) + suffix;
     if (normalizedFormat === "zip") {
       const projectPackage = await buildProjectPackagePayload(payload, {
         contentPreset: packageContents,
       });
       return {
         ...projectPackage,
+        filename,
         label: "Project ZIP package downloaded.",
       };
     }
     const data = JSON.stringify(payload, null, 2);
     return {
       blob: new Blob([data], { type: "application/json" }),
-      filename: "map_project.json",
+      filename,
       pickerTypes: [{
         description: "Editable project JSON",
         accept: {
@@ -674,7 +681,7 @@ class FileManager {
     const payload = FileManager.buildProjectPayload(appState);
     if (!payload) return;
 
-    const download = await FileManager.buildProjectDownloadPayload(payload, options);
+    const download = await FileManager.buildProjectDownloadPayload(payload, options, appState.projectFileStem);
     const wroteFile = await FileManager.writeBlobDownload(download.blob, download.filename, {
       ...options,
       pickerTypes: download.pickerTypes,
@@ -697,6 +704,7 @@ class FileManager {
       throw new Error("Invalid project file");
     }
     let data = migrateImportedProjectData(rawData);
+    data.projectName = typeof data.projectName === "string" ? data.projectName : "";
     if (data.riverPaint != null) data.riverPaint = normalizeRiverPaintState(data.riverPaint);
 
     // import 是旧 schema、缺省字段和 UI/场景派生状态重新归一化的唯一入口。
