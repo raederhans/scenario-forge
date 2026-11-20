@@ -3720,6 +3720,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "格式",
     "en": "Format"
   },
+  "Found unsaved work from {count} minutes ago ({scenario}).": {
+    "zh": "发现 {count} 分钟前未保存的工作（{scenario}）。",
+    "en": {
+      "one": "Found unsaved work from {count} minute ago ({scenario}).",
+      "other": "Found unsaved work from {count} minutes ago ({scenario})."
+    }
+  },
   "Frontline": {
     "zh": "前线",
     "en": "Frontline"
@@ -6164,6 +6171,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "当前视野内没有要素",
     "en": "Not in current view"
   },
+  "Not now": {
+    "zh": "暂不恢复",
+    "en": "Not now"
+  },
   "Not saved yet": {
     "zh": "尚未保存",
     "en": "Not saved yet"
@@ -7786,6 +7797,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Resource type": {
     "zh": "资源种类",
     "en": "Resource type"
+  },
+  "Restore": {
+    "zh": "恢复",
+    "en": "Restore"
   },
   "Restored": {
     "zh": "已恢复",
