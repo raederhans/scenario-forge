@@ -1004,7 +1004,11 @@ def merge_geo(
     geo_name_set = set(geo_names)
     current_normalized = {key: normalize_entry(key, value) for key, value in (current_geo or {}).items()}
     baseline_normalized = {key: normalize_entry(key, value) for key, value in (baseline_geo or {}).items()}
-    merged_existing = merge_locale_snapshots({"geo": current_normalized}, {"geo": baseline_normalized}).get("geo", {})
+    reviewed_global = {
+        key: baseline_normalized[key] for key, entry in (baseline_geo or {}).items()
+        if isinstance(entry, dict) and entry.get("scope") == "global"
+    }
+    search_only_aliases = search_only_aliases.difference(reviewed_global)
     if restrict_scope:
         keys = set(geo_names)
         if include_stable_geo_keys:
@@ -1012,14 +1016,16 @@ def merge_geo(
                 stable_key = alias_to_stable.get(alias)
                 if stable_key:
                     keys.add(stable_key)
-        merged = dict(merged_existing)
+        reviewed_global = {key: reviewed_global[key] for key in keys & reviewed_global.keys()}
+        merged = dict(current_geo or {})
     else:
-        keys = set(geo_names) | set(merged_existing.keys()) | set(alias_to_stable.keys())
+        keys = geo_name_set | current_normalized.keys() | baseline_normalized.keys() | alias_to_stable.keys()
         if include_stable_geo_keys:
             keys.update(alias_to_stable.values())
         keys.difference_update(search_only_aliases)
         merged = {}
-    source_map = {}
+    current_normalized.update(reviewed_global)
+    source_map = dict.fromkeys(merged, "existing_reuse")
 
     primary_names = {
         primary_name
@@ -1047,6 +1053,10 @@ def merge_geo(
         resolved_primary_zh[primary_name] = primary_zh
 
     for key in sorted(keys):
+        if key in reviewed_global:
+            merged[key] = reviewed_global[key]
+            source_map[key] = "baseline_reuse"
+            continue
         stable_key = alias_to_stable.get(key)
         en_value = key
         if stable_key and key != stable_key:
@@ -1075,7 +1085,8 @@ def merge_geo(
     filtered = {
         key: merged[key]
         for key in sorted(merged.keys())
-        if not should_drop_geo_entry(key, geo_name_set, alias_to_stable, stable_to_primary, search_only_aliases)
+        if (restrict_scope and key not in keys)
+        or not should_drop_geo_entry(key, geo_name_set, alias_to_stable, stable_to_primary, search_only_aliases)
     }
     filtered_sources = {key: source_map[key] for key in filtered.keys()}
     return filtered, filtered_sources
