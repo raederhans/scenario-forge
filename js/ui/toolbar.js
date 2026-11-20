@@ -1700,6 +1700,9 @@ function initToolbar({ render } = {}) {
 
   const runToolSelection = (tool, { dismissHint = true, feedbackLabel = "" } = {}) => {
     const nextTool = tool || "select";
+    if (nextTool === "eyedropper" && runtimeState.currentTool !== "eyedropper") {
+      runtimeState.eyedropperPreviousTool = runtimeState.currentTool;
+    }
     runtimeState.currentTool = nextTool;
     if (nextTool === "eyedropper" || nextTool === "select") {
       runtimeState.brushModeEnabled = false;

@@ -1851,6 +1851,10 @@
     "en": "Color bake",
     "zh": "颜色烘焙"
   },
+  "Color picked": {
+    "en": "Color picked",
+    "zh": "已取色"
+  },
   "Color scale": {
     "en": "Color scale",
     "zh": "色带"

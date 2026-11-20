@@ -1,3 +1,16 @@
+import { setClickSelectedColorState } from "../state/actions/renderer_interaction_actions.js";
+
+export function createPickedColorHandler(state, { selectTool, notifyPicked }) {
+  return (color) => {
+    setClickSelectedColorState(state, color);
+    state.updateSwatchUIFn?.();
+    if (state.currentTool === "eyedropper") {
+      selectTool(state.eyedropperPreviousTool || "fill");
+      notifyPicked();
+    }
+  };
+}
+
 const RESOLVED_HIT_KEYS = [
   "targetType",
   "id",
@@ -263,6 +276,8 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     }
     updateDevSelectedHit(hit);
     if (!state.startupReadonly && handleSpecialZoneMembershipClick(hit, event)) return;
+    const shouldPickColor = () => state.currentTool === "eyedropper"
+      || (readonlyModifiers.altKey && (state.currentTool === "fill" || state.currentTool === "eraser"));
     if (target.kind === "special") {
       const specialFeature = state.specialRegionsById.get(id);
       if (!specialFeature) return;
@@ -277,7 +292,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
         noteRenderAction("select-special", actionStart);
         return;
       }
-      if (state.currentTool === "eyedropper") {
+      if (shouldPickColor()) {
         const picked = getSpecialRegionColor(id, specialFeature);
         if (picked) setClickSelectedColor(picked, { updateSwatch: true });
         noteRenderAction("eyedropper-special", actionStart);
@@ -311,6 +326,13 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
         return;
       }
       if (state.currentTool === "select") clearInspectorLandSelection();
+      if (shouldPickColor()) {
+        const picked = getWaterRegionColor(id);
+        if (picked) setClickSelectedColor(picked, { updateSwatch: true });
+        requestInteractionRender("eyedropper-water");
+        noteRenderAction("eyedropper-water", actionStart);
+        return;
+      }
       const macroOceanSelectionOnly =
         isMacroOceanWaterRegion(waterFeature) && !isOpenOceanPaintEnabled();
       if (macroOceanSelectionOnly) {
@@ -335,13 +357,6 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
         requestInteractionRender("click-erase-water");
         refreshSidebarAfterPaint({ waterRegionIds: [id] });
         noteRenderAction("click-erase-water", actionStart);
-        return;
-      }
-      if (state.currentTool === "eyedropper") {
-        const picked = getWaterRegionColor(id);
-        if (picked) setClickSelectedColor(picked, { updateSwatch: true });
-        requestInteractionRender("eyedropper-water");
-        noteRenderAction("eyedropper-water", actionStart);
         return;
       }
       applyWaterRegionFill(id, state.selectedColor, {
@@ -409,10 +424,9 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       noteRenderAction("select-land", actionStart);
       return;
     }
-    if (handleRiverPaintClick(landHit)) return;
-    const targetIds = resolveInteractionTargetIds(feature, landId);
-
-    if (state.currentTool === "eyedropper") {
+    const pickColor = shouldPickColor();
+    if (handleRiverPaintClick(landHit, { pickColor })) return;
+    if (pickColor) {
       // Sample persistent paint, never a heatmap/highlight rendered into colors.
       const picked = getSafeCanvasColor(getFeaturePaintColor(landId), null);
       if (picked) setClickSelectedColor(picked, { updateSwatch: true });
@@ -420,6 +434,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       return;
     }
 
+    const targetIds = resolveInteractionTargetIds(feature, landId);
     if (!targetIds.length) {
       // Country and parent scopes must not silently edit only loaded geometry.
       warnIncompletePaintTargets();

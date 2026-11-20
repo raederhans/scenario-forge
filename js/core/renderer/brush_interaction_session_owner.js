@@ -155,6 +155,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     }
     if (handlePhysicalIntensityPointerDown(event)) return;
     if (handleSpecialZoneMembershipPointerDown(event)) return;
+    if (event.altKey && (runtimeState.currentTool === "fill" || runtimeState.currentTool === "eraser")) return;
     if (!runtimeState.brushModeEnabled || runtimeState.currentTool === "eyedropper" || runtimeState.currentTool === "select" || runtimeState.specialZoneEditor?.active) return;
     if (isBrushNavigationModifier(event)) return;
     if ((event.buttons & 1) !== 1) return;

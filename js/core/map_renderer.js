@@ -301,6 +301,7 @@ import { createHitCanvasSchedulingOwner } from "./map_renderer/hit_canvas_schedu
 import { createMapHoverInteractionOwner } from "./map_renderer/map_hover_interaction_owner.js";
 import {
   createClickSelectionTransactionOwner,
+  createPickedColorHandler,
 } from "./map_renderer/click_selection_transaction_owner.js";
 import { createRendererTransactionResetOwner } from "./map_renderer/renderer_transaction_reset_owner.js";
 import { createScenarioRefreshRuntime } from "./map_renderer/scenario_refresh_runtime.js";
@@ -2067,13 +2068,15 @@ function getRiverContourRenderOwner() {
   });
   return riverContourRenderOwner;
 }
+const selectPickedColor = createPickedColorHandler(runtimeState, {
+  selectTool: tool => callRuntimeHook(runtimeState, "runToolSelectionFn", tool),
+  notifyPicked: () => showToast(t("Color picked", "ui"), { duration: 1200 }),
+});
+
 const getRiverPaintEditorOwner = lazyOwner(() => createRiverPaintEditorOwner({
   state: runtimeState, captureHistoryState, commitHistoryEntry,
   refreshParents: refreshResolvedColorsForFeatures, markDirty, addRecentColor, nowMs,
-  selectColor: color => {
-    setClickSelectedColorState(runtimeState, color);
-    runtimeState.updateSwatchUIFn?.();
-  },
+  selectColor: selectPickedColor,
   announce: reason => showToast(runtimeState.currentLanguage === "zh"
     ? `沿河分区暂不可编辑：${reason}。未修改整块颜色。`
     : `River cell not editable: ${reason}. The parent was not painted.`, { tone: "warning" }),
@@ -2931,10 +2934,8 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     setClickCountryColors: (countryCode, color) => setClickCountryColorsState(runtimeState, countryCode, color),
     setClickHoverOverlayDirty: (dirty) => setClickHoverOverlayDirtyState(runtimeState, dirty),
     setClickSelectedColor: (color, { updateSwatch = false } = {}) => {
-      setClickSelectedColorState(runtimeState, color);
-      if (updateSwatch && typeof runtimeState.updateSwatchUIFn === "function") {
-        runtimeState.updateSwatchUIFn();
-      }
+      if (updateSwatch) selectPickedColor(color);
+      else setClickSelectedColorState(runtimeState, color);
     },
     setClickSelectedSpecialRegionId: (regionId) => setClickSelectedSpecialRegionIdState(runtimeState, regionId),
     setClickSelectedWaterRegionId: (regionId) => setClickSelectedWaterRegionIdState(runtimeState, regionId),
@@ -2958,7 +2959,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     dismissOnboardingHint,
     ensureLeafDetailReady,
     getFeatureCountryCodeNormalized,
-    handleRiverPaintClick: hit => getRiverPaintEditorOwner().handleClick(hit),
+    handleRiverPaintClick: (hit, options) => getRiverPaintEditorOwner().handleClick(hit, options),
     getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
       getSafeColor: getSafeCanvasColor,
       getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),

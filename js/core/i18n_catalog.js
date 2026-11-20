@@ -1853,6 +1853,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "颜色烘焙",
     "en": "Color bake"
   },
+  "Color picked": {
+    "zh": "已取色",
+    "en": "Color picked"
+  },
   "Color scale": {
     "zh": "色带",
     "en": "Color scale"
