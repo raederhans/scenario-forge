@@ -785,7 +785,9 @@ export function createStrategicPanelView({
       const field = document.createElement("label");
       field.className = "mt-2 flex items-center gap-2";
       control.dataset.labelField = key;
-      field.append(t(caption, "ui"), control);
+      const captionText = document.createElement("span");
+      captionText.textContent = t(caption, "ui");
+      field.append(captionText, control);
       fields.appendChild(field);
     };
     const text = document.createElement("textarea");
