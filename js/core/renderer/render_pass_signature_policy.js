@@ -317,6 +317,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       ].join("::");
     }
     if (passName === "labels") {
+      const countryLabels = runtimeState.styleConfig?.countryLabels;
       const physicalStyle = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {});
       return [
         transformSignature,
@@ -331,8 +332,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         getObjectIdentityToken(runtimeState.countryNames),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
-        runtimeState.styleConfig?.countryLabels?.enabled !== false
-          ? `country-labels:on:${getCountryLabelSuppressionSignature()}` : "country-labels:off",
+        countryLabels?.enabled !== false
+          ? `country-labels:on:${countryLabels?.sizeScale ?? 1}:${countryLabels?.uppercase !== false}:${countryLabels?.opacity ?? 1}:${getCountryLabelSuppressionSignature()}` : "country-labels:off",
         runtimeState.showWaterRegions ? "marine:on" : "marine:off",
         runtimeState.showOpenOceanRegions || runtimeState.allowOpenOceanPaint ? "open-ocean-labels:on" : "open-ocean-labels:off",
         `marine-selected:${String(runtimeState.selectedWaterRegionId || "")}`,

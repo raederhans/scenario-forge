@@ -72,6 +72,15 @@ test("only enabled country labels read the current suppression signature", () =>
   assert.equal(reads, 2);
 });
 
+test("each country name style changes the labels signature", () => {
+  const { state, policy } = createHarness();
+  const original = policy.getRenderPassSignature("labels");
+  for (const setting of [{ sizeScale: 0.6 }, { uppercase: false }, { opacity: 0.3 }]) {
+    state.styleConfig.countryLabels = setting;
+    assert.notEqual(policy.getRenderPassSignature("labels"), original);
+  }
+});
+
 test("country label visibility invalidates labels without invalidating political fill", () => {
   const { state, policy } = createHarness();
   const labels = policy.getRenderPassSignature("labels");

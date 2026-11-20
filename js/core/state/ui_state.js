@@ -169,6 +169,16 @@ export function normalizeReferenceImageState(rawState, {
   };
 }
 
+export function normalizeCountryLabelStyle(style, enabledDefault = true) {
+  const bounded = (value, min, max) => Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : 1;
+  return {
+    enabled: typeof style?.enabled === "boolean" ? style.enabled : enabledDefault,
+    sizeScale: bounded(style?.sizeScale, 0.6, 1.6),
+    uppercase: style?.uppercase !== false,
+    opacity: bounded(style?.opacity, 0.3, 1),
+  };
+}
+
 export function createDefaultStyleConfig() {
   return {
     rendering: normalizeRenderingStyleConfig(),
@@ -205,7 +215,7 @@ export function createDefaultStyleConfig() {
       coastalAccentEnabled: true,
     },
     lakes: createDefaultLakeStyleConfig(),
-    countryLabels: { enabled: true },
+    countryLabels: normalizeCountryLabelStyle(),
     cityPoints: {
       ...createDefaultCityLayerStyleConfig(),
     },
@@ -528,11 +538,7 @@ export function restoreImportedStyleConfigState(
       ...((imported.ocean && typeof imported.ocean === "object") ? imported.ocean : {}),
     },
     lakes: normalizeLakeStyle(imported.lakes),
-    countryLabels: {
-      enabled: typeof imported.countryLabels?.enabled === "boolean"
-        ? imported.countryLabels.enabled
-        : currentStyleConfig.countryLabels?.enabled !== false,
-    },
+    countryLabels: normalizeCountryLabelStyle(imported.countryLabels, currentStyleConfig.countryLabels?.enabled !== false),
     cityPoints: imported.cityPoints && typeof imported.cityPoints === "object"
       ? normalizeCityLayerStyle({
           ...(currentStyleConfig.cityPoints || defaults.cityPoints),
