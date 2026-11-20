@@ -11,7 +11,7 @@
     "city_overrides.json": "cd09edddb146a235e0d8bf7cb7c85c40c1f5bc7689ce7ad906178cee9b8937a8",
     "cores.by_feature.json": "a8a431fe1748ca83688beb59269694a964e9f4d88b284ea1243bce7933ea9bf6",
     "countries.json": "dfd5899300c583643b08cd1a34469cd708682eb92a6aa5760f22261caf77d56d",
-    "geo_locale_patch.json": "6bac8b3aa979767b4dfc00e6da1ae8271983474b2e98429c949916752cc6363c",
+    "geo_locale_patch.json": "c9efa73717bc728f1180c4163eaa8ff6531183ef2e7c6505eef77a4d709a4ab4",
     "owners.by_feature.json": "d17ff7f31a8c3985d7f6fd69946aed16b283f2a6be1d390ded332e3c7988ecac",
     "runtime_topology.topo.json": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5",
     "special_zone_layers.json": "136f554498c9be85c7daa4ee823515443af2e585f5e084ace779c2529aaa14c6",
@@ -33,6 +33,6 @@
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "cbd5d4f2d7083a479ecf7d31f1b0faaef7d725474134c414906cc3482737d211",
+  "snapshot_fingerprint": "e3c222950647fc205277a2af08056cb0e0f6c12674461d62598de51718eb4d4d",
   "water_count": 0
 }
