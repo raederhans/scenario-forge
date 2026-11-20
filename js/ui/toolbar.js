@@ -36,7 +36,8 @@ import {
   ensureCountryLabelsReadyForExport,
   setMapData,
 } from "../core/map_renderer/public.js";
-import { captureHistoryState, canRedoHistory, canUndoHistory, getLatestHistoryEntry, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
+import { captureHistoryState, getLatestHistoryEntry, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
+import { findNearCountryColor, getCountryColorHintText } from "../core/near_country_color_hint.js";
 import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { setSelectedColorState } from "../core/state/actions/appearance_selection_actions.js";
 import "../core/state/actions/ui_visibility_actions.js";
@@ -47,7 +48,7 @@ import {
   normalizeHexColor,
 } from "../core/palette_manager.js";
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario/scenario_resources.js";
-import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
+import { getDirectGeoLabel, toggleLanguage, updateHistoryButton, updateUIText, t } from "./i18n.js";
 import { showToast } from "./components/toast.js";
 import { createToolGuidance } from "./toolbar/tool_guidance.js";
 import { createMobileEditingHintController } from "./toolbar/mobile_editing_hint_controller.js";
@@ -1640,8 +1641,8 @@ function initToolbar({ render } = {}) {
     t,
   });
   function updateHistoryUi() {
-    if (undoBtn) undoBtn.disabled = !canUndoHistory();
-    if (redoBtn) redoBtn.disabled = !canRedoHistory();
+    updateHistoryButton(undoBtn, "Undo", getLatestHistoryEntry());
+    updateHistoryButton(redoBtn, "Redo", state.historyFuture?.at(-1));
   }
   registerRuntimeHook(state, "updateHistoryUIFn", updateHistoryUi);
 
@@ -1779,12 +1780,23 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateTextureUIFn", renderTextureUI);
 
   if (customColor) {
-    customColor.addEventListener("input", (event) => {
-      selectPalettePaintColor(runtimeState, event.target.value);
+    let colorHintToast;
+    function selectCustomColor(color) {
+      selectPalettePaintColor(runtimeState, color);
       if (runtimeState.currentTool === "select") {
         callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
       }
       updateSwatchUI();
+    }
+    customColor.addEventListener("input", () => {
+      colorHintToast?.dismiss();
+      selectCustomColor(customColor.value);
+    });
+    customColor.addEventListener("change", () => {
+      const match = findNearCountryColor(runtimeState, customColor.value);
+      if (!match) return;
+      const { message, actionLabel } = getCountryColorHintText(runtimeState, match);
+      colorHintToast = showToast(message, { actionLabel, onAction: () => selectCustomColor(match.color) });
     });
   }
 

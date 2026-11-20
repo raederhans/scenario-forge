@@ -1259,6 +1259,10 @@
     "en": "Centrist republic",
     "zh": "中间派共和制"
   },
+  "Change {country} color": {
+    "en": "Change color of {country}",
+    "zh": "修改 {country} 颜色"
+  },
   "Changes to this order stay in the workbench.": {
     "en": "Changes to this order stay in the workbench.",
     "zh": "此顺序的更改仅保留在工作台中。"
@@ -1742,6 +1746,10 @@
   "Close scenario introduction": {
     "en": "Close scenario introduction",
     "zh": "关闭剧本简介"
+  },
+  "Close to {country}'s color. Painting will create a border.": {
+    "en": "Close to {country}'s color. Painting will create a border.",
+    "zh": "接近{country}颜色，涂上会形成国界"
   },
   "Close transport workbench": {
     "en": "Close transport workbench",
@@ -3210,6 +3218,13 @@
   "Erase": {
     "en": "Erase",
     "zh": "擦除"
+  },
+  "Erase paint from {count} regions": {
+    "en": {
+      "one": "Erase paint from {count} region",
+      "other": "Erase paint from {count} regions"
+    },
+    "zh": "擦除 {count} 个地块的填色"
   },
   "Eraser": {
     "en": "Eraser",
@@ -6627,6 +6642,13 @@
     "en": "Paint water regions to create an override list.",
     "zh": "绘制水域以创建覆盖列表。"
   },
+  "Paint {count} regions": {
+    "en": {
+      "one": "Paint {count} region",
+      "other": "Paint {count} regions"
+    },
+    "zh": "填色 {count} 个地块"
+  },
   "Paints with this country's current color; can be undone.": {
     "en": "Paints with this country's current color; can be undone.",
     "zh": "按本国当前颜色涂色；可撤销"
@@ -7510,6 +7532,10 @@
   "Redo": {
     "en": "Redo",
     "zh": "重做"
+  },
+  "Redo: {action}": {
+    "en": "Redo: {action}",
+    "zh": "重做：{action}"
   },
   "Reduce the visible hub set while keeping the logistics layer point-based.": {
     "en": "Reduce the visible hub set while keeping the logistics layer point-based.",
@@ -10431,6 +10457,10 @@
     "en": "Undo applied",
     "zh": "已撤销"
   },
+  "Undo: {action}": {
+    "en": "Undo: {action}",
+    "zh": "撤销：{action}"
+  },
   "Union with layer": {
     "en": "Union with layer",
     "zh": "与图层并集"
@@ -10674,6 +10704,10 @@
   "Use when": {
     "en": "Use when",
     "zh": "使用场景"
+  },
+  "Use {country}'s color": {
+    "en": "Use {country}'s color",
+    "zh": "改用{country}颜色"
   },
   "User guide": {
     "en": "User guide",
@@ -10954,6 +10988,10 @@
   "Width": {
     "en": "Width",
     "zh": "宽度"
+  },
+  "Will merge into {country}": {
+    "en": "Will merge into {country}",
+    "zh": "将并入{country}"
   },
   "Workbench inspector tabs": {
     "en": "Workbench inspector tabs",
