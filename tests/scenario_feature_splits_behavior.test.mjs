@@ -9,6 +9,12 @@ import { rebuildPresetState, resolveFeatureIdsFromPresetSource } from "../js/cor
 const splits = { CN_M: ["CN_M__SPLIT_S", "CN_M__SPLIT_N"] };
 const override = { feature_merges: { CN_M: ["CN_A", "CN_B"] }, feature_splits: splits };
 const children = splits.CN_M;
+const parent = "PL_POW_2209";
+const danzig = parent + "__SPLIT_DANZIG";
+const danzigLeaves = [danzig + "__SPLIT_MARIENBURG", danzig + "__SPLIT_REST"];
+const rest = parent + "__SPLIT_REST";
+const leaves = [...danzigLeaves, rest];
+const nested = { feature_splits: { [parent]: leaves, [danzig]: danzigLeaves } };
 
 test("historical presets and releasable selectors use split children only in the active scenario", () => {
   const keys = ["activeScenarioId", "activeScenarioManifest", "hierarchyData", "scenarioCountriesByTag", "releasableCatalog",
@@ -93,14 +99,37 @@ test("import forces split migration even when shared base still considers the pa
 });
 
 test("re-split parcels expand to the outermost parent and project from saved intermediate ids", () => {
-  // Keys arrive sorted, so the intermediate parent is listed after the outermost one.
-  const nested = { feature_splits: {
-    P: ["P__SPLIT_A__SPLIT_X", "P__SPLIT_A__SPLIT_Y", "P__SPLIT_B"],
-    P__SPLIT_A: ["P__SPLIT_A__SPLIT_X", "P__SPLIT_A__SPLIT_Y"],
-  } };
-  const leaves = nested.feature_splits.P;
-  assert.deepEqual(expandScenarioFeatureIds(leaves, nested), ["P"]);
-  assert.deepEqual(expandScenarioFeatureIds(leaves.slice(0, 2), nested), ["P__SPLIT_A"]);
-  assert.deepEqual(projectScenarioFeatureIds(["P__SPLIT_A"], nested).ids, leaves.slice(0, 2));
-  assert.deepEqual(projectScenarioFeatureIds(["P"], nested).ids, leaves);
+  assert.deepEqual(expandScenarioFeatureIds(leaves, nested), [parent]);
+  assert.deepEqual(expandScenarioFeatureIds(danzigLeaves, nested), [danzig]);
+  assert.deepEqual(projectScenarioFeatureIds([danzig], nested).ids, danzigLeaves);
+  assert.deepEqual(projectScenarioFeatureIds([parent], nested).ids, leaves);
+});
+
+test("preset exclusions remove all current leaves of an intermediate parcel", () => {
+  const { activeScenarioId, activeScenarioManifest, hierarchyData } = state;
+  try {
+    Object.assign(state, { activeScenarioId: "hoi4_1936", activeScenarioManifest: { hierarchy_overrides: nested },
+      hierarchyData: { groups: { PL_Danzig: [danzig] } } });
+    assert.deepEqual(resolveFeatureIdsFromPresetSource({
+      type: "feature_ids", feature_ids: leaves, exclude_feature_ids: [danzig],
+    }), [rest]);
+    assert.deepEqual(resolveFeatureIdsFromPresetSource({
+      type: "feature_selection", feature_ids: [parent], exclude_group_ids: ["PL_Danzig"],
+    }), [rest]);
+  } finally {
+    Object.assign(state, { activeScenarioId, activeScenarioManifest, hierarchyData });
+  }
+});
+
+test("nested migration inherits the nearest paint and deduplicates overlapping memberships", () => {
+  const lineage = resolveFeatureMergeLineage(null, "hoi4_1936", nested.feature_splits);
+  const data = { visualOverrides: { [parent]: "red", [danzig]: "blue" },
+    customPresets: { PL: [{ ids: [parent, danzig, danzigLeaves[0]] }] } };
+  const migrate = () => migrateMergedFeatureProjectData(data, lineage, new Set(leaves)).data;
+  const expected = { [danzigLeaves[0]]: "blue", [danzigLeaves[1]]: "blue", [rest]: "red" };
+  const result = migrate();
+  assert.deepEqual(result.visualOverrides, expected);
+  assert.deepEqual(result.customPresets.PL[0].ids, leaves);
+  data.visualOverrides[danzigLeaves[0]] = "green";
+  assert.deepEqual(migrate().visualOverrides, { ...expected, [danzigLeaves[0]]: "green" });
 });

@@ -186,11 +186,12 @@ def compile_external_parts(rules, rules_dir, topology, lineage=None):
     return result
 
 
-def split_topology(topology, rules):
+def split_topology(topology, rules, lineage=None):
     validate_partition_plan(rules)
     result = _absolute_topology(topology)
     rows = result["objects"]["political"]["geometries"]
     by_id = {row["properties"]["id"]: row for row in rows}
+    lineage = lineage or {}
     splits, additions, geometries, measurements = {}, [], {}, []
     cuts = defaultdict(list)
     tolerance = rules["area_tolerance_degrees2"]
@@ -202,7 +203,8 @@ def split_topology(topology, rules):
         for parent in entry["feature_ids"]:
             children = entry_child_ids(entry, parent)
             if parent not in by_id:
-                if all(child in by_id for child in children):
+                if all(child in by_id or (lineage.get(child) and all(leaf in by_id for leaf in lineage[child]))
+                       for child in children):
                     continue
                 raise ValueError(f"Missing split parent or children: {parent}")
             if any(child in by_id for child in children):
@@ -271,7 +273,9 @@ def split_topology(topology, rules):
 def run_scenario(scenario_dir, rules):
     topology_path = scenario_dir / "runtime_topology.topo.json"
     before = read(topology_path)
-    after, splits, measurements = split_topology(before, rules)
+    manifest = read(scenario_dir / "manifest.json")
+    feature_splits = manifest.setdefault("hierarchy_overrides", {}).setdefault("feature_splits", {})
+    after, splits, measurements = split_topology(before, rules, feature_splits)
     if not splits:
         return {"changed": 0, "measurements": []}
     owners = read(scenario_dir / "owners.by_feature.json")["owners"]
@@ -280,8 +284,6 @@ def run_scenario(scenario_dir, rules):
     controllers = read(controller_path)["controllers"] if controller_path.exists() else owners
     assignments = {child: dict(parent_id=parent, owner=owners[parent], controller=controllers[parent], cores=cores[parent])
                    for parent, children in splits.items() for child in children}
-    manifest = read(scenario_dir / "manifest.json")
-    feature_splits = manifest.setdefault("hierarchy_overrides", {}).setdefault("feature_splits", {})
     feature_splits.update(splits)
 
     def leaves(fid):
@@ -336,13 +338,20 @@ def main(argv=None):
                             read(directory / "manifest.json").get("hierarchy_overrides", {}).get("feature_splits", {})))
         else:
             compiled.append(scoped)
-    migration = {}
-    for plan in compiled or [rules]:
-        migration.update({parent: entry_child_ids(entry, parent)
-                          for entry in plan["entries"] for parent in entry["feature_ids"]})
+    mappings = [{parent: entry_child_ids(entry, parent)
+                 for entry in plan["entries"] for parent in entry["feature_ids"]}
+                for plan in compiled or [rules]]
+    common = {parent: children for parent, children in mappings[0].items()
+              if all(mapping.get(parent) == children for mapping in mappings[1:])}
+    scoped_splits = {}
+    for scenario, mapping in zip(scenarios, mappings):
+        specific = {parent: children for parent, children in mapping.items() if parent not in common}
+        if specific:
+            scoped_splits[scenario] = specific
     write_json(args.migration_output, {
         "version": 1, "scenarios": scenarios,
-        "feature_splits": migration,
+        "feature_splits": common,
+        **({"scenario_feature_splits": scoped_splits} if scoped_splits else {}),
         "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
     })
     for scenario, plan in zip(scenarios, compiled):

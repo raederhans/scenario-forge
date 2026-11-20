@@ -4,7 +4,7 @@ import argparse
 from collections import Counter, defaultdict
 from copy import deepcopy
 import json
-from math import dist, fsum
+from math import fsum
 from pathlib import Path
 import re
 import sys
@@ -155,6 +155,7 @@ def smooth_enclaves(owners, topology, tags, max_area_km2):
 
 
 def adopt_shell_slivers(owners, topology, id_pattern, max_area_km2, allowed_targets=None, only_from_owners=None):
+    from pyproj import Geod
     from map_builder.regional_geometry import _absolute_topology, _decode_geometry
     from tools.apply_hoi4_geometry_splits import arc_ids, area_km2
 
@@ -182,12 +183,14 @@ def adopt_shell_slivers(owners, topology, id_pattern, max_area_km2, allowed_targ
     areas = {fid: polygon_area(geometries[fid]) for fid in candidates}
     adjacent = set(candidates).union(*(neighbors[fid] for fid in candidates))
     arcs = {fid: set(arc_ids(geometries[fid]["arcs"])) for fid in adjacent}
+    geod = Geod(ellps="WGS84")
     borders = {}
     for fid in candidates:
         borders[fid] = {}
         for other in neighbors[fid]:
             shared = (absolute["arcs"][i] for i in arcs[fid] & arcs[other])
-            borders[fid][other] = fsum(dist(a[:2], b[:2]) for arc in shared for a, b in zip(arc, arc[1:]))
+            borders[fid][other] = fsum(geod.line_length([p[0] for p in arc], [p[1] for p in arc])
+                                       for arc in shared)
 
     changed = set()
     while True:
@@ -256,13 +259,17 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
     result_countries = deepcopy(countries)
     result_owners, result_cores = dict(owners), deepcopy(cores)
     expanded = expand_merge_plans(plans, scenario)
-    split_leaves, split_expanded = {}, {}
-    for parent, children in (feature_splits or {}).items():
+    split_leaves, split_expanded = defaultdict(set), {}
+    outer_first = sorted((feature_splits or {}).items(),
+                         key=lambda item: (-len(item[1]), item[0].count("__SPLIT_")))
+    for parent, children in outer_first:
         source_leaves = expanded.get(parent, {parent})
-        for leaf in source_leaves:
-            split_leaves[leaf] = {(child, leaf) for child in children}
         for child in children:
+            if child in split_expanded:
+                continue
             split_expanded[child] = {(child, leaf) for leaf in source_leaves}
+            for leaf in source_leaves:
+                split_leaves[leaf].add((child, leaf))
         split_expanded[parent] = set().union(*(split_expanded[child] for child in children))
     expanded = {fid: set().union(*(split_leaves.get(leaf, {leaf}) for leaf in leaves))
                 for fid, leaves in expanded.items()}
