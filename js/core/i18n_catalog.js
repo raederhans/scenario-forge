@@ -3655,6 +3655,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "填充父级分组",
     "en": "Fill Parent Group"
   },
+  "Fill country name": {
+    "zh": "填入国名",
+    "en": "Fill country name"
+  },
   "Fill opacity": {
     "zh": "填充不透明度",
     "en": "Fill opacity"
@@ -8651,6 +8655,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Search layers": {
     "zh": "搜索图层",
     "en": "Search layers"
+  },
+  "Search legend or country name": {
+    "zh": "搜索图例名称或国家名",
+    "en": "Search legend or country name"
   },
   "Search options": {
     "zh": "搜索选项",

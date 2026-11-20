@@ -1258,6 +1258,14 @@
     "en": "Category {index}",
     "zh": "类别 {index}"
   },
+  "Search legend or country name": {
+    "en": "Search legend or country name",
+    "zh": "搜索图例名称或国家名"
+  },
+  "Fill country name": {
+    "en": "Fill country name",
+    "zh": "填入国名"
+  },
   "Centrist monarchism": {
     "en": "Centrist monarchism",
     "zh": "中间派君主制"

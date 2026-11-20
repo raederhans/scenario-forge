@@ -4,7 +4,7 @@ import { createUiIcon } from "../components/ui_icons.js";
 import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
-import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
+import { filterLegendEditorEntries } from "../../core/legend_state_normalizers.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   createSpecialZonePatternPreviewStyle,
@@ -1058,19 +1058,22 @@ export function createProjectSupportDiagnosticsController({
 
 
   const LEGEND_EDITOR_PAGE_SIZE = 10;
-  const LEGEND_EDITOR_MAX_ITEMS = 30;
+  const legendSearch = legendList && documentRef.createElement("input");
+  const legendRows = legendList && documentRef.createElement("div");
+  let editorEntries = [];
+  if (legendSearch) {
+    legendSearch.type = "search";
+    legendSearch.className = "legend-input legend-search";
+    legendRows.style.display = "contents";
+    legendSearch.addEventListener("input", () => {
+      legendEditorPageIndex = 0;
+      renderLegendRows();
+    });
+  }
   let legendEditorPageIndex = 0;
   let lastLegendKey = null;
 
-  const clearLegendList = () => {
-    if (typeof legendList.replaceChildren === "function") {
-      legendList.replaceChildren();
-      return;
-    }
-    legendList.innerHTML = "";
-  };
-
-  const createLegendLabelRow = (color, index, colors) => {
+  const createLegendLabelRow = ({ color, countryName, index }) => {
     const row = document.createElement("div");
     row.className = "legend-row";
 
@@ -1081,17 +1084,28 @@ export function createProjectSupportDiagnosticsController({
     const input = document.createElement("input");
     input.type = "text";
     input.className = "legend-input";
-    input.placeholder = t("Category {index}", "ui").replace("{index}", String(index + 1));
+    input.placeholder = countryName || t("Category {index}", "ui").replace("{index}", String(index + 1));
     input.setAttribute("aria-label", `${t("Legend", "ui")} ${index + 1}: ${color}`);
     input.value = legendManager.getLabel(color, state);
-    input.addEventListener("input", (event) => {
-      legendManager.setLabel(color, event.target.value, state);
+    const saveLabel = () => {
+      legendManager.setLabel(color, input.value, state);
       markDirty("legend-label");
-      mapRenderer.renderLegend(colors, legendManager.getLabels(state));
-    });
+      mapRenderer.renderLegend(legendManager.getUniqueColors(state), legendManager.getLabels(state));
+    };
+    input.addEventListener("input", saveLabel);
 
     row.appendChild(swatch);
     row.appendChild(input);
+    if (countryName) {
+      const fill = documentRef.createElement("button");
+      fill.type = "button";
+      fill.textContent = t("Fill country name", "ui");
+      fill.addEventListener("click", () => {
+        input.value = countryName;
+        saveLabel();
+      });
+      row.appendChild(fill);
+    }
     return row;
   };
 
@@ -1107,8 +1121,7 @@ export function createProjectSupportDiagnosticsController({
     previousButton.disabled = pageIndex <= 0;
     previousButton.addEventListener("click", () => {
       legendEditorPageIndex = Math.max(0, legendEditorPageIndex - 1);
-      lastLegendKey = null;
-      refreshLegendEditor();
+      renderLegendRows();
     });
 
     const pageStatus = document.createElement("span");
@@ -1123,65 +1136,68 @@ export function createProjectSupportDiagnosticsController({
     nextButton.disabled = pageIndex >= pageCount - 1;
     nextButton.addEventListener("click", () => {
       legendEditorPageIndex = Math.min(pageCount - 1, legendEditorPageIndex + 1);
-      lastLegendKey = null;
-      refreshLegendEditor();
+      renderLegendRows();
     });
 
     pager.append(previousButton, pageStatus, nextButton);
     return pager;
   };
 
-  const readLegendColors = createRevisionedLegendColorReader((appState) => legendManager.getUniqueColors(appState));
-  const refreshLegendEditor = () => {
-    if (!legendList) return;
-    incrementSidebarCounter("legendRenders");
-    const colors = readLegendColors(state);
-    const specialZoneLegendLayers = getVisibleSpecialZoneLegendLayers();
-    const specialZoneLegendKey = legendManager.getSpecialZoneSignature(state);
-    const colorItems = colors.map((color, index) => ({ type: "color", color, index }));
-    const specialZoneItems = specialZoneLegendLayers.map((layer) => ({ type: "special-zone", layer }));
-    const cappedItems = [...colorItems, ...specialZoneItems].slice(0, LEGEND_EDITOR_MAX_ITEMS);
-    const pageCount = Math.max(1, Math.ceil(cappedItems.length / LEGEND_EDITOR_PAGE_SIZE));
+  const renderLegendRows = () => {
+    const query = legendSearch.value.trim().toLowerCase();
+    const colors = filterLegendEditorEntries(editorEntries, legendManager.getLabels(state), query);
+    const colorItems = colors.map((entry, index) => ({ ...entry, type: "color", index }));
+    const specialZoneItems = getVisibleSpecialZoneLegendLayers()
+      .filter(layer => layer.name.toLowerCase().includes(query))
+      .map(layer => ({ type: "special-zone", layer }));
+    const items = [...colorItems, ...specialZoneItems];
+    const pageCount = Math.max(1, Math.ceil(items.length / LEGEND_EDITOR_PAGE_SIZE));
     legendEditorPageIndex = Math.min(Math.max(legendEditorPageIndex, 0), pageCount - 1);
     const pageStart = legendEditorPageIndex * LEGEND_EDITOR_PAGE_SIZE;
-    const pageItems = cappedItems.slice(pageStart, pageStart + LEGEND_EDITOR_PAGE_SIZE);
+    const pageItems = items.slice(pageStart, pageStart + LEGEND_EDITOR_PAGE_SIZE);
     const visibleLegendRows = Math.min(Math.max(pageItems.length, 1), LEGEND_EDITOR_PAGE_SIZE);
     const pagerReserve = pageCount > 1 ? 38 : 0;
     legendList.dataset.pageCount = String(pageCount);
     legendList.dataset.paged = pageCount > 1 ? "true" : "false";
     legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 168 + (visibleLegendRows * 52) + pagerReserve)}px`);
-    const key = [
-      colors.join("|"),
-      specialZoneLegendKey,
-      JSON.stringify(legendManager.getConfig(state)),
-      legendEditorPageIndex,
-    ].join("::");
-    if (key === lastLegendKey && legendList.dataset.ready === "true") return;
-    lastLegendKey = key;
-    legendList.dataset.ready = "true";
-    clearLegendList();
-    legendList.appendChild(createLegendGeneratorControls());
+    legendRows.replaceChildren();
 
-    if (!colors.length && !specialZoneLegendKey) {
+    if (!items.length && !query) {
       const empty = document.createElement("div");
       empty.className = "legend-empty-state";
       empty.textContent = t("先生成或填充地图颜色，再在这里修改图例名称。", "ui");
-      legendList.appendChild(empty);
+      legendRows.appendChild(empty);
       return;
     }
 
     pageItems.filter((item) => item.type === "color").forEach((item) => {
-      legendList.appendChild(createLegendLabelRow(item.color, item.index, colors));
+      legendRows.appendChild(createLegendLabelRow(item));
     });
     const visibleSpecialZoneLayers = pageItems
       .filter((item) => item.type === "special-zone")
       .map((item) => item.layer);
-    appendSpecialZoneLegendRows(visibleSpecialZoneLayers);
+    appendSpecialZoneLegendRows(visibleSpecialZoneLayers, legendRows);
     if (pageCount > 1) {
-      legendList.appendChild(createLegendPagerControls(legendEditorPageIndex, pageCount));
+      legendRows.appendChild(createLegendPagerControls(legendEditorPageIndex, pageCount));
     }
   };
 
+  const refreshLegendEditor = () => {
+    if (!legendList) return;
+    incrementSidebarCounter("legendRenders");
+    editorEntries = legendManager.getEditorEntries(state);
+    const key = JSON.stringify([
+      editorEntries, legendManager.getLabels(state), legendManager.getConfig(state),
+      legendManager.getSpecialZoneSignature(state), state.currentLanguage,
+    ]);
+    if (key === lastLegendKey && legendList.dataset.ready === "true") return;
+    lastLegendKey = key;
+    legendList.dataset.ready = "true";
+    legendSearch.placeholder = t("Search legend or country name", "ui");
+    legendSearch.setAttribute("aria-label", legendSearch.placeholder);
+    legendList.replaceChildren(createLegendGeneratorControls(), legendSearch, legendRows);
+    renderLegendRows();
+  };
 
   const bindEvents = () => {
     refreshProjectSaveStatus();

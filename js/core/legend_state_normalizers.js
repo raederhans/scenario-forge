@@ -1,6 +1,8 @@
 import { getActiveRiverPack } from "./river_paint/partition_model.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { normalizeHexColor } from "./color_hex_utils.js";
+import { createBorderIdentityResolver } from "./renderer/border_identity.js";
+import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
 
 export const DEFAULT_LEGEND_CONFIG = Object.freeze({
   mode: "direct-area",
@@ -109,17 +111,73 @@ export function normalizeLegendControl(value) {
   };
 }
 
-export function getLegendPaintColors(appState) {
+function* legendPaintSurfaces(appState) {
   const pack = getActiveRiverPack(appState.riverPaint, appState.activeScenarioId, appState.scenarioBaselineHash || "");
   const splitParents = new Set(pack?.parents.map(parent => parent.parentId) || []);
-  const paintColors = Object.entries(appState.colors || {}).filter(([id]) => !splitParents.has(id)).map(([, color]) => color);
+  for (const [id, color] of Object.entries(appState.colors || {})) {
+    if (!splitParents.has(id)) yield { id, color };
+  }
   if (pack) {
     const boundary = getMapDataBoundary(appState);
     for (const parent of pack.parents) for (const cell of parent.cells) {
-      paintColors.push(boundary.paint.resolveRiverCellColor(cell.id).color || appState.colors?.[parent.parentId]);
+      yield {
+        id: parent.parentId,
+        color: boundary.paint.resolveRiverCellColor(cell.id).color || appState.colors?.[parent.parentId],
+        geometry: cell.geometry,
+      };
     }
   }
-  return new Set(paintColors.map(normalizeColor).filter(Boolean));
+}
+
+export function getLegendPaintColors(appState) {
+  const colors = new Set();
+  for (const surface of legendPaintSurfaces(appState)) {
+    const color = normalizeColor(surface.color);
+    if (color) colors.add(color);
+  }
+  return colors;
+}
+
+export function getLegendEditorEntries(appState, getFeatureArea, getCountryName) {
+  const tags = getScenarioCountryTags(appState.scenarioCountriesByTag);
+  const resolveOwner = createBorderIdentityResolver({
+    sovereignBaseColors: appState.sovereignBaseColors,
+    getCountryTags: () => tags,
+    getReferenceOwner: getMapDataBoundary(appState).reference.getBaseGroupCode,
+    getOverrideColor: (_, color) => color,
+  });
+  const totals = new Map();
+  let useArea = true;
+  for (const surface of legendPaintSurfaces(appState)) {
+    const color = normalizeColor(surface.color);
+    if (!color) continue;
+    const geometry = surface.geometry || appState.landIndex?.get(surface.id)?.geometry;
+    if (!geometry) useArea = false;
+    const area = geometry ? getFeatureArea({ type: "Feature", geometry }) : 0;
+    const owner = resolveOwner(surface.id, color);
+    const entry = totals.get(color) || { color, area: 0, count: 0, owners: new Map() };
+    entry.area += area;
+    entry.count++;
+    if (!owner.startsWith("color:")) {
+      const share = entry.owners.get(owner) || { area: 0, count: 0 };
+      share.area += area;
+      share.count++;
+      entry.owners.set(owner, share);
+    }
+    totals.set(color, entry);
+  }
+  const weight = useArea ? "area" : "count";
+  return [...totals.values()].sort((a, b) => b[weight] - a[weight]).slice(0, 200).map(entry => {
+    const [owner] = [...entry.owners.keys()].sort((a, b) =>
+      entry.owners.get(b)[weight] - entry.owners.get(a)[weight] || a.localeCompare(b));
+    return { color: entry.color, countryName: owner ? getCountryName(appState, owner) : "" };
+  });
+}
+
+export function filterLegendEditorEntries(entries, labels, query) {
+  const search = query.trim().toLowerCase();
+  return entries.filter(({ color, countryName }) =>
+    countryName.toLowerCase().includes(search) || (labels[color] || "").toLowerCase().includes(search));
 }
 
 export function getUniqueLegendColors(appState) {

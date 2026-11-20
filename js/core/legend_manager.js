@@ -14,6 +14,7 @@ import {
   normalizeLegendConfig,
   normalizeLegendControl,
   getUniqueLegendColors,
+  getLegendEditorEntries,
   getLegendColorRevisionKey,
 } from "./legend_state_normalizers.js";
 import { patchLegendState, setLegendLabelState, ensureLegendState } from "./state/actions/legend_actions.js";
@@ -451,6 +452,10 @@ class LegendManager {
   static getUniqueColors(appState) {
     ensureLegendState(appState);
     return getUniqueLegendColors(appState);
+  }
+
+  static getEditorEntries(appState) {
+    return getLegendEditorEntries(appState, getFeatureArea, getCountryDisplayName);
   }
 
   static setLabel(color, text, appState = null) {
