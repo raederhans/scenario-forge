@@ -48,6 +48,7 @@ import {
   updateSelectedOperationalLine,
   updateSelectedUnitCounter,
   getCachedEffectiveCityCollection,
+  focusGeoBounds,
   selectLandFeatureById,
 } from "../core/map_renderer/public.js";
 import { applyCountryColor, resetCountryColors } from "../core/country_color_commands.js";
@@ -1140,6 +1141,7 @@ function initSidebar({ render } = {}) {
     t,
     getFeatureOwnerCode,
     getFeatureLabel: getGeoFeatureDisplayLabel,
+    focusGeoBounds,
     selectLandFeatureById,
   });
   regionSearchController.mount(countryInspectorDetail);
@@ -1147,6 +1149,7 @@ function initSidebar({ render } = {}) {
 
   const renamedPlacesCache = { features: null, hasAny: false };
   const countryInspectorController = createCountryInspectorController({
+    focusGeoBounds,
     resolveInspectorGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
     stepUpInspectorSelection: () => callRuntimeHook(runtimeState, "stepUpInspectorSelectionFn"),
     getInspectorFeatureLabel: (id) => getGeoFeatureDisplayLabel(runtimeState.landIndex.get(id)),
