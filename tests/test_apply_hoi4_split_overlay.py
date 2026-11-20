@@ -66,6 +66,64 @@ def test_smoothing_leaves_non_enclaves(enclave_inputs, case):
     assert apply(enclave_inputs, rule, scenario="hoi4_1939")[1] == {}
 
 
+def sliver_rule(**options):
+    return {"id": "adopt", "scenarios": ["hoi4_1936"],
+            "adopt_shell_slivers": {"id_pattern": "1[12]", "max_area_km2": 3000, **options}}
+
+
+def test_adopt_shell_cluster_and_replay(enclave_inputs):
+    enclave_inputs["owners"]["12"] = "CAN"
+    rule = sliver_rule()
+    countries, assignments, report = apply(enclave_inputs, rule)
+    assert {fid: (row["owner"], row["cores"]) for fid, row in assignments.items()} == {
+        "11": ("ENG", ["CHI"]), "12": ("ENG", ["CHI"])}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 2}]
+    enclave_inputs["countries"] = countries
+    enclave_inputs["owners"].update({fid: row["owner"] for fid, row in assignments.items()})
+    _, assignments, report = apply(enclave_inputs, rule)
+    assert assignments == {}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 0}]
+
+
+@pytest.mark.parametrize("options,neighbors", [
+    ({}, {"01": "CAN"}),
+    ({"max_area_km2": 200}, {}),
+    ({"allowed_targets": ["CHI"]}, {"01": "CHI"}),
+    ({"only_from_owners": ["CHI"]}, {}),
+])
+def test_shell_cluster_stays(enclave_inputs, options, neighbors):
+    enclave_inputs["owners"].update({"12": "CAN", **neighbors})
+    _, assignments, report = apply(enclave_inputs, sliver_rule(**options))
+    assert assignments == {}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 0}]
+
+
+@pytest.mark.parametrize("latitude,target", [(0, "ENG"), (70, "CHI")])
+def test_shell_target_by_geodesic_boundary_length(enclave_inputs, latitude, target):
+    enclave_inputs["owners"].update({"01": "CHI", "21": "CHI"})
+    for arc in enclave_inputs["topology"]["arcs"]:
+        for point in arc:
+            point[0] *= 2
+            point[1] += latitude
+    _, assignments, _ = apply(enclave_inputs, sliver_rule(id_pattern="^11$"))
+    assert assignments["11"]["owner"] == target
+
+
+def test_shell_equal_boundaries_choose_first_tag(enclave_inputs):
+    enclave_inputs["owners"].update({"01": "CHI", "21": "ENG"})
+    rows = enclave_inputs["topology"]["objects"]["political"]["geometries"]
+    rows[:] = [row for row in rows if row["properties"]["id"].endswith("1")]
+    _, assignments, _ = apply(enclave_inputs, sliver_rule(id_pattern="^11$"))
+    assert assignments["11"]["owner"] == "CHI"
+
+
+def test_shell_cluster_reconsiders_blocked_target(enclave_inputs):
+    enclave_inputs["owners"].update({"10": "CAN", "11": "CHI", "20": "CHI"})
+    _, assignments, report = apply(enclave_inputs, sliver_rule(id_pattern="1[01]", allowed_targets=["ENG"]))
+    assert {fid: row["owner"] for fid, row in assignments.items()} == {"10": "ENG", "11": "ENG"}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 2}]
+
+
 @pytest.fixture
 def inputs():
     return dict(
@@ -142,19 +200,24 @@ def test_split_unresolved_prefecture_hole(inputs):
     assert report["filled_prefecture_leaf_count"] == 2
 
 
-def test_split_merged_parent_preserves_member_selection_threshold(inputs):
+@pytest.mark.parametrize("outer_first", [True, False])
+def test_nested_split_preserves_selectors_and_member_threshold(inputs, outer_first):
     parent = "CA_MRG_2"
-    inputs["feature_splits"] = {parent: ["CA_south", "CA_north"]}
+    south = parent + "__SPLIT_SOUTH"
+    nested = [south + "__SPLIT_EAST", south + "__SPLIT_WEST"]
+    children = [*nested, parent + "__SPLIT_NORTH"]
+    inputs["feature_splits"] = {parent: children, south: nested} if outer_first else {south: nested, parent: children}
     for key in ("features", "owners", "cores", "bucket_by_feature"):
         value = inputs[key].pop(parent)
         inputs[key].update({child: deepcopy(value) for child in inputs["feature_splits"][parent]})
-    assert set(apply(inputs, entry({"feature_ids": [parent]}))[1]) == {"CA_south", "CA_north"}
-    assert set(apply(inputs, entry({"feature_ids": ["CA_south"]}))[1]) == {"CA_south"}
+    assert set(apply(inputs, entry({"feature_ids": [parent]}))[1]) == set(children)
+    assert set(apply(inputs, entry({"feature_ids": [south]}))[1]) == set(nested)
+    assert set(apply(inputs, entry({"feature_ids": [nested[0]]}))[1]) == {nested[0]}
     _, assignments, report = apply(inputs, entry({"feature_ids": ["a", "ca"]}))
     assert set(assignments) == {"ca"}
-    assert len(report["partial_merged"]) == 2
+    assert len(report["partial_merged"]) == len(children)
     assert all(row["ratio"] == .25 for row in report["partial_merged"])
-    assert set(apply(inputs, entry({"hierarchy_groups": ["CA_Group"]}))[1]) == {"CA_south", "CA_north"}
+    assert set(apply(inputs, entry({"hierarchy_groups": ["CA_Group"]}))[1]) == set(children)
 
 
 def test_exclude_and_sequential_owner_filter(inputs):

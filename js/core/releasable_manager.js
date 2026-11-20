@@ -158,24 +158,28 @@ function projectSharedFeatureIds(ids, details = {}) {
 }
 
 function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
-  const ids = resolveMemberFeatureIdsFromPresetSource(presetSource, entry);
-  const excluded = new Set(normalizePresetSource(presetSource).exclude_feature_ids);
+  const source = normalizePresetSource(presetSource);
+  const groups = getEffectiveScenarioHierarchy(runtimeState)?.groups || {};
+  if (source.type === "hierarchy_group_ids" || source.type === "feature_selection") {
+    const groupMembers = source.exclude_group_ids.flatMap((groupId) => groups[groupId] || []);
+    source.exclude_feature_ids = source.exclude_feature_ids.concat(groupMembers);
+  }
+  const excluded = new Set(projectScenarioFeatureIds(source.exclude_feature_ids, getActiveFeatureMergeOverride()).ids);
+  const ids = resolveMemberFeatureIdsFromPresetSource(source, entry, groups);
   return ids.length
-    ? projectSharedFeatureIds(ids, { tag: normalizeCountryCode(entry.tag), sourceType: String(presetSource?.type || "").trim() })
+    ? projectSharedFeatureIds(ids, { tag: normalizeCountryCode(entry.tag), sourceType: source.type })
       .filter((id) => !excluded.has(id))
     : ids;
 }
 
 // Resolves in member IDs: merged IDs of the projected hierarchy and of a scenario's
 // own catalog are expanded back to members, so feature and exclusion lists apply exactly.
-function resolveMemberFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
+function resolveMemberFeatureIdsFromPresetSource(normalizedPresetSource, entry, groups) {
   const override = getActiveFeatureMergeOverride();
-  const normalizedPresetSource = normalizePresetSource(presetSource);
   normalizedPresetSource.feature_ids = [...new Set(expandScenarioFeatureIds(normalizedPresetSource.feature_ids, override))];
   normalizedPresetSource.exclude_feature_ids = expandScenarioFeatureIds(normalizedPresetSource.exclude_feature_ids, override);
-  const effectiveHierarchy = getEffectiveScenarioHierarchy(runtimeState);
   const groupFeatureIds = (groupId) => {
-    const ids = effectiveHierarchy?.groups?.[groupId];
+    const ids = groups[groupId];
     return Array.isArray(ids) ? expandScenarioFeatureIds(ids, override) : [];
   };
   const sourceType = String(normalizedPresetSource.type || "").trim();
@@ -220,11 +224,6 @@ function resolveMemberFeatureIdsFromPresetSource(presetSource = {}, entry = {}) 
         if (normalized) {
           featureIds.add(normalized);
         }
-      });
-    });
-    normalizedPresetSource.exclude_group_ids.forEach((groupId) => {
-      groupFeatureIds(groupId).forEach((featureId) => {
-        featureIds.delete(String(featureId || "").trim());
       });
     });
     normalizedPresetSource.exclude_feature_ids.forEach((featureId) => {

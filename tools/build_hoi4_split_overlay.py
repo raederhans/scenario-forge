@@ -545,7 +545,13 @@ def split_ids(name, side="inside"):
     rule = geometry_by_id[name]
     return [fid + "__SPLIT_" + rule[side]["suffix"] for fid in rule["feature_ids"]]
 
-next(e for e in E if e["id"] == "danzig")["select"]["feature_ids"].extend(split_ids("danzig"))
+# hoi4_border_refinements.geometry_splits.json re-splits some first-level children.
+REFINED = {parent: [parent + "__SPLIT_" + part["suffix"] for part in [*entry["parts"], entry["remainder"]]]
+           for entry in json.load(open(W / "data/scenario-rules/hoi4_border_refinements.geometry_splits.json",
+                                       encoding="utf-8"))["entries"]
+           for parent in entry["feature_ids"]}
+next(e for e in E if e["id"] == "danzig")["select"]["feature_ids"].extend(
+    leaf for fid in split_ids("danzig") for leaf in REFINED.get(fid, [fid]))
 next(e for e in E if e["id"] == "danzig")["notes"] = geometry_by_id["danzig"]["notes"]
 next(e for e in E if e["id"] == "kwantung")["notes"] = geometry_by_id["kwantung"]["notes"]
 next(e for e in E if e["id"] == "karafuto_kurils")["exclude"] = FI(*split_ids("karafuto", "outside"))
@@ -846,9 +852,37 @@ add("batch7_falkland_dependencies", B, "FLK", None, None,
     FI("AQ_PEN_EAST", "AQ_PEN_OVERLAP_CORE", "AQ_PEN_OVERLAP_EAST", "AQ_PEN_OVERLAP_WEST"),
     only=["ENG"], cores="keep", notes="Includes Falkland Islands Dependencies Antarctic claims, approximated by existing sectors; not a statement of international recognition.")
 
+# Interwar frontier corrections; the __SPLIT_ ids come from hoi4_border_refinements.geometry_splits.json.
+add("germany_interwar_frontier_counties", B, "GER", None, None,
+    FI("PL_POW_2201", "PL_POW_2203", "PL_POW_2207", "PL_POW_2209__SPLIT_REST", "PL_POW_2210__SPLIT_REST",
+       "PL_POW_2212", "PL_POW_2216", "PL_POW_2263", "PL_POW_3031", "PL_POW_2405", "PL_POW_2411",
+       "PL_POW_2462", "PL_POW_2466", "PL_POW_2478"), only=["POL"],
+    notes="1919-1939 German side of the frontier: Bütow, Schlochau, Marienwerder, Marienburg and the Vistula Spit outside the Free City, Stolp, Stuhm, Flatow, and western Upper Silesia (Gleiwitz, Ratibor, Beuthen, Hindenburg). County-level approximation.")
+add("poland_interwar_soldau_lobau", B, "POL", None, None, FI("PL_POW_2803", "PL_POW_2812"), only=["GER"],
+    notes="Soldau (Działdowo) and the Löbau/Neumark area were Polish from 1920.")
+add("moldavian_assr_left_bank", B, "SOV", None, None,
+    FI("MDA-1628", "MDA-1637", "MDA-1638", "MDA-1645", "MDA-1650", "MDA-1652__SPLIT_LEFT"), only=["ROM"],
+    notes="Left bank of the Dniester formed the Moldavian ASSR inside the Soviet Union until 1940. MDA-1645 is the Rîbnița area despite its source name; MDA-1650 covers Tiraspol/Slobozia with a sliver of Bender.")
+add("bessarabia_camenca_right_bank", B, "ROM", None, None, FI("MDA-1652__SPLIT_RIGHT"), only=["SOV"],
+    notes="Right-bank half of the Camenca source parcel belonged to Romanian Bessarabia.")
+add("germany_interwar_lauenburg_marienburg_kahlberg", B, "GER", None, None,
+    FI("PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG", "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
+       "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG"), only=["POL", "DNZ"],
+    notes="Kreis Lauenburg, Marienburg east of the Nogat and Kahlberg on the Vistula Spit stayed German.")
+add("poland_interwar_wilno", B, "POL", None, None, FI("LT011__SPLIT_WILNO"), only=["LIT"],
+    notes="Wilno region was Polish from 1922 to October 1939; five modern municipalities approximate it.")
+add("italy_carnaro", B, "ITA", None, None,
+    FI("HR031__SPLIT_FIUME", "HR031__SPLIT_ABBAZIA", "HR031__SPLIT_CHERSO"), only=["YUG"],
+    notes="Fiume (from 1924), Abbazia and Cherso-Lussino were Italian in 1936 and 1939.")
+add("poland_zaolzie_1939", Y39, "POL", None, None, FI("CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE"),
+    only=["BOM", "CZE"], notes="Zaolzie was Polish from October 1938 to September 1939.")
+E.append({"id": "shell_sliver_adoption", "scenarios": B,
+          "adopt_shell_slivers": {"id_pattern": r"_(ARCTIC|SHELL)_FB_\d+$", "max_area_km2": 3000}})
+
 # Generated family-colour entries select by owner, so they must run after every
 # entry that creates territory (e.g. PCZ is assigned after harmonize_family_colors).
-E.sort(key=lambda e: "_family_colour_" in e["id"])
+# Shell slivers adopt their surroundings only after every owner is final.
+E.sort(key=lambda e: ("adopt_shell_slivers" in e, "_family_colour_" in e["id"]))
 ids = [e["id"] for e in E]
 assert len(ids) == len(set(ids)), "duplicate ids"
 out = {"version": 1,

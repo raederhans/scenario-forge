@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/modern_world/audit.json",
-  "baseline_hash": "f739af85b8d5c89635f1009513a22ee71b2b6d0a5929d1ac7653cde7b416931a",
+  "baseline_hash": "c68a8d2be1dc5cb8d3d1d8c83c265b6f804a8fbab1417a6b4b7c094a30b06940",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Modern-world baseline with matched The Fire Rises country colors.",
   "bookmark_name": "Modern World",
@@ -25,6 +25,7 @@
     "IT"
   ],
   "generated_at": "2026-09-27T13:55:57.885587+00:00",
+  "geo_locale_patch_url": "data/scenarios/modern_world/geo_locale_patch.json",
   "hierarchy_overrides": {
     "feature_merges": {
       "DE_MRG_0fbf2afc9b39": [
@@ -2408,6 +2409,14 @@
         "CY000__SPLIT_NORTHERN_CYPRUS",
         "CY000__SPLIT_REMAINDER"
       ],
+      "DE300": [
+        "DE300__SPLIT_EAST",
+        "DE300__SPLIT_WEST"
+      ],
+      "ES300": [
+        "ES300__SPLIT_CITY",
+        "ES300__SPLIT_REST"
+      ],
       "GEO-3030": [
         "GEO-3030__SPLIT_SOUTH_OSSETIA",
         "GEO-3030__SPLIT_REMAINDER"
@@ -2427,6 +2436,10 @@
       "ISR-3056": [
         "ISR-3056__SPLIT_GOLAN_HEIGHTS",
         "ISR-3056__SPLIT_REMAINDER"
+      ],
+      "ITI43": [
+        "ITI43__SPLIT_CITY",
+        "ITI43__SPLIT_PROVINCE"
       ],
       "MMR-3273": [
         "MMR-3273__SPLIT_SITTWE",
@@ -2469,6 +2482,14 @@
         "MMR-3296__SPLIT_MOGAUNG",
         "MMR-3296__SPLIT_REMAINDER"
       ],
+      "PL_POW_1465": [
+        "PL_POW_1465__SPLIT_PRAGA",
+        "PL_POW_1465__SPLIT_LEFT"
+      ],
+      "RU_CITY_MOSCOW": [
+        "RU_CITY_MOSCOW__SPLIT_SOUTHWEST",
+        "RU_CITY_MOSCOW__SPLIT_CITY"
+      ],
       "SYR-137": [
         "SYR-137__SPLIT_KOBANI",
         "SYR-137__SPLIT_DEIR_HAFIR_MASKANAH",
@@ -2478,6 +2499,10 @@
       "SYR-5261": [
         "SYR-5261__SPLIT_GOLAN_HEIGHTS",
         "SYR-5261__SPLIT_REMAINDER"
+      ],
+      "TR100": [
+        "TR100__SPLIT_ASIA",
+        "TR100__SPLIT_EUROPE"
       ]
     }
   },
@@ -2494,12 +2519,12 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "131c371029968738c7a138ea45e3e7125d8eee36022c5a17eda38af429323ef6",
+  "snapshot_fingerprint": "5fa949bc56e43567077da28f93dc278ae1a7c24167f5fd9c712a8869cf10367f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "48215cc527e437d17634e994c5698b5706f9166cee9b59b90dc370b0367aee3b",
+    "runtime_topology_sha256": "5904e4f5a25bbcc24f9b6fabca3bd18c268b94f40088e85dc119c86f5449d3e1",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "special_zone_layers_url": "data/scenarios/modern_world/special_zone_layers.json",
@@ -2517,25 +2542,24 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 20637,
+    "feature_count": 20643,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 259,
     "quality_counts": {
-      "direct_country_copy": 19077,
-      "manual_reviewed": 1560
+      "direct_country_copy": 18856,
+      "manual_reviewed": 1787
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 19077,
-      "manual_rule": 1560
+      "canonical_baseline": 18856,
+      "manual_rule": 1787
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,
     "topology_blocker_count": 0
   },
-  "version": 2,
-  "geo_locale_patch_url": "data/scenarios/modern_world/geo_locale_patch.json"
+  "version": 2
 }

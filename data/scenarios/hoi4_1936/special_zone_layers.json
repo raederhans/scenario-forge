@@ -173,7 +173,8 @@
         "revision": 1
       },
       "memberFeatureIds": [
-        "TR100",
+        "TR100__SPLIT_ASIA",
+        "TR100__SPLIT_EUROPE",
         "TR212",
         "TR213",
         "TR222"
@@ -201,8 +202,8 @@
       "memberFeatureIds": [
         "PL_MRG_727dd6268093__SPLIT_DANZIG",
         "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
-        "PL_POW_2209__SPLIT_DANZIG",
-        "PL_POW_2210__SPLIT_DANZIG",
+        "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST",
+        "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST",
         "PL_POW_2261",
         "PL_POW_2264"
       ],

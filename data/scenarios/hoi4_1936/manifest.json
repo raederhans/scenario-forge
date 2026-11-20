@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
-  "baseline_hash": "b377db19795824946b84fddd9eb4f0fa91501ac30d567d53706f2ae3459fc16e",
+  "baseline_hash": "a29e7c20e042c2725f1551f7bf9c110a240f9cee8b7d41b7192346bb0345e6ad",
   "bookmark_date": "1936.1.1.12",
   "bookmark_description": "GATHERING_STORM_DESC",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -2463,9 +2463,21 @@
         "CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN",
         "CN_CITY_17275852B90470795224142__SPLIT_REST"
       ],
+      "CZ_ADM2_57006924B91865699855455": [
+        "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE",
+        "CZ_ADM2_57006924B91865699855455__SPLIT_REST"
+      ],
+      "DE300": [
+        "DE300__SPLIT_EAST",
+        "DE300__SPLIT_WEST"
+      ],
       "EH_ADMIN0_PASSTHROUGH": [
         "EH_ADMIN0_PASSTHROUGH__SPLIT_SHM",
         "EH_ADMIN0_PASSTHROUGH__SPLIT_RDO"
+      ],
+      "ES300": [
+        "ES300__SPLIT_CITY",
+        "ES300__SPLIT_REST"
       ],
       "GH_ADM1_GHA-2155": [
         "GH_ADM1_GHA-2155__SPLIT_WTO",
@@ -2478,6 +2490,16 @@
       "GH_ADM1_GHA-2173": [
         "GH_ADM1_GHA-2173__SPLIT_WTO",
         "GH_ADM1_GHA-2173__SPLIT_REST"
+      ],
+      "HR031": [
+        "HR031__SPLIT_FIUME",
+        "HR031__SPLIT_ABBAZIA",
+        "HR031__SPLIT_CHERSO",
+        "HR031__SPLIT_REST"
+      ],
+      "HU110": [
+        "HU110__SPLIT_BUDA",
+        "HU110__SPLIT_PEST"
       ],
       "IN_ADM2_76128533B9892158671522": [
         "IN_ADM2_76128533B9892158671522__SPLIT_DECCAN_STATES",
@@ -2515,6 +2537,14 @@
         "IN_MRG_886776fba38b__SPLIT_COCHIN",
         "IN_MRG_886776fba38b__SPLIT_REST"
       ],
+      "ITI43": [
+        "ITI43__SPLIT_CITY",
+        "ITI43__SPLIT_PROVINCE"
+      ],
+      "LT011": [
+        "LT011__SPLIT_WILNO",
+        "LT011__SPLIT_REST"
+      ],
       "MAR-1445": [
         "MAR-1445__SPLIT_TANGIER",
         "MAR-1445__SPLIT_REST"
@@ -2526,6 +2556,10 @@
       "MAR-3457": [
         "MAR-3457__SPLIT_IFNI",
         "MAR-3457__SPLIT_REST"
+      ],
+      "MDA-1652": [
+        "MDA-1652__SPLIT_LEFT",
+        "MDA-1652__SPLIT_RIGHT"
       ],
       "NG_ADM1_NGA-2839": [
         "NG_ADM1_NGA-2839__SPLIT_NCM",
@@ -2565,23 +2599,50 @@
       ],
       "PL_MRG_727dd6268093": [
         "PL_MRG_727dd6268093__SPLIT_DANZIG",
-        "PL_MRG_727dd6268093__SPLIT_REST"
+        "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG",
+        "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_REST"
+      ],
+      "PL_MRG_727dd6268093__SPLIT_REST": [
+        "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG",
+        "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_REST"
       ],
       "PL_MRG_9e4e875a7bcd": [
         "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
         "PL_MRG_9e4e875a7bcd__SPLIT_REST"
       ],
+      "PL_POW_1465": [
+        "PL_POW_1465__SPLIT_PRAGA",
+        "PL_POW_1465__SPLIT_LEFT"
+      ],
       "PL_POW_2209": [
-        "PL_POW_2209__SPLIT_DANZIG",
+        "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
+        "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST",
         "PL_POW_2209__SPLIT_REST"
       ],
+      "PL_POW_2209__SPLIT_DANZIG": [
+        "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
+        "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST"
+      ],
       "PL_POW_2210": [
-        "PL_POW_2210__SPLIT_DANZIG",
+        "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG",
+        "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST",
         "PL_POW_2210__SPLIT_REST"
+      ],
+      "PL_POW_2210__SPLIT_DANZIG": [
+        "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG",
+        "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST"
+      ],
+      "RU_CITY_MOSCOW": [
+        "RU_CITY_MOSCOW__SPLIT_SOUTHWEST",
+        "RU_CITY_MOSCOW__SPLIT_CITY"
       ],
       "RU_MRG_eefc121c2bf0": [
         "RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO",
         "RU_MRG_eefc121c2bf0__SPLIT_REST"
+      ],
+      "TR100": [
+        "TR100__SPLIT_ASIA",
+        "TR100__SPLIT_EUROPE"
       ]
     }
   },
@@ -2614,12 +2675,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "c00215c3a67709ff31a0e0ca4cf7fb261d38eff13d4f636c875dc68fec5033ce",
+  "snapshot_fingerprint": "11b688e00a11823c27f14ebf6fe7f82252259eaa30fb59a18fa8f978e93564d4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "18968096c0238b3eed2e818b4e007197f2083caedd3e54f4d86520b0974f6f43",
-    "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5"
+    "detail_chunk_manifest_sha256": "9f7b2e25aca3c42e622a5ecf2e5fd0b593d160ac90a253a194d135f7c606b9ac",
+    "runtime_bootstrap_topology_sha256": "87bede3074fad428a40e028c276cf5588b809afa8b63775f0bf6984f526f6179",
+    "runtime_topology_sha256": "39599949211b95bd552663ef84a0b747fa6640edfbdf3a1d23801e91d7644b6f"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1936/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -2637,29 +2698,29 @@
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15314,
+    "changed_feature_count": 15309,
     "controller_count": 323,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21100,
+    "feature_count": 21116,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14867,
+    "manual_reviewed_feature_count": 14862,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 323,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14867
+      "manual_reviewed": 14862
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15291
+      "manual_rule": 15286
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

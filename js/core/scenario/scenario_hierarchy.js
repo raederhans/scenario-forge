@@ -77,8 +77,13 @@ export function projectScenarioFeatureIds(ids, override) {
 export function expandScenarioFeatureIds(ids, override) {
   const merges = featureMergeTargets(override?.feature_merges) ? override.feature_merges : {};
   const present = new Set(Array.isArray(ids) ? ids : []);
-  const parents = new Map(Object.entries(override?.feature_splits || {}).flatMap(([parent, children]) =>
-    children.every((child) => present.has(child)) ? children.map((child) => [child, parent]) : []));
+  // A re-split child is listed by its own parent and by the outermost parent; the
+  // outermost one lists the most leaves and wins when all of them are present.
+  const parents = new Map();
+  Object.entries(override?.feature_splits || {})
+    .filter(([, children]) => children.every((child) => present.has(child)))
+    .sort(([, a], [, b]) => a.length - b.length)
+    .forEach(([parent, children]) => children.forEach((child) => parents.set(child, parent)));
   return [...new Set((Array.isArray(ids) ? ids : []).flatMap((id) => {
     const parent = parents.get(id) || id;
     return Object.hasOwn(merges, parent) ? merges[parent] : [parent];

@@ -96,6 +96,56 @@ def test_saved_parent_mapping_and_inherited_assignments(tmp_path, monkeypatch):
     assert len(calls) == 1
 
 
+def test_resplit_child_resolves_to_leaves_and_uses_full_names(tmp_path, monkeypatch):
+    topology, rules = fixture()
+    directory = tmp_path / "data/scenarios/fixture"
+    directory.mkdir(parents=True)
+    for name, payload in {
+        "runtime_topology.topo.json": topology,
+        "manifest.json": {},
+        "owners.by_feature.json": {"owners": {"original": "JAP", "neighbor": "SOV"}},
+        "cores.by_feature.json": {"cores": {"original": ["JAP"], "neighbor": ["SOV"]}},
+        "geo_locale_patch.json": {"geo": {"id::original": {"en": "Original", "zh": "原块"}}},
+        "city_overrides.json": {"version": 1, "cities": {}},
+    }.items():
+        (directory / name).write_text(json.dumps(payload), encoding="utf-8")
+    (tmp_path / "data/locales.json").write_text(json.dumps({"geo": {}}), encoding="utf-8")
+    (tmp_path / "data/world_cities.geojson").write_text(json.dumps({"features": []}), encoding="utf-8")
+    monkeypatch.setattr(geometry_splits, "ROOT", tmp_path)
+    monkeypatch.setattr(city_hosts, "ROOT", tmp_path)
+    monkeypatch.setattr(geometry_splits, "refresh_scenario", lambda *args, **kwargs: None)
+    geometry_splits.run_scenario(directory, rules)
+    # refresh_scenario is stubbed, so record the first split's assignments by hand.
+    children = ["original__SPLIT_SOUTH", "original__SPLIT_NORTH"]
+    (directory / "owners.by_feature.json").write_text(json.dumps(
+        {"owners": {"neighbor": "SOV", **dict.fromkeys(children, "JAP")}}), encoding="utf-8")
+    (directory / "cores.by_feature.json").write_text(json.dumps(
+        {"cores": {"neighbor": ["SOV"], **{child: ["JAP"] for child in children}}}), encoding="utf-8")
+    resplit ={"area_tolerance_degrees2": 1e-9, "entries": [{
+        "id": "west", "feature_ids": ["original__SPLIT_SOUTH"],
+        "polygon": {"type": "Polygon", "coordinates": [[[-1, -1], [1, -1], [1, 2], [-1, 2], [-1, -1]]]},
+        "inside": {"suffix": "WEST", "name_en": "West End", "name_zh": "西端", "full_name": True},
+        "outside": {"suffix": "EAST", "name_en": "East", "name_zh": "东"}, "sources": ["synthetic"],
+    }]}
+    assert geometry_splits.run_scenario(directory, resplit)["changed"] == 1
+    splits = geometry_splits.read(directory / "manifest.json")["hierarchy_overrides"]["feature_splits"]
+    leaves = ["original__SPLIT_SOUTH__SPLIT_WEST", "original__SPLIT_SOUTH__SPLIT_EAST"]
+    assert splits["original"] == [*leaves, "original__SPLIT_NORTH"]
+    assert splits["original__SPLIT_SOUTH"] == leaves
+    patch = geometry_splits.read(directory / "geo_locale_patch.json")["geo"]
+    assert patch["id::original__SPLIT_SOUTH__SPLIT_WEST"] == {"en": "West End", "zh": "西端"}
+    assert patch["id::original__SPLIT_SOUTH__SPLIT_EAST"] == {"en": "Original · South · East", "zh": "原块 · 南 · 东"}
+    path = directory / "runtime_topology.topo.json"
+    topology = geometry_splits.read(path)
+    rows = topology["objects"]["political"]["geometries"]
+    assert all("full_name" not in row["properties"] for row in rows)
+    assert geometry_splits.run_scenario(directory, rules)["changed"] == 0
+    rows.remove(next(row for row in rows if row["properties"]["id"] == leaves[0]))
+    geometry_splits.write(path, topology)
+    with pytest.raises(ValueError, match="Missing split parent or children: original"):
+        geometry_splits.run_scenario(directory, rules)
+
+
 def multipart_fixture():
     topology, rules = fixture()
     entry = rules["entries"][0]
@@ -225,6 +275,23 @@ def test_main_uses_requested_rules_scenarios_and_migration_output(monkeypatch):
     assert str(writes[0][0]) == "tno.migration.json"
     assert writes[0][1]["scenarios"] == ["tno_1962"]
     assert [path.name for path, _ in runs] == ["tno_1962"]
+
+
+def test_main_scopes_migration_to_scenarios_with_the_split(tmp_path, monkeypatch):
+    _, rules = fixture()
+    historical = ["hoi4_1936", "hoi4_1939"]
+    rules["scenarios"] = [*historical, "modern_world"]
+    rules["entries"].append({**rules["entries"][0], "id": "budapest", "feature_ids": ["HU110"],
+                             "scenarios": historical})
+    path = tmp_path / "rules.json"
+    path.write_text(json.dumps(rules), encoding="utf-8")
+    output = tmp_path / "migration.json"
+    monkeypatch.setattr(geometry_splits, "run_scenario", lambda *args: {"changed": 0})
+    geometry_splits.main(["--rules", str(path), "--migration-output", str(output)])
+    migration = geometry_splits.read(output)
+    assert migration["feature_splits"] == {"original": ["original__SPLIT_SOUTH", "original__SPLIT_NORTH"]}
+    assert migration["scenario_feature_splits"] == {
+        scenario: {"HU110": ["HU110__SPLIT_SOUTH", "HU110__SPLIT_NORTH"]} for scenario in historical}
 
 
 import json

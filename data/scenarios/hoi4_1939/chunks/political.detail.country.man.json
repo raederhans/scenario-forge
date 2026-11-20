@@ -46035,7 +46035,257 @@
       }
     },
     {
-      "id": 21035,
+      "id": "RU_ARCTIC_FB_6546",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_6546",
+        "name": "Russia Shell Fallback 6546",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.16740167401673,
+              52.81103503735038
+            ],
+            [
+              120.23220232202323,
+              52.83533677436775
+            ],
+            [
+              120.35100351003513,
+              52.925600369003675
+            ],
+            [
+              120.20340203402037,
+              52.824921744217434
+            ],
+            [
+              120.16740167401673,
+              52.81103503735038
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_6678",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_6678",
+        "name": "Russia Shell Fallback 6678",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              127.92547925479255,
+              49.59626239762399
+            ],
+            [
+              128.01188011880117,
+              49.57022482224822
+            ],
+            [
+              128.04428044280445,
+              49.56848898388985
+            ],
+            [
+              127.97587975879759,
+              49.6032057510575
+            ],
+            [
+              127.92547925479255,
+              49.59626239762399
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_6707",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_6707",
+        "name": "Russia Shell Fallback 6707",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              128.76788767887678,
+              49.50079128791289
+            ],
+            [
+              128.7750877508775,
+              49.49211209612095
+            ],
+            [
+              128.7858878588786,
+              49.51988550985509
+            ],
+            [
+              128.76788767887678,
+              49.50079128791289
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_6807",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_6807",
+        "name": "Russia Shell Fallback 6807",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              131.30231302313024,
+              44.945951435514345
+            ],
+            [
+              131.23751237512374,
+              44.92512137521375
+            ],
+            [
+              131.27711277112775,
+              44.92338553685538
+            ],
+            [
+              131.30231302313024,
+              44.945951435514345
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_6902",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_6902",
+        "name": "Russia Shell Fallback 6902",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              132.77112771127713,
+              47.94200844208443
+            ],
+            [
+              132.6667266672667,
+              47.955895148951484
+            ],
+            [
+              132.67032670326705,
+              47.924650058500575
+            ],
+            [
+              132.69192691926918,
+              47.93853676536766
+            ],
+            [
+              132.7639276392764,
+              47.93853676536766
+            ],
+            [
+              132.77112771127713,
+              47.94200844208443
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_8993",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_8993",
+        "name": "Russia Shell Fallback 8993",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.16740167401673,
+              52.81103503735038
+            ],
+            [
+              120.23220232202323,
+              52.83533677436775
+            ],
+            [
+              120.35100351003513,
+              52.923864530645304
+            ],
+            [
+              120.34020340203404,
+              52.91865701557016
+            ],
+            [
+              120.23220232202323,
+              52.83533677436775
+            ],
+            [
+              120.18540185401855,
+              52.81797839078389
+            ],
+            [
+              120.16740167401673,
+              52.81103503735038
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 21024,
       "type": "Feature",
       "properties": {
         "id": "CN_CITY_17275852B83272093468807__SPLIT_REST",

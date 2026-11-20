@@ -10032,7 +10032,10 @@
     "DE27E": [
       "DE"
     ],
-    "DE300": [
+    "DE300__SPLIT_EAST": [
+      "DE"
+    ],
+    "DE300__SPLIT_WEST": [
       "DE"
     ],
     "DE402": [
@@ -11874,7 +11877,10 @@
     "ES243": [
       "ES"
     ],
-    "ES300": [
+    "ES300__SPLIT_CITY": [
+      "ES"
+    ],
+    "ES300__SPLIT_REST": [
       "ES"
     ],
     "ES411": [
@@ -16236,7 +16242,10 @@
     "ITI42": [
       "IT"
     ],
-    "ITI43": [
+    "ITI43__SPLIT_CITY": [
+      "IT"
+    ],
+    "ITI43__SPLIT_PROVINCE": [
       "IT"
     ],
     "ITI44": [
@@ -20097,7 +20106,10 @@
     "PL_POW_1463": [
       "PL"
     ],
-    "PL_POW_1465": [
+    "PL_POW_1465__SPLIT_LEFT": [
+      "PL"
+    ],
+    "PL_POW_1465__SPLIT_PRAGA": [
       "PL"
     ],
     "PL_POW_1601": [
@@ -50280,7 +50292,10 @@
     "RU_CITY_ARKHANGELSK": [
       "RU"
     ],
-    "RU_CITY_MOSCOW": [
+    "RU_CITY_MOSCOW__SPLIT_CITY": [
+      "RU"
+    ],
+    "RU_CITY_MOSCOW__SPLIT_SOUTHWEST": [
       "RU"
     ],
     "RU_CITY_SAINT_PETERSBURG": [
@@ -55023,7 +55038,10 @@
     "TL_ADM1_TLS-553": [
       "TL"
     ],
-    "TR100": [
+    "TR100__SPLIT_ASIA": [
+      "TR"
+    ],
+    "TR100__SPLIT_EUROPE": [
       "TR"
     ],
     "TR211": [

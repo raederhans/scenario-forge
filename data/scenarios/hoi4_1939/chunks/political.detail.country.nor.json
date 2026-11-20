@@ -7102,7 +7102,89 @@
       }
     },
     {
-      "id": 21023,
+      "id": "RU_ARCTIC_FB_121",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_121",
+        "name": "Russia Shell Fallback 121",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              30.620106201062015,
+              69.5375734587346
+            ],
+            [
+              30.41490414904149,
+              69.57923357933579
+            ],
+            [
+              30.51570515705157,
+              69.54104513545134
+            ],
+            [
+              30.620106201062015,
+              69.5375734587346
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_132",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_132",
+        "name": "Russia Shell Fallback 132",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              30.846908469084696,
+              69.5358376203762
+            ],
+            [
+              30.844028440284415,
+              69.5358376203762
+            ],
+            [
+              30.64530645306433,
+              69.5358376203762
+            ],
+            [
+              30.62370623706238,
+              69.5358376203762
+            ],
+            [
+              30.81810818108181,
+              69.52889426694266
+            ],
+            [
+              30.846908469084696,
+              69.5358376203762
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 21012,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_15",
@@ -8266,7 +8348,7 @@
       }
     },
     {
-      "id": 21024,
+      "id": 21013,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_16",
@@ -8394,7 +8476,7 @@
       }
     },
     {
-      "id": 21025,
+      "id": 21014,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_26",
@@ -8454,7 +8536,7 @@
       }
     },
     {
-      "id": 21026,
+      "id": 21015,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_27",
@@ -8738,7 +8820,7 @@
       }
     },
     {
-      "id": 21027,
+      "id": 21016,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_28",
@@ -8798,7 +8880,7 @@
       }
     },
     {
-      "id": 21028,
+      "id": 21017,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_29",
@@ -8878,7 +8960,7 @@
       }
     },
     {
-      "id": 21029,
+      "id": 21018,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_30",
@@ -9370,7 +9452,7 @@
       }
     },
     {
-      "id": 21030,
+      "id": 21019,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_31",
@@ -9426,7 +9508,7 @@
       }
     },
     {
-      "id": 21031,
+      "id": 21020,
       "type": "Feature",
       "properties": {
         "id": "NO_PRIMARY_GAP_32",

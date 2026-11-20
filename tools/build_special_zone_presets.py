@@ -58,6 +58,9 @@ class ScenarioData:
         return [fid for fid, owner in self.owners.items() if owner in wanted and fid in self.features]
 
     def require(self, ids):
+        # A preset may name a parcel that this scenario later split; it covers every child.
+        splits = self.manifest.get("hierarchy_overrides", {}).get("feature_splits", {})
+        ids = [child for fid in ids for child in splits.get(fid, [fid])]
         missing = [fid for fid in ids if fid not in self.owners]
         if missing:
             raise ValueError(f"预设引用的地块不存在：{missing}")

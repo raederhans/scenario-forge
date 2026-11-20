@@ -11266,6 +11266,518 @@
           ]
         ]
       }
+    },
+    {
+      "id": "RU_ARCTIC_FB_3277",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_3277",
+        "name": "Russia Shell Fallback 3277",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              50.351903519035204,
+              51.372025038250385
+            ],
+            [
+              50.351903519035204,
+              51.375496714967156
+            ],
+            [
+              50.38070380703809,
+              51.398062613626124
+            ],
+            [
+              50.33750337503375,
+              51.38244006840067
+            ],
+            [
+              50.34915539995096,
+              51.36698978194362
+            ],
+            [
+              50.351903519035204,
+              51.372025038250385
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_3756",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_3756",
+        "name": "Russia Shell Fallback 3756",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              54.45594455944561,
+              50.59263361533614
+            ],
+            [
+              54.45594455944561,
+              50.592137661519466
+            ],
+            [
+              54.45594455944561,
+              50.577011070110686
+            ],
+            [
+              54.51354513545135,
+              50.55097349473495
+            ],
+            [
+              54.47034470344704,
+              50.578746908469085
+            ],
+            [
+              54.45594455944561,
+              50.59263361533614
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_4188",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_4188",
+        "name": "Russia Shell Fallback 4188",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              58.72918729187293,
+              50.813085086850876
+            ],
+            [
+              58.81198811988122,
+              50.73323652236523
+            ],
+            [
+              58.86958869588696,
+              50.70546310863109
+            ],
+            [
+              58.77598775987761,
+              50.81482092520925
+            ],
+            [
+              58.72918729187293,
+              50.813085086850876
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_4275",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_4275",
+        "name": "Russia Shell Fallback 4275",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              59.53199531995321,
+              50.49021915219153
+            ],
+            [
+              59.618396183961835,
+              50.511049212492125
+            ],
+            [
+              59.51399513995142,
+              50.49889834398344
+            ],
+            [
+              59.53199531995321,
+              50.49021915219153
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_4390",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_4390",
+        "name": "Russia Shell Fallback 4390",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              60.741607416074174,
+              52.18613322833228
+            ],
+            [
+              60.87840878408784,
+              52.25209508595087
+            ],
+            [
+              60.78120781207812,
+              52.229529187291874
+            ],
+            [
+              60.741607416074174,
+              52.18613322833228
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_4454",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_4454",
+        "name": "Russia Shell Fallback 4454",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              61.512015120151204,
+              53.47759696696967
+            ],
+            [
+              61.512015120151204,
+              53.48887991629915
+            ],
+            [
+              61.512015120151204,
+              53.48905350013499
+            ],
+            [
+              61.512015120151204,
+              53.489747835478354
+            ],
+            [
+              61.47601476014762,
+              53.47065361353613
+            ],
+            [
+              61.512015120151204,
+              53.47759696696967
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_4573",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_4573",
+        "name": "Russia Shell Fallback 4573",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              64.35964359643597,
+              54.36634620646207
+            ],
+            [
+              64.3647865050079,
+              54.36634620646207
+            ],
+            [
+              64.3668436684367,
+              54.36634620646207
+            ],
+            [
+              64.33084330843309,
+              54.42362887228872
+            ],
+            [
+              64.35964359643597,
+              54.36634620646207
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_4707",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_4707",
+        "name": "Russia Shell Fallback 4707",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              67.81927819278192,
+              54.97041795517954
+            ],
+            [
+              67.78717812451924,
+              54.911946379002956
+            ],
+            [
+              67.82071033237659,
+              54.93037825068509
+            ],
+            [
+              67.82812514977714,
+              54.93445400267418
+            ],
+            [
+              67.83301815826185,
+              54.93714357518648
+            ],
+            [
+              68.06408064080642,
+              54.953059571595716
+            ],
+            [
+              68.0136801368013,
+              54.949587894878945
+            ],
+            [
+              68.1720817208172,
+              54.949587894878945
+            ],
+            [
+              68.18762065868336,
+              54.96869363860053
+            ],
+            [
+              67.81927819278192,
+              54.97041795517954
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_4868",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_4868",
+        "name": "Russia Shell Fallback 4868",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.0069300693007,
+              54.04695194851949
+            ],
+            [
+              73.06453064530646,
+              54.00702766627667
+            ],
+            [
+              73.0609306093061,
+              54.04000859508595
+            ],
+            [
+              73.0069300693007,
+              54.04695194851949
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_5262",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_5262",
+        "name": "Russia Shell Fallback 5262",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              83.0078300783008,
+              50.88946197461975
+            ],
+            [
+              83.05463054630548,
+              50.938065448654484
+            ],
+            [
+              82.98622986229861,
+              50.88946197461975
+            ],
+            [
+              82.98644162912214,
+              50.88946197461975
+            ],
+            [
+              83.00025105514214,
+              50.88946197461975
+            ],
+            [
+              83.0078300783008,
+              50.88946197461975
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_5420",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_5420",
+        "name": "Russia Shell Fallback 5420",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              85.23625236252366,
+              49.6240358113581
+            ],
+            [
+              85.26505265052651,
+              49.61014910449104
+            ],
+            [
+              85.26505265052651,
+              49.620564134641356
+            ],
+            [
+              85.23625236252366,
+              49.6240358113581
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "RU_ARCTIC_FB_5430",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_5430",
+        "name": "Russia Shell Fallback 5430",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              85.32985329853301,
+              49.613620781207814
+            ],
+            [
+              85.38385383853841,
+              49.62229997299973
+            ],
+            [
+              85.44505445054449,
+              49.615356619566185
+            ],
+            [
+              85.38745387453878,
+              49.63445084150841
+            ],
+            [
+              85.32985329853301,
+              49.613620781207814
+            ]
+          ]
+        ]
+      }
     }
   ]
 }

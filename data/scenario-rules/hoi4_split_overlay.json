@@ -306,8 +306,10 @@
           "PL_POW_2264",
           "PL_MRG_727dd6268093__SPLIT_DANZIG",
           "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
-          "PL_POW_2209__SPLIT_DANZIG",
-          "PL_POW_2210__SPLIT_DANZIG"
+          "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
+          "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST",
+          "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG",
+          "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST"
         ]
       },
       "only_from_owners": [
@@ -9705,6 +9707,166 @@
       "notes": "Includes Falkland Islands Dependencies Antarctic claims, approximated by existing sectors; not a statement of international recognition."
     },
     {
+      "id": "germany_interwar_frontier_counties",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GER",
+      "select": {
+        "feature_ids": [
+          "PL_POW_2201",
+          "PL_POW_2203",
+          "PL_POW_2207",
+          "PL_POW_2209__SPLIT_REST",
+          "PL_POW_2210__SPLIT_REST",
+          "PL_POW_2212",
+          "PL_POW_2216",
+          "PL_POW_2263",
+          "PL_POW_3031",
+          "PL_POW_2405",
+          "PL_POW_2411",
+          "PL_POW_2462",
+          "PL_POW_2466",
+          "PL_POW_2478"
+        ]
+      },
+      "only_from_owners": [
+        "POL"
+      ],
+      "notes": "1919-1939 German side of the frontier: Bütow, Schlochau, Marienwerder, Marienburg and the Vistula Spit outside the Free City, Stolp, Stuhm, Flatow, and western Upper Silesia (Gleiwitz, Ratibor, Beuthen, Hindenburg). County-level approximation."
+    },
+    {
+      "id": "poland_interwar_soldau_lobau",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "POL",
+      "select": {
+        "feature_ids": [
+          "PL_POW_2803",
+          "PL_POW_2812"
+        ]
+      },
+      "only_from_owners": [
+        "GER"
+      ],
+      "notes": "Soldau (Działdowo) and the Löbau/Neumark area were Polish from 1920."
+    },
+    {
+      "id": "moldavian_assr_left_bank",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SOV",
+      "select": {
+        "feature_ids": [
+          "MDA-1628",
+          "MDA-1637",
+          "MDA-1638",
+          "MDA-1645",
+          "MDA-1650",
+          "MDA-1652__SPLIT_LEFT"
+        ]
+      },
+      "only_from_owners": [
+        "ROM"
+      ],
+      "notes": "Left bank of the Dniester formed the Moldavian ASSR inside the Soviet Union until 1940. MDA-1645 is the Rîbnița area despite its source name; MDA-1650 covers Tiraspol/Slobozia with a sliver of Bender."
+    },
+    {
+      "id": "bessarabia_camenca_right_bank",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ROM",
+      "select": {
+        "feature_ids": [
+          "MDA-1652__SPLIT_RIGHT"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Right-bank half of the Camenca source parcel belonged to Romanian Bessarabia."
+    },
+    {
+      "id": "germany_interwar_lauenburg_marienburg_kahlberg",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GER",
+      "select": {
+        "feature_ids": [
+          "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG",
+          "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
+          "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG"
+        ]
+      },
+      "only_from_owners": [
+        "POL",
+        "DNZ"
+      ],
+      "notes": "Kreis Lauenburg, Marienburg east of the Nogat and Kahlberg on the Vistula Spit stayed German."
+    },
+    {
+      "id": "poland_interwar_wilno",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "POL",
+      "select": {
+        "feature_ids": [
+          "LT011__SPLIT_WILNO"
+        ]
+      },
+      "only_from_owners": [
+        "LIT"
+      ],
+      "notes": "Wilno region was Polish from 1922 to October 1939; five modern municipalities approximate it."
+    },
+    {
+      "id": "italy_carnaro",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ITA",
+      "select": {
+        "feature_ids": [
+          "HR031__SPLIT_FIUME",
+          "HR031__SPLIT_ABBAZIA",
+          "HR031__SPLIT_CHERSO"
+        ]
+      },
+      "only_from_owners": [
+        "YUG"
+      ],
+      "notes": "Fiume (from 1924), Abbazia and Cherso-Lussino were Italian in 1936 and 1939."
+    },
+    {
+      "id": "poland_zaolzie_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "POL",
+      "select": {
+        "feature_ids": [
+          "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE"
+        ]
+      },
+      "only_from_owners": [
+        "BOM",
+        "CZE"
+      ],
+      "notes": "Zaolzie was Polish from October 1938 to September 1939."
+    },
+    {
       "id": "ang_family_colour_hoi4_1936",
       "scenarios": [
         "hoi4_1936"
@@ -10572,74 +10734,15 @@
       "color_hex": "#3657c4"
     },
     {
-      "id": "germany_interwar_frontier_counties",
+      "id": "shell_sliver_adoption",
       "scenarios": [
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "GER",
-      "select": {
-        "feature_ids": [
-          "PL_POW_2201",
-          "PL_POW_2203",
-          "PL_POW_2207",
-          "PL_POW_2209__SPLIT_REST",
-          "PL_POW_2210__SPLIT_REST",
-          "PL_POW_2212",
-          "PL_POW_2216",
-          "PL_POW_2263",
-          "PL_POW_3031",
-          "PL_POW_2405",
-          "PL_POW_2411",
-          "PL_POW_2462",
-          "PL_POW_2466",
-          "PL_POW_2478"
-        ]
-      },
-      "only_from_owners": [
-        "POL"
-      ],
-      "notes": "1919-1939 German side of the frontier: Bütow, Schlochau, Marienwerder, Marienburg and the Vistula Spit outside the Free City, Stolp, Stuhm, Flatow, and western Upper Silesia (Gleiwitz, Ratibor, Beuthen, Hindenburg). County-level approximation; Lauenburg stays merged with the corridor until the merge group is split."
-    },
-    {
-      "id": "poland_interwar_soldau_lobau",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "POL",
-      "select": {
-        "feature_ids": [
-          "PL_POW_2803",
-          "PL_POW_2812"
-        ]
-      },
-      "only_from_owners": [
-        "GER"
-      ],
-      "notes": "Soldau (Działdowo) and the Löbau/Neumark area were Polish from 1920."
-    },
-    {
-      "id": "moldavian_assr_left_bank",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "SOV",
-      "select": {
-        "feature_ids": [
-          "MDA-1628",
-          "MDA-1637",
-          "MDA-1638",
-          "MDA-1645",
-          "MDA-1650",
-          "MDA-1652"
-        ]
-      },
-      "only_from_owners": [
-        "ROM"
-      ],
-      "notes": "Left bank of the Dniester formed the Moldavian ASSR inside the Soviet Union until 1940. MDA-1645 is the Rîbnița area despite its source name; MDA-1650 covers Tiraspol/Slobozia with a sliver of Bender."
+      "adopt_shell_slivers": {
+        "id_pattern": "_(ARCTIC|SHELL)_FB_\\d+$",
+        "max_area_km2": 3000
+      }
     }
   ]
 }

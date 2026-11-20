@@ -70,7 +70,9 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
         visual.droppedEntries += sources.length;
       }
     }
-    for (const [source, children] of Object.entries(splits)) {
+    const nearestFirst = Object.entries(splits).sort(([a, aLeaves], [b, bLeaves]) =>
+      aLeaves.length - bLeaves.length || b.length - a.length);
+    for (const [source, children] of nearestFirst) {
       if (!Object.hasOwn(result, source)) continue;
       for (const child of children) {
         if (validFeatureIds.has(child) && !Object.hasOwn(result, child)) {

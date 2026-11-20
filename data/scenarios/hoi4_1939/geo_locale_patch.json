@@ -33,6 +33,22 @@
       "en": "Wuchuan · Remainder",
       "zh": "吴川 · 余部"
     },
+    "id::CZ_ADM2_57006924B91865699855455__SPLIT_REST": {
+      "en": "Frýdek-Místek",
+      "zh": "弗里德克-米斯泰克"
+    },
+    "id::CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE": {
+      "en": "Zaolzie (Třinec–Jablunkov)",
+      "zh": "扎奥尔齐（特日内茨—亚布伦科夫）"
+    },
+    "id::DE300__SPLIT_EAST": {
+      "en": "Berlin · East Berlin",
+      "zh": "柏林 · 东柏林"
+    },
+    "id::DE300__SPLIT_WEST": {
+      "en": "Berlin · West Berlin",
+      "zh": "柏林 · 西柏林"
+    },
     "id::EH_ADMIN0_PASSTHROUGH__SPLIT_RDO": {
       "en": "Western Sahara · Rio de Oro",
       "zh": "西撒哈拉 · 里奥德奥罗"
@@ -40,6 +56,14 @@
     "id::EH_ADMIN0_PASSTHROUGH__SPLIT_SHM": {
       "en": "Western Sahara · Saguia el-Hamra",
       "zh": "西撒哈拉 · 萨基亚哈姆拉"
+    },
+    "id::ES300__SPLIT_CITY": {
+      "en": "Madrid city",
+      "zh": "马德里市"
+    },
+    "id::ES300__SPLIT_REST": {
+      "en": "Community of Madrid",
+      "zh": "马德里自治区"
     },
     "id::GH_ADM1_GHA-2155__SPLIT_REST": {
       "en": "Northern · Remainder",
@@ -64,6 +88,30 @@
     "id::GH_ADM1_GHA-2173__SPLIT_WTO": {
       "en": "Volta · British Togoland",
       "zh": "沃尔塔 · 英属多哥兰"
+    },
+    "id::HR031__SPLIT_ABBAZIA": {
+      "en": "Abbazia",
+      "zh": "阿巴齐亚"
+    },
+    "id::HR031__SPLIT_CHERSO": {
+      "en": "Cherso and Lussino",
+      "zh": "凯尔索与卢西诺"
+    },
+    "id::HR031__SPLIT_FIUME": {
+      "en": "Fiume",
+      "zh": "阜姆"
+    },
+    "id::HR031__SPLIT_REST": {
+      "en": "Primorje-Gorski Kotar (Yugoslav part)",
+      "zh": "滨海-戈尔斯基科塔尔（南斯拉夫部分）"
+    },
+    "id::HU110__SPLIT_BUDA": {
+      "en": "Budapest · Buda",
+      "zh": "布达佩斯 · 布达"
+    },
+    "id::HU110__SPLIT_PEST": {
+      "en": "Budapest · Pest",
+      "zh": "布达佩斯 · 佩斯"
     },
     "id::IN_ADM2_76128533B9892158671522__SPLIT_DECCAN_STATES": {
       "en": "Sangli · Deccan states",
@@ -137,6 +185,22 @@
       "en": "Kerala · Central · Remainder",
       "zh": "喀拉拉邦·中部 · 余部"
     },
+    "id::ITI43__SPLIT_CITY": {
+      "en": "Rome",
+      "zh": "罗马市"
+    },
+    "id::ITI43__SPLIT_PROVINCE": {
+      "en": "Province of Rome",
+      "zh": "罗马省"
+    },
+    "id::LT011__SPLIT_REST": {
+      "en": "Vilnius County (Lithuanian part)",
+      "zh": "维尔纽斯县（立陶宛控制部分）"
+    },
+    "id::LT011__SPLIT_WILNO": {
+      "en": "Wilno region",
+      "zh": "维尔诺地区"
+    },
     "id::MAR-1445__SPLIT_REST": {
       "en": "Tanger - Tétouan · Remainder",
       "zh": "丹吉尔 - 得土安 · 余部"
@@ -160,6 +224,14 @@
     "id::MAR-3457__SPLIT_REST": {
       "en": "Guelmim - Es-Semara · Remainder",
       "zh": "盖勒敏 - 埃斯-塞马拉 · 余部"
+    },
+    "id::MDA-1652__SPLIT_LEFT": {
+      "en": "Camenca (left bank)",
+      "zh": "卡缅卡（德涅斯特河左岸）"
+    },
+    "id::MDA-1652__SPLIT_RIGHT": {
+      "en": "Camenca (right bank)",
+      "zh": "卡缅卡（德涅斯特河右岸）"
     },
     "id::NG_ADM1_NGA-2839__SPLIT_NCM": {
       "en": "Borno State · British Northern Cameroons",
@@ -241,6 +313,14 @@
       "en": "Pomeranian · North · Remainder",
       "zh": "滨海省·北部 · 余部"
     },
+    "id::PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG": {
+      "en": "Lauenburg in Pommern",
+      "zh": "劳恩堡（波美拉尼亚）"
+    },
+    "id::PL_MRG_727dd6268093__SPLIT_REST__SPLIT_REST": {
+      "en": "Pomeranian · North · Remainder",
+      "zh": "滨海省·北部 · 余部"
+    },
     "id::PL_MRG_9e4e875a7bcd__SPLIT_DANZIG": {
       "en": "Pomeranian · South · Free City rural district",
       "zh": "滨海省·南部 · 但泽自由市乡村区"
@@ -249,7 +329,23 @@
       "en": "Pomeranian · South · Remainder",
       "zh": "滨海省·南部 · 余部"
     },
+    "id::PL_POW_1465__SPLIT_LEFT": {
+      "en": "Warsaw · Left bank",
+      "zh": "华沙 · 左岸"
+    },
+    "id::PL_POW_1465__SPLIT_PRAGA": {
+      "en": "Warsaw · Praga (right bank)",
+      "zh": "华沙 · 布拉加（右岸）"
+    },
     "id::PL_POW_2209__SPLIT_DANZIG": {
+      "en": "Malbork County · Free City rural district",
+      "zh": "马尔堡县 · 但泽自由市乡村区"
+    },
+    "id::PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG": {
+      "en": "Marienburg (east of the Nogat)",
+      "zh": "马林堡（诺加特河以东）"
+    },
+    "id::PL_POW_2209__SPLIT_DANZIG__SPLIT_REST": {
       "en": "Malbork County · Free City rural district",
       "zh": "马尔堡县 · 但泽自由市乡村区"
     },
@@ -261,9 +357,25 @@
       "en": "Nowy Dwór Gdański County · Free City rural district",
       "zh": "新德武尔县 · 但泽自由市乡村区"
     },
+    "id::PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG": {
+      "en": "Kahlberg (Vistula Spit)",
+      "zh": "卡尔贝格（维斯瓦沙嘴）"
+    },
+    "id::PL_POW_2210__SPLIT_DANZIG__SPLIT_REST": {
+      "en": "Nowy Dwór Gdański County · Free City rural district",
+      "zh": "新德武尔县 · 但泽自由市乡村区"
+    },
     "id::PL_POW_2210__SPLIT_REST": {
       "en": "Nowy Dwór Gdański County · Remainder",
       "zh": "新德武尔县 · 余部"
+    },
+    "id::RU_CITY_MOSCOW__SPLIT_CITY": {
+      "en": "Moscow · City",
+      "zh": "莫斯科 · 市区"
+    },
+    "id::RU_CITY_MOSCOW__SPLIT_SOUTHWEST": {
+      "en": "Moscow · Southwest (Troitsk)",
+      "zh": "莫斯科 · 西南部（特罗伊茨克）"
     },
     "id::RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO": {
       "en": "Sakhalin · Central · South of 50°N",
@@ -272,6 +384,14 @@
     "id::RU_MRG_eefc121c2bf0__SPLIT_REST": {
       "en": "Sakhalin · Central · North of 50°N",
       "zh": "萨哈林州·中部 · 北纬50°以北"
+    },
+    "id::TR100__SPLIT_ASIA": {
+      "en": "İstanbul · Asian side",
+      "zh": "伊斯坦布尔 · 亚洲侧"
+    },
+    "id::TR100__SPLIT_EUROPE": {
+      "en": "İstanbul · European side",
+      "zh": "伊斯坦布尔 · 欧洲侧"
     }
   },
   "scenario_id": "hoi4_1939",
