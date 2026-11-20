@@ -5361,6 +5361,13 @@
     "en": "Manual Zones",
     "zh": "手动区域"
   },
+  "Manual colors will be cleared from {count} regions": {
+    "en": {
+      "one": "Manual colors will be cleared from {count} region",
+      "other": "Manual colors will be cleared from {count} regions"
+    },
+    "zh": "将清除 {count} 个地块的手动颜色"
+  },
   "Manual-reviewed": {
     "en": "Manual-reviewed",
     "zh": "人工校审"
@@ -7799,6 +7806,10 @@
   "Restore": {
     "en": "Restore",
     "zh": "恢复"
+  },
+  "Restore original country color": {
+    "en": "Restore original country color",
+    "zh": "恢复本国原色"
   },
   "Restored": {
     "en": "Restored",
