@@ -46,7 +46,16 @@ function beginLabelDrag(event, { rect, group, state, label, projection, pointer 
   if (doc.activeElement?.matches("#mapLabelSection textarea")) doc.activeElement.blur();
   const preview = makePreview(doc, label, state);
   const position = ([x, y]) => preview.setAttribute("transform", `translate(${x} ${y}) rotate(${label.rotation})`);
-  position(projection([label.lon, label.lat]));
+  const anchor = projection([label.lon, label.lat]);
+  const [startX, startY] = pointer(event, group);
+  const offsetX = startX - anchor[0];
+  const offsetY = startY - anchor[1];
+  const exceedsThreshold = e => Math.hypot(e.clientX - clientX, e.clientY - clientY) > 3;
+  function draggedAnchor(e) {
+    const [x, y] = pointer(e, group);
+    return [x - offsetX, y - offsetY];
+  }
+  position(anchor);
   group.appendChild(preview);
   rect.setPointerCapture(pointerId);
   const listeners = new AbortController();
@@ -55,15 +64,15 @@ function beginLabelDrag(event, { rect, group, state, label, projection, pointer 
     listeners.abort();
     preview.remove();
     if (rect.hasPointerCapture(pointerId)) rect.releasePointerCapture(pointerId);
-    if (endEvent && (endEvent.clientX !== clientX || endEvent.clientY !== clientY)) {
-      const coords = projection.invert(pointer(endEvent, group));
+    if (endEvent && exceedsThreshold(endEvent)) {
+      const coords = projection.invert(draggedAnchor(endEvent));
       if (coords?.every(Number.isFinite)) commitMapLabelMove(label.id, ...coords);
     }
     patchStrategicOverlayEditorState(state, "mapLabelEditor", { draggingId: null });
     requestRender("map-label-drag-end");
   }
   rect.addEventListener("pointermove", move => {
-    if (move.pointerId === pointerId) position(pointer(move, group));
+    if (move.pointerId === pointerId) position(exceedsThreshold(move) ? draggedAnchor(move) : anchor);
   }, options);
   rect.addEventListener("pointerup", up => {
     if (up.pointerId === pointerId) finish(up);
