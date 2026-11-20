@@ -4,6 +4,13 @@ import { state } from "../js/core/state.js";
 import { registerOwnedRuntimeHook } from "../js/core/state/index.js";
 import { initScenarioControls } from "../js/ui/scenario_controls.js";
 
+// CI 运行 Node 20，没有 Promise.withResolvers。
+function deferred() {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+  return { promise, resolve, reject };
+}
+
 class Element extends EventTarget {
   children = [];
   dataset = {};
@@ -48,7 +55,7 @@ for (const choice of ["clean", "cancel", "discard", "save", "failed save", "new 
       historyPast: [{}], historyFuture: [{}],
     });
     const calls = [];
-    const saved = Promise.withResolvers();
+    const saved = deferred();
     context.after(registerOwnedRuntimeHook(state, "runProjectSaveFn", () => {
       calls.push("save");
       return saved.promise;

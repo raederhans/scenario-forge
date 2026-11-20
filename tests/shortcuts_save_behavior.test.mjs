@@ -6,6 +6,13 @@ import { FileManager } from "../js/core/file_manager.js";
 import { initShortcuts } from "../js/ui/shortcuts.js";
 import { createProjectSupportDiagnosticsController } from "../js/ui/sidebar/project_support_diagnostics_controller.js";
 
+// CI 运行 Node 20，没有 Promise.withResolvers。
+function deferred() {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+  return { promise, resolve, reject };
+}
+
 function bindShortcut(context, elements = {}) {
   const listeners = {};
   globalThis.Element = class {};
@@ -37,7 +44,7 @@ test("Ctrl+S and Cmd+S share the pending panel save and its options", async cont
     projectDownloadDestination: { value: "browser" },
     projectPackageContents: { value: "diagnostic" },
   });
-  const pending = Promise.withResolvers();
+  const pending = deferred();
   const calls = [];
   createProjectSupportDiagnosticsController({
     state, helpers: {
