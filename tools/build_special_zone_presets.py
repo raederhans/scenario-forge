@@ -162,8 +162,7 @@ def french_mandate(data: ScenarioData):
     # 1936 年法国委任统治叙利亚、黎巴嫩；HTY 为法国下属亚历山大勒塔自治专区。
     return [fid for fid in data.features
             if data.props(fid).get("cntr_code") in {"SY", "LB"}
-            or (data.props(fid).get("cntr_code") == "TR" and data.props(fid).get("name") == "Hatay"
-                and data.owners[fid] in {"FRA", "SYR", "HTY"})]
+            or (fid.startswith("TR631") and data.owners[fid] in {"FRA", "SYR", "HTY"})]
 
 
 def british_mandates(data: ScenarioData):
@@ -335,8 +334,8 @@ def build(scenario_id: str):
                   [fid for fid in data.features if data.props(fid).get("cntr_code") == "AL"],
                   "1939 年 4 月意大利入侵；按现代 AL 地块覆盖阿尔巴尼亚，剧本保留 ALB 标签"),
             layer("preset-hatay", "claim", "Hatay (annexed by Turkey 1939)", "哈塔伊（1939 年并入土耳其）",
-                  data.by_names(["Hatay"], cntr_code="TR", bbox=(35, 35, 37, 38)),
-                  "1939 年哈塔伊并入土耳其，叙利亚不承认；现代哈塔伊省约 5806 平方公里，未超过原专区约 4700 平方公里的三倍"),
+                  data.require(["TR631__SPLIT_SANJAK"]),
+                  "1939 年哈塔伊并入土耳其，叙利亚不承认；按原专区切出（不含多尔特约尔、埃尔津、哈萨与凯萨卜），约 4790 平方公里"),
             layer("preset-danzig-dmz", "demilitarized", "Danzig Demilitarized Area", "但泽非军事化地带",
                   data.owned_by("DNZ"), "HOI4 州 85 set_demilitarized_zone，书签日仍有效"),
             layer("preset-yellow-river-flood", "restricted", "Yellow River Flood Area", "黄泛区",

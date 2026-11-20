@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "fa03a3de6185b3024fb37b6dc4fc09815895b54a875379d9c6f0eb7549e90f15",
+  "baseline_hash": "6d1d04695d6a36aebee20c31a29a71be556374a76b21bda76bb02ddf252f1801",
   "cores": {
     "AD_ADM1_AND-4876": [
       "AND"
@@ -9304,7 +9304,10 @@
     "CZ_ADM2_57006924B28286346415780": [
       "GER"
     ],
-    "CZ_ADM2_57006924B30982913442521": [
+    "CZ_ADM2_57006924B30982913442521__SPLIT_LANDSKRON": [
+      "GER"
+    ],
+    "CZ_ADM2_57006924B30982913442521__SPLIT_REST": [
       "BOM"
     ],
     "CZ_ADM2_57006924B32669310027153": [
@@ -9313,13 +9316,19 @@
     "CZ_ADM2_57006924B32813693256962": [
       "BOM"
     ],
-    "CZ_ADM2_57006924B34464963037986": [
+    "CZ_ADM2_57006924B34464963037986__SPLIT_NETOLICE": [
+      "BOM"
+    ],
+    "CZ_ADM2_57006924B34464963037986__SPLIT_REST": [
       "GER"
     ],
     "CZ_ADM2_57006924B3568693077695": [
       "GER"
     ],
-    "CZ_ADM2_57006924B40201864279221": [
+    "CZ_ADM2_57006924B40201864279221__SPLIT_BRAUNAU": [
+      "GER"
+    ],
+    "CZ_ADM2_57006924B40201864279221__SPLIT_REST": [
       "BOM"
     ],
     "CZ_ADM2_57006924B40654694205882": [
@@ -9364,8 +9373,11 @@
     "CZ_ADM2_57006924B61995402941039": [
       "BOM"
     ],
-    "CZ_ADM2_57006924B62007249383837": [
+    "CZ_ADM2_57006924B62007249383837__SPLIT_REST": [
       "BOM"
+    ],
+    "CZ_ADM2_57006924B62007249383837__SPLIT_STERNBERG": [
+      "GER"
     ],
     "CZ_ADM2_57006924B6298598328883": [
       "BOM"
@@ -9424,10 +9436,16 @@
     "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE": [
       "POL"
     ],
-    "CZ_ADM2_57006924B92931687173289": [
+    "CZ_ADM2_57006924B92931687173289__SPLIT_REST": [
       "GER"
     ],
-    "CZ_ADM2_57006924B95695201424764": [
+    "CZ_ADM2_57006924B92931687173289__SPLIT_TAUS": [
+      "BOM"
+    ],
+    "CZ_ADM2_57006924B95695201424764__SPLIT_JEVISOVICE": [
+      "BOM"
+    ],
+    "CZ_ADM2_57006924B95695201424764__SPLIT_REST": [
       "GER"
     ],
     "CZ_ADM2_57006924B96542005161261": [
@@ -9448,8 +9466,11 @@
     "CZ_MRG_2919911b5bfd": [
       "BOM"
     ],
-    "CZ_MRG_9096ecd76bb9": [
+    "CZ_MRG_9096ecd76bb9__SPLIT_REST": [
       "BOM"
+    ],
+    "CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST": [
+      "GER"
     ],
     "CZ_MRG_9d601ad75aef": [
       "BOM"
@@ -12286,7 +12307,10 @@
     "FR_ARR_06001": [
       "FRA"
     ],
-    "FR_ARR_06002": [
+    "FR_ARR_06002__SPLIT_MONACO": [
+      "MCO"
+    ],
+    "FR_ARR_06002__SPLIT_REST": [
       "FRA"
     ],
     "FR_ARR_07001": [
@@ -14323,8 +14347,11 @@
     "GR_ADM1_GRC-3001": [
       "GRE"
     ],
-    "GR_ADM1_GRC-3013": [
+    "GR_ADM1_GRC-3013__SPLIT_CYCLADES": [
       "GRE"
+    ],
+    "GR_ADM1_GRC-3013__SPLIT_DODECANESE": [
+      "DOD"
     ],
     "GS": [
       "FLK"
@@ -14602,8 +14629,11 @@
     "HR032": [
       "YUG"
     ],
-    "HR033": [
+    "HR033__SPLIT_REST": [
       "YUG"
+    ],
+    "HR033__SPLIT_ZARA": [
+      "ITA"
     ],
     "HR034": [
       "YUG"
@@ -16453,8 +16483,11 @@
     "ITH58": [
       "ITA"
     ],
-    "ITH59": [
+    "ITH59__SPLIT_REST": [
       "ITA"
+    ],
+    "ITH59__SPLIT_SAN_MARINO": [
+      "SMN"
     ],
     "ITI11": [
       "ITA"
@@ -17278,7 +17311,10 @@
     "LT011__SPLIT_WILNO": [
       "POL"
     ],
-    "LT021": [
+    "LT021__SPLIT_POLISH": [
+      "POL"
+    ],
+    "LT021__SPLIT_REST": [
       "LIT"
     ],
     "LT022": [
@@ -17396,7 +17432,7 @@
       "SSH"
     ],
     "MC_ADMIN0_PASSTHROUGH": [
-      "MCO"
+      "FRA"
     ],
     "MDA-1613": [
       "ROM"
@@ -17506,7 +17542,10 @@
     "MDA-1649": [
       "ROM"
     ],
-    "MDA-1650": [
+    "MDA-1650__SPLIT_BENDER": [
+      "ROM"
+    ],
+    "MDA-1650__SPLIT_LEFT": [
       "SOV"
     ],
     "MDA-1651": [
@@ -19991,7 +20030,7 @@
       "POL"
     ],
     "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG": [
-      "DNZ"
+      "POL"
     ],
     "PL_MRG_9e4e875a7bcd__SPLIT_REST": [
       "POL"
@@ -20491,7 +20530,10 @@
     "PL_POW_2404": [
       "POL"
     ],
-    "PL_POW_2405": [
+    "PL_POW_2405__SPLIT_POLISH": [
+      "POL"
+    ],
+    "PL_POW_2405__SPLIT_REST": [
       "GER"
     ],
     "PL_POW_2406": [
@@ -20569,7 +20611,10 @@
     "PL_POW_2477": [
       "POL"
     ],
-    "PL_POW_2478": [
+    "PL_POW_2478__SPLIT_POLISH": [
+      "POL"
+    ],
+    "PL_POW_2478__SPLIT_REST": [
       "GER"
     ],
     "PL_POW_2661": [
@@ -20590,7 +20635,10 @@
     "PL_POW_2805": [
       "GER"
     ],
-    "PL_POW_2807": [
+    "PL_POW_2807__SPLIT_LUBAWA": [
+      "POL"
+    ],
+    "PL_POW_2807__SPLIT_REST": [
       "GER"
     ],
     "PL_POW_2808": [
@@ -51661,8 +51709,11 @@
     "RU_CITY_MOSCOW__SPLIT_SOUTHWEST": [
       "SOV"
     ],
-    "RU_CITY_SAINT_PETERSBURG": [
+    "RU_CITY_SAINT_PETERSBURG__SPLIT_REST": [
       "SOV"
+    ],
+    "RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI": [
+      "FIN"
     ],
     "RU_CITY_VOLGOGRAD": [
       "SOV"
@@ -53524,8 +53575,11 @@
     "RU_RAY_50074027B39997532554417": [
       "SOV"
     ],
-    "RU_RAY_50074027B39999494546000": [
+    "RU_RAY_50074027B39999494546000__SPLIT_REST": [
       "FIN"
+    ],
+    "RU_RAY_50074027B39999494546000__SPLIT_SOVIET": [
+      "KRL"
     ],
     "RU_RAY_50074027B4006940257071": [
       "SOV"
@@ -53983,8 +54037,11 @@
     "RU_RAY_50074027B55465693339267": [
       "SOV"
     ],
-    "RU_RAY_50074027B55571784565288": [
+    "RU_RAY_50074027B55571784565288__SPLIT_REST": [
       "SOV"
+    ],
+    "RU_RAY_50074027B55571784565288__SPLIT_SALLA": [
+      "FIN"
     ],
     "RU_RAY_50074027B5563807985387": [
       "SOV"
@@ -55474,8 +55531,11 @@
     "SI037": [
       "YUG"
     ],
-    "SI038": [
+    "SI038__SPLIT_ITALIAN": [
       "ITA"
+    ],
+    "SI038__SPLIT_YUGOSLAV": [
+      "YUG"
     ],
     "SI041": [
       "YUG"
@@ -55495,7 +55555,10 @@
     "SK_ADM2_56367889B1447043738985": [
       "HUN"
     ],
-    "SK_ADM2_56367889B14569056094647": [
+    "SK_ADM2_56367889B14569056094647__SPLIT_HU": [
+      "HUN"
+    ],
+    "SK_ADM2_56367889B14569056094647__SPLIT_REST": [
       "SLO"
     ],
     "SK_ADM2_56367889B15205076567490": [
@@ -55564,7 +55627,10 @@
     "SK_ADM2_56367889B50490339994693": [
       "HUN"
     ],
-    "SK_ADM2_56367889B51237059400968": [
+    "SK_ADM2_56367889B51237059400968__SPLIT_DEVIN": [
+      "GER"
+    ],
+    "SK_ADM2_56367889B51237059400968__SPLIT_REST": [
       "SLO"
     ],
     "SK_ADM2_56367889B51496625279666": [
@@ -55591,7 +55657,10 @@
     "SK_ADM2_56367889B61252856682831": [
       "SLO"
     ],
-    "SK_ADM2_56367889B62094256812316": [
+    "SK_ADM2_56367889B62094256812316__SPLIT_HU": [
+      "HUN"
+    ],
+    "SK_ADM2_56367889B62094256812316__SPLIT_REST": [
       "SLO"
     ],
     "SK_ADM2_56367889B62553648042075": [
@@ -55603,13 +55672,19 @@
     "SK_ADM2_56367889B62817588919968": [
       "SLO"
     ],
-    "SK_ADM2_56367889B65708067786299": [
+    "SK_ADM2_56367889B65708067786299__SPLIT_REST": [
       "HUN"
+    ],
+    "SK_ADM2_56367889B65708067786299__SPLIT_SK": [
+      "SLO"
     ],
     "SK_ADM2_56367889B65848289259275": [
       "SLO"
     ],
-    "SK_ADM2_56367889B66923754975257": [
+    "SK_ADM2_56367889B66923754975257__SPLIT_HU": [
+      "HUN"
+    ],
+    "SK_ADM2_56367889B66923754975257__SPLIT_REST": [
       "SLO"
     ],
     "SK_ADM2_56367889B67356758961124": [
@@ -55618,7 +55693,10 @@
     "SK_ADM2_56367889B68595341554064": [
       "SLO"
     ],
-    "SK_ADM2_56367889B690835779632": [
+    "SK_ADM2_56367889B690835779632__SPLIT_PETRZALKA": [
+      "GER"
+    ],
+    "SK_ADM2_56367889B690835779632__SPLIT_REST": [
       "HUN"
     ],
     "SK_ADM2_56367889B72151249658777": [
@@ -55660,7 +55738,10 @@
     "SK_ADM2_56367889B94927774956455": [
       "SLO"
     ],
-    "SK_ADM2_56367889B94951233476884": [
+    "SK_ADM2_56367889B94951233476884__SPLIT_HU": [
+      "HUN"
+    ],
+    "SK_ADM2_56367889B94951233476884__SPLIT_REST": [
       "SLO"
     ],
     "SK_ADM2_56367889B96980961358907": [
@@ -55669,7 +55750,10 @@
     "SK_ADM2_56367889B97071895480744": [
       "SLO"
     ],
-    "SK_ADM2_56367889B97606993013938": [
+    "SK_ADM2_56367889B97606993013938__SPLIT_HU": [
+      "HUN"
+    ],
+    "SK_ADM2_56367889B97606993013938__SPLIT_REST": [
       "SLO"
     ],
     "SK_ADM2_56367889B98399677297130": [
@@ -56476,7 +56560,13 @@
     "TR622": [
       "TUR"
     ],
-    "TR631": [
+    "TR631__SPLIT_KESSAB": [
+      "ALW"
+    ],
+    "TR631__SPLIT_NORTH": [
+      "TUR"
+    ],
+    "TR631__SPLIT_SANJAK": [
       "TUR"
     ],
     "TR632": [
@@ -57217,7 +57307,10 @@
     "UA_RAY_74538382B20048272724198": [
       "UKR"
     ],
-    "UA_RAY_74538382B20694939957091": [
+    "UA_RAY_74538382B20694939957091__SPLIT_BUKOVINA": [
+      "ROM"
+    ],
+    "UA_RAY_74538382B20694939957091__SPLIT_GALICIA": [
       "POL"
     ],
     "UA_RAY_74538382B20988283989287": [
@@ -57373,7 +57466,10 @@
     "UA_RAY_74538382B36929178896395": [
       "UKR"
     ],
-    "UA_RAY_74538382B36952464312213": [
+    "UA_RAY_74538382B36952464312213__SPLIT_BUKOVINA": [
+      "ROM"
+    ],
+    "UA_RAY_74538382B36952464312213__SPLIT_GALICIA": [
       "POL"
     ],
     "UA_RAY_74538382B36980255523800": [
@@ -58570,7 +58666,10 @@
     "UA_SHELL_FB_203": [
       "UKR"
     ],
-    "UA_SHELL_FB_204": [
+    "UA_SHELL_FB_204__SPLIT_AKKERMAN": [
+      "ROM"
+    ],
+    "UA_SHELL_FB_204__SPLIT_OVIDIOPOL": [
       "UKR"
     ],
     "UA_SHELL_FB_205": [

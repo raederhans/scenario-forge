@@ -201,7 +201,6 @@
       },
       "memberFeatureIds": [
         "PL_MRG_727dd6268093__SPLIT_DANZIG",
-        "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
         "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST",
         "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST",
         "PL_POW_2261",
@@ -249,7 +248,8 @@
         "SYR-146",
         "SYR-4843",
         "SYR-5261",
-        "TR631"
+        "TR631__SPLIT_KESSAB",
+        "TR631__SPLIT_SANJAK"
       ],
       "note": "国际联盟法国委任统治；现代叙利亚、黎巴嫩及法国下属亚历山大勒塔自治专区（哈塔伊）"
     },

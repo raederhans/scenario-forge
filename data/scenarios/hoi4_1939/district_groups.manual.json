@@ -129,6 +129,28 @@
         }
       }
     },
+    "ALW": {
+      "tag": "ALW",
+      "districts": {
+        "state_677": {
+          "district_id": "state_677",
+          "name_en": "Aleppo",
+          "name_zh": "阿勒颇",
+          "feature_ids": [
+            "SYR-134",
+            "SYR-135"
+          ]
+        },
+        "state_799": {
+          "district_id": "state_799",
+          "name_en": "Hatay",
+          "name_zh": "哈塔伊",
+          "feature_ids": [
+            "TR631__SPLIT_KESSAB"
+          ]
+        }
+      }
+    },
     "ARG": {
       "tag": "ARG",
       "districts": {
@@ -607,6 +629,7 @@
             "CZ_ADM2_57006924B25962740711880",
             "CZ_ADM2_57006924B26779967263881",
             "CZ_ADM2_57006924B32813693256962",
+            "CZ_ADM2_57006924B34464963037986__SPLIT_NETOLICE",
             "CZ_ADM2_57006924B46613202139284",
             "CZ_ADM2_57006924B55772558323280",
             "CZ_ADM2_57006924B61995402941039",
@@ -629,17 +652,24 @@
             "CZ_SHELL_FB_055"
           ]
         },
+        "state_53": {
+          "district_id": "state_53",
+          "name_en": "Niederbayern",
+          "name_zh": "下巴伐利亚",
+          "feature_ids": [
+            "CZ_ADM2_57006924B92931687173289__SPLIT_TAUS"
+          ]
+        },
         "state_66": {
           "district_id": "state_66",
           "name_en": "Lower Silesia",
           "name_zh": "下西里西亚",
           "feature_ids": [
-            "CZ_ADM2_57006924B40201864279221",
+            "CZ_ADM2_57006924B40201864279221__SPLIT_REST",
             "CZ_ADM2_57006924B50363024387408",
             "CZ_SHELL_FB_024",
             "CZ_SHELL_FB_026",
             "CZ_SHELL_FB_027",
-            "CZ_SHELL_FB_028",
             "CZ_SHELL_FB_056",
             "CZ_SHELL_FB_057",
             "CZ_SHELL_FB_067",
@@ -684,18 +714,17 @@
           "name_zh": "摩拉维亚",
           "feature_ids": [
             "CZ_ADM2_57006924B20341688327038",
-            "CZ_ADM2_57006924B30982913442521",
+            "CZ_ADM2_57006924B30982913442521__SPLIT_REST",
             "CZ_ADM2_57006924B48131365256783",
             "CZ_ADM2_57006924B6194040717331",
-            "CZ_ADM2_57006924B62007249383837",
+            "CZ_ADM2_57006924B62007249383837__SPLIT_REST",
             "CZ_ADM2_57006924B65826634483108",
             "CZ_ADM2_57006924B67004616478789",
             "CZ_ADM2_57006924B90019795994252",
             "CZ_MRG_2919911b5bfd",
-            "CZ_MRG_9096ecd76bb9",
+            "CZ_MRG_9096ecd76bb9__SPLIT_REST",
             "CZ_MRG_e151f991209d",
             "CZ_SHELL_FB_029",
-            "CZ_SHELL_FB_031",
             "CZ_SHELL_FB_037",
             "CZ_SHELL_FB_038",
             "CZ_SHELL_FB_040",
@@ -709,6 +738,7 @@
           "name_zh": "南苏台德",
           "feature_ids": [
             "CZ_ADM2_57006924B67285149942805",
+            "CZ_ADM2_57006924B95695201424764__SPLIT_JEVISOVICE",
             "CZ_MRG_a9dfac9d401b",
             "CZ_SHELL_FB_019",
             "CZ_SHELL_FB_022"
@@ -3260,31 +3290,6 @@
         }
       }
     },
-    "DNZ": {
-      "tag": "DNZ",
-      "districts": {
-        "state_85": {
-          "district_id": "state_85",
-          "name_en": "Danzig",
-          "name_zh": "但泽",
-          "feature_ids": [
-            "PL_MRG_727dd6268093__SPLIT_DANZIG",
-            "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST",
-            "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST",
-            "PL_POW_2261",
-            "PL_POW_2264"
-          ]
-        },
-        "state_807": {
-          "district_id": "state_807",
-          "name_en": "Gdynia",
-          "name_zh": "格丁尼亚",
-          "feature_ids": [
-            "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG"
-          ]
-        }
-      }
-    },
     "ENG": {
       "tag": "ENG",
       "districts": {
@@ -3973,7 +3978,9 @@
           "name_en": "Lappi",
           "name_zh": "拉皮",
           "feature_ids": [
-            "FI1D7"
+            "FI1D7",
+            "RU_ARCTIC_FB_099",
+            "RU_RAY_50074027B55571784565288__SPLIT_SALLA"
           ]
         },
         "state_149": {
@@ -4011,10 +4018,12 @@
             "RU_ARCTIC_FB_8060",
             "RU_ARCTIC_FB_8076",
             "RU_ARCTIC_FB_8080",
+            "RU_ARCTIC_FB_8083",
             "RU_ARCTIC_FB_8119",
             "RU_ARCTIC_FB_9169",
             "RU_ARCTIC_FB_9450",
             "RU_ARCTIC_FB_9659",
+            "RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI",
             "RU_RAY_50074027B13545966526097",
             "RU_RAY_50074027B59818225076566",
             "RU_RAY_50074027B665779401805"
@@ -4056,15 +4065,11 @@
           "feature_ids": [
             "RU_ARCTIC_FB_150",
             "RU_ARCTIC_FB_158",
-            "RU_ARCTIC_FB_174",
             "RU_ARCTIC_FB_220",
             "RU_ARCTIC_FB_243",
-            "RU_ARCTIC_FB_320",
-            "RU_ARCTIC_FB_325",
-            "RU_ARCTIC_FB_351",
             "RU_RAY_50074027B1834792813283",
             "RU_RAY_50074027B28012955245015",
-            "RU_RAY_50074027B39999494546000"
+            "RU_RAY_50074027B39999494546000__SPLIT_REST"
           ]
         },
         "state_926": {
@@ -4598,7 +4603,8 @@
             "FR_ARR_04003",
             "FR_ARR_04004",
             "FR_ARR_06001",
-            "FR_ARR_06002"
+            "FR_ARR_06002__SPLIT_REST",
+            "MC_ADMIN0_PASSTHROUGH"
           ]
         },
         "state_785": {
@@ -4719,7 +4725,7 @@
             "PL_POW_2802",
             "PL_POW_2804",
             "PL_POW_2805",
-            "PL_POW_2807",
+            "PL_POW_2807__SPLIT_REST",
             "PL_POW_2808",
             "PL_POW_2811",
             "PL_POW_2813",
@@ -4736,7 +4742,7 @@
           "name_en": "Bohemia",
           "name_zh": "波希米亚",
           "feature_ids": [
-            "CZ_ADM2_57006924B34464963037986"
+            "CZ_ADM2_57006924B34464963037986__SPLIT_REST"
           ]
         },
         "state_42": {
@@ -4898,7 +4904,7 @@
           "name_zh": "下巴伐利亚",
           "feature_ids": [
             "CZ_ADM2_57006924B55732331485961",
-            "CZ_ADM2_57006924B92931687173289",
+            "CZ_ADM2_57006924B92931687173289__SPLIT_REST",
             "DE211",
             "DE219",
             "DE223",
@@ -5256,6 +5262,8 @@
           "name_en": "Lower Silesia",
           "name_zh": "下西里西亚",
           "feature_ids": [
+            "CZ_ADM2_57006924B40201864279221__SPLIT_BRAUNAU",
+            "CZ_SHELL_FB_028",
             "PL_MRG_cbc1e164f4f5",
             "PL_POW_0203",
             "PL_POW_0204",
@@ -5399,6 +5407,14 @@
             "PL_POW_0225"
           ]
         },
+        "state_70": {
+          "district_id": "state_70",
+          "name_en": "Western Slovakia",
+          "name_zh": "西斯洛伐克",
+          "feature_ids": [
+            "SK_ADM2_56367889B51237059400968__SPLIT_DEVIN"
+          ]
+        },
         "state_74": {
           "district_id": "state_74",
           "name_en": "Sudeten Silesia",
@@ -5429,7 +5445,11 @@
           "name_en": "Moravia",
           "name_zh": "摩拉维亚",
           "feature_ids": [
-            "CZ_ADM2_57006924B61075462930500"
+            "CZ_ADM2_57006924B30982913442521__SPLIT_LANDSKRON",
+            "CZ_ADM2_57006924B61075462930500",
+            "CZ_ADM2_57006924B62007249383837__SPLIT_STERNBERG",
+            "CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST",
+            "CZ_SHELL_FB_031"
           ]
         },
         "state_85": {
@@ -5509,6 +5529,14 @@
             "DE_SHELL_FB_267"
           ]
         },
+        "state_155": {
+          "district_id": "state_155",
+          "name_en": "North Transdanubia",
+          "name_zh": "北外多瑙",
+          "feature_ids": [
+            "SK_ADM2_56367889B690835779632__SPLIT_PETRZALKA"
+          ]
+        },
         "state_188": {
           "district_id": "state_188",
           "name_en": "Memel",
@@ -5540,11 +5568,11 @@
           "name_en": "Katowice",
           "name_zh": "卡托维兹",
           "feature_ids": [
-            "PL_POW_2405",
+            "PL_POW_2405__SPLIT_REST",
             "PL_POW_2411",
             "PL_POW_2462",
             "PL_POW_2466",
-            "PL_POW_2478"
+            "PL_POW_2478__SPLIT_REST"
           ]
         },
         "state_763": {
@@ -5675,7 +5703,7 @@
           "feature_ids": [
             "AT125",
             "CZ_ADM2_57006924B56764577868008",
-            "CZ_ADM2_57006924B95695201424764",
+            "CZ_ADM2_57006924B95695201424764__SPLIT_REST",
             "CZ_SHELL_FB_023",
             "CZ_SHELL_FB_025",
             "CZ_SHELL_FB_030",
@@ -5815,7 +5843,7 @@
             "EL433",
             "EL434",
             "GR_ADM1_GRC-2990",
-            "GR_ADM1_GRC-3013"
+            "GR_ADM1_GRC-3013__SPLIT_CYCLADES"
           ]
         },
         "state_184": {
@@ -6075,15 +6103,23 @@
             "SK_ADM2_56367889B96980961358907"
           ]
         },
+        "state_70": {
+          "district_id": "state_70",
+          "name_en": "Western Slovakia",
+          "name_zh": "西斯洛伐克",
+          "feature_ids": [
+            "SK_ADM2_56367889B62094256812316__SPLIT_HU",
+            "SK_ADM2_56367889B94951233476884__SPLIT_HU"
+          ]
+        },
         "state_71": {
           "district_id": "state_71",
           "name_en": "Eastern Slovakia",
           "name_zh": "东斯洛伐克",
           "feature_ids": [
-            "SK_ADM2_56367889B16879144707830",
-            "SK_ADM2_56367889B46930466225258",
-            "SK_ADM2_56367889B57985107422825",
-            "SK_ADM2_56367889B7741755639355"
+            "SK_ADM2_56367889B14569056094647__SPLIT_HU",
+            "SK_ADM2_56367889B66923754975257__SPLIT_HU",
+            "SK_ADM2_56367889B97606993013938__SPLIT_HU"
           ]
         },
         "state_73": {
@@ -6145,7 +6181,7 @@
             "HU223",
             "SK_ADM2_56367889B27848609458937",
             "SK_ADM2_56367889B62553648042075",
-            "SK_ADM2_56367889B690835779632",
+            "SK_ADM2_56367889B690835779632__SPLIT_REST",
             "SK_ADM2_56367889B78366861694162"
           ]
         },
@@ -6157,9 +6193,13 @@
             "HU311",
             "SK_ADM2_56367889B1447043738985",
             "SK_ADM2_56367889B15205076567490",
+            "SK_ADM2_56367889B16879144707830",
             "SK_ADM2_56367889B31823009041462",
+            "SK_ADM2_56367889B46930466225258",
             "SK_ADM2_56367889B50490339994693",
-            "SK_ADM2_56367889B65708067786299"
+            "SK_ADM2_56367889B57985107422825",
+            "SK_ADM2_56367889B65708067786299__SPLIT_REST",
+            "SK_ADM2_56367889B7741755639355"
           ]
         },
         "state_973": {
@@ -6561,6 +6601,14 @@
             "ITH33"
           ]
         },
+        "state_109": {
+          "district_id": "state_109",
+          "name_en": "Croatia",
+          "name_zh": "克罗地亚",
+          "feature_ids": [
+            "HR033__SPLIT_ZARA"
+          ]
+        },
         "state_114": {
           "district_id": "state_114",
           "name_en": "Sardinia",
@@ -6632,7 +6680,7 @@
           "name_zh": "阿布鲁佐",
           "feature_ids": [
             "ITF12",
-            "ITH59",
+            "ITH59__SPLIT_REST",
             "ITI21",
             "ITI31",
             "ITI32",
@@ -6772,7 +6820,7 @@
             "HR031__SPLIT_CHERSO",
             "HR031__SPLIT_FIUME",
             "HR036",
-            "SI038",
+            "SI038__SPLIT_ITALIAN",
             "SI043",
             "SI044"
           ]
@@ -7738,6 +7786,7 @@
           "feature_ids": [
             "RU_ARCTIC_FB_093",
             "RU_ARCTIC_FB_204",
+            "RU_ARCTIC_FB_213",
             "RU_ARCTIC_FB_381",
             "RU_ARCTIC_FB_400",
             "RU_ARCTIC_FB_422",
@@ -7775,15 +7824,19 @@
             "RU_ARCTIC_FB_117",
             "RU_ARCTIC_FB_127",
             "RU_ARCTIC_FB_152",
+            "RU_ARCTIC_FB_174",
             "RU_ARCTIC_FB_290",
             "RU_ARCTIC_FB_297",
             "RU_ARCTIC_FB_319",
+            "RU_ARCTIC_FB_320",
+            "RU_ARCTIC_FB_325",
             "RU_ARCTIC_FB_332",
             "RU_ARCTIC_FB_335",
             "RU_ARCTIC_FB_336",
             "RU_ARCTIC_FB_343",
             "RU_ARCTIC_FB_346",
             "RU_ARCTIC_FB_348",
+            "RU_ARCTIC_FB_351",
             "RU_ARCTIC_FB_358",
             "RU_ARCTIC_FB_370",
             "RU_ARCTIC_FB_404",
@@ -7810,6 +7863,7 @@
             "RU_RAY_50074027B18326506534636",
             "RU_RAY_50074027B19345825479949",
             "RU_RAY_50074027B35606429719645",
+            "RU_RAY_50074027B39999494546000__SPLIT_SOVIET",
             "RU_RAY_50074027B49390035135032",
             "RU_RAY_50074027B69838123012622",
             "RU_RAY_50074027B74918708224942",
@@ -7943,7 +7997,7 @@
           "name_en": "Sūduva",
           "name_zh": "苏杜瓦",
           "feature_ids": [
-            "LT021",
+            "LT021__SPLIT_REST",
             "LT024"
           ]
         },
@@ -10162,6 +10216,7 @@
           "name_zh": "埃姆兰-马祖伦",
           "feature_ids": [
             "PL_POW_2803",
+            "PL_POW_2807__SPLIT_LUBAWA",
             "PL_POW_2812"
           ]
         },
@@ -10297,11 +10352,11 @@
             "UA_RAY_74538382B11484774081003",
             "UA_RAY_74538382B1294553244801",
             "UA_RAY_74538382B19184608500024",
-            "UA_RAY_74538382B20694939957091",
+            "UA_RAY_74538382B20694939957091__SPLIT_GALICIA",
             "UA_RAY_74538382B20988283989287",
             "UA_RAY_74538382B30474831618663",
             "UA_RAY_74538382B3075345491126",
-            "UA_RAY_74538382B36952464312213",
+            "UA_RAY_74538382B36952464312213__SPLIT_GALICIA",
             "UA_RAY_74538382B3900479393084",
             "UA_RAY_74538382B41206945038645",
             "UA_RAY_74538382B43402639614828",
@@ -10544,6 +10599,7 @@
             "PL_POW_2402",
             "PL_POW_2403",
             "PL_POW_2404",
+            "PL_POW_2405__SPLIT_POLISH",
             "PL_POW_2406",
             "PL_POW_2407",
             "PL_POW_2409",
@@ -10565,7 +10621,8 @@
             "PL_POW_2473",
             "PL_POW_2475",
             "PL_POW_2476",
-            "PL_POW_2477"
+            "PL_POW_2477",
+            "PL_POW_2478__SPLIT_POLISH"
           ]
         },
         "state_784": {
@@ -10588,6 +10645,7 @@
           "name_en": "Gdynia",
           "name_zh": "格丁尼亚",
           "feature_ids": [
+            "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
             "PL_MRG_9e4e875a7bcd__SPLIT_REST",
             "PL_MRG_c93ffd9ad4b7",
             "PL_POW_0402",
@@ -10597,6 +10655,14 @@
             "PL_POW_0415",
             "PL_POW_0461",
             "PL_POW_0463"
+          ]
+        },
+        "state_814": {
+          "district_id": "state_814",
+          "name_en": "Sūduva",
+          "name_zh": "苏杜瓦",
+          "feature_ids": [
+            "LT021__SPLIT_POLISH"
           ]
         }
       }
@@ -11542,6 +11608,7 @@
             "MDA-1647",
             "MDA-1648",
             "MDA-1649",
+            "MDA-1650__SPLIT_BENDER",
             "MDA-1651",
             "MDA-1652__SPLIT_RIGHT",
             "MDA-1653",
@@ -11578,21 +11645,7 @@
             "MDA-1617",
             "RO212",
             "RO215",
-            "UA_RAY_74538382B19402975726216",
-            "UA_RAY_74538382B32943992723151",
-            "UA_RAY_74538382B46813680897661",
-            "UA_RAY_74538382B50216081867244",
-            "UA_RAY_74538382B59394362470608",
             "UA_RAY_74538382B66987741978303",
-            "UA_RAY_74538382B84300639272242",
-            "UA_RAY_74538382B90476934992990",
-            "UA_RAY_74538382B92550814183987",
-            "UA_RAY_74538382B95854535176158",
-            "UA_SHELL_FB_054",
-            "UA_SHELL_FB_060",
-            "UA_SHELL_FB_064",
-            "UA_SHELL_FB_065",
-            "UA_SHELL_FB_069",
             "UA_SHELL_FB_093"
           ]
         },
@@ -11635,6 +11688,29 @@
             "RO123",
             "RO124",
             "RO311"
+          ]
+        },
+        "state_89": {
+          "district_id": "state_89",
+          "name_en": "Stanisławów",
+          "name_zh": "斯坦尼斯瓦沃夫",
+          "feature_ids": [
+            "UA_RAY_74538382B19402975726216",
+            "UA_RAY_74538382B20694939957091__SPLIT_BUKOVINA",
+            "UA_RAY_74538382B32943992723151",
+            "UA_RAY_74538382B36952464312213__SPLIT_BUKOVINA",
+            "UA_RAY_74538382B46813680897661",
+            "UA_RAY_74538382B50216081867244",
+            "UA_RAY_74538382B59394362470608",
+            "UA_RAY_74538382B84300639272242",
+            "UA_RAY_74538382B90476934992990",
+            "UA_RAY_74538382B92550814183987",
+            "UA_RAY_74538382B95854535176158",
+            "UA_SHELL_FB_054",
+            "UA_SHELL_FB_060",
+            "UA_SHELL_FB_064",
+            "UA_SHELL_FB_065",
+            "UA_SHELL_FB_069"
           ]
         },
         "state_198": {
@@ -11680,7 +11756,8 @@
             "UA_SHELL_FB_151",
             "UA_SHELL_FB_162",
             "UA_SHELL_FB_181",
-            "UA_SHELL_FB_197"
+            "UA_SHELL_FB_197",
+            "UA_SHELL_FB_204__SPLIT_AKKERMAN"
           ]
         },
         "state_971": {
@@ -12097,12 +12174,12 @@
             "SK_ADM2_56367889B42847558326348",
             "SK_ADM2_56367889B4918056975771",
             "SK_ADM2_56367889B50353875052402",
-            "SK_ADM2_56367889B51237059400968",
+            "SK_ADM2_56367889B51237059400968__SPLIT_REST",
             "SK_ADM2_56367889B51514564384482",
             "SK_ADM2_56367889B57285771161703",
             "SK_ADM2_56367889B58167623425022",
             "SK_ADM2_56367889B61252856682831",
-            "SK_ADM2_56367889B62094256812316",
+            "SK_ADM2_56367889B62094256812316__SPLIT_REST",
             "SK_ADM2_56367889B62739535395269",
             "SK_ADM2_56367889B62817588919968",
             "SK_ADM2_56367889B65848289259275",
@@ -12113,7 +12190,7 @@
             "SK_ADM2_56367889B81133001321420",
             "SK_ADM2_56367889B87068302757109",
             "SK_ADM2_56367889B91036256885729",
-            "SK_ADM2_56367889B94951233476884",
+            "SK_ADM2_56367889B94951233476884__SPLIT_REST",
             "SK_ADM2_56367889B98399677297130",
             "SK_MRG_351edc5a6c69",
             "SK_MRG_6ddeb377aab6",
@@ -12128,7 +12205,7 @@
           "name_en": "Eastern Slovakia",
           "name_zh": "东斯洛伐克",
           "feature_ids": [
-            "SK_ADM2_56367889B14569056094647",
+            "SK_ADM2_56367889B14569056094647__SPLIT_REST",
             "SK_ADM2_56367889B18200948818921",
             "SK_ADM2_56367889B24002183790147",
             "SK_ADM2_56367889B25974753894430",
@@ -12138,7 +12215,7 @@
             "SK_ADM2_56367889B47622109691322",
             "SK_ADM2_56367889B51496625279666",
             "SK_ADM2_56367889B53553144532917",
-            "SK_ADM2_56367889B66923754975257",
+            "SK_ADM2_56367889B66923754975257__SPLIT_REST",
             "SK_ADM2_56367889B67356758961124",
             "SK_ADM2_56367889B68595341554064",
             "SK_ADM2_56367889B83569782265262",
@@ -12146,9 +12223,17 @@
             "SK_ADM2_56367889B9282010334294",
             "SK_ADM2_56367889B94927774956455",
             "SK_ADM2_56367889B97071895480744",
-            "SK_ADM2_56367889B97606993013938",
+            "SK_ADM2_56367889B97606993013938__SPLIT_REST",
             "SK_ADM2_56367889B99469568447767",
             "SK_MRG_e93604b4f2a5"
+          ]
+        },
+        "state_664": {
+          "district_id": "state_664",
+          "name_en": "Southern Slovakia",
+          "name_zh": "南斯洛伐克",
+          "feature_ids": [
+            "SK_ADM2_56367889B65708067786299__SPLIT_SK"
           ]
         }
       }
@@ -12266,7 +12351,7 @@
             "MDA-1637",
             "MDA-1638",
             "MDA-1645",
-            "MDA-1650",
+            "MDA-1650__SPLIT_LEFT",
             "MDA-1652__SPLIT_LEFT",
             "UA_SHELL_FB_135",
             "UA_SHELL_FB_144"
@@ -12355,7 +12440,6 @@
             "RU_ARCTIC_FB_8067",
             "RU_ARCTIC_FB_8068",
             "RU_ARCTIC_FB_8072",
-            "RU_ARCTIC_FB_8083",
             "RU_ARCTIC_FB_8085",
             "RU_ARCTIC_FB_8086",
             "RU_ARCTIC_FB_8089",
@@ -12365,7 +12449,7 @@
             "RU_ARCTIC_FB_9170",
             "RU_ARCTIC_FB_9171",
             "RU_ARCTIC_FB_9172",
-            "RU_CITY_SAINT_PETERSBURG",
+            "RU_CITY_SAINT_PETERSBURG__SPLIT_REST",
             "RU_RAY_50074027B12162041502673",
             "RU_RAY_50074027B20331318716688",
             "RU_RAY_50074027B49278461872326",
@@ -12714,7 +12798,6 @@
           "name_zh": "摩尔曼斯克",
           "feature_ids": [
             "RU_ARCTIC_FB_075",
-            "RU_ARCTIC_FB_099",
             "RU_ARCTIC_FB_10043",
             "RU_ARCTIC_FB_10044",
             "RU_ARCTIC_FB_10046",
@@ -12739,7 +12822,6 @@
             "RU_ARCTIC_FB_195",
             "RU_ARCTIC_FB_199",
             "RU_ARCTIC_FB_206",
-            "RU_ARCTIC_FB_213",
             "RU_ARCTIC_FB_229",
             "RU_ARCTIC_FB_253",
             "RU_ARCTIC_FB_256",
@@ -12840,7 +12922,7 @@
             "RU_RAY_50074027B34626679799477",
             "RU_RAY_50074027B44344912803329",
             "RU_RAY_50074027B47892582969199",
-            "RU_RAY_50074027B55571784565288",
+            "RU_RAY_50074027B55571784565288__SPLIT_REST",
             "RU_RAY_50074027B84839917007639",
             "RU_RAY_50074027B9218213171589"
           ]
@@ -23486,7 +23568,8 @@
           "name_en": "Hatay",
           "name_zh": "哈塔伊",
           "feature_ids": [
-            "TR631"
+            "TR631__SPLIT_NORTH",
+            "TR631__SPLIT_SANJAK"
           ]
         },
         "state_800": {
@@ -23635,7 +23718,7 @@
             "UA_SHELL_FB_189",
             "UA_SHELL_FB_191",
             "UA_SHELL_FB_199",
-            "UA_SHELL_FB_204",
+            "UA_SHELL_FB_204__SPLIT_OVIDIOPOL",
             "UA_SHELL_FB_211",
             "UA_SHELL_FB_218",
             "UA_SHELL_FB_224",
@@ -26379,7 +26462,7 @@
             "HR027",
             "HR028",
             "HR032",
-            "HR033",
+            "HR033__SPLIT_REST",
             "HR050",
             "HR062",
             "HR063",
@@ -26457,6 +26540,7 @@
             "HR031__SPLIT_REST",
             "SI035",
             "SI037",
+            "SI038__SPLIT_YUGOSLAV",
             "SI041",
             "SI042"
           ]

@@ -45682,43 +45682,6 @@
       }
     },
     {
-      "id": "RU_ARCTIC_FB_6949",
-      "type": "Feature",
-      "properties": {
-        "id": "RU_ARCTIC_FB_6949",
-        "name": "Russia Shell Fallback 6949",
-        "cntr_code": "RU",
-        "admin1_group": "",
-        "legacy_name": "",
-        "anchor_county_name": "",
-        "detail_tier": "",
-        "__source": "detail"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              133.29673296732966,
-              43.3767535595356
-            ],
-            [
-              133.26433264332644,
-              43.420149518495194
-            ],
-            [
-              133.28593285932862,
-              43.321206732067324
-            ],
-            [
-              133.29673296732966,
-              43.3767535595356
-            ]
-          ]
-        ]
-      }
-    },
-    {
       "id": "RU_ARCTIC_FB_6950",
       "type": "Feature",
       "properties": {
@@ -106168,7 +106131,7 @@
       }
     },
     {
-      "id": 21020,
+      "id": 20988,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_eefc121c2bf0__SPLIT_REST",

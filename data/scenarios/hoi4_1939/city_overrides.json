@@ -3859,10 +3859,10 @@
     },
     "MCO": {
       "country_code": "MC",
-      "host_feature_id": "MC_ADMIN0_PASSTHROUGH",
+      "host_feature_id": "FR_ARR_06002__SPLIT_MONACO",
       "urban_match_id": "UA_BBD8D7524307",
-      "lon": 7.418141920294424,
-      "lat": 43.75090156108269,
+      "lon": 7.42091041553169,
+      "lat": 43.7394181387089,
       "population": 36371,
       "base_tier": "major",
       "source": "merged",
@@ -7854,7 +7854,8 @@
         "Saint Petersburg"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
     },
     "CITY::ne::1159150695": {
       "stable_key": "id::CITY::ne::1159150695",
@@ -8969,9 +8970,9 @@
         "en": "Monaco",
         "zh": "摩纳哥"
       },
-      "host_feature_id": "MC_ADMIN0_PASSTHROUGH",
-      "lon": 7.418141920294424,
-      "lat": 43.75090156108269
+      "host_feature_id": "FR_ARR_06002__SPLIT_MONACO",
+      "lon": 7.42091041553169,
+      "lat": 43.7394181387089
     },
     "CITY::ne::1159149089": {
       "city_id": "CITY::ne::1159149089",
@@ -23620,7 +23621,8 @@
       "aliases": [
         "Hindenburg",
         "Zabrze"
-      ]
+      ],
+      "host_feature_id": "PL_POW_2478__SPLIT_REST"
     },
     "CITY::ne::1159129505": {
       "city_id": "CITY::ne::1159129505",
@@ -26785,6 +26787,461 @@
       "city_id": "CITY::gn::599506",
       "stable_key": "id::CITY::gn::599506",
       "host_feature_id": "LT023__SPLIT_MEMEL"
+    },
+    "CITY::gn::12319241": {
+      "city_id": "CITY::gn::12319241",
+      "stable_key": "id::CITY::gn::12319241",
+      "host_feature_id": "FR_ARR_06002__SPLIT_REST"
+    },
+    "CITY::gn::12319260": {
+      "city_id": "CITY::gn::12319260",
+      "stable_key": "id::CITY::gn::12319260",
+      "host_feature_id": "FR_ARR_06002__SPLIT_REST"
+    },
+    "CITY::gn::13118651": {
+      "city_id": "CITY::gn::13118651",
+      "stable_key": "id::CITY::gn::13118651",
+      "host_feature_id": "SK_ADM2_56367889B51237059400968__SPLIT_REST"
+    },
+    "CITY::gn::13580310": {
+      "city_id": "CITY::gn::13580310",
+      "stable_key": "id::CITY::gn::13580310",
+      "host_feature_id": "FR_ARR_06002__SPLIT_REST"
+    },
+    "CITY::gn::296852": {
+      "city_id": "CITY::gn::296852",
+      "stable_key": "id::CITY::gn::296852",
+      "host_feature_id": "TR631__SPLIT_NORTH"
+    },
+    "CITY::gn::2978891": {
+      "city_id": "CITY::gn::2978891",
+      "stable_key": "id::CITY::gn::2978891",
+      "host_feature_id": "FR_ARR_06002__SPLIT_REST"
+    },
+    "CITY::gn::298435": {
+      "city_id": "CITY::gn::298435",
+      "stable_key": "id::CITY::gn::298435",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::2992741": {
+      "city_id": "CITY::gn::2992741",
+      "stable_key": "id::CITY::gn::2992741",
+      "host_feature_id": "FR_ARR_06002__SPLIT_REST"
+    },
+    "CITY::gn::2994497": {
+      "city_id": "CITY::gn::2994497",
+      "stable_key": "id::CITY::gn::2994497",
+      "host_feature_id": "FR_ARR_06002__SPLIT_REST"
+    },
+    "CITY::gn::301089": {
+      "city_id": "CITY::gn::301089",
+      "stable_key": "id::CITY::gn::301089",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::302355": {
+      "city_id": "CITY::gn::302355",
+      "stable_key": "id::CITY::gn::302355",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::3057685": {
+      "city_id": "CITY::gn::3057685",
+      "stable_key": "id::CITY::gn::3057685",
+      "host_feature_id": "SK_ADM2_56367889B94951233476884__SPLIT_REST"
+    },
+    "CITY::gn::3057692": {
+      "city_id": "CITY::gn::3057692",
+      "stable_key": "id::CITY::gn::3057692",
+      "host_feature_id": "SK_ADM2_56367889B62094256812316__SPLIT_HU"
+    },
+    "CITY::gn::3058213": {
+      "city_id": "CITY::gn::3058213",
+      "stable_key": "id::CITY::gn::3058213",
+      "host_feature_id": "SK_ADM2_56367889B690835779632__SPLIT_PETRZALKA"
+    },
+    "CITY::gn::3059564": {
+      "city_id": "CITY::gn::3059564",
+      "stable_key": "id::CITY::gn::3059564",
+      "host_feature_id": "SK_ADM2_56367889B51237059400968__SPLIT_REST"
+    },
+    "CITY::gn::3060219": {
+      "city_id": "CITY::gn::3060219",
+      "stable_key": "id::CITY::gn::3060219",
+      "host_feature_id": "SK_ADM2_56367889B94951233476884__SPLIT_HU"
+    },
+    "CITY::gn::3060322": {
+      "city_id": "CITY::gn::3060322",
+      "stable_key": "id::CITY::gn::3060322",
+      "host_feature_id": "SK_ADM2_56367889B51237059400968__SPLIT_REST"
+    },
+    "CITY::gn::3061344": {
+      "city_id": "CITY::gn::3061344",
+      "stable_key": "id::CITY::gn::3061344",
+      "host_feature_id": "CZ_ADM2_57006924B95695201424764__SPLIT_REST"
+    },
+    "CITY::gn::3063546": {
+      "city_id": "CITY::gn::3063546",
+      "stable_key": "id::CITY::gn::3063546",
+      "host_feature_id": "CZ_ADM2_57006924B30982913442521__SPLIT_REST"
+    },
+    "CITY::gn::3064454": {
+      "city_id": "CITY::gn::3064454",
+      "stable_key": "id::CITY::gn::3064454",
+      "host_feature_id": "CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST"
+    },
+    "CITY::gn::3070122": {
+      "city_id": "CITY::gn::3070122",
+      "stable_key": "id::CITY::gn::3070122",
+      "host_feature_id": "CZ_ADM2_57006924B40201864279221__SPLIT_REST"
+    },
+    "CITY::gn::307657": {
+      "city_id": "CITY::gn::307657",
+      "stable_key": "id::CITY::gn::307657",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::3077170": {
+      "city_id": "CITY::gn::3077170",
+      "stable_key": "id::CITY::gn::3077170",
+      "host_feature_id": "SK_ADM2_56367889B51237059400968__SPLIT_REST"
+    },
+    "CITY::gn::3077539": {
+      "city_id": "CITY::gn::3077539",
+      "stable_key": "id::CITY::gn::3077539",
+      "host_feature_id": "CZ_MRG_9096ecd76bb9__SPLIT_REST"
+    },
+    "CITY::gn::3077920": {
+      "city_id": "CITY::gn::3077920",
+      "stable_key": "id::CITY::gn::3077920",
+      "host_feature_id": "CZ_ADM2_57006924B30982913442521__SPLIT_REST"
+    },
+    "CITY::gn::3087628": {
+      "city_id": "CITY::gn::3087628",
+      "stable_key": "id::CITY::gn::3087628",
+      "host_feature_id": "PL_POW_2405__SPLIT_REST"
+    },
+    "CITY::gn::3095971": {
+      "city_id": "CITY::gn::3095971",
+      "stable_key": "id::CITY::gn::3095971",
+      "host_feature_id": "PL_POW_2405__SPLIT_POLISH"
+    },
+    "CITY::gn::3097902": {
+      "city_id": "CITY::gn::3097902",
+      "stable_key": "id::CITY::gn::3097902",
+      "host_feature_id": "PL_POW_2807__SPLIT_REST"
+    },
+    "CITY::gn::312156": {
+      "city_id": "CITY::gn::312156",
+      "stable_key": "id::CITY::gn::312156",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::316284": {
+      "city_id": "CITY::gn::316284",
+      "stable_key": "id::CITY::gn::316284",
+      "host_feature_id": "TR631__SPLIT_NORTH"
+    },
+    "CITY::gn::3169361": {
+      "city_id": "CITY::gn::3169361",
+      "stable_key": "id::CITY::gn::3169361",
+      "host_feature_id": "ITH59__SPLIT_REST"
+    },
+    "CITY::gn::3169424": {
+      "city_id": "CITY::gn::3169424",
+      "stable_key": "id::CITY::gn::3169424",
+      "host_feature_id": "ITH59__SPLIT_REST"
+    },
+    "CITY::gn::3179347": {
+      "city_id": "CITY::gn::3179347",
+      "stable_key": "id::CITY::gn::3179347",
+      "host_feature_id": "ITH59__SPLIT_REST"
+    },
+    "CITY::gn::321572": {
+      "city_id": "CITY::gn::321572",
+      "stable_key": "id::CITY::gn::321572",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::438055": {
+      "city_id": "CITY::gn::438055",
+      "stable_key": "id::CITY::gn::438055",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::438400": {
+      "city_id": "CITY::gn::438400",
+      "stable_key": "id::CITY::gn::438400",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::gn::461698": {
+      "city_id": "CITY::gn::461698",
+      "stable_key": "id::CITY::gn::461698",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::478724": {
+      "city_id": "CITY::gn::478724",
+      "stable_key": "id::CITY::gn::478724",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::489226": {
+      "city_id": "CITY::gn::489226",
+      "stable_key": "id::CITY::gn::489226",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::490377": {
+      "city_id": "CITY::gn::490377",
+      "stable_key": "id::CITY::gn::490377",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::493316": {
+      "city_id": "CITY::gn::493316",
+      "stable_key": "id::CITY::gn::493316",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::496478": {
+      "city_id": "CITY::gn::496478",
+      "stable_key": "id::CITY::gn::496478",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::500019": {
+      "city_id": "CITY::gn::500019",
+      "stable_key": "id::CITY::gn::500019",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::504003": {
+      "city_id": "CITY::gn::504003",
+      "stable_key": "id::CITY::gn::504003",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::510225": {
+      "city_id": "CITY::gn::510225",
+      "stable_key": "id::CITY::gn::510225",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::510291": {
+      "city_id": "CITY::gn::510291",
+      "stable_key": "id::CITY::gn::510291",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::512052": {
+      "city_id": "CITY::gn::512052",
+      "stable_key": "id::CITY::gn::512052",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::513471": {
+      "city_id": "CITY::gn::513471",
+      "stable_key": "id::CITY::gn::513471",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::519711": {
+      "city_id": "CITY::gn::519711",
+      "stable_key": "id::CITY::gn::519711",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::527361": {
+      "city_id": "CITY::gn::527361",
+      "stable_key": "id::CITY::gn::527361",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::534341": {
+      "city_id": "CITY::gn::534341",
+      "stable_key": "id::CITY::gn::534341",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::535729": {
+      "city_id": "CITY::gn::535729",
+      "stable_key": "id::CITY::gn::535729",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::539061": {
+      "city_id": "CITY::gn::539061",
+      "stable_key": "id::CITY::gn::539061",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::542000": {
+      "city_id": "CITY::gn::542000",
+      "stable_key": "id::CITY::gn::542000",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::546225": {
+      "city_id": "CITY::gn::546225",
+      "stable_key": "id::CITY::gn::546225",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::559029": {
+      "city_id": "CITY::gn::559029",
+      "stable_key": "id::CITY::gn::559029",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::560142": {
+      "city_id": "CITY::gn::560142",
+      "stable_key": "id::CITY::gn::560142",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::567311": {
+      "city_id": "CITY::gn::567311",
+      "stable_key": "id::CITY::gn::567311",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::580222": {
+      "city_id": "CITY::gn::580222",
+      "stable_key": "id::CITY::gn::580222",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::601084": {
+      "city_id": "CITY::gn::601084",
+      "stable_key": "id::CITY::gn::601084",
+      "host_feature_id": "LT021__SPLIT_REST"
+    },
+    "CITY::gn::617381": {
+      "city_id": "CITY::gn::617381",
+      "stable_key": "id::CITY::gn::617381",
+      "host_feature_id": "MDA-1650__SPLIT_LEFT"
+    },
+    "CITY::gn::618577": {
+      "city_id": "CITY::gn::618577",
+      "stable_key": "id::CITY::gn::618577",
+      "host_feature_id": "MDA-1650__SPLIT_BENDER"
+    },
+    "CITY::gn::723358": {
+      "city_id": "CITY::gn::723358",
+      "stable_key": "id::CITY::gn::723358",
+      "host_feature_id": "SK_ADM2_56367889B65708067786299__SPLIT_SK"
+    },
+    "CITY::gn::723559": {
+      "city_id": "CITY::gn::723559",
+      "stable_key": "id::CITY::gn::723559",
+      "host_feature_id": "SK_ADM2_56367889B14569056094647__SPLIT_REST"
+    },
+    "CITY::gn::724144": {
+      "city_id": "CITY::gn::724144",
+      "stable_key": "id::CITY::gn::724144",
+      "host_feature_id": "SK_ADM2_56367889B66923754975257__SPLIT_REST"
+    },
+    "CITY::gn::8224092": {
+      "city_id": "CITY::gn::8224092",
+      "stable_key": "id::CITY::gn::8224092",
+      "host_feature_id": "ITH59__SPLIT_REST"
+    },
+    "CITY::gn::8436165": {
+      "city_id": "CITY::gn::8436165",
+      "stable_key": "id::CITY::gn::8436165",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI"
+    },
+    "CITY::gn::8504946": {
+      "city_id": "CITY::gn::8504946",
+      "stable_key": "id::CITY::gn::8504946",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504947": {
+      "city_id": "CITY::gn::8504947",
+      "stable_key": "id::CITY::gn::8504947",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504948": {
+      "city_id": "CITY::gn::8504948",
+      "stable_key": "id::CITY::gn::8504948",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504949": {
+      "city_id": "CITY::gn::8504949",
+      "stable_key": "id::CITY::gn::8504949",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504950": {
+      "city_id": "CITY::gn::8504950",
+      "stable_key": "id::CITY::gn::8504950",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504951": {
+      "city_id": "CITY::gn::8504951",
+      "stable_key": "id::CITY::gn::8504951",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504952": {
+      "city_id": "CITY::gn::8504952",
+      "stable_key": "id::CITY::gn::8504952",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504953": {
+      "city_id": "CITY::gn::8504953",
+      "stable_key": "id::CITY::gn::8504953",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504958": {
+      "city_id": "CITY::gn::8504958",
+      "stable_key": "id::CITY::gn::8504958",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504959": {
+      "city_id": "CITY::gn::8504959",
+      "stable_key": "id::CITY::gn::8504959",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504960": {
+      "city_id": "CITY::gn::8504960",
+      "stable_key": "id::CITY::gn::8504960",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504964": {
+      "city_id": "CITY::gn::8504964",
+      "stable_key": "id::CITY::gn::8504964",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::8504965": {
+      "city_id": "CITY::gn::8504965",
+      "stable_key": "id::CITY::gn::8504965",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::gn::873901": {
+      "city_id": "CITY::gn::873901",
+      "stable_key": "id::CITY::gn::873901",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::ne::1159113499": {
+      "city_id": "CITY::ne::1159113499",
+      "stable_key": "id::CITY::ne::1159113499",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::ne::1159128545": {
+      "city_id": "CITY::ne::1159128545",
+      "stable_key": "id::CITY::ne::1159128545",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
+    },
+    "CITY::ne::1159130087": {
+      "city_id": "CITY::ne::1159130087",
+      "stable_key": "id::CITY::ne::1159130087",
+      "host_feature_id": "CZ_ADM2_57006924B62007249383837__SPLIT_REST"
+    },
+    "CITY::ne::1159135183": {
+      "city_id": "CITY::ne::1159135183",
+      "stable_key": "id::CITY::ne::1159135183",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::ne::1159135193": {
+      "city_id": "CITY::ne::1159135193",
+      "stable_key": "id::CITY::ne::1159135193",
+      "host_feature_id": "TR631__SPLIT_SANJAK"
+    },
+    "CITY::ne::1159136941": {
+      "city_id": "CITY::ne::1159136941",
+      "stable_key": "id::CITY::ne::1159136941",
+      "host_feature_id": "MDA-1650__SPLIT_LEFT"
+    },
+    "CITY::ne::1159142243": {
+      "city_id": "CITY::ne::1159142243",
+      "stable_key": "id::CITY::ne::1159142243",
+      "host_feature_id": "GR_ADM1_GRC-3013__SPLIT_CYCLADES"
+    },
+    "CITY::ne::1159146501": {
+      "city_id": "CITY::ne::1159146501",
+      "stable_key": "id::CITY::ne::1159146501",
+      "host_feature_id": "RU_RAY_50074027B55571784565288__SPLIT_REST"
+    },
+    "CITY::ne::1159147221": {
+      "city_id": "CITY::ne::1159147221",
+      "stable_key": "id::CITY::ne::1159147221",
+      "host_feature_id": "FR_ARR_06002__SPLIT_REST"
+    },
+    "CITY::ne::1159148085": {
+      "city_id": "CITY::ne::1159148085",
+      "stable_key": "id::CITY::ne::1159148085",
+      "host_feature_id": "RU_ARCTIC_FB_273"
     }
   },
   "audit": {
