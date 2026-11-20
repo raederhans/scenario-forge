@@ -48,6 +48,17 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test("labels signature tracks manual collection identity, visibility and country names", () => {
+  const { state, policy } = createHarness();
+  const signature = () => policy.getRenderPassSignature("labels");
+  for (const change of [{ mapLabels: [] }, { mapLabels: [] }, { annotationView: { showMapLabels: false } },
+    { scenarioCountriesByTag: {} }, { countryNames: {} }, { currentLanguage: "zh" }]) {
+    const before = signature();
+    Object.assign(state, change);
+    assert.notEqual(signature(), before);
+  }
+});
+
 test("only enabled country labels read the current suppression signature", () => {
   let suppression = '', reads = 0;
   const { state, policy } = createHarness({ getCountryLabelSuppressionSignature() { reads++; return suppression; } });

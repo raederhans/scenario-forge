@@ -6,6 +6,9 @@ import { createUrbanAdaptivePaintModel } from "../renderer/urban_adaptive_paint_
 import { createCityLabelTextModel } from "../renderer/city_label_text_model.js";
 import { createCityGeometryPresentation } from "../renderer/city_geometry_presentation.js";
 import { createCountryLabelSourceOwner } from "../renderer/country_label_source.js";
+import { DARK_LABEL_COLORS, LIGHT_LABEL_COLORS } from "../renderer/country_label_text_style.js";
+import { drawManualMapLabels } from "../renderer/manual_map_label_render_owner.js";
+import { getParentMergedParents } from "../renderer/parent_merged_presentation.js";
 import { createCountryLabelCoverageOwner } from "../renderer/country_label_coverage.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "../renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "../renderer/urban_layer_render_owner.js";
@@ -428,8 +431,44 @@ export function createLabelsRuntime({
   const coverage = createCountryLabelCoverageOwner({ state: runtimeState, resolveBorderIdentity,
     peekSource: () => countryLabelSourceOwner?.peekSource() });
 
+  let placedBounds = new Map();
+  let boundCodes = new Set();
+  let bindingLabels, bindingCountries;
+  function getBoundCountryCodes() {
+    const { mapLabels, scenarioCountriesByTag } = runtimeState;
+    if (bindingLabels !== mapLabels || bindingCountries !== scenarioCountriesByTag) {
+      bindingLabels = mapLabels;
+      bindingCountries = scenarioCountriesByTag;
+      boundCodes = new Set();
+      if (mapLabels?.length) {
+        const parents = getParentMergedParents(scenarioCountriesByTag);
+        for (const { countryCode } of mapLabels) {
+          if (countryCode) boundCodes.add(parents.get(countryCode) || countryCode);
+        }
+      }
+    }
+    return boundCodes;
+  }
+
+  function getCountryLabelSuppressionSignature() {
+    const bound = getBoundCountryCodes();
+    if (!bound.size) return coverage.getSignature();
+    return [...new Set([...coverage.getSuppressedCodes(), ...bound])].sort().join(",");
+  }
+
+  function getCountryName(code) {
+    return getLocalizedScenarioCountryName(runtimeState.scenarioCountriesByTag?.[code],
+      runtimeState.countryNames?.[code] || code, name => t(name, "geo"));
+  }
+
+  function getCountryLabelColors(code) {
+    const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
+    return Number.isFinite(luminance) && luminance < 0.18 ? LIGHT_LABEL_COLORS : DARK_LABEL_COLORS;
+  }
+
   let suppressedCodes = new Set();
   function observeCountryLabelSource(source) {
+    getBoundCountryCodes();
     suppressedCodes = coverage.getSuppressedCodes();
     return source;
   }
@@ -439,11 +478,7 @@ export function createLabelsRuntime({
       state: runtimeState,
       topojson: globalThis.topojson,
       ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
-      getCountryName: (code) => getLocalizedScenarioCountryName(
-        runtimeState.scenarioCountriesByTag?.[code],
-        runtimeState.countryNames?.[code] || code,
-        (name) => t(name, "geo"),
-      ),
+      getCountryName,
       onChange: () => {
         invalidateRenderPasses("labels", "country-label-source");
         requestRendererRender("country-label-source", { flush: false });
@@ -465,13 +500,8 @@ export function createLabelsRuntime({
         getTransform: () => runtimeState.zoomTransform,
         getLanguage: () => runtimeState.currentLanguage || "en",
         getCountryLabelSource: () => observeCountryLabelSource(getCountryLabelSourceOwner().getSource()),
-        isCountryLabelSuppressed: code => suppressedCodes.has(code),
-        getCountryLabelColors: (code) => {
-          const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
-          return Number.isFinite(luminance) && luminance < 0.18
-            ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.3)" }
-            : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.22)" };
-        },
+        isCountryLabelSuppressed: code => suppressedCodes.has(code) || boundCodes.has(code),
+        getCountryLabelColors,
       },
       helpers: {
         isPrivatePreparationEnabled: () => !isExportRenderInProgress() && isPrivateSceneActive() && !runtimeState.isInteracting,
@@ -555,6 +585,14 @@ export function createLabelsRuntime({
     previousPreferCountries = hierarchy.preferCountries;
     drawBlankFeatureLabelsPass(k, { interactive });
     const occupiedBoxes = [];
+    if (runtimeState.mapLabels?.length && runtimeState.annotationView?.showMapLabels !== false) {
+      const { requestChineseTextGlyphs } = getCountryLabelRenderOwner();
+      placedBounds = drawManualMapLabels({ state: runtimeState, ctx: rendererSurfaceHost.getContext(),
+        projection: rendererSurfaceHost.getProjection(), k, occupiedBoxes, getCountryName, getCountryLabelColors,
+        requestChineseTextGlyphs });
+    } else if (placedBounds.size) {
+      placedBounds.clear();
+    }
     if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
       getMarineLabelOwner().drawOrdinaryMarineLabels(k, occupiedBoxes);
     }
@@ -660,7 +698,13 @@ export function createLabelsRuntime({
     ensureCountryLabelsReadyForExport,
     getVisibleMapLabels,
     getCountryLabelReadiness,
-    getCountryLabelSuppressionSignature: coverage.getSignature,
+    getCountryLabelSuppressionSignature,
+    getPlacedMapLabels() {
+      return (runtimeState.mapLabels || []).map(({ id, text, countryCode }) => {
+        const bounds = runtimeState.annotationView?.showMapLabels !== false && placedBounds.get(id);
+        return { id, text, countryCode, drawn: !!bounds, bounds: bounds ? { ...bounds } : null };
+      });
+    },
     notifyCountryLabelColorsChanged: coverage.notifyColorsChanged,
     invalidateCountryLabelCoverage: coverage.invalidate,
     drawUrbanLayer,

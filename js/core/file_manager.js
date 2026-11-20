@@ -53,6 +53,7 @@ import {
   resolveSpecialZoneTopologyFingerprint,
   serializeSpecialZoneLayersState,
 } from "./special_zone_layers.js";
+import { normalizeMapLabel } from "./state/strategic_overlay_state.js";
 import { normalizeOpenOceanLayerVisibility } from "./state/ui_state.js";
 import {
   captureUiVisibilityState,
@@ -388,6 +389,25 @@ function normalizeImportedUnitCounterSidc(value, renderer = "game") {
   return UNIT_COUNTER_MILSTD_SIDC_PATTERN.test(token) ? token : "";
 }
 
+function normalizeMapLabels(rawLabels) {
+  if (!Array.isArray(rawLabels)) return [];
+  const labels = [];
+  const ids = new Set(rawLabels.map(label => label?.id));
+  const used = new Set();
+  let counter = 1;
+  for (const raw of rawLabels) {
+    const label = normalizeMapLabel(raw, raw?.id);
+    if (!label) continue;
+    if (typeof label.id !== "string" || !/^map_label_[1-9]\d*$/.test(label.id) || used.has(label.id)) {
+      while (ids.has(`map_label_${counter}`)) counter++;
+      label.id = `map_label_${counter++}`;
+    }
+    used.add(label.id);
+    labels.push(label);
+  }
+  return labels;
+}
+
 function normalizeUnitCounters(rawCounters) {
   if (!Array.isArray(rawCounters)) return [];
   return rawCounters
@@ -518,6 +538,7 @@ class FileManager {
       annotationView: normalizeAnnotationView(appState.annotationView),
       operationalLines: normalizeOperationalLines(appState.operationalLines),
       operationGraphics: normalizeOperationGraphics(appState.operationGraphics),
+      mapLabels: normalizeMapLabels(appState.mapLabels),
       unitCounters: normalizeUnitCounters(appState.unitCounters),
       intensityFields: serializeIntensityFieldsState(appState.intensityFields),
       appearancePresets: serializeAppearancePresetsState(appState.appearancePresets),
@@ -764,6 +785,7 @@ class FileManager {
     data.annotationView = normalizeAnnotationView(data.annotationView);
     data.operationalLines = normalizeOperationalLines(data.operationalLines);
     data.operationGraphics = normalizeOperationGraphics(data.operationGraphics);
+    data.mapLabels = normalizeMapLabels(data.mapLabels);
     data.unitCounters = normalizeUnitCounters(data.unitCounters);
     if (!data.layerVisibility || typeof data.layerVisibility !== "object") {
       data.layerVisibility = {};

@@ -324,6 +324,10 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         stableJson(runtimeState.styleConfig?.physical?.atlasClassVisibility || {}),
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
+        getObjectIdentityToken(runtimeState.mapLabels),
+        runtimeState.annotationView?.showMapLabels !== false,
+        getObjectIdentityToken(runtimeState.scenarioCountriesByTag),
+        getObjectIdentityToken(runtimeState.countryNames),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
         runtimeState.styleConfig?.countryLabels?.enabled !== false

@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import test from "node:test";
 import { createCountryLabelRenderOwner, groupProjectedRings, isCountryLabelDefinitelyInvisible, projectCountryLabelPolygons, waitForCountryLabelsForExport } from "../js/core/renderer/country_label_render_owner.js";
+import { drawManualMapLabels } from "../js/core/renderer/manual_map_label_render_owner.js";
+import { normalizeMapLabel } from "../js/core/state/strategic_overlay_state.js";
 import { createCountryLabelLayoutWorkerHandler } from "../js/core/renderer/country_label_layout_worker.js";
 const vendor = await readFile(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8");
 const sandbox = {};
@@ -119,6 +121,16 @@ function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], re
   return { owner, state, source, context, fitCalls, timers,
     setProjectionIdentity(value) { projectionIdentity = value; }, setViewportWidth(value) { viewportWidth = value; } };
 }
+
+test("manual lettering excludes an overlapping automatic title", () => {
+  const { owner, context } = createHarness();
+  const occupiedBoxes = [];
+  assert.equal(owner.drawCountryLabels(1), 1);
+  drawManualMapLabels({ state: { mapLabels: [normalizeMapLabel({ text: "Manual", lon: 70, lat: 90 }, "a")] },
+    ctx: context, k: 1, projection: point => point, occupiedBoxes });
+  assert.equal(owner.drawCountryLabels(1, { occupiedBoxes }), 0);
+  assert.equal(owner.drawCountryLabels(1), 1);
+});
 
 test("suppressed countries neither reserve glyph boxes nor wait for a view fit", () => {
   let hidden = true;

@@ -887,6 +887,7 @@ function createDefaultAnnotationView() {
     unitRendererDefault: "game",
     unitCounterFixedScaleMultiplier: 1.5,
     showUnitLabels: true,
+    showMapLabels: true,
   };
 }
 
@@ -904,6 +905,7 @@ function normalizeAnnotationView(rawConfig) {
       0.5,
       2.0,
     ),
+    showMapLabels: raw.showMapLabels === undefined ? defaults.showMapLabels : !!raw.showMapLabels,
     showUnitLabels: raw.showUnitLabels === undefined ? defaults.showUnitLabels : !!raw.showUnitLabels,
   };
 }

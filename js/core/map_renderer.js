@@ -9916,6 +9916,8 @@ async function ensureCountryLabelsReadyForExport(passNames) { return labelsRunti
 
 // Labels placed by the last full labels pass that touch the visible viewport:
 // city IDs and country codes. Off-screen paint margins are excluded.
+export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+export function getPlacedMapLabels() { return labelsRuntime.getPlacedMapLabels(); }
 export function getVisibleMapLabels() { return labelsRuntime.getVisibleMapLabels(); }
 
 export function getCountryLabelReadiness() { return labelsRuntime.getCountryLabelReadiness(); }
