@@ -10,20 +10,20 @@
       "zh": "大连 · 余部"
     },
     "id::CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN": {
-      "en": "Zhanjianghsi · Guangzhouwan",
+      "en": "Zhanjiang · Guangzhouwan",
       "zh": "湛江市 · 广州湾"
     },
     "id::CN_CITY_17275852B86000242921086__SPLIT_REST": {
-      "en": "Zhanjianghsi · Remainder",
+      "en": "Zhanjiang · Remainder",
       "zh": "湛江市 · 余部"
     },
     "id::CN_CITY_17275852B89468905887192__SPLIT_GUANGZHOUWAN": {
-      "en": "Suixixian · Guangzhouwan",
-      "zh": "Suixixian · 广州湾"
+      "en": "Suixi County · Guangzhouwan",
+      "zh": "遂溪县 · 广州湾"
     },
     "id::CN_CITY_17275852B89468905887192__SPLIT_REST": {
-      "en": "Suixixian · Remainder",
-      "zh": "Suixixian · 余部"
+      "en": "Suixi County · Remainder",
+      "zh": "遂溪县 · 余部"
     },
     "id::CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN": {
       "en": "Wuchuan · Guangzhouwan",
@@ -43,7 +43,7 @@
     },
     "id::GH_ADM1_GHA-2155__SPLIT_REST": {
       "en": "Northern · Remainder",
-      "zh": "北方 · 其余部分"
+      "zh": "北方 · 余部"
     },
     "id::GH_ADM1_GHA-2155__SPLIT_WTO": {
       "en": "Northern · British Togoland",
@@ -51,7 +51,7 @@
     },
     "id::GH_ADM1_GHA-2156__SPLIT_REST": {
       "en": "Upper East · Remainder",
-      "zh": "上东区 · 其余部分"
+      "zh": "上东区 · 余部"
     },
     "id::GH_ADM1_GHA-2156__SPLIT_WTO": {
       "en": "Upper East · British Togoland",
@@ -59,7 +59,7 @@
     },
     "id::GH_ADM1_GHA-2173__SPLIT_REST": {
       "en": "Volta · Remainder",
-      "zh": "沃尔塔 · 其余部分"
+      "zh": "沃尔塔 · 余部"
     },
     "id::GH_ADM1_GHA-2173__SPLIT_WTO": {
       "en": "Volta · British Togoland",
@@ -167,7 +167,7 @@
     },
     "id::NG_ADM1_NGA-2839__SPLIT_REST": {
       "en": "Borno State · Remainder",
-      "zh": "博尔诺州 · 其余部分"
+      "zh": "博尔诺州 · 余部"
     },
     "id::NG_ADM1_NGA-2848__SPLIT_NCM": {
       "en": "Taraba State · British Northern Cameroons",
@@ -175,7 +175,7 @@
     },
     "id::NG_ADM1_NGA-2848__SPLIT_REST": {
       "en": "Taraba State · Remainder",
-      "zh": "塔拉巴州 · 其余部分"
+      "zh": "塔拉巴州 · 余部"
     },
     "id::NG_ADM1_NGA-2881__SPLIT_NCM": {
       "en": "Adamawa State · British Northern Cameroons",
@@ -183,15 +183,15 @@
     },
     "id::NG_ADM1_NGA-2881__SPLIT_REST": {
       "en": "Adamawa State · Remainder",
-      "zh": "阿达马瓦州 · 其余部分"
+      "zh": "阿达马瓦州 · 余部"
     },
     "id::PAK-1108__SPLIT_BALUCHISTAN_STATES": {
       "en": "Baluchistan · Kalat and associated states",
       "zh": "俾路支省 · 卡拉特及相关土邦"
     },
     "id::PAK-1108__SPLIT_REST": {
-      "en": "Baluchistan · Remainder",
-      "zh": "俾路支省 · 余部"
+      "en": "Baluchistan · Pakistan",
+      "zh": "俾路支省 · 巴基斯坦共和国"
     },
     "id::PAK-1113__SPLIT_BAHAWALPUR": {
       "en": "Punjab · Bahawalpur state",
@@ -219,11 +219,11 @@
     },
     "id::PA_ADM1_PAN-1337__SPLIT_PCZ": {
       "en": "Colón · Panama Canal Zone",
-      "zh": "冒号 · 巴拿马运河区"
+      "zh": "科隆 · 巴拿马运河区"
     },
     "id::PA_ADM1_PAN-1337__SPLIT_REST": {
       "en": "Colón · Remainder",
-      "zh": "冒号 · 余部"
+      "zh": "科隆 · 余部"
     },
     "id::PA_ADM1_PAN-1340__SPLIT_PCZ": {
       "en": "Panamá · Panama Canal Zone",
@@ -250,20 +250,20 @@
       "zh": "滨海省·南部 · 余部"
     },
     "id::PL_POW_2209__SPLIT_DANZIG": {
-      "en": "malborski · Free City rural district",
-      "zh": "马尔堡 · 但泽自由市乡村区"
+      "en": "Malbork County · Free City rural district",
+      "zh": "马尔堡县 · 但泽自由市乡村区"
     },
     "id::PL_POW_2209__SPLIT_REST": {
-      "en": "malborski · Remainder",
-      "zh": "马尔堡 · 余部"
+      "en": "Malbork County · Remainder",
+      "zh": "马尔堡县 · 余部"
     },
     "id::PL_POW_2210__SPLIT_DANZIG": {
-      "en": "nowodworski · Free City rural district",
-      "zh": "nowodworski · 但泽自由市乡村区"
+      "en": "Nowy Dwór Gdański County · Free City rural district",
+      "zh": "新德武尔县 · 但泽自由市乡村区"
     },
     "id::PL_POW_2210__SPLIT_REST": {
-      "en": "nowodworski · Remainder",
-      "zh": "nowodworski · 余部"
+      "en": "Nowy Dwór Gdański County · Remainder",
+      "zh": "新德武尔县 · 余部"
     },
     "id::RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO": {
       "en": "Sakhalin · Central · South of 50°N",

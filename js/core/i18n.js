@@ -210,6 +210,12 @@ function getGeoFeatureDisplayLabel(feature, fallback = "") {
     if (!candidate || preferredIdCandidates.includes(candidate)) return;
     if (hasExplicitScenarioGeoLocaleEntry(candidate)) {
       preferredIdCandidates.push(candidate);
+      return;
+    }
+    // Split tools key their scenario patch entries by stable key (`id::<featureId>`).
+    const stableKey = `id::${candidate}`;
+    if (!preferredIdCandidates.includes(stableKey) && hasExplicitScenarioGeoLocaleEntry(stableKey)) {
+      preferredIdCandidates.push(stableKey);
     }
   });
   const explicitLabel = getPreferredGeoLabel(preferredIdCandidates, "", {
