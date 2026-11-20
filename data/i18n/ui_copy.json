@@ -2971,6 +2971,10 @@
     "en": "Drawing vertices.",
     "zh": "正在绘制顶点。"
   },
+  "Drop to open project": {
+    "en": "Drop to open project",
+    "zh": "松开以打开项目"
+  },
   "Duplicate layer": {
     "en": "Duplicate layer",
     "zh": "复制图层"

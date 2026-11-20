@@ -874,6 +874,7 @@ test("local project zip load unwraps editable project before import funnel", asy
   let importedOptions;
   const dialogs = [];
   const controller = createController(projectSaveStatus, {
+    state: { isDirty: false },
     elements: {
       projectFileInput,
       projectFileName,
@@ -959,6 +960,7 @@ test("local project zip preview cancel clears selected file input", async () => 
   };
   let importCalled = false;
   const controller = createController(projectSaveStatus, {
+    state: { isDirty: false },
     elements: {
       projectFileInput,
       projectFileName,
