@@ -1004,6 +1004,12 @@ def merge_geo(
     geo_name_set = set(geo_names)
     current_normalized = {key: normalize_entry(key, value) for key, value in (current_geo or {}).items()}
     baseline_normalized = {key: normalize_entry(key, value) for key, value in (baseline_geo or {}).items()}
+    reviewed_global = {
+        key: baseline_normalized[key] for key, entry in (baseline_geo or {}).items()
+        if isinstance(entry, dict) and entry.get("scope") == "global"
+    }
+    search_only_aliases = search_only_aliases.difference(reviewed_global)
+    current_normalized.update(reviewed_global)
     merged_existing = merge_locale_snapshots({"geo": current_normalized}, {"geo": baseline_normalized}).get("geo", {})
     if restrict_scope:
         keys = set(geo_names)
@@ -1047,6 +1053,10 @@ def merge_geo(
         resolved_primary_zh[primary_name] = primary_zh
 
     for key in sorted(keys):
+        if key in reviewed_global:
+            merged[key] = reviewed_global[key]
+            source_map[key] = "baseline_reuse"
+            continue
         stable_key = alias_to_stable.get(key)
         en_value = key
         if stable_key and key != stable_key:

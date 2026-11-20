@@ -3637,7 +3637,13 @@
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
         "en": "Pervomaysky District (Nizhny Novgorod)",
-        "zh": "佩沃迈斯基区（兴登堡施塔特）"
+        "zh": "佩沃迈斯基区（下诺夫哥罗德州）"
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Pervomaysky District (Nizhny Novgorod)",
+          "zh": "佩沃迈斯基区（兴登堡施塔特）"
+        }
       },
       "member_names": {
         "RU_RAY_50074027B15035787960404": {
@@ -5414,7 +5420,13 @@
       "parent_id": "RU_Ivanovo",
       "names": {
         "en": "Sokolsky District (Ivanovo)",
-        "zh": "索科尔区（约翰尼斯施塔特）"
+        "zh": "索科尔区（伊万诺沃州）"
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Sokolsky District (Ivanovo)",
+          "zh": "索科尔区（约翰尼斯施塔特）"
+        }
       },
       "member_names": {
         "RU_RAY_50074027B40734262020014": {
@@ -5560,7 +5572,13 @@
       "parent_id": "RU_Voronezh",
       "names": {
         "en": "Pavlovsky District (Voronezh)",
-        "zh": "巴甫洛夫斯基区（曼施泰因施塔特）"
+        "zh": "巴甫洛夫斯基区（沃罗涅日州）"
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Pavlovsky District (Voronezh)",
+          "zh": "巴甫洛夫斯基区（曼施泰因施塔特）"
+        }
       },
       "member_names": {
         "RU_RAY_50074027B45623068595544": {
@@ -6407,7 +6425,13 @@
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
         "en": "Pavlovsky District (Nizhny Novgorod)",
-        "zh": "巴甫洛夫斯基区（兴登堡施塔特）"
+        "zh": "巴甫洛夫斯基区（下诺夫哥罗德州）"
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Pavlovsky District (Nizhny Novgorod)",
+          "zh": "巴甫洛夫斯基区（兴登堡施塔特）"
+        }
       },
       "member_names": {
         "RU_RAY_50074027B75775497066849": {
@@ -7980,7 +8004,7 @@
       "parent_id": "UA_Dnipropetrovsk",
       "names": {
         "en": "Pokrovske",
-        "zh": "封面"
+        "zh": "波克罗夫斯凯"
       },
       "member_names": {
         "UA_RAY_74538382B48526487653487": {
@@ -8303,7 +8327,7 @@
       "parent_id": "UA_Ivano_Frankivsk",
       "names": {
         "en": "Kolomyia",
-        "zh": "科洛梅亚"
+        "zh": "科洛米亚"
       },
       "member_names": {
         "UA_RAY_74538382B88874986196834": {

@@ -649,7 +649,13 @@
       "parent_id": "RU_Samara",
       "names": {
         "en": "Krasnoyarsky District (Samara)",
-        "zh": "克拉斯诺亚尔斯基区（伏尔加施塔特）"
+        "zh": "克拉斯诺亚尔斯基区（萨马拉州）"
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Krasnoyarsky District (Samara)",
+          "zh": "克拉斯诺亚尔斯基区（伏尔加施塔特）"
+        }
       },
       "member_names": {
         "RU_RAY_50074027B13106807035026": {
@@ -2708,7 +2714,13 @@
       "parent_id": "RU_Kostroma",
       "names": {
         "en": "Sharyinsky District (Kostroma)",
-        "zh": "沙林斯基区（科斯特罗姆）"
+        "zh": "沙林斯基区（科斯特罗马州）"
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Sharyinsky District (Kostroma)",
+          "zh": "沙林斯基区（科斯特罗姆）"
+        }
       },
       "member_names": {
         "RU_RAY_50074027B27301406962779": {
