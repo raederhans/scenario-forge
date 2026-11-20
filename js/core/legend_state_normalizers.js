@@ -3,7 +3,7 @@ import { getMapDataBoundary } from "./map_data_boundary.js";
 import { normalizeHexColor } from "./color_hex_utils.js";
 
 export const DEFAULT_LEGEND_CONFIG = Object.freeze({
-  mode: "weighted-random",
+  mode: "direct-area",
   continent: "all",
   useModernMajorOrder: false,
   maxItems: 15,
@@ -109,21 +109,25 @@ export function normalizeLegendControl(value) {
   };
 }
 
-export function getUniqueLegendColors(appState) {
-  const maxItems = Number(appState?.legendConfig?.maxItems || DEFAULT_LEGEND_CONFIG.maxItems);
-  const colors = [];
-  if (!appState || !appState.colors) return colors;
-  const seen = new Set();
+export function getLegendPaintColors(appState) {
   const pack = getActiveRiverPack(appState.riverPaint, appState.activeScenarioId, appState.scenarioBaselineHash || "");
   const splitParents = new Set(pack?.parents.map(parent => parent.parentId) || []);
-  const paintColors = Object.entries(appState.colors).filter(([id]) => !splitParents.has(id)).map(([, color]) => color);
+  const paintColors = Object.entries(appState.colors || {}).filter(([id]) => !splitParents.has(id)).map(([, color]) => color);
   if (pack) {
     const boundary = getMapDataBoundary(appState);
     for (const parent of pack.parents) for (const cell of parent.cells) {
-      paintColors.push(boundary.paint.resolveRiverCellColor(cell.id).color || appState.colors[parent.parentId]);
+      paintColors.push(boundary.paint.resolveRiverCellColor(cell.id).color || appState.colors?.[parent.parentId]);
     }
   }
-  const availableColors = new Set(paintColors.map(normalizeColor).filter(Boolean));
+  return new Set(paintColors.map(normalizeColor).filter(Boolean));
+}
+
+export function getUniqueLegendColors(appState) {
+  if (!appState?.colors) return [];
+  const maxItems = Number(appState.legendConfig?.maxItems || DEFAULT_LEGEND_CONFIG.maxItems);
+  const colors = [];
+  const seen = new Set();
+  const availableColors = getLegendPaintColors(appState);
   for (const value of normalizeColorOrder(appState.legendColorOrder)) {
     const color = normalizeColor(value);
     if (!color || seen.has(color) || !availableColors.has(color)) continue;

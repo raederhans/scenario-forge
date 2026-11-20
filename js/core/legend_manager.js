@@ -1,4 +1,7 @@
 import { getMapDataBoundary } from "./map_data_boundary.js";
+import { createBorderIdentityResolver } from "./renderer/border_identity.js";
+import { getRiverPaintRuntime } from "./river_paint/runtime.js";
+import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
 // Legend manager (Phase 13)
 
 import { getScenarioCountryDisplayName } from "./scenario/scenario_country_display.js";
@@ -170,11 +173,10 @@ function getFeatureContinentId(feature, appState, ownerCode = "") {
 }
 
 function getFeatureOwner(feature, appState) {
-  const id = getFeatureId(feature);
+  const reference = getMapDataBoundary(appState).reference.getBaseGroupCode(feature);
+  if (reference || appState.mapSemanticMode === "blank") return reference;
   return normalizeCode(
-    getMapDataBoundary(appState).reference.getBaseGroupCode(feature)
-    || appState?.runtimeCanonicalCountryByFeatureId?.[id]
-    || feature?.properties?.ISO_A3
+    feature?.properties?.ISO_A3
     || feature?.properties?.ADM0_A3
     || feature?.properties?.SOV_A3
     || feature?.properties?.iso_a3
@@ -245,15 +247,6 @@ function getOwnerBaseColor(appState, ownerCode) {
   );
 }
 
-function getFeatureDisplayedColor(appState, feature, ownerCode) {
-  const id = getFeatureId(feature);
-  return normalizeColor(
-    appState?.colors?.[id]
-    || appState?.visualOverrides?.[id]
-    || getOwnerBaseColor(appState, ownerCode)
-  );
-}
-
 function getRealmRootCode(appState, ownerCode) {
   const normalized = normalizeCode(ownerCode);
   const entry = appState?.scenarioCountriesByTag?.[normalized] || {};
@@ -295,19 +288,31 @@ function addStat(stats, key, ownerCode, area, feature, continentId, displayColor
 
 function collectOwnerStats(appState, config) {
   const stats = new Map();
-  const features = Array.isArray(appState?.landData?.features) ? appState.landData.features : [];
-  features.forEach((feature) => {
-    const ownerCode = getFeatureOwner(feature, appState);
+  if (!appState) return [];
+  const river = getRiverPaintRuntime(appState);
+  const tags = getScenarioCountryTags(appState.scenarioCountriesByTag);
+  const getOverrideColor = (id, feature) => feature?.properties?.__riverParentId
+    ? appState.riverPaint?.overrides?.[id] || appState.visualOverrides?.[feature.properties.__riverParentId]
+    : appState.visualOverrides?.[id];
+  const resolveOwner = createBorderIdentityResolver({
+    sovereignBaseColors: appState.sovereignBaseColors,
+    getCountryTags: () => tags,
+    getReferenceOwner: (id, feature) => getFeatureOwner(river.getParentFeature(feature) || feature, appState),
+    getOverrideColor,
+  });
+  river.surfaces().forEach((feature) => {
+    const id = getFeatureId(feature);
+    const ownerCode = resolveOwner(id, feature);
     if (!ownerCode) return;
     const continentId = getFeatureContinentId(feature, appState, ownerCode);
     if (config.mode === "continent-area" && config.continent !== "all" && continentId !== config.continent) return;
     const area = getFeatureArea(feature);
-    const statKey = config.mode === "realm-area"
+    const statKey = config.mode === "realm-area" && !ownerCode.startsWith("color:")
       ? getRealmRootCode(appState, ownerCode)
       : ownerCode;
-    const displayColor = config.mode === "realm-area"
-      ? getOwnerBaseColor(appState, statKey) || getFeatureDisplayedColor(appState, feature, ownerCode)
-      : getFeatureDisplayedColor(appState, feature, ownerCode);
+    const displayColor = (config.mode === "realm-area" && getOwnerBaseColor(appState, statKey))
+      || normalizeColor(getOverrideColor(id, feature) || appState.colors?.[feature?.properties?.__riverParentId || id])
+      || getOwnerBaseColor(appState, ownerCode);
     addStat(stats, statKey, ownerCode, area, feature, continentId, displayColor);
   });
   return Array.from(stats.values()).map((entry) => ({
@@ -381,13 +386,17 @@ function getDominantEntryColor(entry) {
   return selectedColor;
 }
 
-function buildGeneratedEntries(appState, entries, config) {
+function buildGeneratedEntries(appState, entries) {
   const palette = collectPaletteColors(appState, entries.length);
-  return entries.slice(0, config.maxItems).map((entry, index) => ({
-    ...entry,
-    label: getCountryDisplayName(appState, entry.code),
-    color: String(getDominantEntryColor(entry) || palette[index % palette.length] || ""),
-  }));
+  const byColor = new Map();
+  entries.forEach((entry, index) => {
+    const color = getDominantEntryColor(entry) || palette[index % palette.length];
+    if (!byColor.has(color)) {
+      const label = entry.code.startsWith("color:") ? "" : getCountryDisplayName(appState, entry.code);
+      byColor.set(color, { ...entry, color, label });
+    }
+  });
+  return [...byColor.values()];
 }
 
 class LegendManager {
@@ -468,12 +477,12 @@ class LegendManager {
   static generate(appState, patch = {}) {
     const config = LegendManager.updateConfig(appState, patch);
     const stats = collectOwnerStats(appState, config);
-    const ordered = config.mode === "weighted-random"
-      ? pickWeightedEntries(stats, config, appState)
-      : sortByArea(stats, config);
+    const candidates = buildGeneratedEntries(appState, sortByArea(stats, config));
     return {
       config,
-      entries: buildGeneratedEntries(appState, ordered, config),
+      entries: config.mode === "weighted-random"
+        ? pickWeightedEntries(candidates, config, appState)
+        : candidates.slice(0, config.maxItems),
     };
   }
 
@@ -485,11 +494,11 @@ class LegendManager {
     generation.entries.forEach((entry) => {
       const color = normalizeColor(entry.color);
       const label = String(entry.label || "").trim();
-      if (!color) return;
-      if (!colorOrder.includes(color)) colorOrder.push(color);
+      if (!color || colorOrder.includes(color)) return;
+      colorOrder.push(color);
       entry.ownerCodes.forEach((ownerCode) => {
         const normalizedOwner = normalizeCode(ownerCode);
-        if (!normalizedOwner) return;
+        if (!normalizedOwner || ownerCode.startsWith("color:")) return;
         touchedOwners.add(normalizedOwner);
       });
       if (label) LegendManager.setLabel(color, label, appState);

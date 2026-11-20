@@ -43,6 +43,7 @@ test("explicit country painting overrides hover and local colors; real undo/redo
   t.after(() => { clearHistory(); Object.assign(state, previous); });
   const refreshes = [];
   const operation = createPaletteLibraryOperation({
+    state,
     ...createPaletteLibraryStateAccess(state),
     getCountryFeatureIds: code => [...(getPaletteCountryTargets(state).get(code) || [])],
     captureHistoryState, pushHistoryEntry,

@@ -62,7 +62,7 @@ export function createDefaultColorState() {
     selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],
     legendLabels: {},
     legendConfig: {
-      mode: "weighted-random",
+      mode: "direct-area",
       continent: "all",
       useModernMajorOrder: false,
       maxItems: 15,
