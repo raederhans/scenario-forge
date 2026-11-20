@@ -1,3 +1,4 @@
+import { getCountryNameOverride } from "./country_name_overrides.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { createBorderIdentityResolver } from "./renderer/border_identity.js";
 import { getRiverPaintRuntime } from "./river_paint/runtime.js";
@@ -186,7 +187,7 @@ function getFeatureOwner(feature, appState) {
 function getCountryDisplayName(appState, code) {
   const normalized = normalizeCode(code);
   const record = appState?.scenarioCountriesByTag?.[normalized] || {};
-  const explicitName = getExplicitScenarioCountryDisplayName(appState, record);
+  const explicitName = getCountryNameOverride(appState, normalized) || getExplicitScenarioCountryDisplayName(appState, record);
   if (explicitName) return explicitName;
   const name = getScenarioCountryDisplayName(record, "");
   return getLocalizedLegendName(appState, [

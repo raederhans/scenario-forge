@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
 import { createLabelsRuntime } from "../js/core/map_renderer/labels_runtime.js";
 import { normalizeMapLabel } from "../js/core/state/strategic_overlay_state.js";
 import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
@@ -16,6 +17,7 @@ function createHarness(overrides = {}, context = null, helpers = {}) {
   const renders = [];
   const metrics = [];
   const projection = ([x, y]) => [x, y];
+  projection.stream = sink => sink;
   const runtime = createLabelsRuntime({
     runtimeState: state,
     rendererSurfaceHost: {
@@ -57,6 +59,36 @@ function replaceGlobal(t, name, value) {
   });
 }
 
+test("the automatic name and its inspector status follow edits and viewport placement", async t => {
+  const ring = [[10, 10], [10, 70], [160, 70], [160, 10], [10, 10]];
+  replaceGlobal(t, "topojson", { merge: () => ({ type: "Polygon", coordinates: [ring] }) });
+  const { geoStream } = createRequire(import.meta.url)("../vendor/d3.v7.min.js");
+  replaceGlobal(t, "d3", { geoStream });
+  const painted = [];
+  const ctx = { save() {}, restore() {}, translate() {}, rotate() {}, measureText: () => ({ width: 60 }),
+    fillText: glyph => painted.push(glyph), strokeText() {} };
+  const { state, runtime } = createHarness({
+    activeScenarioId: "history", showCityPoints: false, currentLanguage: "en",
+    scenarioBaselineOwnersByFeatureId: { one: "AAA" }, scenarioCountriesByTag: { AAA: { display_name_en: "Old" } },
+    scenarioRuntimeTopologyData: { objects: { political: { type: "Polygon", id: "one", arcs: [[0]] } } },
+    styleConfig: { countryLabels: { enabled: true } },
+  }, ctx, { getAdmin0BackgroundFillColor: () => "#ffffff" });
+  await runtime.prepareLabelsPass();
+  for (const [overrides, expected] of [[{}, "OLD"], [{ AAA: { en: "New" } }, "NEW"], [{}, "OLD"]]) {
+    state.countryNameOverrides = overrides;
+    await runtime.prepareLabelsPass();
+    painted.length = 0;
+    runtime.drawLabelsPassContent(2);
+    assert.equal(painted.join(""), expected);
+    assert.equal(runtime.getCountryLabelStatus("AAA"), "Displayed");
+  }
+  state.zoomTransform.x = 900;
+  runtime.drawLabelsPassContent(2);
+  assert.equal(runtime.getCountryLabelStatus("AAA"), "Does not fit or is obscured in this view");
+  state.styleConfig.countryLabels.enabled = false;
+  assert.equal(runtime.getCountryLabelStatus("AAA"), "Country names are off");
+});
+
 test("only territorial coverage demotes the scenario capital marker and name", async t => {
   const ring = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]];
   replaceGlobal(t, "topojson", { merge: () => ({ type: "Polygon", coordinates: [ring] }) });
@@ -94,6 +126,8 @@ test("only territorial coverage demotes the scenario capital marker and name", a
   ]) {
     owner = identity;
     runtime.notifyCountryLabelColorsChanged(["one"]);
+    assert.equal(runtime.getCountryLabelStatus("AAA"), owner === "BBB"
+      ? "Annexed (all regions painted in other countries’ colors)" : "Replaced by manual map text");
     labels.length = markers.length = 0;
     runtime.drawLabelsPassContent(12);
     assert.deepEqual(markers, [shape]);
@@ -118,6 +152,10 @@ test("manual titles bind parent countries, follow visibility, and repaint on fon
   runtime.drawLabelsPassContent(2);
   assert.equal(runtime.getCountryLabelSuppressionSignature(), "X");
   assert.deepEqual(calls, [["stroke", "CHILD"], ["fill", "CHILD"]]);
+  state.countryNameOverrides = { Y: { en: "New child" } };
+  runtime.drawLabelsPassContent(2);
+  assert.equal(calls.at(-1)[1], "NEW CHILD");
+  state.countryNameOverrides = {};
   assert.equal(runtime.getPlacedMapLabels()[0].drawn, true);
   onFontLoad({ fontfaces: [{ family: "Map Garamond" }] });
   assert.ok(renders.includes("country-label-fonts"));

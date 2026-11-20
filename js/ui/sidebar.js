@@ -48,6 +48,7 @@ import {
   updateSelectedOperationalLine,
   updateSelectedUnitCounter,
   getCachedEffectiveCityCollection,
+  getCountryLabelStatus,
   focusGeoBounds,
   selectLandFeatureById,
 } from "../core/map_renderer/public.js";
@@ -1183,6 +1184,7 @@ function initSidebar({ render } = {}) {
     selectedCountryActionsSection,
     countryInspectorDetail,
     countryInspectorSelected,
+    getCountryLabelStatus,
     countryInspectorColorRow,
     countryInspectorColorSwatch,
     countryInspectorColorInput,

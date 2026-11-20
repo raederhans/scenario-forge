@@ -10,8 +10,7 @@ export function drawManualMapLabels({ state, ctx, projection, k, getCountryName,
   for (const label of state.mapLabels) {
     // 拖动中的文字由 SVG 预览显示，Canvas 暂不绘制。
     if (draggingId && label.id === draggingId) continue;
-    const name = label.text || (label.countryCode && (state.scenarioCountriesByTag?.[label.countryCode]
-      ? getCountryName(label.countryCode) : label.fallbackName));
+    const name = label.text || (label.countryCode && getCountryName(label.countryCode, label.fallbackName));
     const title = label.uppercase == null ? displayText(name, language)
       : label.uppercase ? name.toLocaleUpperCase("en") : name;
     const alpha = MAX_ALPHA * Math.min(1, (label.size * k - FADE_IN_START_PX) / (FADE_IN_END_PX - FADE_IN_START_PX));

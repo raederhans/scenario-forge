@@ -306,6 +306,7 @@ function stageImportedProjectPatch(data, preparedImport) {
   draft.intensityFields = normalizeIntensityFieldsState(data.intensityFields);
   draft.appearancePresets = normalizeAppearancePresetsState(data.appearancePresets);
   restoreImportedLayerVisibilityState(draft, data.layerVisibility);
+  draft.countryNameOverrides = data.countryNameOverrides;
   draft.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
   return captureProjectImportState(draft);

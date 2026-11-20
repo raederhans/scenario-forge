@@ -2310,6 +2310,34 @@
     "en": "Country indicators · Scenario reference",
     "zh": "国家统计专题 · 剧本参考"
   },
+  "Country display name": {
+    "en": "Country display name",
+    "zh": "国家显示名称"
+  },
+  "Automatic country name": {
+    "en": "Automatic country name",
+    "zh": "自动国名"
+  },
+  "Displayed": {
+    "en": "Displayed",
+    "zh": "已显示"
+  },
+  "Country names are off": {
+    "en": "Country names are off",
+    "zh": "国名已关闭"
+  },
+  "Annexed (all regions painted in other countries’ colors)": {
+    "en": "Annexed (all regions painted in other countries’ colors)",
+    "zh": "已被吞并（全部地块涂成他国颜色）"
+  },
+  "Replaced by manual map text": {
+    "en": "Replaced by manual map text",
+    "zh": "有手动地图文字代替"
+  },
+  "Does not fit or is obscured in this view": {
+    "en": "Does not fit or is obscured in this view",
+    "zh": "当前视图放不下或被遮挡"
+  },
   "Country name opacity": {
     "en": "Country name opacity",
     "zh": "国名不透明度"
