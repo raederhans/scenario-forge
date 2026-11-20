@@ -2875,6 +2875,34 @@
     "en": "Double-Click Quick Fill",
     "zh": "双击快速填色"
   },
+  "Double-click fill: whole country (no parent) · {count} regions": {
+    "en": {
+      "one": "Double-click fill: whole country (no parent) · {count} region",
+      "other": "Double-click fill: whole country (no parent) · {count} regions"
+    },
+    "zh": "双击填充：整国（无上级区域）· {count} 个地块"
+  },
+  "Double-click fill: whole country · {count} regions": {
+    "en": {
+      "one": "Double-click fill: whole country · {count} region",
+      "other": "Double-click fill: whole country · {count} regions"
+    },
+    "zh": "双击填充：整个国家 · {count} 个地块"
+  },
+  "Double-click fill: {count} regions ({group})": {
+    "en": {
+      "one": "Double-click fill: {count} region ({group})",
+      "other": "Double-click fill: {count} regions ({group})"
+    },
+    "zh": "双击填充：{count} 个地块（{group}）"
+  },
+  "Double-click fill: {count} regions (parent region)": {
+    "en": {
+      "one": "Double-click fill: {count} region (parent region)",
+      "other": "Double-click fill: {count} regions (parent region)"
+    },
+    "zh": "双击填充：{count} 个地块（上级区域）"
+  },
   "Double-click quick fill scope": {
     "en": "Double-click quick fill scope",
     "zh": "双击快速填充范围"

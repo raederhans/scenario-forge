@@ -74,6 +74,7 @@ export function createFillTargetPolicy(runtimeState, {
       kind: country ? "fill-country-batch" : "fill-parent-group",
       dirtyReason: country ? "fill-country-batch" : "fill-parent-group",
       fallbackToCountry,
+      groupLabel: requestedScope.startsWith("level:") ? resolution.label : null,
     };
   }
 
@@ -82,5 +83,5 @@ export function createFillTargetPolicy(runtimeState, {
     return !!buildDoubleClickBatchPlan(feature, hit.id);
   }
 
-  return Object.freeze({ resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isDoubleClickBatchEligible });
+  return Object.freeze({ resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isBatchFillDoubleClickBaseEligible, isDoubleClickBatchEligible });
 }

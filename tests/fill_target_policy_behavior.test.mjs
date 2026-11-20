@@ -79,11 +79,11 @@ test("parent targets use scenario district and normalized owner before direct gr
 test("batch plans ignore border caches, preserve singleton parents and explicit country scope", () => {
   const { state, policy, a, hidden } = fixture();
   assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a"), {
-    targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false,
+    targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false, groupLabel: null,
   });
   state.parentGroupByFeatureId.set("a", "only-a");
   assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a"), {
-    targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false,
+    targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false, groupLabel: null,
   });
   state.hierarchyData = { groups: { AA_singleton: ["a"] } };
   assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a").targetIds, ["a"]);
