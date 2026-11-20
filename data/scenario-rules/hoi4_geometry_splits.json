@@ -1362,7 +1362,7 @@
       "remainder": {
         "suffix": "REST",
         "name_en": "Remainder",
-        "name_zh": "其余部分"
+        "name_zh": "余部"
       },
       "sources": [
         "https://www.wasc.org.uk/wasc-Annual-Colonial-Reports.html"
@@ -1441,7 +1441,7 @@
       "remainder": {
         "suffix": "REST",
         "name_en": "Remainder",
-        "name_zh": "其余部分"
+        "name_zh": "余部"
       },
       "sources": [
         "https://ugspace.ug.edu.gh/bitstreams/fe5d6a5b-b20a-4ca6-a153-38d95ef27b7d/download",
