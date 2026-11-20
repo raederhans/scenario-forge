@@ -1,11 +1,12 @@
 import { ensureHgoIdentitySettings } from "./hgo_identity_state.js";
-import { callRuntimeHook } from "../../core/state/index.js";
+import { callRuntimeHook, on, STATE_BUS_EVENTS } from "../../core/state/index.js";
+import { getCountryMemberIds, getCountryOverrideIds, resetCountryOverrides } from "../../core/country_override_reset_command.js";
+import { showAppDialog } from "../components/app_dialog.js";
 import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
 import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
 import { setUiIcon } from "../components/ui_icons.js";
 import { formatModernPlaceName } from "../../core/renderer/modern_place_name.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
-import { getMapDataBoundary } from "../../core/map_data_boundary.js";
 import { focusLandFeatures } from "./region_search_controller.js";
 import {
   ensureInspectorExpansionState,
@@ -1188,11 +1189,17 @@ export function createCountryInspectorController({
   };
 
   const getLoadedCountryFeatures = (code) => {
-    const reference = getMapDataBoundary(runtimeState).reference;
-    const ids = runtimeState.activeScenarioId
-      ? reference.getScenarioGroupFeatureIds(code)
-      : reference.getGeographicCountryFeatureIds(code);
+    const ids = getCountryMemberIds(runtimeState, code);
     return ids.map((id) => runtimeState.landIndex?.get(id)).filter((feature) => feature?.geometry);
+  };
+
+  const resetButton = countryInspectorSelected?.querySelector("#resetCountryOverrides");
+  const resetCount = resetButton?.querySelector("[data-reset-count]");
+  const updateResetCount = () => {
+    if (!resetButton) return;
+    const count = getCountryOverrideIds(runtimeState, runtimeState.selectedInspectorCountryCode).length;
+    resetCount.textContent = `(${count})`;
+    resetButton.disabled = count === 0;
   };
 
   let locateButton;
@@ -1252,6 +1259,7 @@ export function createCountryInspectorController({
     renderInspectorBreadcrumb(countryState);
     renderInspectorModernPlaceNames(countryState);
     renderCountryLocateButton(selectedCode);
+    updateResetCount();
 
     if (countryInspectorColorRow) {
       countryInspectorColorRow.classList.add("hidden");
@@ -1356,6 +1364,22 @@ export function createCountryInspectorController({
   };
 
   const bindEvents = () => {
+    if (resetButton && !resetButton.dataset.bound) {
+      on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateResetCount);
+      resetButton.addEventListener("click", async () => {
+        const ids = getCountryOverrideIds(runtimeState, runtimeState.selectedInspectorCountryCode);
+        if (!ids.length) return;
+        const title = t("Restore original country color", "ui");
+        const confirmed = await showAppDialog({
+          title,
+          message: t("Manual colors will be cleared from {count} regions", "ui", { count: ids.length }),
+          confirmLabel: title,
+          tone: "warning",
+        });
+        if (confirmed) resetCountryOverrides(ids);
+      });
+      resetButton.dataset.bound = "true";
+    }
     if (searchInput && !searchInput.dataset.bound) {
       searchInput.addEventListener("input", () => {
         renderList();

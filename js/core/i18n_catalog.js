@@ -5410,6 +5410,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "手动区域",
     "en": "Manual Zones"
   },
+  "Manual colors will be cleared from {count} regions": {
+    "zh": "将清除 {count} 个地块的手动颜色",
+    "en": {
+      "one": "Manual colors will be cleared from {count} region",
+      "other": "Manual colors will be cleared from {count} regions"
+    }
+  },
   "Manual-reviewed": {
     "zh": "人工校审",
     "en": "Manual-reviewed"
@@ -7848,6 +7855,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Restore": {
     "zh": "恢复",
     "en": "Restore"
+  },
+  "Restore original country color": {
+    "zh": "恢复本国原色",
+    "en": "Restore original country color"
   },
   "Restored": {
     "zh": "已恢复",
