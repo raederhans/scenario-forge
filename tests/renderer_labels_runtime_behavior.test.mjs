@@ -4,7 +4,7 @@ import { createLabelsRuntime } from "../js/core/map_renderer/labels_runtime.js";
 import { normalizeMapLabel } from "../js/core/state/strategic_overlay_state.js";
 import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
 
-function createHarness(overrides = {}, context = null) {
+function createHarness(overrides = {}, context = null, helpers = {}) {
   const state = {
     width: 800, height: 600, showCityPoints: true,
     worldCitiesData: { type: "FeatureCollection", features: [] },
@@ -43,6 +43,7 @@ function createHarness(overrides = {}, context = null) {
     recordInteractionDurationMetric: () => {},
     drawPendingTransportLabels: () => {},
     drawPhysicalRegionLabels: () => {},
+    ...helpers,
   });
   return { runtime, state, renders, metrics, setExporting: value => { exporting = value; } };
 }
@@ -55,6 +56,50 @@ function replaceGlobal(t, name, value) {
     else delete globalThis[name];
   });
 }
+
+test("only territorial coverage demotes the scenario capital marker and name", async t => {
+  const ring = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]];
+  replaceGlobal(t, "topojson", { merge: () => ({ type: "Polygon", coordinates: [ring] }) });
+  replaceGlobal(t, "OffscreenCanvas", class {
+    constructor(width, height) { this.width = width; this.height = height; }
+    getContext() {
+      return {
+        scale() {}, save() {}, restore() {}, beginPath() {}, closePath() {}, fill() {}, stroke() {},
+        moveTo() { }, lineTo: () => { this.shape = "star"; }, arc: () => { this.shape = "circle"; },
+      };
+    }
+  });
+  const labels = [], markers = [];
+  const ctx = { save() {}, restore() {}, measureText: () => ({ width: 4 }),
+    strokeText() {}, fillText(text) { labels.push([text, this.font]); },
+    drawImage(canvas) { markers.push(canvas.shape); } };
+  let owner = "AAA";
+  const { runtime, state } = createHarness({
+    activeScenarioId: "history", zoomTransform: { x: 0, y: 0, k: 12 },
+    scenarioBaselineOwnersByFeatureId: { one: "AAA" }, sovereigntyByFeatureId: { one: "AAA" },
+    scenarioCountriesByTag: { AAA: {} },
+    scenarioRuntimeTopologyData: { objects: { political: { type: "Polygon", id: "one", arcs: [[0]] } } },
+    worldCitiesData: { type: "FeatureCollection", features: [{ type: "Feature", id: "seat",
+      properties: { name: "Seat", __city_country_code: "ZZ", __city_host_feature_id: "one",
+        __city_id: "seat", __city_settlement_rank: "large" },
+      geometry: { type: "Point", coordinates: [20, 20] } }] },
+    styleConfig: { countryLabels: { enabled: true }, cityPoints: { showLabels: true } },
+  }, ctx, { resolveBorderIdentity: () => owner, getResolvedFeatureColor: () => "#ffffff" });
+  await runtime.prepareLabelsPass();
+  state.mapLabels = [normalizeMapLabel({ lon: 0, lat: 0, countryCode: "AAA" }, "manual")];
+  state.annotationView = { showMapLabels: false };
+  assert.equal(runtime.getCountryLabelSuppressionSignature(), "AAA");
+  for (const [identity, shape, weight] of [
+    ["AAA", "star", "600"], ["BBB", "circle", "400"], ["AAA", "star", "600"],
+  ]) {
+    owner = identity;
+    runtime.notifyCountryLabelColorsChanged(["one"]);
+    labels.length = markers.length = 0;
+    runtime.drawLabelsPassContent(12);
+    assert.deepEqual(markers, [shape]);
+    assert.deepEqual(labels.map(([name, font]) => [name, font.split(" ")[0]]), [["Seat", weight]]);
+  }
+});
 
 test("manual titles bind parent countries, follow visibility, and repaint on font load alone", t => {
   let onFontLoad;
