@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import test from "node:test";
 import { createCountryLabelRenderOwner, groupProjectedRings, isCountryLabelDefinitelyInvisible, projectCountryLabelPolygons, waitForCountryLabelsForExport } from "../js/core/renderer/country_label_render_owner.js";
+import { drawManualMapLabels } from "../js/core/renderer/manual_map_label_render_owner.js";
+import { normalizeMapLabel } from "../js/core/state/strategic_overlay_state.js";
 import { createCountryLabelLayoutWorkerHandler } from "../js/core/renderer/country_label_layout_worker.js";
 const vendor = await readFile(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8");
 const sandbox = {};
@@ -75,7 +77,7 @@ function createContext() {
 }
 
 function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], realLayout = false,
-  viewportWidth = 800, helperOptions = {}, getPaintBounds = () => null } = {}) {
+  viewportWidth = 800, helperOptions = {}, getPaintBounds = () => null, isCountryLabelSuppressed } = {}) {
   const context = createContext();
   const state = { styleConfig: {}, zoomTransform: { x: 0, y: 0, k: 1 }, language: "en" };
   const projection = { stream: (sink) => sink };
@@ -112,12 +114,43 @@ function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], re
   const owner = createCountryLabelRenderOwner({ state, helpers, getters: {
     getContext: () => context, getProjection: () => projection,
     getProjectionIdentity: () => projectionIdentity, getCountryLabelSource: () => source,
+    isCountryLabelSuppressed,
     getViewportSize: () => ({ width: viewportWidth, height: 700 }), getPaintBounds,
     getTransform: () => state.zoomTransform, getLanguage: () => state.language,
   } });
   return { owner, state, source, context, fitCalls, timers,
     setProjectionIdentity(value) { projectionIdentity = value; }, setViewportWidth(value) { viewportWidth = value; } };
 }
+
+test("manual lettering excludes an overlapping automatic title", () => {
+  const { owner, context } = createHarness();
+  const occupiedBoxes = [];
+  assert.equal(owner.drawCountryLabels(1), 1);
+  drawManualMapLabels({ state: { mapLabels: [normalizeMapLabel({ text: "Manual", lon: 70, lat: 90 }, "a")] },
+    ctx: context, k: 1, projection: point => point, occupiedBoxes });
+  assert.equal(owner.drawCountryLabels(1, { occupiedBoxes }), 0);
+  assert.equal(owner.drawCountryLabels(1), 1);
+});
+
+test("suppressed countries neither reserve glyph boxes nor wait for a view fit", () => {
+  let hidden = true;
+  const { owner, fitCalls } = createHarness({ isCountryLabelSuppressed: () => hidden });
+  const occupiedBoxes = [];
+  assert.equal(owner.getReadinessForCurrentView().pendingFits, 0);
+  assert.equal(owner.drawCountryLabels(1, { occupiedBoxes }), 0);
+  assert.deepEqual(owner.getDiagnostics().lastLabels, []);
+  assert.deepEqual(occupiedBoxes, []);
+  assert.equal(owner.getReadinessForCurrentView().pendingFits, 0);
+  hidden = false;
+  assert.equal(owner.getReadinessForCurrentView().pendingFits, 1);
+  assert.equal(owner.drawCountryLabels(1), 1);
+  hidden = true;
+  assert.equal(owner.drawCountryLabels(1), 0);
+  assert.deepEqual(owner.getDiagnostics().lastLabels, []);
+  hidden = false;
+  assert.equal(owner.drawCountryLabels(1), 1);
+  assert.equal(fitCalls.length, 1);
+});
 
 test("font family invalidation retains other language fits and metrics", () => {
   const { owner, state } = createHarness();

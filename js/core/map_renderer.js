@@ -788,6 +788,7 @@ const getRenderPassSignaturePolicy = lazyOwner(() => createRenderPassSignaturePo
     getPaintContourRevision: () => [getPaintContourRuntimeOwner().getRevision(),
       getRiverInternalContourOwner().getRevision(), hasVisibleRiverPartitions()].join("|"),
     getPoliticalBorderRevision: () => getPoliticalBorderRuntimeOwner().getRevision(),
+    getCountryLabelSuppressionSignature: () => labelsRuntime.getCountryLabelSuppressionSignature(),
     getBorderAppearanceRevision: () => String(runtimeState.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase() === "manual"
       ? 0 : getCountryFillPaletteOwner().getAppearanceRevision(),
   }));
@@ -6746,6 +6747,7 @@ function rebuildResolvedColors() {
     });
   }
   getCountryFillPaletteOwner().invalidate();
+  labelsRuntime.invalidateCountryLabelCoverage();
   notifyPaintContourColorsChanged();
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
   invalidateRenderPasses(getPhysicalInputInvalidationPasses(colorsChanged
@@ -7227,6 +7229,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
     });
   }
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
+  labelsRuntime.notifyCountryLabelColorsChanged(ids);
   notifyPaintContourColorsChanged(getRiverPaintRuntime(runtimeState).expandDirtyIds(ids));
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
     startedAt: inputStartedAt,
@@ -8740,6 +8743,7 @@ function reconcilePoliticalDerivedColors(delta) {
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
   }
   getCountryFillPaletteOwner().invalidate();
+  labelsRuntime.invalidateCountryLabelCoverage();
   recordRenderPerfMetric("reconcilePoliticalColors", nowMs() - startedAt, {
     resolvedFeatureCount: delta.changedIds.length, removedFeatureCount: delta.removedIds.length,
     sourceFeatureCount: delta.features.size, colorChanged: changed,
@@ -9856,6 +9860,7 @@ function getPhysicalExactRefreshPasses() {
 }
 
 const labelsRuntime = createLabelsRuntime({
+  resolveBorderIdentity,
   runtimeState,
   rendererSurfaceHost,
   TEXTURE_LABEL_SERIF_STACK,
@@ -9912,6 +9917,8 @@ async function ensureCountryLabelsReadyForExport(passNames) { return labelsRunti
 
 // Labels placed by the last full labels pass that touch the visible viewport:
 // city IDs and country codes. Off-screen paint margins are excluded.
+export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+export function getPlacedMapLabels() { return labelsRuntime.getPlacedMapLabels(); }
 export function getVisibleMapLabels() { return labelsRuntime.getVisibleMapLabels(); }
 
 export function getCountryLabelReadiness() { return labelsRuntime.getCountryLabelReadiness(); }
@@ -13173,6 +13180,7 @@ export async function prepareScenarioPoliticalChunkPromotion({ politicalPayload,
     if (colorsChanged) bumpColorRevision(state);
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild(Number(colorRevision || 0));
     getCountryFillPaletteOwner().invalidate();
+    labelsRuntime.invalidateCountryLabelCoverage();
     notifyPaintContourColorsChanged();
     queueIndexUiRefresh({ renderCountryList: true, renderWaterRegionList: true, renderSpecialRegionList: true }, "deferred");
     finalizeIndexBuildEffects();

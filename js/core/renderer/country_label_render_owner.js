@@ -1,17 +1,10 @@
-import { buildCountryLabelCandidates, COUNTRY_LABEL_TRACKING, filterCountryLabelHoles, fitCountryLabel } from "./country_label_layout.js";
+import { buildCountryLabelCandidates, filterCountryLabelHoles, fitCountryLabel } from "./country_label_layout.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { doScreenLabelBoxesOverlap } from "./screen_label_placement.js";
 import { getMapLabelHierarchy, getCountryLabelOpacity } from "./map_label_hierarchy.js";
 
-const ENGLISH_FONT = '"Map Garamond", "Palatino Linotype", Georgia, serif';
-const CHINESE_FONT = '"Map Noto Serif SC", "Noto Serif SC", "Songti SC", SimSun, serif';
-const fontWeight = (font) => font === CHINESE_FONT ? 400 : 500;
-const displayText = (name, language) => {
-  const text = String(name || "").trim();
-  // Strategy-map titles are spaced capitals; tracking stretches them along
-  // the territory instead of shrinking multiword names to mixed case.
-  return language.startsWith("en") ? text.toLocaleUpperCase("en") : text;
-};
+import { CHINESE_FONT, ENGLISH_FONT, fontWeight, displayText, COUNTRY_LABEL_TRACKING,
+  FADE_IN_START_PX, FADE_IN_END_PX, MAX_ALPHA } from "./country_label_text_style.js";
 const METRIC_FONT_SIZE = 100;
 const MAX_CACHED_FITS = 4;
 const MAX_PENDING_WORKER_FITS = 8;
@@ -147,11 +140,8 @@ export function projectCountryLabelPolygons(feature, projection, geoStream) {
 const LAYOUT_MIN_FONT_SIZE = 0.12;
 const LAYOUT_MAX_FONT_SIZE = 96;
 const LAYOUT_MIN_HOLE_AREA = 4;
-const FADE_IN_START_PX = 7;
-const FADE_IN_END_PX = 10;
 const FADE_OUT_START_PX = 120;
 const FADE_OUT_END_PX = 200;
-const MAX_ALPHA = 0.82;
 
 function getVisibilityAlpha(fontSizePx) {
   const legible = clamp((fontSizePx - FADE_IN_START_PX) / (FADE_IN_END_PX - FADE_IN_START_PX), 0, 1);
@@ -236,6 +226,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     getTransform = () => state.zoomTransform || { x: 0, y: 0, k: 1 },
     getLanguage = () => state.currentLanguage || state.language || "en",
     getCountryLabelSource = () => null,
+    isCountryLabelSuppressed = () => false,
     getCountryLabelColors = () => ({ fill: "#172b35", stroke: "rgba(255, 252, 241, 0.4)" }),
     getD3 = () => globalThis.d3,
   } = getters;
@@ -293,9 +284,14 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       || (countries === scannedChineseCountries && language === scannedChineseLanguage)) return;
     scannedChineseCountries = countries;
     scannedChineseLanguage = language;
+    requestChineseTextGlyphs((countries || []).map(record => displayText(record?.name, language)), fonts);
+  }
+
+  function requestChineseTextGlyphs(titles, fonts = getFontSet()) {
+    if (typeof fonts?.load !== "function") return;
     const glyphs = new Set();
-    for (const record of countries || []) {
-      for (const char of displayText(record?.name, language)) if (!requestedChineseGlyphs.has(char)) glyphs.add(char);
+    for (const title of titles) {
+      for (const char of title) if (!requestedChineseGlyphs.has(char)) glyphs.add(char);
     }
     if (!glyphs.size) return;
     for (const char of glyphs) requestedChineseGlyphs.add(char);
@@ -554,6 +550,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
   }
 
   function getViewFitRequest(entry, view, onInvisible = null) {
+    if (isCountryLabelSuppressed(entry.countryCode)) return null;
     const text = displayText(view.records.get(entry.countryCode)?.name, view.language);
     if (!text) return null;
     const key = getFitKey(text, view.language, view.font);
@@ -916,7 +913,9 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     if (source?.status !== "ready") return 1;
     if (!geometryCache || geometryCache.sourceToken !== source.sourceToken
       || geometryCache.revision !== source.revision || geometryCache.projection !== getProjection()
-      || geometryCache.identity !== getProjectionIdentity()) return Math.max(1, source.countries?.length || 0);
+      || geometryCache.identity !== getProjectionIdentity()) {
+      return source.countries?.length ? source.countries.filter(record => !isCountryLabelSuppressed(record.countryCode)).length : 1;
+    }
     const language = String(getLanguage() || "en");
     const font = language.startsWith("zh") ? CHINESE_FONT : ENGLISH_FONT;
     const records = new Map((source.countries || []).map((record) => [record.countryCode, record]));
@@ -924,6 +923,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const viewport = getViewportSize();
     const paintBounds = getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height };
     return geometryCache.entries.reduce((count, entry) => {
+      if (isCountryLabelSuppressed(entry.countryCode)) return count;
       const text = displayText(records.get(entry.countryCode)?.name, language);
       if (!text) return count;
       if (!entry.polygons) return count + 1;
@@ -937,6 +937,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
 
   return {
     drawCountryLabels,
+    requestChineseTextGlyphs,
     prepareCurrentView,
     cancelPreparation() {
       deferredPreparation = null;

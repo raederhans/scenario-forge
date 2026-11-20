@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createLabelsRuntime } from "../js/core/map_renderer/labels_runtime.js";
+import { normalizeMapLabel } from "../js/core/state/strategic_overlay_state.js";
 import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
 
 function createHarness(overrides = {}, context = null) {
@@ -27,6 +28,7 @@ function createHarness(overrides = {}, context = null) {
     clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
     normalizeLongitude: value => value,
     getDisplayOwnerCode: () => "",
+    resolveBorderIdentity: id => state.scenarioBaselineOwnersByFeatureId?.[id],
     getSignedHashUnit: () => 0,
     getLabelPaintBounds: () => null,
     getLabelPaintOverscanPx: () => 0,
@@ -53,6 +55,61 @@ function replaceGlobal(t, name, value) {
     else delete globalThis[name];
   });
 }
+
+test("manual titles bind parent countries, follow visibility, and repaint on font load alone", t => {
+  let onFontLoad;
+  replaceGlobal(t, "document", { fonts: { addEventListener: (_, callback) => { onFontLoad = callback; } } });
+  replaceGlobal(t, "requestAnimationFrame", fn => fn());
+  const calls = [];
+  const ctx = { save() {}, restore() {}, translate() {}, rotate() {}, measureText: () => ({ width: 20 }),
+    globalAlpha: 1, strokeText: text => calls.push(["stroke", text]), fillText: text => calls.push(["fill", text]) };
+  const { runtime, state, renders } = createHarness({ showCityPoints: false, mapLabels: [],
+    scenarioCountriesByTag: { X: {}, Y: { presentation: "parent_merged", parent_owner_tag: "X", display_name_en: "Child" } } }, ctx);
+  runtime.drawLabelsPassContent(2);
+  assert.deepEqual(calls, []);
+  assert.equal(onFontLoad, undefined);
+  const label = normalizeMapLabel({ countryCode: "Y", lon: 0, lat: 0, colorMode: "dark", fallbackName: "Saved" }, "map_label_1");
+  state.mapLabels = [label];
+  runtime.drawLabelsPassContent(2);
+  assert.equal(runtime.getCountryLabelSuppressionSignature(), "X");
+  assert.deepEqual(calls, [["stroke", "CHILD"], ["fill", "CHILD"]]);
+  assert.equal(runtime.getPlacedMapLabels()[0].drawn, true);
+  onFontLoad({ fontfaces: [{ family: "Map Garamond" }] });
+  assert.ok(renders.includes("country-label-fonts"));
+  state.scenarioCountriesByTag = {};
+  runtime.drawLabelsPassContent(2);
+  assert.equal(calls.at(-1)[1], "SAVED");
+  assert.equal(runtime.getCountryLabelSuppressionSignature(), "Y");
+  state.annotationView = { showMapLabels: false };
+  const count = calls.length;
+  runtime.drawLabelsPassContent(2);
+  assert.equal(calls.length, count);
+  assert.equal(runtime.getPlacedMapLabels()[0].drawn, false);
+  state.mapLabels = [];
+  assert.equal(runtime.getCountryLabelSuppressionSignature(), "");
+  assert.deepEqual(runtime.getPlacedMapLabels(), []);
+});
+
+test("a bound country or merged child removes the parent from automatic label fitting", async t => {
+  const ring = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]];
+  replaceGlobal(t, "topojson", { merge: () => ({ type: "Polygon", coordinates: [ring] }) });
+  const { runtime, state } = createHarness({
+    activeScenarioId: "history", showCityPoints: false, styleConfig: { countryLabels: { enabled: true } },
+    scenarioBaselineOwnersByFeatureId: { one: "AAA" },
+    scenarioCountriesByTag: { AAA: {}, BBB: { presentation: "parent_merged", parent_owner_tag: "AAA" } },
+    scenarioRuntimeTopologyData: { objects: { political: { type: "Polygon", id: "one", arcs: [[0]] } } },
+  }, { save() {}, restore() {} });
+  runtime.drawLabelsPassContent(2);
+  await runtime.prepareLabelsPass();
+  const pending = () => runtime.getCountryLabelReadiness().pendingFits;
+  assert.equal(pending(), 1);
+  for (const countryCode of ["AAA", "BBB"]) {
+    state.mapLabels = [normalizeMapLabel({ lon: 0, lat: 0, countryCode }, "map_label_1")];
+    assert.equal(pending(), 0);
+    state.mapLabels = [];
+    assert.equal(pending(), 1);
+  }
+});
 
 test("label priority survives zoom oscillation and switches on monotonic boundary crossings", () => {
   const { runtime, state } = createHarness({

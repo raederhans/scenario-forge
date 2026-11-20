@@ -36,6 +36,28 @@ import {
 } from "../js/core/state/index.js";
 import { unzipSync, zipSync, strFromU8, strToU8 } from "../vendor/fflate.browser.js";
 
+test("project round trip preserves manual lettering and discards invalid coordinates", async () => {
+  const label = { id: "map_label_9", text: "Title", countryCode: "GER", fallbackName: "Germany",
+    lon: 2.5, lat: -10, size: 7.1, rotation: 24, tracking: 0.2, uppercase: false, colorMode: "light" };
+  const payload = await exportProjectPayload({ mapLabels: [label, { lon: null, lat: 0 }],
+    styleConfig: {}, annotationView: { showMapLabels: false } });
+  assert.deepEqual(payload.mapLabels, [label]);
+  payload.mapLabels.push({ lon: 5 }, { lon: "bad", lat: 1 });
+  const imported = (await importProjectPayload(payload)).successes[0];
+  assert.deepEqual(imported.mapLabels, [label]);
+  assert.equal(imported.annotationView.showMapLabels, false);
+  await importProjectThroughFunnelPayload(payload);
+  assert.deepEqual(state.mapLabels, [label]);
+  assert.equal(state.annotationView.showMapLabels, false);
+  delete payload.mapLabels;
+  delete payload.annotationView.showMapLabels;
+  const legacy = (await importProjectPayload(payload)).successes[0];
+  assert.deepEqual(legacy.mapLabels, []);
+  assert.equal(legacy.annotationView.showMapLabels, true);
+  await importProjectThroughFunnelPayload(payload);
+  assert.deepEqual(state.mapLabels, []);
+});
+
 test("import summary counts rejected entries while preserving valid unloaded regions and migration", async () => {
   // Isolate the module's migration-asset promise from other project-import cases.
   const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?import-summary");

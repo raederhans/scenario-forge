@@ -117,7 +117,7 @@ function captureHistoryState({
 
   if (strategicOverlay) {
     const defaults = {
-      annotationView: {}, operationalLines: [], operationGraphics: [], unitCounters: [],
+      annotationView: {}, operationalLines: [], operationGraphics: [], unitCounters: [], mapLabels: [],
       specialZoneLayers: {}, specialZoneMembershipBrushMode: "add",
     };
     // true preserves legacy callers; scoped callers clone only the collections they edit.
@@ -360,6 +360,7 @@ function applyHistorySnapshot(snapshot, direction, entry) {
       "operationalLinesDirty",
       "operationGraphicsDirty",
       "unitCountersDirty",
+      "mapLabelsDirty",
     ]) {
       setStrategicOverlayDirtyState(runtimeState, dirtyKey);
     }

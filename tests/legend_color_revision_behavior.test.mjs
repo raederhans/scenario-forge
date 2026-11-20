@@ -76,6 +76,7 @@ test("visible legend avoids feature scans until actual renderer color transactio
     getPoliticalDerivedStateIdentity: () => [],
     getRiverPaintRuntime,
     getCountryFillPaletteOwner: () => palette,
+    labelsRuntime: { notifyCountryLabelColorsChanged() {}, invalidateCountryLabelCoverage() {} },
     notifyPaintContourColorsChanged: (ids) => {
       // The extracted transaction owns publication order; the contour runtime
       // has its own behavior suite. Observe the actual committed colors here.

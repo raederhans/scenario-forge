@@ -10,6 +10,19 @@ const {
   setStrategicOverlayDirtyState,
 } = strategicOverlayActions;
 
+test("map label patches target their own collection, editor and dirty flag", () => {
+  const target = { mapLabels: [{ id: "a", text: "Old" }], unitCounters: [], unitCountersDirty: false };
+  strategicOverlayActions.patchStrategicOverlayEntityState(target, "mapLabels", "a", { text: "New" });
+  patchStrategicOverlayEditorState(target, "mapLabelEditor", { selectedId: "a" });
+  assert.equal(target.mapLabelEditor.selectedId, "a");
+  assert.deepEqual(target.mapLabels, [{ id: "a", text: "New" }]);
+  assert.equal(target.mapLabelsDirty, true);
+  setStrategicOverlayDirtyState(target, "mapLabelsDirty", false);
+  assert.equal(target.mapLabelsDirty, false);
+  assert.deepEqual(target.unitCounters, []);
+  assert.equal(target.unitCountersDirty, false);
+});
+
 test("strategic overlay actions reject invalid targets and unknown authorities", () => {
   assert.throws(() => commitStrategicOverlayCollectionsState(null, {}), /target must be an object/);
   assert.throws(

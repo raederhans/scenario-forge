@@ -290,6 +290,7 @@ export function createDefaultUiState() {
     operationalLinesDirty: true,
     operationGraphicsDirty: true,
     unitCountersDirty: true,
+    mapLabelsDirty: true,
     tooltipRafHandle: null,
     tooltipPendingState: null,
     selectedWaterRegionId: "",
@@ -331,6 +332,7 @@ export function createDefaultUiState() {
     operationalLines: [],
     operationGraphics: [],
     unitCounters: [],
+    mapLabels: [],
     transportWorkbenchPointDeltas: createDefaultTransportWorkbenchPointDeltas(),
     transportWorkbenchUi: createDefaultTransportWorkbenchUiState(),
     exportWorkbenchUi: normalizeExportWorkbenchUiState(null),
@@ -388,6 +390,7 @@ export function restoreImportedAnnotationOverlayState(
   const nextOperationGraphics = Array.isArray(importedState.operationGraphics)
     ? clone(importedState.operationGraphics)
     : [];
+  const nextMapLabels = Array.isArray(importedState.mapLabels) ? clone(importedState.mapLabels) : [];
   const nextUnitCounters = Array.isArray(importedState.unitCounters)
     ? clone(importedState.unitCounters)
     : [];
@@ -396,15 +399,18 @@ export function restoreImportedAnnotationOverlayState(
     operationalLines: nextOperationalLines,
     operationGraphics: nextOperationGraphics,
     unitCounters: nextUnitCounters,
+    mapLabels: nextMapLabels,
     operationalLinesDirty: true,
     operationGraphicsDirty: true,
     unitCountersDirty: true,
+    mapLabelsDirty: true,
   });
   return {
     annotationView: nextAnnotationView,
     operationalLines: nextOperationalLines,
     operationGraphics: nextOperationGraphics,
     unitCounters: nextUnitCounters,
+    mapLabels: nextMapLabels,
   };
 }
 

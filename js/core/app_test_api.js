@@ -8,7 +8,7 @@ import { callRuntimeHook } from "./state/index.js";
 // Keep it small: add a query only when a golden flow needs it.
 
 import { state } from "./state.js";
-import { getCountryLabelReadiness, getPoliticalIdRasterDiagnostics, getVisibleMapLabels } from "./map_renderer/public.js";
+import { getCountryLabelReadiness, getPoliticalIdRasterDiagnostics, getPlacedMapLabels, getVisibleMapLabels } from "./map_renderer/public.js";
 import { hasPendingPanelRefresh } from "./state/changes.js";
 
 const API_VERSION = 2;
@@ -183,6 +183,7 @@ export function installAppTestApi(target = globalThis) {
     isDirty,
     selection,
     labels,
+    placedLabels: getPlacedMapLabels,
     politicalBackend,
     internals,
     getMissingUiKeys,
