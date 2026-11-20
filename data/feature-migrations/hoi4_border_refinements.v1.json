@@ -1,0 +1,40 @@
+{
+  "feature_splits": {
+    "CZ_ADM2_57006924B91865699855455": [
+      "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE",
+      "CZ_ADM2_57006924B91865699855455__SPLIT_REST"
+    ],
+    "HR031": [
+      "HR031__SPLIT_FIUME",
+      "HR031__SPLIT_ABBAZIA",
+      "HR031__SPLIT_CHERSO",
+      "HR031__SPLIT_REST"
+    ],
+    "LT011": [
+      "LT011__SPLIT_WILNO",
+      "LT011__SPLIT_REST"
+    ],
+    "MDA-1652": [
+      "MDA-1652__SPLIT_LEFT",
+      "MDA-1652__SPLIT_RIGHT"
+    ],
+    "PL_MRG_727dd6268093__SPLIT_REST": [
+      "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG",
+      "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_REST"
+    ],
+    "PL_POW_2209__SPLIT_DANZIG": [
+      "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
+      "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST"
+    ],
+    "PL_POW_2210__SPLIT_DANZIG": [
+      "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG",
+      "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST"
+    ]
+  },
+  "scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
+  "version": 1
+}

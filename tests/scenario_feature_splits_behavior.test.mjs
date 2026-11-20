@@ -91,3 +91,16 @@ test("import forces split migration even when shared base still considers the pa
   assert.deepEqual(result.visualOverrides, Object.fromEntries(children.map(id => [id, "red"])));
   assert.deepEqual(summaries, [{ migratedEntries: 1, ignoredEntries: 0 }]);
 });
+
+test("re-split parcels expand to the outermost parent and project from saved intermediate ids", () => {
+  // Keys arrive sorted, so the intermediate parent is listed after the outermost one.
+  const nested = { feature_splits: {
+    P: ["P__SPLIT_A__SPLIT_X", "P__SPLIT_A__SPLIT_Y", "P__SPLIT_B"],
+    P__SPLIT_A: ["P__SPLIT_A__SPLIT_X", "P__SPLIT_A__SPLIT_Y"],
+  } };
+  const leaves = nested.feature_splits.P;
+  assert.deepEqual(expandScenarioFeatureIds(leaves, nested), ["P"]);
+  assert.deepEqual(expandScenarioFeatureIds(leaves.slice(0, 2), nested), ["P__SPLIT_A"]);
+  assert.deepEqual(projectScenarioFeatureIds(["P__SPLIT_A"], nested).ids, leaves.slice(0, 2));
+  assert.deepEqual(projectScenarioFeatureIds(["P"], nested).ids, leaves);
+});

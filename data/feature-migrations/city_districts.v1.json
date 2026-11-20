@@ -1,0 +1,39 @@
+{
+  "feature_splits": {
+    "DE300": [
+      "DE300__SPLIT_EAST",
+      "DE300__SPLIT_WEST"
+    ],
+    "ES300": [
+      "ES300__SPLIT_CITY",
+      "ES300__SPLIT_REST"
+    ],
+    "HU110": [
+      "HU110__SPLIT_BUDA",
+      "HU110__SPLIT_PEST"
+    ],
+    "ITI43": [
+      "ITI43__SPLIT_CITY",
+      "ITI43__SPLIT_PROVINCE"
+    ],
+    "PL_POW_1465": [
+      "PL_POW_1465__SPLIT_PRAGA",
+      "PL_POW_1465__SPLIT_LEFT"
+    ],
+    "RU_CITY_MOSCOW": [
+      "RU_CITY_MOSCOW__SPLIT_SOUTHWEST",
+      "RU_CITY_MOSCOW__SPLIT_CITY"
+    ],
+    "TR100": [
+      "TR100__SPLIT_ASIA",
+      "TR100__SPLIT_EUROPE"
+    ]
+  },
+  "scenarios": [
+    "modern_world",
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
+  "version": 1
+}

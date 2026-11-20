@@ -25,6 +25,22 @@
       "en": "Cyprus · Remainder",
       "zh": "塞浦路斯 · 余区"
     },
+    "id::DE300__SPLIT_EAST": {
+      "en": "Berlin · East Berlin",
+      "zh": "柏林 · 东柏林"
+    },
+    "id::DE300__SPLIT_WEST": {
+      "en": "Berlin · West Berlin",
+      "zh": "柏林 · 西柏林"
+    },
+    "id::ES300__SPLIT_CITY": {
+      "en": "Madrid city",
+      "zh": "马德里市"
+    },
+    "id::ES300__SPLIT_REST": {
+      "en": "Community of Madrid",
+      "zh": "马德里自治区"
+    },
     "id::GEO-3030__SPLIT_REMAINDER": {
       "en": "Imereti · Remainder",
       "zh": "伊梅列季 · 余区"
@@ -64,6 +80,14 @@
     "id::ISR-3056__SPLIT_REMAINDER": {
       "en": "HaZafon · Remainder",
       "zh": "哈扎丰 · 余区"
+    },
+    "id::ITI43__SPLIT_CITY": {
+      "en": "Rome",
+      "zh": "罗马市"
+    },
+    "id::ITI43__SPLIT_PROVINCE": {
+      "en": "Province of Rome",
+      "zh": "罗马省"
     },
     "id::MMR-3273__SPLIT_KYAUKPYU": {
       "en": "Rakhine · Township Kyaukpyu",
@@ -197,6 +221,22 @@
       "en": "Kachin · Waingmaw strongpoint",
       "zh": "克钦邦 · 威茂据点"
     },
+    "id::PL_POW_1465__SPLIT_LEFT": {
+      "en": "Warsaw · Left bank",
+      "zh": "华沙 · 左岸"
+    },
+    "id::PL_POW_1465__SPLIT_PRAGA": {
+      "en": "Warsaw · Praga (right bank)",
+      "zh": "华沙 · 布拉加（右岸）"
+    },
+    "id::RU_CITY_MOSCOW__SPLIT_CITY": {
+      "en": "Moscow · City",
+      "zh": "莫斯科 · 市区"
+    },
+    "id::RU_CITY_MOSCOW__SPLIT_SOUTHWEST": {
+      "en": "Moscow · Southwest (Troitsk)",
+      "zh": "莫斯科 · 西南部（特罗伊茨克）"
+    },
     "id::SYR-137__SPLIT_ALEPPO_NEIGHBORHOODS": {
       "en": "Aleppo · Sheikh Maqsoud and Ashrafieh",
       "zh": "阿勒颇 · 谢赫马克苏德及阿什拉菲耶"
@@ -220,6 +260,14 @@
     "id::SYR-5261__SPLIT_REMAINDER": {
       "en": "UNDOF · Remainder",
       "zh": "观察员部队 · 余区"
+    },
+    "id::TR100__SPLIT_ASIA": {
+      "en": "İstanbul · Asian side",
+      "zh": "伊斯坦布尔 · 亚洲侧"
+    },
+    "id::TR100__SPLIT_EUROPE": {
+      "en": "İstanbul · European side",
+      "zh": "伊斯坦布尔 · 欧洲侧"
     }
   },
   "scenario_id": "modern_world",

@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 332,
-    "feature_count": 21100,
+    "feature_count": 21116,
     "water_count": 0
   },
   "controller_changes": [],
@@ -19277,19 +19277,6 @@
     {
       "country_code": "HR",
       "critical": true,
-      "feature_id": "HR031",
-      "feature_name": "Primorsko-goranska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
       "feature_id": "HR032",
       "feature_name": "Ličko-senjska županija",
       "from_tag": "CRO",
@@ -25008,19 +24995,6 @@
       "to_tag": "CEY"
     },
     {
-      "country_code": "LT",
-      "critical": true,
-      "feature_id": "LT011",
-      "feature_name": "Vilniaus apskritis",
-      "from_tag": "LIT",
-      "notes": "Project-specific override: Vilnius remains with Lithuania in this scenario instead of strict vanilla HOI4 ownership.",
-      "quality": "manual_reviewed",
-      "rule_id": "lithuania_vilnius_override",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LIT"
-    },
-    {
       "country_code": "MA",
       "critical": false,
       "feature_id": "MAR-1446",
@@ -25675,19 +25649,6 @@
       "critical": true,
       "feature_id": "MDA-1651",
       "feature_name": "Ștefan Vodă",
-      "from_tag": "MOL",
-      "notes": "Greater Romania including Bessarabia and northern Bukovina.",
-      "quality": "manual_reviewed",
-      "rule_id": "romania_bessarabia_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ROM"
-    },
-    {
-      "country_code": "MD",
-      "critical": true,
-      "feature_id": "MDA-1652",
-      "feature_name": "Camenca",
       "from_tag": "MOL",
       "notes": "Greater Romania including Bessarabia and northern Bukovina.",
       "quality": "manual_reviewed",
@@ -34437,19 +34398,6 @@
       "critical": true,
       "feature_id": "CZ_ADM2_57006924B63031935780571",
       "feature_name": "Karviná",
-      "from_tag": "",
-      "notes": "Czechoslovakia baseline override across Czechia and Slovakia.",
-      "quality": "manual_reviewed",
-      "rule_id": "czechoslovakia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "CZE"
-    },
-    {
-      "country_code": "CZ",
-      "critical": true,
-      "feature_id": "CZ_ADM2_57006924B91865699855455",
-      "feature_name": "Frýdek-Místek",
       "from_tag": "",
       "notes": "Czechoslovakia baseline override across Czechia and Slovakia.",
       "quality": "manual_reviewed",
@@ -57961,19 +57909,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "ENG"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_CITY_MOSCOW",
-      "feature_name": "Moscow",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
     },
     {
       "country_code": "RU",
@@ -200403,10 +200338,10 @@
     "CZE": {
       "base_iso2": "CZ",
       "continent_label": "Europe",
-      "controller_feature_count": 240,
+      "controller_feature_count": 260,
       "display_name": "Czechoslovakia",
       "entry_kind": "",
-      "feature_count": 240,
+      "feature_count": 260,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200718,10 +200653,10 @@
     "FIN": {
       "base_iso2": "FI",
       "continent_label": "Europe",
-      "controller_feature_count": 61,
+      "controller_feature_count": 70,
       "display_name": "Finland",
       "entry_kind": "",
-      "feature_count": 61,
+      "feature_count": 70,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200784,10 +200719,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 630,
+      "controller_feature_count": 672,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 630,
+      "feature_count": 672,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201124,10 +201059,10 @@
     "HUN": {
       "base_iso2": "HU",
       "continent_label": "Europe",
-      "controller_feature_count": 20,
+      "controller_feature_count": 21,
       "display_name": "Hungary",
       "entry_kind": "",
-      "feature_count": 20,
+      "feature_count": 21,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201278,10 +201213,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 111,
+      "controller_feature_count": 115,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 111,
+      "feature_count": 115,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201311,10 +201246,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 149,
+      "controller_feature_count": 145,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 149,
+      "feature_count": 145,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201730,10 +201665,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 235,
+      "controller_feature_count": 241,
       "display_name": "Manchukuo",
       "entry_kind": "",
-      "feature_count": 235,
+      "feature_count": 241,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201854,10 +201789,10 @@
     "MON": {
       "base_iso2": "MN",
       "continent_label": "Asia",
-      "controller_feature_count": 22,
+      "controller_feature_count": 38,
       "display_name": "Mongolia",
       "entry_kind": "",
-      "feature_count": 22,
+      "feature_count": 38,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202042,10 +201977,10 @@
     "NOR": {
       "base_iso2": "NO",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 23,
       "display_name": "Norway",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 23,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202291,10 +202226,10 @@
     "POL": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 242,
+      "controller_feature_count": 301,
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 242,
+      "feature_count": 301,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202579,10 +202514,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 97,
+      "controller_feature_count": 117,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 97,
+      "feature_count": 117,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202873,10 +202808,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 10928,
+      "controller_feature_count": 9393,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 10928,
+      "feature_count": 9393,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202888,7 +202823,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 12021
+        "manual_reviewed": 12020
       },
       "rule_sources": [
         "soviet_union"
@@ -202905,10 +202840,10 @@
     "SPR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 52,
+      "controller_feature_count": 53,
       "display_name": "Spain",
       "entry_kind": "",
-      "feature_count": 52,
+      "feature_count": 53,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203138,10 +203073,10 @@
     "TAN": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 11,
+      "controller_feature_count": 88,
       "display_name": "Tannu Tuva",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 88,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203236,10 +203171,10 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 80,
+      "controller_feature_count": 81,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 80,
+      "feature_count": 81,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204561,41 +204496,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "c00215c3a67709ff31a0e0ca4cf7fb261d38eff13d4f636c875dc68fec5033ce",
+  "snapshot_fingerprint": "c12a7ca56060028cef9fde378e12ed8761216676b91630d5c4f91c30d9d855d1",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "6300a0e8c0c9302d9ee616361ebdd77ebe8ee248a2be561427f1ac8f0c7618e2",
-    "detail_chunk_manifest_sha256": "18968096c0238b3eed2e818b4e007197f2083caedd3e54f4d86520b0974f6f43",
-    "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5"
+    "build_snapshot_sha256": "48acb0cd2ae3dbc316e2746b765dcddcd6a64be0235e57d4b424b0022bcfb8c5",
+    "detail_chunk_manifest_sha256": "e2070c135e982ed9b3f8b4b079fb3e27e40762f9ae62dfea68857ad9965e69e4",
+    "runtime_bootstrap_topology_sha256": "87bede3074fad428a40e028c276cf5588b809afa8b63775f0bf6984f526f6179",
+    "runtime_topology_sha256": "39599949211b95bd552663ef84a0b747fa6640edfbdf3a1d23801e91d7644b6f"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15314,
+    "changed_feature_count": 15309,
     "controller_count": 323,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21100,
+    "feature_count": 21116,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14867,
+    "manual_reviewed_feature_count": 14862,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 323,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14867
+      "manual_reviewed": 14862
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15291
+      "manual_rule": 15286
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

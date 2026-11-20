@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "scenarios": [
+    "modern_world",
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "area_tolerance_degrees2": 1e-09,
+  "entries": [
+    {
+      "id": "berlin",
+      "feature_ids": [
+        "DE300"
+      ],
+      "parts": [
+        {
+          "suffix": "EAST",
+          "name_en": "East Berlin",
+          "name_zh": "东柏林",
+          "polygon_source": {
+            "path": "city_districts.sources.geojson",
+            "property": "unit",
+            "values": [
+              "berlin_east"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "WEST",
+        "name_en": "West Berlin",
+        "name_zh": "西柏林"
+      },
+      "sources": [
+        "OpenStreetMap Berlin borough boundaries"
+      ],
+      "notes": "East = Pankow, Lichtenberg, Marzahn-Hellersdorf, Treptow-Köpenick and the Mitte and Friedrichshain localities (1945–1990 Soviet sector)."
+    },
+    {
+      "id": "budapest",
+      "feature_ids": [
+        "HU110"
+      ],
+      "parts": [
+        {
+          "suffix": "BUDA",
+          "name_en": "Buda",
+          "name_zh": "布达",
+          "polygon_source": {
+            "path": "city_districts.sources.geojson",
+            "property": "unit",
+            "values": [
+              "budapest_buda"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "PEST",
+        "name_en": "Pest",
+        "name_zh": "佩斯"
+      },
+      "sources": [
+        "OpenStreetMap Budapest district boundaries"
+      ],
+      "notes": "Buda = districts I, II, III, XI, XII and XXII. Modern World keeps HU110 whole: reviewed Danube river-paint packs already split it.",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ]
+    },
+    {
+      "id": "warsaw",
+      "feature_ids": [
+        "PL_POW_1465"
+      ],
+      "parts": [
+        {
+          "suffix": "PRAGA",
+          "name_en": "Warsaw · Praga (right bank)",
+          "name_zh": "华沙 · 布拉加（右岸）",
+          "polygon_source": {
+            "path": "city_districts.sources.geojson",
+            "property": "unit",
+            "values": [
+              "warsaw_right_bank"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "LEFT",
+        "name_en": "Warsaw · Left bank",
+        "name_zh": "华沙 · 左岸",
+        "full_name": true
+      },
+      "sources": [
+        "OpenStreetMap Warsaw district boundaries"
+      ],
+      "notes": "Right bank = the seven districts east of the Vistula."
+    },
+    {
+      "id": "moscow",
+      "feature_ids": [
+        "RU_CITY_MOSCOW"
+      ],
+      "parts": [
+        {
+          "suffix": "SOUTHWEST",
+          "name_en": "Southwest (Troitsk)",
+          "name_zh": "西南部（特罗伊茨克）",
+          "polygon_source": {
+            "path": "city_districts.sources.geojson",
+            "property": "unit",
+            "values": [
+              "moscow_new"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "CITY",
+        "name_en": "City",
+        "name_zh": "市区"
+      },
+      "sources": [
+        "OpenStreetMap Novomoskovsky and Troitsky okrugs"
+      ],
+      "notes": "The 2012 New Moscow annexation; the remainder keeps Zelenograd."
+    },
+    {
+      "id": "rome",
+      "feature_ids": [
+        "ITI43"
+      ],
+      "parts": [
+        {
+          "suffix": "CITY",
+          "name_en": "Rome",
+          "name_zh": "罗马市",
+          "polygon_source": {
+            "path": "city_districts.sources.geojson",
+            "property": "unit",
+            "values": [
+              "rome_city"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "PROVINCE",
+        "name_en": "Province of Rome",
+        "name_zh": "罗马省",
+        "full_name": true
+      },
+      "sources": [
+        "OpenStreetMap relation/41485"
+      ],
+      "notes": "Roma Capitale municipality inside the Rome province parcel."
+    },
+    {
+      "id": "madrid",
+      "feature_ids": [
+        "ES300"
+      ],
+      "parts": [
+        {
+          "suffix": "CITY",
+          "name_en": "Madrid city",
+          "name_zh": "马德里市",
+          "polygon_source": {
+            "path": "city_districts.sources.geojson",
+            "property": "unit",
+            "values": [
+              "madrid_city"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Community of Madrid",
+        "name_zh": "马德里自治区",
+        "full_name": true
+      },
+      "sources": [
+        "OpenStreetMap relation/5326784"
+      ],
+      "notes": "Madrid municipality inside the Community of Madrid."
+    },
+    {
+      "id": "istanbul",
+      "feature_ids": [
+        "TR100"
+      ],
+      "parts": [
+        {
+          "suffix": "ASIA",
+          "name_en": "Asian side",
+          "name_zh": "亚洲侧",
+          "polygon_source": {
+            "path": "city_districts.sources.geojson",
+            "property": "unit",
+            "values": [
+              "istanbul_asia"
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "EUROPE",
+        "name_en": "European side",
+        "name_zh": "欧洲侧"
+      },
+      "sources": [
+        "Hand-drawn Bosphorus mid-channel line"
+      ],
+      "notes": "Princes Islands follow the Asian side."
+    }
+  ],
+  "omitted": [
+    {
+      "id": "jerusalem",
+      "notes": "No reliable machine boundary for the 1949 armistice line inside the city yet."
+    },
+    {
+      "id": "vienna",
+      "notes": "Four-power sectors need borough-level data; deferred."
+    }
+  ]
+}

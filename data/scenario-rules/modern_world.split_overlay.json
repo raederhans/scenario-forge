@@ -3481,6 +3481,29 @@
           "SYR-145"
         ]
       }
+    },
+    {
+      "id": "mw_ru_shell_sliver_adoption",
+      "scenarios": [
+        "modern_world"
+      ],
+      "adopt_shell_slivers": {
+        "id_pattern": "_(ARCTIC|SHELL)_FB_\\d+$",
+        "max_area_km2": 3000,
+        "only_from_owners": [
+          "RU"
+        ],
+        "allowed_targets": [
+          "BAS",
+          "BUR",
+          "CEC",
+          "DAG",
+          "ING",
+          "SAK",
+          "TAT",
+          "TUV"
+        ]
+      }
     }
   ]
 }

@@ -1020,7 +1020,7 @@
       "base_tier": "major",
       "population": 3426354,
       "country_code": "DE",
-      "host_feature_id": "DE300",
+      "host_feature_id": "DE300__SPLIT_EAST",
       "urban_match_id": "UA_FD1A5680BB21",
       "lon": 13.41053,
       "lat": 52.52437,
@@ -1250,7 +1250,7 @@
       "base_tier": "major",
       "population": 5567000,
       "country_code": "ES",
-      "host_feature_id": "ES300",
+      "host_feature_id": "ES300__SPLIT_CITY",
       "urban_match_id": "UA_9C1AF084419F",
       "lon": -3.70256,
       "lat": 40.4165,
@@ -1881,7 +1881,7 @@
       "base_tier": "major",
       "population": 3339000,
       "country_code": "IT",
-      "host_feature_id": "ITI43",
+      "host_feature_id": "ITI43__SPLIT_CITY",
       "urban_match_id": "UA_EBE4280EE27F",
       "lon": 12.51133,
       "lat": 41.89193,
@@ -3018,7 +3018,7 @@
       "base_tier": "major",
       "population": 1707000,
       "country_code": "PL",
-      "host_feature_id": "PL_POW_1465",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT",
       "urban_match_id": "UA_2BE5967FAC8E",
       "lon": 21.01178,
       "lat": 52.22977,
@@ -3179,7 +3179,7 @@
       "base_tier": "major",
       "population": 10452000,
       "country_code": "RU",
-      "host_feature_id": "RU_CITY_MOSCOW",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY",
       "urban_match_id": "UA_AAE840A5DD13",
       "lon": 37.61781,
       "lat": 55.75204,
@@ -6333,7 +6333,7 @@
     },
     "CITY::ne::1159151529": {
       "city_id": "CITY::ne::1159151529",
-      "host_feature_id": "DE300"
+      "host_feature_id": "DE300__SPLIT_EAST"
     },
     "CITY::ne::1159149869": {
       "city_id": "CITY::ne::1159149869",
@@ -6373,7 +6373,7 @@
     },
     "CITY::ne::1159151503": {
       "city_id": "CITY::ne::1159151503",
-      "host_feature_id": "ES300"
+      "host_feature_id": "ES300__SPLIT_CITY"
     },
     "CITY::ne::1159151549": {
       "city_id": "CITY::ne::1159151549",
@@ -6479,7 +6479,7 @@
     },
     "CITY::ne::1159151593": {
       "city_id": "CITY::ne::1159151593",
-      "host_feature_id": "ITI43"
+      "host_feature_id": "ITI43__SPLIT_CITY"
     },
     "CITY::ne::1159150807": {
       "city_id": "CITY::ne::1159150807",
@@ -6664,7 +6664,7 @@
     },
     "CITY::ne::1159151299": {
       "city_id": "CITY::ne::1159151299",
-      "host_feature_id": "PL_POW_1465"
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
     },
     "CITY::ne::1159150445": {
       "city_id": "CITY::ne::1159150445",
@@ -6692,7 +6692,7 @@
     },
     "CITY::ne::1159151585": {
       "city_id": "CITY::ne::1159151585",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::ne::1159149385": {
       "city_id": "CITY::ne::1159149385",
@@ -12041,7 +12041,7 @@
     "CITY::gn::461835": {
       "city_id": "CITY::gn::461835",
       "stable_key": "id::CITY::gn::461835",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::gn::4619800": {
       "city_id": "CITY::gn::4619800",
@@ -13391,7 +13391,7 @@
     "CITY::gn::541406": {
       "city_id": "CITY::gn::541406",
       "stable_key": "id::CITY::gn::541406",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::gn::5414941": {
       "city_id": "CITY::gn::5414941",
@@ -13871,7 +13871,7 @@
     "CITY::gn::576279": {
       "city_id": "CITY::gn::576279",
       "stable_key": "id::CITY::gn::576279",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::gn::576590": {
       "city_id": "CITY::gn::576590",
@@ -14051,12 +14051,12 @@
     "CITY::gn::6418201": {
       "city_id": "CITY::gn::6418201",
       "stable_key": "id::CITY::gn::6418201",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::gn::6418220": {
       "city_id": "CITY::gn::6418220",
       "stable_key": "id::CITY::gn::6418220",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::gn::6692471": {
       "city_id": "CITY::gn::6692471",
@@ -14326,7 +14326,7 @@
     "CITY::gn::819740": {
       "city_id": "CITY::gn::819740",
       "stable_key": "id::CITY::gn::819740",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::gn::8223943": {
       "city_id": "CITY::gn::8223943",
@@ -16956,7 +16956,7 @@
     "CITY::ne::1159137277": {
       "city_id": "CITY::ne::1159137277",
       "stable_key": "id::CITY::ne::1159137277",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
     },
     "CITY::ne::1159137283": {
       "city_id": "CITY::ne::1159137283",
@@ -19627,6 +19627,1996 @@
       "city_id": "CITY::ne::1159151267",
       "stable_key": "id::CITY::ne::1159151267",
       "host_feature_id": "SYR-137__SPLIT_REMAINDER"
+    },
+    "CITY::gn::11238229": {
+      "city_id": "CITY::gn::11238229",
+      "stable_key": "id::CITY::gn::11238229",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::11257324": {
+      "city_id": "CITY::gn::11257324",
+      "stable_key": "id::CITY::gn::11257324",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::11549926": {
+      "city_id": "CITY::gn::11549926",
+      "stable_key": "id::CITY::gn::11549926",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549927": {
+      "city_id": "CITY::gn::11549927",
+      "stable_key": "id::CITY::gn::11549927",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549928": {
+      "city_id": "CITY::gn::11549928",
+      "stable_key": "id::CITY::gn::11549928",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549929": {
+      "city_id": "CITY::gn::11549929",
+      "stable_key": "id::CITY::gn::11549929",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549930": {
+      "city_id": "CITY::gn::11549930",
+      "stable_key": "id::CITY::gn::11549930",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549931": {
+      "city_id": "CITY::gn::11549931",
+      "stable_key": "id::CITY::gn::11549931",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549932": {
+      "city_id": "CITY::gn::11549932",
+      "stable_key": "id::CITY::gn::11549932",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549933": {
+      "city_id": "CITY::gn::11549933",
+      "stable_key": "id::CITY::gn::11549933",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549934": {
+      "city_id": "CITY::gn::11549934",
+      "stable_key": "id::CITY::gn::11549934",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549935": {
+      "city_id": "CITY::gn::11549935",
+      "stable_key": "id::CITY::gn::11549935",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549937": {
+      "city_id": "CITY::gn::11549937",
+      "stable_key": "id::CITY::gn::11549937",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549938": {
+      "city_id": "CITY::gn::11549938",
+      "stable_key": "id::CITY::gn::11549938",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549939": {
+      "city_id": "CITY::gn::11549939",
+      "stable_key": "id::CITY::gn::11549939",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549940": {
+      "city_id": "CITY::gn::11549940",
+      "stable_key": "id::CITY::gn::11549940",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549942": {
+      "city_id": "CITY::gn::11549942",
+      "stable_key": "id::CITY::gn::11549942",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549943": {
+      "city_id": "CITY::gn::11549943",
+      "stable_key": "id::CITY::gn::11549943",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549944": {
+      "city_id": "CITY::gn::11549944",
+      "stable_key": "id::CITY::gn::11549944",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549945": {
+      "city_id": "CITY::gn::11549945",
+      "stable_key": "id::CITY::gn::11549945",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549946": {
+      "city_id": "CITY::gn::11549946",
+      "stable_key": "id::CITY::gn::11549946",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549947": {
+      "city_id": "CITY::gn::11549947",
+      "stable_key": "id::CITY::gn::11549947",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549948": {
+      "city_id": "CITY::gn::11549948",
+      "stable_key": "id::CITY::gn::11549948",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549949": {
+      "city_id": "CITY::gn::11549949",
+      "stable_key": "id::CITY::gn::11549949",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549950": {
+      "city_id": "CITY::gn::11549950",
+      "stable_key": "id::CITY::gn::11549950",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549951": {
+      "city_id": "CITY::gn::11549951",
+      "stable_key": "id::CITY::gn::11549951",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549952": {
+      "city_id": "CITY::gn::11549952",
+      "stable_key": "id::CITY::gn::11549952",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549953": {
+      "city_id": "CITY::gn::11549953",
+      "stable_key": "id::CITY::gn::11549953",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549954": {
+      "city_id": "CITY::gn::11549954",
+      "stable_key": "id::CITY::gn::11549954",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549955": {
+      "city_id": "CITY::gn::11549955",
+      "stable_key": "id::CITY::gn::11549955",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549956": {
+      "city_id": "CITY::gn::11549956",
+      "stable_key": "id::CITY::gn::11549956",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549958": {
+      "city_id": "CITY::gn::11549958",
+      "stable_key": "id::CITY::gn::11549958",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549959": {
+      "city_id": "CITY::gn::11549959",
+      "stable_key": "id::CITY::gn::11549959",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549960": {
+      "city_id": "CITY::gn::11549960",
+      "stable_key": "id::CITY::gn::11549960",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549961": {
+      "city_id": "CITY::gn::11549961",
+      "stable_key": "id::CITY::gn::11549961",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549962": {
+      "city_id": "CITY::gn::11549962",
+      "stable_key": "id::CITY::gn::11549962",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549963": {
+      "city_id": "CITY::gn::11549963",
+      "stable_key": "id::CITY::gn::11549963",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549964": {
+      "city_id": "CITY::gn::11549964",
+      "stable_key": "id::CITY::gn::11549964",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549965": {
+      "city_id": "CITY::gn::11549965",
+      "stable_key": "id::CITY::gn::11549965",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549966": {
+      "city_id": "CITY::gn::11549966",
+      "stable_key": "id::CITY::gn::11549966",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549967": {
+      "city_id": "CITY::gn::11549967",
+      "stable_key": "id::CITY::gn::11549967",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549968": {
+      "city_id": "CITY::gn::11549968",
+      "stable_key": "id::CITY::gn::11549968",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549969": {
+      "city_id": "CITY::gn::11549969",
+      "stable_key": "id::CITY::gn::11549969",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549970": {
+      "city_id": "CITY::gn::11549970",
+      "stable_key": "id::CITY::gn::11549970",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549972": {
+      "city_id": "CITY::gn::11549972",
+      "stable_key": "id::CITY::gn::11549972",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549973": {
+      "city_id": "CITY::gn::11549973",
+      "stable_key": "id::CITY::gn::11549973",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549974": {
+      "city_id": "CITY::gn::11549974",
+      "stable_key": "id::CITY::gn::11549974",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549975": {
+      "city_id": "CITY::gn::11549975",
+      "stable_key": "id::CITY::gn::11549975",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549977": {
+      "city_id": "CITY::gn::11549977",
+      "stable_key": "id::CITY::gn::11549977",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549978": {
+      "city_id": "CITY::gn::11549978",
+      "stable_key": "id::CITY::gn::11549978",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549979": {
+      "city_id": "CITY::gn::11549979",
+      "stable_key": "id::CITY::gn::11549979",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549980": {
+      "city_id": "CITY::gn::11549980",
+      "stable_key": "id::CITY::gn::11549980",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549981": {
+      "city_id": "CITY::gn::11549981",
+      "stable_key": "id::CITY::gn::11549981",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549983": {
+      "city_id": "CITY::gn::11549983",
+      "stable_key": "id::CITY::gn::11549983",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549984": {
+      "city_id": "CITY::gn::11549984",
+      "stable_key": "id::CITY::gn::11549984",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549985": {
+      "city_id": "CITY::gn::11549985",
+      "stable_key": "id::CITY::gn::11549985",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549986": {
+      "city_id": "CITY::gn::11549986",
+      "stable_key": "id::CITY::gn::11549986",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549988": {
+      "city_id": "CITY::gn::11549988",
+      "stable_key": "id::CITY::gn::11549988",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549989": {
+      "city_id": "CITY::gn::11549989",
+      "stable_key": "id::CITY::gn::11549989",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549990": {
+      "city_id": "CITY::gn::11549990",
+      "stable_key": "id::CITY::gn::11549990",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549991": {
+      "city_id": "CITY::gn::11549991",
+      "stable_key": "id::CITY::gn::11549991",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549993": {
+      "city_id": "CITY::gn::11549993",
+      "stable_key": "id::CITY::gn::11549993",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549994": {
+      "city_id": "CITY::gn::11549994",
+      "stable_key": "id::CITY::gn::11549994",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549995": {
+      "city_id": "CITY::gn::11549995",
+      "stable_key": "id::CITY::gn::11549995",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549996": {
+      "city_id": "CITY::gn::11549996",
+      "stable_key": "id::CITY::gn::11549996",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549997": {
+      "city_id": "CITY::gn::11549997",
+      "stable_key": "id::CITY::gn::11549997",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11549999": {
+      "city_id": "CITY::gn::11549999",
+      "stable_key": "id::CITY::gn::11549999",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550000": {
+      "city_id": "CITY::gn::11550000",
+      "stable_key": "id::CITY::gn::11550000",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550001": {
+      "city_id": "CITY::gn::11550001",
+      "stable_key": "id::CITY::gn::11550001",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550002": {
+      "city_id": "CITY::gn::11550002",
+      "stable_key": "id::CITY::gn::11550002",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550004": {
+      "city_id": "CITY::gn::11550004",
+      "stable_key": "id::CITY::gn::11550004",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550005": {
+      "city_id": "CITY::gn::11550005",
+      "stable_key": "id::CITY::gn::11550005",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550006": {
+      "city_id": "CITY::gn::11550006",
+      "stable_key": "id::CITY::gn::11550006",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550008": {
+      "city_id": "CITY::gn::11550008",
+      "stable_key": "id::CITY::gn::11550008",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550009": {
+      "city_id": "CITY::gn::11550009",
+      "stable_key": "id::CITY::gn::11550009",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550010": {
+      "city_id": "CITY::gn::11550010",
+      "stable_key": "id::CITY::gn::11550010",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550011": {
+      "city_id": "CITY::gn::11550011",
+      "stable_key": "id::CITY::gn::11550011",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550012": {
+      "city_id": "CITY::gn::11550012",
+      "stable_key": "id::CITY::gn::11550012",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550013": {
+      "city_id": "CITY::gn::11550013",
+      "stable_key": "id::CITY::gn::11550013",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550014": {
+      "city_id": "CITY::gn::11550014",
+      "stable_key": "id::CITY::gn::11550014",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550018": {
+      "city_id": "CITY::gn::11550018",
+      "stable_key": "id::CITY::gn::11550018",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550020": {
+      "city_id": "CITY::gn::11550020",
+      "stable_key": "id::CITY::gn::11550020",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550021": {
+      "city_id": "CITY::gn::11550021",
+      "stable_key": "id::CITY::gn::11550021",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550022": {
+      "city_id": "CITY::gn::11550022",
+      "stable_key": "id::CITY::gn::11550022",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550023": {
+      "city_id": "CITY::gn::11550023",
+      "stable_key": "id::CITY::gn::11550023",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550024": {
+      "city_id": "CITY::gn::11550024",
+      "stable_key": "id::CITY::gn::11550024",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550025": {
+      "city_id": "CITY::gn::11550025",
+      "stable_key": "id::CITY::gn::11550025",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550026": {
+      "city_id": "CITY::gn::11550026",
+      "stable_key": "id::CITY::gn::11550026",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550027": {
+      "city_id": "CITY::gn::11550027",
+      "stable_key": "id::CITY::gn::11550027",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550028": {
+      "city_id": "CITY::gn::11550028",
+      "stable_key": "id::CITY::gn::11550028",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550029": {
+      "city_id": "CITY::gn::11550029",
+      "stable_key": "id::CITY::gn::11550029",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::11550030": {
+      "city_id": "CITY::gn::11550030",
+      "stable_key": "id::CITY::gn::11550030",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::12188855": {
+      "city_id": "CITY::gn::12188855",
+      "stable_key": "id::CITY::gn::12188855",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::12188858": {
+      "city_id": "CITY::gn::12188858",
+      "stable_key": "id::CITY::gn::12188858",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::12188859": {
+      "city_id": "CITY::gn::12188859",
+      "stable_key": "id::CITY::gn::12188859",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::2805059": {
+      "city_id": "CITY::gn::2805059",
+      "stable_key": "id::CITY::gn::2805059",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2807360": {
+      "city_id": "CITY::gn::2807360",
+      "stable_key": "id::CITY::gn::2807360",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2808473": {
+      "city_id": "CITY::gn::2808473",
+      "stable_key": "id::CITY::gn::2808473",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2808662": {
+      "city_id": "CITY::gn::2808662",
+      "stable_key": "id::CITY::gn::2808662",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2810538": {
+      "city_id": "CITY::gn::2810538",
+      "stable_key": "id::CITY::gn::2810538",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2813187": {
+      "city_id": "CITY::gn::2813187",
+      "stable_key": "id::CITY::gn::2813187",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2813472": {
+      "city_id": "CITY::gn::2813472",
+      "stable_key": "id::CITY::gn::2813472",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2823538": {
+      "city_id": "CITY::gn::2823538",
+      "stable_key": "id::CITY::gn::2823538",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2823708": {
+      "city_id": "CITY::gn::2823708",
+      "stable_key": "id::CITY::gn::2823708",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2829109": {
+      "city_id": "CITY::gn::2829109",
+      "stable_key": "id::CITY::gn::2829109",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2829962": {
+      "city_id": "CITY::gn::2829962",
+      "stable_key": "id::CITY::gn::2829962",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2836788": {
+      "city_id": "CITY::gn::2836788",
+      "stable_key": "id::CITY::gn::2836788",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2838009": {
+      "city_id": "CITY::gn::2838009",
+      "stable_key": "id::CITY::gn::2838009",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2843106": {
+      "city_id": "CITY::gn::2843106",
+      "stable_key": "id::CITY::gn::2843106",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2843350": {
+      "city_id": "CITY::gn::2843350",
+      "stable_key": "id::CITY::gn::2843350",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2848756": {
+      "city_id": "CITY::gn::2848756",
+      "stable_key": "id::CITY::gn::2848756",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2852217": {
+      "city_id": "CITY::gn::2852217",
+      "stable_key": "id::CITY::gn::2852217",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2855598": {
+      "city_id": "CITY::gn::2855598",
+      "stable_key": "id::CITY::gn::2855598",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2859103": {
+      "city_id": "CITY::gn::2859103",
+      "stable_key": "id::CITY::gn::2859103",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2862888": {
+      "city_id": "CITY::gn::2862888",
+      "stable_key": "id::CITY::gn::2862888",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2864695": {
+      "city_id": "CITY::gn::2864695",
+      "stable_key": "id::CITY::gn::2864695",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2870310": {
+      "city_id": "CITY::gn::2870310",
+      "stable_key": "id::CITY::gn::2870310",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2873074": {
+      "city_id": "CITY::gn::2873074",
+      "stable_key": "id::CITY::gn::2873074",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2873356": {
+      "city_id": "CITY::gn::2873356",
+      "stable_key": "id::CITY::gn::2873356",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2873589": {
+      "city_id": "CITY::gn::2873589",
+      "stable_key": "id::CITY::gn::2873589",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2873606": {
+      "city_id": "CITY::gn::2873606",
+      "stable_key": "id::CITY::gn::2873606",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2874455": {
+      "city_id": "CITY::gn::2874455",
+      "stable_key": "id::CITY::gn::2874455",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2878018": {
+      "city_id": "CITY::gn::2878018",
+      "stable_key": "id::CITY::gn::2878018",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2878044": {
+      "city_id": "CITY::gn::2878044",
+      "stable_key": "id::CITY::gn::2878044",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2878102": {
+      "city_id": "CITY::gn::2878102",
+      "stable_key": "id::CITY::gn::2878102",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2880498": {
+      "city_id": "CITY::gn::2880498",
+      "stable_key": "id::CITY::gn::2880498",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2884161": {
+      "city_id": "CITY::gn::2884161",
+      "stable_key": "id::CITY::gn::2884161",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2885656": {
+      "city_id": "CITY::gn::2885656",
+      "stable_key": "id::CITY::gn::2885656",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2885657": {
+      "city_id": "CITY::gn::2885657",
+      "stable_key": "id::CITY::gn::2885657",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2890136": {
+      "city_id": "CITY::gn::2890136",
+      "stable_key": "id::CITY::gn::2890136",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2892051": {
+      "city_id": "CITY::gn::2892051",
+      "stable_key": "id::CITY::gn::2892051",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2892705": {
+      "city_id": "CITY::gn::2892705",
+      "stable_key": "id::CITY::gn::2892705",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2892811": {
+      "city_id": "CITY::gn::2892811",
+      "stable_key": "id::CITY::gn::2892811",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2894755": {
+      "city_id": "CITY::gn::2894755",
+      "stable_key": "id::CITY::gn::2894755",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2905904": {
+      "city_id": "CITY::gn::2905904",
+      "stable_key": "id::CITY::gn::2905904",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2907551": {
+      "city_id": "CITY::gn::2907551",
+      "stable_key": "id::CITY::gn::2907551",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2909794": {
+      "city_id": "CITY::gn::2909794",
+      "stable_key": "id::CITY::gn::2909794",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2911710": {
+      "city_id": "CITY::gn::2911710",
+      "stable_key": "id::CITY::gn::2911710",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2920789": {
+      "city_id": "CITY::gn::2920789",
+      "stable_key": "id::CITY::gn::2920789",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2924302": {
+      "city_id": "CITY::gn::2924302",
+      "stable_key": "id::CITY::gn::2924302",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2924573": {
+      "city_id": "CITY::gn::2924573",
+      "stable_key": "id::CITY::gn::2924573",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2924577": {
+      "city_id": "CITY::gn::2924577",
+      "stable_key": "id::CITY::gn::2924577",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2924599": {
+      "city_id": "CITY::gn::2924599",
+      "stable_key": "id::CITY::gn::2924599",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2924770": {
+      "city_id": "CITY::gn::2924770",
+      "stable_key": "id::CITY::gn::2924770",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2939440": {
+      "city_id": "CITY::gn::2939440",
+      "stable_key": "id::CITY::gn::2939440",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2940187": {
+      "city_id": "CITY::gn::2940187",
+      "stable_key": "id::CITY::gn::2940187",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2942122": {
+      "city_id": "CITY::gn::2942122",
+      "stable_key": "id::CITY::gn::2942122",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2942341": {
+      "city_id": "CITY::gn::2942341",
+      "stable_key": "id::CITY::gn::2942341",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2944027": {
+      "city_id": "CITY::gn::2944027",
+      "stable_key": "id::CITY::gn::2944027",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::2949073": {
+      "city_id": "CITY::gn::2949073",
+      "stable_key": "id::CITY::gn::2949073",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2951935": {
+      "city_id": "CITY::gn::2951935",
+      "stable_key": "id::CITY::gn::2951935",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2957185": {
+      "city_id": "CITY::gn::2957185",
+      "stable_key": "id::CITY::gn::2957185",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::2959441": {
+      "city_id": "CITY::gn::2959441",
+      "stable_key": "id::CITY::gn::2959441",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::3104703": {
+      "city_id": "CITY::gn::3104703",
+      "stable_key": "id::CITY::gn::3104703",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3104748": {
+      "city_id": "CITY::gn::3104748",
+      "stable_key": "id::CITY::gn::3104748",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3105214": {
+      "city_id": "CITY::gn::3105214",
+      "stable_key": "id::CITY::gn::3105214",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3105247": {
+      "city_id": "CITY::gn::3105247",
+      "stable_key": "id::CITY::gn::3105247",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3106054": {
+      "city_id": "CITY::gn::3106054",
+      "stable_key": "id::CITY::gn::3106054",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3106601": {
+      "city_id": "CITY::gn::3106601",
+      "stable_key": "id::CITY::gn::3106601",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3106868": {
+      "city_id": "CITY::gn::3106868",
+      "stable_key": "id::CITY::gn::3106868",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3107112": {
+      "city_id": "CITY::gn::3107112",
+      "stable_key": "id::CITY::gn::3107112",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3107765": {
+      "city_id": "CITY::gn::3107765",
+      "stable_key": "id::CITY::gn::3107765",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3107784": {
+      "city_id": "CITY::gn::3107784",
+      "stable_key": "id::CITY::gn::3107784",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3108118": {
+      "city_id": "CITY::gn::3108118",
+      "stable_key": "id::CITY::gn::3108118",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3110040": {
+      "city_id": "CITY::gn::3110040",
+      "stable_key": "id::CITY::gn::3110040",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3110360": {
+      "city_id": "CITY::gn::3110360",
+      "stable_key": "id::CITY::gn::3110360",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3110458": {
+      "city_id": "CITY::gn::3110458",
+      "stable_key": "id::CITY::gn::3110458",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3110627": {
+      "city_id": "CITY::gn::3110627",
+      "stable_key": "id::CITY::gn::3110627",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3112737": {
+      "city_id": "CITY::gn::3112737",
+      "stable_key": "id::CITY::gn::3112737",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3112989": {
+      "city_id": "CITY::gn::3112989",
+      "stable_key": "id::CITY::gn::3112989",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3113415": {
+      "city_id": "CITY::gn::3113415",
+      "stable_key": "id::CITY::gn::3113415",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3113943": {
+      "city_id": "CITY::gn::3113943",
+      "stable_key": "id::CITY::gn::3113943",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3114183": {
+      "city_id": "CITY::gn::3114183",
+      "stable_key": "id::CITY::gn::3114183",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3114256": {
+      "city_id": "CITY::gn::3114256",
+      "stable_key": "id::CITY::gn::3114256",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3115659": {
+      "city_id": "CITY::gn::3115659",
+      "stable_key": "id::CITY::gn::3115659",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3116025": {
+      "city_id": "CITY::gn::3116025",
+      "stable_key": "id::CITY::gn::3116025",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3116156": {
+      "city_id": "CITY::gn::3116156",
+      "stable_key": "id::CITY::gn::3116156",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3116963": {
+      "city_id": "CITY::gn::3116963",
+      "stable_key": "id::CITY::gn::3116963",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3117667": {
+      "city_id": "CITY::gn::3117667",
+      "stable_key": "id::CITY::gn::3117667",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3118594": {
+      "city_id": "CITY::gn::3118594",
+      "stable_key": "id::CITY::gn::3118594",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3118848": {
+      "city_id": "CITY::gn::3118848",
+      "stable_key": "id::CITY::gn::3118848",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3119198": {
+      "city_id": "CITY::gn::3119198",
+      "stable_key": "id::CITY::gn::3119198",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3120030": {
+      "city_id": "CITY::gn::3120030",
+      "stable_key": "id::CITY::gn::3120030",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3120501": {
+      "city_id": "CITY::gn::3120501",
+      "stable_key": "id::CITY::gn::3120501",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3120635": {
+      "city_id": "CITY::gn::3120635",
+      "stable_key": "id::CITY::gn::3120635",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3121437": {
+      "city_id": "CITY::gn::3121437",
+      "stable_key": "id::CITY::gn::3121437",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3121766": {
+      "city_id": "CITY::gn::3121766",
+      "stable_key": "id::CITY::gn::3121766",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3121960": {
+      "city_id": "CITY::gn::3121960",
+      "stable_key": "id::CITY::gn::3121960",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3121969": {
+      "city_id": "CITY::gn::3121969",
+      "stable_key": "id::CITY::gn::3121969",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3123115": {
+      "city_id": "CITY::gn::3123115",
+      "stable_key": "id::CITY::gn::3123115",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3123477": {
+      "city_id": "CITY::gn::3123477",
+      "stable_key": "id::CITY::gn::3123477",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3123504": {
+      "city_id": "CITY::gn::3123504",
+      "stable_key": "id::CITY::gn::3123504",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3123608": {
+      "city_id": "CITY::gn::3123608",
+      "stable_key": "id::CITY::gn::3123608",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3124408": {
+      "city_id": "CITY::gn::3124408",
+      "stable_key": "id::CITY::gn::3124408",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3124765": {
+      "city_id": "CITY::gn::3124765",
+      "stable_key": "id::CITY::gn::3124765",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3124794": {
+      "city_id": "CITY::gn::3124794",
+      "stable_key": "id::CITY::gn::3124794",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3124964": {
+      "city_id": "CITY::gn::3124964",
+      "stable_key": "id::CITY::gn::3124964",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3125082": {
+      "city_id": "CITY::gn::3125082",
+      "stable_key": "id::CITY::gn::3125082",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3125239": {
+      "city_id": "CITY::gn::3125239",
+      "stable_key": "id::CITY::gn::3125239",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3126558": {
+      "city_id": "CITY::gn::3126558",
+      "stable_key": "id::CITY::gn::3126558",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3126563": {
+      "city_id": "CITY::gn::3126563",
+      "stable_key": "id::CITY::gn::3126563",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3127958": {
+      "city_id": "CITY::gn::3127958",
+      "stable_key": "id::CITY::gn::3127958",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3128832": {
+      "city_id": "CITY::gn::3128832",
+      "stable_key": "id::CITY::gn::3128832",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3129356": {
+      "city_id": "CITY::gn::3129356",
+      "stable_key": "id::CITY::gn::3129356",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3129636": {
+      "city_id": "CITY::gn::3129636",
+      "stable_key": "id::CITY::gn::3129636",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3129827": {
+      "city_id": "CITY::gn::3129827",
+      "stable_key": "id::CITY::gn::3129827",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::3129857": {
+      "city_id": "CITY::gn::3129857",
+      "stable_key": "id::CITY::gn::3129857",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3130383": {
+      "city_id": "CITY::gn::3130383",
+      "stable_key": "id::CITY::gn::3130383",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3130564": {
+      "city_id": "CITY::gn::3130564",
+      "stable_key": "id::CITY::gn::3130564",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3130583": {
+      "city_id": "CITY::gn::3130583",
+      "stable_key": "id::CITY::gn::3130583",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3130616": {
+      "city_id": "CITY::gn::3130616",
+      "stable_key": "id::CITY::gn::3130616",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::3164630": {
+      "city_id": "CITY::gn::3164630",
+      "stable_key": "id::CITY::gn::3164630",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3165624": {
+      "city_id": "CITY::gn::3165624",
+      "stable_key": "id::CITY::gn::3165624",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3169181": {
+      "city_id": "CITY::gn::3169181",
+      "stable_key": "id::CITY::gn::3169181",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3170342": {
+      "city_id": "CITY::gn::3170342",
+      "stable_key": "id::CITY::gn::3170342",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3172287": {
+      "city_id": "CITY::gn::3172287",
+      "stable_key": "id::CITY::gn::3172287",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3172768": {
+      "city_id": "CITY::gn::3172768",
+      "stable_key": "id::CITY::gn::3172768",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3173582": {
+      "city_id": "CITY::gn::3173582",
+      "stable_key": "id::CITY::gn::3173582",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3173914": {
+      "city_id": "CITY::gn::3173914",
+      "stable_key": "id::CITY::gn::3173914",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3174741": {
+      "city_id": "CITY::gn::3174741",
+      "stable_key": "id::CITY::gn::3174741",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::3175298": {
+      "city_id": "CITY::gn::3175298",
+      "stable_key": "id::CITY::gn::3175298",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3175678": {
+      "city_id": "CITY::gn::3175678",
+      "stable_key": "id::CITY::gn::3175678",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3175775": {
+      "city_id": "CITY::gn::3175775",
+      "stable_key": "id::CITY::gn::3175775",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3176203": {
+      "city_id": "CITY::gn::3176203",
+      "stable_key": "id::CITY::gn::3176203",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3176589": {
+      "city_id": "CITY::gn::3176589",
+      "stable_key": "id::CITY::gn::3176589",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3176923": {
+      "city_id": "CITY::gn::3176923",
+      "stable_key": "id::CITY::gn::3176923",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3178398": {
+      "city_id": "CITY::gn::3178398",
+      "stable_key": "id::CITY::gn::3178398",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3178738": {
+      "city_id": "CITY::gn::3178738",
+      "stable_key": "id::CITY::gn::3178738",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3178999": {
+      "city_id": "CITY::gn::3178999",
+      "stable_key": "id::CITY::gn::3178999",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3182851": {
+      "city_id": "CITY::gn::3182851",
+      "stable_key": "id::CITY::gn::3182851",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3182897": {
+      "city_id": "CITY::gn::3182897",
+      "stable_key": "id::CITY::gn::3182897",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3183005": {
+      "city_id": "CITY::gn::3183005",
+      "stable_key": "id::CITY::gn::3183005",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3183356": {
+      "city_id": "CITY::gn::3183356",
+      "stable_key": "id::CITY::gn::3183356",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::3183539": {
+      "city_id": "CITY::gn::3183539",
+      "stable_key": "id::CITY::gn::3183539",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::3337408": {
+      "city_id": "CITY::gn::3337408",
+      "stable_key": "id::CITY::gn::3337408",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::461740": {
+      "city_id": "CITY::gn::461740",
+      "stable_key": "id::CITY::gn::461740",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::462745": {
+      "city_id": "CITY::gn::462745",
+      "stable_key": "id::CITY::gn::462745",
+      "host_feature_id": "RU_ARCTIC_FB_938"
+    },
+    "CITY::gn::463829": {
+      "city_id": "CITY::gn::463829",
+      "stable_key": "id::CITY::gn::463829",
+      "host_feature_id": "RU_ARCTIC_FB_822"
+    },
+    "CITY::gn::465057": {
+      "city_id": "CITY::gn::465057",
+      "stable_key": "id::CITY::gn::465057",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::468809": {
+      "city_id": "CITY::gn::468809",
+      "stable_key": "id::CITY::gn::468809",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::470451": {
+      "city_id": "CITY::gn::470451",
+      "stable_key": "id::CITY::gn::470451",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::471456": {
+      "city_id": "CITY::gn::471456",
+      "stable_key": "id::CITY::gn::471456",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::472072": {
+      "city_id": "CITY::gn::472072",
+      "stable_key": "id::CITY::gn::472072",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::472079": {
+      "city_id": "CITY::gn::472079",
+      "stable_key": "id::CITY::gn::472079",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::472732": {
+      "city_id": "CITY::gn::472732",
+      "stable_key": "id::CITY::gn::472732",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::473127": {
+      "city_id": "CITY::gn::473127",
+      "stable_key": "id::CITY::gn::473127",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::473972": {
+      "city_id": "CITY::gn::473972",
+      "stable_key": "id::CITY::gn::473972",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::477377": {
+      "city_id": "CITY::gn::477377",
+      "stable_key": "id::CITY::gn::477377",
+      "host_feature_id": "RU_ARCTIC_FB_879"
+    },
+    "CITY::gn::481453": {
+      "city_id": "CITY::gn::481453",
+      "stable_key": "id::CITY::gn::481453",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::481608": {
+      "city_id": "CITY::gn::481608",
+      "stable_key": "id::CITY::gn::481608",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_SOUTHWEST"
+    },
+    "CITY::gn::483551": {
+      "city_id": "CITY::gn::483551",
+      "stable_key": "id::CITY::gn::483551",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::483826": {
+      "city_id": "CITY::gn::483826",
+      "stable_key": "id::CITY::gn::483826",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::484912": {
+      "city_id": "CITY::gn::484912",
+      "stable_key": "id::CITY::gn::484912",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::485630": {
+      "city_id": "CITY::gn::485630",
+      "stable_key": "id::CITY::gn::485630",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::487150": {
+      "city_id": "CITY::gn::487150",
+      "stable_key": "id::CITY::gn::487150",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::490971": {
+      "city_id": "CITY::gn::490971",
+      "stable_key": "id::CITY::gn::490971",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::491250": {
+      "city_id": "CITY::gn::491250",
+      "stable_key": "id::CITY::gn::491250",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::491280": {
+      "city_id": "CITY::gn::491280",
+      "stable_key": "id::CITY::gn::491280",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::491895": {
+      "city_id": "CITY::gn::491895",
+      "stable_key": "id::CITY::gn::491895",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::495136": {
+      "city_id": "CITY::gn::495136",
+      "stable_key": "id::CITY::gn::495136",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::495260": {
+      "city_id": "CITY::gn::495260",
+      "stable_key": "id::CITY::gn::495260",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_SOUTHWEST"
+    },
+    "CITY::gn::496456": {
+      "city_id": "CITY::gn::496456",
+      "stable_key": "id::CITY::gn::496456",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::497271": {
+      "city_id": "CITY::gn::497271",
+      "stable_key": "id::CITY::gn::497271",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::500843": {
+      "city_id": "CITY::gn::500843",
+      "stable_key": "id::CITY::gn::500843",
+      "host_feature_id": "RU_ARCTIC_FB_848"
+    },
+    "CITY::gn::501187": {
+      "city_id": "CITY::gn::501187",
+      "stable_key": "id::CITY::gn::501187",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::502018": {
+      "city_id": "CITY::gn::502018",
+      "stable_key": "id::CITY::gn::502018",
+      "host_feature_id": "RU_ARCTIC_FB_936"
+    },
+    "CITY::gn::502971": {
+      "city_id": "CITY::gn::502971",
+      "stable_key": "id::CITY::gn::502971",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::506043": {
+      "city_id": "CITY::gn::506043",
+      "stable_key": "id::CITY::gn::506043",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::506117": {
+      "city_id": "CITY::gn::506117",
+      "stable_key": "id::CITY::gn::506117",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::507338": {
+      "city_id": "CITY::gn::507338",
+      "stable_key": "id::CITY::gn::507338",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::508751": {
+      "city_id": "CITY::gn::508751",
+      "stable_key": "id::CITY::gn::508751",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::513896": {
+      "city_id": "CITY::gn::513896",
+      "stable_key": "id::CITY::gn::513896",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::514284": {
+      "city_id": "CITY::gn::514284",
+      "stable_key": "id::CITY::gn::514284",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::515027": {
+      "city_id": "CITY::gn::515027",
+      "stable_key": "id::CITY::gn::515027",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::516264": {
+      "city_id": "CITY::gn::516264",
+      "stable_key": "id::CITY::gn::516264",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::517121": {
+      "city_id": "CITY::gn::517121",
+      "stable_key": "id::CITY::gn::517121",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::517161": {
+      "city_id": "CITY::gn::517161",
+      "stable_key": "id::CITY::gn::517161",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::518657": {
+      "city_id": "CITY::gn::518657",
+      "stable_key": "id::CITY::gn::518657",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::518740": {
+      "city_id": "CITY::gn::518740",
+      "stable_key": "id::CITY::gn::518740",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::518879": {
+      "city_id": "CITY::gn::518879",
+      "stable_key": "id::CITY::gn::518879",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::521416": {
+      "city_id": "CITY::gn::521416",
+      "stable_key": "id::CITY::gn::521416",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::521500": {
+      "city_id": "CITY::gn::521500",
+      "stable_key": "id::CITY::gn::521500",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::527057": {
+      "city_id": "CITY::gn::527057",
+      "stable_key": "id::CITY::gn::527057",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::528454": {
+      "city_id": "CITY::gn::528454",
+      "stable_key": "id::CITY::gn::528454",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::529237": {
+      "city_id": "CITY::gn::529237",
+      "stable_key": "id::CITY::gn::529237",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::532535": {
+      "city_id": "CITY::gn::532535",
+      "stable_key": "id::CITY::gn::532535",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::533067": {
+      "city_id": "CITY::gn::533067",
+      "stable_key": "id::CITY::gn::533067",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::535270": {
+      "city_id": "CITY::gn::535270",
+      "stable_key": "id::CITY::gn::535270",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::535966": {
+      "city_id": "CITY::gn::535966",
+      "stable_key": "id::CITY::gn::535966",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::536098": {
+      "city_id": "CITY::gn::536098",
+      "stable_key": "id::CITY::gn::536098",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::536164": {
+      "city_id": "CITY::gn::536164",
+      "stable_key": "id::CITY::gn::536164",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::536398": {
+      "city_id": "CITY::gn::536398",
+      "stable_key": "id::CITY::gn::536398",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::537832": {
+      "city_id": "CITY::gn::537832",
+      "stable_key": "id::CITY::gn::537832",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::538321": {
+      "city_id": "CITY::gn::538321",
+      "stable_key": "id::CITY::gn::538321",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::538472": {
+      "city_id": "CITY::gn::538472",
+      "stable_key": "id::CITY::gn::538472",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::542634": {
+      "city_id": "CITY::gn::542634",
+      "stable_key": "id::CITY::gn::542634",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::543254": {
+      "city_id": "CITY::gn::543254",
+      "stable_key": "id::CITY::gn::543254",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::543344": {
+      "city_id": "CITY::gn::543344",
+      "stable_key": "id::CITY::gn::543344",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::546244": {
+      "city_id": "CITY::gn::546244",
+      "stable_key": "id::CITY::gn::546244",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::549479": {
+      "city_id": "CITY::gn::549479",
+      "stable_key": "id::CITY::gn::549479",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::551835": {
+      "city_id": "CITY::gn::551835",
+      "stable_key": "id::CITY::gn::551835",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::553034": {
+      "city_id": "CITY::gn::553034",
+      "stable_key": "id::CITY::gn::553034",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::554787": {
+      "city_id": "CITY::gn::554787",
+      "stable_key": "id::CITY::gn::554787",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::555129": {
+      "city_id": "CITY::gn::555129",
+      "stable_key": "id::CITY::gn::555129",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::560465": {
+      "city_id": "CITY::gn::560465",
+      "stable_key": "id::CITY::gn::560465",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::562820": {
+      "city_id": "CITY::gn::562820",
+      "stable_key": "id::CITY::gn::562820",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::565197": {
+      "city_id": "CITY::gn::565197",
+      "stable_key": "id::CITY::gn::565197",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::566976": {
+      "city_id": "CITY::gn::566976",
+      "stable_key": "id::CITY::gn::566976",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::569273": {
+      "city_id": "CITY::gn::569273",
+      "stable_key": "id::CITY::gn::569273",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::571741": {
+      "city_id": "CITY::gn::571741",
+      "stable_key": "id::CITY::gn::571741",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::574675": {
+      "city_id": "CITY::gn::574675",
+      "stable_key": "id::CITY::gn::574675",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::575505": {
+      "city_id": "CITY::gn::575505",
+      "stable_key": "id::CITY::gn::575505",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::576432": {
+      "city_id": "CITY::gn::576432",
+      "stable_key": "id::CITY::gn::576432",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::579870": {
+      "city_id": "CITY::gn::579870",
+      "stable_key": "id::CITY::gn::579870",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::582266": {
+      "city_id": "CITY::gn::582266",
+      "stable_key": "id::CITY::gn::582266",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::583589": {
+      "city_id": "CITY::gn::583589",
+      "stable_key": "id::CITY::gn::583589",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::6324376": {
+      "city_id": "CITY::gn::6324376",
+      "stable_key": "id::CITY::gn::6324376",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6418146": {
+      "city_id": "CITY::gn::6418146",
+      "stable_key": "id::CITY::gn::6418146",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::6418787": {
+      "city_id": "CITY::gn::6418787",
+      "stable_key": "id::CITY::gn::6418787",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::6534228": {
+      "city_id": "CITY::gn::6534228",
+      "stable_key": "id::CITY::gn::6534228",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::6534284": {
+      "city_id": "CITY::gn::6534284",
+      "stable_key": "id::CITY::gn::6534284",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::6544099": {
+      "city_id": "CITY::gn::6544099",
+      "stable_key": "id::CITY::gn::6544099",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544487": {
+      "city_id": "CITY::gn::6544487",
+      "stable_key": "id::CITY::gn::6544487",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544488": {
+      "city_id": "CITY::gn::6544488",
+      "stable_key": "id::CITY::gn::6544488",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544489": {
+      "city_id": "CITY::gn::6544489",
+      "stable_key": "id::CITY::gn::6544489",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544490": {
+      "city_id": "CITY::gn::6544490",
+      "stable_key": "id::CITY::gn::6544490",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544491": {
+      "city_id": "CITY::gn::6544491",
+      "stable_key": "id::CITY::gn::6544491",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544492": {
+      "city_id": "CITY::gn::6544492",
+      "stable_key": "id::CITY::gn::6544492",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544493": {
+      "city_id": "CITY::gn::6544493",
+      "stable_key": "id::CITY::gn::6544493",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544494": {
+      "city_id": "CITY::gn::6544494",
+      "stable_key": "id::CITY::gn::6544494",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6544495": {
+      "city_id": "CITY::gn::6544495",
+      "stable_key": "id::CITY::gn::6544495",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6545078": {
+      "city_id": "CITY::gn::6545078",
+      "stable_key": "id::CITY::gn::6545078",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6545089": {
+      "city_id": "CITY::gn::6545089",
+      "stable_key": "id::CITY::gn::6545089",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6545097": {
+      "city_id": "CITY::gn::6545097",
+      "stable_key": "id::CITY::gn::6545097",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::6545288": {
+      "city_id": "CITY::gn::6545288",
+      "stable_key": "id::CITY::gn::6545288",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::6545310": {
+      "city_id": "CITY::gn::6545310",
+      "stable_key": "id::CITY::gn::6545310",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::6545326": {
+      "city_id": "CITY::gn::6545326",
+      "stable_key": "id::CITY::gn::6545326",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::6545347": {
+      "city_id": "CITY::gn::6545347",
+      "stable_key": "id::CITY::gn::6545347",
+      "host_feature_id": "PL_POW_1465__SPLIT_PRAGA"
+    },
+    "CITY::gn::6545348": {
+      "city_id": "CITY::gn::6545348",
+      "stable_key": "id::CITY::gn::6545348",
+      "host_feature_id": "PL_POW_1465__SPLIT_PRAGA"
+    },
+    "CITY::gn::6620312": {
+      "city_id": "CITY::gn::6620312",
+      "stable_key": "id::CITY::gn::6620312",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::6698332": {
+      "city_id": "CITY::gn::6698332",
+      "stable_key": "id::CITY::gn::6698332",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::6698333": {
+      "city_id": "CITY::gn::6698333",
+      "stable_key": "id::CITY::gn::6698333",
+      "host_feature_id": "ITI43__SPLIT_CITY"
+    },
+    "CITY::gn::6947637": {
+      "city_id": "CITY::gn::6947637",
+      "stable_key": "id::CITY::gn::6947637",
+      "host_feature_id": "TR100__SPLIT_ASIA"
+    },
+    "CITY::gn::6947639": {
+      "city_id": "CITY::gn::6947639",
+      "stable_key": "id::CITY::gn::6947639",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::6947640": {
+      "city_id": "CITY::gn::6947640",
+      "stable_key": "id::CITY::gn::6947640",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::6947641": {
+      "city_id": "CITY::gn::6947641",
+      "stable_key": "id::CITY::gn::6947641",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::7290252": {
+      "city_id": "CITY::gn::7290252",
+      "stable_key": "id::CITY::gn::7290252",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::7290255": {
+      "city_id": "CITY::gn::7290255",
+      "stable_key": "id::CITY::gn::7290255",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::737081": {
+      "city_id": "CITY::gn::737081",
+      "stable_key": "id::CITY::gn::737081",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::738064": {
+      "city_id": "CITY::gn::738064",
+      "stable_key": "id::CITY::gn::738064",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::738329": {
+      "city_id": "CITY::gn::738329",
+      "stable_key": "id::CITY::gn::738329",
+      "host_feature_id": "TR100__SPLIT_ASIA"
+    },
+    "CITY::gn::738377": {
+      "city_id": "CITY::gn::738377",
+      "stable_key": "id::CITY::gn::738377",
+      "host_feature_id": "TR100__SPLIT_ASIA"
+    },
+    "CITY::gn::738858": {
+      "city_id": "CITY::gn::738858",
+      "stable_key": "id::CITY::gn::738858",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::739110": {
+      "city_id": "CITY::gn::739110",
+      "stable_key": "id::CITY::gn::739110",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::739634": {
+      "city_id": "CITY::gn::739634",
+      "stable_key": "id::CITY::gn::739634",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::741529": {
+      "city_id": "CITY::gn::741529",
+      "stable_key": "id::CITY::gn::741529",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::741763": {
+      "city_id": "CITY::gn::741763",
+      "stable_key": "id::CITY::gn::741763",
+      "host_feature_id": "TR100__SPLIT_ASIA"
+    },
+    "CITY::gn::743818": {
+      "city_id": "CITY::gn::743818",
+      "stable_key": "id::CITY::gn::743818",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::745039": {
+      "city_id": "CITY::gn::745039",
+      "stable_key": "id::CITY::gn::745039",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::746234": {
+      "city_id": "CITY::gn::746234",
+      "stable_key": "id::CITY::gn::746234",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::747323": {
+      "city_id": "CITY::gn::747323",
+      "stable_key": "id::CITY::gn::747323",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::747340": {
+      "city_id": "CITY::gn::747340",
+      "stable_key": "id::CITY::gn::747340",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::749644": {
+      "city_id": "CITY::gn::749644",
+      "stable_key": "id::CITY::gn::749644",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::751324": {
+      "city_id": "CITY::gn::751324",
+      "stable_key": "id::CITY::gn::751324",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::751868": {
+      "city_id": "CITY::gn::751868",
+      "stable_key": "id::CITY::gn::751868",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::753142": {
+      "city_id": "CITY::gn::753142",
+      "stable_key": "id::CITY::gn::753142",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::755330": {
+      "city_id": "CITY::gn::755330",
+      "stable_key": "id::CITY::gn::755330",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::755475": {
+      "city_id": "CITY::gn::755475",
+      "stable_key": "id::CITY::gn::755475",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::756092": {
+      "city_id": "CITY::gn::756092",
+      "stable_key": "id::CITY::gn::756092",
+      "host_feature_id": "PL_POW_1465__SPLIT_PRAGA"
+    },
+    "CITY::gn::756320": {
+      "city_id": "CITY::gn::756320",
+      "stable_key": "id::CITY::gn::756320",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::757065": {
+      "city_id": "CITY::gn::757065",
+      "stable_key": "id::CITY::gn::757065",
+      "host_feature_id": "PL_POW_1465__SPLIT_PRAGA"
+    },
+    "CITY::gn::7577022": {
+      "city_id": "CITY::gn::7577022",
+      "stable_key": "id::CITY::gn::7577022",
+      "host_feature_id": "ES300__SPLIT_REST"
+    },
+    "CITY::gn::758470": {
+      "city_id": "CITY::gn::758470",
+      "stable_key": "id::CITY::gn::758470",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::760503": {
+      "city_id": "CITY::gn::760503",
+      "stable_key": "id::CITY::gn::760503",
+      "host_feature_id": "PL_POW_1465__SPLIT_PRAGA"
+    },
+    "CITY::gn::7627067": {
+      "city_id": "CITY::gn::7627067",
+      "stable_key": "id::CITY::gn::7627067",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::7628416": {
+      "city_id": "CITY::gn::7628416",
+      "stable_key": "id::CITY::gn::7628416",
+      "host_feature_id": "TR100__SPLIT_EUROPE"
+    },
+    "CITY::gn::7628419": {
+      "city_id": "CITY::gn::7628419",
+      "stable_key": "id::CITY::gn::7628419",
+      "host_feature_id": "TR100__SPLIT_ASIA"
+    },
+    "CITY::gn::7628420": {
+      "city_id": "CITY::gn::7628420",
+      "stable_key": "id::CITY::gn::7628420",
+      "host_feature_id": "TR100__SPLIT_ASIA"
+    },
+    "CITY::gn::763442": {
+      "city_id": "CITY::gn::763442",
+      "stable_key": "id::CITY::gn::763442",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::764484": {
+      "city_id": "CITY::gn::764484",
+      "stable_key": "id::CITY::gn::764484",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::769893": {
+      "city_id": "CITY::gn::769893",
+      "stable_key": "id::CITY::gn::769893",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::776029": {
+      "city_id": "CITY::gn::776029",
+      "stable_key": "id::CITY::gn::776029",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::776103": {
+      "city_id": "CITY::gn::776103",
+      "stable_key": "id::CITY::gn::776103",
+      "host_feature_id": "PL_POW_1465__SPLIT_PRAGA"
+    },
+    "CITY::gn::776251": {
+      "city_id": "CITY::gn::776251",
+      "stable_key": "id::CITY::gn::776251",
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+    },
+    "CITY::gn::819552": {
+      "city_id": "CITY::gn::819552",
+      "stable_key": "id::CITY::gn::819552",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_SOUTHWEST"
+    },
+    "CITY::gn::8285534": {
+      "city_id": "CITY::gn::8285534",
+      "stable_key": "id::CITY::gn::8285534",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::8285535": {
+      "city_id": "CITY::gn::8285535",
+      "stable_key": "id::CITY::gn::8285535",
+      "host_feature_id": "ES300__SPLIT_CITY"
+    },
+    "CITY::gn::8334621": {
+      "city_id": "CITY::gn::8334621",
+      "stable_key": "id::CITY::gn::8334621",
+      "host_feature_id": "DE300__SPLIT_WEST"
+    },
+    "CITY::gn::8334622": {
+      "city_id": "CITY::gn::8334622",
+      "stable_key": "id::CITY::gn::8334622",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::8334624": {
+      "city_id": "CITY::gn::8334624",
+      "stable_key": "id::CITY::gn::8334624",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::8334625": {
+      "city_id": "CITY::gn::8334625",
+      "stable_key": "id::CITY::gn::8334625",
+      "host_feature_id": "DE300__SPLIT_EAST"
+    },
+    "CITY::gn::8378910": {
+      "city_id": "CITY::gn::8378910",
+      "stable_key": "id::CITY::gn::8378910",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::8394392": {
+      "city_id": "CITY::gn::8394392",
+      "stable_key": "id::CITY::gn::8394392",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
+    },
+    "CITY::gn::8505053": {
+      "city_id": "CITY::gn::8505053",
+      "stable_key": "id::CITY::gn::8505053",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_CITY"
+    },
+    "CITY::gn::857689": {
+      "city_id": "CITY::gn::857689",
+      "stable_key": "id::CITY::gn::857689",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_SOUTHWEST"
+    },
+    "CITY::gn::857690": {
+      "city_id": "CITY::gn::857690",
+      "stable_key": "id::CITY::gn::857690",
+      "host_feature_id": "RU_CITY_MOSCOW__SPLIT_SOUTHWEST"
+    },
+    "CITY::gn::8623183": {
+      "city_id": "CITY::gn::8623183",
+      "stable_key": "id::CITY::gn::8623183",
+      "host_feature_id": "TR100__SPLIT_ASIA"
+    },
+    "CITY::ne::1159139551": {
+      "city_id": "CITY::ne::1159139551",
+      "stable_key": "id::CITY::ne::1159139551",
+      "host_feature_id": "ITI43__SPLIT_PROVINCE"
     }
   },
   "audit": {

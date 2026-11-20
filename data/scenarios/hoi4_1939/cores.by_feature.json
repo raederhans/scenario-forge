@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "e924f5b3850ff490c32b5d07967744e497495efa6c17e4ed184fdea369b58d3f",
+  "baseline_hash": "5360162b13cce704e232e17975d7eddc5fb11b7bcdd6b70b1517931d59b2e9a9",
   "cores": {
     "AD_ADM1_AND-4876": [
       "AND"
@@ -9418,8 +9418,11 @@
     "CZ_ADM2_57006924B9167412778740": [
       "BOM"
     ],
-    "CZ_ADM2_57006924B91865699855455": [
+    "CZ_ADM2_57006924B91865699855455__SPLIT_REST": [
       "BOM"
+    ],
+    "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE": [
+      "POL"
     ],
     "CZ_ADM2_57006924B92931687173289": [
       "GER"
@@ -10021,7 +10024,10 @@
     "DE27E": [
       "GER"
     ],
-    "DE300": [
+    "DE300__SPLIT_EAST": [
+      "GER"
+    ],
+    "DE300__SPLIT_WEST": [
       "GER"
     ],
     "DE402": [
@@ -12016,7 +12022,10 @@
     "ES243": [
       "SPR"
     ],
-    "ES300": [
+    "ES300__SPLIT_CITY": [
+      "SPR"
+    ],
+    "ES300__SPLIT_REST": [
       "SPR"
     ],
     "ES411": [
@@ -14578,7 +14587,16 @@
     "HR028": [
       "YUG"
     ],
-    "HR031": [
+    "HR031__SPLIT_ABBAZIA": [
+      "ITA"
+    ],
+    "HR031__SPLIT_CHERSO": [
+      "ITA"
+    ],
+    "HR031__SPLIT_FIUME": [
+      "ITA"
+    ],
+    "HR031__SPLIT_REST": [
       "YUG"
     ],
     "HR032": [
@@ -14647,7 +14665,10 @@
     "HT_ADM1_HTI-1389": [
       "HAI"
     ],
-    "HU110": [
+    "HU110__SPLIT_BUDA": [
+      "HUN"
+    ],
+    "HU110__SPLIT_PEST": [
       "HUN"
     ],
     "HU120": [
@@ -16492,7 +16513,10 @@
     "ITI42": [
       "ITA"
     ],
-    "ITI43": [
+    "ITI43__SPLIT_CITY": [
+      "ITA"
+    ],
+    "ITI43__SPLIT_PROVINCE": [
       "ITA"
     ],
     "ITI44": [
@@ -17248,8 +17272,11 @@
     "LS_ADM1_LSO-3453": [
       "BAS"
     ],
-    "LT011": [
+    "LT011__SPLIT_REST": [
       "LIT"
+    ],
+    "LT011__SPLIT_WILNO": [
+      "POL"
     ],
     "LT021": [
       "LIT"
@@ -17479,8 +17506,11 @@
     "MDA-1651": [
       "ROM"
     ],
-    "MDA-1652": [
+    "MDA-1652__SPLIT_LEFT": [
       "SOV"
+    ],
+    "MDA-1652__SPLIT_RIGHT": [
+      "ROM"
     ],
     "MDA-1653": [
       "ROM"
@@ -19939,7 +19969,10 @@
     "PL_MRG_727dd6268093__SPLIT_DANZIG": [
       "DNZ"
     ],
-    "PL_MRG_727dd6268093__SPLIT_REST": [
+    "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG": [
+      "GER"
+    ],
+    "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_REST": [
       "POL"
     ],
     "PL_MRG_7d57be806a08": [
@@ -20284,7 +20317,10 @@
     "PL_POW_1463": [
       "POL"
     ],
-    "PL_POW_1465": [
+    "PL_POW_1465__SPLIT_LEFT": [
+      "POL"
+    ],
+    "PL_POW_1465__SPLIT_PRAGA": [
       "POL"
     ],
     "PL_POW_1601": [
@@ -20401,13 +20437,19 @@
     "PL_POW_2207": [
       "GER"
     ],
-    "PL_POW_2209__SPLIT_DANZIG": [
+    "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG": [
+      "GER"
+    ],
+    "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST": [
       "DNZ"
     ],
     "PL_POW_2209__SPLIT_REST": [
       "GER"
     ],
-    "PL_POW_2210__SPLIT_DANZIG": [
+    "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG": [
+      "GER"
+    ],
+    "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST": [
       "DNZ"
     ],
     "PL_POW_2210__SPLIT_REST": [
@@ -40247,7 +40289,7 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_6546": [
-      "SOV"
+      "MAN"
     ],
     "RU_ARCTIC_FB_6547": [
       "SOV"
@@ -40682,7 +40724,7 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_6678": [
-      "SOV"
+      "MAN"
     ],
     "RU_ARCTIC_FB_6679": [
       "SOV"
@@ -40778,7 +40820,7 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_6707": [
-      "SOV"
+      "MAN"
     ],
     "RU_ARCTIC_FB_6708": [
       "SOV"
@@ -41108,7 +41150,7 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_6807": [
-      "SOV"
+      "MAN"
     ],
     "RU_ARCTIC_FB_6808": [
       "SOV"
@@ -41423,7 +41465,7 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_6902": [
-      "SOV"
+      "MAN"
     ],
     "RU_ARCTIC_FB_6903": [
       "SOV"
@@ -48317,7 +48359,7 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_8993": [
-      "SOV"
+      "MAN"
     ],
     "RU_ARCTIC_FB_8994": [
       "SOV"
@@ -51607,7 +51649,10 @@
     "RU_CITY_ARKHANGELSK": [
       "SOV"
     ],
-    "RU_CITY_MOSCOW": [
+    "RU_CITY_MOSCOW__SPLIT_CITY": [
+      "SOV"
+    ],
+    "RU_CITY_MOSCOW__SPLIT_SOUTHWEST": [
       "SOV"
     ],
     "RU_CITY_SAINT_PETERSBURG": [
@@ -56332,7 +56377,10 @@
     "TL_ADM1_TLS-553": [
       "TMR"
     ],
-    "TR100": [
+    "TR100__SPLIT_ASIA": [
+      "TUR"
+    ],
+    "TR100__SPLIT_EUROPE": [
       "TUR"
     ],
     "TR211": [

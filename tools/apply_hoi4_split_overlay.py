@@ -166,7 +166,20 @@ def adopt_shell_slivers(owners, topology, id_pattern, max_area_km2, allowed_targ
         return 0
     absolute = _absolute_topology(topology)
     geometries = {g["properties"]["id"]: g for g in absolute["objects"]["political"]["geometries"]}
-    areas = {fid: area_km2(_decode_geometry(absolute, geometries[fid])) for fid in candidates}
+    def polygon_area(row):
+        # Fallback shells can carry collapsed rings (< 4 points); they contribute no area.
+        polygons = row["arcs"] if row.get("type") == "MultiPolygon" else [row.get("arcs", [])]
+        total = 0.0
+        for polygon in polygons:
+            for index, ring in enumerate(polygon):
+                try:
+                    part = area_km2(_decode_geometry(absolute, {"type": "Polygon", "arcs": [ring]}))
+                except ValueError:
+                    continue
+                total += part if index == 0 else -part
+        return max(total, 0.0)
+
+    areas = {fid: polygon_area(geometries[fid]) for fid in candidates}
     adjacent = set(candidates).union(*(neighbors[fid] for fid in candidates))
     arcs = {fid: set(arc_ids(geometries[fid]["arcs"])) for fid in adjacent}
     borders = {}

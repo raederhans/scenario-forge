@@ -236,9 +236,14 @@ def split_topology(topology, rules):
                 props = deepcopy(row["properties"])
                 original_name = props.get("name_en") or props.get("name") or parent
                 props["aliases"] = list(dict.fromkeys([*props.get("aliases", []), original_name]))
-                props.update(id=child, name=original_name + " · " + definition["name_en"],
-                             name_en=original_name + " · " + definition["name_en"],
-                             name_zh=(props.get("name_zh") or original_name) + " · " + definition["name_zh"])
+                if definition.get("full_name"):
+                    # The definition names the child outright instead of qualifying the parent name.
+                    props.update(id=child, name=definition["name_en"], name_en=definition["name_en"],
+                                 name_zh=definition["name_zh"], full_name=True)
+                else:
+                    props.update(id=child, name=original_name + " · " + definition["name_en"],
+                                 name_en=original_name + " · " + definition["name_en"],
+                                 name_zh=(props.get("name_zh") or original_name) + " · " + definition["name_zh"])
                 additions.append({"type": part.geom_type, "properties": props})
                 geometries[child] = part
                 measurements.append(dict(parent_id=parent, child_id=child, area_km2=area_km2(part),
@@ -276,7 +281,16 @@ def run_scenario(scenario_dir, rules):
     assignments = {child: dict(parent_id=parent, owner=owners[parent], controller=controllers[parent], cores=cores[parent])
                    for parent, children in splits.items() for child in children}
     manifest = read(scenario_dir / "manifest.json")
-    manifest.setdefault("hierarchy_overrides", {}).setdefault("feature_splits", {}).update(splits)
+    feature_splits = manifest.setdefault("hierarchy_overrides", {}).setdefault("feature_splits", {})
+    feature_splits.update(splits)
+
+    def leaves(fid):
+        return [leaf for child in feature_splits[fid]
+                for leaf in (leaves(child) if child in feature_splits else [child])]
+
+    # Runtime projection resolves one level, so a re-split child must resolve to its final leaves.
+    for fid in list(feature_splits):
+        feature_splits[fid] = leaves(fid)
     patch_path = scenario_dir / "geo_locale_patch.json"
     patch = (read(patch_path) if patch_path.exists() else
              _minimal_geo_locale_patch_payload(scenario_dir.name, manifest.get("generated_at", "")))
@@ -286,7 +300,7 @@ def run_scenario(scenario_dir, rules):
         if props["id"] in assignments:
             parent = assignments[props["id"]]["parent_id"]
             source_names = patch["geo"].get("id::"+parent) or patch["geo"].get(parent) or shared_names.get("id::"+parent, {})
-            for lang in ("en", "zh"):
+            for lang in ("en", "zh") if not props.pop("full_name", False) else ():
                 suffix = props["name_"+lang].rsplit(" · ", 1)[-1]
                 props["name_"+lang] = source_names.get(lang, props["name_"+lang].rsplit(" · ", 1)[0]) + " · " + suffix
             props["name"] = props["name_en"]
@@ -312,13 +326,16 @@ def main(argv=None):
     compiled = []
     external = any("polygon_source" in part for entry in rules["entries"] for part in entry.get("parts", []))
     for scenario in scenarios:
+        # An entry may narrow the file's scenarios with its own "scenarios" list.
+        scoped = {**rules, "entries": [entry for entry in rules["entries"]
+                                       if scenario in entry.get("scenarios", [scenario])]}
         if external:
             directory = ROOT / "data/scenarios" / scenario
-            compiled.append(compile_external_parts(rules, args.rules.parent,
+            compiled.append(compile_external_parts(scoped, args.rules.parent,
                             read(directory / "runtime_topology.topo.json"),
                             read(directory / "manifest.json").get("hierarchy_overrides", {}).get("feature_splits", {})))
         else:
-            compiled.append(rules)
+            compiled.append(scoped)
     migration = {}
     for plan in compiled or [rules]:
         migration.update({parent: entry_child_ids(entry, parent)

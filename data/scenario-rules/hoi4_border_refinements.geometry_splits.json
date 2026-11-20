@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "area_tolerance_degrees2": 1e-09,
+  "entries": [
+    {
+      "id": "lauenburg",
+      "feature_ids": [
+        "PL_MRG_727dd6268093__SPLIT_REST"
+      ],
+      "parts": [
+        {
+          "suffix": "LAUENBURG",
+          "name_en": "Lauenburg in Pommern",
+          "name_zh": "劳恩堡（波美拉尼亚）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "lebork"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Pomeranian · North · Remainder",
+        "name_zh": "滨海省·北部 · 余部",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/1552947"
+      ],
+      "notes": "Modern powiat lęborski approximates the German Kreis Lauenburg (1920–1939)."
+    },
+    {
+      "id": "marienburg_east_of_nogat",
+      "feature_ids": [
+        "PL_POW_2209__SPLIT_DANZIG"
+      ],
+      "parts": [
+        {
+          "suffix": "MARIENBURG",
+          "name_en": "Marienburg (east of the Nogat)",
+          "name_zh": "马林堡（诺加特河以东）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "nogat_east"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Malbork County · Free City rural district",
+        "name_zh": "马尔堡县 · 但泽自由市乡村区",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/1645604"
+      ],
+      "notes": "The Nogat formed the Free City–East Prussia boundary; Marienburg town lay on the German bank."
+    },
+    {
+      "id": "kahlberg_spit",
+      "feature_ids": [
+        "PL_POW_2210__SPLIT_DANZIG"
+      ],
+      "parts": [
+        {
+          "suffix": "KAHLBERG",
+          "name_en": "Kahlberg (Vistula Spit)",
+          "name_zh": "卡尔贝格（维斯瓦沙嘴）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "krynica"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Nowy Dwór Gdański County · Free City rural district",
+        "name_zh": "新德武尔县 · 但泽自由市乡村区",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/5313887"
+      ],
+      "notes": "Modern Krynica Morska municipality approximates the East Prussian part of the spit."
+    },
+    {
+      "id": "camenca_dniester",
+      "feature_ids": [
+        "MDA-1652"
+      ],
+      "parts": [
+        {
+          "suffix": "LEFT",
+          "name_en": "Camenca (left bank)",
+          "name_zh": "卡缅卡（德涅斯特河左岸）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "camenca"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "RIGHT",
+        "name_en": "Camenca (right bank)",
+        "name_zh": "卡缅卡（德涅斯特河右岸）",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/1702216"
+      ],
+      "notes": "The source parcel straddles the Dniester; the left-bank raion boundary separates the Moldavian ASSR side."
+    },
+    {
+      "id": "wilno_region",
+      "feature_ids": [
+        "LT011"
+      ],
+      "parts": [
+        {
+          "suffix": "WILNO",
+          "name_en": "Wilno region",
+          "name_zh": "维尔诺地区",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "lt_vilnius_city",
+              "lt_vilnius_dist",
+              "lt_salcininkai",
+              "lt_svencionys",
+              "lt_trakai"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Vilnius County (Lithuanian part)",
+        "name_zh": "维尔纽斯县（立陶宛控制部分）",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/968952",
+        "https://www.openstreetmap.org/relation/977316",
+        "https://www.openstreetmap.org/relation/1016307",
+        "https://www.openstreetmap.org/relation/967318",
+        "https://www.openstreetmap.org/relation/1016309"
+      ],
+      "notes": "Five modern municipalities approximate the Polish-held Wilno area (1922–1939); Varėna, Druskininkai and Ignalina are not separated."
+    },
+    {
+      "id": "fiume_quarnero",
+      "feature_ids": [
+        "HR031"
+      ],
+      "parts": [
+        {
+          "suffix": "FIUME",
+          "name_en": "Fiume",
+          "name_zh": "阜姆",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "hr_fiume"
+            ]
+          },
+          "full_name": true
+        },
+        {
+          "suffix": "ABBAZIA",
+          "name_en": "Abbazia",
+          "name_zh": "阿巴齐亚",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "hr_opatija",
+              "hr_lovran",
+              "hr_moscenicka"
+            ]
+          },
+          "full_name": true
+        },
+        {
+          "suffix": "CHERSO",
+          "name_en": "Cherso and Lussino",
+          "name_zh": "凯尔索与卢西诺",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "hr_cres",
+              "hr_losinj"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Primorje-Gorski Kotar (Yugoslav part)",
+        "name_zh": "滨海-戈尔斯基科塔尔（南斯拉夫部分）",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/2260028",
+        "https://www.openstreetmap.org/relation/2162164",
+        "https://www.openstreetmap.org/relation/2162165",
+        "https://www.openstreetmap.org/relation/2162166",
+        "https://www.openstreetmap.org/relation/12889960",
+        "https://www.openstreetmap.org/relation/12889969"
+      ],
+      "notes": "Italian Carnaro territory 1924–1943; Fiume is cut at the Rječina so Sušak stays Yugoslav."
+    },
+    {
+      "id": "zaolzie_frydek",
+      "feature_ids": [
+        "CZ_ADM2_57006924B91865699855455"
+      ],
+      "parts": [
+        {
+          "suffix": "ZAOLZIE",
+          "name_en": "Zaolzie (Třinec–Jablunkov)",
+          "name_zh": "扎奥尔齐（特日内茨—亚布伦科夫）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "cz_trinec",
+              "cz_jablunkov"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Frýdek-Místek",
+        "name_zh": "弗里德克-米斯泰克",
+        "full_name": true
+      },
+      "sources": [
+        "https://www.openstreetmap.org/relation/20437274",
+        "https://www.openstreetmap.org/relation/20437275"
+      ],
+      "notes": "Třinec and Jablunkov administrative districts approximate the Frýdek-Místek part of Zaolzie (Polish October 1938–September 1939)."
+    }
+  ],
+  "omitted": [
+    {
+      "id": "zara",
+      "notes": "Runtime coastline does not resolve the Zara enclave."
+    },
+    {
+      "id": "lastovo",
+      "notes": "Lagosta is absent from the runtime topology."
+    }
+  ]
+}
