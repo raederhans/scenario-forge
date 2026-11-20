@@ -1595,19 +1595,19 @@
       "color_hex": "#585858",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 88,
+      "controller_feature_count": 74,
       "display_name": "Protectorate of Bohemia and Moravia",
       "display_name_en": "Protectorate of Bohemia and Moravia",
       "display_name_zh": "波希米亚和摩拉维亚保护国",
       "entry_kind": "scenario_subject",
-      "feature_count": 88,
+      "feature_count": 74,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "CZ",
-      "notes": "",
+      "notes": "České Budějovice, Jindřichův Hradec and Klatovy districts: the district towns stayed in the Protectorate. Whole-district approximation; the Sudeten border strips (Nové Hrady, Slavonice, Nýrsko) are not separated.",
       "parent_owner_tag": "GER",
       "parent_owner_tags": [
         "GER"
@@ -1616,7 +1616,8 @@
       "provenance_iso2": "CZ",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "bohemia_moravia"
+        "bohemia_moravia",
+        "protectorate_southern_bohemia_1939"
       ],
       "ruling_ideology": "fascism",
       "ruling_ideology_source": "inherited:GER",
@@ -3778,7 +3779,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "finnish_aland",
-        "finnish_karelia"
+        "finnish_karelia",
+        "finland_terijoki_coast"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
@@ -4252,19 +4254,19 @@
       "color_hex": "#3c3c3c",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 777,
+      "controller_feature_count": 792,
       "display_name": "German Reich",
       "display_name_en": "German Reich",
       "display_name_zh": "德意志国",
       "entry_kind": "",
-      "feature_count": 777,
+      "feature_count": 792,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "DE",
-      "notes": "Kreis Lauenburg, Marienburg east of the Nogat and Kahlberg on the Vistula Spit stayed German.",
+      "notes": "Opava/Hlučín, Jeseník, Bruntál, Šumperk, Nový Jičín and Litoměřice districts: their towns lay in the Sudetenland after October 1938. Whole-district approximation; strips such as Frenštát and Roudnice stay with it.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "germany_frontier_1936",
@@ -4278,7 +4280,9 @@
         "1939_germany_memel",
         "liberec_return",
         "germany_interwar_frontier_counties",
-        "germany_interwar_lauenburg_marienburg_kahlberg"
+        "germany_interwar_lauenburg_marienburg_kahlberg",
+        "germany_memel_pogegen_1939",
+        "sudetenland_moravian_districts_1939"
       ],
       "ruling_ideology": "fascism",
       "ruling_ideology_source": "game_history",
@@ -8011,26 +8015,27 @@
       "color_hex": "#dbdb77",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 10,
+      "controller_feature_count": 11,
       "display_name": "Republic of Lithuania",
       "display_name_en": "Republic of Lithuania",
       "display_name_zh": "立陶宛共和国",
       "entry_kind": "",
-      "feature_count": 10,
+      "feature_count": 11,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "LT",
-      "notes": "Project-specific override: Vilnius remains with Lithuania in this scenario instead of strict vanilla HOI4 ownership.",
+      "notes": "Kretinga, Skuodas and Palanga stayed Lithuanian after the Memel annexation.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "lithuania_vilnius_override",
       "provenance_iso2": "LT",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "lithuania_vilnius_override"
+        "lithuania_vilnius_override",
+        "lithuania_kretinga_skuodas_1939"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
@@ -11122,19 +11127,19 @@
       "color_hex": "#d7c448",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 117,
+      "controller_feature_count": 119,
       "display_name": "Kingdom of Romania",
       "display_name_en": "Kingdom of Romania",
       "display_name_zh": "罗马尼亚王国",
       "entry_kind": "",
-      "feature_count": 117,
+      "feature_count": 119,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "RO",
-      "notes": "Right-bank half of the Camenca source parcel belonged to Romanian Bessarabia.",
+      "notes": "Khotyn lies on the Bessarabian (Romanian) bank of the Dniester until 1940.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "romania_bessarabia_1936",
@@ -11143,7 +11148,8 @@
       "rule_sources": [
         "romania_bessarabia_1936",
         "southern_dobruja",
-        "bessarabia_camenca_right_bank"
+        "bessarabia_camenca_right_bank",
+        "romanian_northern_bessarabia_khotyn"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
@@ -13945,12 +13951,12 @@
       "color_hex": "#79001c",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 744,
+      "controller_feature_count": 742,
       "display_name": "Ukrainian SSR",
       "display_name_en": "Ukrainian SSR",
       "display_name_zh": "乌克兰苏维埃社会主义共和国",
       "entry_kind": "scenario_subject",
-      "feature_count": 744,
+      "feature_count": 742,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [

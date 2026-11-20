@@ -201,6 +201,22 @@
       "en": "Wilno region",
       "zh": "维尔诺地区"
     },
+    "id::LT023__SPLIT_MEMEL": {
+      "en": "Memel Territory",
+      "zh": "梅梅尔地区"
+    },
+    "id::LT023__SPLIT_REST": {
+      "en": "Kretinga and Skuodas",
+      "zh": "克雷廷加与斯库奥达斯"
+    },
+    "id::LT027__SPLIT_POGEGEN": {
+      "en": "Pogegen (Memel Territory)",
+      "zh": "波格根（梅梅尔地区）"
+    },
+    "id::LT027__SPLIT_REST": {
+      "en": "Tauragė County (rest)",
+      "zh": "陶拉格县（其余）"
+    },
     "id::MAR-1445__SPLIT_REST": {
       "en": "Tanger - Tétouan · Remainder",
       "zh": "丹吉尔 - 得土安 · 余部"

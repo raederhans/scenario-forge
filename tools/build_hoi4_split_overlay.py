@@ -876,6 +876,22 @@ add("italy_carnaro", B, "ITA", None, None,
     notes="Fiume (from 1924), Abbazia and Cherso-Lussino were Italian in 1936 and 1939.")
 add("poland_zaolzie_1939", Y39, "POL", None, None, FI("CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE"),
     only=["BOM", "CZE"], notes="Zaolzie was Polish from October 1938 to September 1939.")
+add("germany_memel_pogegen_1939", Y39, "GER", None, None, FI("LT027__SPLIT_POGEGEN"), only=["LIT"],
+    notes="Kreis Pogegen belonged to the Memel Territory annexed in March 1939.")
+add("lithuania_kretinga_skuodas_1939", Y39, "LIT", None, None, FI("LT023__SPLIT_REST"), only=["GER"],
+    notes="Kretinga, Skuodas and Palanga stayed Lithuanian after the Memel annexation.")
+CZ = "CZ_ADM2_57006924B"
+add("sudetenland_moravian_districts_1939", Y39, "GER", None, None,
+    FI(*(CZ + n for n in ("13474079400168", "8762756005554", "90452896246775", "61075462930500",
+                          "81305487356227", "28286346415780"))), only=["BOM"],
+    notes="Opava/Hlučín, Jeseník, Bruntál, Šumperk, Nový Jičín and Litoměřice districts: their towns lay in the "
+          "Sudetenland after October 1938. Whole-district approximation; strips such as Frenštát and Roudnice stay with it.")
+add("protectorate_southern_bohemia_1939", Y39, "BOM", None, None,
+    FI(*(CZ + n for n in ("73132069516203", "67285149942805", "72008682408189"))), only=["GER"],
+    notes="České Budějovice, Jindřichův Hradec and Klatovy districts: the district towns stayed in the Protectorate. "
+          "Whole-district approximation; the Sudeten border strips (Nové Hrady, Slavonice, Nýrsko) are not separated.")
+add("romanian_northern_bessarabia_khotyn", B, "ROM", None, None, FI("UA_RAY_74538382B35313257426644"), only=["UKR"],
+    notes="Khotyn lies on the Bessarabian (Romanian) bank of the Dniester until 1940.")
 E.append({"id": "shell_sliver_adoption", "scenarios": B,
           "adopt_shell_slivers": {"id_pattern": r"_(ARCTIC|SHELL)_FB_\d+$", "max_area_km2": 3000}})
 

@@ -9867,6 +9867,94 @@
       "notes": "Zaolzie was Polish from October 1938 to September 1939."
     },
     {
+      "id": "germany_memel_pogegen_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GER",
+      "select": {
+        "feature_ids": [
+          "LT027__SPLIT_POGEGEN"
+        ]
+      },
+      "only_from_owners": [
+        "LIT"
+      ],
+      "notes": "Kreis Pogegen belonged to the Memel Territory annexed in March 1939."
+    },
+    {
+      "id": "lithuania_kretinga_skuodas_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "LIT",
+      "select": {
+        "feature_ids": [
+          "LT023__SPLIT_REST"
+        ]
+      },
+      "only_from_owners": [
+        "GER"
+      ],
+      "notes": "Kretinga, Skuodas and Palanga stayed Lithuanian after the Memel annexation."
+    },
+    {
+      "id": "sudetenland_moravian_districts_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GER",
+      "select": {
+        "feature_ids": [
+          "CZ_ADM2_57006924B13474079400168",
+          "CZ_ADM2_57006924B8762756005554",
+          "CZ_ADM2_57006924B90452896246775",
+          "CZ_ADM2_57006924B61075462930500",
+          "CZ_ADM2_57006924B81305487356227",
+          "CZ_ADM2_57006924B28286346415780"
+        ]
+      },
+      "only_from_owners": [
+        "BOM"
+      ],
+      "notes": "Opava/Hlučín, Jeseník, Bruntál, Šumperk, Nový Jičín and Litoměřice districts: their towns lay in the Sudetenland after October 1938. Whole-district approximation; strips such as Frenštát and Roudnice stay with it."
+    },
+    {
+      "id": "protectorate_southern_bohemia_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "BOM",
+      "select": {
+        "feature_ids": [
+          "CZ_ADM2_57006924B73132069516203",
+          "CZ_ADM2_57006924B67285149942805",
+          "CZ_ADM2_57006924B72008682408189"
+        ]
+      },
+      "only_from_owners": [
+        "GER"
+      ],
+      "notes": "České Budějovice, Jindřichův Hradec and Klatovy districts: the district towns stayed in the Protectorate. Whole-district approximation; the Sudeten border strips (Nové Hrady, Slavonice, Nýrsko) are not separated."
+    },
+    {
+      "id": "romanian_northern_bessarabia_khotyn",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ROM",
+      "select": {
+        "feature_ids": [
+          "UA_RAY_74538382B35313257426644"
+        ]
+      },
+      "only_from_owners": [
+        "UKR"
+      ],
+      "notes": "Khotyn lies on the Bessarabian (Romanian) bank of the Dniester until 1940."
+    },
+    {
       "id": "ang_family_colour_hoi4_1936",
       "scenarios": [
         "hoi4_1936"
