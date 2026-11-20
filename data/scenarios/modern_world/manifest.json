@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/modern_world/audit.json",
-  "baseline_hash": "6358dd68e3e4dd0a881aab420bc839c5a5892b0a95be6543d12106fab24de98a",
+  "baseline_hash": "c68a8d2be1dc5cb8d3d1d8c83c265b6f804a8fbab1417a6b4b7c094a30b06940",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Modern-world baseline with matched The Fire Rises country colors.",
   "bookmark_name": "Modern World",
@@ -2519,7 +2519,7 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "8f9070ff436db054ac790261f0d7ca0b469c3353f77019ea6e9d049dd4349a14",
+  "snapshot_fingerprint": "5fa949bc56e43567077da28f93dc278ae1a7c24167f5fd9c712a8869cf10367f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",

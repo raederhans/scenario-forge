@@ -201582,10 +201582,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 778,
+      "controller_feature_count": 777,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 778,
+      "feature_count": 777,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202375,10 +202375,10 @@
     "LIT": {
       "base_iso2": "LT",
       "continent_label": "Europe",
-      "controller_feature_count": 9,
+      "controller_feature_count": 10,
       "display_name": "Lithuania",
       "entry_kind": "",
-      "feature_count": 9,
+      "feature_count": 10,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -205350,11 +205350,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "130764bf177d6b4beb487b4fd02970bd0df3ed40597848c8d70ae9b1a62a7e98",
+  "snapshot_fingerprint": "e6035afefb0bebec20bb58f97ce4447eabf9543deba2e5ff85b82599519dc7ab",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "1476900ec26f11f3dbda822aa9f9a7cf032007fcf020b9d458b478b56a1c11bc",
-    "detail_chunk_manifest_sha256": "caa8477ec64537b6a70e508914bde390c714dfb145b892d00630ba3ceabc594d",
+    "build_snapshot_sha256": "3715d3a4e07754868782a220b4fa8daee948bfa9603fb9afdfdb4e312a120aee",
+    "detail_chunk_manifest_sha256": "80796e9c72c8bd1b4347c87f9e73c883d6940fce517694588c03f4d24de11fdc",
     "runtime_bootstrap_topology_sha256": "87bede3074fad428a40e028c276cf5588b809afa8b63775f0bf6984f526f6179",
     "runtime_topology_sha256": "39599949211b95bd552663ef84a0b747fa6640edfbdf3a1d23801e91d7644b6f"
   },

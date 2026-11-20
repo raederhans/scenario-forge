@@ -8,10 +8,6 @@
       "ES300__SPLIT_CITY",
       "ES300__SPLIT_REST"
     ],
-    "HU110": [
-      "HU110__SPLIT_BUDA",
-      "HU110__SPLIT_PEST"
-    ],
     "ITI43": [
       "ITI43__SPLIT_CITY",
       "ITI43__SPLIT_PROVINCE"
@@ -28,6 +24,20 @@
       "TR100__SPLIT_ASIA",
       "TR100__SPLIT_EUROPE"
     ]
+  },
+  "scenario_feature_splits": {
+    "hoi4_1936": {
+      "HU110": [
+        "HU110__SPLIT_BUDA",
+        "HU110__SPLIT_PEST"
+      ]
+    },
+    "hoi4_1939": {
+      "HU110": [
+        "HU110__SPLIT_BUDA",
+        "HU110__SPLIT_PEST"
+      ]
+    }
   },
   "scenarios": [
     "modern_world",

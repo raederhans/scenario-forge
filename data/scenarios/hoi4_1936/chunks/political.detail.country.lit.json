@@ -1935,6 +1935,51 @@
       }
     },
     {
+      "id": "RU_ARCTIC_FB_039",
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_039",
+        "name": "Russia Shell Fallback 39",
+        "cntr_code": "RU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              22.700027000270012,
+              54.57638264782646
+            ],
+            [
+              22.700027000270012,
+              54.588533516335175
+            ],
+            [
+              22.700027000270012,
+              54.61071367313674
+            ],
+            [
+              22.700027000270012,
+              54.61109941499414
+            ],
+            [
+              22.6640266402664,
+              54.588533516335175
+            ],
+            [
+              22.700027000270012,
+              54.57638264782646
+            ]
+          ]
+        ]
+      }
+    },
+    {
       "id": 21095,
       "type": "Feature",
       "properties": {

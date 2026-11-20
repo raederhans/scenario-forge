@@ -10,9 +10,9 @@
     "capital_hints.json": "683ca232a288dfbdf0817548ccb0aeb0b7a0f196c153983dc59b99d1afa2f258",
     "city_overrides.json": "5d5b5b427ca747c3734986fc9c9c51ebcb0b62b38ac330c9d3b2fe43493b72ed",
     "cores.by_feature.json": "92b44be72f06e6dbeb75918c7b801e4f66ca1bb01a7f7d29c7bd9cc1d3c8daa2",
-    "countries.json": "f4d1157e1c43fa019f02f48cf76235eefe8f3b45cc22e366ec766dd284d77a33",
+    "countries.json": "8c723f0002e6a9654a0a34d6508e718786664b58921faac0d598c043c7f73eb4",
     "geo_locale_patch.json": "9afb6997b97298e8b01b1fb136dcbd787e02100a1b373a3e9bda018f1eead8b8",
-    "owners.by_feature.json": "32c2b3c00779a3c8e0fd67e4a1e7cb007b229a913804e6fbe44609118de92d3a",
+    "owners.by_feature.json": "675515ffebcd9c7910f66f8c5ec6fbfd3294d9c8888be0c9517330503479912a",
     "runtime_topology.topo.json": "5904e4f5a25bbcc24f9b6fabca3bd18c268b94f40088e85dc119c86f5449d3e1",
     "special_zone_layers.json": "2dc725d3ccaa7453286f8381e6b4c151e53a7274e730ca6ce84eee17563080f0"
   },
@@ -20,6 +20,6 @@
   "profile": "lightweight_base",
   "report_paths": {},
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "8f9070ff436db054ac790261f0d7ca0b469c3353f77019ea6e9d049dd4349a14",
+  "snapshot_fingerprint": "5fa949bc56e43567077da28f93dc278ae1a7c24167f5fd9c712a8869cf10367f",
   "water_count": 0
 }

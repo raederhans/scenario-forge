@@ -1888,6 +1888,7 @@
             "RU_ARCTIC_FB_2580",
             "RU_ARCTIC_FB_2592",
             "RU_ARCTIC_FB_2600",
+            "RU_ARCTIC_FB_2602",
             "RU_ARCTIC_FB_2609",
             "RU_ARCTIC_FB_2617",
             "RU_ARCTIC_FB_2636",
@@ -3082,7 +3083,6 @@
             "RU_ARCTIC_FB_2563",
             "RU_ARCTIC_FB_2582",
             "RU_ARCTIC_FB_2587",
-            "RU_ARCTIC_FB_2602",
             "RU_ARCTIC_FB_2614",
             "RU_ARCTIC_FB_2623",
             "RU_ARCTIC_FB_2629",
@@ -3214,12 +3214,14 @@
           "feature_ids": [
             "RU_ARCTIC_FB_2518",
             "RU_ARCTIC_FB_2653",
+            "RU_ARCTIC_FB_2667",
             "RU_ARCTIC_FB_2678",
             "RU_ARCTIC_FB_2685",
             "RU_ARCTIC_FB_2694",
             "RU_ARCTIC_FB_2718",
             "RU_ARCTIC_FB_2721",
             "RU_ARCTIC_FB_2726",
+            "RU_ARCTIC_FB_8592",
             "RU_MRG_0fa9348c8062",
             "RU_RAY_50074027B58467356693682",
             "RU_RAY_50074027B83535390579003"
@@ -5577,7 +5579,6 @@
             "RU_ARCTIC_FB_036",
             "RU_ARCTIC_FB_037",
             "RU_ARCTIC_FB_038",
-            "RU_ARCTIC_FB_039",
             "RU_ARCTIC_FB_041",
             "RU_ARCTIC_FB_8032",
             "RU_ARCTIC_FB_9658",
@@ -7325,7 +7326,6 @@
           "name_zh": "阿斯特拉罕",
           "feature_ids": [
             "RU_ARCTIC_FB_2646",
-            "RU_ARCTIC_FB_2667",
             "RU_ARCTIC_FB_2728",
             "RU_ARCTIC_FB_2751",
             "RU_ARCTIC_FB_2764",
@@ -7342,7 +7342,6 @@
             "RU_ARCTIC_FB_2894",
             "RU_ARCTIC_FB_2908",
             "RU_ARCTIC_FB_2909",
-            "RU_ARCTIC_FB_8592",
             "RU_RAY_50074027B16130547537538",
             "RU_RAY_50074027B17781956857402",
             "RU_RAY_50074027B44442883085225"
@@ -7913,6 +7912,14 @@
             "LT026",
             "LT027",
             "LT028"
+          ]
+        },
+        "state_206": {
+          "district_id": "state_206",
+          "name_en": "Minsk",
+          "name_zh": "明斯克",
+          "feature_ids": [
+            "RU_ARCTIC_FB_039"
           ]
         },
         "state_814": {
