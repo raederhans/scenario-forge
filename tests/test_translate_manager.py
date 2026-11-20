@@ -21,6 +21,22 @@ from tools.translate_manager import (
 
 
 class GlobalGeoNamesTest(unittest.TestCase):
+    def test_scoped_rebuild_preserves_reviewed_names_outside_scope(self):
+        archer = {"en": "Archer County", "zh": "阿彻县现名"}
+        warsaw = {"en": "Warsaw", "zh": "华沙"}
+        geo, sources = merge_geo(
+            geo_names=["Warszawa"],
+            current_geo={"Archer County": archer, "Warszawa": {"en": "Warschau", "zh": "瓦尔绍"}},
+            baseline_geo={
+                "Archer County": {"en": "Archer County", "zh": "阿彻县", "scope": "global"},
+                "Warszawa": {**warsaw, "scope": "global"},
+            },
+            alias_to_stable={}, stable_to_primary={}, search_only_aliases={"Archer County", "Warszawa"},
+            translator=MachineTranslator(), include_stable_geo_keys=False, restrict_scope=True,
+        )
+        self.assertEqual(geo, {"Archer County": archer, "Warszawa": warsaw})
+        self.assertEqual(sources, {"Archer County": "existing_reuse", "Warszawa": "baseline_reuse"})
+
     def test_rebuild_keeps_global_names_when_existing_snapshot_contains_scenario_names(self):
         modern = {"en": "Volgograd", "zh": "伏尔加格勒"}
         historical = {"en": "Paulusburg", "zh": "保卢斯堡"}
