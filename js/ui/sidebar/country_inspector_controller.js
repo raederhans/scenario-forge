@@ -1379,7 +1379,7 @@ export function createCountryInspectorController({
     }
 
     if (countryInspectorColorInput && !countryInspectorColorInput.dataset.bound) {
-      countryInspectorColorInput.addEventListener("change", (event) => {
+      countryInspectorColorInput.addEventListener("change", async (event) => {
         const latestCountryStatesByCode = getLatestCountryStatesByCode();
         const selectedCode = ensureSelectedInspectorCountry();
         if (!selectedCode) return;
@@ -1392,7 +1392,7 @@ export function createCountryInspectorController({
           renderCountryInspectorDetail();
           return;
         }
-        applyCountryColor(selectedCode, nextColor);
+        await applyCountryColor(selectedCode, nextColor);
         closeCountryInspectorColorPicker();
         markDirty("inspector-country-color");
         refreshCountryRows({

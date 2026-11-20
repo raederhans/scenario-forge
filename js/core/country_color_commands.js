@@ -1,3 +1,5 @@
+import { normalizeHexColor } from "./color_hex_utils.js";
+import { applyColorReplacement, withCountryColorReplacement } from "./replace_color_command.js";
 // Shared map logic helpers (Phase 13)
 import { state as runtimeState, countryPalette, defaultCountryPalette } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
@@ -11,27 +13,28 @@ function normalizeCountryCode(rawCode) {
   return normalizeFeatureCountryCode(rawCode);
 }
 
-function applyCountryColor(code, color) {
+function applyCountryColor(code, color, dialog) {
   if (!runtimeState.landData) return;
   const target = normalizeCountryCode(code);
   if (!target) return;
-  const before = captureHistoryState({
-    ownerCodes: [target],
-  });
-  runtimeState.countryPalette[target] = color;
-  runtimeState.sovereignBaseColors[target] = color;
-
-  refreshResolvedColorsForOwners([target], { renderNow: true });
-  pushHistoryEntry({
-    kind: "inspector-country-color",
-    before,
-    after: captureHistoryState({
-      ownerCodes: [target],
-    }),
-    meta: {
-      affectsSovereignty: false,
-    },
-  });
+  const oldColor = normalizeHexColor(state.sovereignBaseColors[target] || state.countryPalette[target]);
+  const newColor = normalizeHexColor(color);
+  return withCountryColorReplacement(state, target, oldColor, newColor, replacement => {
+    const scope = { ownerCodes: [target], ...replacement };
+    const before = captureHistoryState(scope);
+    state.countryPalette[target] = color;
+    state.sovereignBaseColors[target] = color;
+    if (replacement) {
+      applyColorReplacement(state, replacement, oldColor, newColor);
+      refreshColorState({ renderNow: true });
+    } else {
+      refreshResolvedColorsForOwners([target], { renderNow: true });
+    }
+    pushHistoryEntry({
+      kind: replacement ? "replace-color" : "inspector-country-color",
+      before, after: captureHistoryState(scope), meta: { affectsSovereignty: false },
+    });
+  }, dialog);
 }
 
 function resetCountryColors() {

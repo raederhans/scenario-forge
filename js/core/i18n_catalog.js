@@ -485,6 +485,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已经在使用这个边界变体。",
     "en": "Already using this boundary variant."
   },
+  "Also update {count} regions painted in {country}'s old color?": {
+    "zh": "同时更新涂成 {country} 旧颜色的 {count} 个地块？",
+    "en": {
+      "one": "Also update {count} region painted in {country}'s old color?",
+      "other": "Also update {count} regions painted in {country}'s old color?"
+    }
+  },
   "Aluminium": {
     "zh": "铝",
     "en": "Aluminium"
