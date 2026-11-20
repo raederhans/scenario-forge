@@ -125,6 +125,7 @@ export function buildPerLayerExportPlan(exportUi) {
   });
   if (exportUi?.textVisibility?.["svg-annotations"]) outputs.push({ id: "svg-annotations" });
   if (exportUi?.textVisibility?.["special-zones"]) outputs.push({ id: "special-zones" });
+  if (exportUi?.textVisibility?.legend) outputs.push({ id: "legend" });
   return outputs;
 }
 

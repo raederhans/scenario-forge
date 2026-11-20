@@ -3,6 +3,7 @@
 // toolbar.js 继续保留 overlay 外壳、跨面板仲裁、URL/focus 协调和 open/close facade。
 
 import { resolveSampleExportRecommendationContext } from "../../core/sample_export_recommendation.js";
+import { getPoliticalExportLegend } from "../../core/renderer/political_export_legend.js";
 import {
   ensureExportWorkbenchUiState as ensureExportWorkbenchUiAction,
   setExportAdjustmentsState,
@@ -27,6 +28,7 @@ const EXPORT_TEXT_LAYER_VIEW_MODELS = Object.freeze([
   Object.freeze({ id: "render-labels", name: "Render-pass labels", summary: "City and map labels from the labels pass" }),
   Object.freeze({ id: "special-zones", name: "Special zones", summary: "Layer-based special zone fills, patterns, and outlines" }),
   Object.freeze({ id: "svg-annotations", name: "SVG annotations", summary: "Operational lines, graphics, counters, and other SVG overlays" }),
+  Object.freeze({ id: "legend", name: "Legend" }),
 ]);
 const EXPORT_TEXT_LAYER_IDS = Object.freeze(EXPORT_TEXT_LAYER_VIEW_MODELS.map((layer) => layer.id));
 const EXPORT_TEXT_LAYER_MODEL_BY_ID = new Map(EXPORT_TEXT_LAYER_VIEW_MODELS.map((layer) => [layer.id, layer]));
@@ -106,10 +108,13 @@ function normalizeExportWorkbenchVisibility(value) {
   );
 }
 
-function normalizeExportWorkbenchTextVisibility(value, includeTextLayer = true) {
+function normalizeExportWorkbenchTextVisibility(value, includeTextLayer = true, legendVisible = true) {
   const source = value && typeof value === "object" ? value : {};
   return Object.fromEntries(
-    EXPORT_TEXT_LAYER_IDS.map((layerId) => [layerId, source[layerId] === undefined ? !!includeTextLayer : source[layerId] !== false])
+    EXPORT_TEXT_LAYER_IDS.map((layerId) => [
+      layerId,
+      source[layerId] === undefined ? (layerId === "legend" ? legendVisible : !!includeTextLayer) : source[layerId] !== false,
+    ])
   );
 }
 
@@ -140,9 +145,12 @@ function getExportAnnotationCountSummary(mapSvg = null) {
 }
 
 function ensureExportWorkbenchUiState(state, normalizeExportWorkbenchUiState) {
-  return ensureExportWorkbenchUiAction(state, {
+  const ui = ensureExportWorkbenchUiAction(state, {
     normalizeState: normalizeExportWorkbenchUiState,
   });
+  ui.textVisibility = normalizeExportWorkbenchTextVisibility(ui.textVisibility, ui.includeTextLayer, state.legendControl?.visible !== false);
+  ui.includeTextLayer = Object.values(ui.textVisibility).some(Boolean);
+  return ui;
 }
 
 function resolveExportPassSequence(exportWorkbenchUi, renderPassNames) {
@@ -195,6 +203,7 @@ function getExportPreviewSourceKey(state, exportUi, renderPassNames, svgMarkup =
     state.colorCanvas?.width, state.colorCanvas?.height,
     transform.k, transform.x, transform.y,
     state.styleConfig,
+    exportUi.textVisibility?.legend && (sourceId === "main" || sourceId === "legend") ? getPoliticalExportLegend(state) : null,
     passes.map((name) => [name, cache.signatures[name], cache.referenceTransforms?.[name]]),
     svgMarkup,
   ]);
@@ -288,6 +297,7 @@ function createExportWorkbenchController({
     const specialZoneCount = mapSvg ? mapSvg.querySelectorAll(".special-zones-layer .special-zone").length : 0;
     const renderPassMetrics = state.renderPassCache?.metrics?.labels || null;
     const annotationSummary = getExportAnnotationCountSummary(mapSvg);
+    const legend = getPoliticalExportLegend(state);
     return [
       {
         ...EXPORT_TEXT_LAYER_MODEL_BY_ID.get("render-labels"),
@@ -307,6 +317,7 @@ function createExportWorkbenchController({
         count: annotationSummary.count,
         familyCounts: annotationSummary.counts,
       },
+      { ...EXPORT_TEXT_LAYER_MODEL_BY_ID.get("legend"), count: legend.colors.length + legend.zones.length },
     ].filter((entry) => !!entry?.id);
   };
 
