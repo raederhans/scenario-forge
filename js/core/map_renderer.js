@@ -2963,6 +2963,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     commitHistoryEntry,
     dismissOnboardingHint,
     ensureLeafDetailReady,
+    fillFromDoubleClick,
     getFeatureCountryCodeNormalized,
     handleRiverPaintClick: (hit, options) => getRiverPaintEditorOwner().handleClick(hit, options),
     getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
@@ -12803,7 +12804,6 @@ async function handleDoubleClick(event, _interactionContext = null) {
     blockStartupReadonlyInteraction();
     return;
   }
-  const actionStart = nowMs();
   if (runtimeState.specialZoneEditor?.active) {
     if (event?.preventDefault) event.preventDefault();
     finishSpecialZoneDraw();
@@ -12819,6 +12819,11 @@ async function handleDoubleClick(event, _interactionContext = null) {
     finishOperationGraphicDraw();
     return;
   }
+  return getClickSelectionTransactionOwner().handleDoubleClickFill(event);
+}
+
+async function fillFromDoubleClick(event) {
+  const actionStart = nowMs();
   if (!runtimeState.landData) return;
   if (event?.preventDefault) event.preventDefault();
 
