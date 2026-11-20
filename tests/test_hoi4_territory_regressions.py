@@ -78,7 +78,7 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
                 owners = json.loads((directory / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
                 countries = json.loads((directory / "countries.json").read_text(encoding="utf-8"))["countries"]
                 cities = json.loads((directory / "city_overrides.json").read_text(encoding="utf-8"))
-                self.assertEqual(len(owners), 21118)
+                self.assertEqual(len(owners), 21151)
                 self.assertEqual(owners["AU_ADM1_AUS-2653"], "AST")
                 self.assertEqual(owners["AU_ADM1_AUS-2650"], "NTR")
                 self.assertEqual(owners["CN_CITY_17275852B99290886399570"], "QMA")

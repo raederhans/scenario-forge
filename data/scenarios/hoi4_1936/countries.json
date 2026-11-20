@@ -2908,12 +2908,12 @@
       "color_hex": "#36a79c",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 260,
+      "controller_feature_count": 274,
       "display_name": "Czechoslovak Republic",
       "display_name_en": "Czechoslovak Republic",
       "display_name_zh": "捷克斯洛伐克共和国",
       "entry_kind": "",
-      "feature_count": 260,
+      "feature_count": 274,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3173,12 +3173,12 @@
       "color_hex": "#c9a227",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 6,
+      "controller_feature_count": 5,
       "display_name": "Free City of Danzig",
       "display_name_en": "Free City of Danzig",
       "display_name_zh": "但泽自由市",
       "entry_kind": "",
-      "feature_count": 6,
+      "feature_count": 5,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3216,19 +3216,19 @@
       "color_hex": "#679457",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 1,
+      "controller_feature_count": 2,
       "display_name": "Italian Aegean Islands",
       "display_name_en": "Italian Aegean Islands",
       "display_name_zh": "意属爱琴海群岛",
       "entry_kind": "scenario_subject",
-      "feature_count": 1,
+      "feature_count": 2,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "GR",
-      "notes": "",
+      "notes": "Kos, Kalymnos, Leros and the other Dodecanese inside the South Aegean parcel.",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "ITA"
@@ -3237,7 +3237,8 @@
       "provenance_iso2": "GR",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "dodecanese_hoi4_1936"
+        "dodecanese_hoi4_1936",
+        "dodecanese_south_aegean"
       ],
       "ruling_ideology": "fascism",
       "ruling_ideology_source": "inherited:ITA",
@@ -3795,7 +3796,7 @@
         "vanilla"
       ],
       "lookup_iso2": "FI",
-      "notes": "Pre-Winter War Finnish Karelian Isthmus, Ladoga Karelia and Petsamo, approximated by parcel centroid.",
+      "notes": "Terijoki, Kellomäki, Kuokkala (north of the Sestra) and old Salla east of today's border were Finnish until 1940.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "finnish_aland",
@@ -3804,7 +3805,8 @@
       "rule_sources": [
         "finnish_aland",
         "finnish_karelia",
-        "finland_terijoki_coast"
+        "finland_terijoki_coast",
+        "finland_interwar_isthmus_salla"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
@@ -3919,12 +3921,12 @@
       "color_hex": "#3971e4",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 321,
+      "controller_feature_count": 322,
       "display_name": "French Republic",
       "display_name_en": "French Republic",
       "display_name_zh": "法兰西共和国",
       "entry_kind": "",
-      "feature_count": 321,
+      "feature_count": 322,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3939,7 +3941,8 @@
       "quality": "approx_existing_geometry",
       "rule_sources": [
         "french_colonies",
-        "algeria_northern_departments"
+        "algeria_northern_departments",
+        "la_turbie_french"
       ],
       "ruling_ideology": "democratic",
       "ruling_ideology_source": "game_history",
@@ -5245,12 +5248,12 @@
       "color_hex": "#297cef",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 1,
+      "controller_feature_count": 2,
       "display_name": "Alexandretta Autonomous Sanjak Debug Region",
       "display_name_en": "Alexandretta Autonomous Sanjak Debug Region",
       "display_name_zh": "亚历山大勒塔自治专区调试分区",
       "entry_kind": "scenario_subject",
-      "feature_count": 1,
+      "feature_count": 2,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -5290,25 +5293,27 @@
       "color_hex": "#f97e62",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 22,
       "display_name": "Kingdom of Hungary",
       "display_name_en": "Kingdom of Hungary",
       "display_name_zh": "匈牙利王国",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 22,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "HU",
-      "notes": "",
+      "notes": "Jarovce, Rusovce and Čunovo stayed Hungarian until the 1947 Paris treaty.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "",
       "provenance_iso2": "HU",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "bratislava_bridgehead_hungarian_villages_1936"
+      ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
       "scenario_only": false,
@@ -6090,19 +6095,19 @@
       "color_hex": "#437f3f",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 115,
+      "controller_feature_count": 116,
       "display_name": "Kingdom of Italy",
       "display_name_en": "Kingdom of Italy",
       "display_name_zh": "意大利王国",
       "entry_kind": "",
-      "feature_count": 115,
+      "feature_count": 116,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "IT",
-      "notes": "Fiume (from 1924), Abbazia and Cherso-Lussino were Italian in 1936 and 1939.",
+      "notes": "Zara enclave (Treaty of Rapallo, 1920).",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "italy_absorbs_san_marino_1936",
@@ -6111,7 +6116,8 @@
       "rule_sources": [
         "italy_absorbs_san_marino_1936",
         "julian_march",
-        "italy_carnaro"
+        "italy_carnaro",
+        "italy_zara"
       ],
       "ruling_ideology": "fascism",
       "ruling_ideology_source": "game_history",
@@ -7126,19 +7132,19 @@
       "color_hex": "#610101",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 66,
+      "controller_feature_count": 72,
       "display_name": "Karelian ASSR",
       "display_name_en": "Karelian ASSR",
       "display_name_zh": "卡累利阿自治共和国",
       "entry_kind": "scenario_subject",
-      "feature_count": 66,
+      "feature_count": 72,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "RU",
-      "notes": "Modern republic boundary used as an approximation.",
+      "notes": "Porajärvi/Porosozero stayed in Soviet Karelia under the 1920 Tartu treaty.",
       "parent_owner_tag": "SOV",
       "parent_owner_tags": [
         "SOV"
@@ -7147,7 +7153,8 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "karelian_assr_hoi4_1936"
+        "karelian_assr_hoi4_1936",
+        "karelia_porosozero"
       ],
       "ruling_ideology": "communism",
       "ruling_ideology_source": "inherited:SOV",
@@ -8210,14 +8217,15 @@
         "extended"
       ],
       "lookup_iso2": "MC",
-      "notes": "",
+      "notes": "Monaco's land lies inside the Nice parcel; the separate Monaco parcel sits over La Turbie and Beausoleil.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "monaco",
       "provenance_iso2": "MC",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "monaco"
+        "monaco",
+        "monaco_edge"
       ],
       "ruling_ideology": "",
       "ruling_ideology_source": "",
@@ -10187,19 +10195,19 @@
       "color_hex": "#d6668b",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 301,
+      "controller_feature_count": 306,
       "display_name": "Republic of Poland",
       "display_name_en": "Republic of Poland",
       "display_name_zh": "波兰共和国",
       "entry_kind": "",
-      "feature_count": 301,
+      "feature_count": 306,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "PL",
-      "notes": "Wilno region was Polish from 1922 to October 1939; five modern municipalities approximate it.",
+      "notes": "Druskininkai and the Grodno railway (Varėna station, Marcinkonys), Lubawa, Knurów/Gierałtowice/Przyszowice and Tczew with the land south of Pszczółki were Polish; that last slice lies outside the Free City.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "poland_kresy_1936",
@@ -10208,7 +10216,8 @@
       "rule_sources": [
         "poland_kresy_1936",
         "poland_interwar_soldau_lobau",
-        "poland_interwar_wilno"
+        "poland_interwar_wilno",
+        "poland_interwar_druskieniki_lubawa_knurow"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
@@ -10814,19 +10823,19 @@
       "color_hex": "#d7c448",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 119,
+      "controller_feature_count": 123,
       "display_name": "Kingdom of Romania",
       "display_name_en": "Kingdom of Romania",
       "display_name_zh": "罗马尼亚王国",
       "entry_kind": "",
-      "feature_count": 119,
+      "feature_count": 123,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "RO",
-      "notes": "Khotyn lies on the Bessarabian (Romanian) bank of the Dniester until 1940.",
+      "notes": "Vyzhnytsia and Vashkivtsi (Bukovina), Bender/Varnița on the right bank and Cetatea Albă on the Dniester liman were Romanian until 1940.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "romania_bessarabia_1936",
@@ -10836,7 +10845,8 @@
         "romania_bessarabia_1936",
         "southern_dobruja",
         "bessarabia_camenca_right_bank",
-        "romanian_northern_bessarabia_khotyn"
+        "romanian_northern_bessarabia_khotyn",
+        "romania_bukovina_bessarabia_edges"
       ],
       "ruling_ideology": "democratic",
       "ruling_ideology_source": "game_history",
@@ -11664,12 +11674,12 @@
       "color_hex": "#6fb3d9",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 9,
+      "controller_feature_count": 10,
       "display_name": "San Marino",
       "display_name_en": "San Marino",
       "display_name_zh": "圣马力诺",
       "entry_kind": "",
-      "feature_count": 9,
+      "feature_count": 10,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -11683,7 +11693,8 @@
       "provenance_iso2": "SM",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "san_marino"
+        "san_marino",
+        "san_marino_edge"
       ],
       "ruling_ideology": "fascism",
       "ruling_ideology_source": "manual",
@@ -11844,12 +11855,12 @@
       "color_hex": "#7d0d18",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 9393,
+      "controller_feature_count": 9390,
       "display_name": "Union of Soviet Socialist Republics",
       "display_name_en": "Union of Soviet Socialist Republics",
       "display_name_zh": "苏维埃社会主义共和国联盟",
       "entry_kind": "",
-      "feature_count": 9393,
+      "feature_count": 9390,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -13411,25 +13422,27 @@
       "color_hex": "#abbe98",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 81,
+      "controller_feature_count": 82,
       "display_name": "Republic of Turkey",
       "display_name_en": "Republic of Turkey",
       "display_name_zh": "土耳其共和国",
       "entry_kind": "",
-      "feature_count": 81,
+      "feature_count": 82,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "TR",
-      "notes": "",
+      "notes": "Dörtyol, Erzin and Hassa were Turkish before 1939, outside the Sanjak of Alexandretta.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "",
       "provenance_iso2": "TR",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "hatay_north_turkish_1936"
+      ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",
       "scenario_only": false,
@@ -14290,26 +14303,27 @@
       "color_hex": "#48497e",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 116,
+      "controller_feature_count": 117,
       "display_name": "Kingdom of Yugoslavia",
       "display_name_en": "Kingdom of Yugoslavia",
       "display_name_zh": "南斯拉夫王国",
       "entry_kind": "",
-      "feature_count": 116,
+      "feature_count": 117,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
       ],
       "lookup_iso2": "RS",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
+      "notes": "Rakek, Cerknica and Loška dolina lay on the Yugoslav side of the Rapallo border.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "yugoslavia_union",
       "provenance_iso2": "RS",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "yugoslavia_union"
+        "yugoslavia_union",
+        "yugoslavia_cerknica_loska_dolina"
       ],
       "ruling_ideology": "neutrality",
       "ruling_ideology_source": "game_history",

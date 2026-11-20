@@ -4310,10 +4310,10 @@
     },
     {
       "country_code": "MC",
-      "host_feature_id": "MC_ADMIN0_PASSTHROUGH",
+      "host_feature_id": "FR_ARR_06002__SPLIT_MONACO",
       "urban_match_id": "UA_BBD8D7524307",
-      "lon": 7.418141920294424,
-      "lat": 43.75090156108269,
+      "lon": 7.42091041553169,
+      "lat": 43.7394181387089,
       "population": 36371,
       "base_tier": "major",
       "source": "merged",

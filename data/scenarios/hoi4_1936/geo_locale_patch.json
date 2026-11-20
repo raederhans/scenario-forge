@@ -33,6 +33,38 @@
       "en": "Wuchuan · Remainder",
       "zh": "吴川 · 余部"
     },
+    "id::CZ_ADM2_57006924B30982913442521__SPLIT_LANDSKRON": {
+      "en": "Landskron and Grulich",
+      "zh": "兰什克龙与克拉利基"
+    },
+    "id::CZ_ADM2_57006924B30982913442521__SPLIT_REST": {
+      "en": "Ústí nad Orlicí District (Czech part)",
+      "zh": "奥尔利采河畔乌斯季县（捷克部分）"
+    },
+    "id::CZ_ADM2_57006924B34464963037986__SPLIT_NETOLICE": {
+      "en": "Netolice and Vlachovo Březí",
+      "zh": "内托利采与弗拉霍沃布热齐"
+    },
+    "id::CZ_ADM2_57006924B34464963037986__SPLIT_REST": {
+      "en": "Prachatitz and Winterberg area",
+      "zh": "普拉哈蒂采与温珀克一带"
+    },
+    "id::CZ_ADM2_57006924B40201864279221__SPLIT_BRAUNAU": {
+      "en": "Braunau and Wekelsdorf",
+      "zh": "布劳莫夫与梅图耶河畔特普利采"
+    },
+    "id::CZ_ADM2_57006924B40201864279221__SPLIT_REST": {
+      "en": "Náchod District (Czech part)",
+      "zh": "纳霍德县（捷克部分）"
+    },
+    "id::CZ_ADM2_57006924B62007249383837__SPLIT_REST": {
+      "en": "Olomouc District (Czech part)",
+      "zh": "奥洛穆茨县（捷克部分）"
+    },
+    "id::CZ_ADM2_57006924B62007249383837__SPLIT_STERNBERG": {
+      "en": "Sternberg, Mährisch Neustadt and Bärn",
+      "zh": "什特恩贝克、乌尼乔夫与摩拉维亚贝龙"
+    },
     "id::CZ_ADM2_57006924B91865699855455__SPLIT_REST": {
       "en": "Frýdek-Místek",
       "zh": "弗里德克-米斯泰克"
@@ -40,6 +72,30 @@
     "id::CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE": {
       "en": "Zaolzie (Třinec–Jablunkov)",
       "zh": "扎奥尔齐（特日内茨—亚布伦科夫）"
+    },
+    "id::CZ_ADM2_57006924B92931687173289__SPLIT_REST": {
+      "en": "Bischofteinitz area",
+      "zh": "霍尔肖夫斯基蒂恩一带"
+    },
+    "id::CZ_ADM2_57006924B92931687173289__SPLIT_TAUS": {
+      "en": "Domažlice and Staňkov",
+      "zh": "多马日利采与斯坦科夫"
+    },
+    "id::CZ_ADM2_57006924B95695201424764__SPLIT_JEVISOVICE": {
+      "en": "Jevišovice",
+      "zh": "耶维舍维采"
+    },
+    "id::CZ_ADM2_57006924B95695201424764__SPLIT_REST": {
+      "en": "Znaim area",
+      "zh": "兹诺伊莫一带"
+    },
+    "id::CZ_MRG_9096ecd76bb9__SPLIT_REST": {
+      "en": "Chrudim, Litomyšl and Polička",
+      "zh": "赫鲁迪姆、利托米什尔与波利奇卡"
+    },
+    "id::CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST": {
+      "en": "Zwittau and Mährisch Trübau",
+      "zh": "斯维塔维与摩拉维亚特热博瓦"
     },
     "id::DE300__SPLIT_EAST": {
       "en": "Berlin · East Berlin",
@@ -65,6 +121,14 @@
       "en": "Community of Madrid",
       "zh": "马德里自治区"
     },
+    "id::FR_ARR_06002__SPLIT_MONACO": {
+      "en": "Monaco edge",
+      "zh": "摩纳哥边缘"
+    },
+    "id::FR_ARR_06002__SPLIT_REST": {
+      "en": "Nice",
+      "zh": "尼斯"
+    },
     "id::GH_ADM1_GHA-2155__SPLIT_REST": {
       "en": "Northern · Remainder",
       "zh": "北方 · 余部"
@@ -89,6 +153,14 @@
       "en": "Volta · British Togoland",
       "zh": "沃尔塔 · 英属多哥兰"
     },
+    "id::GR_ADM1_GRC-3013__SPLIT_CYCLADES": {
+      "en": "Cyclades",
+      "zh": "基克拉泽斯群岛"
+    },
+    "id::GR_ADM1_GRC-3013__SPLIT_DODECANESE": {
+      "en": "Dodecanese",
+      "zh": "多德卡尼斯群岛"
+    },
     "id::HR031__SPLIT_ABBAZIA": {
       "en": "Abbazia",
       "zh": "阿巴齐亚"
@@ -104,6 +176,14 @@
     "id::HR031__SPLIT_REST": {
       "en": "Primorje-Gorski Kotar (Yugoslav part)",
       "zh": "滨海-戈尔斯基科塔尔（南斯拉夫部分）"
+    },
+    "id::HR033__SPLIT_REST": {
+      "en": "Zadar County (Yugoslav part)",
+      "zh": "扎达尔县（南斯拉夫部分）"
+    },
+    "id::HR033__SPLIT_ZARA": {
+      "en": "Zara",
+      "zh": "扎拉"
     },
     "id::HU110__SPLIT_BUDA": {
       "en": "Budapest · Buda",
@@ -185,6 +265,14 @@
       "en": "Kerala · Central · Remainder",
       "zh": "喀拉拉邦·中部 · 余部"
     },
+    "id::ITH59__SPLIT_REST": {
+      "en": "Rimini",
+      "zh": "里米尼"
+    },
+    "id::ITH59__SPLIT_SAN_MARINO": {
+      "en": "Serravalle and Dogana edge",
+      "zh": "塞拉瓦莱与多加纳边缘"
+    },
     "id::ITI43__SPLIT_CITY": {
       "en": "Rome",
       "zh": "罗马市"
@@ -200,6 +288,14 @@
     "id::LT011__SPLIT_WILNO": {
       "en": "Wilno region",
       "zh": "维尔诺地区"
+    },
+    "id::LT021__SPLIT_POLISH": {
+      "en": "Druskieniki and the Grodno railway",
+      "zh": "德鲁斯基宁凯与格罗德诺铁路沿线"
+    },
+    "id::LT021__SPLIT_REST": {
+      "en": "Alytus County (Lithuanian part)",
+      "zh": "阿利图斯县（立陶宛控制部分）"
     },
     "id::LT023__SPLIT_MEMEL": {
       "en": "Memel Territory",
@@ -240,6 +336,14 @@
     "id::MAR-3457__SPLIT_REST": {
       "en": "Guelmim - Es-Semara · Remainder",
       "zh": "盖勒敏 - 埃斯-塞马拉 · 余部"
+    },
+    "id::MDA-1650__SPLIT_BENDER": {
+      "en": "Bender and Varnița (right bank)",
+      "zh": "宾杰里与瓦尔尼察（右岸）"
+    },
+    "id::MDA-1650__SPLIT_LEFT": {
+      "en": "Tiraspol and Slobozia (left bank)",
+      "zh": "蒂拉斯波尔与斯洛博齐亚（左岸）"
     },
     "id::MDA-1652__SPLIT_LEFT": {
       "en": "Camenca (left bank)",
@@ -385,6 +489,30 @@
       "en": "Nowy Dwór Gdański County · Remainder",
       "zh": "新德武尔县 · 余部"
     },
+    "id::PL_POW_2405__SPLIT_POLISH": {
+      "en": "Knurów and Gierałtowice",
+      "zh": "克努鲁夫与盖拉乌托维采"
+    },
+    "id::PL_POW_2405__SPLIT_REST": {
+      "en": "Gliwice County (German part)",
+      "zh": "格利维采县（德国部分）"
+    },
+    "id::PL_POW_2478__SPLIT_POLISH": {
+      "en": "Przyszowice edge",
+      "zh": "普日绍维采边缘"
+    },
+    "id::PL_POW_2478__SPLIT_REST": {
+      "en": "Zabrze (Hindenburg)",
+      "zh": "扎布热（兴登堡）"
+    },
+    "id::PL_POW_2807__SPLIT_LUBAWA": {
+      "en": "Lubawa (Löbau)",
+      "zh": "卢巴瓦（勒鲍）"
+    },
+    "id::PL_POW_2807__SPLIT_REST": {
+      "en": "Iława County (East Prussian part)",
+      "zh": "伊瓦瓦县（东普鲁士部分）"
+    },
     "id::RU_CITY_MOSCOW__SPLIT_CITY": {
       "en": "Moscow · City",
       "zh": "莫斯科 · 市区"
@@ -392,6 +520,14 @@
     "id::RU_CITY_MOSCOW__SPLIT_SOUTHWEST": {
       "en": "Moscow · Southwest (Troitsk)",
       "zh": "莫斯科 · 西南部（特罗伊茨克）"
+    },
+    "id::RU_CITY_SAINT_PETERSBURG__SPLIT_REST": {
+      "en": "Saint Petersburg",
+      "zh": "圣彼得堡"
+    },
+    "id::RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI": {
+      "en": "Terijoki and Kuokkala coast",
+      "zh": "泰里约基与库奥卡拉沿岸"
     },
     "id::RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO": {
       "en": "Sakhalin · Central · South of 50°N",
@@ -401,6 +537,94 @@
       "en": "Sakhalin · Central · North of 50°N",
       "zh": "萨哈林州·中部 · 北纬50°以北"
     },
+    "id::RU_RAY_50074027B39999494546000__SPLIT_REST": {
+      "en": "Suojärvi",
+      "zh": "苏奥亚尔维"
+    },
+    "id::RU_RAY_50074027B39999494546000__SPLIT_SOVIET": {
+      "en": "Porosozero area (Soviet side)",
+      "zh": "波罗索泽罗一带（苏联一侧）"
+    },
+    "id::RU_RAY_50074027B55571784565288__SPLIT_REST": {
+      "en": "Kandalaksha District",
+      "zh": "坎达拉克沙区"
+    },
+    "id::RU_RAY_50074027B55571784565288__SPLIT_SALLA": {
+      "en": "Old Salla (Kuolajärvi)",
+      "zh": "旧萨拉（库奥拉耶尔维）"
+    },
+    "id::SI038__SPLIT_ITALIAN": {
+      "en": "Postumia and Villa del Nevoso",
+      "zh": "波斯托伊纳与伊利尔斯卡比斯特里察"
+    },
+    "id::SI038__SPLIT_YUGOSLAV": {
+      "en": "Cerknica, Loška dolina and Bloke",
+      "zh": "采尔克尼察、洛什卡谷与布洛凯"
+    },
+    "id::SK_ADM2_56367889B14569056094647__SPLIT_HU": {
+      "en": "Takcsány area",
+      "zh": "斯塔克钦一带"
+    },
+    "id::SK_ADM2_56367889B14569056094647__SPLIT_REST": {
+      "en": "Snina District (Slovak part)",
+      "zh": "斯尼纳县（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B51237059400968__SPLIT_DEVIN": {
+      "en": "Devín (Theben)",
+      "zh": "德温（特本）"
+    },
+    "id::SK_ADM2_56367889B51237059400968__SPLIT_REST": {
+      "en": "Bratislava IV (Slovak part)",
+      "zh": "布拉迪斯拉发第四区（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B62094256812316__SPLIT_HU": {
+      "en": "Szenc area",
+      "zh": "塞内茨一带"
+    },
+    "id::SK_ADM2_56367889B62094256812316__SPLIT_REST": {
+      "en": "Senec District (Slovak part)",
+      "zh": "塞内茨县（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B65708067786299__SPLIT_REST": {
+      "en": "Bodrogköz and Királyhelmec",
+      "zh": "博德罗格河间地与克拉洛夫斯基赫鲁梅茨"
+    },
+    "id::SK_ADM2_56367889B65708067786299__SPLIT_SK": {
+      "en": "Trebišov and Sečovce",
+      "zh": "特雷比绍夫与塞乔夫采"
+    },
+    "id::SK_ADM2_56367889B66923754975257__SPLIT_HU": {
+      "en": "Nagykapos area",
+      "zh": "大卡普沙尼一带"
+    },
+    "id::SK_ADM2_56367889B66923754975257__SPLIT_REST": {
+      "en": "Michalovce District (Slovak part)",
+      "zh": "米哈洛夫采县（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B690835779632__SPLIT_PETRZALKA": {
+      "en": "Petržalka (Engerau)",
+      "zh": "佩特扎尔卡（恩格劳）"
+    },
+    "id::SK_ADM2_56367889B690835779632__SPLIT_REST": {
+      "en": "Jarovce, Rusovce and Čunovo",
+      "zh": "亚罗夫采、鲁索夫采与丘诺沃"
+    },
+    "id::SK_ADM2_56367889B94951233476884__SPLIT_HU": {
+      "en": "Galánta area",
+      "zh": "加兰塔一带"
+    },
+    "id::SK_ADM2_56367889B94951233476884__SPLIT_REST": {
+      "en": "Sereď area",
+      "zh": "谢列吉一带"
+    },
+    "id::SK_ADM2_56367889B97606993013938__SPLIT_HU": {
+      "en": "Szobránc area",
+      "zh": "索布兰采一带"
+    },
+    "id::SK_ADM2_56367889B97606993013938__SPLIT_REST": {
+      "en": "Sobrance District (Slovak part)",
+      "zh": "索布兰采县（斯洛伐克部分）"
+    },
     "id::TR100__SPLIT_ASIA": {
       "en": "İstanbul · Asian side",
       "zh": "伊斯坦布尔 · 亚洲侧"
@@ -408,6 +632,42 @@
     "id::TR100__SPLIT_EUROPE": {
       "en": "İstanbul · European side",
       "zh": "伊斯坦布尔 · 欧洲侧"
+    },
+    "id::TR631__SPLIT_KESSAB": {
+      "en": "Kessab",
+      "zh": "凯萨卜"
+    },
+    "id::TR631__SPLIT_NORTH": {
+      "en": "Dörtyol, Erzin and Hassa",
+      "zh": "多尔特约尔、埃尔津与哈萨"
+    },
+    "id::TR631__SPLIT_SANJAK": {
+      "en": "Sanjak of Alexandretta",
+      "zh": "亚历山大勒塔桑贾克"
+    },
+    "id::UA_RAY_74538382B20694939957091__SPLIT_BUKOVINA": {
+      "en": "Vyzhnytsia (Bukovina bank)",
+      "zh": "维日尼察（布科维纳岸）"
+    },
+    "id::UA_RAY_74538382B20694939957091__SPLIT_GALICIA": {
+      "en": "Kosiv and Kuty",
+      "zh": "科西夫与库季"
+    },
+    "id::UA_RAY_74538382B36952464312213__SPLIT_BUKOVINA": {
+      "en": "Vashkivtsi (Bukovina)",
+      "zh": "瓦什基夫齐（布科维纳）"
+    },
+    "id::UA_RAY_74538382B36952464312213__SPLIT_GALICIA": {
+      "en": "Sniatyn",
+      "zh": "斯尼亚汀"
+    },
+    "id::UA_SHELL_FB_204__SPLIT_AKKERMAN": {
+      "en": "Cetatea Albă shore",
+      "zh": "白堡（比尔霍罗德）岸"
+    },
+    "id::UA_SHELL_FB_204__SPLIT_OVIDIOPOL": {
+      "en": "Ovidiopol shore",
+      "zh": "奥维季奥波尔岸"
     }
   },
   "scenario_id": "hoi4_1936",

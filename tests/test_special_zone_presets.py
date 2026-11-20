@@ -61,7 +61,9 @@ class SpecialZonePresetTest(unittest.TestCase):
                     self.assertFalse(codes & {"IQ", "EG"})
 
         french = set(layers["preset-french-mandate"]["memberFeatureIds"])
-        self.assertIn("TR631", french)
+        # The Sanjak of Alexandretta is mandate territory; Dörtyol/Erzin/Hassa north of it were Turkish.
+        self.assertIn("TR631__SPLIT_SANJAK", french)
+        self.assertNotIn("TR631__SPLIT_NORTH", french)
         self.assertTrue({fid for fid in data.features if data.props(fid).get("cntr_code") in {"SY", "LB"}} <= french)
         british = set(layers["preset-british-mandates"]["memberFeatureIds"])
         self.assertEqual(british, {fid for fid in data.features if data.props(fid).get("cntr_code") in {"PS", "IL", "JO"}})

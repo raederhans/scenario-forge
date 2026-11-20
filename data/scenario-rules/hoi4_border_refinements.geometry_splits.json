@@ -334,6 +334,1022 @@
         "https://www.openstreetmap.org/relation/1002044"
       ],
       "notes": "Pagėgiai municipality approximates Kreis Pogegen, the Memel Territory part north of the Neman now in Tauragė County."
+    },
+    {
+      "id": "schonhengst_svitavy",
+      "feature_ids": [
+        "CZ_MRG_9096ecd76bb9"
+      ],
+      "parts": [
+        {
+          "suffix": "SCHONHENGST",
+          "name_en": "Zwittau and Mährisch Trübau",
+          "name_zh": "斯维塔维与摩拉维亚特热博瓦",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "schonhengst_svitavy_schonhengst"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Chrudim, Litomyšl and Polička",
+        "name_zh": "赫鲁迪姆、利托米什尔与波利奇卡",
+        "full_name": true
+      },
+      "notes": "Schönhengstgau: Svitavy and Moravská Třebová lay in the Sudetenland after October 1938; Litomyšl, Polička and Chrudim stayed Czech. SO POÚ approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "landskron_grulich",
+      "feature_ids": [
+        "CZ_ADM2_57006924B30982913442521"
+      ],
+      "parts": [
+        {
+          "suffix": "LANDSKRON",
+          "name_en": "Landskron and Grulich",
+          "name_zh": "兰什克龙与克拉利基",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "landskron_grulich_landskron"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Ústí nad Orlicí District (Czech part)",
+        "name_zh": "奥尔利采河畔乌斯季县（捷克部分）",
+        "full_name": true
+      },
+      "notes": "Lanškroun and Králíky were annexed in 1938; Ústí nad Orlicí, Česká Třebová and Žamberk stayed in the Protectorate. SO POÚ approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "sternberg_mahrisch_neustadt",
+      "feature_ids": [
+        "CZ_ADM2_57006924B62007249383837"
+      ],
+      "parts": [
+        {
+          "suffix": "STERNBERG",
+          "name_en": "Sternberg, Mährisch Neustadt and Bärn",
+          "name_zh": "什特恩贝克、乌尼乔夫与摩拉维亚贝龙",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "sternberg_mahrisch_neustadt_sternberg"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Olomouc District (Czech part)",
+        "name_zh": "奥洛穆茨县（捷克部分）",
+        "full_name": true
+      },
+      "notes": "Šternberk, Uničov and Moravský Beroun were Sudeten; Olomouc and Litovel stayed in the Protectorate. SO POÚ approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "braunau_wekelsdorf",
+      "feature_ids": [
+        "CZ_ADM2_57006924B40201864279221"
+      ],
+      "parts": [
+        {
+          "suffix": "BRAUNAU",
+          "name_en": "Braunau and Wekelsdorf",
+          "name_zh": "布劳莫夫与梅图耶河畔特普利采",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "braunau_wekelsdorf_braunau"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Náchod District (Czech part)",
+        "name_zh": "纳霍德县（捷克部分）",
+        "full_name": true
+      },
+      "notes": "The Broumov basin and Teplice nad Metují were annexed in 1938; Náchod, Hronov and Police nad Metují stayed Czech. SO POÚ approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "taus_stankau",
+      "feature_ids": [
+        "CZ_ADM2_57006924B92931687173289"
+      ],
+      "parts": [
+        {
+          "suffix": "TAUS",
+          "name_en": "Domažlice and Staňkov",
+          "name_zh": "多马日利采与斯坦科夫",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "taus_stankau_taus"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Bischofteinitz area",
+        "name_zh": "霍尔肖夫斯基蒂恩一带",
+        "full_name": true
+      },
+      "notes": "Domažlice and Staňkov stayed in the Protectorate; Horšovský Týn, Poběžovice and Holýšov were Sudeten. SO POÚ approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "netolitz_vlachovo_brezi",
+      "feature_ids": [
+        "CZ_ADM2_57006924B34464963037986"
+      ],
+      "parts": [
+        {
+          "suffix": "NETOLICE",
+          "name_en": "Netolice and Vlachovo Březí",
+          "name_zh": "内托利采与弗拉霍沃布热齐",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "netolitz_vlachovo_brezi_netolice"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Prachatitz and Winterberg area",
+        "name_zh": "普拉哈蒂采与温珀克一带",
+        "full_name": true
+      },
+      "notes": "Netolice and Vlachovo Březí stayed in the Protectorate; Prachatice, Vimperk and Volary were Sudeten.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "jevisovice",
+      "feature_ids": [
+        "CZ_ADM2_57006924B95695201424764"
+      ],
+      "parts": [
+        {
+          "suffix": "JEVISOVICE",
+          "name_en": "Jevišovice",
+          "name_zh": "耶维舍维采",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "jevisovice_jevisovice"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Znaim area",
+        "name_zh": "兹诺伊莫一带",
+        "full_name": true
+      },
+      "notes": "Jevišovice stayed Czech (Protectorate); Znojmo and the rest of the district were annexed to Niederdonau.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "bratislava_petrzalka",
+      "feature_ids": [
+        "SK_ADM2_56367889B690835779632"
+      ],
+      "parts": [
+        {
+          "suffix": "PETRZALKA",
+          "name_en": "Petržalka (Engerau)",
+          "name_zh": "佩特扎尔卡（恩格劳）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "bratislava_petrzalka_petrzalka"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Jarovce, Rusovce and Čunovo",
+        "name_zh": "亚罗夫采、鲁索夫采与丘诺沃",
+        "full_name": true
+      },
+      "notes": "Petržalka was Czechoslovak from 1920 and German from November 1938; Jarovce, Rusovce and Čunovo stayed Hungarian until 1947.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2695633"
+      ]
+    },
+    {
+      "id": "bratislava_devin",
+      "feature_ids": [
+        "SK_ADM2_56367889B51237059400968"
+      ],
+      "parts": [
+        {
+          "suffix": "DEVIN",
+          "name_en": "Devín (Theben)",
+          "name_zh": "德温（特本）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "bratislava_devin_devin"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Bratislava IV (Slovak part)",
+        "name_zh": "布拉迪斯拉发第四区（斯洛伐克部分）",
+        "full_name": true
+      },
+      "notes": "Devín was annexed by Germany in November 1938; Devínska Nová Ves, Dúbravka and Karlova Ves stayed Slovak.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2857482"
+      ]
+    },
+    {
+      "id": "senec_award",
+      "feature_ids": [
+        "SK_ADM2_56367889B62094256812316"
+      ],
+      "parts": [
+        {
+          "suffix": "HU",
+          "name_en": "Szenc area",
+          "name_zh": "塞内茨一带",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "senec_award_hu"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Senec District (Slovak part)",
+        "name_zh": "塞内茨县（斯洛伐克部分）",
+        "full_name": true
+      },
+      "notes": "First Vienna Award: Senec, Tomášov and the Žitný ostrov villages went to Hungary; Ivanka pri Dunaji, Bernolákovo and Chorvátsky Grob stayed Slovak. Municipality approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2747871"
+      ]
+    },
+    {
+      "id": "galanta_award",
+      "feature_ids": [
+        "SK_ADM2_56367889B94951233476884"
+      ],
+      "parts": [
+        {
+          "suffix": "HU",
+          "name_en": "Galánta area",
+          "name_zh": "加兰塔一带",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "galanta_award_hu"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Sereď area",
+        "name_zh": "谢列吉一带",
+        "full_name": true
+      },
+      "notes": "First Vienna Award: Galanta, Sládkovičovo and Jelka went to Hungary; Sereď and the Váh valley north of it stayed Slovak. Municipality approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2747871"
+      ]
+    },
+    {
+      "id": "kapusany_award",
+      "feature_ids": [
+        "SK_ADM2_56367889B66923754975257"
+      ],
+      "parts": [
+        {
+          "suffix": "HU",
+          "name_en": "Nagykapos area",
+          "name_zh": "大卡普沙尼一带",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "kapusany_award_hu"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Michalovce District (Slovak part)",
+        "name_zh": "米哈洛夫采县（斯洛伐克部分）",
+        "full_name": true
+      },
+      "notes": "First Vienna Award: Veľké Kapušany and the Uh lowland villages went to Hungary; Michalovce stayed Slovak. Municipality approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2747871"
+      ]
+    },
+    {
+      "id": "trebisov_award",
+      "feature_ids": [
+        "SK_ADM2_56367889B65708067786299"
+      ],
+      "parts": [
+        {
+          "suffix": "SK",
+          "name_en": "Trebišov and Sečovce",
+          "name_zh": "特雷比绍夫与塞乔夫采",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "trebisov_award_sk"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Bodrogköz and Királyhelmec",
+        "name_zh": "博德罗格河间地与克拉洛夫斯基赫鲁梅茨",
+        "full_name": true
+      },
+      "notes": "First Vienna Award: Kráľovský Chlmec and the Bodrog–Tisa lowland went to Hungary; Trebišov and Sečovce stayed Slovak. Approximated by municipalities north of 48.50° N.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2747871"
+      ]
+    },
+    {
+      "id": "snina_stakcin_1939",
+      "feature_ids": [
+        "SK_ADM2_56367889B14569056094647"
+      ],
+      "parts": [
+        {
+          "suffix": "HU",
+          "name_en": "Takcsány area",
+          "name_zh": "斯塔克钦一带",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "snina_stakcin_1939_hu"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Snina District (Slovak part)",
+        "name_zh": "斯尼纳县（斯洛伐克部分）",
+        "full_name": true
+      },
+      "notes": "After the March–April 1939 Slovak–Hungarian war, Stakčín and the upper Cirocha and Ulička valleys went to Hungary; Snina stayed Slovak. Municipalities east of 22.25° E.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2747871"
+      ]
+    },
+    {
+      "id": "varena_druskininkai",
+      "feature_ids": [
+        "LT021"
+      ],
+      "parts": [
+        {
+          "suffix": "POLISH",
+          "name_en": "Druskieniki and the Grodno railway",
+          "name_zh": "德鲁斯基宁凯与格罗德诺铁路沿线",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "varena_druskininkai_polish"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Alytus County (Lithuanian part)",
+        "name_zh": "阿利图斯县（立陶宛控制部分）",
+        "full_name": true
+      },
+      "notes": "The Vilnius–Grodno railway (Valkininkai, Varėna station, Marcinkonys) and Druskininkai were Polish 1922–1939; Alytus, Merkinė and Senoji Varėna stayed Lithuanian. Varėna eldership is clipped at 54.232° N between the two Varėnas.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2692205"
+      ]
+    },
+    {
+      "id": "lubawa",
+      "feature_ids": [
+        "PL_POW_2807"
+      ],
+      "parts": [
+        {
+          "suffix": "LUBAWA",
+          "name_en": "Lubawa (Löbau)",
+          "name_zh": "卢巴瓦（勒鲍）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "lubawa_lubawa"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Iława County (East Prussian part)",
+        "name_zh": "伊瓦瓦县（东普鲁士部分）",
+        "full_name": true
+      },
+      "notes": "Lubawa town and rural commune were Polish from 1920; Iława (Deutsch Eylau) and Susz stayed in East Prussia.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2692205"
+      ]
+    },
+    {
+      "id": "knurow_gieraltowice",
+      "feature_ids": [
+        "PL_POW_2405"
+      ],
+      "parts": [
+        {
+          "suffix": "POLISH",
+          "name_en": "Knurów and Gierałtowice",
+          "name_zh": "克努鲁夫与盖拉乌托维采",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "knurow_gieraltowice_polish"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Gliwice County (German part)",
+        "name_zh": "格利维采县（德国部分）",
+        "full_name": true
+      },
+      "notes": "1922 Upper Silesian partition: Knurów and Gierałtowice were Polish; Pyskowice, Toszek and Sośnicowice stayed German.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2692205"
+      ]
+    },
+    {
+      "id": "zabrze_przyszowice",
+      "feature_ids": [
+        "PL_POW_2478"
+      ],
+      "parts": [
+        {
+          "suffix": "POLISH",
+          "name_en": "Przyszowice edge",
+          "name_zh": "普日绍维采边缘",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "zabrze_przyszowice_polish"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Zabrze (Hindenburg)",
+        "name_zh": "扎布热（兴登堡）",
+        "full_name": true
+      },
+      "notes": "The parcel's southern edge reaches Przyszowice (Gierałtowice commune), which was Polish after 1922; Hindenburg itself stayed German.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2692205"
+      ]
+    },
+    {
+      "id": "vyzhnytsia_cheremosh",
+      "feature_ids": [
+        "UA_RAY_74538382B20694939957091"
+      ],
+      "parts": [
+        {
+          "suffix": "BUKOVINA",
+          "name_en": "Vyzhnytsia (Bukovina bank)",
+          "name_zh": "维日尼察（布科维纳岸）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "vyzhnytsia_cheremosh_bukovina"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "GALICIA",
+        "name_en": "Kosiv and Kuty",
+        "name_zh": "科西夫与库季",
+        "full_name": true
+      },
+      "notes": "The Cheremosh separated Polish Kuty and Kosiv from Romanian Vyzhnytsia; today's Chernivtsi oblast border follows it.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2693259"
+      ]
+    },
+    {
+      "id": "vashkivtsi_bukovina",
+      "feature_ids": [
+        "UA_RAY_74538382B36952464312213"
+      ],
+      "parts": [
+        {
+          "suffix": "BUKOVINA",
+          "name_en": "Vashkivtsi (Bukovina)",
+          "name_zh": "瓦什基夫齐（布科维纳）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "vashkivtsi_bukovina_bukovina"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "GALICIA",
+        "name_en": "Sniatyn",
+        "name_zh": "斯尼亚汀",
+        "full_name": true
+      },
+      "notes": "The old Galicia–Bukovina line (today's Chernivtsi oblast border) separated Polish Sniatyn from Romanian Vashkivtsi.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2693259"
+      ]
+    },
+    {
+      "id": "bender_right_bank",
+      "feature_ids": [
+        "MDA-1650"
+      ],
+      "parts": [
+        {
+          "suffix": "BENDER",
+          "name_en": "Bender and Varnița (right bank)",
+          "name_zh": "宾杰里与瓦尔尼察（右岸）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "bender_right_bank_bender"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "LEFT",
+        "name_en": "Tiraspol and Slobozia (left bank)",
+        "name_zh": "蒂拉斯波尔与斯洛博齐亚（左岸）",
+        "full_name": true
+      },
+      "notes": "Bender (Tighina) and Varnița on the right bank were Romanian Bessarabia; Tiraspol on the left bank was in the Moldavian ASSR.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2693259"
+      ]
+    },
+    {
+      "id": "akkerman_liman",
+      "feature_ids": [
+        "UA_SHELL_FB_204"
+      ],
+      "parts": [
+        {
+          "suffix": "AKKERMAN",
+          "name_en": "Cetatea Albă shore",
+          "name_zh": "白堡（比尔霍罗德）岸",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "akkerman_liman_akkerman"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "OVIDIOPOL",
+        "name_en": "Ovidiopol shore",
+        "name_zh": "奥维季奥波尔岸",
+        "full_name": true
+      },
+      "notes": "The Dniester liman separated Romanian Cetatea Albă (Bilhorod-Dnistrovskyi) from Soviet Ovidiopol.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2693259"
+      ]
+    },
+    {
+      "id": "zara_enclave",
+      "feature_ids": [
+        "HR033"
+      ],
+      "parts": [
+        {
+          "suffix": "ZARA",
+          "name_en": "Zara",
+          "name_zh": "扎拉",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "zara_enclave_zara"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Zadar County (Yugoslav part)",
+        "name_zh": "扎达尔县（南斯拉夫部分）",
+        "full_name": true
+      },
+      "notes": "Treaty of Rapallo: Zara with Borgo Erizzo, Boccagnazzo and Cerno was Italian; Bibinje, Murvica and Zemunik stayed Yugoslav. Settlement approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2851104"
+      ]
+    },
+    {
+      "id": "rakek_cerknica",
+      "feature_ids": [
+        "SI038"
+      ],
+      "parts": [
+        {
+          "suffix": "YUGOSLAV",
+          "name_en": "Cerknica, Loška dolina and Bloke",
+          "name_zh": "采尔克尼察、洛什卡谷与布洛凯",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "rakek_cerknica_yugoslav"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "ITALIAN",
+        "name_en": "Postumia and Villa del Nevoso",
+        "name_zh": "波斯托伊纳与伊利尔斯卡比斯特里察",
+        "full_name": true
+      },
+      "notes": "Rapallo border: Rakek, Cerknica and Stari trg were Yugoslav; Postojna, Pivka and Ilirska Bistrica Italian. Municipality approximation.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2747831"
+      ]
+    },
+    {
+      "id": "dodecanese_south_aegean",
+      "feature_ids": [
+        "GR_ADM1_GRC-3013"
+      ],
+      "parts": [
+        {
+          "suffix": "DODECANESE",
+          "name_en": "Dodecanese",
+          "name_zh": "多德卡尼斯群岛",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "gr_dodecanese"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "CYCLADES",
+        "name_en": "Cyclades",
+        "name_zh": "基克拉泽斯群岛",
+        "full_name": true
+      },
+      "notes": "The Dodecanese (Rhodes, Kos, Kalymnos and Karpathos regional units) were Italian 1912–1947; the Cyclades were Greek.",
+      "sources": [
+        "https://www.openstreetmap.org/relation/5324258",
+        "https://www.openstreetmap.org/relation/5324235",
+        "https://www.openstreetmap.org/relation/5324202",
+        "https://www.openstreetmap.org/relation/5324274"
+      ]
+    },
+    {
+      "id": "hatay_north_kessab",
+      "feature_ids": [
+        "TR631"
+      ],
+      "parts": [
+        {
+          "suffix": "NORTH",
+          "name_en": "Dörtyol, Erzin and Hassa",
+          "name_zh": "多尔特约尔、埃尔津与哈萨",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "hatay_north_kessab_north"
+            ]
+          },
+          "full_name": true
+        },
+        {
+          "suffix": "KESSAB",
+          "name_en": "Kessab",
+          "name_zh": "凯萨卜",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "hatay_north_kessab_kessab"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "SANJAK",
+        "name_en": "Sanjak of Alexandretta",
+        "name_zh": "亚历山大勒塔桑贾克",
+        "full_name": true
+      },
+      "notes": "Dörtyol, Erzin and Hassa were Turkish before 1939 (outside the Sanjak); Kessab stayed Syrian after the 1939 cession.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2801012",
+        "https://www.openstreetmap.org/relation/11030777"
+      ]
+    },
+    {
+      "id": "san_marino_rimini",
+      "feature_ids": [
+        "ITH59"
+      ],
+      "parts": [
+        {
+          "suffix": "SAN_MARINO",
+          "name_en": "Serravalle and Dogana edge",
+          "name_zh": "塞拉瓦莱与多加纳边缘",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "san_marino_rimini_san_marino"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Rimini",
+        "name_zh": "里米尼",
+        "full_name": true
+      },
+      "notes": "Serravalle and Dogana fall inside the Rimini parcel; the San Marino border is cut out.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2853735"
+      ]
+    },
+    {
+      "id": "monaco_nice",
+      "feature_ids": [
+        "FR_ARR_06002"
+      ],
+      "parts": [
+        {
+          "suffix": "MONACO",
+          "name_en": "Monaco edge",
+          "name_zh": "摩纳哥边缘",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "monaco_nice_monaco"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Nice",
+        "name_zh": "尼斯",
+        "full_name": true
+      },
+      "notes": "Monaco's land border is cut out of the Nice arrondissement.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2693418"
+      ]
+    },
+    {
+      "id": "karelian_isthmus_coast",
+      "feature_ids": [
+        "RU_CITY_SAINT_PETERSBURG"
+      ],
+      "parts": [
+        {
+          "suffix": "TERIJOKI",
+          "name_en": "Terijoki and Kuokkala coast",
+          "name_zh": "泰里约基与库奥卡拉沿岸",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "karelian_isthmus_coast_terijoki"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Saint Petersburg",
+        "name_zh": "圣彼得堡",
+        "full_name": true
+      },
+      "notes": "North of the Sestra river (Terijoki, Kellomäki, Kuokkala, Ollila) was Finnish until 1940; Sestroretsk and Beloostrov stayed Soviet.",
+      "sources": [
+        "https://www.openstreetmap.org/relation/1119502",
+        "https://www.openstreetmap.org/relation/1117563",
+        "https://www.openstreetmap.org/relation/1117550",
+        "https://www.openstreetmap.org/relation/1117451",
+        "https://www.openstreetmap.org/relation/1119500",
+        "https://www.openstreetmap.org/relation/1120126",
+        "https://www.openstreetmap.org/relation/1120125",
+        "https://www.openstreetmap.org/relation/1120127"
+      ]
+    },
+    {
+      "id": "sobrance_1939",
+      "feature_ids": [
+        "SK_ADM2_56367889B97606993013938"
+      ],
+      "parts": [
+        {
+          "suffix": "HU",
+          "name_en": "Szobránc area",
+          "name_zh": "索布兰采一带",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "sobrance_1939_hu"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Sobrance District (Slovak part)",
+        "name_zh": "索布兰采县（斯洛伐克部分）",
+        "full_name": true
+      },
+      "notes": "After the March–April 1939 Slovak–Hungarian war, Sobrance and most of its district went to Hungary.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2747871"
+      ]
+    },
+    {
+      "id": "old_salla",
+      "feature_ids": [
+        "RU_RAY_50074027B55571784565288"
+      ],
+      "parts": [
+        {
+          "suffix": "SALLA",
+          "name_en": "Old Salla (Kuolajärvi)",
+          "name_zh": "旧萨拉（库奥拉耶尔维）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "old_salla_salla"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Kandalaksha District",
+        "name_zh": "坎达拉克沙区",
+        "full_name": true
+      },
+      "notes": "Salla parish east of today's border (Alakurtti, Kuolajärvi) was Finnish until the 1940 Moscow Peace Treaty.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2959045"
+      ]
+    },
+    {
+      "id": "porajarvi_border",
+      "feature_ids": [
+        "RU_RAY_50074027B39999494546000"
+      ],
+      "parts": [
+        {
+          "suffix": "SOVIET",
+          "name_en": "Porosozero area (Soviet side)",
+          "name_zh": "波罗索泽罗一带（苏联一侧）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements.sources.geojson",
+            "property": "unit",
+            "values": [
+              "porajarvi_border_soviet"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Suojärvi",
+        "name_zh": "苏奥亚尔维",
+        "full_name": true
+      },
+      "notes": "The 1920 Tartu border left Porajärvi/Porosozero in Soviet Karelia; Suojärvi was Finnish until 1940.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2959045"
+      ]
     }
   ],
   "omitted": [

@@ -892,6 +892,58 @@ add("protectorate_southern_bohemia_1939", Y39, "BOM", None, None,
           "Whole-district approximation; the Sudeten border strips (Nové Hrady, Slavonice, Nýrsko) are not separated.")
 add("romanian_northern_bessarabia_khotyn", B, "ROM", None, None, FI("UA_RAY_74538382B35313257426644"), only=["UKR"],
     notes="Khotyn lies on the Bessarabian (Romanian) bank of the Dniester until 1940.")
+# Precise cuts along the historical lines (OpenHistoricalMap 1920-1940 country outlines, see
+# hoi4_border_refinements.geometry_splits.json). Each child is named after the towns that decide its side.
+SK = "SK_ADM2_56367889B"
+add("sudeten_edges_1939", Y39, "GER", None, None,
+    FI("CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST", CZ + "30982913442521__SPLIT_LANDSKRON",
+       CZ + "62007249383837__SPLIT_STERNBERG", CZ + "40201864279221__SPLIT_BRAUNAU"), only=["BOM"],
+    notes="Svitavy/Moravská Třebová, Lanškroun/Králíky, Šternberk/Uničov and the Broumov basin lay outside "
+          "post-Munich Czechoslovakia; Litomyšl, Ústí nad Orlicí, Olomouc and Náchod stayed in the Protectorate.")
+add("protectorate_edges_1939", Y39, "BOM", None, None,
+    FI(CZ + "92931687173289__SPLIT_TAUS", CZ + "34464963037986__SPLIT_NETOLICE", CZ + "95695201424764__SPLIT_JEVISOVICE"),
+    only=["GER"], notes="Domažlice, Netolice/Vlachovo Březí and Jevišovice stayed inside post-Munich Czechoslovakia.")
+add("bratislava_bridgehead_hungarian_villages_1936", Y36, "HUN", None, None, FI(SK + "690835779632__SPLIT_REST"),
+    only=["CZE"], notes="Jarovce, Rusovce and Čunovo stayed Hungarian until the 1947 Paris treaty.")
+add("petrzalka_devin_1939", Y39, "GER", None, None,
+    FI(SK + "690835779632__SPLIT_PETRZALKA", SK + "51237059400968__SPLIT_DEVIN"), only=["HUN", "SLO"],
+    notes="Petržalka (Engerau) and Devín (Theben) were annexed by Germany in November 1938.")
+add("southern_slovakia_hungary_1939", Y39, "HUN", None, None,
+    FI(*(SK + n + "__SPLIT_HU" for n in ("62094256812316", "94951233476884", "66923754975257",
+                                         "14569056094647", "97606993013938"))), only=["SLO"],
+    notes="Senec, Galanta and Veľké Kapušany (First Vienna Award), Stakčín and Sobrance (April 1939 border) were Hungarian.")
+add("trebisov_slovak_1939", Y39, "SLO", None, None, FI(SK + "65708067786299__SPLIT_SK"), only=["HUN"],
+    notes="Trebišov and Sečovce stayed Slovak; only Kráľovský Chlmec and the Bodrog lowland went to Hungary.")
+add("poland_interwar_druskieniki_lubawa_knurow", B, "POL", None, None,
+    FI("LT021__SPLIT_POLISH", "PL_POW_2807__SPLIT_LUBAWA", "PL_POW_2405__SPLIT_POLISH", "PL_POW_2478__SPLIT_POLISH",
+       "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG"), only=["LIT", "GER", "DNZ"],
+    notes="Druskininkai and the Grodno railway (Varėna station, Marcinkonys), Lubawa, Knurów/Gierałtowice/Przyszowice "
+          "and Tczew with the land south of Pszczółki were Polish; that last slice lies outside the Free City.")
+add("romania_bukovina_bessarabia_edges", B, "ROM", None, None,
+    FI("UA_RAY_74538382B20694939957091__SPLIT_BUKOVINA", "UA_RAY_74538382B36952464312213__SPLIT_BUKOVINA",
+       "MDA-1650__SPLIT_BENDER", "UA_SHELL_FB_204__SPLIT_AKKERMAN"), only=["POL", "SOV", "UKR"],
+    notes="Vyzhnytsia and Vashkivtsi (Bukovina), Bender/Varnița on the right bank and Cetatea Albă on the Dniester "
+          "liman were Romanian until 1940.")
+add("italy_zara", B, "ITA", None, None, FI("HR033__SPLIT_ZARA"), only=["YUG"],
+    notes="Zara enclave (Treaty of Rapallo, 1920).")
+add("yugoslavia_cerknica_loska_dolina", B, "YUG", None, None, FI("SI038__SPLIT_YUGOSLAV"), only=["ITA"],
+    notes="Rakek, Cerknica and Loška dolina lay on the Yugoslav side of the Rapallo border.")
+add("dodecanese_south_aegean", B, "DOD", None, None, FI("GR_ADM1_GRC-3013__SPLIT_DODECANESE"), only=["GRE"],
+    notes="Kos, Kalymnos, Leros and the other Dodecanese inside the South Aegean parcel.")
+add("hatay_north_turkish_1936", Y36, "TUR", None, None, FI("TR631__SPLIT_NORTH"), only=["HTY", "SYR"],
+    notes="Dörtyol, Erzin and Hassa were Turkish before 1939, outside the Sanjak of Alexandretta.")
+add("kessab_syrian_1939", Y39, "ALW", None, None, FI("TR631__SPLIT_KESSAB"), only=["TUR"],
+    notes="Kessab was returned to Syria in the 1939 cession; modelled with neighbouring Latakia.")
+add("san_marino_edge", B, "SMN", None, None, FI("ITH59__SPLIT_SAN_MARINO"), only=["ITA"])
+add("monaco_edge", B, "MCO", None, None, FI("FR_ARR_06002__SPLIT_MONACO"), only=["FRA"],
+    notes="Monaco's land lies inside the Nice parcel; the separate Monaco parcel sits over La Turbie and Beausoleil.")
+add("la_turbie_french", B, "FRA", None, None, FI("MC_ADMIN0_PASSTHROUGH"), only=["MCO"])
+add("finland_interwar_isthmus_salla", B, "FIN", None, None,
+    FI("RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI", "RU_ARCTIC_FB_8083",
+       "RU_RAY_50074027B55571784565288__SPLIT_SALLA"), only=["SOV"],
+    notes="Terijoki, Kellomäki, Kuokkala (north of the Sestra) and old Salla east of today's border were Finnish until 1940.")
+add("karelia_porosozero", B, "KRL", None, None, FI("RU_RAY_50074027B39999494546000__SPLIT_SOVIET"), only=["FIN"],
+    notes="Porajärvi/Porosozero stayed in Soviet Karelia under the 1920 Tartu treaty.")
 E.append({"id": "shell_sliver_adoption", "scenarios": B,
           "adopt_shell_slivers": {"id_pattern": r"_(ARCTIC|SHELL)_FB_\d+$", "max_area_km2": 3000}})
 

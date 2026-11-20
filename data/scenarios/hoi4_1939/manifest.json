@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "fa03a3de6185b3024fb37b6dc4fc09815895b54a875379d9c6f0eb7549e90f15",
+  "baseline_hash": "6d1d04695d6a36aebee20c31a29a71be556374a76b21bda76bb02ddf252f1801",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -2459,9 +2459,37 @@
         "CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN",
         "CN_CITY_17275852B90470795224142__SPLIT_REST"
       ],
+      "CZ_ADM2_57006924B30982913442521": [
+        "CZ_ADM2_57006924B30982913442521__SPLIT_LANDSKRON",
+        "CZ_ADM2_57006924B30982913442521__SPLIT_REST"
+      ],
+      "CZ_ADM2_57006924B34464963037986": [
+        "CZ_ADM2_57006924B34464963037986__SPLIT_NETOLICE",
+        "CZ_ADM2_57006924B34464963037986__SPLIT_REST"
+      ],
+      "CZ_ADM2_57006924B40201864279221": [
+        "CZ_ADM2_57006924B40201864279221__SPLIT_BRAUNAU",
+        "CZ_ADM2_57006924B40201864279221__SPLIT_REST"
+      ],
+      "CZ_ADM2_57006924B62007249383837": [
+        "CZ_ADM2_57006924B62007249383837__SPLIT_STERNBERG",
+        "CZ_ADM2_57006924B62007249383837__SPLIT_REST"
+      ],
       "CZ_ADM2_57006924B91865699855455": [
         "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE",
         "CZ_ADM2_57006924B91865699855455__SPLIT_REST"
+      ],
+      "CZ_ADM2_57006924B92931687173289": [
+        "CZ_ADM2_57006924B92931687173289__SPLIT_TAUS",
+        "CZ_ADM2_57006924B92931687173289__SPLIT_REST"
+      ],
+      "CZ_ADM2_57006924B95695201424764": [
+        "CZ_ADM2_57006924B95695201424764__SPLIT_JEVISOVICE",
+        "CZ_ADM2_57006924B95695201424764__SPLIT_REST"
+      ],
+      "CZ_MRG_9096ecd76bb9": [
+        "CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST",
+        "CZ_MRG_9096ecd76bb9__SPLIT_REST"
       ],
       "DE300": [
         "DE300__SPLIT_EAST",
@@ -2475,6 +2503,10 @@
         "ES300__SPLIT_CITY",
         "ES300__SPLIT_REST"
       ],
+      "FR_ARR_06002": [
+        "FR_ARR_06002__SPLIT_MONACO",
+        "FR_ARR_06002__SPLIT_REST"
+      ],
       "GH_ADM1_GHA-2155": [
         "GH_ADM1_GHA-2155__SPLIT_WTO",
         "GH_ADM1_GHA-2155__SPLIT_REST"
@@ -2487,11 +2519,19 @@
         "GH_ADM1_GHA-2173__SPLIT_WTO",
         "GH_ADM1_GHA-2173__SPLIT_REST"
       ],
+      "GR_ADM1_GRC-3013": [
+        "GR_ADM1_GRC-3013__SPLIT_DODECANESE",
+        "GR_ADM1_GRC-3013__SPLIT_CYCLADES"
+      ],
       "HR031": [
         "HR031__SPLIT_FIUME",
         "HR031__SPLIT_ABBAZIA",
         "HR031__SPLIT_CHERSO",
         "HR031__SPLIT_REST"
+      ],
+      "HR033": [
+        "HR033__SPLIT_ZARA",
+        "HR033__SPLIT_REST"
       ],
       "HU110": [
         "HU110__SPLIT_BUDA",
@@ -2533,6 +2573,10 @@
         "IN_MRG_886776fba38b__SPLIT_COCHIN",
         "IN_MRG_886776fba38b__SPLIT_REST"
       ],
+      "ITH59": [
+        "ITH59__SPLIT_SAN_MARINO",
+        "ITH59__SPLIT_REST"
+      ],
       "ITI43": [
         "ITI43__SPLIT_CITY",
         "ITI43__SPLIT_PROVINCE"
@@ -2540,6 +2584,10 @@
       "LT011": [
         "LT011__SPLIT_WILNO",
         "LT011__SPLIT_REST"
+      ],
+      "LT021": [
+        "LT021__SPLIT_POLISH",
+        "LT021__SPLIT_REST"
       ],
       "LT023": [
         "LT023__SPLIT_MEMEL",
@@ -2560,6 +2608,10 @@
       "MAR-3457": [
         "MAR-3457__SPLIT_IFNI",
         "MAR-3457__SPLIT_REST"
+      ],
+      "MDA-1650": [
+        "MDA-1650__SPLIT_BENDER",
+        "MDA-1650__SPLIT_LEFT"
       ],
       "MDA-1652": [
         "MDA-1652__SPLIT_LEFT",
@@ -2636,17 +2688,94 @@
         "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG",
         "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST"
       ],
+      "PL_POW_2405": [
+        "PL_POW_2405__SPLIT_POLISH",
+        "PL_POW_2405__SPLIT_REST"
+      ],
+      "PL_POW_2478": [
+        "PL_POW_2478__SPLIT_POLISH",
+        "PL_POW_2478__SPLIT_REST"
+      ],
+      "PL_POW_2807": [
+        "PL_POW_2807__SPLIT_LUBAWA",
+        "PL_POW_2807__SPLIT_REST"
+      ],
       "RU_CITY_MOSCOW": [
         "RU_CITY_MOSCOW__SPLIT_SOUTHWEST",
         "RU_CITY_MOSCOW__SPLIT_CITY"
+      ],
+      "RU_CITY_SAINT_PETERSBURG": [
+        "RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI",
+        "RU_CITY_SAINT_PETERSBURG__SPLIT_REST"
       ],
       "RU_MRG_eefc121c2bf0": [
         "RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO",
         "RU_MRG_eefc121c2bf0__SPLIT_REST"
       ],
+      "RU_RAY_50074027B39999494546000": [
+        "RU_RAY_50074027B39999494546000__SPLIT_SOVIET",
+        "RU_RAY_50074027B39999494546000__SPLIT_REST"
+      ],
+      "RU_RAY_50074027B55571784565288": [
+        "RU_RAY_50074027B55571784565288__SPLIT_SALLA",
+        "RU_RAY_50074027B55571784565288__SPLIT_REST"
+      ],
+      "SI038": [
+        "SI038__SPLIT_YUGOSLAV",
+        "SI038__SPLIT_ITALIAN"
+      ],
+      "SK_ADM2_56367889B14569056094647": [
+        "SK_ADM2_56367889B14569056094647__SPLIT_HU",
+        "SK_ADM2_56367889B14569056094647__SPLIT_REST"
+      ],
+      "SK_ADM2_56367889B51237059400968": [
+        "SK_ADM2_56367889B51237059400968__SPLIT_DEVIN",
+        "SK_ADM2_56367889B51237059400968__SPLIT_REST"
+      ],
+      "SK_ADM2_56367889B62094256812316": [
+        "SK_ADM2_56367889B62094256812316__SPLIT_HU",
+        "SK_ADM2_56367889B62094256812316__SPLIT_REST"
+      ],
+      "SK_ADM2_56367889B65708067786299": [
+        "SK_ADM2_56367889B65708067786299__SPLIT_SK",
+        "SK_ADM2_56367889B65708067786299__SPLIT_REST"
+      ],
+      "SK_ADM2_56367889B66923754975257": [
+        "SK_ADM2_56367889B66923754975257__SPLIT_HU",
+        "SK_ADM2_56367889B66923754975257__SPLIT_REST"
+      ],
+      "SK_ADM2_56367889B690835779632": [
+        "SK_ADM2_56367889B690835779632__SPLIT_PETRZALKA",
+        "SK_ADM2_56367889B690835779632__SPLIT_REST"
+      ],
+      "SK_ADM2_56367889B94951233476884": [
+        "SK_ADM2_56367889B94951233476884__SPLIT_HU",
+        "SK_ADM2_56367889B94951233476884__SPLIT_REST"
+      ],
+      "SK_ADM2_56367889B97606993013938": [
+        "SK_ADM2_56367889B97606993013938__SPLIT_HU",
+        "SK_ADM2_56367889B97606993013938__SPLIT_REST"
+      ],
       "TR100": [
         "TR100__SPLIT_ASIA",
         "TR100__SPLIT_EUROPE"
+      ],
+      "TR631": [
+        "TR631__SPLIT_NORTH",
+        "TR631__SPLIT_KESSAB",
+        "TR631__SPLIT_SANJAK"
+      ],
+      "UA_RAY_74538382B20694939957091": [
+        "UA_RAY_74538382B20694939957091__SPLIT_BUKOVINA",
+        "UA_RAY_74538382B20694939957091__SPLIT_GALICIA"
+      ],
+      "UA_RAY_74538382B36952464312213": [
+        "UA_RAY_74538382B36952464312213__SPLIT_BUKOVINA",
+        "UA_RAY_74538382B36952464312213__SPLIT_GALICIA"
+      ],
+      "UA_SHELL_FB_204": [
+        "UA_SHELL_FB_204__SPLIT_AKKERMAN",
+        "UA_SHELL_FB_204__SPLIT_OVIDIOPOL"
       ]
     }
   },
@@ -2679,12 +2808,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "38ab66469f2be8f635ba8efb8c1758a85718ce8fb5b6d1d32705bb19a715b967",
+  "snapshot_fingerprint": "cc7f62ebb341cb3ed3d9205a3ec61377cfa5305e508bfe6ed5c4ecc4480d8626",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "18f0ac165347c48602d816c5f05505ed4aa0926850c1efe04d49a21952ed0937",
-    "runtime_bootstrap_topology_sha256": "87bede3074fad428a40e028c276cf5588b809afa8b63775f0bf6984f526f6179",
-    "runtime_topology_sha256": "523b600d9e01b4857cc0e0f1a05f1b6d1fdf13ffd0c18a7887d8b9a4d60630b2"
+    "detail_chunk_manifest_sha256": "25be342abce7d87e68a16f1bd72e5f20e65aa81e4b5132a4fad4a8b0a392aff3",
+    "runtime_bootstrap_topology_sha256": "5b62828e0bcb3c1c310e57d61c92b45b0aeffa96006c85f649ad4982e7b34bc9",
+    "runtime_topology_sha256": "2dec06bcf29dbf8892cd19a319cb87fb5c4dad0379c9aed64df5d337e7fb6b75"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -2702,29 +2831,29 @@
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15385,
+    "changed_feature_count": 15361,
     "controller_count": 328,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 21118,
+    "feature_count": 21151,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14938,
+    "manual_reviewed_feature_count": 14914,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 328,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,
-      "manual_reviewed": 14938
+      "manual_reviewed": 14914
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15362
+      "manual_rule": 15338
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

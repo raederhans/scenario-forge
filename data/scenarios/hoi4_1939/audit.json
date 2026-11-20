@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 336,
-    "feature_count": 21118,
+    "feature_count": 21151,
     "water_count": 0
   },
   "controller_changes": [],
@@ -20176,19 +20176,6 @@
     {
       "country_code": "HR",
       "critical": true,
-      "feature_id": "HR033",
-      "feature_name": "Zadarska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
       "feature_id": "HR034",
       "feature_name": "Šibensko-kninska županija",
       "from_tag": "CRO",
@@ -26520,19 +26507,6 @@
     {
       "country_code": "MD",
       "critical": true,
-      "feature_id": "MDA-1650",
-      "feature_name": "Bender",
-      "from_tag": "MOL",
-      "notes": "Greater Romania including Bessarabia and northern Bukovina.",
-      "quality": "manual_reviewed",
-      "rule_id": "romania_bessarabia_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ROM"
-    },
-    {
-      "country_code": "MD",
-      "critical": true,
       "feature_id": "MDA-1651",
       "feature_name": "Ștefan Vodă",
       "from_tag": "MOL",
@@ -29042,19 +29016,6 @@
     {
       "country_code": "PL",
       "critical": true,
-      "feature_id": "PL_POW_2807",
-      "feature_name": "iławski",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
       "feature_id": "PL_POW_2808",
       "feature_name": "kętrzyński",
       "from_tag": "POL",
@@ -30058,19 +30019,6 @@
       "critical": true,
       "feature_id": "SI037",
       "feature_name": "Jugovzhodna Slovenija",
-      "from_tag": "SLV",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "SI",
-      "critical": true,
-      "feature_id": "SI038",
-      "feature_name": "Primorsko-notranjska",
       "from_tag": "SLV",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
@@ -34827,34 +34775,8 @@
     {
       "country_code": "CZ",
       "critical": true,
-      "feature_id": "CZ_ADM2_57006924B40201864279221",
-      "feature_name": "Náchod",
-      "from_tag": "",
-      "notes": "Germany directly annexes the Bohemia-Moravia remainder in the simplified 1939 baseline; the protectorate is available as a releasable instead of an active start country.",
-      "quality": "manual_reviewed",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "CZ",
-      "critical": true,
       "feature_id": "CZ_ADM2_57006924B55732331485961",
       "feature_name": "Tachov",
-      "from_tag": "",
-      "notes": "Sudetenland belt based on targeted CZ ADM2 split features.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_sudetenland_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "CZ",
-      "critical": true,
-      "feature_id": "CZ_ADM2_57006924B92931687173289",
-      "feature_name": "Domažlice",
       "from_tag": "",
       "notes": "Sudetenland belt based on targeted CZ ADM2 split features.",
       "quality": "manual_reviewed",
@@ -34983,19 +34905,6 @@
     {
       "country_code": "CZ",
       "critical": true,
-      "feature_id": "CZ_ADM2_57006924B30982913442521",
-      "feature_name": "Ústí nad Orlicí",
-      "from_tag": "",
-      "notes": "Germany directly annexes the Bohemia-Moravia remainder in the simplified 1939 baseline; the protectorate is available as a releasable instead of an active start country.",
-      "quality": "manual_reviewed",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "CZ",
-      "critical": true,
       "feature_id": "CZ_ADM2_57006924B8762756005554",
       "feature_name": "Jeseník",
       "from_tag": "",
@@ -35087,19 +34996,6 @@
     {
       "country_code": "CZ",
       "critical": true,
-      "feature_id": "CZ_ADM2_57006924B34464963037986",
-      "feature_name": "Prachatice",
-      "from_tag": "",
-      "notes": "Sudetenland belt based on targeted CZ ADM2 split features.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_sudetenland_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "CZ",
-      "critical": true,
       "feature_id": "CZ_ADM2_57006924B21154438881940",
       "feature_name": "Český Krumlov",
       "from_tag": "",
@@ -35165,19 +35061,6 @@
     {
       "country_code": "CZ",
       "critical": true,
-      "feature_id": "CZ_ADM2_57006924B95695201424764",
-      "feature_name": "Znojmo",
-      "from_tag": "",
-      "notes": "Sudetenland belt based on targeted CZ ADM2 split features.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_sudetenland_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "CZ",
-      "critical": true,
       "feature_id": "CZ_ADM2_57006924B56764577868008",
       "feature_name": "Břeclav",
       "from_tag": "",
@@ -35232,19 +35115,6 @@
       "critical": true,
       "feature_id": "CZ_ADM2_57006924B17496332064462",
       "feature_name": "Přerov",
-      "from_tag": "",
-      "notes": "Germany directly annexes the Bohemia-Moravia remainder in the simplified 1939 baseline; the protectorate is available as a releasable instead of an active start country.",
-      "quality": "manual_reviewed",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "CZ",
-      "critical": true,
-      "feature_id": "CZ_ADM2_57006924B62007249383837",
-      "feature_name": "Olomouc",
       "from_tag": "",
       "notes": "Germany directly annexes the Bohemia-Moravia remainder in the simplified 1939 baseline; the protectorate is available as a releasable instead of an active start country.",
       "quality": "manual_reviewed",
@@ -35334,32 +35204,6 @@
     {
       "country_code": "SK",
       "critical": true,
-      "feature_id": "SK_ADM2_56367889B65708067786299",
-      "feature_name": "District of Trebi ov",
-      "from_tag": "SLO",
-      "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
-      "quality": "manual_reviewed",
-      "rule_id": "hungary_south_slovakia_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "HUN"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B94951233476884",
-      "feature_name": "District of Galanta",
-      "from_tag": "SLO",
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_slovakia_puppet_state",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SLO"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
       "feature_id": "SK_ADM2_56367889B62817588919968",
       "feature_name": "District of Cadca",
       "from_tag": "SLO",
@@ -35401,19 +35245,6 @@
       "critical": true,
       "feature_id": "SK_ADM2_56367889B50353875052402",
       "feature_name": "District of Bytca",
-      "from_tag": "SLO",
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_slovakia_puppet_state",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SLO"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B97606993013938",
-      "feature_name": "District of Sobrance",
       "from_tag": "SLO",
       "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
       "quality": "manual_reviewed",
@@ -35503,19 +35334,6 @@
     {
       "country_code": "SK",
       "critical": true,
-      "feature_id": "SK_ADM2_56367889B66923754975257",
-      "feature_name": "District of Michalovce",
-      "from_tag": "SLO",
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_slovakia_puppet_state",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SLO"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
       "feature_id": "SK_ADM2_56367889B34538662559621",
       "feature_name": "District of Skalica",
       "from_tag": "SLO",
@@ -35557,19 +35375,6 @@
       "critical": true,
       "feature_id": "SK_ADM2_56367889B1447043738985",
       "feature_name": "District of Kovice - okolie",
-      "from_tag": "SLO",
-      "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
-      "quality": "manual_reviewed",
-      "rule_id": "hungary_south_slovakia_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "HUN"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B690835779632",
-      "feature_name": "District of Bratislava V",
       "from_tag": "SLO",
       "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
       "quality": "manual_reviewed",
@@ -35713,19 +35518,6 @@
       "critical": true,
       "feature_id": "SK_ADM2_56367889B4918056975771",
       "feature_name": "District of Gala",
-      "from_tag": "SLO",
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_slovakia_puppet_state",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SLO"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B62094256812316",
-      "feature_name": "District of Senec",
       "from_tag": "SLO",
       "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
       "quality": "manual_reviewed",
@@ -35954,32 +35746,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "HUN"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B14569056094647",
-      "feature_name": "District of Snina",
-      "from_tag": "SLO",
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_slovakia_puppet_state",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SLO"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B51237059400968",
-      "feature_name": "District of Bratislava IV",
-      "from_tag": "SLO",
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_slovakia_puppet_state",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SLO"
     },
     {
       "country_code": "SK",
@@ -46683,19 +46449,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B39999494546000",
-      "feature_name": "Suojärvi District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B69838123012622",
       "feature_name": "Mujejärvi District",
       "from_tag": "",
@@ -46854,19 +46607,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B18455261144282",
       "feature_name": "Louhi District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B55571784565288",
-      "feature_name": "Kantalahti District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -50585,32 +50325,6 @@
       "critical": true,
       "feature_id": "UA_RAY_74538382B19184608500024",
       "feature_name": "Verkhovyna",
-      "from_tag": "UKR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B20694939957091",
-      "feature_name": "Kosiv",
-      "from_tag": "UKR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B36952464312213",
-      "feature_name": "Sniatyn",
       "from_tag": "UKR",
       "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
       "quality": "manual_reviewed",
@@ -58938,19 +58652,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "ENG"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_CITY_SAINT_PETERSBURG",
-      "feature_name": "Saint Petersburg",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
     },
     {
       "country_code": "RU",
@@ -165841,19 +165542,6 @@
     {
       "country_code": "UA",
       "critical": true,
-      "feature_id": "UA_SHELL_FB_204",
-      "feature_name": "Ukraine Shell Fallback 204",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
       "feature_id": "UA_SHELL_FB_205",
       "feature_name": "Ukraine Shell Fallback 205",
       "from_tag": "UKR",
@@ -201536,10 +201224,10 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 321,
+      "controller_feature_count": 322,
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 321,
+      "feature_count": 322,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201569,10 +201257,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 792,
+      "controller_feature_count": 800,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 792,
+      "feature_count": 800,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201915,10 +201603,10 @@
     "HUN": {
       "base_iso2": "HU",
       "continent_label": "Europe",
-      "controller_feature_count": 67,
+      "controller_feature_count": 72,
       "display_name": "Hungary",
       "entry_kind": "",
-      "feature_count": 67,
+      "feature_count": 72,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202073,10 +201761,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 129,
+      "controller_feature_count": 130,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 129,
+      "feature_count": 130,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203055,10 +202743,10 @@
     "POL": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 303,
+      "controller_feature_count": 308,
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 303,
+      "feature_count": 308,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203346,10 +203034,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 119,
+      "controller_feature_count": 123,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 119,
+      "feature_count": 123,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203605,10 +203293,10 @@
     "SLO": {
       "base_iso2": "SK",
       "continent_label": "Europe",
-      "controller_feature_count": 54,
+      "controller_feature_count": 55,
       "display_name": "Slovakia",
       "entry_kind": "",
-      "feature_count": 54,
+      "feature_count": 55,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203671,10 +203359,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 9393,
+      "controller_feature_count": 9390,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 9393,
+      "feature_count": 9390,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203686,7 +203374,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 12020
+        "manual_reviewed": 12016
       },
       "rule_sources": [
         "soviet_union"
@@ -204035,10 +203723,10 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 82,
+      "controller_feature_count": 83,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 82,
+      "feature_count": 83,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204285,10 +203973,10 @@
     "YUG": {
       "base_iso2": "RS",
       "continent_label": "Europe",
-      "controller_feature_count": 116,
+      "controller_feature_count": 117,
       "display_name": "Yugoslavia",
       "entry_kind": "",
-      "feature_count": 116,
+      "feature_count": 117,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -205337,41 +205025,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "38ab66469f2be8f635ba8efb8c1758a85718ce8fb5b6d1d32705bb19a715b967",
+  "snapshot_fingerprint": "cc7f62ebb341cb3ed3d9205a3ec61377cfa5305e508bfe6ed5c4ecc4480d8626",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "7821a3cb7c693235eef276b87954186a7a7a63c4a6af14218d3b636757a5e3e2",
-    "detail_chunk_manifest_sha256": "18f0ac165347c48602d816c5f05505ed4aa0926850c1efe04d49a21952ed0937",
-    "runtime_bootstrap_topology_sha256": "87bede3074fad428a40e028c276cf5588b809afa8b63775f0bf6984f526f6179",
-    "runtime_topology_sha256": "523b600d9e01b4857cc0e0f1a05f1b6d1fdf13ffd0c18a7887d8b9a4d60630b2"
+    "build_snapshot_sha256": "02b9541002301bd0077834d2ee12586780e1581971ad389f13d7c0e7f3c6dc17",
+    "detail_chunk_manifest_sha256": "25be342abce7d87e68a16f1bd72e5f20e65aa81e4b5132a4fad4a8b0a392aff3",
+    "runtime_bootstrap_topology_sha256": "5b62828e0bcb3c1c310e57d61c92b45b0aeffa96006c85f649ad4982e7b34bc9",
+    "runtime_topology_sha256": "2dec06bcf29dbf8892cd19a319cb87fb5c4dad0379c9aed64df5d337e7fb6b75"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15385,
+    "changed_feature_count": 15361,
     "controller_count": 328,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 21118,
+    "feature_count": 21151,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14938,
+    "manual_reviewed_feature_count": 14914,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 328,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,
-      "manual_reviewed": 14938
+      "manual_reviewed": 14914
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15362
+      "manual_rule": 15338
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,
