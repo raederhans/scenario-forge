@@ -66,6 +66,55 @@ def test_smoothing_leaves_non_enclaves(enclave_inputs, case):
     assert apply(enclave_inputs, rule, scenario="hoi4_1939")[1] == {}
 
 
+def sliver_rule(**options):
+    return {"id": "adopt", "scenarios": ["hoi4_1936"],
+            "adopt_shell_slivers": {"id_pattern": "1[12]", "max_area_km2": 3000, **options}}
+
+
+def test_adopt_shell_cluster_and_replay(enclave_inputs):
+    enclave_inputs["owners"]["12"] = "CAN"
+    rule = sliver_rule()
+    countries, assignments, report = apply(enclave_inputs, rule)
+    assert {fid: (row["owner"], row["cores"]) for fid, row in assignments.items()} == {
+        "11": ("ENG", ["CHI"]), "12": ("ENG", ["CHI"])}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 2}]
+    enclave_inputs["countries"] = countries
+    enclave_inputs["owners"].update({fid: row["owner"] for fid, row in assignments.items()})
+    _, assignments, report = apply(enclave_inputs, rule)
+    assert assignments == {}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 0}]
+
+
+@pytest.mark.parametrize("options,neighbors", [
+    ({}, {"01": "CAN"}),
+    ({"max_area_km2": 200}, {}),
+    ({"allowed_targets": ["CHI"]}, {"01": "CHI"}),
+    ({"only_from_owners": ["CHI"]}, {}),
+])
+def test_shell_cluster_stays(enclave_inputs, options, neighbors):
+    enclave_inputs["owners"].update({"12": "CAN", **neighbors})
+    _, assignments, report = apply(enclave_inputs, sliver_rule(**options))
+    assert assignments == {}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 0}]
+
+
+@pytest.mark.parametrize("width,target", [(1, "CHI"), (2, "ENG")])
+def test_shell_target_by_boundary_length_then_tag(enclave_inputs, width, target):
+    enclave_inputs["owners"].update({"01": "CHI", "21": "CHI"})
+    for arc in enclave_inputs["topology"]["arcs"]:
+        for point in arc:
+            point[0] *= width
+    _, assignments, _ = apply(enclave_inputs, sliver_rule(id_pattern="^11$"))
+    assert assignments["11"]["owner"] == target
+
+
+def test_shell_cluster_reconsiders_blocked_target(enclave_inputs):
+    enclave_inputs["owners"].update({"10": "CAN", "11": "CHI", "20": "CHI"})
+    _, assignments, report = apply(enclave_inputs, sliver_rule(id_pattern="1[01]", allowed_targets=["ENG"]))
+    assert {fid: row["owner"] for fid, row in assignments.items()} == {"10": "ENG", "11": "ENG"}
+    assert report["entries"] == [{"entry_id": "adopt", "changed_count": 2}]
+
+
 @pytest.fixture
 def inputs():
     return dict(

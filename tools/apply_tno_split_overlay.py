@@ -106,12 +106,13 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
     )
     result_owners = {**owners, **{fid: row["owner"] for fid, row in assignments.items()}}
     base_topology = read_json_source(data_dir / "europe_topology.runtime_political_v1.json")
+    overlay_tags = {entry["tag"] for entry in overlay["entries"] if "tag" in entry} & countries.keys()
     update_country_geography(
         countries, result_owners,
         {g["properties"]["id"]: g["properties"] for g in geometries},
         {g["properties"]["id"]: g["properties"]
          for g in base_topology["objects"]["political"]["geometries"]},
-        meta, {entry["tag"] for entry in overlay["entries"]} & countries.keys(),
+        meta, overlay_tags,
     )
     counts = Counter(result_owners.values())
     for tag, country in countries.items():
@@ -131,7 +132,7 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
         manual["countries"].pop(tag, None)
         mutations["countries"].pop(tag, None)
         mutations.get("capitals", {}).pop(tag, None)
-    for tag in sorted(({entry["tag"] for entry in overlay["entries"]} & countries.keys()) | {
+    for tag in sorted(overlay_tags | {
         tag for tag, country in countries.items() if country.get("entry_kind") == "scenario_container"
     }):
         country = countries[tag]

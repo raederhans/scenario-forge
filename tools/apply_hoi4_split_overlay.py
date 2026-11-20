@@ -4,6 +4,7 @@ import argparse
 from collections import Counter, defaultdict
 from copy import deepcopy
 import json
+from math import dist, fsum
 from pathlib import Path
 import re
 import sys
@@ -153,6 +154,64 @@ def smooth_enclaves(owners, topology, tags, max_area_km2):
             return len(changed)
 
 
+def adopt_shell_slivers(owners, topology, id_pattern, max_area_km2, allowed_targets=None, only_from_owners=None):
+    from map_builder.regional_geometry import _absolute_topology, _decode_geometry
+    from tools.apply_hoi4_geometry_splits import arc_ids, area_km2
+
+    pattern = re.compile(id_pattern)
+    neighbors = land_neighbors(topology)
+    candidates = sorted(fid for fid in neighbors if pattern.search(fid)
+                        and (only_from_owners is None or owners[fid] in only_from_owners))
+    if not candidates:
+        return 0
+    absolute = _absolute_topology(topology)
+    geometries = {g["properties"]["id"]: g for g in absolute["objects"]["political"]["geometries"]}
+    areas = {fid: area_km2(_decode_geometry(absolute, geometries[fid])) for fid in candidates}
+    adjacent = set(candidates).union(*(neighbors[fid] for fid in candidates))
+    arcs = {fid: set(arc_ids(geometries[fid]["arcs"])) for fid in adjacent}
+    borders = {}
+    for fid in candidates:
+        borders[fid] = {}
+        for other in neighbors[fid]:
+            shared = (absolute["arcs"][i] for i in arcs[fid] & arcs[other])
+            borders[fid][other] = fsum(dist(a[:2], b[:2]) for arc in shared for a, b in zip(arc, arc[1:]))
+
+    changed = set()
+    while True:
+        visited = set()
+        for seed in candidates:
+            owner = owners[seed]
+            if seed in visited or (only_from_owners is not None and owner not in only_from_owners):
+                continue
+            cluster = {seed}
+            pending = [seed]
+            while pending:
+                fid = pending.pop()
+                for other in neighbors[fid]:
+                    if other in areas and other not in cluster and owners[other] == owner:
+                        cluster.add(other)
+                        pending.append(other)
+            visited.update(cluster)
+            if fsum(areas[fid] for fid in cluster) > max_area_km2:
+                continue
+            lengths = defaultdict(list)
+            for fid in cluster:
+                for other, length in borders[fid].items():
+                    if other not in cluster:
+                        lengths[owners[other]].append(length)
+            if not lengths or owner in lengths:
+                continue
+            target = min(lengths, key=lambda tag: (-fsum(lengths[tag]), tag))
+            if allowed_targets is not None and target not in allowed_targets:
+                continue
+            for fid in cluster:
+                owners[fid] = target
+            changed.update(cluster)
+            break
+        else:
+            return len(changed)
+
+
 def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
                   default_country, hierarchy_groups, country_meta, prefectures,
                   bucket_by_feature, plans, unresolved=(), point_for_feature=None, feature_splits=None,
@@ -167,7 +226,7 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
         ids.add(eid)
         if not entry.get("scenarios") or not set(entry["scenarios"]) <= set(RULE_SCENARIOS):
             raise ValueError(f"entry {eid}: invalid scenarios")
-        if "smooth_enclaves" in entry:
+        if "smooth_enclaves" in entry or "adopt_shell_slivers" in entry:
             continue
         if not re.fullmatch(r"[A-Z0-9]{2,4}", entry.get("tag", "")):
             raise ValueError(f"entry {eid}: invalid tag")
@@ -267,6 +326,10 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
         return direct
 
     for entry in entries:
+        if "adopt_shell_slivers" in entry:
+            changed = adopt_shell_slivers(result_owners, topology, **entry["adopt_shell_slivers"])
+            report["entries"].append({"entry_id": entry["id"], "changed_count": changed})
+            continue
         if "smooth_enclaves" in entry:
             changed = smooth_enclaves(result_owners, topology, **entry["smooth_enclaves"])
             report["entries"].append({"entry_id": entry["id"], "changed_count": changed})
