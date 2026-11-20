@@ -1,4 +1,5 @@
 import { createExportBakeRuntime } from "./export_bake_runtime.js";
+import { buildDefaultFileStem } from "../../core/file_name_policy.js";
 import { normalizeExportWorkbenchUiState } from "../../core/state.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { buildExportArtifactPackage } from "../../core/export_artifact_package.js";
@@ -207,12 +208,17 @@ export function createExportWorkflowController({
     });
   };
 
+  const buildDownloadName = (fileStem, extension) => {
+    const suffix = `${fileStem.slice("map".length)}.${extension}`;
+    return buildDefaultFileStem(runtimeState, new Date(), suffix) + suffix;
+  };
+
   const triggerCanvasDownload = (canvas, extension, fileStem) => {
     const format = extension === "jpg" ? "image/jpeg" : "image/png";
     const dataUrl = canvas.toDataURL(format, 0.92);
     const link = document.createElement("a");
     link.href = dataUrl;
-    link.download = `${fileStem}.${extension}`;
+    link.download = buildDownloadName(fileStem, extension);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -222,7 +228,7 @@ export function createExportWorkflowController({
     const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = objectUrl;
-    link.download = `${fileStem}.${extension}`;
+    link.download = buildDownloadName(fileStem, extension);
     document.body.appendChild(link);
     link.click();
     link.remove();

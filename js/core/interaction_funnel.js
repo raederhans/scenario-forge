@@ -339,7 +339,7 @@ function isImportDocumentCurrent(identity) {
   return identity();
 }
 
-async function applyImportedProjectState(data, { ui, hooks, request }) {
+async function applyImportedProjectState(data, { ui, hooks, request, fileName }) {
   debugState.importPhase = "begin";
   const preparedImport = await prepareImportedProjectState({
     data, ui, debugState, getScenarioResourcesModule,
@@ -359,6 +359,8 @@ async function applyImportedProjectState(data, { ui, hooks, request }) {
     commitImportedProjectPatch(state, previous);
     throw error;
   }
+  state.projectName = data.projectName;
+  state.projectFileStem = fileName.replace(/\.[^.]*$/, "");
   const warnings = [];
   // Both APIs update their state before notifying UI observers. An observer failure
   // must not turn a document that has already committed into a failed import.
@@ -471,12 +473,13 @@ async function runProjectImport(input, options, source) {
   debugState.importStartCount += 1;
   debugState.importPhase = `${source}-read`;
   debugState.lastImportError = "";
-  debugState.lastImportFileName = String(source === "file" ? input?.name || options.fileName || "" : options.fileName || "");
+  const fileName = String(source === "file" ? input?.name || options.fileName || "" : options.fileName || "");
+  debugState.lastImportFileName = fileName;
   let result = null;
   try {
     const { FileManager } = await getFileManagerModule();
     const callback = async data => {
-      result = await applyImportedProjectState(data, { ui, hooks, request });
+      result = await applyImportedProjectState(data, { ui, hooks, request, fileName });
       return result;
     };
     const observers = {

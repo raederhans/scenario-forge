@@ -7354,6 +7354,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已导入项目：{scenario}。已恢复 {colors} 条上色记录和 {owners} 条归属记录。",
     "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries."
   },
+  "Project name (optional)": {
+    "zh": "项目名（可选）",
+    "en": "Project name (optional)"
+  },
   "Project only": {
     "zh": "仅项目",
     "en": "Project only"
