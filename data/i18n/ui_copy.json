@@ -2775,6 +2775,14 @@
     "en": "Disabled",
     "zh": "残疾人"
   },
+  "Continuing will discard unsaved changes to the current map.": {
+    "en": "Continuing will discard unsaved changes to the current map.",
+    "zh": "继续操作将丢弃当前地图尚未保存的更改。"
+  },
+  "Discard and continue": {
+    "en": "Discard and continue",
+    "zh": "丢弃并继续"
+  },
   "Discard and Load": {
     "en": "Discard and Load",
     "zh": "丢弃并加载"
@@ -8151,6 +8159,10 @@
   "Save and restore the complete working state.": {
     "en": "Save and restore the complete working state.",
     "zh": "保存和恢复完整工作状态。"
+  },
+  "Save first": {
+    "en": "Save first",
+    "zh": "先保存"
   },
   "Save or load your map state as a project file.": {
     "en": "Save or load your map state as a project file.",

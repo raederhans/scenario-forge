@@ -1,4 +1,7 @@
 import { state as runtimeState } from "../core/state.js";
+import { clearHistory } from "../core/history_manager.js";
+import { confirmDiscardDirtyWork } from "./sidebar/project_support_diagnostics_controller.js";
+import { showAppDialog } from "./components/app_dialog.js";
 import { applyScenarioOpeningView } from "../core/scenario/presentation_opening_view.js";
 import { callRuntimeHook, registerOwnedRuntimeHook } from "../core/state/index.js";
 import {
@@ -25,7 +28,7 @@ import { createScenarioIntroCard } from "./scenario_intro_card.js";
 const state = runtimeState;
 let disposeActiveScenarioControls = null;
 
-export function initScenarioControls() {
+export function initScenarioControls({ applyScenario = applyScenarioByIdCommand } = {}) {
   disposeActiveScenarioControls?.();
   const events = new AbortController();
   const eventOptions = { signal: events.signal };
@@ -245,16 +248,29 @@ export function initScenarioControls() {
     }, eventOptions);
   }
 
+  const confirmScenarioAction = async (actionLabel) => {
+    const confirmed = await confirmDiscardDirtyWork(state, showAppDialog, {
+      title: t(actionLabel, "ui"),
+      message: t("Continuing will discard unsaved changes to the current map.", "ui"),
+      confirmLabel: t("Save first", "ui"),
+      secondaryLabel: t("Discard and continue", "ui"),
+      cancelLabel: t("Cancel", "ui"),
+    });
+    return confirmed && !events.signal.aborted;
+  };
+
   if (applyScenarioBtn) {
     applyScenarioBtn.addEventListener("click", async () => {
       const scenarioId = pendingScenarioId || normalizeScenarioId(scenarioSelect?.value);
       if (!scenarioId) return;
       try {
-        await applyScenarioByIdCommand(scenarioId, {
+        if (state.isDirty && !(await confirmScenarioAction("Apply Scenario"))) return;
+        await applyScenario(scenarioId, {
           renderMode: "request",
           markDirtyReason: "scenario-apply",
           showToastOnComplete: true,
         });
+        if (normalizeScenarioId(state.activeScenarioId) === scenarioId) clearHistory();
         applyScenarioOpeningView(runtimeState.activeScenarioManifest, { animate: true });
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
@@ -273,14 +289,16 @@ export function initScenarioControls() {
   }
 
   if (resetScenarioBtn) {
-    resetScenarioBtn.addEventListener("click", () => {
+    resetScenarioBtn.addEventListener("click", async () => {
       if (!runtimeState.activeScenarioId || runtimeState.scenarioApplyInFlight) return;
+      if (state.isDirty && !(await confirmScenarioAction("Reset Changes To Baseline"))) return;
       const changed = resetScenarioToBaselineCommand({
         renderMode: "request",
         markDirtyReason: "scenario-reset",
         showToastOnComplete: true,
       });
       if (changed) {
+        clearHistory();
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       }
@@ -291,13 +309,13 @@ export function initScenarioControls() {
     clearScenarioBtn.addEventListener("click", async () => {
       try {
         if (!runtimeState.activeScenarioId || runtimeState.scenarioApplyInFlight) return;
-        if (runtimeState.activeScenarioId) {
-          clearActiveScenarioCommand({
-            renderMode: "request",
-            markDirtyReason: "scenario-clear",
-            showToastOnComplete: true,
-          });
-        }
+        if (state.isDirty && !(await confirmScenarioAction("Exit Scenario"))) return;
+        clearActiveScenarioCommand({
+          renderMode: "request",
+          markDirtyReason: "scenario-clear",
+          showToastOnComplete: true,
+        });
+        clearHistory();
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       } catch (error) {
