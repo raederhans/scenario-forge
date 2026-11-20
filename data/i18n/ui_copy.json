@@ -3699,6 +3699,13 @@
     "en": "Format",
     "zh": "格式"
   },
+  "Found unsaved work from {count} minutes ago ({scenario}).": {
+    "en": {
+      "one": "Found unsaved work from {count} minute ago ({scenario}).",
+      "other": "Found unsaved work from {count} minutes ago ({scenario})."
+    },
+    "zh": "发现 {count} 分钟前未保存的工作（{scenario}）。"
+  },
   "Frontline": {
     "en": "Frontline",
     "zh": "前线"
@@ -6143,6 +6150,10 @@
     "en": "Not in current view",
     "zh": "当前视野内没有要素"
   },
+  "Not now": {
+    "en": "Not now",
+    "zh": "暂不恢复"
+  },
   "Not saved yet": {
     "en": "Not saved yet",
     "zh": "尚未保存"
@@ -7754,6 +7765,10 @@
   "Resource type": {
     "en": "Resource type",
     "zh": "资源种类"
+  },
+  "Restore": {
+    "en": "Restore",
+    "zh": "恢复"
   },
   "Restored": {
     "en": "Restored",
