@@ -1,4 +1,5 @@
 import { lazyOwner } from "./lazy_owner.js";
+import { claimScreenLabelPlacement } from "../renderer/screen_label_placement.js";
 import { getMapLabelHierarchy } from "../renderer/map_label_hierarchy.js";
 import { getProjectionGeometryGeneration } from "../renderer/projection_geometry_identity.js";
 import { createMarineLabelOwner, shouldShowMarineRegionNames } from "../renderer/marine_label_owner.js";
@@ -342,7 +343,10 @@ export function createLabelsRuntime({
   }
 
   function getCityVisualCapitalState(entry, config = {}) {
-    return !!entry?.isCapital && config.showCapitalOverlay !== false;
+    if (!entry?.isCapital || config.showCapitalOverlay === false) return false;
+    const props = entry.feature?.properties;
+    const code = entry.scenarioTag || String(props?.__city_country_code || props?.country_code || "").trim().toUpperCase();
+    return !coverage.getSuppressedCodes().has(code);
   }
 
   function getHoveredCityEntryFromEvent(event) {
@@ -389,12 +393,14 @@ export function createLabelsRuntime({
     return String(props.name || props.label || id || "").trim();
   }
 
-  function drawBlankFeatureLabelsPass(k, { interactive = false } = {}) {
+  function drawBlankFeatureLabelsPass(k, occupiedBoxes, interactive) {
     if (interactive) return;
     if (normalizeMapSemanticMode(runtimeState.mapSemanticMode) !== "blank") return;
     if (String(runtimeState.activeScenarioId || "") !== "blank_base") return;
     if (!runtimeState.showBlankFeatureLabels) return;
-    if (!runtimeState.landData?.features?.length || !rendererSurfaceHost.getContext() || typeof rendererSurfaceHost.getPathCanvas()?.centroid !== "function") return;
+    const context = rendererSurfaceHost.getContext();
+    const path = rendererSurfaceHost.getPathCanvas();
+    if (!runtimeState.landData?.features?.length || !context || !path) return;
     const visibleItems = collectVisibleLandSpatialItems();
     const items = Array.isArray(visibleItems) && visibleItems.length
       ? visibleItems
@@ -402,28 +408,37 @@ export function createLabelsRuntime({
         feature,
         id: getFeatureId(feature) || `feature-${index}`,
       }));
-    const maxLabels = Math.max(24, Math.min(140, Math.round(44 * Math.max(1, Number(k) || 1))));
-    const step = Math.max(1, Math.ceil(items.length / maxLabels));
-    const fontSize = Math.max(7, Math.min(12, 11 / Math.max(0.75, Number(k) || 1)));
-    rendererSurfaceHost.getContext().save();
-    rendererSurfaceHost.getContext().font = `${fontSize}px system-ui, sans-serif`;
-    rendererSurfaceHost.getContext().textAlign = "center";
-    rendererSurfaceHost.getContext().textBaseline = "middle";
-    rendererSurfaceHost.getContext().lineWidth = Math.max(1.8 / Math.max(0.75, Number(k) || 1), 0.7);
-    rendererSurfaceHost.getContext().strokeStyle = "rgba(248, 250, 252, 0.82)";
-    rendererSurfaceHost.getContext().fillStyle = "rgba(31, 41, 55, 0.86)";
-    for (let index = 0; index < items.length; index += step) {
-      const item = items[index];
-      const feature = item?.feature || item;
-      const id = item?.id || getFeatureId(feature) || "";
-      const label = getBlankFeatureLabel(feature, id);
+    const candidates = items.map(item => {
+      const feature = item.feature || item;
+      return { feature, id: item.id, area: path.area(feature) };
+    }).sort((a, b) => b.area - a.area);
+    const { x: tx = 0, y: ty = 0 } = runtimeState.zoomTransform || {};
+    const fontSize = 11 / k;
+    context.save();
+    context.font = `${fontSize}px system-ui, sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineWidth = 1.8 / k;
+    context.strokeStyle = "rgba(248, 250, 252, 0.82)";
+    context.fillStyle = "rgba(31, 41, 55, 0.86)";
+    for (const { feature, id } of candidates) {
+      const label = getBlankFeatureLabel(feature, id || getFeatureId(feature));
       if (!label) continue;
-      const centroid = rendererSurfaceHost.getPathCanvas().centroid(feature);
-      if (!centroid || !Number.isFinite(centroid[0]) || !Number.isFinite(centroid[1])) continue;
-      rendererSurfaceHost.getContext().strokeText(label, centroid[0], centroid[1]);
-      rendererSurfaceHost.getContext().fillText(label, centroid[0], centroid[1]);
+      const [x, y] = path.centroid(feature);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      const bounds = getProjectedFeatureBounds(feature);
+      if (!bounds) continue;
+      const width = context.measureText(label).width + context.lineWidth;
+      const height = fontSize + context.lineWidth;
+      const left = x - width / 2;
+      const top = y - height / 2;
+      if (left < bounds.minX || top < bounds.minY || left + width > bounds.maxX || top + height > bounds.maxY) continue;
+      const box = { x: left * k + tx, y: top * k + ty, w: width * k, h: height * k };
+      if (!claimScreenLabelPlacement([{ box }], occupiedBoxes)) continue;
+      context.strokeText(label, x, y);
+      context.fillText(label, x, y);
     }
-    rendererSurfaceHost.getContext().restore();
+    context.restore();
   }
 
   let countryLabelSourceOwner = null;
@@ -583,7 +598,6 @@ export function createLabelsRuntime({
     }
     const hierarchy = getMapLabelHierarchy(k, runtimeState, previousPreferCountries);
     previousPreferCountries = hierarchy.preferCountries;
-    drawBlankFeatureLabelsPass(k, { interactive });
     const occupiedBoxes = [];
     if (runtimeState.mapLabels?.length && runtimeState.annotationView?.showMapLabels !== false) {
       const { requestChineseTextGlyphs } = getCountryLabelRenderOwner();
@@ -593,6 +607,8 @@ export function createLabelsRuntime({
     } else if (placedBounds.size) {
       placedBounds.clear();
     }
+    // 用户手放的文字先占位，空白底图地块名避让它。
+    drawBlankFeatureLabelsPass(k, occupiedBoxes, interactive);
     if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
       getMarineLabelOwner().drawOrdinaryMarineLabels(k, occupiedBoxes);
     }
