@@ -161,7 +161,6 @@ export function startAutosave({
       confirmLabel: t("Local history", "ui"),
       cancelLabel: t("Not now", "ui"),
     });
-    if (review) return openHistory();
     await useStorage(() => storage.edit((records, store) => {
       for (const item of offered) {
         const current = records.find(record => record.scenarioId === item.scenarioId);
@@ -174,6 +173,7 @@ export function startAutosave({
         for (const old of previous.sort((a, b) => b.savedAt - a.savedAt).slice(2)) store.delete(old.scenarioId);
       }
     })).then(onHistoryChange, () => {});
+    if (review) return openHistory();
   }
 
   async function restoreSnapshot(record) {

@@ -121,7 +121,7 @@ test("startup opens history and restores only the selected version after discard
   assert.equal(dialog.mock.callCount(), 1);
   assert.equal(openHistory.mock.callCount(), 1);
   const history = await manager.listHistory();
-  assert.deepEqual(history.map(record => record.scenarioId), ["1936", "older"]);
+  assert.deepEqual(history.map(record => record.scenarioId), [`1936@${NOW - 120_000}`, `older@${NOW - WEEK}`]);
   markDirty("paint");
   dialog.mock.mockImplementationOnce(() => false);
   await manager.restoreSnapshot(history[1]);

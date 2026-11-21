@@ -390,7 +390,7 @@ function normalizeImportedUnitCounterSidc(value, renderer = "game") {
   return UNIT_COUNTER_MILSTD_SIDC_PATTERN.test(token) ? token : "";
 }
 
-function normalizeMapLabels(rawLabels) {
+function normalizeMapLabels(rawLabels, { migrateLegacy = false } = {}) {
   if (!Array.isArray(rawLabels)) return [];
   const labels = [];
   const ids = new Set(rawLabels.map(label => label?.id));
@@ -399,6 +399,9 @@ function normalizeMapLabels(rawLabels) {
   for (const raw of rawLabels) {
     const label = normalizeMapLabel(raw, raw?.id);
     if (!label) continue;
+    if (migrateLegacy && label.countryCode && label.text && !Object.hasOwn(raw, "replaceCountryName")) {
+      label.replaceCountryName = true;
+    }
     if (typeof label.id !== "string" || !/^map_label_[1-9]\d*$/.test(label.id) || used.has(label.id)) {
       while (ids.has(`map_label_${counter}`)) counter++;
       label.id = `map_label_${counter++}`;
@@ -632,7 +635,8 @@ class FileManager {
         return handle;
       } catch (error) {
         if (error?.name === "AbortError") return false;
-        throw error;
+        if (currentHandle) throw error;
+        throw new Error(t("Unable to save the project file. Check the destination and write permission.", "ui"), { cause: error });
       }
     }
 
@@ -686,11 +690,19 @@ class FileManager {
     const currentHandle = options.saveAs ? null : documentBinding?.handle;
     const format = currentHandle ? (/\.zip$/i.test(currentHandle.name) ? "zip" : "json") : options.format;
     const download = await FileManager.buildProjectDownloadPayload(payload, { ...options, format }, appState.projectFileStem);
-    const wroteFile = await FileManager.writeBlobDownload(download.blob, download.filename, {
-      destination: options.saveAs ? "picker" : options.destination,
-      currentHandle,
+    const write = (handle, destination) => FileManager.writeBlobDownload(download.blob, download.filename, {
+      destination,
+      currentHandle: handle,
       pickerTypes: download.pickerTypes,
     });
+    let wroteFile;
+    try {
+      wroteFile = await write(currentHandle, options.saveAs ? "picker" : options.destination);
+    } catch (error) {
+      if (!currentHandle) throw error;
+      documentBinding.handle = null;
+      wroteFile = await write(null, "picker");
+    }
     if (!wroteFile) return false;
     const sameDocument = appState.projectFileBinding === documentBinding;
     if (wroteFile.name && sameDocument) {
@@ -809,7 +821,7 @@ class FileManager {
     data.annotationView = normalizeAnnotationView(data.annotationView);
     data.operationalLines = normalizeOperationalLines(data.operationalLines);
     data.operationGraphics = normalizeOperationGraphics(data.operationGraphics);
-    data.mapLabels = normalizeMapLabels(data.mapLabels);
+    data.mapLabels = normalizeMapLabels(data.mapLabels, { migrateLegacy: true });
     data.unitCounters = normalizeUnitCounters(data.unitCounters);
     if (!data.layerVisibility || typeof data.layerVisibility !== "object") {
       data.layerVisibility = {};

@@ -11565,6 +11565,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "无法读取所选文件。",
     "en": "Unable to read the selected file."
   },
+  "Unable to save the project file. Check the destination and write permission.": {
+    "zh": "无法保存项目文件。请检查目标位置和写入权限。",
+    "en": "Unable to save the project file. Check the destination and write permission."
+  },
   "Unassigned": {
     "zh": "未分配",
     "en": "Unassigned"
