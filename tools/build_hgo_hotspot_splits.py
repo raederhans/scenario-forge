@@ -27,8 +27,22 @@ ASSETS = ROOT / "apps/hgo/assets"
 PREFIX = DATA / "scenario-rules/hoi4_hgo_hotspots"
 GEOD = Geod(ellps="WGS84")
 
+# These desert controls cluster on settled margins. Preserve the native grid scale inland.
+TRANSLATION_ONLY = {"western_desert", "fezzan", "spanish_sahara_frontier", "iraq_neutral_zones"}
+
 # Geographically identified out-of-region candidates would stretch the fallback extent.
 OUTSIDE_REGION = {
+    "western_desert": {3869},  # Giza
+    "fezzan": {6898},  # The Im Anguel footprint extends west to central Algeria.
+    "spanish_sahara_frontier": {1633, 6025},  # Southern Spanish Sahara and Adrar
+    "syrian_jazira": {1886, 2049, 3297, 3568, 5677, 6984},  # Hama, Mardin and Iraq
+    "maan_aqaba_hejaz": {3350, 6963, 6964, 6965, 8083, 9033},  # Rutba, Arar and Medina
+    "iraq_neutral_zones": {3273, 3356},  # Kuwait
+    "iranian_azerbaijan": {1079, 7040, 7121, 9865},  # Şırnak, Zangilan, Ağrı and Soran
+    "buraimi_abu_dhabi": {5613, 5614, 6649},  # Oman and Saudi Arabia
+    "bosnia_drina": {810, 1311, 3460, 3652, 4980, 7343, 7345, 7346, 7622, 7623},
+    "lapland_arctic": {2777, 2781, 2930, 2935, 3848, 4912},  # Kola, Nordland and the southern counties
+    "cilicia": {11854, 11859},  # Ermenek and Kadirli
     "friuli": {1229, 5940},  # East Tyrol and the Gulf of Trieste
     "burgenland_sopron": {7946, 10534},  # Pápa and Rusovce
     "backa_baranja_srem": {5369, 7620, 7992},  # Slatina, Taraš and Szolnok
@@ -45,6 +59,18 @@ OUTSIDE_REGION = {
 # HGO label anchors for towns and the two provincial seats. Merano has two
 # different HGO labels for the same town, so neither is a registration control.
 STATE_CITY_CONTROLS = {
+    "western_desert": {451: "Derna", 6365: "Siwa", 6954: "Sallum"},
+    "fezzan": {6924: "Sinawin", 6919: "Wazin"},
+    "spanish_sahara_frontier": {7898: "Assa", 6910: "Figuig"},
+    "syrian_jazira": {350: "Siverek", 5693: "Tall Tamr", 5696: "Al-Bab", 6983: "Hajin", 5705: "Urfa"},
+    "maan_aqaba_hejaz": {5670: "Shobak", 5674: "Umm El-Jimaal", 5882: "Tayma", 9241: "Duba", 1177: "Haql"},
+    "iraq_neutral_zones": {1373: "Basra", 6962: "Rafha", 6965: "Arar", 3358: "Rawdat Habbas", 4994: "Shafi"},
+    "iranian_azerbaijan": {419: "Tabriz", 2179: "Maku", 4986: "Khoy", 5898: "Oshnavieh", 5708: "Gevas"},
+    "buraimi_abu_dhabi": {3389: "Abu Dhabi", 3390: "Al Ain", 5615: "Al Wagan", 5795: "Asab"},
+    "bosnia_drina": {2175: "Drvar", 2787: "Novi Grad", 5150: "Bijeljina", 5151: "Stolac", 7364: "Livno"},
+    "lapland_arctic": {1102: "Kittila", 2779: "Vuotso", 2927: "Haparanda", 4903: "Ajos", 4909: "Pajala",
+                       4910: "Lulea", 2946: "Vardo", 8026: "Tana", 8027: "Olderdalen"},
+    "cilicia": {344: "Adana", 345: "Tarsus", 5166: "Kozan", 7143: "Elbistan", 7183: "Silifke", 11855: "Mut"},
     "friuli": {1309: "Tarvisio", 5942: "Valbruna", 5943: "Dogna", 7548: "Marano Lagunare",
                7549: "Pocenia", 2284: "Gorizia"},
     "burgenland_sopron": {793: "Oberwart", 2471: "Sopron", 4819: "Eisenstadt", 4820: "Fertod",
@@ -71,6 +97,21 @@ STATE_CITY_CONTROLS = {
 
 # Small town seats absent from the world city index, in longitude/latitude order.
 LOCAL_SEATS = {
+    "western_desert": {"Sallum": (25.16, 31.55)},
+    "fezzan": {"Sinawin": (10.60, 31.02), "Wazin": (10.66, 31.95)},
+    "spanish_sahara_frontier": {"Assa": (-9.43, 28.61), "Figuig": (-1.23, 32.11)},
+    "syrian_jazira": {"Tall Tamr": (40.37, 36.66), "Hajin": (40.83, 34.69)},
+    "maan_aqaba_hejaz": {"Umm El-Jimaal": (36.37, 32.33), "Haql": (34.95, 29.29),
+                         "Shobak": (35.56, 30.52), "Tayma": (38.55, 27.63), "Duba": (35.69, 27.35)},
+    "iraq_neutral_zones": {"Rawdat Habbas": (44.34, 29.64), "Shafi": (47.62, 30.90)},
+    "iranian_azerbaijan": {"Maku": (44.52, 39.29), "Khoy": (44.95, 38.55), "Oshnavieh": (45.10, 37.04),
+                           "Gevas": (43.11, 38.30)},
+    "buraimi_abu_dhabi": {"Al Wagan": (55.42, 23.61), "Asab": (54.30, 23.29)},
+    "bosnia_drina": {"Drvar": (16.38, 44.37), "Novi Grad": (16.38, 45.05), "Stolac": (17.96, 43.08),
+                     "Livno": (17.01, 43.83), "Bijeljina": (19.22, 44.76)},
+    "lapland_arctic": {"Kittila": (24.91, 67.65), "Lulea": (22.15, 65.58), "Ajos": (24.52, 65.67),
+                       "Vuotso": (27.12, 68.09), "Pajala": (23.37, 67.21), "Tana": (28.19, 70.20),
+                       "Vardo": (31.10, 70.37), "Olderdalen": (20.53, 69.60)},
     "friuli": {"Tarvisio": (13.58, 46.51), "Valbruna": (13.49, 46.49), "Dogna": (13.32, 46.45),
                "Marano Lagunare": (13.17, 45.76), "Pocenia": (13.10, 45.84),
                "Cividale del Friuli": (13.43, 46.09), "Manzano": (13.38, 45.99),
@@ -94,6 +135,19 @@ LOCAL_SEATS = {
 
 # Name corrections from the regional review: (parent, suffix) -> (English, Chinese).
 NAME_FIXES = {
+    ('LBY-2987', 'DERNA'): ('Tobruk', '图卜鲁格'),
+    ('LBY-2965', 'remainder'): ('Kufrah', '库夫拉'),
+    ('MR_ADM1_MRT-2783', 'BIR_MOGHREIN'): ('Ain Ben Tili', '艾因本提利'),
+    ('MR_ADM1_MRT-2783', 'EAST_BIN_MOHGREIN'): ('East Bir Moghrein', '东比尔莫格兰'),
+    ('MR_ADM1_MRT-2783', 'remainder'): ('Fort Trinquet', '特兰凯堡'),
+    ('DZA-2150', 'SOUTHWEST_TINDOUF'): ('Tindouf', '廷杜夫'),
+    ('DZA-2150', 'TINDOUF'): ('Northeast Tindouf', '东北廷杜夫'),
+    ('DZA-2150', 'WEST_TINDOUF'): ('West Tindouf', '西廷杜夫'),
+    ('DZA-2150', 'remainder'): ('East Tindouf', '东廷杜夫'),
+    ('IRQ-3223', 'remainder'): ('Al Hajara', '哈贾拉'),
+    ('IRN-3237', 'MAKU'): ('Maku', '马库'),
+    ('SE332', 'LANNAVAARA'): ('Lannavaara', '兰纳瓦拉'),
+    ('ARE-349', 'REMAH'): ('Remah', '里马'),
     ('LV005', 'BALVI'): ('Viļaka', '维利亚卡'),
     ('RS123', 'SYRMIA'): ('Titel', '蒂特尔'),
     ('RS123', 'KULA'): ('Bač', '巴奇'),
@@ -122,10 +176,124 @@ NAME_FIXES = {
     ('SK_ADM2_56367889B15407569919112', 'SURANY'): ('Tekovské Lužany', '泰科夫斯凯卢扎尼'),
     ('HU323', 'CIGAND'): ('Kemecse', '凯梅切'),
     ('SK_ADM2_56367889B4918056975771', 'GALANTA'): ('Selice', '塞利采'),
+    ('TR632', 'GOKSUN'): ('Goksun', '格克孙'),
+    ('IRN-3237', 'SHOWT'): ('Chaldoran', '查尔迪兰'),
+    ('IRN-3237', 'SOUTH_TIBRIZ'): ('North Shahin Dezh', '沙欣代日北部'),
+    ('IRN-3237', 'WESTERN_NANAS'): ('Silvana', '西尔瓦纳'),
+    ('IRN-3238', 'NORTH_MARAND'): ('Kaleybar', '卡莱巴尔'),
+    ('JOR-853', 'EAST_AL_JAFR'): ('West Al-Jafr', '西贾弗尔'),
+    ('JOR-850', 'RUSSEIFA'): ('Safawi', '萨法维'),
+    ('JOR-850', 'remainder'): ('Ruwaished', '鲁韦希德'),
+    ('JOR-850', 'RWASHIED'): ('East Ruwaished', '鲁韦希德东部'),
+    ('SAU-862', 'remainder'): ('Sakakah', '塞卡凯'),
+    ('LBY-2967', 'INNER_SABHA'): ('Idri', '伊德里'),
+    ('LBY-2969', 'SABHA'): ('Zuwaylah', '祖韦拉'),
+    ('LBY-2969', 'remainder'): ('Waw an Namus', '瓦乌纳穆斯'),
+    ('LBY-2969', 'INNER_LIBYAN_SAHARA'): ('Tmassah', '泰迈萨'),
+    ('LBY-2967', 'EAST_ARBARI'): ('East Awbari', '东奥巴里'),
+    ('DZA-2188', 'SOUTH_IN_DAMENAS'): ('South In Amenas', '南因阿迈纳斯'),
+    ('DZA-2188', 'SOUTH_AIN_SALAH'): ('Bordj Omar Driss', '博尔季奥马尔德里斯'),
+    ('LBY-2882', 'NALUT'): ('Nalut', '纳卢特'),
+    ('MR_ADM1_MRT-2783', 'AIN_BEN_TILI'): ('East Ain Ben Tili', '艾因本提利东部'),
+    ('MR_ADM1_MRT-2783', 'FDERIK'): ('East Fderik', '弗德里克东部'),
+    ('MR_ADM1_MRT-2783', 'CENTRAL_CHEGGAA'): ('Central Chegga', '舍加中部'),
+    ('MAR-3457__SPLIT_REST', 'ABTEH'): ('Tan-Tan', '坦坦'),
+    ('MAR-3457__SPLIT_REST', 'EL_OUATIA'): ('Guelmim', '盖勒敏'),
+    ('DZA-2148', 'TINDOUF'): ('Northeast Tindouf', '廷杜夫东北部'),
+    ('IRQ-3223', 'AL_SALMAN'): ('Al Busayyah', '布赛耶'),
+    ('IRQ-3223', 'BATHA'): ('Al Salman', '萨勒曼'),
+    ('IRQ-3223', 'DHI_QAR'): ('North Ar Rumaythah', '鲁迈萨北部'),
+    ('IRQ-3223', 'NASRIYAH'): ('Samawah', '萨马沃'),
+    ('IRQ-3222', 'BASRA'): ('Basra', '巴士拉'),
+    ('IRQ-3222', 'remainder'): ('West Al-Zubair', '祖拜尔西部'),
+    ('IRQ-3222', 'CHIBAYISH'): ('Hammar', '哈马尔'),
+    ('SAU-861', 'EAST_RAFHA'): ('East Rafha', '东拉夫哈'),
+    ('FI1D7', 'LAPPI'): ('Savukoski', '萨武科斯基'),
+    ('FI1D7', 'LUOSTO'): ('Salla', '萨拉'),
+    ('FI1D7', 'KURSU'): ('Hautajärvi', '豪塔耶尔维'),
+    ('FI1D7', 'NORTH_KEMPELE'): ('Ranua', '拉努阿'),
+    ('FI1D7', 'NORTH_VAALA'): ('Posio', '波西奥'),
+    ('NO074', 'NORJA'): ('Kautokeino', '考托凯诺'),
+    ('SE332', 'VASTERBOTTEN'): ('Jokkmokk', '约克莫克'),
+    ('BA_ADM1_54001226B66267900922909', 'BUGOJNO'): ('South Doboj', '南多博伊'),
+    ('BA_ADM1_54001226B66267900922909', 'MOSTAR'): ('Sipovo', '希波沃'),
+    ('BA_ADM1_54001226B66267900922909', 'SRPSKA'): ('Srebrenica', '斯雷布雷尼察'),
+    ('BA_ADM1_54001226B66267900922909', 'NORTH_SOKOLAC'): ('Lopare', '洛帕雷'),
+    ('BA_ADM1_54001226B66267900922909', 'ILIDZA'): ('Kalinovik', '卡利诺维克'),
+    ('BA_ADM1_54001226B66267900922909', 'RIJEKA'): ('Rudo', '鲁多'),
+    ('BA_ADM1_54001226B66267900922909', 'BRCKO'): ('Brcko', '布尔奇科'),
+    ('BA_ADM1_54001226B17629474923252', 'BOSNIA'): ('Jajce', '亚伊采'),
+    ('BA_ADM1_54001226B17629474923252', 'HERZEGOVINA'): ('Ljubuski', '柳布什基'),
+    ('BA_ADM1_54001226B17629474923252', 'SOKOLAC'): ('Trnovo', '特尔诺沃'),
+    ('RS211', 'ZLATIBOR'): ('Arilje', '阿里列'),
+    ('LBY-2987', 'JARABUB'): ('Southwest Jaghbub', '西南杰格布卜'),
+    ('LBY-2987', 'CENTRAL_JARABUB'): ('West Jaghbub', '西杰格布卜'),
+    ('LBY-2987', 'NORTH_JARABUB'): ('Northwest Jaghbub', '西北杰格布卜'),
+    ('LBY-2987', 'NORTH_JAGHBUB'): ('Jaghbub', '杰格布卜'),
+    ('LBY-2987', 'CENTRAL_JAGHBUB'): ('South Jaghbub', '南杰格布卜'),
+    ('LBY-2987', 'AL_JAGHBUB'): ('Far South Jaghbub', '杰格布卜远南部'),
+    ('LBY-2987', 'remainder'): ('Bir Hakeim', '比尔哈凯姆'),
+    ('EGY-1540', 'SIDI_BARRANI'): ('Mersa Matruh', '马特鲁港'),
+    ('LBY-2965', 'WEST_AL_JAWF'): ('Southeast Kufrah', '东南库夫拉'),
+    ('LBY-2965', 'EAST_AL_JAWF'): ('Southwest Al-Jawf', '焦夫西南'),
+    ('LBY-2983', 'EAST_AJDABIYA'): ('Central South Ajdabiya', '中南艾季达比亚'),
+    ('LBY-2983', 'RAS_LANUF'): ('El Agheila', '阿盖拉'),
+    ('SYR-141', 'DEIR_EZ_ZOR'): ('Markadah', '马尔卡达'),
+    ('SYR-136', 'MARKADAH'): ('East Madan', '马丹东部'),
+    ('SYR-142', 'MARKADAH'): ('Al-Tibni', '提卜尼'),
+    ('SYR-136', 'SOUTH_MANBIJ'): ('Tabqa', '塔卜卡'),
+    ('SYR-136', 'AL_TABQAH'): ('South Tabqa', '塔卜卡南部'),
+    ('SYR-136', 'EAST_MANBIJ'): ('North Raqqa', '北拉卡'),
+    ('SYR-137', 'MANBIJ'): ('Maskanah', '马斯卡纳'),
+    ('SYR-137', 'AL_SAFIRAH'): ('Khanasir', '哈纳西尔'),
+    ('SYR-142', 'SOUTH_AL_MAYADIN'): ('Abu Kamal', '阿布凯马勒'),
 }
 
 # Exclude state footprints that spill across a border into the neighbouring parent.
 OUTSIDE_PARENT = {
+    "western_desert": {
+        "LBY-2987": {3434, 3882, 6364, 6931, 6932, 6953, 6954},
+        "EGY-1540": {860, 6052, 6066, 6067},
+        "LBY-2983": {856, 6052, 6054},
+        "LBY-2965": {6052},
+    },
+    "fezzan": {
+        "LBY-2882": {6379, 8126, 10189, 10192},
+        "DZA-2188": {859, 6045, 10189},
+    },
+    "spanish_sahara_frontier": {
+        "MR_ADM1_MRT-2783": {1844, 2144},
+        "DZA-2150": {1844, 2216, 5337, 5338, 6754, 6755, 6756, 6758, 6905, 6950, 7669, 7670, 7898, 8135, 9213},
+        "MAR-3457__SPLIT_REST": {6901, 6904, 8140},
+        "DZA-2148": {6910, 7655},
+    },
+    "syrian_jazira": {
+        "SYR-141": {7134},
+        "SYR-137": {3571, 5705},
+        "SYR-136": {3618, 5705, 7134},
+        "TRC21": {5693, 5694, 6989},
+    },
+    "maan_aqaba_hejaz": {
+        "JOR-853": {959, 1175, 3351, 3352, 3369, 6961},
+        "JOR-850": {959, 6961},
+        "SAU-862": {1176, 3353, 5884},
+    },
+    "iraq_neutral_zones": {
+        "IRQ-3223": {1105, 2212, 3358, 3359, 5621, 5887, 8078, 8079},
+    },
+    "iranian_azerbaijan": {
+        "IRN-3238": {4986, 5899},
+        "TRB21": {2179, 4012, 4014, 4986, 5897, 6995, 6996},
+    },
+    "bosnia_drina": {
+        "RS211": {2089, 2263, 4041, 5490, 7344, 7353, 7621},
+    },
+    "lapland_arctic": {
+        "FI1D7": {940, 1239, 2778, 2927, 2944, 4909, 8026, 8027},
+        "NO074": {1101, 1244, 2778, 2780, 2928},
+        "SE332": {1102, 1244, 2944, 4903},
+    },
+    "cilicia": {"TR621": {345, 3299, 3521}, "TR622": {344, 11857}},
     "southern_bukovina": {"RO215": {5537, 5538, 5539}},  # Neamț seats supply registration controls only.
     "burgenland_sopron": {
         "AT113": {7639, 7950},
@@ -172,6 +340,77 @@ OUTSIDE_PARENT = {
 }
 
 TRANSLATIONS = {
+    350: "锡韦雷克", 675: "哈贾拉", 856: "库夫拉", 857: "杰格布卜",
+    858: "盖特龙", 859: "奥巴里", 860: "瓦特", 861: "萨拉",
+    1079: "贝伊蒂谢巴普", 1104: "伊拉克中立区", 1105: "沙特中立区", 1143: "哈塞克",
+    1175: "卡夫", 1176: "图拜克", 1177: "哈克勒", 1239: "挪威",
+    1243: "南瓦朗厄尔", 1379: "祖拜尔", 1633: "阿古尼特", 1843: "特兰凯堡",
+    1844: "比尔莱赫卢", 2089: "巴斯塔西", 2152: "米古瓦", 2153: "瓦特",
+    2175: "德尔瓦尔", 2176: "布戈伊诺", 2178: "斯泰彭", 2179: "马库",
+    2212: "穆萨纳", 2213: "贾弗尔", 2216: "朱比角内陆", 2263: "塞族地区",
+    2267: "伊利扎", 2346: "赫利格斯科根", 2777: "斯韦特雷", 2778: "兰纳瓦拉",
+    2779: "沃措", 2780: "波卡", 2781: "比耶克维克", 2787: "诺维格勒",
+    2788: "波多维", 2927: "哈帕兰达", 2928: "里特瑟姆", 2929: "梅尔克内斯",
+    2930: "泰尔纳比", 2944: "迪维河谷", 2945: "瓦格", 2946: "瓦尔德",
+    2947: "库内斯", 3299: "阿夫欣", 3348: "阿卢瓦", 3350: "西鲁特拜",
+    3351: "南卡夫", 3352: "东哈克勒", 3353: "西图拜克", 3356: "祖尔",
+    3358: "劳达特哈巴斯", 3359: "西穆萨纳", 3360: "舒巴克", 3369: "哈拉特阿马尔",
+    3392: "里马", 3434: "西迪拜拉尼", 3521: "格克孙", 3522: "马克纳",
+    3568: "南奥贝迪", 3570: "迈亚丁", 3571: "苏鲁奇", 3573: "泰基尔",
+    3618: "苏莱曼沙阿陵墓", 3645: "布罗达雷沃", 3646: "普里耶波列", 3651: "莫克拉戈拉",
+    3652: "洛兹尼察", 3848: "库萨莫", 4012: "杜斯坦", 4014: "拉维扬",
+    4041: "梅斯特雷瓦茨", 4042: "扎瓦伊特", 4903: "阿约斯", 4904: "洛韦",
+    4905: "纳尔考斯", 4906: "卢奥斯托", 4907: "库尔苏", 4909: "帕亚拉",
+    4911: "皮特奥", 4912: "布雷奥", 4987: "马兰德", 4994: "沙菲",
+    5151: "斯托拉茨", 5152: "莫斯科村", 5153: "索科拉茨", 5154: "察津",
+    5155: "泽贝", 5337: "艾因本提利", 5368: "扎洛姆", 5490: "梅久雷切",
+    5613: "莱赫韦尔", 5614: "苏奈纳", 5615: "瓦甘", 5616: "苏韦汉",
+    5621: "沙亚", 5664: "瓦西", 5665: "比尔伊本希尔马斯", 5668: "贾弗尔",
+    5670: "舒巴克", 5673: "哈拉巴特堡", 5674: "乌姆吉马勒", 5677: "加伊姆",
+    5690: "鲁萨法", 5691: "马丹", 5692: "泰勒伊尔凡", 5693: "泰勒泰米尔",
+    5694: "穆纳吉尔", 5695: "萨菲拉", 5696: "巴卜", 5697: "阿纳丹",
+    5698: "达比克", 5701: "马拉什", 5702: "埃基诺聚", 5703: "沙特尔许于克",
+    5704: "凯奇布尔朱", 5705: "乌尔法", 5707: "巴什卡莱", 5708: "盖瓦什",
+    5795: "阿萨卜", 5882: "泰马", 5884: "穆达瓦拉", 5887: "盖苏马",
+    5888: "萨勒曼", 5891: "伊本达拉希姆堡", 5897: "舒特", 5898: "奥什纳维耶",
+    5899: "纳纳斯", 6015: "尼埃尔夫", 6046: "东盖特龙", 6049: "东萨拉",
+    6051: "东库夫拉", 6053: "杰格布卜中部", 6054: "塔济尔布", 6055: "贾哈拉德",
+    6056: "西塔济尔布", 6059: "东瓦特", 6063: "梅基利", 6064: "阿德姆",
+    6065: "北杰格布卜", 6364: "北梅基利", 6366: "卡拉", 6380: "沃丹",
+    6391: "萨拉中部", 6649: "北巴特哈", 6756: "南艾因本提利", 6757: "东比尔莫格兰",
+    6758: "北图林", 6766: "姆西德", 6767: "阿卜泰赫", 6769: "乌姆阿塞勒",
+    6770: "东乌姆阿塞勒", 6790: "图林中部", 6802: "北图拜克", 6803: "东贾弗尔",
+    6804: "贾弗尔中部", 6881: "西图林", 6898: "伊姆安盖勒", 6905: "扎格",
+    6906: "南姆西德", 6909: "杰尼安布雷兹格", 6910: "菲吉格", 6919: "瓦津",
+    6921: "提吉", 6923: "塔巴盖", 6924: "西纳温", 6925: "东北艾季达比耶",
+    6926: "西梅基利", 6927: "扎勒坦", 6928: "贾卢", 6929: "东贾卢",
+    6930: "南贾哈拉德", 6931: "北库夫拉", 6932: "东北库夫拉", 6933: "东杰格布卜",
+    6934: "北卡拉", 6950: "谢加中部", 6954: "塞卢姆", 6955: "南塞卢姆",
+    6961: "盖利拜", 6963: "鲁特拜外围", 6964: "鲁特拜中部", 6969: "巴特哈",
+    6970: "杰拜希", 6983: "哈金", 6984: "辛贾尔", 6987: "盖尔泽罗",
+    6989: "科巴尼", 6990: "阿布凯马勒", 6991: "塔卜卡", 6992: "南马丹",
+    6993: "马尔卡达", 6994: "阿布哈曼", 6995: "阿瓦吉克", 6996: "卡普特",
+    6997: "萨汉德", 7040: "明吉万", 7118: "北马兰德", 7119: "南马兰德",
+    7121: "迪亚丁", 7134: "维兰谢希尔", 7143: "埃尔比斯坦", 7184: "阿纳穆尔",
+    7255: "萨拉内陆", 7257: "焦什", 7266: "拉斯拉努夫", 7345: "戈兰斯科",
+    7351: "北杜布尼察", 7353: "北斯泰彭", 7354: "北索科拉茨", 7356: "北布戈伊诺",
+    7358: "西德尔瓦尔", 7364: "利夫诺", 7621: "佩蒂内", 7655: "南菲吉格",
+    7665: "图林内陆", 7668: "东图林", 7897: "瓦提亚", 7898: "阿萨",
+    8026: "塔纳", 8027: "奥尔德达伦", 8076: "西里马", 8081: "泰马外围",
+    8082: "南盖利拜", 8126: "东奥巴里", 8133: "图林中西部", 8135: "艾因本提利中部",
+    8571: "南盖塔拉", 8572: "盖塔拉运河拟址", 8573: "东盖塔拉", 9025: "纳西里耶",
+    9030: "鲁赛法", 9031: "阿兹拉克", 9032: "鲁韦希德", 9213: "塔塔",
+    9241: "杜巴", 9242: "舒瓦克", 9263: "北伊镇", 9264: "北肯佩莱",
+    9265: "北瓦拉", 9784: "博格阿拉伯", 9847: "东德尔纳", 9850: "南阿纳丹",
+    9851: "南巴卜", 9865: "东索兰", 9871: "西纳纳斯", 9940: "南萨拉",
+    10176: "梅基利中西部", 10177: "梅基利中部", 10178: "贾卢中部", 10179: "梅基利外围",
+    10183: "盖特龙中部", 10185: "东北盖特龙", 10189: "奥巴里中部", 10192: "东奥巴里内陆",
+    10193: "北盖尔迈", 10194: "沃丹外围", 10196: "西富盖哈", 10197: "东因萨拉赫",
+    10234: "西图林内陆", 10237: "图林中西部外围", 10343: "南阿卢瓦", 10348: "南因萨拉赫",
+    10349: "南因阿迈纳斯", 10350: "东因阿迈纳斯", 10351: "因阿迈纳斯外围", 10504: "南阿布凯马勒",
+    10505: "南迈亚丁", 10588: "耶尼斯科斯基", 11042: "北斯托拉茨", 11854: "埃尔梅内克",
+    11855: "穆特", 11856: "博尔卡尔山", 11857: "阿拉达", 11858: "费凯",
+    11859: "卡迪尔利", 11860: "杰伊汉",
     76: "塞克勒地区", 83: "克里沙纳", 736: "普拉", 779: "奥伊彭-马尔梅迪",
     802: "内乌姆", 806: "伊德里亚", 821: "北伊庇鲁斯", 828: "乔尔卢",
     1009: "格但斯克波美拉尼亚", 1111: "弗尔克拉马克特", 1201: "哈尔基季基", 1218: "奥拉迪亚县",
@@ -318,7 +557,7 @@ def city_index(features):
     return index
 
 
-def registration(shapes, target, places, cities, grid, step, state_anchors=()):
+def registration(shapes, target, places, cities, grid, step, state_anchors=(), translation_only=False):
     src, dst = [], []
     extent = shapely.box(*shapely.total_bounds(list(shapes.values())))
     for p in [*places, *state_anchors]:
@@ -335,7 +574,11 @@ def registration(shapes, target, places, cities, grid, step, state_anchors=()):
             src.append([*xy, 1])
             dst.append([lon, lat])
     matrix = None
-    if len(src) >= 3:
+    if translation_only and src:
+        offset = (np.array(dst) - np.array(src)[:, :2]).mean(axis=0)
+        matrix = [1, 0, 0, 1, *offset]
+        method = "city/state-anchor translation"
+    elif len(src) >= 3:
         fit, _, rank, _ = np.linalg.lstsq(src, dst, rcond=None)
         if rank == 3 and (not state_anchors or np.linalg.det(fit[:2]) > 0):
             matrix = [*fit[:2, 0], *fit[:2, 1], *fit[2]]
@@ -444,6 +687,15 @@ STATE_NAMES = {
 }
 
 CITY_ZH = {
+    "Batabo": "巴塔布", "Jarabulus": "杰拉布卢斯", "Subaykhan": "苏拜汉", "Birecik": "比雷吉克",
+    "Ar Rumaythah": "鲁迈萨", "Al Basrah al Qadimah": "巴士拉旧城", "Al Qurnah": "古尔奈",
+    "Bukan": "布坎", "Poldasht": "波勒达什特", "Salmas": "萨勒马斯", "Oshnaviyeh": "奥什纳维耶",
+    "Shahin Dezh": "沙欣代日", "Takab": "塔卡布", "Miandoab": "米扬杜阿卜", "Sarab": "萨拉卜",
+    "Mianeh": "米亚内", "Musaffah": "穆萨法", "Trebinje": "特雷比涅", "Doboj": "多博伊",
+    "Gorazde": "戈拉日代", "Bosanska Krupa": "波斯尼亚克鲁帕", "Bihac": "比哈奇",
+    "Gradacac": "格拉达查茨", "Uzice": "乌日策", "Tornio": "托尔尼奥",
+    "Yesilova": "耶希洛瓦", "Erdemli": "埃尔代姆利", "Goeksun": "格克孙",
+    "Caglayancerit": "恰拉扬杰里特", "Pazarcik": "帕扎尔哲克",
     "Cividale del Friuli": "弗留利地区奇维达莱", "Manzano": "曼扎诺",
     "San Giorgio di Nogaro": "圣乔尔焦迪诺加罗", "Oberwart": "上瓦特",
     "Güssing": "居辛", "Loipersbach im Burgenland": "布尔根兰州洛伊珀斯巴赫",
@@ -604,7 +856,8 @@ def main(argv=None):
                    for sid, name in controls.items() if sid in states]
         local_cities = cities | {code(name): [xy] for name, xy in seats.items()} if seats else cities
         matrix, report = registration(states, shapely.union_all(list(parents.values())),
-                                      places, local_cities, grid, step, anchors)
+                                      places, local_cities, grid, step, anchors,
+                                      translation_only=region["region_id"] in TRANSLATION_ONLY)
         pixel_counts = {sid: state_rows[sid]["pixelCount"] for sid in states} if controls else None
         states = {sid: affine_transform(g, matrix) for sid, g in states.items()}
         count, skipped, merge_counts = 0, [], []

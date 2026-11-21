@@ -4244,7 +4244,7 @@
       }
     },
     {
-      "id": 21427,
+      "id": 21390,
       "type": "Feature",
       "properties": {
         "id": "AT211__SPLIT_VOLKERMARKT",
@@ -4327,7 +4327,7 @@
       }
     },
     {
-      "id": 21428,
+      "id": 21391,
       "type": "Feature",
       "properties": {
         "id": "AT211__SPLIT_EBRIACH",
@@ -4402,7 +4402,7 @@
       }
     },
     {
-      "id": 21429,
+      "id": 21392,
       "type": "Feature",
       "properties": {
         "id": "AT211__SPLIT_KLAGENFURT_LAND",
@@ -4529,7 +4529,7 @@
       }
     },
     {
-      "id": 21430,
+      "id": 21393,
       "type": "Feature",
       "properties": {
         "id": "AT212__SPLIT_EBRIACH",
@@ -4646,7 +4646,7 @@
       }
     },
     {
-      "id": 21431,
+      "id": 21394,
       "type": "Feature",
       "properties": {
         "id": "AT212__SPLIT_GALLIZIEN",
@@ -4745,7 +4745,7 @@
       }
     },
     {
-      "id": 21432,
+      "id": 21395,
       "type": "Feature",
       "properties": {
         "id": "AT212__SPLIT_RUCKERSDORF",
@@ -4804,7 +4804,7 @@
       }
     },
     {
-      "id": 21433,
+      "id": 21396,
       "type": "Feature",
       "properties": {
         "id": "AT212__SPLIT_GRAFENSTEIN",
@@ -4887,7 +4887,7 @@
       }
     },
     {
-      "id": 21434,
+      "id": 21397,
       "type": "Feature",
       "properties": {
         "id": "AT212__SPLIT_EBENTHAL",
@@ -4958,7 +4958,7 @@
       }
     },
     {
-      "id": 21435,
+      "id": 21398,
       "type": "Feature",
       "properties": {
         "id": "AT212__SPLIT_CARINTHIA",
@@ -5085,7 +5085,7 @@
       }
     },
     {
-      "id": 21436,
+      "id": 21399,
       "type": "Feature",
       "properties": {
         "id": "AT213__SPLIT_WOLFSBERG",
@@ -5202,7 +5202,7 @@
       }
     },
     {
-      "id": 21437,
+      "id": 21400,
       "type": "Feature",
       "properties": {
         "id": "AT213__SPLIT_RUCKERSDORF",
@@ -5265,7 +5265,7 @@
       }
     },
     {
-      "id": 21438,
+      "id": 21401,
       "type": "Feature",
       "properties": {
         "id": "AT213__SPLIT_TAINACH",
@@ -5336,7 +5336,7 @@
       }
     },
     {
-      "id": 21439,
+      "id": 21402,
       "type": "Feature",
       "properties": {
         "id": "AT213__SPLIT_VOLKERMARKT",
@@ -5443,7 +5443,7 @@
       }
     },
     {
-      "id": 21637,
+      "id": 21600,
       "type": "Feature",
       "properties": {
         "id": "AT113__SPLIT_BURGENLAND",
@@ -5530,7 +5530,7 @@
       }
     },
     {
-      "id": 21638,
+      "id": 21601,
       "type": "Feature",
       "properties": {
         "id": "AT113__SPLIT_SZOMBATHELY",
@@ -5645,7 +5645,7 @@
       }
     },
     {
-      "id": 21639,
+      "id": 21602,
       "type": "Feature",
       "properties": {
         "id": "AT112__SPLIT_SOPRON",
@@ -5704,7 +5704,7 @@
       }
     },
     {
-      "id": 21640,
+      "id": 21603,
       "type": "Feature",
       "properties": {
         "id": "AT112__SPLIT_NORTH_BURGENLAND",

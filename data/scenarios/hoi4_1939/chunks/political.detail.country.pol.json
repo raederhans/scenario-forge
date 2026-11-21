@@ -55338,7 +55338,7 @@
       }
     },
     {
-      "id": 20672,
+      "id": 20636,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
@@ -55449,7 +55449,7 @@
       }
     },
     {
-      "id": 20723,
+      "id": 20686,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_REST",
@@ -57172,7 +57172,7 @@
       }
     },
     {
-      "id": 20730,
+      "id": 20693,
       "type": "Feature",
       "properties": {
         "id": "LT011__SPLIT_WILNO",
@@ -63805,7 +63805,7 @@
       }
     },
     {
-      "id": 20736,
+      "id": 20699,
       "type": "Feature",
       "properties": {
         "id": "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE",
@@ -64634,7 +64634,7 @@
       }
     },
     {
-      "id": 20742,
+      "id": 20705,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_1465__SPLIT_PRAGA",
@@ -65289,7 +65289,7 @@
       }
     },
     {
-      "id": 20743,
+      "id": 20706,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_1465__SPLIT_LEFT",
@@ -66138,7 +66138,7 @@
       }
     },
     {
-      "id": 20784,
+      "id": 20747,
       "type": "Feature",
       "properties": {
         "id": "LT021__SPLIT_POLISH",
@@ -67980,7 +67980,7 @@
       }
     },
     {
-      "id": 20786,
+      "id": 20749,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_2807__SPLIT_LUBAWA",
@@ -68213,7 +68213,7 @@
       }
     },
     {
-      "id": 20788,
+      "id": 20751,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_2405__SPLIT_POLISH",
@@ -68572,7 +68572,7 @@
       }
     },
     {
-      "id": 20790,
+      "id": 20753,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_2478__SPLIT_POLISH",
@@ -68897,7 +68897,7 @@
       }
     },
     {
-      "id": 20793,
+      "id": 20756,
       "type": "Feature",
       "properties": {
         "id": "UA_RAY_74538382B20694939957091__SPLIT_GALICIA",
@@ -69844,7 +69844,7 @@
       }
     },
     {
-      "id": 20795,
+      "id": 20758,
       "type": "Feature",
       "properties": {
         "id": "UA_RAY_74538382B36952464312213__SPLIT_GALICIA",
@@ -70931,7 +70931,7 @@
       }
     },
     {
-      "id": 20820,
+      "id": 20783,
       "type": "Feature",
       "properties": {
         "id": "LT029__SPLIT_POLISH",
@@ -71196,7 +71196,7 @@
       }
     },
     {
-      "id": 20836,
+      "id": 20799,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA",
@@ -72863,7 +72863,7 @@
       }
     },
     {
-      "id": 20838,
+      "id": 20801,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B83569782265262__SPLIT_ORAVA",
@@ -74018,7 +74018,7 @@
       }
     },
     {
-      "id": 21471,
+      "id": 21434,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_KARTUZY",
@@ -74243,7 +74243,7 @@
       }
     },
     {
-      "id": 21472,
+      "id": 21435,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_GNIEW",
@@ -74352,7 +74352,7 @@
       }
     },
     {
-      "id": 21473,
+      "id": 21436,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SUSZ",
@@ -74433,7 +74433,7 @@
       }
     },
     {
-      "id": 21474,
+      "id": 21437,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SOUTH_KARTUZY",
@@ -74608,7 +74608,7 @@
       }
     },
     {
-      "id": 21475,
+      "id": 21438,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_NORTH_KUYAVIA",
@@ -74811,7 +74811,7 @@
       }
     },
     {
-      "id": 21476,
+      "id": 21439,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_POMORZE_GDANSKIE",
@@ -74984,7 +74984,7 @@
       }
     },
     {
-      "id": 21477,
+      "id": 21440,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c93ffd9ad4b7__SPLIT_KISIELICE",
@@ -75159,7 +75159,7 @@
       }
     },
     {
-      "id": 21478,
+      "id": 21441,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c93ffd9ad4b7__SPLIT_NORTH_KUYAVIA",
@@ -75456,7 +75456,7 @@
       }
     },
     {
-      "id": 21479,
+      "id": 21442,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c93ffd9ad4b7__SPLIT_GRUZIADZ",
@@ -75845,7 +75845,7 @@
       }
     },
     {
-      "id": 21484,
+      "id": 21447,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_OSZMIANA",
@@ -76214,7 +76214,7 @@
       }
     },
     {
-      "id": 21485,
+      "id": 21448,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_ZELWA",
@@ -76305,7 +76305,7 @@
       }
     },
     {
-      "id": 21486,
+      "id": 21449,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_SLONIM",
@@ -76504,7 +76504,7 @@
       }
     },
     {
-      "id": 21487,
+      "id": 21450,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_VAVERKA",
@@ -76745,7 +76745,7 @@
       }
     },
     {
-      "id": 21488,
+      "id": 21451,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_BYAROZAWKA",
@@ -76880,7 +76880,7 @@
       }
     },
     {
-      "id": 21489,
+      "id": 21452,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_BOROVIKI",
@@ -76975,7 +76975,7 @@
       }
     },
     {
-      "id": 21490,
+      "id": 21453,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_MANCHIKI",
@@ -77078,7 +77078,7 @@
       }
     },
     {
-      "id": 21491,
+      "id": 21454,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_PIESKI",
@@ -77181,7 +77181,7 @@
       }
     },
     {
-      "id": 21492,
+      "id": 21455,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_KURILOVICHI",
@@ -77302,7 +77302,7 @@
       }
     },
     {
-      "id": 21493,
+      "id": 21456,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_GONCHARY",
@@ -77501,7 +77501,7 @@
       }
     },
     {
-      "id": 21494,
+      "id": 21457,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_TSATSKI",
@@ -77588,7 +77588,7 @@
       }
     },
     {
-      "id": 21495,
+      "id": 21458,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_PORASLI",
@@ -77701,7 +77701,7 @@
       }
     },
     {
-      "id": 21496,
+      "id": 21459,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_NORTH_KAMENETS",
@@ -77820,7 +77820,7 @@
       }
     },
     {
-      "id": 21497,
+      "id": 21460,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_WEST_PIESKI",
@@ -77981,7 +77981,7 @@
       }
     },
     {
-      "id": 21498,
+      "id": 21461,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_CENTRAL_INDURA",
@@ -78080,7 +78080,7 @@
       }
     },
     {
-      "id": 21499,
+      "id": 21462,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_SOUTH_INDURA",
@@ -78289,7 +78289,7 @@
       }
     },
     {
-      "id": 21500,
+      "id": 21463,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_WEST_BOROVIKI",
@@ -78440,7 +78440,7 @@
       }
     },
     {
-      "id": 21501,
+      "id": 21464,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_GRODNO__SPLIT_BAKSHTY",
@@ -78789,7 +78789,7 @@
       }
     },
     {
-      "id": 21502,
+      "id": 21465,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B13547290723272__SPLIT_GRODNO",
@@ -78896,7 +78896,7 @@
       }
     },
     {
-      "id": 21503,
+      "id": 21466,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B13547290723272__SPLIT_SZTABIN",
@@ -78967,7 +78967,7 @@
       }
     },
     {
-      "id": 21504,
+      "id": 21467,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B13547290723272__SPLIT_NORTH_MONKI",
@@ -79030,7 +79030,7 @@
       }
     },
     {
-      "id": 21505,
+      "id": 21468,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B13547290723272__SPLIT_SOUTH_KOROBCHITSY",
@@ -79121,7 +79121,7 @@
       }
     },
     {
-      "id": 21506,
+      "id": 21469,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B13547290723272__SPLIT_CENTRAL_KOROBCHITSY",
@@ -79196,7 +79196,7 @@
       }
     },
     {
-      "id": 21507,
+      "id": 21470,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B13547290723272__SPLIT_INDURA",
@@ -79347,7 +79347,7 @@
       }
     },
     {
-      "id": 21508,
+      "id": 21471,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B18933715013959__SPLIT_STAKAI",
@@ -79414,7 +79414,7 @@
       }
     },
     {
-      "id": 21509,
+      "id": 21472,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B18933715013959__SPLIT_BYENYAKONI",
@@ -79481,7 +79481,7 @@
       }
     },
     {
-      "id": 21510,
+      "id": 21473,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B18933715013959__SPLIT_HALSHANY",
@@ -79584,7 +79584,7 @@
       }
     },
     {
-      "id": 21511,
+      "id": 21474,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B66420794580046__SPLIT_PIESKI",
@@ -79705,7 +79705,7 @@
       }
     },
     {
-      "id": 21512,
+      "id": 21475,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B66420794580046__SPLIT_MASTY",
@@ -79830,7 +79830,7 @@
       }
     },
     {
-      "id": 21513,
+      "id": 21476,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B66420794580046__SPLIT_EAST_ASTRYNA",
@@ -79975,7 +79975,7 @@
       }
     },
     {
-      "id": 21514,
+      "id": 21477,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_2001__SPLIT_MONKI",
@@ -80186,7 +80186,7 @@
       }
     },
     {
-      "id": 21515,
+      "id": 21478,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_2001__SPLIT_SZELIGI",
@@ -80435,7 +80435,7 @@
       }
     },
     {
-      "id": 21698,
+      "id": 21661,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_POLESIE",
@@ -80830,7 +80830,7 @@
       }
     },
     {
-      "id": 21699,
+      "id": 21662,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_NOWOGRODEK",
@@ -81055,7 +81055,7 @@
       }
     },
     {
-      "id": 21700,
+      "id": 21663,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_NORTH_PINSK",
@@ -81402,7 +81402,7 @@
       }
     },
     {
-      "id": 21701,
+      "id": 21664,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_LUSINO",
@@ -81457,7 +81457,7 @@
       }
     },
     {
-      "id": 21702,
+      "id": 21665,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_MALKOVICHI",
@@ -81520,7 +81520,7 @@
       }
     },
     {
-      "id": 21703,
+      "id": 21666,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_KHOTYNICHI",
@@ -81615,7 +81615,7 @@
       }
     },
     {
-      "id": 21704,
+      "id": 21667,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_VYGONOSCHI",
@@ -81726,7 +81726,7 @@
       }
     },
     {
-      "id": 21705,
+      "id": 21668,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_KAMENETS",
@@ -81849,7 +81849,7 @@
       }
     },
     {
-      "id": 21706,
+      "id": 21669,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_OGORODNIKI",
@@ -81954,7 +81954,7 @@
       }
     },
     {
-      "id": 21707,
+      "id": 21670,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_DOBROMYSL",
@@ -82125,7 +82125,7 @@
       }
     },
     {
-      "id": 21708,
+      "id": 21671,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_MEDNO",
@@ -82266,7 +82266,7 @@
       }
     },
     {
-      "id": 21709,
+      "id": 21672,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_DYMNA",
@@ -82363,7 +82363,7 @@
       }
     },
     {
-      "id": 21710,
+      "id": 21673,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_DUBICHNO",
@@ -82470,7 +82470,7 @@
       }
     },
     {
-      "id": 21711,
+      "id": 21674,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_CHERNYANY",
@@ -82567,7 +82567,7 @@
       }
     },
     {
-      "id": 21712,
+      "id": 21675,
       "type": "Feature",
       "properties": {
         "id": "BY_INT_BREST__SPLIT_PINSK",
@@ -82880,7 +82880,7 @@
       }
     },
     {
-      "id": 21713,
+      "id": 21676,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B59963656038120__SPLIT_KAMENETS",
@@ -82943,7 +82943,7 @@
       }
     },
     {
-      "id": 21714,
+      "id": 21677,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B59963656038120__SPLIT_MUCHAVEC",
@@ -83038,7 +83038,7 @@
       }
     },
     {
-      "id": 21715,
+      "id": 21678,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B59963656038120__SPLIT_MEDNO",
@@ -83145,7 +83145,7 @@
       }
     },
     {
-      "id": 21716,
+      "id": 21679,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B59963656038120__SPLIT_DYMNA",
@@ -83216,7 +83216,7 @@
       }
     },
     {
-      "id": 21717,
+      "id": 21680,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B59963656038120__SPLIT_DUBICHNO",
@@ -83287,7 +83287,7 @@
       }
     },
     {
-      "id": 21718,
+      "id": 21681,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B59963656038120__SPLIT_NORTH_VOLCHIN",
@@ -83362,7 +83362,7 @@
       }
     },
     {
-      "id": 21719,
+      "id": 21682,
       "type": "Feature",
       "properties": {
         "id": "BY_RAY_67162791B59963656038120__SPLIT_OGORODNIKI",
@@ -83503,7 +83503,7 @@
       }
     },
     {
-      "id": 21720,
+      "id": 21683,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_BIALYSTOK",
@@ -83844,7 +83844,7 @@
       }
     },
     {
-      "id": 21721,
+      "id": 21684,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_EAST_BIALYSTOK",
@@ -83959,7 +83959,7 @@
       }
     },
     {
-      "id": 21722,
+      "id": 21685,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_PLATNICA",
@@ -84134,7 +84134,7 @@
       }
     },
     {
-      "id": 21723,
+      "id": 21686,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_NAGORKI",
@@ -84257,7 +84257,7 @@
       }
     },
     {
-      "id": 21724,
+      "id": 21687,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_WLODKI",
@@ -84340,7 +84340,7 @@
       }
     },
     {
-      "id": 21725,
+      "id": 21688,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_POPKI",
@@ -84667,7 +84667,7 @@
       }
     },
     {
-      "id": 21726,
+      "id": 21689,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_MSCIWUJE",
@@ -84730,7 +84730,7 @@
       }
     },
     {
-      "id": 21727,
+      "id": 21690,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_44c900e7cbdd__SPLIT_GONIADZ",
@@ -85141,7 +85141,7 @@
       }
     },
     {
-      "id": 21728,
+      "id": 21691,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c5cfb391c06f__SPLIT_LUBLIN",
@@ -85350,7 +85350,7 @@
       }
     },
     {
-      "id": 21729,
+      "id": 21692,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c5cfb391c06f__SPLIT_WEST_CHELM",
@@ -85511,7 +85511,7 @@
       }
     },
     {
-      "id": 21730,
+      "id": 21693,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c5cfb391c06f__SPLIT_JANOWKA",
@@ -85684,7 +85684,7 @@
       }
     },
     {
-      "id": 21731,
+      "id": 21694,
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c5cfb391c06f__SPLIT_LUKOW",
@@ -86187,7 +86187,7 @@
       }
     },
     {
-      "id": 21732,
+      "id": 21695,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_0601__SPLIT_WEST_CHELM",
@@ -86302,7 +86302,7 @@
       }
     },
     {
-      "id": 21733,
+      "id": 21696,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_0601__SPLIT_WLODAWA",
@@ -86459,7 +86459,7 @@
       }
     },
     {
-      "id": 21734,
+      "id": 21697,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_0601__SPLIT_KOROLOWKA",
@@ -86542,7 +86542,7 @@
       }
     },
     {
-      "id": 21735,
+      "id": 21698,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_0601__SPLIT_JANOWKA",
@@ -86797,7 +86797,7 @@
       }
     },
     {
-      "id": 21736,
+      "id": 21699,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_0601__SPLIT_EAST_OKUNINKA",
@@ -86984,7 +86984,7 @@
       }
     },
     {
-      "id": 21737,
+      "id": 21700,
       "type": "Feature",
       "properties": {
         "id": "PL_POW_0601__SPLIT_OKUNINKA",

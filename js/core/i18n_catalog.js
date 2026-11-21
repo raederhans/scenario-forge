@@ -6656,8 +6656,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "No facility details available yet."
   },
   "No file selected": {
-    "zh": "打开项目文件，或将文件拖到地图上。",
-    "en": "Open a project file or drop a project file onto the map."
+    "zh": "未选择文件",
+    "en": "No file selected"
   },
   "No frontline control split in current scenario.": {
     "zh": "当前情况下没有前线控制分裂。",

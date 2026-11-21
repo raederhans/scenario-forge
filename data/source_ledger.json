@@ -476,6 +476,7 @@
       "tools/build_hoi4_water_shape_splits.py",
       "data/scenario-rules/hoi4_hgo_hotspots.sources.geojson",
       "data/scenario-rules/hoi4_hgo_hotspots_2.sources.geojson",
+      "data/scenario-rules/hoi4_hgo_hotspots_3.sources.geojson",
       "data/scenario-rules/hoi4_water_shapes.sources.geojson"
     ],
     "rebuild_command": "python tools/import_country_palette.py --source-root \"historic geographic overhaul\" --palette-id hgo --display-name \"Historic Geographical Overhaul\" --source-variant hgo --source-workshop-id 2241701657 --localisation-root localisation --manual-map data/palette-maps/hgo.manual.json && python tools/build_hgo_name_catalog.py --source-root \"historic geographic overhaul\" && python tools/build_hgo_flag_index.py --source-root \"historic geographic overhaul\" && python tools/build_hgo_flag_png_catalog.py --source-root \"historic geographic overhaul\"",

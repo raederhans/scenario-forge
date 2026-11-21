@@ -78,7 +78,7 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
                 owners = json.loads((directory / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
                 countries = json.loads((directory / "countries.json").read_text(encoding="utf-8"))["countries"]
                 cities = json.loads((directory / "city_overrides.json").read_text(encoding="utf-8"))
-                self.assertEqual(len(owners), 21824)
+                self.assertEqual(len(owners), 22206)
                 # Wave-4 border parcels, water-shaped parcels and HGO hotspot subdivisions.
                 self.assertEqual(owners["LT029__SPLIT_POLISH"], "POL")
                 self.assertEqual(owners["CH057__SPLIT_BUSINGEN"], "GER")
@@ -93,6 +93,13 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
                 self.assertEqual(owners["BY_INT_BREST__SPLIT_PINSK"], "POL")
                 self.assertEqual(owners["TRA22__SPLIT_KARS"], "TUR")
                 self.assertEqual(owners["GB_NUTS1_UKN__SPLIT_BELFAST"], "ENG")
+                # Third batch: children keep the parent owner, except 1939 coastal Libya joining Italy.
+                self.assertEqual(owners["IRN-3237__SPLIT_MAKU"], "PER")
+                self.assertEqual(owners["FI1D7__SPLIT_INARI"], "FIN")
+                self.assertEqual(owners["BA_ADM1_54001226B66267900922909__SPLIT_BRCKO"], "YUG")
+                self.assertEqual(owners["LBY-2965__SPLIT_KUFRAH"], "LBA")
+                self.assertEqual(owners["LBY-2983__SPLIT_AJDABIYA"], "LBA" if scenario == "hoi4_1936" else "ITA")
+                self.assertEqual(owners["SYR-141__SPLIT_AL_HASEKE"], "SYR" if scenario == "hoi4_1936" else "JAZ")
                 self.assertEqual(owners["AU_ADM1_AUS-2653"], "AST")
                 self.assertEqual(owners["AU_ADM1_AUS-2650"], "NTR")
                 self.assertEqual(owners["CN_CITY_17275852B99290886399570"], "QMA")

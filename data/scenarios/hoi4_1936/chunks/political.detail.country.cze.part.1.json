@@ -126287,7 +126287,7 @@
       }
     },
     {
-      "id": 20736,
+      "id": 20699,
       "type": "Feature",
       "properties": {
         "id": "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE",
@@ -127116,7 +127116,7 @@
       }
     },
     {
-      "id": 20737,
+      "id": 20700,
       "type": "Feature",
       "properties": {
         "id": "CZ_ADM2_57006924B91865699855455__SPLIT_REST",
@@ -128629,7 +128629,7 @@
       }
     },
     {
-      "id": 20760,
+      "id": 20723,
       "type": "Feature",
       "properties": {
         "id": "CZ_ADM2_57006924B62007249383837__SPLIT_STERNBERG",
@@ -130188,7 +130188,7 @@
       }
     },
     {
-      "id": 20774,
+      "id": 20737,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B62094256812316__SPLIT_HU",
@@ -131073,7 +131073,7 @@
       }
     },
     {
-      "id": 20775,
+      "id": 20738,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B62094256812316__SPLIT_REST",
@@ -132272,7 +132272,7 @@
       }
     },
     {
-      "id": 20776,
+      "id": 20739,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B94951233476884__SPLIT_HU",
@@ -133943,7 +133943,7 @@
       }
     },
     {
-      "id": 20777,
+      "id": 20740,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B94951233476884__SPLIT_REST",
@@ -134986,7 +134986,7 @@
       }
     },
     {
-      "id": 20778,
+      "id": 20741,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B66923754975257__SPLIT_HU",
@@ -136105,7 +136105,7 @@
       }
     },
     {
-      "id": 20779,
+      "id": 20742,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B66923754975257__SPLIT_REST",
@@ -137942,7 +137942,7 @@
       }
     },
     {
-      "id": 20780,
+      "id": 20743,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B65708067786299__SPLIT_SK",
@@ -139359,7 +139359,7 @@
       }
     },
     {
-      "id": 20781,
+      "id": 20744,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B65708067786299__SPLIT_REST",
@@ -140622,7 +140622,7 @@
       }
     },
     {
-      "id": 20782,
+      "id": 20745,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B14569056094647__SPLIT_HU",
@@ -141209,7 +141209,7 @@
       }
     },
     {
-      "id": 20783,
+      "id": 20746,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B14569056094647__SPLIT_REST",
@@ -142012,7 +142012,7 @@
       }
     },
     {
-      "id": 20814,
+      "id": 20777,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B97606993013938__SPLIT_HU",
@@ -142895,7 +142895,7 @@
       }
     },
     {
-      "id": 20815,
+      "id": 20778,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B97606993013938__SPLIT_REST",
@@ -143198,7 +143198,7 @@
       }
     },
     {
-      "id": 20836,
+      "id": 20799,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA",
@@ -144865,7 +144865,7 @@
       }
     },
     {
-      "id": 20837,
+      "id": 20800,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B94927774956455__SPLIT_REST",
@@ -149216,7 +149216,7 @@
       }
     },
     {
-      "id": 20838,
+      "id": 20801,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B83569782265262__SPLIT_ORAVA",
@@ -150371,7 +150371,7 @@
       }
     },
     {
-      "id": 20839,
+      "id": 20802,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B83569782265262__SPLIT_REST",
@@ -152462,7 +152462,7 @@
       }
     },
     {
-      "id": 21673,
+      "id": 21636,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B4918056975771__SPLIT_SOUTH_NYITRA",
@@ -152745,7 +152745,7 @@
       }
     },
     {
-      "id": 21674,
+      "id": 21637,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B4918056975771__SPLIT_SAFA",
@@ -153012,7 +153012,7 @@
       }
     },
     {
-      "id": 21675,
+      "id": 21638,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B4918056975771__SPLIT_GALANTA",
@@ -153455,7 +153455,7 @@
       }
     },
     {
-      "id": 21676,
+      "id": 21639,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B4918056975771__SPLIT_WESTERN_SLOVAKIA",
@@ -154290,7 +154290,7 @@
       }
     },
     {
-      "id": 21677,
+      "id": 21640,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B15407569919112__SPLIT_PODHAJSKA",
@@ -155269,7 +155269,7 @@
       }
     },
     {
-      "id": 21678,
+      "id": 21641,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B15407569919112__SPLIT_SURANY",
@@ -155724,7 +155724,7 @@
       }
     },
     {
-      "id": 21679,
+      "id": 21642,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B15407569919112__SPLIT_LEVICE",
