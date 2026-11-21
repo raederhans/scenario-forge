@@ -114,3 +114,35 @@ def test_second_batch_parent_coverage_and_names():
         for language in ("name_en", "name_zh"):
             names = [part[language].strip().casefold() for part in parts]
             assert all(names) and len(set(names)) == len(parts), entry["id"]
+
+
+def test_third_batch_parent_coverage_and_border_names():
+    prefix = build.PREFIX.with_name("hoi4_hgo_hotspots_3")
+    regions = build.read(prefix.with_suffix(".regions.json"))
+    entries = build.read(prefix.with_suffix(".geometry_splits.json"))["entries"]
+    parts = {fid: apply.entry_parts(entry) for entry in entries for fid in entry["feature_ids"]}
+    assert set(parts) == {fid for region in regions for fid in region["parent_ids"]}
+    for fid, children in parts.items():
+        assert len(children) >= 2, fid
+        for language in ("name_en", "name_zh"):
+            labels = [child[language].strip().casefold() for child in children]
+            assert all(labels) and len(set(labels)) == len(labels), fid
+
+    names = {fid: {p["name_en"] for p in children} for fid, children in parts.items()}
+    assert {"Jarabub", "Tobruk"} <= names["LBY-2987"]
+    assert {"Maku", "Khoy"} <= names["IRN-3237"]
+    assert names["TRB21"] == {"Van", "Baskale", "Gevas"}
+    assert {"Inari", "Kittila"} <= names["FI1D7"]
+    assert {"Inari", "Kittila"}.isdisjoint(names["SE332"] | names["NO074"])
+    assert "Iraq Neutral Zone" in names["IRQ-3223"]
+    assert "Saudi Neutral Zone" in names["SAU-861"]
+
+
+def test_desert_registration_preserves_scale_away_from_controls():
+    grid = np.stack(np.meshgrid(np.arange(5), np.arange(5)), axis=-1).astype(float)
+    states = {1: box(0, 0, 3, 3)}
+    anchors = [dict(stateId=1, x=1.5, y=1.5, name="A"), dict(stateId=1, x=2.5, y=1.5, name="B")]
+    cities = {"A": [(1.1, 0.9)], "B": [(2.3, 0.9)]}
+    matrix, _ = build.registration(states, box(0, 0, 4, 4), [], cities, grid, np.ones(2),
+                                   anchors, translation_only=True)
+    assert matrix == pytest.approx([1, 0, 0, 1, 0.2, -0.1])
