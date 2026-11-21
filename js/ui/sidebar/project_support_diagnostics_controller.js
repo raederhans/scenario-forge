@@ -1,3 +1,6 @@
+import { focusLandFeatures } from "./region_search_controller.js";
+import { listRecentProjects, rememberProject } from "../../core/recent_projects.js";
+import { importResourceLabel } from "../../core/interaction_funnel/import_recovery_ui.js";
 import { bindProjectFileDrop } from "../project_file_drop.js";
 import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { createUiIcon } from "../components/ui_icons.js";
@@ -164,12 +167,29 @@ export function createProjectSupportDiagnosticsController({
     projectSaveStatus.textContent = "";
 
     actions.appendChild(downloadBtn);
+    const saveAsBtn = documentRef.createElement("button");
+    saveAsBtn.id = "projectSaveAsBtn";
+    saveAsBtn.type = "button";
+    saveAsBtn.className = "btn-secondary";
+    saveAsBtn.setAttribute("data-i18n", "Save a copy…");
+    saveAsBtn.textContent = t("Save a copy…", "ui");
+    actions.appendChild(saveAsBtn);
     actions.appendChild(projectDownloadOptions);
     actions.appendChild(uploadBtn);
     actions.appendChild(projectSaveStatus);
     actions.appendChild(fileMeta);
     actions.appendChild(fileInput);
 
+    if (globalThis.showOpenFilePicker && globalThis.indexedDB) {
+      const recent = documentRef.createElement("details");
+      const title = documentRef.createElement("summary");
+      title.setAttribute("data-i18n", "Recent projects");
+      title.textContent = t("Recent projects", "ui");
+      const list = documentRef.createElement("div");
+      list.id = "recentProjectList";
+      recent.append(title, list);
+      actions.appendChild(recent);
+    }
     projectSection.appendChild(actions);
     projectManagementStack.appendChild(projectSection);
   }
@@ -414,10 +434,9 @@ export function createProjectSupportDiagnosticsController({
   let projectImportController = null;
   const formatProjectImportSummary = (summary) => {
     const scenario = summary.scenarioName || summary.scenarioId || t("None", "ui");
-    const restored = t("Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.", "ui")
+    const restored = t("Project imported: {scenario}. Restored {colors} color entries.", "ui")
       .replace("{scenario}", scenario)
-      .replace("{colors}", String(summary.restoredColorEntries))
-      .replace("{owners}", String(summary.restoredOwnershipEntries));
+      .replace("{colors}", String(summary.restoredColorEntries));
     const details = [restored];
     if (summary.ignoredEntries > 0) {
       details.push(t("Ignored {count} entries that are not valid for this map.", "ui")
@@ -1213,20 +1232,89 @@ export function createProjectSupportDiagnosticsController({
       projectDownloadFormat.addEventListener?.("change", syncProjectPackageContentAvailability);
       projectDownloadFormat.dataset.packageContentsBound = "true";
     }
-    const exportProject = async () => {
+    registerRuntimeHook(state, "showProjectMigrationDetailsFn", regions => {
+      const dialog = documentRef.createElement("dialog");
+      const heading = documentRef.createElement("h2");
+      heading.textContent = t("Unmatched map regions", "ui");
+      dialog.setAttribute("aria-label", heading.textContent);
+      dialog.appendChild(heading);
+      for (const { featureId, color, targetIds = [] } of regions) {
+        const row = documentRef.createElement("p");
+        row.textContent = [featureId, color].filter(Boolean).join(" · ");
+        const features = [featureId, ...targetIds].map(id => state.landIndex?.get(id)).filter(feature => feature?.geometry);
+        if (features.length) {
+          const locate = documentRef.createElement("button");
+          locate.type = "button";
+          locate.textContent = t("Locate on Map", "ui");
+          locate.addEventListener("click", () => {
+            dialog.close();
+            focusLandFeatures(features, mapRenderer.focusGeoBounds);
+          });
+          row.appendChild(locate);
+        } else {
+          row.append(" · ", t("Location unavailable on this map", "ui"));
+        }
+        dialog.appendChild(row);
+      }
+      const close = documentRef.createElement("button");
+      close.type = "button";
+      close.textContent = t("Close", "ui");
+      close.addEventListener("click", () => dialog.close());
+      dialog.appendChild(close);
+      dialog.addEventListener("close", () => dialog.remove(), { once: true });
+      documentRef.body.appendChild(dialog);
+      dialog.showModal();
+    });
+    const recentList = documentRef.getElementById("recentProjectList");
+    const saveAsBtn = documentRef.getElementById("projectSaveAsBtn");
+    const showOpenError = error => {
+      if (error.name === "AbortError") return;
+      console.error("Project open failed", error);
+      showToast(t("Unable to open the file. Check file access and try again.", "ui"), { tone: "error" });
+    };
+    const renderRecent = projects => {
+      recentList.replaceChildren();
+      for (const project of projects) {
+        const button = documentRef.createElement("button");
+        button.type = "button";
+        button.textContent = [project.name, project.scenario, new Date(project.time).toLocaleString()].filter(Boolean).join(" · ");
+        button.addEventListener("click", async () => {
+          try {
+            if (await project.handle.requestPermission({ mode: "readwrite" }) !== "granted") {
+              showToast(t("File access was not granted.", "ui"), { tone: "warning" });
+              return;
+            }
+            await importProjectFile(await project.handle.getFile(), project.handle);
+          } catch (error) { showOpenError(error); }
+        });
+        recentList.appendChild(button);
+      }
+    };
+    const recordRecent = async handle => {
+      if (!recentList || !handle) return;
+      try {
+        renderRecent(await rememberProject({ handle, name: state.projectName || handle.name,
+          scenario: state.activeScenarioManifest?.display_name || state.activeScenarioId || "", time: Date.now() }));
+      } catch (error) { console.warn("Recent projects unavailable", error); }
+    };
+    const describeWarnings = warnings => t("Could not restore {resource}.", "ui")
+      .replace("{resource}", warnings.map(item => importResourceLabel(item.resource, t)).join(", "));
+    const exportProject = async (saveAs = false) => {
       if (projectExportBusy) return false;
       projectExportBusy = true;
-      const buttons = [downloadProjectBtn, workspaceSaveBtn].filter(Boolean);
+      const buttons = [downloadProjectBtn, workspaceSaveBtn, saveAsBtn].filter(Boolean);
       const disabledStates = buttons.map((button) => button.disabled);
       buttons.forEach((button) => { button.disabled = true; button.ariaBusy = "true"; });
       refreshProjectSaveStatus(t("Exporting project file with appearance and transport settings.", "ui"));
       try {
         const exported = await fileManager.exportProject(state, {
           format: projectDownloadFormat?.value || "json",
-          destination: projectDownloadDestination?.value || "picker",
+          destination: saveAs ? "picker" : projectDownloadDestination?.value || "picker",
+          ...(saveAs ? { saveAs: true } : {}),
           packageContents: projectPackageContents?.value || "recommended",
         });
         refreshProjectSaveStatus(exported === false ? t("Project export cancelled.", "ui") : "");
+        if (exported === true) await recordRecent(state.projectFileBinding?.handle);
         return exported === true;
       } catch (error) {
         refreshProjectSaveStatus(String(error?.message || error || ""));
@@ -1238,13 +1326,14 @@ export function createProjectSupportDiagnosticsController({
       }
     };
     registerRuntimeHook(state, "runProjectSaveFn", exportProject);
-    [downloadProjectBtn, workspaceSaveBtn].forEach((button) => {
+    registerRuntimeHook(state, "runProjectSaveAsFn", () => exportProject(true));
+    [downloadProjectBtn, workspaceSaveBtn, saveAsBtn].forEach((button) => {
       if (!button || button.dataset.bound) return;
-      button.addEventListener("click", exportProject);
+      button.addEventListener("click", () => exportProject(button === saveAsBtn));
       button.dataset.bound = "true";
     });
 
-    const importProjectFile = async (file) => {
+    const importProjectFile = async (file, fileHandle = null) => {
       if (file && !(await confirmReplaceCurrentProject())) return;
       projectImportController?.abort();
       const importController = new AbortController();
@@ -1279,6 +1368,7 @@ export function createProjectSupportDiagnosticsController({
         const outcome = await importProjectThroughFunnel(importFile, {
           projectPayload,
           fileName: file.name,
+          fileHandle,
           signal: importController.signal,
           ui: {
             t,
@@ -1293,20 +1383,22 @@ export function createProjectSupportDiagnosticsController({
               if (projectImportController && projectImportController !== importController) return;
               if (recovery.phase === "complete") refreshProjectSaveStatus();
               else if (recovery.warnings.length) refreshProjectSaveStatus(
-                `${t("Project imported", "ui")}: ${recovery.warnings.map(item => item.resource).join(", ")}`
+                describeWarnings(recovery.warnings)
               );
             },
           },
         });
         if (importController.signal.aborted) return;
+        if (outcome?.status === "committed" || outcome?.status === "committed-with-warnings") await recordRecent(fileHandle);
         if (outcome?.status === "committed-with-warnings") {
-          refreshProjectSaveStatus(`${t("Project imported", "ui")}: ${outcome.warnings.map(item => item.resource).join(", ")}`);
+          refreshProjectSaveStatus(describeWarnings(outcome.warnings));
         } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
           refreshProjectSaveStatus(t("Project import is already in progress.", "ui"));
         }
       } catch (error) {
         if (importController.signal.aborted) return;
-        const message = String(error?.message || error || "");
+        console.error("Project import failed", error);
+        const message = t(error?.userMessage || "Unable to read the selected file.", "ui");
         refreshProjectSaveStatus(message);
         if (typeof showToast === "function") {
           showToast(message, {
@@ -1323,8 +1415,17 @@ export function createProjectSupportDiagnosticsController({
     registerRuntimeHook(state, "runProjectImportFileFn", importProjectFile);
     bindProjectFileDrop(documentRef.getElementById("mapContainer"), state, t);
 
+    if (recentList) listRecentProjects().then(renderRecent).catch(error => console.warn("Recent projects unavailable", error));
     if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
-      uploadProjectBtn.addEventListener("click", () => projectFileInput.click());
+      uploadProjectBtn.addEventListener("click", async () => {
+        if (!globalThis.showOpenFilePicker) return projectFileInput.click();
+        try {
+          const [handle] = await globalThis.showOpenFilePicker({ types: [{
+            description: t("Load Project", "ui"), accept: { "application/json": [".json"], "application/zip": [".zip"] },
+          }] });
+          await importProjectFile(await handle.getFile(), handle);
+        } catch (error) { showOpenError(error); }
+      });
       uploadProjectBtn.dataset.bound = "true";
     }
 

@@ -1524,6 +1524,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "城市层级",
     "en": "City hierarchy"
   },
+  "City points": {
+    "zh": "城市点",
+    "en": "City points"
+  },
   "City points help": {
     "zh": "城市点位帮助",
     "en": "City points help"
@@ -1884,6 +1888,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "颜色烘焙",
     "en": "Color bake"
   },
+  "Color palette": {
+    "zh": "调色板",
+    "en": "Color palette"
+  },
   "Color picked": {
     "zh": "已取色",
     "en": "Color picked"
@@ -2236,6 +2244,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "通道强度（仅现代）",
     "en": "Corridor Strength (Modern only)"
   },
+  "Could not restore {resource}.": {
+    "zh": "未能恢复{resource}。",
+    "en": "Could not restore {resource}."
+  },
   "Counter Editor": {
     "zh": "计数器编辑器",
     "en": "Counter Editor"
@@ -2351,6 +2363,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Country names are off": {
     "zh": "国名已关闭",
     "en": "Country names are off"
+  },
+  "Country ownership": {
+    "zh": "国家归属",
+    "en": "Country ownership"
+  },
+  "Country transport overlays": {
+    "zh": "各国交通叠加层",
+    "en": "Country transport overlays"
   },
   "Coverage": {
     "zh": "覆盖范围",
@@ -3128,6 +3148,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "编辑国家颜色",
     "en": "Edit country color"
   },
+  "Edit history": {
+    "zh": "编辑历史记录",
+    "en": "Edit history"
+  },
   "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": {
     "zh": "根据剧本参考分组编辑地图颜色。参考边界保持不变。",
     "en": "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged."
@@ -3646,6 +3670,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Fictional / alt-history": {
     "zh": "虚构或架空历史",
     "en": "Fictional / alt-history"
+  },
+  "File access was not granted.": {
+    "zh": "未获得文件读写权限。",
+    "en": "File access was not granted."
   },
   "File type": {
     "zh": "文件类型",
@@ -5258,6 +5286,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "位置背景",
     "en": "Location context"
   },
+  "Location unavailable on this map": {
+    "zh": "当前地图没有该地块的位置",
+    "en": "Location unavailable on this map"
+  },
   "Lock what enters the Japan rail pack before render style.": {
     "zh": "在渲染样式之前锁定进入日本铁路包的内容。",
     "en": "Lock what enters the Japan rail pack before render style."
@@ -5529,6 +5561,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "地图详细程度",
     "en": "Map detail"
   },
+  "Map display": {
+    "zh": "地图显示",
+    "en": "Map display"
+  },
   "Map labels": {
     "zh": "地图标签",
     "en": "Map labels"
@@ -5556,6 +5592,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Map style": {
     "zh": "地图样式",
     "en": "Map style"
+  },
+  "Map view": {
+    "zh": "地图视角",
+    "en": "Map view"
   },
   "Map workspace": {
     "zh": "地图工作区",
@@ -5660,6 +5700,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Middle East": {
     "zh": "中东",
     "en": "Middle East"
+  },
+  "Migrated {updated} entries. Could not match {count} regions.": {
+    "zh": "已迁移 {updated} 处记录，{count} 个地块无法对应。",
+    "en": "Migrated {updated} entries. Could not match {count} regions."
   },
   "Military Factories": {
     "zh": "军用工厂",
@@ -7364,6 +7408,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "项目 ZIP 包已下载。",
     "en": "Project ZIP package downloaded."
   },
+  "Project controls": {
+    "zh": "项目面板",
+    "en": "Project controls"
+  },
+  "Project data": {
+    "zh": "项目数据",
+    "en": "Project data"
+  },
   "Project downloaded": {
     "zh": "项目已下载",
     "en": "Project downloaded"
@@ -7439,6 +7491,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.": {
     "zh": "已导入项目：{scenario}。已恢复 {colors} 条上色记录和 {owners} 条归属记录。",
     "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries."
+  },
+  "Project imported: {scenario}. Restored {colors} color entries.": {
+    "zh": "已导入项目：{scenario}。已恢复 {colors} 条颜色记录。",
+    "en": "Project imported: {scenario}. Restored {colors} color entries."
   },
   "Project name (optional)": {
     "zh": "项目名（可选）",
@@ -7651,6 +7707,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Recent colors": {
     "zh": "最近颜色",
     "en": "Recent colors"
+  },
+  "Recent projects": {
+    "zh": "最近项目",
+    "en": "Recent projects"
   },
   "Recent scenario tag colors": {
     "zh": "最近使用的剧本标签颜色",
@@ -8292,6 +8352,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "保存预设",
     "en": "Save Preset"
   },
+  "Save a copy…": {
+    "zh": "另存为副本…",
+    "en": "Save a copy…"
+  },
   "Save and restore the complete working state.": {
     "zh": "保存和恢复完整工作状态。",
     "en": "Save and restore the complete working state."
@@ -8311,6 +8375,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Save scenario layer asset": {
     "zh": "保存场景图层资产",
     "en": "Save scenario layer asset"
+  },
+  "Save status": {
+    "zh": "保存状态",
+    "en": "Save status"
   },
   "Save title": {
     "zh": "存档标题",
@@ -8339,6 +8407,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Saved population data version is unavailable.": {
     "zh": "保存的人口数据版本不可用。",
     "en": "Saved population data version is unavailable."
+  },
+  "Saved to {file}": {
+    "zh": "已保存到 {file}",
+    "en": "Saved to {file}"
   },
   "Saving scenario special zone layers…": {
     "zh": "正在保存剧本特殊区域图层…",
@@ -8451,6 +8523,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Scenario countries mapped": {
     "zh": "场景国家已匹配",
     "en": "Scenario countries mapped"
+  },
+  "Scenario data": {
+    "zh": "剧本数据",
+    "en": "Scenario data"
   },
   "Scenario depth is schematic": {
     "zh": "剧本深度为示意",
@@ -9376,6 +9452,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "部分数据加载失败",
     "en": "Some data failed to load"
   },
+  "Some saved regions could not be matched safely. Open the project with its original map data.": {
+    "zh": "部分存档地块无法可靠匹配，请使用原版本的地图数据打开项目。",
+    "en": "Some saved regions could not be matched safely. Open the project with its original map data."
+  },
   "Sort": {
     "zh": "排序",
     "en": "Sort"
@@ -9688,6 +9768,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "战略标注",
     "en": "Strategic annotations"
   },
+  "Strategic resources": {
+    "zh": "战略资源",
+    "en": "Strategic resources"
+  },
   "Stratocracy": {
     "zh": "军政体制",
     "en": "Stratocracy"
@@ -9883,6 +9967,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Temperate Forest": {
     "zh": "温带森林",
     "en": "Temperate Forest"
+  },
+  "Terrain": {
+    "zh": "地形",
+    "en": "Terrain"
   },
   "Terrain + ownership": {
     "zh": "地形 + 归属",
@@ -10104,6 +10192,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "2026 年的世界政治格局，包含占领区与事实独立地区，如俄控乌克兰东部、北塞浦路斯与分治的克什米尔。",
     "en": "The political map of 2026, including occupied and de facto independent areas such as Russian-held eastern Ukraine, Northern Cyprus and divided Kashmir."
   },
+  "The project ZIP could not be opened. Ask the sender to export it again.": {
+    "zh": "无法打开项目压缩包，请让发送方重新导出。",
+    "en": "The project ZIP could not be opened. Ask the sender to export it again."
+  },
   "The project was imported, but editing is paused until map recovery succeeds.": {
     "zh": "项目已导入，地图恢复成功后才能继续编辑。",
     "en": "The project was imported, but editing is paused until map recovery succeeds."
@@ -10127,6 +10219,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.": {
     "zh": "该保存项目基于不同的剧本基线创建。只有在你接受按当前资源加载它时，才继续。",
     "en": "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets."
+  },
+  "The saved river regions require the original version of the map.": {
+    "zh": "存档中的河流分区需要使用原版本的地图数据。",
+    "en": "The saved river regions require the original version of the map."
+  },
+  "The saved scenario is unavailable in this version of the map.": {
+    "zh": "当前地图版本未提供存档使用的剧本。",
+    "en": "The saved scenario is unavailable in this version of the map."
   },
   "The selected country, owner tag, and visible boundary should describe the same place before you edit.": {
     "zh": "编辑前，选中国家、归属标签和可见边界应指向同一个地方。",
@@ -10232,6 +10332,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "这个排序板控制八个 transport families 的未来绘制顺序，避免写死单一堆叠规则。",
     "en": "This board controls future draw order across the eight transport families instead of hard-coding one fixed stacking rule."
   },
+  "This browser cannot read the project ZIP. Open the editable JSON file instead.": {
+    "zh": "当前浏览器无法读取项目压缩包，请打开其中可编辑的 JSON 文件。",
+    "en": "This browser cannot read the project ZIP. Open the editable JSON file instead."
+  },
   "This family has not exposed extra manifest or audit cards in the current shell.": {
     "zh": "这个 family 目前还没有在这个 shell 里暴露额外的 manifest 或 audit 卡片。",
     "en": "This family has not exposed extra manifest or audit cards in the current shell."
@@ -10263,6 +10367,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "This only removes the selected project-local strategic line.": {
     "zh": "这只会移除当前项目中的所选战略线。",
     "en": "This only removes the selected project-local strategic line."
+  },
+  "This project ZIP exceeds the import limit. Export the project as JSON instead.": {
+    "zh": "项目压缩包超出导入限制，请改为导出项目 JSON 文件。",
+    "en": "This project ZIP exceeds the import limit. Export the project as JSON instead."
+  },
+  "This project uses different map data. Colors will be migrated. {count} regions could not be matched.": {
+    "zh": "项目使用的地图数据已更新。继续打开会将颜色迁移到新地块，有 {count} 个地块无法对应，可能需要重新涂色。",
+    "en": "This project uses different map data. Colors will be migrated. {count} regions could not be matched."
   },
   "This removes current paint overrides and, in political mode, restores ownership to its baseline. You can undo the clear from history.": {
     "zh": "这会移除当前绘制覆盖；在政治模式下，还会将归属恢复到其基线。你可以通过历史记录撤销清空。",
@@ -10476,6 +10588,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "交通图层顺序",
     "en": "Transport layer order"
   },
+  "Transport overview": {
+    "zh": "交通概览",
+    "en": "Transport overview"
+  },
   "Transport pack": {
     "zh": "交通资源包",
     "en": "Transport pack"
@@ -10592,6 +10708,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "无法加载诊断",
     "en": "Unable to load diagnostics"
   },
+  "Unable to open the file. Check file access and try again.": {
+    "zh": "无法打开文件，请检查文件权限后重试。",
+    "en": "Unable to open the file. Check file access and try again."
+  },
   "Unable to read the selected file.": {
     "zh": "无法读取所选文件。",
     "en": "Unable to read the selected file."
@@ -10668,6 +10788,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "未匹配",
     "en": "Unmatched"
   },
+  "Unmatched map regions": {
+    "zh": "无法对应的地块",
+    "en": "Unmatched map regions"
+  },
   "Unnamed facility": {
     "zh": "未命名设施",
     "en": "Unnamed facility"
@@ -10719,6 +10843,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Urban Areas": {
     "zh": "城市区域",
     "en": "Urban Areas"
+  },
+  "Urban areas": {
+    "zh": "城区",
+    "en": "Urban areas"
   },
   "Urban population share": {
     "zh": "城镇人口占比",
@@ -10935,6 +11063,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "View all": {
     "zh": "查看全部",
     "en": "View all"
+  },
+  "View details": {
+    "zh": "查看详情",
+    "en": "View details"
   },
   "Viewport controls": {
     "zh": "视口控制",

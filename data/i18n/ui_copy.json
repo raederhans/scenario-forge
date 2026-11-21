@@ -11569,5 +11569,137 @@
   "面积模式优先现代大国排序": {
     "en": "Prefer modern major-power order for area modes",
     "zh": "面积模式优先现代大国排序"
+  },
+  "Save a copy…": {
+    "en": "Save a copy…",
+    "zh": "另存为副本…"
+  },
+  "Recent projects": {
+    "en": "Recent projects",
+    "zh": "最近项目"
+  },
+  "Saved to {file}": {
+    "en": "Saved to {file}",
+    "zh": "已保存到 {file}"
+  },
+  "File access was not granted.": {
+    "en": "File access was not granted.",
+    "zh": "未获得文件读写权限。"
+  },
+  "Unable to open the file. Check file access and try again.": {
+    "en": "Unable to open the file. Check file access and try again.",
+    "zh": "无法打开文件，请检查文件权限后重试。"
+  },
+  "The project ZIP could not be opened. Ask the sender to export it again.": {
+    "en": "The project ZIP could not be opened. Ask the sender to export it again.",
+    "zh": "无法打开项目压缩包，请让发送方重新导出。"
+  },
+  "The saved river regions require the original version of the map.": {
+    "en": "The saved river regions require the original version of the map.",
+    "zh": "存档中的河流分区需要使用原版本的地图数据。"
+  },
+  "Project imported: {scenario}. Restored {colors} color entries.": {
+    "en": "Project imported: {scenario}. Restored {colors} color entries.",
+    "zh": "已导入项目：{scenario}。已恢复 {colors} 条颜色记录。"
+  },
+  "Edit history": {
+    "en": "Edit history",
+    "zh": "编辑历史记录"
+  },
+  "Save status": {
+    "en": "Save status",
+    "zh": "保存状态"
+  },
+  "Map display": {
+    "en": "Map display",
+    "zh": "地图显示"
+  },
+  "Scenario data": {
+    "en": "Scenario data",
+    "zh": "剧本数据"
+  },
+  "Country ownership": {
+    "en": "Country ownership",
+    "zh": "国家归属"
+  },
+  "Project controls": {
+    "en": "Project controls",
+    "zh": "项目面板"
+  },
+  "Map view": {
+    "en": "Map view",
+    "zh": "地图视角"
+  },
+  "City points": {
+    "en": "City points",
+    "zh": "城市点"
+  },
+  "Strategic resources": {
+    "en": "Strategic resources",
+    "zh": "战略资源"
+  },
+  "Urban areas": {
+    "en": "Urban areas",
+    "zh": "城区"
+  },
+  "Terrain": {
+    "en": "Terrain",
+    "zh": "地形"
+  },
+  "Transport overview": {
+    "en": "Transport overview",
+    "zh": "交通概览"
+  },
+  "Country transport overlays": {
+    "en": "Country transport overlays",
+    "zh": "各国交通叠加层"
+  },
+  "Color palette": {
+    "en": "Color palette",
+    "zh": "调色板"
+  },
+  "Project data": {
+    "en": "Project data",
+    "zh": "项目数据"
+  },
+  "This project uses different map data. Colors will be migrated. {count} regions could not be matched.": {
+    "en": "This project uses different map data. Colors will be migrated. {count} regions could not be matched.",
+    "zh": "项目使用的地图数据已更新。继续打开会将颜色迁移到新地块，有 {count} 个地块无法对应，可能需要重新涂色。"
+  },
+  "Some saved regions could not be matched safely. Open the project with its original map data.": {
+    "en": "Some saved regions could not be matched safely. Open the project with its original map data.",
+    "zh": "部分存档地块无法可靠匹配，请使用原版本的地图数据打开项目。"
+  },
+  "Migrated {updated} entries. Could not match {count} regions.": {
+    "en": "Migrated {updated} entries. Could not match {count} regions.",
+    "zh": "已迁移 {updated} 处记录，{count} 个地块无法对应。"
+  },
+  "View details": {
+    "en": "View details",
+    "zh": "查看详情"
+  },
+  "Unmatched map regions": {
+    "en": "Unmatched map regions",
+    "zh": "无法对应的地块"
+  },
+  "Could not restore {resource}.": {
+    "en": "Could not restore {resource}.",
+    "zh": "未能恢复{resource}。"
+  },
+  "Location unavailable on this map": {
+    "en": "Location unavailable on this map",
+    "zh": "当前地图没有该地块的位置"
+  },
+  "The saved scenario is unavailable in this version of the map.": {
+    "en": "The saved scenario is unavailable in this version of the map.",
+    "zh": "当前地图版本未提供存档使用的剧本。"
+  },
+  "This project ZIP exceeds the import limit. Export the project as JSON instead.": {
+    "en": "This project ZIP exceeds the import limit. Export the project as JSON instead.",
+    "zh": "项目压缩包超出导入限制，请改为导出项目 JSON 文件。"
+  },
+  "This browser cannot read the project ZIP. Open the editable JSON file instead.": {
+    "en": "This browser cannot read the project ZIP. Open the editable JSON file instead.",
+    "zh": "当前浏览器无法读取项目压缩包，请打开其中可编辑的 JSON 文件。"
   }
 }

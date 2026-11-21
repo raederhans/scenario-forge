@@ -10489,6 +10489,26 @@ function focusRiverPaintParentById(id) {
   return true;
 }
 
+function captureProjectView() {
+  const projection = rendererSurfaceHost.getProjection();
+  const { width, height, zoomTransform } = runtimeState;
+  if (!projection || !zoomTransform || !width || !height) return null;
+  const { x, y, k } = zoomTransform;
+  const center = projection.invert([(width / 2 - x) / k, (height / 2 - y) / k]);
+  return center?.every(Number.isFinite) ? { center, k } : null;
+}
+
+function restoreProjectView({ center, k }) {
+  const point = rendererSurfaceHost.getProjection()?.(center);
+  const interaction = rendererSurfaceHost.getInteractionRect();
+  const zoom = rendererSurfaceHost.getZoomBehavior();
+  if (!point || !interaction || !zoom) return;
+  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, k));
+  interaction.interrupt().call(zoom.transform, globalThis.d3.zoomIdentity
+    .translate(runtimeState.width / 2, runtimeState.height / 2)
+    .scale(scale).translate(-point[0], -point[1]));
+}
+
 function focusWaterRegionById(id) {
   const feature = runtimeState.waterRegionsById?.get(String(id || "").trim());
   const interactionRect = rendererSurfaceHost.getInteractionRect();
@@ -12952,6 +12972,8 @@ function initMap({
   getRendererSurfaceLifecycleOwner().resolveDomHandles({ containerId });
   getFacilityInteractionRuntime().resolveDomHandles();
   runtimeState.refreshColorStateFn = refreshColorState;
+  registerRuntimeHook(runtimeState, "captureProjectViewFn", captureProjectView);
+  registerRuntimeHook(runtimeState, "restoreProjectViewFn", restoreProjectView);
   registerRuntimeHook(runtimeState, "stepUpInspectorSelectionFn", stepUpInspectorSelection);
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);
