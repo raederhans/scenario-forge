@@ -12,11 +12,13 @@ import { redoHistory, undoHistory } from "../core/history_manager.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
 import { showToast } from "./components/toast.js";
 import { t } from "./i18n.js";
+import { shortcuts, keyboardChord } from "./command_palette.js";
 import { getActiveModal } from "./ui_contract.js";
 import {
   clearDevSelection,
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
+  panMapByPixels,
   resetZoomToFit,
   undoSpecialZoneVertex,
   zoomByStep,
@@ -94,11 +96,12 @@ function pickQuickSwatch(index) {
   return true;
 }
 
-function allowShortcutDuringStartupReadonly({ key = "", modifier = false } = {}) {
-  if (modifier) return false;
-  return key === "+" || key === "=" || key === "-" || key === "_" || key === "0"
-    || key === "Shift" || key === " " || key === "Escape";
-}
+const toolButtons = {
+  toolSelectBtn: "select", toolFillBtn: "fill", toolEraserBtn: "eraser", toolEyedropperBtn: "eyedropper",
+};
+const panDirections = {
+  up: [0, 1], down: [0, -1], left: [1, 0], right: [-1, 0],
+};
 
 async function saveProject() {
   try {
@@ -113,13 +116,18 @@ async function saveProject() {
   }
 }
 
-function initShortcuts() {
+function initShortcuts({ pan = panMapByPixels } = {}) {
   if (document.body?.dataset.shortcutsBound === "true") return;
+
+  let altCursorMap;
+  function releaseAltCursor() {
+    if (altCursorMap && runtimeState.currentTool !== "eyedropper") altCursorMap.classList.remove("tool-eyedropper");
+    altCursorMap = null;
+  }
 
   window.addEventListener("keydown", (event) => {
     if (event.defaultPrevented || getActiveModal()) return;
     const key = String(event.key || "");
-    const lower = key.toLowerCase();
     const modifier = event.metaKey || event.ctrlKey;
     const editableTarget = isEditableTarget(event.target);
 
@@ -137,165 +145,97 @@ function initShortcuts() {
       return;
     }
 
-    if (runtimeState.startupReadonly && !allowShortcutDuringStartupReadonly({ key, modifier })) {
+    if (key === "Alt" && !runtimeState.startupReadonly && ["fill", "eraser"].includes(runtimeState.currentTool)) {
+      altCursorMap = document.getElementById("mapContainer");
+      altCursorMap?.classList.add("tool-eyedropper");
       return;
     }
+    const chord = keyboardChord(event);
+    const onMap = event.target?.id === "mapContainer";
+    const matches = shortcuts.filter(row => row.keys.includes(chord));
+    const { action } = (onMap && matches.find(row => panDirections[row.action]))
+      || matches.find(row => !panDirections[row.action]) || {};
+    if (!action || event.altKey) return;
+    if (runtimeState.startupReadonly && !panDirections[action]
+      && !["zoomIn", "zoomOut", "zoomReset", "brushPan", "escape", "help"].includes(action)) return;
 
-    if (modifier && event.shiftKey && lower === "d") {
-      if (runtimeState.toggleDeveloperModeFn) {
+    if (panDirections[action]) {
+      const [x, y] = panDirections[action];
+      const step = event.shiftKey ? 240 : 60;
+      event.preventDefault();
+      pan(x * step, y * step);
+      return;
+    }
+    if (toolButtons[action]) {
+      event.preventDefault();
+      setCurrentTool(toolButtons[action]);
+      return;
+    }
+    switch (action) {
+    case "toggleDeveloperModeFn":
+    case "toggleRightPanelFn":
+    case "toggleLeftPanelFn":
+    case "toggleDockFn":
+    case "text": {
+      const hook = readRuntimeHook(runtimeState, action === "text" ? "runMapTextToolFn" : action);
+      if (hook) {
         event.preventDefault();
-        callRuntimeHook(runtimeState, "toggleDeveloperModeFn");
+        hook();
       }
       return;
     }
-
-    if (modifier && key === "\\") {
-      if (runtimeState.toggleRightPanelFn) {
-        event.preventDefault();
-        callRuntimeHook(runtimeState, "toggleRightPanelFn");
-      }
-      return;
-    }
-
-    if (!modifier && key === "\\") {
-      if (runtimeState.toggleLeftPanelFn) {
-        event.preventDefault();
-        callRuntimeHook(runtimeState, "toggleLeftPanelFn");
-      }
-      return;
-    }
-
-    if (!modifier && key === "`") {
-      if (runtimeState.toggleDockFn) {
-        event.preventDefault();
-        callRuntimeHook(runtimeState, "toggleDockFn");
-      }
-      return;
-    }
-
-    if (key === "Shift") {
+    case "brushPan":
       setBrushPanModifier(true);
-    }
-
-    if (key === " ") {
-      setBrushPanModifier(true);
-    }
-
-    if (modifier && !event.shiftKey && !event.altKey && lower === "o") {
-      const button = document.getElementById("uploadProjectBtn");
+      return;
+    case "open":
+    case "help": {
+      const button = document.getElementById(action === "open" ? "uploadProjectBtn" : "editorKeyboardShortcutsBtn");
       if (button) {
         event.preventDefault();
         button.click();
       }
       return;
     }
-
-    if (modifier && lower === "s") {
+    case "save":
       event.preventDefault();
       return saveProject();
-    }
-
-    if (modifier && lower === "z") {
+    case "undo":
+    case "redo":
       event.preventDefault();
-      if (runtimeState.specialZoneEditor?.active) {
+      if (runtimeState.specialZoneEditor?.active && chord !== "Mod+Y") {
         undoSpecialZoneVertex();
         refreshAfterSpecialZoneShortcut();
-        return;
-      }
-      if (event.shiftKey) {
-        if (runtimeState.runHistoryActionFn) {
-          callRuntimeHook(runtimeState, "runHistoryActionFn", "redo");
-        } else {
-          redoHistory();
-        }
-      } else {
-        if (runtimeState.runHistoryActionFn) {
-          callRuntimeHook(runtimeState, "runHistoryActionFn", "undo");
-        } else {
-          undoHistory();
-        }
-      }
+      } else if (runtimeState.runHistoryActionFn) {
+        callRuntimeHook(runtimeState, "runHistoryActionFn", action);
+      } else if (action === "redo") redoHistory();
+      else undoHistory();
       return;
-    }
-
-    if (modifier && lower === "y") {
-      event.preventDefault();
-      if (runtimeState.runHistoryActionFn) {
-        callRuntimeHook(runtimeState, "runHistoryActionFn", "redo");
-      } else {
-        redoHistory();
-      }
-      return;
-    }
-
-    if (!modifier && lower === "v") {
-      event.preventDefault();
-      setCurrentTool("select");
-      return;
-    }
-    if (!modifier && lower === "f") {
-      event.preventDefault();
-      setCurrentTool("fill");
-      return;
-    }
-    if (!modifier && lower === "q") {
-      event.preventDefault();
-      setCurrentTool("fill");
-      return;
-    }
-    if (!modifier && lower === "w") {
-      event.preventDefault();
-      setCurrentTool("eraser");
-      return;
-    }
-    if (!modifier && lower === "e") {
-      event.preventDefault();
-      setCurrentTool("eraser");
-      return;
-    }
-    if (!modifier && lower === "b") {
+    case "brushModeBtn":
       event.preventDefault();
       toggleBrushMode();
       return;
-    }
-    if (!modifier && lower === "i") {
-      event.preventDefault();
-      setCurrentTool("eyedropper");
-      return;
-    }
-    if (!modifier && /^[1-6]$/.test(key)) {
+    case "swatch":
       event.preventDefault();
       pickQuickSwatch(Number(key) - 1);
       return;
-    }
-    if (!modifier && (key === "+" || key === "=")) {
+    case "zoomIn":
+    case "zoomOut": {
       event.preventDefault();
-      if (runtimeState.runZoomStepFn) {
-        callRuntimeHook(runtimeState, "runZoomStepFn", 1);
-      } else {
-        zoomByStep(1);
-      }
+      const direction = action === "zoomIn" ? 1 : -1;
+      if (runtimeState.runZoomStepFn) callRuntimeHook(runtimeState, "runZoomStepFn", direction);
+      else zoomByStep(direction);
       return;
     }
-    if (!modifier && (key === "-" || key === "_")) {
+    case "zoomReset":
       event.preventDefault();
-      if (runtimeState.runZoomStepFn) {
-        callRuntimeHook(runtimeState, "runZoomStepFn", -1);
-      } else {
-        zoomByStep(-1);
-      }
+      if (runtimeState.runZoomResetFn) callRuntimeHook(runtimeState, "runZoomResetFn");
+      else resetZoomToFit({ animate: true });
       return;
-    }
-    if (!modifier && key === "0") {
-      event.preventDefault();
-      if (runtimeState.runZoomResetFn) {
-        callRuntimeHook(runtimeState, "runZoomResetFn");
-      } else {
-        resetZoomToFit({ animate: true });
+    case "escape":
+      if (runtimeState.brushModeEnabled && callRuntimeHook(runtimeState, "cancelBrushStrokeFn")) {
+        event.preventDefault();
+        return;
       }
-      return;
-    }
-    if (!modifier && key === "Escape") {
       if (cancelActiveStrategicInteractionModes()) {
         event.preventDefault();
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_STRATEGIC_OVERLAY_UI);
@@ -334,6 +274,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("keyup", (event) => {
+    if (event.key === "Alt") releaseAltCursor();
     if (event.defaultPrevented || getActiveModal()) return;
     if (runtimeState.bootBlocking) return;
     if (event.key !== "Shift" && event.key !== " ") return;
@@ -341,6 +282,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("blur", () => {
+    releaseAltCursor();
     setBrushPanModifier(false);
   });
 

@@ -19,6 +19,8 @@ export function bindProjectFileDrop(container, state, t) {
     event.preventDefault();
     if ((file || item) && isProjectFile(file || item)) {
       container.dataset.projectDropLabel = t("Drop to open project", "ui");
+    } else if ((file || item)?.type.startsWith("image/")) {
+      container.dataset.projectDropLabel = t("Drop to use as a reference image", "ui");
     } else {
       delete container.dataset.projectDropLabel;
     }
@@ -34,6 +36,20 @@ export function bindProjectFileDrop(container, state, t) {
     const file = event.dataTransfer.files[0];
     if (!file) return;
     event.preventDefault();
-    if (isProjectFile(file)) callRuntimeHook(state, "runProjectImportFileFn", file);
+    if (isProjectFile(file)) {
+      callRuntimeHook(state, "runProjectImportFileFn", file);
+    } else if (file.type.startsWith("image/")) {
+      const doc = container.ownerDocument;
+      const input = doc?.getElementById("referenceImageInput");
+      if (input) {
+        doc.getElementById("dockReferenceBtn")?.click();
+        input.files = event.dataTransfer.files;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      } else {
+        callRuntimeHook(state, "showToastFn", t("Images can be used as a reference map", "ui"));
+      }
+    } else {
+      callRuntimeHook(state, "showToastFn", t("Only .json/.zip project files can be opened", "ui"));
+    }
   });
 }

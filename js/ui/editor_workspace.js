@@ -1,6 +1,6 @@
 import { createButton } from "./components/button.js";
 import { createUiIcon, setUiIcon } from "./components/ui_icons.js";
-import { initCommandPalette } from "./command_palette.js";
+import { initCommandPalette, shortcuts, formatShortcut, shortcutLabel } from "./command_palette.js";
 
 // Reuse panes already mounted in the workspace. Remaining legacy panes move
 // with their element references, event handlers, and native form contracts.
@@ -632,11 +632,8 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   const commandPalette = initCommandPalette({ documentRef, t, getCommands: () => [
     ...[...propertyEntries].filter(([, entry]) => entry.task === "layers").map(([key, entry]) => ({ key, label: entry.label, button: entry.trigger, group: "Layers" })),
     ...objectEntries.map((entry) => ({ key: entry.key, label: propertyEntries.get(entry.key).label, button: entry.button, group: "Objects" })),
-    ...[
-      ["toolSelectBtn", "Select tool", "V"], ["toolFillBtn", "Fill tool", "F"],
-      ["toolEraserBtn", "Eraser tool", "E"], ["toolEyedropperBtn", "Eyedropper tool", "I"],
-      ["brushModeBtn", "Brush", "B"],
-    ].map(([key, label, shortcut]) => ({ key, label, shortcut, button: get(key), group: "Tools" })),
+    ...shortcuts.filter(({ group, action }) => group === "Tools" && get(action))
+      .map(({ action, label, keys, group }) => ({ key: action, label, shortcut: formatShortcut(keys), button: get(action), group })),
     ...[
       ["workspaceSaveBtn", "Save project"], ["workspaceExportBtn", "Export image"],
       ["quickReexportBtn", "Export with last settings"],
@@ -670,11 +667,11 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   helpButton.setAttribute("aria-label", t("Help", "ui"));
   helpButton.dataset.i18nAriaLabel = "Help";
   helpButton.title = t("Help", "ui");
-  const openPalette = (query) => { closeHelp(true); commandPalette.open(query); };
+  const openPalette = (query) => { closeHelp(!helpMenu.hidden); commandPalette.open(query); };
   helpMenu.append(button("Keyboard shortcuts", "editorKeyboardShortcutsBtn", () => openPalette("?")));
   const paletteButton = button("", "editorCommandPaletteBtn", () => openPalette(""));
   const paletteShortcut = make("kbd", "");
-  paletteShortcut.textContent = "Ctrl+K";
+  paletteShortcut.textContent = shortcutLabel("palette");
   paletteButton.append(make("span", "", "Command palette"), paletteShortcut);
   helpMenu.append(paletteButton);
   const github = move("workspaceGithubLink", helpMenu);

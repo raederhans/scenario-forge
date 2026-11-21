@@ -6154,8 +6154,8 @@
     "zh": "暂时没有可用的 facility 详情。"
   },
   "No file selected": {
-    "en": "No file selected",
-    "zh": "未选择文件"
+    "en": "No file selected. You can also drop a project file onto the map.",
+    "zh": "未选择文件。也可以把项目文件拖到地图上。"
   },
   "No frontline control split in current scenario.": {
     "en": "No frontline control split in current scenario.",
@@ -12260,5 +12260,93 @@
       "other": "Skipping {count} painted regions"
     },
     "zh": "将跳过 {count} 块已涂地块"
+  },
+  "Alt+Click": {
+    "en": "Alt+Click",
+    "zh": "Alt+单击"
+  },
+  "Cancel stroke or exit current mode": {
+    "en": "Cancel stroke or exit current mode",
+    "zh": "取消笔画或逐级退出当前模式"
+  },
+  "Choose a quick color": {
+    "en": "Choose a quick color",
+    "zh": "选择快捷色"
+  },
+  "Colors": {
+    "en": "Colors",
+    "zh": "颜色"
+  },
+  "Double-click": {
+    "en": "Double-click",
+    "zh": "双击"
+  },
+  "Drop to use as a reference image": {
+    "en": "Drop to use as a reference image",
+    "zh": "放下作为参考图"
+  },
+  "File": {
+    "en": "File",
+    "zh": "文件"
+  },
+  "Gestures": {
+    "en": "Gestures",
+    "zh": "手势"
+  },
+  "Hold Alt and click to sample a color": {
+    "en": "Hold Alt and click to sample a color",
+    "zh": "按住 Alt 点击取色"
+  },
+  "Hold and drag to pan": {
+    "en": "Hold and drag to pan",
+    "zh": "按住并拖动以平移地图"
+  },
+  "Images can be used as a reference map": {
+    "en": "Images can be used as a reference map",
+    "zh": "图片可作为参考图"
+  },
+  "Only .json/.zip project files can be opened": {
+    "en": "Only .json/.zip project files can be opened",
+    "zh": "只能打开 .json/.zip 项目文件"
+  },
+  "Open project": {
+    "en": "Open project",
+    "zh": "打开项目"
+  },
+  "Pan down on focused map (Shift for larger steps)": {
+    "en": "Pan down on focused map (Shift for larger steps)",
+    "zh": "地图获得焦点时向下平移（按住 Shift 加大步长）"
+  },
+  "Pan left on focused map (Shift for larger steps)": {
+    "en": "Pan left on focused map (Shift for larger steps)",
+    "zh": "地图获得焦点时向左平移（按住 Shift 加大步长）"
+  },
+  "Pan right on focused map (Shift for larger steps)": {
+    "en": "Pan right on focused map (Shift for larger steps)",
+    "zh": "地图获得焦点时向右平移（按住 Shift 加大步长）"
+  },
+  "Pan up on focused map (Shift for larger steps)": {
+    "en": "Pan up on focused map (Shift for larger steps)",
+    "zh": "地图获得焦点时向上平移（按住 Shift 加大步长）"
+  },
+  "Place map text": {
+    "en": "Place map text",
+    "zh": "放置地图文字"
+  },
+  "Quick fill": {
+    "en": "Quick fill",
+    "zh": "快速填色"
+  },
+  "Space": {
+    "en": "Space",
+    "zh": "空格"
+  },
+  "Toggle bottom dock": {
+    "en": "Toggle bottom dock",
+    "zh": "开关底栏"
+  },
+  "Toggle developer mode": {
+    "en": "Toggle developer mode",
+    "zh": "开关开发者模式"
   }
 }
