@@ -85,8 +85,10 @@
           "name_en": "Farah",
           "name_zh": "法拉赫",
           "feature_ids": [
-            "AFG-1749",
-            "AFG-1751"
+            "AFG-1749__SPLIT_PLAYA_HAMUN_E_SABERI",
+            "AFG-1749__SPLIT_REST",
+            "AFG-1751__SPLIT_PLAYA_GOWD_E_ZEREH",
+            "AFG-1751__SPLIT_REST"
           ]
         }
       }
@@ -113,7 +115,10 @@
           "name_zh": "北伊庇鲁斯",
           "feature_ids": [
             "AL033",
-            "AL034",
+            "AL034__SPLIT_GALICHITSA",
+            "AL034__SPLIT_OUTER_VLORE",
+            "AL034__SPLIT_POGRADEC",
+            "AL034__SPLIT_PRESPA",
             "AL035"
           ]
         },
@@ -167,8 +172,12 @@
           "name_en": "Tucumán",
           "name_zh": "图库曼",
           "feature_ids": [
-            "AR_ADM1_ARG-1300",
-            "AR_ADM1_ARG-1304",
+            "AR_ADM1_ARG-1300__SPLIT_PLAYA_SALAR_DE_PIPANACO",
+            "AR_ADM1_ARG-1300__SPLIT_PLAYA_SALT_FLAT_19",
+            "AR_ADM1_ARG-1300__SPLIT_PLAYA_SALT_FLAT_33",
+            "AR_ADM1_ARG-1300__SPLIT_REST",
+            "AR_ADM1_ARG-1304__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA",
+            "AR_ADM1_ARG-1304__SPLIT_REST",
             "AR_ADM1_ARG-1305"
           ]
         },
@@ -254,7 +263,10 @@
           "name_en": "San Luis y La Pampa",
           "name_zh": "圣路易斯和拉潘帕",
           "feature_ids": [
-            "AR_ADM1_ARG-1299"
+            "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA",
+            "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_19",
+            "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_20",
+            "AR_ADM1_ARG-1299__SPLIT_REST"
           ]
         },
         "state_959": {
@@ -263,7 +275,8 @@
           "name_zh": "洛斯安第斯",
           "feature_ids": [
             "AR_ADM1_ARG-1301",
-            "AR_ADM1_ARG-1303"
+            "AR_ADM1_ARG-1303__SPLIT_PLAYA_SALAR_DE_ARIZARO",
+            "AR_ADM1_ARG-1303__SPLIT_REST"
           ]
         },
         "state_960": {
@@ -272,7 +285,9 @@
           "name_zh": "圣胡安和拉里奥哈",
           "feature_ids": [
             "AR_ADM1_ARG-1273",
-            "AR_ADM1_ARG-1302"
+            "AR_ADM1_ARG-1302__SPLIT_PLAYA_SALT_FLAT_19",
+            "AR_ADM1_ARG-1302__SPLIT_PLAYA_SALT_FLAT_34",
+            "AR_ADM1_ARG-1302__SPLIT_REST"
           ]
         }
       }
@@ -335,7 +350,9 @@
           "name_en": "Western Australia",
           "name_zh": "西澳大利亚",
           "feature_ids": [
-            "AU_ADM1_AUS-2651",
+            "AU_ADM1_AUS-2651__SPLIT_LAKE_ARGYLE",
+            "AU_ADM1_AUS-2651__SPLIT_PLAYA_FORTESCUE_RIVER_FLOODOUT",
+            "AU_ADM1_AUS-2651__SPLIT_REST",
             "AU_CITY_PERTH"
           ]
         }
@@ -403,9 +420,19 @@
           "name_en": "Steiermark-Kärnten",
           "name_zh": "施泰尔马克-克恩滕",
           "feature_ids": [
-            "AT211",
-            "AT212",
-            "AT213",
+            "AT211__SPLIT_EBRIACH",
+            "AT211__SPLIT_KLAGENFURT_LAND",
+            "AT211__SPLIT_VOLKERMARKT",
+            "AT212__SPLIT_CARINTHIA",
+            "AT212__SPLIT_EBENTHAL",
+            "AT212__SPLIT_EBRIACH",
+            "AT212__SPLIT_GALLIZIEN",
+            "AT212__SPLIT_GRAFENSTEIN",
+            "AT212__SPLIT_RUCKERSDORF",
+            "AT213__SPLIT_RUCKERSDORF",
+            "AT213__SPLIT_TAINACH",
+            "AT213__SPLIT_VOLKERMARKT",
+            "AT213__SPLIT_WOLFSBERG",
             "AT221",
             "AT223",
             "AT224",
@@ -448,7 +475,15 @@
             "BE332",
             "BE343",
             "BE351",
-            "BE_MRG_49096f4ef44b",
+            "BE_MRG_49096f4ef44b__SPLIT_EUPEN_MALMEDY",
+            "BE_MRG_49096f4ef44b__SPLIT_HASSELT",
+            "BE_MRG_49096f4ef44b__SPLIT_KELMIS",
+            "BE_MRG_49096f4ef44b__SPLIT_LIEGE",
+            "BE_MRG_49096f4ef44b__SPLIT_MALDINGEN",
+            "BE_MRG_49096f4ef44b__SPLIT_REINARTZHOF",
+            "BE_MRG_49096f4ef44b__SPLIT_SPA",
+            "BE_MRG_49096f4ef44b__SPLIT_VERVIERS",
+            "BE_MRG_49096f4ef44b__SPLIT_VOEREN",
             "BE_MRG_6a92ca76474d",
             "BE_MRG_a29e92a10668"
           ]
@@ -571,9 +606,12 @@
             "BO_ADM1_BOL-1291",
             "BO_ADM1_BOL-1293",
             "BO_ADM1_BOL-1936",
-            "BO_ADM1_BOL-1937",
+            "BO_ADM1_BOL-1937__SPLIT_PLAYA_SALAR_DE_COIPASA",
+            "BO_ADM1_BOL-1937__SPLIT_PLAYA_SALAR_DE_UYUNI",
+            "BO_ADM1_BOL-1937__SPLIT_REST",
             "BO_ADM1_BOL-1938",
-            "BO_ADM1_BOL-1939"
+            "BO_ADM1_BOL-1939__SPLIT_PLAYA_SALAR_DE_UYUNI",
+            "BO_ADM1_BOL-1939__SPLIT_REST"
           ]
         },
         "state_487": {
@@ -636,7 +674,11 @@
           "name_en": "Minas Gerais",
           "name_zh": "米纳斯吉拉斯",
           "feature_ids": [
-            "BR_ADM1_BRA-601"
+            "BR_ADM1_BRA-601__SPLIT_REPRESA_DE_SAO_SIMAO",
+            "BR_ADM1_BRA-601__SPLIT_REPRESA_FURNAS",
+            "BR_ADM1_BRA-601__SPLIT_REPRESA_TRES_MARIAS",
+            "BR_ADM1_BRA-601__SPLIT_REPRESSA_DE_JUPIA",
+            "BR_ADM1_BRA-601__SPLIT_REST"
           ]
         },
         "state_497": {
@@ -661,7 +703,8 @@
           "name_en": "Bahia",
           "name_zh": "巴伊亚",
           "feature_ids": [
-            "BR_ADM1_BRA-624",
+            "BR_ADM1_BRA-624__SPLIT_REPRESA_DE_SOBRADINHO",
+            "BR_ADM1_BRA-624__SPLIT_REST",
             "BR_ADM1_BRA-629"
           ]
         },
@@ -678,7 +721,11 @@
           "name_en": "São Paulo",
           "name_zh": "圣保罗",
           "feature_ids": [
-            "BR_ADM1_BRA-1311"
+            "BR_ADM1_BRA-1311__SPLIT_BARIRI",
+            "BR_ADM1_BRA-1311__SPLIT_REPRESA_IEPE",
+            "BR_ADM1_BRA-1311__SPLIT_REPRESA_PORTO_PRIMAVERA",
+            "BR_ADM1_BRA-1311__SPLIT_REPRESSA_DE_JUPIA",
+            "BR_ADM1_BRA-1311__SPLIT_REST"
           ]
         },
         "state_502": {
@@ -702,7 +749,9 @@
           "name_en": "Punta Porá",
           "name_zh": "蓬塔波朗",
           "feature_ids": [
-            "BR_ADM1_BRA-600"
+            "BR_ADM1_BRA-600__SPLIT_REPRESA_PORTO_PRIMAVERA",
+            "BR_ADM1_BRA-600__SPLIT_REPRESSA_DE_JUPIA",
+            "BR_ADM1_BRA-600__SPLIT_REST"
           ]
         },
         "state_505": {
@@ -710,7 +759,8 @@
           "name_en": "Goiás",
           "name_zh": "戈亚斯",
           "feature_ids": [
-            "BR_ADM1_BRA-1294",
+            "BR_ADM1_BRA-1294__SPLIT_REPRESA_DE_SAO_SIMAO",
+            "BR_ADM1_BRA-1294__SPLIT_REST",
             "BR_ADM1_BRA-599"
           ]
         },
@@ -744,7 +794,8 @@
           "name_en": "Amapá",
           "name_zh": "阿马帕",
           "feature_ids": [
-            "BR_ADM1_BRA-594",
+            "BR_ADM1_BRA-594__SPLIT_REPRESA_DE_TUCURUI",
+            "BR_ADM1_BRA-594__SPLIT_REST",
             "BR_ADM1_BRA-681"
           ]
         },
@@ -785,7 +836,9 @@
           "name_en": "Paraná",
           "name_zh": "巴拉那",
           "feature_ids": [
-            "BR_ADM1_BRA-613"
+            "BR_ADM1_BRA-613__SPLIT_REPRESA_IEPE",
+            "BR_ADM1_BRA-613__SPLIT_REPRESA_ITAIPU",
+            "BR_ADM1_BRA-613__SPLIT_REST"
           ]
         },
         "state_969": {
@@ -1085,7 +1138,9 @@
             "BG313",
             "BG411",
             "BG412",
-            "BG413",
+            "BG413__SPLIT_BANSKO",
+            "BG413__SPLIT_DOSPAT",
+            "BG413__SPLIT_SANDANSKI",
             "BG414",
             "BG415"
           ]
@@ -1111,7 +1166,13 @@
           "feature_ids": [
             "BG344",
             "BG421",
-            "BG422",
+            "BG422__SPLIT_EDIRNE",
+            "BG422__SPLIT_HUHLA",
+            "BG422__SPLIT_KEMAL",
+            "BG422__SPLIT_MERIC",
+            "BG422__SPLIT_ORESTIADA",
+            "BG422__SPLIT_ORMENIO",
+            "BG422__SPLIT_SVILENGRAD",
             "BG423",
             "BG424",
             "BG425"
@@ -1532,7 +1593,8 @@
             "CA_FED_48037",
             "CA_FED_59007",
             "CA_FED_59014",
-            "CA_FED_59026",
+            "CA_FED_59026__SPLIT_REST",
+            "CA_FED_59026__SPLIT_WILLISTON_LAKE",
             "CA_MRG_096ac84a0cc7",
             "CA_MRG_2ebb41be023f",
             "CA_MRG_567d2b874fad",
@@ -1609,11 +1671,14 @@
           "name_en": "Maurice",
           "name_zh": "莫里斯",
           "feature_ids": [
-            "CA_FED_24001",
+            "CA_FED_24001__SPLIT_RESERVOIR_DE_LA_GRANDE_2",
+            "CA_FED_24001__SPLIT_RESERVOIR_DE_LA_GRANDE_3",
+            "CA_FED_24001__SPLIT_REST",
             "CA_FED_24008",
             "CA_FED_24016",
             "CA_FED_24018",
-            "CA_FED_24021",
+            "CA_FED_24021__SPLIT_RESERVOIR_MANICOUAGAN",
+            "CA_FED_24021__SPLIT_REST",
             "CA_FED_24030",
             "CA_FED_24033",
             "CA_FED_24059",
@@ -2706,7 +2771,9 @@
           "name_en": "Atacama",
           "name_zh": "阿塔卡马",
           "feature_ids": [
-            "CL_ADM1_CHL-2695",
+            "CL_ADM1_CHL-2695__SPLIT_PLAYA_SALAR_DE_ATACAMA",
+            "CL_ADM1_CHL-2695__SPLIT_PLAYA_SALAR_DE_PUNTA_NEGRA",
+            "CL_ADM1_CHL-2695__SPLIT_REST",
             "CL_ADM1_CHL-2696"
           ]
         }
@@ -2877,12 +2944,15 @@
             "RU_ARCTIC_FB_8611",
             "RU_MRG_110b1d987f63",
             "RU_MRG_369dfe090b12",
-            "RU_RAY_50074027B16961904381699",
-            "RU_RAY_50074027B20716795967188",
+            "RU_RAY_50074027B16961904381699__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B16961904381699__SPLIT_REST",
+            "RU_RAY_50074027B20716795967188__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B20716795967188__SPLIT_REST",
             "RU_RAY_50074027B41946531355256",
             "RU_RAY_50074027B45893078100577",
             "RU_RAY_50074027B5573235052647",
-            "RU_RAY_50074027B57067541625780",
+            "RU_RAY_50074027B57067541625780__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B57067541625780__SPLIT_REST",
             "RU_RAY_50074027B65458030094261",
             "RU_RAY_50074027B91746933948416"
           ]
@@ -3068,7 +3138,8 @@
             "SK_ADM2_56367889B67356758961124",
             "SK_ADM2_56367889B68595341554064",
             "SK_ADM2_56367889B89309998682201",
-            "SK_ADM2_56367889B94927774956455",
+            "SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA",
+            "SK_ADM2_56367889B94927774956455__SPLIT_REST",
             "SK_ADM2_56367889B97071895480744",
             "SK_ADM2_56367889B99469568447767",
             "SK_MRG_e93604b4f2a5"
@@ -3155,7 +3226,8 @@
             "SK_ADM2_56367889B2947656286883",
             "SK_ADM2_56367889B50353875052402",
             "SK_ADM2_56367889B62817588919968",
-            "SK_ADM2_56367889B83569782265262",
+            "SK_ADM2_56367889B83569782265262__SPLIT_ORAVA",
+            "SK_ADM2_56367889B83569782265262__SPLIT_REST",
             "SK_MRG_6ddeb377aab6",
             "SK_MRG_dac05b35b387"
           ]
@@ -3428,7 +3500,8 @@
           "name_en": "Southern Jutland",
           "name_zh": "南日德兰",
           "feature_ids": [
-            "DK_HIST_NORTH_SCHLESWIG",
+            "DK_HIST_NORTH_SCHLESWIG__SPLIT_SYDJYLLAND",
+            "DK_HIST_NORTH_SCHLESWIG__SPLIT_TONDERN",
             "DK_SJY_REMAINDER"
           ]
         }
@@ -4122,6 +4195,32 @@
             "EE008"
           ]
         },
+        "state_195": {
+          "district_id": "state_195",
+          "name_en": "Leningrad",
+          "name_zh": "列宁格勒",
+          "feature_ids": [
+            "RU_RAY_50074027B99227036451137__SPLIT_JAANILINN"
+          ]
+        },
+        "state_208": {
+          "district_id": "state_208",
+          "name_en": "Luga",
+          "name_zh": "卢加",
+          "feature_ids": [
+            "RU_RAY_50074027B5223158268211__SPLIT_NARVATAGUSE"
+          ]
+        },
+        "state_209": {
+          "district_id": "state_209",
+          "name_en": "Pskov",
+          "name_zh": "普斯科夫",
+          "feature_ids": [
+            "RU_ARCTIC_FB_043",
+            "RU_ARCTIC_FB_8033",
+            "RU_RAY_50074027B90555869339870__SPLIT_PETSERI"
+          ]
+        },
         "state_812": {
           "district_id": "state_812",
           "name_en": "Harju",
@@ -4719,16 +4818,39 @@
             "FR_ARR_54004",
             "FR_ARR_55002",
             "FR_ARR_57003",
-            "FR_ARR_57005",
-            "FR_ARR_57006",
-            "FR_ARR_57007",
-            "FR_ARR_57009",
+            "FR_ARR_57005__SPLIT_ALSACE",
+            "FR_ARR_57005__SPLIT_HATTIGNY",
+            "FR_ARR_57005__SPLIT_INNER_ALSACE",
+            "FR_ARR_57005__SPLIT_INNER_MOSELLE",
+            "FR_ARR_57005__SPLIT_SARREBOURG",
+            "FR_ARR_57005__SPLIT_SAVERNE",
+            "FR_ARR_57006__SPLIT_HAGUENAU",
+            "FR_ARR_57006__SPLIT_MOSELLE",
+            "FR_ARR_57006__SPLIT_SARREBOURG",
+            "FR_ARR_57007__SPLIT_BRIEY",
+            "FR_ARR_57007__SPLIT_CATTENOM",
+            "FR_ARR_57007__SPLIT_HAYANGE",
+            "FR_ARR_57007__SPLIT_MANDEREN",
+            "FR_ARR_57007__SPLIT_THIONVILLE",
+            "FR_ARR_57009__SPLIT_HAYANGE",
+            "FR_ARR_57009__SPLIT_INNER_MOSELLE",
+            "FR_ARR_57009__SPLIT_METZ",
+            "FR_ARR_57009__SPLIT_VIGNY",
+            "FR_ARR_57009__SPLIT_WOIPPY",
             "FR_ARR_67002",
-            "FR_ARR_67003",
-            "FR_ARR_67004",
-            "FR_ARR_67005",
+            "FR_ARR_67003__SPLIT_ALSACE",
+            "FR_ARR_67003__SPLIT_SAVERNE",
+            "FR_ARR_67003__SPLIT_STRASBOURG",
+            "FR_ARR_67004__SPLIT_ALSACE",
+            "FR_ARR_67004__SPLIT_HAGUENAU",
+            "FR_ARR_67004__SPLIT_MOSELLE",
+            "FR_ARR_67004__SPLIT_SARREBOURG",
+            "FR_ARR_67004__SPLIT_STRASBOURG",
+            "FR_ARR_67005__SPLIT_COLMAR",
+            "FR_ARR_67005__SPLIT_STRASBOURG",
             "FR_ARR_67008",
-            "FR_ARR_68002",
+            "FR_ARR_68002__SPLIT_COLMAR",
+            "FR_ARR_68002__SPLIT_KINTZHEIM",
             "FR_ARR_88003"
           ]
         },
@@ -4794,7 +4916,7 @@
             "FR_ARR_65001",
             "FR_ARR_65002",
             "FR_ARR_65003",
-            "FR_ARR_66003",
+            "FR_ARR_66003__SPLIT_REST",
             "FR_MRG_0d1fb06c5ad5",
             "FR_MRG_5b351c0f453a",
             "FR_MRG_b062e98b7497",
@@ -4863,7 +4985,7 @@
             "FR_ARR_04003",
             "FR_ARR_04004",
             "FR_ARR_06001",
-            "FR_ARR_06002__SPLIT_REST",
+            "FR_ARR_06002__SPLIT_REST__SPLIT_NICE",
             "MC_ADMIN0_PASSTHROUGH"
           ]
         },
@@ -4894,8 +5016,10 @@
             "DZA-2146",
             "DZA-2147",
             "DZA-2201",
-            "DZA-2204",
-            "DZA-2205",
+            "DZA-2204__SPLIT_PLAYA_CHOTT_ECH_CHERGUI",
+            "DZA-2204__SPLIT_REST",
+            "DZA-2205__SPLIT_PLAYA_CHOTT_ECH_CHERGUI",
+            "DZA-2205__SPLIT_REST",
             "DZA-2206"
           ]
         },
@@ -4918,7 +5042,22 @@
           "name_en": "Ermland-Masuren",
           "name_zh": "埃姆兰-马祖伦",
           "feature_ids": [
-            "PL_MRG_c908eb11c602",
+            "PL_MRG_c908eb11c602__SPLIT_ALLENSTEIN",
+            "PL_MRG_c908eb11c602__SPLIT_ARYS",
+            "PL_MRG_c908eb11c602__SPLIT_DZIALDOWO",
+            "PL_MRG_c908eb11c602__SPLIT_EAST_SOLDAU",
+            "PL_MRG_c908eb11c602__SPLIT_GARDIENEN",
+            "PL_MRG_c908eb11c602__SPLIT_GUTTSTADT",
+            "PL_MRG_c908eb11c602__SPLIT_HOHENSTEIN",
+            "PL_MRG_c908eb11c602__SPLIT_KURKI",
+            "PL_MRG_c908eb11c602__SPLIT_MARIENWERDER",
+            "PL_MRG_c908eb11c602__SPLIT_NIKOLAIKEN",
+            "PL_MRG_c908eb11c602__SPLIT_ORTELSBURG",
+            "PL_MRG_c908eb11c602__SPLIT_ORTELSBURG_7428",
+            "PL_MRG_c908eb11c602__SPLIT_PASSENHEIM",
+            "PL_MRG_c908eb11c602__SPLIT_PLOSNICA",
+            "PL_MRG_c908eb11c602__SPLIT_RASTENBURG",
+            "PL_MRG_c908eb11c602__SPLIT_SENSBURG",
             "PL_POW_2207",
             "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
             "PL_POW_2209__SPLIT_REST",
@@ -4926,16 +5065,23 @@
             "PL_POW_2210__SPLIT_REST",
             "PL_POW_2216",
             "PL_POW_2801",
-            "PL_POW_2802",
-            "PL_POW_2804",
+            "PL_POW_2802__SPLIT_BRAUNSBERG",
+            "PL_POW_2802__SPLIT_HEILSBERG",
+            "PL_POW_2802__SPLIT_SCHONFELD",
+            "PL_POW_2802__SPLIT_WORMDITT",
+            "PL_POW_2804__SPLIT_MALDEUTEN",
+            "PL_POW_2804__SPLIT_SCHONFELD",
             "PL_POW_2805",
             "PL_POW_2807__SPLIT_REST",
-            "PL_POW_2808",
+            "PL_POW_2808__SPLIT_LISSEN",
+            "PL_POW_2808__SPLIT_OSTPREUEN",
             "PL_POW_2811",
             "PL_POW_2813",
             "PL_POW_2815",
             "PL_POW_2816",
-            "PL_POW_2817",
+            "PL_POW_2817__SPLIT_DZIALDOWO",
+            "PL_POW_2817__SPLIT_KURKI",
+            "PL_POW_2817__SPLIT_MAZURIA",
             "PL_POW_2819",
             "PL_POW_2861",
             "PL_POW_2862"
@@ -5581,9 +5727,20 @@
           "name_zh": "但泽",
           "feature_ids": [
             "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG",
-            "PL_POW_2201",
+            "PL_POW_2201__SPLIT_EAST_BUTOW",
+            "PL_POW_2201__SPLIT_REIHERSHORST",
+            "PL_POW_2201__SPLIT_SCHWARZ_DAMERKOW",
+            "PL_POW_2201__SPLIT_SIANOWO",
             "PL_POW_2212",
             "PL_POW_2263"
+          ]
+        },
+        "state_151": {
+          "district_id": "state_151",
+          "name_en": "Eastern Swiss Alps",
+          "name_zh": "东瑞士阿尔卑斯",
+          "feature_ids": [
+            "CH057__SPLIT_BUSINGEN"
           ]
         },
         "state_206": {
@@ -5613,7 +5770,10 @@
           "name_en": "Königsberg",
           "name_zh": "柯尼斯堡",
           "feature_ids": [
-            "PL_POW_2818",
+            "PL_POW_2818__SPLIT_ANGERBURG",
+            "PL_POW_2818__SPLIT_DARKEHMEN",
+            "PL_POW_2818__SPLIT_GOLDAP",
+            "PL_POW_2818__SPLIT_LOTZEN",
             "RU_ARCTIC_FB_003",
             "RU_ARCTIC_FB_005",
             "RU_ARCTIC_FB_006",
@@ -5680,9 +5840,19 @@
           "name_zh": "石勒苏益格",
           "feature_ids": [
             "DEF01",
-            "DEF07",
-            "DEF0C",
-            "DE_MRG_d67a0e4a728d",
+            "DEF07__SPLIT_HUSUM",
+            "DEF07__SPLIT_PADBORG",
+            "DEF07__SPLIT_RUDBOL",
+            "DEF07__SPLIT_SCHLESWIG",
+            "DEF0C__SPLIT_ALS",
+            "DEF0C__SPLIT_DAMP",
+            "DEF0C__SPLIT_PADBORG",
+            "DEF0C__SPLIT_SCHLESWIG",
+            "DE_MRG_d67a0e4a728d__SPLIT_DAMP",
+            "DE_MRG_d67a0e4a728d__SPLIT_EAST_KIEL_CANAL",
+            "DE_MRG_d67a0e4a728d__SPLIT_RENDSBURG",
+            "DE_MRG_d67a0e4a728d__SPLIT_SOUTH_DAMP",
+            "DE_MRG_d67a0e4a728d__SPLIT_WEST_SCHLESWIG",
             "DE_SHELL_FB_027",
             "DE_SHELL_FB_028",
             "DE_SHELL_FB_030",
@@ -5839,7 +6009,12 @@
           "name_en": "Thrace",
           "name_zh": "色雷斯",
           "feature_ids": [
-            "GR_ADM1_GRC-3001"
+            "GR_ADM1_GRC-3001__SPLIT_ALEXANDROUPOLI",
+            "GR_ADM1_GRC-3001__SPLIT_IPSALA",
+            "GR_ADM1_GRC-3001__SPLIT_KESAN",
+            "GR_ADM1_GRC-3001__SPLIT_LULEBURGAZ",
+            "GR_ADM1_GRC-3001__SPLIT_MERIC",
+            "GR_ADM1_GRC-3001__SPLIT_UZUMKOPRU"
           ]
         },
         "state_185": {
@@ -5847,31 +6022,44 @@
           "name_en": "Epirus",
           "name_zh": "伊庇鲁斯",
           "feature_ids": [
-            "EL511",
-            "EL512",
-            "EL513",
-            "EL514",
-            "EL515",
-            "EL521",
-            "EL522",
-            "EL523",
-            "EL524",
-            "EL525",
-            "EL526",
-            "EL527",
             "EL531",
             "EL532",
-            "EL533",
             "EL541",
             "EL542",
-            "EL543",
+            "EL543__SPLIT_CENTRAL_EPIRUS",
+            "EL543__SPLIT_ERSEKE",
+            "EL543__SPLIT_KONITSA",
+            "EL543__SPLIT_METSOVO",
+            "EL543__SPLIT_NORTH_EPIRUS",
+            "EL543__SPLIT_PARGA",
+            "EL543__SPLIT_SARANDE",
             "EL611",
-            "EL612",
             "EL622",
             "EL624",
             "EL631",
             "EL643",
-            "GR_ADM1_GRC-2883"
+            "GR_ADM1_GRC-2883",
+            "GR_ADM1_GRC-2892__SPLIT_DISPILLO",
+            "GR_ADM1_GRC-2892__SPLIT_EAST_KASTORIA",
+            "GR_ADM1_GRC-2892__SPLIT_KASTORIA",
+            "GR_ADM1_GRC-2892__SPLIT_KOZANI",
+            "GR_ADM1_GRC-2892__SPLIT_PRESPA",
+            "GR_ADM1_GRC-2892__SPLIT_PTOLEMAIDA",
+            "GR_ADM1_GRC-2892__SPLIT_SIMANTRO",
+            "GR_ADM1_GRC-2900",
+            "GR_ADM1_GRC-2949__SPLIT_ARTA",
+            "GR_ADM1_GRC-2949__SPLIT_CENTRAL_EPIRUS",
+            "GR_ADM1_GRC-2949__SPLIT_ERSEKE",
+            "GR_ADM1_GRC-2949__SPLIT_KONITSA",
+            "GR_ADM1_GRC-2949__SPLIT_METSOVO",
+            "GR_ADM1_GRC-2949__SPLIT_NORTH_EPIRUS",
+            "GR_ADM1_GRC-2949__SPLIT_PARGA",
+            "GR_ADM1_GRC-2949__SPLIT_PREVEZA",
+            "GR_ADM1_GRC-2949__SPLIT_SARANDE",
+            "GR_ADM1_GRC-2949__SPLIT_WEST_IOANNINA",
+            "GR_ADM1_GRC-2991__SPLIT_CENTRAL_MACEDONIA",
+            "GR_ADM1_GRC-2991__SPLIT_CHALKIDIKI",
+            "GR_ADM1_GRC-2991__SPLIT_KATERINI"
           ]
         },
         "state_186": {
@@ -5916,10 +6104,20 @@
           "name_en": "Central Macedonia",
           "name_zh": "中马其顿",
           "feature_ids": [
-            "GR_ADM1_GRC-2892",
-            "GR_ADM1_GRC-2900",
-            "GR_ADM1_GRC-2949",
-            "GR_ADM1_GRC-2991",
+            "EL511",
+            "EL512",
+            "EL513",
+            "EL514",
+            "EL515",
+            "EL521",
+            "EL522",
+            "EL523",
+            "EL524",
+            "EL525",
+            "EL526",
+            "EL527",
+            "EL533",
+            "EL612",
             "GR_ADM1_GRC-2992"
           ]
         }
@@ -6337,7 +6535,9 @@
             "NL131",
             "NL213",
             "NL226",
-            "NL230",
+            "NL230__SPLIT_FLEVOPOLDER",
+            "NL230__SPLIT_NOORDOOSTPOLDER",
+            "NL230__SPLIT_REST",
             "NL321",
             "NL_MRG_39ca088797c0",
             "NL_MRG_45a7250c2862",
@@ -6628,7 +6828,8 @@
           "name_zh": "海德拉巴",
           "feature_ids": [
             "IN_ADM2_76128533B14849085202492",
-            "IN_ADM2_76128533B75922461866405"
+            "IN_ADM2_76128533B75922461866405__SPLIT_PLAYA_RANN_OF_KUTCH",
+            "IN_ADM2_76128533B75922461866405__SPLIT_REST"
           ]
         },
         "state_428": {
@@ -6636,7 +6837,8 @@
           "name_en": "Gujarat",
           "name_zh": "古吉拉特",
           "feature_ids": [
-            "IN_MRG_c84cc721f026"
+            "IN_MRG_c84cc721f026__SPLIT_PLAYA_RANN_OF_KUTCH",
+            "IN_MRG_c84cc721f026__SPLIT_REST"
           ]
         },
         "state_433": {
@@ -6724,12 +6926,15 @@
           "name_en": "Baghdad",
           "name_zh": "巴格达",
           "feature_ids": [
-            "IRQ-3052",
+            "IRQ-3052__SPLIT_BUHAYRAT_ATH_THARTHAR",
+            "IRQ-3052__SPLIT_REST",
             "IRQ-3062",
             "IRQ-3063",
             "IRQ-3227",
             "IRQ-3243",
-            "IRQ-3471",
+            "IRQ-3471__SPLIT_BUHAYRAT_ATH_THARTHAR",
+            "IRQ-3471__SPLIT_PLAYA_SALT_FLAT_40",
+            "IRQ-3471__SPLIT_REST",
             "IRQ-3472"
           ]
         },
@@ -6791,7 +6996,14 @@
           "name_en": "South Tyrol",
           "name_zh": "南蒂罗尔",
           "feature_ids": [
-            "ITH10",
+            "ITH10__SPLIT_BRUNICO",
+            "ITH10__SPLIT_LACES",
+            "ITH10__SPLIT_MELAGO",
+            "ITH10__SPLIT_MERANO",
+            "ITH10__SPLIT_MERANO_MERAN",
+            "ITH10__SPLIT_NORTH_TRENTINO",
+            "ITH10__SPLIT_SUDTIROL",
+            "ITH10__SPLIT_WEST_SUDTIROL",
             "ITH33"
           ]
         },
@@ -6954,6 +7166,14 @@
             "ITI1A"
           ]
         },
+        "state_735": {
+          "district_id": "state_735",
+          "name_en": "Savoy",
+          "name_zh": "萨伏依",
+          "feature_ids": [
+            "FR_ARR_06002__SPLIT_REST__SPLIT_TENDE"
+          ]
+        },
         "state_736": {
           "district_id": "state_736",
           "name_en": "Litorale",
@@ -6962,6 +7182,14 @@
             "ITH42",
             "ITH43",
             "ITH44"
+          ]
+        },
+        "state_846": {
+          "district_id": "state_846",
+          "name_en": "Ticino",
+          "name_zh": "提契诺",
+          "feature_ids": [
+            "CH070__SPLIT_CAMPIONE"
           ]
         },
         "state_849": {
@@ -6986,7 +7214,11 @@
           "feature_ids": [
             "ITC44",
             "ITC47",
-            "ITH20",
+            "ITH20__SPLIT_NORTH_TRENTINO",
+            "ITH20__SPLIT_ROVERETO",
+            "ITH20__SPLIT_TRENTINO",
+            "ITH20__SPLIT_WEST_SUDTIROL",
+            "ITH20__SPLIT_WEST_TRENTINO",
             "ITH31",
             "ITH32"
           ]
@@ -6999,10 +7231,19 @@
             "HR031__SPLIT_ABBAZIA",
             "HR031__SPLIT_CHERSO",
             "HR031__SPLIT_FIUME",
-            "HR036",
+            "HR036__SPLIT_CANFANARO",
+            "HR036__SPLIT_GIMINO",
+            "HR036__SPLIT_MEDOLINO",
+            "HR036__SPLIT_POLA",
+            "HR036__SPLIT_VALDARSA",
             "SI038__SPLIT_ITALIAN",
-            "SI043",
-            "SI044"
+            "SI043__SPLIT_IDRIA",
+            "SI043__SPLIT_LOGATEC",
+            "SI043__SPLIT_POSTUMIA",
+            "SI043__SPLIT_VKENTZI",
+            "SI044__SPLIT_GIMINO",
+            "SI044__SPLIT_POSTUMIA",
+            "SI044__SPLIT_SOUTH_IDRIA"
           ]
         }
       }
@@ -7438,7 +7679,11 @@
           "name_en": "Akhtubinsk",
           "name_zh": "阿赫图宾斯克",
           "feature_ids": [
-            "KAZ-3195",
+            "KAZ-3195__SPLIT_ARAL1987",
+            "KAZ-3195__SPLIT_ARAL2006",
+            "KAZ-3195__SPLIT_ARAL2009",
+            "KAZ-3195__SPLIT_ARALBASIN",
+            "KAZ-3195__SPLIT_REST",
             "RU_ARCTIC_FB_4188",
             "RU_ARCTIC_FB_4275"
           ]
@@ -7456,7 +7701,14 @@
           "name_en": "Kyzyl Orda",
           "name_zh": "克孜勒奥尔达",
           "feature_ids": [
-            "KAZ-3197"
+            "KAZ-3197__SPLIT_ARAL1973",
+            "KAZ-3197__SPLIT_ARAL1987",
+            "KAZ-3197__SPLIT_ARAL1999",
+            "KAZ-3197__SPLIT_ARAL2006",
+            "KAZ-3197__SPLIT_ARAL2009",
+            "KAZ-3197__SPLIT_ARAL2014",
+            "KAZ-3197__SPLIT_ARALBASIN",
+            "KAZ-3197__SPLIT_REST"
           ]
         },
         "state_405": {
@@ -7857,6 +8109,21 @@
             "LV003"
           ]
         },
+        "state_209": {
+          "district_id": "state_209",
+          "name_en": "Pskov",
+          "name_zh": "普斯科夫",
+          "feature_ids": [
+            "RU_ARCTIC_FB_044",
+            "RU_ARCTIC_FB_047",
+            "RU_ARCTIC_FB_048",
+            "RU_ARCTIC_FB_049",
+            "RU_ARCTIC_FB_051",
+            "RU_RAY_50074027B19741518738580__SPLIT_KACENI",
+            "RU_RAY_50074027B88274438285408__SPLIT_ABRENE",
+            "RU_RAY_50074027B90555869339870__SPLIT_LATVIAN"
+          ]
+        },
         "state_808": {
           "district_id": "state_808",
           "name_en": "Rīga",
@@ -7939,7 +8206,7 @@
           "name_zh": "奥克斯泰体哈",
           "feature_ids": [
             "LT025",
-            "LT029"
+            "LT029__SPLIT_REST"
           ]
         }
       }
@@ -8391,8 +8658,10 @@
             "MX_ZN_12_008",
             "MX_ZN_12_010",
             "MX_ZN_14_001",
-            "MX_ZN_14_002",
-            "MX_ZN_14_003",
+            "MX_ZN_14_002__SPLIT_LAKE_TEXCOCO",
+            "MX_ZN_14_002__SPLIT_REST",
+            "MX_ZN_14_003__SPLIT_LAKE_TEXCOCO",
+            "MX_ZN_14_003__SPLIT_REST",
             "MX_ZN_15_010",
             "MX_ZN_15_011",
             "MX_ZN_15_012",
@@ -8412,11 +8681,16 @@
             "MX_ZN_26_007",
             "MX_ZN_26_008",
             "MX_ZN_26_009",
-            "MX_ZN_26_010",
-            "MX_ZN_26_011",
-            "MX_ZN_26_012",
-            "MX_ZN_26_013",
-            "MX_ZN_26_014",
+            "MX_ZN_26_010__SPLIT_LAKE_TEXCOCO",
+            "MX_ZN_26_010__SPLIT_REST",
+            "MX_ZN_26_011__SPLIT_LAKE_TEXCOCO",
+            "MX_ZN_26_011__SPLIT_REST",
+            "MX_ZN_26_012__SPLIT_LAKE_TEXCOCO",
+            "MX_ZN_26_012__SPLIT_REST",
+            "MX_ZN_26_013__SPLIT_LAKE_TEXCOCO",
+            "MX_ZN_26_013__SPLIT_REST",
+            "MX_ZN_26_014__SPLIT_LAKE_TEXCOCO",
+            "MX_ZN_26_014__SPLIT_REST",
             "MX_ZN_26_015",
             "MX_ZN_30_002"
           ]
@@ -8829,8 +9103,10 @@
           "feature_ids": [
             "MNG-3208",
             "MNG-3318",
-            "MNG-3319",
-            "MNG-3320",
+            "MNG-3319__SPLIT_PLAYA_TSAGAAN_NUUR",
+            "MNG-3319__SPLIT_REST",
+            "MNG-3320__SPLIT_PLAYA_SALT_FLAT_27",
+            "MNG-3320__SPLIT_REST",
             "MNG-3322",
             "RU_ARCTIC_FB_5584",
             "RU_ARCTIC_FB_5621",
@@ -9015,12 +9291,16 @@
             "RU_ARCTIC_FB_2593",
             "RU_ARCTIC_FB_2594",
             "RU_ARCTIC_FB_2613",
-            "RU_ARCTIC_FB_2634",
+            "RU_ARCTIC_FB_2634__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_ARCTIC_FB_2634__SPLIT_REST",
             "RU_ARCTIC_FB_2738",
             "RU_ARCTIC_FB_2744",
-            "RU_RAY_50074027B31803957515687",
-            "RU_RAY_50074027B54726203316693",
-            "RU_RAY_50074027B85030315682895",
+            "RU_RAY_50074027B31803957515687__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B31803957515687__SPLIT_REST",
+            "RU_RAY_50074027B54726203316693__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B54726203316693__SPLIT_REST",
+            "RU_RAY_50074027B85030315682895__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B85030315682895__SPLIT_REST",
             "RU_RAY_50074027B96655496117027"
           ]
         },
@@ -9256,7 +9536,8 @@
             "ZM_ADM1_ZMB-516",
             "ZM_ADM1_ZMB-517",
             "ZM_ADM1_ZMB-520",
-            "ZM_ADM1_ZMB-522"
+            "ZM_ADM1_ZMB-522__SPLIT_LAKE_KARIBA",
+            "ZM_ADM1_ZMB-522__SPLIT_REST"
           ]
         },
         "state_981": {
@@ -9451,10 +9732,12 @@
             "PY_ADM1_PRY-610",
             "PY_ADM1_PRY-611",
             "PY_ADM1_PRY-615",
-            "PY_ADM1_PRY-616",
+            "PY_ADM1_PRY-616__SPLIT_REPRESA_ITAIPU",
+            "PY_ADM1_PRY-616__SPLIT_REST",
             "PY_ADM1_PRY-617",
             "PY_ADM1_PRY-618",
-            "PY_ADM1_PRY-619",
+            "PY_ADM1_PRY-619__SPLIT_REPRESA_ITAIPU",
+            "PY_ADM1_PRY-619__SPLIT_REST",
             "PY_ADM1_PRY-620"
           ]
         },
@@ -9479,9 +9762,14 @@
           "feature_ids": [
             "IRN-3213",
             "IRN-3214",
-            "IRN-3215",
-            "IRN-3216",
-            "IRN-3232",
+            "IRN-3215__SPLIT_PLAYA_DARYACHEH_YE_NAMAK",
+            "IRN-3215__SPLIT_PLAYA_DASHT_E_KAVIR",
+            "IRN-3215__SPLIT_PLAYA_SALT_FLAT_22",
+            "IRN-3215__SPLIT_REST",
+            "IRN-3216__SPLIT_PLAYA_SALT_FLAT_22",
+            "IRN-3216__SPLIT_REST",
+            "IRN-3232__SPLIT_PLAYA_DARYACHEH_YE_NAMAK",
+            "IRN-3232__SPLIT_REST",
             "IRN-5490"
           ]
         },
@@ -9491,7 +9779,9 @@
           "name_zh": "伊斯法罕",
           "feature_ids": [
             "IRN-3209",
-            "IRN-3211",
+            "IRN-3211__SPLIT_PLAYA_DARYACHEH_YE_NAMAK",
+            "IRN-3211__SPLIT_PLAYA_DASHT_E_KAVIR",
+            "IRN-3211__SPLIT_REST",
             "IRN-3218"
           ]
         },
@@ -9518,8 +9808,15 @@
           "name_en": "Kerman",
           "name_zh": "克尔曼",
           "feature_ids": [
-            "IRN-3247",
-            "IRN-3248"
+            "IRN-3247__SPLIT_PLAYA_DARYACHEH_YE_SISTAN",
+            "IRN-3247__SPLIT_PLAYA_HAMUN_E_JAZ_MURIAN",
+            "IRN-3247__SPLIT_PLAYA_HAMUN_E_SABERI",
+            "IRN-3247__SPLIT_PLAYA_HAMUN_I_MASHKEL",
+            "IRN-3247__SPLIT_REST",
+            "IRN-3248__SPLIT_PLAYA_HAMUN_E_JAZ_MURIAN",
+            "IRN-3248__SPLIT_PLAYA_KAVIR_E_NAMAK_E_SIRJAN",
+            "IRN-3248__SPLIT_PLAYA_NAMAKZAR_E_SHADAD",
+            "IRN-3248__SPLIT_REST"
           ]
         },
         "state_416": {
@@ -9527,7 +9824,9 @@
           "name_en": "Khorasan",
           "name_zh": "霍拉桑",
           "feature_ids": [
-            "IRN-3245",
+            "IRN-3245__SPLIT_PLAYA_DASHT_E_KAVIR",
+            "IRN-3245__SPLIT_PLAYA_KEVIR_E_NAMAK",
+            "IRN-3245__SPLIT_REST",
             "IRN-3246"
           ]
         },
@@ -9583,7 +9882,10 @@
           "name_en": "Yazd",
           "name_zh": "亚兹德",
           "feature_ids": [
-            "IRN-3217"
+            "IRN-3217__SPLIT_PLAYA_DASHT_E_KAVIR",
+            "IRN-3217__SPLIT_PLAYA_KAVIR_E_ABARKUH",
+            "IRN-3217__SPLIT_PLAYA_KAVIR_E_NAMAK_E_SIRJAN",
+            "IRN-3217__SPLIT_REST"
           ]
         },
         "state_1003": {
@@ -9591,7 +9893,9 @@
           "name_en": "South Khorasan",
           "name_zh": "南霍拉桑",
           "feature_ids": [
-            "IRN-3244"
+            "IRN-3244__SPLIT_PLAYA_DAQQ_E_PATERGAN",
+            "IRN-3244__SPLIT_PLAYA_DARYACHEH_YE_SISTAN",
+            "IRN-3244__SPLIT_REST"
           ]
         }
       }
@@ -10093,8 +10397,15 @@
           "name_en": "Nowogródek",
           "name_zh": "新格鲁多克",
           "feature_ids": [
-            "BY_RAY_67162791B13547290723272",
-            "BY_RAY_67162791B66420794580046"
+            "BY_RAY_67162791B13547290723272__SPLIT_CENTRAL_KOROBCHITSY",
+            "BY_RAY_67162791B13547290723272__SPLIT_GRODNO",
+            "BY_RAY_67162791B13547290723272__SPLIT_INDURA",
+            "BY_RAY_67162791B13547290723272__SPLIT_NORTH_MONKI",
+            "BY_RAY_67162791B13547290723272__SPLIT_SOUTH_KOROBCHITSY",
+            "BY_RAY_67162791B13547290723272__SPLIT_SZTABIN",
+            "BY_RAY_67162791B66420794580046__SPLIT_EAST_ASTRYNA",
+            "BY_RAY_67162791B66420794580046__SPLIT_MASTY",
+            "BY_RAY_67162791B66420794580046__SPLIT_PIESKI"
           ]
         },
         "state_97": {
@@ -10103,7 +10414,8 @@
           "name_zh": "比亚韦斯托克",
           "feature_ids": [
             "PL_MRG_44c900e7cbdd",
-            "PL_POW_2001",
+            "PL_POW_2001__SPLIT_MONKI",
+            "PL_POW_2001__SPLIT_SZELIGI",
             "PL_POW_2002",
             "PL_POW_2004",
             "PL_POW_2005",
@@ -10181,9 +10493,28 @@
           "name_zh": "维尔纳",
           "feature_ids": [
             "BY_HIST_POL_MINSK_WEST",
-            "BY_INT_GRODNO",
+            "BY_INT_GRODNO__SPLIT_BAKSHTY",
+            "BY_INT_GRODNO__SPLIT_BOROVIKI",
+            "BY_INT_GRODNO__SPLIT_BYAROZAWKA",
+            "BY_INT_GRODNO__SPLIT_CENTRAL_INDURA",
+            "BY_INT_GRODNO__SPLIT_GONCHARY",
+            "BY_INT_GRODNO__SPLIT_KURILOVICHI",
+            "BY_INT_GRODNO__SPLIT_MANCHIKI",
+            "BY_INT_GRODNO__SPLIT_NORTH_KAMENETS",
+            "BY_INT_GRODNO__SPLIT_OSZMIANA",
+            "BY_INT_GRODNO__SPLIT_PIESKI",
+            "BY_INT_GRODNO__SPLIT_PORASLI",
+            "BY_INT_GRODNO__SPLIT_SLONIM",
+            "BY_INT_GRODNO__SPLIT_SOUTH_INDURA",
+            "BY_INT_GRODNO__SPLIT_TSATSKI",
+            "BY_INT_GRODNO__SPLIT_VAVERKA",
+            "BY_INT_GRODNO__SPLIT_WEST_BOROVIKI",
+            "BY_INT_GRODNO__SPLIT_WEST_PIESKI",
+            "BY_INT_GRODNO__SPLIT_ZELWA",
             "BY_RAY_67162791B18102707107362",
-            "BY_RAY_67162791B18933715013959",
+            "BY_RAY_67162791B18933715013959__SPLIT_BYENYAKONI",
+            "BY_RAY_67162791B18933715013959__SPLIT_HALSHANY",
+            "BY_RAY_67162791B18933715013959__SPLIT_STAKAI",
             "BY_RAY_67162791B41761210959552",
             "BY_RAY_67162791B43104058935452",
             "BY_RAY_67162791B54270193950847",
@@ -10196,8 +10527,15 @@
           "name_zh": "格丁尼亚",
           "feature_ids": [
             "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
-            "PL_MRG_9e4e875a7bcd__SPLIT_REST",
-            "PL_MRG_c93ffd9ad4b7",
+            "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_GNIEW",
+            "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_KARTUZY",
+            "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_NORTH_KUYAVIA",
+            "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_POMORZE_GDANSKIE",
+            "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SOUTH_KARTUZY",
+            "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SUSZ",
+            "PL_MRG_c93ffd9ad4b7__SPLIT_GRUZIADZ",
+            "PL_MRG_c93ffd9ad4b7__SPLIT_KISIELICE",
+            "PL_MRG_c93ffd9ad4b7__SPLIT_NORTH_KUYAVIA",
             "PL_POW_0402",
             "PL_POW_0403",
             "PL_POW_0406",
@@ -10213,6 +10551,14 @@
           "name_zh": "苏杜瓦",
           "feature_ids": [
             "LT021__SPLIT_POLISH"
+          ]
+        },
+        "state_815": {
+          "district_id": "state_815",
+          "name_en": "Aukštaitija",
+          "name_zh": "奥克斯泰体哈",
+          "feature_ids": [
+            "LT029__SPLIT_POLISH"
           ]
         }
       }
@@ -10469,7 +10815,8 @@
           "name_en": "Hyderabad",
           "name_zh": "海德拉巴",
           "feature_ids": [
-            "PAK-1114__SPLIT_REST"
+            "PAK-1114__SPLIT_REST__SPLIT_PLAYA_RANN_OF_KUTCH",
+            "PAK-1114__SPLIT_REST__SPLIT_REST"
           ]
         },
         "state_428": {
@@ -10481,7 +10828,8 @@
             "IN_ADM2_76128533B7606365706860",
             "IN_ADM2_76128533B93113981386565",
             "IN_ADM2_76128533B97372652494648",
-            "IN_MRG_0f1924c89ced",
+            "IN_MRG_0f1924c89ced__SPLIT_PLAYA_RANN_OF_KUTCH",
+            "IN_MRG_0f1924c89ced__SPLIT_REST",
             "IN_MRG_b291003b6f41"
           ]
         },
@@ -10934,7 +11282,8 @@
           "name_en": "Kalat",
           "name_zh": "卡拉特",
           "feature_ids": [
-            "PAK-1108__SPLIT_REST"
+            "PAK-1108__SPLIT_REST__SPLIT_PLAYA_HAMUN_I_LORA",
+            "PAK-1108__SPLIT_REST__SPLIT_REST"
           ]
         }
       }
@@ -10963,11 +11312,30 @@
           "name_en": "North Transylvania",
           "name_zh": "北特兰西瓦尼亚",
           "feature_ids": [
-            "RO112",
-            "RO113",
-            "RO114",
-            "RO115",
-            "RO116",
+            "RO112__SPLIT_BORCA",
+            "RO112__SPLIT_NORTH_TRANSILVANIA",
+            "RO112__SPLIT_SOUTH_BORSA",
+            "RO112__SPLIT_VISEUL_DE_SUS",
+            "RO113__SPLIT_APUSENI_MOUNTAINS",
+            "RO113__SPLIT_CLUJ",
+            "RO113__SPLIT_NAPOCA",
+            "RO113__SPLIT_NORTH_TRANSILVANIA",
+            "RO114__SPLIT_BORSA",
+            "RO114__SPLIT_CAVNIC",
+            "RO114__SPLIT_IEUD",
+            "RO114__SPLIT_MARAMURES",
+            "RO114__SPLIT_NORTH_IEUD",
+            "RO114__SPLIT_ROHIA",
+            "RO114__SPLIT_VISEUL_DE_SUS",
+            "RO115__SPLIT_BOGDAND",
+            "RO115__SPLIT_DOBA",
+            "RO115__SPLIT_MARMARATIEI",
+            "RO115__SPLIT_SATU_MARE",
+            "RO115__SPLIT_ZALAU",
+            "RO116__SPLIT_ALESD",
+            "RO116__SPLIT_CAVNIC",
+            "RO116__SPLIT_NAPOCA",
+            "RO116__SPLIT_ZALAU",
             "RO121",
             "RO125",
             "RO126",
@@ -11059,8 +11427,18 @@
           "name_en": "Banat",
           "name_zh": "巴纳特",
           "feature_ids": [
-            "RO422",
-            "RO424"
+            "RO422__SPLIT_BANAT",
+            "RO422__SPLIT_PASUL_VALCAN",
+            "RO422__SPLIT_PORTILE_DE_FIER",
+            "RO422__SPLIT_SOUTH_BANAT",
+            "RO424__SPLIT_CARANSEBES",
+            "RO424__SPLIT_DEVA",
+            "RO424__SPLIT_FIBIS",
+            "RO424__SPLIT_OTELU_ROSU",
+            "RO424__SPLIT_PECICA",
+            "RO424__SPLIT_RADNA",
+            "RO424__SPLIT_SATCHINEZ",
+            "RO424__SPLIT_TIMISORA"
           ]
         },
         "state_83": {
@@ -11068,8 +11446,16 @@
           "name_en": "Crisana",
           "name_zh": "克里沙那",
           "feature_ids": [
-            "RO111",
-            "RO421"
+            "RO111__SPLIT_ALESD",
+            "RO111__SPLIT_BELUS",
+            "RO111__SPLIT_CAREI",
+            "RO111__SPLIT_HUEDEIN",
+            "RO111__SPLIT_ORADEA_COUNTY",
+            "RO111__SPLIT_TURDA",
+            "RO421__SPLIT_BELUS",
+            "RO421__SPLIT_CRISANA",
+            "RO421__SPLIT_DEVA",
+            "RO421__SPLIT_OTELU_ROSU"
           ]
         },
         "state_84": {
@@ -11078,8 +11464,11 @@
           "name_zh": "特兰西瓦尼亚",
           "feature_ids": [
             "RO122",
-            "RO123",
-            "RO124",
+            "RO123__SPLIT_COVASNA",
+            "RO123__SPLIT_PASUL_TULGHES",
+            "RO124__SPLIT_MOINESTI",
+            "RO124__SPLIT_NORTH_PASUL_TULGHES",
+            "RO124__SPLIT_ROZNOV",
             "RO311"
           ]
         },
@@ -11518,7 +11907,8 @@
           "name_zh": "乌鲁木齐",
           "feature_ids": [
             "CN_CITY_17275852B11647586732977",
-            "CN_CITY_17275852B14447575237215",
+            "CN_CITY_17275852B14447575237215__SPLIT_PLAYA_SALT_FLAT_70",
+            "CN_CITY_17275852B14447575237215__SPLIT_REST",
             "CN_CITY_17275852B1480822694432",
             "CN_CITY_17275852B17496009208379",
             "CN_CITY_17275852B175268982459",
@@ -11548,7 +11938,8 @@
             "CN_CITY_17275852B73402209651960",
             "CN_CITY_17275852B73975880118601",
             "CN_CITY_17275852B79135697753229",
-            "CN_CITY_17275852B82973388541806",
+            "CN_CITY_17275852B82973388541806__SPLIT_PLAYA_SALT_FLAT_70",
+            "CN_CITY_17275852B82973388541806__SPLIT_REST",
             "CN_CITY_17275852B85233502536199",
             "CN_CITY_17275852B90369139050224",
             "CN_CITY_17275852B91248766779193",
@@ -11609,7 +12000,9 @@
           "name_zh": "达坂城",
           "feature_ids": [
             "CN_CITY_17275852B30377041544199",
-            "CN_CITY_17275852B47937532060975",
+            "CN_CITY_17275852B47937532060975__SPLIT_LOP_NUR",
+            "CN_CITY_17275852B47937532060975__SPLIT_PLAYA_LOP_NUR",
+            "CN_CITY_17275852B47937532060975__SPLIT_REST",
             "CN_CITY_17275852B50829513875986",
             "CN_CITY_17275852B51760047756920",
             "CN_CITY_17275852B62165589707618",
@@ -11721,7 +12114,8 @@
             "RU_ARCTIC_FB_9545",
             "RU_ARCTIC_FB_9749",
             "RU_ARCTIC_FB_9946",
-            "RU_MRG_7973a5d85acb",
+            "RU_MRG_7973a5d85acb__SPLIT_NOVOSIBIRSK_RESERVOIR",
+            "RU_MRG_7973a5d85acb__SPLIT_REST",
             "RU_MRG_ae16dca1a1ab",
             "RU_MRG_bb039ce19fe3",
             "RU_RAY_50074027B16932918285671",
@@ -11844,7 +12238,7 @@
             "RU_RAY_50074027B49278461872326",
             "RU_RAY_50074027B56817088939843",
             "RU_RAY_50074027B64055482679717",
-            "RU_RAY_50074027B99227036451137"
+            "RU_RAY_50074027B99227036451137__SPLIT_REST"
           ]
         },
         "state_196": {
@@ -12037,7 +12431,7 @@
             "RU_RAY_50074027B11673707761487",
             "RU_RAY_50074027B3638705238012",
             "RU_RAY_50074027B49826229755475",
-            "RU_RAY_50074027B5223158268211",
+            "RU_RAY_50074027B5223158268211__SPLIT_REST",
             "RU_RAY_50074027B5631740772865",
             "RU_RAY_50074027B58076034090645",
             "RU_RAY_50074027B64455240716412",
@@ -12052,21 +12446,14 @@
           "name_zh": "普斯科夫",
           "feature_ids": [
             "RU_ARCTIC_FB_042",
-            "RU_ARCTIC_FB_043",
-            "RU_ARCTIC_FB_044",
             "RU_ARCTIC_FB_045",
             "RU_ARCTIC_FB_046",
-            "RU_ARCTIC_FB_047",
-            "RU_ARCTIC_FB_048",
-            "RU_ARCTIC_FB_049",
-            "RU_ARCTIC_FB_051",
             "RU_ARCTIC_FB_052",
             "RU_ARCTIC_FB_057",
             "RU_ARCTIC_FB_058",
             "RU_ARCTIC_FB_060",
             "RU_ARCTIC_FB_062",
             "RU_ARCTIC_FB_063",
-            "RU_ARCTIC_FB_8033",
             "RU_ARCTIC_FB_8035",
             "RU_ARCTIC_FB_8036",
             "RU_ARCTIC_FB_8038",
@@ -12096,11 +12483,10 @@
             "RU_ARCTIC_FB_8082",
             "RU_MRG_91492abc09f9",
             "RU_MRG_929562691caa",
-            "RU_RAY_50074027B19741518738580",
+            "RU_RAY_50074027B19741518738580__SPLIT_REST",
             "RU_RAY_50074027B37881642500609",
             "RU_RAY_50074027B86681375933080",
-            "RU_RAY_50074027B88274438285408",
-            "RU_RAY_50074027B90555869339870",
+            "RU_RAY_50074027B88274438285408__SPLIT_REST",
             "RU_RAY_50074027B91439993213773",
             "RU_RAY_50074027B93378157948323"
           ]
@@ -12601,24 +12987,32 @@
             "RU_ARCTIC_FB_8555",
             "RU_CITY_VOLGOGRAD",
             "RU_RAY_50074027B12225471433206",
-            "RU_RAY_50074027B15993714165206",
+            "RU_RAY_50074027B15993714165206__SPLIT_REST",
+            "RU_RAY_50074027B15993714165206__SPLIT_TSIMLYANSK_RESERVOIR",
             "RU_RAY_50074027B30801426940346",
-            "RU_RAY_50074027B3691210145247",
+            "RU_RAY_50074027B3691210145247__SPLIT_REST",
+            "RU_RAY_50074027B3691210145247__SPLIT_TSIMLYANSK_RESERVOIR",
             "RU_RAY_50074027B44154738908147",
-            "RU_RAY_50074027B4882309977182",
+            "RU_RAY_50074027B4882309977182__SPLIT_REST",
+            "RU_RAY_50074027B4882309977182__SPLIT_TSIMLYANSK_RESERVOIR",
             "RU_RAY_50074027B54184638100605",
             "RU_RAY_50074027B5850420655248",
             "RU_RAY_50074027B60097792769672",
-            "RU_RAY_50074027B6068395788556",
+            "RU_RAY_50074027B6068395788556__SPLIT_REST",
+            "RU_RAY_50074027B6068395788556__SPLIT_TSIMLYANSK_RESERVOIR",
             "RU_RAY_50074027B61241799946425",
-            "RU_RAY_50074027B66955592022274",
+            "RU_RAY_50074027B66955592022274__SPLIT_REST",
+            "RU_RAY_50074027B66955592022274__SPLIT_TSIMLYANSK_RESERVOIR",
             "RU_RAY_50074027B68317438478241",
             "RU_RAY_50074027B68742604318629",
             "RU_RAY_50074027B72027623217592",
             "RU_RAY_50074027B81882539182238",
-            "RU_RAY_50074027B88958089507858",
-            "RU_RAY_50074027B94816741297533",
-            "RU_RAY_50074027B97827439207559"
+            "RU_RAY_50074027B88958089507858__SPLIT_REST",
+            "RU_RAY_50074027B88958089507858__SPLIT_TSIMLYANSK_RESERVOIR",
+            "RU_RAY_50074027B94816741297533__SPLIT_REST",
+            "RU_RAY_50074027B94816741297533__SPLIT_VOLGOGRAD_RESERVOIR",
+            "RU_RAY_50074027B97827439207559__SPLIT_REST",
+            "RU_RAY_50074027B97827439207559__SPLIT_TSIMLYANSK_RESERVOIR"
           ]
         },
         "state_218": {
@@ -13487,17 +13881,23 @@
             "RU_ARCTIC_FB_8667",
             "RU_ARCTIC_FB_8670",
             "RU_ARCTIC_FB_8673",
-            "RU_MRG_5a4cd4b44b6d",
-            "RU_RAY_50074027B18920333631541",
+            "RU_MRG_5a4cd4b44b6d__SPLIT_REST",
+            "RU_MRG_5a4cd4b44b6d__SPLIT_SAMARA_RESERVOIR",
+            "RU_RAY_50074027B18920333631541__SPLIT_REST",
+            "RU_RAY_50074027B18920333631541__SPLIT_SAMARA_RESERVOIR",
             "RU_RAY_50074027B20925327326281",
             "RU_RAY_50074027B27498645809538",
             "RU_RAY_50074027B35912731621053",
-            "RU_RAY_50074027B44960058886802",
+            "RU_RAY_50074027B44960058886802__SPLIT_REST",
+            "RU_RAY_50074027B44960058886802__SPLIT_SARATOV_RESERVOIR",
             "RU_RAY_50074027B48616413135567",
-            "RU_RAY_50074027B58494309327601",
+            "RU_RAY_50074027B58494309327601__SPLIT_REST",
+            "RU_RAY_50074027B58494309327601__SPLIT_SAMARA_RESERVOIR",
             "RU_RAY_50074027B69042014993745",
-            "RU_RAY_50074027B72026568542942",
-            "RU_RAY_50074027B84391084656620"
+            "RU_RAY_50074027B72026568542942__SPLIT_REST",
+            "RU_RAY_50074027B72026568542942__SPLIT_SARATOV_RESERVOIR",
+            "RU_RAY_50074027B84391084656620__SPLIT_REST",
+            "RU_RAY_50074027B84391084656620__SPLIT_SAMARA_RESERVOIR"
           ]
         },
         "state_236": {
@@ -13680,9 +14080,11 @@
             "RU_MRG_2edaa5bd48b5",
             "RU_MRG_88df92bd6ae6",
             "RU_RAY_50074027B10199346430351",
-            "RU_RAY_50074027B22819891790259",
+            "RU_RAY_50074027B22819891790259__SPLIT_REST",
+            "RU_RAY_50074027B22819891790259__SPLIT_TSIMLYANSK_RESERVOIR",
             "RU_RAY_50074027B36547207144508",
-            "RU_RAY_50074027B38321108376859",
+            "RU_RAY_50074027B38321108376859__SPLIT_REST",
+            "RU_RAY_50074027B38321108376859__SPLIT_TSIMLYANSK_RESERVOIR",
             "RU_RAY_50074027B40979258556268",
             "RU_RAY_50074027B65693066006745",
             "RU_RAY_50074027B75402656675224",
@@ -13735,21 +14137,24 @@
             "RU_ARCTIC_FB_2536",
             "RU_ARCTIC_FB_2537",
             "RU_ARCTIC_FB_2542",
-            "RU_ARCTIC_FB_2558",
+            "RU_ARCTIC_FB_2558__SPLIT_REST",
+            "RU_ARCTIC_FB_2558__SPLIT_VOLGOGRAD_RESERVOIR",
             "RU_ARCTIC_FB_2560",
             "RU_ARCTIC_FB_2568",
-            "RU_ARCTIC_FB_2578",
             "RU_ARCTIC_FB_2596",
             "RU_ARCTIC_FB_2624",
             "RU_ARCTIC_FB_8560",
             "RU_ARCTIC_FB_8566",
             "RU_ARCTIC_FB_8584",
-            "RU_MRG_3ec7b40d49ee",
+            "RU_MRG_3ec7b40d49ee__SPLIT_REST",
+            "RU_MRG_3ec7b40d49ee__SPLIT_VOLGOGRAD_RESERVOIR",
             "RU_MRG_ad216f601dda",
-            "RU_RAY_50074027B39404018386654",
+            "RU_RAY_50074027B39404018386654__SPLIT_REST",
+            "RU_RAY_50074027B39404018386654__SPLIT_VOLGOGRAD_RESERVOIR",
             "RU_RAY_50074027B52521252875752",
             "RU_RAY_50074027B75699624456558",
-            "RU_RAY_50074027B97557760790791"
+            "RU_RAY_50074027B97557760790791__SPLIT_REST",
+            "RU_RAY_50074027B97557760790791__SPLIT_VOLGOGRAD_RESERVOIR"
           ]
         },
         "state_240": {
@@ -14382,7 +14787,8 @@
             "RU_ARCTIC_FB_857",
             "RU_ARCTIC_FB_861",
             "RU_MRG_7fd8b4f87f37",
-            "RU_MRG_c4615cedcd6d",
+            "RU_MRG_c4615cedcd6d__SPLIT_REST",
+            "RU_MRG_c4615cedcd6d__SPLIT_RYBINSK_RESERVOIR",
             "RU_RAY_50074027B10833307399195",
             "RU_RAY_50074027B37288894870067",
             "RU_RAY_50074027B38387906709835",
@@ -14396,7 +14802,8 @@
             "RU_RAY_50074027B80385124466315",
             "RU_RAY_50074027B83580242970033",
             "RU_RAY_50074027B8395031141899",
-            "RU_RAY_50074027B91001506415746"
+            "RU_RAY_50074027B91001506415746__SPLIT_REST",
+            "RU_RAY_50074027B91001506415746__SPLIT_RYBINSK_RESERVOIR"
           ]
         },
         "state_249": {
@@ -14487,12 +14894,18 @@
             "RU_ARCTIC_FB_8614",
             "RU_MRG_0d8fd8e60da3",
             "RU_RAY_50074027B23939913802573",
-            "RU_RAY_50074027B3936819954606",
-            "RU_RAY_50074027B61660763245932",
-            "RU_RAY_50074027B64412298842231",
-            "RU_RAY_50074027B67860704242461",
-            "RU_RAY_50074027B68460090008050",
-            "RU_RAY_50074027B97493150269350"
+            "RU_RAY_50074027B3936819954606__SPLIT_REST",
+            "RU_RAY_50074027B3936819954606__SPLIT_SAMARA_RESERVOIR",
+            "RU_RAY_50074027B61660763245932__SPLIT_REST",
+            "RU_RAY_50074027B61660763245932__SPLIT_SAMARA_RESERVOIR",
+            "RU_RAY_50074027B64412298842231__SPLIT_REST",
+            "RU_RAY_50074027B64412298842231__SPLIT_SAMARA_RESERVOIR",
+            "RU_RAY_50074027B67860704242461__SPLIT_REST",
+            "RU_RAY_50074027B67860704242461__SPLIT_SAMARA_RESERVOIR",
+            "RU_RAY_50074027B68460090008050__SPLIT_REST",
+            "RU_RAY_50074027B68460090008050__SPLIT_SAMARA_RESERVOIR",
+            "RU_RAY_50074027B97493150269350__SPLIT_REST",
+            "RU_RAY_50074027B97493150269350__SPLIT_SAMARA_RESERVOIR"
           ]
         },
         "state_251": {
@@ -14789,13 +15202,16 @@
             "RU_ARCTIC_FB_8573",
             "RU_ARCTIC_FB_8576",
             "RU_ARCTIC_FB_8578",
-            "RU_MRG_1899c681a78b",
-            "RU_MRG_3c1ff2d8d28d",
+            "RU_MRG_1899c681a78b__SPLIT_GORKY_RESERVOIR",
+            "RU_MRG_1899c681a78b__SPLIT_REST",
+            "RU_MRG_3c1ff2d8d28d__SPLIT_GORKY_RESERVOIR",
+            "RU_MRG_3c1ff2d8d28d__SPLIT_REST",
             "RU_MRG_3e0fb7d7044d",
             "RU_MRG_65703efd9a03",
             "RU_MRG_a689e895d9b5",
             "RU_MRG_bf81dbf98241",
-            "RU_MRG_dde1d8a90afe",
+            "RU_MRG_dde1d8a90afe__SPLIT_GORKY_RESERVOIR",
+            "RU_MRG_dde1d8a90afe__SPLIT_REST",
             "RU_MRG_e212c64d0aec",
             "RU_MRG_f01ba8f5e4fe",
             "RU_RAY_50074027B29424671559681",
@@ -14804,7 +15220,8 @@
             "RU_RAY_50074027B6888827238248",
             "RU_RAY_50074027B91908607754232",
             "RU_RAY_50074027B92070848873743",
-            "RU_RAY_50074027B99457892446306"
+            "RU_RAY_50074027B99457892446306__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B99457892446306__SPLIT_REST"
           ]
         },
         "state_253": {
@@ -14940,12 +15357,15 @@
             "RU_RAY_50074027B19325401389824",
             "RU_RAY_50074027B23123118816327",
             "RU_RAY_50074027B3057027535626",
-            "RU_RAY_50074027B51121921202406",
-            "RU_RAY_50074027B55061952513406",
+            "RU_RAY_50074027B51121921202406__SPLIT_GORKY_RESERVOIR",
+            "RU_RAY_50074027B51121921202406__SPLIT_REST",
+            "RU_RAY_50074027B55061952513406__SPLIT_GORKY_RESERVOIR",
+            "RU_RAY_50074027B55061952513406__SPLIT_REST",
             "RU_RAY_50074027B69214251360695",
             "RU_RAY_50074027B70214193667243",
             "RU_RAY_50074027B73776930226055",
-            "RU_RAY_50074027B81093411628760",
+            "RU_RAY_50074027B81093411628760__SPLIT_GORKY_RESERVOIR",
+            "RU_RAY_50074027B81093411628760__SPLIT_REST",
             "RU_RAY_50074027B90093816910352"
           ]
         },
@@ -15235,7 +15655,8 @@
             "RU_ARCTIC_FB_9700",
             "RU_ARCTIC_FB_9898",
             "RU_MRG_852ed1368c51",
-            "RU_RAY_50074027B22241988675108"
+            "RU_RAY_50074027B22241988675108__SPLIT_CHEBOKSARY_RESERVOIR",
+            "RU_RAY_50074027B22241988675108__SPLIT_REST"
           ]
         },
         "state_257": {
@@ -15716,7 +16137,8 @@
             "RU_RAY_50074027B60205066083435",
             "RU_RAY_50074027B6123322766775",
             "RU_RAY_50074027B75950164154064",
-            "RU_RAY_50074027B884948676219"
+            "RU_RAY_50074027B884948676219__SPLIT_REST",
+            "RU_RAY_50074027B884948676219__SPLIT_VOLGOGRAD_RESERVOIR"
           ]
         },
         "state_351": {
@@ -15814,18 +16236,22 @@
             "RU_ARCTIC_FB_969",
             "RU_ARCTIC_FB_990",
             "RU_ARCTIC_FB_999",
-            "RU_MRG_06348d287b63",
+            "RU_MRG_06348d287b63__SPLIT_REST",
+            "RU_MRG_06348d287b63__SPLIT_RYBINSK_RESERVOIR",
             "RU_MRG_1b7e5a79de61",
-            "RU_MRG_465e54ee3c98",
+            "RU_MRG_465e54ee3c98__SPLIT_REST",
+            "RU_MRG_465e54ee3c98__SPLIT_RYBINSK_RESERVOIR",
             "RU_MRG_71b514987d9d",
             "RU_MRG_aedb5f9ed3b1",
             "RU_MRG_c619f16f4823",
-            "RU_MRG_cb7ab64b43b7",
+            "RU_MRG_cb7ab64b43b7__SPLIT_REST",
+            "RU_MRG_cb7ab64b43b7__SPLIT_RYBINSK_RESERVOIR",
             "RU_MRG_db0276985b26",
             "RU_MRG_f2dfc1043432",
             "RU_RAY_50074027B20500956922329",
             "RU_RAY_50074027B39041476138502",
-            "RU_RAY_50074027B42465403886102",
+            "RU_RAY_50074027B42465403886102__SPLIT_REST",
+            "RU_RAY_50074027B42465403886102__SPLIT_RYBINSK_RESERVOIR",
             "RU_RAY_50074027B44706978372394",
             "RU_RAY_50074027B55270503343274",
             "RU_RAY_50074027B62324973885793",
@@ -16066,14 +16492,20 @@
             "RU_ARCTIC_FB_9909",
             "RU_ARCTIC_FB_9917",
             "RU_MRG_0a979d718e91",
-            "RU_MRG_333dbd033786",
-            "RU_MRG_4d7b251116c1",
+            "RU_MRG_333dbd033786__SPLIT_KAMA_RESERVOIR",
+            "RU_MRG_333dbd033786__SPLIT_REST",
+            "RU_MRG_4d7b251116c1__SPLIT_REST",
+            "RU_MRG_4d7b251116c1__SPLIT_VOTKINSK_RESERVOIR",
             "RU_MRG_780f218076e4",
             "RU_MRG_7a7536733086",
-            "RU_MRG_9ce979430f48",
-            "RU_MRG_a1f39ea34970",
+            "RU_MRG_9ce979430f48__SPLIT_KAMA_RESERVOIR",
+            "RU_MRG_9ce979430f48__SPLIT_REST",
+            "RU_MRG_9ce979430f48__SPLIT_VOTKINSK_RESERVOIR",
+            "RU_MRG_a1f39ea34970__SPLIT_KAMA_RESERVOIR",
+            "RU_MRG_a1f39ea34970__SPLIT_REST",
             "RU_MRG_a78f8c3b44c8",
-            "RU_MRG_d7a2203edffa",
+            "RU_MRG_d7a2203edffa__SPLIT_KAMA_RESERVOIR",
+            "RU_MRG_d7a2203edffa__SPLIT_REST",
             "RU_MRG_da6565876fb2",
             "RU_MRG_efde66add412",
             "RU_RAY_50074027B14882106865056",
@@ -16082,7 +16514,8 @@
             "RU_RAY_50074027B41842513634160",
             "RU_RAY_50074027B44716960384813",
             "RU_RAY_50074027B44738927608854",
-            "RU_RAY_50074027B60091493242386",
+            "RU_RAY_50074027B60091493242386__SPLIT_KAMA_RESERVOIR",
+            "RU_RAY_50074027B60091493242386__SPLIT_REST",
             "RU_RAY_50074027B62021010666251",
             "RU_RAY_50074027B67988371503022",
             "RU_RAY_50074027B90499708128895",
@@ -16131,7 +16564,8 @@
             "RU_ARCTIC_FB_3911",
             "RU_ARCTIC_FB_3943",
             "RU_ARCTIC_FB_8730",
-            "RU_MRG_5eefe2103e77",
+            "RU_MRG_5eefe2103e77__SPLIT_REST",
+            "RU_MRG_5eefe2103e77__SPLIT_VOTKINSK_RESERVOIR",
             "RU_RAY_50074027B91023662606674"
           ]
         },
@@ -16309,7 +16743,7 @@
             "RU_ARCTIC_FB_3008",
             "RU_ARCTIC_FB_3013",
             "RU_ARCTIC_FB_3016",
-            "RU_ARCTIC_FB_3024",
+            "RU_ARCTIC_FB_3024__SPLIT_SARATOV_RESERVOIR",
             "RU_ARCTIC_FB_3026",
             "RU_ARCTIC_FB_3031",
             "RU_ARCTIC_FB_3041",
@@ -16339,18 +16773,22 @@
             "RU_ARCTIC_FB_8630",
             "RU_ARCTIC_FB_8647",
             "RU_ARCTIC_FB_8652",
-            "RU_MRG_384b6ae65f4e",
-            "RU_MRG_593a91bdd3f1",
+            "RU_MRG_384b6ae65f4e__SPLIT_REST",
+            "RU_MRG_384b6ae65f4e__SPLIT_SARATOV_RESERVOIR",
+            "RU_MRG_593a91bdd3f1__SPLIT_REST",
+            "RU_MRG_593a91bdd3f1__SPLIT_SARATOV_RESERVOIR",
             "RU_MRG_a79f92e2d2cb",
             "RU_RAY_50074027B12014197778868",
             "RU_RAY_50074027B20858489153060",
             "RU_RAY_50074027B26800252676575",
             "RU_RAY_50074027B3226583010199",
-            "RU_RAY_50074027B43084003717333",
+            "RU_RAY_50074027B43084003717333__SPLIT_REST",
+            "RU_RAY_50074027B43084003717333__SPLIT_SARATOV_RESERVOIR",
             "RU_RAY_50074027B49435645657248",
             "RU_RAY_50074027B62011091195870",
             "RU_RAY_50074027B67118840363468",
-            "RU_RAY_50074027B68349842384732"
+            "RU_RAY_50074027B68349842384732__SPLIT_REST",
+            "RU_RAY_50074027B68349842384732__SPLIT_SARATOV_RESERVOIR"
           ]
         },
         "state_402": {
@@ -17441,7 +17879,8 @@
             "RU_RAY_50074027B8567553383469",
             "RU_RAY_50074027B88266732999715",
             "RU_RAY_50074027B88724749460683",
-            "RU_RAY_50074027B90244452662579",
+            "RU_RAY_50074027B90244452662579__SPLIT_REST",
+            "RU_RAY_50074027B90244452662579__SPLIT_ZEYA_RESERVOIR",
             "RU_RAY_50074027B91760241420643",
             "RU_RAY_50074027B95387741431040"
           ]
@@ -17803,7 +18242,8 @@
             "RU_RAY_50074027B15872482411826",
             "RU_RAY_50074027B2325947694706",
             "RU_RAY_50074027B59423174958471",
-            "RU_RAY_50074027B66849950652275",
+            "RU_RAY_50074027B66849950652275__SPLIT_KHANTAYSKOYE_RESERVOIR",
+            "RU_RAY_50074027B66849950652275__SPLIT_REST",
             "RU_RAY_50074027B84010004825464"
           ]
         },
@@ -18100,8 +18540,10 @@
             "RU_RAY_50074027B42772585169334",
             "RU_RAY_50074027B52095363621144",
             "RU_RAY_50074027B6450887110855",
-            "RU_RAY_50074027B64669214156055",
-            "RU_RAY_50074027B66856367478499",
+            "RU_RAY_50074027B64669214156055__SPLIT_PLAYA_SALT_FLAT_46",
+            "RU_RAY_50074027B64669214156055__SPLIT_REST",
+            "RU_RAY_50074027B66856367478499__SPLIT_PLAYA_SALT_FLAT_46",
+            "RU_RAY_50074027B66856367478499__SPLIT_REST",
             "RU_RAY_50074027B75343755211502",
             "RU_RAY_50074027B79971887964789",
             "RU_RAY_50074027B8579713719118",
@@ -18328,16 +18770,22 @@
             "RU_ARCTIC_FB_9959",
             "RU_MRG_1105fd659924",
             "RU_MRG_4faa8695fd7f",
-            "RU_MRG_76bad646959e",
+            "RU_MRG_76bad646959e__SPLIT_BRATSK_RESERVOIR",
+            "RU_MRG_76bad646959e__SPLIT_REST",
             "RU_MRG_89b539cd826a",
-            "RU_MRG_aa1c4ed50e09",
-            "RU_MRG_e3d6057202ff",
+            "RU_MRG_aa1c4ed50e09__SPLIT_BRATSK_RESERVOIR",
+            "RU_MRG_aa1c4ed50e09__SPLIT_REST",
+            "RU_MRG_e3d6057202ff__SPLIT_BRATSK_RESERVOIR",
+            "RU_MRG_e3d6057202ff__SPLIT_REST",
             "RU_RAY_50074027B13440984713855",
             "RU_RAY_50074027B16590534350990",
-            "RU_RAY_50074027B33581045729564",
+            "RU_RAY_50074027B33581045729564__SPLIT_BRATSK_RESERVOIR",
+            "RU_RAY_50074027B33581045729564__SPLIT_REST",
+            "RU_RAY_50074027B33581045729564__SPLIT_UST_ILIMSK_RESERVOIR",
             "RU_RAY_50074027B56311400642429",
             "RU_RAY_50074027B5650924989435",
-            "RU_RAY_50074027B61732353469918",
+            "RU_RAY_50074027B61732353469918__SPLIT_REST",
+            "RU_RAY_50074027B61732353469918__SPLIT_VILYUY_RESERVOIR",
             "RU_RAY_50074027B62361238296524",
             "RU_RAY_50074027B64035112017093",
             "RU_RAY_50074027B64994254262493",
@@ -18550,7 +18998,8 @@
             "RU_ARCTIC_FB_9952",
             "RU_ARCTIC_FB_9953",
             "RU_MRG_3bd4e545064b",
-            "RU_MRG_89888850a4dc",
+            "RU_MRG_89888850a4dc__SPLIT_KRASNOYARSK_RESERVOIR",
+            "RU_MRG_89888850a4dc__SPLIT_REST",
             "RU_MRG_8e0791d514f6",
             "RU_MRG_abf0de7d54dd",
             "RU_MRG_b01e724ae967",
@@ -18570,7 +19019,8 @@
             "RU_RAY_50074027B71368048698898",
             "RU_RAY_50074027B86573453113564",
             "RU_RAY_50074027B87665702460834",
-            "RU_RAY_50074027B89196470968911",
+            "RU_RAY_50074027B89196470968911__SPLIT_REST",
+            "RU_RAY_50074027B89196470968911__SPLIT_UST_ILIMSK_RESERVOIR",
             "RU_RAY_50074027B9240580019103",
             "RU_RAY_50074027B9623133340795"
           ]
@@ -18728,9 +19178,11 @@
             "RU_MRG_04ecf80cba32",
             "RU_MRG_5ec0d20cf55a",
             "RU_MRG_688a52c8f42a",
-            "RU_MRG_8d9e296327d0",
+            "RU_MRG_8d9e296327d0__SPLIT_KRASNOYARSK_RESERVOIR",
+            "RU_MRG_8d9e296327d0__SPLIT_REST",
             "RU_MRG_b31c7670b4a5",
-            "RU_MRG_d3e6d3f9aa41",
+            "RU_MRG_d3e6d3f9aa41__SPLIT_KRASNOYARSK_RESERVOIR",
+            "RU_MRG_d3e6d3f9aa41__SPLIT_REST",
             "RU_RAY_50074027B1492213945391",
             "RU_RAY_50074027B18065649680617",
             "RU_RAY_50074027B27229100203359",
@@ -18820,11 +19272,14 @@
             "RU_ARCTIC_FB_8872",
             "RU_MRG_04f6e9aa1398",
             "RU_MRG_5cb2fb3991d9",
-            "RU_MRG_69fe24997bd8",
+            "RU_MRG_69fe24997bd8__SPLIT_NOVOSIBIRSK_RESERVOIR",
+            "RU_MRG_69fe24997bd8__SPLIT_REST",
             "RU_MRG_a0da05ed6a33",
-            "RU_MRG_adcc83649ef9",
+            "RU_MRG_adcc83649ef9__SPLIT_NOVOSIBIRSK_RESERVOIR",
+            "RU_MRG_adcc83649ef9__SPLIT_REST",
             "RU_MRG_fc918738b546",
-            "RU_RAY_50074027B14040427045082",
+            "RU_RAY_50074027B14040427045082__SPLIT_NOVOSIBIRSK_RESERVOIR",
+            "RU_RAY_50074027B14040427045082__SPLIT_REST",
             "RU_RAY_50074027B15875512450628",
             "RU_RAY_50074027B18253095483754",
             "RU_RAY_50074027B19808785107388",
@@ -21073,6 +21528,7 @@
           "name_zh": "恩格斯-马克思施塔特",
           "feature_ids": [
             "RU_ARCTIC_FB_2577",
+            "RU_ARCTIC_FB_2578",
             "RU_ARCTIC_FB_2619",
             "RU_ARCTIC_FB_2627",
             "RU_ARCTIC_FB_2637",
@@ -21092,11 +21548,15 @@
             "RU_ARCTIC_FB_2823",
             "RU_ARCTIC_FB_2830",
             "RU_ARCTIC_FB_2854",
-            "RU_MRG_ffd24a81e81e",
-            "RU_RAY_50074027B23214282298262",
-            "RU_RAY_50074027B34579677769219",
+            "RU_MRG_ffd24a81e81e__SPLIT_REST",
+            "RU_MRG_ffd24a81e81e__SPLIT_VOLGOGRAD_RESERVOIR",
+            "RU_RAY_50074027B23214282298262__SPLIT_REST",
+            "RU_RAY_50074027B23214282298262__SPLIT_VOLGOGRAD_RESERVOIR",
+            "RU_RAY_50074027B34579677769219__SPLIT_REST",
+            "RU_RAY_50074027B34579677769219__SPLIT_VOLGOGRAD_RESERVOIR",
             "RU_RAY_50074027B34939639698741",
-            "RU_RAY_50074027B65758721423350",
+            "RU_RAY_50074027B65758721423350__SPLIT_REST",
+            "RU_RAY_50074027B65758721423350__SPLIT_VOLGOGRAD_RESERVOIR",
             "RU_RAY_50074027B95256084907759"
           ]
         },
@@ -21718,6 +22178,14 @@
     "SPR": {
       "tag": "SPR",
       "districts": {
+        "state_31": {
+          "district_id": "state_31",
+          "name_en": "Midi Pyrenees",
+          "name_zh": "南部-比利牛斯",
+          "feature_ids": [
+            "FR_ARR_66003__SPLIT_LLIVIA"
+          ]
+        },
         "state_41": {
           "district_id": "state_41",
           "name_en": "Madrid",
@@ -22162,7 +22630,7 @@
             "CH054",
             "CH055",
             "CH056",
-            "CH057",
+            "CH057__SPLIT_REST",
             "CH062"
           ]
         },
@@ -22183,7 +22651,7 @@
           "name_en": "Ticino",
           "name_zh": "提契诺",
           "feature_ids": [
-            "CH070"
+            "CH070__SPLIT_REST"
           ]
         }
       }
@@ -22479,9 +22947,12 @@
             "RU_ARCTIC_FB_8682",
             "RU_ARCTIC_FB_8685",
             "RU_ARCTIC_FB_8699",
-            "RU_MRG_21bf4048bc4e",
-            "RU_MRG_8392a1282904",
-            "RU_MRG_8a42821c9c7f",
+            "RU_MRG_21bf4048bc4e__SPLIT_REST",
+            "RU_MRG_21bf4048bc4e__SPLIT_SAMARA_RESERVOIR",
+            "RU_MRG_8392a1282904__SPLIT_REST",
+            "RU_MRG_8392a1282904__SPLIT_SAMARA_RESERVOIR",
+            "RU_MRG_8a42821c9c7f__SPLIT_REST",
+            "RU_MRG_8a42821c9c7f__SPLIT_SAMARA_RESERVOIR",
             "RU_MRG_e992818a800f",
             "RU_MRG_fc7975888a87",
             "RU_RAY_50074027B16082818896565",
@@ -22516,9 +22987,11 @@
             "RU_RAY_50074027B14046308931292",
             "RU_RAY_50074027B24067170808668",
             "RU_RAY_50074027B45607076105456",
-            "RU_RAY_50074027B47970821426630",
+            "RU_RAY_50074027B47970821426630__SPLIT_REST",
+            "RU_RAY_50074027B47970821426630__SPLIT_SAMARA_RESERVOIR",
             "RU_RAY_50074027B75875360813754",
-            "RU_RAY_50074027B87542455562769"
+            "RU_RAY_50074027B87542455562769__SPLIT_REST",
+            "RU_RAY_50074027B87542455562769__SPLIT_SAMARA_RESERVOIR"
           ]
         },
         "state_251": {
@@ -22580,7 +23053,8 @@
             "RU_ARCTIC_FB_3701",
             "RU_ARCTIC_FB_3722",
             "RU_MRG_207d2d3eaab4",
-            "RU_MRG_473afe9c50b3",
+            "RU_MRG_473afe9c50b3__SPLIT_REST",
+            "RU_MRG_473afe9c50b3__SPLIT_SAMARA_RESERVOIR",
             "RU_RAY_50074027B118068330623",
             "RU_RAY_50074027B12153637659947"
           ]
@@ -23212,7 +23686,8 @@
             "RU_ARCTIC_FB_8722",
             "RU_ARCTIC_FB_8723",
             "RU_ARCTIC_FB_8724",
-            "RU_MRG_17e4b5e02ee0",
+            "RU_MRG_17e4b5e02ee0__SPLIT_REST",
+            "RU_MRG_17e4b5e02ee0__SPLIT_VOTKINSK_RESERVOIR",
             "RU_MRG_26381cddc895",
             "RU_MRG_8a04555b8e14",
             "RU_MRG_ea4870a8e882",
@@ -23345,8 +23820,10 @@
             "UA_RAY_74538382B42205538030067",
             "UA_RAY_74538382B43795583594371",
             "UA_RAY_74538382B44474254323889",
-            "UA_RAY_74538382B60808123109786",
-            "UA_RAY_74538382B61089393980714",
+            "UA_RAY_74538382B60808123109786__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B60808123109786__SPLIT_REST",
+            "UA_RAY_74538382B61089393980714__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B61089393980714__SPLIT_REST",
             "UA_RAY_74538382B62779126534418",
             "UA_RAY_74538382B65177906747126",
             "UA_RAY_74538382B72369548204787",
@@ -23504,26 +23981,34 @@
           "feature_ids": [
             "UA_MRG_1a8aac8d6778",
             "UA_MRG_570a8d4dd729",
-            "UA_MRG_87ad72dae9b5",
+            "UA_MRG_87ad72dae9b5__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_MRG_87ad72dae9b5__SPLIT_REST",
             "UA_MRG_9e7d5f1ce841",
             "UA_MRG_c5aa2c8a6048",
             "UA_MRG_de7101fe7980",
-            "UA_RAY_74538382B1179884845086",
+            "UA_RAY_74538382B1179884845086__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B1179884845086__SPLIT_REST",
             "UA_RAY_74538382B13057195168049",
             "UA_RAY_74538382B20048272724198",
             "UA_RAY_74538382B32095344223749",
-            "UA_RAY_74538382B3314448443504",
+            "UA_RAY_74538382B3314448443504__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B3314448443504__SPLIT_REST",
             "UA_RAY_74538382B42239251891056",
             "UA_RAY_74538382B42406222783177",
             "UA_RAY_74538382B53420808029005",
             "UA_RAY_74538382B5599119898653",
             "UA_RAY_74538382B57790499946350",
-            "UA_RAY_74538382B71954626153569",
+            "UA_RAY_74538382B71954626153569__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B71954626153569__SPLIT_REST",
             "UA_RAY_74538382B83290488809947",
-            "UA_RAY_74538382B85739457006484",
-            "UA_RAY_74538382B86672078093677",
-            "UA_RAY_74538382B8704633300515",
-            "UA_RAY_74538382B88832969225176",
+            "UA_RAY_74538382B85739457006484__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B85739457006484__SPLIT_REST",
+            "UA_RAY_74538382B86672078093677__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B86672078093677__SPLIT_REST",
+            "UA_RAY_74538382B8704633300515__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B8704633300515__SPLIT_REST",
+            "UA_RAY_74538382B88832969225176__SPLIT_KAKHOVKA_RESERVOIR",
+            "UA_RAY_74538382B88832969225176__SPLIT_REST",
             "UA_RAY_74538382B92774727366654",
             "UA_RAY_74538382B92973355473211",
             "UA_RAY_74538382B95492559683598",
@@ -23688,7 +24173,8 @@
           "name_en": "Cherkasy",
           "name_zh": "切尔卡瑟",
           "feature_ids": [
-            "UA_MRG_1d698b91bc32",
+            "UA_MRG_1d698b91bc32__SPLIT_KREMENCHUK_RESERVOIR",
+            "UA_MRG_1d698b91bc32__SPLIT_REST",
             "UA_MRG_2d1c37bdd071",
             "UA_MRG_39b244f210a7",
             "UA_MRG_4a445701c4c6",
@@ -23702,11 +24188,14 @@
             "UA_MRG_fbcb4404788c",
             "UA_RAY_74538382B16214498015051",
             "UA_RAY_74538382B17419757649625",
-            "UA_RAY_74538382B23530210512837",
+            "UA_RAY_74538382B23530210512837__SPLIT_KREMENCHUK_RESERVOIR",
+            "UA_RAY_74538382B23530210512837__SPLIT_REST",
             "UA_RAY_74538382B27817216475835",
-            "UA_RAY_74538382B28718545705075",
+            "UA_RAY_74538382B28718545705075__SPLIT_KREMENCHUK_RESERVOIR",
+            "UA_RAY_74538382B28718545705075__SPLIT_REST",
             "UA_RAY_74538382B33094259068281",
-            "UA_RAY_74538382B332128375794",
+            "UA_RAY_74538382B332128375794__SPLIT_KREMENCHUK_RESERVOIR",
+            "UA_RAY_74538382B332128375794__SPLIT_REST",
             "UA_RAY_74538382B62388892645700",
             "UA_RAY_74538382B83638043560631",
             "UA_RAY_74538382B92678915216320",
@@ -23734,7 +24223,7 @@
             "UA_SHELL_FB_264",
             "UA_SHELL_FB_266",
             "UA_SHELL_FB_268",
-            "UA_SHELL_FB_269",
+            "UA_SHELL_FB_269__SPLIT_KREMENCHUK_RESERVOIR",
             "UA_SHELL_FB_274",
             "UA_SHELL_FB_276",
             "UA_SHELL_FB_281",
@@ -24001,7 +24490,8 @@
             "UA_MRG_98ce0c6febb4",
             "UA_MRG_c2b5f29d91e8",
             "UA_MRG_c74c01b39f8e",
-            "UA_RAY_74538382B15303326410198",
+            "UA_RAY_74538382B15303326410198__SPLIT_KREMENCHUK_RESERVOIR",
+            "UA_RAY_74538382B15303326410198__SPLIT_REST",
             "UA_RAY_74538382B15383579018603",
             "UA_RAY_74538382B16544098233158",
             "UA_RAY_74538382B29845079622826",
@@ -24151,9 +24641,11 @@
           "name_zh": "塞罗拉戈",
           "feature_ids": [
             "UY_ADM1_URY-12",
-            "UY_ADM1_URY-13",
+            "UY_ADM1_URY-13__SPLIT_LAGO_RINCON_DEL_BONETE",
+            "UY_ADM1_URY-13__SPLIT_REST",
             "UY_ADM1_URY-14",
-            "UY_ADM1_URY-15",
+            "UY_ADM1_URY-15__SPLIT_LAGO_RINCON_DEL_BONETE",
+            "UY_ADM1_URY-15__SPLIT_REST",
             "UY_ADM1_URY-16",
             "UY_ADM1_URY-22"
           ]
@@ -24167,7 +24659,8 @@
             "UY_ADM1_URY-11",
             "UY_ADM1_URY-6",
             "UY_ADM1_URY-8",
-            "UY_ADM1_URY-9"
+            "UY_ADM1_URY-9__SPLIT_LAGO_RINCON_DEL_BONETE",
+            "UY_ADM1_URY-9__SPLIT_REST"
           ]
         }
       }
@@ -24893,11 +25386,14 @@
             "US_CNTY_49035",
             "US_CNTY_49049",
             "US_ZN_32_002__R",
-            "US_ZN_32_005__R",
-            "US_ZN_32_006__R",
+            "US_ZN_32_005__R__SPLIT_PLAYA_CARSON_SINK",
+            "US_ZN_32_005__R__SPLIT_REST",
+            "US_ZN_32_006__R__SPLIT_PLAYA_GREAT_SALT_LAKE_DESERT",
+            "US_ZN_32_006__R__SPLIT_REST",
             "US_ZN_32_008__R",
             "US_ZN_49_001__R",
-            "US_ZN_49_002__R",
+            "US_ZN_49_002__R__SPLIT_PLAYA_GREAT_SALT_LAKE_DESERT",
+            "US_ZN_49_002__R__SPLIT_REST",
             "US_ZN_49_003__R",
             "US_ZN_49_004__R"
           ]
@@ -24950,9 +25446,12 @@
             "US_ZN_31_004__R",
             "US_ZN_31_005__R",
             "US_ZN_31_006__R",
-            "US_ZN_46_001__R",
-            "US_ZN_46_002__R",
-            "US_ZN_46_003__R",
+            "US_ZN_46_001__R__SPLIT_LAKE_OAHE",
+            "US_ZN_46_001__R__SPLIT_REST",
+            "US_ZN_46_002__R__SPLIT_LAKE_OAHE",
+            "US_ZN_46_002__R__SPLIT_REST",
+            "US_ZN_46_003__R__SPLIT_LAKE_OAHE",
+            "US_ZN_46_003__R__SPLIT_REST",
             "US_ZN_46_004__R"
           ]
         },
@@ -25070,10 +25569,14 @@
             "US_ZN_27_001__R",
             "US_ZN_27_002__R",
             "US_ZN_27_005__R",
-            "US_ZN_30_005__R",
-            "US_ZN_38_001__R",
-            "US_ZN_38_002__R",
-            "US_ZN_38_003__R",
+            "US_ZN_30_005__R__SPLIT_FORT_PECK_LAKE",
+            "US_ZN_30_005__R__SPLIT_REST",
+            "US_ZN_38_001__R__SPLIT_LAKE_SAKAKAWEA",
+            "US_ZN_38_001__R__SPLIT_REST",
+            "US_ZN_38_002__R__SPLIT_LAKE_SAKAKAWEA",
+            "US_ZN_38_002__R__SPLIT_REST",
+            "US_ZN_38_003__R__SPLIT_LAKE_OAHE",
+            "US_ZN_38_003__R__SPLIT_REST",
             "US_ZN_38_004__R"
           ]
         },
@@ -25083,7 +25586,8 @@
           "name_zh": "南达科他",
           "feature_ids": [
             "US_ZN_30_003__R",
-            "US_ZN_30_004__R",
+            "US_ZN_30_004__R__SPLIT_FORT_PECK_LAKE",
+            "US_ZN_30_004__R__SPLIT_REST",
             "US_ZN_56_001__R",
             "US_ZN_56_002__R",
             "US_ZN_56_003__R"
@@ -25348,7 +25852,8 @@
             "VE_ADM1_VEN-33",
             "VE_ADM1_VEN-36",
             "VE_ADM1_VEN-38",
-            "VE_ADM1_VEN-39",
+            "VE_ADM1_VEN-39__SPLIT_EMBALSE_DE_GURI",
+            "VE_ADM1_VEN-39__SPLIT_REST",
             "VE_ADM1_VEN-40",
             "VE_ADM1_VEN-41",
             "VE_ADM1_VEN-42",
@@ -25583,7 +26088,8 @@
             "RU_RAY_50074027B2556018304316",
             "RU_RAY_50074027B26762093153483",
             "RU_RAY_50074027B33321279608248",
-            "RU_RAY_50074027B34454529298169",
+            "RU_RAY_50074027B34454529298169__SPLIT_REST",
+            "RU_RAY_50074027B34454529298169__SPLIT_VILYUY_RESERVOIR",
             "RU_RAY_50074027B45070384031046",
             "RU_RAY_50074027B58575735972897",
             "RU_RAY_50074027B62743108472351",
@@ -26040,9 +26546,15 @@
           "name_en": "Dalmatia",
           "name_zh": "达尔马提亚",
           "feature_ids": [
-            "HR034",
-            "HR035",
-            "HR037"
+            "HR034__SPLIT_BRUSKA",
+            "HR034__SPLIT_CETINA",
+            "HR034__SPLIT_MURVICA",
+            "HR035__SPLIT_DALMATIA",
+            "HR035__SPLIT_DALMATIAN_ISLANDS",
+            "HR035__SPLIT_METKOVIC",
+            "HR037__SPLIT_MERDARI",
+            "HR037__SPLIT_NEUM",
+            "HR037__SPLIT_WEST_DUBORVNIK"
           ]
         },
         "state_104": {
@@ -26086,7 +26598,9 @@
             "MK001",
             "MK002",
             "MK004",
-            "MK007",
+            "MK007__SPLIT_DIMITROVERAD",
+            "MK007__SPLIT_KRIVE_PALANKA",
+            "MK007__SPLIT_MACEDONIA",
             "MK008",
             "XK_ADM1_KOS-5915"
           ]
@@ -26128,7 +26642,9 @@
             "HR023",
             "HR027",
             "HR028",
-            "HR032",
+            "HR032__SPLIT_KARLOBAG",
+            "HR032__SPLIT_KORENICA",
+            "HR032__SPLIT_NORTHERN_DALMATIA",
             "HR033__SPLIT_REST",
             "HR050",
             "HR062",
@@ -26217,9 +26733,13 @@
           "name_en": "Debar",
           "name_zh": "德巴尔",
           "feature_ids": [
-            "MK003",
+            "MK003__SPLIT_BOJANE",
+            "MK003__SPLIT_PCINJA",
+            "MK003__SPLIT_WEST_MACEDONIA",
             "MK005",
-            "MK006"
+            "MK006__SPLIT_BOJANE",
+            "MK006__SPLIT_ELEZ_HAN",
+            "MK006__SPLIT_TETOVO"
           ]
         }
       }

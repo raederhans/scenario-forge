@@ -32923,7 +32923,7 @@
       }
     },
     {
-      "id": 21070,
+      "id": 20778,
       "type": "Feature",
       "properties": {
         "id": "HU110__SPLIT_BUDA",
@@ -33106,7 +33106,7 @@
       }
     },
     {
-      "id": 21071,
+      "id": 20779,
       "type": "Feature",
       "properties": {
         "id": "HU110__SPLIT_PEST",
@@ -33319,7 +33319,7 @@
       }
     },
     {
-      "id": 21101,
+      "id": 20809,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B690835779632__SPLIT_REST",
@@ -33774,7 +33774,7 @@
       }
     },
     {
-      "id": 21104,
+      "id": 20812,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B62094256812316__SPLIT_HU",
@@ -34659,7 +34659,7 @@
       }
     },
     {
-      "id": 21106,
+      "id": 20814,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B94951233476884__SPLIT_HU",
@@ -36330,7 +36330,7 @@
       }
     },
     {
-      "id": 21108,
+      "id": 20816,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B66923754975257__SPLIT_HU",
@@ -37449,7 +37449,7 @@
       }
     },
     {
-      "id": 21111,
+      "id": 20819,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B65708067786299__SPLIT_REST",
@@ -38712,7 +38712,7 @@
       }
     },
     {
-      "id": 21112,
+      "id": 20820,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B14569056094647__SPLIT_HU",
@@ -39299,7 +39299,7 @@
       }
     },
     {
-      "id": 21145,
+      "id": 20852,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B97606993013938__SPLIT_HU",

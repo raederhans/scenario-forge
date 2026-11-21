@@ -78,7 +78,16 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
                 owners = json.loads((directory / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
                 countries = json.loads((directory / "countries.json").read_text(encoding="utf-8"))["countries"]
                 cities = json.loads((directory / "city_overrides.json").read_text(encoding="utf-8"))
-                self.assertEqual(len(owners), 21151)
+                self.assertEqual(len(owners), 21661)
+                # Wave-4 border parcels, water-shaped parcels and HGO hotspot subdivisions.
+                self.assertEqual(owners["LT029__SPLIT_POLISH"], "POL")
+                self.assertEqual(owners["CH057__SPLIT_BUSINGEN"], "GER")
+                self.assertEqual(owners["FR_ARR_06002__SPLIT_REST__SPLIT_TENDE"], "ITA")
+                self.assertEqual(owners["SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA"],
+                                 "CZE" if scenario == "hoi4_1936" else "POL")
+                self.assertEqual(owners["RU_MRG_465e54ee3c98__SPLIT_RYBINSK_RESERVOIR"], "SOV")
+                self.assertEqual(owners["FR_ARR_57009__SPLIT_METZ"], "FRA")
+                self.assertEqual(owners["ITH10__SPLIT_BRUNICO"], "ITA")
                 self.assertEqual(owners["AU_ADM1_AUS-2653"], "AST")
                 self.assertEqual(owners["AU_ADM1_AUS-2650"], "NTR")
                 self.assertEqual(owners["CN_CITY_17275852B99290886399570"], "QMA")
