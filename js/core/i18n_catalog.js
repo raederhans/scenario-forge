@@ -293,6 +293,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "加入当前选中分组",
     "en": "Add selected group"
   },
+  "Add zone layer": {
+    "zh": "添加特殊区域图层",
+    "en": "Add zone layer"
+  },
+  "Add zone members": {
+    "zh": "添加特殊区域成员",
+    "en": "Add zone members"
+  },
   "Added {count} defense lines": {
     "zh": "已添加 {count} 条防线",
     "en": "Added {count} defense lines"
@@ -640,6 +648,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "应用符号，然后返回地图以继续放置或实时编辑所选计数器。",
     "en": "Apply a symbol, then return to the map to continue placement or edit the selected counter live."
   },
+  "Apply appearance preset": {
+    "zh": "应用外观预设",
+    "en": "Apply appearance preset"
+  },
   "Apply current tool": {
     "zh": "应用当前工具",
     "en": "Apply current tool"
@@ -755,6 +767,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Auto-Fill Visuals": {
     "zh": "自动填充视觉色",
     "en": "Auto-Fill Visuals"
+  },
+  "Auto-fill map": {
+    "zh": "自动填色",
+    "en": "Auto-fill map"
+  },
+  "Auto-fill regions": {
+    "zh": "按区域自动填色",
+    "en": "Auto-fill regions"
   },
   "Automatic": {
     "zh": "自动",
@@ -1188,6 +1208,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "笔刷开启 · 按住 Shift 拖动画布",
     "en": "Brush On · Shift+Drag to pan"
   },
+  "Brush intensity field": {
+    "zh": "涂绘强度场",
+    "en": "Brush intensity field"
+  },
   "Brush select": {
     "zh": "笔刷选择",
     "en": "Brush select"
@@ -1307,6 +1331,58 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Centrist republic": {
     "zh": "中间派共和制",
     "en": "Centrist republic"
+  },
+  "Change drafting grid": {
+    "zh": "更改制图网格",
+    "en": "Change drafting grid"
+  },
+  "Change graticule style": {
+    "zh": "更改经纬网样式",
+    "en": "Change graticule style"
+  },
+  "Change lake color link": {
+    "zh": "更改湖泊颜色联动",
+    "en": "Change lake color link"
+  },
+  "Change lake fill": {
+    "zh": "更改湖泊填色",
+    "en": "Change lake fill"
+  },
+  "Change lake outline": {
+    "zh": "更改湖泊轮廓",
+    "en": "Change lake outline"
+  },
+  "Change ocean region names display": {
+    "zh": "更改海域名称显示",
+    "en": "Change ocean region names display"
+  },
+  "Change paper texture": {
+    "zh": "更改纸张纹理",
+    "en": "Change paper texture"
+  },
+  "Change texture opacity": {
+    "zh": "更改纹理不透明度",
+    "en": "Change texture opacity"
+  },
+  "Change texture style": {
+    "zh": "更改纹理样式",
+    "en": "Change texture style"
+  },
+  "Change zone category": {
+    "zh": "更改特殊区域类别",
+    "en": "Change zone category"
+  },
+  "Change zone legend visibility": {
+    "zh": "更改特殊区域图例可见性",
+    "en": "Change zone legend visibility"
+  },
+  "Change zone style": {
+    "zh": "更改特殊区域样式",
+    "en": "Change zone style"
+  },
+  "Change zone visibility": {
+    "zh": "更改特殊区域可见性",
+    "en": "Change zone visibility"
   },
   "Change {country} color": {
     "zh": "修改 {country} 颜色",
@@ -1659,6 +1735,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Clear the current map?": {
     "zh": "清空当前地图吗？",
     "en": "Clear the current map?"
+  },
+  "Clear zone members": {
+    "zh": "清空特殊区域成员",
+    "en": "Clear zone members"
   },
   "Cleared": {
     "zh": "已清除",
@@ -2236,6 +2316,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "将所选地块的标签填入归属输入框",
     "en": "Copy the selected feature's tag into the owner input"
   },
+  "Copy zone members": {
+    "zh": "复制特殊区域成员",
+    "en": "Copy zone members"
+  },
   "Core": {
     "zh": "核",
     "en": "Core"
@@ -2432,6 +2516,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "创建预设或自定义图层后开始编辑地图成员。",
     "en": "Create a preset or custom layer to start editing map membership."
   },
+  "Create operational line": {
+    "zh": "绘制作战线",
+    "en": "Create operational line"
+  },
   "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff.": {
     "zh": "创建作战线、行动图形和单位计数器，作为项目内的战略标注用于导出和交接。",
     "en": "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff."
@@ -2535,6 +2623,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Current working state": {
     "zh": "当前工作状态",
     "en": "Current working state"
+  },
+  "Current: {action}": {
+    "zh": "当前：{action}",
+    "en": "Current: {action}"
   },
   "Custom": {
     "zh": "自定义",
@@ -2700,9 +2792,29 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "删除区域",
     "en": "Delete Zone"
   },
+  "Delete appearance preset": {
+    "zh": "删除外观预设",
+    "en": "Delete appearance preset"
+  },
+  "Delete graphic vertex": {
+    "zh": "删除作战图形顶点",
+    "en": "Delete graphic vertex"
+  },
   "Delete layer": {
     "zh": "删除图层",
     "en": "Delete layer"
+  },
+  "Delete map label": {
+    "zh": "删除地图文字",
+    "en": "Delete map label"
+  },
+  "Delete operation graphic": {
+    "zh": "删除作战图形",
+    "en": "Delete operation graphic"
+  },
+  "Delete operational line": {
+    "zh": "删除作战线",
+    "en": "Delete operational line"
   },
   "Delete the selected operation graphic?": {
     "zh": "删除所选行动图形？",
@@ -2719,6 +2831,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Delete the selected unit counter?": {
     "zh": "删除所选单位计数器？",
     "en": "Delete the selected unit counter?"
+  },
+  "Delete unit counter": {
+    "zh": "删除兵棋",
+    "en": "Delete unit counter"
+  },
+  "Delete zone layer": {
+    "zh": "删除特殊区域图层",
+    "en": "Delete zone layer"
   },
   "Demilitarized / buffer": {
     "zh": "非军事化/缓冲",
@@ -3084,6 +3204,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "拖动白色手柄以移动顶点，单击中点以插入，然后根据需要删除选定的顶点。",
     "en": "Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed."
   },
+  "Draw operation graphic": {
+    "zh": "绘制作战图形",
+    "en": "Draw operation graphic"
+  },
   "Drawing in progress: click map to add vertices, double-click to finish.": {
     "zh": "绘图进行中：点击地图添加顶点，双击完成。",
     "en": "Drawing in progress: click map to add vertices, double-click to finish."
@@ -3103,6 +3227,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Duplicate layer": {
     "zh": "复制图层",
     "en": "Duplicate layer"
+  },
+  "Duplicate zone layer": {
+    "zh": "复制特殊区域图层",
+    "en": "Duplicate zone layer"
   },
   "Dynamic / Runtime": {
     "zh": "动态 / 运行时",
@@ -3172,9 +3300,21 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "编辑国家颜色",
     "en": "Edit country color"
   },
+  "Edit lake style": {
+    "zh": "编辑湖泊样式",
+    "en": "Edit lake style"
+  },
+  "Edit map": {
+    "zh": "编辑地图",
+    "en": "Edit map"
+  },
   "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": {
     "zh": "根据剧本参考分组编辑地图颜色。参考边界保持不变。",
     "en": "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged."
+  },
+  "Edit map label": {
+    "zh": "编辑地图文字",
+    "en": "Edit map label"
   },
   "Edit map membership": {
     "zh": "编辑地图成员",
@@ -3183,6 +3323,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Edit members on map": {
     "zh": "在地图上编辑成员",
     "en": "Edit members on map"
+  },
+  "Edit operation graphic": {
+    "zh": "编辑作战图形",
+    "en": "Edit operation graphic"
+  },
+  "Edit operational line": {
+    "zh": "编辑作战线",
+    "en": "Edit operational line"
   },
   "Edit special region color": {
     "zh": "编辑特殊区域颜色",
@@ -3200,6 +3348,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "编辑工具",
     "en": "Edit tools"
   },
+  "Edit unit counter": {
+    "zh": "编辑兵棋",
+    "en": "Edit unit counter"
+  },
   "Edit vertices and style.": {
     "zh": "编辑顶点和样式。",
     "en": "Edit vertices and style."
@@ -3207,6 +3359,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Edit water region color": {
     "zh": "编辑水域颜色",
     "en": "Edit water region color"
+  },
+  "Edit zone layers": {
+    "zh": "编辑特殊区域图层",
+    "en": "Edit zone layers"
   },
   "Editable project JSON": {
     "zh": "可编辑项目 JSON",
@@ -4350,6 +4506,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "导入",
     "en": "Import"
   },
+  "Import appearance preset": {
+    "zh": "导入外观预设",
+    "en": "Import appearance preset"
+  },
   "Import cancelled": {
     "zh": "导入已取消",
     "en": "Import cancelled"
@@ -4470,6 +4630,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "内陆",
     "en": "Inland"
   },
+  "Insert graphic vertex": {
+    "zh": "插入作战图形顶点",
+    "en": "Insert graphic vertex"
+  },
   "Inspect": {
     "zh": "检查",
     "en": "Inspect"
@@ -4542,6 +4706,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "强度场",
     "en": "Intensity Field"
   },
+  "Intensity field": {
+    "zh": "强度场",
+    "en": "Intensity field"
+  },
   "Interaction": {
     "zh": "交互",
     "en": "Interaction"
@@ -4589,6 +4757,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Intersect layer": {
     "zh": "与图层交集",
     "en": "Intersect layer"
+  },
+  "Intersect zone members": {
+    "zh": "取特殊区域成员交集",
+    "en": "Intersect zone members"
   },
   "Invalid project file. Please select a valid map_project.json.": {
     "zh": "项目文件无效，请选择有效的 map_project.json。",
@@ -5885,6 +6057,18 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "下移",
     "en": "Move down"
   },
+  "Move graphic vertex": {
+    "zh": "移动作战图形顶点",
+    "en": "Move graphic vertex"
+  },
+  "Move map label": {
+    "zh": "移动地图文字",
+    "en": "Move map label"
+  },
+  "Move unit counter": {
+    "zh": "移动兵棋",
+    "en": "Move unit counter"
+  },
   "Move up": {
     "zh": "上移",
     "en": "Move up"
@@ -6128,6 +6312,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "No hierarchy groups": {
     "zh": "没有可用层级分组",
     "en": "No hierarchy groups"
+  },
+  "No history yet": {
+    "zh": "暂无历史记录",
+    "en": "No history yet"
   },
   "No industrial polygon selected": {
     "zh": "未选择工业多边形",
@@ -6400,6 +6588,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Ocean": {
     "zh": "海洋",
     "en": "Ocean"
+  },
+  "Ocean depth field": {
+    "zh": "海洋深度场",
+    "en": "Ocean depth field"
   },
   "Oceania": {
     "zh": "大洋洲",
@@ -6972,6 +7164,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "地貌区域",
     "en": "Physical Regions"
   },
+  "Physical intensity field": {
+    "zh": "地形强度场",
+    "en": "Physical intensity field"
+  },
   "Physical region names": {
     "zh": "地貌区域名称",
     "en": "Physical region names"
@@ -6992,9 +7188,21 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "试点范围停留在高速公路、主干道和主干道上。",
     "en": "Pilot scope stays on motorway, trunk, and primary."
   },
+  "Place intensity point": {
+    "zh": "添加强度点",
+    "en": "Place intensity point"
+  },
   "Place label": {
     "zh": "放置文字",
     "en": "Place label"
+  },
+  "Place map label": {
+    "zh": "添加地图文字",
+    "en": "Place map label"
+  },
+  "Place unit counter": {
+    "zh": "放置兵棋",
+    "en": "Place unit counter"
   },
   "Placed Counters": {
     "zh": "已放置计数器",
@@ -7908,6 +8116,18 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "移除成员",
     "en": "Remove member"
   },
+  "Remove zone members": {
+    "zh": "移除特殊区域成员",
+    "en": "Remove zone members"
+  },
+  "Rename country": {
+    "zh": "重命名国家",
+    "en": "Rename country"
+  },
+  "Rename zone layer": {
+    "zh": "重命名特殊区域图层",
+    "en": "Rename zone layer"
+  },
   "Render Profile": {
     "zh": "渲染档位",
     "en": "Render Profile"
@@ -7940,6 +8160,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "调整交通图层顺序",
     "en": "Reorder transport layers"
   },
+  "Reorder zone layers": {
+    "zh": "调整特殊区域图层顺序",
+    "en": "Reorder zone layers"
+  },
+  "Replace color": {
+    "zh": "替换颜色",
+    "en": "Replace color"
+  },
   "Replace with dev selection": {
     "zh": "用开发选择替换",
     "en": "Replace with dev selection"
@@ -7947,6 +8175,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Replace with imported ids": {
     "zh": "用导入 ID 替换",
     "en": "Replace with imported ids"
+  },
+  "Replace zone members": {
+    "zh": "替换特殊区域成员",
+    "en": "Replace zone members"
   },
   "Replaced by manual map text": {
     "zh": "有手动地图文字代替",
@@ -7992,6 +8224,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "重置所有国家颜色并清除视觉覆盖吗？",
     "en": "Reset all country colors and clear visual overrides?"
   },
+  "Reset country overrides": {
+    "zh": "重置国家局部配色",
+    "en": "Reset country overrides"
+  },
   "Reset zoom": {
     "zh": "重置缩放",
     "en": "Reset zoom"
@@ -8035,6 +8271,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Return to": {
     "zh": "返回",
     "en": "Return to"
+  },
+  "Return to: {action}": {
+    "zh": "回到：{action}",
+    "en": "Return to: {action}"
   },
   "Review": {
     "zh": "审查",
@@ -8367,6 +8607,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Save and restore the complete working state.": {
     "zh": "保存和恢复完整工作状态。",
     "en": "Save and restore the complete working state."
+  },
+  "Save appearance preset": {
+    "zh": "保存外观预设",
+    "en": "Save appearance preset"
   },
   "Save first": {
     "zh": "先保存",
@@ -8948,6 +9192,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "选择锚定区域",
     "en": "Select anchor region"
   },
+  "Select appearance preset": {
+    "zh": "选择外观预设",
+    "en": "Select appearance preset"
+  },
   "Select country": {
     "zh": "选择国家",
     "en": "Select country"
@@ -8999,6 +9247,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Select which official port legal classes remain visible.": {
     "zh": "选择哪些官方港口法律类别保持可见。",
     "en": "Select which official port legal classes remain visible."
+  },
+  "Select zone layer": {
+    "zh": "选择特殊区域图层",
+    "en": "Select zone layer"
   },
   "Selected": {
     "zh": "已选",
@@ -10500,6 +10752,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "切换活动场景的海岸线、盆地轮廓和纹理叠加。",
     "en": "Toggle shoreline, basin contour, and texture overlays for the active scenario."
   },
+  "Toggle zone membership": {
+    "zh": "切换特殊区域成员资格",
+    "en": "Toggle zone membership"
+  },
   "Tone Bias": {
     "zh": "色调偏差",
     "en": "Tone Bias"
@@ -10827,6 +11083,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Urban Areas": {
     "zh": "城市区域",
     "en": "Urban Areas"
+  },
+  "Urban intensity field": {
+    "zh": "城市强度场",
+    "en": "Urban intensity field"
   },
   "Urban population share": {
     "zh": "城镇人口占比",

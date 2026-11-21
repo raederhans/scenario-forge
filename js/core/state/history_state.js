@@ -2,6 +2,6 @@ export function createDefaultHistoryState() {
   return {
     historyPast: [],
     historyFuture: [],
-    historyMax: 80,
+    historyMax: 200,
   };
 }

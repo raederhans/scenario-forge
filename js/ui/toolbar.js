@@ -1,3 +1,4 @@
+import { bindHistoryPanel } from "./history_panel.js";
 import { normalizeBorderColor } from "./toolbar/appearance_border_owner.js";
 import { createRiverPaintControls } from "./river_paint_controls.js";
 import { createRiverCellPicker } from "./river_cell_picker.js";
@@ -1640,7 +1641,9 @@ function initToolbar({ render } = {}) {
     showToast,
     t,
   });
+  const refreshHistoryPanel = bindHistoryPanel(document.getElementById("historyDropdown"));
   function updateHistoryUi() {
+    refreshHistoryPanel();
     updateHistoryButton(undoBtn, "Undo", getLatestHistoryEntry());
     updateHistoryButton(redoBtn, "Redo", state.historyFuture?.at(-1));
   }
