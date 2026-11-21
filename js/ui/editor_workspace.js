@@ -639,6 +639,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     ].map(([key, label, shortcut]) => ({ key, label, shortcut, button: get(key), group: "Tools" })),
     ...[
       ["workspaceSaveBtn", "Save project"], ["workspaceExportBtn", "Export image"],
+      ["quickReexportBtn", "Export with last settings"],
       ["btnToggleLang", "Switch language"], ["scenarioGuideBtn", "User guide"],
     ].map(([key, label]) => ({ key, label, button: get(key), group: "Project" })),
   ] });

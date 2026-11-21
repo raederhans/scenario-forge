@@ -82,6 +82,8 @@ export {
   getEffectiveCityCollection,
   getWaterRegionColor,
   rebuildStaticMeshes,
+  isExportRenderOverBudget,
+  getOceanBaseFillColor,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
   ensureBathymetryReadyForExport,

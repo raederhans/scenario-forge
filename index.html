@@ -3059,6 +3059,21 @@
 
               </summary>
 
+              <template id="legendAppearanceFields">
+                <label class="legend-generator-field"><span data-i18n="Legend title">Legend title</span>
+                  <input class="legend-input" type="text" name="title">
+                </label>
+                <label class="legend-generator-field"><span data-i18n="Legend background">Legend background</span>
+                  <select class="legend-generator-select" name="exportBackground">
+                    <option value="light" data-i18n="Light">Light</option>
+                    <option value="dark" data-i18n="Dark">Dark</option>
+                    <option value="none" data-i18n="None">None</option>
+                  </select>
+                </label>
+                <label class="legend-generator-check"><input type="checkbox" name="exportOpaque">
+                  <span data-i18n="Opaque on export">Opaque on export</span>
+                </label>
+              </template>
               <div id="legendEditorStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
@@ -3103,6 +3118,7 @@
                   </div>
                 </div>
                 <div class="sidebar-support-actions" role="group" aria-label="Export actions" data-i18n-aria-label="Export actions">
+                  <button id="quickReexportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Export with last settings">Export with last settings</button>
                   <button id="dockExportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Open workbench">Open workbench</button>
                 </div>
               </div>
@@ -3420,6 +3436,7 @@
               </div>
               <div id="exportWorkbenchPreviewCanvas" class="export-workbench-preview-canvas" aria-live="polite">
                 <div id="exportWorkbenchPreviewStage" class="export-workbench-preview-stage"></div>
+                <div id="exportJobStatus" class="export-workbench-preview-state" role="status" hidden></div>
                 <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state" data-i18n="Export preview ready">
                   Export preview ready
                 </div>
@@ -3490,17 +3507,20 @@
               <option value="png">PNG</option>
               <option value="jpg">JPG</option>
             </select>
+            <label><input id="exportTransparentBackground" type="checkbox"> <span data-i18n="Transparent background">Transparent background</span></label>
+            <small id="exportJpegHint" hidden data-i18n="JPG uses the ocean color behind transparent areas.">JPG uses the ocean color behind transparent areas.</small>
             </div>
             <div class="export-workbench-field">
             <label id="lblExportWorkbenchScale" class="sidebar-field-label" for="exportWorkbenchScale" data-i18n="Export Resolution">Export Resolution</label>
             <select id="exportWorkbenchScale" name="export-workbench-scale" autocomplete="off" class="select-input export-workbench-format-select">
-              <option value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
-              <option value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
-              <option value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
-              <option value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
+              <option value="1">1×</option>
+              <option value="1.5">1.5×</option>
+              <option value="2" selected>2×</option>
+              <option value="4">4×</option>
             </select>
             </div>
             <p id="exportWorkbenchResolutionHint" class="sidebar-help-copy" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
+            <button id="exportCopyBtn" class="btn-secondary" type="button" data-i18n="Copy image">Copy image</button>
             <button id="exportWorkbenchSnapshotBtn" class="btn-primary export-workbench-snapshot-btn" type="button" data-i18n="Download Snapshot">
               Download Snapshot
             </button>
