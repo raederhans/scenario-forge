@@ -29,6 +29,25 @@ export function resolveExportBaseDimensions(
   return { width, height };
 }
 
+export function getExportScaleInfo(state, scale, passGroups, isOverBudget, renderRatio = Number(scale)) {
+  const base = resolveExportBaseDimensions(state.dpr, state.width, state.height, state.colorCanvas?.width, state.colorCanvas?.height);
+  const width = Math.round(base.width * scale);
+  const height = Math.round(base.height * scale);
+  let reason = "";
+  if (width > EXPORT_MAX_DIMENSION_PX || height > EXPORT_MAX_DIMENSION_PX || width * height > EXPORT_MAX_PIXELS) {
+    reason = "Exceeds 8K limit";
+  } else if (passGroups.some(passes => isOverBudget(passes, renderRatio))) {
+    reason = "Exceeds render budget";
+  }
+  return { width, height, reason };
+}
+
+export function encodeExportCanvas(canvas, mime) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Unable to encode artifact canvas.")), mime, 0.92);
+  });
+}
+
 export function buildExportAdjustmentFilter(exportUi) {
   const adjustments = exportUi?.adjustments || {};
   const brightness = normalizeExportAdjustmentValue(adjustments.brightness) / 100;

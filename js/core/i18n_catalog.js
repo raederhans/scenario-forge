@@ -281,6 +281,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已添加 {count} 条防线",
     "en": "Added {count} defense lines"
   },
+  "Adjust settings": {
+    "zh": "调整设置",
+    "en": "Adjust settings"
+  },
   "Adjust the road rules on the left, then select a road or route label to inspect it.": {
     "zh": "在左侧调整道路规则，再选择道路或路线编号查看详情。",
     "en": "Adjust the road rules on the left, then select a road or route label to inspect it."
@@ -1019,6 +1023,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Belarus hybrid": {
     "zh": "白俄罗斯混合拓扑",
     "en": "Belarus hybrid"
+  },
+  "Below screen resolution": {
+    "zh": "低于屏幕清晰度",
+    "en": "Below screen resolution"
   },
   "Berlin": {
     "zh": "柏林",
@@ -2196,6 +2204,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "复制名称 + ID",
     "en": "Copy Names + ID"
   },
+  "Copy image": {
+    "zh": "复制图片",
+    "en": "Copy image"
+  },
   "Copy members from layer": {
     "zh": "从图层复制成员",
     "en": "Copy members from layer"
@@ -2235,6 +2247,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Corridor Strength (Modern only)": {
     "zh": "通道强度（仅现代）",
     "en": "Corridor Strength (Modern only)"
+  },
+  "Could not copy image. Check clipboard permissions or download the snapshot.": {
+    "zh": "无法复制图片。请检查剪贴板权限，或下载快照。",
+    "en": "Could not copy image. Check clipboard permissions or download the snapshot."
   },
   "Counter Editor": {
     "zh": "计数器编辑器",
@@ -3252,6 +3268,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "包围",
     "en": "Encirclement"
   },
+  "Encoding image…": {
+    "zh": "正在编码…",
+    "en": "Encoding image…"
+  },
   "Energy Facilities": {
     "zh": "能源设施",
     "en": "Energy Facilities"
@@ -3350,6 +3370,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Every province of the present-day world with no owner assigned. Paint your own alternate history from scratch: countries, borders and colours are entirely up to you.": {
     "zh": "当代世界的全部地块，没有任何预设归属。适合从零开始绘制自己的架空历史：国家、疆界和配色完全由你决定。",
     "en": "Every province of the present-day world with no owner assigned. Paint your own alternate history from scratch: countries, borders and colours are entirely up to you."
+  },
+  "Exceeds 8K limit": {
+    "zh": "超出 8K 上限",
+    "en": "Exceeds 8K limit"
+  },
+  "Exceeds render budget": {
+    "zh": "超出渲染内存预算",
+    "en": "Exceeds render budget"
   },
   "Exclude *_link": {
     "zh": "排除 *_link",
@@ -3515,6 +3543,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "导出工具",
     "en": "Export tools"
   },
+  "Export with last settings": {
+    "zh": "按上次设置导出",
+    "en": "Export with last settings"
+  },
   "Export workbench": {
     "zh": "导出工作台",
     "en": "Export workbench"
@@ -3530,6 +3562,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Exporting sample": {
     "zh": "正在导出示例",
     "en": "Exporting sample"
+  },
+  "Exporting…": {
+    "zh": "正在导出…",
+    "en": "Exporting…"
   },
   "Expose OSM versus N06 conflicts instead of hiding them.": {
     "zh": "公开 OSM 与 N06 的冲突，而不是隐藏它们。",
@@ -4290,6 +4326,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已忽略 {count} 条不适用于当前地图的记录。",
     "en": "Ignored {count} entries that are not valid for this map."
   },
+  "Image clipboard unavailable": {
+    "zh": "此浏览器不支持复制图片",
+    "en": "Image clipboard unavailable"
+  },
+  "Image copied. Paste it into a chat.": {
+    "zh": "已复制，可直接粘贴到聊天。",
+    "en": "Image copied. Paste it into a chat."
+  },
   "Import": {
     "zh": "导入",
     "en": "Import"
@@ -4545,6 +4589,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Ivory Night": {
     "zh": "夜色象牙",
     "en": "Ivory Night"
+  },
+  "JPG uses the ocean color behind transparent areas.": {
+    "zh": "JPG 会在透明区域铺上海洋底色。",
+    "en": "JPG uses the ocean color behind transparent areas."
   },
   "Japan": {
     "zh": "日本",
@@ -4949,6 +4997,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Legend Editor": {
     "zh": "图例编辑器",
     "en": "Legend Editor"
+  },
+  "Legend background": {
+    "zh": "图例背景",
+    "en": "Legend background"
+  },
+  "Legend title": {
+    "zh": "图例标题",
+    "en": "Legend title"
   },
   "Lens": {
     "zh": "视图",
@@ -6433,6 +6489,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "不透明度",
     "en": "Opacity"
   },
+  "Opaque on export": {
+    "zh": "导出时不透明",
+    "en": "Opaque on export"
+  },
   "Open HGO editor": {
     "zh": "打开 HGO 独立编辑器",
     "en": "Open HGO editor"
@@ -7164,6 +7224,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "正在准备默认剧本",
     "en": "Preparing default scenario"
   },
+  "Preparing export data…": {
+    "zh": "正在准备导出数据…",
+    "en": "Preparing export data…"
+  },
   "Preparing preview…": {
     "zh": "正在准备预览…",
     "en": "Preparing preview…"
@@ -7863,6 +7927,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Rendering export preview…": {
     "zh": "正在渲染导出预览…",
     "en": "Rendering export preview…"
+  },
+  "Rendering map…": {
+    "zh": "正在渲染地图…",
+    "en": "Rendering map…"
   },
   "Reorder the 8 transport families in the center board. This order currently stays local to the Transport workbench.": {
     "zh": "在中间面板调整 8 个交通图层族的顺序。此顺序目前只保存在交通工作台内。",
@@ -10443,6 +10511,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Transfer not applied": {
     "zh": "未申请转移",
     "en": "Transfer not applied"
+  },
+  "Transparent background": {
+    "zh": "透明背景",
+    "en": "Transparent background"
   },
   "Transport": {
     "zh": "交通",

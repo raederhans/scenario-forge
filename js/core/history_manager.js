@@ -78,6 +78,7 @@ function captureHistoryState({
   ownerCodes = [],
   stylePaths = [],
   legend = false,
+  legendConfig = false,
   countryNameOverrides = false,
   strategicOverlay = false,
   intensityFieldChannels = [],
@@ -111,6 +112,7 @@ function captureHistoryState({
   if (styleKeys.length) {
     snapshot.styleConfig = captureStylePaths(styleKeys);
   }
+  if (legendConfig) snapshot.legendConfig = { ...runtimeState.legendConfig };
   if (legend) {
     snapshot.legendLabels = { ...runtimeState.legendLabels };
     snapshot.legendColorOrder = [...(runtimeState.legendColorOrder || [])];
@@ -330,6 +332,7 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
   applyStyleSnapshot(snapshot.styleConfig);
   if (snapshot.countryNameOverrides) runtimeState.countryNameOverrides = cloneStructuredValue(snapshot.countryNameOverrides);
+  if (snapshot.legendConfig) patchLegendState(runtimeState, { legendConfig: snapshot.legendConfig });
   if (snapshot.legendLabels) {
     patchLegendState(runtimeState, { legendLabels: snapshot.legendLabels, legendColorOrder: snapshot.legendColorOrder });
   }

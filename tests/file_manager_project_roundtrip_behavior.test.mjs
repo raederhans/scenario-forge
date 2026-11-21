@@ -452,6 +452,9 @@ test("project payload builder returns export schema without triggering download"
     continent: "asia",
     useModernMajorOrder: true,
     maxItems: 15,
+    title: "",
+    exportBackground: "light",
+    exportOpaque: false,
   });
   assert.deepEqual(payload.legendControl, {
     visible: false,

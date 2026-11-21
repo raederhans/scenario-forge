@@ -28,6 +28,8 @@ import {
   zoomByStep,
   setZoomPercent,
   RENDER_PASS_NAMES,
+  isExportRenderOverBudget,
+  getOceanBaseFillColor,
   renderExportPassesToCanvas,
   assertPopulationHeatmapReadyForExport,
   ensurePopulationHeatmapReadyForExport,
@@ -527,6 +529,8 @@ function initToolbar({ render } = {}) {
   const exportWorkflowController = createExportWorkflowController({
     state, document, t,
     renderPassNames: RENDER_PASS_NAMES,
+    isExportRenderOverBudget,
+    getOceanBaseFillColor,
     renderExportPassesToCanvas,
     assertPopulationHeatmapReadyForExport,
     ensurePopulationHeatmapReadyForExport,

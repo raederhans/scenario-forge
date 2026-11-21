@@ -10915,6 +10915,30 @@ async function ensureBathymetryReadyForExport(passNames, pixelRatio = null) {
   }
 }
 
+function needsExportRedraw(passNames, pixelRatio, targetDpr) {
+  return (politicalPassUsesDirectScene && passNames.includes("political"))
+    || (pixelRatio !== null && targetDpr >= Number(runtimeState.dpr || 1));
+}
+
+function isExportRenderOverBudget(passNames, pixelRatio) {
+  return getExportRenderBytes(filterCurrentEnabledRenderPasses(passNames), pixelRatio) > EXPORT_RENDER_BUDGET_BYTES;
+}
+
+function getExportRenderBytes(passNames, pixelRatio) {
+  const targetDpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
+  if (!needsExportRedraw(passNames, pixelRatio, targetDpr)) return 0;
+  return estimateExportRenderBytes({
+    width: runtimeState.width,
+    height: runtimeState.height,
+    pixelRatio: targetDpr,
+    passNames,
+    bathymetryCoverage: !!runtimeState.styleConfig?.ocean?.experimentalAdvancedStyles
+      && runtimeState.styleConfig.ocean.preset !== "flat",
+    physicalIntensity: !!runtimeState.showPhysical && ["physicalAtlas", "physicalContour"].some((id) => runtimeState.intensityFields?.channels?.[id]?.enabled),
+    riverInternalContours: hasVisibleRiverPartitions(),
+  });
+}
+
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   passNames = filterCurrentEnabledRenderPasses(passNames);
   if (passNames.includes("populationHeatmap")) assertPopulationHeatmapReadyForExport();
@@ -10945,24 +10969,14 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   }
   // A matching screen DPR may still hold transformed interaction passes. Final
   // exports at that density need an exact redraw as well.
-  const redrawAtTargetResolution = (politicalPassUsesDirectScene && passNames.includes("political"))
-    || (pixelRatio !== null && targetDpr >= Number(runtimeState.dpr || 1));
+  const redrawAtTargetResolution = needsExportRedraw(passNames, pixelRatio, targetDpr);
   const logicalWidth = Number(runtimeState.width || 0);
   const logicalHeight = Number(runtimeState.height || 0);
   if (redrawAtTargetResolution) {
     if (!(logicalWidth > 0) || !(logicalHeight > 0)) {
       throw new RangeError("Export viewport dimensions are unavailable.");
     }
-    const estimatedBytes = estimateExportRenderBytes({
-      width: logicalWidth,
-      height: logicalHeight,
-      pixelRatio: targetDpr,
-      passNames,
-      bathymetryCoverage: !!runtimeState.styleConfig?.ocean?.experimentalAdvancedStyles
-        && runtimeState.styleConfig.ocean.preset !== "flat",
-      physicalIntensity: !!runtimeState.showPhysical && ["physicalAtlas", "physicalContour"].some((id) => runtimeState.intensityFields?.channels?.[id]?.enabled),
-      riverInternalContours: hasVisibleRiverPartitions(),
-    });
+    const estimatedBytes = getExportRenderBytes(passNames, pixelRatio);
     if (estimatedBytes > EXPORT_RENDER_BUDGET_BYTES) {
       throw new RangeError(
         `Export render budget exceeded (${Math.ceil(estimatedBytes / 1048576)} MiB estimated for ${passNames.length} passes; limit ${EXPORT_RENDER_BUDGET_BYTES / 1048576} MiB).`,
@@ -13457,6 +13471,8 @@ export {
   focusGeoBounds,
   focusRiverPaintParentById,
   applyRiverPaintCellById,
+  isExportRenderOverBudget,
+  getOceanBaseFillColor,
   renderExportPassesToCanvas,
   captureRenderSnapshot,
 

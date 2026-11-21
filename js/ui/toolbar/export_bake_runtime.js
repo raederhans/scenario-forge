@@ -394,7 +394,7 @@ export function createExportBakeRuntime({
     onlyViewportSelector: ".special-zones-layer",
   }, dimensions);
 
-  const buildCompositeSourceCanvas = async (exportUi, dimensions = null) => {
+  const buildCompositeSourceCanvas = async (exportUi, dimensions = null, onRendering) => {
     await ensureScenarioPoliticalDetailForExport();
     const passNames = resolveExportPassSequence({
       ...exportUi,
@@ -404,6 +404,7 @@ export function createExportBakeRuntime({
     await ensurePaintContoursReady();
     await ensureCountryLabelsReadyForExport(passNames);
     await ensureBathymetryReadyForExport(passNames, dimensions?.pixelRatio ?? null);
+    if (onRendering) await onRendering();
     const compositeCanvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
@@ -504,9 +505,9 @@ export function createExportBakeRuntime({
     return applyExportAdjustmentsToCanvas(sourceCanvas, exportUi, dimensions);
   };
 
-  const buildCompositeExportCanvas = async (exportUi, scaleMultiplier) => {
+  const buildCompositeExportCanvas = async (exportUi, scaleMultiplier, onRendering) => {
     const dimensions = getExportDimensions(scaleMultiplier);
-    const compositeCanvas = await buildCompositeSourceCanvas(exportUi, dimensions);
+    const compositeCanvas = await buildCompositeSourceCanvas(exportUi, dimensions, onRendering);
     return scaleCanvasForExport(compositeCanvas, scaleMultiplier, exportUi);
   };
 

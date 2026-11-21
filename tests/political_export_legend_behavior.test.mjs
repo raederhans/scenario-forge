@@ -8,6 +8,7 @@ function makeCanvas(width = 800, height = 600) {
     save() {}, restore() {}, drawImage() {}, strokeRect() {},
     setTransform(...args) { calls.push(["transform", ...args]); },
     fillRect(...args) { calls.push(["rect", this.fillStyle, this.globalAlpha, ...args]); },
+    measureText(text) { return { width: text.length * 7 }; },
     fillText(text) { calls.push(["text", text]); },
   };
   return { width, height, calls, getContext: () => ctx };

@@ -11569,5 +11569,77 @@
   "面积模式优先现代大国排序": {
     "en": "Prefer modern major-power order for area modes",
     "zh": "面积模式优先现代大国排序"
+  },
+  "Export with last settings": {
+    "en": "Export with last settings",
+    "zh": "按上次设置导出"
+  },
+  "Transparent background": {
+    "en": "Transparent background",
+    "zh": "透明背景"
+  },
+  "JPG uses the ocean color behind transparent areas.": {
+    "en": "JPG uses the ocean color behind transparent areas.",
+    "zh": "JPG 会在透明区域铺上海洋底色。"
+  },
+  "Copy image": {
+    "en": "Copy image",
+    "zh": "复制图片"
+  },
+  "Image clipboard unavailable": {
+    "en": "Image clipboard unavailable",
+    "zh": "此浏览器不支持复制图片"
+  },
+  "Exceeds 8K limit": {
+    "en": "Exceeds 8K limit",
+    "zh": "超出 8K 上限"
+  },
+  "Exceeds render budget": {
+    "en": "Exceeds render budget",
+    "zh": "超出渲染内存预算"
+  },
+  "Below screen resolution": {
+    "en": "Below screen resolution",
+    "zh": "低于屏幕清晰度"
+  },
+  "Exporting…": {
+    "en": "Exporting…",
+    "zh": "正在导出…"
+  },
+  "Preparing export data…": {
+    "en": "Preparing export data…",
+    "zh": "正在准备导出数据…"
+  },
+  "Rendering map…": {
+    "en": "Rendering map…",
+    "zh": "正在渲染地图…"
+  },
+  "Encoding image…": {
+    "en": "Encoding image…",
+    "zh": "正在编码…"
+  },
+  "Image copied. Paste it into a chat.": {
+    "en": "Image copied. Paste it into a chat.",
+    "zh": "已复制，可直接粘贴到聊天。"
+  },
+  "Adjust settings": {
+    "en": "Adjust settings",
+    "zh": "调整设置"
+  },
+  "Legend title": {
+    "en": "Legend title",
+    "zh": "图例标题"
+  },
+  "Legend background": {
+    "en": "Legend background",
+    "zh": "图例背景"
+  },
+  "Opaque on export": {
+    "en": "Opaque on export",
+    "zh": "导出时不透明"
+  },
+  "Could not copy image. Check clipboard permissions or download the snapshot.": {
+    "en": "Could not copy image. Check clipboard permissions or download the snapshot.",
+    "zh": "无法复制图片。请检查剪贴板权限，或下载快照。"
   }
 }
