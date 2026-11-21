@@ -35,26 +35,7 @@ function createScenarioGuidePopoverController({
     return SCENARIO_GUIDE_SECTIONS.includes(normalizedValue);
   };
 
-  const syncScenarioGuideQuickSteps = () => {
-    const identityStep = scenarioGuidePopover?.querySelector?.("#scenarioGuideStepActive");
-    if (identityStep) {
-      identityStep.hidden = true;
-      identityStep.classList.add("hidden");
-    }
-    const headings = [
-      ["scenarioGuideStepOwner", "3. Set the active owner"],
-      ["scenarioGuideStepApplyActions", "4. Edit, style, then save"],
-    ];
-    headings.forEach(([id, key]) => {
-      const heading = scenarioGuidePopover?.querySelector?.(`#${id} strong`);
-      if (!heading) return;
-      heading.setAttribute("data-i18n", key);
-      heading.textContent = t(key, "ui");
-    });
-  };
-
   const renderScenarioGuideSection = (section = "quick", { syncUrl = true } = {}) => {
-    syncScenarioGuideQuickSteps();
     scenarioGuideActiveSection = normalizeScenarioGuideSection(section);
     if (syncUrl) {
       onSectionChange?.(scenarioGuideActiveSection);
@@ -86,7 +67,6 @@ function createScenarioGuidePopoverController({
     isOpen = false,
     tutorialEntryVisible = state.ui?.tutorialEntryVisible !== false,
   } = {}) => {
-    syncScenarioGuideQuickSteps();
     if (scenarioGuideBtn) {
       scenarioGuideBtn.classList.toggle("hidden", !tutorialEntryVisible);
       scenarioGuideBtn.classList.toggle("is-active", isOpen);

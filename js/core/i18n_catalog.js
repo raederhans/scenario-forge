@@ -69,6 +69,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "2. 伪影猎人（红色巨物）",
     "en": "2. Artifact Hunter (Red Giants)"
   },
+  "2. Pick the receiving country’s color": {
+    "zh": "2. 取接收国的底色",
+    "en": "2. Pick the receiving country’s color"
+  },
   "2. Select the target country in Inspector": {
     "zh": "2. 在检查器里选中目标国家",
     "en": "2. Select the target country in Inspector"
@@ -105,6 +109,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "3. 设置当前归属方",
     "en": "3. Set the active owner"
   },
+  "3. Transfer a border province": {
+    "zh": "3. 把边境省划给邻国",
+    "en": "3. Transfer a border province"
+  },
   "4 presets": {
     "zh": "4 个预设",
     "en": "4 presets"
@@ -116,6 +124,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "4. ID Stability": {
     "zh": "4. ID 稳定性",
     "en": "4. ID Stability"
+  },
+  "4. Label the map": {
+    "zh": "4. 标注地图",
+    "en": "4. Label the map"
   },
   "4. Set the active owner": {
     "zh": "4. 设置当前归属方",
@@ -136,6 +148,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "5. Edit, style, then save": {
     "zh": "5. 编辑、调整样式并保存",
     "en": "5. Edit, style, then save"
+  },
+  "5. Save the project and export an image": {
+    "zh": "5. 保存项目并导出图片",
+    "en": "5. Save the project and export an image"
   },
   "A country needs a specific HGO display name, flag variant, or ideology label before export.": {
     "zh": "导出前，某个国家需要指定 HGO 显示名称、旗帜变体或意识形态标签时使用。",
@@ -292,6 +308,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Advanced Label Placement": {
     "zh": "高级标签放置",
     "en": "Advanced Label Placement"
+  },
+  "Advanced actions": {
+    "zh": "进阶动作",
+    "en": "Advanced actions"
   },
   "Advanced contour settings": {
     "zh": "等高线高级设置",
@@ -527,6 +547,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Anchor: Province / Free": {
     "zh": "锚点：省份 / 自由",
     "en": "Anchor: Province / Free"
+  },
+  "Annexation and country colors": {
+    "zh": "吞并与国家改色",
+    "en": "Annexation and country colors"
   },
   "Annexed (all regions painted in other countries’ colors)": {
     "zh": "已被吞并（全部地块涂成他国颜色）",
@@ -1304,6 +1328,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "当画面异常时，检查渲染状态、调试视图和项目诊断。",
     "en": "Check rendering state, debug views, and project diagnostics when something looks off."
   },
+  "Check the border, country name and legend after painting.": {
+    "zh": "填色后查看边界、国名和图例，确认地块归入了预期的国家。",
+    "en": "Check the border, country name and legend after painting."
+  },
   "Check the current layer order here.": {
     "zh": "在此查看当前图层顺序。",
     "en": "Check the current layer order here."
@@ -1379,6 +1407,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Choose a pack for this layer": {
     "zh": "请选择此图层的数据包",
     "en": "Choose a pack for this layer"
+  },
+  "Choose a scenario with two neighboring countries and apply it.": {
+    "zh": "选择一个包含相邻两国的剧本，点击应用。",
+    "en": "Choose a scenario with two neighboring countries and apply it."
   },
   "Choose a sea or strait from the map or list. To select lakes, first enable lake interaction in settings.": {
     "zh": "从地图或列表选择海域或海峡。要选择湖泊，请先在设置中开启湖泊交互。",
@@ -2304,6 +2336,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "国家视觉",
     "en": "Country Visuals"
   },
+  "Country color": {
+    "zh": "国家颜色",
+    "en": "Country color"
+  },
   "Country colors were reset.": {
     "zh": "国家颜色已重置。",
     "en": "Country colors were reset."
@@ -2347,6 +2383,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Country names": {
     "zh": "国家名称",
     "en": "Country names"
+  },
+  "Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key.": {
+    "zh": "国名和图例条目会随地块颜色更新。用「地图文字」放置注记，再到「图例」编辑条目。",
+    "en": "Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key."
   },
   "Country names are off": {
     "zh": "国名已关闭",
@@ -3027,6 +3067,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Drag rows to define transport layer order. Availability follows the selected family and current runtime data.": {
     "zh": "拖动各行设定交通图层顺序。可用项随所选图层族和当前运行时数据变化。",
     "en": "Drag rows to define transport layer order. Availability follows the selected family and current runtime data."
+  },
+  "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.": {
+    "zh": "将保存的 JSON 拖到地图上，确认剧本、注记、标签和导出设置均已恢复。",
+    "en": "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return."
   },
   "Drag to reorder exported layer groups. Visibility only applies to this export session.": {
     "zh": "拖动以重排导出图层组。可见性设置仅影响当前导出会话。",
@@ -3751,6 +3795,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "最终交付检查",
     "en": "Final handoff check"
   },
+  "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.": {
+    "zh": "在调色板的国家列表找到乙国，选中它的底色。使用填充工具时，也可以按住 Alt 单击地图上的乙国取色。",
+    "en": "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color."
+  },
   "Find region": {
     "zh": "查找地块",
     "en": "Find region"
@@ -3810,6 +3858,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "For 1936, 1939 and TNO. Detail is restored after navigation.": {
     "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。",
     "en": "For 1936, 1939 and TNO. Detail is restored after navigation."
+  },
+  "For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.": {
+    "zh": "要手动添加注记，打开「地图文字」，选择「放置标签」，点击地图上的目标位置，再编辑文字。导出前在预览中检查文字和图例。",
+    "en": "For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview."
+  },
+  "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.": {
+    "zh": "进阶操作中，若剧本动作明确使用「当前归属方」，请在执行前核对当前国家。",
+    "en": "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action."
   },
   "Forbidden": {
     "zh": "禁止项",
@@ -4309,6 +4365,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Important": {
     "zh": "重要的",
     "en": "Important"
+  },
+  "In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map.": {
+    "zh": "在视觉上色模式下，把地块涂成哪个国家的底色，它在图上就属于哪个国家。",
+    "en": "In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map."
   },
   "Inactive fade strength": {
     "zh": "非活动淡入淡出强度",
@@ -6777,6 +6837,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "绘制水域以创建覆盖列表。",
     "en": "Paint water regions to create an override list."
   },
+  "Paint with country colors": {
+    "zh": "用国家底色填图",
+    "en": "Paint with country colors"
+  },
   "Paint {count} regions": {
     "zh": "填色 {count} 个地块",
     "en": {
@@ -7235,6 +7299,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Presets": {
     "zh": "预设",
     "en": "Presets"
+  },
+  "Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map.": {
+    "zh": "按 Ctrl+S 保存可继续编辑的项目 JSON。点击「导出图片」，检查预览后下载地图。",
+    "en": "Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map."
   },
   "Preview available": {
     "zh": "可预览",
@@ -8220,6 +8288,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已选样品",
     "en": "Sample Selected"
   },
+  "Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools.": {
+    "zh": "用吸管在地图上取一个国家的颜色，再切回填充。使用填充工具时，按住 Alt 单击即可直接取色。",
+    "en": "Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools."
+  },
   "Sample guide actions": {
     "zh": "示例引导操作",
     "en": "Sample guide actions"
@@ -8308,9 +8380,17 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "保存项目",
     "en": "Save project"
   },
+  "Save project downloads the editable map, including its colors, annotations and export settings.": {
+    "zh": "点击「保存项目」即可下载可编辑的地图，保留地块颜色、注记和导出设置。",
+    "en": "Save project downloads the editable map, including its colors, annotations and export settings."
+  },
   "Save scenario layer asset": {
     "zh": "保存场景图层资产",
     "en": "Save scenario layer asset"
+  },
+  "Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings.": {
+    "zh": "打开其他文件前，先按 Ctrl+S 保存当前项目。打开项目会替换当前地图及其设置。",
+    "en": "Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings."
   },
   "Save title": {
     "zh": "存档标题",
@@ -8895,6 +8975,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Select source layer": {
     "zh": "选择来源图层",
     "en": "Select source layer"
+  },
+  "Select the country in the country list, then click its color swatch in the Inspector to change its base color.": {
+    "zh": "要给国家换色，先在国家列表中选中它，再点击检查器中的色块修改底色。",
+    "en": "Select the country in the country list, then click its color swatch in the Inspector to change its base color."
   },
   "Select the country, enable the HGO identity view in Inspector, pick the intended identity option, then review the map label and flag preview.": {
     "zh": "选中国家，在检查器中启用 HGO 身份视图，选择目标身份选项，然后检查地图标签和旗帜预览。",
@@ -10036,6 +10120,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "请先加载完整参考分组，再进行填色。",
     "en": "The complete reference group must be loaded before filling it."
   },
+  "The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color.": {
+    "zh": "上下文栏显示剧本、当前国家、选中对象和模式。上色前，确认剧本和当前选色即可。",
+    "en": "The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color."
+  },
   "The control deck now binds the new display schema on the right side while the left column stays contextual.": {
     "zh": "控制面板现在将新的显示模式绑定在右侧，而左列保持上下文状态。",
     "en": "The control deck now binds the new display schema on the right side while the left column stays contextual."
@@ -10360,6 +10448,18 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "倾向强度",
     "en": "Tint Strength"
   },
+  "To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.": {
+    "zh": "要把甲国并入乙国，先选乙国底色，再填满甲国领土，检查是否还有保留甲国原色的地块。",
+    "en": "To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color."
+  },
+  "To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision.": {
+    "zh": "需要成组填色时，在快填中选择默认上级、本地可用的区域层级或全国，再双击一个地块。",
+    "en": "To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision."
+  },
+  "To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits.": {
+    "zh": "把已保存的项目 JSON 拖到地图上即可重新打开。下次打开编辑器时，如果浏览器找到自动保存的草稿，点击「恢复」即可继续编辑。",
+    "en": "To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits."
+  },
   "Toggle Atlantropa-style scenario regions without affecting the base map.": {
     "zh": "切换 Atlantropa 风格的剧本区域而不影响基础地图。",
     "en": "Toggle Atlantropa-style scenario regions without affecting the base map."
@@ -10444,6 +10544,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "未申请转移",
     "en": "Transfer not applied"
   },
+  "Transfer territory or change a country’s base color.": {
+    "zh": "划转领土，或调整一个国家的底色。",
+    "en": "Transfer territory or change a country’s base color."
+  },
   "Transport": {
     "zh": "交通",
     "en": "Transport"
@@ -10523,6 +10627,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Turn it on when you want to derive conflict lines from the active scenario.": {
     "zh": "当你想从当前剧本派生冲突线时再打开它。",
     "en": "Turn it on when you want to derive conflict lines from the active scenario."
+  },
+  "Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke.": {
+    "zh": "开启刷子，拖过要上色的地块。按 Ctrl+Z 可撤销这一笔。",
+    "en": "Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke."
   },
   "Turn on Show Transport Overview, choose Distribution, Network, or Coverage, then tune each family visibility, labels, and scope.": {
     "zh": "打开“显示交通概览”，选择分布、网络或覆盖，再调整各类交通的可见性、标签和范围。",
@@ -10748,6 +10856,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "使用“下载项目”保存当前可编辑状态：场景选择、归属修改、外观、交通、战略标注、参考图对齐参数和导出设置。",
     "en": "Use Download Project to save the current editable state: scenario choice, ownership edits, appearance, transport, strategic annotations, reference alignment values, and export settings."
   },
+  "Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke.": {
+    "zh": "用填充工具单击地块，用快填一次处理一组地块，或用刷子连续上色。",
+    "en": "Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke."
+  },
   "Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters.": {
     "zh": "先应用场景，再使用 Frontline。这个区块同时管理 derived conflict overlay 和 project-local strategic workspace，用于 operational lines、graphics 和 unit counters。",
     "en": "Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters."
@@ -10767,6 +10879,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.": {
     "zh": "把项目工具当成发布检查清单：先保存项目，再补战略信息、对齐参考图，最后导出。",
     "en": "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export."
+  },
+  "Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.": {
+    "zh": "点击「保存项目」下载可编辑的 JSON 文件。将文件拖回地图即可重新打开。",
+    "en": "Use Save project to download the editable JSON. Drag the saved file onto the map to open it again."
   },
   "Use Selection Country": {
     "zh": "使用当前选择国家",
@@ -11163,6 +11279,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Will merge into {country}": {
     "zh": "将并入{country}",
     "en": "Will merge into {country}"
+  },
+  "With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it.": {
+    "zh": "选好乙国底色后，单击甲国的一个边境地块，观察边界变化。要划出整个省，选好对应的快填层级，再双击省内的地块。",
+    "en": "With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it."
   },
   "Workbench inspector tabs": {
     "zh": "工作台检查器选项卡",

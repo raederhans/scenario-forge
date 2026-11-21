@@ -11569,5 +11569,125 @@
   "面积模式优先现代大国排序": {
     "en": "Prefer modern major-power order for area modes",
     "zh": "面积模式优先现代大国排序"
+  },
+  "Choose a scenario with two neighboring countries and apply it.": {
+    "en": "Choose a scenario with two neighboring countries and apply it.",
+    "zh": "选择一个包含相邻两国的剧本，点击应用。"
+  },
+  "2. Pick the receiving country’s color": {
+    "en": "2. Pick the receiving country’s color",
+    "zh": "2. 取接收国的底色"
+  },
+  "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.": {
+    "en": "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.",
+    "zh": "在调色板的国家列表找到乙国，选中它的底色。使用填充工具时，也可以按住 Alt 单击地图上的乙国取色。"
+  },
+  "3. Transfer a border province": {
+    "en": "3. Transfer a border province",
+    "zh": "3. 把边境省划给邻国"
+  },
+  "With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it.": {
+    "en": "With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it.",
+    "zh": "选好乙国底色后，单击甲国的一个边境地块，观察边界变化。要划出整个省，选好对应的快填层级，再双击省内的地块。"
+  },
+  "4. Label the map": {
+    "en": "4. Label the map",
+    "zh": "4. 标注地图"
+  },
+  "Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key.": {
+    "en": "Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key.",
+    "zh": "国名和图例条目会随地块颜色更新。用「地图文字」放置注记，再到「图例」编辑条目。"
+  },
+  "5. Save the project and export an image": {
+    "en": "5. Save the project and export an image",
+    "zh": "5. 保存项目并导出图片"
+  },
+  "Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map.": {
+    "en": "Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map.",
+    "zh": "按 Ctrl+S 保存可继续编辑的项目 JSON。点击「导出图片」，检查预览后下载地图。"
+  },
+  "The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color.": {
+    "en": "The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color.",
+    "zh": "上下文栏显示剧本、当前国家、选中对象和模式。上色前，确认剧本和当前选色即可。"
+  },
+  "To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits.": {
+    "en": "To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits.",
+    "zh": "把已保存的项目 JSON 拖到地图上即可重新打开。下次打开编辑器时，如果浏览器找到自动保存的草稿，点击「恢复」即可继续编辑。"
+  },
+  "Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke.": {
+    "en": "Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke.",
+    "zh": "用填充工具单击地块，用快填一次处理一组地块，或用刷子连续上色。"
+  },
+  "Paint with country colors": {
+    "en": "Paint with country colors",
+    "zh": "用国家底色填图"
+  },
+  "In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map.": {
+    "en": "In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map.",
+    "zh": "在视觉上色模式下，把地块涂成哪个国家的底色，它在图上就属于哪个国家。"
+  },
+  "Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools.": {
+    "en": "Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools.",
+    "zh": "用吸管在地图上取一个国家的颜色，再切回填充。使用填充工具时，按住 Alt 单击即可直接取色。"
+  },
+  "To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision.": {
+    "en": "To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision.",
+    "zh": "需要成组填色时，在快填中选择默认上级、本地可用的区域层级或全国，再双击一个地块。"
+  },
+  "Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke.": {
+    "en": "Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke.",
+    "zh": "开启刷子，拖过要上色的地块。按 Ctrl+Z 可撤销这一笔。"
+  },
+  "Check the border, country name and legend after painting.": {
+    "en": "Check the border, country name and legend after painting.",
+    "zh": "填色后查看边界、国名和图例，确认地块归入了预期的国家。"
+  },
+  "Annexation and country colors": {
+    "en": "Annexation and country colors",
+    "zh": "吞并与国家改色"
+  },
+  "Transfer territory or change a country’s base color.": {
+    "en": "Transfer territory or change a country’s base color.",
+    "zh": "划转领土，或调整一个国家的底色。"
+  },
+  "To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.": {
+    "en": "To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.",
+    "zh": "要把甲国并入乙国，先选乙国底色，再填满甲国领土，检查是否还有保留甲国原色的地块。"
+  },
+  "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.": {
+    "en": "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.",
+    "zh": "进阶操作中，若剧本动作明确使用「当前归属方」，请在执行前核对当前国家。"
+  },
+  "For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.": {
+    "en": "For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.",
+    "zh": "要手动添加注记，打开「地图文字」，选择「放置标签」，点击地图上的目标位置，再编辑文字。导出前在预览中检查文字和图例。"
+  },
+  "Select the country in the country list, then click its color swatch in the Inspector to change its base color.": {
+    "en": "Select the country in the country list, then click its color swatch in the Inspector to change its base color.",
+    "zh": "要给国家换色，先在国家列表中选中它，再点击检查器中的色块修改底色。"
+  },
+  "Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings.": {
+    "en": "Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings.",
+    "zh": "打开其他文件前，先按 Ctrl+S 保存当前项目。打开项目会替换当前地图及其设置。"
+  },
+  "Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.": {
+    "en": "Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.",
+    "zh": "点击「保存项目」下载可编辑的 JSON 文件。将文件拖回地图即可重新打开。"
+  },
+  "Save project downloads the editable map, including its colors, annotations and export settings.": {
+    "en": "Save project downloads the editable map, including its colors, annotations and export settings.",
+    "zh": "点击「保存项目」即可下载可编辑的地图，保留地块颜色、注记和导出设置。"
+  },
+  "Country color": {
+    "en": "Country color",
+    "zh": "国家颜色"
+  },
+  "Advanced actions": {
+    "en": "Advanced actions",
+    "zh": "进阶动作"
+  },
+  "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.": {
+    "en": "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.",
+    "zh": "将保存的 JSON 拖到地图上，确认剧本、注记、标签和导出设置均已恢复。"
   }
 }
