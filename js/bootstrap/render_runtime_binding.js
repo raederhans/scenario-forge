@@ -41,6 +41,7 @@ export function createStartupRenderRuntimeBinding({
   registerHook = registerRuntimeHook,
   initToastFn = initToast,
   showToastFn = showToast,
+  showAppDialogFn = showAppDialog,
   initPresetStateFn = initPresetState,
 } = {}) {
   assertObjectRecord(targetState, "targetState");
@@ -55,6 +56,7 @@ export function createStartupRenderRuntimeBinding({
   assertFunction(registerHook, "registerHook");
   assertFunction(initToastFn, "initToastFn");
   assertFunction(showToastFn, "showToastFn");
+  assertFunction(showAppDialogFn, "showAppDialogFn");
   assertFunction(initPresetStateFn, "initPresetStateFn");
 
   const normalizedFlushReason = normalizeFlushReason(flushReason);
@@ -88,7 +90,7 @@ export function createStartupRenderRuntimeBinding({
   initToastFn();
   registerHook(targetState, "showToastFn", showToastFn);
   // 核心层不能导入 UI，弹框经 hook 提供。
-  registerHook(targetState, "showAppDialogFn", showAppDialog);
+  registerHook(targetState, "showAppDialogFn", showAppDialogFn);
   setBootPreviewVisible(false);
   initPresetStateFn();
 
