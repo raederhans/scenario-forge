@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 332,
-    "feature_count": 21824,
+    "feature_count": 22206,
     "water_count": 0
   },
   "controller_changes": [],
@@ -546,19 +546,6 @@
       "critical": false,
       "feature_id": "ARE-348",
       "feature_name": "Sharjah",
-      "from_tag": "UAE",
-      "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "british_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ENG"
-    },
-    {
-      "country_code": "AE",
-      "critical": false,
-      "feature_id": "ARE-349",
-      "feature_name": "Abu Dhabi",
       "from_tag": "UAE",
       "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
       "quality": "approx_existing_geometry",
@@ -18068,34 +18055,8 @@
     {
       "country_code": "DZ",
       "critical": false,
-      "feature_id": "DZA-2148",
-      "feature_name": "Béchar",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
       "feature_id": "DZA-2149",
       "feature_name": "Naâma",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
-      "feature_id": "DZA-2150",
-      "feature_name": "Tindouf",
       "from_tag": "ALG",
       "notes": "French Algeria represented as a separate colonial administration.",
       "quality": "manual_reviewed",
@@ -18148,19 +18109,6 @@
       "critical": false,
       "feature_id": "DZA-2166",
       "feature_name": "Skikda",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
-      "feature_id": "DZA-2188",
-      "feature_name": "Illizi",
       "from_tag": "ALG",
       "notes": "French Algeria represented as a separate colonial administration.",
       "quality": "manual_reviewed",
@@ -18681,19 +18629,6 @@
       "critical": false,
       "feature_id": "EGY-1539",
       "feature_name": "Dumyat",
-      "from_tag": "EGY",
-      "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
-      "quality": "manual_reviewed",
-      "rule_id": "egypt_kingdom",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "EGY"
-    },
-    {
-      "country_code": "EG",
-      "critical": false,
-      "feature_id": "EGY-1540",
-      "feature_name": "Matruh",
       "from_tag": "EGY",
       "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
       "quality": "manual_reviewed",
@@ -24048,34 +23983,8 @@
     {
       "country_code": "LY",
       "critical": false,
-      "feature_id": "LBY-2882",
-      "feature_name": "Ghadamis",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
       "feature_id": "LBY-2964",
       "feature_name": "Al Jufrah",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
-      "feature_id": "LBY-2965",
-      "feature_name": "Al Kufrah",
       "from_tag": "LBA",
       "notes": "Italian Libya represented as a distinct colonial administration.",
       "quality": "approx_existing_geometry",
@@ -24100,34 +24009,8 @@
     {
       "country_code": "LY",
       "critical": false,
-      "feature_id": "LBY-2967",
-      "feature_name": "Ash Shati'",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
       "feature_id": "LBY-2968",
       "feature_name": "Ghat",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
-      "feature_id": "LBY-2969",
-      "feature_name": "Murzuq",
       "from_tag": "LBA",
       "notes": "Italian Libya represented as a distinct colonial administration.",
       "quality": "approx_existing_geometry",
@@ -24243,19 +24126,6 @@
     {
       "country_code": "LY",
       "critical": false,
-      "feature_id": "LBY-2983",
-      "feature_name": "Ajdabiya",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
       "feature_id": "LBY-2984",
       "feature_name": "Benghazi",
       "from_tag": "LBA",
@@ -24271,19 +24141,6 @@
       "critical": false,
       "feature_id": "LBY-2985",
       "feature_name": "Surt",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
-      "feature_id": "LBY-2987",
-      "feature_name": "Al Butnan",
       "from_tag": "LBA",
       "notes": "Italian Libya represented as a distinct colonial administration.",
       "quality": "approx_existing_geometry",
@@ -28247,19 +28104,6 @@
     {
       "country_code": "RS",
       "critical": true,
-      "feature_id": "RS211",
-      "feature_name": "Златиборска област",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "RS",
-      "critical": true,
       "feature_id": "RS212",
       "feature_name": "Колубарска област",
       "from_tag": "",
@@ -28663,32 +28507,6 @@
     {
       "country_code": "SY",
       "critical": false,
-      "feature_id": "SYR-136",
-      "feature_name": "Ar Raqqah",
-      "from_tag": "SYR",
-      "notes": "French Mandate for Syria represented as a separate mandate government.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_mandate_syria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SYR"
-    },
-    {
-      "country_code": "SY",
-      "critical": false,
-      "feature_id": "SYR-137",
-      "feature_name": "Aleppo",
-      "from_tag": "SYR",
-      "notes": "French Mandate for Syria represented as a separate mandate government.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_mandate_syria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SYR"
-    },
-    {
-      "country_code": "SY",
-      "critical": false,
       "feature_id": "SYR-138",
       "feature_name": "Hamah",
       "from_tag": "SYR",
@@ -28717,32 +28535,6 @@
       "critical": false,
       "feature_id": "SYR-140",
       "feature_name": "Idlib",
-      "from_tag": "SYR",
-      "notes": "French Mandate for Syria represented as a separate mandate government.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_mandate_syria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SYR"
-    },
-    {
-      "country_code": "SY",
-      "critical": false,
-      "feature_id": "SYR-141",
-      "feature_name": "Hasaka (Al Haksa)",
-      "from_tag": "SYR",
-      "notes": "French Mandate for Syria represented as a separate mandate government.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_mandate_syria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SYR"
-    },
-    {
-      "country_code": "SY",
-      "critical": false,
-      "feature_id": "SYR-142",
-      "feature_name": "Dayr Az Zawr",
       "from_tag": "SYR",
       "notes": "French Mandate for Syria represented as a separate mandate government.",
       "quality": "manual_reviewed",
@@ -32514,32 +32306,6 @@
       "feature_id": "XK_ADM1_KOS-5915",
       "feature_name": "Kačanik",
       "from_tag": "KOS",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "BA",
-      "critical": true,
-      "feature_id": "BA_ADM1_54001226B17629474923252",
-      "feature_name": "Federation of Bosnia and Herzegovina",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "BA",
-      "critical": true,
-      "feature_id": "BA_ADM1_54001226B66267900922909",
-      "feature_name": "Republika Srpska",
-      "from_tag": "",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
       "rule_id": "yugoslavia_union",
@@ -51936,19 +51702,6 @@
       "feature_id": "ML_ADM1_MLI-4860",
       "feature_name": "Koulikoro",
       "from_tag": "MLI",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "MR",
-      "critical": false,
-      "feature_id": "MR_ADM1_MRT-2783",
-      "feature_name": "Tiris Zemmour",
-      "from_tag": "MRT",
       "notes": "French West Africa represented as a macro-level colonial federation.",
       "quality": "manual_reviewed",
       "rule_id": "french_west_africa",
@@ -197273,10 +197026,10 @@
     "ALG": {
       "base_iso2": "DZ",
       "continent_label": "Africa",
-      "controller_feature_count": 17,
+      "controller_feature_count": 44,
       "display_name": "French Algeria",
       "entry_kind": "scenario_subject",
-      "feature_count": 17,
+      "feature_count": 44,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -197341,10 +197094,10 @@
     "AOF": {
       "base_iso2": "SN",
       "continent_label": "Africa",
-      "controller_feature_count": 98,
+      "controller_feature_count": 122,
       "display_name": "French West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 98,
+      "feature_count": 122,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -198121,10 +197874,10 @@
     "EGY": {
       "base_iso2": "EG",
       "continent_label": "Africa",
-      "controller_feature_count": 35,
+      "controller_feature_count": 46,
       "display_name": "Kingdom of Egypt",
       "entry_kind": "scenario_subject",
-      "feature_count": 35,
+      "feature_count": 46,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -198313,10 +198066,10 @@
     "FIN": {
       "base_iso2": "FI",
       "continent_label": "Europe",
-      "controller_feature_count": 70,
+      "controller_feature_count": 83,
       "display_name": "Finland",
       "entry_kind": "",
-      "feature_count": 70,
+      "feature_count": 83,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -198843,10 +198596,10 @@
     "IRQ": {
       "base_iso2": "IQ",
       "continent_label": "Asia",
-      "controller_feature_count": 35,
+      "controller_feature_count": 48,
       "display_name": "Iraq",
       "entry_kind": "",
-      "feature_count": 35,
+      "feature_count": 48,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -198939,10 +198692,10 @@
     "JOR": {
       "base_iso2": "JO",
       "continent_label": "Asia",
-      "controller_feature_count": 12,
+      "controller_feature_count": 30,
       "display_name": "Jordan",
       "entry_kind": "",
-      "feature_count": 12,
+      "feature_count": 30,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199063,10 +198816,10 @@
     "LBA": {
       "base_iso2": "LY",
       "continent_label": "Africa",
-      "controller_feature_count": 24,
+      "controller_feature_count": 103,
       "display_name": "Libya",
       "entry_kind": "scenario_subject",
-      "feature_count": 24,
+      "feature_count": 103,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199637,10 +199390,10 @@
     "NOR": {
       "base_iso2": "NO",
       "continent_label": "Europe",
-      "controller_feature_count": 23,
+      "controller_feature_count": 34,
       "display_name": "Norway",
       "entry_kind": "",
-      "feature_count": 23,
+      "feature_count": 34,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199822,10 +199575,10 @@
     "PER": {
       "base_iso2": "IR",
       "continent_label": "Asia",
-      "controller_feature_count": 52,
+      "controller_feature_count": 73,
       "display_name": "Iran",
       "entry_kind": "",
-      "feature_count": 52,
+      "feature_count": 73,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200242,10 +199995,10 @@
     "SAU": {
       "base_iso2": "SA",
       "continent_label": "Asia",
-      "controller_feature_count": 13,
+      "controller_feature_count": 45,
       "display_name": "Saudi Arabia",
       "entry_kind": "",
-      "feature_count": 13,
+      "feature_count": 45,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200400,10 +200153,10 @@
     "SMR": {
       "base_iso2": "MA",
       "continent_label": "Africa",
-      "controller_feature_count": 4,
+      "controller_feature_count": 14,
       "display_name": "Spanish Morocco",
       "entry_kind": "scenario_subject",
-      "feature_count": 4,
+      "feature_count": 14,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200602,10 +200355,10 @@
     "SWE": {
       "base_iso2": "SE",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 29,
       "display_name": "Sweden",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 29,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200665,10 +200418,10 @@
     "SYR": {
       "base_iso2": "SY",
       "continent_label": "Asia",
-      "controller_feature_count": 12,
+      "controller_feature_count": 56,
       "display_name": "French Mandate for Syria",
       "entry_kind": "scenario_subject",
-      "feature_count": 12,
+      "feature_count": 56,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200831,10 +200584,10 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 102,
+      "controller_feature_count": 123,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 102,
+      "feature_count": 123,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201109,10 +200862,10 @@
     "YUG": {
       "base_iso2": "RS",
       "continent_label": "Europe",
-      "controller_feature_count": 151,
+      "controller_feature_count": 193,
       "display_name": "Yugoslavia",
       "entry_kind": "",
-      "feature_count": 151,
+      "feature_count": 193,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202156,41 +201909,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "6d587c6c05596fc810d90ff33b84a3f111d3f004624d8589738cf971faa04b86",
+  "snapshot_fingerprint": "78f9a11c0ce4a2caacdbe66b79ec2a012a5d9b1bc5c9a922924c2722630626dd",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "4d38a2b3cc6141aac26224136b8d2581e125143f45b27f8e4218fd85a1b2abd5",
-    "detail_chunk_manifest_sha256": "5554b6450b88d8193d8f250113a2a8e5909ec33d83ae1ad5bf49b106bdde6ebf",
-    "runtime_bootstrap_topology_sha256": "faaaa257491556eca37ca3108d6d1d55d4c3372e072df00b5089f88225307d93",
-    "runtime_topology_sha256": "204103e95a39ce91ab13b710ed3cb1a52ddfdaaf3fe3f041631bf85950f043cf"
+    "build_snapshot_sha256": "8c8393d6c7f332bc6b2558d98538cb5d7ff6719476ef9d623e12da5e3902a682",
+    "detail_chunk_manifest_sha256": "9af6e858215b5cfcf115b42e6fab8ad7e207921fb3ef57bd84e905c0ffb1ec7f",
+    "runtime_bootstrap_topology_sha256": "eb9f10c148bfc5390041018c1b3058242f141a76116bf1c0022d684d0e535e3e",
+    "runtime_topology_sha256": "f1929579e6f0c6d9633c498e7851403c0158eb976eebee3db8ade0e79032a44d"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15129,
+    "changed_feature_count": 15110,
     "controller_count": 323,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21824,
+    "feature_count": 22206,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14691,
+    "manual_reviewed_feature_count": 14679,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 323,
     "quality_counts": {
-      "approx_existing_geometry": 438,
+      "approx_existing_geometry": 431,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14691
+      "manual_reviewed": 14679
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 17,
-      "manual_rule": 15107
+      "manual_rule": 15088
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

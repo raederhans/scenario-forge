@@ -6873,7 +6873,7 @@
     },
     "ABD": {
       "country_code": "AE",
-      "host_feature_id": "ARE-349",
+      "host_feature_id": "ARE-349__SPLIT_ABU_DHABI_CITY",
       "urban_match_id": "",
       "lon": 54.433609419711146,
       "lat": 24.533351824984454,
@@ -10182,7 +10182,7 @@
         "en": "Abu Dhabi",
         "zh": "阿布扎比"
       },
-      "host_feature_id": "ARE-349",
+      "host_feature_id": "ARE-349__SPLIT_ABU_DHABI_CITY",
       "lon": 54.433609419711146,
       "lat": 24.533351824984454
     },
@@ -12333,7 +12333,7 @@
     "CITY::gn::2529362": {
       "city_id": "CITY::gn::2529362",
       "stable_key": "id::CITY::gn::2529362",
-      "host_feature_id": "MAR-3457__SPLIT_REST"
+      "host_feature_id": "MAR-3457__SPLIT_REST__SPLIT_TATA"
     },
     "CITY::gn::2529649": {
       "city_id": "CITY::gn::2529649",
@@ -21093,7 +21093,7 @@
     "CITY::ne::1159139287": {
       "city_id": "CITY::ne::1159139287",
       "stable_key": "id::CITY::ne::1159139287",
-      "host_feature_id": "MAR-3457__SPLIT_REST"
+      "host_feature_id": "MAR-3457__SPLIT_REST__SPLIT_ABTEH"
     },
     "CITY::ne::1159139291": {
       "city_id": "CITY::ne::1159139291",
@@ -22496,12 +22496,12 @@
     "CITY::ne::1159148255": {
       "city_id": "CITY::ne::1159148255",
       "stable_key": "id::CITY::ne::1159148255",
-      "host_feature_id": "MAR-3457__SPLIT_REST"
+      "host_feature_id": "MAR-3457__SPLIT_REST__SPLIT_EL_OUATIA"
     },
     "CITY::ne::1159148257": {
       "city_id": "CITY::ne::1159148257",
       "stable_key": "id::CITY::ne::1159148257",
-      "host_feature_id": "MAR-3457__SPLIT_REST"
+      "host_feature_id": "MAR-3457__SPLIT_REST__SPLIT_LAAYOUNE"
     },
     "CITY::ne::1159148505": {
       "city_id": "CITY::ne::1159148505",
@@ -23753,7 +23753,8 @@
       "aliases": [
         "Urfa",
         "Şanlıurfa"
-      ]
+      ],
+      "host_feature_id": "TRC21__SPLIT_URFA"
     },
     "CITY::ne::1159130775": {
       "city_id": "CITY::ne::1159130775",
@@ -23765,7 +23766,8 @@
       "aliases": [
         "Rezaieh",
         "Urmia"
-      ]
+      ],
+      "host_feature_id": "IRN-3237__SPLIT_NANAS"
     },
     "CITY::gn::141679": {
       "city_id": "CITY::gn::141679",
@@ -32161,6 +32163,861 @@
       "city_id": "CITY::ne::1159150087",
       "stable_key": "id::CITY::ne::1159150087",
       "host_feature_id": "IRQ-3051__SPLIT_MOSUL"
+    },
+    "CITY::gn::10861986": {
+      "city_id": "CITY::gn::10861986",
+      "stable_key": "id::CITY::gn::10861986",
+      "host_feature_id": "JOR-860"
+    },
+    "CITY::gn::113508": {
+      "city_id": "CITY::gn::113508",
+      "stable_key": "id::CITY::gn::113508",
+      "host_feature_id": "IRN-3237__SPLIT_SOUTH_MARAND"
+    },
+    "CITY::gn::117111": {
+      "city_id": "CITY::gn::117111",
+      "stable_key": "id::CITY::gn::117111",
+      "host_feature_id": "IRN-3237__SPLIT_WEST_AZERBAIJAN"
+    },
+    "CITY::gn::117368": {
+      "city_id": "CITY::gn::117368",
+      "stable_key": "id::CITY::gn::117368",
+      "host_feature_id": "IRN-3238__SPLIT_MARAND"
+    },
+    "CITY::gn::117656": {
+      "city_id": "CITY::gn::117656",
+      "stable_key": "id::CITY::gn::117656",
+      "host_feature_id": "IRN-3237__SPLIT_KHOY"
+    },
+    "CITY::gn::117793": {
+      "city_id": "CITY::gn::117793",
+      "stable_key": "id::CITY::gn::117793",
+      "host_feature_id": "IRN-3237__SPLIT_SAHAND"
+    },
+    "CITY::gn::119730": {
+      "city_id": "CITY::gn::119730",
+      "stable_key": "id::CITY::gn::119730",
+      "host_feature_id": "IRN-3237__SPLIT_NORTH_TIBRIZ"
+    },
+    "CITY::gn::12042053": {
+      "city_id": "CITY::gn::12042053",
+      "stable_key": "id::CITY::gn::12042053",
+      "host_feature_id": "ARE-349__SPLIT_ABU_DHABI_CITY"
+    },
+    "CITY::gn::120954": {
+      "city_id": "CITY::gn::120954",
+      "stable_key": "id::CITY::gn::120954",
+      "host_feature_id": "IRN-3237__SPLIT_MAKU"
+    },
+    "CITY::gn::121795": {
+      "city_id": "CITY::gn::121795",
+      "stable_key": "id::CITY::gn::121795",
+      "host_feature_id": "IRN-3237__SPLIT_OSHNAVIEH"
+    },
+    "CITY::gn::122698": {
+      "city_id": "CITY::gn::122698",
+      "stable_key": "id::CITY::gn::122698",
+      "host_feature_id": "IRN-3237__SPLIT_WEST_AZERBAIJAN"
+    },
+    "CITY::gn::124082": {
+      "city_id": "CITY::gn::124082",
+      "stable_key": "id::CITY::gn::124082",
+      "host_feature_id": "IRN-3238__SPLIT_SOUTH_MARAND"
+    },
+    "CITY::gn::124085": {
+      "city_id": "CITY::gn::124085",
+      "stable_key": "id::CITY::gn::124085",
+      "host_feature_id": "IRN-3238__SPLIT_WEST_AZERBAIJAN"
+    },
+    "CITY::gn::124862": {
+      "city_id": "CITY::gn::124862",
+      "stable_key": "id::CITY::gn::124862",
+      "host_feature_id": "IRN-3238__SPLIT_NORTH_TIBRIZ"
+    },
+    "CITY::gn::125112": {
+      "city_id": "CITY::gn::125112",
+      "stable_key": "id::CITY::gn::125112",
+      "host_feature_id": "IRN-3238__SPLIT_SOUTH_TIBRIZ"
+    },
+    "CITY::gn::139889": {
+      "city_id": "CITY::gn::139889",
+      "stable_key": "id::CITY::gn::139889",
+      "host_feature_id": "IRN-3237__SPLIT_WEST_AZERBAIJAN"
+    },
+    "CITY::gn::140889": {
+      "city_id": "CITY::gn::140889",
+      "stable_key": "id::CITY::gn::140889",
+      "host_feature_id": "IRN-3238__SPLIT_SOUTH_TIBRIZ"
+    },
+    "CITY::gn::142554": {
+      "city_id": "CITY::gn::142554",
+      "stable_key": "id::CITY::gn::142554",
+      "host_feature_id": "IRN-3238__SPLIT_SOUTH_TIBRIZ"
+    },
+    "CITY::gn::144443": {
+      "city_id": "CITY::gn::144443",
+      "stable_key": "id::CITY::gn::144443",
+      "host_feature_id": "IRN-3238__SPLIT_SOUTH_TIBRIZ"
+    },
+    "CITY::gn::163476": {
+      "city_id": "CITY::gn::163476",
+      "stable_key": "id::CITY::gn::163476",
+      "host_feature_id": "SYR-137__SPLIT_DABIQ"
+    },
+    "CITY::gn::163811": {
+      "city_id": "CITY::gn::163811",
+      "stable_key": "id::CITY::gn::163811",
+      "host_feature_id": "SYR-137__SPLIT_AL_BAB"
+    },
+    "CITY::gn::164025": {
+      "city_id": "CITY::gn::164025",
+      "stable_key": "id::CITY::gn::164025",
+      "host_feature_id": "SYR-142__SPLIT_ABU_HAMAN"
+    },
+    "CITY::gn::166285": {
+      "city_id": "CITY::gn::166285",
+      "stable_key": "id::CITY::gn::166285",
+      "host_feature_id": "SYR-137__SPLIT_AL_BAB"
+    },
+    "CITY::gn::166331": {
+      "city_id": "CITY::gn::166331",
+      "stable_key": "id::CITY::gn::166331",
+      "host_feature_id": "SYR-137__SPLIT_DABIQ"
+    },
+    "CITY::gn::169179": {
+      "city_id": "CITY::gn::169179",
+      "stable_key": "id::CITY::gn::169179",
+      "host_feature_id": "SYR-137__SPLIT_KOBANE"
+    },
+    "CITY::gn::170785": {
+      "city_id": "CITY::gn::170785",
+      "stable_key": "id::CITY::gn::170785",
+      "host_feature_id": "SYR-137__SPLIT_AL_BAB"
+    },
+    "CITY::gn::170887": {
+      "city_id": "CITY::gn::170887",
+      "stable_key": "id::CITY::gn::170887",
+      "host_feature_id": "SYR-141__SPLIT_GER_ZERO"
+    },
+    "CITY::gn::171694": {
+      "city_id": "CITY::gn::171694",
+      "stable_key": "id::CITY::gn::171694",
+      "host_feature_id": "SYR-137__SPLIT_ANADAN"
+    },
+    "CITY::gn::172256": {
+      "city_id": "CITY::gn::172256",
+      "stable_key": "id::CITY::gn::172256",
+      "host_feature_id": "SYR-137__SPLIT_KOBANE"
+    },
+    "CITY::gn::172503": {
+      "city_id": "CITY::gn::172503",
+      "stable_key": "id::CITY::gn::172503",
+      "host_feature_id": "SYR-137__SPLIT_AL_BAB"
+    },
+    "CITY::gn::173230": {
+      "city_id": "CITY::gn::173230",
+      "stable_key": "id::CITY::gn::173230",
+      "host_feature_id": "SYR-141__SPLIT_GER_ZERO"
+    },
+    "CITY::gn::173480": {
+      "city_id": "CITY::gn::173480",
+      "stable_key": "id::CITY::gn::173480",
+      "host_feature_id": "SYR-142__SPLIT_AL_MAYADIN"
+    },
+    "CITY::gn::173530": {
+      "city_id": "CITY::gn::173530",
+      "stable_key": "id::CITY::gn::173530",
+      "host_feature_id": "SYR-141__SPLIT_GER_ZERO"
+    },
+    "CITY::gn::174018": {
+      "city_id": "CITY::gn::174018",
+      "stable_key": "id::CITY::gn::174018",
+      "host_feature_id": "SYR-137__SPLIT_AL_BAB"
+    },
+    "CITY::gn::174186": {
+      "city_id": "CITY::gn::174186",
+      "stable_key": "id::CITY::gn::174186",
+      "host_feature_id": "SYR-137__SPLIT_DABIQ"
+    },
+    "CITY::gn::174506": {
+      "city_id": "CITY::gn::174506",
+      "stable_key": "id::CITY::gn::174506",
+      "host_feature_id": "SYR-142__SPLIT_HAJIN"
+    },
+    "CITY::gn::296829": {
+      "city_id": "CITY::gn::296829",
+      "stable_key": "id::CITY::gn::296829",
+      "host_feature_id": "TR621__SPLIT_FEKE"
+    },
+    "CITY::gn::298033": {
+      "city_id": "CITY::gn::298033",
+      "stable_key": "id::CITY::gn::298033",
+      "host_feature_id": "TRC21__SPLIT_VIRANSEHIR"
+    },
+    "CITY::gn::299643": {
+      "city_id": "CITY::gn::299643",
+      "stable_key": "id::CITY::gn::299643",
+      "host_feature_id": "TR622__SPLIT_SILIFKE"
+    },
+    "CITY::gn::300075": {
+      "city_id": "CITY::gn::300075",
+      "stable_key": "id::CITY::gn::300075",
+      "host_feature_id": "TRC21__SPLIT_URFA"
+    },
+    "CITY::gn::300614": {
+      "city_id": "CITY::gn::300614",
+      "stable_key": "id::CITY::gn::300614",
+      "host_feature_id": "TRC21__SPLIT_SIVEREK"
+    },
+    "CITY::gn::300808": {
+      "city_id": "CITY::gn::300808",
+      "stable_key": "id::CITY::gn::300808",
+      "host_feature_id": "TR622__SPLIT_SILIFKE"
+    },
+    "CITY::gn::302800": {
+      "city_id": "CITY::gn::302800",
+      "stable_key": "id::CITY::gn::302800",
+      "host_feature_id": "TR632__SPLIT_SATIRHUYUK"
+    },
+    "CITY::gn::304013": {
+      "city_id": "CITY::gn::304013",
+      "stable_key": "id::CITY::gn::304013",
+      "host_feature_id": "TR622__SPLIT_MUT"
+    },
+    "CITY::gn::306112": {
+      "city_id": "CITY::gn::306112",
+      "stable_key": "id::CITY::gn::306112",
+      "host_feature_id": "TR621__SPLIT_KOZAN"
+    },
+    "CITY::gn::307677": {
+      "city_id": "CITY::gn::307677",
+      "stable_key": "id::CITY::gn::307677",
+      "host_feature_id": "TR621__SPLIT_ADANA"
+    },
+    "CITY::gn::311453": {
+      "city_id": "CITY::gn::311453",
+      "stable_key": "id::CITY::gn::311453",
+      "host_feature_id": "TR621__SPLIT_KOZAN"
+    },
+    "CITY::gn::312134": {
+      "city_id": "CITY::gn::312134",
+      "stable_key": "id::CITY::gn::312134",
+      "host_feature_id": "TRC21__SPLIT_SIVEREK"
+    },
+    "CITY::gn::3133904": {
+      "city_id": "CITY::gn::3133904",
+      "stable_key": "id::CITY::gn::3133904",
+      "host_feature_id": "NO074__SPLIT_TROMS"
+    },
+    "CITY::gn::314188": {
+      "city_id": "CITY::gn::314188",
+      "stable_key": "id::CITY::gn::314188",
+      "host_feature_id": "TR632__SPLIT_GOKSUN"
+    },
+    "CITY::gn::315515": {
+      "city_id": "CITY::gn::315515",
+      "stable_key": "id::CITY::gn::315515",
+      "host_feature_id": "TR622__SPLIT_MERSIN"
+    },
+    "CITY::gn::315530": {
+      "city_id": "CITY::gn::315530",
+      "stable_key": "id::CITY::gn::315530",
+      "host_feature_id": "TRB21__SPLIT_VAN"
+    },
+    "CITY::gn::315795": {
+      "city_id": "CITY::gn::315795",
+      "stable_key": "id::CITY::gn::315795",
+      "host_feature_id": "TR632__SPLIT_ELBISTAN"
+    },
+    "CITY::gn::318668": {
+      "city_id": "CITY::gn::318668",
+      "stable_key": "id::CITY::gn::318668",
+      "host_feature_id": "TRC21__SPLIT_VIRANSEHIR"
+    },
+    "CITY::gn::318675": {
+      "city_id": "CITY::gn::318675",
+      "stable_key": "id::CITY::gn::318675",
+      "host_feature_id": "TR621__SPLIT_CEYHAN"
+    },
+    "CITY::gn::3187609": {
+      "city_id": "CITY::gn::3187609",
+      "stable_key": "id::CITY::gn::3187609",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_BUGOJNO"
+    },
+    "CITY::gn::3188225": {
+      "city_id": "CITY::gn::3188225",
+      "stable_key": "id::CITY::gn::3188225",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_CAZIN"
+    },
+    "CITY::gn::3188434": {
+      "city_id": "CITY::gn::3188434",
+      "stable_key": "id::CITY::gn::3188434",
+      "host_feature_id": "RS211__SPLIT_MOKRA_GORA"
+    },
+    "CITY::gn::3188893": {
+      "city_id": "CITY::gn::3188893",
+      "stable_key": "id::CITY::gn::3188893",
+      "host_feature_id": "BA_ADM1_54001226B66267900922909__SPLIT_MOSKO"
+    },
+    "CITY::gn::3188924": {
+      "city_id": "CITY::gn::3188924",
+      "stable_key": "id::CITY::gn::3188924",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_MOSTAR"
+    },
+    "CITY::gn::3196079": {
+      "city_id": "CITY::gn::3196079",
+      "stable_key": "id::CITY::gn::3196079",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_NORTH_SOKOLAC"
+    },
+    "CITY::gn::3199145": {
+      "city_id": "CITY::gn::3199145",
+      "stable_key": "id::CITY::gn::3199145",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_ZALOM"
+    },
+    "CITY::gn::3199744": {
+      "city_id": "CITY::gn::3199744",
+      "stable_key": "id::CITY::gn::3199744",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_NORTH_BUGOJNO"
+    },
+    "CITY::gn::3199779": {
+      "city_id": "CITY::gn::3199779",
+      "stable_key": "id::CITY::gn::3199779",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_NORTH_SOKOLAC"
+    },
+    "CITY::gn::320004": {
+      "city_id": "CITY::gn::320004",
+      "stable_key": "id::CITY::gn::320004",
+      "host_feature_id": "TR632__SPLIT_EKINOZU"
+    },
+    "CITY::gn::3200396": {
+      "city_id": "CITY::gn::3200396",
+      "stable_key": "id::CITY::gn::3200396",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_ILIDZA"
+    },
+    "CITY::gn::3201984": {
+      "city_id": "CITY::gn::3201984",
+      "stable_key": "id::CITY::gn::3201984",
+      "host_feature_id": "BA_ADM1_54001226B66267900922909__SPLIT_NORTH_BUGOJNO"
+    },
+    "CITY::gn::3202822": {
+      "city_id": "CITY::gn::3202822",
+      "stable_key": "id::CITY::gn::3202822",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_CAZIN"
+    },
+    "CITY::gn::3203099": {
+      "city_id": "CITY::gn::3203099",
+      "stable_key": "id::CITY::gn::3203099",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_MOSTAR"
+    },
+    "CITY::gn::3203653": {
+      "city_id": "CITY::gn::3203653",
+      "stable_key": "id::CITY::gn::3203653",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_NOVI_GRAD"
+    },
+    "CITY::gn::3204186": {
+      "city_id": "CITY::gn::3204186",
+      "stable_key": "id::CITY::gn::3204186",
+      "host_feature_id": "BA_ADM1_54001226B66267900922909__SPLIT_BIJELJINA"
+    },
+    "CITY::gn::3204222": {
+      "city_id": "CITY::gn::3204222",
+      "stable_key": "id::CITY::gn::3204222",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_CAZIN"
+    },
+    "CITY::gn::320552": {
+      "city_id": "CITY::gn::320552",
+      "stable_key": "id::CITY::gn::320552",
+      "host_feature_id": "TR622__SPLIT_ANAMUR"
+    },
+    "CITY::gn::320581": {
+      "city_id": "CITY::gn::320581",
+      "stable_key": "id::CITY::gn::320581",
+      "host_feature_id": "TRC21__SPLIT_URFA"
+    },
+    "CITY::gn::321062": {
+      "city_id": "CITY::gn::321062",
+      "stable_key": "id::CITY::gn::321062",
+      "host_feature_id": "TRC21__SPLIT_SURUC"
+    },
+    "CITY::gn::323828": {
+      "city_id": "CITY::gn::323828",
+      "stable_key": "id::CITY::gn::323828",
+      "host_feature_id": "TR622__SPLIT_ANAMUR"
+    },
+    "CITY::gn::324944": {
+      "city_id": "CITY::gn::324944",
+      "stable_key": "id::CITY::gn::324944",
+      "host_feature_id": "TRC21__SPLIT_VIRANSEHIR"
+    },
+    "CITY::gn::325304": {
+      "city_id": "CITY::gn::325304",
+      "stable_key": "id::CITY::gn::325304",
+      "host_feature_id": "TR632__SPLIT_AFSIN"
+    },
+    "CITY::gn::3337476": {
+      "city_id": "CITY::gn::3337476",
+      "stable_key": "id::CITY::gn::3337476",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_ZALOM"
+    },
+    "CITY::gn::388349": {
+      "city_id": "CITY::gn::388349",
+      "stable_key": "id::CITY::gn::388349",
+      "host_feature_id": "IRQ-3222__SPLIT_BASRA"
+    },
+    "CITY::gn::401118": {
+      "city_id": "CITY::gn::401118",
+      "stable_key": "id::CITY::gn::401118",
+      "host_feature_id": "IRN-3237__SPLIT_MAKU"
+    },
+    "CITY::gn::603570": {
+      "city_id": "CITY::gn::603570",
+      "stable_key": "id::CITY::gn::603570",
+      "host_feature_id": "SE332__SPLIT_PITEA"
+    },
+    "CITY::gn::606531": {
+      "city_id": "CITY::gn::606531",
+      "stable_key": "id::CITY::gn::606531",
+      "host_feature_id": "SE332__SPLIT_LULEA"
+    },
+    "CITY::gn::634093": {
+      "city_id": "CITY::gn::634093",
+      "stable_key": "id::CITY::gn::634093",
+      "host_feature_id": "FI1D7__SPLIT_AJOS"
+    },
+    "CITY::gn::98245": {
+      "city_id": "CITY::gn::98245",
+      "stable_key": "id::CITY::gn::98245",
+      "host_feature_id": "IRQ-3222__SPLIT_BASRA"
+    },
+    "CITY::gn::98685": {
+      "city_id": "CITY::gn::98685",
+      "stable_key": "id::CITY::gn::98685",
+      "host_feature_id": "IRQ-3223__SPLIT_SOUTH_DHI_QAR"
+    },
+    "CITY::gn::98993": {
+      "city_id": "CITY::gn::98993",
+      "stable_key": "id::CITY::gn::98993",
+      "host_feature_id": "IRQ-3222__SPLIT_QASR_IBN_DARAHIM"
+    },
+    "CITY::gn::99106": {
+      "city_id": "CITY::gn::99106",
+      "stable_key": "id::CITY::gn::99106",
+      "host_feature_id": "IRQ-3222__SPLIT_QASR_IBN_DARAHIM"
+    },
+    "CITY::gn::99446": {
+      "city_id": "CITY::gn::99446",
+      "stable_key": "id::CITY::gn::99446",
+      "host_feature_id": "IRQ-3222__SPLIT_BASRA"
+    },
+    "CITY::ne::1159115897": {
+      "city_id": "CITY::ne::1159115897",
+      "stable_key": "id::CITY::ne::1159115897",
+      "host_feature_id": "SAU-862__SPLIT_AL_JAWF"
+    },
+    "CITY::ne::1159117307": {
+      "city_id": "CITY::ne::1159117307",
+      "stable_key": "id::CITY::ne::1159117307",
+      "host_feature_id": "JOR-850__SPLIT_AL_MAFRAQ_6801"
+    },
+    "CITY::ne::1159117345": {
+      "city_id": "CITY::ne::1159117345",
+      "stable_key": "id::CITY::ne::1159117345",
+      "host_feature_id": "JOR-853__SPLIT_MA_AN"
+    },
+    "CITY::ne::1159122257": {
+      "city_id": "CITY::ne::1159122257",
+      "stable_key": "id::CITY::ne::1159122257",
+      "host_feature_id": "SAU-862__SPLIT_AL_QALIBAH"
+    },
+    "CITY::ne::1159122481": {
+      "city_id": "CITY::ne::1159122481",
+      "stable_key": "id::CITY::ne::1159122481",
+      "host_feature_id": "MR_ADM1_MRT-2783__SPLIT_ZOUERAT"
+    },
+    "CITY::ne::1159126149": {
+      "city_id": "CITY::ne::1159126149",
+      "stable_key": "id::CITY::ne::1159126149",
+      "host_feature_id": "SYR-136__SPLIT_SOUTH_MANBIJ"
+    },
+    "CITY::ne::1159126163": {
+      "city_id": "CITY::ne::1159126163",
+      "stable_key": "id::CITY::ne::1159126163",
+      "host_feature_id": "SYR-137__SPLIT_DABIQ"
+    },
+    "CITY::ne::1159126179": {
+      "city_id": "CITY::ne::1159126179",
+      "stable_key": "id::CITY::ne::1159126179",
+      "host_feature_id": "SYR-137__SPLIT_AL_BAB"
+    },
+    "CITY::ne::1159126205": {
+      "city_id": "CITY::ne::1159126205",
+      "stable_key": "id::CITY::ne::1159126205",
+      "host_feature_id": "SYR-141__SPLIT_GER_ZERO"
+    },
+    "CITY::ne::1159126219": {
+      "city_id": "CITY::ne::1159126219",
+      "stable_key": "id::CITY::ne::1159126219",
+      "host_feature_id": "SYR-141__SPLIT_AL_HASEKE"
+    },
+    "CITY::ne::1159127453": {
+      "city_id": "CITY::ne::1159127453",
+      "stable_key": "id::CITY::ne::1159127453",
+      "host_feature_id": "TR632__SPLIT_MARAS"
+    },
+    "CITY::ne::1159127463": {
+      "city_id": "CITY::ne::1159127463",
+      "stable_key": "id::CITY::ne::1159127463",
+      "host_feature_id": "TR622__SPLIT_TARSUS"
+    },
+    "CITY::ne::1159128179": {
+      "city_id": "CITY::ne::1159128179",
+      "stable_key": "id::CITY::ne::1159128179",
+      "host_feature_id": "SAU-862__SPLIT_AL_QALIBAH"
+    },
+    "CITY::ne::1159128201": {
+      "city_id": "CITY::ne::1159128201",
+      "stable_key": "id::CITY::ne::1159128201",
+      "host_feature_id": "NO074__SPLIT_TROMS"
+    },
+    "CITY::ne::1159130757": {
+      "city_id": "CITY::ne::1159130757",
+      "stable_key": "id::CITY::ne::1159130757",
+      "host_feature_id": "IRQ-3222__SPLIT_BASRA"
+    },
+    "CITY::ne::1159130777": {
+      "city_id": "CITY::ne::1159130777",
+      "stable_key": "id::CITY::ne::1159130777",
+      "host_feature_id": "IRN-3238__SPLIT_TIBRIZ"
+    },
+    "CITY::ne::1159132327": {
+      "city_id": "CITY::ne::1159132327",
+      "stable_key": "id::CITY::ne::1159132327",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_BUGOJNO"
+    },
+    "CITY::ne::1159132339": {
+      "city_id": "CITY::ne::1159132339",
+      "stable_key": "id::CITY::ne::1159132339",
+      "host_feature_id": "ARE-349__SPLIT_ABU_DHABI_CITY"
+    },
+    "CITY::ne::1159133897": {
+      "city_id": "CITY::ne::1159133897",
+      "stable_key": "id::CITY::ne::1159133897",
+      "host_feature_id": "SYR-136__SPLIT_MANBIJ"
+    },
+    "CITY::ne::1159133909": {
+      "city_id": "CITY::ne::1159133909",
+      "stable_key": "id::CITY::ne::1159133909",
+      "host_feature_id": "SYR-142__SPLIT_SOUTH_AL_MAYADIN"
+    },
+    "CITY::ne::1159133915": {
+      "city_id": "CITY::ne::1159133915",
+      "stable_key": "id::CITY::ne::1159133915",
+      "host_feature_id": "SYR-142__SPLIT_AL_MAYADIN"
+    },
+    "CITY::ne::1159134285": {
+      "city_id": "CITY::ne::1159134285",
+      "stable_key": "id::CITY::ne::1159134285",
+      "host_feature_id": "ARE-349__SPLIT_AL_AIN"
+    },
+    "CITY::ne::1159135179": {
+      "city_id": "CITY::ne::1159135179",
+      "stable_key": "id::CITY::ne::1159135179",
+      "host_feature_id": "TR622__SPLIT_TARSUS"
+    },
+    "CITY::ne::1159135367": {
+      "city_id": "CITY::ne::1159135367",
+      "stable_key": "id::CITY::ne::1159135367",
+      "host_feature_id": "TRB21__SPLIT_VAN"
+    },
+    "CITY::ne::1159136221": {
+      "city_id": "CITY::ne::1159136221",
+      "stable_key": "id::CITY::ne::1159136221",
+      "host_feature_id": "SAU-861__SPLIT_ARAR"
+    },
+    "CITY::ne::1159136225": {
+      "city_id": "CITY::ne::1159136225",
+      "stable_key": "id::CITY::ne::1159136225",
+      "host_feature_id": "SAU-861__SPLIT_EAST_RAFHA"
+    },
+    "CITY::ne::1159136315": {
+      "city_id": "CITY::ne::1159136315",
+      "stable_key": "id::CITY::ne::1159136315",
+      "host_feature_id": "NO074__SPLIT_TROMS"
+    },
+    "CITY::ne::1159138649": {
+      "city_id": "CITY::ne::1159138649",
+      "stable_key": "id::CITY::ne::1159138649",
+      "host_feature_id": "MR_ADM1_MRT-2783__SPLIT_ZOUERAT"
+    },
+    "CITY::ne::1159138653": {
+      "city_id": "CITY::ne::1159138653",
+      "stable_key": "id::CITY::ne::1159138653",
+      "host_feature_id": "MR_ADM1_MRT-2783__SPLIT_EAST_CENTRAL_CHEGGA"
+    },
+    "CITY::ne::1159138945": {
+      "city_id": "CITY::ne::1159138945",
+      "stable_key": "id::CITY::ne::1159138945",
+      "host_feature_id": "LBY-2882__SPLIT_GADAMIS"
+    },
+    "CITY::ne::1159138951": {
+      "city_id": "CITY::ne::1159138951",
+      "stable_key": "id::CITY::ne::1159138951",
+      "host_feature_id": "LBY-2882__SPLIT_NALUT"
+    },
+    "CITY::ne::1159138969": {
+      "city_id": "CITY::ne::1159138969",
+      "stable_key": "id::CITY::ne::1159138969",
+      "host_feature_id": "LBY-2969__SPLIT_NORTHEAST_QATRUN"
+    },
+    "CITY::ne::1159139015": {
+      "city_id": "CITY::ne::1159139015",
+      "stable_key": "id::CITY::ne::1159139015",
+      "host_feature_id": "LBY-2983__SPLIT_RAS_LANUF"
+    },
+    "CITY::ne::1159139019": {
+      "city_id": "CITY::ne::1159139019",
+      "stable_key": "id::CITY::ne::1159139019",
+      "host_feature_id": "LBY-2983__SPLIT_MARADAH"
+    },
+    "CITY::ne::1159139033": {
+      "city_id": "CITY::ne::1159139033",
+      "stable_key": "id::CITY::ne::1159139033",
+      "host_feature_id": "LBY-2987__SPLIT_NORTH_JAGHBUB"
+    },
+    "CITY::ne::1159140389": {
+      "city_id": "CITY::ne::1159140389",
+      "stable_key": "id::CITY::ne::1159140389",
+      "host_feature_id": "EGY-1540__SPLIT_SIDI_BARRANI"
+    },
+    "CITY::ne::1159140395": {
+      "city_id": "CITY::ne::1159140395",
+      "stable_key": "id::CITY::ne::1159140395",
+      "host_feature_id": "EGY-1540__SPLIT_QATTARA_CANAL_SITE"
+    },
+    "CITY::ne::1159140399": {
+      "city_id": "CITY::ne::1159140399",
+      "stable_key": "id::CITY::ne::1159140399",
+      "host_feature_id": "EGY-1540__SPLIT_SIDI_BARRANI"
+    },
+    "CITY::ne::1159140403": {
+      "city_id": "CITY::ne::1159140403",
+      "stable_key": "id::CITY::ne::1159140403",
+      "host_feature_id": "EGY-1540__SPLIT_SIDI_BARRANI"
+    },
+    "CITY::ne::1159142379": {
+      "city_id": "CITY::ne::1159142379",
+      "stable_key": "id::CITY::ne::1159142379",
+      "host_feature_id": "FI1D7__SPLIT_POKKA"
+    },
+    "CITY::ne::1159142639": {
+      "city_id": "CITY::ne::1159142639",
+      "stable_key": "id::CITY::ne::1159142639",
+      "host_feature_id": "IRQ-3223__SPLIT_NASRIYAH"
+    },
+    "CITY::ne::1159142675": {
+      "city_id": "CITY::ne::1159142675",
+      "stable_key": "id::CITY::ne::1159142675",
+      "host_feature_id": "IRN-3237__SPLIT_WEST_AZERBAIJAN"
+    },
+    "CITY::ne::1159142681": {
+      "city_id": "CITY::ne::1159142681",
+      "stable_key": "id::CITY::ne::1159142681",
+      "host_feature_id": "IRN-3237__SPLIT_NORTH_TIBRIZ"
+    },
+    "CITY::ne::1159142685": {
+      "city_id": "CITY::ne::1159142685",
+      "stable_key": "id::CITY::ne::1159142685",
+      "host_feature_id": "IRN-3238__SPLIT_SOUTH_TIBRIZ"
+    },
+    "CITY::ne::1159144925": {
+      "city_id": "CITY::ne::1159144925",
+      "stable_key": "id::CITY::ne::1159144925",
+      "host_feature_id": "DZA-2148__SPLIT_NORTH_BENI_OUNIF"
+    },
+    "CITY::ne::1159144931": {
+      "city_id": "CITY::ne::1159144931",
+      "stable_key": "id::CITY::ne::1159144931",
+      "host_feature_id": "DZA-2148__SPLIT_AIN_SEFRA"
+    },
+    "CITY::ne::1159144967": {
+      "city_id": "CITY::ne::1159144967",
+      "stable_key": "id::CITY::ne::1159144967",
+      "host_feature_id": "DZA-2188__SPLIT_OUTER_IN_DAMENAS"
+    },
+    "CITY::ne::1159144971": {
+      "city_id": "CITY::ne::1159144971",
+      "stable_key": "id::CITY::ne::1159144971",
+      "host_feature_id": "DZA-2188__SPLIT_CENTRAL_IN_AMENAS"
+    },
+    "CITY::ne::1159145043": {
+      "city_id": "CITY::ne::1159145043",
+      "stable_key": "id::CITY::ne::1159145043",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_STOLAC"
+    },
+    "CITY::ne::1159145879": {
+      "city_id": "CITY::ne::1159145879",
+      "stable_key": "id::CITY::ne::1159145879",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_NORTH_SOKOLAC"
+    },
+    "CITY::ne::1159145885": {
+      "city_id": "CITY::ne::1159145885",
+      "stable_key": "id::CITY::ne::1159145885",
+      "host_feature_id": "BA_ADM1_54001226B66267900922909__SPLIT_NOVI_GRAD"
+    },
+    "CITY::ne::1159145889": {
+      "city_id": "CITY::ne::1159145889",
+      "stable_key": "id::CITY::ne::1159145889",
+      "host_feature_id": "BA_ADM1_54001226B66267900922909__SPLIT_BOSNIA"
+    },
+    "CITY::ne::1159146451": {
+      "city_id": "CITY::ne::1159146451",
+      "stable_key": "id::CITY::ne::1159146451",
+      "host_feature_id": "NO074__SPLIT_FINNMARK"
+    },
+    "CITY::ne::1159146453": {
+      "city_id": "CITY::ne::1159146453",
+      "stable_key": "id::CITY::ne::1159146453",
+      "host_feature_id": "NO074__SPLIT_NYELV"
+    },
+    "CITY::ne::1159147271": {
+      "city_id": "CITY::ne::1159147271",
+      "stable_key": "id::CITY::ne::1159147271",
+      "host_feature_id": "FI1D7__SPLIT_POKKA"
+    },
+    "CITY::ne::1159147883": {
+      "city_id": "CITY::ne::1159147883",
+      "stable_key": "id::CITY::ne::1159147883",
+      "host_feature_id": "SE332__SPLIT_NORRBOTTEN"
+    },
+    "CITY::ne::1159147959": {
+      "city_id": "CITY::ne::1159147959",
+      "stable_key": "id::CITY::ne::1159147959",
+      "host_feature_id": "SAU-848__SPLIT_TABUK"
+    },
+    "CITY::ne::1159148001": {
+      "city_id": "CITY::ne::1159148001",
+      "stable_key": "id::CITY::ne::1159148001",
+      "host_feature_id": "NO074__SPLIT_ETELA_VARNANKI"
+    },
+    "CITY::ne::1159148431": {
+      "city_id": "CITY::ne::1159148431",
+      "stable_key": "id::CITY::ne::1159148431",
+      "host_feature_id": "EGY-1540__SPLIT_SIWA_OASIS"
+    },
+    "CITY::ne::1159148577": {
+      "city_id": "CITY::ne::1159148577",
+      "stable_key": "id::CITY::ne::1159148577",
+      "host_feature_id": "MR_ADM1_MRT-2783__SPLIT_FORT_TRINQUET"
+    },
+    "CITY::ne::1159148593": {
+      "city_id": "CITY::ne::1159148593",
+      "stable_key": "id::CITY::ne::1159148593",
+      "host_feature_id": "LBY-2882__SPLIT_AWBARI"
+    },
+    "CITY::ne::1159148599": {
+      "city_id": "CITY::ne::1159148599",
+      "stable_key": "id::CITY::ne::1159148599",
+      "host_feature_id": "LBY-2967__SPLIT_WEST_AL_FUQAHA"
+    },
+    "CITY::ne::1159148605": {
+      "city_id": "CITY::ne::1159148605",
+      "stable_key": "id::CITY::ne::1159148605",
+      "host_feature_id": "LBY-2969__SPLIT_INNER_SABHA"
+    },
+    "CITY::ne::1159148607": {
+      "city_id": "CITY::ne::1159148607",
+      "stable_key": "id::CITY::ne::1159148607",
+      "host_feature_id": "LBY-2983__SPLIT_NORTHEAST_ADJABIA"
+    },
+    "CITY::ne::1159148609": {
+      "city_id": "CITY::ne::1159148609",
+      "stable_key": "id::CITY::ne::1159148609",
+      "host_feature_id": "LBY-2983__SPLIT_JAKHARRAD"
+    },
+    "CITY::ne::1159148615": {
+      "city_id": "CITY::ne::1159148615",
+      "stable_key": "id::CITY::ne::1159148615",
+      "host_feature_id": "LBY-2987__SPLIT_DERNA"
+    },
+    "CITY::ne::1159148649": {
+      "city_id": "CITY::ne::1159148649",
+      "stable_key": "id::CITY::ne::1159148649",
+      "host_feature_id": "FI1D7__SPLIT_NORTH_LI"
+    },
+    "CITY::ne::1159149023": {
+      "city_id": "CITY::ne::1159149023",
+      "stable_key": "id::CITY::ne::1159149023",
+      "host_feature_id": "DZA-2148__SPLIT_AIN_SEFRA"
+    },
+    "CITY::ne::1159149025": {
+      "city_id": "CITY::ne::1159149025",
+      "stable_key": "id::CITY::ne::1159149025",
+      "host_feature_id": "DZA-2150__SPLIT_SOUTHWEST_TINDOUF"
+    },
+    "CITY::ne::1159149027": {
+      "city_id": "CITY::ne::1159149027",
+      "stable_key": "id::CITY::ne::1159149027",
+      "host_feature_id": "DZA-2188__SPLIT_EAST_IN_DAMENAS"
+    },
+    "CITY::ne::1159149381": {
+      "city_id": "CITY::ne::1159149381",
+      "stable_key": "id::CITY::ne::1159149381",
+      "host_feature_id": "TR621__SPLIT_ADANA"
+    },
+    "CITY::ne::1159149399": {
+      "city_id": "CITY::ne::1159149399",
+      "stable_key": "id::CITY::ne::1159149399",
+      "host_feature_id": "SE332__SPLIT_LULEA"
+    },
+    "CITY::ne::1159149445": {
+      "city_id": "CITY::ne::1159149445",
+      "stable_key": "id::CITY::ne::1159149445",
+      "host_feature_id": "SAU-848__SPLIT_SHUWAQ"
+    },
+    "CITY::ne::1159149467": {
+      "city_id": "CITY::ne::1159149467",
+      "stable_key": "id::CITY::ne::1159149467",
+      "host_feature_id": "NO074__SPLIT_FINNMARK"
+    },
+    "CITY::ne::1159150075": {
+      "city_id": "CITY::ne::1159150075",
+      "stable_key": "id::CITY::ne::1159150075",
+      "host_feature_id": "LBY-2965__SPLIT_KUFRAH"
+    },
+    "CITY::ne::1159150079": {
+      "city_id": "CITY::ne::1159150079",
+      "stable_key": "id::CITY::ne::1159150079",
+      "host_feature_id": "LBY-2969__SPLIT_INNER_LIBYAN_SAHARA"
+    },
+    "CITY::ne::1159150099": {
+      "city_id": "CITY::ne::1159150099",
+      "stable_key": "id::CITY::ne::1159150099",
+      "host_feature_id": "FI1D7__SPLIT_LOUE"
+    },
+    "CITY::ne::1159150127": {
+      "city_id": "CITY::ne::1159150127",
+      "stable_key": "id::CITY::ne::1159150127",
+      "host_feature_id": "IRQ-3222__SPLIT_BASRA"
+    },
+    "CITY::ne::1159150135": {
+      "city_id": "CITY::ne::1159150135",
+      "stable_key": "id::CITY::ne::1159150135",
+      "host_feature_id": "IRN-3238__SPLIT_TIBRIZ"
+    },
+    "CITY::ne::1159150639": {
+      "city_id": "CITY::ne::1159150639",
+      "stable_key": "id::CITY::ne::1159150639",
+      "host_feature_id": "NO074__SPLIT_TROMS"
+    },
+    "CITY::ne::1159151177": {
+      "city_id": "CITY::ne::1159151177",
+      "stable_key": "id::CITY::ne::1159151177",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252__SPLIT_BUGOJNO"
+    },
+    "CITY::ne::1159151267": {
+      "city_id": "CITY::ne::1159151267",
+      "stable_key": "id::CITY::ne::1159151267",
+      "host_feature_id": "SYR-137__SPLIT_DABIQ"
     }
   },
   "audit": {

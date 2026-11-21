@@ -33,6 +33,42 @@
       "en": "Prespa",
       "zh": "普雷斯帕"
     },
+    "id::ARE-349__SPLIT_ABU_DHABI_CITY": {
+      "en": "Musaffah",
+      "zh": "穆萨法"
+    },
+    "id::ARE-349__SPLIT_AL_AIN": {
+      "en": "Al Ain",
+      "zh": "艾因"
+    },
+    "id::ARE-349__SPLIT_AL_WAGAN": {
+      "en": "South Al Wagan",
+      "zh": "南瓦甘"
+    },
+    "id::ARE-349__SPLIT_ASAB": {
+      "en": "Asab",
+      "zh": "阿萨卜"
+    },
+    "id::ARE-349__SPLIT_CENTRAL_ABU_DHABI": {
+      "en": "Central Abu Dhabi",
+      "zh": "阿布扎比中部"
+    },
+    "id::ARE-349__SPLIT_INNER_ABU_DHABI": {
+      "en": "Inner Abu Dhabi",
+      "zh": "阿布扎比内区"
+    },
+    "id::ARE-349__SPLIT_REMAH": {
+      "en": "Remah",
+      "zh": "里马"
+    },
+    "id::ARE-349__SPLIT_SVEIHAN": {
+      "en": "Sveihan",
+      "zh": "苏韦汉"
+    },
+    "id::ARE-349__SPLIT_WEST_REMAH": {
+      "en": "West Remah",
+      "zh": "西里马"
+    },
     "id::ARM-1555__SPLIT_BASKOY": {
       "en": "Garnarrich",
       "zh": "加尔纳里奇"
@@ -188,6 +224,170 @@
     "id::AU_ADM1_AUS-2651__SPLIT_REST": {
       "en": "Western Australia",
       "zh": "西澳大利亚州"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_BOSNIA": {
+      "en": "Jajce",
+      "zh": "亚伊采"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_BUGOJNO": {
+      "en": "Sarajevo",
+      "zh": "萨拉热窝"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_CAZIN": {
+      "en": "Bihac",
+      "zh": "比哈奇"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_DRVAR": {
+      "en": "North Drvar",
+      "zh": "北德尔瓦尔"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_HERZEGOVINA": {
+      "en": "Ljubuski",
+      "zh": "柳布什基"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_ILIDZA": {
+      "en": "Gorazde",
+      "zh": "戈拉日代"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_LIVNO": {
+      "en": "Livno",
+      "zh": "利夫诺"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_MOSKO": {
+      "en": "Mosko",
+      "zh": "莫斯科村"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_MOSTAR": {
+      "en": "Bugojno",
+      "zh": "布戈伊诺"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_NORTH_BUGOJNO": {
+      "en": "Gradacac",
+      "zh": "格拉达查茨"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_NORTH_SOKOLAC": {
+      "en": "Tuzla",
+      "zh": "图兹拉"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_NORTH_STOLAC": {
+      "en": "North Stolac",
+      "zh": "北斯托拉茨"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_NOVI_GRAD": {
+      "en": "Bosanska Krupa",
+      "zh": "波斯尼亚克鲁帕"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_PODOVI": {
+      "en": "South Drvar",
+      "zh": "南德尔瓦尔"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_POSAVINA": {
+      "en": "Posavina",
+      "zh": "波萨维纳"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_SOKOLAC": {
+      "en": "Trnovo",
+      "zh": "特尔诺沃"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_STOLAC": {
+      "en": "Mostar",
+      "zh": "莫斯塔尔"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_WEST_DRVAR": {
+      "en": "West Drvar",
+      "zh": "西德尔瓦尔"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_ZALOM": {
+      "en": "Ilidza",
+      "zh": "伊利扎"
+    },
+    "id::BA_ADM1_54001226B17629474923252__SPLIT_ZEBE": {
+      "en": "Zebe",
+      "zh": "泽贝"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_BIJELJINA": {
+      "en": "Bijeljina",
+      "zh": "比耶利纳"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_BOSNIA": {
+      "en": "Banja Luka",
+      "zh": "巴尼亚卢卡"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_BRCKO": {
+      "en": "Brcko",
+      "zh": "布尔奇科"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_BUGOJNO": {
+      "en": "South Doboj",
+      "zh": "南多博伊"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_DRVAR": {
+      "en": "Drvar",
+      "zh": "德尔瓦尔"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_ILIDZA": {
+      "en": "Kalinovik",
+      "zh": "卡利诺维克"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_MOSKO": {
+      "en": "Trebinje",
+      "zh": "特雷比涅"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_MOSTAR": {
+      "en": "Sipovo",
+      "zh": "希波沃"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_NORTH_BUGOJNO": {
+      "en": "Doboj",
+      "zh": "多博伊"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_NORTH_SOKOLAC": {
+      "en": "Lopare",
+      "zh": "洛帕雷"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_NORTH_STEPEN": {
+      "en": "North Stepen",
+      "zh": "北斯泰彭"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_NORTH_STOLAC": {
+      "en": "North Stolac",
+      "zh": "北斯托拉茨"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_NOVI_GRAD": {
+      "en": "Prijedor",
+      "zh": "普里耶多尔"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_PODOVI": {
+      "en": "Podovi",
+      "zh": "波多维"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_POSAVINA": {
+      "en": "Posavina",
+      "zh": "波萨维纳"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_RIJEKA": {
+      "en": "Rudo",
+      "zh": "鲁多"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_SOKOLAC": {
+      "en": "Sokolac",
+      "zh": "索科拉茨"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_SRPSKA": {
+      "en": "Srebrenica",
+      "zh": "斯雷布雷尼察"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_STEPEN": {
+      "en": "Stepen",
+      "zh": "斯泰彭"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_STOLAC": {
+      "en": "Stolac",
+      "zh": "斯托拉茨"
+    },
+    "id::BA_ADM1_54001226B66267900922909__SPLIT_ZALOM": {
+      "en": "Zalom",
+      "zh": "扎洛姆"
     },
     "id::BE_MRG_49096f4ef44b__SPLIT_EUPEN_MALMEDY": {
       "en": "Eupen-Malmedy",
@@ -893,6 +1093,126 @@
       "en": "Tonder",
       "zh": "滕德"
     },
+    "id::DZA-2148__SPLIT_AIN_SEFRA": {
+      "en": "Béchar",
+      "zh": "贝沙尔"
+    },
+    "id::DZA-2148__SPLIT_BENI_OUNIF": {
+      "en": "South Beni Ounif",
+      "zh": "南贝尼乌尼夫"
+    },
+    "id::DZA-2148__SPLIT_DJENIENE_BOUREZG": {
+      "en": "Djeniene Bourezg",
+      "zh": "杰尼安布雷兹格"
+    },
+    "id::DZA-2148__SPLIT_EASTERN_OUM_EL_ASSEL": {
+      "en": "Eastern Oum el-Assel",
+      "zh": "东乌姆阿塞勒"
+    },
+    "id::DZA-2148__SPLIT_EAST_ADRAR": {
+      "en": "East Adrar",
+      "zh": "阿德拉尔东部"
+    },
+    "id::DZA-2148__SPLIT_EAST_TINDOUF": {
+      "en": "East Tindouf",
+      "zh": "廷杜夫东部"
+    },
+    "id::DZA-2148__SPLIT_NORTH_ADRAR": {
+      "en": "North Adrar",
+      "zh": "阿德拉尔北部"
+    },
+    "id::DZA-2148__SPLIT_NORTH_BENI_OUNIF": {
+      "en": "North Beni Ounif",
+      "zh": "北贝尼乌尼夫"
+    },
+    "id::DZA-2148__SPLIT_OUM_EL_ASSEL": {
+      "en": "Oum el-Assel",
+      "zh": "乌姆阿塞勒"
+    },
+    "id::DZA-2148__SPLIT_SOUTH_AIN_SEFRA": {
+      "en": "South Ain Sefra",
+      "zh": "艾因塞夫拉南部"
+    },
+    "id::DZA-2148__SPLIT_TINDOUF": {
+      "en": "Northeast Tindouf",
+      "zh": "廷杜夫东北部"
+    },
+    "id::DZA-2148__SPLIT_WEST_BENI_OUNIF": {
+      "en": "West Beni Ounif",
+      "zh": "贝尼乌尼夫西部"
+    },
+    "id::DZA-2150__SPLIT_EAST_TINDOUF": {
+      "en": "East Tindouf",
+      "zh": "东廷杜夫"
+    },
+    "id::DZA-2150__SPLIT_NORTH_CENTRAL_TINDOUF": {
+      "en": "North Central Tindouf",
+      "zh": "廷杜夫中部北部"
+    },
+    "id::DZA-2150__SPLIT_NORTH_ERG_CHECH": {
+      "en": "North Erg Chech",
+      "zh": "北舍什沙漠"
+    },
+    "id::DZA-2150__SPLIT_OUM_EL_ASSEL": {
+      "en": "Oum el-Assel",
+      "zh": "乌姆阿塞勒"
+    },
+    "id::DZA-2150__SPLIT_OUTER_TINDOUF": {
+      "en": "Outer Tindouf",
+      "zh": "廷杜夫外围"
+    },
+    "id::DZA-2150__SPLIT_SOUTHWEST_TINDOUF": {
+      "en": "Tindouf",
+      "zh": "廷杜夫"
+    },
+    "id::DZA-2150__SPLIT_SOUTH_CENTRAL_TINDOUF": {
+      "en": "South Central Tindouf",
+      "zh": "廷杜夫中部南部"
+    },
+    "id::DZA-2150__SPLIT_SOUTH_TINDOUF": {
+      "en": "South Tindouf",
+      "zh": "廷杜夫南部"
+    },
+    "id::DZA-2150__SPLIT_TINDOUF": {
+      "en": "Northeast Tindouf",
+      "zh": "东北廷杜夫"
+    },
+    "id::DZA-2150__SPLIT_WEST_ERG_CHECH": {
+      "en": "West Erg Chech",
+      "zh": "西舍什沙漠"
+    },
+    "id::DZA-2150__SPLIT_WEST_TINDOUF": {
+      "en": "West Tindouf",
+      "zh": "西廷杜夫"
+    },
+    "id::DZA-2188__SPLIT_CENTRAL_IN_AMENAS": {
+      "en": "East In Amenas",
+      "zh": "东因阿迈纳斯"
+    },
+    "id::DZA-2188__SPLIT_EAST_AIN_SALAH": {
+      "en": "East Ain Salah",
+      "zh": "东因萨拉赫"
+    },
+    "id::DZA-2188__SPLIT_EAST_IN_DAMENAS": {
+      "en": "Illizi",
+      "zh": "伊利济"
+    },
+    "id::DZA-2188__SPLIT_IN_AMENAS": {
+      "en": "West In Amenas",
+      "zh": "西因阿迈纳斯"
+    },
+    "id::DZA-2188__SPLIT_OUTER_IN_DAMENAS": {
+      "en": "Djanet",
+      "zh": "贾奈特"
+    },
+    "id::DZA-2188__SPLIT_SOUTH_AIN_SALAH": {
+      "en": "Bordj Omar Driss",
+      "zh": "博尔季奥马尔德里斯"
+    },
+    "id::DZA-2188__SPLIT_SOUTH_IN_DAMENAS": {
+      "en": "South In Amenas",
+      "zh": "南因阿迈纳斯"
+    },
     "id::DZA-2189__SPLIT_PLAYA_SALT_FLAT_18": {
       "en": "Tamanghasset · Salt flat",
       "zh": "塔曼哈塞特 · 盐沼"
@@ -936,6 +1256,54 @@
     "id::DZA-2205__SPLIT_REST": {
       "en": "Tiaret",
       "zh": "提亚雷特"
+    },
+    "id::EGY-1540__SPLIT_BORG_EL_ARAB": {
+      "en": "Borg El Arab",
+      "zh": "博格阿拉伯"
+    },
+    "id::EGY-1540__SPLIT_CARA": {
+      "en": "Cara",
+      "zh": "卡拉"
+    },
+    "id::EGY-1540__SPLIT_EAST_QATTARA": {
+      "en": "East Qattara",
+      "zh": "东盖塔拉"
+    },
+    "id::EGY-1540__SPLIT_EL_SALLOUM": {
+      "en": "El Salloum",
+      "zh": "塞卢姆"
+    },
+    "id::EGY-1540__SPLIT_MARSA_MATRUH": {
+      "en": "West Marsa Matruh",
+      "zh": "西马特鲁港"
+    },
+    "id::EGY-1540__SPLIT_NORTH_CARA": {
+      "en": "North Cara",
+      "zh": "北卡拉"
+    },
+    "id::EGY-1540__SPLIT_QATTARA_CANAL_SITE": {
+      "en": "El Alamein",
+      "zh": "阿莱曼"
+    },
+    "id::EGY-1540__SPLIT_SIDI_BARRANI": {
+      "en": "Mersa Matruh",
+      "zh": "马特鲁港"
+    },
+    "id::EGY-1540__SPLIT_SIWA_OASIS": {
+      "en": "Siwa Oasis",
+      "zh": "西瓦"
+    },
+    "id::EGY-1540__SPLIT_SOUTH_EL_SALLOUM": {
+      "en": "South El Salloum",
+      "zh": "南塞卢姆"
+    },
+    "id::EGY-1540__SPLIT_SOUTH_QATTARA": {
+      "en": "South Qattara",
+      "zh": "南盖塔拉"
+    },
+    "id::EGY-1540__SPLIT_WEST_SIWA": {
+      "en": "West Siwa",
+      "zh": "西瓦西部"
     },
     "id::EGY-1548__SPLIT_LAKE_NASSER": {
       "en": "Aswan · Lake Nasser site",
@@ -1032,6 +1400,62 @@
     "id::ES300__SPLIT_REST": {
       "en": "Community of Madrid",
       "zh": "马德里自治区"
+    },
+    "id::FI1D7__SPLIT_AJOS": {
+      "en": "Tornio",
+      "zh": "托尔尼奥"
+    },
+    "id::FI1D7__SPLIT_ENONTEKIO": {
+      "en": "Enontekiö",
+      "zh": "埃农泰基厄"
+    },
+    "id::FI1D7__SPLIT_INARI": {
+      "en": "Inari",
+      "zh": "伊纳里"
+    },
+    "id::FI1D7__SPLIT_KITTILA": {
+      "en": "Kittila",
+      "zh": "基蒂莱"
+    },
+    "id::FI1D7__SPLIT_KURSU": {
+      "en": "Hautajärvi",
+      "zh": "豪塔耶尔维"
+    },
+    "id::FI1D7__SPLIT_LAPPI": {
+      "en": "Savukoski",
+      "zh": "萨武科斯基"
+    },
+    "id::FI1D7__SPLIT_LOUE": {
+      "en": "Rovaniemi",
+      "zh": "罗瓦涅米"
+    },
+    "id::FI1D7__SPLIT_LUOSTO": {
+      "en": "Salla",
+      "zh": "萨拉"
+    },
+    "id::FI1D7__SPLIT_NARKAUS": {
+      "en": "Narkaus",
+      "zh": "纳尔考斯"
+    },
+    "id::FI1D7__SPLIT_NORTH_KEMPELE": {
+      "en": "Ranua",
+      "zh": "拉努阿"
+    },
+    "id::FI1D7__SPLIT_NORTH_LI": {
+      "en": "Kemi",
+      "zh": "凯米"
+    },
+    "id::FI1D7__SPLIT_NORTH_VAALA": {
+      "en": "Posio",
+      "zh": "波西奥"
+    },
+    "id::FI1D7__SPLIT_POKKA": {
+      "en": "Sodankylä",
+      "zh": "索丹屈莱"
+    },
+    "id::FI1D7__SPLIT_VUOTSO": {
+      "en": "Vuotso",
+      "zh": "沃措"
     },
     "id::FR_ARR_06002__SPLIT_MONACO": {
       "en": "Monaco edge",
@@ -1785,6 +2209,98 @@
       "en": "Qom",
       "zh": "库姆"
     },
+    "id::IRN-3237__SPLIT_AVACIQ": {
+      "en": "Avaciq",
+      "zh": "阿瓦吉克"
+    },
+    "id::IRN-3237__SPLIT_DUSTAN": {
+      "en": "Dustan",
+      "zh": "杜斯坦"
+    },
+    "id::IRN-3237__SPLIT_KAPUT": {
+      "en": "Kaput",
+      "zh": "卡普特"
+    },
+    "id::IRN-3237__SPLIT_KHOY": {
+      "en": "Salmas",
+      "zh": "萨勒马斯"
+    },
+    "id::IRN-3237__SPLIT_MAKU": {
+      "en": "Maku",
+      "zh": "马库"
+    },
+    "id::IRN-3237__SPLIT_NANAS": {
+      "en": "Urmia",
+      "zh": "乌尔米耶"
+    },
+    "id::IRN-3237__SPLIT_NORTH_TIBRIZ": {
+      "en": "Khoy",
+      "zh": "霍伊"
+    },
+    "id::IRN-3237__SPLIT_OSHNAVIEH": {
+      "en": "Oshnaviyeh",
+      "zh": "奥什纳维耶"
+    },
+    "id::IRN-3237__SPLIT_RAVYAN": {
+      "en": "Ravyan",
+      "zh": "拉维扬"
+    },
+    "id::IRN-3237__SPLIT_SAHAND": {
+      "en": "Shahin Dezh",
+      "zh": "沙欣代日"
+    },
+    "id::IRN-3237__SPLIT_SHOWT": {
+      "en": "Chaldoran",
+      "zh": "查尔迪兰"
+    },
+    "id::IRN-3237__SPLIT_SOUTH_MARAND": {
+      "en": "Takab",
+      "zh": "塔卡布"
+    },
+    "id::IRN-3237__SPLIT_SOUTH_TIBRIZ": {
+      "en": "North Shahin Dezh",
+      "zh": "沙欣代日北部"
+    },
+    "id::IRN-3237__SPLIT_WESTERN_NANAS": {
+      "en": "Silvana",
+      "zh": "西尔瓦纳"
+    },
+    "id::IRN-3237__SPLIT_WEST_AZERBAIJAN": {
+      "en": "Bukan",
+      "zh": "布坎"
+    },
+    "id::IRN-3238__SPLIT_MARAND": {
+      "en": "Sarab",
+      "zh": "萨拉卜"
+    },
+    "id::IRN-3238__SPLIT_NORTH_MARAND": {
+      "en": "Kaleybar",
+      "zh": "卡莱巴尔"
+    },
+    "id::IRN-3238__SPLIT_NORTH_TIBRIZ": {
+      "en": "Marand",
+      "zh": "马兰德"
+    },
+    "id::IRN-3238__SPLIT_SAHAND": {
+      "en": "Sahand",
+      "zh": "萨汉德"
+    },
+    "id::IRN-3238__SPLIT_SOUTH_MARAND": {
+      "en": "Mianeh",
+      "zh": "米亚内"
+    },
+    "id::IRN-3238__SPLIT_SOUTH_TIBRIZ": {
+      "en": "Maragheh",
+      "zh": "马拉盖"
+    },
+    "id::IRN-3238__SPLIT_TIBRIZ": {
+      "en": "Tabriz",
+      "zh": "大不里士"
+    },
+    "id::IRN-3238__SPLIT_WEST_AZERBAIJAN": {
+      "en": "Miandoab",
+      "zh": "米扬杜阿卜"
+    },
     "id::IRN-3244__SPLIT_PLAYA_DAQQ_E_PATERGAN": {
       "en": "South Khorasan · Daqq-e Patergan",
       "zh": "南呼罗珊省 · 帕特根盐湖"
@@ -1920,6 +2436,66 @@
     "id::IRQ-3052__SPLIT_REST": {
       "en": "Sala ad-Din",
       "zh": "阿丁厅"
+    },
+    "id::IRQ-3222__SPLIT_AL_ZUBAIR": {
+      "en": "West Al-Zubair",
+      "zh": "祖拜尔西部"
+    },
+    "id::IRQ-3222__SPLIT_BASRA": {
+      "en": "Basra",
+      "zh": "巴士拉"
+    },
+    "id::IRQ-3222__SPLIT_CHIBAYISH": {
+      "en": "Hammar",
+      "zh": "哈马尔"
+    },
+    "id::IRQ-3222__SPLIT_NORTH_BASRA": {
+      "en": "North Basra",
+      "zh": "巴士拉北部"
+    },
+    "id::IRQ-3222__SPLIT_QASR_IBN_DARAHIM": {
+      "en": "Al Qurnah",
+      "zh": "古尔奈"
+    },
+    "id::IRQ-3222__SPLIT_SHAFI": {
+      "en": "Shafi",
+      "zh": "沙菲"
+    },
+    "id::IRQ-3223__SPLIT_AL_HAJARA": {
+      "en": "Al Hajara",
+      "zh": "哈贾拉"
+    },
+    "id::IRQ-3223__SPLIT_AL_SALMAN": {
+      "en": "Al Busayyah",
+      "zh": "布赛耶"
+    },
+    "id::IRQ-3223__SPLIT_AL_ZUBAIR": {
+      "en": "Al-Zubair",
+      "zh": "祖拜尔"
+    },
+    "id::IRQ-3223__SPLIT_BATHA": {
+      "en": "Al Salman",
+      "zh": "萨勒曼"
+    },
+    "id::IRQ-3223__SPLIT_DHI_QAR": {
+      "en": "North Ar Rumaythah",
+      "zh": "鲁迈萨北部"
+    },
+    "id::IRQ-3223__SPLIT_IRAQ_NEUTRAL_ZONE": {
+      "en": "Iraq Neutral Zone",
+      "zh": "伊拉克中立区"
+    },
+    "id::IRQ-3223__SPLIT_NASRIYAH": {
+      "en": "Samawah",
+      "zh": "萨马沃"
+    },
+    "id::IRQ-3223__SPLIT_NORTHEAST_NEUTRAL_ZONE": {
+      "en": "Northeast Neutral Zone",
+      "zh": "中立区东北部"
+    },
+    "id::IRQ-3223__SPLIT_SOUTH_DHI_QAR": {
+      "en": "Ar Rumaythah",
+      "zh": "鲁迈萨"
     },
     "id::IRQ-3471__SPLIT_BUHAYRAT_ATH_THARTHAR": {
       "en": "Al-Anbar · Buhayrat ath Tharthar site",
@@ -2089,6 +2665,86 @@
       "en": "Province of Rome",
       "zh": "罗马省"
     },
+    "id::JOR-850__SPLIT_AL_MAFRAQ": {
+      "en": "Ruwaished",
+      "zh": "鲁韦希德"
+    },
+    "id::JOR-850__SPLIT_AL_MAFRAQ_6801": {
+      "en": "West Mafraq",
+      "zh": "西马弗拉克"
+    },
+    "id::JOR-850__SPLIT_AZRAQ": {
+      "en": "Azraq",
+      "zh": "阿兹拉克"
+    },
+    "id::JOR-850__SPLIT_EAST_MAFRAQ": {
+      "en": "East Mafraq",
+      "zh": "马弗拉克东部"
+    },
+    "id::JOR-850__SPLIT_NORTHEAST_AL_MAFRAQ": {
+      "en": "Northeast Al-Mafraq",
+      "zh": "马弗拉克东北部"
+    },
+    "id::JOR-850__SPLIT_QASR_AL_HALLABAT": {
+      "en": "Qasr Al-Hallabat",
+      "zh": "哈拉巴特堡"
+    },
+    "id::JOR-850__SPLIT_RUSSEIFA": {
+      "en": "Safawi",
+      "zh": "萨法维"
+    },
+    "id::JOR-850__SPLIT_RWASHIED": {
+      "en": "East Ruwaished",
+      "zh": "鲁韦希德东部"
+    },
+    "id::JOR-850__SPLIT_UMM_EL_JIMAAL": {
+      "en": "Umm El-Jimaal",
+      "zh": "乌姆吉马勒"
+    },
+    "id::JOR-853__SPLIT_ALTUBAIQ": {
+      "en": "Altubaiq",
+      "zh": "图拜克"
+    },
+    "id::JOR-853__SPLIT_AL_JAFR": {
+      "en": "North Al-Jafr",
+      "zh": "北贾弗尔"
+    },
+    "id::JOR-853__SPLIT_AL_JAFR_5668": {
+      "en": "South Al-Jafr",
+      "zh": "南贾弗尔"
+    },
+    "id::JOR-853__SPLIT_AL_MUDAWWARA": {
+      "en": "Al-Mudawwara",
+      "zh": "穆达瓦拉"
+    },
+    "id::JOR-853__SPLIT_CENTRAL_AL_JAFR": {
+      "en": "Central Al Jafr",
+      "zh": "贾弗尔中部"
+    },
+    "id::JOR-853__SPLIT_EAST_AL_JAFR": {
+      "en": "West Al-Jafr",
+      "zh": "西贾弗尔"
+    },
+    "id::JOR-853__SPLIT_MA_AN": {
+      "en": "Ma'an",
+      "zh": "马安"
+    },
+    "id::JOR-853__SPLIT_NORTH_ALTUBAIQ": {
+      "en": "North Altubaiq",
+      "zh": "北图拜克"
+    },
+    "id::JOR-853__SPLIT_SHOBAK": {
+      "en": "South Shobak",
+      "zh": "南舒巴克"
+    },
+    "id::JOR-853__SPLIT_SHOBAK_5670": {
+      "en": "North Shobak",
+      "zh": "北舒巴克"
+    },
+    "id::JOR-853__SPLIT_WEST_ALTUBAIQ": {
+      "en": "West Altubaiq",
+      "zh": "西图拜克"
+    },
     "id::KAZ-3195__SPLIT_ARAL1987": {
       "en": "Aqtöbe · Aral seabed (dried by 1987)",
       "zh": "阿克托贝 · 咸海干涸湖床（1987 年前）"
@@ -2141,6 +2797,194 @@
       "en": "Qyzylorda",
       "zh": "克孜勒奥尔达"
     },
+    "id::LBY-2882__SPLIT_AL_JAWSH": {
+      "en": "Al Jawsh",
+      "zh": "焦什"
+    },
+    "id::LBY-2882__SPLIT_AWBARI": {
+      "en": "Ghadames",
+      "zh": "古达米斯"
+    },
+    "id::LBY-2882__SPLIT_GADAMIS": {
+      "en": "Dirj",
+      "zh": "代赖季"
+    },
+    "id::LBY-2882__SPLIT_NALUT": {
+      "en": "Nalut",
+      "zh": "纳卢特"
+    },
+    "id::LBY-2882__SPLIT_SINAWIN": {
+      "en": "Sinawin",
+      "zh": "西纳温"
+    },
+    "id::LBY-2882__SPLIT_TABAQAH": {
+      "en": "Tabaqah",
+      "zh": "塔巴盖"
+    },
+    "id::LBY-2882__SPLIT_TIJI": {
+      "en": "Tiji",
+      "zh": "提吉"
+    },
+    "id::LBY-2882__SPLIT_WAZIN": {
+      "en": "Wazin",
+      "zh": "瓦津"
+    },
+    "id::LBY-2965__SPLIT_AL_JAWF": {
+      "en": "South Al-Jawf",
+      "zh": "南焦夫"
+    },
+    "id::LBY-2965__SPLIT_CENTRAL_SARRA": {
+      "en": "Central Sarra",
+      "zh": "萨拉中部"
+    },
+    "id::LBY-2965__SPLIT_EAST_AL_JAWF": {
+      "en": "Southwest Al-Jawf",
+      "zh": "焦夫西南"
+    },
+    "id::LBY-2965__SPLIT_EAST_KUFRAH": {
+      "en": "East Kufrah",
+      "zh": "东库夫拉"
+    },
+    "id::LBY-2965__SPLIT_EAST_SARRA": {
+      "en": "East Sarra",
+      "zh": "东萨拉"
+    },
+    "id::LBY-2965__SPLIT_EAST_WATH": {
+      "en": "East Wath",
+      "zh": "东瓦特"
+    },
+    "id::LBY-2965__SPLIT_INNER_SARRA": {
+      "en": "Inner Sarra",
+      "zh": "萨拉内陆"
+    },
+    "id::LBY-2965__SPLIT_KUFRAH": {
+      "en": "Kufrah",
+      "zh": "库夫拉"
+    },
+    "id::LBY-2965__SPLIT_NORTHEAST_KUFRAH": {
+      "en": "Northeast Kufrah",
+      "zh": "东北库夫拉"
+    },
+    "id::LBY-2965__SPLIT_NORTH_KUFRAH": {
+      "en": "North Kufrah",
+      "zh": "北库夫拉"
+    },
+    "id::LBY-2965__SPLIT_SARRA": {
+      "en": "Sarra",
+      "zh": "萨拉"
+    },
+    "id::LBY-2965__SPLIT_SOUTH_SARRA": {
+      "en": "South Sarra",
+      "zh": "南萨拉"
+    },
+    "id::LBY-2965__SPLIT_TAZIRBU": {
+      "en": "Tazirbu",
+      "zh": "塔济尔布"
+    },
+    "id::LBY-2965__SPLIT_WEST_AL_JAWF": {
+      "en": "Southeast Kufrah",
+      "zh": "东南库夫拉"
+    },
+    "id::LBY-2967__SPLIT_AWBARI": {
+      "en": "Awbari",
+      "zh": "奥巴里"
+    },
+    "id::LBY-2967__SPLIT_CENTRAL_AWBARI": {
+      "en": "Central Awbari",
+      "zh": "奥巴里中部"
+    },
+    "id::LBY-2967__SPLIT_EAST_ARBARI": {
+      "en": "East Awbari",
+      "zh": "东奥巴里"
+    },
+    "id::LBY-2967__SPLIT_INNER_EAST_AWBARI": {
+      "en": "Inner East Awbari",
+      "zh": "东奥巴里内陆"
+    },
+    "id::LBY-2967__SPLIT_INNER_SABHA": {
+      "en": "Idri",
+      "zh": "伊德里"
+    },
+    "id::LBY-2967__SPLIT_NORTH_GERMA": {
+      "en": "North Germa",
+      "zh": "北盖尔迈"
+    },
+    "id::LBY-2967__SPLIT_OUTER_WADDAN": {
+      "en": "Outer Waddan",
+      "zh": "沃丹外围"
+    },
+    "id::LBY-2967__SPLIT_WADDAN": {
+      "en": "Waddan",
+      "zh": "沃丹"
+    },
+    "id::LBY-2967__SPLIT_WEST_AL_FUQAHA": {
+      "en": "Brak",
+      "zh": "比拉克"
+    },
+    "id::LBY-2969__SPLIT_CENTRAL_GHAT": {
+      "en": "Central Ghat",
+      "zh": "加特中部"
+    },
+    "id::LBY-2969__SPLIT_CENTRAL_QATRUN": {
+      "en": "Central Qatrun",
+      "zh": "盖特龙中部"
+    },
+    "id::LBY-2969__SPLIT_CENTRAL_SABHA": {
+      "en": "Central Sabha",
+      "zh": "塞卜哈中部"
+    },
+    "id::LBY-2969__SPLIT_EAST_GHAT": {
+      "en": "East Ghat",
+      "zh": "加特东部"
+    },
+    "id::LBY-2969__SPLIT_EAST_QATRUN": {
+      "en": "East Qatrun",
+      "zh": "东盖特龙"
+    },
+    "id::LBY-2969__SPLIT_EAST_SABHA": {
+      "en": "East Sabha",
+      "zh": "塞卜哈东部"
+    },
+    "id::LBY-2969__SPLIT_GHAT": {
+      "en": "Ghat",
+      "zh": "加特"
+    },
+    "id::LBY-2969__SPLIT_INNER_CENTRAL_SABHA": {
+      "en": "Inner Central Sabha",
+      "zh": "塞卜哈中部内区"
+    },
+    "id::LBY-2969__SPLIT_INNER_LIBYAN_SAHARA": {
+      "en": "Tmassah",
+      "zh": "泰迈萨"
+    },
+    "id::LBY-2969__SPLIT_INNER_SABHA": {
+      "en": "Murzuk",
+      "zh": "迈尔祖格"
+    },
+    "id::LBY-2969__SPLIT_NORTHEAST_QATRUN": {
+      "en": "Tajarhi",
+      "zh": "塔杰希"
+    },
+    "id::LBY-2969__SPLIT_QATRUN": {
+      "en": "Qatrun",
+      "zh": "盖特龙"
+    },
+    "id::LBY-2969__SPLIT_SABHA": {
+      "en": "Zuwaylah",
+      "zh": "祖韦拉"
+    },
+    "id::LBY-2969__SPLIT_WATH": {
+      "en": "Waw an Namus",
+      "zh": "瓦乌纳穆斯"
+    },
+    "id::LBY-2969__SPLIT_WEST_AL_FUQAHA": {
+      "en": "West Al Fuqaha",
+      "zh": "西富盖哈"
+    },
+    "id::LBY-2969__SPLIT_WEST_TAZIRBU": {
+      "en": "West Tazirbu",
+      "zh": "西塔济尔布"
+    },
     "id::LBY-2982__SPLIT_PLAYA_SALT_FLAT_39": {
       "en": "Al Jabal al Akhdar · Salt flat",
       "zh": "阿赫达尔山 · 盐沼"
@@ -2149,6 +2993,106 @@
       "en": "Al Jabal al Akhdar",
       "zh": "阿赫达尔山"
     },
+    "id::LBY-2983__SPLIT_AJDABIYA": {
+      "en": "West South Ajdabiya",
+      "zh": "西南艾季达比亚"
+    },
+    "id::LBY-2983__SPLIT_AJDABIYA_7267": {
+      "en": "West North Ajdabiya",
+      "zh": "西北艾季达比亚"
+    },
+    "id::LBY-2983__SPLIT_AWJILAH": {
+      "en": "North Awjilah",
+      "zh": "北奥吉拉"
+    },
+    "id::LBY-2983__SPLIT_CENTRAL_JALU": {
+      "en": "Central Jalu",
+      "zh": "贾卢中部"
+    },
+    "id::LBY-2983__SPLIT_CENTRAL_MECHILI": {
+      "en": "Central Mechili",
+      "zh": "梅基利中部"
+    },
+    "id::LBY-2983__SPLIT_EAST_AJDABIYA": {
+      "en": "Central South Ajdabiya",
+      "zh": "中南艾季达比亚"
+    },
+    "id::LBY-2983__SPLIT_EAST_JALU": {
+      "en": "East Jalu",
+      "zh": "东贾卢"
+    },
+    "id::LBY-2983__SPLIT_EAST_MARADAH": {
+      "en": "East Maradah",
+      "zh": "马拉达东部"
+    },
+    "id::LBY-2983__SPLIT_EAST_ZILLAH": {
+      "en": "East Zillah",
+      "zh": "齐拉东部"
+    },
+    "id::LBY-2983__SPLIT_INNER_AWJILAH": {
+      "en": "Inner Awjilah",
+      "zh": "奥吉拉内区"
+    },
+    "id::LBY-2983__SPLIT_JAKHARRAD": {
+      "en": "South Awjila",
+      "zh": "南奥吉拉"
+    },
+    "id::LBY-2983__SPLIT_JALU": {
+      "en": "Jalu",
+      "zh": "贾卢"
+    },
+    "id::LBY-2983__SPLIT_MARADAH": {
+      "en": "Marada",
+      "zh": "马拉达"
+    },
+    "id::LBY-2983__SPLIT_MECHILI": {
+      "en": "Mechili",
+      "zh": "梅基利"
+    },
+    "id::LBY-2983__SPLIT_NORTHEAST_ADJABIA": {
+      "en": "East North Ajdabiya",
+      "zh": "东北艾季达比亚"
+    },
+    "id::LBY-2983__SPLIT_NORTHEAST_KUFRAH": {
+      "en": "Northeast Kufrah",
+      "zh": "东北库夫拉"
+    },
+    "id::LBY-2983__SPLIT_NORTH_KUFRAH": {
+      "en": "North Kufrah",
+      "zh": "北库夫拉"
+    },
+    "id::LBY-2983__SPLIT_NORTH_MECHILI": {
+      "en": "North Mechili",
+      "zh": "北梅基利"
+    },
+    "id::LBY-2983__SPLIT_OUTER_MECHILI": {
+      "en": "Outer Mechili",
+      "zh": "梅基利外围"
+    },
+    "id::LBY-2983__SPLIT_RAS_LANUF": {
+      "en": "El Agheila",
+      "zh": "阿盖拉"
+    },
+    "id::LBY-2983__SPLIT_SOUTH_AJDABIYA": {
+      "en": "East South Ajdabiya",
+      "zh": "东南艾季达比亚"
+    },
+    "id::LBY-2983__SPLIT_SOUTH_JAKHARRAD": {
+      "en": "South Jakharrad",
+      "zh": "南贾哈拉德"
+    },
+    "id::LBY-2983__SPLIT_WEST_CENTRAL_MECHILI": {
+      "en": "West Central Mechili",
+      "zh": "梅基利中西部"
+    },
+    "id::LBY-2983__SPLIT_WEST_MECHILI": {
+      "en": "West Mechili",
+      "zh": "西梅基利"
+    },
+    "id::LBY-2983__SPLIT_ZALTAN": {
+      "en": "Zaltan",
+      "zh": "扎勒坦"
+    },
     "id::LBY-2986__SPLIT_PLAYA_SALT_FLAT_39": {
       "en": "Al Qubbah · Salt flat",
       "zh": "阿尔库巴 · 盐沼"
@@ -2156,6 +3100,58 @@
     "id::LBY-2986__SPLIT_REST": {
       "en": "Al Qubbah",
       "zh": "阿尔库巴"
+    },
+    "id::LBY-2987__SPLIT_ADAM": {
+      "en": "Adam",
+      "zh": "阿德姆"
+    },
+    "id::LBY-2987__SPLIT_AL_JAGHBUB": {
+      "en": "Far South Jaghbub",
+      "zh": "杰格布卜远南部"
+    },
+    "id::LBY-2987__SPLIT_CENTRAL_JAGHBUB": {
+      "en": "South Jaghbub",
+      "zh": "南杰格布卜"
+    },
+    "id::LBY-2987__SPLIT_CENTRAL_JARABUB": {
+      "en": "West Jaghbub",
+      "zh": "西杰格布卜"
+    },
+    "id::LBY-2987__SPLIT_CYRENAICA": {
+      "en": "Bir Hakeim",
+      "zh": "比尔哈凯姆"
+    },
+    "id::LBY-2987__SPLIT_DERNA": {
+      "en": "Tobruk",
+      "zh": "图卜鲁格"
+    },
+    "id::LBY-2987__SPLIT_JAKHARRAD": {
+      "en": "Jakharrad",
+      "zh": "贾哈拉德"
+    },
+    "id::LBY-2987__SPLIT_JARABUB": {
+      "en": "Southwest Jaghbub",
+      "zh": "西南杰格布卜"
+    },
+    "id::LBY-2987__SPLIT_MECHILI": {
+      "en": "Mechili",
+      "zh": "梅基利"
+    },
+    "id::LBY-2987__SPLIT_NORTH_JAGHBUB": {
+      "en": "Jaghbub",
+      "zh": "杰格布卜"
+    },
+    "id::LBY-2987__SPLIT_NORTH_JARABUB": {
+      "en": "Northwest Jaghbub",
+      "zh": "西北杰格布卜"
+    },
+    "id::LBY-2987__SPLIT_SOUTH_JAKHARRAD": {
+      "en": "South Jakharrad",
+      "zh": "南贾哈拉德"
+    },
+    "id::LBY-2987__SPLIT_WATH": {
+      "en": "Wath",
+      "zh": "瓦特"
     },
     "id::LT011__SPLIT_REST": {
       "en": "Vilnius County (Lithuanian part)",
@@ -2281,6 +3277,50 @@
       "en": "Guelmim - Es-Semara · Remainder",
       "zh": "盖勒敏 - 埃斯-塞马拉 · 余部"
     },
+    "id::MAR-3457__SPLIT_REST__SPLIT_ABTEH": {
+      "en": "Tan-Tan",
+      "zh": "坦坦"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_ASSA": {
+      "en": "Assa",
+      "zh": "阿萨"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_BIR_LAHLOU": {
+      "en": "Bir Lahlou",
+      "zh": "比尔莱赫卢"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_EL_OUATIA": {
+      "en": "Guelmim",
+      "zh": "盖勒敏"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_GUELMIM": {
+      "en": "East Guelmim",
+      "zh": "东盖勒敏"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_INNER_CAPE_JUBY": {
+      "en": "Inner Cape Juby",
+      "zh": "朱比角内陆"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_LAAYOUNE": {
+      "en": "Smara",
+      "zh": "斯马拉"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_MSIED": {
+      "en": "Msied",
+      "zh": "姆西德"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_SOUTH_MSIED": {
+      "en": "South Msied",
+      "zh": "南姆西德"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_TATA": {
+      "en": "Tata",
+      "zh": "塔塔"
+    },
+    "id::MAR-3457__SPLIT_REST__SPLIT_ZAG": {
+      "en": "Zag",
+      "zh": "扎格"
+    },
     "id::MDA-1650__SPLIT_BENDER": {
       "en": "Bender and Varnița (right bank)",
       "zh": "宾杰里与瓦尔尼察（右岸）"
@@ -2360,6 +3400,106 @@
     "id::MNG-3320__SPLIT_REST": {
       "en": "Hovd",
       "zh": "头"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_AIN_BEN_TILI": {
+      "en": "East Ain Ben Tili",
+      "zh": "艾因本提利东部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_BIR_MOGHREIN": {
+      "en": "Ain Ben Tili",
+      "zh": "艾因本提利"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_CENTRAL_AIN_BEN_TILI": {
+      "en": "Central Ain Ben Tili",
+      "zh": "艾因本提利中部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_CENTRAL_BIR_MOGHREIN": {
+      "en": "Central Bir Moghrein",
+      "zh": "比尔莫格兰中部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_CENTRAL_CHEGGAA": {
+      "en": "Central Chegga",
+      "zh": "舍加中部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_CENTRAL_TOURINE": {
+      "en": "Central Tourine",
+      "zh": "图林中部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_EAST_BIN_MOHGREIN": {
+      "en": "East Bir Moghrein",
+      "zh": "东比尔莫格兰"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_EAST_CENTRAL_CHEGGA": {
+      "en": "Chegga",
+      "zh": "舍加"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_EAST_TOURINE": {
+      "en": "East Tourine",
+      "zh": "东图林"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_FDERIK": {
+      "en": "East Fderik",
+      "zh": "弗德里克东部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_FORT_TRINQUET": {
+      "en": "Fort Trinquet",
+      "zh": "特兰凯堡"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_INNER_NORTHEAST_FDERIK": {
+      "en": "Inner Northeast Fderik",
+      "zh": "弗德里克东北部内区"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_INNER_TOURINE": {
+      "en": "Inner Tourine",
+      "zh": "图林内陆"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_INNER_WEST_TOURINE": {
+      "en": "Inner West Tourine",
+      "zh": "西图林内陆"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_NORTHEAST_FDERIK": {
+      "en": "Northeast Fderik",
+      "zh": "弗德里克东北部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_NORTH_TOURINE": {
+      "en": "North Tourine",
+      "zh": "北图林"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_OUTER_BIR_MOGHREIN": {
+      "en": "Outer Bir Moghrein",
+      "zh": "比尔莫格兰外围"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_OUTER_WEST_CENTRAL_TOURINE": {
+      "en": "Outer West Central Tourine",
+      "zh": "图林中西部外围"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_SOUTH_AIN_BEN_TILI": {
+      "en": "South Ain Ben Tili",
+      "zh": "南艾因本提利"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_SOUTH_BIR_MOGHREIN": {
+      "en": "South Bir Moghrein",
+      "zh": "比尔莫格兰南部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_WEST_CENTRAL_CHEGGA": {
+      "en": "West Central Chegga",
+      "zh": "舍加中部西部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_WEST_CENTRAL_TOURINE": {
+      "en": "West Central Tourine",
+      "zh": "图林中西部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_WEST_CHEGGA": {
+      "en": "West Chegga",
+      "zh": "舍加西部"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_WEST_TOURINE": {
+      "en": "West Tourine",
+      "zh": "西图林"
+    },
+    "id::MR_ADM1_MRT-2783__SPLIT_ZOUERAT": {
+      "en": "Zouerat",
+      "zh": "祖埃拉特"
     },
     "id::MX_ZN_14_002__SPLIT_LAKE_TEXCOCO": {
       "en": "Mexico Zone 2 · Lake Texcoco lakebed",
@@ -2516,6 +3656,54 @@
     "id::NL230__SPLIT_REST": {
       "en": "Flevoland",
       "zh": "弗莱福兰"
+    },
+    "id::NO074__SPLIT_DIVIDALEN": {
+      "en": "Dividalen",
+      "zh": "迪维河谷"
+    },
+    "id::NO074__SPLIT_ETELA_VARNANKI": {
+      "en": "Kirkenes",
+      "zh": "希尔克内斯"
+    },
+    "id::NO074__SPLIT_FINNMARK": {
+      "en": "Alta",
+      "zh": "阿尔塔镇"
+    },
+    "id::NO074__SPLIT_HELLIGSKOGEN": {
+      "en": "Helligskogen",
+      "zh": "赫利格斯科根"
+    },
+    "id::NO074__SPLIT_KUNES": {
+      "en": "Kunes",
+      "zh": "库内斯"
+    },
+    "id::NO074__SPLIT_NORJA": {
+      "en": "Kautokeino",
+      "zh": "考托凯诺"
+    },
+    "id::NO074__SPLIT_NYELV": {
+      "en": "Nyelv",
+      "zh": "尼埃尔夫"
+    },
+    "id::NO074__SPLIT_OLDERDALEN": {
+      "en": "Olderdalen",
+      "zh": "奥尔德达伦"
+    },
+    "id::NO074__SPLIT_TANA": {
+      "en": "Tana",
+      "zh": "塔纳"
+    },
+    "id::NO074__SPLIT_TROMS": {
+      "en": "Troms",
+      "zh": "特罗姆斯"
+    },
+    "id::NO074__SPLIT_VAGGE": {
+      "en": "Vagge",
+      "zh": "瓦格"
+    },
+    "id::NO074__SPLIT_VARDO": {
+      "en": "Vardo",
+      "zh": "瓦尔德"
     },
     "id::PAK-1108__SPLIT_BALUCHISTAN_STATES": {
       "en": "Baluchistan · Kalat and associated states",
@@ -3220,6 +4408,22 @@
     "id::RS127__SPLIT_SYRMIA": {
       "en": "Ruma",
       "zh": "鲁马"
+    },
+    "id::RS211__SPLIT_BRODAREVO": {
+      "en": "Brodarevo",
+      "zh": "布罗达雷沃"
+    },
+    "id::RS211__SPLIT_MOKRA_GORA": {
+      "en": "Uzice",
+      "zh": "乌日策"
+    },
+    "id::RS211__SPLIT_PRIJEPOLJE": {
+      "en": "Prijepolje",
+      "zh": "普里耶波列"
+    },
+    "id::RS211__SPLIT_ZLATIBOR": {
+      "en": "Arilje",
+      "zh": "阿里列"
     },
     "id::RS217__SPLIT_DRAGA": {
       "en": "Raška",
@@ -4037,6 +5241,146 @@
       "en": "Lyskovsky District",
       "zh": "莱斯科夫斯基区"
     },
+    "id::SAU-848__SPLIT_BIR_IBN_HIRMAS": {
+      "en": "Bir Ibn-Hirmas",
+      "zh": "比尔伊本希尔马斯"
+    },
+    "id::SAU-848__SPLIT_DUBA": {
+      "en": "Duba",
+      "zh": "杜巴"
+    },
+    "id::SAU-848__SPLIT_HALAT_AMMAR": {
+      "en": "Halat Ammar",
+      "zh": "哈拉特阿马尔"
+    },
+    "id::SAU-848__SPLIT_MAGNA": {
+      "en": "Magna",
+      "zh": "马克纳"
+    },
+    "id::SAU-848__SPLIT_MEEGOWA": {
+      "en": "Meegowa",
+      "zh": "米古瓦"
+    },
+    "id::SAU-848__SPLIT_NORTH_TABUK": {
+      "en": "North Tabuk",
+      "zh": "塔布克北部"
+    },
+    "id::SAU-848__SPLIT_OUTER_TAYMA": {
+      "en": "Outer Tayma",
+      "zh": "泰马外围"
+    },
+    "id::SAU-848__SPLIT_SHUWAQ": {
+      "en": "Tabuk",
+      "zh": "塔布克"
+    },
+    "id::SAU-848__SPLIT_SOUTH_AL_QALIBAH": {
+      "en": "South Al Qalibah",
+      "zh": "南盖利拜"
+    },
+    "id::SAU-848__SPLIT_TABUK": {
+      "en": "Al Wajh governorate",
+      "zh": "沃季赫"
+    },
+    "id::SAU-848__SPLIT_TAYMA": {
+      "en": "Tayma",
+      "zh": "泰马"
+    },
+    "id::SAU-861__SPLIT_ALMSNAH": {
+      "en": "Almsnah",
+      "zh": "穆萨纳"
+    },
+    "id::SAU-861__SPLIT_AL_QAISUMAH": {
+      "en": "Al Qaisumah",
+      "zh": "盖苏马"
+    },
+    "id::SAU-861__SPLIT_ARAR": {
+      "en": "Arar",
+      "zh": "阿尔阿尔"
+    },
+    "id::SAU-861__SPLIT_EAST_RAFHA": {
+      "en": "East Rafha",
+      "zh": "东拉夫哈"
+    },
+    "id::SAU-861__SPLIT_HAFAR_AL_BATIN": {
+      "en": "Hafar Al Batin",
+      "zh": "哈费尔巴廷"
+    },
+    "id::SAU-861__SPLIT_NORTH_HAFAR_AL_BATIN": {
+      "en": "North Hafar Al Batin",
+      "zh": "哈费尔巴廷北部"
+    },
+    "id::SAU-861__SPLIT_RAFHA": {
+      "en": "West Rafha",
+      "zh": "西拉夫哈"
+    },
+    "id::SAU-861__SPLIT_RAWDAT_HABBAS": {
+      "en": "Rawdat Habbas",
+      "zh": "劳达特哈巴斯"
+    },
+    "id::SAU-861__SPLIT_SAUDI_NEUTRAL_ZONE": {
+      "en": "Saudi Neutral Zone",
+      "zh": "沙特中立区"
+    },
+    "id::SAU-861__SPLIT_SHA_YA": {
+      "en": "Sha'ya",
+      "zh": "沙亚"
+    },
+    "id::SAU-861__SPLIT_WEST_ALMSNAH": {
+      "en": "West Almsnah",
+      "zh": "西穆萨纳"
+    },
+    "id::SAU-862__SPLIT_ALWASEI": {
+      "en": "Alwasei",
+      "zh": "瓦西"
+    },
+    "id::SAU-862__SPLIT_AL_JAWF": {
+      "en": "Nabk",
+      "zh": "纳布克"
+    },
+    "id::SAU-862__SPLIT_AL_QALIBAH": {
+      "en": "Sakakah",
+      "zh": "塞卡凯"
+    },
+    "id::SAU-862__SPLIT_EAST_HAQL": {
+      "en": "East Haql",
+      "zh": "东哈克勒"
+    },
+    "id::SAU-862__SPLIT_HALAT_AMMAR": {
+      "en": "Halat Ammar",
+      "zh": "哈拉特阿马尔"
+    },
+    "id::SAU-862__SPLIT_HAQL": {
+      "en": "Haql",
+      "zh": "哈克勒"
+    },
+    "id::SAU-862__SPLIT_KAF": {
+      "en": "Kaf",
+      "zh": "卡夫"
+    },
+    "id::SAU-862__SPLIT_MAGNA": {
+      "en": "Magna",
+      "zh": "马克纳"
+    },
+    "id::SAU-862__SPLIT_MEEGOWA": {
+      "en": "Meegowa",
+      "zh": "米古瓦"
+    },
+    "id::SAU-862__SPLIT_NORTH_TABUK": {
+      "en": "North Tabuk",
+      "zh": "塔布克北部"
+    },
+    "id::SAU-862__SPLIT_OUTER_TAYMA": {
+      "en": "Outer Tayma",
+      "zh": "泰马外围"
+    },
+    "id::SAU-862__SPLIT_SOUTH_AL_QALIBAH": {
+      "en": "South Al Qalibah",
+      "zh": "南盖利拜"
+    },
+    "id::SAU-862__SPLIT_SOUTH_KAF": {
+      "en": "South Kaf",
+      "zh": "南卡夫"
+    },
     "id::SD_ADM1_SDN-878__SPLIT_LAKE_NASSER": {
       "en": "Northern · Lake Nasser site",
       "zh": "北方 · 纳赛尔湖库址"
@@ -4044,6 +5388,42 @@
     "id::SD_ADM1_SDN-878__SPLIT_REST": {
       "en": "Northern",
       "zh": "北方"
+    },
+    "id::SE332__SPLIT_HAPARANDA": {
+      "en": "Haparanda",
+      "zh": "哈帕兰达"
+    },
+    "id::SE332__SPLIT_LANNAVAARA": {
+      "en": "Lannavaara",
+      "zh": "兰纳瓦拉"
+    },
+    "id::SE332__SPLIT_LULEA": {
+      "en": "Lulea",
+      "zh": "吕勒奥"
+    },
+    "id::SE332__SPLIT_MERKENES": {
+      "en": "Merkenes",
+      "zh": "梅尔克内斯"
+    },
+    "id::SE332__SPLIT_NORRBOTTEN": {
+      "en": "Kiruna",
+      "zh": "基律纳"
+    },
+    "id::SE332__SPLIT_PAJALA": {
+      "en": "South Pajala",
+      "zh": "南帕亚拉"
+    },
+    "id::SE332__SPLIT_PITEA": {
+      "en": "Pitea",
+      "zh": "皮特奥"
+    },
+    "id::SE332__SPLIT_RITSEM": {
+      "en": "Ritsem",
+      "zh": "里特瑟姆"
+    },
+    "id::SE332__SPLIT_VASTERBOTTEN": {
+      "en": "Jokkmokk",
+      "zh": "约克莫克"
     },
     "id::SI038__SPLIT_ITALIAN": {
       "en": "Postumia and Villa del Nevoso",
@@ -4197,6 +5577,198 @@
       "en": "Brokopondo",
       "zh": "布罗科蓬多"
     },
+    "id::SYR-136__SPLIT_AL_TABQAH": {
+      "en": "South Tabqa",
+      "zh": "塔卜卡南部"
+    },
+    "id::SYR-136__SPLIT_EAST_MANBIJ": {
+      "en": "North Raqqa",
+      "zh": "北拉卡"
+    },
+    "id::SYR-136__SPLIT_KOBANE": {
+      "en": "Kobane",
+      "zh": "科巴尼"
+    },
+    "id::SYR-136__SPLIT_MADAN": {
+      "en": "Madan",
+      "zh": "马丹"
+    },
+    "id::SYR-136__SPLIT_MANBIJ": {
+      "en": "West Raqqa",
+      "zh": "西拉卡"
+    },
+    "id::SYR-136__SPLIT_MARKADAH": {
+      "en": "East Madan",
+      "zh": "马丹东部"
+    },
+    "id::SYR-136__SPLIT_RAQQA": {
+      "en": "East Raqqa",
+      "zh": "东拉卡"
+    },
+    "id::SYR-136__SPLIT_RESAFA": {
+      "en": "Resafa",
+      "zh": "鲁萨法"
+    },
+    "id::SYR-136__SPLIT_SOUTHERN_RAQQA": {
+      "en": "Southern Raqqa",
+      "zh": "拉卡南部"
+    },
+    "id::SYR-136__SPLIT_SOUTH_MADAN": {
+      "en": "South Madan",
+      "zh": "南马丹"
+    },
+    "id::SYR-136__SPLIT_SOUTH_MANBIJ": {
+      "en": "Tabqa",
+      "zh": "塔卜卡"
+    },
+    "id::SYR-137__SPLIT_ALEPPO": {
+      "en": "South Aleppo",
+      "zh": "南阿勒颇"
+    },
+    "id::SYR-137__SPLIT_AL_BAB": {
+      "en": "Al-Bab",
+      "zh": "巴卜"
+    },
+    "id::SYR-137__SPLIT_AL_SAFIRAH": {
+      "en": "Khanasir",
+      "zh": "哈纳西尔"
+    },
+    "id::SYR-137__SPLIT_AL_TABQAH": {
+      "en": "Al Tabqah",
+      "zh": "塔卜卡"
+    },
+    "id::SYR-137__SPLIT_ANADAN": {
+      "en": "Batabo",
+      "zh": "巴塔布"
+    },
+    "id::SYR-137__SPLIT_DABIQ": {
+      "en": "North Aleppo",
+      "zh": "北阿勒颇"
+    },
+    "id::SYR-137__SPLIT_KOBANE": {
+      "en": "Jarabulus",
+      "zh": "杰拉布卢斯"
+    },
+    "id::SYR-137__SPLIT_MANBIJ": {
+      "en": "Maskanah",
+      "zh": "马斯卡纳"
+    },
+    "id::SYR-137__SPLIT_RESAFA": {
+      "en": "Resafa",
+      "zh": "鲁萨法"
+    },
+    "id::SYR-137__SPLIT_SOUTH_AL_BAB": {
+      "en": "South Al-Bab",
+      "zh": "南巴卜"
+    },
+    "id::SYR-137__SPLIT_SOUTH_ANADAN": {
+      "en": "South Anadan",
+      "zh": "南阿纳丹"
+    },
+    "id::SYR-137__SPLIT_SOUTH_MANBIJ": {
+      "en": "South Manbij",
+      "zh": "曼比季南部"
+    },
+    "id::SYR-141__SPLIT_AALOUA": {
+      "en": "Aaloua",
+      "zh": "阿卢瓦"
+    },
+    "id::SYR-141__SPLIT_AL_HASEKE": {
+      "en": "Al-Hasakah",
+      "zh": "哈塞克"
+    },
+    "id::SYR-141__SPLIT_AL_MNAJEER": {
+      "en": "Al-Mnajeer",
+      "zh": "穆纳吉尔"
+    },
+    "id::SYR-141__SPLIT_DEIR_EZ_ZOR": {
+      "en": "Markadah",
+      "zh": "马尔卡达"
+    },
+    "id::SYR-141__SPLIT_GER_ZERO": {
+      "en": "Qamishli",
+      "zh": "卡米什利"
+    },
+    "id::SYR-141__SPLIT_NORTH_DEIR_EZ_ZOR": {
+      "en": "North Deir-Ez-Zor",
+      "zh": "代尔祖尔北部"
+    },
+    "id::SYR-141__SPLIT_RAQQA": {
+      "en": "Raqqa",
+      "zh": "拉卡"
+    },
+    "id::SYR-141__SPLIT_SOUTH_AALOUA": {
+      "en": "South Aaloua",
+      "zh": "南阿卢瓦"
+    },
+    "id::SYR-141__SPLIT_TALL_TAMR": {
+      "en": "Tall Tamr",
+      "zh": "泰勒泰米尔"
+    },
+    "id::SYR-141__SPLIT_TAL_ERPHAN": {
+      "en": "Tal Erphan",
+      "zh": "泰勒伊尔凡"
+    },
+    "id::SYR-142__SPLIT_ABU_HAMAN": {
+      "en": "Subaykhan",
+      "zh": "苏拜汉"
+    },
+    "id::SYR-142__SPLIT_AL_BUKAMAL": {
+      "en": "West Al Bukamal",
+      "zh": "西阿布凯马勒"
+    },
+    "id::SYR-142__SPLIT_AL_MAYADIN": {
+      "en": "South Deir Ez-Zor",
+      "zh": "南代尔祖尔"
+    },
+    "id::SYR-142__SPLIT_AL_MNAJEER": {
+      "en": "Al-Mnajeer",
+      "zh": "穆纳吉尔"
+    },
+    "id::SYR-142__SPLIT_AL_TABQAH": {
+      "en": "Al Tabqah",
+      "zh": "塔卜卡"
+    },
+    "id::SYR-142__SPLIT_DEIR_EZ_ZOR": {
+      "en": "East North Deir Ez-Zor",
+      "zh": "东北代尔祖尔"
+    },
+    "id::SYR-142__SPLIT_EAST_MANBIJ": {
+      "en": "East Manbij",
+      "zh": "曼比季东部"
+    },
+    "id::SYR-142__SPLIT_HAJIN": {
+      "en": "Hajin",
+      "zh": "哈金"
+    },
+    "id::SYR-142__SPLIT_MARKADAH": {
+      "en": "Al-Tibni",
+      "zh": "提卜尼"
+    },
+    "id::SYR-142__SPLIT_NORTH_DEIR_EZ_ZOR": {
+      "en": "West North Deir-Ez-Zor",
+      "zh": "西代尔祖尔北部"
+    },
+    "id::SYR-142__SPLIT_RAQQA": {
+      "en": "Raqqa",
+      "zh": "拉卡"
+    },
+    "id::SYR-142__SPLIT_SOUTHERN_RAQQA": {
+      "en": "Southern Raqqa",
+      "zh": "拉卡南部"
+    },
+    "id::SYR-142__SPLIT_SOUTH_AL_BUKAMAL": {
+      "en": "South Al Bukamal",
+      "zh": "南阿布凯马勒"
+    },
+    "id::SYR-142__SPLIT_SOUTH_AL_MAYADIN": {
+      "en": "Abu Kamal",
+      "zh": "阿布凯马勒"
+    },
+    "id::SYR-142__SPLIT_SOUTH_MADAN": {
+      "en": "South Madan",
+      "zh": "南马丹"
+    },
     "id::TD_ADM1_TCD-1464__SPLIT_LAKE_CHAD": {
       "en": "Hadjer-Lamis · Lake Chad lakebed",
       "zh": "哈杰拉米斯 · 乍得湖故湖床"
@@ -4221,6 +5793,50 @@
       "en": "İstanbul · European side",
       "zh": "伊斯坦布尔 · 欧洲侧"
     },
+    "id::TR621__SPLIT_ADANA": {
+      "en": "Adana",
+      "zh": "阿达纳"
+    },
+    "id::TR621__SPLIT_ALADAG": {
+      "en": "Aladag",
+      "zh": "阿拉达"
+    },
+    "id::TR621__SPLIT_CEYHAN": {
+      "en": "Ceyhan",
+      "zh": "杰伊汉"
+    },
+    "id::TR621__SPLIT_FEKE": {
+      "en": "Yesilova",
+      "zh": "耶希洛瓦"
+    },
+    "id::TR621__SPLIT_KOZAN": {
+      "en": "Kozan",
+      "zh": "科赞"
+    },
+    "id::TR622__SPLIT_ANAMUR": {
+      "en": "Anamur",
+      "zh": "阿纳穆尔"
+    },
+    "id::TR622__SPLIT_BOLKAR": {
+      "en": "Bolkar",
+      "zh": "博尔卡尔山"
+    },
+    "id::TR622__SPLIT_MERSIN": {
+      "en": "Erdemli",
+      "zh": "埃尔代姆利"
+    },
+    "id::TR622__SPLIT_MUT": {
+      "en": "Mut",
+      "zh": "穆特"
+    },
+    "id::TR622__SPLIT_SILIFKE": {
+      "en": "Silifke",
+      "zh": "锡利夫凯"
+    },
+    "id::TR622__SPLIT_TARSUS": {
+      "en": "Tarsus",
+      "zh": "塔尔苏斯"
+    },
     "id::TR631__SPLIT_KESSAB": {
       "en": "Kessab",
       "zh": "凯萨卜"
@@ -4232,6 +5848,34 @@
     "id::TR631__SPLIT_SANJAK": {
       "en": "Sanjak of Alexandretta",
       "zh": "亚历山大勒塔桑贾克"
+    },
+    "id::TR632__SPLIT_AFSIN": {
+      "en": "Afsin",
+      "zh": "阿夫欣"
+    },
+    "id::TR632__SPLIT_EKINOZU": {
+      "en": "Caglayancerit",
+      "zh": "恰拉扬杰里特"
+    },
+    "id::TR632__SPLIT_ELBISTAN": {
+      "en": "Elbistan",
+      "zh": "埃尔比斯坦"
+    },
+    "id::TR632__SPLIT_GOKSUN": {
+      "en": "Goksun",
+      "zh": "格克孙"
+    },
+    "id::TR632__SPLIT_MARAS": {
+      "en": "Kahramanmaraş",
+      "zh": "卡赫拉曼马拉什"
+    },
+    "id::TR632__SPLIT_SATIRHUYUK": {
+      "en": "Pazarcik",
+      "zh": "帕扎尔哲克"
+    },
+    "id::TR632__SPLIT_TEKIR": {
+      "en": "Tekir",
+      "zh": "泰基尔"
     },
     "id::TR905__SPLIT_ARTVIN": {
       "en": "Artvin",
@@ -4328,6 +5972,38 @@
     "id::TRA24__SPLIT_TURKGOZU": {
       "en": "Turkgozu",
       "zh": "蒂尔克格聚"
+    },
+    "id::TRB21__SPLIT_BASKALE": {
+      "en": "Baskale",
+      "zh": "巴什卡莱"
+    },
+    "id::TRB21__SPLIT_GEVAS": {
+      "en": "Gevas",
+      "zh": "盖瓦什"
+    },
+    "id::TRB21__SPLIT_VAN": {
+      "en": "Van",
+      "zh": "凡城"
+    },
+    "id::TRC21__SPLIT_KECIBURCU": {
+      "en": "Keciburcu",
+      "zh": "凯奇布尔朱"
+    },
+    "id::TRC21__SPLIT_SIVEREK": {
+      "en": "Siverek",
+      "zh": "锡韦雷克"
+    },
+    "id::TRC21__SPLIT_SURUC": {
+      "en": "Birecik",
+      "zh": "比雷吉克"
+    },
+    "id::TRC21__SPLIT_URFA": {
+      "en": "Şanlıurfa",
+      "zh": "尚勒乌尔法"
+    },
+    "id::TRC21__SPLIT_VIRANSEHIR": {
+      "en": "Viransehir",
+      "zh": "维兰谢希尔"
     },
     "id::TUN-101__SPLIT_PLAYA_CHOTT_EL_DJERID": {
       "en": "Tozeur · Chott el Djerid",

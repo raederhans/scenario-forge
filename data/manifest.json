@@ -966,7 +966,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_manifest.schema.json",
       "size_bytes": 187827,
-      "sha256": "e5f76eec8daf8f6a08937881af74d10342c2ad662c30135c3a7c4e248e195089",
+      "sha256": "a584ebb14fb86fdadd5c542e60d6d4d6d94de3098f0ac7766897b764bed8702c",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/overview.json": {
@@ -995,8 +995,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 6181531,
-      "sha256": "d6a5881cc99a5be896a021c0d22dfc231897c4b06ab650c866e9eb5b234ad9cb",
+      "size_bytes": 6282045,
+      "sha256": "68f7eb3ecfb3741e889973cbda2e1ab9ec7b6e527b939207e3bfdfd31dbf7cf1",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1939.json": {
@@ -1005,8 +1005,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 6181531,
-      "sha256": "dd67a6612640d391edb64af311dc83c3231454f43df7bd9bbcf0440f85357e21",
+      "size_bytes": 6282045,
+      "sha256": "679881912b48eca1bee86cb7b267d73ec64f2ee5cfca0882b131c4f286dcb819",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/tno_1962.json": {
@@ -7785,8 +7785,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "schema://json/object/v1",
-      "size_bytes": 8904458,
-      "sha256": "2edc11ed2a3bebccc14c84033e9d50cd9a29c2e8d22e7848d0a308462ebea113"
+      "size_bytes": 8947630,
+      "sha256": "746ab576774f5ca3d6387934d095695bce92148a78d156f4b1cfeca38f6156b0"
     },
     "thematic_layers/population/ghsl_population_2020_v1/source_ledger.json": {
       "role": "population_spatial_provenance",

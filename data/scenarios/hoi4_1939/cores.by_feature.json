@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "5941fa33ed6cdb1349ca6c4f33b5765c97c4e91b264015e2f1a8357dbc15de96",
+  "baseline_hash": "6f3dd63d2c3d28222dbc830262c1d7d5b925dccfb85da080afd9914c3b775111",
   "cores": {
     "AD_ADM1_AND-4876": [
       "AND"
@@ -283,7 +283,31 @@
     "ARE-348": [
       "SHJ"
     ],
-    "ARE-349": [
+    "ARE-349__SPLIT_ABU_DHABI_CITY": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_AL_AIN": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_AL_WAGAN": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_ASAB": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_CENTRAL_ABU_DHABI": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_INNER_ABU_DHABI": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_REMAH": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_SVEIHAN": [
+      "ABD"
+    ],
+    "ARE-349__SPLIT_WEST_REMAH": [
       "ABD"
     ],
     "ARE-350": [
@@ -847,10 +871,127 @@
     "AZE-5567": [
       "AZR"
     ],
-    "BA_ADM1_54001226B17629474923252": [
+    "BA_ADM1_54001226B17629474923252__SPLIT_BOSNIA": [
       "YUG"
     ],
-    "BA_ADM1_54001226B66267900922909": [
+    "BA_ADM1_54001226B17629474923252__SPLIT_BUGOJNO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_CAZIN": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_DRVAR": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_HERZEGOVINA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_ILIDZA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_LIVNO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_MOSKO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_MOSTAR": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_NORTH_BUGOJNO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_NORTH_SOKOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_NORTH_STOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_NOVI_GRAD": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_PODOVI": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_POSAVINA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_SOKOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_STOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_WEST_DRVAR": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_ZALOM": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B17629474923252__SPLIT_ZEBE": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_BIJELJINA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_BOSNIA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_BRCKO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_BUGOJNO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_DRVAR": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_ILIDZA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_MOSKO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_MOSTAR": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_NORTH_BUGOJNO": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_NORTH_SOKOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_NORTH_STEPEN": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_NORTH_STOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_NOVI_GRAD": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_PODOVI": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_POSAVINA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_RIJEKA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_SOKOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_SRPSKA": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_STEPEN": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_STOLAC": [
+      "YUG"
+    ],
+    "BA_ADM1_54001226B66267900922909__SPLIT_ZALOM": [
       "YUG"
     ],
     "BA_ADM1_54001226B82378099338701": [
@@ -11956,13 +12097,76 @@
     "DZA-2147": [
       "FRA"
     ],
-    "DZA-2148": [
+    "DZA-2148__SPLIT_AIN_SEFRA": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_BENI_OUNIF": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_DJENIENE_BOUREZG": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_EASTERN_OUM_EL_ASSEL": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_EAST_ADRAR": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_EAST_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_NORTH_ADRAR": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_NORTH_BENI_OUNIF": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_OUM_EL_ASSEL": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_SOUTH_AIN_SEFRA": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2148__SPLIT_WEST_BENI_OUNIF": [
       "ALG"
     ],
     "DZA-2149": [
       "ALG"
     ],
-    "DZA-2150": [
+    "DZA-2150__SPLIT_EAST_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_NORTH_CENTRAL_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_NORTH_ERG_CHECH": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_OUM_EL_ASSEL": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_OUTER_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_SOUTHWEST_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_SOUTH_CENTRAL_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_SOUTH_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_TINDOUF": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_WEST_ERG_CHECH": [
+      "ALG"
+    ],
+    "DZA-2150__SPLIT_WEST_TINDOUF": [
       "ALG"
     ],
     "DZA-2163": [
@@ -11977,7 +12181,25 @@
     "DZA-2166": [
       "FRA"
     ],
-    "DZA-2188": [
+    "DZA-2188__SPLIT_CENTRAL_IN_AMENAS": [
+      "ALG"
+    ],
+    "DZA-2188__SPLIT_EAST_AIN_SALAH": [
+      "ALG"
+    ],
+    "DZA-2188__SPLIT_EAST_IN_DAMENAS": [
+      "ALG"
+    ],
+    "DZA-2188__SPLIT_IN_AMENAS": [
+      "ALG"
+    ],
+    "DZA-2188__SPLIT_OUTER_IN_DAMENAS": [
+      "ALG"
+    ],
+    "DZA-2188__SPLIT_SOUTH_AIN_SALAH": [
+      "ALG"
+    ],
+    "DZA-2188__SPLIT_SOUTH_IN_DAMENAS": [
       "ALG"
     ],
     "DZA-2189__SPLIT_PLAYA_SALT_FLAT_18": [
@@ -12220,7 +12442,40 @@
     "EGY-1539": [
       "EGY"
     ],
-    "EGY-1540": [
+    "EGY-1540__SPLIT_BORG_EL_ARAB": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_CARA": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_EAST_QATTARA": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_EL_SALLOUM": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_MARSA_MATRUH": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_NORTH_CARA": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_QATTARA_CANAL_SITE": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_SIDI_BARRANI": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_SIWA_OASIS": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_SOUTH_EL_SALLOUM": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_SOUTH_QATTARA": [
+      "EGY"
+    ],
+    "EGY-1540__SPLIT_WEST_SIWA": [
       "EGY"
     ],
     "EGY-1541": [
@@ -12733,7 +12988,46 @@
     "FI1D5": [
       "FIN"
     ],
-    "FI1D7": [
+    "FI1D7__SPLIT_AJOS": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_ENONTEKIO": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_INARI": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_KITTILA": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_KURSU": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_LAPPI": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_LOUE": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_LUOSTO": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_NARKAUS": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_NORTH_KEMPELE": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_NORTH_LI": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_NORTH_VAALA": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_POKKA": [
+      "FIN"
+    ],
+    "FI1D7__SPLIT_VUOTSO": [
       "FIN"
     ],
     "FI1D8": [
@@ -16939,10 +17233,73 @@
     "IRN-3235": [
       "PER"
     ],
-    "IRN-3237": [
+    "IRN-3237__SPLIT_AVACIQ": [
       "PER"
     ],
-    "IRN-3238": [
+    "IRN-3237__SPLIT_DUSTAN": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_KAPUT": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_KHOY": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_MAKU": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_NANAS": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_NORTH_TIBRIZ": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_OSHNAVIEH": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_RAVYAN": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_SAHAND": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_SHOWT": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_SOUTH_MARAND": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_SOUTH_TIBRIZ": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_WESTERN_NANAS": [
+      "PER"
+    ],
+    "IRN-3237__SPLIT_WEST_AZERBAIJAN": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_MARAND": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_NORTH_MARAND": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_NORTH_TIBRIZ": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_SAHAND": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_SOUTH_MARAND": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_SOUTH_TIBRIZ": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_TIBRIZ": [
+      "PER"
+    ],
+    "IRN-3238__SPLIT_WEST_AZERBAIJAN": [
       "PER"
     ],
     "IRN-3239": [
@@ -17074,10 +17431,49 @@
     "IRQ-3063": [
       "IRQ"
     ],
-    "IRQ-3222": [
+    "IRQ-3222__SPLIT_AL_ZUBAIR": [
       "IRQ"
     ],
-    "IRQ-3223": [
+    "IRQ-3222__SPLIT_BASRA": [
+      "IRQ"
+    ],
+    "IRQ-3222__SPLIT_CHIBAYISH": [
+      "IRQ"
+    ],
+    "IRQ-3222__SPLIT_NORTH_BASRA": [
+      "IRQ"
+    ],
+    "IRQ-3222__SPLIT_QASR_IBN_DARAHIM": [
+      "IRQ"
+    ],
+    "IRQ-3222__SPLIT_SHAFI": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_AL_HAJARA": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_AL_SALMAN": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_AL_ZUBAIR": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_BATHA": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_DHI_QAR": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_IRAQ_NEUTRAL_ZONE": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_NASRIYAH": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_NORTHEAST_NEUTRAL_ZONE": [
+      "IRQ"
+    ],
+    "IRQ-3223__SPLIT_SOUTH_DHI_QAR": [
       "IRQ"
     ],
     "IRQ-3224": [
@@ -17560,7 +17956,31 @@
     "JOR-849": [
       "JOR"
     ],
-    "JOR-850": [
+    "JOR-850__SPLIT_AL_MAFRAQ": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_AL_MAFRAQ_6801": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_AZRAQ": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_EAST_MAFRAQ": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_NORTHEAST_AL_MAFRAQ": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_QASR_AL_HALLABAT": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_RUSSEIFA": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_RWASHIED": [
+      "JOR"
+    ],
+    "JOR-850__SPLIT_UMM_EL_JIMAAL": [
       "JOR"
     ],
     "JOR-851": [
@@ -17569,7 +17989,37 @@
     "JOR-852": [
       "JOR"
     ],
-    "JOR-853": [
+    "JOR-853__SPLIT_ALTUBAIQ": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_AL_JAFR": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_AL_JAFR_5668": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_AL_MUDAWWARA": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_CENTRAL_AL_JAFR": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_EAST_AL_JAFR": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_MA_AN": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_NORTH_ALTUBAIQ": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_SHOBAK": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_SHOBAK_5670": [
+      "JOR"
+    ],
+    "JOR-853__SPLIT_WEST_ALTUBAIQ": [
       "JOR"
     ],
     "JOR-854": [
@@ -18082,25 +18532,154 @@
     "LBN-3060": [
       "LEB"
     ],
-    "LBY-2882": [
+    "LBY-2882__SPLIT_AL_JAWSH": [
+      "ITA"
+    ],
+    "LBY-2882__SPLIT_AWBARI": [
+      "ITA"
+    ],
+    "LBY-2882__SPLIT_GADAMIS": [
+      "ITA"
+    ],
+    "LBY-2882__SPLIT_NALUT": [
+      "ITA"
+    ],
+    "LBY-2882__SPLIT_SINAWIN": [
+      "ITA"
+    ],
+    "LBY-2882__SPLIT_TABAQAH": [
+      "ITA"
+    ],
+    "LBY-2882__SPLIT_TIJI": [
+      "ITA"
+    ],
+    "LBY-2882__SPLIT_WAZIN": [
       "ITA"
     ],
     "LBY-2964": [
       "LBA"
     ],
-    "LBY-2965": [
+    "LBY-2965__SPLIT_AL_JAWF": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_CENTRAL_SARRA": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_EAST_AL_JAWF": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_EAST_KUFRAH": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_EAST_SARRA": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_EAST_WATH": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_INNER_SARRA": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_KUFRAH": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_NORTHEAST_KUFRAH": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_NORTH_KUFRAH": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_SARRA": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_SOUTH_SARRA": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_TAZIRBU": [
+      "LBA"
+    ],
+    "LBY-2965__SPLIT_WEST_AL_JAWF": [
       "LBA"
     ],
     "LBY-2966": [
       "ITA"
     ],
-    "LBY-2967": [
+    "LBY-2967__SPLIT_AWBARI": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_CENTRAL_AWBARI": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_EAST_ARBARI": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_INNER_EAST_AWBARI": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_INNER_SABHA": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_NORTH_GERMA": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_OUTER_WADDAN": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_WADDAN": [
+      "LBA"
+    ],
+    "LBY-2967__SPLIT_WEST_AL_FUQAHA": [
       "LBA"
     ],
     "LBY-2968": [
       "LBA"
     ],
-    "LBY-2969": [
+    "LBY-2969__SPLIT_CENTRAL_GHAT": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_CENTRAL_QATRUN": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_CENTRAL_SABHA": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_EAST_GHAT": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_EAST_QATRUN": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_EAST_SABHA": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_GHAT": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_INNER_CENTRAL_SABHA": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_INNER_LIBYAN_SAHARA": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_INNER_SABHA": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_NORTHEAST_QATRUN": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_QATRUN": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_SABHA": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_WATH": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_WEST_AL_FUQAHA": [
+      "LBA"
+    ],
+    "LBY-2969__SPLIT_WEST_TAZIRBU": [
       "LBA"
     ],
     "LBY-2970": [
@@ -18133,7 +18712,79 @@
     "LBY-2982__SPLIT_REST": [
       "ITA"
     ],
-    "LBY-2983": [
+    "LBY-2983__SPLIT_AJDABIYA": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_AJDABIYA_7267": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_AWJILAH": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_CENTRAL_JALU": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_CENTRAL_MECHILI": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_EAST_AJDABIYA": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_EAST_JALU": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_EAST_MARADAH": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_EAST_ZILLAH": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_INNER_AWJILAH": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_JAKHARRAD": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_JALU": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_MARADAH": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_MECHILI": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_NORTHEAST_ADJABIA": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_NORTHEAST_KUFRAH": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_NORTH_KUFRAH": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_NORTH_MECHILI": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_OUTER_MECHILI": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_RAS_LANUF": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_SOUTH_AJDABIYA": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_SOUTH_JAKHARRAD": [
+      "LBA"
+    ],
+    "LBY-2983__SPLIT_WEST_CENTRAL_MECHILI": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_WEST_MECHILI": [
+      "ITA"
+    ],
+    "LBY-2983__SPLIT_ZALTAN": [
       "LBA"
     ],
     "LBY-2984": [
@@ -18148,7 +18799,43 @@
     "LBY-2986__SPLIT_REST": [
       "ITA"
     ],
-    "LBY-2987": [
+    "LBY-2987__SPLIT_ADAM": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_AL_JAGHBUB": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_CENTRAL_JAGHBUB": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_CENTRAL_JARABUB": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_CYRENAICA": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_DERNA": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_JAKHARRAD": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_JARABUB": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_MECHILI": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_NORTH_JAGHBUB": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_NORTH_JARABUB": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_SOUTH_JAKHARRAD": [
+      "ITA"
+    ],
+    "LBY-2987__SPLIT_WATH": [
       "ITA"
     ],
     "LBY-5488": [
@@ -18496,7 +19183,37 @@
     "MAR-3457__SPLIT_IFNI": [
       "IFN"
     ],
-    "MAR-3457__SPLIT_REST": [
+    "MAR-3457__SPLIT_REST__SPLIT_ABTEH": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_ASSA": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_BIR_LAHLOU": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_EL_OUATIA": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_GUELMIM": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_INNER_CAPE_JUBY": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_LAAYOUNE": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_MSIED": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_SOUTH_MSIED": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_TATA": [
+      "SMR"
+    ],
+    "MAR-3457__SPLIT_REST__SPLIT_ZAG": [
       "SMR"
     ],
     "MAR-3469": [
@@ -18955,7 +19672,79 @@
     "MQ_PRIMARY": [
       "MTQ"
     ],
-    "MR_ADM1_MRT-2783": [
+    "MR_ADM1_MRT-2783__SPLIT_AIN_BEN_TILI": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_BIR_MOGHREIN": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_CENTRAL_AIN_BEN_TILI": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_CENTRAL_BIR_MOGHREIN": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_CENTRAL_CHEGGAA": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_CENTRAL_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_EAST_BIN_MOHGREIN": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_EAST_CENTRAL_CHEGGA": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_EAST_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_FDERIK": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_FORT_TRINQUET": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_INNER_NORTHEAST_FDERIK": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_INNER_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_INNER_WEST_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_NORTHEAST_FDERIK": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_NORTH_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_OUTER_BIR_MOGHREIN": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_OUTER_WEST_CENTRAL_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_SOUTH_AIN_BEN_TILI": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_SOUTH_BIR_MOGHREIN": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_WEST_CENTRAL_CHEGGA": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_WEST_CENTRAL_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_WEST_CHEGGA": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_WEST_TOURINE": [
+      "AOF"
+    ],
+    "MR_ADM1_MRT-2783__SPLIT_ZOUERAT": [
       "AOF"
     ],
     "MR_ADM1_MRT-2784": [
@@ -20377,7 +21166,40 @@
     "NO071": [
       "NOR"
     ],
-    "NO074": [
+    "NO074__SPLIT_DIVIDALEN": [
+      "NOR"
+    ],
+    "NO074__SPLIT_ETELA_VARNANKI": [
+      "NOR"
+    ],
+    "NO074__SPLIT_FINNMARK": [
+      "NOR"
+    ],
+    "NO074__SPLIT_HELLIGSKOGEN": [
+      "NOR"
+    ],
+    "NO074__SPLIT_KUNES": [
+      "NOR"
+    ],
+    "NO074__SPLIT_NORJA": [
+      "NOR"
+    ],
+    "NO074__SPLIT_NYELV": [
+      "NOR"
+    ],
+    "NO074__SPLIT_OLDERDALEN": [
+      "NOR"
+    ],
+    "NO074__SPLIT_TANA": [
+      "NOR"
+    ],
+    "NO074__SPLIT_TROMS": [
+      "NOR"
+    ],
+    "NO074__SPLIT_VAGGE": [
+      "NOR"
+    ],
+    "NO074__SPLIT_VARDO": [
       "NOR"
     ],
     "NO081": [
@@ -22570,7 +23392,16 @@
     "RS127__SPLIT_SYRMIA": [
       "YUG"
     ],
-    "RS211": [
+    "RS211__SPLIT_BRODAREVO": [
+      "YUG"
+    ],
+    "RS211__SPLIT_MOKRA_GORA": [
+      "YUG"
+    ],
+    "RS211__SPLIT_PRIJEPOLJE": [
+      "YUG"
+    ],
+    "RS211__SPLIT_ZLATIBOR": [
       "YUG"
     ],
     "RS212": [
@@ -57130,13 +57961,109 @@
     "SAU-847": [
       "SAU"
     ],
-    "SAU-848": [
+    "SAU-848__SPLIT_BIR_IBN_HIRMAS": [
       "SAU"
     ],
-    "SAU-861": [
+    "SAU-848__SPLIT_DUBA": [
       "SAU"
     ],
-    "SAU-862": [
+    "SAU-848__SPLIT_HALAT_AMMAR": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_MAGNA": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_MEEGOWA": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_NORTH_TABUK": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_OUTER_TAYMA": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_SHUWAQ": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_SOUTH_AL_QALIBAH": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_TABUK": [
+      "SAU"
+    ],
+    "SAU-848__SPLIT_TAYMA": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_ALMSNAH": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_AL_QAISUMAH": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_ARAR": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_EAST_RAFHA": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_HAFAR_AL_BATIN": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_NORTH_HAFAR_AL_BATIN": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_RAFHA": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_RAWDAT_HABBAS": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_SAUDI_NEUTRAL_ZONE": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_SHA_YA": [
+      "SAU"
+    ],
+    "SAU-861__SPLIT_WEST_ALMSNAH": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_ALWASEI": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_AL_JAWF": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_AL_QALIBAH": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_EAST_HAQL": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_HALAT_AMMAR": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_HAQL": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_KAF": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_MAGNA": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_MEEGOWA": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_NORTH_TABUK": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_OUTER_TAYMA": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_SOUTH_AL_QALIBAH": [
+      "SAU"
+    ],
+    "SAU-862__SPLIT_SOUTH_KAF": [
       "SAU"
     ],
     "SAU-885": [
@@ -57268,7 +58195,31 @@
     "SE331": [
       "SWE"
     ],
-    "SE332": [
+    "SE332__SPLIT_HAPARANDA": [
+      "SWE"
+    ],
+    "SE332__SPLIT_LANNAVAARA": [
+      "SWE"
+    ],
+    "SE332__SPLIT_LULEA": [
+      "SWE"
+    ],
+    "SE332__SPLIT_MERKENES": [
+      "SWE"
+    ],
+    "SE332__SPLIT_NORRBOTTEN": [
+      "SWE"
+    ],
+    "SE332__SPLIT_PAJALA": [
+      "SWE"
+    ],
+    "SE332__SPLIT_PITEA": [
+      "SWE"
+    ],
+    "SE332__SPLIT_RITSEM": [
+      "SWE"
+    ],
+    "SE332__SPLIT_VASTERBOTTEN": [
       "SWE"
     ],
     "SGP-4871": [
@@ -57850,10 +58801,73 @@
     "SYR-135": [
       "ALW"
     ],
-    "SYR-136": [
+    "SYR-136__SPLIT_AL_TABQAH": [
       "SYR"
     ],
-    "SYR-137": [
+    "SYR-136__SPLIT_EAST_MANBIJ": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_KOBANE": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_MADAN": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_MANBIJ": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_MARKADAH": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_RAQQA": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_RESAFA": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_SOUTHERN_RAQQA": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_SOUTH_MADAN": [
+      "SYR"
+    ],
+    "SYR-136__SPLIT_SOUTH_MANBIJ": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_ALEPPO": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_AL_BAB": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_AL_SAFIRAH": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_AL_TABQAH": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_ANADAN": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_DABIQ": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_KOBANE": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_MANBIJ": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_RESAFA": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_SOUTH_AL_BAB": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_SOUTH_ANADAN": [
+      "SYR"
+    ],
+    "SYR-137__SPLIT_SOUTH_MANBIJ": [
       "SYR"
     ],
     "SYR-138": [
@@ -57865,10 +58879,79 @@
     "SYR-140": [
       "SYR"
     ],
-    "SYR-141": [
+    "SYR-141__SPLIT_AALOUA": [
       "JAZ"
     ],
-    "SYR-142": [
+    "SYR-141__SPLIT_AL_HASEKE": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_AL_MNAJEER": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_DEIR_EZ_ZOR": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_GER_ZERO": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_NORTH_DEIR_EZ_ZOR": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_RAQQA": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_SOUTH_AALOUA": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_TALL_TAMR": [
+      "JAZ"
+    ],
+    "SYR-141__SPLIT_TAL_ERPHAN": [
+      "JAZ"
+    ],
+    "SYR-142__SPLIT_ABU_HAMAN": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_AL_BUKAMAL": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_AL_MAYADIN": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_AL_MNAJEER": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_AL_TABQAH": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_DEIR_EZ_ZOR": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_EAST_MANBIJ": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_HAJIN": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_MARKADAH": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_NORTH_DEIR_EZ_ZOR": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_RAQQA": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_SOUTHERN_RAQQA": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_SOUTH_AL_BUKAMAL": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_SOUTH_AL_MAYADIN": [
+      "SYR"
+    ],
+    "SYR-142__SPLIT_SOUTH_MADAN": [
       "SYR"
     ],
     "SYR-143": [
@@ -58378,10 +59461,37 @@
     "TR613": [
       "TUR"
     ],
-    "TR621": [
+    "TR621__SPLIT_ADANA": [
       "TUR"
     ],
-    "TR622": [
+    "TR621__SPLIT_ALADAG": [
+      "TUR"
+    ],
+    "TR621__SPLIT_CEYHAN": [
+      "TUR"
+    ],
+    "TR621__SPLIT_FEKE": [
+      "TUR"
+    ],
+    "TR621__SPLIT_KOZAN": [
+      "TUR"
+    ],
+    "TR622__SPLIT_ANAMUR": [
+      "TUR"
+    ],
+    "TR622__SPLIT_BOLKAR": [
+      "TUR"
+    ],
+    "TR622__SPLIT_MERSIN": [
+      "TUR"
+    ],
+    "TR622__SPLIT_MUT": [
+      "TUR"
+    ],
+    "TR622__SPLIT_SILIFKE": [
+      "TUR"
+    ],
+    "TR622__SPLIT_TARSUS": [
       "TUR"
     ],
     "TR631__SPLIT_KESSAB": [
@@ -58393,7 +59503,25 @@
     "TR631__SPLIT_SANJAK": [
       "TUR"
     ],
-    "TR632": [
+    "TR632__SPLIT_AFSIN": [
+      "TUR"
+    ],
+    "TR632__SPLIT_EKINOZU": [
+      "TUR"
+    ],
+    "TR632__SPLIT_ELBISTAN": [
+      "TUR"
+    ],
+    "TR632__SPLIT_GOKSUN": [
+      "TUR"
+    ],
+    "TR632__SPLIT_MARAS": [
+      "TUR"
+    ],
+    "TR632__SPLIT_SATIRHUYUK": [
+      "TUR"
+    ],
+    "TR632__SPLIT_TEKIR": [
       "TUR"
     ],
     "TR633": [
@@ -58564,7 +59692,13 @@
     "TRB14": [
       "TUR"
     ],
-    "TRB21": [
+    "TRB21__SPLIT_BASKALE": [
+      "TUR"
+    ],
+    "TRB21__SPLIT_GEVAS": [
+      "TUR"
+    ],
+    "TRB21__SPLIT_VAN": [
       "TUR"
     ],
     "TRB22": [
@@ -58585,7 +59719,19 @@
     "TRC13": [
       "TUR"
     ],
-    "TRC21": [
+    "TRC21__SPLIT_KECIBURCU": [
+      "TUR"
+    ],
+    "TRC21__SPLIT_SIVEREK": [
+      "TUR"
+    ],
+    "TRC21__SPLIT_SURUC": [
+      "TUR"
+    ],
+    "TRC21__SPLIT_URFA": [
+      "TUR"
+    ],
+    "TRC21__SPLIT_VIRANSEHIR": [
       "TUR"
     ],
     "TRC22": [
