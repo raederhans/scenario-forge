@@ -11,9 +11,8 @@ import {
   refreshUnitCounterPreviewSection,
 } from "./strategic_overlay/unit_counter_render_helpers.js";
 import { patchStrategicOverlayEditorState } from "../../core/state/actions/strategic_overlay_actions.js";
-import { deleteMapLabel, updateMapLabel } from "../../core/renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+import { deleteMapLabel, updateMapLabel, syncMapLabelHandles } from "../../core/map_renderer/public.js";
 import { getLocalizedScenarioCountryName } from "../../core/scenario/scenario_country_display.js";
-import { syncMapLabelHandles } from "../../core/renderer/map_label_handles_owner.js";
 import { loadDefenseLinePresets, buildScenarioDefenseLineEntries } from "../../core/scenario/defense_line_presets.js";
 import { OPERATIONAL_LINE_KIND_LABELS, OPERATION_GRAPHIC_KIND_LABELS } from "./strategic_overlay/type_labels.js";
 

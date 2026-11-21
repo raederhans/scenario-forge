@@ -413,6 +413,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "所有类型",
     "en": "All Types"
   },
+  "All caps": {
+    "zh": "全大写",
+    "en": "All caps"
+  },
   "All mapped parcels": {
     "zh": "全部映射地块",
     "en": "All mapped parcels"
@@ -643,6 +647,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Apply to Selection": {
     "zh": "应用到当前选择",
     "en": "Apply to Selection"
+  },
+  "Apply to labels with this style": {
+    "zh": "应用到所有同预设文字",
+    "en": "Apply to labels with this style"
   },
   "Approximate": {
     "zh": "近似映射",
@@ -2336,6 +2344,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "国家统计专题 · 剧本参考",
     "en": "Country indicators · Scenario reference"
   },
+  "Country name": {
+    "zh": "国名",
+    "en": "Country name"
+  },
   "Country name opacity": {
     "zh": "国名不透明度",
     "en": "Country name opacity"
@@ -3803,9 +3815,17 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "纯蓝模式仅保留干净的海洋底色，不叠加测深效果。",
     "en": "Flat Blue keeps the ocean fill clean with no bathymetry overlay."
   },
+  "Follow style": {
+    "zh": "跟随",
+    "en": "Follow style"
+  },
   "Font size": {
     "zh": "字号",
     "en": "Font size"
+  },
+  "Font weight": {
+    "zh": "字重",
+    "en": "Font weight"
   },
   "For 1936, 1939 and TNO. Detail is restored after navigation.": {
     "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。",
@@ -3829,6 +3849,10 @@ export const UI_COPY_CATALOG = Object.freeze({
       "one": "Found unsaved work from {count} minute ago ({scenario}).",
       "other": "Found unsaved work from {count} minutes ago ({scenario})."
     }
+  },
+  "Freeze visible country names": {
+    "zh": "固定当前视图所有国名",
+    "en": "Freeze visible country names"
   },
   "Frontline": {
     "zh": "前线",
@@ -4542,6 +4566,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "孤立的工业场地",
     "en": "Isolated industrial site"
   },
+  "Italic": {
+    "zh": "斜体",
+    "en": "Italic"
+  },
   "Ivory Night": {
     "zh": "夜色象牙",
     "en": "Ivory Night"
@@ -4957,6 +4985,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Less fields": {
     "zh": "收起字段",
     "en": "Less fields"
+  },
+  "Letter case": {
+    "zh": "大小写",
+    "en": "Letter case"
   },
   "Letter spacing": {
     "zh": "字距",
@@ -6301,6 +6333,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "尚未保存",
     "en": "Not saved yet"
   },
+  "Note": {
+    "zh": "注释",
+    "en": "Note"
+  },
   "Notes": {
     "zh": "说明",
     "en": "Notes"
@@ -6572,6 +6608,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Organization": {
     "zh": "组织",
     "en": "Organization"
+  },
+  "Original case": {
+    "zh": "原样",
+    "en": "Original case"
   },
   "Other": {
     "zh": "其他",
@@ -7872,6 +7912,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "调整交通图层顺序",
     "en": "Reorder transport layers"
   },
+  "Replace automatic country name": {
+    "zh": "作为国名替代",
+    "en": "Replace automatic country name"
+  },
   "Replace with dev selection": {
     "zh": "用开发选择替换",
     "en": "Replace with dev selection"
@@ -8059,6 +8103,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Risky fixes": {
     "zh": "风险修复",
     "en": "Risky fixes"
+  },
+  "River / terrain": {
+    "zh": "河流/地形",
+    "en": "River / terrain"
   },
   "River Stroke": {
     "zh": "河流描边",
@@ -9311,6 +9359,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Single-click: one subdivision | Double-click: province batch": {
     "zh": "单击：单个地块 | 双击：按省级批量",
     "en": "Single-click: one subdivision | Double-click: province batch"
+  },
+  "Size in this view (px)": {
+    "zh": "当前视图字号（px）",
+    "en": "Size in this view (px)"
   },
   "Skip to map workspace": {
     "zh": "跳转到地图工作区",

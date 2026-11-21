@@ -1,5 +1,5 @@
 import { state } from "../../state.js";
-import { normalizeMapLabel } from "../../state/strategic_overlay_state.js";
+import { MAP_LABEL_PRESETS, normalizeMapLabel, replacesCountryLabel } from "../../state/strategic_overlay_state.js";
 import { commitStrategicOverlayCollectionsState, patchStrategicOverlayEditorState } from "../../state/actions/strategic_overlay_actions.js";
 import { captureHistoryState, pushHistoryEntry } from "../../history_manager.js";
 import { markDirty } from "../../dirty_state.js";
@@ -28,10 +28,17 @@ function commitLabels(kind, mapLabels, editorPatch) {
   requestRender(kind);
 }
 
+function labelStyle(label) {
+  const { size, rotation, tracking, uppercase, colorMode, italic, weight, color, opacity, preset } = label;
+  return { size, rotation, tracking, uppercase, colorMode, italic, weight, color, opacity, preset };
+}
+
 export function placeMapLabel(options) {
   const counter = ensureMapLabelCounter();
   const id = `map_label_${counter}`;
-  const label = normalizeMapLabel({ ...options, size: options.size ?? 18 / (state.zoomTransform?.k || 1) }, id);
+  const previous = state.mapLabels.find(label => label.id === state.mapLabelEditor.selectedId) ?? state.mapLabels.at(-1);
+  const style = previous ? labelStyle(previous) : { size: 18 / (state.zoomTransform?.k || 1) };
+  const label = normalizeMapLabel({ ...style, ...options }, id);
   if (!label) return false;
   commitLabels("place-map-label", [...state.mapLabels, label], { active: false, counter: counter + 1, selectedId: id });
   return id;
@@ -47,7 +54,49 @@ function editLabel(kind, id, patch) {
 }
 
 export function updateMapLabel(id, patch) {
+  if (Object.hasOwn(MAP_LABEL_PRESETS, patch.preset)) {
+    patch = { ...MAP_LABEL_PRESETS[patch.preset], colorMode: "auto", opacity: null, uppercase: null, ...patch };
+  }
   return editLabel("edit-map-label", id, patch);
+}
+
+export function applyMapLabelStyleToPreset(id) {
+  const source = state.mapLabels.find(label => label.id === id);
+  if (!source) return false;
+  const style = labelStyle(source);
+  let changed = false;
+  const labels = state.mapLabels.map(label => {
+    if (label.preset !== source.preset || Object.keys(style).every(key => label[key] === style[key])) return label;
+    changed = true;
+    return { ...label, ...style };
+  });
+  if (changed) commitLabels("apply-map-label-style", labels);
+  return changed;
+}
+
+export function freezeCountryLabels(records, projection, getCountryName, code) {
+  const { x, y, k } = state.zoomTransform;
+  let counter = ensureMapLabelCounter();
+  const additions = [];
+  const seen = new Set(state.mapLabels
+    .filter(label => label.countryCode && replacesCountryLabel(label, getCountryName(label.countryCode)))
+    .map(label => label.countryCode));
+  for (const { countryCode, bounds, fontSizePx, angle } of records) {
+    if ((code && countryCode !== code) || seen.has(countryCode)) continue;
+    if (bounds.x + bounds.w < 0 || bounds.y + bounds.h < 0 || bounds.x > state.width || bounds.y > state.height) continue;
+    const point = projection.invert([(bounds.x + bounds.w / 2 - x) / k, (bounds.y + bounds.h / 2 - y) / k]);
+    const label = normalizeMapLabel({ countryCode, fallbackName: getCountryName(countryCode), lon: point?.[0], lat: point?.[1],
+      size: fontSizePx / k / (state.styleConfig?.countryLabels?.sizeScale ?? 1), rotation: angle * 180 / Math.PI }, `map_label_${counter}`);
+    if (!label) continue;
+    seen.add(countryCode);
+    additions.push(label);
+    counter++;
+  }
+  if (!additions.length) return false;
+  commitLabels("freeze-country-labels", [...state.mapLabels, ...additions], {
+    active: false, counter, selectedId: additions[0].id,
+  });
+  return code ? additions[0].id : additions.length;
 }
 
 export function commitMapLabelMove(id, lon, lat) {

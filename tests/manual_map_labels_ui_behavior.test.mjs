@@ -11,7 +11,7 @@ import { createRenderPassSignaturePolicy } from "../js/core/renderer/render_pass
 import { CHINESE_FONT } from "../js/core/renderer/country_label_text_style.js";
 import { bindMapLabelPanel } from "../js/ui/sidebar/strategic_overlay_controller.js";
 
-test("placement consumes the map click, uses effective colors and respects readonly and cancellation", async () => {
+test("placement consumes the map click, leaves notes unbound and respects readonly and cancellation", async () => {
   state.landData = { features: [] };
   state.landIndex = new Map([["land", {}]]);
   state.sovereignBaseColors = { GER: "#123456" };
@@ -46,9 +46,9 @@ test("placement consumes the map click, uses effective colors and respects reado
   assert.equal(state.mapLabelEditor.active, false);
   state.startupReadonly = false;
   state.currentTool = "fill";
-  for (const [scenario, color, targetType, expected] of [
-    ["example", "#123456", "land", "GER"], ["example", "#fedcba", "land", ""],
-    ["example", "#123456", "water", ""], ["", "#123456", "land", "GER"], ["", "#fedcba", "land", ""],
+  for (const [scenario, color, targetType] of [
+    ["example", "#123456", "land"], ["example", "#fedcba", "land"],
+    ["example", "#123456", "water"], ["", "#123456", "land"], ["", "#fedcba", "land"],
   ]) {
     state.activeScenarioId = scenario;
     if (!scenario) state.scenarioCountriesByTag = {};
@@ -59,7 +59,7 @@ test("placement consumes the map click, uses effective colors and respects reado
     await click.handleClick({});
     assert.equal(state.mapLabels.length, count + 1);
     const label = state.mapLabels.at(-1);
-    assert.equal(label.countryCode, expected);
+    assert.equal(label.countryCode, "");
     assert.equal(label.text, "");
     assert.equal(label.size, 9);
     assert.deepEqual(state.visualOverrides, { land: color });
