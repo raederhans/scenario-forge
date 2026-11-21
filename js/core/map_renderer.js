@@ -252,6 +252,8 @@ import { isScenarioStrategicValuesUsable } from "./scenario/strategic_values.js"
 import { createColorResolutionStrategyOwner, isColorResolutionOceanFeature } from "./renderer/color_resolution_strategy.js";
 import { createStrategicOverlayHelpersOwner } from "./renderer/strategic_overlay_helpers.js";
 import { createStrategicOverlayRenderOwner } from "./renderer/strategic_overlay_render_owner.js";
+import { freezeCountryLabels } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+export { syncMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { renderMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
 import { createPoliticalCollectionOwner } from "./renderer/political_collection_owner.js";
@@ -9948,7 +9950,14 @@ async function ensureCountryLabelsReadyForExport(passNames) { return labelsRunti
 
 // Labels placed by the last full labels pass that touch the visible viewport:
 // city IDs and country codes. Off-screen paint margins are excluded.
-export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+export function convertCountryLabelToMapLabel(code) {
+  if (!code) return false;
+  return freezeCountryLabels(labelsRuntime.getLastCountryLabels(), rendererSurfaceHost.getProjection(), labelsRuntime.getCountryName, code);
+}
+export function freezeVisibleCountryLabels() {
+  return freezeCountryLabels(labelsRuntime.getLastCountryLabels(), rendererSurfaceHost.getProjection(), labelsRuntime.getCountryName);
+}
+export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove, applyMapLabelStyleToPreset } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
 export function getPlacedMapLabels() { return labelsRuntime.getPlacedMapLabels(); }
 export function getVisibleMapLabels() { return labelsRuntime.getVisibleMapLabels(); }
 export function getCountryLabelStatus(code) { return labelsRuntime.getCountryLabelStatus(code); }

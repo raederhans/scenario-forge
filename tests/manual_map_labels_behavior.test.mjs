@@ -12,7 +12,7 @@ test("placed labels keep independent reversible history and avoid imported ids",
   const snapshots = [state.mapLabels];
   const id = placeMapLabel({ lon: 2, lat: 4, countryCode: "ger" });
   assert.equal(id, "map_label_9");
-  assert.equal(state.mapLabels[1].size, 6);
+  assert.equal(state.mapLabels[1].size, state.mapLabels[0].size);
   snapshots.push(state.mapLabels);
   assert.equal(updateMapLabel(id, { text: "New" }), true);
   snapshots.push(state.mapLabels);
@@ -43,13 +43,13 @@ test("manual lettering rotates multiline text and reserves each painted line", (
   const label = normalizeMapLabel({ text: "测试\nMap", lon: 4, lat: 5, size: 12, rotation: 90 }, "map_label_1");
   const occupiedBoxes = [];
   const draw = k => drawManualMapLabels({ state: { mapLabels: [label] }, ctx,
-    requestChineseTextGlyphs: titles => assert.deepEqual(titles, ["测试\nMAP"]),
+    requestChineseTextGlyphs: titles => assert.deepEqual(titles, ["测试\nMap"]),
     projection: point => point, k, occupiedBoxes });
   assert.equal(draw(0.5).size, 0);
   assert.deepEqual(paints, []);
-  assert.equal(draw(20).size, 1);
+  assert.equal(draw(8).size, 1);
   assert.deepEqual(paints.map(([type, text]) => [type, text]), [
-    ["stroke", "测试"], ["fill", "测试"], ["stroke", "MAP"], ["fill", "MAP"],
+    ["stroke", "测试"], ["fill", "测试"], ["stroke", "Map"], ["fill", "Map"],
   ]);
   assert.match(paints[0][2], /400 12px "Map Noto Serif SC"/);
   assert.equal(ctx.letterSpacing, "1.44px");

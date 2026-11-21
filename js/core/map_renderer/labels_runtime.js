@@ -741,6 +741,8 @@ export function createLabelsRuntime({
     getEffectiveCityCollection,
     ensureCountryLabelsReadyForExport,
     getVisibleMapLabels,
+    getLastCountryLabels: () => lastCountryLabels,
+    getCountryName,
     getCountryLabelStatus,
     getCountryLabelReadiness,
     getCountryLabelSuppressionSignature,

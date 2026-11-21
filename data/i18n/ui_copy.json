@@ -12496,5 +12496,57 @@
   "This browser cannot read the project ZIP. Open the editable JSON file instead.": {
     "en": "This browser cannot read the project ZIP. Open the editable JSON file instead.",
     "zh": "当前浏览器无法读取项目压缩包，请打开其中可编辑的 JSON 文件。"
+  },
+  "All caps": {
+    "en": "All caps",
+    "zh": "全大写"
+  },
+  "Apply to labels with this style": {
+    "en": "Apply to labels with this style",
+    "zh": "应用到所有同预设文字"
+  },
+  "Replace automatic country name": {
+    "en": "Replace automatic country name",
+    "zh": "作为国名替代"
+  },
+  "Country name": {
+    "en": "Country name",
+    "zh": "国名"
+  },
+  "River / terrain": {
+    "en": "River / terrain",
+    "zh": "河流/地形"
+  },
+  "Note": {
+    "en": "Note",
+    "zh": "注释"
+  },
+  "Letter case": {
+    "en": "Letter case",
+    "zh": "大小写"
+  },
+  "Follow style": {
+    "en": "Follow style",
+    "zh": "跟随"
+  },
+  "Original case": {
+    "en": "Original case",
+    "zh": "原样"
+  },
+  "Italic": {
+    "en": "Italic",
+    "zh": "斜体"
+  },
+  "Font weight": {
+    "en": "Font weight",
+    "zh": "字重"
+  },
+  "Freeze visible country names": {
+    "en": "Freeze visible country names",
+    "zh": "固定当前视图所有国名"
+  },
+  "Size in this view (px)": {
+    "en": "Size in this view (px)",
+    "zh": "当前视图字号（px）"
   }
 }

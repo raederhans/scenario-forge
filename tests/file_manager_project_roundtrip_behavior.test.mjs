@@ -53,7 +53,8 @@ test("project name survives import and save while the source filename stays loca
 
 test("project round trip preserves manual lettering and discards invalid coordinates", async () => {
   const label = { id: "map_label_9", text: "Title", countryCode: "GER", fallbackName: "Germany",
-    lon: 2.5, lat: -10, size: 7.1, rotation: 24, tracking: 0.2, uppercase: false, colorMode: "light" };
+    lon: 2.5, lat: -10, size: 7.1, rotation: 24, tracking: 0.2, uppercase: false, colorMode: "light",
+    italic: true, weight: 600, color: "#123abc", opacity: 0, preset: "sea", replaceCountryName: false };
   const payload = await exportProjectPayload({ mapLabels: [label, { lon: null, lat: 0 }],
     styleConfig: {}, annotationView: { showMapLabels: false } });
   assert.deepEqual(payload.mapLabels, [label]);
