@@ -61,9 +61,18 @@ export function createFillTargetPolicy(runtimeState, {
     return hierarchy.resolve(feature, featureId, scope, seedColor);
   }
 
-  function buildDoubleClickBatchPlan(feature, featureId, seedColor) {
+  function unprotectedIds(ids) {
+    return runtimeState.onlyUnpainted ? ids.filter(id => !Object.hasOwn(runtimeState.visualOverrides || {}, id)) : ids;
+  }
+
+  function getGestureScope(event) {
+    if (event?.shiftKey) return "country";
+    if (runtimeState.brushPanModifierActive) return "parent";
+    return normalizeQuickFillScope(runtimeState.batchFillScope);
+  }
+
+  function buildDoubleClickBatchPlan(feature, featureId, requestedScope = normalizeQuickFillScope(runtimeState.batchFillScope), seedColor) {
     if (!isBatchFillDoubleClickBaseEligible({ id: featureId }, feature)) return null;
-    const requestedScope = normalizeQuickFillScope(runtimeState.batchFillScope);
     let resolution = resolveQuickFillPlan(feature, featureId, requestedScope, seedColor);
     let fallbackToCountry = false;
     if (requestedScope === "parent" && resolution.status === "no_parent_level") {
@@ -72,11 +81,13 @@ export function createFillTargetPolicy(runtimeState, {
     }
     if (resolution.status !== "ready" || !resolution.targetIds.length) return null;
     const country = requestedScope === "country" || fallbackToCountry;
+    const targetIds = unprotectedIds(resolution.targetIds);
     return {
-      targetIds: resolution.targetIds,
+      targetIds,
+      ...(resolution.visibleColorFallback ? { visibleColorFallback: true } : {}),
+      ...(runtimeState.onlyUnpainted ? { skippedCount: resolution.targetIds.length - targetIds.length } : {}),
       kind: country ? "fill-country-batch" : "fill-parent-group",
       dirtyReason: country ? "fill-country-batch" : "fill-parent-group",
-      ...(resolution.visibleColorFallback ? { visibleColorFallback: true } : {}),
       fallbackToCountry,
       groupLabel: requestedScope === "color"
         ? t(resolution.visibleColorFallback ? "Matching parcels in view" : "Connected parcels of the same color", "ui")
@@ -84,10 +95,10 @@ export function createFillTargetPolicy(runtimeState, {
     };
   }
 
-  function isDoubleClickBatchEligible(hit, feature) {
+  function isDoubleClickBatchEligible(hit, feature, event) {
     if (!isBatchFillDoubleClickBaseEligible(hit, feature)) return false;
-    return !!buildDoubleClickBatchPlan(feature, hit.id);
+    return !!buildDoubleClickBatchPlan(feature, hit.id, getGestureScope(event));
   }
 
-  return Object.freeze({ resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isBatchFillDoubleClickBaseEligible, isDoubleClickBatchEligible });
+  return Object.freeze({ getGestureScope, unprotectedIds, resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isBatchFillDoubleClickBaseEligible, isDoubleClickBatchEligible });
 }

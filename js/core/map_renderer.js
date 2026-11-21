@@ -74,7 +74,7 @@ import { pageResourceBudget } from "./runtime_resource_budget.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
 import { createBorderMeshWorkerClient } from "./border_mesh_worker_client.js";
 import { getProjectionGeometryGeneration } from "./renderer/projection_geometry_identity.js";
-import { createBrushInteractionSessionOwner } from "./renderer/brush_interaction_session_owner.js";
+import { isBrushPanGesture, createBrushInteractionSessionOwner } from "./renderer/brush_interaction_session_owner.js";
 import { createPhysicalIntensityPreviewOwner } from "./renderer/physical_intensity_preview_owner.js";
 import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
 import { createScenarioRegionOverlayRenderOwner } from "./renderer/scenario_region_overlay_render_owner.js";
@@ -12604,7 +12604,7 @@ function resolveInteractionTargetIds(feature, id) {
 }
 
 function isBrushNavigationModifier(event) {
-  return !!(runtimeState.brushModeEnabled && event?.shiftKey);
+  return isBrushPanGesture(runtimeState, event);
 }
 
 function shouldAllowZoomEvent(event) {
@@ -12630,14 +12630,15 @@ function resolveSpecialZoneParentGroupTargetIds(featureId) {
   return getFillTargetPolicy().resolveSpecialZoneParentGroupTargetIds(featureId);
 }
 
-function isDoubleClickBatchEligible(hit, feature) {
-  return getFillTargetPolicy().isDoubleClickBatchEligible(hit, feature);
+function isDoubleClickBatchEligible(hit, feature, event) {
+  return getFillTargetPolicy().isDoubleClickBatchEligible(hit, feature, event);
 }
 
 let lastQuickFillLeafClick = null;
 function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind, gesture = null } = {}) {
   const actionStart = nowMs();
-  const resolvedIds = normalizeFeatureOverrideTargetIds(targetIds);
+  if (gesture?.type === "leaf-click") lastQuickFillLeafClick = null;
+  const resolvedIds = getFillTargetPolicy().unprotectedIds(normalizeFeatureOverrideTargetIds(targetIds));
   if (!resolvedIds.length) return false;
   const color = getSafeCanvasColor(selectedColor, LAND_FILL_COLOR);
   const historyGesture = gesture ? { ...gesture, color, scenarioId: String(runtimeState.activeScenarioId || "") } : null;
@@ -12692,17 +12693,18 @@ function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-regi
   return true;
 }
 
-function executeDoubleClickBatchFill(feature, featureId, event = null) {
+function executeDoubleClickBatchFill(feature, featureId, event, scope) {
   if (!feature || !featureId) return false;
   const leadingClick = lastQuickFillLeafClick;
   lastQuickFillLeafClick = null;
   const seedColor = leadingClick?.featureId === featureId && leadingClick.scenarioId === String(runtimeState.activeScenarioId || "")
     ? leadingClick.seedColor : undefined;
-  const plan = getFillTargetPolicy().buildDoubleClickBatchPlan(feature, featureId, seedColor);
-  if (!plan?.targetIds?.length) {
+  const policy = getFillTargetPolicy();
+  const plan = policy.buildDoubleClickBatchPlan(feature, featureId, scope, seedColor);
+  if (!plan) {
     if (runtimeState.currentTool === "fill"
         && runtimeState.interactionGranularity === "subdivision" && !runtimeState.brushModeEnabled) {
-      const resolution = getFillTargetPolicy().resolveQuickFillPlan(feature, featureId);
+      const resolution = policy.resolveQuickFillPlan(feature, featureId, scope, seedColor);
       const zh = String(runtimeState.currentLanguage || "en").startsWith("zh");
       const message = resolution.status === "loading"
         ? (zh ? "分组成员尚未完整加载，批量填色未执行。请启用细节层后重试。" : "Group members are not fully loaded. Batch fill was not applied; enable the detail layer and retry.")
@@ -12716,6 +12718,8 @@ function executeDoubleClickBatchFill(feature, featureId, event = null) {
   if (plan.visibleColorFallback) {
     showToast(t("Adjacency unavailable. Filling matching parcels in the current view.", "ui"), { tone: "info" });
   }
+  // 「只涂未涂过的地块」把目标全部跳过时，不再落色。
+  if (!plan.targetIds.length) return false;
   if (plan.fallbackToCountry) {
     showDetailPromotionToast("No parent group was available here. Double-click fell back to country fill.", {
       title: "Quick fill scope",
@@ -12824,7 +12828,8 @@ function applyBrushHit(hit) {
   const selectedColor = getSafeCanvasColor(runtimeState.selectedColor, LAND_FILL_COLOR);
 
   if (runtimeState.currentTool === "eyedropper") return false;
-  const freshIds = targetIds.filter((targetId) => !brushSession.visitedFeatureIds.has(targetId));
+  const paintIds = runtimeState.currentTool === "eraser" ? targetIds : getFillTargetPolicy().unprotectedIds(targetIds);
+  const freshIds = paintIds.filter((targetId) => !brushSession.visitedFeatureIds.has(targetId));
   if (!freshIds.length) return false;
   mergeHistorySnapshot(brushSession.before, captureHistoryState({ featureIds: freshIds }));
   freshIds.forEach((targetId) => {
@@ -12870,6 +12875,7 @@ async function handleDoubleClick(event, _interactionContext = null) {
 }
 
 async function fillFromDoubleClick(event) {
+  const scope = getFillTargetPolicy().getGestureScope(event);
   const actionStart = nowMs();
   if (!runtimeState.landData) return;
   if (event?.preventDefault) event.preventDefault();
@@ -12902,7 +12908,7 @@ async function fillFromDoubleClick(event) {
       countryCode = refreshedHit.countryCode || getFeatureCountryCodeNormalized(feature);
     }
   }
-  executeDoubleClickBatchFill(feature, featureId, event);
+  executeDoubleClickBatchFill(feature, featureId, event, scope);
   noteRenderAction("double-click-fill", actionStart);
 }
 
@@ -12999,6 +13005,7 @@ function initMap({
   getRendererSurfaceLifecycleOwner().resolveDomHandles({ containerId });
   getFacilityInteractionRuntime().resolveDomHandles();
   runtimeState.refreshColorStateFn = refreshColorState;
+  registerRuntimeHook(runtimeState, "cancelBrushStrokeFn", cancelBrushSession);
   registerRuntimeHook(runtimeState, "stepUpInspectorSelectionFn", stepUpInspectorSelection);
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);

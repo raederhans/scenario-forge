@@ -93,7 +93,9 @@ export function createMapInteractionEventBindingOwner({
     interactionRect.on("pointerdown.fieldTool", handlePointerDown);
     interactionRect.on("pointermove.fieldTool", handlePointerMove);
     interactionRect.on("mousedown.brush", requireFunction(handlers, "handleBrushPointerDown"));
-    interactionRect.on("mousemove.brush", requireFunction(handlers, "handleBrushPointerMove"));
+    interactionRect.on("pointermove.brush", (event) => {
+      if (event.pointerType === "mouse") handlers.handleBrushPointerMove(event);
+    });
     interactionRect.on("mouseleave", requireFunction(handlers, "handleMouseLeave"));
     interactionRect.on("click", requireFunction(handlers, "mapClick"));
     interactionRect.on("dblclick", requireFunction(handlers, "mapDoubleClick"));

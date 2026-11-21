@@ -469,7 +469,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
 
     const selectedColor = getSafeCanvasColor(state.selectedColor, landFillColor);
     const clickCount = Math.max(1, Number(event?.detail || 1));
-    if (!countryScope && clickCount >= 2 && isDoubleClickBatchEligible(landHit, feature)) {
+    if (!countryScope && clickCount >= 2 && isDoubleClickBatchEligible(landHit, feature, event)) {
       return;
     }
     setClickSelectedColor(selectedColor);

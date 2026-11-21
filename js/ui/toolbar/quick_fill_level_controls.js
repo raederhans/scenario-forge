@@ -42,6 +42,13 @@ export function getQuickFillLevelModel(state) {
       : "Single-click paints one leaf; double-click uses the selected level. Geographic groups are not historical administration. Missing or unverified groups never expand the fill scope." };
 }
 
+export function getNextQuickFillLevel(state) {
+  const model = getQuickFillLevelModel(state);
+  const levels = model.options.filter(option => !option.disabled);
+  const current = levels.findIndex(option => option.value === model.selected);
+  return levels[(current + 1) % levels.length];
+}
+
 export function createQuickFillLevelControls({ state, container, onChange }) {
   let select = null;
   let signature = "";

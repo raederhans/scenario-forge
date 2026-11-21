@@ -12222,5 +12222,43 @@
   "Could not copy image. Check clipboard permissions or download the snapshot.": {
     "en": "Could not copy image. Check clipboard permissions or download the snapshot.",
     "zh": "无法复制图片。请检查剪贴板权限，或下载快照。"
+  },
+  "Clear {count} manually painted regions and reset country colors?": {
+    "en": {
+      "one": "Clear {count} manually painted region and reset country colors?",
+      "other": "Clear {count} manually painted regions and reset country colors?"
+    },
+    "zh": "将清除 {count} 块手涂颜色并重设国家配色，是否继续？"
+  },
+  "Auto-fill also resets the ocean color. You can undo this from history.": {
+    "en": "Auto-fill also resets the ocean color. You can undo this from history.",
+    "zh": "自动填色还会重设海洋颜色。可从历史记录撤销。"
+  },
+  "Map auto-filled.": {
+    "en": "Map auto-filled.",
+    "zh": "已自动填色。"
+  },
+  "Newer edits prevent undoing auto-fill.": {
+    "en": "Newer edits prevent undoing auto-fill.",
+    "zh": "已有后续编辑，无法直接撤销这次自动填色。"
+  },
+  "Drag with two fingers to pan": {
+    "en": "Drag with two fingers to pan",
+    "zh": "双指拖动平移"
+  },
+  "Paint only unpainted regions": {
+    "en": "Paint only unpainted regions",
+    "zh": "只涂未涂过的地块"
+  },
+  "Shift + double-click: country. Space + double-click: parent. G: next level.": {
+    "en": "Shift + double-click: country. Space + double-click: parent. G: next level.",
+    "zh": "Shift + 双击填整国，空格 + 双击填上级区域，G 切换层级。"
+  },
+  "Skipping {count} painted regions": {
+    "en": {
+      "one": "Skipping {count} painted region",
+      "other": "Skipping {count} painted regions"
+    },
+    "zh": "将跳过 {count} 块已涂地块"
   }
 }
