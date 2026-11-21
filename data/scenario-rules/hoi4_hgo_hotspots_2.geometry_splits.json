@@ -1,0 +1,2775 @@
+{
+  "version": 1,
+  "scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "area_tolerance_degrees2": 1e-09,
+  "entries": [
+    {
+      "id": "ITH42",
+      "feature_ids": [
+        "ITH42"
+      ],
+      "parts": [
+        {
+          "suffix": "FRIULI",
+          "name_en": "Codroipo",
+          "name_zh": "科德罗伊波",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_809"
+            ]
+          }
+        },
+        {
+          "suffix": "TARVISIO",
+          "name_en": "Tarvisio",
+          "name_zh": "塔尔维西奥",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_1309"
+            ]
+          }
+        },
+        {
+          "suffix": "GORIZIA",
+          "name_en": "Manzano",
+          "name_zh": "曼扎诺",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_2284"
+            ]
+          }
+        },
+        {
+          "suffix": "NORTH_GORIZIA",
+          "name_en": "Cividale del Friuli",
+          "name_zh": "奇维达莱德尔弗留利",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_3534"
+            ]
+          }
+        },
+        {
+          "suffix": "VALBRUNA",
+          "name_en": "Valbruna",
+          "name_zh": "瓦尔布鲁纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_5942"
+            ]
+          }
+        },
+        {
+          "suffix": "DOGNA",
+          "name_en": "Dogna",
+          "name_zh": "多尼亚",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_5943"
+            ]
+          }
+        },
+        {
+          "suffix": "AUPA",
+          "name_en": "Aupa",
+          "name_zh": "奥帕",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_5944"
+            ]
+          }
+        },
+        {
+          "suffix": "MARANO_LAGUNARE",
+          "name_en": "San Giorgio di Nogaro",
+          "name_zh": "圣乔尔焦迪诺加罗",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_7548"
+            ]
+          }
+        },
+        {
+          "suffix": "POCENIA",
+          "name_en": "Marano Lagunare",
+          "name_zh": "马拉诺拉古纳雷",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_7549"
+            ]
+          }
+        },
+        {
+          "suffix": "MORTEGLIANO",
+          "name_en": "Osoppo",
+          "name_zh": "奥索波",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_7550"
+            ]
+          }
+        },
+        {
+          "suffix": "VKENTZI",
+          "name_en": "Cave del Predil",
+          "name_zh": "卡韦德尔普雷迪尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH42_7551"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "NORTH_FRIULI",
+        "name_en": "Udine",
+        "name_zh": "乌迪内",
+        "full_name": true
+      }
+    },
+    {
+      "id": "ITH41",
+      "feature_ids": [
+        "ITH41"
+      ],
+      "parts": [
+        {
+          "suffix": "FRIULI",
+          "name_en": "Pordenone",
+          "name_zh": "波代诺内",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ITH41_809"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "NORTH_FRIULI",
+        "name_en": "Maniago",
+        "name_zh": "马尼亚戈",
+        "full_name": true
+      }
+    },
+    {
+      "id": "AT113",
+      "feature_ids": [
+        "AT113"
+      ],
+      "parts": [
+        {
+          "suffix": "BURGENLAND",
+          "name_en": "Oberwart",
+          "name_zh": "上瓦特",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "AT113_793"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SZOMBATHELY",
+        "name_en": "Güssing",
+        "name_zh": "居辛",
+        "full_name": true
+      }
+    },
+    {
+      "id": "AT112",
+      "feature_ids": [
+        "AT112"
+      ],
+      "parts": [
+        {
+          "suffix": "SOPRON",
+          "name_en": "Loipersbach im Burgenland",
+          "name_zh": "布尔根兰州洛伊珀斯巴赫",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "AT112_2471"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "NORTH_BURGENLAND",
+        "name_en": "Eisenstadt",
+        "name_zh": "艾森斯塔特",
+        "full_name": true
+      }
+    },
+    {
+      "id": "HU221",
+      "feature_ids": [
+        "HU221"
+      ],
+      "parts": [
+        {
+          "suffix": "SOPRON",
+          "name_en": "Sopron",
+          "name_zh": "肖普朗",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU221_2471"
+            ]
+          }
+        },
+        {
+          "suffix": "ABDA",
+          "name_en": "Abda",
+          "name_zh": "奥布道",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU221_7400"
+            ]
+          }
+        },
+        {
+          "suffix": "VAMOSSZABADI",
+          "name_en": "Győr",
+          "name_zh": "杰尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU221_7641"
+            ]
+          }
+        },
+        {
+          "suffix": "TET",
+          "name_en": "Tet",
+          "name_zh": "泰特",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU221_7948"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "FERTOD",
+        "name_en": "Mosonmagyarovar",
+        "name_zh": "莫雄马扎尔古堡",
+        "full_name": true
+      }
+    },
+    {
+      "id": "HU222",
+      "feature_ids": [
+        "HU222"
+      ],
+      "parts": [
+        {
+          "suffix": "SZOMBATHELY",
+          "name_en": "Sarvar",
+          "name_zh": "沙尔堡",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU222_4826"
+            ]
+          }
+        },
+        {
+          "suffix": "ZALALOVO",
+          "name_en": "Zalalovo",
+          "name_zh": "佐洛勒沃",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU222_7639"
+            ]
+          }
+        },
+        {
+          "suffix": "KAM",
+          "name_en": "Szombathely",
+          "name_zh": "松博特海伊",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU222_7950"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "VASVAR",
+        "name_en": "Vasvar",
+        "name_zh": "沃什堡",
+        "full_name": true
+      }
+    },
+    {
+      "id": "HU331",
+      "feature_ids": [
+        "HU331"
+      ],
+      "parts": [
+        {
+          "suffix": "BACS_KISKUN",
+          "name_en": "Kiskunfelegyhaza",
+          "name_zh": "基什孔费莱吉哈佐",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU331_801"
+            ]
+          }
+        },
+        {
+          "suffix": "BAJA",
+          "name_en": "Baja",
+          "name_zh": "鲍姚",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU331_2207"
+            ]
+          }
+        },
+        {
+          "suffix": "REM",
+          "name_en": "Kiskunhalas",
+          "name_zh": "基什孔豪洛什",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU331_7990"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "KECSKEMET",
+        "name_en": "Kecskemet",
+        "name_zh": "凯奇凯梅特",
+        "full_name": true
+      }
+    },
+    {
+      "id": "RS123",
+      "feature_ids": [
+        "RS123"
+      ],
+      "parts": [
+        {
+          "suffix": "SYRMIA",
+          "name_en": "Titel",
+          "name_zh": "蒂特尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS123_814"
+            ]
+          }
+        },
+        {
+          "suffix": "ILOK",
+          "name_en": "Backa Palanka",
+          "name_zh": "巴奇卡帕兰卡",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS123_7372"
+            ]
+          }
+        },
+        {
+          "suffix": "TEMERIN",
+          "name_en": "Vrbas",
+          "name_zh": "弗尔巴斯",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS123_7383"
+            ]
+          }
+        },
+        {
+          "suffix": "KULA",
+          "name_en": "Bač",
+          "name_zh": "巴奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS123_7385"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "BECEJ",
+        "name_en": "Novi Sad",
+        "name_zh": "诺维萨德",
+        "full_name": true
+      }
+    },
+    {
+      "id": "RS121",
+      "feature_ids": [
+        "RS121"
+      ],
+      "parts": [
+        {
+          "suffix": "OSIJEK",
+          "name_en": "Apatin",
+          "name_zh": "阿帕廷",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS121_818"
+            ]
+          }
+        },
+        {
+          "suffix": "KULA",
+          "name_en": "Kula",
+          "name_zh": "库拉",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS121_7385"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SOMBOR",
+        "name_en": "Sombor",
+        "name_zh": "松博尔",
+        "full_name": true
+      }
+    },
+    {
+      "id": "HR025",
+      "feature_ids": [
+        "HR025"
+      ],
+      "parts": [
+        {
+          "suffix": "VINKOVCI",
+          "name_en": "South Osijek",
+          "name_zh": "南奥西耶克",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HR025_3201"
+            ]
+          }
+        },
+        {
+          "suffix": "SARVAS",
+          "name_en": "Sarvas",
+          "name_zh": "萨尔瓦什",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HR025_5041"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "OSIJEK",
+        "name_en": "North Osijek",
+        "name_zh": "北奥西耶克",
+        "full_name": true
+      }
+    },
+    {
+      "id": "HR026",
+      "feature_ids": [
+        "HR026"
+      ],
+      "parts": [
+        {
+          "suffix": "OTOK",
+          "name_en": "Otok",
+          "name_zh": "奥托克",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HR026_1212"
+            ]
+          }
+        },
+        {
+          "suffix": "VUKOVAR",
+          "name_en": "Vukovar",
+          "name_zh": "武科瓦尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HR026_5040"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "VINKOVCI",
+        "name_en": "Vinkovci",
+        "name_zh": "温科夫齐",
+        "full_name": true
+      }
+    },
+    {
+      "id": "RS127",
+      "feature_ids": [
+        "RS127"
+      ],
+      "parts": [
+        {
+          "suffix": "JAMENA",
+          "name_en": "Jamena",
+          "name_zh": "亚梅纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS127_7375"
+            ]
+          }
+        },
+        {
+          "suffix": "KUSMIN",
+          "name_en": "Kuzmin",
+          "name_zh": "库兹明",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS127_7376"
+            ]
+          }
+        },
+        {
+          "suffix": "SREMSKA_MITROVICA",
+          "name_en": "West Sremska Mitrovica",
+          "name_zh": "西斯雷姆斯卡米特罗维察",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS127_7377"
+            ]
+          }
+        },
+        {
+          "suffix": "IRIG",
+          "name_en": "East Sremska Mitrovica",
+          "name_zh": "东斯雷姆斯卡米特罗维察",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS127_7378"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SYRMIA",
+        "name_en": "Ruma",
+        "name_zh": "鲁马",
+        "full_name": true
+      }
+    },
+    {
+      "id": "SK_ADM2_56367889B4918056975771",
+      "feature_ids": [
+        "SK_ADM2_56367889B4918056975771"
+      ],
+      "parts": [
+        {
+          "suffix": "SOUTH_NYITRA",
+          "name_en": "South Nyitra",
+          "name_zh": "南尼特拉",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "SK_ADM2_56367889B4918056975771_1213"
+            ]
+          }
+        },
+        {
+          "suffix": "SAFA",
+          "name_en": "South Šaľa",
+          "name_zh": "南沙拉",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "SK_ADM2_56367889B4918056975771_7395"
+            ]
+          }
+        },
+        {
+          "suffix": "GALANTA",
+          "name_en": "Selice",
+          "name_zh": "塞利采",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "SK_ADM2_56367889B4918056975771_7396"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "WESTERN_SLOVAKIA",
+        "name_en": "North Šaľa",
+        "name_zh": "北沙拉",
+        "full_name": true
+      }
+    },
+    {
+      "id": "SK_ADM2_56367889B15407569919112",
+      "feature_ids": [
+        "SK_ADM2_56367889B15407569919112"
+      ],
+      "parts": [
+        {
+          "suffix": "PODHAJSKA",
+          "name_en": "Želiezovce",
+          "name_zh": "热列佐夫采",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "SK_ADM2_56367889B15407569919112_7392"
+            ]
+          }
+        },
+        {
+          "suffix": "SURANY",
+          "name_en": "Tekovské Lužany",
+          "name_zh": "泰科夫斯凯卢扎尼",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "SK_ADM2_56367889B15407569919112_7393"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "LEVICE",
+        "name_en": "Levice",
+        "name_zh": "莱维采",
+        "full_name": true
+      }
+    },
+    {
+      "id": "HU311",
+      "feature_ids": [
+        "HU311"
+      ],
+      "parts": [
+        {
+          "suffix": "CIGAND",
+          "name_en": "Tiszaujvaros",
+          "name_zh": "蒂萨新城",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU311_6019"
+            ]
+          }
+        },
+        {
+          "suffix": "HRAN",
+          "name_en": "Satoraljaujhely",
+          "name_zh": "沙托劳尔尧乌伊海伊",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU311_7975"
+            ]
+          }
+        },
+        {
+          "suffix": "MISKOLC",
+          "name_en": "Encs",
+          "name_zh": "恩奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU311_7983"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "MEZOKOVESD",
+        "name_en": "Miskolc",
+        "name_zh": "米什科尔茨",
+        "full_name": true
+      }
+    },
+    {
+      "id": "HU323",
+      "feature_ids": [
+        "HU323"
+      ],
+      "parts": [
+        {
+          "suffix": "NYIREGYHAZA",
+          "name_en": "Nyiregyhaza",
+          "name_zh": "尼赖吉哈佐",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU323_4824"
+            ]
+          }
+        },
+        {
+          "suffix": "CIGAND",
+          "name_en": "Kemecse",
+          "name_zh": "凯梅切",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "HU323_6019"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SZATMARCSEKE",
+        "name_en": "Mateszalka",
+        "name_zh": "马泰绍尔考",
+        "full_name": true
+      }
+    },
+    {
+      "id": "LV005",
+      "feature_ids": [
+        "LV005"
+      ],
+      "parts": [
+        {
+          "suffix": "LATGALE",
+          "name_en": "Viļāni",
+          "name_zh": "维利亚尼",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_992"
+            ]
+          }
+        },
+        {
+          "suffix": "ZEMGALE",
+          "name_en": "Subate",
+          "name_zh": "苏巴特",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_993"
+            ]
+          }
+        },
+        {
+          "suffix": "ZILUPE",
+          "name_en": "Zilupe",
+          "name_zh": "济卢佩",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_1284"
+            ]
+          }
+        },
+        {
+          "suffix": "SKRUDALIENA",
+          "name_en": "Skrudaliena",
+          "name_zh": "斯克鲁达列纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_1293"
+            ]
+          }
+        },
+        {
+          "suffix": "DAUGAVPILS",
+          "name_en": "Daugavpils",
+          "name_zh": "陶格夫匹尔斯",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_3542"
+            ]
+          }
+        },
+        {
+          "suffix": "JEKABPILS",
+          "name_en": "Līvāni",
+          "name_zh": "利瓦尼",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_4847"
+            ]
+          }
+        },
+        {
+          "suffix": "BALVI",
+          "name_en": "Viļaka",
+          "name_zh": "维利亚卡",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_4849"
+            ]
+          }
+        },
+        {
+          "suffix": "REZEKNE",
+          "name_en": "West Rezekne",
+          "name_zh": "西雷泽克内",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_5777"
+            ]
+          }
+        },
+        {
+          "suffix": "REZEKNE_5789",
+          "name_en": "East Rezekne",
+          "name_zh": "东雷泽克内",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_5789"
+            ]
+          }
+        },
+        {
+          "suffix": "TILZA",
+          "name_en": "Tilza",
+          "name_zh": "蒂尔扎",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "LV005_5790"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "KRASLAVA",
+        "name_en": "Kraslava",
+        "name_zh": "克拉斯拉瓦",
+        "full_name": true
+      }
+    },
+    {
+      "id": "BY_INT_BREST",
+      "feature_ids": [
+        "BY_INT_BREST"
+      ],
+      "parts": [
+        {
+          "suffix": "POLESIE",
+          "name_en": "Kobryn",
+          "name_zh": "科布林",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_94"
+            ]
+          }
+        },
+        {
+          "suffix": "NOWOGRODEK",
+          "name_en": "Baranavichy",
+          "name_zh": "巴拉诺维奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_95"
+            ]
+          }
+        },
+        {
+          "suffix": "NORTH_PINSK",
+          "name_en": "Ivanovo",
+          "name_zh": "伊万诺沃",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5377"
+            ]
+          }
+        },
+        {
+          "suffix": "LUSINO",
+          "name_en": "Lusino",
+          "name_zh": "卢西诺",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5497"
+            ]
+          }
+        },
+        {
+          "suffix": "MALKOVICHI",
+          "name_en": "Malkovichi",
+          "name_zh": "马尔科维奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5498"
+            ]
+          }
+        },
+        {
+          "suffix": "KHOTYNICHI",
+          "name_en": "Khotynichi",
+          "name_zh": "霍特尼奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5499"
+            ]
+          }
+        },
+        {
+          "suffix": "VYGONOSCHI",
+          "name_en": "Vygonoschi",
+          "name_zh": "维戈诺希",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5500"
+            ]
+          }
+        },
+        {
+          "suffix": "KAMENETS",
+          "name_en": "Kamenets",
+          "name_zh": "卡梅内茨",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5502"
+            ]
+          }
+        },
+        {
+          "suffix": "OGORODNIKI",
+          "name_en": "Ogorodniki",
+          "name_zh": "奥戈罗德尼基",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5503"
+            ]
+          }
+        },
+        {
+          "suffix": "DOBROMYSL",
+          "name_en": "Ivatsevichi",
+          "name_zh": "伊瓦采维奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5505"
+            ]
+          }
+        },
+        {
+          "suffix": "MEDNO",
+          "name_en": "Medno",
+          "name_zh": "梅德诺",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5985"
+            ]
+          }
+        },
+        {
+          "suffix": "DYMNA",
+          "name_en": "Dymna",
+          "name_zh": "德姆纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5986"
+            ]
+          }
+        },
+        {
+          "suffix": "DUBICHNO",
+          "name_en": "Dubichno",
+          "name_zh": "杜比奇诺",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5987"
+            ]
+          }
+        },
+        {
+          "suffix": "CHERNYANY",
+          "name_en": "Chernyany",
+          "name_zh": "切尔尼亚内",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_INT_BREST_5988"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "PINSK",
+        "name_en": "Pinsk",
+        "name_zh": "平斯克",
+        "full_name": true
+      }
+    },
+    {
+      "id": "BY_RAY_67162791B59963656038120",
+      "feature_ids": [
+        "BY_RAY_67162791B59963656038120"
+      ],
+      "parts": [
+        {
+          "suffix": "KAMENETS",
+          "name_en": "Kamenets",
+          "name_zh": "卡梅内茨",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_RAY_67162791B59963656038120_5502"
+            ]
+          }
+        },
+        {
+          "suffix": "MUCHAVEC",
+          "name_en": "Muchavec",
+          "name_zh": "穆哈韦茨",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_RAY_67162791B59963656038120_5984"
+            ]
+          }
+        },
+        {
+          "suffix": "MEDNO",
+          "name_en": "Medno",
+          "name_zh": "梅德诺",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_RAY_67162791B59963656038120_5985"
+            ]
+          }
+        },
+        {
+          "suffix": "DYMNA",
+          "name_en": "Dymna",
+          "name_zh": "德姆纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_RAY_67162791B59963656038120_5986"
+            ]
+          }
+        },
+        {
+          "suffix": "DUBICHNO",
+          "name_en": "Dubichno",
+          "name_zh": "杜比奇诺",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_RAY_67162791B59963656038120_5987"
+            ]
+          }
+        },
+        {
+          "suffix": "NORTH_VOLCHIN",
+          "name_en": "North Volchin",
+          "name_zh": "北沃尔钦",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "BY_RAY_67162791B59963656038120_8052"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "OGORODNIKI",
+        "name_en": "Ogorodniki",
+        "name_zh": "奥戈罗德尼基",
+        "full_name": true
+      }
+    },
+    {
+      "id": "PL_MRG_44c900e7cbdd",
+      "feature_ids": [
+        "PL_MRG_44c900e7cbdd"
+      ],
+      "parts": [
+        {
+          "suffix": "BIALYSTOK",
+          "name_en": "Brańsk",
+          "name_zh": "布兰斯克",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_44c900e7cbdd_97"
+            ]
+          }
+        },
+        {
+          "suffix": "EAST_BIALYSTOK",
+          "name_en": "Bielsk Podlaski",
+          "name_zh": "波德拉谢地区别尔斯克",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_44c900e7cbdd_3230"
+            ]
+          }
+        },
+        {
+          "suffix": "PLATNICA",
+          "name_en": "Ciechanowiec",
+          "name_zh": "切哈诺维茨",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_44c900e7cbdd_5737"
+            ]
+          }
+        },
+        {
+          "suffix": "NAGORKI",
+          "name_en": "Zambrow",
+          "name_zh": "赞布鲁夫",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_44c900e7cbdd_5739"
+            ]
+          }
+        },
+        {
+          "suffix": "WLODKI",
+          "name_en": "Wlodki",
+          "name_zh": "弗沃德基",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_44c900e7cbdd_5740"
+            ]
+          }
+        },
+        {
+          "suffix": "POPKI",
+          "name_en": "Lomza",
+          "name_zh": "沃姆扎",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_44c900e7cbdd_5741"
+            ]
+          }
+        },
+        {
+          "suffix": "MSCIWUJE",
+          "name_en": "Msciwuje",
+          "name_zh": "姆希武耶",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_44c900e7cbdd_5742"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "GONIADZ",
+        "name_en": "Goniadz",
+        "name_zh": "戈尼翁兹",
+        "full_name": true
+      }
+    },
+    {
+      "id": "PL_MRG_c5cfb391c06f",
+      "feature_ids": [
+        "PL_MRG_c5cfb391c06f"
+      ],
+      "parts": [
+        {
+          "suffix": "LUBLIN",
+          "name_en": "Lubartow",
+          "name_zh": "卢巴尔图夫",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_c5cfb391c06f_92"
+            ]
+          }
+        },
+        {
+          "suffix": "WEST_CHELM",
+          "name_en": "West Chelm",
+          "name_zh": "西海乌姆",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_c5cfb391c06f_3229"
+            ]
+          }
+        },
+        {
+          "suffix": "JANOWKA",
+          "name_en": "Janowka",
+          "name_zh": "亚努夫卡",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_MRG_c5cfb391c06f_5736"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "LUKOW",
+        "name_en": "Pulawy",
+        "name_zh": "普瓦维",
+        "full_name": true
+      }
+    },
+    {
+      "id": "PL_POW_0601",
+      "feature_ids": [
+        "PL_POW_0601"
+      ],
+      "parts": [
+        {
+          "suffix": "WEST_CHELM",
+          "name_en": "Biala Podlaska",
+          "name_zh": "比亚瓦波德拉斯卡",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_POW_0601_3229"
+            ]
+          }
+        },
+        {
+          "suffix": "WLODAWA",
+          "name_en": "Wlodawa",
+          "name_zh": "弗沃达瓦",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_POW_0601_5733"
+            ]
+          }
+        },
+        {
+          "suffix": "KOROLOWKA",
+          "name_en": "Korolowka",
+          "name_zh": "科罗卢夫卡",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_POW_0601_5734"
+            ]
+          }
+        },
+        {
+          "suffix": "JANOWKA",
+          "name_en": "Miedzyrzec Podlaski",
+          "name_zh": "波德拉谢地区缅济热茨",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_POW_0601_5736"
+            ]
+          }
+        },
+        {
+          "suffix": "EAST_OKUNINKA",
+          "name_en": "Terespol",
+          "name_zh": "泰雷斯波尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "PL_POW_0601_9842"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "OKUNINKA",
+        "name_en": "Okuninka",
+        "name_zh": "奥库宁卡",
+        "full_name": true
+      }
+    },
+    {
+      "id": "TRA11",
+      "feature_ids": [
+        "TRA11"
+      ],
+      "parts": [
+        {
+          "suffix": "PASINLER",
+          "name_en": "Hinis",
+          "name_zh": "赫内斯",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA11_353"
+            ]
+          }
+        },
+        {
+          "suffix": "ASKALE",
+          "name_en": "Askale",
+          "name_zh": "阿什卡莱",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA11_3296"
+            ]
+          }
+        },
+        {
+          "suffix": "HORASAN",
+          "name_en": "Narman",
+          "name_zh": "纳尔曼",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA11_4982"
+            ]
+          }
+        },
+        {
+          "suffix": "ISPIR",
+          "name_en": "Ispir",
+          "name_zh": "伊斯皮尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA11_7106"
+            ]
+          }
+        },
+        {
+          "suffix": "PAZARYOLU",
+          "name_en": "Pazaryolu",
+          "name_zh": "帕扎尔约卢",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA11_7110"
+            ]
+          }
+        },
+        {
+          "suffix": "OLTU",
+          "name_en": "Oltu",
+          "name_zh": "奥尔图",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA11_7111"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "ERZURUM",
+        "name_en": "Erzurum",
+        "name_zh": "埃尔祖鲁姆",
+        "full_name": true
+      }
+    },
+    {
+      "id": "TRA22",
+      "feature_ids": [
+        "TRA22"
+      ],
+      "parts": [
+        {
+          "suffix": "ODALAR",
+          "name_en": "Odalar",
+          "name_zh": "奥达拉尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_1374"
+            ]
+          }
+        },
+        {
+          "suffix": "CILDIR",
+          "name_en": "Cildir",
+          "name_zh": "彻尔德尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_7097"
+            ]
+          }
+        },
+        {
+          "suffix": "BASKOY",
+          "name_en": "Baskoy",
+          "name_zh": "巴什柯伊",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_7098"
+            ]
+          }
+        },
+        {
+          "suffix": "KIRAC",
+          "name_en": "Kirac",
+          "name_zh": "克拉奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_7099"
+            ]
+          }
+        },
+        {
+          "suffix": "KARAKALE",
+          "name_en": "Karakale",
+          "name_zh": "卡拉卡莱",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_7100"
+            ]
+          }
+        },
+        {
+          "suffix": "DIGOR",
+          "name_en": "Digor",
+          "name_zh": "迪戈尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_7113"
+            ]
+          }
+        },
+        {
+          "suffix": "KAGIZMAN",
+          "name_en": "Kagizman",
+          "name_zh": "卡厄兹曼",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_7114"
+            ]
+          }
+        },
+        {
+          "suffix": "SARIKAMIS",
+          "name_en": "Sarikamis",
+          "name_zh": "萨勒卡默什",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA22_7593"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "KARS",
+        "name_en": "Kars",
+        "name_zh": "卡尔斯",
+        "full_name": true
+      }
+    },
+    {
+      "id": "TRA24",
+      "feature_ids": [
+        "TRA24"
+      ],
+      "parts": [
+        {
+          "suffix": "TURKGOZU",
+          "name_en": "Turkgozu",
+          "name_zh": "蒂尔克格聚",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA24_7095"
+            ]
+          }
+        },
+        {
+          "suffix": "KOLKOY",
+          "name_en": "Kolkoy",
+          "name_zh": "科尔柯伊",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA24_7096"
+            ]
+          }
+        },
+        {
+          "suffix": "CILDIR",
+          "name_en": "Cildir",
+          "name_zh": "彻尔德尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TRA24_7097"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "ARDAHAN",
+        "name_en": "Ardahan",
+        "name_zh": "阿尔达汉",
+        "full_name": true
+      }
+    },
+    {
+      "id": "TR905",
+      "feature_ids": [
+        "TR905"
+      ],
+      "parts": [
+        {
+          "suffix": "SAVSAT",
+          "name_en": "Savsat",
+          "name_zh": "萨夫沙特",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TR905_2486"
+            ]
+          }
+        },
+        {
+          "suffix": "ARTVIN",
+          "name_en": "Artvin",
+          "name_zh": "阿尔特温",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TR905_7101"
+            ]
+          }
+        },
+        {
+          "suffix": "HOPA",
+          "name_en": "Hopa",
+          "name_zh": "霍帕",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "TR905_7102"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "YUSUFELI",
+        "name_en": "Yusufeli",
+        "name_zh": "优素费利",
+        "full_name": true
+      }
+    },
+    {
+      "id": "ARM-1555",
+      "feature_ids": [
+        "ARM-1555"
+      ],
+      "parts": [
+        {
+          "suffix": "BASKOY",
+          "name_en": "Garnarrich",
+          "name_zh": "加尔纳里奇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ARM-1555_7098"
+            ]
+          }
+        },
+        {
+          "suffix": "KIRAC",
+          "name_en": "Meghrashat",
+          "name_zh": "梅格拉沙特",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ARM-1555_7099"
+            ]
+          }
+        },
+        {
+          "suffix": "KARAKALE",
+          "name_en": "Gyumri",
+          "name_zh": "久姆里",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ARM-1555_7100"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SALUT",
+        "name_en": "Artik",
+        "name_zh": "阿尔蒂克",
+        "full_name": true
+      }
+    },
+    {
+      "id": "GEO-3038",
+      "feature_ids": [
+        "GEO-3038"
+      ],
+      "parts": [
+        {
+          "suffix": "JAVAKH",
+          "name_en": "Javakh",
+          "name_zh": "贾瓦赫季",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "GEO-3038_2035"
+            ]
+          }
+        },
+        {
+          "suffix": "SAMTSKHE",
+          "name_en": "Borjomi",
+          "name_zh": "博尔若米",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "GEO-3038_4756"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "TURKGOZU",
+        "name_en": "Akhaltsikhe",
+        "name_zh": "阿哈尔齐赫",
+        "full_name": true
+      }
+    },
+    {
+      "id": "IRQ-3051",
+      "feature_ids": [
+        "IRQ-3051"
+      ],
+      "parts": [
+        {
+          "suffix": "MOSUL",
+          "name_en": "Mosul",
+          "name_zh": "摩苏尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_676"
+            ]
+          }
+        },
+        {
+          "suffix": "SHAYKHAN",
+          "name_en": "Fishkhabur",
+          "name_zh": "菲什哈布尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_1886"
+            ]
+          }
+        },
+        {
+          "suffix": "BARDARASH",
+          "name_en": "Zummar",
+          "name_zh": "祖马尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_5679"
+            ]
+          }
+        },
+        {
+          "suffix": "AL_SHIRQAT",
+          "name_en": "Al-Hamdaniya",
+          "name_zh": "哈姆达尼耶",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_5893"
+            ]
+          }
+        },
+        {
+          "suffix": "HATRA",
+          "name_en": "Hatra",
+          "name_zh": "哈特拉",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_5894"
+            ]
+          }
+        },
+        {
+          "suffix": "TAL_AFAR",
+          "name_en": "North Tal Afar",
+          "name_zh": "北泰勒阿费尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_6985"
+            ]
+          }
+        },
+        {
+          "suffix": "SOUTH_SINJAR",
+          "name_en": "Rabia",
+          "name_zh": "拉比亚",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_9859"
+            ]
+          }
+        },
+        {
+          "suffix": "SOUTH_MOSUL",
+          "name_en": "Tallkayf",
+          "name_zh": "泰勒凯夫",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_9861"
+            ]
+          }
+        },
+        {
+          "suffix": "SOUTH_SHAQLAWA",
+          "name_en": "'Aqrah",
+          "name_zh": "阿克拉",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3051_9863"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "QARYAT_AL_ASHIQ",
+        "name_en": "Sinjar",
+        "name_zh": "辛贾尔",
+        "full_name": true
+      }
+    },
+    {
+      "id": "IRQ-3049",
+      "feature_ids": [
+        "IRQ-3049"
+      ],
+      "parts": [
+        {
+          "suffix": "ARBIL",
+          "name_en": "Hawija",
+          "name_zh": "哈维杰",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3049_1362"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "KIRKUK",
+        "name_en": "Kirkuk",
+        "name_zh": "基尔库克",
+        "full_name": true
+      }
+    },
+    {
+      "id": "IRQ-3050",
+      "feature_ids": [
+        "IRQ-3050"
+      ],
+      "parts": [
+        {
+          "suffix": "ARBIL",
+          "name_en": "Erbil",
+          "name_zh": "埃尔比勒",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3050_1362"
+            ]
+          }
+        },
+        {
+          "suffix": "KIRKUK",
+          "name_en": "Koysinceq",
+          "name_zh": "科伊桑贾克",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3050_1363"
+            ]
+          }
+        },
+        {
+          "suffix": "SHAQLAWA",
+          "name_en": "Barzan",
+          "name_zh": "巴尔赞",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3050_5680"
+            ]
+          }
+        },
+        {
+          "suffix": "SOUTH_SHAQLAWA",
+          "name_en": "Shaqlawa",
+          "name_zh": "沙克拉瓦",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IRQ-3050_9863"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SORAN",
+        "name_en": "Soran",
+        "name_zh": "索兰",
+        "full_name": true
+      }
+    },
+    {
+      "id": "IE041",
+      "feature_ids": [
+        "IE041"
+      ],
+      "parts": [
+        {
+          "suffix": "CAVAN_MONAGHAN",
+          "name_en": "Cavan-Monaghan",
+          "name_zh": "卡文-莫纳亨",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IE041_1832"
+            ]
+          }
+        },
+        {
+          "suffix": "LOUGH_SWILLY",
+          "name_en": "Lough Swilly",
+          "name_zh": "斯威利湾",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IE041_3205"
+            ]
+          }
+        },
+        {
+          "suffix": "SLIGO",
+          "name_en": "Sligo",
+          "name_zh": "斯莱戈",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IE041_4970"
+            ]
+          }
+        },
+        {
+          "suffix": "CLONES",
+          "name_en": "Monaghan",
+          "name_zh": "莫纳亨",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IE041_6091"
+            ]
+          }
+        },
+        {
+          "suffix": "MANORHAMILTON",
+          "name_en": "Carrick-on-Shannon",
+          "name_zh": "香农河畔卡里克",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "IE041_7482"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "DONEGAL",
+        "name_en": "Letterkenny",
+        "name_zh": "莱特肯尼",
+        "full_name": true
+      }
+    },
+    {
+      "id": "GB_NUTS1_UKN",
+      "feature_ids": [
+        "GB_NUTS1_UKN"
+      ],
+      "parts": [
+        {
+          "suffix": "NORTHERN_IRELAND",
+          "name_en": "Londonderry-Tyrone",
+          "name_zh": "伦敦德里-蒂龙",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "GB_NUTS1_UKN_119"
+            ]
+          }
+        },
+        {
+          "suffix": "ENNISKILLEN",
+          "name_en": "Enniskillen",
+          "name_zh": "恩尼斯基林",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "GB_NUTS1_UKN_4961"
+            ]
+          }
+        },
+        {
+          "suffix": "ARMAGH",
+          "name_en": "Armagh",
+          "name_zh": "阿马",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "GB_NUTS1_UKN_4963"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "BELFAST",
+        "name_en": "Belfast",
+        "name_zh": "贝尔法斯特",
+        "full_name": true
+      }
+    },
+    {
+      "id": "RS217",
+      "feature_ids": [
+        "RS217"
+      ],
+      "parts": [
+        {
+          "suffix": "SJENICA",
+          "name_en": "Ušće",
+          "name_zh": "乌什切",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS217_1733"
+            ]
+          }
+        },
+        {
+          "suffix": "NOVI_PAZAR",
+          "name_en": "Novi Pazar",
+          "name_zh": "新帕扎尔",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS217_1801"
+            ]
+          }
+        },
+        {
+          "suffix": "DUBNICA",
+          "name_en": "Jošanička Banja",
+          "name_zh": "约沙尼奇卡矿泉镇",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS217_2295"
+            ]
+          }
+        },
+        {
+          "suffix": "DRAGA",
+          "name_en": "Raška",
+          "name_zh": "拉什卡",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RS217_5923"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "KRALJEVO",
+        "name_en": "Kraljevo",
+        "name_zh": "克拉列沃",
+        "full_name": true
+      }
+    },
+    {
+      "id": "ME_ADM1_MNE-1509",
+      "feature_ids": [
+        "ME_ADM1_MNE-1509"
+      ],
+      "parts": [
+        {
+          "suffix": "ANDRIJEVICA",
+          "name_en": "Andrijevica",
+          "name_zh": "安德里耶维察",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ME_ADM1_MNE-1509_3641"
+            ]
+          }
+        },
+        {
+          "suffix": "PETNIJCA",
+          "name_en": "Petnjica",
+          "name_zh": "佩特尼察",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ME_ADM1_MNE-1509_7630"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SOUTH_KOLASIN",
+        "name_en": "Berane",
+        "name_zh": "贝拉内",
+        "full_name": true
+      }
+    },
+    {
+      "id": "RO215",
+      "feature_ids": [
+        "RO215"
+      ],
+      "parts": [
+        {
+          "suffix": "SOUTHERN_BUCOVINA",
+          "name_en": "Southern Bucovina",
+          "name_zh": "南布科维纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RO215_792"
+            ]
+          }
+        },
+        {
+          "suffix": "INNER_MOLDOVA",
+          "name_en": "Inner Moldova",
+          "name_zh": "内摩尔多瓦",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "RO215_2276"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "SUCEAVA",
+        "name_en": "Suceava",
+        "name_zh": "苏恰瓦",
+        "full_name": true
+      }
+    },
+    {
+      "id": "EGY-1558",
+      "feature_ids": [
+        "EGY-1558"
+      ],
+      "parts": [
+        {
+          "suffix": "NORTH_SINAI",
+          "name_en": "North Sinai",
+          "name_zh": "北西奈",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_3364"
+            ]
+          }
+        },
+        {
+          "suffix": "HASNA",
+          "name_en": "Al Kuntillah",
+          "name_zh": "昆提拉",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_3367"
+            ]
+          }
+        },
+        {
+          "suffix": "ZARANIK",
+          "name_en": "Arish",
+          "name_zh": "阿里什",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_6794"
+            ]
+          }
+        },
+        {
+          "suffix": "RAFAH",
+          "name_en": "Ash Shaykh Zuwayd",
+          "name_zh": "谢赫祖韦德",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_6795"
+            ]
+          }
+        },
+        {
+          "suffix": "BIR_AL_ABED",
+          "name_en": "Bi'r al 'Abd",
+          "name_zh": "比尔阿卜德",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_6936"
+            ]
+          }
+        },
+        {
+          "suffix": "EAST_BIR_AL_ABED",
+          "name_en": "East Bir Al-Abed",
+          "name_zh": "东比尔阿卜德",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_6937"
+            ]
+          }
+        },
+        {
+          "suffix": "WEST_RAFAH",
+          "name_en": "East Arish",
+          "name_zh": "东阿里什",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_9881"
+            ]
+          }
+        },
+        {
+          "suffix": "SOUTH_ARISH",
+          "name_en": "Al Hasana",
+          "name_zh": "哈萨纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "EGY-1558_9883"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "NEKHEL",
+        "name_en": "Nekhel",
+        "name_zh": "奈赫勒",
+        "full_name": true
+      }
+    },
+    {
+      "id": "ISR-3053",
+      "feature_ids": [
+        "ISR-3053"
+      ],
+      "parts": [
+        {
+          "suffix": "NEGEV_HIGHLANDS",
+          "name_en": "Nitzana",
+          "name_zh": "尼察纳",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ISR-3053_1204"
+            ]
+          }
+        },
+        {
+          "suffix": "EILAT",
+          "name_en": "Eilat",
+          "name_zh": "埃拉特",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ISR-3053_3375"
+            ]
+          }
+        },
+        {
+          "suffix": "LAHAV",
+          "name_en": "Kiryat Gat",
+          "name_zh": "基里亚特加特",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ISR-3053_3381"
+            ]
+          }
+        },
+        {
+          "suffix": "NEGEV",
+          "name_en": "Ashdod",
+          "name_zh": "阿什杜德",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ISR-3053_3383"
+            ]
+          }
+        },
+        {
+          "suffix": "EZUZ",
+          "name_en": "Mitzpe Ramon",
+          "name_zh": "米茨佩拉蒙",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ISR-3053_6796"
+            ]
+          }
+        },
+        {
+          "suffix": "YERUHAM",
+          "name_en": "Beersheba",
+          "name_zh": "贝尔谢巴",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ISR-3053_6797"
+            ]
+          }
+        },
+        {
+          "suffix": "TLALIM",
+          "name_en": "Tlalim",
+          "name_zh": "特拉利姆",
+          "full_name": true,
+          "polygon_source": {
+            "path": "hoi4_hgo_hotspots_2.sources.geojson",
+            "property": "unit",
+            "values": [
+              "ISR-3053_6798"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "HGO states (Historic Geographical Overhaul)"
+      ],
+      "remainder": {
+        "suffix": "DIMONA",
+        "name_en": "Dimona",
+        "name_zh": "迪莫纳",
+        "full_name": true
+      }
+    }
+  ]
+}

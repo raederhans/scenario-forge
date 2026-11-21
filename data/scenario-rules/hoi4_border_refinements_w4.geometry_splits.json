@@ -1,0 +1,479 @@
+{
+  "version": 1,
+  "scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "area_tolerance_degrees2": 1e-09,
+  "description": "Fourth wave of HOI4 interwar border refinements, applied after hoi4_border_refinements.geometry_splits.json.",
+  "entries": [
+    {
+      "id": "ignalina_turmantas",
+      "feature_ids": [
+        "LT029"
+      ],
+      "parts": [
+        {
+          "suffix": "POLISH",
+          "name_en": "Ignalina and Turmantas",
+          "name_zh": "伊格纳利纳与图尔曼塔斯",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_ignalina"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Utena County (Lithuanian part)",
+        "name_zh": "乌田纳县（立陶宛控制部分）",
+        "full_name": true
+      },
+      "notes": "Ignalina, Turmantas and the site of later Visaginas lay on the Polish side of the 1922–1939 line (OpenHistoricalMap 1924–1938 Poland outline); a small second slice west of Molėtai sits on the same line.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2692205"
+      ]
+    },
+    {
+      "id": "petseri",
+      "feature_ids": [
+        "RU_RAY_50074027B90555869339870"
+      ],
+      "parts": [
+        {
+          "suffix": "PETSERI",
+          "name_en": "Petseri (Pechory)",
+          "name_zh": "佩采里（佩乔雷）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_petseri"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "LATVIAN",
+        "name_en": "Northern Abrene (Pechorsky part)",
+        "name_zh": "阿布雷内北部（伯乔尔斯基区部分）",
+        "full_name": true
+      },
+      "notes": "Petseri County was Estonian under the 1920 Tartu treaty (OpenHistoricalMap 1918–1940 Estonia outline). The rest of today's district lies inside the OpenHistoricalMap 1920–1940 Latvia outline (about 311 of 338 km²).",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2801387",
+        "https://www.openhistoricalmap.org/relation/2704702"
+      ]
+    },
+    {
+      "id": "narvataguse",
+      "feature_ids": [
+        "RU_RAY_50074027B5223158268211"
+      ],
+      "parts": [
+        {
+          "suffix": "NARVATAGUSE",
+          "name_en": "Narvataguse (Slantsy part)",
+          "name_zh": "纳尔瓦河外地区（斯兰齐区部分）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_narvataguse"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Slantsevsky District",
+        "name_zh": "斯兰齐区",
+        "full_name": true
+      },
+      "notes": "The Tartu treaty line ran east of the Narva river and reservoir: these right-bank villages were Estonian until 1945.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2801387"
+      ]
+    },
+    {
+      "id": "jaanilinn",
+      "feature_ids": [
+        "RU_RAY_50074027B99227036451137"
+      ],
+      "parts": [
+        {
+          "suffix": "JAANILINN",
+          "name_en": "Jaanilinn (Ivangorod) and the Narva right bank",
+          "name_zh": "亚尼林（伊万哥罗德）与纳尔瓦河东岸",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_jaanilinn"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Kingisepp District",
+        "name_zh": "金吉谢普区",
+        "full_name": true
+      },
+      "notes": "The Tartu treaty line ran east of the Narva: Jaanilinn/Ivangorod and the right-bank strip were Estonian until 1940.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2801387"
+      ]
+    },
+    {
+      "id": "abrene",
+      "feature_ids": [
+        "RU_RAY_50074027B88274438285408"
+      ],
+      "parts": [
+        {
+          "suffix": "ABRENE",
+          "name_en": "Abrene (Pytalovo)",
+          "name_zh": "阿布雷内（佩塔洛沃）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_abrene"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Pytalovsky District (Soviet part)",
+        "name_zh": "皮塔洛夫斯基区（苏联部分）",
+        "full_name": true
+      },
+      "notes": "Abrene district was Latvian from 1920 to 1940 (OpenHistoricalMap 1920–1940 Latvia outline).",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2704702"
+      ]
+    },
+    {
+      "id": "kaceni",
+      "feature_ids": [
+        "RU_RAY_50074027B19741518738580"
+      ],
+      "parts": [
+        {
+          "suffix": "KACENI",
+          "name_en": "Kacēni (Kachanovo)",
+          "name_zh": "卡采尼（卡恰诺沃）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_kaceni"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Palkinsky District",
+        "name_zh": "帕尔金斯基区",
+        "full_name": true
+      },
+      "notes": "The Kacēni/Kachanovo parish west of Palkino belonged to Latvian Abrene district until 1940.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2704702"
+      ]
+    },
+    {
+      "id": "nador_spanish_zone",
+      "feature_ids": [
+        "MAR-1454"
+      ],
+      "parts": [
+        {
+          "suffix": "SPANISH",
+          "name_en": "Nador and Driouch (Spanish zone)",
+          "name_zh": "纳祖尔与德里乌什（西属区）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_nador_spanish"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Oriental (French zone)",
+        "name_zh": "东部（法属区）",
+        "full_name": true
+      },
+      "notes": "The eastern Rif around Nador, Driouch and the Kert river lay in the Spanish protectorate (1926–1956 outline).",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2860422"
+      ]
+    },
+    {
+      "id": "taza_french_zone",
+      "feature_ids": [
+        "MAR-1447"
+      ],
+      "parts": [
+        {
+          "suffix": "FRENCH",
+          "name_en": "Taza and Taounate (French zone)",
+          "name_zh": "塔扎与陶纳特（法属区）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_taza_french"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Al Hoceima (Spanish zone)",
+        "name_zh": "胡塞马（西属区）",
+        "full_name": true
+      },
+      "notes": "Taza, Taounate and Guercif were in the French protectorate; only the Al Hoceima coast was Spanish.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2860422",
+        "https://www.openhistoricalmap.org/relation/2690949"
+      ]
+    },
+    {
+      "id": "javorina_1938",
+      "feature_ids": [
+        "SK_ADM2_56367889B94927774956455"
+      ],
+      "parts": [
+        {
+          "suffix": "JAVORINA",
+          "name_en": "Javorina (Jaworzyna Spiska)",
+          "name_zh": "亚沃里纳（斯皮什亚沃日纳）",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_javorina"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "District of Poprad",
+        "name_zh": "波普拉德区",
+        "full_name": true
+      },
+      "notes": "Tatranská Javorina was ceded to Poland in November 1938 and returned to Slovakia in 1939; modern municipality.",
+      "sources": [
+        "https://www.openstreetmap.org/relation/2275136"
+      ]
+    },
+    {
+      "id": "orava_1938",
+      "feature_ids": [
+        "SK_ADM2_56367889B83569782265262"
+      ],
+      "parts": [
+        {
+          "suffix": "ORAVA",
+          "name_en": "Hladovka and Suchá Hora",
+          "name_zh": "赫拉多夫卡与苏哈霍拉",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_orava"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "District of Tvrdošín",
+        "name_zh": "特夫尔多欣区",
+        "full_name": true
+      },
+      "notes": "Hladovka and Suchá Hora in Orava were ceded to Poland in November 1938; modern municipalities.",
+      "sources": [
+        "https://www.openstreetmap.org/relation/2167078",
+        "https://www.openstreetmap.org/relation/2167082"
+      ]
+    },
+    {
+      "id": "llivia",
+      "feature_ids": [
+        "FR_ARR_66003"
+      ],
+      "parts": [
+        {
+          "suffix": "LLIVIA",
+          "name_en": "Llívia",
+          "name_zh": "利维亚",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_llivia"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Prades",
+        "name_zh": "普拉德",
+        "full_name": true
+      },
+      "notes": "Spanish exclave in the French Cerdagne.",
+      "sources": [
+        "https://www.openstreetmap.org/relation/356747"
+      ]
+    },
+    {
+      "id": "busingen",
+      "feature_ids": [
+        "CH057"
+      ],
+      "parts": [
+        {
+          "suffix": "BUSINGEN",
+          "name_en": "Büsingen am Hochrhein",
+          "name_zh": "上莱茵河畔比辛根",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_busingen"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Thurgau",
+        "name_zh": "图尔高",
+        "full_name": true
+      },
+      "notes": "German exclave; the runtime Thurgau parcel covers most of it, the Schaffhausen sliver (about 1.5 km²) is not cut.",
+      "sources": [
+        "https://www.openstreetmap.org/relation/2785126"
+      ]
+    },
+    {
+      "id": "campione",
+      "feature_ids": [
+        "CH070"
+      ],
+      "parts": [
+        {
+          "suffix": "CAMPIONE",
+          "name_en": "Campione d'Italia",
+          "name_zh": "坎皮奥内迪塔利亚",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_campione"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Ticino",
+        "name_zh": "提契诺州",
+        "full_name": true
+      },
+      "notes": "Italian exclave on Lake Lugano.",
+      "sources": [
+        "https://www.openstreetmap.org/relation/46664"
+      ]
+    },
+    {
+      "id": "halaib_triangle",
+      "feature_ids": [
+        "EGY-1556"
+      ],
+      "parts": [
+        {
+          "suffix": "HALAIB",
+          "name_en": "Hala'ib Triangle",
+          "name_zh": "哈拉伊卜三角区",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_halaib"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Red Sea Governorate",
+        "name_zh": "红海省",
+        "full_name": true
+      },
+      "notes": "North of 22°N but administered from Sudan under the 1902 administrative line (OpenHistoricalMap 1934–1956 Anglo-Egyptian Sudan outline). Bir Tawil is not cut: OpenHistoricalMap has no Egyptian outline for it.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2803203"
+      ]
+    },
+    {
+      "id": "tende_la_brigue",
+      "feature_ids": [
+        "FR_ARR_06002__SPLIT_REST"
+      ],
+      "parts": [
+        {
+          "suffix": "TENDE",
+          "name_en": "Tende, La Brigue and the upper valleys",
+          "name_zh": "坦德、拉布里格与上游河谷",
+          "polygon_source": {
+            "path": "hoi4_border_refinements_w4.sources.geojson",
+            "property": "unit",
+            "values": [
+              "w4_tende"
+            ]
+          },
+          "full_name": true
+        }
+      ],
+      "remainder": {
+        "suffix": "NICE",
+        "name_en": "Nice",
+        "name_zh": "尼斯",
+        "full_name": true
+      },
+      "notes": "Tende, La Brigue and the high Tinée/Vésubie valleys stayed Italian until the 1947 Paris treaty (OpenHistoricalMap 1929–1940 Italy outline). Its parent is a child of monaco_nice, hence this separate file.",
+      "sources": [
+        "https://www.openhistoricalmap.org/relation/2851104"
+      ]
+    }
+  ]
+}

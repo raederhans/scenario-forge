@@ -460,7 +460,7 @@
     "upstream_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2241701657",
     "immutable_ref": "descriptor.mod version=1.9.* supported_version=1.9.3 remote_file_id=2241701657",
     "current_local_sha256": "6c7a6c0bc2a7f618dfedd1d20597c88ebe7c1aca28da3f2b88fbc0dc2990cc3e",
-    "license": "Steam Workshop UGC; converted flag PNG catalog authorized by user confirmation on 2026-06-03",
+    "license": "Steam Workshop UGC; development taken over by the project owner with the original authors' permission (user confirmation 2026-11-21), covering flags, names and map geometry",
     "citation": "Historic Geographical Overhaul, Steam Workshop 2241701657",
     "consumers": [
       "tools/import_country_palette.py",
@@ -471,7 +471,12 @@
       "data/hgo_catalogs/hgo_place_names.json",
       "data/hgo_catalogs/hgo_flags.index.json",
       "data/hgo_catalogs/hgo_flags.png_manifest.json",
-      "data/palettes/hgo.palette.json"
+      "data/palettes/hgo.palette.json",
+      "tools/build_hgo_hotspot_splits.py",
+      "tools/build_hoi4_water_shape_splits.py",
+      "data/scenario-rules/hoi4_hgo_hotspots.sources.geojson",
+      "data/scenario-rules/hoi4_hgo_hotspots_2.sources.geojson",
+      "data/scenario-rules/hoi4_water_shapes.sources.geojson"
     ],
     "rebuild_command": "python tools/import_country_palette.py --source-root \"historic geographic overhaul\" --palette-id hgo --display-name \"Historic Geographical Overhaul\" --source-variant hgo --source-workshop-id 2241701657 --localisation-root localisation --manual-map data/palette-maps/hgo.manual.json && python tools/build_hgo_name_catalog.py --source-root \"historic geographic overhaul\" && python tools/build_hgo_flag_index.py --source-root \"historic geographic overhaul\" && python tools/build_hgo_flag_png_catalog.py --source-root \"historic geographic overhaul\"",
     "provenance_sidecar": "data/hgo_catalogs/hgo_descriptor.provenance.json",
@@ -648,5 +653,37 @@
     "provenance_sidecar": "data/scenario-rules/modern_world.sources/myanmar/provenance.json",
     "status": "frozen_local_only",
     "local_presence": "required"
+  },
+  {
+    "upstream_url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_lakes_historic.zip",
+    "license": "Natural Earth public domain",
+    "citation": "https://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-lakes/",
+    "status": "frozen_verified",
+    "local_presence": "required",
+    "source_id": "natural_earth_lakes_historic_10m",
+    "local_path": "data/ne_10m_lakes_historic.zip",
+    "origin_kind": "download",
+    "rebuild_command": "python tools/build_hoi4_water_shape_splits.py",
+    "immutable_ref": "Source ZIP sha256:f82fb212a4e472fcfd43afb78b37b20792987cda4aa239aab6818e4b0fb713ac",
+    "current_local_sha256": "f82fb212a4e472fcfd43afb78b37b20792987cda4aa239aab6818e4b0fb713ac",
+    "consumers": [
+      "tools/build_hoi4_water_shape_splits.py"
+    ]
+  },
+  {
+    "upstream_url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_playas.zip",
+    "license": "Natural Earth public domain",
+    "citation": "https://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-playas/",
+    "status": "frozen_verified",
+    "local_presence": "required",
+    "source_id": "natural_earth_playas_10m",
+    "local_path": "data/ne_10m_playas.zip",
+    "origin_kind": "download",
+    "rebuild_command": "python tools/build_hoi4_water_shape_splits.py",
+    "immutable_ref": "Source ZIP sha256:74e366d0042ecfa742bf787475a78442b44ae554dfcd3366cfa35254959e873c",
+    "current_local_sha256": "74e366d0042ecfa742bf787475a78442b44ae554dfcd3366cfa35254959e873c",
+    "consumers": [
+      "tools/build_hoi4_water_shape_splits.py"
+    ]
   }
 ]

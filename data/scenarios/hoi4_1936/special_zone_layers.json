@@ -201,7 +201,6 @@
       },
       "memberFeatureIds": [
         "PL_MRG_727dd6268093__SPLIT_DANZIG",
-        "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
         "PL_POW_2209__SPLIT_DANZIG__SPLIT_REST",
         "PL_POW_2210__SPLIT_DANZIG__SPLIT_REST",
         "PL_POW_2261",
@@ -249,7 +248,8 @@
         "SYR-146",
         "SYR-4843",
         "SYR-5261",
-        "TR631"
+        "TR631__SPLIT_KESSAB",
+        "TR631__SPLIT_SANJAK"
       ],
       "note": "国际联盟法国委任统治；现代叙利亚、黎巴嫩及法国下属亚历山大勒塔自治专区（哈塔伊）"
     },
@@ -273,7 +273,14 @@
       },
       "memberFeatureIds": [
         "GAZ+00?",
-        "ISR-3053",
+        "ISR-3053__SPLIT_DIMONA",
+        "ISR-3053__SPLIT_EILAT",
+        "ISR-3053__SPLIT_EZUZ",
+        "ISR-3053__SPLIT_LAHAV",
+        "ISR-3053__SPLIT_NEGEV",
+        "ISR-3053__SPLIT_NEGEV_HIGHLANDS",
+        "ISR-3053__SPLIT_TLALIM",
+        "ISR-3053__SPLIT_YERUHAM",
         "ISR-3054",
         "ISR-3055",
         "ISR-3056",
@@ -331,7 +338,8 @@
         "BI_ADM1_BDI-3365",
         "BI_ADM1_BDI-4854",
         "BI_ADM1_BDI-5588",
-        "CM_ADM1_CMR-1462",
+        "CM_ADM1_CMR-1462__SPLIT_LAKE_CHAD",
+        "CM_ADM1_CMR-1462__SPLIT_REST",
         "CM_ADM1_CMR-1476",
         "CM_ADM1_CMR-1477",
         "CM_ADM1_CMR-1480",
@@ -409,7 +417,8 @@
         "NA_ADM1_NAM-3352",
         "NA_ADM1_NAM-3353",
         "NA_ADM1_NAM-3354",
-        "NA_ADM1_NAM-3355",
+        "NA_ADM1_NAM-3355__SPLIT_PLAYA_ETOSHA_PAN",
+        "NA_ADM1_NAM-3355__SPLIT_REST",
         "NA_ADM1_NAM-3356",
         "PG_ADM1_PNG-1238",
         "PG_ADM1_PNG-1239",

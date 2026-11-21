@@ -1,6 +1,734 @@
 {
   "generated_at": "2026-06-13T22:56:20.686233+00:00",
   "geo": {
+    "id::AFG-1749__SPLIT_PLAYA_HAMUN_E_SABERI": {
+      "en": "Farah · Hamun-e Saberi",
+      "zh": "法拉赫 · 萨贝里湖"
+    },
+    "id::AFG-1749__SPLIT_REST": {
+      "en": "Farah",
+      "zh": "法拉赫"
+    },
+    "id::AFG-1751__SPLIT_PLAYA_GOWD_E_ZEREH": {
+      "en": "Nimroz · Gowd-e Zereh",
+      "zh": "尼姆鲁兹 · 泽雷洼地"
+    },
+    "id::AFG-1751__SPLIT_REST": {
+      "en": "Nimroz",
+      "zh": "尼姆鲁兹"
+    },
+    "id::AL034__SPLIT_GALICHITSA": {
+      "en": "Pogradec",
+      "zh": "波格拉德茨"
+    },
+    "id::AL034__SPLIT_OUTER_VLORE": {
+      "en": "Outer Vlore",
+      "zh": "发罗拉外围"
+    },
+    "id::AL034__SPLIT_POGRADEC": {
+      "en": "Korçë",
+      "zh": "科尔察"
+    },
+    "id::AL034__SPLIT_PRESPA": {
+      "en": "Prespa",
+      "zh": "普雷斯帕"
+    },
+    "id::ARM-1555__SPLIT_BASKOY": {
+      "en": "Garnarrich",
+      "zh": "加尔纳里奇"
+    },
+    "id::ARM-1555__SPLIT_KARAKALE": {
+      "en": "Gyumri",
+      "zh": "久姆里"
+    },
+    "id::ARM-1555__SPLIT_KIRAC": {
+      "en": "Meghrashat",
+      "zh": "梅格拉沙特"
+    },
+    "id::ARM-1555__SPLIT_SALUT": {
+      "en": "Artik",
+      "zh": "阿尔蒂克"
+    },
+    "id::AR_ADM1_ARG-1299__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA": {
+      "en": "Córdoba · Salinas de Ambargasta",
+      "zh": "科尔多瓦 · 安巴加斯塔盐沼"
+    },
+    "id::AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_19": {
+      "en": "Córdoba · Salt flat",
+      "zh": "科尔多瓦 · 盐沼"
+    },
+    "id::AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_20": {
+      "en": "Córdoba · Salt flat",
+      "zh": "科尔多瓦 · 盐沼"
+    },
+    "id::AR_ADM1_ARG-1299__SPLIT_REST": {
+      "en": "Córdoba",
+      "zh": "科尔多瓦"
+    },
+    "id::AR_ADM1_ARG-1300__SPLIT_PLAYA_SALAR_DE_PIPANACO": {
+      "en": "Catamarca · Salar de Pipanaco",
+      "zh": "卡塔马卡 · 皮帕纳科盐沼"
+    },
+    "id::AR_ADM1_ARG-1300__SPLIT_PLAYA_SALT_FLAT_19": {
+      "en": "Catamarca · Salt flat",
+      "zh": "卡塔马卡 · 盐沼"
+    },
+    "id::AR_ADM1_ARG-1300__SPLIT_PLAYA_SALT_FLAT_33": {
+      "en": "Catamarca · Salt flat",
+      "zh": "卡塔马卡 · 盐沼"
+    },
+    "id::AR_ADM1_ARG-1300__SPLIT_REST": {
+      "en": "Catamarca",
+      "zh": "卡塔马卡"
+    },
+    "id::AR_ADM1_ARG-1302__SPLIT_PLAYA_SALT_FLAT_19": {
+      "en": "La Rioja · Salt flat",
+      "zh": "里奥哈 · 盐沼"
+    },
+    "id::AR_ADM1_ARG-1302__SPLIT_PLAYA_SALT_FLAT_34": {
+      "en": "La Rioja · Salt flat",
+      "zh": "里奥哈 · 盐沼"
+    },
+    "id::AR_ADM1_ARG-1302__SPLIT_REST": {
+      "en": "La Rioja",
+      "zh": "里奥哈"
+    },
+    "id::AR_ADM1_ARG-1303__SPLIT_PLAYA_SALAR_DE_ARIZARO": {
+      "en": "Salta · Salar de Arizaro",
+      "zh": "萨尔塔 · 阿里萨罗盐沼"
+    },
+    "id::AR_ADM1_ARG-1303__SPLIT_REST": {
+      "en": "Salta",
+      "zh": "萨尔塔"
+    },
+    "id::AR_ADM1_ARG-1304__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA": {
+      "en": "Santiago del Estero · Salinas de Ambargasta",
+      "zh": "圣地亚哥·德尔·埃斯特罗 · 安巴加斯塔盐沼"
+    },
+    "id::AR_ADM1_ARG-1304__SPLIT_REST": {
+      "en": "Santiago del Estero",
+      "zh": "圣地亚哥·德尔·埃斯特罗"
+    },
+    "id::AT112__SPLIT_NORTH_BURGENLAND": {
+      "en": "Eisenstadt",
+      "zh": "艾森斯塔特"
+    },
+    "id::AT112__SPLIT_SOPRON": {
+      "en": "Loipersbach im Burgenland",
+      "zh": "布尔根兰州洛伊珀斯巴赫"
+    },
+    "id::AT113__SPLIT_BURGENLAND": {
+      "en": "Oberwart",
+      "zh": "上瓦特"
+    },
+    "id::AT113__SPLIT_SZOMBATHELY": {
+      "en": "Güssing",
+      "zh": "居辛"
+    },
+    "id::AT211__SPLIT_EBRIACH": {
+      "en": "Ebriach",
+      "zh": "埃布里亚赫"
+    },
+    "id::AT211__SPLIT_KLAGENFURT_LAND": {
+      "en": "Villach",
+      "zh": "菲拉赫"
+    },
+    "id::AT211__SPLIT_VOLKERMARKT": {
+      "en": "Klagenfurt",
+      "zh": "克拉根福"
+    },
+    "id::AT212__SPLIT_CARINTHIA": {
+      "en": "Carinthia",
+      "zh": "克恩顿"
+    },
+    "id::AT212__SPLIT_EBENTHAL": {
+      "en": "Ebenthal",
+      "zh": "埃本塔尔"
+    },
+    "id::AT212__SPLIT_EBRIACH": {
+      "en": "Ebriach",
+      "zh": "埃布里亚赫"
+    },
+    "id::AT212__SPLIT_GALLIZIEN": {
+      "en": "Gallizien",
+      "zh": "加利齐恩"
+    },
+    "id::AT212__SPLIT_GRAFENSTEIN": {
+      "en": "Grafenstein",
+      "zh": "格拉芬施泰因"
+    },
+    "id::AT212__SPLIT_RUCKERSDORF": {
+      "en": "Ruckersdorf",
+      "zh": "吕克斯多夫"
+    },
+    "id::AT213__SPLIT_RUCKERSDORF": {
+      "en": "Ruckersdorf",
+      "zh": "吕克斯多夫"
+    },
+    "id::AT213__SPLIT_TAINACH": {
+      "en": "Tainach",
+      "zh": "泰纳赫"
+    },
+    "id::AT213__SPLIT_VOLKERMARKT": {
+      "en": "East Wolfsberg",
+      "zh": "东沃尔夫斯贝格"
+    },
+    "id::AT213__SPLIT_WOLFSBERG": {
+      "en": "West Wolfsberg",
+      "zh": "西沃尔夫斯贝格"
+    },
+    "id::AU_ADM1_AUS-2651__SPLIT_LAKE_ARGYLE": {
+      "en": "Western Australia · Lake Argyle site",
+      "zh": "西澳大利亚州 · 阿盖尔湖库址"
+    },
+    "id::AU_ADM1_AUS-2651__SPLIT_PLAYA_FORTESCUE_RIVER_FLOODOUT": {
+      "en": "Western Australia · Fortescue River Floodout",
+      "zh": "西澳大利亚州 · 福特斯库河泛滥平原"
+    },
+    "id::AU_ADM1_AUS-2651__SPLIT_REST": {
+      "en": "Western Australia",
+      "zh": "西澳大利亚州"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_EUPEN_MALMEDY": {
+      "en": "Eupen-Malmedy",
+      "zh": "奥伊彭-马尔梅迪"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_HASSELT": {
+      "en": "Huy",
+      "zh": "于伊"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_KELMIS": {
+      "en": "Eupen",
+      "zh": "欧本"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_LIEGE": {
+      "en": "Liege",
+      "zh": "列日"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_MALDINGEN": {
+      "en": "Maldingen",
+      "zh": "马尔丁根"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_REINARTZHOF": {
+      "en": "Reinartzhof",
+      "zh": "莱纳茨霍夫"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_SPA": {
+      "en": "West Verviers",
+      "zh": "西维尔维耶"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_VERVIERS": {
+      "en": "East Verviers",
+      "zh": "东维尔维耶"
+    },
+    "id::BE_MRG_49096f4ef44b__SPLIT_VOEREN": {
+      "en": "Voeren",
+      "zh": "富伦"
+    },
+    "id::BG413__SPLIT_BANSKO": {
+      "en": "Bansko",
+      "zh": "班斯科"
+    },
+    "id::BG413__SPLIT_DOSPAT": {
+      "en": "Dospat",
+      "zh": "多斯帕特"
+    },
+    "id::BG413__SPLIT_SANDANSKI": {
+      "en": "Blagoevgrad",
+      "zh": "布拉戈耶夫格勒"
+    },
+    "id::BG422__SPLIT_EDIRNE": {
+      "en": "Harmanli",
+      "zh": "哈曼利"
+    },
+    "id::BG422__SPLIT_HUHLA": {
+      "en": "Huhla",
+      "zh": "胡赫拉"
+    },
+    "id::BG422__SPLIT_KEMAL": {
+      "en": "Kemal",
+      "zh": "凯末尔"
+    },
+    "id::BG422__SPLIT_MERIC": {
+      "en": "Meric",
+      "zh": "梅里奇"
+    },
+    "id::BG422__SPLIT_ORESTIADA": {
+      "en": "Orestiada",
+      "zh": "奥雷斯蒂亚达"
+    },
+    "id::BG422__SPLIT_ORMENIO": {
+      "en": "Haskovo",
+      "zh": "哈斯科沃"
+    },
+    "id::BG422__SPLIT_SVILENGRAD": {
+      "en": "Dimitrovgrad",
+      "zh": "季米特洛夫格勒"
+    },
+    "id::BO_ADM1_BOL-1937__SPLIT_PLAYA_SALAR_DE_COIPASA": {
+      "en": "Oruro · Salar de Coipasa",
+      "zh": "奥鲁罗 · 科伊帕萨盐沼"
+    },
+    "id::BO_ADM1_BOL-1937__SPLIT_PLAYA_SALAR_DE_UYUNI": {
+      "en": "Oruro · Salar de Uyuni",
+      "zh": "奥鲁罗 · 乌尤尼盐沼"
+    },
+    "id::BO_ADM1_BOL-1937__SPLIT_REST": {
+      "en": "Oruro",
+      "zh": "奥鲁罗"
+    },
+    "id::BO_ADM1_BOL-1939__SPLIT_PLAYA_SALAR_DE_UYUNI": {
+      "en": "Potosí · Salar de Uyuni",
+      "zh": "波托西 · 乌尤尼盐沼"
+    },
+    "id::BO_ADM1_BOL-1939__SPLIT_REST": {
+      "en": "Potosí",
+      "zh": "波托西"
+    },
+    "id::BR_ADM1_BRA-1294__SPLIT_REPRESA_DE_SAO_SIMAO": {
+      "en": "Goiás · Represa de São Simão site",
+      "zh": "戈亚斯州 · 圣西芒水库库址"
+    },
+    "id::BR_ADM1_BRA-1294__SPLIT_REST": {
+      "en": "Goiás",
+      "zh": "戈亚斯州"
+    },
+    "id::BR_ADM1_BRA-1311__SPLIT_BARIRI": {
+      "en": "São Paulo · Bariri site",
+      "zh": "圣保罗 · 巴里里水库库址"
+    },
+    "id::BR_ADM1_BRA-1311__SPLIT_REPRESA_IEPE": {
+      "en": "São Paulo · Represa Iepe site",
+      "zh": "圣保罗 · 雷普水库库址"
+    },
+    "id::BR_ADM1_BRA-1311__SPLIT_REPRESA_PORTO_PRIMAVERA": {
+      "en": "São Paulo · Represa Porto Primavera site",
+      "zh": "圣保罗 · 波图普里马韦拉水库库址"
+    },
+    "id::BR_ADM1_BRA-1311__SPLIT_REPRESSA_DE_JUPIA": {
+      "en": "São Paulo · Repressa de Jupia site",
+      "zh": "圣保罗 · 朱皮亚水库库址"
+    },
+    "id::BR_ADM1_BRA-1311__SPLIT_REST": {
+      "en": "São Paulo",
+      "zh": "圣保罗"
+    },
+    "id::BR_ADM1_BRA-594__SPLIT_REPRESA_DE_TUCURUI": {
+      "en": "Pará · Represa de Tucuruí site",
+      "zh": "帕拉州 · 图库里水库库址"
+    },
+    "id::BR_ADM1_BRA-594__SPLIT_REST": {
+      "en": "Pará",
+      "zh": "帕拉州"
+    },
+    "id::BR_ADM1_BRA-600__SPLIT_REPRESA_PORTO_PRIMAVERA": {
+      "en": "Mato Grosso do Sul · Represa Porto Primavera site",
+      "zh": "南马托格罗索州 · 波图普里马韦拉水库库址"
+    },
+    "id::BR_ADM1_BRA-600__SPLIT_REPRESSA_DE_JUPIA": {
+      "en": "Mato Grosso do Sul · Repressa de Jupia site",
+      "zh": "南马托格罗索州 · 朱皮亚水库库址"
+    },
+    "id::BR_ADM1_BRA-600__SPLIT_REST": {
+      "en": "Mato Grosso do Sul",
+      "zh": "南马托格罗索州"
+    },
+    "id::BR_ADM1_BRA-601__SPLIT_REPRESA_DE_SAO_SIMAO": {
+      "en": "Minas Gerais · Represa de São Simão site",
+      "zh": "米纳斯吉拉斯州 · 圣西芒水库库址"
+    },
+    "id::BR_ADM1_BRA-601__SPLIT_REPRESA_FURNAS": {
+      "en": "Minas Gerais · Represa Furnas site",
+      "zh": "米纳斯吉拉斯州 · 弗纳斯水库库址"
+    },
+    "id::BR_ADM1_BRA-601__SPLIT_REPRESA_TRES_MARIAS": {
+      "en": "Minas Gerais · Represa Três Marias site",
+      "zh": "米纳斯吉拉斯州 · 三玛丽亚斯水库库址"
+    },
+    "id::BR_ADM1_BRA-601__SPLIT_REPRESSA_DE_JUPIA": {
+      "en": "Minas Gerais · Repressa de Jupia site",
+      "zh": "米纳斯吉拉斯州 · 朱皮亚水库库址"
+    },
+    "id::BR_ADM1_BRA-601__SPLIT_REST": {
+      "en": "Minas Gerais",
+      "zh": "米纳斯吉拉斯州"
+    },
+    "id::BR_ADM1_BRA-613__SPLIT_REPRESA_IEPE": {
+      "en": "Paraná · Represa Iepe site",
+      "zh": "巴拉那州 · 雷普水库库址"
+    },
+    "id::BR_ADM1_BRA-613__SPLIT_REPRESA_ITAIPU": {
+      "en": "Paraná · Represa Itaipu site",
+      "zh": "巴拉那州 · 伊泰普水库库址"
+    },
+    "id::BR_ADM1_BRA-613__SPLIT_REST": {
+      "en": "Paraná",
+      "zh": "巴拉那州"
+    },
+    "id::BR_ADM1_BRA-624__SPLIT_REPRESA_DE_SOBRADINHO": {
+      "en": "Bahia · Represa de Sobradinho site",
+      "zh": "巴伊亚 · 索布拉迪纽水库库址"
+    },
+    "id::BR_ADM1_BRA-624__SPLIT_REST": {
+      "en": "Bahia",
+      "zh": "巴伊亚"
+    },
+    "id::BW_ADM1_BWA-2630__SPLIT_PLAYA_MAKGADIKGADI_PANS": {
+      "en": "Central · Makgadikgadi Pans",
+      "zh": "中央 · 马卡迪卡迪盐沼"
+    },
+    "id::BW_ADM1_BWA-2630__SPLIT_REST": {
+      "en": "Central",
+      "zh": "中央"
+    },
+    "id::BY_INT_BREST__SPLIT_CHERNYANY": {
+      "en": "Chernyany",
+      "zh": "切尔尼亚内"
+    },
+    "id::BY_INT_BREST__SPLIT_DOBROMYSL": {
+      "en": "Ivatsevichi",
+      "zh": "伊瓦采维奇"
+    },
+    "id::BY_INT_BREST__SPLIT_DUBICHNO": {
+      "en": "Dubichno",
+      "zh": "杜比奇诺"
+    },
+    "id::BY_INT_BREST__SPLIT_DYMNA": {
+      "en": "Dymna",
+      "zh": "德姆纳"
+    },
+    "id::BY_INT_BREST__SPLIT_KAMENETS": {
+      "en": "Kamenets",
+      "zh": "卡梅内茨"
+    },
+    "id::BY_INT_BREST__SPLIT_KHOTYNICHI": {
+      "en": "Khotynichi",
+      "zh": "霍特尼奇"
+    },
+    "id::BY_INT_BREST__SPLIT_LUSINO": {
+      "en": "Lusino",
+      "zh": "卢西诺"
+    },
+    "id::BY_INT_BREST__SPLIT_MALKOVICHI": {
+      "en": "Malkovichi",
+      "zh": "马尔科维奇"
+    },
+    "id::BY_INT_BREST__SPLIT_MEDNO": {
+      "en": "Medno",
+      "zh": "梅德诺"
+    },
+    "id::BY_INT_BREST__SPLIT_NORTH_PINSK": {
+      "en": "Ivanovo",
+      "zh": "伊万诺沃"
+    },
+    "id::BY_INT_BREST__SPLIT_NOWOGRODEK": {
+      "en": "Baranavichy",
+      "zh": "巴拉诺维奇"
+    },
+    "id::BY_INT_BREST__SPLIT_OGORODNIKI": {
+      "en": "Ogorodniki",
+      "zh": "奥戈罗德尼基"
+    },
+    "id::BY_INT_BREST__SPLIT_PINSK": {
+      "en": "Pinsk",
+      "zh": "平斯克"
+    },
+    "id::BY_INT_BREST__SPLIT_POLESIE": {
+      "en": "Kobryn",
+      "zh": "科布林"
+    },
+    "id::BY_INT_BREST__SPLIT_VYGONOSCHI": {
+      "en": "Vygonoschi",
+      "zh": "维戈诺希"
+    },
+    "id::BY_INT_GRODNO__SPLIT_BAKSHTY": {
+      "en": "Bakshty",
+      "zh": "巴克什蒂"
+    },
+    "id::BY_INT_GRODNO__SPLIT_BOROVIKI": {
+      "en": "Boroviki",
+      "zh": "博罗维基"
+    },
+    "id::BY_INT_GRODNO__SPLIT_BYAROZAWKA": {
+      "en": "Novogrudok",
+      "zh": "新格鲁多克"
+    },
+    "id::BY_INT_GRODNO__SPLIT_CENTRAL_INDURA": {
+      "en": "Central Indura",
+      "zh": "因杜拉中部"
+    },
+    "id::BY_INT_GRODNO__SPLIT_GONCHARY": {
+      "en": "Gonchary",
+      "zh": "贡恰雷"
+    },
+    "id::BY_INT_GRODNO__SPLIT_KURILOVICHI": {
+      "en": "Kurilovichi",
+      "zh": "库里洛维奇"
+    },
+    "id::BY_INT_GRODNO__SPLIT_MANCHIKI": {
+      "en": "Manchiki",
+      "zh": "曼奇基"
+    },
+    "id::BY_INT_GRODNO__SPLIT_NORTH_KAMENETS": {
+      "en": "North Kamenets",
+      "zh": "卡梅内茨北部"
+    },
+    "id::BY_INT_GRODNO__SPLIT_OSZMIANA": {
+      "en": "Smarhon",
+      "zh": "斯莫尔贡"
+    },
+    "id::BY_INT_GRODNO__SPLIT_PIESKI": {
+      "en": "Pieski",
+      "zh": "皮耶斯基"
+    },
+    "id::BY_INT_GRODNO__SPLIT_PORASLI": {
+      "en": "Porasli",
+      "zh": "波拉斯利"
+    },
+    "id::BY_INT_GRODNO__SPLIT_SLONIM": {
+      "en": "Slonim",
+      "zh": "斯洛尼姆"
+    },
+    "id::BY_INT_GRODNO__SPLIT_SOUTH_INDURA": {
+      "en": "South Indura",
+      "zh": "南因杜拉"
+    },
+    "id::BY_INT_GRODNO__SPLIT_TSATSKI": {
+      "en": "Tsatski",
+      "zh": "察茨基"
+    },
+    "id::BY_INT_GRODNO__SPLIT_VAVERKA": {
+      "en": "Lida",
+      "zh": "利达"
+    },
+    "id::BY_INT_GRODNO__SPLIT_WEST_BOROVIKI": {
+      "en": "Volkovysk",
+      "zh": "沃尔科维斯克"
+    },
+    "id::BY_INT_GRODNO__SPLIT_WEST_PIESKI": {
+      "en": "West Pieski",
+      "zh": "西皮耶斯基"
+    },
+    "id::BY_INT_GRODNO__SPLIT_ZELWA": {
+      "en": "Zelwa",
+      "zh": "泽尔瓦"
+    },
+    "id::BY_RAY_67162791B13547290723272__SPLIT_CENTRAL_KOROBCHITSY": {
+      "en": "Central Korobchitsy",
+      "zh": "科罗布奇齐中部"
+    },
+    "id::BY_RAY_67162791B13547290723272__SPLIT_GRODNO": {
+      "en": "East Grodno",
+      "zh": "东格罗德诺"
+    },
+    "id::BY_RAY_67162791B13547290723272__SPLIT_INDURA": {
+      "en": "Indura",
+      "zh": "因杜拉"
+    },
+    "id::BY_RAY_67162791B13547290723272__SPLIT_NORTH_MONKI": {
+      "en": "North Monki",
+      "zh": "北蒙基"
+    },
+    "id::BY_RAY_67162791B13547290723272__SPLIT_SOUTH_KOROBCHITSY": {
+      "en": "South Korobchitsy",
+      "zh": "南科罗布奇齐"
+    },
+    "id::BY_RAY_67162791B13547290723272__SPLIT_SZTABIN": {
+      "en": "West Grodno",
+      "zh": "西格罗德诺"
+    },
+    "id::BY_RAY_67162791B18933715013959__SPLIT_BYENYAKONI": {
+      "en": "Byenyakoni",
+      "zh": "别尼亚科尼"
+    },
+    "id::BY_RAY_67162791B18933715013959__SPLIT_HALSHANY": {
+      "en": "Oshmyany",
+      "zh": "奥什米亚内"
+    },
+    "id::BY_RAY_67162791B18933715013959__SPLIT_STAKAI": {
+      "en": "Stakai",
+      "zh": "斯塔凯"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_DUBICHNO": {
+      "en": "Dubichno",
+      "zh": "杜比奇诺"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_DYMNA": {
+      "en": "Dymna",
+      "zh": "德姆纳"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_KAMENETS": {
+      "en": "Kamenets",
+      "zh": "卡梅内茨"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_MEDNO": {
+      "en": "Medno",
+      "zh": "梅德诺"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_MUCHAVEC": {
+      "en": "Muchavec",
+      "zh": "穆哈韦茨"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_NORTH_VOLCHIN": {
+      "en": "North Volchin",
+      "zh": "北沃尔钦"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_OGORODNIKI": {
+      "en": "Ogorodniki",
+      "zh": "奥戈罗德尼基"
+    },
+    "id::BY_RAY_67162791B66420794580046__SPLIT_EAST_ASTRYNA": {
+      "en": "East Astryna",
+      "zh": "东阿斯特里纳"
+    },
+    "id::BY_RAY_67162791B66420794580046__SPLIT_MASTY": {
+      "en": "Masty",
+      "zh": "莫斯特"
+    },
+    "id::BY_RAY_67162791B66420794580046__SPLIT_PIESKI": {
+      "en": "Shchuchyn",
+      "zh": "舒钦"
+    },
+    "id::CA_FED_10004__SPLIT_REST": {
+      "en": "Labrador",
+      "zh": "拉布拉多"
+    },
+    "id::CA_FED_10004__SPLIT_SMALLWOOD_RESERVOIR": {
+      "en": "Labrador · Smallwood Reservoir site",
+      "zh": "拉布拉多 · 斯莫尔伍德水库库址"
+    },
+    "id::CA_FED_24001__SPLIT_RESERVOIR_DE_LA_GRANDE_2": {
+      "en": "Abitibi—Baie-James—Nunavik—Eeyou · Réservoir de La Grande 2 site",
+      "zh": "阿比蒂比—拜-詹姆斯—努纳维克—伊尤 · 格朗德二级水库库址"
+    },
+    "id::CA_FED_24001__SPLIT_RESERVOIR_DE_LA_GRANDE_3": {
+      "en": "Abitibi—Baie-James—Nunavik—Eeyou · Réservoir de La Grande 3 site",
+      "zh": "阿比蒂比—拜-詹姆斯—努纳维克—伊尤 · 格朗德三级水库库址"
+    },
+    "id::CA_FED_24001__SPLIT_REST": {
+      "en": "Abitibi—Baie-James—Nunavik—Eeyou",
+      "zh": "阿比蒂比—拜-詹姆斯—努纳维克—伊尤"
+    },
+    "id::CA_FED_24021__SPLIT_RESERVOIR_MANICOUAGAN": {
+      "en": "Côte-Nord—Kawawachikamach—Nitassinan · Réservoir Manicouagan site",
+      "zh": "北海岸—河瓦近卡马赫—尼塔西南 · 马尼夸根水库库址"
+    },
+    "id::CA_FED_24021__SPLIT_REST": {
+      "en": "Côte-Nord—Kawawachikamach—Nitassinan",
+      "zh": "北海岸—河瓦近卡马赫—尼塔西南"
+    },
+    "id::CA_FED_59026__SPLIT_REST": {
+      "en": "Prince George—Peace River—Northern Rockies",
+      "zh": "乔治王子城—皮斯河—北落基山脉"
+    },
+    "id::CA_FED_59026__SPLIT_WILLISTON_LAKE": {
+      "en": "Prince George—Peace River—Northern Rockies · Williston Lake site",
+      "zh": "乔治王子城—皮斯河—北落基山脉 · 威利斯顿湖库址"
+    },
+    "id::CH057__SPLIT_BUSINGEN": {
+      "en": "Büsingen am Hochrhein",
+      "zh": "上莱茵河畔比辛根"
+    },
+    "id::CH057__SPLIT_REST": {
+      "en": "Thurgau",
+      "zh": "图尔高"
+    },
+    "id::CH070__SPLIT_CAMPIONE": {
+      "en": "Campione d'Italia",
+      "zh": "坎皮奥内迪塔利亚"
+    },
+    "id::CH070__SPLIT_REST": {
+      "en": "Ticino",
+      "zh": "提契诺州"
+    },
+    "id::CI_ADM1_83157122B20352934117266__SPLIT_LAC_DE_KOSSOU": {
+      "en": "Lacs · Lac de Kossou site",
+      "zh": "拉克斯 · 科苏湖库址"
+    },
+    "id::CI_ADM1_83157122B20352934117266__SPLIT_REST": {
+      "en": "Lacs",
+      "zh": "拉克斯"
+    },
+    "id::CI_ADM1_83157122B30232425959699__SPLIT_LAC_DE_KOSSOU": {
+      "en": "District Autonome De Yamoussoukro · Lac de Kossou site",
+      "zh": "亚穆苏克罗自治区 · 科苏湖库址"
+    },
+    "id::CI_ADM1_83157122B30232425959699__SPLIT_REST": {
+      "en": "District Autonome De Yamoussoukro",
+      "zh": "亚穆苏克罗自治区"
+    },
+    "id::CI_ADM1_83157122B58892240487392__SPLIT_LAC_DE_KOSSOU": {
+      "en": "Woroba · Lac de Kossou site",
+      "zh": "沃罗巴 · 科苏湖库址"
+    },
+    "id::CI_ADM1_83157122B58892240487392__SPLIT_REST": {
+      "en": "Woroba",
+      "zh": "沃罗巴"
+    },
+    "id::CI_ADM1_83157122B62906982633778__SPLIT_LAC_DE_KOSSOU": {
+      "en": "Valle Du Bandama · Lac de Kossou site",
+      "zh": "班达马山谷 · 科苏湖库址"
+    },
+    "id::CI_ADM1_83157122B62906982633778__SPLIT_REST": {
+      "en": "Valle Du Bandama",
+      "zh": "班达马山谷"
+    },
+    "id::CI_ADM1_83157122B74959515955757__SPLIT_LAC_DE_KOSSOU": {
+      "en": "Sassandra-Marahoue · Lac de Kossou site",
+      "zh": "萨珊德拉·玛拉胡埃 · 科苏湖库址"
+    },
+    "id::CI_ADM1_83157122B74959515955757__SPLIT_REST": {
+      "en": "Sassandra-Marahoue",
+      "zh": "萨珊德拉·玛拉胡埃"
+    },
+    "id::CL_ADM1_CHL-2695__SPLIT_PLAYA_SALAR_DE_ATACAMA": {
+      "en": "Antofagasta · Salar de Atacama",
+      "zh": "安托法加斯塔 · 阿塔卡马盐沼"
+    },
+    "id::CL_ADM1_CHL-2695__SPLIT_PLAYA_SALAR_DE_PUNTA_NEGRA": {
+      "en": "Antofagasta · Salar de Punta Negra",
+      "zh": "安托法加斯塔 · 蓬塔内格拉盐沼"
+    },
+    "id::CL_ADM1_CHL-2695__SPLIT_REST": {
+      "en": "Antofagasta",
+      "zh": "安托法加斯塔"
+    },
+    "id::CM_ADM1_CMR-1462__SPLIT_LAKE_CHAD": {
+      "en": "Far North · Lake Chad lakebed",
+      "zh": "远北 · 乍得湖故湖床"
+    },
+    "id::CM_ADM1_CMR-1462__SPLIT_REST": {
+      "en": "Far North",
+      "zh": "远北"
+    },
+    "id::CN_CITY_17275852B14447575237215__SPLIT_PLAYA_SALT_FLAT_70": {
+      "en": "Tuokexunxian · Salt flat",
+      "zh": "托克逊县 · 盐沼"
+    },
+    "id::CN_CITY_17275852B14447575237215__SPLIT_REST": {
+      "en": "Tuokexunxian",
+      "zh": "托克逊县"
+    },
+    "id::CN_CITY_17275852B47937532060975__SPLIT_LOP_NUR": {
+      "en": "Ruoqiangxian · Lop Nur lakebed",
+      "zh": "若羌县 · 罗布泊故湖床"
+    },
+    "id::CN_CITY_17275852B47937532060975__SPLIT_PLAYA_LOP_NUR": {
+      "en": "Ruoqiangxian · Lop Nur",
+      "zh": "若羌县 · 罗布泊"
+    },
+    "id::CN_CITY_17275852B47937532060975__SPLIT_REST": {
+      "en": "Ruoqiangxian",
+      "zh": "若羌县"
+    },
+    "id::CN_CITY_17275852B82973388541806__SPLIT_PLAYA_SALT_FLAT_70": {
+      "en": "Tulufan · Salt flat",
+      "zh": "吐鲁番 · 盐沼"
+    },
+    "id::CN_CITY_17275852B82973388541806__SPLIT_REST": {
+      "en": "Tulufan",
+      "zh": "吐鲁番"
+    },
     "id::CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG": {
       "en": "Dalian · Kwantung",
       "zh": "大连 · 关东州"
@@ -33,6 +761,38 @@
       "en": "Wuchuan · Remainder",
       "zh": "吴川 · 余部"
     },
+    "id::CZ_ADM2_57006924B30982913442521__SPLIT_LANDSKRON": {
+      "en": "Landskron and Grulich",
+      "zh": "兰什克龙与克拉利基"
+    },
+    "id::CZ_ADM2_57006924B30982913442521__SPLIT_REST": {
+      "en": "Ústí nad Orlicí District (Czech part)",
+      "zh": "奥尔利采河畔乌斯季县（捷克部分）"
+    },
+    "id::CZ_ADM2_57006924B34464963037986__SPLIT_NETOLICE": {
+      "en": "Netolice and Vlachovo Březí",
+      "zh": "内托利采与弗拉霍沃布热齐"
+    },
+    "id::CZ_ADM2_57006924B34464963037986__SPLIT_REST": {
+      "en": "Prachatitz and Winterberg area",
+      "zh": "普拉哈蒂采与温珀克一带"
+    },
+    "id::CZ_ADM2_57006924B40201864279221__SPLIT_BRAUNAU": {
+      "en": "Braunau and Wekelsdorf",
+      "zh": "布劳莫夫与梅图耶河畔特普利采"
+    },
+    "id::CZ_ADM2_57006924B40201864279221__SPLIT_REST": {
+      "en": "Náchod District (Czech part)",
+      "zh": "纳霍德县（捷克部分）"
+    },
+    "id::CZ_ADM2_57006924B62007249383837__SPLIT_REST": {
+      "en": "Olomouc District (Czech part)",
+      "zh": "奥洛穆茨县（捷克部分）"
+    },
+    "id::CZ_ADM2_57006924B62007249383837__SPLIT_STERNBERG": {
+      "en": "Sternberg, Mährisch Neustadt and Bärn",
+      "zh": "什特恩贝克、乌尼乔夫与摩拉维亚贝龙"
+    },
     "id::CZ_ADM2_57006924B91865699855455__SPLIT_REST": {
       "en": "Frýdek-Místek",
       "zh": "弗里德克-米斯泰克"
@@ -40,6 +800,30 @@
     "id::CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE": {
       "en": "Zaolzie (Třinec–Jablunkov)",
       "zh": "扎奥尔齐（特日内茨—亚布伦科夫）"
+    },
+    "id::CZ_ADM2_57006924B92931687173289__SPLIT_REST": {
+      "en": "Bischofteinitz area",
+      "zh": "霍尔肖夫斯基蒂恩一带"
+    },
+    "id::CZ_ADM2_57006924B92931687173289__SPLIT_TAUS": {
+      "en": "Domažlice and Staňkov",
+      "zh": "多马日利采与斯坦科夫"
+    },
+    "id::CZ_ADM2_57006924B95695201424764__SPLIT_JEVISOVICE": {
+      "en": "Jevišovice",
+      "zh": "耶维舍维采"
+    },
+    "id::CZ_ADM2_57006924B95695201424764__SPLIT_REST": {
+      "en": "Znaim area",
+      "zh": "兹诺伊莫一带"
+    },
+    "id::CZ_MRG_9096ecd76bb9__SPLIT_REST": {
+      "en": "Chrudim, Litomyšl and Polička",
+      "zh": "赫鲁迪姆、利托米什尔与波利奇卡"
+    },
+    "id::CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST": {
+      "en": "Zwittau and Mährisch Trübau",
+      "zh": "斯维塔维与摩拉维亚特热博瓦"
     },
     "id::DE300__SPLIT_EAST": {
       "en": "Berlin · East Berlin",
@@ -49,6 +833,162 @@
       "en": "Berlin · West Berlin",
       "zh": "柏林 · 西柏林"
     },
+    "id::DEF07__SPLIT_HUSUM": {
+      "en": "Husum",
+      "zh": "胡苏姆"
+    },
+    "id::DEF07__SPLIT_PADBORG": {
+      "en": "Padborg",
+      "zh": "帕德堡"
+    },
+    "id::DEF07__SPLIT_RUDBOL": {
+      "en": "Rudbol",
+      "zh": "鲁德伯尔"
+    },
+    "id::DEF07__SPLIT_SCHLESWIG": {
+      "en": "Schleswig",
+      "zh": "石勒苏益格"
+    },
+    "id::DEF0C__SPLIT_ALS": {
+      "en": "Als",
+      "zh": "阿尔斯岛"
+    },
+    "id::DEF0C__SPLIT_DAMP": {
+      "en": "South Schleswig",
+      "zh": "南石勒苏益格"
+    },
+    "id::DEF0C__SPLIT_PADBORG": {
+      "en": "Padborg",
+      "zh": "帕德堡"
+    },
+    "id::DEF0C__SPLIT_SCHLESWIG": {
+      "en": "North Schleswig",
+      "zh": "北石勒苏益格"
+    },
+    "id::DE_MRG_d67a0e4a728d__SPLIT_DAMP": {
+      "en": "Eckernfoerde",
+      "zh": "埃肯弗德"
+    },
+    "id::DE_MRG_d67a0e4a728d__SPLIT_EAST_KIEL_CANAL": {
+      "en": "East Kiel Canal",
+      "zh": "基尔运河东段"
+    },
+    "id::DE_MRG_d67a0e4a728d__SPLIT_RENDSBURG": {
+      "en": "West Rendsburg",
+      "zh": "西伦茨堡"
+    },
+    "id::DE_MRG_d67a0e4a728d__SPLIT_SOUTH_DAMP": {
+      "en": "East Rendsburg",
+      "zh": "东伦茨堡"
+    },
+    "id::DE_MRG_d67a0e4a728d__SPLIT_WEST_SCHLESWIG": {
+      "en": "Heide",
+      "zh": "海德"
+    },
+    "id::DK_HIST_NORTH_SCHLESWIG__SPLIT_SYDJYLLAND": {
+      "en": "Sonderborg",
+      "zh": "森讷堡"
+    },
+    "id::DK_HIST_NORTH_SCHLESWIG__SPLIT_TONDERN": {
+      "en": "Tonder",
+      "zh": "滕德"
+    },
+    "id::DZA-2189__SPLIT_PLAYA_SALT_FLAT_18": {
+      "en": "Tamanghasset · Salt flat",
+      "zh": "塔曼哈塞特 · 盐沼"
+    },
+    "id::DZA-2189__SPLIT_REST": {
+      "en": "Tamanghasset",
+      "zh": "塔曼哈塞特"
+    },
+    "id::DZA-2190__SPLIT_PLAYA_CHOTT_ECH_CHERGUI": {
+      "en": "El Bayadh · Chott ech Chergui",
+      "zh": "埃尔巴亚兹 · 谢尔吉盐湖"
+    },
+    "id::DZA-2190__SPLIT_REST": {
+      "en": "El Bayadh",
+      "zh": "埃尔巴亚兹"
+    },
+    "id::DZA-2191__SPLIT_PLAYA_CHOTT_EL_GHARSA": {
+      "en": "El Oued · Chott el Gharsa",
+      "zh": "乌艾德 · 盖尔萨盐湖"
+    },
+    "id::DZA-2191__SPLIT_PLAYA_CHOTT_MELRHIR": {
+      "en": "El Oued · Chott Melrhir",
+      "zh": "乌艾德 · 迈勒吉尔盐湖"
+    },
+    "id::DZA-2191__SPLIT_REST": {
+      "en": "El Oued",
+      "zh": "乌艾德"
+    },
+    "id::DZA-2204__SPLIT_PLAYA_CHOTT_ECH_CHERGUI": {
+      "en": "Saïda · Chott ech Chergui",
+      "zh": "赛达 · 谢尔吉盐湖"
+    },
+    "id::DZA-2204__SPLIT_REST": {
+      "en": "Saïda",
+      "zh": "赛达"
+    },
+    "id::DZA-2205__SPLIT_PLAYA_CHOTT_ECH_CHERGUI": {
+      "en": "Tiaret · Chott ech Chergui",
+      "zh": "提亚雷特 · 谢尔吉盐湖"
+    },
+    "id::DZA-2205__SPLIT_REST": {
+      "en": "Tiaret",
+      "zh": "提亚雷特"
+    },
+    "id::EGY-1548__SPLIT_LAKE_NASSER": {
+      "en": "Aswan · Lake Nasser site",
+      "zh": "阿斯旺 · 纳赛尔湖库址"
+    },
+    "id::EGY-1548__SPLIT_REST": {
+      "en": "Aswan",
+      "zh": "阿斯旺"
+    },
+    "id::EGY-1556__SPLIT_HALAIB": {
+      "en": "Hala'ib Triangle",
+      "zh": "哈拉伊卜三角区"
+    },
+    "id::EGY-1556__SPLIT_REST": {
+      "en": "Red Sea Governorate",
+      "zh": "红海省"
+    },
+    "id::EGY-1558__SPLIT_BIR_AL_ABED": {
+      "en": "Bi'r al 'Abd",
+      "zh": "比尔阿卜德"
+    },
+    "id::EGY-1558__SPLIT_EAST_BIR_AL_ABED": {
+      "en": "East Bir Al-Abed",
+      "zh": "东比尔阿卜德"
+    },
+    "id::EGY-1558__SPLIT_HASNA": {
+      "en": "Al Kuntillah",
+      "zh": "昆提拉"
+    },
+    "id::EGY-1558__SPLIT_NEKHEL": {
+      "en": "Nekhel",
+      "zh": "奈赫勒"
+    },
+    "id::EGY-1558__SPLIT_NORTH_SINAI": {
+      "en": "North Sinai",
+      "zh": "北西奈"
+    },
+    "id::EGY-1558__SPLIT_RAFAH": {
+      "en": "Ash Shaykh Zuwayd",
+      "zh": "谢赫祖韦德"
+    },
+    "id::EGY-1558__SPLIT_SOUTH_ARISH": {
+      "en": "Al Hasana",
+      "zh": "哈萨纳"
+    },
+    "id::EGY-1558__SPLIT_WEST_RAFAH": {
+      "en": "East Arish",
+      "zh": "东阿里什"
+    },
+    "id::EGY-1558__SPLIT_ZARANIK": {
+      "en": "Arish",
+      "zh": "阿里什"
+    },
     "id::EH_ADMIN0_PASSTHROUGH__SPLIT_RDO": {
       "en": "Western Sahara · Rio de Oro",
       "zh": "西撒哈拉 · 里奥德奥罗"
@@ -56,6 +996,34 @@
     "id::EH_ADMIN0_PASSTHROUGH__SPLIT_SHM": {
       "en": "Western Sahara · Saguia el-Hamra",
       "zh": "西撒哈拉 · 萨基亚哈姆拉"
+    },
+    "id::EL543__SPLIT_CENTRAL_EPIRUS": {
+      "en": "Central Epirus",
+      "zh": "伊庇鲁斯中部"
+    },
+    "id::EL543__SPLIT_ERSEKE": {
+      "en": "Erseke",
+      "zh": "爱尔塞克"
+    },
+    "id::EL543__SPLIT_KONITSA": {
+      "en": "Konitsa",
+      "zh": "科尼察"
+    },
+    "id::EL543__SPLIT_METSOVO": {
+      "en": "Ioannina",
+      "zh": "约阿尼纳"
+    },
+    "id::EL543__SPLIT_NORTH_EPIRUS": {
+      "en": "North Epirus",
+      "zh": "北伊庇鲁斯"
+    },
+    "id::EL543__SPLIT_PARGA": {
+      "en": "Parga",
+      "zh": "帕尔加"
+    },
+    "id::EL543__SPLIT_SARANDE": {
+      "en": "Sarande",
+      "zh": "萨兰达"
     },
     "id::ES300__SPLIT_CITY": {
       "en": "Madrid city",
@@ -65,11 +1033,203 @@
       "en": "Community of Madrid",
       "zh": "马德里自治区"
     },
+    "id::FR_ARR_06002__SPLIT_MONACO": {
+      "en": "Monaco edge",
+      "zh": "摩纳哥边缘"
+    },
+    "id::FR_ARR_06002__SPLIT_REST": {
+      "en": "Nice",
+      "zh": "尼斯"
+    },
+    "id::FR_ARR_06002__SPLIT_REST__SPLIT_NICE": {
+      "en": "Nice",
+      "zh": "尼斯"
+    },
+    "id::FR_ARR_06002__SPLIT_REST__SPLIT_TENDE": {
+      "en": "Tende, La Brigue and the upper valleys",
+      "zh": "坦德、拉布里格与上游河谷"
+    },
+    "id::FR_ARR_57005__SPLIT_ALSACE": {
+      "en": "Alsace",
+      "zh": "阿尔萨斯"
+    },
+    "id::FR_ARR_57005__SPLIT_HATTIGNY": {
+      "en": "Hattigny",
+      "zh": "阿蒂尼"
+    },
+    "id::FR_ARR_57005__SPLIT_INNER_ALSACE": {
+      "en": "Inner Alsace",
+      "zh": "阿尔萨斯内区"
+    },
+    "id::FR_ARR_57005__SPLIT_INNER_MOSELLE": {
+      "en": "Inner Moselle",
+      "zh": "摩泽尔内区"
+    },
+    "id::FR_ARR_57005__SPLIT_SARREBOURG": {
+      "en": "Sarrebourg",
+      "zh": "萨尔堡"
+    },
+    "id::FR_ARR_57005__SPLIT_SAVERNE": {
+      "en": "Saverne",
+      "zh": "萨韦尔内"
+    },
+    "id::FR_ARR_57006__SPLIT_HAGUENAU": {
+      "en": "Haguenau",
+      "zh": "阿格诺"
+    },
+    "id::FR_ARR_57006__SPLIT_MOSELLE": {
+      "en": "Sarreguemines",
+      "zh": "萨尔格米讷"
+    },
+    "id::FR_ARR_57006__SPLIT_SARREBOURG": {
+      "en": "Sarrebourg",
+      "zh": "萨尔堡"
+    },
+    "id::FR_ARR_57007__SPLIT_BRIEY": {
+      "en": "Briey",
+      "zh": "布里耶"
+    },
+    "id::FR_ARR_57007__SPLIT_CATTENOM": {
+      "en": "Cattenom",
+      "zh": "卡特农"
+    },
+    "id::FR_ARR_57007__SPLIT_HAYANGE": {
+      "en": "Hayange",
+      "zh": "阿扬日"
+    },
+    "id::FR_ARR_57007__SPLIT_MANDEREN": {
+      "en": "Manderen",
+      "zh": "芒德朗"
+    },
+    "id::FR_ARR_57007__SPLIT_THIONVILLE": {
+      "en": "Thionville",
+      "zh": "蒂永维尔"
+    },
+    "id::FR_ARR_57009__SPLIT_HAYANGE": {
+      "en": "Hayange",
+      "zh": "阿扬日"
+    },
+    "id::FR_ARR_57009__SPLIT_INNER_MOSELLE": {
+      "en": "Inner Moselle",
+      "zh": "摩泽尔内区"
+    },
+    "id::FR_ARR_57009__SPLIT_METZ": {
+      "en": "Metz",
+      "zh": "梅斯"
+    },
+    "id::FR_ARR_57009__SPLIT_VIGNY": {
+      "en": "Vigny",
+      "zh": "维尼"
+    },
+    "id::FR_ARR_57009__SPLIT_WOIPPY": {
+      "en": "Woippy",
+      "zh": "瓦皮"
+    },
+    "id::FR_ARR_66003__SPLIT_LLIVIA": {
+      "en": "Llívia",
+      "zh": "利维亚"
+    },
+    "id::FR_ARR_66003__SPLIT_REST": {
+      "en": "Prades",
+      "zh": "普拉德"
+    },
+    "id::FR_ARR_67003__SPLIT_ALSACE": {
+      "en": "Alsace",
+      "zh": "阿尔萨斯"
+    },
+    "id::FR_ARR_67003__SPLIT_SAVERNE": {
+      "en": "Saverne",
+      "zh": "萨韦尔内"
+    },
+    "id::FR_ARR_67003__SPLIT_STRASBOURG": {
+      "en": "Strasbourg",
+      "zh": "斯特拉斯堡"
+    },
+    "id::FR_ARR_67004__SPLIT_ALSACE": {
+      "en": "Alsace",
+      "zh": "阿尔萨斯"
+    },
+    "id::FR_ARR_67004__SPLIT_HAGUENAU": {
+      "en": "Haguenau",
+      "zh": "阿格诺"
+    },
+    "id::FR_ARR_67004__SPLIT_MOSELLE": {
+      "en": "Moselle",
+      "zh": "摩泽尔"
+    },
+    "id::FR_ARR_67004__SPLIT_SARREBOURG": {
+      "en": "Sarrebourg",
+      "zh": "萨尔堡"
+    },
+    "id::FR_ARR_67004__SPLIT_STRASBOURG": {
+      "en": "Strasbourg",
+      "zh": "斯特拉斯堡"
+    },
+    "id::FR_ARR_67005__SPLIT_COLMAR": {
+      "en": "Selestat",
+      "zh": "塞莱斯塔"
+    },
+    "id::FR_ARR_67005__SPLIT_STRASBOURG": {
+      "en": "Strasbourg",
+      "zh": "斯特拉斯堡"
+    },
+    "id::FR_ARR_68002__SPLIT_COLMAR": {
+      "en": "Colmar",
+      "zh": "科尔马"
+    },
+    "id::FR_ARR_68002__SPLIT_KINTZHEIM": {
+      "en": "Kintzheim",
+      "zh": "金茨海姆"
+    },
+    "id::GB_NUTS1_UKN__SPLIT_ARMAGH": {
+      "en": "Armagh",
+      "zh": "阿马"
+    },
+    "id::GB_NUTS1_UKN__SPLIT_BELFAST": {
+      "en": "Belfast",
+      "zh": "贝尔法斯特"
+    },
+    "id::GB_NUTS1_UKN__SPLIT_ENNISKILLEN": {
+      "en": "Enniskillen",
+      "zh": "恩尼斯基林"
+    },
+    "id::GB_NUTS1_UKN__SPLIT_NORTHERN_IRELAND": {
+      "en": "Londonderry-Tyrone",
+      "zh": "伦敦德里-蒂龙"
+    },
+    "id::GEO-3038__SPLIT_JAVAKH": {
+      "en": "Javakh",
+      "zh": "贾瓦赫季"
+    },
+    "id::GEO-3038__SPLIT_SAMTSKHE": {
+      "en": "Borjomi",
+      "zh": "博尔若米"
+    },
+    "id::GEO-3038__SPLIT_TURKGOZU": {
+      "en": "Akhaltsikhe",
+      "zh": "阿哈尔齐赫"
+    },
     "id::GH_ADM1_GHA-2155__SPLIT_REST": {
       "en": "Northern · Remainder",
       "zh": "北方 · 余部"
     },
+    "id::GH_ADM1_GHA-2155__SPLIT_REST__SPLIT_LAKE_VOLTA": {
+      "en": "Northern · Remainder · Lake Volta site",
+      "zh": "北方 · 余部 · 沃尔特水库库址"
+    },
+    "id::GH_ADM1_GHA-2155__SPLIT_REST__SPLIT_REST": {
+      "en": "Northern · Remainder",
+      "zh": "北方 · 余部"
+    },
     "id::GH_ADM1_GHA-2155__SPLIT_WTO": {
+      "en": "Northern · British Togoland",
+      "zh": "北方 · 英属多哥兰"
+    },
+    "id::GH_ADM1_GHA-2155__SPLIT_WTO__SPLIT_LAKE_VOLTA": {
+      "en": "Northern · British Togoland · Lake Volta site",
+      "zh": "北方 · 英属多哥兰 · 沃尔特水库库址"
+    },
+    "id::GH_ADM1_GHA-2155__SPLIT_WTO__SPLIT_REST": {
       "en": "Northern · British Togoland",
       "zh": "北方 · 英属多哥兰"
     },
@@ -81,13 +1241,181 @@
       "en": "Upper East · British Togoland",
       "zh": "上东区 · 英属多哥兰"
     },
+    "id::GH_ADM1_GHA-2159__SPLIT_LAKE_VOLTA": {
+      "en": "Brong-Ahafo · Lake Volta site",
+      "zh": "布朗-阿哈福 · 沃尔特水库库址"
+    },
+    "id::GH_ADM1_GHA-2159__SPLIT_REST": {
+      "en": "Brong-Ahafo",
+      "zh": "布朗-阿哈福"
+    },
+    "id::GH_ADM1_GHA-2161__SPLIT_LAKE_VOLTA": {
+      "en": "Eastern · Lake Volta site",
+      "zh": "东 · 沃尔特水库库址"
+    },
+    "id::GH_ADM1_GHA-2161__SPLIT_REST": {
+      "en": "Eastern",
+      "zh": "东"
+    },
     "id::GH_ADM1_GHA-2173__SPLIT_REST": {
+      "en": "Volta · Remainder",
+      "zh": "沃尔塔 · 余部"
+    },
+    "id::GH_ADM1_GHA-2173__SPLIT_REST__SPLIT_LAKE_VOLTA": {
+      "en": "Volta · Remainder · Lake Volta site",
+      "zh": "沃尔塔 · 余部 · 沃尔特水库库址"
+    },
+    "id::GH_ADM1_GHA-2173__SPLIT_REST__SPLIT_REST": {
       "en": "Volta · Remainder",
       "zh": "沃尔塔 · 余部"
     },
     "id::GH_ADM1_GHA-2173__SPLIT_WTO": {
       "en": "Volta · British Togoland",
       "zh": "沃尔塔 · 英属多哥兰"
+    },
+    "id::GH_ADM1_GHA-2173__SPLIT_WTO__SPLIT_LAKE_VOLTA": {
+      "en": "Volta · British Togoland · Lake Volta site",
+      "zh": "沃尔塔 · 英属多哥兰 · 沃尔特水库库址"
+    },
+    "id::GH_ADM1_GHA-2173__SPLIT_WTO__SPLIT_REST": {
+      "en": "Volta · British Togoland",
+      "zh": "沃尔塔 · 英属多哥兰"
+    },
+    "id::GR_ADM1_GRC-2892__SPLIT_DISPILLO": {
+      "en": "Dispillo",
+      "zh": "迪斯皮利奥"
+    },
+    "id::GR_ADM1_GRC-2892__SPLIT_EAST_KASTORIA": {
+      "en": "Ptolemaida",
+      "zh": "托勒迈达"
+    },
+    "id::GR_ADM1_GRC-2892__SPLIT_KASTORIA": {
+      "en": "Kastoria",
+      "zh": "卡斯托里亚"
+    },
+    "id::GR_ADM1_GRC-2892__SPLIT_KOZANI": {
+      "en": "West Kozani",
+      "zh": "西科扎尼"
+    },
+    "id::GR_ADM1_GRC-2892__SPLIT_PRESPA": {
+      "en": "Prespa",
+      "zh": "普雷斯帕"
+    },
+    "id::GR_ADM1_GRC-2892__SPLIT_PTOLEMAIDA": {
+      "en": "East Kozani",
+      "zh": "东科扎尼"
+    },
+    "id::GR_ADM1_GRC-2892__SPLIT_SIMANTRO": {
+      "en": "Simantro",
+      "zh": "西曼特罗"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_ARTA": {
+      "en": "West Arta",
+      "zh": "西阿尔塔"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_CENTRAL_EPIRUS": {
+      "en": "Central Epirus",
+      "zh": "伊庇鲁斯中部"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_ERSEKE": {
+      "en": "Erseke",
+      "zh": "爱尔塞克"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_KONITSA": {
+      "en": "Konitsa",
+      "zh": "科尼察"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_METSOVO": {
+      "en": "Ioannina",
+      "zh": "约阿尼纳"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_NORTH_EPIRUS": {
+      "en": "North Epirus",
+      "zh": "北伊庇鲁斯"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_PARGA": {
+      "en": "Parga",
+      "zh": "帕尔加"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_PREVEZA": {
+      "en": "Preveza",
+      "zh": "普雷韦扎"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_SARANDE": {
+      "en": "Sarande",
+      "zh": "萨兰达"
+    },
+    "id::GR_ADM1_GRC-2949__SPLIT_WEST_IOANNINA": {
+      "en": "East Arta",
+      "zh": "东阿尔塔"
+    },
+    "id::GR_ADM1_GRC-2991__SPLIT_CENTRAL_MACEDONIA": {
+      "en": "Veroia",
+      "zh": "韦里亚"
+    },
+    "id::GR_ADM1_GRC-2991__SPLIT_CHALKIDIKI": {
+      "en": "Thessaloniki",
+      "zh": "塞萨洛尼基"
+    },
+    "id::GR_ADM1_GRC-2991__SPLIT_KATERINI": {
+      "en": "Katerini",
+      "zh": "卡泰里尼"
+    },
+    "id::GR_ADM1_GRC-3001__SPLIT_ALEXANDROUPOLI": {
+      "en": "Xanthi",
+      "zh": "克桑西"
+    },
+    "id::GR_ADM1_GRC-3001__SPLIT_IPSALA": {
+      "en": "Ipsala",
+      "zh": "伊普萨拉"
+    },
+    "id::GR_ADM1_GRC-3001__SPLIT_KESAN": {
+      "en": "Alexandroupoli",
+      "zh": "亚历山德鲁波利斯"
+    },
+    "id::GR_ADM1_GRC-3001__SPLIT_LULEBURGAZ": {
+      "en": "Orestiada",
+      "zh": "奥雷斯蒂亚达"
+    },
+    "id::GR_ADM1_GRC-3001__SPLIT_MERIC": {
+      "en": "Meric",
+      "zh": "梅里奇"
+    },
+    "id::GR_ADM1_GRC-3001__SPLIT_UZUMKOPRU": {
+      "en": "Uzumkopru",
+      "zh": "乌尊克普吕"
+    },
+    "id::GR_ADM1_GRC-3013__SPLIT_CYCLADES": {
+      "en": "Cyclades",
+      "zh": "基克拉泽斯群岛"
+    },
+    "id::GR_ADM1_GRC-3013__SPLIT_DODECANESE": {
+      "en": "Dodecanese",
+      "zh": "多德卡尼斯群岛"
+    },
+    "id::HR025__SPLIT_OSIJEK": {
+      "en": "North Osijek",
+      "zh": "北奥西耶克"
+    },
+    "id::HR025__SPLIT_SARVAS": {
+      "en": "Sarvas",
+      "zh": "萨尔瓦什"
+    },
+    "id::HR025__SPLIT_VINKOVCI": {
+      "en": "South Osijek",
+      "zh": "南奥西耶克"
+    },
+    "id::HR026__SPLIT_OTOK": {
+      "en": "Otok",
+      "zh": "奥托克"
+    },
+    "id::HR026__SPLIT_VINKOVCI": {
+      "en": "Vinkovci",
+      "zh": "温科夫齐"
+    },
+    "id::HR026__SPLIT_VUKOVAR": {
+      "en": "Vukovar",
+      "zh": "武科瓦尔"
     },
     "id::HR031__SPLIT_ABBAZIA": {
       "en": "Abbazia",
@@ -105,6 +1433,82 @@
       "en": "Primorje-Gorski Kotar (Yugoslav part)",
       "zh": "滨海-戈尔斯基科塔尔（南斯拉夫部分）"
     },
+    "id::HR032__SPLIT_KARLOBAG": {
+      "en": "Karlobag",
+      "zh": "卡尔洛巴格"
+    },
+    "id::HR032__SPLIT_KORENICA": {
+      "en": "Korenica",
+      "zh": "科雷尼察"
+    },
+    "id::HR032__SPLIT_NORTHERN_DALMATIA": {
+      "en": "Northern Dalmatia",
+      "zh": "达尔马提亚北部"
+    },
+    "id::HR033__SPLIT_REST": {
+      "en": "Zadar County (Yugoslav part)",
+      "zh": "扎达尔县（南斯拉夫部分）"
+    },
+    "id::HR033__SPLIT_ZARA": {
+      "en": "Zara",
+      "zh": "扎拉"
+    },
+    "id::HR034__SPLIT_BRUSKA": {
+      "en": "Bruska",
+      "zh": "布鲁什卡"
+    },
+    "id::HR034__SPLIT_CETINA": {
+      "en": "Cetina",
+      "zh": "采蒂纳"
+    },
+    "id::HR034__SPLIT_MURVICA": {
+      "en": "Šibenik",
+      "zh": "希贝尼克"
+    },
+    "id::HR035__SPLIT_DALMATIA": {
+      "en": "Solin",
+      "zh": "索林"
+    },
+    "id::HR035__SPLIT_DALMATIAN_ISLANDS": {
+      "en": "Dalmatian Islands",
+      "zh": "达尔马提亚群岛"
+    },
+    "id::HR035__SPLIT_METKOVIC": {
+      "en": "Metkovic",
+      "zh": "梅特科维奇"
+    },
+    "id::HR036__SPLIT_CANFANARO": {
+      "en": "Canfanaro",
+      "zh": "坎法纳罗"
+    },
+    "id::HR036__SPLIT_GIMINO": {
+      "en": "Gimino",
+      "zh": "日米尼"
+    },
+    "id::HR036__SPLIT_MEDOLINO": {
+      "en": "South Pula",
+      "zh": "南普拉"
+    },
+    "id::HR036__SPLIT_POLA": {
+      "en": "North Pola",
+      "zh": "北普拉"
+    },
+    "id::HR036__SPLIT_VALDARSA": {
+      "en": "Valdarsa",
+      "zh": "瓦尔达尔萨"
+    },
+    "id::HR037__SPLIT_MERDARI": {
+      "en": "Merdari",
+      "zh": "梅尔达里"
+    },
+    "id::HR037__SPLIT_NEUM": {
+      "en": "Neum",
+      "zh": "内乌姆"
+    },
+    "id::HR037__SPLIT_WEST_DUBORVNIK": {
+      "en": "West Dubrovnik",
+      "zh": "西杜布罗夫尼克"
+    },
     "id::HU110__SPLIT_BUDA": {
       "en": "Budapest · Buda",
       "zh": "布达佩斯 · 布达"
@@ -112,6 +1516,126 @@
     "id::HU110__SPLIT_PEST": {
       "en": "Budapest · Pest",
       "zh": "布达佩斯 · 佩斯"
+    },
+    "id::HU221__SPLIT_ABDA": {
+      "en": "Abda",
+      "zh": "奥布道"
+    },
+    "id::HU221__SPLIT_FERTOD": {
+      "en": "Mosonmagyarovar",
+      "zh": "莫雄马扎尔古堡"
+    },
+    "id::HU221__SPLIT_SOPRON": {
+      "en": "Sopron",
+      "zh": "肖普朗"
+    },
+    "id::HU221__SPLIT_TET": {
+      "en": "Tet",
+      "zh": "泰特"
+    },
+    "id::HU221__SPLIT_VAMOSSZABADI": {
+      "en": "Győr",
+      "zh": "杰尔"
+    },
+    "id::HU222__SPLIT_KAM": {
+      "en": "Szombathely",
+      "zh": "松博特海伊"
+    },
+    "id::HU222__SPLIT_SZOMBATHELY": {
+      "en": "Sarvar",
+      "zh": "沙尔堡"
+    },
+    "id::HU222__SPLIT_VASVAR": {
+      "en": "Vasvar",
+      "zh": "沃什堡"
+    },
+    "id::HU222__SPLIT_ZALALOVO": {
+      "en": "Zalalovo",
+      "zh": "佐洛勒沃"
+    },
+    "id::HU311__SPLIT_CIGAND": {
+      "en": "Tiszaujvaros",
+      "zh": "蒂萨新城"
+    },
+    "id::HU311__SPLIT_HRAN": {
+      "en": "Satoraljaujhely",
+      "zh": "沙托劳尔尧乌伊海伊"
+    },
+    "id::HU311__SPLIT_MEZOKOVESD": {
+      "en": "Miskolc",
+      "zh": "米什科尔茨"
+    },
+    "id::HU311__SPLIT_MISKOLC": {
+      "en": "Encs",
+      "zh": "恩奇"
+    },
+    "id::HU323__SPLIT_CIGAND": {
+      "en": "Kemecse",
+      "zh": "凯梅切"
+    },
+    "id::HU323__SPLIT_NYIREGYHAZA": {
+      "en": "Nyiregyhaza",
+      "zh": "尼赖吉哈佐"
+    },
+    "id::HU323__SPLIT_SZATMARCSEKE": {
+      "en": "Mateszalka",
+      "zh": "马泰绍尔考"
+    },
+    "id::HU331__SPLIT_BACS_KISKUN": {
+      "en": "Kiskunfelegyhaza",
+      "zh": "基什孔费莱吉哈佐"
+    },
+    "id::HU331__SPLIT_BAJA": {
+      "en": "Baja",
+      "zh": "鲍姚"
+    },
+    "id::HU331__SPLIT_KECSKEMET": {
+      "en": "Kecskemet",
+      "zh": "凯奇凯梅特"
+    },
+    "id::HU331__SPLIT_REM": {
+      "en": "Kiskunhalas",
+      "zh": "基什孔豪洛什"
+    },
+    "id::IE041__SPLIT_CAVAN_MONAGHAN": {
+      "en": "Cavan-Monaghan",
+      "zh": "卡文-莫纳亨"
+    },
+    "id::IE041__SPLIT_CLONES": {
+      "en": "Monaghan",
+      "zh": "莫纳亨"
+    },
+    "id::IE041__SPLIT_DONEGAL": {
+      "en": "Letterkenny",
+      "zh": "莱特肯尼"
+    },
+    "id::IE041__SPLIT_LOUGH_SWILLY": {
+      "en": "Lough Swilly",
+      "zh": "斯威利湾"
+    },
+    "id::IE041__SPLIT_MANORHAMILTON": {
+      "en": "Carrick-on-Shannon",
+      "zh": "香农河畔卡里克"
+    },
+    "id::IE041__SPLIT_SLIGO": {
+      "en": "Sligo",
+      "zh": "斯莱戈"
+    },
+    "id::IN_ADM2_76128533B75922461866405__SPLIT_PLAYA_RANN_OF_KUTCH": {
+      "en": "Barmer · Rann of Kutch",
+      "zh": "巴默 · 卡奇沼泽"
+    },
+    "id::IN_ADM2_76128533B75922461866405__SPLIT_REST": {
+      "en": "Barmer",
+      "zh": "巴默"
+    },
+    "id::IN_ADM2_76128533B91881382098572__SPLIT_PLAYA_RANN_OF_KUTCH": {
+      "en": "Kachchh · Rann of Kutch",
+      "zh": "卡奇赫 · 卡奇沼泽"
+    },
+    "id::IN_ADM2_76128533B91881382098572__SPLIT_REST": {
+      "en": "Kachchh",
+      "zh": "卡奇赫"
     },
     "id::IN_ADM2_76128533B9892158671522__SPLIT_DECCAN_STATES": {
       "en": "Sangli · Deccan states",
@@ -128,6 +1652,14 @@
     "id::IN_MRG_0de8d89a2f89__SPLIT_REST": {
       "en": "Telangana · East · Remainder",
       "zh": "特伦甘纳邦·东部 · 余部"
+    },
+    "id::IN_MRG_0f1924c89ced__SPLIT_PLAYA_RANN_OF_KUTCH": {
+      "en": "Gujarat · North · Rann of Kutch",
+      "zh": "古吉拉特邦·北部 · 卡奇沼泽"
+    },
+    "id::IN_MRG_0f1924c89ced__SPLIT_REST": {
+      "en": "Gujarat · North",
+      "zh": "古吉拉特邦·北部"
     },
     "id::IN_MRG_16da719e5c4e__SPLIT_PARBHANI": {
       "en": "Maharashtra · East 1 · Parbhani and Hingoli",
@@ -185,6 +1717,370 @@
       "en": "Kerala · Central · Remainder",
       "zh": "喀拉拉邦·中部 · 余部"
     },
+    "id::IN_MRG_c84cc721f026__SPLIT_PLAYA_RANN_OF_KUTCH": {
+      "en": "Rajasthan · South 1 · Rann of Kutch",
+      "zh": "拉贾斯坦邦·南部1 · 卡奇沼泽"
+    },
+    "id::IN_MRG_c84cc721f026__SPLIT_REST": {
+      "en": "Rajasthan · South 1",
+      "zh": "拉贾斯坦邦·南部1"
+    },
+    "id::IRN-3211__SPLIT_PLAYA_DARYACHEH_YE_NAMAK": {
+      "en": "Esfahan · Daryacheh-ye Namak",
+      "zh": "伊斯法罕 · 纳马克湖"
+    },
+    "id::IRN-3211__SPLIT_PLAYA_DASHT_E_KAVIR": {
+      "en": "Esfahan · Dasht-e Kavir",
+      "zh": "伊斯法罕 · 卡维尔盐漠"
+    },
+    "id::IRN-3211__SPLIT_REST": {
+      "en": "Esfahan",
+      "zh": "伊斯法罕"
+    },
+    "id::IRN-3215__SPLIT_PLAYA_DARYACHEH_YE_NAMAK": {
+      "en": "Semnan · Daryacheh-ye Namak",
+      "zh": "塞姆南 · 纳马克湖"
+    },
+    "id::IRN-3215__SPLIT_PLAYA_DASHT_E_KAVIR": {
+      "en": "Semnan · Dasht-e Kavir",
+      "zh": "塞姆南 · 卡维尔盐漠"
+    },
+    "id::IRN-3215__SPLIT_PLAYA_SALT_FLAT_22": {
+      "en": "Semnan · Salt flat",
+      "zh": "塞姆南 · 盐沼"
+    },
+    "id::IRN-3215__SPLIT_REST": {
+      "en": "Semnan",
+      "zh": "塞姆南"
+    },
+    "id::IRN-3216__SPLIT_PLAYA_SALT_FLAT_22": {
+      "en": "Tehran · Salt flat",
+      "zh": "德黑兰 · 盐沼"
+    },
+    "id::IRN-3216__SPLIT_REST": {
+      "en": "Tehran",
+      "zh": "德黑兰"
+    },
+    "id::IRN-3217__SPLIT_PLAYA_DASHT_E_KAVIR": {
+      "en": "Yazd · Dasht-e Kavir",
+      "zh": "亚兹德 · 卡维尔盐漠"
+    },
+    "id::IRN-3217__SPLIT_PLAYA_KAVIR_E_ABARKUH": {
+      "en": "Yazd · Kavir-e Abarkuh",
+      "zh": "亚兹德 · 阿巴尔库盐漠"
+    },
+    "id::IRN-3217__SPLIT_PLAYA_KAVIR_E_NAMAK_E_SIRJAN": {
+      "en": "Yazd · Kavir-e Namak-e Sirjan",
+      "zh": "亚兹德 · 锡尔詹盐湖沙漠"
+    },
+    "id::IRN-3217__SPLIT_REST": {
+      "en": "Yazd",
+      "zh": "亚兹德"
+    },
+    "id::IRN-3232__SPLIT_PLAYA_DARYACHEH_YE_NAMAK": {
+      "en": "Qom · Daryacheh-ye Namak",
+      "zh": "库姆 · 纳马克湖"
+    },
+    "id::IRN-3232__SPLIT_REST": {
+      "en": "Qom",
+      "zh": "库姆"
+    },
+    "id::IRN-3244__SPLIT_PLAYA_DAQQ_E_PATERGAN": {
+      "en": "South Khorasan · Daqq-e Patergan",
+      "zh": "南呼罗珊省 · 帕特根盐湖"
+    },
+    "id::IRN-3244__SPLIT_PLAYA_DARYACHEH_YE_SISTAN": {
+      "en": "South Khorasan · Daryacheh-ye Sistan",
+      "zh": "南呼罗珊省 · 锡斯坦湖"
+    },
+    "id::IRN-3244__SPLIT_REST": {
+      "en": "South Khorasan",
+      "zh": "南呼罗珊省"
+    },
+    "id::IRN-3245__SPLIT_PLAYA_DASHT_E_KAVIR": {
+      "en": "Razavi Khorasan · Dasht-e Kavir",
+      "zh": "拉扎维呼罗珊 · 卡维尔盐漠"
+    },
+    "id::IRN-3245__SPLIT_PLAYA_KEVIR_E_NAMAK": {
+      "en": "Razavi Khorasan · Kevir-e Namak",
+      "zh": "拉扎维呼罗珊 · 纳马克盐漠"
+    },
+    "id::IRN-3245__SPLIT_REST": {
+      "en": "Razavi Khorasan",
+      "zh": "拉扎维呼罗珊"
+    },
+    "id::IRN-3247__SPLIT_PLAYA_DARYACHEH_YE_SISTAN": {
+      "en": "Sistan and Baluchestan · Daryacheh-ye Sistan",
+      "zh": "锡斯坦和俾路支斯坦 · 锡斯坦湖"
+    },
+    "id::IRN-3247__SPLIT_PLAYA_HAMUN_E_JAZ_MURIAN": {
+      "en": "Sistan and Baluchestan · Hamun-e Jaz Murian",
+      "zh": "锡斯坦和俾路支斯坦 · 贾兹穆里安湖"
+    },
+    "id::IRN-3247__SPLIT_PLAYA_HAMUN_E_SABERI": {
+      "en": "Sistan and Baluchestan · Hamun-e Saberi",
+      "zh": "锡斯坦和俾路支斯坦 · 萨贝里湖"
+    },
+    "id::IRN-3247__SPLIT_PLAYA_HAMUN_I_MASHKEL": {
+      "en": "Sistan and Baluchestan · Hamun-i-Mashkel",
+      "zh": "锡斯坦和俾路支斯坦 · 马什克尔湖"
+    },
+    "id::IRN-3247__SPLIT_REST": {
+      "en": "Sistan and Baluchestan",
+      "zh": "锡斯坦和俾路支斯坦"
+    },
+    "id::IRN-3248__SPLIT_PLAYA_HAMUN_E_JAZ_MURIAN": {
+      "en": "Kerman · Hamun-e Jaz Murian",
+      "zh": "克尔曼 · 贾兹穆里安湖"
+    },
+    "id::IRN-3248__SPLIT_PLAYA_KAVIR_E_NAMAK_E_SIRJAN": {
+      "en": "Kerman · Kavir-e Namak-e Sirjan",
+      "zh": "克尔曼 · 锡尔詹盐湖沙漠"
+    },
+    "id::IRN-3248__SPLIT_PLAYA_NAMAKZAR_E_SHADAD": {
+      "en": "Kerman · Namakzar-e Shadad",
+      "zh": "克尔曼 · 沙达德盐沼"
+    },
+    "id::IRN-3248__SPLIT_REST": {
+      "en": "Kerman",
+      "zh": "克尔曼"
+    },
+    "id::IRQ-3049__SPLIT_ARBIL": {
+      "en": "Hawija",
+      "zh": "哈维杰"
+    },
+    "id::IRQ-3049__SPLIT_KIRKUK": {
+      "en": "Kirkuk",
+      "zh": "基尔库克"
+    },
+    "id::IRQ-3050__SPLIT_ARBIL": {
+      "en": "Erbil",
+      "zh": "埃尔比勒"
+    },
+    "id::IRQ-3050__SPLIT_KIRKUK": {
+      "en": "Koysinceq",
+      "zh": "科伊桑贾克"
+    },
+    "id::IRQ-3050__SPLIT_SHAQLAWA": {
+      "en": "Barzan",
+      "zh": "巴尔赞"
+    },
+    "id::IRQ-3050__SPLIT_SORAN": {
+      "en": "Soran",
+      "zh": "索兰"
+    },
+    "id::IRQ-3050__SPLIT_SOUTH_SHAQLAWA": {
+      "en": "Shaqlawa",
+      "zh": "沙克拉瓦"
+    },
+    "id::IRQ-3051__SPLIT_AL_SHIRQAT": {
+      "en": "Al-Hamdaniya",
+      "zh": "哈姆达尼耶"
+    },
+    "id::IRQ-3051__SPLIT_BARDARASH": {
+      "en": "Zummar",
+      "zh": "祖马尔"
+    },
+    "id::IRQ-3051__SPLIT_HATRA": {
+      "en": "Hatra",
+      "zh": "哈特拉"
+    },
+    "id::IRQ-3051__SPLIT_MOSUL": {
+      "en": "Mosul",
+      "zh": "摩苏尔"
+    },
+    "id::IRQ-3051__SPLIT_QARYAT_AL_ASHIQ": {
+      "en": "Sinjar",
+      "zh": "辛贾尔"
+    },
+    "id::IRQ-3051__SPLIT_SHAYKHAN": {
+      "en": "Fishkhabur",
+      "zh": "菲什哈布尔"
+    },
+    "id::IRQ-3051__SPLIT_SOUTH_MOSUL": {
+      "en": "Tallkayf",
+      "zh": "泰勒凯夫"
+    },
+    "id::IRQ-3051__SPLIT_SOUTH_SHAQLAWA": {
+      "en": "'Aqrah",
+      "zh": "阿克拉"
+    },
+    "id::IRQ-3051__SPLIT_SOUTH_SINJAR": {
+      "en": "Rabia",
+      "zh": "拉比亚"
+    },
+    "id::IRQ-3051__SPLIT_TAL_AFAR": {
+      "en": "North Tal Afar",
+      "zh": "北泰勒阿费尔"
+    },
+    "id::IRQ-3052__SPLIT_BUHAYRAT_ATH_THARTHAR": {
+      "en": "Sala ad-Din · Buhayrat ath Tharthar site",
+      "zh": "阿丁厅 · 塞尔萨尔湖库址"
+    },
+    "id::IRQ-3052__SPLIT_REST": {
+      "en": "Sala ad-Din",
+      "zh": "阿丁厅"
+    },
+    "id::IRQ-3471__SPLIT_BUHAYRAT_ATH_THARTHAR": {
+      "en": "Al-Anbar · Buhayrat ath Tharthar site",
+      "zh": "安巴尔 · 塞尔萨尔湖库址"
+    },
+    "id::IRQ-3471__SPLIT_PLAYA_SALT_FLAT_40": {
+      "en": "Al-Anbar · Salt flat",
+      "zh": "安巴尔 · 盐沼"
+    },
+    "id::IRQ-3471__SPLIT_REST": {
+      "en": "Al-Anbar",
+      "zh": "安巴尔"
+    },
+    "id::ISR-3053__SPLIT_DIMONA": {
+      "en": "Dimona",
+      "zh": "迪莫纳"
+    },
+    "id::ISR-3053__SPLIT_EILAT": {
+      "en": "Eilat",
+      "zh": "埃拉特"
+    },
+    "id::ISR-3053__SPLIT_EZUZ": {
+      "en": "Mitzpe Ramon",
+      "zh": "米茨佩拉蒙"
+    },
+    "id::ISR-3053__SPLIT_LAHAV": {
+      "en": "Kiryat Gat",
+      "zh": "基里亚特加特"
+    },
+    "id::ISR-3053__SPLIT_NEGEV": {
+      "en": "Ashdod",
+      "zh": "阿什杜德"
+    },
+    "id::ISR-3053__SPLIT_NEGEV_HIGHLANDS": {
+      "en": "Nitzana",
+      "zh": "尼察纳"
+    },
+    "id::ISR-3053__SPLIT_TLALIM": {
+      "en": "Tlalim",
+      "zh": "特拉利姆"
+    },
+    "id::ISR-3053__SPLIT_YERUHAM": {
+      "en": "Beersheba",
+      "zh": "贝尔谢巴"
+    },
+    "id::ITH10__SPLIT_BRUNICO": {
+      "en": "Brunico",
+      "zh": "布鲁尼科"
+    },
+    "id::ITH10__SPLIT_LACES": {
+      "en": "Laces",
+      "zh": "拉切斯"
+    },
+    "id::ITH10__SPLIT_MELAGO": {
+      "en": "Melago",
+      "zh": "梅拉戈"
+    },
+    "id::ITH10__SPLIT_MERANO": {
+      "en": "East Merano",
+      "zh": "东梅拉诺"
+    },
+    "id::ITH10__SPLIT_MERANO_MERAN": {
+      "en": "Merano-Meran",
+      "zh": "梅拉诺-梅兰"
+    },
+    "id::ITH10__SPLIT_NORTH_TRENTINO": {
+      "en": "North Trentino",
+      "zh": "特伦蒂诺北部"
+    },
+    "id::ITH10__SPLIT_SUDTIROL": {
+      "en": "Bolzano",
+      "zh": "波尔查诺"
+    },
+    "id::ITH10__SPLIT_WEST_SUDTIROL": {
+      "en": "West Merano",
+      "zh": "西梅拉诺"
+    },
+    "id::ITH20__SPLIT_NORTH_TRENTINO": {
+      "en": "North Trentino",
+      "zh": "特伦蒂诺北部"
+    },
+    "id::ITH20__SPLIT_ROVERETO": {
+      "en": "West Rovereto",
+      "zh": "西罗韦雷托"
+    },
+    "id::ITH20__SPLIT_TRENTINO": {
+      "en": "East Rovereto",
+      "zh": "东罗韦雷托"
+    },
+    "id::ITH20__SPLIT_WEST_SUDTIROL": {
+      "en": "West-Sudtirol",
+      "zh": "西南蒂罗尔"
+    },
+    "id::ITH20__SPLIT_WEST_TRENTINO": {
+      "en": "Trento",
+      "zh": "特伦托"
+    },
+    "id::ITH41__SPLIT_FRIULI": {
+      "en": "Pordenone",
+      "zh": "波代诺内"
+    },
+    "id::ITH41__SPLIT_NORTH_FRIULI": {
+      "en": "Maniago",
+      "zh": "马尼亚戈"
+    },
+    "id::ITH42__SPLIT_AUPA": {
+      "en": "Aupa",
+      "zh": "奥帕"
+    },
+    "id::ITH42__SPLIT_DOGNA": {
+      "en": "Dogna",
+      "zh": "多尼亚"
+    },
+    "id::ITH42__SPLIT_FRIULI": {
+      "en": "Codroipo",
+      "zh": "科德罗伊波"
+    },
+    "id::ITH42__SPLIT_GORIZIA": {
+      "en": "Manzano",
+      "zh": "曼扎诺"
+    },
+    "id::ITH42__SPLIT_MARANO_LAGUNARE": {
+      "en": "San Giorgio di Nogaro",
+      "zh": "圣乔尔焦迪诺加罗"
+    },
+    "id::ITH42__SPLIT_MORTEGLIANO": {
+      "en": "Osoppo",
+      "zh": "奥索波"
+    },
+    "id::ITH42__SPLIT_NORTH_FRIULI": {
+      "en": "Udine",
+      "zh": "乌迪内"
+    },
+    "id::ITH42__SPLIT_NORTH_GORIZIA": {
+      "en": "Cividale del Friuli",
+      "zh": "奇维达莱德尔弗留利"
+    },
+    "id::ITH42__SPLIT_POCENIA": {
+      "en": "Marano Lagunare",
+      "zh": "马拉诺拉古纳雷"
+    },
+    "id::ITH42__SPLIT_TARVISIO": {
+      "en": "Tarvisio",
+      "zh": "塔尔维西奥"
+    },
+    "id::ITH42__SPLIT_VALBRUNA": {
+      "en": "Valbruna",
+      "zh": "瓦尔布鲁纳"
+    },
+    "id::ITH42__SPLIT_VKENTZI": {
+      "en": "Cave del Predil",
+      "zh": "卡韦德尔普雷迪尔"
+    },
+    "id::ITH59__SPLIT_REST": {
+      "en": "Rimini",
+      "zh": "里米尼"
+    },
+    "id::ITH59__SPLIT_SAN_MARINO": {
+      "en": "Serravalle and Dogana edge",
+      "zh": "塞拉瓦莱与多加纳边缘"
+    },
     "id::ITI43__SPLIT_CITY": {
       "en": "Rome",
       "zh": "罗马市"
@@ -193,6 +2089,74 @@
       "en": "Province of Rome",
       "zh": "罗马省"
     },
+    "id::KAZ-3195__SPLIT_ARAL1987": {
+      "en": "Aqtöbe · Aral seabed (dried by 1987)",
+      "zh": "阿克托贝 · 咸海干涸湖床（1987 年前）"
+    },
+    "id::KAZ-3195__SPLIT_ARAL2006": {
+      "en": "Aqtöbe · Aral seabed (dried by 2006)",
+      "zh": "阿克托贝 · 咸海干涸湖床（2006 年前）"
+    },
+    "id::KAZ-3195__SPLIT_ARAL2009": {
+      "en": "Aqtöbe · Aral seabed (dried by 2009)",
+      "zh": "阿克托贝 · 咸海干涸湖床（2009 年前）"
+    },
+    "id::KAZ-3195__SPLIT_ARALBASIN": {
+      "en": "Aqtöbe · Aral seabed (residual basin)",
+      "zh": "阿克托贝 · 咸海干涸湖床（残余湖盆）"
+    },
+    "id::KAZ-3195__SPLIT_REST": {
+      "en": "Aqtöbe",
+      "zh": "阿克托贝"
+    },
+    "id::KAZ-3197__SPLIT_ARAL1973": {
+      "en": "Qyzylorda · Aral seabed (dried by 1973)",
+      "zh": "克孜勒奥尔达 · 咸海干涸湖床（1973 年前）"
+    },
+    "id::KAZ-3197__SPLIT_ARAL1987": {
+      "en": "Qyzylorda · Aral seabed (dried by 1987)",
+      "zh": "克孜勒奥尔达 · 咸海干涸湖床（1987 年前）"
+    },
+    "id::KAZ-3197__SPLIT_ARAL1999": {
+      "en": "Qyzylorda · Aral seabed (dried by 1999)",
+      "zh": "克孜勒奥尔达 · 咸海干涸湖床（1999 年前）"
+    },
+    "id::KAZ-3197__SPLIT_ARAL2006": {
+      "en": "Qyzylorda · Aral seabed (dried by 2006)",
+      "zh": "克孜勒奥尔达 · 咸海干涸湖床（2006 年前）"
+    },
+    "id::KAZ-3197__SPLIT_ARAL2009": {
+      "en": "Qyzylorda · Aral seabed (dried by 2009)",
+      "zh": "克孜勒奥尔达 · 咸海干涸湖床（2009 年前）"
+    },
+    "id::KAZ-3197__SPLIT_ARAL2014": {
+      "en": "Qyzylorda · Aral seabed (dried by 2014)",
+      "zh": "克孜勒奥尔达 · 咸海干涸湖床（2014 年前）"
+    },
+    "id::KAZ-3197__SPLIT_ARALBASIN": {
+      "en": "Qyzylorda · Aral seabed (residual basin)",
+      "zh": "克孜勒奥尔达 · 咸海干涸湖床（残余湖盆）"
+    },
+    "id::KAZ-3197__SPLIT_REST": {
+      "en": "Qyzylorda",
+      "zh": "克孜勒奥尔达"
+    },
+    "id::LBY-2982__SPLIT_PLAYA_SALT_FLAT_39": {
+      "en": "Al Jabal al Akhdar · Salt flat",
+      "zh": "阿赫达尔山 · 盐沼"
+    },
+    "id::LBY-2982__SPLIT_REST": {
+      "en": "Al Jabal al Akhdar",
+      "zh": "阿赫达尔山"
+    },
+    "id::LBY-2986__SPLIT_PLAYA_SALT_FLAT_39": {
+      "en": "Al Qubbah · Salt flat",
+      "zh": "阿尔库巴 · 盐沼"
+    },
+    "id::LBY-2986__SPLIT_REST": {
+      "en": "Al Qubbah",
+      "zh": "阿尔库巴"
+    },
     "id::LT011__SPLIT_REST": {
       "en": "Vilnius County (Lithuanian part)",
       "zh": "维尔纽斯县（立陶宛控制部分）"
@@ -200,6 +2164,14 @@
     "id::LT011__SPLIT_WILNO": {
       "en": "Wilno region",
       "zh": "维尔诺地区"
+    },
+    "id::LT021__SPLIT_POLISH": {
+      "en": "Druskieniki and the Grodno railway",
+      "zh": "德鲁斯基宁凯与格罗德诺铁路沿线"
+    },
+    "id::LT021__SPLIT_REST": {
+      "en": "Alytus County (Lithuanian part)",
+      "zh": "阿利图斯县（立陶宛控制部分）"
     },
     "id::LT023__SPLIT_MEMEL": {
       "en": "Memel Territory",
@@ -217,6 +2189,58 @@
       "en": "Tauragė County (rest)",
       "zh": "陶拉格县（其余）"
     },
+    "id::LT029__SPLIT_POLISH": {
+      "en": "Ignalina and Turmantas",
+      "zh": "伊格纳利纳与图尔曼塔斯"
+    },
+    "id::LT029__SPLIT_REST": {
+      "en": "Utena County (Lithuanian part)",
+      "zh": "乌田纳县（立陶宛控制部分）"
+    },
+    "id::LV005__SPLIT_BALVI": {
+      "en": "Viļaka",
+      "zh": "维利亚卡"
+    },
+    "id::LV005__SPLIT_DAUGAVPILS": {
+      "en": "Daugavpils",
+      "zh": "陶格夫匹尔斯"
+    },
+    "id::LV005__SPLIT_JEKABPILS": {
+      "en": "Līvāni",
+      "zh": "利瓦尼"
+    },
+    "id::LV005__SPLIT_KRASLAVA": {
+      "en": "Kraslava",
+      "zh": "克拉斯拉瓦"
+    },
+    "id::LV005__SPLIT_LATGALE": {
+      "en": "Viļāni",
+      "zh": "维利亚尼"
+    },
+    "id::LV005__SPLIT_REZEKNE": {
+      "en": "West Rezekne",
+      "zh": "西雷泽克内"
+    },
+    "id::LV005__SPLIT_REZEKNE_5789": {
+      "en": "East Rezekne",
+      "zh": "东雷泽克内"
+    },
+    "id::LV005__SPLIT_SKRUDALIENA": {
+      "en": "Skrudaliena",
+      "zh": "斯克鲁达列纳"
+    },
+    "id::LV005__SPLIT_TILZA": {
+      "en": "Tilza",
+      "zh": "蒂尔扎"
+    },
+    "id::LV005__SPLIT_ZEMGALE": {
+      "en": "Subate",
+      "zh": "苏巴特"
+    },
+    "id::LV005__SPLIT_ZILUPE": {
+      "en": "Zilupe",
+      "zh": "济卢佩"
+    },
     "id::MAR-1445__SPLIT_REST": {
       "en": "Tanger - Tétouan · Remainder",
       "zh": "丹吉尔 - 得土安 · 余部"
@@ -224,6 +2248,22 @@
     "id::MAR-1445__SPLIT_TANGIER": {
       "en": "Tanger - Tétouan · Tangier International Zone",
       "zh": "丹吉尔 - 得土安 · 坦吉尔国际区"
+    },
+    "id::MAR-1447__SPLIT_FRENCH": {
+      "en": "Taza and Taounate (French zone)",
+      "zh": "塔扎与陶纳特（法属区）"
+    },
+    "id::MAR-1447__SPLIT_REST": {
+      "en": "Al Hoceima (Spanish zone)",
+      "zh": "胡塞马（西属区）"
+    },
+    "id::MAR-1454__SPLIT_REST": {
+      "en": "Oriental (French zone)",
+      "zh": "东部（法属区）"
+    },
+    "id::MAR-1454__SPLIT_SPANISH": {
+      "en": "Nador and Driouch (Spanish zone)",
+      "zh": "纳祖尔与德里乌什（西属区）"
     },
     "id::MAR-1455__SPLIT_IFNI": {
       "en": "Souss - Massa - Draâ · Ifni",
@@ -241,6 +2281,14 @@
       "en": "Guelmim - Es-Semara · Remainder",
       "zh": "盖勒敏 - 埃斯-塞马拉 · 余部"
     },
+    "id::MDA-1650__SPLIT_BENDER": {
+      "en": "Bender and Varnița (right bank)",
+      "zh": "宾杰里与瓦尔尼察（右岸）"
+    },
+    "id::MDA-1650__SPLIT_LEFT": {
+      "en": "Tiraspol and Slobozia (left bank)",
+      "zh": "蒂拉斯波尔与斯洛博齐亚（左岸）"
+    },
     "id::MDA-1652__SPLIT_LEFT": {
       "en": "Camenca (left bank)",
       "zh": "卡缅卡（德涅斯特河左岸）"
@@ -249,11 +2297,179 @@
       "en": "Camenca (right bank)",
       "zh": "卡缅卡（德涅斯特河右岸）"
     },
+    "id::ME_ADM1_MNE-1509__SPLIT_ANDRIJEVICA": {
+      "en": "Andrijevica",
+      "zh": "安德里耶维察"
+    },
+    "id::ME_ADM1_MNE-1509__SPLIT_PETNIJCA": {
+      "en": "Petnjica",
+      "zh": "佩特尼察"
+    },
+    "id::ME_ADM1_MNE-1509__SPLIT_SOUTH_KOLASIN": {
+      "en": "Berane",
+      "zh": "贝拉内"
+    },
+    "id::MK003__SPLIT_BOJANE": {
+      "en": "Bojane",
+      "zh": "博亚内"
+    },
+    "id::MK003__SPLIT_PCINJA": {
+      "en": "Ohrid",
+      "zh": "奥赫里德"
+    },
+    "id::MK003__SPLIT_WEST_MACEDONIA": {
+      "en": "Centar Zupa",
+      "zh": "中茹帕"
+    },
+    "id::MK006__SPLIT_BOJANE": {
+      "en": "Brvenica",
+      "zh": "布尔韦尼察"
+    },
+    "id::MK006__SPLIT_ELEZ_HAN": {
+      "en": "Tetovo",
+      "zh": "泰托沃"
+    },
+    "id::MK006__SPLIT_TETOVO": {
+      "en": "Gostivar",
+      "zh": "戈斯蒂瓦尔"
+    },
+    "id::MK007__SPLIT_DIMITROVERAD": {
+      "en": "Dimitroverad",
+      "zh": "迪米特洛夫格勒"
+    },
+    "id::MK007__SPLIT_KRIVE_PALANKA": {
+      "en": "Kriva Palanka",
+      "zh": "克里瓦帕兰卡"
+    },
+    "id::MK007__SPLIT_MACEDONIA": {
+      "en": "Kumanovo",
+      "zh": "库马诺沃"
+    },
+    "id::MNG-3319__SPLIT_PLAYA_TSAGAAN_NUUR": {
+      "en": "Govi-Altay · Tsagaan Nuur",
+      "zh": "戈壁-阿勒泰 · 察干湖"
+    },
+    "id::MNG-3319__SPLIT_REST": {
+      "en": "Govi-Altay",
+      "zh": "戈壁-阿勒泰"
+    },
+    "id::MNG-3320__SPLIT_PLAYA_SALT_FLAT_27": {
+      "en": "Hovd · Salt flat",
+      "zh": "头 · 盐沼"
+    },
+    "id::MNG-3320__SPLIT_REST": {
+      "en": "Hovd",
+      "zh": "头"
+    },
+    "id::MX_ZN_14_002__SPLIT_LAKE_TEXCOCO": {
+      "en": "Mexico Zone 2 · Lake Texcoco lakebed",
+      "zh": "墨西哥2区 · 特斯科科湖故湖床"
+    },
+    "id::MX_ZN_14_002__SPLIT_REST": {
+      "en": "Mexico Zone 2",
+      "zh": "墨西哥2区"
+    },
+    "id::MX_ZN_14_003__SPLIT_LAKE_TEXCOCO": {
+      "en": "Mexico Zone 3 · Lake Texcoco lakebed",
+      "zh": "墨西哥3区 · 特斯科科湖故湖床"
+    },
+    "id::MX_ZN_14_003__SPLIT_REST": {
+      "en": "Mexico Zone 3",
+      "zh": "墨西哥3区"
+    },
+    "id::MX_ZN_26_010__SPLIT_LAKE_TEXCOCO": {
+      "en": "State of Mexico Zone 10 · Lake Texcoco lakebed",
+      "zh": "墨西哥州 10 区 · 特斯科科湖故湖床"
+    },
+    "id::MX_ZN_26_010__SPLIT_REST": {
+      "en": "State of Mexico Zone 10",
+      "zh": "墨西哥州 10 区"
+    },
+    "id::MX_ZN_26_011__SPLIT_LAKE_TEXCOCO": {
+      "en": "State of Mexico Zone 11 · Lake Texcoco lakebed",
+      "zh": "墨西哥州11区 · 特斯科科湖故湖床"
+    },
+    "id::MX_ZN_26_011__SPLIT_REST": {
+      "en": "State of Mexico Zone 11",
+      "zh": "墨西哥州11区"
+    },
+    "id::MX_ZN_26_012__SPLIT_LAKE_TEXCOCO": {
+      "en": "State of Mexico Zone 12 · Lake Texcoco lakebed",
+      "zh": "墨西哥州 12 区 · 特斯科科湖故湖床"
+    },
+    "id::MX_ZN_26_012__SPLIT_REST": {
+      "en": "State of Mexico Zone 12",
+      "zh": "墨西哥州 12 区"
+    },
+    "id::MX_ZN_26_013__SPLIT_LAKE_TEXCOCO": {
+      "en": "State of Mexico Zone 13 · Lake Texcoco lakebed",
+      "zh": "墨西哥州13区 · 特斯科科湖故湖床"
+    },
+    "id::MX_ZN_26_013__SPLIT_REST": {
+      "en": "State of Mexico Zone 13",
+      "zh": "墨西哥州13区"
+    },
+    "id::MX_ZN_26_014__SPLIT_LAKE_TEXCOCO": {
+      "en": "State of Mexico Zone 14 · Lake Texcoco lakebed",
+      "zh": "墨西哥州14区 · 特斯科科湖故湖床"
+    },
+    "id::MX_ZN_26_014__SPLIT_REST": {
+      "en": "State of Mexico Zone 14",
+      "zh": "墨西哥州14区"
+    },
+    "id::MZ_ADM1_MOZ-1190__SPLIT_LAGO_DE_CAHORA_BASSA": {
+      "en": "Tete · Lago de Cahora Bassa site",
+      "zh": "太特 · 卡布拉巴萨水库库址"
+    },
+    "id::MZ_ADM1_MOZ-1190__SPLIT_REST": {
+      "en": "Tete",
+      "zh": "太特"
+    },
+    "id::NA_ADM1_NAM-3355__SPLIT_PLAYA_ETOSHA_PAN": {
+      "en": "Oshikoto · Etosha Pan",
+      "zh": "奥希科托 · 埃托沙盐沼"
+    },
+    "id::NA_ADM1_NAM-3355__SPLIT_REST": {
+      "en": "Oshikoto",
+      "zh": "奥希科托"
+    },
+    "id::NE_ADM1_NER-796__SPLIT_LAKE_CHAD": {
+      "en": "Diffa · Lake Chad lakebed",
+      "zh": "迪法 · 乍得湖故湖床"
+    },
+    "id::NE_ADM1_NER-796__SPLIT_REST": {
+      "en": "Diffa",
+      "zh": "迪法"
+    },
+    "id::NE_ADM1_NER-800__SPLIT_PLAYA_SALT_FLAT_18": {
+      "en": "Agadez · Salt flat",
+      "zh": "阿加德兹 · 盐沼"
+    },
+    "id::NE_ADM1_NER-800__SPLIT_REST": {
+      "en": "Agadez",
+      "zh": "阿加德兹"
+    },
     "id::NG_ADM1_NGA-2839__SPLIT_NCM": {
       "en": "Borno State · British Northern Cameroons",
       "zh": "博尔诺州 · 英属北喀麦隆"
     },
+    "id::NG_ADM1_NGA-2839__SPLIT_NCM__SPLIT_LAKE_CHAD": {
+      "en": "Borno State · British Northern Cameroons · Lake Chad lakebed",
+      "zh": "博尔诺州 · 英属北喀麦隆 · 乍得湖故湖床"
+    },
+    "id::NG_ADM1_NGA-2839__SPLIT_NCM__SPLIT_REST": {
+      "en": "Borno State · British Northern Cameroons",
+      "zh": "博尔诺州 · 英属北喀麦隆"
+    },
     "id::NG_ADM1_NGA-2839__SPLIT_REST": {
+      "en": "Borno State · Remainder",
+      "zh": "博尔诺州 · 余部"
+    },
+    "id::NG_ADM1_NGA-2839__SPLIT_REST__SPLIT_LAKE_CHAD": {
+      "en": "Borno State · Remainder · Lake Chad lakebed",
+      "zh": "博尔诺州 · 余部 · 乍得湖故湖床"
+    },
+    "id::NG_ADM1_NGA-2839__SPLIT_REST__SPLIT_REST": {
       "en": "Borno State · Remainder",
       "zh": "博尔诺州 · 余部"
     },
@@ -265,6 +2481,22 @@
       "en": "Taraba State · Remainder",
       "zh": "塔拉巴州 · 余部"
     },
+    "id::NG_ADM1_NGA-2851__SPLIT_KAINJI_RESERVOIR": {
+      "en": "Niger State · Kainji Reservoir site",
+      "zh": "尼日尔州 · 卡因吉水库库址"
+    },
+    "id::NG_ADM1_NGA-2851__SPLIT_REST": {
+      "en": "Niger State",
+      "zh": "尼日尔州"
+    },
+    "id::NG_ADM1_NGA-2879__SPLIT_KAINJI_RESERVOIR": {
+      "en": "Kebbi State · Kainji Reservoir site",
+      "zh": "凯比州 · 卡因吉水库库址"
+    },
+    "id::NG_ADM1_NGA-2879__SPLIT_REST": {
+      "en": "Kebbi State",
+      "zh": "凯比州"
+    },
     "id::NG_ADM1_NGA-2881__SPLIT_NCM": {
       "en": "Adamawa State · British Northern Cameroons",
       "zh": "阿达马瓦州 · 英属北喀麦隆"
@@ -273,11 +2505,43 @@
       "en": "Adamawa State · Remainder",
       "zh": "阿达马瓦州 · 余部"
     },
+    "id::NL230__SPLIT_FLEVOPOLDER": {
+      "en": "Flevoland · Flevopolder",
+      "zh": "弗莱福兰 · 弗莱福圩田"
+    },
+    "id::NL230__SPLIT_NOORDOOSTPOLDER": {
+      "en": "Flevoland · Noordoostpolder",
+      "zh": "弗莱福兰 · 东北圩田"
+    },
+    "id::NL230__SPLIT_REST": {
+      "en": "Flevoland",
+      "zh": "弗莱福兰"
+    },
     "id::PAK-1108__SPLIT_BALUCHISTAN_STATES": {
       "en": "Baluchistan · Kalat and associated states",
       "zh": "俾路支省 · 卡拉特及相关土邦"
     },
+    "id::PAK-1108__SPLIT_BALUCHISTAN_STATES__SPLIT_PLAYA_HAMUN_I_LORA": {
+      "en": "Baluchistan · Kalat and associated states · Hamun-i-Lora",
+      "zh": "俾路支省 · 卡拉特及相关土邦 · 洛拉湖"
+    },
+    "id::PAK-1108__SPLIT_BALUCHISTAN_STATES__SPLIT_PLAYA_HAMUN_I_MASHKEL": {
+      "en": "Baluchistan · Kalat and associated states · Hamun-i-Mashkel",
+      "zh": "俾路支省 · 卡拉特及相关土邦 · 马什克尔湖"
+    },
+    "id::PAK-1108__SPLIT_BALUCHISTAN_STATES__SPLIT_REST": {
+      "en": "Baluchistan · Kalat and associated states",
+      "zh": "俾路支省 · 卡拉特及相关土邦"
+    },
     "id::PAK-1108__SPLIT_REST": {
+      "en": "Baluchistan · Pakistan",
+      "zh": "俾路支省 · 巴基斯坦共和国"
+    },
+    "id::PAK-1108__SPLIT_REST__SPLIT_PLAYA_HAMUN_I_LORA": {
+      "en": "Baluchistan · Pakistan · Hamun-i-Lora",
+      "zh": "俾路支省 · 巴基斯坦共和国 · 洛拉湖"
+    },
+    "id::PAK-1108__SPLIT_REST__SPLIT_REST": {
       "en": "Baluchistan · Pakistan",
       "zh": "俾路支省 · 巴基斯坦共和国"
     },
@@ -294,6 +2558,14 @@
       "zh": "信德 · 海尔布尔土邦"
     },
     "id::PAK-1114__SPLIT_REST": {
+      "en": "Sind · Remainder",
+      "zh": "信德 · 余部"
+    },
+    "id::PAK-1114__SPLIT_REST__SPLIT_PLAYA_RANN_OF_KUTCH": {
+      "en": "Sind · Remainder · Rann of Kutch",
+      "zh": "信德 · 余部 · 卡奇沼泽"
+    },
+    "id::PAK-1114__SPLIT_REST__SPLIT_REST": {
       "en": "Sind · Remainder",
       "zh": "信德 · 余部"
     },
@@ -321,6 +2593,38 @@
       "en": "Panamá · Remainder",
       "zh": "巴拿马 · 余部"
     },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_BIALYSTOK": {
+      "en": "Brańsk",
+      "zh": "布兰斯克"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_EAST_BIALYSTOK": {
+      "en": "Bielsk Podlaski",
+      "zh": "波德拉谢地区别尔斯克"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_GONIADZ": {
+      "en": "Goniadz",
+      "zh": "戈尼翁兹"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_MSCIWUJE": {
+      "en": "Msciwuje",
+      "zh": "姆希武耶"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_NAGORKI": {
+      "en": "Zambrow",
+      "zh": "赞布鲁夫"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_PLATNICA": {
+      "en": "Ciechanowiec",
+      "zh": "切哈诺维茨"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_POPKI": {
+      "en": "Lomza",
+      "zh": "沃姆扎"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_WLODKI": {
+      "en": "Wlodki",
+      "zh": "弗沃德基"
+    },
     "id::PL_MRG_727dd6268093__SPLIT_DANZIG": {
       "en": "Pomeranian · North · Free City rural district",
       "zh": "滨海省·北部 · 但泽自由市乡村区"
@@ -345,6 +2649,146 @@
       "en": "Pomeranian · South · Remainder",
       "zh": "滨海省·南部 · 余部"
     },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_GNIEW": {
+      "en": "Gniew",
+      "zh": "格涅夫"
+    },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_KARTUZY": {
+      "en": "Koscierzyna",
+      "zh": "科希切日纳"
+    },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_NORTH_KUYAVIA": {
+      "en": "North Kuyavia",
+      "zh": "北库亚维"
+    },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_POMORZE_GDANSKIE": {
+      "en": "Starogard Gdanski",
+      "zh": "格但斯克旧城"
+    },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SOUTH_KARTUZY": {
+      "en": "Chojnice",
+      "zh": "霍伊尼采"
+    },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SUSZ": {
+      "en": "Susz",
+      "zh": "苏什"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_JANOWKA": {
+      "en": "Janowka",
+      "zh": "亚努夫卡"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_LUBLIN": {
+      "en": "Lubartow",
+      "zh": "卢巴尔图夫"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_LUKOW": {
+      "en": "Pulawy",
+      "zh": "普瓦维"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_WEST_CHELM": {
+      "en": "West Chelm",
+      "zh": "西海乌姆"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_ALLENSTEIN": {
+      "en": "Allenstein",
+      "zh": "阿伦施泰因"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_ARYS": {
+      "en": "Arys",
+      "zh": "阿里斯"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_DZIALDOWO": {
+      "en": "Dzialdowo",
+      "zh": "贾乌多沃"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_EAST_SOLDAU": {
+      "en": "East Soldau",
+      "zh": "东索尔道"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_GARDIENEN": {
+      "en": "Gardienen",
+      "zh": "加尔迪嫩"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_GUTTSTADT": {
+      "en": "Guttstadt",
+      "zh": "古特施塔特"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_HOHENSTEIN": {
+      "en": "Hohenstein",
+      "zh": "霍恩施泰因"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_KURKI": {
+      "en": "Kurki",
+      "zh": "库尔基"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_MARIENWERDER": {
+      "en": "Marienwerder",
+      "zh": "马林韦尔德"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_NIKOLAIKEN": {
+      "en": "Mragowo",
+      "zh": "姆龙戈沃"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_ORTELSBURG": {
+      "en": "West Ortelsburg",
+      "zh": "西奥尔特尔斯堡"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_ORTELSBURG_7428": {
+      "en": "East Ortelsburg",
+      "zh": "东奥尔特尔斯堡"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_PASSENHEIM": {
+      "en": "Passenheim",
+      "zh": "帕森海姆"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_PLOSNICA": {
+      "en": "Plosnica",
+      "zh": "普沃希尼察"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_RASTENBURG": {
+      "en": "Lidzbark Warminski",
+      "zh": "瓦尔米亚地区利兹巴克"
+    },
+    "id::PL_MRG_c908eb11c602__SPLIT_SENSBURG": {
+      "en": "Gizycko",
+      "zh": "吉日茨科"
+    },
+    "id::PL_MRG_c93ffd9ad4b7__SPLIT_GRUZIADZ": {
+      "en": "Swiecie",
+      "zh": "希维切"
+    },
+    "id::PL_MRG_c93ffd9ad4b7__SPLIT_KISIELICE": {
+      "en": "Grudziądz",
+      "zh": "格鲁琼兹"
+    },
+    "id::PL_MRG_c93ffd9ad4b7__SPLIT_NORTH_KUYAVIA": {
+      "en": "North Kuyavia",
+      "zh": "北库亚维"
+    },
+    "id::PL_POW_0601__SPLIT_EAST_OKUNINKA": {
+      "en": "Terespol",
+      "zh": "泰雷斯波尔"
+    },
+    "id::PL_POW_0601__SPLIT_JANOWKA": {
+      "en": "Miedzyrzec Podlaski",
+      "zh": "波德拉谢地区缅济热茨"
+    },
+    "id::PL_POW_0601__SPLIT_KOROLOWKA": {
+      "en": "Korolowka",
+      "zh": "科罗卢夫卡"
+    },
+    "id::PL_POW_0601__SPLIT_OKUNINKA": {
+      "en": "Okuninka",
+      "zh": "奥库宁卡"
+    },
+    "id::PL_POW_0601__SPLIT_WEST_CHELM": {
+      "en": "Biala Podlaska",
+      "zh": "比亚瓦波德拉斯卡"
+    },
+    "id::PL_POW_0601__SPLIT_WLODAWA": {
+      "en": "Wlodawa",
+      "zh": "弗沃达瓦"
+    },
     "id::PL_POW_1465__SPLIT_LEFT": {
       "en": "Warsaw · Left bank",
       "zh": "华沙 · 左岸"
@@ -352,6 +2796,30 @@
     "id::PL_POW_1465__SPLIT_PRAGA": {
       "en": "Warsaw · Praga (right bank)",
       "zh": "华沙 · 布拉加（右岸）"
+    },
+    "id::PL_POW_2001__SPLIT_MONKI": {
+      "en": "Monki",
+      "zh": "蒙基"
+    },
+    "id::PL_POW_2001__SPLIT_SZELIGI": {
+      "en": "Augustow",
+      "zh": "奥古斯图夫"
+    },
+    "id::PL_POW_2201__SPLIT_EAST_BUTOW": {
+      "en": "Bytow",
+      "zh": "比图夫"
+    },
+    "id::PL_POW_2201__SPLIT_REIHERSHORST": {
+      "en": "Reihershorst",
+      "zh": "赖赫斯霍斯特"
+    },
+    "id::PL_POW_2201__SPLIT_SCHWARZ_DAMERKOW": {
+      "en": "Schwarz Damerkow",
+      "zh": "施瓦茨达默科"
+    },
+    "id::PL_POW_2201__SPLIT_SIANOWO": {
+      "en": "Sianowo",
+      "zh": "夏诺沃"
     },
     "id::PL_POW_2209__SPLIT_DANZIG": {
       "en": "Malbork County · Free City rural district",
@@ -385,6 +2853,414 @@
       "en": "Nowy Dwór Gdański County · Remainder",
       "zh": "新德武尔县 · 余部"
     },
+    "id::PL_POW_2405__SPLIT_POLISH": {
+      "en": "Knurów and Gierałtowice",
+      "zh": "克努鲁夫与盖拉乌托维采"
+    },
+    "id::PL_POW_2405__SPLIT_REST": {
+      "en": "Gliwice County (German part)",
+      "zh": "格利维采县（德国部分）"
+    },
+    "id::PL_POW_2478__SPLIT_POLISH": {
+      "en": "Przyszowice edge",
+      "zh": "普日绍维采边缘"
+    },
+    "id::PL_POW_2478__SPLIT_REST": {
+      "en": "Zabrze (Hindenburg)",
+      "zh": "扎布热（兴登堡）"
+    },
+    "id::PL_POW_2802__SPLIT_BRAUNSBERG": {
+      "en": "Braunsberg",
+      "zh": "布劳恩斯贝格"
+    },
+    "id::PL_POW_2802__SPLIT_HEILSBERG": {
+      "en": "Heilsberg",
+      "zh": "海尔斯贝格"
+    },
+    "id::PL_POW_2802__SPLIT_SCHONFELD": {
+      "en": "Schonfeld",
+      "zh": "舍恩费尔德"
+    },
+    "id::PL_POW_2802__SPLIT_WORMDITT": {
+      "en": "Braniewo",
+      "zh": "布拉涅沃"
+    },
+    "id::PL_POW_2804__SPLIT_MALDEUTEN": {
+      "en": "Maldeuten",
+      "zh": "马尔多伊滕"
+    },
+    "id::PL_POW_2804__SPLIT_SCHONFELD": {
+      "en": "Schonfeld",
+      "zh": "舍恩费尔德"
+    },
+    "id::PL_POW_2807__SPLIT_LUBAWA": {
+      "en": "Lubawa (Löbau)",
+      "zh": "卢巴瓦（勒鲍）"
+    },
+    "id::PL_POW_2807__SPLIT_REST": {
+      "en": "Iława County (East Prussian part)",
+      "zh": "伊瓦瓦县（东普鲁士部分）"
+    },
+    "id::PL_POW_2808__SPLIT_LISSEN": {
+      "en": "Gierloz",
+      "zh": "盖尔沃日"
+    },
+    "id::PL_POW_2808__SPLIT_OSTPREUEN": {
+      "en": "East Prussia",
+      "zh": "东普鲁士"
+    },
+    "id::PL_POW_2817__SPLIT_DZIALDOWO": {
+      "en": "Dzialdowo",
+      "zh": "贾乌多沃"
+    },
+    "id::PL_POW_2817__SPLIT_KURKI": {
+      "en": "Kurki",
+      "zh": "库尔基"
+    },
+    "id::PL_POW_2817__SPLIT_MAZURIA": {
+      "en": "Szczytno",
+      "zh": "什奇特诺"
+    },
+    "id::PL_POW_2818__SPLIT_ANGERBURG": {
+      "en": "Angerburg",
+      "zh": "安格堡"
+    },
+    "id::PL_POW_2818__SPLIT_DARKEHMEN": {
+      "en": "Darkehmen",
+      "zh": "达尔克门"
+    },
+    "id::PL_POW_2818__SPLIT_GOLDAP": {
+      "en": "Goldap",
+      "zh": "戈乌达普"
+    },
+    "id::PL_POW_2818__SPLIT_LOTZEN": {
+      "en": "Lotzen",
+      "zh": "勒岑"
+    },
+    "id::PY_ADM1_PRY-616__SPLIT_REPRESA_ITAIPU": {
+      "en": "Alto Paraná · Represa Itaipu site",
+      "zh": "上巴拉那州 · 伊泰普水库库址"
+    },
+    "id::PY_ADM1_PRY-616__SPLIT_REST": {
+      "en": "Alto Paraná",
+      "zh": "上巴拉那州"
+    },
+    "id::PY_ADM1_PRY-619__SPLIT_REPRESA_ITAIPU": {
+      "en": "Canindeyú · Represa Itaipu site",
+      "zh": "卡宁德尤 · 伊泰普水库库址"
+    },
+    "id::PY_ADM1_PRY-619__SPLIT_REST": {
+      "en": "Canindeyú",
+      "zh": "卡宁德尤"
+    },
+    "id::RO111__SPLIT_ALESD": {
+      "en": "Alesd",
+      "zh": "阿莱什德"
+    },
+    "id::RO111__SPLIT_BELUS": {
+      "en": "Belus",
+      "zh": "贝卢什"
+    },
+    "id::RO111__SPLIT_CAREI": {
+      "en": "Carei",
+      "zh": "卡雷伊"
+    },
+    "id::RO111__SPLIT_HUEDEIN": {
+      "en": "Huedein",
+      "zh": "胡埃丁"
+    },
+    "id::RO111__SPLIT_ORADEA_COUNTY": {
+      "en": "Oradea",
+      "zh": "奥拉迪亚"
+    },
+    "id::RO111__SPLIT_TURDA": {
+      "en": "Turda",
+      "zh": "图尔达"
+    },
+    "id::RO112__SPLIT_BORCA": {
+      "en": "Borca",
+      "zh": "博尔卡"
+    },
+    "id::RO112__SPLIT_NORTH_TRANSILVANIA": {
+      "en": "Bistrița",
+      "zh": "比斯特里察"
+    },
+    "id::RO112__SPLIT_SOUTH_BORSA": {
+      "en": "South Borsa",
+      "zh": "南博尔沙"
+    },
+    "id::RO112__SPLIT_VISEUL_DE_SUS": {
+      "en": "Viseul de Sus",
+      "zh": "上维谢乌"
+    },
+    "id::RO113__SPLIT_APUSENI_MOUNTAINS": {
+      "en": "Apuseni Mountains",
+      "zh": "阿普塞尼山脉"
+    },
+    "id::RO113__SPLIT_CLUJ": {
+      "en": "Cluj-Napoca",
+      "zh": "克卢日-纳波卡"
+    },
+    "id::RO113__SPLIT_NAPOCA": {
+      "en": "Napoca",
+      "zh": "纳波卡"
+    },
+    "id::RO113__SPLIT_NORTH_TRANSILVANIA": {
+      "en": "Turda",
+      "zh": "图尔达"
+    },
+    "id::RO114__SPLIT_BORSA": {
+      "en": "Borsa",
+      "zh": "博尔沙"
+    },
+    "id::RO114__SPLIT_CAVNIC": {
+      "en": "Baia Mare",
+      "zh": "巴亚马雷"
+    },
+    "id::RO114__SPLIT_IEUD": {
+      "en": "Ieud",
+      "zh": "耶乌德"
+    },
+    "id::RO114__SPLIT_MARAMURES": {
+      "en": "Sighetu Marmatiei",
+      "zh": "锡盖图马尔马切伊"
+    },
+    "id::RO114__SPLIT_NORTH_IEUD": {
+      "en": "North Ieud",
+      "zh": "北耶乌德"
+    },
+    "id::RO114__SPLIT_ROHIA": {
+      "en": "Baia Sprie",
+      "zh": "巴亚斯普列"
+    },
+    "id::RO114__SPLIT_VISEUL_DE_SUS": {
+      "en": "Viseul de Sus",
+      "zh": "上维谢乌"
+    },
+    "id::RO115__SPLIT_BOGDAND": {
+      "en": "Bogdand",
+      "zh": "博格丹德"
+    },
+    "id::RO115__SPLIT_DOBA": {
+      "en": "Carei",
+      "zh": "卡雷伊"
+    },
+    "id::RO115__SPLIT_MARMARATIEI": {
+      "en": "Marmaratiei",
+      "zh": "马尔马齐耶伊"
+    },
+    "id::RO115__SPLIT_SATU_MARE": {
+      "en": "Satu Mare",
+      "zh": "萨图马雷"
+    },
+    "id::RO115__SPLIT_ZALAU": {
+      "en": "Zalau",
+      "zh": "札勒乌"
+    },
+    "id::RO116__SPLIT_ALESD": {
+      "en": "Alesd",
+      "zh": "阿莱什德"
+    },
+    "id::RO116__SPLIT_CAVNIC": {
+      "en": "Cavnic",
+      "zh": "卡夫尼克"
+    },
+    "id::RO116__SPLIT_NAPOCA": {
+      "en": "Napoca",
+      "zh": "纳波卡"
+    },
+    "id::RO116__SPLIT_ZALAU": {
+      "en": "Zalau",
+      "zh": "札勒乌"
+    },
+    "id::RO123__SPLIT_COVASNA": {
+      "en": "Sfântu Gheorghe",
+      "zh": "圣格奥尔基"
+    },
+    "id::RO123__SPLIT_PASUL_TULGHES": {
+      "en": "Targu Secuiesc",
+      "zh": "特尔古塞奎斯克"
+    },
+    "id::RO124__SPLIT_MOINESTI": {
+      "en": "West Miercurea Ciuc",
+      "zh": "西米耶尔库雷亚丘克"
+    },
+    "id::RO124__SPLIT_NORTH_PASUL_TULGHES": {
+      "en": "East Miercurea-Ciuc",
+      "zh": "东米耶尔库雷亚丘克"
+    },
+    "id::RO124__SPLIT_ROZNOV": {
+      "en": "Roznov",
+      "zh": "罗兹诺夫"
+    },
+    "id::RO215__SPLIT_INNER_MOLDOVA": {
+      "en": "Inner Moldova",
+      "zh": "内摩尔多瓦"
+    },
+    "id::RO215__SPLIT_SOUTHERN_BUCOVINA": {
+      "en": "Southern Bucovina",
+      "zh": "南布科维纳"
+    },
+    "id::RO215__SPLIT_SUCEAVA": {
+      "en": "Suceava",
+      "zh": "苏恰瓦"
+    },
+    "id::RO421__SPLIT_BELUS": {
+      "en": "Belus",
+      "zh": "贝卢什"
+    },
+    "id::RO421__SPLIT_CRISANA": {
+      "en": "Arad",
+      "zh": "阿拉德"
+    },
+    "id::RO421__SPLIT_DEVA": {
+      "en": "Deva",
+      "zh": "德瓦"
+    },
+    "id::RO421__SPLIT_OTELU_ROSU": {
+      "en": "Otelu Rosu",
+      "zh": "奥采卢罗舒"
+    },
+    "id::RO422__SPLIT_BANAT": {
+      "en": "Reșița",
+      "zh": "雷希察"
+    },
+    "id::RO422__SPLIT_PASUL_VALCAN": {
+      "en": "Pasul Valcan",
+      "zh": "沃尔坎山口"
+    },
+    "id::RO422__SPLIT_PORTILE_DE_FIER": {
+      "en": "Portile de Fier",
+      "zh": "铁门峡谷"
+    },
+    "id::RO422__SPLIT_SOUTH_BANAT": {
+      "en": "South Banat",
+      "zh": "巴纳特南部"
+    },
+    "id::RO424__SPLIT_CARANSEBES": {
+      "en": "Lugoj",
+      "zh": "卢戈日"
+    },
+    "id::RO424__SPLIT_DEVA": {
+      "en": "Deva",
+      "zh": "德瓦"
+    },
+    "id::RO424__SPLIT_FIBIS": {
+      "en": "North Timișoara",
+      "zh": "北蒂米什瓦拉"
+    },
+    "id::RO424__SPLIT_OTELU_ROSU": {
+      "en": "Otelu Rosu",
+      "zh": "奥采卢罗舒"
+    },
+    "id::RO424__SPLIT_PECICA": {
+      "en": "Pecica",
+      "zh": "佩奇卡"
+    },
+    "id::RO424__SPLIT_RADNA": {
+      "en": "Radna",
+      "zh": "拉德纳"
+    },
+    "id::RO424__SPLIT_SATCHINEZ": {
+      "en": "Satchinez",
+      "zh": "萨特基内兹"
+    },
+    "id::RO424__SPLIT_TIMISORA": {
+      "en": "South Timișoara",
+      "zh": "南蒂米什瓦拉"
+    },
+    "id::RS121__SPLIT_KULA": {
+      "en": "Kula",
+      "zh": "库拉"
+    },
+    "id::RS121__SPLIT_OSIJEK": {
+      "en": "Apatin",
+      "zh": "阿帕廷"
+    },
+    "id::RS121__SPLIT_SOMBOR": {
+      "en": "Sombor",
+      "zh": "松博尔"
+    },
+    "id::RS123__SPLIT_BECEJ": {
+      "en": "Novi Sad",
+      "zh": "诺维萨德"
+    },
+    "id::RS123__SPLIT_ILOK": {
+      "en": "Backa Palanka",
+      "zh": "巴奇卡帕兰卡"
+    },
+    "id::RS123__SPLIT_KULA": {
+      "en": "Bač",
+      "zh": "巴奇"
+    },
+    "id::RS123__SPLIT_SYRMIA": {
+      "en": "Titel",
+      "zh": "蒂特尔"
+    },
+    "id::RS123__SPLIT_TEMERIN": {
+      "en": "Vrbas",
+      "zh": "弗尔巴斯"
+    },
+    "id::RS127__SPLIT_IRIG": {
+      "en": "East Sremska Mitrovica",
+      "zh": "东斯雷姆斯卡米特罗维察"
+    },
+    "id::RS127__SPLIT_JAMENA": {
+      "en": "Jamena",
+      "zh": "亚梅纳"
+    },
+    "id::RS127__SPLIT_KUSMIN": {
+      "en": "Kuzmin",
+      "zh": "库兹明"
+    },
+    "id::RS127__SPLIT_SREMSKA_MITROVICA": {
+      "en": "West Sremska Mitrovica",
+      "zh": "西斯雷姆斯卡米特罗维察"
+    },
+    "id::RS127__SPLIT_SYRMIA": {
+      "en": "Ruma",
+      "zh": "鲁马"
+    },
+    "id::RS217__SPLIT_DRAGA": {
+      "en": "Raška",
+      "zh": "拉什卡"
+    },
+    "id::RS217__SPLIT_DUBNICA": {
+      "en": "Jošanička Banja",
+      "zh": "约沙尼奇卡矿泉镇"
+    },
+    "id::RS217__SPLIT_KRALJEVO": {
+      "en": "Kraljevo",
+      "zh": "克拉列沃"
+    },
+    "id::RS217__SPLIT_NOVI_PAZAR": {
+      "en": "Novi Pazar",
+      "zh": "新帕扎尔"
+    },
+    "id::RS217__SPLIT_SJENICA": {
+      "en": "Ušće",
+      "zh": "乌什切"
+    },
+    "id::RU_ARCTIC_FB_2558__SPLIT_REST": {
+      "en": "Russia Shell Fallback 2558",
+      "zh": "Russia Shell Fallback 2558"
+    },
+    "id::RU_ARCTIC_FB_2558__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Russia Shell Fallback 2558 · Volgograd Reservoir site",
+      "zh": "Russia Shell Fallback 2558 · 伏尔加格勒水库库址"
+    },
+    "id::RU_ARCTIC_FB_2634__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Russia Shell Fallback 2634 · Cheboksary Reservoir site",
+      "zh": "Russia Shell Fallback 2634 · 切博克萨雷水库库址"
+    },
+    "id::RU_ARCTIC_FB_2634__SPLIT_REST": {
+      "en": "Russia Shell Fallback 2634",
+      "zh": "Russia Shell Fallback 2634"
+    },
+    "id::RU_ARCTIC_FB_3024__SPLIT_SARATOV_RESERVOIR": {
+      "en": "Russia Shell Fallback 3024 · Saratov Reservoir site",
+      "zh": "Russia Shell Fallback 3024 · 萨拉托夫水库库址"
+    },
     "id::RU_CITY_MOSCOW__SPLIT_CITY": {
       "en": "Moscow · City",
       "zh": "莫斯科 · 市区"
@@ -392,6 +3268,266 @@
     "id::RU_CITY_MOSCOW__SPLIT_SOUTHWEST": {
       "en": "Moscow · Southwest (Troitsk)",
       "zh": "莫斯科 · 西南部（特罗伊茨克）"
+    },
+    "id::RU_CITY_SAINT_PETERSBURG__SPLIT_REST": {
+      "en": "Saint Petersburg",
+      "zh": "圣彼得堡"
+    },
+    "id::RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI": {
+      "en": "Terijoki and Kuokkala coast",
+      "zh": "泰里约基与库奥卡拉沿岸"
+    },
+    "id::RU_MRG_06348d287b63__SPLIT_REST": {
+      "en": "Vologda · Southwest 1",
+      "zh": "沃洛格达州·西南部1"
+    },
+    "id::RU_MRG_06348d287b63__SPLIT_RYBINSK_RESERVOIR": {
+      "en": "Vologda · Southwest 1 · Rybinsk Reservoir site",
+      "zh": "沃洛格达州·西南部1 · 雷宾斯克水库库址"
+    },
+    "id::RU_MRG_17e4b5e02ee0__SPLIT_REST": {
+      "en": "Udmurtia · South",
+      "zh": "乌德穆尔特共和国·南部"
+    },
+    "id::RU_MRG_17e4b5e02ee0__SPLIT_VOTKINSK_RESERVOIR": {
+      "en": "Udmurtia · South · Votkinsk Reservoir site",
+      "zh": "乌德穆尔特共和国·南部 · 沃特金斯克水库库址"
+    },
+    "id::RU_MRG_1899c681a78b__SPLIT_GORKY_RESERVOIR": {
+      "en": "Puchezhsky District + Sokolsky District · Gorky Reservoir site",
+      "zh": "普切日斯基区、索科尔区 · 高尔基水库库址"
+    },
+    "id::RU_MRG_1899c681a78b__SPLIT_REST": {
+      "en": "Puchezhsky District + Sokolsky District",
+      "zh": "普切日斯基区、索科尔区"
+    },
+    "id::RU_MRG_21bf4048bc4e__SPLIT_REST": {
+      "en": "Tatarstan · Central",
+      "zh": "鞑靼斯坦共和国·中部"
+    },
+    "id::RU_MRG_21bf4048bc4e__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Tatarstan · Central · Samara Reservoir site",
+      "zh": "鞑靼斯坦共和国·中部 · 古比雪夫水库库址"
+    },
+    "id::RU_MRG_333dbd033786__SPLIT_KAMA_RESERVOIR": {
+      "en": "Perm Krai · Central 2 · Kama Reservoir site",
+      "zh": "彼尔姆边疆区·中部2 · 卡马水库库址"
+    },
+    "id::RU_MRG_333dbd033786__SPLIT_REST": {
+      "en": "Perm Krai · Central 2",
+      "zh": "彼尔姆边疆区·中部2"
+    },
+    "id::RU_MRG_384b6ae65f4e__SPLIT_REST": {
+      "en": "Ulyanovsk · South",
+      "zh": "乌里扬诺夫斯克州·南部"
+    },
+    "id::RU_MRG_384b6ae65f4e__SPLIT_SARATOV_RESERVOIR": {
+      "en": "Ulyanovsk · South · Saratov Reservoir site",
+      "zh": "乌里扬诺夫斯克州·南部 · 萨拉托夫水库库址"
+    },
+    "id::RU_MRG_3c1ff2d8d28d__SPLIT_GORKY_RESERVOIR": {
+      "en": "Nizhny Novgorod · Northwest · Gorky Reservoir site",
+      "zh": "下诺夫哥罗德州·西北部 · 高尔基水库库址"
+    },
+    "id::RU_MRG_3c1ff2d8d28d__SPLIT_REST": {
+      "en": "Nizhny Novgorod · Northwest",
+      "zh": "下诺夫哥罗德州·西北部"
+    },
+    "id::RU_MRG_3ec7b40d49ee__SPLIT_REST": {
+      "en": "Saratov · West 1",
+      "zh": "萨拉托夫州·西部1"
+    },
+    "id::RU_MRG_3ec7b40d49ee__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Saratov · West 1 · Volgograd Reservoir site",
+      "zh": "萨拉托夫州·西部1 · 伏尔加格勒水库库址"
+    },
+    "id::RU_MRG_465e54ee3c98__SPLIT_REST": {
+      "en": "Yaroslavl · North",
+      "zh": "雅罗斯拉夫尔州·北部"
+    },
+    "id::RU_MRG_465e54ee3c98__SPLIT_RYBINSK_RESERVOIR": {
+      "en": "Yaroslavl · North · Rybinsk Reservoir site",
+      "zh": "雅罗斯拉夫尔州·北部 · 雷宾斯克水库库址"
+    },
+    "id::RU_MRG_473afe9c50b3__SPLIT_REST": {
+      "en": "Tatarstan · Northeast",
+      "zh": "鞑靼斯坦共和国·东北部"
+    },
+    "id::RU_MRG_473afe9c50b3__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Tatarstan · Northeast · Samara Reservoir site",
+      "zh": "鞑靼斯坦共和国·东北部 · 古比雪夫水库库址"
+    },
+    "id::RU_MRG_4d7b251116c1__SPLIT_REST": {
+      "en": "Perm Krai · South 2",
+      "zh": "彼尔姆边疆区·南部2"
+    },
+    "id::RU_MRG_4d7b251116c1__SPLIT_VOTKINSK_RESERVOIR": {
+      "en": "Perm Krai · South 2 · Votkinsk Reservoir site",
+      "zh": "彼尔姆边疆区·南部2 · 沃特金斯克水库库址"
+    },
+    "id::RU_MRG_593a91bdd3f1__SPLIT_REST": {
+      "en": "Saratov · Northeast",
+      "zh": "萨拉托夫州·东北部"
+    },
+    "id::RU_MRG_593a91bdd3f1__SPLIT_SARATOV_RESERVOIR": {
+      "en": "Saratov · Northeast · Saratov Reservoir site",
+      "zh": "萨拉托夫州·东北部 · 萨拉托夫水库库址"
+    },
+    "id::RU_MRG_5a4cd4b44b6d__SPLIT_REST": {
+      "en": "Ulyanovsk · East",
+      "zh": "乌里扬诺夫斯克州·东部"
+    },
+    "id::RU_MRG_5a4cd4b44b6d__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Ulyanovsk · East · Samara Reservoir site",
+      "zh": "乌里扬诺夫斯克州·东部 · 古比雪夫水库库址"
+    },
+    "id::RU_MRG_5eefe2103e77__SPLIT_REST": {
+      "en": "Perm Krai · Southwest 2",
+      "zh": "彼尔姆边疆区·西南部2"
+    },
+    "id::RU_MRG_5eefe2103e77__SPLIT_VOTKINSK_RESERVOIR": {
+      "en": "Perm Krai · Southwest 2 · Votkinsk Reservoir site",
+      "zh": "彼尔姆边疆区·西南部2 · 沃特金斯克水库库址"
+    },
+    "id::RU_MRG_69fe24997bd8__SPLIT_NOVOSIBIRSK_RESERVOIR": {
+      "en": "Novosibirsk · East 1 · Novosibirsk Reservoir site",
+      "zh": "新西伯利亚州·东部1 · 新西伯利亚水库库址"
+    },
+    "id::RU_MRG_69fe24997bd8__SPLIT_REST": {
+      "en": "Novosibirsk · East 1",
+      "zh": "新西伯利亚州·东部1"
+    },
+    "id::RU_MRG_76bad646959e__SPLIT_BRATSK_RESERVOIR": {
+      "en": "Irkutsk · Southwest 1 · Bratsk Reservoir site",
+      "zh": "伊尔库茨克州·西南部1 · 布拉茨克水库库址"
+    },
+    "id::RU_MRG_76bad646959e__SPLIT_REST": {
+      "en": "Irkutsk · Southwest 1",
+      "zh": "伊尔库茨克州·西南部1"
+    },
+    "id::RU_MRG_7973a5d85acb__SPLIT_NOVOSIBIRSK_RESERVOIR": {
+      "en": "Altai Krai · North 1 · Novosibirsk Reservoir site",
+      "zh": "阿尔泰边疆区·北部1 · 新西伯利亚水库库址"
+    },
+    "id::RU_MRG_7973a5d85acb__SPLIT_REST": {
+      "en": "Altai Krai · North 1",
+      "zh": "阿尔泰边疆区·北部1"
+    },
+    "id::RU_MRG_8392a1282904__SPLIT_REST": {
+      "en": "Tatarstan · Northwest",
+      "zh": "鞑靼斯坦共和国·西北部"
+    },
+    "id::RU_MRG_8392a1282904__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Tatarstan · Northwest · Samara Reservoir site",
+      "zh": "鞑靼斯坦共和国·西北部 · 古比雪夫水库库址"
+    },
+    "id::RU_MRG_89888850a4dc__SPLIT_KRASNOYARSK_RESERVOIR": {
+      "en": "Krasnoyarsk Krai · South 6 · Krasnoyarsk Reservoir site",
+      "zh": "克拉斯诺亚尔斯克边疆区·南部6 · 克拉斯诺亚尔斯克水库库址"
+    },
+    "id::RU_MRG_89888850a4dc__SPLIT_REST": {
+      "en": "Krasnoyarsk Krai · South 6",
+      "zh": "克拉斯诺亚尔斯克边疆区·南部6"
+    },
+    "id::RU_MRG_8a42821c9c7f__SPLIT_REST": {
+      "en": "Tatarstan · West 1",
+      "zh": "鞑靼斯坦共和国·西部1"
+    },
+    "id::RU_MRG_8a42821c9c7f__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Tatarstan · West 1 · Samara Reservoir site",
+      "zh": "鞑靼斯坦共和国·西部1 · 古比雪夫水库库址"
+    },
+    "id::RU_MRG_8d9e296327d0__SPLIT_KRASNOYARSK_RESERVOIR": {
+      "en": "Khakassia · North · Krasnoyarsk Reservoir site",
+      "zh": "哈卡斯共和国·北部 · 克拉斯诺亚尔斯克水库库址"
+    },
+    "id::RU_MRG_8d9e296327d0__SPLIT_REST": {
+      "en": "Khakassia · North",
+      "zh": "哈卡斯共和国·北部"
+    },
+    "id::RU_MRG_9ce979430f48__SPLIT_KAMA_RESERVOIR": {
+      "en": "Perm Krai · South 1 · Kama Reservoir site",
+      "zh": "彼尔姆边疆区·南部1 · 卡马水库库址"
+    },
+    "id::RU_MRG_9ce979430f48__SPLIT_REST": {
+      "en": "Perm Krai · South 1",
+      "zh": "彼尔姆边疆区·南部1"
+    },
+    "id::RU_MRG_9ce979430f48__SPLIT_VOTKINSK_RESERVOIR": {
+      "en": "Perm Krai · South 1 · Votkinsk Reservoir site",
+      "zh": "彼尔姆边疆区·南部1 · 沃特金斯克水库库址"
+    },
+    "id::RU_MRG_a1f39ea34970__SPLIT_KAMA_RESERVOIR": {
+      "en": "Perm Krai · Southwest 1 · Kama Reservoir site",
+      "zh": "彼尔姆边疆区·西南部1 · 卡马水库库址"
+    },
+    "id::RU_MRG_a1f39ea34970__SPLIT_REST": {
+      "en": "Perm Krai · Southwest 1",
+      "zh": "彼尔姆边疆区·西南部1"
+    },
+    "id::RU_MRG_aa1c4ed50e09__SPLIT_BRATSK_RESERVOIR": {
+      "en": "Irkutsk · Southwest 4 · Bratsk Reservoir site",
+      "zh": "伊尔库茨克州·西南部4 · 布拉茨克水库库址"
+    },
+    "id::RU_MRG_aa1c4ed50e09__SPLIT_REST": {
+      "en": "Irkutsk · Southwest 4",
+      "zh": "伊尔库茨克州·西南部4"
+    },
+    "id::RU_MRG_adcc83649ef9__SPLIT_NOVOSIBIRSK_RESERVOIR": {
+      "en": "Novosibirsk · East 2 · Novosibirsk Reservoir site",
+      "zh": "新西伯利亚州·东部2 · 新西伯利亚水库库址"
+    },
+    "id::RU_MRG_adcc83649ef9__SPLIT_REST": {
+      "en": "Novosibirsk · East 2",
+      "zh": "新西伯利亚州·东部2"
+    },
+    "id::RU_MRG_c4615cedcd6d__SPLIT_REST": {
+      "en": "Некоузский район",
+      "zh": "内库兹斯基区"
+    },
+    "id::RU_MRG_c4615cedcd6d__SPLIT_RYBINSK_RESERVOIR": {
+      "en": "Некоузский район · Rybinsk Reservoir site",
+      "zh": "内库兹斯基区 · 雷宾斯克水库库址"
+    },
+    "id::RU_MRG_cb7ab64b43b7__SPLIT_REST": {
+      "en": "Vologda · West 2",
+      "zh": "沃洛格达州·西部2"
+    },
+    "id::RU_MRG_cb7ab64b43b7__SPLIT_RYBINSK_RESERVOIR": {
+      "en": "Vologda · West 2 · Rybinsk Reservoir site",
+      "zh": "沃洛格达州·西部2 · 雷宾斯克水库库址"
+    },
+    "id::RU_MRG_d3e6d3f9aa41__SPLIT_KRASNOYARSK_RESERVOIR": {
+      "en": "Krasnoyarsk Krai · South 2 · Krasnoyarsk Reservoir site",
+      "zh": "克拉斯诺亚尔斯克边疆区·南部2 · 克拉斯诺亚尔斯克水库库址"
+    },
+    "id::RU_MRG_d3e6d3f9aa41__SPLIT_REST": {
+      "en": "Krasnoyarsk Krai · South 2",
+      "zh": "克拉斯诺亚尔斯克边疆区·南部2"
+    },
+    "id::RU_MRG_d7a2203edffa__SPLIT_KAMA_RESERVOIR": {
+      "en": "Perm Krai · Central 1 · Kama Reservoir site",
+      "zh": "彼尔姆边疆区·中部1 · 卡马水库库址"
+    },
+    "id::RU_MRG_d7a2203edffa__SPLIT_REST": {
+      "en": "Perm Krai · Central 1",
+      "zh": "彼尔姆边疆区·中部1"
+    },
+    "id::RU_MRG_dde1d8a90afe__SPLIT_GORKY_RESERVOIR": {
+      "en": "Kostroma · Southeast · Gorky Reservoir site",
+      "zh": "科斯特罗马州·东南部 · 高尔基水库库址"
+    },
+    "id::RU_MRG_dde1d8a90afe__SPLIT_REST": {
+      "en": "Kostroma · Southeast",
+      "zh": "科斯特罗马州·东南部"
+    },
+    "id::RU_MRG_e3d6057202ff__SPLIT_BRATSK_RESERVOIR": {
+      "en": "Irkutsk · Southwest 2 · Bratsk Reservoir site",
+      "zh": "伊尔库茨克州·西南部2 · 布拉茨克水库库址"
+    },
+    "id::RU_MRG_e3d6057202ff__SPLIT_REST": {
+      "en": "Irkutsk · Southwest 2",
+      "zh": "伊尔库茨克州·西南部2"
     },
     "id::RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO": {
       "en": "Sakhalin · Central · South of 50°N",
@@ -401,6 +3537,682 @@
       "en": "Sakhalin · Central · North of 50°N",
       "zh": "萨哈林州·中部 · 北纬50°以北"
     },
+    "id::RU_MRG_ffd24a81e81e__SPLIT_REST": {
+      "en": "Saratov · South",
+      "zh": "萨拉托夫州·南部"
+    },
+    "id::RU_MRG_ffd24a81e81e__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Saratov · South · Volgograd Reservoir site",
+      "zh": "萨拉托夫州·南部 · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B14040427045082__SPLIT_NOVOSIBIRSK_RESERVOIR": {
+      "en": "Krutikhinsky District · Novosibirsk Reservoir site",
+      "zh": "克鲁季欣斯基区 · 新西伯利亚水库库址"
+    },
+    "id::RU_RAY_50074027B14040427045082__SPLIT_REST": {
+      "en": "Krutikhinsky District",
+      "zh": "克鲁季欣斯基区"
+    },
+    "id::RU_RAY_50074027B15993714165206__SPLIT_REST": {
+      "en": "Surovikinsky District",
+      "zh": "苏罗维金斯基区"
+    },
+    "id::RU_RAY_50074027B15993714165206__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Surovikinsky District · Tsimlyansk Reservoir site",
+      "zh": "苏罗维金斯基区 · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B16961904381699__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Cheboksarsky District · Cheboksary Reservoir site",
+      "zh": "切博克萨尔斯基区 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B16961904381699__SPLIT_REST": {
+      "en": "Cheboksarsky District",
+      "zh": "切博克萨尔斯基区"
+    },
+    "id::RU_RAY_50074027B18920333631541__SPLIT_REST": {
+      "en": "Stavropolsky District",
+      "zh": "斯塔夫罗波尔斯基区"
+    },
+    "id::RU_RAY_50074027B18920333631541__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Stavropolsky District · Samara Reservoir site",
+      "zh": "斯塔夫罗波尔斯基区 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B19741518738580__SPLIT_KACENI": {
+      "en": "Kacēni (Kachanovo)",
+      "zh": "卡采尼（卡恰诺沃）"
+    },
+    "id::RU_RAY_50074027B19741518738580__SPLIT_REST": {
+      "en": "Palkinsky District",
+      "zh": "帕尔金斯基区"
+    },
+    "id::RU_RAY_50074027B20716795967188__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Morgaushsky District · Cheboksary Reservoir site",
+      "zh": "莫尔高什斯基区 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B20716795967188__SPLIT_REST": {
+      "en": "Morgaushsky District",
+      "zh": "莫尔高什斯基区"
+    },
+    "id::RU_RAY_50074027B22241988675108__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Vorotynsky District · Cheboksary Reservoir site",
+      "zh": "沃罗廷斯基区 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B22241988675108__SPLIT_REST": {
+      "en": "Vorotynsky District",
+      "zh": "沃罗廷斯基区"
+    },
+    "id::RU_RAY_50074027B22819891790259__SPLIT_REST": {
+      "en": "Tsimlyansky District",
+      "zh": "齐姆良斯基区"
+    },
+    "id::RU_RAY_50074027B22819891790259__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Tsimlyansky District · Tsimlyansk Reservoir site",
+      "zh": "齐姆良斯基区 · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B23214282298262__SPLIT_REST": {
+      "en": "Engelssky District",
+      "zh": "恩格尔斯基区"
+    },
+    "id::RU_RAY_50074027B23214282298262__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Engelssky District · Volgograd Reservoir site",
+      "zh": "恩格尔斯基区 · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B31803957515687__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Kilemarsky District · Cheboksary Reservoir site",
+      "zh": "基勒马斯基区 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B31803957515687__SPLIT_REST": {
+      "en": "Kilemarsky District",
+      "zh": "基勒马斯基区"
+    },
+    "id::RU_RAY_50074027B33581045729564__SPLIT_BRATSK_RESERVOIR": {
+      "en": "Нижнеилимский район · Bratsk Reservoir site",
+      "zh": "下尼利姆斯基区 · 布拉茨克水库库址"
+    },
+    "id::RU_RAY_50074027B33581045729564__SPLIT_REST": {
+      "en": "Нижнеилимский район",
+      "zh": "下尼利姆斯基区"
+    },
+    "id::RU_RAY_50074027B33581045729564__SPLIT_UST_ILIMSK_RESERVOIR": {
+      "en": "Нижнеилимский район · Ust-Ilimsk Reservoir site",
+      "zh": "下尼利姆斯基区 · 乌斯特伊利姆斯克水库库址"
+    },
+    "id::RU_RAY_50074027B34454529298169__SPLIT_REST": {
+      "en": "Mirninsky Ulus",
+      "zh": "米尔宁斯基·乌鲁斯"
+    },
+    "id::RU_RAY_50074027B34454529298169__SPLIT_VILYUY_RESERVOIR": {
+      "en": "Mirninsky Ulus · Vilyuy Reservoir site",
+      "zh": "米尔宁斯基·乌鲁斯 · 维尔尤伊水库库址"
+    },
+    "id::RU_RAY_50074027B34579677769219__SPLIT_REST": {
+      "en": "Staropoltavsky District",
+      "zh": "旧波尔塔夫斯基区"
+    },
+    "id::RU_RAY_50074027B34579677769219__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Staropoltavsky District · Volgograd Reservoir site",
+      "zh": "旧波尔塔夫斯基区 · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B3691210145247__SPLIT_REST": {
+      "en": "Ilovlinsky District",
+      "zh": "伊洛夫林斯基区"
+    },
+    "id::RU_RAY_50074027B3691210145247__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Ilovlinsky District · Tsimlyansk Reservoir site",
+      "zh": "伊洛夫林斯基区 · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B38321108376859__SPLIT_REST": {
+      "en": "Дубовский район",
+      "zh": "杜博夫斯基区"
+    },
+    "id::RU_RAY_50074027B38321108376859__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Дубовский район · Tsimlyansk Reservoir site",
+      "zh": "杜博夫斯基区 · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B3936819954606__SPLIT_REST": {
+      "en": "городской округ Новоульяно",
+      "zh": "新利亚诺"
+    },
+    "id::RU_RAY_50074027B3936819954606__SPLIT_SAMARA_RESERVOIR": {
+      "en": "городской округ Новоульяно · Samara Reservoir site",
+      "zh": "新利亚诺 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B39404018386654__SPLIT_REST": {
+      "en": "Saratov",
+      "zh": "萨拉托夫"
+    },
+    "id::RU_RAY_50074027B39404018386654__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Saratov · Volgograd Reservoir site",
+      "zh": "萨拉托夫 · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B39999494546000__SPLIT_REST": {
+      "en": "Suojärvi",
+      "zh": "苏奥亚尔维"
+    },
+    "id::RU_RAY_50074027B39999494546000__SPLIT_SOVIET": {
+      "en": "Porosozero area (Soviet side)",
+      "zh": "波罗索泽罗一带（苏联一侧）"
+    },
+    "id::RU_RAY_50074027B42465403886102__SPLIT_REST": {
+      "en": "Vesyegonsky District",
+      "zh": "维谢贡斯基区"
+    },
+    "id::RU_RAY_50074027B42465403886102__SPLIT_RYBINSK_RESERVOIR": {
+      "en": "Vesyegonsky District · Rybinsk Reservoir site",
+      "zh": "维谢贡斯基区 · 雷宾斯克水库库址"
+    },
+    "id::RU_RAY_50074027B43084003717333__SPLIT_REST": {
+      "en": "Balakovsky District",
+      "zh": "巴拉科夫斯基区"
+    },
+    "id::RU_RAY_50074027B43084003717333__SPLIT_SARATOV_RESERVOIR": {
+      "en": "Balakovsky District · Saratov Reservoir site",
+      "zh": "巴拉科夫斯基区 · 萨拉托夫水库库址"
+    },
+    "id::RU_RAY_50074027B44960058886802__SPLIT_REST": {
+      "en": "Syzransky District",
+      "zh": "塞兹兰斯基区"
+    },
+    "id::RU_RAY_50074027B44960058886802__SPLIT_SARATOV_RESERVOIR": {
+      "en": "Syzransky District · Saratov Reservoir site",
+      "zh": "塞兹兰斯基区 · 萨拉托夫水库库址"
+    },
+    "id::RU_RAY_50074027B47970821426630__SPLIT_REST": {
+      "en": "Tetyushsky District",
+      "zh": "捷秋斯基区"
+    },
+    "id::RU_RAY_50074027B47970821426630__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Tetyushsky District · Samara Reservoir site",
+      "zh": "捷秋斯基区 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B4882309977182__SPLIT_REST": {
+      "en": "Kotelnikovsky District",
+      "zh": "科捷尔尼科夫斯基区"
+    },
+    "id::RU_RAY_50074027B4882309977182__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Kotelnikovsky District · Tsimlyansk Reservoir site",
+      "zh": "科捷尔尼科夫斯基区 · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B51121921202406__SPLIT_GORKY_RESERVOIR": {
+      "en": "Kadyysky District · Gorky Reservoir site",
+      "zh": "卡德斯基区 · 高尔基水库库址"
+    },
+    "id::RU_RAY_50074027B51121921202406__SPLIT_REST": {
+      "en": "Kadyysky District",
+      "zh": "卡德斯基区"
+    },
+    "id::RU_RAY_50074027B5223158268211__SPLIT_NARVATAGUSE": {
+      "en": "Narvataguse (Slantsy part)",
+      "zh": "纳尔瓦河外地区（斯兰齐区部分）"
+    },
+    "id::RU_RAY_50074027B5223158268211__SPLIT_REST": {
+      "en": "Slantsevsky District",
+      "zh": "斯兰齐区"
+    },
+    "id::RU_RAY_50074027B54726203316693__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Gornomariysky District · Cheboksary Reservoir site",
+      "zh": "戈尔诺马里斯基区 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B54726203316693__SPLIT_REST": {
+      "en": "Gornomariysky District",
+      "zh": "戈尔诺马里斯基区"
+    },
+    "id::RU_RAY_50074027B55061952513406__SPLIT_GORKY_RESERVOIR": {
+      "en": "Kineshemsky District · Gorky Reservoir site",
+      "zh": "基内谢姆斯基区 · 高尔基水库库址"
+    },
+    "id::RU_RAY_50074027B55061952513406__SPLIT_REST": {
+      "en": "Kineshemsky District",
+      "zh": "基内谢姆斯基区"
+    },
+    "id::RU_RAY_50074027B55571784565288__SPLIT_REST": {
+      "en": "Kandalaksha District",
+      "zh": "坎达拉克沙区"
+    },
+    "id::RU_RAY_50074027B55571784565288__SPLIT_SALLA": {
+      "en": "Old Salla (Kuolajärvi)",
+      "zh": "旧萨拉（库奥拉耶尔维）"
+    },
+    "id::RU_RAY_50074027B57067541625780__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "городской округ Чебоксары · Cheboksary Reservoir site",
+      "zh": "切博克萨雷 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B57067541625780__SPLIT_REST": {
+      "en": "городской округ Чебоксары",
+      "zh": "切博克萨雷"
+    },
+    "id::RU_RAY_50074027B58494309327601__SPLIT_REST": {
+      "en": "Tolyatti",
+      "zh": "陶里亚蒂"
+    },
+    "id::RU_RAY_50074027B58494309327601__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Tolyatti · Samara Reservoir site",
+      "zh": "陶里亚蒂 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B60091493242386__SPLIT_KAMA_RESERVOIR": {
+      "en": "Чусовской район · Kama Reservoir site",
+      "zh": "丘索夫斯基区 · 卡马水库库址"
+    },
+    "id::RU_RAY_50074027B60091493242386__SPLIT_REST": {
+      "en": "Чусовской район",
+      "zh": "丘索夫斯基区"
+    },
+    "id::RU_RAY_50074027B6068395788556__SPLIT_REST": {
+      "en": "Чернышковский район",
+      "zh": "车尔尼什科夫斯基区"
+    },
+    "id::RU_RAY_50074027B6068395788556__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Чернышковский район · Tsimlyansk Reservoir site",
+      "zh": "车尔尼什科夫斯基区 · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B61660763245932__SPLIT_REST": {
+      "en": "Staromaynsky District",
+      "zh": "斯塔罗梅斯基区"
+    },
+    "id::RU_RAY_50074027B61660763245932__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Staromaynsky District · Samara Reservoir site",
+      "zh": "斯塔罗梅斯基区 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B61732353469918__SPLIT_REST": {
+      "en": "Katangsky Rayon",
+      "zh": "加丹斯基区"
+    },
+    "id::RU_RAY_50074027B61732353469918__SPLIT_VILYUY_RESERVOIR": {
+      "en": "Katangsky Rayon · Vilyuy Reservoir site",
+      "zh": "加丹斯基区 · 维尔尤伊水库库址"
+    },
+    "id::RU_RAY_50074027B64412298842231__SPLIT_REST": {
+      "en": "Cherdaklinsky District",
+      "zh": "切尔达克林斯基区"
+    },
+    "id::RU_RAY_50074027B64412298842231__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Cherdaklinsky District · Samara Reservoir site",
+      "zh": "切尔达克林斯基区 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B64669214156055__SPLIT_PLAYA_SALT_FLAT_46": {
+      "en": "Borzinsky District · Salt flat",
+      "zh": "博尔津斯基区 · 盐沼"
+    },
+    "id::RU_RAY_50074027B64669214156055__SPLIT_REST": {
+      "en": "Borzinsky District",
+      "zh": "博尔津斯基区"
+    },
+    "id::RU_RAY_50074027B65758721423350__SPLIT_REST": {
+      "en": "Voskresensky District",
+      "zh": "Voskresensky District"
+    },
+    "id::RU_RAY_50074027B65758721423350__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Voskresensky District · Volgograd Reservoir site",
+      "zh": "Voskresensky District · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B66849950652275__SPLIT_KHANTAYSKOYE_RESERVOIR": {
+      "en": "Taymyrsky Dolgano-Nenetsky District · Khantayskoye Reservoir site",
+      "zh": "泰梅尔斯基多尔加诺-涅涅茨基地区 · 汉泰水库库址"
+    },
+    "id::RU_RAY_50074027B66849950652275__SPLIT_REST": {
+      "en": "Taymyrsky Dolgano-Nenetsky District",
+      "zh": "泰梅尔斯基多尔加诺-涅涅茨基地区"
+    },
+    "id::RU_RAY_50074027B66856367478499__SPLIT_PLAYA_SALT_FLAT_46": {
+      "en": "Ononsky District · Salt flat",
+      "zh": "奥农斯基区 · 盐沼"
+    },
+    "id::RU_RAY_50074027B66856367478499__SPLIT_REST": {
+      "en": "Ononsky District",
+      "zh": "奥农斯基区"
+    },
+    "id::RU_RAY_50074027B66955592022274__SPLIT_REST": {
+      "en": "Oktyabrsky District",
+      "zh": "Oktyabrsky District"
+    },
+    "id::RU_RAY_50074027B66955592022274__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Oktyabrsky District · Tsimlyansk Reservoir site",
+      "zh": "Oktyabrsky District · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B67860704242461__SPLIT_REST": {
+      "en": "городской округ Ульяновск",
+      "zh": "乌里扬诺夫斯克"
+    },
+    "id::RU_RAY_50074027B67860704242461__SPLIT_SAMARA_RESERVOIR": {
+      "en": "городской округ Ульяновск · Samara Reservoir site",
+      "zh": "乌里扬诺夫斯克 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B68349842384732__SPLIT_REST": {
+      "en": "Volsky District",
+      "zh": "沃尔斯基区"
+    },
+    "id::RU_RAY_50074027B68349842384732__SPLIT_SARATOV_RESERVOIR": {
+      "en": "Volsky District · Saratov Reservoir site",
+      "zh": "沃尔斯基区 · 萨拉托夫水库库址"
+    },
+    "id::RU_RAY_50074027B68460090008050__SPLIT_REST": {
+      "en": "Sengileyevsky District",
+      "zh": "森吉列夫斯基区"
+    },
+    "id::RU_RAY_50074027B68460090008050__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Sengileyevsky District · Samara Reservoir site",
+      "zh": "森吉列夫斯基区 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B72026568542942__SPLIT_REST": {
+      "en": "Privolzhsky District",
+      "zh": "Privolzhsky District"
+    },
+    "id::RU_RAY_50074027B72026568542942__SPLIT_SARATOV_RESERVOIR": {
+      "en": "Privolzhsky District · Saratov Reservoir site",
+      "zh": "Privolzhsky District · 萨拉托夫水库库址"
+    },
+    "id::RU_RAY_50074027B81093411628760__SPLIT_GORKY_RESERVOIR": {
+      "en": "Yuryevetsky District · Gorky Reservoir site",
+      "zh": "尤里耶维茨基区 · 高尔基水库库址"
+    },
+    "id::RU_RAY_50074027B81093411628760__SPLIT_REST": {
+      "en": "Yuryevetsky District",
+      "zh": "尤里耶维茨基区"
+    },
+    "id::RU_RAY_50074027B84391084656620__SPLIT_REST": {
+      "en": "Shigonsky District",
+      "zh": "希贡斯基区"
+    },
+    "id::RU_RAY_50074027B84391084656620__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Shigonsky District · Samara Reservoir site",
+      "zh": "希贡斯基区 · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B85030315682895__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Yurinsky District · Cheboksary Reservoir site",
+      "zh": "尤林斯基区 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B85030315682895__SPLIT_REST": {
+      "en": "Yurinsky District",
+      "zh": "尤林斯基区"
+    },
+    "id::RU_RAY_50074027B87542455562769__SPLIT_REST": {
+      "en": "Spassky District",
+      "zh": "Spassky District"
+    },
+    "id::RU_RAY_50074027B87542455562769__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Spassky District · Samara Reservoir site",
+      "zh": "Spassky District · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B88274438285408__SPLIT_ABRENE": {
+      "en": "Abrene (Pytalovo)",
+      "zh": "阿布雷内（佩塔洛沃）"
+    },
+    "id::RU_RAY_50074027B88274438285408__SPLIT_REST": {
+      "en": "Pytalovsky District (Soviet part)",
+      "zh": "皮塔洛夫斯基区（苏联部分）"
+    },
+    "id::RU_RAY_50074027B884948676219__SPLIT_REST": {
+      "en": "Kamyshinsky District",
+      "zh": "卡梅辛斯基区"
+    },
+    "id::RU_RAY_50074027B884948676219__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Kamyshinsky District · Volgograd Reservoir site",
+      "zh": "卡梅辛斯基区 · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B88958089507858__SPLIT_REST": {
+      "en": "Gorodishchensky District",
+      "zh": "Gorodishchensky District"
+    },
+    "id::RU_RAY_50074027B88958089507858__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Gorodishchensky District · Tsimlyansk Reservoir site",
+      "zh": "Gorodishchensky District · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B89196470968911__SPLIT_REST": {
+      "en": "Ust-Ilimsky",
+      "zh": "乌斯季伊利姆斯基"
+    },
+    "id::RU_RAY_50074027B89196470968911__SPLIT_UST_ILIMSK_RESERVOIR": {
+      "en": "Ust-Ilimsky · Ust-Ilimsk Reservoir site",
+      "zh": "乌斯季伊利姆斯基 · 乌斯特伊利姆斯克水库库址"
+    },
+    "id::RU_RAY_50074027B90244452662579__SPLIT_REST": {
+      "en": "Zeysky District",
+      "zh": "泽斯基区"
+    },
+    "id::RU_RAY_50074027B90244452662579__SPLIT_ZEYA_RESERVOIR": {
+      "en": "Zeysky District · Zeya Reservoir site",
+      "zh": "泽斯基区 · 结雅水库库址"
+    },
+    "id::RU_RAY_50074027B90555869339870__SPLIT_LATVIAN": {
+      "en": "Northern Abrene (Pechorsky part)",
+      "zh": "阿布雷内北部（伯乔尔斯基区部分）"
+    },
+    "id::RU_RAY_50074027B90555869339870__SPLIT_PETSERI": {
+      "en": "Petseri (Pechory)",
+      "zh": "佩采里（佩乔雷）"
+    },
+    "id::RU_RAY_50074027B91001506415746__SPLIT_REST": {
+      "en": "Рыбинский район",
+      "zh": "雷宾斯克区"
+    },
+    "id::RU_RAY_50074027B91001506415746__SPLIT_RYBINSK_RESERVOIR": {
+      "en": "Рыбинский район · Rybinsk Reservoir site",
+      "zh": "雷宾斯克区 · 雷宾斯克水库库址"
+    },
+    "id::RU_RAY_50074027B94816741297533__SPLIT_REST": {
+      "en": "Nikolayevsky District",
+      "zh": "Nikolayevsky District"
+    },
+    "id::RU_RAY_50074027B94816741297533__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Nikolayevsky District · Volgograd Reservoir site",
+      "zh": "Nikolayevsky District · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B97493150269350__SPLIT_REST": {
+      "en": "Ulyanovsky District",
+      "zh": "Ulyanovsky District"
+    },
+    "id::RU_RAY_50074027B97493150269350__SPLIT_SAMARA_RESERVOIR": {
+      "en": "Ulyanovsky District · Samara Reservoir site",
+      "zh": "Ulyanovsky District · 古比雪夫水库库址"
+    },
+    "id::RU_RAY_50074027B97557760790791__SPLIT_REST": {
+      "en": "Saratovsky District",
+      "zh": "萨拉托夫斯基区"
+    },
+    "id::RU_RAY_50074027B97557760790791__SPLIT_VOLGOGRAD_RESERVOIR": {
+      "en": "Saratovsky District · Volgograd Reservoir site",
+      "zh": "萨拉托夫斯基区 · 伏尔加格勒水库库址"
+    },
+    "id::RU_RAY_50074027B97827439207559__SPLIT_REST": {
+      "en": "Kalachyovsky District",
+      "zh": "卡拉乔夫斯基区"
+    },
+    "id::RU_RAY_50074027B97827439207559__SPLIT_TSIMLYANSK_RESERVOIR": {
+      "en": "Kalachyovsky District · Tsimlyansk Reservoir site",
+      "zh": "卡拉乔夫斯基区 · 齐姆良斯克水库库址"
+    },
+    "id::RU_RAY_50074027B99227036451137__SPLIT_JAANILINN": {
+      "en": "Jaanilinn (Ivangorod) and the Narva right bank",
+      "zh": "亚尼林（伊万哥罗德）与纳尔瓦河东岸"
+    },
+    "id::RU_RAY_50074027B99227036451137__SPLIT_REST": {
+      "en": "Kingisepp District",
+      "zh": "金吉谢普区"
+    },
+    "id::RU_RAY_50074027B99457892446306__SPLIT_CHEBOKSARY_RESERVOIR": {
+      "en": "Lyskovsky District · Cheboksary Reservoir site",
+      "zh": "莱斯科夫斯基区 · 切博克萨雷水库库址"
+    },
+    "id::RU_RAY_50074027B99457892446306__SPLIT_REST": {
+      "en": "Lyskovsky District",
+      "zh": "莱斯科夫斯基区"
+    },
+    "id::SD_ADM1_SDN-878__SPLIT_LAKE_NASSER": {
+      "en": "Northern · Lake Nasser site",
+      "zh": "北方 · 纳赛尔湖库址"
+    },
+    "id::SD_ADM1_SDN-878__SPLIT_REST": {
+      "en": "Northern",
+      "zh": "北方"
+    },
+    "id::SI038__SPLIT_ITALIAN": {
+      "en": "Postumia and Villa del Nevoso",
+      "zh": "波斯托伊纳与伊利尔斯卡比斯特里察"
+    },
+    "id::SI038__SPLIT_YUGOSLAV": {
+      "en": "Cerknica, Loška dolina and Bloke",
+      "zh": "采尔克尼察、洛什卡谷与布洛凯"
+    },
+    "id::SI043__SPLIT_IDRIA": {
+      "en": "Gorizia",
+      "zh": "戈里齐亚"
+    },
+    "id::SI043__SPLIT_LOGATEC": {
+      "en": "Logatec",
+      "zh": "洛加泰茨"
+    },
+    "id::SI043__SPLIT_POSTUMIA": {
+      "en": "Postumia",
+      "zh": "波斯托伊纳"
+    },
+    "id::SI043__SPLIT_VKENTZI": {
+      "en": "Vkentzi",
+      "zh": "弗肯齐"
+    },
+    "id::SI044__SPLIT_GIMINO": {
+      "en": "Gimino",
+      "zh": "日米尼"
+    },
+    "id::SI044__SPLIT_POSTUMIA": {
+      "en": "Postumia",
+      "zh": "波斯托伊纳"
+    },
+    "id::SI044__SPLIT_SOUTH_IDRIA": {
+      "en": "Koper",
+      "zh": "科佩尔"
+    },
+    "id::SK_ADM2_56367889B14569056094647__SPLIT_HU": {
+      "en": "Takcsány area",
+      "zh": "斯塔克钦一带"
+    },
+    "id::SK_ADM2_56367889B14569056094647__SPLIT_REST": {
+      "en": "Snina District (Slovak part)",
+      "zh": "斯尼纳县（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B15407569919112__SPLIT_LEVICE": {
+      "en": "Levice",
+      "zh": "莱维采"
+    },
+    "id::SK_ADM2_56367889B15407569919112__SPLIT_PODHAJSKA": {
+      "en": "Želiezovce",
+      "zh": "热列佐夫采"
+    },
+    "id::SK_ADM2_56367889B15407569919112__SPLIT_SURANY": {
+      "en": "Tekovské Lužany",
+      "zh": "泰科夫斯凯卢扎尼"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_GALANTA": {
+      "en": "Selice",
+      "zh": "塞利采"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_SAFA": {
+      "en": "South Šaľa",
+      "zh": "南沙拉"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_SOUTH_NYITRA": {
+      "en": "South Nyitra",
+      "zh": "南尼特拉"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_WESTERN_SLOVAKIA": {
+      "en": "North Šaľa",
+      "zh": "北沙拉"
+    },
+    "id::SK_ADM2_56367889B51237059400968__SPLIT_DEVIN": {
+      "en": "Devín (Theben)",
+      "zh": "德温（特本）"
+    },
+    "id::SK_ADM2_56367889B51237059400968__SPLIT_REST": {
+      "en": "Bratislava IV (Slovak part)",
+      "zh": "布拉迪斯拉发第四区（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B62094256812316__SPLIT_HU": {
+      "en": "Szenc area",
+      "zh": "塞内茨一带"
+    },
+    "id::SK_ADM2_56367889B62094256812316__SPLIT_REST": {
+      "en": "Senec District (Slovak part)",
+      "zh": "塞内茨县（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B65708067786299__SPLIT_REST": {
+      "en": "Bodrogköz and Királyhelmec",
+      "zh": "博德罗格河间地与克拉洛夫斯基赫鲁梅茨"
+    },
+    "id::SK_ADM2_56367889B65708067786299__SPLIT_SK": {
+      "en": "Trebišov and Sečovce",
+      "zh": "特雷比绍夫与塞乔夫采"
+    },
+    "id::SK_ADM2_56367889B66923754975257__SPLIT_HU": {
+      "en": "Nagykapos area",
+      "zh": "大卡普沙尼一带"
+    },
+    "id::SK_ADM2_56367889B66923754975257__SPLIT_REST": {
+      "en": "Michalovce District (Slovak part)",
+      "zh": "米哈洛夫采县（斯洛伐克部分）"
+    },
+    "id::SK_ADM2_56367889B690835779632__SPLIT_PETRZALKA": {
+      "en": "Petržalka (Engerau)",
+      "zh": "佩特扎尔卡（恩格劳）"
+    },
+    "id::SK_ADM2_56367889B690835779632__SPLIT_REST": {
+      "en": "Jarovce, Rusovce and Čunovo",
+      "zh": "亚罗夫采、鲁索夫采与丘诺沃"
+    },
+    "id::SK_ADM2_56367889B83569782265262__SPLIT_ORAVA": {
+      "en": "Hladovka and Suchá Hora",
+      "zh": "赫拉多夫卡与苏哈霍拉"
+    },
+    "id::SK_ADM2_56367889B83569782265262__SPLIT_REST": {
+      "en": "District of Tvrdošín",
+      "zh": "特夫尔多欣区"
+    },
+    "id::SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA": {
+      "en": "Javorina (Jaworzyna Spiska)",
+      "zh": "亚沃里纳（斯皮什亚沃日纳）"
+    },
+    "id::SK_ADM2_56367889B94927774956455__SPLIT_REST": {
+      "en": "District of Poprad",
+      "zh": "波普拉德区"
+    },
+    "id::SK_ADM2_56367889B94951233476884__SPLIT_HU": {
+      "en": "Galánta area",
+      "zh": "加兰塔一带"
+    },
+    "id::SK_ADM2_56367889B94951233476884__SPLIT_REST": {
+      "en": "Sereď area",
+      "zh": "谢列吉一带"
+    },
+    "id::SK_ADM2_56367889B97606993013938__SPLIT_HU": {
+      "en": "Szobránc area",
+      "zh": "索布兰采一带"
+    },
+    "id::SK_ADM2_56367889B97606993013938__SPLIT_REST": {
+      "en": "Sobrance District (Slovak part)",
+      "zh": "索布兰采县（斯洛伐克部分）"
+    },
+    "id::SR_ADM1_SUR-66__SPLIT_PROFESSOR_DOCTOR_INGENIEUR_W_J_VAN_BLOMMESTEIN_MEER": {
+      "en": "Brokopondo · Brokopondo Reservoir site",
+      "zh": "布罗科蓬多 · 布罗科蓬多水库库址"
+    },
+    "id::SR_ADM1_SUR-66__SPLIT_REST": {
+      "en": "Brokopondo",
+      "zh": "布罗科蓬多"
+    },
+    "id::TD_ADM1_TCD-1464__SPLIT_LAKE_CHAD": {
+      "en": "Hadjer-Lamis · Lake Chad lakebed",
+      "zh": "哈杰拉米斯 · 乍得湖故湖床"
+    },
+    "id::TD_ADM1_TCD-1464__SPLIT_REST": {
+      "en": "Hadjer-Lamis",
+      "zh": "哈杰拉米斯"
+    },
+    "id::TD_ADM1_TCD-1466__SPLIT_LAKE_CHAD": {
+      "en": "Lac · Lake Chad lakebed",
+      "zh": "拉克 · 乍得湖故湖床"
+    },
+    "id::TD_ADM1_TCD-1466__SPLIT_REST": {
+      "en": "Lac",
+      "zh": "拉克"
+    },
     "id::TR100__SPLIT_ASIA": {
       "en": "İstanbul · Asian side",
       "zh": "伊斯坦布尔 · 亚洲侧"
@@ -408,6 +4220,470 @@
     "id::TR100__SPLIT_EUROPE": {
       "en": "İstanbul · European side",
       "zh": "伊斯坦布尔 · 欧洲侧"
+    },
+    "id::TR631__SPLIT_KESSAB": {
+      "en": "Kessab",
+      "zh": "凯萨卜"
+    },
+    "id::TR631__SPLIT_NORTH": {
+      "en": "Dörtyol, Erzin and Hassa",
+      "zh": "多尔特约尔、埃尔津与哈萨"
+    },
+    "id::TR631__SPLIT_SANJAK": {
+      "en": "Sanjak of Alexandretta",
+      "zh": "亚历山大勒塔桑贾克"
+    },
+    "id::TR905__SPLIT_ARTVIN": {
+      "en": "Artvin",
+      "zh": "阿尔特温"
+    },
+    "id::TR905__SPLIT_HOPA": {
+      "en": "Hopa",
+      "zh": "霍帕"
+    },
+    "id::TR905__SPLIT_SAVSAT": {
+      "en": "Savsat",
+      "zh": "萨夫沙特"
+    },
+    "id::TR905__SPLIT_YUSUFELI": {
+      "en": "Yusufeli",
+      "zh": "优素费利"
+    },
+    "id::TRA11__SPLIT_ASKALE": {
+      "en": "Askale",
+      "zh": "阿什卡莱"
+    },
+    "id::TRA11__SPLIT_ERZURUM": {
+      "en": "Erzurum",
+      "zh": "埃尔祖鲁姆"
+    },
+    "id::TRA11__SPLIT_HORASAN": {
+      "en": "Narman",
+      "zh": "纳尔曼"
+    },
+    "id::TRA11__SPLIT_ISPIR": {
+      "en": "Ispir",
+      "zh": "伊斯皮尔"
+    },
+    "id::TRA11__SPLIT_OLTU": {
+      "en": "Oltu",
+      "zh": "奥尔图"
+    },
+    "id::TRA11__SPLIT_PASINLER": {
+      "en": "Hinis",
+      "zh": "赫内斯"
+    },
+    "id::TRA11__SPLIT_PAZARYOLU": {
+      "en": "Pazaryolu",
+      "zh": "帕扎尔约卢"
+    },
+    "id::TRA22__SPLIT_BASKOY": {
+      "en": "Baskoy",
+      "zh": "巴什柯伊"
+    },
+    "id::TRA22__SPLIT_CILDIR": {
+      "en": "Cildir",
+      "zh": "彻尔德尔"
+    },
+    "id::TRA22__SPLIT_DIGOR": {
+      "en": "Digor",
+      "zh": "迪戈尔"
+    },
+    "id::TRA22__SPLIT_KAGIZMAN": {
+      "en": "Kagizman",
+      "zh": "卡厄兹曼"
+    },
+    "id::TRA22__SPLIT_KARAKALE": {
+      "en": "Karakale",
+      "zh": "卡拉卡莱"
+    },
+    "id::TRA22__SPLIT_KARS": {
+      "en": "Kars",
+      "zh": "卡尔斯"
+    },
+    "id::TRA22__SPLIT_KIRAC": {
+      "en": "Kirac",
+      "zh": "克拉奇"
+    },
+    "id::TRA22__SPLIT_ODALAR": {
+      "en": "Odalar",
+      "zh": "奥达拉尔"
+    },
+    "id::TRA22__SPLIT_SARIKAMIS": {
+      "en": "Sarikamis",
+      "zh": "萨勒卡默什"
+    },
+    "id::TRA24__SPLIT_ARDAHAN": {
+      "en": "Ardahan",
+      "zh": "阿尔达汉"
+    },
+    "id::TRA24__SPLIT_CILDIR": {
+      "en": "Cildir",
+      "zh": "彻尔德尔"
+    },
+    "id::TRA24__SPLIT_KOLKOY": {
+      "en": "Kolkoy",
+      "zh": "科尔柯伊"
+    },
+    "id::TRA24__SPLIT_TURKGOZU": {
+      "en": "Turkgozu",
+      "zh": "蒂尔克格聚"
+    },
+    "id::TUN-101__SPLIT_PLAYA_CHOTT_EL_DJERID": {
+      "en": "Tozeur · Chott el Djerid",
+      "zh": "托泽尔 · 杰里德盐湖"
+    },
+    "id::TUN-101__SPLIT_PLAYA_CHOTT_EL_GHARSA": {
+      "en": "Tozeur · Chott el Gharsa",
+      "zh": "托泽尔 · 盖尔萨盐湖"
+    },
+    "id::TUN-101__SPLIT_REST": {
+      "en": "Tozeur",
+      "zh": "托泽尔"
+    },
+    "id::TUN-111__SPLIT_PLAYA_CHOTT_EL_FEJAJ": {
+      "en": "Gabès · Chott el Fejaj",
+      "zh": "加贝斯 · 费贾杰盐湖"
+    },
+    "id::TUN-111__SPLIT_REST": {
+      "en": "Gabès",
+      "zh": "加贝斯"
+    },
+    "id::TUN-97__SPLIT_PLAYA_CHOTT_EL_DJERID": {
+      "en": "Kebili · Chott el Djerid",
+      "zh": "克比利 · 杰里德盐湖"
+    },
+    "id::TUN-97__SPLIT_PLAYA_CHOTT_EL_FEJAJ": {
+      "en": "Kebili · Chott el Fejaj",
+      "zh": "克比利 · 费贾杰盐湖"
+    },
+    "id::TUN-97__SPLIT_REST": {
+      "en": "Kebili",
+      "zh": "克比利"
+    },
+    "id::UA_MRG_1d698b91bc32__SPLIT_KREMENCHUK_RESERVOIR": {
+      "en": "Zolotonosha · Kremenchuk Reservoir site",
+      "zh": "佐洛托诺沙 · 克列缅丘格水库库址"
+    },
+    "id::UA_MRG_1d698b91bc32__SPLIT_REST": {
+      "en": "Zolotonosha",
+      "zh": "佐洛托诺沙"
+    },
+    "id::UA_MRG_87ad72dae9b5__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Tokmak · Kakhovka Reservoir site",
+      "zh": "旋钮 · 卡霍夫卡水库库址"
+    },
+    "id::UA_MRG_87ad72dae9b5__SPLIT_REST": {
+      "en": "Tokmak",
+      "zh": "旋钮"
+    },
+    "id::UA_RAY_74538382B1179884845086__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Apostolove · Kakhovka Reservoir site",
+      "zh": "阿波斯托洛夫 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B1179884845086__SPLIT_REST": {
+      "en": "Apostolove",
+      "zh": "阿波斯托洛夫"
+    },
+    "id::UA_RAY_74538382B15303326410198__SPLIT_KREMENCHUK_RESERVOIR": {
+      "en": "Hlobyne · Kremenchuk Reservoir site",
+      "zh": "赫洛伊内 · 克列缅丘格水库库址"
+    },
+    "id::UA_RAY_74538382B15303326410198__SPLIT_REST": {
+      "en": "Hlobyne",
+      "zh": "赫洛伊内"
+    },
+    "id::UA_RAY_74538382B20694939957091__SPLIT_BUKOVINA": {
+      "en": "Vyzhnytsia (Bukovina bank)",
+      "zh": "维日尼察（布科维纳岸）"
+    },
+    "id::UA_RAY_74538382B20694939957091__SPLIT_GALICIA": {
+      "en": "Kosiv and Kuty",
+      "zh": "科西夫与库季"
+    },
+    "id::UA_RAY_74538382B23530210512837__SPLIT_KREMENCHUK_RESERVOIR": {
+      "en": "Chyhyryn · Kremenchuk Reservoir site",
+      "zh": "奇赫林 · 克列缅丘格水库库址"
+    },
+    "id::UA_RAY_74538382B23530210512837__SPLIT_REST": {
+      "en": "Chyhyryn",
+      "zh": "奇赫林"
+    },
+    "id::UA_RAY_74538382B28718545705075__SPLIT_KREMENCHUK_RESERVOIR": {
+      "en": "Cherkasy · Kremenchuk Reservoir site",
+      "zh": "切尔卡瑟 · 克列缅丘格水库库址"
+    },
+    "id::UA_RAY_74538382B28718545705075__SPLIT_REST": {
+      "en": "Cherkasy",
+      "zh": "切尔卡瑟"
+    },
+    "id::UA_RAY_74538382B3314448443504__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Kamianka Dniprovska · Kakhovka Reservoir site",
+      "zh": "卡缅卡第聂伯罗夫斯卡 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B3314448443504__SPLIT_REST": {
+      "en": "Kamianka Dniprovska",
+      "zh": "卡缅卡第聂伯罗夫斯卡"
+    },
+    "id::UA_RAY_74538382B332128375794__SPLIT_KREMENCHUK_RESERVOIR": {
+      "en": "Svitlovodsk · Kremenchuk Reservoir site",
+      "zh": "斯维特洛沃茨克 · 克列缅丘格水库库址"
+    },
+    "id::UA_RAY_74538382B332128375794__SPLIT_REST": {
+      "en": "Svitlovodsk",
+      "zh": "斯维特洛沃茨克"
+    },
+    "id::UA_RAY_74538382B36952464312213__SPLIT_BUKOVINA": {
+      "en": "Vashkivtsi (Bukovina)",
+      "zh": "瓦什基夫齐（布科维纳）"
+    },
+    "id::UA_RAY_74538382B36952464312213__SPLIT_GALICIA": {
+      "en": "Sniatyn",
+      "zh": "斯尼亚汀"
+    },
+    "id::UA_RAY_74538382B60808123109786__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Beryslav · Kakhovka Reservoir site",
+      "zh": "别列斯拉夫 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B60808123109786__SPLIT_REST": {
+      "en": "Beryslav",
+      "zh": "别列斯拉夫"
+    },
+    "id::UA_RAY_74538382B61089393980714__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Kakhovka · Kakhovka Reservoir site",
+      "zh": "卡霍夫卡 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B61089393980714__SPLIT_REST": {
+      "en": "Kakhovka",
+      "zh": "卡霍夫卡"
+    },
+    "id::UA_RAY_74538382B71954626153569__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Tomakivka · Kakhovka Reservoir site",
+      "zh": "托马基夫卡 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B71954626153569__SPLIT_REST": {
+      "en": "Tomakivka",
+      "zh": "托马基夫卡"
+    },
+    "id::UA_RAY_74538382B85739457006484__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Novovorontsovka · Kakhovka Reservoir site",
+      "zh": "新沃龙佐夫卡 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B85739457006484__SPLIT_REST": {
+      "en": "Novovorontsovka",
+      "zh": "新沃龙佐夫卡"
+    },
+    "id::UA_RAY_74538382B86672078093677__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Zaporizhia · Kakhovka Reservoir site",
+      "zh": "扎波罗热 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B86672078093677__SPLIT_REST": {
+      "en": "Zaporizhia",
+      "zh": "扎波罗热"
+    },
+    "id::UA_RAY_74538382B8704633300515__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Nikopol · Kakhovka Reservoir site",
+      "zh": "尼科波尔 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B8704633300515__SPLIT_REST": {
+      "en": "Nikopol",
+      "zh": "尼科波尔"
+    },
+    "id::UA_RAY_74538382B88832969225176__SPLIT_KAKHOVKA_RESERVOIR": {
+      "en": "Verkhniy Rohackyk · Kakhovka Reservoir site",
+      "zh": "上罗哈基克 · 卡霍夫卡水库库址"
+    },
+    "id::UA_RAY_74538382B88832969225176__SPLIT_REST": {
+      "en": "Verkhniy Rohackyk",
+      "zh": "上罗哈基克"
+    },
+    "id::UA_SHELL_FB_204__SPLIT_AKKERMAN": {
+      "en": "Cetatea Albă shore",
+      "zh": "白堡（比尔霍罗德）岸"
+    },
+    "id::UA_SHELL_FB_204__SPLIT_OVIDIOPOL": {
+      "en": "Ovidiopol shore",
+      "zh": "奥维季奥波尔岸"
+    },
+    "id::UA_SHELL_FB_269__SPLIT_KREMENCHUK_RESERVOIR": {
+      "en": "Ukraine Shell Fallback 269 · Kremenchuk Reservoir site",
+      "zh": "Ukraine Shell Fallback 269 · 克列缅丘格水库库址"
+    },
+    "id::US_ZN_30_004__R__SPLIT_FORT_PECK_LAKE": {
+      "en": "Yellowstone County · Fort Peck Lake site",
+      "zh": "黄石县 · 佩克堡湖库址"
+    },
+    "id::US_ZN_30_004__R__SPLIT_REST": {
+      "en": "Yellowstone County",
+      "zh": "黄石县"
+    },
+    "id::US_ZN_30_005__R__SPLIT_FORT_PECK_LAKE": {
+      "en": "Richland County · Fort Peck Lake site",
+      "zh": "里奇兰县 · 佩克堡湖库址"
+    },
+    "id::US_ZN_30_005__R__SPLIT_REST": {
+      "en": "Richland County",
+      "zh": "里奇兰县"
+    },
+    "id::US_ZN_32_005__R__SPLIT_PLAYA_CARSON_SINK": {
+      "en": "Churchill County · Carson Sink",
+      "zh": "丘吉尔县 · 卡森洼地"
+    },
+    "id::US_ZN_32_005__R__SPLIT_REST": {
+      "en": "Churchill County",
+      "zh": "丘吉尔县"
+    },
+    "id::US_ZN_32_006__R__SPLIT_PLAYA_GREAT_SALT_LAKE_DESERT": {
+      "en": "Elko County · Great Salt Lake Desert",
+      "zh": "埃尔科县 · 大盐湖沙漠"
+    },
+    "id::US_ZN_32_006__R__SPLIT_REST": {
+      "en": "Elko County",
+      "zh": "埃尔科县"
+    },
+    "id::US_ZN_38_001__R__SPLIT_LAKE_SAKAKAWEA": {
+      "en": "Williams County · Lake Sakakawea site",
+      "zh": "威廉姆斯县 · 萨卡卡维亚湖库址"
+    },
+    "id::US_ZN_38_001__R__SPLIT_REST": {
+      "en": "Williams County",
+      "zh": "威廉姆斯县"
+    },
+    "id::US_ZN_38_002__R__SPLIT_LAKE_SAKAKAWEA": {
+      "en": "Burleigh County · Lake Sakakawea site",
+      "zh": "伯利县 · 萨卡卡维亚湖库址"
+    },
+    "id::US_ZN_38_002__R__SPLIT_REST": {
+      "en": "Burleigh County",
+      "zh": "伯利县"
+    },
+    "id::US_ZN_38_003__R__SPLIT_LAKE_OAHE": {
+      "en": "Morton County · Lake Oahe site",
+      "zh": "莫顿县 · 欧河湖库址"
+    },
+    "id::US_ZN_38_003__R__SPLIT_REST": {
+      "en": "Morton County",
+      "zh": "莫顿县"
+    },
+    "id::US_ZN_46_001__R__SPLIT_LAKE_OAHE": {
+      "en": "Pennington County · Lake Oahe site",
+      "zh": "彭宁顿县 · 欧河湖库址"
+    },
+    "id::US_ZN_46_001__R__SPLIT_REST": {
+      "en": "Pennington County",
+      "zh": "彭宁顿县"
+    },
+    "id::US_ZN_46_002__R__SPLIT_LAKE_OAHE": {
+      "en": "Hughes County · Lake Oahe site",
+      "zh": "休斯县 · 欧河湖库址"
+    },
+    "id::US_ZN_46_002__R__SPLIT_REST": {
+      "en": "Hughes County",
+      "zh": "休斯县"
+    },
+    "id::US_ZN_46_003__R__SPLIT_LAKE_OAHE": {
+      "en": "Brown County · Lake Oahe site",
+      "zh": "布朗县 · 欧河湖库址"
+    },
+    "id::US_ZN_46_003__R__SPLIT_REST": {
+      "en": "Brown County",
+      "zh": "布朗县"
+    },
+    "id::US_ZN_49_002__R__SPLIT_PLAYA_GREAT_SALT_LAKE_DESERT": {
+      "en": "Davis County · Great Salt Lake Desert",
+      "zh": "戴维斯县 · 大盐湖沙漠"
+    },
+    "id::US_ZN_49_002__R__SPLIT_REST": {
+      "en": "Davis County",
+      "zh": "戴维斯县"
+    },
+    "id::UY_ADM1_URY-13__SPLIT_LAGO_RINCON_DEL_BONETE": {
+      "en": "Durazno · Lago Rincón del Bonete site",
+      "zh": "杜拉兹诺 · 里孔德尔博内特水库库址"
+    },
+    "id::UY_ADM1_URY-13__SPLIT_REST": {
+      "en": "Durazno",
+      "zh": "杜拉兹诺"
+    },
+    "id::UY_ADM1_URY-15__SPLIT_LAGO_RINCON_DEL_BONETE": {
+      "en": "Tacuarembó · Lago Rincón del Bonete site",
+      "zh": "塔库阿伦博 · 里孔德尔博内特水库库址"
+    },
+    "id::UY_ADM1_URY-15__SPLIT_REST": {
+      "en": "Tacuarembó",
+      "zh": "塔库阿伦博"
+    },
+    "id::UY_ADM1_URY-9__SPLIT_LAGO_RINCON_DEL_BONETE": {
+      "en": "Río Negro · Lago Rincón del Bonete site",
+      "zh": "内格罗河 · 里孔德尔博内特水库库址"
+    },
+    "id::UY_ADM1_URY-9__SPLIT_REST": {
+      "en": "Río Negro",
+      "zh": "内格罗河"
+    },
+    "id::UZB-356__SPLIT_ARAL1973": {
+      "en": "Karakalpakstan · Aral seabed (dried by 1973)",
+      "zh": "卡拉卡尔帕克斯坦 · 咸海干涸湖床（1973 年前）"
+    },
+    "id::UZB-356__SPLIT_ARAL1987": {
+      "en": "Karakalpakstan · Aral seabed (dried by 1987)",
+      "zh": "卡拉卡尔帕克斯坦 · 咸海干涸湖床（1987 年前）"
+    },
+    "id::UZB-356__SPLIT_ARAL1999": {
+      "en": "Karakalpakstan · Aral seabed (dried by 1999)",
+      "zh": "卡拉卡尔帕克斯坦 · 咸海干涸湖床（1999 年前）"
+    },
+    "id::UZB-356__SPLIT_ARAL2006": {
+      "en": "Karakalpakstan · Aral seabed (dried by 2006)",
+      "zh": "卡拉卡尔帕克斯坦 · 咸海干涸湖床（2006 年前）"
+    },
+    "id::UZB-356__SPLIT_ARAL2009": {
+      "en": "Karakalpakstan · Aral seabed (dried by 2009)",
+      "zh": "卡拉卡尔帕克斯坦 · 咸海干涸湖床（2009 年前）"
+    },
+    "id::UZB-356__SPLIT_ARAL2014": {
+      "en": "Karakalpakstan · Aral seabed (dried by 2014)",
+      "zh": "卡拉卡尔帕克斯坦 · 咸海干涸湖床（2014 年前）"
+    },
+    "id::UZB-356__SPLIT_ARALBASIN": {
+      "en": "Karakalpakstan · Aral seabed (residual basin)",
+      "zh": "卡拉卡尔帕克斯坦 · 咸海干涸湖床（残余湖盆）"
+    },
+    "id::UZB-356__SPLIT_REST": {
+      "en": "Karakalpakstan",
+      "zh": "卡拉卡尔帕克斯坦"
+    },
+    "id::VE_ADM1_VEN-39__SPLIT_EMBALSE_DE_GURI": {
+      "en": "Bolívar · Embalse de Guri site",
+      "zh": "玻利瓦尔 · 古里水库库址"
+    },
+    "id::VE_ADM1_VEN-39__SPLIT_REST": {
+      "en": "Bolívar",
+      "zh": "玻利瓦尔"
+    },
+    "id::ZM_ADM1_ZMB-522__SPLIT_LAKE_KARIBA": {
+      "en": "Southern · Lake Kariba site",
+      "zh": "南方 · 卡里巴水库库址"
+    },
+    "id::ZM_ADM1_ZMB-522__SPLIT_REST": {
+      "en": "Southern",
+      "zh": "南方"
+    },
+    "id::ZW_ADM1_ZWE-526__SPLIT_LAKE_KARIBA": {
+      "en": "Matabeleland North · Lake Kariba site",
+      "zh": "北马塔贝莱兰 · 卡里巴水库库址"
+    },
+    "id::ZW_ADM1_ZWE-526__SPLIT_REST": {
+      "en": "Matabeleland North",
+      "zh": "北马塔贝莱兰"
+    },
+    "id::ZW_ADM1_ZWE-533__SPLIT_LAKE_KARIBA": {
+      "en": "Mashonaland West · Lake Kariba site",
+      "zh": "西马绍纳兰 · 卡里巴水库库址"
+    },
+    "id::ZW_ADM1_ZWE-533__SPLIT_REST": {
+      "en": "Mashonaland West",
+      "zh": "西马绍纳兰"
     }
   },
   "language": "zh",

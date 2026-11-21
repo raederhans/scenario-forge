@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "06b23583499ed21160520fee8d6d6b14aa2f66c68f26f1d0c00f42b047f2fa52",
+  "baseline_hash": "32f16f71bbe8f534b1a3e43a8ed51d7b9f77b0bb49650c0eaba60bb2b733fd00",
   "cores": {
     "AD_ADM1_AND-4876": [
       "AND"
@@ -46,13 +46,19 @@
     "AFG-1748": [
       "AFG"
     ],
-    "AFG-1749": [
+    "AFG-1749__SPLIT_PLAYA_HAMUN_E_SABERI": [
+      "AFG"
+    ],
+    "AFG-1749__SPLIT_REST": [
       "AFG"
     ],
     "AFG-1750": [
       "AFG"
     ],
-    "AFG-1751": [
+    "AFG-1751__SPLIT_PLAYA_GOWD_E_ZEREH": [
+      "AFG"
+    ],
+    "AFG-1751__SPLIT_REST": [
       "AFG"
     ],
     "AFG-1752": [
@@ -154,7 +160,16 @@
     "AL033": [
       "ALB"
     ],
-    "AL034": [
+    "AL034__SPLIT_GALICHITSA": [
+      "ALB"
+    ],
+    "AL034__SPLIT_OUTER_VLORE": [
+      "ALB"
+    ],
+    "AL034__SPLIT_POGRADEC": [
+      "ALB"
+    ],
+    "AL034__SPLIT_PRESPA": [
       "ALB"
     ],
     "AL035": [
@@ -280,7 +295,16 @@
     "ARM-1554": [
       "TSC"
     ],
-    "ARM-1555": [
+    "ARM-1555__SPLIT_BASKOY": [
+      "TSC"
+    ],
+    "ARM-1555__SPLIT_KARAKALE": [
+      "TSC"
+    ],
+    "ARM-1555__SPLIT_KIRAC": [
+      "TSC"
+    ],
+    "ARM-1555__SPLIT_SALUT": [
       "TSC"
     ],
     "ARM-1670": [
@@ -337,22 +361,52 @@
     "AR_ADM1_ARG-1298": [
       "ARG"
     ],
-    "AR_ADM1_ARG-1299": [
+    "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA": [
       "ARG"
     ],
-    "AR_ADM1_ARG-1300": [
+    "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_19": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_20": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1299__SPLIT_REST": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1300__SPLIT_PLAYA_SALAR_DE_PIPANACO": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1300__SPLIT_PLAYA_SALT_FLAT_19": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1300__SPLIT_PLAYA_SALT_FLAT_33": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1300__SPLIT_REST": [
       "ARG"
     ],
     "AR_ADM1_ARG-1301": [
       "ARG"
     ],
-    "AR_ADM1_ARG-1302": [
+    "AR_ADM1_ARG-1302__SPLIT_PLAYA_SALT_FLAT_19": [
       "ARG"
     ],
-    "AR_ADM1_ARG-1303": [
+    "AR_ADM1_ARG-1302__SPLIT_PLAYA_SALT_FLAT_34": [
       "ARG"
     ],
-    "AR_ADM1_ARG-1304": [
+    "AR_ADM1_ARG-1302__SPLIT_REST": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1303__SPLIT_PLAYA_SALAR_DE_ARIZARO": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1303__SPLIT_REST": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1304__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA": [
+      "ARG"
+    ],
+    "AR_ADM1_ARG-1304__SPLIT_REST": [
       "ARG"
     ],
     "AR_ADM1_ARG-1305": [
@@ -382,10 +436,16 @@
     "AT111": [
       "AUS"
     ],
-    "AT112": [
+    "AT112__SPLIT_NORTH_BURGENLAND": [
       "AUS"
     ],
-    "AT113": [
+    "AT112__SPLIT_SOPRON": [
+      "AUS"
+    ],
+    "AT113__SPLIT_BURGENLAND": [
+      "AUS"
+    ],
+    "AT113__SPLIT_SZOMBATHELY": [
       "AUS"
     ],
     "AT121": [
@@ -412,13 +472,43 @@
     "AT130": [
       "AUS"
     ],
-    "AT211": [
+    "AT211__SPLIT_EBRIACH": [
       "AUS"
     ],
-    "AT212": [
+    "AT211__SPLIT_KLAGENFURT_LAND": [
       "AUS"
     ],
-    "AT213": [
+    "AT211__SPLIT_VOLKERMARKT": [
+      "AUS"
+    ],
+    "AT212__SPLIT_CARINTHIA": [
+      "AUS"
+    ],
+    "AT212__SPLIT_EBENTHAL": [
+      "AUS"
+    ],
+    "AT212__SPLIT_EBRIACH": [
+      "AUS"
+    ],
+    "AT212__SPLIT_GALLIZIEN": [
+      "AUS"
+    ],
+    "AT212__SPLIT_GRAFENSTEIN": [
+      "AUS"
+    ],
+    "AT212__SPLIT_RUCKERSDORF": [
+      "AUS"
+    ],
+    "AT213__SPLIT_RUCKERSDORF": [
+      "AUS"
+    ],
+    "AT213__SPLIT_TAINACH": [
+      "AUS"
+    ],
+    "AT213__SPLIT_VOLKERMARKT": [
+      "AUS"
+    ],
+    "AT213__SPLIT_WOLFSBERG": [
       "AUS"
     ],
     "AT221": [
@@ -487,7 +577,13 @@
     "AU_ADM1_AUS-2650": [
       "AST"
     ],
-    "AU_ADM1_AUS-2651": [
+    "AU_ADM1_AUS-2651__SPLIT_LAKE_ARGYLE": [
+      "AST"
+    ],
+    "AU_ADM1_AUS-2651__SPLIT_PLAYA_FORTESCUE_RIVER_FLOODOUT": [
+      "AST"
+    ],
+    "AU_ADM1_AUS-2651__SPLIT_REST": [
       "AST"
     ],
     "AU_ADM1_AUS-2653": [
@@ -811,7 +907,31 @@
     "BE_MRG_38ea003ab243": [
       "BEL"
     ],
-    "BE_MRG_49096f4ef44b": [
+    "BE_MRG_49096f4ef44b__SPLIT_EUPEN_MALMEDY": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_HASSELT": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_KELMIS": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_LIEGE": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_MALDINGEN": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_REINARTZHOF": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_SPA": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_VERVIERS": [
+      "BEL"
+    ],
+    "BE_MRG_49096f4ef44b__SPLIT_VOEREN": [
       "BEL"
     ],
     "BE_MRG_6a92ca76474d": [
@@ -934,7 +1054,13 @@
     "BG412": [
       "BUL"
     ],
-    "BG413": [
+    "BG413__SPLIT_BANSKO": [
+      "BUL"
+    ],
+    "BG413__SPLIT_DOSPAT": [
+      "BUL"
+    ],
+    "BG413__SPLIT_SANDANSKI": [
       "BUL"
     ],
     "BG414": [
@@ -946,7 +1072,25 @@
     "BG421": [
       "BUL"
     ],
-    "BG422": [
+    "BG422__SPLIT_EDIRNE": [
+      "BUL"
+    ],
+    "BG422__SPLIT_HUHLA": [
+      "BUL"
+    ],
+    "BG422__SPLIT_KEMAL": [
+      "BUL"
+    ],
+    "BG422__SPLIT_MERIC": [
+      "BUL"
+    ],
+    "BG422__SPLIT_ORESTIADA": [
+      "BUL"
+    ],
+    "BG422__SPLIT_ORMENIO": [
+      "BUL"
+    ],
+    "BG422__SPLIT_SVILENGRAD": [
       "BUL"
     ],
     "BG423": [
@@ -1105,13 +1249,22 @@
     "BO_ADM1_BOL-1936": [
       "BOL"
     ],
-    "BO_ADM1_BOL-1937": [
+    "BO_ADM1_BOL-1937__SPLIT_PLAYA_SALAR_DE_COIPASA": [
+      "BOL"
+    ],
+    "BO_ADM1_BOL-1937__SPLIT_PLAYA_SALAR_DE_UYUNI": [
+      "BOL"
+    ],
+    "BO_ADM1_BOL-1937__SPLIT_REST": [
       "BOL"
     ],
     "BO_ADM1_BOL-1938": [
       "BOL"
     ],
-    "BO_ADM1_BOL-1939": [
+    "BO_ADM1_BOL-1939__SPLIT_PLAYA_SALAR_DE_UYUNI": [
+      "BOL"
+    ],
+    "BO_ADM1_BOL-1939__SPLIT_REST": [
       "BOL"
     ],
     "BO_ADM1_BOL-1940": [
@@ -1120,10 +1273,25 @@
     "BO_ADM1_BOL-1941": [
       "BOL"
     ],
-    "BR_ADM1_BRA-1294": [
+    "BR_ADM1_BRA-1294__SPLIT_REPRESA_DE_SAO_SIMAO": [
       "BRA"
     ],
-    "BR_ADM1_BRA-1311": [
+    "BR_ADM1_BRA-1294__SPLIT_REST": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-1311__SPLIT_BARIRI": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-1311__SPLIT_REPRESA_IEPE": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-1311__SPLIT_REPRESA_PORTO_PRIMAVERA": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-1311__SPLIT_REPRESSA_DE_JUPIA": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-1311__SPLIT_REST": [
       "BRA"
     ],
     "BR_ADM1_BRA-1313": [
@@ -1138,7 +1306,10 @@
     "BR_ADM1_BRA-593": [
       "BRA"
     ],
-    "BR_ADM1_BRA-594": [
+    "BR_ADM1_BRA-594__SPLIT_REPRESA_DE_TUCURUI": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-594__SPLIT_REST": [
       "BRA"
     ],
     "BR_ADM1_BRA-595": [
@@ -1150,10 +1321,28 @@
     "BR_ADM1_BRA-599": [
       "BRA"
     ],
-    "BR_ADM1_BRA-600": [
+    "BR_ADM1_BRA-600__SPLIT_REPRESA_PORTO_PRIMAVERA": [
       "BRA"
     ],
-    "BR_ADM1_BRA-601": [
+    "BR_ADM1_BRA-600__SPLIT_REPRESSA_DE_JUPIA": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-600__SPLIT_REST": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-601__SPLIT_REPRESA_DE_SAO_SIMAO": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-601__SPLIT_REPRESA_FURNAS": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-601__SPLIT_REPRESA_TRES_MARIAS": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-601__SPLIT_REPRESSA_DE_JUPIA": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-601__SPLIT_REST": [
       "BRA"
     ],
     "BR_ADM1_BRA-602": [
@@ -1162,7 +1351,13 @@
     "BR_ADM1_BRA-612": [
       "BRA"
     ],
-    "BR_ADM1_BRA-613": [
+    "BR_ADM1_BRA-613__SPLIT_REPRESA_IEPE": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-613__SPLIT_REPRESA_ITAIPU": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-613__SPLIT_REST": [
       "BRA"
     ],
     "BR_ADM1_BRA-614": [
@@ -1177,7 +1372,10 @@
     "BR_ADM1_BRA-623": [
       "BRA"
     ],
-    "BR_ADM1_BRA-624": [
+    "BR_ADM1_BRA-624__SPLIT_REPRESA_DE_SOBRADINHO": [
+      "BRA"
+    ],
+    "BR_ADM1_BRA-624__SPLIT_REST": [
       "BRA"
     ],
     "BR_ADM1_BRA-625": [
@@ -1273,7 +1471,10 @@
     "BW_ADM1_BWA-2629": [
       "BOT"
     ],
-    "BW_ADM1_BWA-2630": [
+    "BW_ADM1_BWA-2630__SPLIT_PLAYA_MAKGADIKGADI_PANS": [
+      "BOT"
+    ],
+    "BW_ADM1_BWA-2630__SPLIT_REST": [
       "BOT"
     ],
     "BW_ADM1_BWA-2646": [
@@ -1318,13 +1519,106 @@
     "BY_HIST_POL_VITEBSK_WEST": [
       "BLR"
     ],
-    "BY_INT_BREST": [
+    "BY_INT_BREST__SPLIT_CHERNYANY": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_DOBROMYSL": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_DUBICHNO": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_DYMNA": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_KAMENETS": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_KHOTYNICHI": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_LUSINO": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_MALKOVICHI": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_MEDNO": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_NORTH_PINSK": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_NOWOGRODEK": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_OGORODNIKI": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_PINSK": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_POLESIE": [
+      "POL"
+    ],
+    "BY_INT_BREST__SPLIT_VYGONOSCHI": [
       "POL"
     ],
     "BY_INT_GOMEL": [
       "BLR"
     ],
-    "BY_INT_GRODNO": [
+    "BY_INT_GRODNO__SPLIT_BAKSHTY": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_BOROVIKI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_BYAROZAWKA": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_CENTRAL_INDURA": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_GONCHARY": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_KURILOVICHI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_MANCHIKI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_NORTH_KAMENETS": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_OSZMIANA": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_PIESKI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_PORASLI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_SLONIM": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_SOUTH_INDURA": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_TSATSKI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_VAVERKA": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_WEST_BOROVIKI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_WEST_PIESKI": [
+      "POL"
+    ],
+    "BY_INT_GRODNO__SPLIT_ZELWA": [
       "POL"
     ],
     "BY_INT_MINSK": [
@@ -1342,7 +1636,22 @@
     "BY_RAY_67162791B11584975294724": [
       "BLR"
     ],
-    "BY_RAY_67162791B13547290723272": [
+    "BY_RAY_67162791B13547290723272__SPLIT_CENTRAL_KOROBCHITSY": [
+      "POL"
+    ],
+    "BY_RAY_67162791B13547290723272__SPLIT_GRODNO": [
+      "POL"
+    ],
+    "BY_RAY_67162791B13547290723272__SPLIT_INDURA": [
+      "POL"
+    ],
+    "BY_RAY_67162791B13547290723272__SPLIT_NORTH_MONKI": [
+      "POL"
+    ],
+    "BY_RAY_67162791B13547290723272__SPLIT_SOUTH_KOROBCHITSY": [
+      "POL"
+    ],
+    "BY_RAY_67162791B13547290723272__SPLIT_SZTABIN": [
       "POL"
     ],
     "BY_RAY_67162791B14569635979911": [
@@ -1357,7 +1666,13 @@
     "BY_RAY_67162791B18102707107362": [
       "POL"
     ],
-    "BY_RAY_67162791B18933715013959": [
+    "BY_RAY_67162791B18933715013959__SPLIT_BYENYAKONI": [
+      "POL"
+    ],
+    "BY_RAY_67162791B18933715013959__SPLIT_HALSHANY": [
+      "POL"
+    ],
+    "BY_RAY_67162791B18933715013959__SPLIT_STAKAI": [
       "POL"
     ],
     "BY_RAY_67162791B19917337499758": [
@@ -1393,13 +1708,37 @@
     "BY_RAY_67162791B58533541453403": [
       "BLR"
     ],
-    "BY_RAY_67162791B59963656038120": [
+    "BY_RAY_67162791B59963656038120__SPLIT_DUBICHNO": [
+      "POL"
+    ],
+    "BY_RAY_67162791B59963656038120__SPLIT_DYMNA": [
+      "POL"
+    ],
+    "BY_RAY_67162791B59963656038120__SPLIT_KAMENETS": [
+      "POL"
+    ],
+    "BY_RAY_67162791B59963656038120__SPLIT_MEDNO": [
+      "POL"
+    ],
+    "BY_RAY_67162791B59963656038120__SPLIT_MUCHAVEC": [
+      "POL"
+    ],
+    "BY_RAY_67162791B59963656038120__SPLIT_NORTH_VOLCHIN": [
+      "POL"
+    ],
+    "BY_RAY_67162791B59963656038120__SPLIT_OGORODNIKI": [
       "POL"
     ],
     "BY_RAY_67162791B65560195088656": [
       "BLR"
     ],
-    "BY_RAY_67162791B66420794580046": [
+    "BY_RAY_67162791B66420794580046__SPLIT_EAST_ASTRYNA": [
+      "POL"
+    ],
+    "BY_RAY_67162791B66420794580046__SPLIT_MASTY": [
+      "POL"
+    ],
+    "BY_RAY_67162791B66420794580046__SPLIT_PIESKI": [
       "POL"
     ],
     "BY_RAY_67162791B72598168140482": [
@@ -1441,7 +1780,10 @@
     "CA_FED_10003": [
       "NFL"
     ],
-    "CA_FED_10004": [
+    "CA_FED_10004__SPLIT_REST": [
+      "NFL"
+    ],
+    "CA_FED_10004__SPLIT_SMALLWOOD_RESERVOIR": [
       "NFL"
     ],
     "CA_FED_10005": [
@@ -1510,7 +1852,13 @@
     "CA_FED_13010": [
       "CAN"
     ],
-    "CA_FED_24001": [
+    "CA_FED_24001__SPLIT_RESERVOIR_DE_LA_GRANDE_2": [
+      "CAN"
+    ],
+    "CA_FED_24001__SPLIT_RESERVOIR_DE_LA_GRANDE_3": [
+      "CAN"
+    ],
+    "CA_FED_24001__SPLIT_REST": [
       "CAN"
     ],
     "CA_FED_24002": [
@@ -1555,7 +1903,10 @@
     "CA_FED_24020": [
       "CAN"
     ],
-    "CA_FED_24021": [
+    "CA_FED_24021__SPLIT_RESERVOIR_MANICOUAGAN": [
+      "CAN"
+    ],
+    "CA_FED_24021__SPLIT_REST": [
       "CAN"
     ],
     "CA_FED_24024": [
@@ -2059,7 +2410,10 @@
     "CA_FED_59024": [
       "CAN"
     ],
-    "CA_FED_59026": [
+    "CA_FED_59026__SPLIT_REST": [
+      "CAN"
+    ],
+    "CA_FED_59026__SPLIT_WILLISTON_LAKE": [
       "CAN"
     ],
     "CA_FED_59027": [
@@ -2446,7 +2800,10 @@
     "CH056": [
       "SWI"
     ],
-    "CH057": [
+    "CH057__SPLIT_BUSINGEN": [
+      "GER"
+    ],
+    "CH057__SPLIT_REST": [
       "SWI"
     ],
     "CH061": [
@@ -2467,28 +2824,43 @@
     "CH066": [
       "SWI"
     ],
-    "CH070": [
+    "CH070__SPLIT_CAMPIONE": [
+      "ITA"
+    ],
+    "CH070__SPLIT_REST": [
       "SWI"
     ],
     "CI_ADM1_83157122B12160353323799": [
       "AOF"
     ],
-    "CI_ADM1_83157122B20352934117266": [
+    "CI_ADM1_83157122B20352934117266__SPLIT_LAC_DE_KOSSOU": [
+      "AOF"
+    ],
+    "CI_ADM1_83157122B20352934117266__SPLIT_REST": [
       "AOF"
     ],
     "CI_ADM1_83157122B28791092437733": [
       "AOF"
     ],
-    "CI_ADM1_83157122B30232425959699": [
+    "CI_ADM1_83157122B30232425959699__SPLIT_LAC_DE_KOSSOU": [
+      "AOF"
+    ],
+    "CI_ADM1_83157122B30232425959699__SPLIT_REST": [
       "AOF"
     ],
     "CI_ADM1_83157122B34711482467037": [
       "AOF"
     ],
-    "CI_ADM1_83157122B58892240487392": [
+    "CI_ADM1_83157122B58892240487392__SPLIT_LAC_DE_KOSSOU": [
       "AOF"
     ],
-    "CI_ADM1_83157122B62906982633778": [
+    "CI_ADM1_83157122B58892240487392__SPLIT_REST": [
+      "AOF"
+    ],
+    "CI_ADM1_83157122B62906982633778__SPLIT_LAC_DE_KOSSOU": [
+      "AOF"
+    ],
+    "CI_ADM1_83157122B62906982633778__SPLIT_REST": [
       "AOF"
     ],
     "CI_ADM1_83157122B69310198422077": [
@@ -2497,7 +2869,10 @@
     "CI_ADM1_83157122B73612976130091": [
       "AOF"
     ],
-    "CI_ADM1_83157122B74959515955757": [
+    "CI_ADM1_83157122B74959515955757__SPLIT_LAC_DE_KOSSOU": [
+      "AOF"
+    ],
+    "CI_ADM1_83157122B74959515955757__SPLIT_REST": [
       "AOF"
     ],
     "CI_ADM1_83157122B76853064397847": [
@@ -2527,7 +2902,13 @@
     "CL_ADM1_CHL-2694": [
       "CHL"
     ],
-    "CL_ADM1_CHL-2695": [
+    "CL_ADM1_CHL-2695__SPLIT_PLAYA_SALAR_DE_ATACAMA": [
+      "CHL"
+    ],
+    "CL_ADM1_CHL-2695__SPLIT_PLAYA_SALAR_DE_PUNTA_NEGRA": [
+      "CHL"
+    ],
+    "CL_ADM1_CHL-2695__SPLIT_REST": [
       "CHL"
     ],
     "CL_ADM1_CHL-2696": [
@@ -2560,7 +2941,10 @@
     "CL_ADM1_CHL-2705": [
       "CHL"
     ],
-    "CM_ADM1_CMR-1462": [
+    "CM_ADM1_CMR-1462__SPLIT_LAKE_CHAD": [
+      "FCM"
+    ],
+    "CM_ADM1_CMR-1462__SPLIT_REST": [
       "FCM"
     ],
     "CM_ADM1_CMR-1476": [
@@ -2842,7 +3226,10 @@
     "CN_CITY_17275852B14438310223406": [
       "YUN"
     ],
-    "CN_CITY_17275852B14447575237215": [
+    "CN_CITY_17275852B14447575237215__SPLIT_PLAYA_SALT_FLAT_70": [
+      "SIK"
+    ],
+    "CN_CITY_17275852B14447575237215__SPLIT_REST": [
       "SIK"
     ],
     "CN_CITY_17275852B14553820792876": [
@@ -5107,7 +5494,13 @@
     "CN_CITY_17275852B47923210823500": [
       "YUE"
     ],
-    "CN_CITY_17275852B47937532060975": [
+    "CN_CITY_17275852B47937532060975__SPLIT_LOP_NUR": [
+      "SIK"
+    ],
+    "CN_CITY_17275852B47937532060975__SPLIT_PLAYA_LOP_NUR": [
+      "SIK"
+    ],
+    "CN_CITY_17275852B47937532060975__SPLIT_REST": [
       "SIK"
     ],
     "CN_CITY_17275852B47950992751133": [
@@ -7360,7 +7753,10 @@
     "CN_CITY_17275852B8296297044700": [
       "CHI"
     ],
-    "CN_CITY_17275852B82973388541806": [
+    "CN_CITY_17275852B82973388541806__SPLIT_PLAYA_SALT_FLAT_70": [
+      "SIK"
+    ],
+    "CN_CITY_17275852B82973388541806__SPLIT_REST": [
       "SIK"
     ],
     "CN_CITY_17275852B83006271829254": [
@@ -9304,7 +9700,10 @@
     "CZ_ADM2_57006924B28286346415780": [
       "CZE"
     ],
-    "CZ_ADM2_57006924B30982913442521": [
+    "CZ_ADM2_57006924B30982913442521__SPLIT_LANDSKRON": [
+      "CZE"
+    ],
+    "CZ_ADM2_57006924B30982913442521__SPLIT_REST": [
       "CZE"
     ],
     "CZ_ADM2_57006924B32669310027153": [
@@ -9313,13 +9712,19 @@
     "CZ_ADM2_57006924B32813693256962": [
       "CZE"
     ],
-    "CZ_ADM2_57006924B34464963037986": [
+    "CZ_ADM2_57006924B34464963037986__SPLIT_NETOLICE": [
+      "CZE"
+    ],
+    "CZ_ADM2_57006924B34464963037986__SPLIT_REST": [
       "CZE"
     ],
     "CZ_ADM2_57006924B3568693077695": [
       "CZE"
     ],
-    "CZ_ADM2_57006924B40201864279221": [
+    "CZ_ADM2_57006924B40201864279221__SPLIT_BRAUNAU": [
+      "CZE"
+    ],
+    "CZ_ADM2_57006924B40201864279221__SPLIT_REST": [
       "CZE"
     ],
     "CZ_ADM2_57006924B40654694205882": [
@@ -9364,7 +9769,10 @@
     "CZ_ADM2_57006924B61995402941039": [
       "CZE"
     ],
-    "CZ_ADM2_57006924B62007249383837": [
+    "CZ_ADM2_57006924B62007249383837__SPLIT_REST": [
+      "CZE"
+    ],
+    "CZ_ADM2_57006924B62007249383837__SPLIT_STERNBERG": [
       "CZE"
     ],
     "CZ_ADM2_57006924B6298598328883": [
@@ -9424,10 +9832,16 @@
     "CZ_ADM2_57006924B91865699855455__SPLIT_ZAOLZIE": [
       "CZE"
     ],
-    "CZ_ADM2_57006924B92931687173289": [
+    "CZ_ADM2_57006924B92931687173289__SPLIT_REST": [
       "CZE"
     ],
-    "CZ_ADM2_57006924B95695201424764": [
+    "CZ_ADM2_57006924B92931687173289__SPLIT_TAUS": [
+      "CZE"
+    ],
+    "CZ_ADM2_57006924B95695201424764__SPLIT_JEVISOVICE": [
+      "CZE"
+    ],
+    "CZ_ADM2_57006924B95695201424764__SPLIT_REST": [
       "CZE"
     ],
     "CZ_ADM2_57006924B96542005161261": [
@@ -9448,7 +9862,10 @@
     "CZ_MRG_2919911b5bfd": [
       "CZE"
     ],
-    "CZ_MRG_9096ecd76bb9": [
+    "CZ_MRG_9096ecd76bb9__SPLIT_REST": [
+      "CZE"
+    ],
+    "CZ_MRG_9096ecd76bb9__SPLIT_SCHONHENGST": [
       "CZE"
     ],
     "CZ_MRG_9d601ad75aef": [
@@ -10387,7 +10804,16 @@
     "DEF06": [
       "GER"
     ],
-    "DEF07": [
+    "DEF07__SPLIT_HUSUM": [
+      "GER"
+    ],
+    "DEF07__SPLIT_PADBORG": [
+      "GER"
+    ],
+    "DEF07__SPLIT_RUDBOL": [
+      "GER"
+    ],
+    "DEF07__SPLIT_SCHLESWIG": [
       "GER"
     ],
     "DEF08": [
@@ -10399,7 +10825,16 @@
     "DEF0A": [
       "GER"
     ],
-    "DEF0C": [
+    "DEF0C__SPLIT_ALS": [
+      "GER"
+    ],
+    "DEF0C__SPLIT_DAMP": [
+      "GER"
+    ],
+    "DEF0C__SPLIT_PADBORG": [
+      "GER"
+    ],
+    "DEF0C__SPLIT_SCHLESWIG": [
       "GER"
     ],
     "DEF0D": [
@@ -10516,7 +10951,19 @@
     "DE_MRG_d4ab7c811a60": [
       "GER"
     ],
-    "DE_MRG_d67a0e4a728d": [
+    "DE_MRG_d67a0e4a728d__SPLIT_DAMP": [
+      "GER"
+    ],
+    "DE_MRG_d67a0e4a728d__SPLIT_EAST_KIEL_CANAL": [
+      "GER"
+    ],
+    "DE_MRG_d67a0e4a728d__SPLIT_RENDSBURG": [
+      "GER"
+    ],
+    "DE_MRG_d67a0e4a728d__SPLIT_SOUTH_DAMP": [
+      "GER"
+    ],
+    "DE_MRG_d67a0e4a728d__SPLIT_WEST_SCHLESWIG": [
       "GER"
     ],
     "DE_MRG_d7270b2f4f53": [
@@ -11389,7 +11836,10 @@
     "DK050": [
       "DEN"
     ],
-    "DK_HIST_NORTH_SCHLESWIG": [
+    "DK_HIST_NORTH_SCHLESWIG__SPLIT_SYDJYLLAND": [
+      "DEN"
+    ],
+    "DK_HIST_NORTH_SCHLESWIG__SPLIT_TONDERN": [
       "DEN"
     ],
     "DK_SJY_REMAINDER": [
@@ -11530,13 +11980,25 @@
     "DZA-2188": [
       "ALG"
     ],
-    "DZA-2189": [
+    "DZA-2189__SPLIT_PLAYA_SALT_FLAT_18": [
       "ALG"
     ],
-    "DZA-2190": [
+    "DZA-2189__SPLIT_REST": [
       "ALG"
     ],
-    "DZA-2191": [
+    "DZA-2190__SPLIT_PLAYA_CHOTT_ECH_CHERGUI": [
+      "ALG"
+    ],
+    "DZA-2190__SPLIT_REST": [
+      "ALG"
+    ],
+    "DZA-2191__SPLIT_PLAYA_CHOTT_EL_GHARSA": [
+      "ALG"
+    ],
+    "DZA-2191__SPLIT_PLAYA_CHOTT_MELRHIR": [
+      "ALG"
+    ],
+    "DZA-2191__SPLIT_REST": [
       "ALG"
     ],
     "DZA-2192": [
@@ -11575,10 +12037,16 @@
     "DZA-2203": [
       "FRA"
     ],
-    "DZA-2204": [
+    "DZA-2204__SPLIT_PLAYA_CHOTT_ECH_CHERGUI": [
       "FRA"
     ],
-    "DZA-2205": [
+    "DZA-2204__SPLIT_REST": [
+      "FRA"
+    ],
+    "DZA-2205__SPLIT_PLAYA_CHOTT_ECH_CHERGUI": [
+      "FRA"
+    ],
+    "DZA-2205__SPLIT_REST": [
       "FRA"
     ],
     "DZA-2206": [
@@ -11776,7 +12244,10 @@
     "EGY-1547": [
       "EGY"
     ],
-    "EGY-1548": [
+    "EGY-1548__SPLIT_LAKE_NASSER": [
+      "EGY"
+    ],
+    "EGY-1548__SPLIT_REST": [
       "EGY"
     ],
     "EGY-1549": [
@@ -11791,13 +12262,40 @@
     "EGY-1552": [
       "EGY"
     ],
-    "EGY-1556": [
+    "EGY-1556__SPLIT_HALAIB": [
+      "SUD"
+    ],
+    "EGY-1556__SPLIT_REST": [
       "EGY"
     ],
     "EGY-1557": [
       "EGY"
     ],
-    "EGY-1558": [
+    "EGY-1558__SPLIT_BIR_AL_ABED": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_EAST_BIR_AL_ABED": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_HASNA": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_NEKHEL": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_NORTH_SINAI": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_RAFAH": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_SOUTH_ARISH": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_WEST_RAFAH": [
+      "EGY"
+    ],
+    "EGY-1558__SPLIT_ZARANIK": [
       "EGY"
     ],
     "EH_ADMIN0_PASSTHROUGH__SPLIT_RDO": [
@@ -11905,7 +12403,25 @@
     "EL542": [
       "GRE"
     ],
-    "EL543": [
+    "EL543__SPLIT_CENTRAL_EPIRUS": [
+      "GRE"
+    ],
+    "EL543__SPLIT_ERSEKE": [
+      "GRE"
+    ],
+    "EL543__SPLIT_KONITSA": [
+      "GRE"
+    ],
+    "EL543__SPLIT_METSOVO": [
+      "GRE"
+    ],
+    "EL543__SPLIT_NORTH_EPIRUS": [
+      "GRE"
+    ],
+    "EL543__SPLIT_PARGA": [
+      "GRE"
+    ],
+    "EL543__SPLIT_SARANDE": [
       "GRE"
     ],
     "EL611": [
@@ -12286,8 +12802,14 @@
     "FR_ARR_06001": [
       "FRA"
     ],
-    "FR_ARR_06002": [
+    "FR_ARR_06002__SPLIT_MONACO": [
+      "MCO"
+    ],
+    "FR_ARR_06002__SPLIT_REST__SPLIT_NICE": [
       "FRA"
+    ],
+    "FR_ARR_06002__SPLIT_REST__SPLIT_TENDE": [
+      "ITA"
     ],
     "FR_ARR_07001": [
       "FRA"
@@ -12691,16 +13213,61 @@
     "FR_ARR_57003": [
       "FRA"
     ],
-    "FR_ARR_57005": [
+    "FR_ARR_57005__SPLIT_ALSACE": [
       "FRA"
     ],
-    "FR_ARR_57006": [
+    "FR_ARR_57005__SPLIT_HATTIGNY": [
       "FRA"
     ],
-    "FR_ARR_57007": [
+    "FR_ARR_57005__SPLIT_INNER_ALSACE": [
       "FRA"
     ],
-    "FR_ARR_57009": [
+    "FR_ARR_57005__SPLIT_INNER_MOSELLE": [
+      "FRA"
+    ],
+    "FR_ARR_57005__SPLIT_SARREBOURG": [
+      "FRA"
+    ],
+    "FR_ARR_57005__SPLIT_SAVERNE": [
+      "FRA"
+    ],
+    "FR_ARR_57006__SPLIT_HAGUENAU": [
+      "FRA"
+    ],
+    "FR_ARR_57006__SPLIT_MOSELLE": [
+      "FRA"
+    ],
+    "FR_ARR_57006__SPLIT_SARREBOURG": [
+      "FRA"
+    ],
+    "FR_ARR_57007__SPLIT_BRIEY": [
+      "FRA"
+    ],
+    "FR_ARR_57007__SPLIT_CATTENOM": [
+      "FRA"
+    ],
+    "FR_ARR_57007__SPLIT_HAYANGE": [
+      "FRA"
+    ],
+    "FR_ARR_57007__SPLIT_MANDEREN": [
+      "FRA"
+    ],
+    "FR_ARR_57007__SPLIT_THIONVILLE": [
+      "FRA"
+    ],
+    "FR_ARR_57009__SPLIT_HAYANGE": [
+      "FRA"
+    ],
+    "FR_ARR_57009__SPLIT_INNER_MOSELLE": [
+      "FRA"
+    ],
+    "FR_ARR_57009__SPLIT_METZ": [
+      "FRA"
+    ],
+    "FR_ARR_57009__SPLIT_VIGNY": [
+      "FRA"
+    ],
+    "FR_ARR_57009__SPLIT_WOIPPY": [
       "FRA"
     ],
     "FR_ARR_58001": [
@@ -12784,19 +13351,43 @@
     "FR_ARR_66002": [
       "FRA"
     ],
-    "FR_ARR_66003": [
+    "FR_ARR_66003__SPLIT_LLIVIA": [
+      "SPR"
+    ],
+    "FR_ARR_66003__SPLIT_REST": [
       "FRA"
     ],
     "FR_ARR_67002": [
       "FRA"
     ],
-    "FR_ARR_67003": [
+    "FR_ARR_67003__SPLIT_ALSACE": [
       "FRA"
     ],
-    "FR_ARR_67004": [
+    "FR_ARR_67003__SPLIT_SAVERNE": [
       "FRA"
     ],
-    "FR_ARR_67005": [
+    "FR_ARR_67003__SPLIT_STRASBOURG": [
+      "FRA"
+    ],
+    "FR_ARR_67004__SPLIT_ALSACE": [
+      "FRA"
+    ],
+    "FR_ARR_67004__SPLIT_HAGUENAU": [
+      "FRA"
+    ],
+    "FR_ARR_67004__SPLIT_MOSELLE": [
+      "FRA"
+    ],
+    "FR_ARR_67004__SPLIT_SARREBOURG": [
+      "FRA"
+    ],
+    "FR_ARR_67004__SPLIT_STRASBOURG": [
+      "FRA"
+    ],
+    "FR_ARR_67005__SPLIT_COLMAR": [
+      "FRA"
+    ],
+    "FR_ARR_67005__SPLIT_STRASBOURG": [
       "FRA"
     ],
     "FR_ARR_67008": [
@@ -12805,7 +13396,10 @@
     "FR_ARR_68001": [
       "FRA"
     ],
-    "FR_ARR_68002": [
+    "FR_ARR_68002__SPLIT_COLMAR": [
+      "FRA"
+    ],
+    "FR_ARR_68002__SPLIT_KINTZHEIM": [
       "FRA"
     ],
     "FR_ARR_68004": [
@@ -13156,7 +13750,16 @@
     "GB_NUTS1_UKM": [
       "ENG"
     ],
-    "GB_NUTS1_UKN": [
+    "GB_NUTS1_UKN__SPLIT_ARMAGH": [
+      "ENG"
+    ],
+    "GB_NUTS1_UKN__SPLIT_BELFAST": [
+      "ENG"
+    ],
+    "GB_NUTS1_UKN__SPLIT_ENNISKILLEN": [
+      "ENG"
+    ],
+    "GB_NUTS1_UKN__SPLIT_NORTHERN_IRELAND": [
       "ENG"
     ],
     "GB_SHELL_FB_001": [
@@ -14164,7 +14767,13 @@
     "GEO-3037": [
       "TSC"
     ],
-    "GEO-3038": [
+    "GEO-3038__SPLIT_JAVAKH": [
+      "TSC"
+    ],
+    "GEO-3038__SPLIT_SAMTSKHE": [
+      "TSC"
+    ],
+    "GEO-3038__SPLIT_TURKGOZU": [
       "TSC"
     ],
     "GEO-3039": [
@@ -14176,10 +14785,16 @@
     "GG": [
       "ENG"
     ],
-    "GH_ADM1_GHA-2155__SPLIT_REST": [
+    "GH_ADM1_GHA-2155__SPLIT_REST__SPLIT_LAKE_VOLTA": [
       "GLD"
     ],
-    "GH_ADM1_GHA-2155__SPLIT_WTO": [
+    "GH_ADM1_GHA-2155__SPLIT_REST__SPLIT_REST": [
+      "GLD"
+    ],
+    "GH_ADM1_GHA-2155__SPLIT_WTO__SPLIT_LAKE_VOLTA": [
+      "GLD"
+    ],
+    "GH_ADM1_GHA-2155__SPLIT_WTO__SPLIT_REST": [
       "GLD"
     ],
     "GH_ADM1_GHA-2156__SPLIT_REST": [
@@ -14194,13 +14809,19 @@
     "GH_ADM1_GHA-2158": [
       "GLD"
     ],
-    "GH_ADM1_GHA-2159": [
+    "GH_ADM1_GHA-2159__SPLIT_LAKE_VOLTA": [
+      "GLD"
+    ],
+    "GH_ADM1_GHA-2159__SPLIT_REST": [
       "GLD"
     ],
     "GH_ADM1_GHA-2160": [
       "GLD"
     ],
-    "GH_ADM1_GHA-2161": [
+    "GH_ADM1_GHA-2161__SPLIT_LAKE_VOLTA": [
+      "GLD"
+    ],
+    "GH_ADM1_GHA-2161__SPLIT_REST": [
       "GLD"
     ],
     "GH_ADM1_GHA-2162": [
@@ -14209,10 +14830,16 @@
     "GH_ADM1_GHA-2172": [
       "GLD"
     ],
-    "GH_ADM1_GHA-2173__SPLIT_REST": [
+    "GH_ADM1_GHA-2173__SPLIT_REST__SPLIT_LAKE_VOLTA": [
       "GLD"
     ],
-    "GH_ADM1_GHA-2173__SPLIT_WTO": [
+    "GH_ADM1_GHA-2173__SPLIT_REST__SPLIT_REST": [
+      "GLD"
+    ],
+    "GH_ADM1_GHA-2173__SPLIT_WTO__SPLIT_LAKE_VOLTA": [
+      "GLD"
+    ],
+    "GH_ADM1_GHA-2173__SPLIT_WTO__SPLIT_REST": [
       "GLD"
     ],
     "GL": [
@@ -14296,13 +14923,58 @@
     "GR_ADM1_GRC-2886": [
       "GRE"
     ],
-    "GR_ADM1_GRC-2892": [
+    "GR_ADM1_GRC-2892__SPLIT_DISPILLO": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2892__SPLIT_EAST_KASTORIA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2892__SPLIT_KASTORIA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2892__SPLIT_KOZANI": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2892__SPLIT_PRESPA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2892__SPLIT_PTOLEMAIDA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2892__SPLIT_SIMANTRO": [
       "GRE"
     ],
     "GR_ADM1_GRC-2900": [
       "GRE"
     ],
-    "GR_ADM1_GRC-2949": [
+    "GR_ADM1_GRC-2949__SPLIT_ARTA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_CENTRAL_EPIRUS": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_ERSEKE": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_KONITSA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_METSOVO": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_NORTH_EPIRUS": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_PARGA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_PREVEZA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_SARANDE": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2949__SPLIT_WEST_IOANNINA": [
       "GRE"
     ],
     "GR_ADM1_GRC-2988": [
@@ -14314,17 +14986,41 @@
     "GR_ADM1_GRC-2990": [
       "GRE"
     ],
-    "GR_ADM1_GRC-2991": [
+    "GR_ADM1_GRC-2991__SPLIT_CENTRAL_MACEDONIA": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2991__SPLIT_CHALKIDIKI": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-2991__SPLIT_KATERINI": [
       "GRE"
     ],
     "GR_ADM1_GRC-2992": [
       "GRE"
     ],
-    "GR_ADM1_GRC-3001": [
+    "GR_ADM1_GRC-3001__SPLIT_ALEXANDROUPOLI": [
       "GRE"
     ],
-    "GR_ADM1_GRC-3013": [
+    "GR_ADM1_GRC-3001__SPLIT_IPSALA": [
       "GRE"
+    ],
+    "GR_ADM1_GRC-3001__SPLIT_KESAN": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-3001__SPLIT_LULEBURGAZ": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-3001__SPLIT_MERIC": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-3001__SPLIT_UZUMKOPRU": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-3013__SPLIT_CYCLADES": [
+      "GRE"
+    ],
+    "GR_ADM1_GRC-3013__SPLIT_DODECANESE": [
+      "DOD"
     ],
     "GS": [
       "FLK"
@@ -14575,10 +15271,22 @@
     "HR024": [
       "YUG"
     ],
-    "HR025": [
+    "HR025__SPLIT_OSIJEK": [
       "YUG"
     ],
-    "HR026": [
+    "HR025__SPLIT_SARVAS": [
+      "YUG"
+    ],
+    "HR025__SPLIT_VINKOVCI": [
+      "YUG"
+    ],
+    "HR026__SPLIT_OTOK": [
+      "YUG"
+    ],
+    "HR026__SPLIT_VINKOVCI": [
+      "YUG"
+    ],
+    "HR026__SPLIT_VUKOVAR": [
       "YUG"
     ],
     "HR027": [
@@ -14599,22 +15307,61 @@
     "HR031__SPLIT_REST": [
       "YUG"
     ],
-    "HR032": [
+    "HR032__SPLIT_KARLOBAG": [
       "YUG"
     ],
-    "HR033": [
+    "HR032__SPLIT_KORENICA": [
       "YUG"
     ],
-    "HR034": [
+    "HR032__SPLIT_NORTHERN_DALMATIA": [
       "YUG"
     ],
-    "HR035": [
+    "HR033__SPLIT_REST": [
       "YUG"
     ],
-    "HR036": [
+    "HR033__SPLIT_ZARA": [
       "ITA"
     ],
-    "HR037": [
+    "HR034__SPLIT_BRUSKA": [
+      "YUG"
+    ],
+    "HR034__SPLIT_CETINA": [
+      "YUG"
+    ],
+    "HR034__SPLIT_MURVICA": [
+      "YUG"
+    ],
+    "HR035__SPLIT_DALMATIA": [
+      "YUG"
+    ],
+    "HR035__SPLIT_DALMATIAN_ISLANDS": [
+      "YUG"
+    ],
+    "HR035__SPLIT_METKOVIC": [
+      "YUG"
+    ],
+    "HR036__SPLIT_CANFANARO": [
+      "ITA"
+    ],
+    "HR036__SPLIT_GIMINO": [
+      "ITA"
+    ],
+    "HR036__SPLIT_MEDOLINO": [
+      "ITA"
+    ],
+    "HR036__SPLIT_POLA": [
+      "ITA"
+    ],
+    "HR036__SPLIT_VALDARSA": [
+      "ITA"
+    ],
+    "HR037__SPLIT_MERDARI": [
+      "YUG"
+    ],
+    "HR037__SPLIT_NEUM": [
+      "YUG"
+    ],
+    "HR037__SPLIT_WEST_DUBORVNIK": [
       "YUG"
     ],
     "HR050": [
@@ -14683,10 +15430,31 @@
     "HU213": [
       "HUN"
     ],
-    "HU221": [
+    "HU221__SPLIT_ABDA": [
       "HUN"
     ],
-    "HU222": [
+    "HU221__SPLIT_FERTOD": [
+      "HUN"
+    ],
+    "HU221__SPLIT_SOPRON": [
+      "HUN"
+    ],
+    "HU221__SPLIT_TET": [
+      "HUN"
+    ],
+    "HU221__SPLIT_VAMOSSZABADI": [
+      "HUN"
+    ],
+    "HU222__SPLIT_KAM": [
+      "HUN"
+    ],
+    "HU222__SPLIT_SZOMBATHELY": [
+      "HUN"
+    ],
+    "HU222__SPLIT_VASVAR": [
+      "HUN"
+    ],
+    "HU222__SPLIT_ZALALOVO": [
       "HUN"
     ],
     "HU223": [
@@ -14701,7 +15469,16 @@
     "HU233": [
       "HUN"
     ],
-    "HU311": [
+    "HU311__SPLIT_CIGAND": [
+      "HUN"
+    ],
+    "HU311__SPLIT_HRAN": [
+      "HUN"
+    ],
+    "HU311__SPLIT_MEZOKOVESD": [
+      "HUN"
+    ],
+    "HU311__SPLIT_MISKOLC": [
       "HUN"
     ],
     "HU312": [
@@ -14716,10 +15493,25 @@
     "HU322": [
       "HUN"
     ],
-    "HU323": [
+    "HU323__SPLIT_CIGAND": [
       "HUN"
     ],
-    "HU331": [
+    "HU323__SPLIT_NYIREGYHAZA": [
+      "HUN"
+    ],
+    "HU323__SPLIT_SZATMARCSEKE": [
+      "HUN"
+    ],
+    "HU331__SPLIT_BACS_KISKUN": [
+      "HUN"
+    ],
+    "HU331__SPLIT_BAJA": [
+      "HUN"
+    ],
+    "HU331__SPLIT_KECSKEMET": [
+      "HUN"
+    ],
+    "HU331__SPLIT_REM": [
       "HUN"
     ],
     "HU332": [
@@ -14830,7 +15622,22 @@
     "ID_ADM1_65028918B99918739720671": [
       "INS"
     ],
-    "IE041": [
+    "IE041__SPLIT_CAVAN_MONAGHAN": [
+      "IRE"
+    ],
+    "IE041__SPLIT_CLONES": [
+      "IRE"
+    ],
+    "IE041__SPLIT_DONEGAL": [
+      "IRE"
+    ],
+    "IE041__SPLIT_LOUGH_SWILLY": [
+      "IRE"
+    ],
+    "IE041__SPLIT_MANORHAMILTON": [
+      "IRE"
+    ],
+    "IE041__SPLIT_SLIGO": [
       "IRE"
     ],
     "IE042": [
@@ -15529,7 +16336,10 @@
     "IN_ADM2_76128533B75519739609062": [
       "TVC"
     ],
-    "IN_ADM2_76128533B75922461866405": [
+    "IN_ADM2_76128533B75922461866405__SPLIT_PLAYA_RANN_OF_KUTCH": [
+      "IRA"
+    ],
+    "IN_ADM2_76128533B75922461866405__SPLIT_REST": [
       "IRA"
     ],
     "IN_ADM2_76128533B7606365706860": [
@@ -15643,7 +16453,10 @@
     "IN_ADM2_76128533B91480770176940": [
       "RAJ"
     ],
-    "IN_ADM2_76128533B91881382098572": [
+    "IN_ADM2_76128533B91881382098572__SPLIT_PLAYA_RANN_OF_KUTCH": [
+      "KUT"
+    ],
+    "IN_ADM2_76128533B91881382098572__SPLIT_REST": [
       "KUT"
     ],
     "IN_ADM2_76128533B91943656836526": [
@@ -15742,7 +16555,10 @@
     "IN_MRG_0de8d89a2f89__SPLIT_REST": [
       "HYD"
     ],
-    "IN_MRG_0f1924c89ced": [
+    "IN_MRG_0f1924c89ced__SPLIT_PLAYA_RANN_OF_KUTCH": [
+      "RAJ"
+    ],
+    "IN_MRG_0f1924c89ced__SPLIT_REST": [
       "RAJ"
     ],
     "IN_MRG_169df8d18d42": [
@@ -15967,7 +16783,10 @@
     "IN_MRG_c2a8b7b28b23": [
       "MYS"
     ],
-    "IN_MRG_c84cc721f026": [
+    "IN_MRG_c84cc721f026__SPLIT_PLAYA_RANN_OF_KUTCH": [
+      "IRA"
+    ],
+    "IN_MRG_c84cc721f026__SPLIT_REST": [
       "IRA"
     ],
     "IN_MRG_cba921b13656": [
@@ -16036,7 +16855,13 @@
     "IRN-3210": [
       "PER"
     ],
-    "IRN-3211": [
+    "IRN-3211__SPLIT_PLAYA_DARYACHEH_YE_NAMAK": [
+      "PER"
+    ],
+    "IRN-3211__SPLIT_PLAYA_DASHT_E_KAVIR": [
+      "PER"
+    ],
+    "IRN-3211__SPLIT_REST": [
       "PER"
     ],
     "IRN-3212": [
@@ -16048,13 +16873,34 @@
     "IRN-3214": [
       "PER"
     ],
-    "IRN-3215": [
+    "IRN-3215__SPLIT_PLAYA_DARYACHEH_YE_NAMAK": [
       "PER"
     ],
-    "IRN-3216": [
+    "IRN-3215__SPLIT_PLAYA_DASHT_E_KAVIR": [
       "PER"
     ],
-    "IRN-3217": [
+    "IRN-3215__SPLIT_PLAYA_SALT_FLAT_22": [
+      "PER"
+    ],
+    "IRN-3215__SPLIT_REST": [
+      "PER"
+    ],
+    "IRN-3216__SPLIT_PLAYA_SALT_FLAT_22": [
+      "PER"
+    ],
+    "IRN-3216__SPLIT_REST": [
+      "PER"
+    ],
+    "IRN-3217__SPLIT_PLAYA_DASHT_E_KAVIR": [
+      "PER"
+    ],
+    "IRN-3217__SPLIT_PLAYA_KAVIR_E_ABARKUH": [
+      "PER"
+    ],
+    "IRN-3217__SPLIT_PLAYA_KAVIR_E_NAMAK_E_SIRJAN": [
+      "PER"
+    ],
+    "IRN-3217__SPLIT_REST": [
       "PER"
     ],
     "IRN-3218": [
@@ -16078,7 +16924,10 @@
     "IRN-3231": [
       "PER"
     ],
-    "IRN-3232": [
+    "IRN-3232__SPLIT_PLAYA_DARYACHEH_YE_NAMAK": [
+      "PER"
+    ],
+    "IRN-3232__SPLIT_REST": [
       "PER"
     ],
     "IRN-3233": [
@@ -16105,19 +16954,52 @@
     "IRN-3241": [
       "PER"
     ],
-    "IRN-3244": [
+    "IRN-3244__SPLIT_PLAYA_DAQQ_E_PATERGAN": [
       "PER"
     ],
-    "IRN-3245": [
+    "IRN-3244__SPLIT_PLAYA_DARYACHEH_YE_SISTAN": [
+      "PER"
+    ],
+    "IRN-3244__SPLIT_REST": [
+      "PER"
+    ],
+    "IRN-3245__SPLIT_PLAYA_DASHT_E_KAVIR": [
+      "PER"
+    ],
+    "IRN-3245__SPLIT_PLAYA_KEVIR_E_NAMAK": [
+      "PER"
+    ],
+    "IRN-3245__SPLIT_REST": [
       "PER"
     ],
     "IRN-3246": [
       "PER"
     ],
-    "IRN-3247": [
+    "IRN-3247__SPLIT_PLAYA_DARYACHEH_YE_SISTAN": [
       "PER"
     ],
-    "IRN-3248": [
+    "IRN-3247__SPLIT_PLAYA_HAMUN_E_JAZ_MURIAN": [
+      "PER"
+    ],
+    "IRN-3247__SPLIT_PLAYA_HAMUN_E_SABERI": [
+      "PER"
+    ],
+    "IRN-3247__SPLIT_PLAYA_HAMUN_I_MASHKEL": [
+      "PER"
+    ],
+    "IRN-3247__SPLIT_REST": [
+      "PER"
+    ],
+    "IRN-3248__SPLIT_PLAYA_HAMUN_E_JAZ_MURIAN": [
+      "PER"
+    ],
+    "IRN-3248__SPLIT_PLAYA_KAVIR_E_NAMAK_E_SIRJAN": [
+      "PER"
+    ],
+    "IRN-3248__SPLIT_PLAYA_NAMAKZAR_E_SHADAD": [
+      "PER"
+    ],
+    "IRN-3248__SPLIT_REST": [
       "PER"
     ],
     "IRN-5490": [
@@ -16126,16 +17008,61 @@
     "IRQ-3046": [
       "IRQ"
     ],
-    "IRQ-3049": [
+    "IRQ-3049__SPLIT_ARBIL": [
       "IRQ"
     ],
-    "IRQ-3050": [
+    "IRQ-3049__SPLIT_KIRKUK": [
       "IRQ"
     ],
-    "IRQ-3051": [
+    "IRQ-3050__SPLIT_ARBIL": [
       "IRQ"
     ],
-    "IRQ-3052": [
+    "IRQ-3050__SPLIT_KIRKUK": [
+      "IRQ"
+    ],
+    "IRQ-3050__SPLIT_SHAQLAWA": [
+      "IRQ"
+    ],
+    "IRQ-3050__SPLIT_SORAN": [
+      "IRQ"
+    ],
+    "IRQ-3050__SPLIT_SOUTH_SHAQLAWA": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_AL_SHIRQAT": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_BARDARASH": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_HATRA": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_MOSUL": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_QARYAT_AL_ASHIQ": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_SHAYKHAN": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_SOUTH_MOSUL": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_SOUTH_SHAQLAWA": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_SOUTH_SINJAR": [
+      "IRQ"
+    ],
+    "IRQ-3051__SPLIT_TAL_AFAR": [
+      "IRQ"
+    ],
+    "IRQ-3052__SPLIT_BUHAYRAT_ATH_THARTHAR": [
+      "IRQ"
+    ],
+    "IRQ-3052__SPLIT_REST": [
       "IRQ"
     ],
     "IRQ-3061": [
@@ -16171,7 +17098,13 @@
     "IRQ-3243": [
       "IRQ"
     ],
-    "IRQ-3471": [
+    "IRQ-3471__SPLIT_BUHAYRAT_ATH_THARTHAR": [
+      "IRQ"
+    ],
+    "IRQ-3471__SPLIT_PLAYA_SALT_FLAT_40": [
+      "IRQ"
+    ],
+    "IRQ-3471__SPLIT_REST": [
       "IRQ"
     ],
     "IRQ-3472": [
@@ -16183,7 +17116,28 @@
     "IS002": [
       "ICE"
     ],
-    "ISR-3053": [
+    "ISR-3053__SPLIT_DIMONA": [
+      "PAL"
+    ],
+    "ISR-3053__SPLIT_EILAT": [
+      "PAL"
+    ],
+    "ISR-3053__SPLIT_EZUZ": [
+      "PAL"
+    ],
+    "ISR-3053__SPLIT_LAHAV": [
+      "PAL"
+    ],
+    "ISR-3053__SPLIT_NEGEV": [
+      "PAL"
+    ],
+    "ISR-3053__SPLIT_NEGEV_HIGHLANDS": [
+      "PAL"
+    ],
+    "ISR-3053__SPLIT_TLALIM": [
+      "PAL"
+    ],
+    "ISR-3053__SPLIT_YERUHAM": [
       "PAL"
     ],
     "ISR-3054": [
@@ -16390,10 +17344,43 @@
     "ITG2H": [
       "ITA"
     ],
-    "ITH10": [
+    "ITH10__SPLIT_BRUNICO": [
       "ITA"
     ],
-    "ITH20": [
+    "ITH10__SPLIT_LACES": [
+      "ITA"
+    ],
+    "ITH10__SPLIT_MELAGO": [
+      "ITA"
+    ],
+    "ITH10__SPLIT_MERANO": [
+      "ITA"
+    ],
+    "ITH10__SPLIT_MERANO_MERAN": [
+      "ITA"
+    ],
+    "ITH10__SPLIT_NORTH_TRENTINO": [
+      "ITA"
+    ],
+    "ITH10__SPLIT_SUDTIROL": [
+      "ITA"
+    ],
+    "ITH10__SPLIT_WEST_SUDTIROL": [
+      "ITA"
+    ],
+    "ITH20__SPLIT_NORTH_TRENTINO": [
+      "ITA"
+    ],
+    "ITH20__SPLIT_ROVERETO": [
+      "ITA"
+    ],
+    "ITH20__SPLIT_TRENTINO": [
+      "ITA"
+    ],
+    "ITH20__SPLIT_WEST_SUDTIROL": [
+      "ITA"
+    ],
+    "ITH20__SPLIT_WEST_TRENTINO": [
       "ITA"
     ],
     "ITH31": [
@@ -16417,10 +17404,46 @@
     "ITH37": [
       "ITA"
     ],
-    "ITH41": [
+    "ITH41__SPLIT_FRIULI": [
       "ITA"
     ],
-    "ITH42": [
+    "ITH41__SPLIT_NORTH_FRIULI": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_AUPA": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_DOGNA": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_FRIULI": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_GORIZIA": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_MARANO_LAGUNARE": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_MORTEGLIANO": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_NORTH_FRIULI": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_NORTH_GORIZIA": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_POCENIA": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_TARVISIO": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_VALBRUNA": [
+      "ITA"
+    ],
+    "ITH42__SPLIT_VKENTZI": [
       "ITA"
     ],
     "ITH43": [
@@ -16453,8 +17476,11 @@
     "ITH58": [
       "ITA"
     ],
-    "ITH59": [
+    "ITH59__SPLIT_REST": [
       "ITA"
+    ],
+    "ITH59__SPLIT_SAN_MARINO": [
+      "SMN"
     ],
     "ITI11": [
       "ITA"
@@ -16708,13 +17734,46 @@
     "JPN-3503": [
       "JAP"
     ],
-    "KAZ-3195": [
+    "KAZ-3195__SPLIT_ARAL1987": [
+      "KAZ"
+    ],
+    "KAZ-3195__SPLIT_ARAL2006": [
+      "KAZ"
+    ],
+    "KAZ-3195__SPLIT_ARAL2009": [
+      "KAZ"
+    ],
+    "KAZ-3195__SPLIT_ARALBASIN": [
+      "KAZ"
+    ],
+    "KAZ-3195__SPLIT_REST": [
       "KAZ"
     ],
     "KAZ-3196": [
       "KAZ"
     ],
-    "KAZ-3197": [
+    "KAZ-3197__SPLIT_ARAL1973": [
+      "KAZ"
+    ],
+    "KAZ-3197__SPLIT_ARAL1987": [
+      "KAZ"
+    ],
+    "KAZ-3197__SPLIT_ARAL1999": [
+      "KAZ"
+    ],
+    "KAZ-3197__SPLIT_ARAL2006": [
+      "KAZ"
+    ],
+    "KAZ-3197__SPLIT_ARAL2009": [
+      "KAZ"
+    ],
+    "KAZ-3197__SPLIT_ARAL2014": [
+      "KAZ"
+    ],
+    "KAZ-3197__SPLIT_ARALBASIN": [
+      "KAZ"
+    ],
+    "KAZ-3197__SPLIT_REST": [
       "KAZ"
     ],
     "KAZ-3198": [
@@ -17068,7 +18127,10 @@
     "LBY-2981": [
       "LBA"
     ],
-    "LBY-2982": [
+    "LBY-2982__SPLIT_PLAYA_SALT_FLAT_39": [
+      "LBA"
+    ],
+    "LBY-2982__SPLIT_REST": [
       "LBA"
     ],
     "LBY-2983": [
@@ -17080,7 +18142,10 @@
     "LBY-2985": [
       "LBA"
     ],
-    "LBY-2986": [
+    "LBY-2986__SPLIT_PLAYA_SALT_FLAT_39": [
+      "LBA"
+    ],
+    "LBY-2986__SPLIT_REST": [
       "LBA"
     ],
     "LBY-2987": [
@@ -17278,7 +18343,10 @@
     "LT011__SPLIT_WILNO": [
       "POL"
     ],
-    "LT021": [
+    "LT021__SPLIT_POLISH": [
+      "POL"
+    ],
+    "LT021__SPLIT_REST": [
       "LIT"
     ],
     "LT022": [
@@ -17308,7 +18376,10 @@
     "LT028": [
       "LIT"
     ],
-    "LT029": [
+    "LT029__SPLIT_POLISH": [
+      "POL"
+    ],
+    "LT029__SPLIT_REST": [
       "LIT"
     ],
     "LU_ADM1_LUX-906": [
@@ -17323,7 +18394,37 @@
     "LV003": [
       "LAT"
     ],
-    "LV005": [
+    "LV005__SPLIT_BALVI": [
+      "LAT"
+    ],
+    "LV005__SPLIT_DAUGAVPILS": [
+      "LAT"
+    ],
+    "LV005__SPLIT_JEKABPILS": [
+      "LAT"
+    ],
+    "LV005__SPLIT_KRASLAVA": [
+      "LAT"
+    ],
+    "LV005__SPLIT_LATGALE": [
+      "LAT"
+    ],
+    "LV005__SPLIT_REZEKNE": [
+      "LAT"
+    ],
+    "LV005__SPLIT_REZEKNE_5789": [
+      "LAT"
+    ],
+    "LV005__SPLIT_SKRUDALIENA": [
+      "LAT"
+    ],
+    "LV005__SPLIT_TILZA": [
+      "LAT"
+    ],
+    "LV005__SPLIT_ZEMGALE": [
+      "LAT"
+    ],
+    "LV005__SPLIT_ZILUPE": [
       "LAT"
     ],
     "LV006": [
@@ -17347,7 +18448,10 @@
     "MAR-1446": [
       "MOR"
     ],
-    "MAR-1447": [
+    "MAR-1447__SPLIT_FRENCH": [
+      "MOR"
+    ],
+    "MAR-1447__SPLIT_REST": [
       "SMR"
     ],
     "MAR-1448": [
@@ -17368,8 +18472,11 @@
     "MAR-1453": [
       "MOR"
     ],
-    "MAR-1454": [
+    "MAR-1454__SPLIT_REST": [
       "MOR"
+    ],
+    "MAR-1454__SPLIT_SPANISH": [
+      "SMR"
     ],
     "MAR-1455__SPLIT_IFNI": [
       "IFN"
@@ -17396,7 +18503,7 @@
       "SSH"
     ],
     "MC_ADMIN0_PASSTHROUGH": [
-      "MCO"
+      "FRA"
     ],
     "MDA-1613": [
       "ROM"
@@ -17506,7 +18613,10 @@
     "MDA-1649": [
       "ROM"
     ],
-    "MDA-1650": [
+    "MDA-1650__SPLIT_BENDER": [
+      "ROM"
+    ],
+    "MDA-1650__SPLIT_LEFT": [
       "SOV"
     ],
     "MDA-1651": [
@@ -17548,7 +18658,13 @@
     "ME_ADM1_MNE-1508": [
       "YUG"
     ],
-    "ME_ADM1_MNE-1509": [
+    "ME_ADM1_MNE-1509__SPLIT_ANDRIJEVICA": [
+      "YUG"
+    ],
+    "ME_ADM1_MNE-1509__SPLIT_PETNIJCA": [
+      "YUG"
+    ],
+    "ME_ADM1_MNE-1509__SPLIT_SOUTH_KOLASIN": [
       "YUG"
     ],
     "ME_ADM1_MNE-1510": [
@@ -17656,7 +18772,13 @@
     "MK002": [
       "YUG"
     ],
-    "MK003": [
+    "MK003__SPLIT_BOJANE": [
+      "YUG"
+    ],
+    "MK003__SPLIT_PCINJA": [
+      "YUG"
+    ],
+    "MK003__SPLIT_WEST_MACEDONIA": [
       "YUG"
     ],
     "MK004": [
@@ -17665,10 +18787,22 @@
     "MK005": [
       "YUG"
     ],
-    "MK006": [
+    "MK006__SPLIT_BOJANE": [
       "YUG"
     ],
-    "MK007": [
+    "MK006__SPLIT_ELEZ_HAN": [
+      "YUG"
+    ],
+    "MK006__SPLIT_TETOVO": [
+      "YUG"
+    ],
+    "MK007__SPLIT_DIMITROVERAD": [
+      "YUG"
+    ],
+    "MK007__SPLIT_KRIVE_PALANKA": [
+      "YUG"
+    ],
+    "MK007__SPLIT_MACEDONIA": [
       "YUG"
     ],
     "MK008": [
@@ -17764,10 +18898,16 @@
     "MNG-3318": [
       "MON"
     ],
-    "MNG-3319": [
+    "MNG-3319__SPLIT_PLAYA_TSAGAAN_NUUR": [
       "MON"
     ],
-    "MNG-3320": [
+    "MNG-3319__SPLIT_REST": [
+      "MON"
+    ],
+    "MNG-3320__SPLIT_PLAYA_SALT_FLAT_27": [
+      "MON"
+    ],
+    "MNG-3320__SPLIT_REST": [
       "MON"
     ],
     "MNG-3321": [
@@ -18127,10 +19267,16 @@
     "MX_ZN_14_001": [
       "MEX"
     ],
-    "MX_ZN_14_002": [
+    "MX_ZN_14_002__SPLIT_LAKE_TEXCOCO": [
       "MEX"
     ],
-    "MX_ZN_14_003": [
+    "MX_ZN_14_002__SPLIT_REST": [
+      "MEX"
+    ],
+    "MX_ZN_14_003__SPLIT_LAKE_TEXCOCO": [
+      "MEX"
+    ],
+    "MX_ZN_14_003__SPLIT_REST": [
       "MEX"
     ],
     "MX_ZN_15_001": [
@@ -18577,19 +19723,34 @@
     "MX_ZN_26_009": [
       "MEX"
     ],
-    "MX_ZN_26_010": [
+    "MX_ZN_26_010__SPLIT_LAKE_TEXCOCO": [
       "MEX"
     ],
-    "MX_ZN_26_011": [
+    "MX_ZN_26_010__SPLIT_REST": [
       "MEX"
     ],
-    "MX_ZN_26_012": [
+    "MX_ZN_26_011__SPLIT_LAKE_TEXCOCO": [
       "MEX"
     ],
-    "MX_ZN_26_013": [
+    "MX_ZN_26_011__SPLIT_REST": [
       "MEX"
     ],
-    "MX_ZN_26_014": [
+    "MX_ZN_26_012__SPLIT_LAKE_TEXCOCO": [
+      "MEX"
+    ],
+    "MX_ZN_26_012__SPLIT_REST": [
+      "MEX"
+    ],
+    "MX_ZN_26_013__SPLIT_LAKE_TEXCOCO": [
+      "MEX"
+    ],
+    "MX_ZN_26_013__SPLIT_REST": [
+      "MEX"
+    ],
+    "MX_ZN_26_014__SPLIT_LAKE_TEXCOCO": [
+      "MEX"
+    ],
+    "MX_ZN_26_014__SPLIT_REST": [
       "MEX"
     ],
     "MX_ZN_26_015": [
@@ -18823,7 +19984,10 @@
     "MYS-4833": [
       "STR"
     ],
-    "MZ_ADM1_MOZ-1190": [
+    "MZ_ADM1_MOZ-1190__SPLIT_LAGO_DE_CAHORA_BASSA": [
+      "MZB"
+    ],
+    "MZ_ADM1_MOZ-1190__SPLIT_REST": [
       "MZB"
     ],
     "MZ_ADM1_MOZ-1192": [
@@ -18889,7 +20053,10 @@
     "NA_ADM1_NAM-3354": [
       "SWA"
     ],
-    "NA_ADM1_NAM-3355": [
+    "NA_ADM1_NAM-3355__SPLIT_PLAYA_ETOSHA_PAN": [
+      "SWA"
+    ],
+    "NA_ADM1_NAM-3355__SPLIT_REST": [
       "SWA"
     ],
     "NA_ADM1_NAM-3356": [
@@ -18898,10 +20065,16 @@
     "NE_ADM1_NER-4859": [
       "AOF"
     ],
-    "NE_ADM1_NER-796": [
+    "NE_ADM1_NER-796__SPLIT_LAKE_CHAD": [
       "AOF"
     ],
-    "NE_ADM1_NER-800": [
+    "NE_ADM1_NER-796__SPLIT_REST": [
+      "AOF"
+    ],
+    "NE_ADM1_NER-800__SPLIT_PLAYA_SALT_FLAT_18": [
+      "AOF"
+    ],
+    "NE_ADM1_NER-800__SPLIT_REST": [
       "AOF"
     ],
     "NE_ADM1_NER-91": [
@@ -18919,10 +20092,16 @@
     "NE_ADM1_NER-95": [
       "AOF"
     ],
-    "NG_ADM1_NGA-2839__SPLIT_NCM": [
+    "NG_ADM1_NGA-2839__SPLIT_NCM__SPLIT_LAKE_CHAD": [
       "BWA"
     ],
-    "NG_ADM1_NGA-2839__SPLIT_REST": [
+    "NG_ADM1_NGA-2839__SPLIT_NCM__SPLIT_REST": [
+      "BWA"
+    ],
+    "NG_ADM1_NGA-2839__SPLIT_REST__SPLIT_LAKE_CHAD": [
+      "BWA"
+    ],
+    "NG_ADM1_NGA-2839__SPLIT_REST__SPLIT_REST": [
       "BWA"
     ],
     "NG_ADM1_NGA-2841": [
@@ -18958,7 +20137,10 @@
     "NG_ADM1_NGA-2850": [
       "BWA"
     ],
-    "NG_ADM1_NGA-2851": [
+    "NG_ADM1_NGA-2851__SPLIT_KAINJI_RESERVOIR": [
+      "BWA"
+    ],
+    "NG_ADM1_NGA-2851__SPLIT_REST": [
       "BWA"
     ],
     "NG_ADM1_NGA-2852": [
@@ -19027,7 +20209,10 @@
     "NG_ADM1_NGA-2873": [
       "BWA"
     ],
-    "NG_ADM1_NGA-2879": [
+    "NG_ADM1_NGA-2879__SPLIT_KAINJI_RESERVOIR": [
+      "BWA"
+    ],
+    "NG_ADM1_NGA-2879__SPLIT_REST": [
       "BWA"
     ],
     "NG_ADM1_NGA-2881__SPLIT_NCM": [
@@ -19108,7 +20293,13 @@
     "NL226": [
       "HOL"
     ],
-    "NL230": [
+    "NL230__SPLIT_FLEVOPOLDER": [
+      "HOL"
+    ],
+    "NL230__SPLIT_NOORDOOSTPOLDER": [
+      "HOL"
+    ],
+    "NL230__SPLIT_REST": [
       "HOL"
     ],
     "NL310": [
@@ -19366,10 +20557,19 @@
     "OMN-5497": [
       "OMA"
     ],
-    "PAK-1108__SPLIT_BALUCHISTAN_STATES": [
+    "PAK-1108__SPLIT_BALUCHISTAN_STATES__SPLIT_PLAYA_HAMUN_I_LORA": [
       "KLA"
     ],
-    "PAK-1108__SPLIT_REST": [
+    "PAK-1108__SPLIT_BALUCHISTAN_STATES__SPLIT_PLAYA_HAMUN_I_MASHKEL": [
+      "KLA"
+    ],
+    "PAK-1108__SPLIT_BALUCHISTAN_STATES__SPLIT_REST": [
+      "KLA"
+    ],
+    "PAK-1108__SPLIT_REST__SPLIT_PLAYA_HAMUN_I_LORA": [
+      "RAJ"
+    ],
+    "PAK-1108__SPLIT_REST__SPLIT_REST": [
       "RAJ"
     ],
     "PAK-1109": [
@@ -19393,7 +20593,10 @@
     "PAK-1114__SPLIT_KHAIRPUR": [
       "KPU"
     ],
-    "PAK-1114__SPLIT_REST": [
+    "PAK-1114__SPLIT_REST__SPLIT_PLAYA_RANN_OF_KUTCH": [
+      "RAJ"
+    ],
+    "PAK-1114__SPLIT_REST__SPLIT_REST": [
       "RAJ"
     ],
     "PAK-1123__SPLIT_FRONTIER_STATES": [
@@ -19948,7 +21151,28 @@
     "PL_MRG_28fa0ad78ed7": [
       "POL"
     ],
-    "PL_MRG_44c900e7cbdd": [
+    "PL_MRG_44c900e7cbdd__SPLIT_BIALYSTOK": [
+      "POL"
+    ],
+    "PL_MRG_44c900e7cbdd__SPLIT_EAST_BIALYSTOK": [
+      "POL"
+    ],
+    "PL_MRG_44c900e7cbdd__SPLIT_GONIADZ": [
+      "POL"
+    ],
+    "PL_MRG_44c900e7cbdd__SPLIT_MSCIWUJE": [
+      "POL"
+    ],
+    "PL_MRG_44c900e7cbdd__SPLIT_NAGORKI": [
+      "POL"
+    ],
+    "PL_MRG_44c900e7cbdd__SPLIT_PLATNICA": [
+      "POL"
+    ],
+    "PL_MRG_44c900e7cbdd__SPLIT_POPKI": [
+      "POL"
+    ],
+    "PL_MRG_44c900e7cbdd__SPLIT_WLODKI": [
       "POL"
     ],
     "PL_MRG_49c8bdd6da87": [
@@ -19991,9 +21215,24 @@
       "POL"
     ],
     "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG": [
-      "DNZ"
+      "POL"
     ],
-    "PL_MRG_9e4e875a7bcd__SPLIT_REST": [
+    "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_GNIEW": [
+      "POL"
+    ],
+    "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_KARTUZY": [
+      "POL"
+    ],
+    "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_NORTH_KUYAVIA": [
+      "POL"
+    ],
+    "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_POMORZE_GDANSKIE": [
+      "POL"
+    ],
+    "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SOUTH_KARTUZY": [
+      "POL"
+    ],
+    "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SUSZ": [
       "POL"
     ],
     "PL_MRG_a40b880dd29e": [
@@ -20005,13 +21244,73 @@
     "PL_MRG_c16d6d416392": [
       "POL"
     ],
-    "PL_MRG_c5cfb391c06f": [
+    "PL_MRG_c5cfb391c06f__SPLIT_JANOWKA": [
       "POL"
     ],
-    "PL_MRG_c908eb11c602": [
+    "PL_MRG_c5cfb391c06f__SPLIT_LUBLIN": [
+      "POL"
+    ],
+    "PL_MRG_c5cfb391c06f__SPLIT_LUKOW": [
+      "POL"
+    ],
+    "PL_MRG_c5cfb391c06f__SPLIT_WEST_CHELM": [
+      "POL"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_ALLENSTEIN": [
       "GER"
     ],
-    "PL_MRG_c93ffd9ad4b7": [
+    "PL_MRG_c908eb11c602__SPLIT_ARYS": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_DZIALDOWO": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_EAST_SOLDAU": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_GARDIENEN": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_GUTTSTADT": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_HOHENSTEIN": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_KURKI": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_MARIENWERDER": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_NIKOLAIKEN": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_ORTELSBURG": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_ORTELSBURG_7428": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_PASSENHEIM": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_PLOSNICA": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_RASTENBURG": [
+      "GER"
+    ],
+    "PL_MRG_c908eb11c602__SPLIT_SENSBURG": [
+      "GER"
+    ],
+    "PL_MRG_c93ffd9ad4b7__SPLIT_GRUZIADZ": [
+      "POL"
+    ],
+    "PL_MRG_c93ffd9ad4b7__SPLIT_KISIELICE": [
+      "POL"
+    ],
+    "PL_MRG_c93ffd9ad4b7__SPLIT_NORTH_KUYAVIA": [
       "POL"
     ],
     "PL_MRG_cb41a08029c6": [
@@ -20125,7 +21424,22 @@
     "PL_POW_0463": [
       "POL"
     ],
-    "PL_POW_0601": [
+    "PL_POW_0601__SPLIT_EAST_OKUNINKA": [
+      "POL"
+    ],
+    "PL_POW_0601__SPLIT_JANOWKA": [
+      "POL"
+    ],
+    "PL_POW_0601__SPLIT_KOROLOWKA": [
+      "POL"
+    ],
+    "PL_POW_0601__SPLIT_OKUNINKA": [
+      "POL"
+    ],
+    "PL_POW_0601__SPLIT_WEST_CHELM": [
+      "POL"
+    ],
+    "PL_POW_0601__SPLIT_WLODAWA": [
       "POL"
     ],
     "PL_POW_0603": [
@@ -20401,7 +21715,10 @@
     "PL_POW_1863": [
       "POL"
     ],
-    "PL_POW_2001": [
+    "PL_POW_2001__SPLIT_MONKI": [
+      "POL"
+    ],
+    "PL_POW_2001__SPLIT_SZELIGI": [
       "POL"
     ],
     "PL_POW_2002": [
@@ -20434,7 +21751,16 @@
     "PL_POW_2063": [
       "POL"
     ],
-    "PL_POW_2201": [
+    "PL_POW_2201__SPLIT_EAST_BUTOW": [
+      "GER"
+    ],
+    "PL_POW_2201__SPLIT_REIHERSHORST": [
+      "GER"
+    ],
+    "PL_POW_2201__SPLIT_SCHWARZ_DAMERKOW": [
+      "GER"
+    ],
+    "PL_POW_2201__SPLIT_SIANOWO": [
       "GER"
     ],
     "PL_POW_2203": [
@@ -20491,7 +21817,10 @@
     "PL_POW_2404": [
       "POL"
     ],
-    "PL_POW_2405": [
+    "PL_POW_2405__SPLIT_POLISH": [
+      "POL"
+    ],
+    "PL_POW_2405__SPLIT_REST": [
       "GER"
     ],
     "PL_POW_2406": [
@@ -20569,7 +21898,10 @@
     "PL_POW_2477": [
       "POL"
     ],
-    "PL_POW_2478": [
+    "PL_POW_2478__SPLIT_POLISH": [
+      "POL"
+    ],
+    "PL_POW_2478__SPLIT_REST": [
       "GER"
     ],
     "PL_POW_2661": [
@@ -20578,22 +21910,40 @@
     "PL_POW_2801": [
       "GER"
     ],
-    "PL_POW_2802": [
+    "PL_POW_2802__SPLIT_BRAUNSBERG": [
+      "GER"
+    ],
+    "PL_POW_2802__SPLIT_HEILSBERG": [
+      "GER"
+    ],
+    "PL_POW_2802__SPLIT_SCHONFELD": [
+      "GER"
+    ],
+    "PL_POW_2802__SPLIT_WORMDITT": [
       "GER"
     ],
     "PL_POW_2803": [
       "POL"
     ],
-    "PL_POW_2804": [
+    "PL_POW_2804__SPLIT_MALDEUTEN": [
+      "GER"
+    ],
+    "PL_POW_2804__SPLIT_SCHONFELD": [
       "GER"
     ],
     "PL_POW_2805": [
       "GER"
     ],
-    "PL_POW_2807": [
+    "PL_POW_2807__SPLIT_LUBAWA": [
+      "POL"
+    ],
+    "PL_POW_2807__SPLIT_REST": [
       "GER"
     ],
-    "PL_POW_2808": [
+    "PL_POW_2808__SPLIT_LISSEN": [
+      "GER"
+    ],
+    "PL_POW_2808__SPLIT_OSTPREUEN": [
       "GER"
     ],
     "PL_POW_2811": [
@@ -20611,10 +21961,25 @@
     "PL_POW_2816": [
       "GER"
     ],
-    "PL_POW_2817": [
+    "PL_POW_2817__SPLIT_DZIALDOWO": [
       "GER"
     ],
-    "PL_POW_2818": [
+    "PL_POW_2817__SPLIT_KURKI": [
+      "GER"
+    ],
+    "PL_POW_2817__SPLIT_MAZURIA": [
+      "GER"
+    ],
+    "PL_POW_2818__SPLIT_ANGERBURG": [
+      "GER"
+    ],
+    "PL_POW_2818__SPLIT_DARKEHMEN": [
+      "GER"
+    ],
+    "PL_POW_2818__SPLIT_GOLDAP": [
+      "GER"
+    ],
+    "PL_POW_2818__SPLIT_LOTZEN": [
       "GER"
     ],
     "PL_POW_2819": [
@@ -20854,7 +22219,10 @@
     "PY_ADM1_PRY-615": [
       "PAR"
     ],
-    "PY_ADM1_PRY-616": [
+    "PY_ADM1_PRY-616__SPLIT_REPRESA_ITAIPU": [
+      "PAR"
+    ],
+    "PY_ADM1_PRY-616__SPLIT_REST": [
       "PAR"
     ],
     "PY_ADM1_PRY-617": [
@@ -20863,7 +22231,10 @@
     "PY_ADM1_PRY-618": [
       "PAR"
     ],
-    "PY_ADM1_PRY-619": [
+    "PY_ADM1_PRY-619__SPLIT_REPRESA_ITAIPU": [
+      "PAR"
+    ],
+    "PY_ADM1_PRY-619__SPLIT_REST": [
       "PAR"
     ],
     "PY_ADM1_PRY-620": [
@@ -20893,22 +22264,94 @@
     "RE_PRIMARY": [
       "RE"
     ],
-    "RO111": [
+    "RO111__SPLIT_ALESD": [
       "ROM"
     ],
-    "RO112": [
+    "RO111__SPLIT_BELUS": [
       "ROM"
     ],
-    "RO113": [
+    "RO111__SPLIT_CAREI": [
       "ROM"
     ],
-    "RO114": [
+    "RO111__SPLIT_HUEDEIN": [
       "ROM"
     ],
-    "RO115": [
+    "RO111__SPLIT_ORADEA_COUNTY": [
       "ROM"
     ],
-    "RO116": [
+    "RO111__SPLIT_TURDA": [
+      "ROM"
+    ],
+    "RO112__SPLIT_BORCA": [
+      "ROM"
+    ],
+    "RO112__SPLIT_NORTH_TRANSILVANIA": [
+      "ROM"
+    ],
+    "RO112__SPLIT_SOUTH_BORSA": [
+      "ROM"
+    ],
+    "RO112__SPLIT_VISEUL_DE_SUS": [
+      "ROM"
+    ],
+    "RO113__SPLIT_APUSENI_MOUNTAINS": [
+      "ROM"
+    ],
+    "RO113__SPLIT_CLUJ": [
+      "ROM"
+    ],
+    "RO113__SPLIT_NAPOCA": [
+      "ROM"
+    ],
+    "RO113__SPLIT_NORTH_TRANSILVANIA": [
+      "ROM"
+    ],
+    "RO114__SPLIT_BORSA": [
+      "ROM"
+    ],
+    "RO114__SPLIT_CAVNIC": [
+      "ROM"
+    ],
+    "RO114__SPLIT_IEUD": [
+      "ROM"
+    ],
+    "RO114__SPLIT_MARAMURES": [
+      "ROM"
+    ],
+    "RO114__SPLIT_NORTH_IEUD": [
+      "ROM"
+    ],
+    "RO114__SPLIT_ROHIA": [
+      "ROM"
+    ],
+    "RO114__SPLIT_VISEUL_DE_SUS": [
+      "ROM"
+    ],
+    "RO115__SPLIT_BOGDAND": [
+      "ROM"
+    ],
+    "RO115__SPLIT_DOBA": [
+      "ROM"
+    ],
+    "RO115__SPLIT_MARMARATIEI": [
+      "ROM"
+    ],
+    "RO115__SPLIT_SATU_MARE": [
+      "ROM"
+    ],
+    "RO115__SPLIT_ZALAU": [
+      "ROM"
+    ],
+    "RO116__SPLIT_ALESD": [
+      "ROM"
+    ],
+    "RO116__SPLIT_CAVNIC": [
+      "ROM"
+    ],
+    "RO116__SPLIT_NAPOCA": [
+      "ROM"
+    ],
+    "RO116__SPLIT_ZALAU": [
       "ROM"
     ],
     "RO121": [
@@ -20917,10 +22360,19 @@
     "RO122": [
       "ROM"
     ],
-    "RO123": [
+    "RO123__SPLIT_COVASNA": [
       "ROM"
     ],
-    "RO124": [
+    "RO123__SPLIT_PASUL_TULGHES": [
+      "ROM"
+    ],
+    "RO124__SPLIT_MOINESTI": [
+      "ROM"
+    ],
+    "RO124__SPLIT_NORTH_PASUL_TULGHES": [
+      "ROM"
+    ],
+    "RO124__SPLIT_ROZNOV": [
       "ROM"
     ],
     "RO125": [
@@ -20941,7 +22393,13 @@
     "RO214": [
       "ROM"
     ],
-    "RO215": [
+    "RO215__SPLIT_INNER_MOLDOVA": [
+      "ROM"
+    ],
+    "RO215__SPLIT_SOUTHERN_BUCOVINA": [
+      "ROM"
+    ],
+    "RO215__SPLIT_SUCEAVA": [
       "ROM"
     ],
     "RO216": [
@@ -21007,28 +22465,85 @@
     "RO415": [
       "ROM"
     ],
-    "RO421": [
+    "RO421__SPLIT_BELUS": [
       "ROM"
     ],
-    "RO422": [
+    "RO421__SPLIT_CRISANA": [
+      "ROM"
+    ],
+    "RO421__SPLIT_DEVA": [
+      "ROM"
+    ],
+    "RO421__SPLIT_OTELU_ROSU": [
+      "ROM"
+    ],
+    "RO422__SPLIT_BANAT": [
+      "ROM"
+    ],
+    "RO422__SPLIT_PASUL_VALCAN": [
+      "ROM"
+    ],
+    "RO422__SPLIT_PORTILE_DE_FIER": [
+      "ROM"
+    ],
+    "RO422__SPLIT_SOUTH_BANAT": [
       "ROM"
     ],
     "RO423": [
       "ROM"
     ],
-    "RO424": [
+    "RO424__SPLIT_CARANSEBES": [
+      "ROM"
+    ],
+    "RO424__SPLIT_DEVA": [
+      "ROM"
+    ],
+    "RO424__SPLIT_FIBIS": [
+      "ROM"
+    ],
+    "RO424__SPLIT_OTELU_ROSU": [
+      "ROM"
+    ],
+    "RO424__SPLIT_PECICA": [
+      "ROM"
+    ],
+    "RO424__SPLIT_RADNA": [
+      "ROM"
+    ],
+    "RO424__SPLIT_SATCHINEZ": [
+      "ROM"
+    ],
+    "RO424__SPLIT_TIMISORA": [
       "ROM"
     ],
     "RS110": [
       "YUG"
     ],
-    "RS121": [
+    "RS121__SPLIT_KULA": [
+      "YUG"
+    ],
+    "RS121__SPLIT_OSIJEK": [
+      "YUG"
+    ],
+    "RS121__SPLIT_SOMBOR": [
       "YUG"
     ],
     "RS122": [
       "YUG"
     ],
-    "RS123": [
+    "RS123__SPLIT_BECEJ": [
+      "YUG"
+    ],
+    "RS123__SPLIT_ILOK": [
+      "YUG"
+    ],
+    "RS123__SPLIT_KULA": [
+      "YUG"
+    ],
+    "RS123__SPLIT_SYRMIA": [
+      "YUG"
+    ],
+    "RS123__SPLIT_TEMERIN": [
       "YUG"
     ],
     "RS124": [
@@ -21040,7 +22555,19 @@
     "RS126": [
       "YUG"
     ],
-    "RS127": [
+    "RS127__SPLIT_IRIG": [
+      "YUG"
+    ],
+    "RS127__SPLIT_JAMENA": [
+      "YUG"
+    ],
+    "RS127__SPLIT_KUSMIN": [
+      "YUG"
+    ],
+    "RS127__SPLIT_SREMSKA_MITROVICA": [
+      "YUG"
+    ],
+    "RS127__SPLIT_SYRMIA": [
       "YUG"
     ],
     "RS211": [
@@ -21061,7 +22588,19 @@
     "RS216": [
       "YUG"
     ],
-    "RS217": [
+    "RS217__SPLIT_DRAGA": [
+      "YUG"
+    ],
+    "RS217__SPLIT_DUBNICA": [
+      "YUG"
+    ],
+    "RS217__SPLIT_KRALJEVO": [
+      "YUG"
+    ],
+    "RS217__SPLIT_NOVI_PAZAR": [
+      "YUG"
+    ],
+    "RS217__SPLIT_SJENICA": [
       "YUG"
     ],
     "RS218": [
@@ -27133,7 +28672,10 @@
     "RU_ARCTIC_FB_2557": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_2558": [
+    "RU_ARCTIC_FB_2558__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_2558__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_ARCTIC_FB_2559": [
@@ -27385,7 +28927,10 @@
     "RU_ARCTIC_FB_2633": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_2634": [
+    "RU_ARCTIC_FB_2634__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_2634__SPLIT_REST": [
       "SOV"
     ],
     "RU_ARCTIC_FB_2635": [
@@ -28672,7 +30217,7 @@
     "RU_ARCTIC_FB_3023": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_3024": [
+    "RU_ARCTIC_FB_3024__SPLIT_SARATOV_RESERVOIR": [
       "SOV"
     ],
     "RU_ARCTIC_FB_3025": [
@@ -51661,8 +53206,11 @@
     "RU_CITY_MOSCOW__SPLIT_SOUTHWEST": [
       "SOV"
     ],
-    "RU_CITY_SAINT_PETERSBURG": [
+    "RU_CITY_SAINT_PETERSBURG__SPLIT_REST": [
       "SOV"
+    ],
+    "RU_CITY_SAINT_PETERSBURG__SPLIT_TERIJOKI": [
+      "FIN"
     ],
     "RU_CITY_VOLGOGRAD": [
       "SOV"
@@ -51685,7 +53233,10 @@
     "RU_MRG_056bdf91219f": [
       "SOV"
     ],
-    "RU_MRG_06348d287b63": [
+    "RU_MRG_06348d287b63__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_06348d287b63__SPLIT_RYBINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_06b69386dedf": [
@@ -51757,10 +53308,16 @@
     "RU_MRG_176371b655b8": [
       "SOV"
     ],
-    "RU_MRG_17e4b5e02ee0": [
+    "RU_MRG_17e4b5e02ee0__SPLIT_REST": [
       "UDM"
     ],
-    "RU_MRG_1899c681a78b": [
+    "RU_MRG_17e4b5e02ee0__SPLIT_VOTKINSK_RESERVOIR": [
+      "UDM"
+    ],
+    "RU_MRG_1899c681a78b__SPLIT_GORKY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_1899c681a78b__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_18dd0a266ccd": [
@@ -51787,7 +53344,10 @@
     "RU_MRG_207d2d3eaab4": [
       "TAT"
     ],
-    "RU_MRG_21bf4048bc4e": [
+    "RU_MRG_21bf4048bc4e__SPLIT_REST": [
+      "TAT"
+    ],
+    "RU_MRG_21bf4048bc4e__SPLIT_SAMARA_RESERVOIR": [
       "TAT"
     ],
     "RU_MRG_2411b96a17b5": [
@@ -51856,7 +53416,10 @@
     "RU_MRG_331cee07a9f5": [
       "SOV"
     ],
-    "RU_MRG_333dbd033786": [
+    "RU_MRG_333dbd033786__SPLIT_KAMA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_333dbd033786__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_3486106432ea": [
@@ -51874,13 +53437,19 @@
     "RU_MRG_382557a61d2d": [
       "SOV"
     ],
-    "RU_MRG_384b6ae65f4e": [
+    "RU_MRG_384b6ae65f4e__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_384b6ae65f4e__SPLIT_SARATOV_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_3bd4e545064b": [
       "SOV"
     ],
-    "RU_MRG_3c1ff2d8d28d": [
+    "RU_MRG_3c1ff2d8d28d__SPLIT_GORKY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_3c1ff2d8d28d__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_3e0fb7d7044d": [
@@ -51895,7 +53464,10 @@
     "RU_MRG_3e81642c622c": [
       "NOS"
     ],
-    "RU_MRG_3ec7b40d49ee": [
+    "RU_MRG_3ec7b40d49ee__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_3ec7b40d49ee__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_4141b3936e66": [
@@ -51913,7 +53485,10 @@
     "RU_MRG_44ea1332b6c4": [
       "SOV"
     ],
-    "RU_MRG_465e54ee3c98": [
+    "RU_MRG_465e54ee3c98__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_465e54ee3c98__SPLIT_RYBINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_4684548dd1e8": [
@@ -51922,7 +53497,10 @@
     "RU_MRG_46e24f51467f": [
       "KOM"
     ],
-    "RU_MRG_473afe9c50b3": [
+    "RU_MRG_473afe9c50b3__SPLIT_REST": [
+      "TAT"
+    ],
+    "RU_MRG_473afe9c50b3__SPLIT_SAMARA_RESERVOIR": [
       "TAT"
     ],
     "RU_MRG_4844dd62c5ed": [
@@ -51940,7 +53518,10 @@
     "RU_MRG_4bf0c35acefc": [
       "SOV"
     ],
-    "RU_MRG_4d7b251116c1": [
+    "RU_MRG_4d7b251116c1__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_4d7b251116c1__SPLIT_VOTKINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_4faa8695fd7f": [
@@ -51970,13 +53551,19 @@
     "RU_MRG_591cc0025487": [
       "CHE"
     ],
-    "RU_MRG_593a91bdd3f1": [
+    "RU_MRG_593a91bdd3f1__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_593a91bdd3f1__SPLIT_SARATOV_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_59f6abe0ef5a": [
       "SOV"
     ],
-    "RU_MRG_5a4cd4b44b6d": [
+    "RU_MRG_5a4cd4b44b6d__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_5a4cd4b44b6d__SPLIT_SAMARA_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_5abc4d494d63": [
@@ -52006,7 +53593,10 @@
     "RU_MRG_5ec0d20cf55a": [
       "SOV"
     ],
-    "RU_MRG_5eefe2103e77": [
+    "RU_MRG_5eefe2103e77__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_5eefe2103e77__SPLIT_VOTKINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_65703efd9a03": [
@@ -52024,7 +53614,10 @@
     "RU_MRG_69b237a8444a": [
       "SOV"
     ],
-    "RU_MRG_69fe24997bd8": [
+    "RU_MRG_69fe24997bd8__SPLIT_NOVOSIBIRSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_69fe24997bd8__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_6ac3b28a1717": [
@@ -52084,7 +53677,10 @@
     "RU_MRG_7678c679b507": [
       "BSH"
     ],
-    "RU_MRG_76bad646959e": [
+    "RU_MRG_76bad646959e__SPLIT_BRATSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_76bad646959e__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_778d6b9a6bcb": [
@@ -52093,7 +53689,10 @@
     "RU_MRG_780f218076e4": [
       "SOV"
     ],
-    "RU_MRG_7973a5d85acb": [
+    "RU_MRG_7973a5d85acb__SPLIT_NOVOSIBIRSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_7973a5d85acb__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_7a7536733086": [
@@ -52132,7 +53731,10 @@
     "RU_MRG_83744c263574": [
       "SOV"
     ],
-    "RU_MRG_8392a1282904": [
+    "RU_MRG_8392a1282904__SPLIT_REST": [
+      "TAT"
+    ],
+    "RU_MRG_8392a1282904__SPLIT_SAMARA_RESERVOIR": [
       "TAT"
     ],
     "RU_MRG_83d38d63f890": [
@@ -52147,7 +53749,10 @@
     "RU_MRG_88df92bd6ae6": [
       "SOV"
     ],
-    "RU_MRG_89888850a4dc": [
+    "RU_MRG_89888850a4dc__SPLIT_KRASNOYARSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_89888850a4dc__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_89b539cd826a": [
@@ -52159,7 +53764,10 @@
     "RU_MRG_8a04555b8e14": [
       "UDM"
     ],
-    "RU_MRG_8a42821c9c7f": [
+    "RU_MRG_8a42821c9c7f__SPLIT_REST": [
+      "TAT"
+    ],
+    "RU_MRG_8a42821c9c7f__SPLIT_SAMARA_RESERVOIR": [
       "TAT"
     ],
     "RU_MRG_8ab72609576c": [
@@ -52171,7 +53779,10 @@
     "RU_MRG_8c032ccba409": [
       "SOV"
     ],
-    "RU_MRG_8d9e296327d0": [
+    "RU_MRG_8d9e296327d0__SPLIT_KRASNOYARSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_8d9e296327d0__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_8e0791d514f6": [
@@ -52219,7 +53830,13 @@
     "RU_MRG_9ab22494f2aa": [
       "SOV"
     ],
-    "RU_MRG_9ce979430f48": [
+    "RU_MRG_9ce979430f48__SPLIT_KAMA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_9ce979430f48__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_9ce979430f48__SPLIT_VOTKINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_9d9bddbd62f8": [
@@ -52246,7 +53863,10 @@
     "RU_MRG_a1cbe886988c": [
       "SOV"
     ],
-    "RU_MRG_a1f39ea34970": [
+    "RU_MRG_a1f39ea34970__SPLIT_KAMA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_a1f39ea34970__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_a27d346b2a79": [
@@ -52291,7 +53911,10 @@
     "RU_MRG_a9d2f764d518": [
       "SOV"
     ],
-    "RU_MRG_aa1c4ed50e09": [
+    "RU_MRG_aa1c4ed50e09__SPLIT_BRATSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_aa1c4ed50e09__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_aa3ae65083fb": [
@@ -52312,7 +53935,10 @@
     "RU_MRG_ad216f601dda": [
       "SOV"
     ],
-    "RU_MRG_adcc83649ef9": [
+    "RU_MRG_adcc83649ef9__SPLIT_NOVOSIBIRSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_adcc83649ef9__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_ae16dca1a1ab": [
@@ -52402,7 +54028,10 @@
     "RU_MRG_c34e3c08e3b0": [
       "SOV"
     ],
-    "RU_MRG_c4615cedcd6d": [
+    "RU_MRG_c4615cedcd6d__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_c4615cedcd6d__SPLIT_RYBINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_c5b150b1920d": [
@@ -52435,7 +54064,10 @@
     "RU_MRG_c9d03fafaebf": [
       "SOV"
     ],
-    "RU_MRG_cb7ab64b43b7": [
+    "RU_MRG_cb7ab64b43b7__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_cb7ab64b43b7__SPLIT_RYBINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_MRG_cfcedc0d18e0": [
@@ -52453,7 +54085,10 @@
     "RU_MRG_d1f63e4e9c78": [
       "SOV"
     ],
-    "RU_MRG_d3e6d3f9aa41": [
+    "RU_MRG_d3e6d3f9aa41__SPLIT_KRASNOYARSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_d3e6d3f9aa41__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_d4338b65c7be": [
@@ -52471,7 +54106,10 @@
     "RU_MRG_d79a5c8b8671": [
       "SOV"
     ],
-    "RU_MRG_d7a2203edffa": [
+    "RU_MRG_d7a2203edffa__SPLIT_KAMA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_d7a2203edffa__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_d85f19b13cb8": [
@@ -52498,7 +54136,10 @@
     "RU_MRG_dd9e0f5e82c6": [
       "SOV"
     ],
-    "RU_MRG_dde1d8a90afe": [
+    "RU_MRG_dde1d8a90afe__SPLIT_GORKY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_dde1d8a90afe__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_de2381594c4b": [
@@ -52528,7 +54169,10 @@
     "RU_MRG_e212c64d0aec": [
       "SOV"
     ],
-    "RU_MRG_e3d6057202ff": [
+    "RU_MRG_e3d6057202ff__SPLIT_BRATSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_MRG_e3d6057202ff__SPLIT_REST": [
       "SOV"
     ],
     "RU_MRG_e4b148e58ff8": [
@@ -52621,7 +54265,10 @@
     "RU_MRG_ffcfcee321ef": [
       "SOV"
     ],
-    "RU_MRG_ffd24a81e81e": [
+    "RU_MRG_ffd24a81e81e__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_MRG_ffd24a81e81e__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B10199346430351": [
@@ -52729,7 +54376,10 @@
     "RU_RAY_50074027B13867451681945": [
       "SOV"
     ],
-    "RU_RAY_50074027B14040427045082": [
+    "RU_RAY_50074027B14040427045082__SPLIT_NOVOSIBIRSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B14040427045082__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B14046308931292": [
@@ -52792,7 +54442,10 @@
     "RU_RAY_50074027B15921204725831": [
       "BYA"
     ],
-    "RU_RAY_50074027B15993714165206": [
+    "RU_RAY_50074027B15993714165206__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B15993714165206__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B16069237925080": [
@@ -52828,7 +54481,10 @@
     "RU_RAY_50074027B16932918285671": [
       "SOV"
     ],
-    "RU_RAY_50074027B16961904381699": [
+    "RU_RAY_50074027B16961904381699__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "CVS"
+    ],
+    "RU_RAY_50074027B16961904381699__SPLIT_REST": [
       "CVS"
     ],
     "RU_RAY_50074027B16974547320790": [
@@ -52894,7 +54550,10 @@
     "RU_RAY_50074027B18879924091572": [
       "SOV"
     ],
-    "RU_RAY_50074027B18920333631541": [
+    "RU_RAY_50074027B18920333631541__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B18920333631541__SPLIT_SAMARA_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B19177714198501": [
@@ -52927,7 +54586,10 @@
     "RU_RAY_50074027B19694965074272": [
       "SOV"
     ],
-    "RU_RAY_50074027B19741518738580": [
+    "RU_RAY_50074027B19741518738580__SPLIT_KACENI": [
+      "LAT"
+    ],
+    "RU_RAY_50074027B19741518738580__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B19808785107388": [
@@ -52951,7 +54613,10 @@
     "RU_RAY_50074027B20695979575241": [
       "KBA"
     ],
-    "RU_RAY_50074027B20716795967188": [
+    "RU_RAY_50074027B20716795967188__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "CVS"
+    ],
+    "RU_RAY_50074027B20716795967188__SPLIT_REST": [
       "CVS"
     ],
     "RU_RAY_50074027B20844544643532": [
@@ -52990,7 +54655,10 @@
     "RU_RAY_50074027B22004389566857": [
       "SOV"
     ],
-    "RU_RAY_50074027B22241988675108": [
+    "RU_RAY_50074027B22241988675108__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B22241988675108__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B22451429500005": [
@@ -53002,7 +54670,10 @@
     "RU_RAY_50074027B22575347101555": [
       "SOV"
     ],
-    "RU_RAY_50074027B22819891790259": [
+    "RU_RAY_50074027B22819891790259__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B22819891790259__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B22946859849779": [
@@ -53011,7 +54682,10 @@
     "RU_RAY_50074027B23123118816327": [
       "SOV"
     ],
-    "RU_RAY_50074027B23214282298262": [
+    "RU_RAY_50074027B23214282298262__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B23214282298262__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B23250289134297": [
@@ -53272,7 +54946,10 @@
     "RU_RAY_50074027B31742107079052": [
       "GER"
     ],
-    "RU_RAY_50074027B31803957515687": [
+    "RU_RAY_50074027B31803957515687__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "MRE"
+    ],
+    "RU_RAY_50074027B31803957515687__SPLIT_REST": [
       "MRE"
     ],
     "RU_RAY_50074027B31853797856912": [
@@ -53338,7 +55015,13 @@
     "RU_RAY_50074027B33454891885145": [
       "SOV"
     ],
-    "RU_RAY_50074027B33581045729564": [
+    "RU_RAY_50074027B33581045729564__SPLIT_BRATSK_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B33581045729564__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B33581045729564__SPLIT_UST_ILIMSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B33807030271571": [
@@ -53359,7 +55042,10 @@
     "RU_RAY_50074027B34419784992527": [
       "SOV"
     ],
-    "RU_RAY_50074027B34454529298169": [
+    "RU_RAY_50074027B34454529298169__SPLIT_REST": [
+      "YAK"
+    ],
+    "RU_RAY_50074027B34454529298169__SPLIT_VILYUY_RESERVOIR": [
       "YAK"
     ],
     "RU_RAY_50074027B34532862724666": [
@@ -53368,7 +55054,10 @@
     "RU_RAY_50074027B34567864414207": [
       "SOV"
     ],
-    "RU_RAY_50074027B34579677769219": [
+    "RU_RAY_50074027B34579677769219__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B34579677769219__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B34626679799477": [
@@ -53440,7 +55129,10 @@
     "RU_RAY_50074027B36737161681879": [
       "SOV"
     ],
-    "RU_RAY_50074027B3691210145247": [
+    "RU_RAY_50074027B3691210145247__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B3691210145247__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B36993675567197": [
@@ -53473,7 +55165,10 @@
     "RU_RAY_50074027B38279427309518": [
       "SOV"
     ],
-    "RU_RAY_50074027B38321108376859": [
+    "RU_RAY_50074027B38321108376859__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B38321108376859__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B38387906709835": [
@@ -53512,10 +55207,16 @@
     "RU_RAY_50074027B39333917624056": [
       "KAL"
     ],
-    "RU_RAY_50074027B3936819954606": [
+    "RU_RAY_50074027B3936819954606__SPLIT_REST": [
       "SOV"
     ],
-    "RU_RAY_50074027B39404018386654": [
+    "RU_RAY_50074027B3936819954606__SPLIT_SAMARA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B39404018386654__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B39404018386654__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B39972680453550": [
@@ -53524,8 +55225,11 @@
     "RU_RAY_50074027B39997532554417": [
       "SOV"
     ],
-    "RU_RAY_50074027B39999494546000": [
+    "RU_RAY_50074027B39999494546000__SPLIT_REST": [
       "FIN"
+    ],
+    "RU_RAY_50074027B39999494546000__SPLIT_SOVIET": [
+      "KRL"
     ],
     "RU_RAY_50074027B4006940257071": [
       "SOV"
@@ -53614,7 +55318,10 @@
     "RU_RAY_50074027B42449829895110": [
       "SOV"
     ],
-    "RU_RAY_50074027B42465403886102": [
+    "RU_RAY_50074027B42465403886102__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B42465403886102__SPLIT_RYBINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B42720608112791": [
@@ -53638,7 +55345,10 @@
     "RU_RAY_50074027B42915894018382": [
       "SOV"
     ],
-    "RU_RAY_50074027B43084003717333": [
+    "RU_RAY_50074027B43084003717333__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B43084003717333__SPLIT_SARATOV_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B43413058399728": [
@@ -53704,7 +55414,10 @@
     "RU_RAY_50074027B44870327389428": [
       "BSH"
     ],
-    "RU_RAY_50074027B44960058886802": [
+    "RU_RAY_50074027B44960058886802__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B44960058886802__SPLIT_SARATOV_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B45070384031046": [
@@ -53773,7 +55486,10 @@
     "RU_RAY_50074027B47945657174327": [
       "CHE"
     ],
-    "RU_RAY_50074027B47970821426630": [
+    "RU_RAY_50074027B47970821426630__SPLIT_REST": [
+      "TAT"
+    ],
+    "RU_RAY_50074027B47970821426630__SPLIT_SAMARA_RESERVOIR": [
       "TAT"
     ],
     "RU_RAY_50074027B48200335175308": [
@@ -53791,7 +55507,10 @@
     "RU_RAY_50074027B48772613269862": [
       "SOV"
     ],
-    "RU_RAY_50074027B4882309977182": [
+    "RU_RAY_50074027B4882309977182__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B4882309977182__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B48970806712504": [
@@ -53845,7 +55564,10 @@
     "RU_RAY_50074027B51076628931359": [
       "SOV"
     ],
-    "RU_RAY_50074027B51121921202406": [
+    "RU_RAY_50074027B51121921202406__SPLIT_GORKY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B51121921202406__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B51159964054862": [
@@ -53875,7 +55597,10 @@
     "RU_RAY_50074027B52153292155727": [
       "KOM"
     ],
-    "RU_RAY_50074027B5223158268211": [
+    "RU_RAY_50074027B5223158268211__SPLIT_NARVATAGUSE": [
+      "EST"
+    ],
+    "RU_RAY_50074027B5223158268211__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B5244237471572": [
@@ -53956,7 +55681,10 @@
     "RU_RAY_50074027B54706574675580": [
       "SOV"
     ],
-    "RU_RAY_50074027B54726203316693": [
+    "RU_RAY_50074027B54726203316693__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "MRE"
+    ],
+    "RU_RAY_50074027B54726203316693__SPLIT_REST": [
       "MRE"
     ],
     "RU_RAY_50074027B54727716550524": [
@@ -53965,7 +55693,10 @@
     "RU_RAY_50074027B55014623372781": [
       "SOV"
     ],
-    "RU_RAY_50074027B55061952513406": [
+    "RU_RAY_50074027B55061952513406__SPLIT_GORKY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B55061952513406__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B55220147812936": [
@@ -53983,8 +55714,11 @@
     "RU_RAY_50074027B55465693339267": [
       "SOV"
     ],
-    "RU_RAY_50074027B55571784565288": [
+    "RU_RAY_50074027B55571784565288__SPLIT_REST": [
       "SOV"
+    ],
+    "RU_RAY_50074027B55571784565288__SPLIT_SALLA": [
+      "FIN"
     ],
     "RU_RAY_50074027B5563807985387": [
       "SOV"
@@ -54043,7 +55777,10 @@
     "RU_RAY_50074027B57020766667209": [
       "CHE"
     ],
-    "RU_RAY_50074027B57067541625780": [
+    "RU_RAY_50074027B57067541625780__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "CVS"
+    ],
+    "RU_RAY_50074027B57067541625780__SPLIT_REST": [
       "CVS"
     ],
     "RU_RAY_50074027B57103542258327": [
@@ -54100,7 +55837,10 @@
     "RU_RAY_50074027B58467356693682": [
       "DAG"
     ],
-    "RU_RAY_50074027B58494309327601": [
+    "RU_RAY_50074027B58494309327601__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B58494309327601__SPLIT_SAMARA_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B5850420655248": [
@@ -54145,7 +55885,10 @@
     "RU_RAY_50074027B59835640460134": [
       "SOV"
     ],
-    "RU_RAY_50074027B60091493242386": [
+    "RU_RAY_50074027B60091493242386__SPLIT_KAMA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B60091493242386__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B60097792769672": [
@@ -54160,7 +55903,10 @@
     "RU_RAY_50074027B60606739466906": [
       "SOV"
     ],
-    "RU_RAY_50074027B6068395788556": [
+    "RU_RAY_50074027B6068395788556__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B6068395788556__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B61183763679661": [
@@ -54187,10 +55933,16 @@
     "RU_RAY_50074027B61649362479384": [
       "SOV"
     ],
-    "RU_RAY_50074027B61660763245932": [
+    "RU_RAY_50074027B61660763245932__SPLIT_REST": [
       "SOV"
     ],
-    "RU_RAY_50074027B61732353469918": [
+    "RU_RAY_50074027B61660763245932__SPLIT_SAMARA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B61732353469918__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B61732353469918__SPLIT_VILYUY_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B6183649278140": [
@@ -54262,7 +56014,10 @@
     "RU_RAY_50074027B64298708996780": [
       "SOV"
     ],
-    "RU_RAY_50074027B64412298842231": [
+    "RU_RAY_50074027B64412298842231__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B64412298842231__SPLIT_SAMARA_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B64424707524567": [
@@ -54277,7 +56032,10 @@
     "RU_RAY_50074027B6450887110855": [
       "SOV"
     ],
-    "RU_RAY_50074027B64669214156055": [
+    "RU_RAY_50074027B64669214156055__SPLIT_PLAYA_SALT_FLAT_46": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B64669214156055__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B64879952129543": [
@@ -54316,7 +56074,10 @@
     "RU_RAY_50074027B65704335571669": [
       "SOV"
     ],
-    "RU_RAY_50074027B65758721423350": [
+    "RU_RAY_50074027B65758721423350__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B65758721423350__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B65812733420621": [
@@ -54376,16 +56137,25 @@
     "RU_RAY_50074027B66770935409727": [
       "SOV"
     ],
-    "RU_RAY_50074027B66849950652275": [
+    "RU_RAY_50074027B66849950652275__SPLIT_KHANTAYSKOYE_RESERVOIR": [
       "SOV"
     ],
-    "RU_RAY_50074027B66856367478499": [
+    "RU_RAY_50074027B66849950652275__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B66856367478499__SPLIT_PLAYA_SALT_FLAT_46": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B66856367478499__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B6686274683844": [
       "SOV"
     ],
-    "RU_RAY_50074027B66955592022274": [
+    "RU_RAY_50074027B66955592022274__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B66955592022274__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B66970562543464": [
@@ -54400,7 +56170,10 @@
     "RU_RAY_50074027B67711550367692": [
       "SOV"
     ],
-    "RU_RAY_50074027B67860704242461": [
+    "RU_RAY_50074027B67860704242461__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B67860704242461__SPLIT_SAMARA_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B679557218720": [
@@ -54421,13 +56194,19 @@
     "RU_RAY_50074027B68324499400164": [
       "BYA"
     ],
-    "RU_RAY_50074027B68349842384732": [
+    "RU_RAY_50074027B68349842384732__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B68349842384732__SPLIT_SARATOV_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B68450782776786": [
       "SOV"
     ],
-    "RU_RAY_50074027B68460090008050": [
+    "RU_RAY_50074027B68460090008050__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B68460090008050__SPLIT_SAMARA_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B68599046641011": [
@@ -54532,7 +56311,10 @@
     "RU_RAY_50074027B71829249339229": [
       "SOV"
     ],
-    "RU_RAY_50074027B72026568542942": [
+    "RU_RAY_50074027B72026568542942__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B72026568542942__SPLIT_SARATOV_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B72027623217592": [
@@ -54715,7 +56497,10 @@
     "RU_RAY_50074027B81019147084957": [
       "SOV"
     ],
-    "RU_RAY_50074027B81093411628760": [
+    "RU_RAY_50074027B81093411628760__SPLIT_GORKY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B81093411628760__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B81132289602019": [
@@ -54802,7 +56587,10 @@
     "RU_RAY_50074027B84010004825464": [
       "SOV"
     ],
-    "RU_RAY_50074027B84391084656620": [
+    "RU_RAY_50074027B84391084656620__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B84391084656620__SPLIT_SAMARA_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B84484580118953": [
@@ -54820,7 +56608,10 @@
     "RU_RAY_50074027B84921708867300": [
       "SOV"
     ],
-    "RU_RAY_50074027B85030315682895": [
+    "RU_RAY_50074027B85030315682895__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "MRE"
+    ],
+    "RU_RAY_50074027B85030315682895__SPLIT_REST": [
       "MRE"
     ],
     "RU_RAY_50074027B85308151104910": [
@@ -54901,7 +56692,10 @@
     "RU_RAY_50074027B8751485821395": [
       "SOV"
     ],
-    "RU_RAY_50074027B87542455562769": [
+    "RU_RAY_50074027B87542455562769__SPLIT_REST": [
+      "TAT"
+    ],
+    "RU_RAY_50074027B87542455562769__SPLIT_SAMARA_RESERVOIR": [
       "TAT"
     ],
     "RU_RAY_50074027B87627181065564": [
@@ -54931,7 +56725,10 @@
     "RU_RAY_50074027B88266732999715": [
       "SOV"
     ],
-    "RU_RAY_50074027B88274438285408": [
+    "RU_RAY_50074027B88274438285408__SPLIT_ABRENE": [
+      "LAT"
+    ],
+    "RU_RAY_50074027B88274438285408__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B88311001056531": [
@@ -54943,19 +56740,28 @@
     "RU_RAY_50074027B88418643135218": [
       "SOV"
     ],
-    "RU_RAY_50074027B884948676219": [
+    "RU_RAY_50074027B884948676219__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B884948676219__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B88724749460683": [
       "SOV"
     ],
-    "RU_RAY_50074027B88958089507858": [
+    "RU_RAY_50074027B88958089507858__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B88958089507858__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B89113278802627": [
       "SOV"
     ],
-    "RU_RAY_50074027B89196470968911": [
+    "RU_RAY_50074027B89196470968911__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B89196470968911__SPLIT_UST_ILIMSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B89219784048225": [
@@ -54976,7 +56782,10 @@
     "RU_RAY_50074027B90118567248058": [
       "TAT"
     ],
-    "RU_RAY_50074027B90244452662579": [
+    "RU_RAY_50074027B90244452662579__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B90244452662579__SPLIT_ZEYA_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B90279098260480": [
@@ -54988,8 +56797,11 @@
     "RU_RAY_50074027B90499708128895": [
       "SOV"
     ],
-    "RU_RAY_50074027B90555869339870": [
-      "SOV"
+    "RU_RAY_50074027B90555869339870__SPLIT_LATVIAN": [
+      "LAT"
+    ],
+    "RU_RAY_50074027B90555869339870__SPLIT_PETSERI": [
+      "EST"
     ],
     "RU_RAY_50074027B90632265551754": [
       "SOV"
@@ -55000,7 +56812,10 @@
     "RU_RAY_50074027B90926067565803": [
       "SOV"
     ],
-    "RU_RAY_50074027B91001506415746": [
+    "RU_RAY_50074027B91001506415746__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B91001506415746__SPLIT_RYBINSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B91023662606674": [
@@ -55120,7 +56935,10 @@
     "RU_RAY_50074027B94648571764089": [
       "KOM"
     ],
-    "RU_RAY_50074027B94816741297533": [
+    "RU_RAY_50074027B94816741297533__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B94816741297533__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B94982078467016": [
@@ -55192,10 +57010,16 @@
     "RU_RAY_50074027B97431177425360": [
       "SOV"
     ],
-    "RU_RAY_50074027B97493150269350": [
+    "RU_RAY_50074027B97493150269350__SPLIT_REST": [
       "SOV"
     ],
-    "RU_RAY_50074027B97557760790791": [
+    "RU_RAY_50074027B97493150269350__SPLIT_SAMARA_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B97557760790791__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B97557760790791__SPLIT_VOLGOGRAD_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B97565558072550": [
@@ -55204,7 +57028,10 @@
     "RU_RAY_50074027B97646617766813": [
       "SOV"
     ],
-    "RU_RAY_50074027B97827439207559": [
+    "RU_RAY_50074027B97827439207559__SPLIT_REST": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B97827439207559__SPLIT_TSIMLYANSK_RESERVOIR": [
       "SOV"
     ],
     "RU_RAY_50074027B97835853534706": [
@@ -55237,7 +57064,10 @@
     "RU_RAY_50074027B98963269942164": [
       "SOV"
     ],
-    "RU_RAY_50074027B99227036451137": [
+    "RU_RAY_50074027B99227036451137__SPLIT_JAANILINN": [
+      "EST"
+    ],
+    "RU_RAY_50074027B99227036451137__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B99284789446769": [
@@ -55252,7 +57082,10 @@
     "RU_RAY_50074027B99437248655047": [
       "SOV"
     ],
-    "RU_RAY_50074027B99457892446306": [
+    "RU_RAY_50074027B99457892446306__SPLIT_CHEBOKSARY_RESERVOIR": [
+      "SOV"
+    ],
+    "RU_RAY_50074027B99457892446306__SPLIT_REST": [
       "SOV"
     ],
     "RU_RAY_50074027B99649740896004": [
@@ -55351,7 +57184,10 @@
     "SD_ADM1_SDN-877": [
       "SUD"
     ],
-    "SD_ADM1_SDN-878": [
+    "SD_ADM1_SDN-878__SPLIT_LAKE_NASSER": [
+      "SUD"
+    ],
+    "SD_ADM1_SDN-878__SPLIT_REST": [
       "SUD"
     ],
     "SD_ADM1_SDN-879": [
@@ -55474,8 +57310,11 @@
     "SI037": [
       "YUG"
     ],
-    "SI038": [
+    "SI038__SPLIT_ITALIAN": [
       "ITA"
+    ],
+    "SI038__SPLIT_YUGOSLAV": [
+      "YUG"
     ],
     "SI041": [
       "YUG"
@@ -55483,10 +57322,25 @@
     "SI042": [
       "YUG"
     ],
-    "SI043": [
+    "SI043__SPLIT_IDRIA": [
       "ITA"
     ],
-    "SI044": [
+    "SI043__SPLIT_LOGATEC": [
+      "ITA"
+    ],
+    "SI043__SPLIT_POSTUMIA": [
+      "ITA"
+    ],
+    "SI043__SPLIT_VKENTZI": [
+      "ITA"
+    ],
+    "SI044__SPLIT_GIMINO": [
+      "ITA"
+    ],
+    "SI044__SPLIT_POSTUMIA": [
+      "ITA"
+    ],
+    "SI044__SPLIT_SOUTH_IDRIA": [
       "ITA"
     ],
     "SK_ADM2_56367889B13739678014174": [
@@ -55495,13 +57349,22 @@
     "SK_ADM2_56367889B1447043738985": [
       "CZE"
     ],
-    "SK_ADM2_56367889B14569056094647": [
+    "SK_ADM2_56367889B14569056094647__SPLIT_HU": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B14569056094647__SPLIT_REST": [
       "CZE"
     ],
     "SK_ADM2_56367889B15205076567490": [
       "CZE"
     ],
-    "SK_ADM2_56367889B15407569919112": [
+    "SK_ADM2_56367889B15407569919112__SPLIT_LEVICE": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B15407569919112__SPLIT_PODHAJSKA": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B15407569919112__SPLIT_SURANY": [
       "CZE"
     ],
     "SK_ADM2_56367889B16879144707830": [
@@ -55555,7 +57418,16 @@
     "SK_ADM2_56367889B47622109691322": [
       "CZE"
     ],
-    "SK_ADM2_56367889B4918056975771": [
+    "SK_ADM2_56367889B4918056975771__SPLIT_GALANTA": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B4918056975771__SPLIT_SAFA": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B4918056975771__SPLIT_SOUTH_NYITRA": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B4918056975771__SPLIT_WESTERN_SLOVAKIA": [
       "CZE"
     ],
     "SK_ADM2_56367889B50353875052402": [
@@ -55564,7 +57436,10 @@
     "SK_ADM2_56367889B50490339994693": [
       "CZE"
     ],
-    "SK_ADM2_56367889B51237059400968": [
+    "SK_ADM2_56367889B51237059400968__SPLIT_DEVIN": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B51237059400968__SPLIT_REST": [
       "CZE"
     ],
     "SK_ADM2_56367889B51496625279666": [
@@ -55591,7 +57466,10 @@
     "SK_ADM2_56367889B61252856682831": [
       "CZE"
     ],
-    "SK_ADM2_56367889B62094256812316": [
+    "SK_ADM2_56367889B62094256812316__SPLIT_HU": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B62094256812316__SPLIT_REST": [
       "CZE"
     ],
     "SK_ADM2_56367889B62553648042075": [
@@ -55603,13 +57481,19 @@
     "SK_ADM2_56367889B62817588919968": [
       "CZE"
     ],
-    "SK_ADM2_56367889B65708067786299": [
+    "SK_ADM2_56367889B65708067786299__SPLIT_REST": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B65708067786299__SPLIT_SK": [
       "CZE"
     ],
     "SK_ADM2_56367889B65848289259275": [
       "CZE"
     ],
-    "SK_ADM2_56367889B66923754975257": [
+    "SK_ADM2_56367889B66923754975257__SPLIT_HU": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B66923754975257__SPLIT_REST": [
       "CZE"
     ],
     "SK_ADM2_56367889B67356758961124": [
@@ -55618,8 +57502,11 @@
     "SK_ADM2_56367889B68595341554064": [
       "CZE"
     ],
-    "SK_ADM2_56367889B690835779632": [
+    "SK_ADM2_56367889B690835779632__SPLIT_PETRZALKA": [
       "CZE"
+    ],
+    "SK_ADM2_56367889B690835779632__SPLIT_REST": [
+      "HUN"
     ],
     "SK_ADM2_56367889B72151249658777": [
       "CZE"
@@ -55642,7 +57529,10 @@
     "SK_ADM2_56367889B81133001321420": [
       "CZE"
     ],
-    "SK_ADM2_56367889B83569782265262": [
+    "SK_ADM2_56367889B83569782265262__SPLIT_ORAVA": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B83569782265262__SPLIT_REST": [
       "CZE"
     ],
     "SK_ADM2_56367889B87068302757109": [
@@ -55657,10 +57547,16 @@
     "SK_ADM2_56367889B9282010334294": [
       "CZE"
     ],
-    "SK_ADM2_56367889B94927774956455": [
+    "SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA": [
       "CZE"
     ],
-    "SK_ADM2_56367889B94951233476884": [
+    "SK_ADM2_56367889B94927774956455__SPLIT_REST": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B94951233476884__SPLIT_HU": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B94951233476884__SPLIT_REST": [
       "CZE"
     ],
     "SK_ADM2_56367889B96980961358907": [
@@ -55669,7 +57565,10 @@
     "SK_ADM2_56367889B97071895480744": [
       "CZE"
     ],
-    "SK_ADM2_56367889B97606993013938": [
+    "SK_ADM2_56367889B97606993013938__SPLIT_HU": [
+      "CZE"
+    ],
+    "SK_ADM2_56367889B97606993013938__SPLIT_REST": [
       "CZE"
     ],
     "SK_ADM2_56367889B98399677297130": [
@@ -55837,7 +57736,10 @@
     "SR_ADM1_SUR-37": [
       "SUR"
     ],
-    "SR_ADM1_SUR-66": [
+    "SR_ADM1_SUR-66__SPLIT_PROFESSOR_DOCTOR_INGENIEUR_W_J_VAN_BLOMMESTEIN_MEER": [
+      "SUR"
+    ],
+    "SR_ADM1_SUR-66__SPLIT_REST": [
       "SUR"
     ],
     "SR_ADM1_SUR-67": [
@@ -55999,13 +57901,19 @@
     "SZ_ADM1_SWZ-537": [
       "SWZ"
     ],
-    "TD_ADM1_TCD-1464": [
+    "TD_ADM1_TCD-1464__SPLIT_LAKE_CHAD": [
+      "AEF"
+    ],
+    "TD_ADM1_TCD-1464__SPLIT_REST": [
       "AEF"
     ],
     "TD_ADM1_TCD-1465": [
       "AEF"
     ],
-    "TD_ADM1_TCD-1466": [
+    "TD_ADM1_TCD-1466__SPLIT_LAKE_CHAD": [
+      "AEF"
+    ],
+    "TD_ADM1_TCD-1466__SPLIT_REST": [
       "AEF"
     ],
     "TD_ADM1_TCD-1472": [
@@ -56476,7 +58384,13 @@
     "TR622": [
       "TUR"
     ],
-    "TR631": [
+    "TR631__SPLIT_KESSAB": [
+      "HTY"
+    ],
+    "TR631__SPLIT_NORTH": [
+      "TUR"
+    ],
+    "TR631__SPLIT_SANJAK": [
       "HTY"
     ],
     "TR632": [
@@ -56551,13 +58465,40 @@
     "TR904": [
       "TUR"
     ],
-    "TR905": [
+    "TR905__SPLIT_ARTVIN": [
+      "TUR"
+    ],
+    "TR905__SPLIT_HOPA": [
+      "TUR"
+    ],
+    "TR905__SPLIT_SAVSAT": [
+      "TUR"
+    ],
+    "TR905__SPLIT_YUSUFELI": [
       "TUR"
     ],
     "TR906": [
       "TUR"
     ],
-    "TRA11": [
+    "TRA11__SPLIT_ASKALE": [
+      "TUR"
+    ],
+    "TRA11__SPLIT_ERZURUM": [
+      "TUR"
+    ],
+    "TRA11__SPLIT_HORASAN": [
+      "TUR"
+    ],
+    "TRA11__SPLIT_ISPIR": [
+      "TUR"
+    ],
+    "TRA11__SPLIT_OLTU": [
+      "TUR"
+    ],
+    "TRA11__SPLIT_PASINLER": [
+      "TUR"
+    ],
+    "TRA11__SPLIT_PAZARYOLU": [
       "TUR"
     ],
     "TRA12": [
@@ -56569,13 +58510,46 @@
     "TRA21": [
       "TUR"
     ],
-    "TRA22": [
+    "TRA22__SPLIT_BASKOY": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_CILDIR": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_DIGOR": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_KAGIZMAN": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_KARAKALE": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_KARS": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_KIRAC": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_ODALAR": [
+      "TUR"
+    ],
+    "TRA22__SPLIT_SARIKAMIS": [
       "TUR"
     ],
     "TRA23": [
       "TUR"
     ],
-    "TRA24": [
+    "TRA24__SPLIT_ARDAHAN": [
+      "TUR"
+    ],
+    "TRA24__SPLIT_CILDIR": [
+      "TUR"
+    ],
+    "TRA24__SPLIT_KOLKOY": [
+      "TUR"
+    ],
+    "TRA24__SPLIT_TURKGOZU": [
       "TUR"
     ],
     "TRB11": [
@@ -56632,7 +58606,13 @@
     "TT": [
       "TRI"
     ],
-    "TUN-101": [
+    "TUN-101__SPLIT_PLAYA_CHOTT_EL_DJERID": [
+      "TUN"
+    ],
+    "TUN-101__SPLIT_PLAYA_CHOTT_EL_GHARSA": [
+      "TUN"
+    ],
+    "TUN-101__SPLIT_REST": [
       "TUN"
     ],
     "TUN-102": [
@@ -56662,7 +58642,10 @@
     "TUN-110": [
       "TUN"
     ],
-    "TUN-111": [
+    "TUN-111__SPLIT_PLAYA_CHOTT_EL_FEJAJ": [
+      "TUN"
+    ],
+    "TUN-111__SPLIT_REST": [
       "TUN"
     ],
     "TUN-112": [
@@ -56695,7 +58678,13 @@
     "TUN-96": [
       "TUN"
     ],
-    "TUN-97": [
+    "TUN-97__SPLIT_PLAYA_CHOTT_EL_DJERID": [
+      "TUN"
+    ],
+    "TUN-97__SPLIT_PLAYA_CHOTT_EL_FEJAJ": [
+      "TUN"
+    ],
+    "TUN-97__SPLIT_REST": [
       "TUN"
     ],
     "TUN-98": [
@@ -56875,7 +58864,10 @@
     "UA_MRG_1a8aac8d6778": [
       "UKR"
     ],
-    "UA_MRG_1d698b91bc32": [
+    "UA_MRG_1d698b91bc32__SPLIT_KREMENCHUK_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_MRG_1d698b91bc32__SPLIT_REST": [
       "UKR"
     ],
     "UA_MRG_1e19f7d437d0": [
@@ -56983,7 +58975,10 @@
     "UA_MRG_873c83173170": [
       "UKR"
     ],
-    "UA_MRG_87ad72dae9b5": [
+    "UA_MRG_87ad72dae9b5__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_MRG_87ad72dae9b5__SPLIT_REST": [
       "UKR"
     ],
     "UA_MRG_8c4b9e4808b7": [
@@ -57130,7 +59125,10 @@
     "UA_RAY_74538382B11484774081003": [
       "POL"
     ],
-    "UA_RAY_74538382B1179884845086": [
+    "UA_RAY_74538382B1179884845086__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B1179884845086__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B12626856106214": [
@@ -57157,7 +59155,10 @@
     "UA_RAY_74538382B150351319009": [
       "UKR"
     ],
-    "UA_RAY_74538382B15303326410198": [
+    "UA_RAY_74538382B15303326410198__SPLIT_KREMENCHUK_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B15303326410198__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B15383579018603": [
@@ -57217,7 +59218,10 @@
     "UA_RAY_74538382B20048272724198": [
       "UKR"
     ],
-    "UA_RAY_74538382B20694939957091": [
+    "UA_RAY_74538382B20694939957091__SPLIT_BUKOVINA": [
+      "ROM"
+    ],
+    "UA_RAY_74538382B20694939957091__SPLIT_GALICIA": [
       "POL"
     ],
     "UA_RAY_74538382B20988283989287": [
@@ -57250,7 +59254,10 @@
     "UA_RAY_74538382B23313109833663": [
       "UKR"
     ],
-    "UA_RAY_74538382B23530210512837": [
+    "UA_RAY_74538382B23530210512837__SPLIT_KREMENCHUK_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B23530210512837__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B23907235979788": [
@@ -57283,7 +59290,10 @@
     "UA_RAY_74538382B28282753236246": [
       "CZE"
     ],
-    "UA_RAY_74538382B28718545705075": [
+    "UA_RAY_74538382B28718545705075__SPLIT_KREMENCHUK_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B28718545705075__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B28831490249541": [
@@ -57331,10 +59341,16 @@
     "UA_RAY_74538382B33094259068281": [
       "UKR"
     ],
-    "UA_RAY_74538382B3314448443504": [
+    "UA_RAY_74538382B3314448443504__SPLIT_KAKHOVKA_RESERVOIR": [
       "UKR"
     ],
-    "UA_RAY_74538382B332128375794": [
+    "UA_RAY_74538382B3314448443504__SPLIT_REST": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B332128375794__SPLIT_KREMENCHUK_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B332128375794__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B33781793273381": [
@@ -57373,7 +59389,10 @@
     "UA_RAY_74538382B36929178896395": [
       "UKR"
     ],
-    "UA_RAY_74538382B36952464312213": [
+    "UA_RAY_74538382B36952464312213__SPLIT_BUKOVINA": [
+      "ROM"
+    ],
+    "UA_RAY_74538382B36952464312213__SPLIT_GALICIA": [
       "POL"
     ],
     "UA_RAY_74538382B36980255523800": [
@@ -57607,7 +59626,10 @@
     "UA_RAY_74538382B60058274039512": [
       "UKR"
     ],
-    "UA_RAY_74538382B60808123109786": [
+    "UA_RAY_74538382B60808123109786__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B60808123109786__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B60890943260132": [
@@ -57619,7 +59641,10 @@
     "UA_RAY_74538382B60964237816069": [
       "UKR"
     ],
-    "UA_RAY_74538382B61089393980714": [
+    "UA_RAY_74538382B61089393980714__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B61089393980714__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B61551312903365": [
@@ -57691,7 +59716,10 @@
     "UA_RAY_74538382B7147656565480": [
       "UKR"
     ],
-    "UA_RAY_74538382B71954626153569": [
+    "UA_RAY_74538382B71954626153569__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B71954626153569__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B72123275564902": [
@@ -57805,7 +59833,10 @@
     "UA_RAY_74538382B85654458417277": [
       "UKR"
     ],
-    "UA_RAY_74538382B85739457006484": [
+    "UA_RAY_74538382B85739457006484__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B85739457006484__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B85800934600856": [
@@ -57817,10 +59848,16 @@
     "UA_RAY_74538382B86462977342473": [
       "POL"
     ],
-    "UA_RAY_74538382B86672078093677": [
+    "UA_RAY_74538382B86672078093677__SPLIT_KAKHOVKA_RESERVOIR": [
       "UKR"
     ],
-    "UA_RAY_74538382B8704633300515": [
+    "UA_RAY_74538382B86672078093677__SPLIT_REST": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B8704633300515__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B8704633300515__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B87091028068119": [
@@ -57841,7 +59878,10 @@
     "UA_RAY_74538382B88503218872177": [
       "UKR"
     ],
-    "UA_RAY_74538382B88832969225176": [
+    "UA_RAY_74538382B88832969225176__SPLIT_KAKHOVKA_RESERVOIR": [
+      "UKR"
+    ],
+    "UA_RAY_74538382B88832969225176__SPLIT_REST": [
       "UKR"
     ],
     "UA_RAY_74538382B89155529549277": [
@@ -58570,7 +60610,10 @@
     "UA_SHELL_FB_203": [
       "UKR"
     ],
-    "UA_SHELL_FB_204": [
+    "UA_SHELL_FB_204__SPLIT_AKKERMAN": [
+      "ROM"
+    ],
+    "UA_SHELL_FB_204__SPLIT_OVIDIOPOL": [
       "UKR"
     ],
     "UA_SHELL_FB_205": [
@@ -58765,7 +60808,7 @@
     "UA_SHELL_FB_268": [
       "UKR"
     ],
-    "UA_SHELL_FB_269": [
+    "UA_SHELL_FB_269__SPLIT_KREMENCHUK_RESERVOIR": [
       "UKR"
     ],
     "UA_SHELL_FB_270": [
@@ -62053,10 +64096,16 @@
     "US_ZN_30_003__R": [
       "USA"
     ],
-    "US_ZN_30_004__R": [
+    "US_ZN_30_004__R__SPLIT_FORT_PECK_LAKE": [
       "USA"
     ],
-    "US_ZN_30_005__R": [
+    "US_ZN_30_004__R__SPLIT_REST": [
+      "USA"
+    ],
+    "US_ZN_30_005__R__SPLIT_FORT_PECK_LAKE": [
+      "USA"
+    ],
+    "US_ZN_30_005__R__SPLIT_REST": [
       "USA"
     ],
     "US_ZN_31_001__R": [
@@ -62089,10 +64138,16 @@
     "US_ZN_32_004__R": [
       "USA"
     ],
-    "US_ZN_32_005__R": [
+    "US_ZN_32_005__R__SPLIT_PLAYA_CARSON_SINK": [
       "USA"
     ],
-    "US_ZN_32_006__R": [
+    "US_ZN_32_005__R__SPLIT_REST": [
+      "USA"
+    ],
+    "US_ZN_32_006__R__SPLIT_PLAYA_GREAT_SALT_LAKE_DESERT": [
+      "USA"
+    ],
+    "US_ZN_32_006__R__SPLIT_REST": [
       "USA"
     ],
     "US_ZN_32_007__R": [
@@ -62281,13 +64336,22 @@
     "US_ZN_37_017": [
       "USA"
     ],
-    "US_ZN_38_001__R": [
+    "US_ZN_38_001__R__SPLIT_LAKE_SAKAKAWEA": [
       "USA"
     ],
-    "US_ZN_38_002__R": [
+    "US_ZN_38_001__R__SPLIT_REST": [
       "USA"
     ],
-    "US_ZN_38_003__R": [
+    "US_ZN_38_002__R__SPLIT_LAKE_SAKAKAWEA": [
+      "USA"
+    ],
+    "US_ZN_38_002__R__SPLIT_REST": [
+      "USA"
+    ],
+    "US_ZN_38_003__R__SPLIT_LAKE_OAHE": [
+      "USA"
+    ],
+    "US_ZN_38_003__R__SPLIT_REST": [
       "USA"
     ],
     "US_ZN_38_004__R": [
@@ -62485,13 +64549,22 @@
     "US_ZN_45_010__R": [
       "USA"
     ],
-    "US_ZN_46_001__R": [
+    "US_ZN_46_001__R__SPLIT_LAKE_OAHE": [
       "USA"
     ],
-    "US_ZN_46_002__R": [
+    "US_ZN_46_001__R__SPLIT_REST": [
       "USA"
     ],
-    "US_ZN_46_003__R": [
+    "US_ZN_46_002__R__SPLIT_LAKE_OAHE": [
+      "USA"
+    ],
+    "US_ZN_46_002__R__SPLIT_REST": [
+      "USA"
+    ],
+    "US_ZN_46_003__R__SPLIT_LAKE_OAHE": [
+      "USA"
+    ],
+    "US_ZN_46_003__R__SPLIT_REST": [
       "USA"
     ],
     "US_ZN_46_004__R": [
@@ -62536,7 +64609,10 @@
     "US_ZN_49_001__R": [
       "USA"
     ],
-    "US_ZN_49_002__R": [
+    "US_ZN_49_002__R__SPLIT_PLAYA_GREAT_SALT_LAKE_DESERT": [
+      "USA"
+    ],
+    "US_ZN_49_002__R__SPLIT_REST": [
       "USA"
     ],
     "US_ZN_49_003__R": [
@@ -62752,13 +64828,19 @@
     "UY_ADM1_URY-12": [
       "URG"
     ],
-    "UY_ADM1_URY-13": [
+    "UY_ADM1_URY-13__SPLIT_LAGO_RINCON_DEL_BONETE": [
+      "URG"
+    ],
+    "UY_ADM1_URY-13__SPLIT_REST": [
       "URG"
     ],
     "UY_ADM1_URY-14": [
       "URG"
     ],
-    "UY_ADM1_URY-15": [
+    "UY_ADM1_URY-15__SPLIT_LAGO_RINCON_DEL_BONETE": [
+      "URG"
+    ],
+    "UY_ADM1_URY-15__SPLIT_REST": [
       "URG"
     ],
     "UY_ADM1_URY-16": [
@@ -62797,7 +64879,10 @@
     "UY_ADM1_URY-8": [
       "URG"
     ],
-    "UY_ADM1_URY-9": [
+    "UY_ADM1_URY-9__SPLIT_LAGO_RINCON_DEL_BONETE": [
+      "URG"
+    ],
+    "UY_ADM1_URY-9__SPLIT_REST": [
       "URG"
     ],
     "UZB-354": [
@@ -62806,7 +64891,28 @@
     "UZB-355": [
       "UZB"
     ],
-    "UZB-356": [
+    "UZB-356__SPLIT_ARAL1973": [
+      "KKP"
+    ],
+    "UZB-356__SPLIT_ARAL1987": [
+      "KKP"
+    ],
+    "UZB-356__SPLIT_ARAL1999": [
+      "KKP"
+    ],
+    "UZB-356__SPLIT_ARAL2006": [
+      "KKP"
+    ],
+    "UZB-356__SPLIT_ARAL2009": [
+      "KKP"
+    ],
+    "UZB-356__SPLIT_ARAL2014": [
+      "KKP"
+    ],
+    "UZB-356__SPLIT_ARALBASIN": [
+      "KKP"
+    ],
+    "UZB-356__SPLIT_REST": [
       "KKP"
     ],
     "UZB-357": [
@@ -62884,7 +64990,10 @@
     "VE_ADM1_VEN-38": [
       "VEN"
     ],
-    "VE_ADM1_VEN-39": [
+    "VE_ADM1_VEN-39__SPLIT_EMBALSE_DE_GURI": [
+      "VEN"
+    ],
+    "VE_ADM1_VEN-39__SPLIT_REST": [
       "VEN"
     ],
     "VE_ADM1_VEN-40": [
@@ -63316,7 +65425,10 @@
     "ZM_ADM1_ZMB-521": [
       "NRH"
     ],
-    "ZM_ADM1_ZMB-522": [
+    "ZM_ADM1_ZMB-522__SPLIT_LAKE_KARIBA": [
+      "NRH"
+    ],
+    "ZM_ADM1_ZMB-522__SPLIT_REST": [
       "NRH"
     ],
     "ZM_ADM1_ZMB-523": [
@@ -63331,7 +65443,10 @@
     "ZW_ADM1_ZWE-525": [
       "RHO"
     ],
-    "ZW_ADM1_ZWE-526": [
+    "ZW_ADM1_ZWE-526__SPLIT_LAKE_KARIBA": [
+      "RHO"
+    ],
+    "ZW_ADM1_ZWE-526__SPLIT_REST": [
       "RHO"
     ],
     "ZW_ADM1_ZWE-527": [
@@ -63352,7 +65467,10 @@
     "ZW_ADM1_ZWE-532": [
       "RHO"
     ],
-    "ZW_ADM1_ZWE-533": [
+    "ZW_ADM1_ZWE-533__SPLIT_LAKE_KARIBA": [
+      "RHO"
+    ],
+    "ZW_ADM1_ZWE-533__SPLIT_REST": [
       "RHO"
     ]
   },
