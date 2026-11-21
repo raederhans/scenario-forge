@@ -6,7 +6,6 @@ import { FileManager } from "./file_manager.js";
 import { t } from "./i18n.js";
 import { importProjectThroughFunnel } from "./interaction_funnel.js";
 import { getScenarioDisplayName } from "./scenario/bundle_loader.js";
-import { showAppDialog } from "../ui/components/app_dialog.js";
 
 const STORE = "snapshots";
 const WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -50,7 +49,7 @@ export function startAutosave({
   storage = indexedStorage,
   page = document,
   timers = globalThis,
-  dialog = showAppDialog,
+  dialog = (options) => Promise.resolve(callRuntimeHook(state, "showAppDialogFn", options) ?? false),
   importProject = importProjectThroughFunnel,
 } = {}) {
   let timer;

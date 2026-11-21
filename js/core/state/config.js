@@ -130,6 +130,7 @@ export const STATE_HANDLER_HOOK_NAMES = Object.freeze([
   "runZoomStepFn",
   "runZoomResetFn",
   "runProjectSaveFn",
+  "showAppDialogFn",
   "runToolSelectionFn",
   "runBrushModeToggleFn",
   "runProjectImportFileFn",

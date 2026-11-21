@@ -8,6 +8,7 @@ import {
 import { registerRuntimeHook } from "../core/state/index.js";
 import { initPresetState } from "../core/preset_state.js";
 import { initToast, showToast } from "../ui/components/toast.js";
+import { showAppDialog } from "../ui/components/app_dialog.js";
 
 function normalizeFlushReason(flushReason) {
   const normalized = String(flushReason || "").trim();
@@ -86,6 +87,8 @@ export function createStartupRenderRuntimeBinding({
 
   initToastFn();
   registerHook(targetState, "showToastFn", showToastFn);
+  // 核心层不能导入 UI，弹框经 hook 提供。
+  registerHook(targetState, "showAppDialogFn", showAppDialog);
   setBootPreviewVisible(false);
   initPresetStateFn();
 

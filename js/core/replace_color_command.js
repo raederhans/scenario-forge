@@ -7,7 +7,6 @@ import { migrateLegendColorState } from "./state/actions/legend_actions.js";
 import { restoreRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { t } from "./i18n.js";
 import { getLocalizedScenarioCountryName } from "./scenario/scenario_country_display.js";
-import { showAppDialog } from "../ui/components/app_dialog.js";
 
 function matchingIds(overrides, color) {
   return Object.keys(overrides || {}).filter(id => normalizeHexColor(overrides[id]) === color);
@@ -21,7 +20,12 @@ function replacementScope(target, oldColor) {
   };
 }
 
-export function withCountryColorReplacement(target, country, oldColor, newColor, commit, dialog = showAppDialog, countryIds = []) {
+// 核心层不能导入 UI；没有注册弹框时按"不替换"处理。
+function showRuntimeDialog(options) {
+  return Promise.resolve(callRuntimeHook(state, "showAppDialogFn", options) ?? false);
+}
+
+export function withCountryColorReplacement(target, country, oldColor, newColor, commit, dialog = showRuntimeDialog, countryIds = []) {
   if (!oldColor || oldColor === newColor) return commit(null);
   const scope = replacementScope(target, oldColor);
   if (countryIds.length && scope.featureIds.length) {
