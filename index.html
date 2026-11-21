@@ -2079,6 +2079,7 @@
                     <label for="populationSummaryScope" class="range-label" data-i18n="Summary scope">Summary scope</label>
                     <select id="populationSummaryScope" class="select-input"></select>
                     <p id="populationSummary" class="city-points-advanced-hint" role="status"></p>
+                    <p class="hint" data-i18n="With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.">With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.</p>
                     <button id="populationSummarizeSelection" type="button" class="btn-secondary" data-i18n="Summarize selected parcels">Summarize selected parcels</button>
                     <button id="populationExportStats" type="button" class="btn-secondary" data-i18n="Export parcel statistics (CSV)">Export parcel statistics (CSV)</button>
                   </details>
@@ -2211,6 +2212,11 @@
           </div>
 
           <div id="toolHudChip" class="tool-hud-chip hidden" aria-live="polite"></div>
+          <div id="parcelSelectionPanel" class="map-onboarding-hint hidden" style="top: 12px; transform: translateX(-50%); width: max-content">
+            <span id="parcelSelectionCount" aria-live="polite"></span>
+            <button type="button" id="fillSelectedParcels" class="btn-secondary" data-i18n="Fill with current color">Fill with current color</button>
+            <button type="button" id="clearSelectedParcels" class="btn-secondary" data-i18n="Clear">Clear</button>
+          </div>
           <div id="mapOnboardingHint" class="map-onboarding-hint" data-i18n="Click to inspect a region or country. Press F to switch to fill before painting.">
             Click to inspect a region or country. Press F to switch to fill before painting.
           </div>

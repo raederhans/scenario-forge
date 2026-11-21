@@ -14,6 +14,7 @@ import { showToast } from "./components/toast.js";
 import { t } from "./i18n.js";
 import { getActiveModal } from "./ui_contract.js";
 import {
+  clearDevSelection,
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
   resetZoomToFit,
@@ -320,6 +321,10 @@ function initShortcuts() {
         runtimeState.brushModeEnabled = false;
         setBrushPanModifier(false);
         syncToolUi();
+        return;
+      }
+      if (runtimeState.devSelectionOrder?.length && clearDevSelection()) {
+        event.preventDefault();
         return;
       }
       if (runtimeState.selectedInspectorCountryCode && callRuntimeHook(runtimeState, "stepUpInspectorSelectionFn")) {

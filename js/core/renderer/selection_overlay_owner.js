@@ -1,3 +1,5 @@
+import { t } from "../i18n.js";
+
 export function createSelectionOverlayOwner({
   getOverlayProjectionSignature,
   getTopologyRevision,
@@ -125,7 +127,7 @@ export function createSelectionOverlayOwner({
     selection.exit().remove();
     getDevGroup()
       .attr("aria-hidden", data.length ? "false" : "true")
-      .attr("aria-label", data.length ? `Development selection overlay (${data.length})` : "Development selection overlay");
+      .attr("aria-label", data.length ? t("{count} parcels selected", "ui", { count: data.length }) : null);
   }
 
   function renderInspectorHighlightOverlay() {
