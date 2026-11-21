@@ -11569,5 +11569,265 @@
   "面积模式优先现代大国排序": {
     "en": "Prefer modern major-power order for area modes",
     "zh": "面积模式优先现代大国排序"
+  },
+  "Edit map": {
+    "en": "Edit map",
+    "zh": "编辑地图"
+  },
+  "Rename country": {
+    "en": "Rename country",
+    "zh": "重命名国家"
+  },
+  "Replace color": {
+    "en": "Replace color",
+    "zh": "替换颜色"
+  },
+  "Reset country overrides": {
+    "en": "Reset country overrides",
+    "zh": "重置国家局部配色"
+  },
+  "Auto-fill map": {
+    "en": "Auto-fill map",
+    "zh": "自动填色"
+  },
+  "Auto-fill regions": {
+    "en": "Auto-fill regions",
+    "zh": "按区域自动填色"
+  },
+  "Place map label": {
+    "en": "Place map label",
+    "zh": "添加地图文字"
+  },
+  "Edit map label": {
+    "en": "Edit map label",
+    "zh": "编辑地图文字"
+  },
+  "Move map label": {
+    "en": "Move map label",
+    "zh": "移动地图文字"
+  },
+  "Delete map label": {
+    "en": "Delete map label",
+    "zh": "删除地图文字"
+  },
+  "Place unit counter": {
+    "en": "Place unit counter",
+    "zh": "放置兵棋"
+  },
+  "Edit unit counter": {
+    "en": "Edit unit counter",
+    "zh": "编辑兵棋"
+  },
+  "Move unit counter": {
+    "en": "Move unit counter",
+    "zh": "移动兵棋"
+  },
+  "Delete unit counter": {
+    "en": "Delete unit counter",
+    "zh": "删除兵棋"
+  },
+  "Create operational line": {
+    "en": "Create operational line",
+    "zh": "绘制作战线"
+  },
+  "Edit operational line": {
+    "en": "Edit operational line",
+    "zh": "编辑作战线"
+  },
+  "Delete operational line": {
+    "en": "Delete operational line",
+    "zh": "删除作战线"
+  },
+  "Draw operation graphic": {
+    "en": "Draw operation graphic",
+    "zh": "绘制作战图形"
+  },
+  "Delete operation graphic": {
+    "en": "Delete operation graphic",
+    "zh": "删除作战图形"
+  },
+  "Edit operation graphic": {
+    "en": "Edit operation graphic",
+    "zh": "编辑作战图形"
+  },
+  "Delete graphic vertex": {
+    "en": "Delete graphic vertex",
+    "zh": "删除作战图形顶点"
+  },
+  "Insert graphic vertex": {
+    "en": "Insert graphic vertex",
+    "zh": "插入作战图形顶点"
+  },
+  "Move graphic vertex": {
+    "en": "Move graphic vertex",
+    "zh": "移动作战图形顶点"
+  },
+  "Save appearance preset": {
+    "en": "Save appearance preset",
+    "zh": "保存外观预设"
+  },
+  "Select appearance preset": {
+    "en": "Select appearance preset",
+    "zh": "选择外观预设"
+  },
+  "Apply appearance preset": {
+    "en": "Apply appearance preset",
+    "zh": "应用外观预设"
+  },
+  "Delete appearance preset": {
+    "en": "Delete appearance preset",
+    "zh": "删除外观预设"
+  },
+  "Import appearance preset": {
+    "en": "Import appearance preset",
+    "zh": "导入外观预设"
+  },
+  "Place intensity point": {
+    "en": "Place intensity point",
+    "zh": "添加强度点"
+  },
+  "Brush intensity field": {
+    "en": "Brush intensity field",
+    "zh": "涂绘强度场"
+  },
+  "Edit lake style": {
+    "en": "Edit lake style",
+    "zh": "编辑湖泊样式"
+  },
+  "Change lake color link": {
+    "en": "Change lake color link",
+    "zh": "更改湖泊颜色联动"
+  },
+  "Change lake outline": {
+    "en": "Change lake outline",
+    "zh": "更改湖泊轮廓"
+  },
+  "Change lake fill": {
+    "en": "Change lake fill",
+    "zh": "更改湖泊填色"
+  },
+  "Change ocean region names display": {
+    "en": "Change ocean region names display",
+    "zh": "更改海域名称显示"
+  },
+  "Add zone layer": {
+    "en": "Add zone layer",
+    "zh": "添加特殊区域图层"
+  },
+  "Delete zone layer": {
+    "en": "Delete zone layer",
+    "zh": "删除特殊区域图层"
+  },
+  "Duplicate zone layer": {
+    "en": "Duplicate zone layer",
+    "zh": "复制特殊区域图层"
+  },
+  "Rename zone layer": {
+    "en": "Rename zone layer",
+    "zh": "重命名特殊区域图层"
+  },
+  "Change zone visibility": {
+    "en": "Change zone visibility",
+    "zh": "更改特殊区域可见性"
+  },
+  "Select zone layer": {
+    "en": "Select zone layer",
+    "zh": "选择特殊区域图层"
+  },
+  "Change zone category": {
+    "en": "Change zone category",
+    "zh": "更改特殊区域类别"
+  },
+  "Change zone style": {
+    "en": "Change zone style",
+    "zh": "更改特殊区域样式"
+  },
+  "Change zone legend visibility": {
+    "en": "Change zone legend visibility",
+    "zh": "更改特殊区域图例可见性"
+  },
+  "Reorder zone layers": {
+    "en": "Reorder zone layers",
+    "zh": "调整特殊区域图层顺序"
+  },
+  "Edit zone layers": {
+    "en": "Edit zone layers",
+    "zh": "编辑特殊区域图层"
+  },
+  "Clear zone members": {
+    "en": "Clear zone members",
+    "zh": "清空特殊区域成员"
+  },
+  "Remove zone members": {
+    "en": "Remove zone members",
+    "zh": "移除特殊区域成员"
+  },
+  "Add zone members": {
+    "en": "Add zone members",
+    "zh": "添加特殊区域成员"
+  },
+  "Replace zone members": {
+    "en": "Replace zone members",
+    "zh": "替换特殊区域成员"
+  },
+  "Toggle zone membership": {
+    "en": "Toggle zone membership",
+    "zh": "切换特殊区域成员资格"
+  },
+  "Intersect zone members": {
+    "en": "Intersect zone members",
+    "zh": "取特殊区域成员交集"
+  },
+  "Copy zone members": {
+    "en": "Copy zone members",
+    "zh": "复制特殊区域成员"
+  },
+  "Change texture style": {
+    "en": "Change texture style",
+    "zh": "更改纹理样式"
+  },
+  "Change texture opacity": {
+    "en": "Change texture opacity",
+    "zh": "更改纹理不透明度"
+  },
+  "Change paper texture": {
+    "en": "Change paper texture",
+    "zh": "更改纸张纹理"
+  },
+  "Change graticule style": {
+    "en": "Change graticule style",
+    "zh": "更改经纬网样式"
+  },
+  "Change drafting grid": {
+    "en": "Change drafting grid",
+    "zh": "更改制图网格"
+  },
+  "No history yet": {
+    "en": "No history yet",
+    "zh": "暂无历史记录"
+  },
+  "Urban intensity field": {
+    "en": "Urban intensity field",
+    "zh": "城市强度场"
+  },
+  "Physical intensity field": {
+    "en": "Physical intensity field",
+    "zh": "地形强度场"
+  },
+  "Ocean depth field": {
+    "en": "Ocean depth field",
+    "zh": "海洋深度场"
+  },
+  "Intensity field": {
+    "en": "Intensity field",
+    "zh": "强度场"
+  },
+  "Return to: {action}": {
+    "en": "Return to: {action}",
+    "zh": "回到：{action}"
+  },
+  "Current: {action}": {
+    "en": "Current: {action}",
+    "zh": "当前：{action}"
   }
 }

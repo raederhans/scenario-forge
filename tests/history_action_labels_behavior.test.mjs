@@ -60,3 +60,25 @@ test("switching language keeps the next action in both button attributes", async
   assert.deepEqual([undo.title, undo["aria-label"], undo.disabled], ["Undo: Paint 1 region", "Undo: Paint 1 region", false]);
   assert.deepEqual([redo.title, redo["aria-label"], redo.disabled], ["Redo", "Redo", true]);
 });
+
+test("named edits in the history list and toolbar use the active language", () => {
+  for (const [entry, en, zh] of [
+    [{ kind: "replace-color" }, "Replace color", "替换颜色"],
+    [{ kind: "country-name" }, "Rename country", "重命名国家"],
+    [{ kind: "reset-country-overrides" }, "Reset country overrides", "重置国家局部配色"],
+    [{ kind: "auto-fill-region" }, "Auto-fill regions", "按区域自动填色"],
+    [{ kind: "place-map-label" }, "Place map label", "添加地图文字"],
+    [{ kind: "edit-map-label" }, "Edit map label", "编辑地图文字"],
+    [{ kind: "move-map-label" }, "Move map label", "移动地图文字"],
+    [{ kind: "delete-map-label" }, "Delete map label", "删除地图文字"],
+    [{ kind: "move-unit-counter" }, "Move unit counter", "移动兵棋"],
+    [{ kind: "create-operational-line" }, "Create operational line", "绘制作战线"],
+    [{ meta: { kind: "appearance-preset-import" } }, "Import appearance preset", "导入外观预设"],
+    [{ label: "Physical intensity field" }, "Physical intensity field", "地形强度场"],
+  ]) {
+    state.currentLanguage = "en";
+    assert.equal(getHistoryActionLabel(null, entry), en);
+    state.currentLanguage = "zh";
+    assert.equal(getHistoryActionLabel("Redo", entry), `重做：${zh}`);
+  }
+});

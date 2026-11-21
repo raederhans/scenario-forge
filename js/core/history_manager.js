@@ -221,7 +221,7 @@ function pushHistoryEntry(entry) {
   if (merged) runtimeState.historyPast.pop();
   runtimeState.historyPast.push(merged || nextEntry);
 
-  const max = Math.max(1, Number(runtimeState.historyMax) || 80);
+  const max = Math.max(1, Number(runtimeState.historyMax) || 200);
   if (runtimeState.historyPast.length > max) {
     runtimeState.historyPast = runtimeState.historyPast.slice(runtimeState.historyPast.length - max);
   }
@@ -301,6 +301,7 @@ function refreshUiAfterHistory(direction, entry) {
         "tool",
         "appearance",
         "activeSovereign",
+        ...(!entry ? ["inspector"] : []),
         "countryList",
         "waterRegionList",
         "specialRegionList",
@@ -312,7 +313,7 @@ function refreshUiAfterHistory(direction, entry) {
   flushHistoryRender(`history-${direction}`);
 }
 
-function applyHistorySnapshot(snapshot, direction, entry) {
+function applyHistorySnapshot(snapshot) {
   if (!snapshot || typeof snapshot !== "object") return false;
   const hasAnnotationView = !!(snapshot.annotationView && typeof snapshot.annotationView === "object");
   // runtimeState 上这一批容器必须先补齐，历史快照恢复才可以安全地执行 delete / replace。
@@ -369,9 +370,6 @@ function applyHistorySnapshot(snapshot, direction, entry) {
       setStrategicOverlayDirtyState(runtimeState, dirtyKey);
     }
   }
-  // Undo/redo changes the saved document in every domain, once per application.
-  markDirty(`history-${direction}`);
-  refreshUiAfterHistory(direction, entry);
   return true;
 }
 
@@ -383,24 +381,30 @@ function canRedoHistory() {
   return Array.isArray(runtimeState.historyFuture) && runtimeState.historyFuture.length > 0;
 }
 
-function undoHistory() {
-  if (!canUndoHistory()) return false;
-  const entry = runtimeState.historyPast.pop();
-  runtimeState.historyFuture = Array.isArray(runtimeState.historyFuture) ? runtimeState.historyFuture : [];
-  runtimeState.historyFuture.push(entry);
-  applyHistorySnapshot(entry.before, "undo", entry);
-  commitChange({ domains: ["history"], reason: "history-undo" });
+function moveHistory(source, destination, steps, direction) {
+  if (!Number.isInteger(steps) || steps < 1 || steps > source.length) return false;
+  const singleEntry = steps === 1 ? source.at(-1) : null;
+  for (let i = 0; i < steps; i++) {
+    const entry = source.pop();
+    destination.push(entry);
+    applyHistorySnapshot(direction === "undo" ? entry.before : entry.after);
+  }
+  markDirty(`history-${direction}`);
+  refreshUiAfterHistory(direction, singleEntry);
+  commitChange({ domains: ["history"], reason: `history-${direction}` });
   return true;
 }
 
-function redoHistory() {
+function undoHistory(steps = 1) {
+  if (!canUndoHistory()) return false;
+  runtimeState.historyFuture = Array.isArray(runtimeState.historyFuture) ? runtimeState.historyFuture : [];
+  return moveHistory(runtimeState.historyPast, runtimeState.historyFuture, steps, "undo");
+}
+
+function redoHistory(steps = 1) {
   if (!canRedoHistory()) return false;
-  const entry = runtimeState.historyFuture.pop();
   runtimeState.historyPast = Array.isArray(runtimeState.historyPast) ? runtimeState.historyPast : [];
-  runtimeState.historyPast.push(entry);
-  applyHistorySnapshot(entry.after, "redo", entry);
-  commitChange({ domains: ["history"], reason: "history-redo" });
-  return true;
+  return moveHistory(runtimeState.historyFuture, runtimeState.historyPast, steps, "redo");
 }
 
 function clearHistory() {
