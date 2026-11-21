@@ -129,7 +129,7 @@ def test_third_batch_parent_coverage_and_border_names():
             assert all(labels) and len(set(labels)) == len(labels), fid
 
     names = {fid: {p["name_en"] for p in children} for fid, children in parts.items()}
-    assert {"Jarabub", "Tobruk"} <= names["LBY-2987"]
+    assert {"Jaghbub", "Tobruk"} <= names["LBY-2987"]
     assert {"Maku", "Khoy"} <= names["IRN-3237"]
     assert names["TRB21"] == {"Van", "Baskale", "Gevas"}
     assert {"Inari", "Kittila"} <= names["FI1D7"]
