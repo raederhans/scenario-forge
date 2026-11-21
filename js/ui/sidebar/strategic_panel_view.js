@@ -826,6 +826,7 @@ export function createStrategicPanelView({
       ["", "Follow style"], ["false", "Original case"], ["true", "All caps"],
     ]));
     const pixels = document.createElement("input");
+    pixels.dataset.labelReadout = "size";
     Object.assign(pixels, { type: "number", min: 0, step: "any" });
     for (const [key, caption, min, max, step] of [
       ["size", "Font size", Math.log2(0.12), 9, "any"],
@@ -837,6 +838,11 @@ export function createStrategicPanelView({
       Object.assign(range, { type: "range", min, max, step });
       addField(key, caption, range);
       if (key === "size") addField("size", "Size in this view (px)", pixels);
+      if (key === "rotation") {
+        const output = document.createElement("output");
+        output.dataset.labelReadout = key;
+        range.parentElement.appendChild(output);
+      }
     }
     const italic = document.createElement("input");
     italic.type = "checkbox";

@@ -1,3 +1,4 @@
+import { positionMapTitleAwareLegend } from "./map_title_render_owner.js";
 import { getThematicWgiLegend } from "../thematic/thematic_wgi_view_model.js";
 
 function wrapText(ctx, text, width) {
@@ -32,7 +33,7 @@ export function drawThematicWgiExportLegend(canvas, state) {
   const referenceHeight = referenceLines.length ? referenceLines.length * 14 + 8 : 0;
   const height = 160 + titleExtraHeight + referenceHeight;
   const scale = Math.min(canvas.width / Math.max(1, state.width || canvas.width), canvas.width / 340, canvas.height / (height + 30));
-  const x = 12, y = canvas.height / scale - height - 12;
+  const [x, y] = positionMapTitleAwareLegend(canvas, state, scale, width, height);
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
   ctx.globalAlpha = 1;
   ctx.fillStyle = "#ffffff";

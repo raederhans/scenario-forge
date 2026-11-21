@@ -5,9 +5,14 @@
 import { getExportScaleInfo, getBakePackLayerIds, getBakePassNamesForLayer, encodeExportCanvas } from "./export_artifact_model.js";
 import { createExportError } from "./export_failure_handler.js";
 import { resolveSampleExportRecommendationContext } from "../../core/sample_export_recommendation.js";
-import { getPoliticalExportLegend } from "../../core/renderer/political_export_legend.js";
+import { getPoliticalExportLegend, hasMapTitles } from "../../core/map_renderer/public.js";
+import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
+import { markDirty } from "../../core/dirty_state.js";
+import { requestRender } from "../../core/render_boundary.js";
+import { registerRuntimeHook } from "../../core/state/index.js";
 import {
   ensureExportWorkbenchUiState as ensureExportWorkbenchUiAction,
+  commitExportWorkbenchUiState,
   setExportAdjustmentsState,
   setExportBakeState,
   setExportLayerOrderState,
@@ -151,7 +156,7 @@ function ensureExportWorkbenchUiState(state, normalizeExportWorkbenchUiState) {
     normalizeState: normalizeExportWorkbenchUiState,
   });
   ui.textVisibility = normalizeExportWorkbenchTextVisibility(ui.textVisibility, ui.includeTextLayer, state.legendControl?.visible !== false);
-  ui.includeTextLayer = Object.values(ui.textVisibility).some(Boolean);
+  ui.includeTextLayer = Object.values(ui.textVisibility).some(Boolean) || hasMapTitles(ui.mapTitles);
   return ui;
 }
 
@@ -194,6 +199,7 @@ function getExportPreviewSourceKey(state, exportUi, renderPassNames, svgMarkup =
     exportUi.layerOrder,
     exportUi.visibility,
     exportUi.textVisibility,
+    exportUi.mapTitles,
     state.activeScenarioId,
     state.renderTransactionDiagnostics?.scenarioApplyEpoch,
     state.sceneGeneration,
@@ -698,8 +704,56 @@ function createExportWorkbenchController({
     return startPreviewWork();
   };
 
+  const syncMapTitleFields = (ui) => {
+    const document = exportWorkbenchOverlay?.ownerDocument;
+    const host = document?.getElementById("exportMapTitleFields");
+    if (!host) return;
+    const template = document.getElementById("exportMapTitleField");
+    const labels = { title: "Map title", subtitle: "Subtitle", attribution: "Attribution" };
+    for (const [key, label] of Object.entries(labels)) {
+      let field = host.querySelector(`[data-title-field="${key}"]`);
+      if (!field) {
+        field = template.content.firstElementChild.cloneNode(true);
+        field.dataset.titleField = key;
+        const edit = (patch) => {
+          const current = getExportUi();
+          const before = captureHistoryState({ mapTitles: true });
+          Object.assign(current.mapTitles[key], patch);
+          const updated = commitExportWorkbenchUiState(state, current);
+          const after = captureHistoryState({ mapTitles: true });
+          if (!pushHistoryEntry({ kind: "map-title", before, after })) return;
+          markDirty("map-title");
+          requestRender("map-title");
+          syncMapTitleFields(updated);
+          void renderExportWorkbenchPreview();
+        };
+        field.addEventListener("change", ({ target }) => {
+          edit({ [target.name]: target.type === "checkbox" ? target.checked : target.value });
+        });
+        if (key === "title") {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "btn-secondary";
+          button.dataset.i18n = "Use project name";
+          button.addEventListener("click", () => edit({ enabled: true, text: state.projectName }));
+          field.append(button);
+        }
+        host.append(field);
+      }
+      field.querySelector("legend").textContent = t(label, "ui");
+      for (const node of field.querySelectorAll("[data-i18n]")) node.textContent = t(node.dataset.i18n, "ui");
+      for (const control of field.querySelectorAll("[name]")) {
+        if (control.type === "checkbox") control.checked = ui.mapTitles[key].enabled;
+        else control.value = ui.mapTitles[key][control.name];
+      }
+      const button = field.querySelector("button");
+      if (button) button.disabled = !state.projectName;
+    }
+  };
+
   const syncExportWorkbenchControlsFromState = () => {
     const exportUiState = getExportUi();
+    syncMapTitleFields(exportUiState);
     if (exportTarget) {
       exportTarget.value = exportUiState.target;
     }
@@ -858,6 +912,11 @@ function createExportWorkbenchController({
   };
 
   const bindExportWorkbenchEvents = () => {
+    registerRuntimeHook(state, "refreshExportMapTitlesFn", () => {
+      if (exportWorkbenchOverlay?.getAttribute("aria-hidden") !== "false") return;
+      syncMapTitleFields(getExportUi());
+      void renderExportWorkbenchPreview();
+    });
     if (exportWorkbenchCloseBtn && !exportWorkbenchCloseBtn.dataset.bound) {
       exportWorkbenchCloseBtn.addEventListener("click", () => {
         onRequestClose?.({ restoreFocus: true });

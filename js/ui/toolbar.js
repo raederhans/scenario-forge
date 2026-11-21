@@ -1146,6 +1146,13 @@ function initToolbar({ render } = {}) {
   };
   const showOnboardingHint = () => {
     if (!mapOnboardingHint) return;
+    try {
+      if (localStorage.getItem("sf.mapOnboardingHint.seen")) {
+        dismissOnboardingHint();
+        return;
+      }
+      localStorage.setItem("sf.mapOnboardingHint.seen", "1");
+    } catch {}
     runtimeState.onboardingDismissed = false;
     mapOnboardingHint.classList.remove("is-hidden");
     mapOnboardingHint.setAttribute("aria-hidden", "false");
@@ -1993,7 +2000,7 @@ function initToolbar({ render } = {}) {
     const next = getNextQuickFillLevel(runtimeState);
     setBatchFillScopeState(runtimeState, next.value);
     refreshQuickFillControls();
-    showToast(next.label, { title: t("Quick fill scope", "ui"), duration: 1400 });
+    showToast(next.label, { title: t("Double-click quick fill scope", "ui"), duration: 1400 });
     return true;
   });
   bindQuickFillControls();

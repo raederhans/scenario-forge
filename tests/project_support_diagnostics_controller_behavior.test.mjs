@@ -371,6 +371,7 @@ test("project download passes selected file format and destination", async () =>
   const downloadProjectBtn = createButtonNode();
   const calls = [];
   const controller = createController(projectSaveStatus, {
+    state: { isDirty: false },
     elements: {
       downloadProjectBtn,
       projectDownloadFormat: { value: "zip" },

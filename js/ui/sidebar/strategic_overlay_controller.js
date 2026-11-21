@@ -1,3 +1,4 @@
+import { readMapLabelField, syncMapLabelField } from "./strategic_panel_view.js";
 import {
   createUnitCounterCatalog,
 } from "./strategic_overlay/unit_counter_catalog_helper.js";
@@ -12,7 +13,8 @@ import {
 } from "./strategic_overlay/unit_counter_render_helpers.js";
 import { patchStrategicOverlayEditorState } from "../../core/state/actions/strategic_overlay_actions.js";
 import { commitMapLabelMove, deleteMapLabel, placeMapLabel, syncMapLabelHandles, updateMapLabel } from "../../core/map_renderer/public.js";
-import { registerRuntimeHook } from "../../core/state/index.js";
+import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
+import { getCountryNameOverride } from "../../core/country_name_overrides.js";
 import { getLocalizedScenarioCountryName } from "../../core/scenario/scenario_country_display.js";
 import { loadDefenseLinePresets, buildScenarioDefenseLineEntries } from "../../core/scenario/defense_line_presets.js";
 import { OPERATIONAL_LINE_KIND_LABELS, OPERATION_GRAPHIC_KIND_LABELS } from "./strategic_overlay/type_labels.js";
@@ -38,14 +40,17 @@ export function bindMapLabelPanel({ section, state, startPlacement, refresh, foc
   for (const field of section.querySelectorAll("[data-label-field]")) {
     const key = field.dataset.labelField;
     const commit = () => {
-      const value = ["range", "number"].includes(field.type) ? Number(field.value) : field.value;
+      const value = readMapLabelField(field, state.zoomTransform?.k || 1);
       const patch = { [key]: value };
       if (key === "countryCode") patch.fallbackName = value ? countryName(value) : "";
       if (updateMapLabel(selectedId(), patch)) refresh();
     };
     if (field.type === "range") field.addEventListener("input", () => {
       const readout = section.querySelector(`[data-label-readout="${key}"]`);
-      if (readout) readout.value = field.value;
+      if (readout && key === "size") {
+        const k = state.zoomTransform?.k || 1;
+        syncMapLabelField(readout, { size: readMapLabelField(field, k) }, k);
+      } else if (readout) readout.value = field.value;
     });
     field.addEventListener(key === "text" ? "blur" : "change", commit);
     if (key === "text") field.addEventListener("keydown", event => {
@@ -229,7 +234,7 @@ export function createStrategicOverlayController({
   let defenseLineButton;
   let defenseLineStatus;
   const { mapLabelSection, mapLabelSectionToggle } = elements;
-  const countryName = code => getLocalizedScenarioCountryName(state.scenarioCountriesByTag?.[code],
+  const countryName = code => getCountryNameOverride(state, code) || getLocalizedScenarioCountryName(state.scenarioCountriesByTag?.[code],
     state.countryNames?.[code] || code, name => t(name, "geo"));
   let placingLabel = false;
   const annotationToggles = mapLabelSection ? mapLabelSection.ownerDocument.querySelectorAll("[data-annotation-view]") : [];
@@ -514,11 +519,13 @@ export function createStrategicOverlayController({
           { value: "", label: t("None", "ui") },
           ...Array.from(codes).sort().map(code => ({ value: code, label: countryName(code) })),
         ], { value: selected.countryCode });
-        for (const readout of mapLabelSection.querySelectorAll("[data-label-readout]")) {
+        for (const readout of mapLabelSection.querySelectorAll("output[data-label-readout]")) {
           if (readout !== document.activeElement) readout.value = selected[readout.dataset.labelReadout];
         }
         for (const field of mapLabelSection.querySelectorAll("[data-label-field]")) {
-          if (field !== document.activeElement) field.value = selected[field.dataset.labelField] ?? 0;
+          if (field !== document.activeElement) {
+            syncMapLabelField(field, selected, state.zoomTransform?.k || 1, state.styleConfig?.countryLabels);
+          }
         }
       }
       placementHint.hidden = !active;
@@ -855,7 +862,7 @@ export function createStrategicOverlayController({
       refreshStrategicOverlayUI({ scopes: "workspaceChrome" });
     };
     registerRuntimeHook(state, "runMapTextToolFn", startPlacement);
-    textTool.addEventListener("click", startPlacement);
+    textTool.addEventListener("click", () => callRuntimeHook(state, "runMapTextToolFn"));
     for (const toggle of annotationToggles) {
       toggle.addEventListener("change", () => {
         const snapshot = () => captureHistoryState({ strategicOverlay: ["annotationView"] });

@@ -684,6 +684,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "申请失败",
     "en": "Apply failed"
   },
+  "Apply label text": {
+    "zh": "确认文字内容",
+    "en": "Apply label text"
+  },
   "Apply territory": {
     "zh": "应用领土",
     "en": "Apply territory"
@@ -2791,6 +2795,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "循环速度",
     "en": "Cycle Speed"
   },
+  "Cycle quick fill level": {
+    "zh": "切换快填层级",
+    "en": "Cycle quick fill level"
+  },
   "Dam": {
     "zh": "大坝",
     "en": "Dam"
@@ -3370,6 +3378,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Duplicate layer": {
     "zh": "复制图层",
     "en": "Duplicate layer"
+  },
+  "Duplicate selected map label": {
+    "zh": "复制选中的地图文字",
+    "en": "Duplicate selected map label"
   },
   "Duplicate zone layer": {
     "zh": "复制特殊区域图层",
@@ -6624,8 +6636,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "No facility details available yet."
   },
   "No file selected": {
-    "zh": "未选择文件",
-    "en": "No file selected"
+    "zh": "打开项目文件，或将文件拖到地图上。",
+    "en": "Open a project file or drop a project file onto the map."
   },
   "No frontline control split in current scenario.": {
     "zh": "当前情况下没有前线控制分裂。",
@@ -6890,6 +6902,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Notes and sources": {
     "zh": "说明与来源",
     "en": "Notes and sources"
+  },
+  "Nudge selected map label": {
+    "zh": "微调选中地图文字的位置",
+    "en": "Nudge selected map label"
   },
   "ORG": {
     "zh": "奥格",
@@ -7562,6 +7578,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "点击「放置文字」添加第一条地图文字。",
     "en": "Place a label to start lettering the map."
   },
+  "Place another map label": {
+    "zh": "连续放置地图文字",
+    "en": "Place another map label"
+  },
   "Place intensity point": {
     "zh": "添加强度点",
     "en": "Place intensity point"
@@ -8201,6 +8221,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Quick fill": {
     "zh": "快速填色",
     "en": "Quick fill"
+  },
+  "Quick fill parent region": {
+    "zh": "快填上级区域",
+    "en": "Quick fill parent region"
+  },
+  "Quick fill whole country": {
+    "zh": "快填整个国家",
+    "en": "Quick fill whole country"
   },
   "Quick path": {
     "zh": "快速路径",
@@ -11260,6 +11288,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Toggle legal ownership vs frontline control.": {
     "zh": "切换合法所有权与一线控制权。",
     "en": "Toggle legal ownership vs frontline control."
+  },
+  "Toggle parcel selection": {
+    "zh": "选中或取消选中地块",
+    "en": "Toggle parcel selection"
   },
   "Toggle right panel": {
     "zh": "切换右侧面板",

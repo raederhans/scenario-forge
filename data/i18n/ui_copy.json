@@ -6170,8 +6170,8 @@
     "zh": "暂时没有可用的 facility 详情。"
   },
   "No file selected": {
-    "en": "No file selected",
-    "zh": "未选择文件"
+    "en": "Open a project file or drop a project file onto the map.",
+    "zh": "打开项目文件，或将文件拖到地图上。"
   },
   "No frontline control split in current scenario.": {
     "en": "No frontline control split in current scenario.",
@@ -12548,5 +12548,37 @@
   "Size in this view (px)": {
     "en": "Size in this view (px)",
     "zh": "当前视图字号（px）"
+  },
+  "Cycle quick fill level": {
+    "en": "Cycle quick fill level",
+    "zh": "切换快填层级"
+  },
+  "Quick fill whole country": {
+    "en": "Quick fill whole country",
+    "zh": "快填整个国家"
+  },
+  "Quick fill parent region": {
+    "en": "Quick fill parent region",
+    "zh": "快填上级区域"
+  },
+  "Toggle parcel selection": {
+    "en": "Toggle parcel selection",
+    "zh": "选中或取消选中地块"
+  },
+  "Place another map label": {
+    "en": "Place another map label",
+    "zh": "连续放置地图文字"
+  },
+  "Duplicate selected map label": {
+    "en": "Duplicate selected map label",
+    "zh": "复制选中的地图文字"
+  },
+  "Nudge selected map label": {
+    "en": "Nudge selected map label",
+    "zh": "微调选中地图文字的位置"
+  },
+  "Apply label text": {
+    "en": "Apply label text",
+    "zh": "确认文字内容"
   }
 }

@@ -103,11 +103,11 @@ const panDirections = {
   up: [0, 1], down: [0, -1], left: [1, 0], right: [-1, 0],
 };
 
-async function saveProject() {
+async function saveProject(saveAs) {
   try {
-    const save = readRuntimeHook(runtimeState, "runProjectSaveFn");
+    const save = readRuntimeHook(runtimeState, saveAs ? "runProjectSaveAsFn" : "runProjectSaveFn");
     if (save) await save();
-    else await FileManager.exportProject(runtimeState);
+    else await FileManager.exportProject(runtimeState, { saveAs });
   } catch (error) {
     showToast(String(error?.message || error || t("Unknown error", "ui")), {
       title: t("Project save failed", "ui"),
@@ -119,6 +119,7 @@ async function saveProject() {
 function initShortcuts({ pan = panMapByPixels } = {}) {
   if (document.body?.dataset.shortcutsBound === "true") return;
 
+  let spaceHeld = false;
   let altCursorMap;
   function releaseAltCursor() {
     if (altCursorMap && runtimeState.currentTool !== "eyedropper") altCursorMap.classList.remove("tool-eyedropper");
@@ -176,15 +177,23 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
     case "toggleRightPanelFn":
     case "toggleLeftPanelFn":
     case "toggleDockFn":
+    case "runQuickReexportFn":
     case "text": {
       const hook = readRuntimeHook(runtimeState, action === "text" ? "runMapTextToolFn" : action);
       if (hook) {
         event.preventDefault();
-        hook();
+        return hook();
       }
       return;
     }
+    case "cycleQuickFillLevelFn":
+      if (!event.repeat && !event.shiftKey && callRuntimeHook(runtimeState, action)) event.preventDefault();
+      return;
     case "brushPan":
+      if (key === " ") {
+        event.preventDefault();
+        spaceHeld = true;
+      }
       setBrushPanModifier(true);
       return;
     case "open":
@@ -197,8 +206,9 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
       return;
     }
     case "save":
+    case "saveAs":
       event.preventDefault();
-      return saveProject();
+      return saveProject(action === "saveAs");
     case "undo":
     case "redo":
       event.preventDefault();
@@ -275,14 +285,18 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
 
   window.addEventListener("keyup", (event) => {
     if (event.key === "Alt") releaseAltCursor();
-    if (event.defaultPrevented || getActiveModal()) return;
-    if (runtimeState.bootBlocking) return;
     if (event.key !== "Shift" && event.key !== " ") return;
-    setBrushPanModifier(false);
+    if (event.key === " ") {
+      if (!spaceHeld) return;
+      if (!isEditableTarget(event.target)) event.preventDefault();
+      spaceHeld = false;
+    }
+    setBrushPanModifier(spaceHeld || !!event.shiftKey);
   });
 
   window.addEventListener("blur", () => {
     releaseAltCursor();
+    spaceHeld = false;
     setBrushPanModifier(false);
   });
 

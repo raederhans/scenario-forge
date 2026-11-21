@@ -1,12 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { state } from "../js/core/state.js";
-import { undoHistory, redoHistory } from "../js/core/history_manager.js";
+import { clearHistory, undoHistory, redoHistory } from "../js/core/history_manager.js";
 import { placeMapLabel, updateMapLabel, commitMapLabelMove, deleteMapLabel } from "../js/core/renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
 import { normalizeMapLabel } from "../js/core/state/strategic_overlay_state.js";
 import { drawManualMapLabels } from "../js/core/renderer/manual_map_label_render_owner.js";
 
 test("placed labels keep independent reversible history and avoid imported ids", () => {
+  clearHistory();
+  state.mapLabelEditor.counter = 1;
   state.mapLabels = [normalizeMapLabel({ lon: 1, lat: 1, text: "Old" }, "map_label_8")];
   state.zoomTransform = { x: 0, y: 0, k: 3 };
   const snapshots = [state.mapLabels];

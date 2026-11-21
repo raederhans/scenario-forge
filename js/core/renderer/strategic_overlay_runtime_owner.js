@@ -542,7 +542,7 @@ export function createStrategicOverlayRuntimeOwner({
   function placeMapLabelFromEvent(event) {
     const point = getMapLonLatFromEvent(event);
     if (!point) return false;
-    const id = placeMapLabel({ lon: point[0], lat: point[1] });
+    const id = placeMapLabel({ lon: point[0], lat: point[1] }, !!event.shiftKey);
     updateStrategicOverlayUi();
     return id;
   }
