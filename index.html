@@ -2198,6 +2198,7 @@
             <img id="referenceImage" class="reference-image" alt="" />
             <canvas id="colorCanvas" class="map-layer" data-i18n="Interactive map color layer.">Interactive map color layer.</canvas>
             <canvas id="lineCanvas" class="map-layer map-layer-top" data-i18n="Interactive map line layer.">Interactive map line layer.</canvas>
+            <canvas id="mapTitleCanvas" class="map-layer map-layer-top" style="display:none;z-index:4" aria-hidden="true"></canvas>
           </div>
 
           <button id="sidebarDrawerBackdrop" type="button" class="sidebar-drawer-backdrop hidden" tabindex="-1" aria-label="Close panels" data-i18n-aria-label="Close panels"></button>
@@ -3403,6 +3404,36 @@
                     <span class="export-workbench-group-hint" data-i18n="Text and annotations">Text and annotations</span>
                   </div>
                   <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list"></div>
+                  <div id="exportMapTitleFields" role="group" aria-label="Layout text" data-i18n-aria-label="Layout text"></div>
+                  <template id="exportMapTitleField">
+                    <fieldset class="export-workbench-control">
+                      <legend></legend>
+                      <label><input type="checkbox" name="enabled" /> <span data-i18n="Visible">Visible</span></label>
+                      <label><span data-i18n="Text">Text</span><input class="input" name="text" type="text" /></label>
+                      <label><span data-i18n="Position">Position</span>
+                        <select name="position" class="select-input">
+                          <option value="top-left" data-i18n="Top left">Top left</option>
+                          <option value="top-center" data-i18n="Top center">Top center</option>
+                          <option value="top-right" data-i18n="Top right">Top right</option>
+                          <option value="bottom-left" data-i18n="Bottom left">Bottom left</option>
+                          <option value="bottom-right" data-i18n="Bottom right">Bottom right</option>
+                        </select>
+                      </label>
+                      <label><span data-i18n="Font size">Font size</span>
+                        <select name="size" class="select-input">
+                          <option value="small" data-i18n="Small">Small</option>
+                          <option value="medium" data-i18n="Medium">Medium</option>
+                          <option value="large" data-i18n="Large">Large</option>
+                        </select>
+                      </label>
+                      <label><span data-i18n="Background">Background</span>
+                        <select name="background" class="select-input">
+                          <option value="light" data-i18n="Light">Light</option>
+                          <option value="dark" data-i18n="Dark">Dark</option>
+                        </select>
+                      </label>
+                    </fieldset>
+                  </template>
                 </div>
               </div>
             </section>

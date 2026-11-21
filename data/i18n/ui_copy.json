@@ -1,4 +1,56 @@
 {
+  "Map title": {
+    "en": "Map title",
+    "zh": "地图标题"
+  },
+  "Subtitle": {
+    "en": "Subtitle",
+    "zh": "副标题"
+  },
+  "Attribution": {
+    "en": "Attribution",
+    "zh": "署名"
+  },
+  "Use project name": {
+    "en": "Use project name",
+    "zh": "填入项目名"
+  },
+  "Top left": {
+    "en": "Top left",
+    "zh": "左上"
+  },
+  "Top center": {
+    "en": "Top center",
+    "zh": "上方居中"
+  },
+  "Top right": {
+    "en": "Top right",
+    "zh": "右上"
+  },
+  "Bottom left": {
+    "en": "Bottom left",
+    "zh": "左下"
+  },
+  "Bottom right": {
+    "en": "Bottom right",
+    "zh": "右下"
+  },
+  "Medium": {
+    "en": "Medium",
+    "zh": "中"
+  },
+  "Position": {
+    "en": "Position",
+    "zh": "位置"
+  },
+  "Text": {
+    "en": "Text",
+    "zh": "文字"
+  },
+  "Layout text": {
+    "en": "Layout text",
+    "zh": "版式文字"
+  },
   "--- Presets ---": {
     "en": "--- Presets ---",
     "zh": "--- 预设 ---"

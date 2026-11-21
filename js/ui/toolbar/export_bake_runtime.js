@@ -1,6 +1,7 @@
-import { drawThematicWgiExportLegend } from "../../core/renderer/thematic_wgi_export_legend.js";
-import { drawPopulationExportLegend } from "../../core/renderer/population_export_legend.js";
-import { drawPoliticalExportLegend, getPoliticalExportLegend } from "../../core/renderer/political_export_legend.js";
+import {
+  drawMapTitles, drawThematicWgiExportLegend, drawPopulationExportLegend,
+  drawPoliticalExportLegend, getPoliticalExportLegend,
+} from "../../core/map_renderer/public.js";
 import { ensurePopulationData } from "../../core/thematic/population_spatial_runtime.js";
 import { isPopulationActive, getPopulationSignature, getPopulationViewModel } from "../../core/thematic/population_spatial_view_model.js";
 import { ensureThematicWgiData } from "../../core/thematic/thematic_wgi_runtime.js";
@@ -84,6 +85,7 @@ export function createExportBakeRuntime({
     if (layerId === "color") {
       return [
         ...thematicDependencies,
+        JSON.stringify(exportUi.mapTitles),
         getExportBakeVisibilitySignature(exportUi),
         `colorRevision:${Number(runtimeState.colorRevision) || 0}`,
         `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
@@ -111,6 +113,7 @@ export function createExportBakeRuntime({
     if (layerId === "text") {
       return [
         legendDependency,
+        JSON.stringify(exportUi.mapTitles),
         getExportBakeVisibilitySignature(exportUi),
         `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
         `svgChildren:${mapSvgChildCount}`,
@@ -120,6 +123,7 @@ export function createExportBakeRuntime({
     }
     return [
       legendDependency,
+      JSON.stringify(exportUi.mapTitles),
       ...thematicDependencies,
       getExportBakeVisibilitySignature(exportUi),
       `colorRevision:${Number(runtimeState.colorRevision) || 0}`,
@@ -338,6 +342,7 @@ export function createExportBakeRuntime({
       if (normalizedLayerId === "text" && exportUi.textVisibility?.legend) drawPoliticalExportLegend(bakeCanvas, runtimeState);
       if (bakePassNames.includes("political")) { drawThematicWgiExportLegend(bakeCanvas, runtimeState); drawPopulationExportLegend(bakeCanvas, runtimeState); }
     }
+    if (normalizedLayerId === "text") drawMapTitles(bakeCanvas, exportUi.mapTitles, runtimeState.dpr || 1);
     const version = cacheEntry ? Number(cacheEntry.version || 0) + 1 : 1;
     exportBakeCache.set(normalizedLayerId, {
       hash,
@@ -429,6 +434,7 @@ export function createExportBakeRuntime({
     }
     if (passNames.includes("political")) { drawThematicWgiExportLegend(workingCanvas, runtimeState); drawPopulationExportLegend(workingCanvas, runtimeState); }
     if (exportUi.textVisibility?.legend) drawPoliticalExportLegend(workingCanvas, runtimeState, dimensions?.pixelRatio);
+    drawMapTitles(workingCanvas, exportUi.mapTitles, dimensions?.pixelRatio ?? (runtimeState.dpr || 1));
     return workingCanvas;
   };
 
@@ -450,11 +456,12 @@ export function createExportBakeRuntime({
       return canvas;
     }
     await ensurePaintContoursReady();
-    if (normalizedSourceId === "legend") {
+    if (normalizedSourceId === "map-titles" || normalizedSourceId === "legend") {
       const canvas = document.createElement("canvas");
       canvas.width = dimensions?.width ?? runtimeState.colorCanvas.width;
       canvas.height = dimensions?.height ?? runtimeState.colorCanvas.height;
-      if (exportUi.textVisibility?.legend) drawPoliticalExportLegend(canvas, runtimeState, dimensions?.pixelRatio);
+      if (normalizedSourceId === "map-titles") drawMapTitles(canvas, exportUi.mapTitles, dimensions?.pixelRatio ?? (runtimeState.dpr || 1));
+      else if (exportUi.textVisibility?.legend) drawPoliticalExportLegend(canvas, runtimeState, dimensions?.pixelRatio);
       return canvas;
     }
     if (normalizedSourceId === "render-labels") {

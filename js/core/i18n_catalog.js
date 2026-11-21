@@ -692,6 +692,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "进攻",
     "en": "Attack"
   },
+  "Attribution": {
+    "zh": "署名",
+    "en": "Attribution"
+  },
   "Audit and manifest stay read-only here so tuning and source truth do not get mixed.": {
     "zh": "审计和清单在这里保持只读状态，因此调整和源事实不会混淆。",
     "en": "Audit and manifest stay read-only here so tuning and source truth do not get mixed."
@@ -1083,6 +1087,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Borders up to date": {
     "zh": "边界已更新",
     "en": "Borders up to date"
+  },
+  "Bottom left": {
+    "zh": "左下",
+    "en": "Bottom left"
+  },
+  "Bottom right": {
+    "zh": "右下",
+    "en": "Bottom right"
   },
   "Bound country": {
     "zh": "绑定国家",
@@ -4926,6 +4938,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "图层已导出",
     "en": "Layers exported"
   },
+  "Layout text": {
+    "zh": "版式文字",
+    "en": "Layout text"
+  },
   "Lease / condominium / treaty port": {
     "zh": "租借/共管/条约港",
     "en": "Lease / condominium / treaty port"
@@ -5557,6 +5573,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "地图样式",
     "en": "Map style"
   },
+  "Map title": {
+    "zh": "地图标题",
+    "en": "Map title"
+  },
   "Map workspace": {
     "zh": "地图工作区",
     "en": "Map workspace"
@@ -5624,6 +5644,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Mediterranean supplement": {
     "zh": "地中海补充数据",
     "en": "Mediterranean supplement"
+  },
+  "Medium": {
+    "zh": "中",
+    "en": "Medium"
   },
   "Medium city": {
     "zh": "中型城市",
@@ -7131,6 +7155,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Port workbench": {
     "zh": "港口工作台",
     "en": "Port workbench"
+  },
+  "Position": {
+    "zh": "位置",
+    "en": "Position"
   },
   "Precise display restored": {
     "zh": "已恢复精确显示",
@@ -9768,6 +9796,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "附属政府",
     "en": "Subject Governments"
   },
+  "Subtitle": {
+    "zh": "副标题",
+    "en": "Subtitle"
+  },
   "Subtract layer": {
     "zh": "减去图层",
     "en": "Subtract layer"
@@ -9923,6 +9955,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Tertiary": {
     "zh": "第三",
     "en": "Tertiary"
+  },
+  "Text": {
+    "zh": "文字",
+    "en": "Text"
   },
   "Text and annotations": {
     "zh": "文字与标注",
@@ -10408,6 +10444,18 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "工具",
     "en": "Tools"
   },
+  "Top center": {
+    "zh": "上方居中",
+    "en": "Top center"
+  },
+  "Top left": {
+    "zh": "左上",
+    "en": "Top left"
+  },
+  "Top right": {
+    "zh": "右上",
+    "en": "Top right"
+  },
   "Topology Summary": {
     "zh": "拓扑摘要",
     "en": "Topology Summary"
@@ -10823,6 +10871,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Use official road names and route numbers where available.": {
     "zh": "有官方道路名称和路线编号时优先使用。",
     "en": "Use official road names and route numbers where available."
+  },
+  "Use project name": {
+    "zh": "填入项目名",
+    "en": "Use project name"
   },
   "Use short intent lines and quiet captions so arrows support the frontline instead of overpowering it.": {
     "zh": "使用简短的意图线和低调标签，让箭头辅助前线而不是压过前线。",
