@@ -1,3 +1,4 @@
+import { openLegendColorEditor } from "../toolbar/palette_country_editor.js";
 import { bindProjectFileDrop } from "../project_file_drop.js";
 import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { createUiIcon } from "../components/ui_icons.js";
@@ -1073,11 +1074,14 @@ export function createProjectSupportDiagnosticsController({
   let legendEditorPageIndex = 0;
   let lastLegendKey = null;
 
-  const createLegendLabelRow = ({ color, countryName, index }) => {
+  const createLegendLabelRow = ({ color, owner, countryName, index }) => {
     const row = document.createElement("div");
     row.className = "legend-row";
 
-    const swatch = document.createElement("span");
+    const swatch = document.createElement("button");
+    swatch.type = "button";
+    swatch.setAttribute("aria-label", t("Edit legend color {color}", "ui", { color }));
+    swatch.addEventListener("click", () => openLegendColorEditor(document, state, { color, owner }, refreshLegendEditor));
     swatch.className = "legend-swatch";
     swatch.style.backgroundColor = color;
 

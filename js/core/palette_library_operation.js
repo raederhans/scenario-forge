@@ -3,6 +3,7 @@ import { normalizeHexColor } from "./palette_manager.js";
 import { getLegendPaintColors } from "./legend_state_normalizers.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { migrateLegendColorState } from "./state/actions/legend_actions.js";
+import { createPaletteOwnerResolver } from "./palette_country_targets.js";
 
 // The composition root supplies history, refresh, and synchronous paint selection.
 // Recent-color feedback and the final render follow the applied result.
@@ -56,7 +57,8 @@ export function createPaletteLibraryOperation({
 
     selectPaintColor(color);
     const isFeature = target.type === "feature";
-    const featureIds = explicitCountry ? countryIds : isFeature
+    const resolveOwner = explicitCountry && createPaletteOwnerResolver(state);
+    const featureIds = explicitCountry ? countryIds.filter(id => resolveOwner(id) === explicitCountry) : isFeature
       ? target.featureIds
       : getOwnerFeatureIds(target.ownerCode);
     const oldColor = !isFeature && normalizeHexColor(state.sovereignBaseColors?.[target.ownerCode]
@@ -106,7 +108,7 @@ export function createPaletteLibraryOperation({
         after: captureHistoryState(historyScope),
         meta: { affectsSovereignty: false },
       });
-      return { status: "applied", color, target, ...(explicitCountry ? { featureCount: featureIds.length } : {}) };
+      return { status: "applied", color, target, ...(explicitCountry ? { featureCount: featureIds.length, preservedCount: countryIds.length - featureIds.length } : {}) };
     }
   }
   return Object.freeze({ applyColor });
