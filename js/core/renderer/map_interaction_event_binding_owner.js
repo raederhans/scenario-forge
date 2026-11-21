@@ -27,6 +27,7 @@ export function createMapInteractionEventBindingOwner({
   }
 
   function handlePointerMove(event) {
+    if (event.pointerType === "mouse" && getters.hasMouseBrushDrag?.()) return handlers.handleBrushPointerMove(event);
     if (!isTouchPointer(event)) return handlers.handlePhysicalIntensityPointerMove(event);
   }
 
@@ -93,9 +94,6 @@ export function createMapInteractionEventBindingOwner({
     interactionRect.on("pointerdown.fieldTool", handlePointerDown);
     interactionRect.on("pointermove.fieldTool", handlePointerMove);
     interactionRect.on("mousedown.brush", requireFunction(handlers, "handleBrushPointerDown"));
-    interactionRect.on("pointermove.brush", (event) => {
-      if (event.pointerType === "mouse") handlers.handleBrushPointerMove(event);
-    });
     interactionRect.on("mouseleave", requireFunction(handlers, "handleMouseLeave"));
     interactionRect.on("click", requireFunction(handlers, "mapClick"));
     interactionRect.on("dblclick", requireFunction(handlers, "mapDoubleClick"));

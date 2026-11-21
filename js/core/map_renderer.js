@@ -3042,6 +3042,7 @@ const getMapInteractionEventBindingOwner = lazyOwner(() => createMapInteractionE
     getWindow: () => window,
     getInteractionRectNode: () => rendererSurfaceHost.getInteractionRect()?.node?.(),
     isTouchBrushEnabled: () => runtimeState.brushModeEnabled || getIntensityFieldTool().active,
+    hasMouseBrushDrag: () => !!brushSession || getStrategicOverlayRuntimeOwner().hasSpecialZoneMembershipDragSession(),
   },
   handlers: {
     mapClick: handleClick,
