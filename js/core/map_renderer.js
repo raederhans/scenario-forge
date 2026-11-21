@@ -1,3 +1,4 @@
+import { renderViewportMapTitles } from "./renderer/map_title_render_owner.js";
 import { createLabelsRuntime } from "./map_renderer/labels_runtime.js";
 import { createFacilityInteractionRuntime } from "./renderer/facility_interaction_runtime.js";
 import { createIndexUiRefreshScheduler } from "./renderer/index_ui_refresh_scheduler.js";
@@ -11622,6 +11623,7 @@ function render() {
     else invalidateRenderPasses(["political"], "political-id-raster-activation");
   }
   drawCanvas();
+  renderViewportMapTitles(rendererSurfaceHost.getMapContainer()?.querySelector("#mapTitleCanvas"), runtimeState);
   publishPoliticalIdRasterStatus(getPoliticalIdRasterDiagnostics());
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();

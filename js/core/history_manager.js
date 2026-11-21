@@ -78,6 +78,7 @@ function captureHistoryState({
   ownerCodes = [],
   stylePaths = [],
   legend = false,
+  mapTitles = false,
   countryNameOverrides = false,
   cityNameOverrides = false,
   strategicOverlay = false,
@@ -112,6 +113,7 @@ function captureHistoryState({
   if (styleKeys.length) {
     snapshot.styleConfig = captureStylePaths(styleKeys);
   }
+  if (mapTitles) snapshot.mapTitles = cloneStructuredValue(runtimeState.exportWorkbenchUi.mapTitles);
   if (legend) {
     snapshot.legendLabels = { ...runtimeState.legendLabels };
     snapshot.legendColorOrder = [...(runtimeState.legendColorOrder || [])];
@@ -334,6 +336,10 @@ function applyHistorySnapshot(snapshot) {
   applyStyleSnapshot(snapshot.styleConfig);
   if (snapshot.countryNameOverrides) runtimeState.countryNameOverrides = cloneStructuredValue(snapshot.countryNameOverrides);
   if (snapshot.cityNameOverrides) runtimeState.cityNameOverrides = cloneStructuredValue(snapshot.cityNameOverrides);
+  if (snapshot.mapTitles) {
+    runtimeState.exportWorkbenchUi.mapTitles = cloneStructuredValue(snapshot.mapTitles);
+    callRuntimeHook(state, "refreshExportMapTitlesFn");
+  }
   if (snapshot.legendLabels) {
     patchLegendState(runtimeState, { legendLabels: snapshot.legendLabels, legendColorOrder: snapshot.legendColorOrder });
   }

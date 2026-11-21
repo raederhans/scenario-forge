@@ -1,3 +1,7 @@
+export { drawMapTitles, hasMapTitles } from "../renderer/map_title_render_owner.js";
+export { drawThematicWgiExportLegend } from "../renderer/thematic_wgi_export_legend.js";
+export { drawPopulationExportLegend } from "../renderer/population_export_legend.js";
+export { drawPoliticalExportLegend, getPoliticalExportLegend } from "../renderer/political_export_legend.js";
 // Stable app/UI facade for map_renderer.
 // Internal bridge and core helper imports stay on ../map_renderer.js this round.
 export {
