@@ -1,5 +1,6 @@
 import { getEffectiveScenarioHierarchy } from "../../core/scenario/scenario_hierarchy.js";
 import { getQuickFillLevels, normalizeQuickFillScope } from "../../core/quick_fill_hierarchy.js";
+import { t } from "../../core/i18n.js";
 import { getCountryCode } from "../../core/feature_identity.js";
 
 const ZH = {
@@ -30,11 +31,12 @@ export function getQuickFillLevelModel(state) {
     options.push({ value: `level:${level.id}`, label, status: level.status });
   }
   options.push({ value: "country", label: state.activeScenarioId ? (zh ? "当前剧本国家" : "Current scenario owner") : (zh ? "全国" : "Country") });
+  options.push({ value: "color", label: t("Connected parcels of the same color", "ui") });
   const selected = normalizeQuickFillScope(state.batchFillScope);
   if (!options.some((option) => option.value === selected)) {
     options.push({ value: selected, label: zh ? "此层级在当前区域不可用" : "Selected level is unavailable here", disabled: true });
   }
-  return { countryCode, selected, options, explicitLevel: selected.startsWith("level:"),
+  return { countryCode, selected, options, explicitLevel: selected === "color" || selected.startsWith("level:"),
     hint: zh
       ? "单击填一块；双击按所选层级填色。地理分组不代表剧本年代行政区，缺失或待核验时不扩大填色范围。"
       : "Single-click paints one leaf; double-click uses the selected level. Geographic groups are not historical administration. Missing or unverified groups never expand the fill scope." };

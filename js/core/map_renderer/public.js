@@ -23,6 +23,7 @@ export {
   applyDevMacroFillCurrentOwnerScope,
   applyDevMacroFillCurrentParentGroup,
   applyDevSelectionFill,
+  fillSelectedParcels,
   autoFillMap,
   clearDevSelection,
   removeLastDevSelection,

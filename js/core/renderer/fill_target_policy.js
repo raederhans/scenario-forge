@@ -1,14 +1,17 @@
+import { t } from "../i18n.js";
 import { getMapDataBoundary } from "../map_data_boundary.js";
 import { createQuickFillHierarchyResolver, normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
 
 // Owns fill target policy decisions; inputs remain live.
 export function createFillTargetPolicy(runtimeState, {
+  getColorAdjacency, getFeaturePaintColor, getVisibleFeatureIds,
   getAdmin1Group,
   getFeatureCountryCodeNormalized,
   getFeatureInteractionCountryCodeNormalized,
   shouldExcludePoliticalInteractionFeature,
 }) {
   const hierarchy = createQuickFillHierarchyResolver(runtimeState, {
+    getColorAdjacency, getFeaturePaintColor, getVisibleFeatureIds,
     getAdmin1Group, getFeatureCountryCodeNormalized,
     getFeatureInteractionCountryCodeNormalized, shouldExcludePoliticalInteractionFeature,
   });
@@ -54,14 +57,14 @@ export function createFillTargetPolicy(runtimeState, {
     return true;
   }
 
-  function resolveQuickFillPlan(feature, featureId, scope = runtimeState.batchFillScope) {
-    return hierarchy.resolve(feature, featureId, scope);
+  function resolveQuickFillPlan(feature, featureId, scope = runtimeState.batchFillScope, seedColor) {
+    return hierarchy.resolve(feature, featureId, scope, seedColor);
   }
 
-  function buildDoubleClickBatchPlan(feature, featureId) {
+  function buildDoubleClickBatchPlan(feature, featureId, seedColor) {
     if (!isBatchFillDoubleClickBaseEligible({ id: featureId }, feature)) return null;
     const requestedScope = normalizeQuickFillScope(runtimeState.batchFillScope);
-    let resolution = resolveQuickFillPlan(feature, featureId, requestedScope);
+    let resolution = resolveQuickFillPlan(feature, featureId, requestedScope, seedColor);
     let fallbackToCountry = false;
     if (requestedScope === "parent" && resolution.status === "no_parent_level") {
       resolution = resolveQuickFillPlan(feature, featureId, "country");
@@ -73,8 +76,11 @@ export function createFillTargetPolicy(runtimeState, {
       targetIds: resolution.targetIds,
       kind: country ? "fill-country-batch" : "fill-parent-group",
       dirtyReason: country ? "fill-country-batch" : "fill-parent-group",
+      ...(resolution.visibleColorFallback ? { visibleColorFallback: true } : {}),
       fallbackToCountry,
-      groupLabel: requestedScope.startsWith("level:") ? resolution.label : null,
+      groupLabel: requestedScope === "color"
+        ? t(resolution.visibleColorFallback ? "Matching parcels in view" : "Connected parcels of the same color", "ui")
+        : requestedScope.startsWith("level:") ? resolution.label : null,
     };
   }
 

@@ -11569,5 +11569,36 @@
   "面积模式优先现代大国排序": {
     "en": "Prefer modern major-power order for area modes",
     "zh": "面积模式优先现代大国排序"
+  },
+  "Adjacency unavailable. Filling matching parcels in the current view.": {
+    "en": "Adjacency unavailable. Filling matching parcels in the current view.",
+    "zh": "缺少邻接数据，将填充当前视图内的同色地块。"
+  },
+  "Connected parcels of the same color": {
+    "en": "Connected parcels of the same color",
+    "zh": "当前颜色相同且相连的地块"
+  },
+  "Fill with current color": {
+    "en": "Fill with current color",
+    "zh": "用当前色填充"
+  },
+  "With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.": {
+    "en": "With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.",
+    "zh": "使用选择工具，按住 Ctrl/Cmd 或 Shift 单击地块即可多选。"
+  },
+  "{count} parcels selected": {
+    "en": {
+      "one": "{count} parcel selected",
+      "other": "{count} parcels selected"
+    },
+    "zh": "已选 {count} 块"
+  },
+  "Matching parcels in view": {
+    "en": "Matching parcels in view",
+    "zh": "当前视图内的同色地块"
+  },
+  "Selection limit reached ({limit}).": {
+    "en": "Selection limit reached ({limit}).",
+    "zh": "已达到多选上限（{limit} 块）。"
   }
 }

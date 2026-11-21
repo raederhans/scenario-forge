@@ -1,3 +1,4 @@
+import { initSelectionPanel } from "./selection_panel.js";
 import { ensureHgoIdentitySettings as ensureHgoIdentityRuntimeState } from "./sidebar/hgo_identity_state.js";
 import { createStrategicPanelView } from "./sidebar/strategic_panel_view.js";
 import { setSelectedColorState } from "../core/state/actions/appearance_selection_actions.js";
@@ -665,6 +666,7 @@ function initSidebar({ render } = {}) {
   const specialRegionColorInput = document.getElementById("specialRegionColorInput");
   const clearSpecialRegionColorBtn = document.getElementById("clearSpecialRegionColorBtn");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
+  initSelectionPanel();
   initDevWorkspace();
 
   let countryInspectorColorPickerOpen = false;

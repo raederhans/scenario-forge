@@ -281,6 +281,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已添加 {count} 条防线",
     "en": "Added {count} defense lines"
   },
+  "Adjacency unavailable. Filling matching parcels in the current view.": {
+    "zh": "缺少邻接数据，将填充当前视图内的同色地块。",
+    "en": "Adjacency unavailable. Filling matching parcels in the current view."
+  },
   "Adjust the road rules on the left, then select a road or route label to inspect it.": {
     "zh": "在左侧调整道路规则，再选择道路或路线编号查看详情。",
     "en": "Adjust the road rules on the left, then select a road or route label to inspect it."
@@ -1983,6 +1987,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Congo Lake": {
     "zh": "刚果湖",
     "en": "Congo Lake"
+  },
+  "Connected parcels of the same color": {
+    "zh": "当前颜色相同且相连的地块",
+    "en": "Connected parcels of the same color"
   },
   "Conservative constitutionalism": {
     "zh": "保守宪政",
@@ -3690,6 +3698,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Fill tool": {
     "zh": "填充工具",
     "en": "Fill tool"
+  },
+  "Fill with current color": {
+    "zh": "用当前色填充",
+    "en": "Fill with current color"
   },
   "Filter airport points by type, status, and importance.": {
     "zh": "按类型、状态和重要程度筛选机场。",
@@ -5588,6 +5600,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Matches": {
     "zh": "匹配数",
     "en": "Matches"
+  },
+  "Matching parcels in view": {
+    "zh": "当前视图内的同色地块",
+    "en": "Matching parcels in view"
   },
   "Matching regions": {
     "zh": "匹配的地块",
@@ -9004,6 +9020,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "多选已复制",
     "en": "Selection copied"
   },
+  "Selection limit reached ({limit}).": {
+    "zh": "已达到多选上限（{limit} 块）。",
+    "en": "Selection limit reached ({limit})."
+  },
   "Separate official and public sources": {
     "zh": "官方与公开来源分开",
     "en": "Separate official and public sources"
@@ -11164,6 +11184,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "将并入{country}",
     "en": "Will merge into {country}"
   },
+  "With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.": {
+    "zh": "使用选择工具，按住 Ctrl/Cmd 或 Shift 单击地块即可多选。",
+    "en": "With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them."
+  },
   "Workbench inspector tabs": {
     "zh": "工作台检查器选项卡",
     "en": "Workbench inspector tabs"
@@ -11503,6 +11527,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "{count} parcels": {
     "zh": "{count} 个地块",
     "en": "{count} parcels"
+  },
+  "{count} parcels selected": {
+    "zh": "已选 {count} 块",
+    "en": {
+      "one": "{count} parcel selected",
+      "other": "{count} parcels selected"
+    }
   },
   "{count} preset lines; {present} already on map": {
     "zh": "{count} 条预置防线；{present} 条已在地图上",

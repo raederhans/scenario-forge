@@ -627,6 +627,7 @@ const CHUNKED_SPATIAL_BUILD_SLICE_SIZE = 900;
 const HOVER_INTERACTION_METRIC_SAMPLE_RATE = 10;
 const HOVER_INTERACTION_SLOW_SAMPLE_MS = 8;
 let debugMode = "PROD";
+const unavailableNeighbors = Object.freeze([]);
 let islandNeighborsCache = {
   topologyRef: null,
   objectRef: null,
@@ -762,7 +763,28 @@ const getVisibleFrameIdentityPolicy = lazyOwner(() => createVisibleFrameIdentity
     rendererSurfaceHost,
   }));
 
+function getFeaturePaintColor(featureId) {
+  return getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
+    getSafeColor: getSafeCanvasColor,
+    getBaseGroupCode: id => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
+  }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR);
+}
+
 const getFillTargetPolicy = lazyOwner(() => createFillTargetPolicy(runtimeState, {
+    getFeaturePaintColor,
+    getVisibleFeatureIds: () => (collectVisibleLandSpatialItemsWithStats({ overscanPx: 0 })?.items || []).map(item => item.id),
+    getColorAdjacency: id => {
+      if (runtimeState.activeScenarioId) {
+        const index = runtimeState.runtimeFeatureIndexById.get(id);
+        const graph = runtimeState.runtimeNeighborGraph;
+        return graph[index] === unavailableNeighbors ? null : { ids: runtimeState.runtimeFeatureIds, graph, index };
+      }
+      const political = runtimeState.topology?.objects?.political;
+      const graph = getIslandNeighborGraph();
+      if (!graph.length || !islandNeighborsCache.available) return null;
+      islandNeighborsCache.ids ??= political.geometries.map(geometry => getEntityFeatureId(geometry));
+      return { ids: islandNeighborsCache.ids, graph };
+    },
     getAdmin1Group,
     getFeatureCountryCodeNormalized,
     getFeatureInteractionCountryCodeNormalized,
@@ -2966,10 +2988,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     fillFromDoubleClick,
     getFeatureCountryCodeNormalized,
     handleRiverPaintClick: (hit, options) => getRiverPaintEditorOwner().handleClick(hit, options),
-    getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
-      getSafeColor: getSafeCanvasColor,
-      getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
-    }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
+    getFeaturePaintColor,
     getHitFromEvent,
     getHoveredFacilityEntryFromEvent: getFacilityInteractionRuntime().getHoveredFacilityEntryFromEvent,
     getIntensityFieldTool,
@@ -5785,7 +5804,8 @@ function getIslandNeighborGraph() {
     }
   }
 
-  if (!Array.isArray(neighbors) || neighbors.length !== geometries.length) {
+  const available = Array.isArray(neighbors) && neighbors.length === geometries.length;
+  if (!available) {
     neighbors = new Array(geometries.length).fill(null).map(() => []);
   }
 
@@ -5794,6 +5814,7 @@ function getIslandNeighborGraph() {
     objectRef: object,
     count: geometries.length,
     neighbors,
+    available,
   };
   return neighbors;
 }
@@ -8464,7 +8485,7 @@ function buildRuntimePoliticalMetaFallback() {
       runtimeState.runtimeNeighborGraph.push(
         objectName === "political" && Array.isArray(neighbors[index])
           ? neighbors[index]
-          : []
+          : unavailableNeighbors
       );
     });
   });
@@ -12346,12 +12367,7 @@ function addFeatureToDevSelection(featureId) {
   }
   const limit = Math.max(1, Number(runtimeState.devSelectionLimit) || 200);
   if (runtimeState.devSelectionOrder.length >= limit) {
-    showToast(
-      runtimeState.currentLanguage === "zh"
-        ? `开发多选已达到上限（${limit}）。`
-        : `Selection limit reached (${limit}).`,
-      {
-      title: t("Dev Workspace", "ui"),
+    showToast(t("Selection limit reached ({limit}).", "ui", { limit }), {
       tone: "warning",
       duration: 3600,
     });
@@ -12547,6 +12563,11 @@ function applyDevMacroFillCurrentOwnerScope() {
   });
 }
 
+function fillSelectedParcels() {
+  if (blockStartupReadonlyInteraction()) return false;
+  return applyVisualSubdivisionFill(getDevSelectionIds(), runtimeState.selectedColor);
+}
+
 function applyDevSelectionFill() {
   const ids = getDevSelectionIds();
   if (!ids.length) {
@@ -12604,7 +12625,12 @@ function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-fea
   if (!resolvedIds.length) return false;
   const color = getSafeCanvasColor(selectedColor, LAND_FILL_COLOR);
   const historyGesture = gesture ? { ...gesture, color, scenarioId: String(runtimeState.activeScenarioId || "") } : null;
-  if (historyGesture?.type === "leaf-click") lastQuickFillLeafClick = historyGesture;
+  if (historyGesture?.type === "leaf-click") {
+    lastQuickFillLeafClick = {
+      ...historyGesture,
+      seedColor: runtimeState.batchFillScope === "color" ? getFeaturePaintColor(gesture.featureId) : undefined,
+    };
+  }
   commitVisualFeaturePaint(resolvedIds, color, {
     kind,
     dirtyReason,
@@ -12654,7 +12680,9 @@ function executeDoubleClickBatchFill(feature, featureId, event = null) {
   if (!feature || !featureId) return false;
   const leadingClick = lastQuickFillLeafClick;
   lastQuickFillLeafClick = null;
-  const plan = getFillTargetPolicy().buildDoubleClickBatchPlan(feature, featureId);
+  const seedColor = leadingClick?.featureId === featureId && leadingClick.scenarioId === String(runtimeState.activeScenarioId || "")
+    ? leadingClick.seedColor : undefined;
+  const plan = getFillTargetPolicy().buildDoubleClickBatchPlan(feature, featureId, seedColor);
   if (!plan?.targetIds?.length) {
     if (runtimeState.currentTool === "fill"
         && runtimeState.interactionGranularity === "subdivision" && !runtimeState.brushModeEnabled) {
@@ -12668,6 +12696,9 @@ function executeDoubleClickBatchFill(feature, featureId, event = null) {
       showDetailPromotionToast(message, { title: zh ? "快速填色范围" : "Quick fill scope", tone: "warning", duration: 3600 });
     }
     return false;
+  }
+  if (plan.visibleColorFallback) {
+    showToast(t("Adjacency unavailable. Filling matching parcels in the current view.", "ui"), { tone: "info" });
   }
   if (plan.fallbackToCountry) {
     showDetailPromotionToast("No parent group was available here. Double-click fell back to country fill.", {
@@ -13439,6 +13470,7 @@ export {
   applyDevMacroFillCurrentParentGroup,
   applyDevMacroFillCurrentOwnerScope,
   applyDevSelectionFill,
+  fillSelectedParcels,
 
   // Read-model helpers for UI, diagnostics, and export tooling.
   autoFillMap,

@@ -290,6 +290,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     const inputs = [hit.id, feature, state.batchFillScope, state.currentLanguage, state.topologyRevision,
       state.activeScenarioId, state.mapSemanticMode, state.hierarchyData, state.activeScenarioManifest,
       state.scenarioDistrictGroupsData];
+    if (state.batchFillScope === "color") inputs.push(state.colorRevision, state.zoomTransform);
     if (!fillPreview || inputs.some((value, i) => value !== fillPreview.inputs[i])) {
       const plan = policy.buildDoubleClickBatchPlan(feature, hit.id);
       let line = "";
