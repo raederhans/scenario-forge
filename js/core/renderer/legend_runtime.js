@@ -17,6 +17,7 @@ export function createLegendRuntime({ state, runtimeState, getMapContainer, clam
       getMapContainer,
       getViewportSize: () => ({ width: Number(runtimeState.width), height: Number(runtimeState.height) }),
       getLanguage: () => String(runtimeState.currentLanguage || state.currentLanguage || ""),
+      getTitle: () => state.legendConfig?.title,
       getLegendModel: (uniqueColors, labels) => ({
         colors: Array.isArray(uniqueColors) ? uniqueColors : readLegendColors(state),
         specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),

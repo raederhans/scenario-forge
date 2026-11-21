@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { state } from "../js/core/state.js";
+import { clearHistory } from "../js/core/history_manager.js";
 import { createClickSelectionTransactionOwner } from "../js/core/map_renderer/click_selection_transaction_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "../js/core/renderer/strategic_overlay_runtime_owner.js";
 import { createBorderIdentityResolver } from "../js/core/renderer/border_identity.js";
@@ -11,7 +12,7 @@ import { createRenderPassSignaturePolicy } from "../js/core/renderer/render_pass
 import { CHINESE_FONT } from "../js/core/renderer/country_label_text_style.js";
 import { bindMapLabelPanel } from "../js/ui/sidebar/strategic_overlay_controller.js";
 
-test("placement consumes the map click, uses effective colors and respects readonly and cancellation", async () => {
+test("placement consumes the map click, leaves notes unbound and respects readonly and cancellation", async () => {
   state.landData = { features: [] };
   state.landIndex = new Map([["land", {}]]);
   state.sovereignBaseColors = { GER: "#123456" };
@@ -46,9 +47,9 @@ test("placement consumes the map click, uses effective colors and respects reado
   assert.equal(state.mapLabelEditor.active, false);
   state.startupReadonly = false;
   state.currentTool = "fill";
-  for (const [scenario, color, targetType, expected] of [
-    ["example", "#123456", "land", "GER"], ["example", "#fedcba", "land", ""],
-    ["example", "#123456", "water", ""], ["", "#123456", "land", "GER"], ["", "#fedcba", "land", ""],
+  for (const [scenario, color, targetType] of [
+    ["example", "#123456", "land"], ["example", "#fedcba", "land"],
+    ["example", "#123456", "water"], ["", "#123456", "land"], ["", "#fedcba", "land"],
   ]) {
     state.activeScenarioId = scenario;
     if (!scenario) state.scenarioCountriesByTag = {};
@@ -59,7 +60,7 @@ test("placement consumes the map click, uses effective colors and respects reado
     await click.handleClick({});
     assert.equal(state.mapLabels.length, count + 1);
     const label = state.mapLabels.at(-1);
-    assert.equal(label.countryCode, expected);
+    assert.equal(label.countryCode, "");
     assert.equal(label.text, "");
     assert.equal(label.size, 9);
     assert.deepEqual(state.visualOverrides, { land: color });
@@ -68,6 +69,7 @@ test("placement consumes the map click, uses effective colors and respects reado
 });
 
 test("panel edits commit once per field and Delete removes the selection", () => {
+  clearHistory();
   state.strategicOverlayUi.modalOpen = true;
   state.strategicOverlayUi.modalSection = "label";
   const id = placeMapLabel({ lon: 1, lat: 2 });
@@ -76,13 +78,13 @@ test("panel edits commit once per field and Delete removes the selection", () =>
     Object.assign(new EventTarget(), { dataset: { labelField: key }, type }));
   const doc = new EventTarget();
   bindMapLabelPanel({
-    section: { ownerDocument: doc, querySelector: () => new EventTarget(), querySelectorAll: () => fields },
+    section: { ownerDocument: doc, querySelector: selector => selector.startsWith("#") ? new EventTarget() : null, querySelectorAll: () => fields },
     state, countryName: () => "Germany", startPlacement() {}, refresh() {},
   });
-  const values = ["First\nSecond", "GER", 24, -30, 0.2, "light"];
+  const values = ["First\nSecond", "GER", 32, -30, 0.2, "light"];
   fields.forEach((field, index) => {
     const before = state.historyPast.length;
-    field.value = String(values[index]);
+    field.value = String(field.dataset.labelField === "size" ? Math.log2(values[index]) : values[index]);
     field.dispatchEvent(new Event("input"));
     assert.equal(state.historyPast.length, before);
     field.dispatchEvent(new Event(index === 0 ? "blur" : "change"));
@@ -121,6 +123,7 @@ class SvgNode extends EventTarget {
 
 for (const gesture of ["drop", "escape", "click"]) {
   test(`map label drag: ${gesture}`, context => {
+    clearHistory();
     const doc = new EventTarget();
     doc.createElementNS = (_, tag) => new SvgNode(doc, tag);
     const group = new SvgNode(doc, "g");

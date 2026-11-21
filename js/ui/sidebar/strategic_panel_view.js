@@ -1,9 +1,32 @@
+import { applyMapLabelStyleToPreset, freezeVisibleCountryLabels } from "../../core/map_renderer/public.js";
 import { createUnitCounterPreview } from "./unit_counter_preview.js";
 import { createButton } from "../components/button.js";
 import { createTextInput } from "../components/text_input.js";
 import { setUiIcon } from "../components/ui_icons.js";
 import { DEFAULT_UNIT_COUNTER_PRESET_ID, getUnitCounterCategoryLabel, getUnitCounterIconPathById } from "../../core/unit_counter_presets.js";
 import { OPERATIONAL_LINE_KIND_LABELS, OPERATION_GRAPHIC_KIND_LABELS } from "./strategic_overlay/type_labels.js";
+
+export function readMapLabelField(field, k) {
+  const key = field.dataset.labelField;
+  if (key === "size") return field.type === "range" ? 2 ** Number(field.value) : Number(field.value) / k;
+  if (key === "uppercase" || key === "replaceCountryName") return field.value === "" ? null : field.value === "true";
+  if (key === "italic") return field.checked;
+  if (key === "weight") return field.value ? Number(field.value) : null;
+  return field.type === "range" ? Number(field.value) : field.value;
+}
+
+export function syncMapLabelField(field, label, k, countryStyle) {
+  const key = field.dataset.labelField;
+  if (key === "size") {
+    field.value = field.type === "range" ? Math.log2(label.size) : Number((label.size * k).toFixed(2));
+  } else if (key === "italic") {
+    field.checked = label.italic;
+  } else if (key === "opacity") {
+    field.value = label.opacity ?? ((!label.text && label.countryCode ? countryStyle?.opacity : null) ?? 1);
+  } else {
+    field.value = label[key] ?? (key === "tracking" ? 0 : "");
+  }
+}
 
 export function createStrategicPanelView({
   frontlineTabStack, runtimeState, countryNames, t, getDirectGeoLabel,
@@ -794,20 +817,54 @@ export function createStrategicPanelView({
     text.placeholder = t("Enter name", "ui");
     addField("text", "Label text", text);
     addField("countryCode", "Bound country", buildSelect("mapLabelCountry", []));
+    const choices = [["", "Automatic"], ["true", "On"], ["false", "Off"]];
+    addField("replaceCountryName", "Replace automatic country name", buildSelect("mapLabelReplace", choices));
+    addField("preset", "Style", buildSelect("mapLabelPreset", [
+      ["country", "Country name"], ["region", "Region"], ["sea", "Sea"], ["terrain", "River / terrain"], ["note", "Note"],
+    ]));
+    addField("uppercase", "Letter case", buildSelect("mapLabelCase", [
+      ["", "Follow style"], ["false", "Original case"], ["true", "All caps"],
+    ]));
+    const pixels = document.createElement("input");
+    pixels.dataset.labelReadout = "size";
+    Object.assign(pixels, { type: "number", min: 0, step: "any" });
     for (const [key, caption, min, max, step] of [
-      ["size", "Font size", 0.12, 512, 0.01],
+      ["size", "Font size", Math.log2(0.12), 9, "any"],
+      ["opacity", "Opacity", 0, 1, 0.01],
       ["rotation", "Rotation", -90, 90, 1],
       ["tracking", "Letter spacing", 0, 1, 0.01],
     ]) {
       const range = document.createElement("input");
       Object.assign(range, { type: "range", min, max, step });
       addField(key, caption, range);
+      if (key === "size") addField("size", "Size in this view (px)", pixels);
+      if (key === "rotation") {
+        const output = document.createElement("output");
+        output.dataset.labelReadout = key;
+        range.parentElement.appendChild(output);
+      }
     }
+    const italic = document.createElement("input");
+    italic.type = "checkbox";
+    addField("italic", "Italic", italic);
+    addField("weight", "Font weight", buildSelect("mapLabelWeight", [
+      ["", "Automatic"], ...[100, 200, 300, 400, 500, 600, 700, 800, 900].map(value => [String(value), String(value)]),
+    ]));
+    addField("color", "Custom color", buildInput("mapLabelCustomColor", "#RRGGBB"));
     addField("colorMode", "Color", buildSelect("mapLabelColor", [
       ["auto", "Automatic"], ["dark", "Dark"], ["light", "Light"],
     ]));
+    const applyPreset = buildButton("mapLabelApplyPreset", "Apply to labels with this style");
+    applyPreset.addEventListener("click", () => {
+      if (applyMapLabelStyleToPreset(runtimeState.mapLabelEditor.selectedId)) refreshStrategicOverlayUI();
+    });
+    fields.appendChild(applyPreset);
     fields.appendChild(buildButton("mapLabelDelete", "Delete"));
-    lettering.append(place, list, fields);
+    const freeze = buildButton("mapLabelFreeze", "Freeze visible country names");
+    freeze.addEventListener("click", () => {
+      if (freezeVisibleCountryLabels()) refreshStrategicOverlayUI();
+    });
+    lettering.append(place, freeze, list, fields);
     strategicOverlaySection.appendChild(lettering);
     frontlineTabStack.appendChild(strategicOverlaySection);
   }

@@ -1,5 +1,4 @@
 import { placeMapLabel } from "./strategic_overlay_runtime/map_label_runtime_domain.js";
-import { getLocalizedScenarioCountryName } from "../scenario/scenario_country_display.js";
 import { createOperationGraphicsRuntimeDomain } from "./strategic_overlay_runtime/operation_graphics_runtime_domain.js";
 import { createSpecialZonesRuntimeDomain } from "./strategic_overlay_runtime/special_zones_runtime_domain.js";
 import { createUnitCounterRuntimeDomain } from "./strategic_overlay_runtime/unit_counter_runtime_domain.js";
@@ -543,14 +542,7 @@ export function createStrategicOverlayRuntimeOwner({
   function placeMapLabelFromEvent(event) {
     const point = getMapLonLatFromEvent(event);
     if (!point) return false;
-    const hit = getHitFromEvent(event, { enableSnap: false, eventType: "map-label-place" });
-    const identity = hit?.targetType === "land"
-      ? helpers.resolveBorderIdentity(hit.id, state.landIndex.get(hit.id)) : "";
-    const countries = state.activeScenarioId ? state.scenarioCountriesByTag : state.sovereignBaseColors;
-    const countryCode = Object.hasOwn(countries || {}, identity) ? identity : "";
-    const fallbackName = countryCode ? getLocalizedScenarioCountryName(state.scenarioCountriesByTag?.[countryCode],
-      state.countryNames?.[countryCode] || countryCode, name => t(name, "geo")) : "";
-    const id = placeMapLabel({ lon: point[0], lat: point[1], countryCode, fallbackName });
+    const id = placeMapLabel({ lon: point[0], lat: point[1] }, !!event.shiftKey);
     updateStrategicOverlayUi();
     return id;
   }

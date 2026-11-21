@@ -16,7 +16,7 @@ export const STRATEGIC_OVERLAY_ENTITY_FIELD_KEYS = Object.freeze({
   operationGraphics: Object.freeze([
     "kind", "label", "points", "stylePreset", "stroke", "width", "opacity",
   ]),
-  mapLabels: Object.freeze(["text", "countryCode", "fallbackName", "lon", "lat", "size", "rotation", "tracking", "uppercase", "colorMode"]),
+  mapLabels: Object.freeze(["text", "countryCode", "fallbackName", "lon", "lat", "size", "rotation", "tracking", "uppercase", "colorMode", "replaceCountryName", "preset", "italic", "weight", "color", "opacity"]),
   unitCounters: Object.freeze([
     "renderer", "label", "sidc", "symbolCode", "nationTag", "nationSource", "presetId",
     "iconId", "unitType", "echelon", "subLabel", "strengthText", "baseFillColor",

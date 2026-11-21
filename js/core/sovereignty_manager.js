@@ -225,7 +225,7 @@ async function loadFeatureMigrationMap({ fetchImpl = globalThis.fetch } = {}) {
   return featureMigrationMapPromise;
 }
 
-async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = globalThis.fetch, scenarioId = "", featureSplits = {} } = {}) {
+async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = globalThis.fetch, scenarioId = "", featureSplits = {}, onDiscard } = {}) {
   if (!featureMergeLineagePromise) {
     featureMergeLineagePromise = (async () => {
       if (typeof fetchImpl !== "function") return null;
@@ -245,9 +245,9 @@ async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = g
   const lineage = await featureMergeLineagePromise;
   if (!Array.isArray(lineage?.plans)) {
     featureMergeLineagePromise = null;
-    return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(null, scenarioId, featureSplits), validFeatureIds);
+    return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(null, scenarioId, featureSplits), validFeatureIds, onDiscard);
   }
-  return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(lineage, scenarioId, featureSplits), validFeatureIds);
+  return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(lineage, scenarioId, featureSplits), validFeatureIds, onDiscard);
 }
 
 function remapFeatureScopedEntries(entries, validFeatureIds, migrationMap) {
@@ -321,7 +321,7 @@ function partitionFeatureScopedEntries(entries, validFeatureIds) {
 
 async function migrateFeatureScopedProjectDataToCurrentTopology(
   data,
-  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null, scenarioManifest = null } = {}
+  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null, onDiscard, scenarioManifest = null } = {}
 ) {
   let payload = data && typeof data === "object" ? { ...data } : {};
   delete payload.sovereigntyByFeatureId;
@@ -355,7 +355,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   Object.keys(scenarioManifest?.hierarchy_overrides?.feature_splits || {}).forEach((id) => scopedMembers.add(id));
   const mergeMigration = collectProjectFeatureIds(payload).some((id) => !normalizedValidFeatureIds.has(id) || scopedMembers.has(id))
     ? await migrateAcrossFeatureMerges(payload, normalizedValidFeatureIds, {
-      fetchImpl, scenarioId: String(payload.scenario?.id || scenarioManifest?.scenario_id || "").trim(),
+      fetchImpl, onDiscard, scenarioId: String(payload.scenario?.id || scenarioManifest?.scenario_id || "").trim(),
       featureSplits: scenarioManifest?.hierarchy_overrides?.feature_splits || {},
     })
     : null;
@@ -364,7 +364,14 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   const mergedAuxiliary = mergeMigration?.summary.auxiliary || { migratedEntries: 0, droppedEntries: 0 };
   const nextVisualOverrides = payload.visualOverrides || {};
   const visualPartition = partitionFeatureScopedEntries(nextVisualOverrides, normalizedValidFeatureIds);
-  const reportMigration = (migratedEntries = 0) => {
+  const reportMigration = (migratedEntries = 0, migrationMap = {}) => {
+    if (onDiscard) {
+      for (const id of Object.keys(nextVisualOverrides)) {
+        if (!normalizedValidFeatureIds.has(id) && !(Array.isArray(migrationMap[id]) && migrationMap[id].some(target => normalizedValidFeatureIds.has(target)))) {
+          onDiscard(id, []);
+        }
+      }
+    }
     if (typeof onMigration !== "function") return;
     // Colour counts compare saved colour entries only; merged targets are not saved entries.
     const sourceCount = Object.keys(sourceVisualOverrides).length;
@@ -399,7 +406,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     migrationMap
   );
 
-  reportMigration(visualMigration.migratedSourceCount);
+  reportMigration(visualMigration.migratedSourceCount, migrationMap);
   delete payload.scenarioControllersByFeatureId;
   payload.visualOverrides = visualMigration.remapped;
 

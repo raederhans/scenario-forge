@@ -1,3 +1,4 @@
+import { initSelectionPanel } from "./selection_panel.js";
 import { ensureHgoIdentitySettings as ensureHgoIdentityRuntimeState } from "./sidebar/hgo_identity_state.js";
 import { createStrategicPanelView } from "./sidebar/strategic_panel_view.js";
 import { setSelectedColorState } from "../core/state/actions/appearance_selection_actions.js";
@@ -17,6 +18,8 @@ import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { pushRecentColorState } from "../core/state/actions/editor_input_actions.js";
 import { ColorManager } from "../core/color_manager.js";
+import * as renderer from "../core/map_renderer/public.js";
+import { getOwnershipDisplayName } from "../core/i18n.js";
 import {
   cancelActiveStrategicInteractionModes,
   cancelOperationGraphicDraw,
@@ -665,6 +668,7 @@ function initSidebar({ render } = {}) {
   const specialRegionColorInput = document.getElementById("specialRegionColorInput");
   const clearSpecialRegionColorBtn = document.getElementById("clearSpecialRegionColorBtn");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
+  initSelectionPanel();
   initDevWorkspace();
 
   let countryInspectorColorPickerOpen = false;
@@ -1141,13 +1145,13 @@ function initSidebar({ render } = {}) {
     documentRef: document,
     state,
     t,
-    getFeatureOwnerCode,
+    getFeatureOwnerCode: (id, feature) => callRuntimeHook(runtimeState, "resolveBorderIdentityFn", id, feature) || getFeatureOwnerCode(id),
+    getOwnerLabel: getOwnershipDisplayName,
     getFeatureLabel: getGeoFeatureDisplayLabel,
     focusGeoBounds,
     selectLandFeatureById,
   });
-  regionSearchController.mount(countryInspectorDetail);
-  countryInspectorSelected.after(countryInspectorDetail.lastElementChild);
+  regionSearchController.mount(searchInput.closest(".inspector-search-shell"));
 
   const renamedPlacesCache = { features: null, hasAny: false };
   const countryInspectorController = createCountryInspectorController({
@@ -1185,6 +1189,7 @@ function initSidebar({ render } = {}) {
     countryInspectorDetail,
     countryInspectorSelected,
     getCountryLabelStatus,
+    convertCountryLabelToMapLabel: renderer["convertCountryLabelToMapLabel"],
     countryInspectorColorRow,
     countryInspectorColorSwatch,
     countryInspectorColorInput,
@@ -1547,7 +1552,9 @@ function initSidebar({ render } = {}) {
     if (!normalizedId) return "";
     const feature = runtimeState.landIndex?.get(normalizedId);
     if (!feature) return "";
-    const ownerCode = normalizeCountryCode(getFeatureOwnerCode(normalizedId));
+    const identity = callRuntimeHook(runtimeState, "resolveBorderIdentityFn", normalizedId, feature);
+    if (identity?.startsWith("color:")) return "";
+    const ownerCode = normalizeCountryCode(identity || getFeatureOwnerCode(normalizedId));
     const featureCode = normalizeCountryCode(
       getSharedFeatureCountryCode(feature || { id: normalizedId }, { useIdFallback: true })
     );

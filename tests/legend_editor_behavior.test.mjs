@@ -43,7 +43,7 @@ test("editor resolves painted scenario identities, filters by either name and sa
   };
   const entries = LegendManager.getEditorEntries(state);
   const [country, custom] = entries;
-  assert.deepEqual(country, { color: shared, countryName: "Beta" });
+  assert.deepEqual(country, { color: shared, owner: "BBB", countryName: "Beta" });
   assert.equal(custom.countryName, "");
   for (const query of [" Alliance ", "ETA"]) {
     assert.deepEqual(filterLegendEditorEntries(entries, state.legendLabels, query), [country]);

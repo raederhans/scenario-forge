@@ -1,5 +1,6 @@
 // UI translation runtime hooks and DOM refresh helpers.
 import { state as runtimeState } from "../core/state.js";
+import { shortcutLabel } from "./command_palette.js";
 import { getHistoryActionLabel } from "../core/history_action_labels.js";
 import { callRuntimeHook, callRuntimeHooks } from "../core/state/index.js";
 import {
@@ -24,7 +25,7 @@ export function updateHistoryButton(button, direction, entry) {
   if (!button) return;
   button.disabled = !entry;
   const label = getHistoryActionLabel(direction, entry);
-  button.setAttribute("title", label);
+  button.setAttribute("title", `${label} (${shortcutLabel(direction.toLowerCase())})`);
   button.setAttribute("aria-label", label);
 }
 
@@ -544,18 +545,18 @@ function updateUIText() {
     ["toolEraserBtn", "Eraser tool"],
     ["toolEyedropperBtn", "Eyedropper tool"],
     ["brushModeBtn", "Brush"],
-    ["zoomInBtn", "Zoom in"],
-    ["zoomOutBtn", "Zoom out"],
+    ["zoomInBtn", "Zoom in", "zoomIn"],
+    ["zoomOutBtn", "Zoom out", "zoomOut"],
     ["dockReferenceBtn", "Reference"],
     ["dockExportBtn", "Open workbench"],
   ];
-  iconButtonLabels.forEach(([id, label]) => {
+  iconButtonLabels.forEach(([id, label, action]) => {
     const el = document.getElementById(id);
     if (!el) return;
     const translated = t(label, "ui");
     el.setAttribute("aria-label", translated);
     if (el.dataset.editorTooltip) el.removeAttribute("title");
-    else el.setAttribute("title", translated);
+    else el.setAttribute("title", action ? `${translated} (${shortcutLabel(action)})` : translated);
   });
 
   const zoomPercentInput = document.getElementById("zoomPercentInput");

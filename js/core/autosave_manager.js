@@ -37,7 +37,6 @@ async function transact(mode, operation) {
 const indexedStorage = {
   put: record => transact("readwrite", store => store.put(record)),
   remove: id => transact("readwrite", store => store.delete(id)),
-  list: () => transact("readonly", store => store.getAll()),
   edit: visit => transact("readwrite", store => {
     const request = store.getAll();
     request.onsuccess = () => visit(request.result, store);
@@ -51,6 +50,7 @@ export function startAutosave({
   timers = globalThis,
   dialog = (options) => Promise.resolve(callRuntimeHook(state, "showAppDialogFn", options) ?? false),
   importProject = importProjectThroughFunnel,
+  onHistoryChange = () => {},
 } = {}) {
   let timer;
   let idle;
@@ -58,8 +58,9 @@ export function startAutosave({
   let pending = Promise.resolve();
 
   function useStorage(operation) {
-    pending = pending.then(operation).catch(() => undefined);
-    return pending;
+    const result = pending.then(operation);
+    pending = result.catch(() => undefined);
+    return result;
   }
 
   function cancelScheduled() {
@@ -68,16 +69,30 @@ export function startAutosave({
     idle = null;
   }
 
-  function save() {
-    if (!state.isDirty) return;
+  function buildRecord(type) {
     const scenarioId = state.activeScenarioId || "";
     const payload = new Blob([JSON.stringify(FileManager.buildProjectPayload(state))]);
-    if (payload.size > 64 * 1024 * 1024) return;
-    const record = {
-      scenarioId, payload, savedAt: Date.now(), projectFileStem: state.projectFileStem,
+    return {
+      scenarioId, type, payload, savedAt: Date.now(), projectFileStem: state.projectFileStem,
+      projectName: state.projectName || "",
       scenarioName: getScenarioDisplayName(state.activeScenarioManifest, scenarioId, t) || t("No scenario active", "ui"),
     };
-    return useStorage(() => storage.put(record));
+  }
+
+  function save() {
+    if (!state.isDirty) return;
+    const record = buildRecord("auto");
+    if (record.payload.size > 64 * 1024 * 1024) return;
+    return useStorage(() => storage.put(record)).then(onHistoryChange, () => {});
+  }
+
+  function saveSnapshot(note) {
+    const record = { ...buildRecord("manual"), scenarioId: `manual@${crypto.randomUUID()}`, note };
+    return useStorage(() => storage.edit((records, store) => {
+      store.put(record);
+      const previous = records.filter(item => item.type === "manual").sort((a, b) => b.savedAt - a.savedAt);
+      for (const old of previous.slice(19)) store.delete(old.scenarioId);
+    })).then(onHistoryChange);
   }
 
   function schedule() {
@@ -93,7 +108,7 @@ export function startAutosave({
     if (state.isDirty) schedule();
     else if (dirtyReason === "project-export") {
       const id = state.activeScenarioId || "";
-      useStorage(() => storage.remove(id));
+      useStorage(() => storage.remove(id)).then(onHistoryChange, () => {});
     }
   });
   function onVisibilityChange() {
@@ -104,44 +119,74 @@ export function startAutosave({
   page.addEventListener("visibilitychange", onVisibilityChange);
   if (state.isDirty) schedule();
 
-  async function recover() {
-    const records = await useStorage(() => storage.list());
-    if (!records) return;
+  async function readRecords() {
     const now = Date.now();
-    let newest;
+    const history = [];
+    await useStorage(() => storage.edit((records, store) => {
+      for (const record of records) {
+        const type = record.type || (record.deferred ? "deferred" : "auto");
+        if (type !== "manual" && now - record.savedAt > WEEK) store.delete(record.scenarioId);
+        else history.push({ ...record, type });
+      }
+    }));
+    return history.sort((a, b) => b.savedAt - a.savedAt);
+  }
+
+  async function listHistory() {
+    const records = await readRecords();
     for (const record of records) {
-      if (now - record.savedAt > WEEK) await useStorage(() => storage.remove(record.scenarioId));
-      else if (!newest || record.savedAt > newest.savedAt) newest = record;
+      if (record.projectName === undefined) {
+        record.projectName = JSON.parse(await record.payload.text()).projectName || "";
+      }
     }
-    if (!newest || recoveryPromptShown) return;
+    return records;
+  }
+
+  function deleteSnapshot(record) {
+    return useStorage(() => storage.edit((records, store) => {
+      if (records.some(item => item.scenarioId === record.scenarioId && item.savedAt === record.savedAt)) {
+        store.delete(record.scenarioId);
+      }
+    })).then(onHistoryChange);
+  }
+
+  async function recover(openHistory) {
+    const history = await readRecords().catch(() => []);
+    const offered = history.filter(record => record.type === "auto");
+    if (!offered.length || recoveryPromptShown) return;
     recoveryPromptShown = true;
-    const restore = await dialog({
+    const review = await dialog({
       title: t("Unsaved changes", "ui"),
-      message: t("Found unsaved work from {count} minutes ago ({scenario}).", "ui", {
-        count: Math.max(0, Math.floor((now - newest.savedAt) / 60_000)),
-        scenario: newest.scenarioName,
-      }),
-      confirmLabel: t("Restore", "ui"),
+      message: t("Found {count} unsaved projects.", "ui", { count: offered.length }),
+      confirmLabel: t("Local history", "ui"),
       cancelLabel: t("Not now", "ui"),
     });
-    if (!restore) {
-      if (!newest.deferred) {
-        await useStorage(() => storage.edit((snapshots, store) => {
-          const deferred = { ...newest, scenarioId: `${newest.scenarioId}@${newest.savedAt}`, deferred: true };
-          store.put(deferred);
-          const current = snapshots.find(record => record.scenarioId === newest.scenarioId);
-          if (current?.savedAt === newest.savedAt) store.delete(newest.scenarioId);
-          const previous = snapshots.filter(record => record.deferred && record.scenarioId !== deferred.scenarioId);
-          for (const record of [...previous, deferred].sort((a, b) => b.savedAt - a.savedAt).slice(3)) {
-            store.delete(record.scenarioId);
-          }
-        }));
+    await useStorage(() => storage.edit((records, store) => {
+      for (const item of offered) {
+        const current = records.find(record => record.scenarioId === item.scenarioId);
+        if (current?.savedAt !== item.savedAt) continue;
+        const prefix = `${item.scenarioId}@`;
+        store.put({ ...item, type: "deferred", scenarioId: prefix + item.savedAt, deferred: true });
+        store.delete(item.scenarioId);
+        const previous = records.filter(record => record.deferred &&
+          record.scenarioId === prefix + record.savedAt);
+        for (const old of previous.sort((a, b) => b.savedAt - a.savedAt).slice(2)) store.delete(old.scenarioId);
       }
-      return;
-    }
+    })).then(onHistoryChange, () => {});
+    if (review) return openHistory();
+  }
+
+  async function restoreSnapshot(record) {
+    if (state.isDirty && !await dialog({
+      title: t("Unsaved changes", "ui"),
+      message: t("You have unsaved changes. Loading a project will replace the current map.", "ui"),
+      confirmLabel: t("Discard and Load", "ui"),
+      cancelLabel: t("Stay on Current Map", "ui"),
+      tone: "warning",
+    })) return;
     const outcome = await importProject(null, {
-      fileName: newest.projectFileStem ? `${newest.projectFileStem}.json` : "",
-      projectPayload: JSON.parse(await newest.payload.text()),
+      fileName: record.projectFileStem ? `${record.projectFileStem}.json` : "",
+      projectPayload: JSON.parse(await record.payload.text()),
       ui: { t, showAppDialog: dialog, showToast: (...args) => callRuntimeHook(state, "showToastFn", ...args) },
       hooks: { refreshColorState: options => callRuntimeHook(state, "refreshColorStateFn", options) },
     });
@@ -149,7 +194,7 @@ export function startAutosave({
   }
 
   return {
-    recover,
+    recover, listHistory, saveSnapshot, restoreSnapshot, deleteSnapshot,
     dispose() {
       cancelScheduled();
       unsubscribe();

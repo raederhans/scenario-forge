@@ -1,3 +1,5 @@
+import { hasMapTitles } from "../../core/map_renderer/public.js";
+
 export const EXPORT_MAX_DIMENSION_PX = 7680;
 export const EXPORT_MAX_PIXELS = 7680 * 4320;
 
@@ -27,6 +29,25 @@ export function resolveExportBaseDimensions(
   const width = Math.round(Number(logicalWidth || fallbackLogicalWidth || 0));
   const height = Math.round(Number(logicalHeight || fallbackLogicalHeight || 0));
   return { width, height };
+}
+
+export function getExportScaleInfo(state, scale, passGroups, isOverBudget, renderRatio = Number(scale)) {
+  const base = resolveExportBaseDimensions(state.dpr, state.width, state.height, state.colorCanvas?.width, state.colorCanvas?.height);
+  const width = Math.round(base.width * scale);
+  const height = Math.round(base.height * scale);
+  let reason = "";
+  if (width > EXPORT_MAX_DIMENSION_PX || height > EXPORT_MAX_DIMENSION_PX || width * height > EXPORT_MAX_PIXELS) {
+    reason = "Exceeds 8K limit";
+  } else if (passGroups.some(passes => isOverBudget(passes, renderRatio))) {
+    reason = "Exceeds render budget";
+  }
+  return { width, height, reason };
+}
+
+export function encodeExportCanvas(canvas, mime) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Unable to encode artifact canvas.")), mime, 0.92);
+  });
 }
 
 export function buildExportAdjustmentFilter(exportUi) {
@@ -76,7 +97,7 @@ export function getBakePackLayerIds(exportUi) {
   );
   const hasVisibleMainLayers = visibleMainLayers.length > 0;
   const hasEffectsLayer = visibleMainLayers.includes("effects");
-  const hasTextLayer = Object.values(exportUi?.textVisibility || {}).some(Boolean);
+  const hasTextLayer = Object.values(exportUi?.textVisibility || {}).some(Boolean) || hasMapTitles(exportUi?.mapTitles);
   const next = [];
   if (hasVisibleMainLayers) next.push("color");
   if (hasEffectsLayer) next.push("line");
@@ -126,6 +147,7 @@ export function buildPerLayerExportPlan(exportUi) {
   if (exportUi?.textVisibility?.["svg-annotations"]) outputs.push({ id: "svg-annotations" });
   if (exportUi?.textVisibility?.["special-zones"]) outputs.push({ id: "special-zones" });
   if (exportUi?.textVisibility?.legend) outputs.push({ id: "legend" });
+  if (hasMapTitles(exportUi?.mapTitles)) outputs.push({ id: "map-titles" });
   return outputs;
 }
 

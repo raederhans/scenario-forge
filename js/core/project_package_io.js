@@ -253,10 +253,16 @@ function buildJsonProjectFile(text, filename = "map_project.json") {
   return blob;
 }
 
+function projectZipLimitError(message) {
+  return Object.assign(new Error(message), {
+    userMessage: "This project ZIP exceeds the import limit. Export the project as JSON instead.",
+  });
+}
+
 function assertProjectZipFileBudget(file) {
   const size = Number(file?.size || 0) || 0;
   if (size > MAX_PROJECT_PACKAGE_ZIP_BYTES) {
-    throw new Error("Project ZIP is too large for editable project import.");
+    throw projectZipLimitError("Project ZIP is too large for editable project import.");
   }
 }
 
@@ -290,7 +296,7 @@ async function readProjectZipEntries(file, signal) {
     if (failure) throw failure;
     entryCount += 1;
     if (entryCount > MAX_PROJECT_PACKAGE_ENTRY_COUNT) {
-      throw new Error("Project ZIP contains too many files for editable project import.");
+      throw projectZipLimitError("Project ZIP contains too many files for editable project import.");
     }
     if (Object.hasOwn(entries, entry.name)) throw new Error(`Duplicate project package file path: ${entry.name}`);
     entries[entry.name] = null;
@@ -301,7 +307,7 @@ async function readProjectZipEntries(file, signal) {
       if (error) { failure = error; return; }
       totalBytes += chunk.byteLength;
       if (totalBytes > MAX_PROJECT_PACKAGE_UNZIPPED_BYTES) {
-        failure = new Error("Project ZIP expands beyond the editable project import limit.");
+        failure = projectZipLimitError("Project ZIP expands beyond the editable project import limit.");
         return;
       }
       chunks.push(chunk);
@@ -457,13 +463,24 @@ async function validateManifestProjectEntry({ manifest, projectBytes, selectedPr
   }
 }
 
-async function prepareProjectImportFile(file, { materializeFile = true, signal } = {}) {
+async function prepareProjectImportFile(file, options = {}) {
+  try {
+    return await unpackProjectFile(file, options);
+  } catch (error) {
+    if (error.name !== "AbortError") error.userMessage ||= "The project ZIP could not be opened. Ask the sender to export it again.";
+    throw error;
+  }
+}
+
+async function unpackProjectFile(file, { materializeFile = true, signal } = {}) {
   checkImportCancellation(signal);
   if (!fileLooksLikeProjectZip(file)) {
     return { file, preview: null, manifest: null };
   }
   if (!file || typeof file.arrayBuffer !== "function") {
-    throw new Error("Project ZIP cannot be read by this browser.");
+    throw Object.assign(new Error("Project ZIP cannot be read by this browser."), {
+      userMessage: "This browser cannot read the project ZIP. Open the editable JSON file instead.",
+    });
   }
   assertProjectZipFileBudget(file);
   const entries = await readProjectZipEntries(file, signal);

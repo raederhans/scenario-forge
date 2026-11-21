@@ -77,7 +77,7 @@ test("merge matches actual fallback IDs and preserves selection order", () => {
   assert.deepEqual(h.merged[0].map((geometry) => geometry.id), ["b", "a"]);
   assert.equal(h.devGroup.rows.length, 1);
   assert.equal(h.devGroup.rows[0].properties.selectionGeometry, "topology-boolean-merge");
-  assert.equal(h.devGroup.attrs["aria-label"], "Development selection overlay (2)");
+  assert.equal(h.devGroup.attrs["aria-label"], "2 parcels selected");
   assert.equal(h.devGroup.pathAttrs["vector-effect"], "non-scaling-stroke");
   assert.equal(h.devGroup.pathAttrs.d, h.path);
 });

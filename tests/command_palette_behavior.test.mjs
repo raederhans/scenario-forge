@@ -161,8 +161,16 @@ test("disabled and missing buttons are omitted and ? lists shortcuts", () => {
   h.palette.open();
   assert.equal(h.options().length, 2);
   h.filter("?");
-  assert.equal(h.options().length, 1);
-  assert.equal(h.options()[0].children[1].textContent, "F");
+  assert.equal(h.options().length, 0);
+  const results = h.get("editorCommandResults");
+  assert.equal(results.getAttribute("role"), "region");
+  assert.equal(h.doc.activeElement, results);
+  const keys = results.querySelectorAll("kbd").map(node => node.textContent);
+  for (const shortcut of ["F / Q", "1 / 2 / 3 / 4 / 5 / 6", "Alt+Click", "Double-click"]) {
+    assert.ok(keys.includes(shortcut));
+  }
+  h.press("Enter");
+  assert.deepEqual(h.clicks, []);
 });
 
 test("results are capped at fifty", () => {

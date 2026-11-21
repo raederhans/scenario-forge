@@ -17,7 +17,6 @@ function setup(t, options = {}) {
   const page = new EventTarget();
   const records = new Map();
   const storage = {
-    list: () => [...records.values()],
     put: t.mock.fn(record => records.set(record.scenarioId, record)),
     remove: id => records.delete(id),
     edit: visit => visit([...records.values()], { put: storage.put, delete: storage.remove }),
@@ -108,23 +107,32 @@ function snapshot(scenarioId, age) {
   };
 }
 
-test("startup offers the newest snapshot, imports the chosen payload and keeps it dirty", async t => {
+test("startup opens history and restores only the selected version after discard confirmation", async t => {
   const dialog = t.mock.fn(() => true);
   const importProject = t.mock.fn(() => ({ status: "committed" }));
   const { records, manager } = setup(t, { dialog, importProject });
   records.set("older", snapshot("older", WEEK));
   records.set("1936", snapshot("1936", 120_000));
-  await manager.recover();
+  const openHistory = t.mock.fn();
+  await manager.recover(openHistory);
   const [{ message, confirmLabel, cancelLabel }] = dialog.mock.calls[0].arguments;
-  assert.equal(message, "发现 2 分钟前未保存的工作（欧洲）。");
-  assert.deepEqual([confirmLabel, cancelLabel], ["恢复", "暂不恢复"]);
+  assert.equal(message, "发现 2 份未保存的工作。");
+  assert.deepEqual([confirmLabel, cancelLabel], ["本地历史", "暂不恢复"]);
   assert.equal(dialog.mock.callCount(), 1);
-  assert.deepEqual(importProject.mock.calls[0].arguments[1].projectPayload, { scenario: { id: "1936" } });
+  assert.equal(openHistory.mock.callCount(), 1);
+  const history = await manager.listHistory();
+  assert.deepEqual(history.map(record => record.scenarioId), [`1936@${NOW - 120_000}`, `older@${NOW - WEEK}`]);
+  markDirty("paint");
+  dialog.mock.mockImplementationOnce(() => false);
+  await manager.restoreSnapshot(history[1]);
+  assert.equal(importProject.mock.callCount(), 0);
+  await manager.restoreSnapshot(history[1]);
+  assert.deepEqual(importProject.mock.calls[0].arguments[1].projectPayload, { scenario: { id: "older" } });
   assert.equal(state.isDirty, true);
   assert.equal(records.size, 2);
 });
 
-test("dismissing recovery preserves fresh snapshots and defers the prompt until the next startup", async t => {
+test("dismissing recovery keeps every offered project in history without prompting next startup", async t => {
   const dialog = t.mock.fn(() => false);
   const importProject = t.mock.fn();
   const { records, manager, storage, page } = setup(t, { dialog, importProject });
@@ -135,18 +143,18 @@ test("dismissing recovery preserves fresh snapshots and defers the prompt until 
   await manager.recover();
   assert.equal(dialog.mock.callCount(), 1);
   assert.equal(importProject.mock.callCount(), 0);
-  assert.deepEqual([...records.keys()], ["valid", `latest@${NOW - 60_000}`]);
+  assert.deepEqual([...records.keys()], [`latest@${NOW - 60_000}`, `valid@${NOW - WEEK}`]);
 
   manager.dispose();
   const nextSession = startAutosave({ storage, page, dialog, importProject });
   t.after(nextSession.dispose);
   await nextSession.recover();
-  assert.equal(dialog.mock.callCount(), 2);
+  assert.equal(dialog.mock.callCount(), 1);
 });
 
 test("storage failures during startup, autosave and export cleanup stay local", async t => {
   const fail = t.mock.fn(() => { throw Error("storage unavailable"); });
-  const { manager } = setup(t, { storage: { list: fail, put: fail, remove: fail } });
+  const { manager } = setup(t, { storage: { edit: fail, put: fail, remove: fail } });
   await manager.recover();
   markDirty("paint");
   t.mock.timers.tick(30_000);
@@ -167,4 +175,34 @@ test("oversized UTF-8 payload leaves the previous snapshot intact", async t => {
   await nextTurn();
   assert.equal(storage.put.mock.callCount(), 0);
   assert.equal(records.get("1936"), previous);
+});
+
+test("manual snapshots keep the latest twenty versions across projects, never expire and can be deleted", async t => {
+  const dialog = t.mock.fn();
+  const { records, manager } = setup(t, { dialog });
+  records.set("legacy@1", { ...snapshot("legacy@1", 10), deferred: true,
+    payload: new Blob([JSON.stringify({ projectName: "Legacy project" })]) });
+  const [legacy] = await manager.listHistory();
+  assert.equal(legacy.type, "deferred");
+  assert.equal(legacy.projectName, "Legacy project");
+  for (let i = 0; i < 21; i++) {
+    state.activeScenarioId = i % 2 ? "older" : "1936";
+    state.projectName = `Project ${i}`;
+    await manager.saveSnapshot(`Version ${i}`);
+    t.mock.timers.tick(1);
+  }
+  assert.equal(records.size, 21);
+  t.mock.timers.tick(WEEK + 1);
+  await manager.recover();
+  assert.equal(dialog.mock.callCount(), 0);
+  const versions = await manager.listHistory();
+  assert.equal(versions.length, 20);
+  assert.deepEqual(versions.map(record => record.note),
+    Array.from({ length: 20 }, (_, i) => `Version ${20 - i}`));
+  const chosen = versions[4];
+  assert.equal(chosen.projectName, "Project 16");
+  assert.equal(JSON.parse(await chosen.payload.text()).projectName, "Project 16");
+  await manager.deleteSnapshot(chosen);
+  assert.equal(records.size, 19);
+  assert.equal(records.has(chosen.scenarioId), false);
 });

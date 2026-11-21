@@ -29,7 +29,7 @@ export function resolveFeatureMergeLineage(lineage, scenarioId = "", splits = {}
 // member means its default, not consent to copy a neighbour's edit.
 // A member stays valid in the shared base topology after a scenario-scoped
 // merge, so membership in this scenario's lineage decides, not ID validity.
-export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) {
+export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds, onDiscard) {
   const { isMerged, resolve, leavesOf, splits = {} } = lineage;
   const counts = () => ({ migratedEntries: 0, droppedEntries: 0 });
   const summary = { visualOverrides: { ...counts(), createdEntries: 0 }, auxiliary: counts() };
@@ -68,6 +68,7 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
         visual.createdEntries += 1;
       } else {
         visual.droppedEntries += sources.length;
+        sources.forEach(id => onDiscard?.(id, splits[target] || [target]));
       }
     }
     const nearestFirst = Object.entries(splits).sort(([a, aLeaves], [b, bLeaves]) =>
@@ -101,6 +102,7 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
         auxiliary.migratedEntries += sources.length;
       } else {
         auxiliary.droppedEntries += sources.length;
+        sources.forEach(id => onDiscard?.(id, splits[target] || [target]));
       }
     }
     return [...new Set(result.flatMap((id) => {
@@ -114,6 +116,7 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
     const target = targetOf(id);
     if (splits[target || id]) {
       auxiliary.droppedEntries += 1;
+      onDiscard?.(id, splits[target || id]);
       return "";
     }
     if (!target) return id;

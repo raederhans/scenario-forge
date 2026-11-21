@@ -56,7 +56,7 @@ function normalizeIdentity(value) {
   return value === null || value.trim().length === 0 ? null : value;
 }
 
-export function resolveClickSelectionDecision(resolvedHit, readonlyModifiers) {
+export function resolveClickSelectionDecision(resolvedHit, readonlyModifiers, currentTool = "select") {
   requireExactDataRecord(resolvedHit, RESOLVED_HIT_KEYS, "resolvedHit");
   requireExactDataRecord(readonlyModifiers, READONLY_MODIFIER_KEYS, "readonlyModifiers");
 
@@ -82,7 +82,8 @@ export function resolveClickSelectionDecision(resolvedHit, readonlyModifiers) {
         runtimeCountryCode: normalizeIdentity(resolvedHit.runtimeCountryCode),
       };
   const decision = {
-    devSelectionRequested: target.kind === "land" && (readonlyModifiers.ctrlKey || readonlyModifiers.metaKey),
+    devSelectionRequested: currentTool === "select" && target.kind === "land"
+      && (readonlyModifiers.ctrlKey || readonlyModifiers.metaKey || readonlyModifiers.shiftKey),
   };
   return { decision, target };
 }
@@ -267,7 +268,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       shiftKey: !!event?.shiftKey,
       altKey: !!event?.altKey,
     });
-    const { decision, target } = resolveClickSelectionDecision(resolvedHit, readonlyModifiers);
+    const { decision, target } = resolveClickSelectionDecision(resolvedHit, readonlyModifiers, state.currentTool);
     // City points may influence hover messaging, but paint/select stays bound to
     // the canonical land/water/special hit pipeline only.
     const id = target.id;
@@ -319,7 +320,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       if (!waterFeature) return;
       const previousSpecialRegionId = String(state.selectedSpecialRegionId || "").trim();
       const previousWaterRegionId = String(state.selectedWaterRegionId || "").trim();
-      const isSelectionToggle = readonlyModifiers.ctrlKey || readonlyModifiers.metaKey;
+      const isSelectionToggle = state.currentTool === "select" && (readonlyModifiers.ctrlKey || readonlyModifiers.metaKey);
       if (isSelectionToggle && event?.preventDefault) event.preventDefault();
       setClickSelectedSpecialRegionId("");
       if (isSelectionToggle && previousWaterRegionId === id) {
@@ -468,7 +469,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
 
     const selectedColor = getSafeCanvasColor(state.selectedColor, landFillColor);
     const clickCount = Math.max(1, Number(event?.detail || 1));
-    if (!countryScope && clickCount >= 2 && isDoubleClickBatchEligible(landHit, feature)) {
+    if (!countryScope && clickCount >= 2 && isDoubleClickBatchEligible(landHit, feature, event)) {
       return;
     }
     setClickSelectedColor(selectedColor);

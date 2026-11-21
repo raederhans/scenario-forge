@@ -4,11 +4,10 @@ import { doScreenLabelBoxesOverlap } from "./screen_label_placement.js";
 import { getMapLabelHierarchy, getCountryLabelOpacity } from "./map_label_hierarchy.js";
 
 import { CHINESE_FONT, ENGLISH_FONT, fontWeight, displayText, COUNTRY_LABEL_TRACKING,
-  FADE_IN_START_PX, FADE_IN_END_PX, MAX_ALPHA } from "./country_label_text_style.js";
+  FADE_IN_START_PX, FADE_IN_END_PX, MAX_ALPHA, getVisibilityAlpha } from "./country_label_text_style.js";
 const METRIC_FONT_SIZE = 100;
 const MAX_CACHED_FITS = 4;
 const MAX_PENDING_WORKER_FITS = 8;
-const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const segmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
 
 function ringMetrics(ring) {
@@ -140,15 +139,6 @@ export function projectCountryLabelPolygons(feature, projection, geoStream) {
 const LAYOUT_MIN_FONT_SIZE = 0.12;
 const LAYOUT_MAX_FONT_SIZE = 96;
 const LAYOUT_MIN_HOLE_AREA = 4;
-const FADE_OUT_START_PX = 120;
-const FADE_OUT_END_PX = 200;
-
-function getVisibilityAlpha(fontSizePx) {
-  const legible = clamp((fontSizePx - FADE_IN_START_PX) / (FADE_IN_END_PX - FADE_IN_START_PX), 0, 1);
-  const overview = clamp((FADE_OUT_END_PX - fontSizePx) / (FADE_OUT_END_PX - FADE_OUT_START_PX), 0, 1);
-  return legible * overview * MAX_ALPHA;
-}
-
 function screenBox(box, transform, padding) {
   const corners = box.corners;
   const minX = box.minX ?? (corners?.length ? Math.min(...corners.map((point) => point.x)) : undefined);
@@ -508,21 +498,31 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
 
   function getGeometry(source, projection) {
     const identity = getProjectionIdentity();
-    if (geometryCache && geometryCache.sourceToken === source.sourceToken
-      && geometryCache.revision === source.revision && geometryCache.projection === projection
-      && geometryCache.identity === identity) return geometryCache;
+    const sameSource = geometryCache && geometryCache.sourceToken === source.sourceToken
+      && geometryCache.projection === projection && geometryCache.identity === identity;
+    if (sameSource && geometryCache.revision === source.revision) return geometryCache;
     cancelPrivatePreparation();
     deferredPreparation = null;
+    const previousEntries = sameSource && !workerFailed
+      ? new Map(geometryCache.entries.map(entry => [entry.countryCode, entry])) : null;
     const entries = (source.countries || []).map((record, index) => {
       const shape = record.geometry || record.feature?.geometry;
+      const previous = previousEntries?.get(record.countryCode);
+      if (previous && previous.shape === shape) {
+        previous.workerHasGeometry = false;
+        return previous;
+      }
       const inputPolygons = shape?.type === "MultiPolygon" ? shape.coordinates
         : shape?.type === "Polygon" ? [shape.coordinates] : [];
-      return { countryCode: record.countryCode, inputPolygons, projectedPolygons: [], polygonCursor: 0,
+      return { countryCode: record.countryCode, shape, inputPolygons, projectedPolygons: [], polygonCursor: 0,
         polygons: null, bounds: null, components: [], candidates: null, fits: new Map(),
         workerPending: new Set(), workerHasGeometry: false, workerSlot: index % maxLayoutWorkers };
     });
-    terminateLayoutWorkers();
-    for (const pending of workerRequests.values()) clearRequestTimeout(pending.timeout);
+    if (!previousEntries || workerRequests.size) terminateLayoutWorkers();
+    for (const pending of workerRequests.values()) {
+      clearRequestTimeout(pending.timeout);
+      pending.entry.workerPending.delete(pending.key);
+    }
     workerRequests.clear();
     scheduledContinuation = null;
     // A failure stops this generation; a new scene or projection owns a fresh
@@ -533,13 +533,15 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     diagnostics.preparedGeometryBytes = 0;
     cacheGeneration += 1;
     diagnostics.geometryBuilds += 1;
-    diagnostics.projectedCountries = 0;
+    diagnostics.projectedCountries = entries.filter(entry => entry.polygons?.length).length;
     diagnostics.candidateCount = 0;
     geometryCache = { sourceToken: source.sourceToken, revision: source.revision, projection, identity, entries };
     // A replaced source/projection also releases obsolete text measurements.
-    glyphMetrics.clear();
+    if (!previousEntries) glyphMetrics.clear();
     if (typeof helpers.onInvalidate !== "function") {
-      for (const entry of entries) projectEntry(entry, projection);
+      for (const entry of entries) {
+        if (!entry.polygons) projectEntry(entry, projection);
+      }
     }
     return geometryCache;
   }
@@ -903,7 +905,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
         const x = Math.min(...inkBoxes.map(box => box.x)), y = Math.min(...inkBoxes.map(box => box.y));
         diagnostics.lastLabels.push({ countryCode: entry.countryCode, text,
           fontSizePx: fontSize * k, alpha, candidateIndex: fit.candidateIndex, polygonIndex: fit.polygonIndex,
-          candidateKind: fit.candidateKind,
+          candidateKind: fit.candidateKind, angle: fit.candidateKind === "tilted" ? glyphs[0].angle : 0,
           lineCount: fit.lineCount || 1,
           bounds: { x, y, w: Math.max(...inkBoxes.map(box => box.x + box.w)) - x,
             h: Math.max(...inkBoxes.map(box => box.y + box.h)) - y } });

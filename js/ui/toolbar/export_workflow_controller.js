@@ -5,7 +5,7 @@ import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../
 import { buildExportArtifactPackage } from "../../core/export_artifact_package.js";
 import { showToast } from "../components/toast.js";
 import { showExportFailureToast } from "./export_failure_handler.js";
-import { buildBakePackMetadata, buildBakePackPackageFiles, buildExportArtifactProjectContext, buildExportArtifactScenarioContext, buildExportUiManifestSnapshot, buildPerLayerPackageFiles, getBakePackLayerIds } from "./export_artifact_model.js";
+import { encodeExportCanvas, buildBakePackMetadata, buildBakePackPackageFiles, buildExportArtifactProjectContext, buildExportArtifactScenarioContext, buildExportUiManifestSnapshot, buildPerLayerPackageFiles, getBakePackLayerIds } from "./export_artifact_model.js";
 import { createExportWorkbenchController } from "./export_workbench_controller.js";
 
 const EXPORT_MAX_CONCURRENT_JOBS = 1;
@@ -13,6 +13,7 @@ const EXPORT_MAX_CONCURRENT_JOBS = 1;
 export function createExportWorkflowController({
   state, document, t, closeDockPopover, closeScenarioGuide,
   renderPassNames: RENDER_PASS_NAMES,
+  isExportRenderOverBudget, getOceanBaseFillColor,
   renderExportPassesToCanvas,
   assertPopulationHeatmapReadyForExport,
   ensurePopulationHeatmapReadyForExport,
@@ -143,13 +144,9 @@ export function createExportWorkflowController({
     }
   };
 
-  const getSelectedExportScale = () => {
-    const rawValue = String(exportScale?.value || ensureExportWorkbenchUiState().scale || "2").trim();
-    return ["1", "1.5", "2", "4"].includes(rawValue) ? Number(rawValue) : 2;
-  };
-
-  const buildPerLayerExportPackage = async (exportUi, scaleMultiplier) => {
+  const buildPerLayerExportPackage = async (exportUi, scaleMultiplier, onEncoding) => {
     const outputs = await buildPerLayerExportOutputs(exportUi, scaleMultiplier);
+    await onEncoding();
     return buildExportArtifactPackage({
       artifactKind: "per-layer",
       fileStem: "map_layers",
@@ -188,8 +185,9 @@ export function createExportWorkflowController({
     return outputs;
   };
 
-  const buildBakePackPackage = async (exportUi, scaleMultiplier) => {
+  const buildBakePackPackage = async (exportUi, scaleMultiplier, onEncoding) => {
     const outputs = await buildBakePackOutputs(exportUi, scaleMultiplier);
+    await onEncoding();
     return buildExportArtifactPackage({
       artifactKind: "bake-pack",
       fileStem: "map_bake_pack",
@@ -213,15 +211,17 @@ export function createExportWorkflowController({
     return buildDefaultFileStem(runtimeState, new Date(), suffix) + suffix;
   };
 
-  const triggerCanvasDownload = (canvas, extension, fileStem) => {
-    const format = extension === "jpg" ? "image/jpeg" : "image/png";
-    const dataUrl = canvas.toDataURL(format, 0.92);
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = buildDownloadName(fileStem, extension);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+  const triggerCanvasDownload = async (canvas, extension, fileStem) => {
+    if (extension === "jpg") {
+      const ctx = canvas.getContext("2d");
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.fillStyle = getOceanBaseFillColor();
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+    const blob = await encodeExportCanvas(canvas, extension === "jpg" ? "image/jpeg" : "image/png");
+    triggerBlobDownload(blob, extension, fileStem);
   };
 
   const triggerBlobDownload = (blob, extension, fileStem) => {
@@ -232,7 +232,7 @@ export function createExportWorkflowController({
     document.body.appendChild(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(objectUrl);
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
   };
 
   const syncExportWorkbenchControlsFromState = () => {
@@ -287,7 +287,13 @@ export function createExportWorkflowController({
     buildBakePackOutputs: (...args) => buildBakePackOutputs(...args),
     buildBakePackPackage: (...args) => buildBakePackPackage(...args),
     buildCompositeExportCanvas: (...args) => buildCompositeExportCanvas(...args),
-    getSelectedExportScale: (...args) => getSelectedExportScale(...args),
+    isExportRenderOverBudget,
+    exportCopyBtn: document.getElementById("exportCopyBtn"),
+    exportJobStatus: document.getElementById("exportJobStatus"),
+    quickReexportBtn: document.getElementById("quickReexportBtn"),
+    transparentBackground: document.getElementById("exportTransparentBackground"),
+    jpegHint: document.getElementById("exportJpegHint"),
+    openSettings: () => callRuntimeHook(state, "openExportWorkbenchFn", exportBtn),
     triggerCanvasDownload: (...args) => triggerCanvasDownload(...args),
     triggerBlobDownload: (...args) => triggerBlobDownload(...args),
     bakeLayer: (...args) => bakeLayer(...args),
@@ -295,6 +301,7 @@ export function createExportWorkflowController({
     exportMaxConcurrentJobs: EXPORT_MAX_CONCURRENT_JOBS,
   });
   ensureExportWorkbenchUiState = exportWorkbenchController.ensureExportWorkbenchUiState;
+  registerRuntimeHook(state, "runQuickReexportFn", () => exportWorkbenchController.handleExportAction());
   registerRuntimeHook(state, "clearExportBakeCacheFn", clearExportBakeCache);
   const bindEntryEvents = () => {
     const workspaceExportBtn = document.getElementById("workspaceExportBtn");

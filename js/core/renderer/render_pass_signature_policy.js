@@ -313,6 +313,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         stableJson(runtimeState.styleConfig?.strategicValues || {}),
         ...getTransportPresentationSignatureParts(),
         ...getUrbanCityRenderPassSignatureParts(runtimeState, "contextMarkers"),
+        getObjectIdentityToken(runtimeState.cityNameOverrides),
         stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
       ].join("::");
     }
@@ -331,6 +332,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         getObjectIdentityToken(runtimeState.scenarioCountriesByTag),
         getObjectIdentityToken(runtimeState.countryNames),
         getObjectIdentityToken(runtimeState.countryNameOverrides),
+        getObjectIdentityToken(runtimeState.cityNameOverrides),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
         countryLabels?.enabled !== false

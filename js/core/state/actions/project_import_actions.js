@@ -7,9 +7,12 @@ export function captureProjectImportState(target) {
     allowOpenOceanSelect: target.allowOpenOceanSelect,
     annotationView: target.annotationView,
     appearancePresets: target.appearancePresets,
+    onlyUnpainted: target.onlyUnpainted,
     batchFillScope: target.batchFillScope,
     customPresets: target.customPresets,
+    legendConfig: target.legendConfig,
     countryNameOverrides: target.countryNameOverrides,
+    cityNameOverrides: target.cityNameOverrides,
     devClipboardFallbackText: target.devClipboardFallbackText,
     devClipboardPreviewFormat: target.devClipboardPreviewFormat,
     devHoverHit: target.devHoverHit,
@@ -87,9 +90,13 @@ export function captureProjectImportState(target) {
 }
 
 export function applyProjectImportPatch(target, patch) {
+  if (Object.hasOwn(patch, "onlyUnpainted")) target.onlyUnpainted = patch.onlyUnpainted;
   if (Object.hasOwn(patch, "annotationView")) target.annotationView = patch.annotationView;
   if (Object.hasOwn(patch, "customPresets")) target.customPresets = patch.customPresets;
+  // 文件导入时已归一化；回滚要恢复原对象引用。
+  if (Object.hasOwn(patch, "legendConfig")) target.legendConfig = patch.legendConfig;
   if (Object.hasOwn(patch, "countryNameOverrides")) target.countryNameOverrides = patch.countryNameOverrides;
+  if (Object.hasOwn(patch, "cityNameOverrides")) target.cityNameOverrides = patch.cityNameOverrides;
   if (Object.hasOwn(patch, "devClipboardFallbackText")) target.devClipboardFallbackText = patch.devClipboardFallbackText;
   if (Object.hasOwn(patch, "devClipboardPreviewFormat")) target.devClipboardPreviewFormat = patch.devClipboardPreviewFormat;
   if (Object.hasOwn(patch, "devHoverHit")) target.devHoverHit = patch.devHoverHit;

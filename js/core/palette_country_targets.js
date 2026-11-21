@@ -1,4 +1,16 @@
 import { getMapDataBoundary } from "./map_data_boundary.js";
+import { createBorderIdentityResolver } from "./renderer/border_identity.js";
+import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
+
+export function createPaletteOwnerResolver(state) {
+  const tags = state.activeScenarioId ? getScenarioCountryTags(state.scenarioCountriesByTag) : null;
+  return createBorderIdentityResolver({
+    sovereignBaseColors: state.sovereignBaseColors,
+    getCountryTags: () => tags,
+    getReferenceOwner: getMapDataBoundary(state).reference.getBaseGroupCode,
+    getOverrideColor: id => state.visualOverrides?.[id],
+  });
+}
 
 // Use reference identity, including unhydrated scenario members, never RGB.
 export function getPaletteCountryTargets(state) {

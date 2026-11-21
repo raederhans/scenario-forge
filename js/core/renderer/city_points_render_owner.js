@@ -341,6 +341,7 @@ export function createCityPointsRenderOwner({
   function getCityRevealViewKey(cityCollection, scale, transform, config, currentProjection = getProjection()) {
     return [
       cityCollection, cityCollection?.features, cityCollection?.features?.length, runtimeState.cityLayerRevision,
+      runtimeState.cityNameOverrides,
       runtimeState.showCityPoints, runtimeState.worldCitiesData, runtimeState.scenarioCityOverridesData,
       !!runtimeState.showModernPlaceNames, runtimeState.currentLanguage,
       runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.scenarioDataGeneration,

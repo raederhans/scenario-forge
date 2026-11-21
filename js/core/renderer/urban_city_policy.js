@@ -508,6 +508,8 @@ export function createUrbanCityPolicyOwner({
 
     const paintOverscanPx = getCityPaintOverscanPx();
     const createCandidateEntry = (feature) => {
+        const cityId = getCityCanonicalId(feature) || getCityFeatureKey(feature);
+        if (state?.cityNameOverrides?.[cityId]?.hidden) return null;
         const anchor = getCityAnchor(feature);
         if (!anchor || !isCityAnchorInViewport(anchor, { padding: paintOverscanPx, transform })) {
           return null;
@@ -546,7 +548,7 @@ export function createUrbanCityPolicyOwner({
           feature,
           anchor,
           screenPoint: getCityScreenPoint(anchor, transform),
-          cityId: getCityCanonicalId(feature) || getCityFeatureKey(feature),
+          cityId,
           isCapital,
           minZoom,
           cityTier,

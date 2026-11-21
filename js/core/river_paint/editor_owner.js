@@ -31,9 +31,12 @@ export function createRiverPaintEditorOwner({ state, captureHistoryState, commit
     if (!state.riverPaint?.editMode || state.interactionGranularity === 'country'
       || !['fill', 'eraser'].includes(state.currentTool)) return { consumed: true, changed: false };
     if (brushSession?.visitedRiverCellIds?.has(cellId)) return { consumed: true, changed: false };
+    const remove = state.currentTool === 'eraser';
+    if (!remove && state.onlyUnpainted && Object.hasOwn(state.riverPaint.overrides, cellId)) {
+      return { consumed: true, changed: false };
+    }
     const started = nowMs();
     const before = captureHistoryState({ riverCellIds: [cellId] });
-    const remove = state.currentTool === 'eraser';
     const result = applyRiverCellPaintState(state, cellId, state.selectedColor, { remove });
     if (brushSession) {
       brushSession.visitedRiverCellIds ||= new Set();

@@ -1,3 +1,4 @@
+import { bindHistoryPanel } from "./history_panel.js";
 import { normalizeBorderColor } from "./toolbar/appearance_border_owner.js";
 import { createRiverPaintControls } from "./river_paint_controls.js";
 import { createRiverCellPicker } from "./river_cell_picker.js";
@@ -28,6 +29,8 @@ import {
   zoomByStep,
   setZoomPercent,
   RENDER_PASS_NAMES,
+  isExportRenderOverBudget,
+  getOceanBaseFillColor,
   renderExportPassesToCanvas,
   assertPopulationHeatmapReadyForExport,
   ensurePopulationHeatmapReadyForExport,
@@ -50,6 +53,8 @@ import {
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario/scenario_resources.js";
 import { getDirectGeoLabel, toggleLanguage, updateHistoryButton, updateUIText, t } from "./i18n.js";
 import { showToast } from "./components/toast.js";
+import { getNextQuickFillLevel } from "./toolbar/quick_fill_level_controls.js";
+import { setBatchFillScopeState } from "../core/state/actions/scenario_presentation_actions.js";
 import { createToolGuidance } from "./toolbar/tool_guidance.js";
 import { createMobileEditingHintController } from "./toolbar/mobile_editing_hint_controller.js";
 import { createUiIcon, setUiIcon } from "./components/ui_icons.js";
@@ -184,6 +189,19 @@ function populatePaletteSourceOptions(select) {
 
 
 
+export function confirmAutoFill(state, showDialog) {
+  const count = Object.keys(state.visualOverrides || {}).length + Object.keys(state.riverPaint?.overrides || {}).length;
+  if (!count && !Object.keys(state.sovereignBaseColors || {}).length) return true;
+  return showDialog({
+    title: t("Auto-fill map", "ui"),
+    message: t("Clear {count} manually painted regions and reset country colors?", "ui", { count }),
+    details: t("Auto-fill also resets the ocean color. You can undo this from history.", "ui"),
+    confirmLabel: t("Auto-fill map", "ui"),
+    cancelLabel: t("Keep Current Map", "ui"),
+    tone: "warning",
+  });
+}
+
 function initToolbar({ render } = {}) {
   // toolbar.js 保留的是壳层接线职责：集中拿 DOM、拼 controller、注册 runtime hooks。
   // 各个面板自身的业务逻辑应继续留在子 controller，避免再把 owner 逻辑回流到这个大文件。
@@ -303,6 +321,7 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchCoverageSections = document.getElementById("transportWorkbenchCoverageSections");
   const transportWorkbenchDataSections = document.getElementById("transportWorkbenchDataSections");
   const transportWorkbenchFamilyTabs = Array.from(document.querySelectorAll(".transport-workbench-family-tab"));
+  const protectPaint = document.getElementById("onlyUnpainted");
   const dockQuickFillRow = document.getElementById("dockQuickFillRow");
   const quickFillParentBtn = document.getElementById("quickFillParentBtn");
   const quickFillCountryBtn = document.getElementById("quickFillCountryBtn");
@@ -527,6 +546,8 @@ function initToolbar({ render } = {}) {
   const exportWorkflowController = createExportWorkflowController({
     state, document, t,
     renderPassNames: RENDER_PASS_NAMES,
+    isExportRenderOverBudget,
+    getOceanBaseFillColor,
     renderExportPassesToCanvas,
     assertPopulationHeatmapReadyForExport,
     ensurePopulationHeatmapReadyForExport,
@@ -1065,6 +1086,7 @@ function initToolbar({ render } = {}) {
       dynamicBorderStatus.classList.toggle("hidden", !showBorderMaintenance);
     }
 
+    if (protectPaint) protectPaint.checked = runtimeState.onlyUnpainted;
     refreshQuickFillControls();
     refreshWorkspaceStatus();
   };
@@ -1124,6 +1146,13 @@ function initToolbar({ render } = {}) {
   };
   const showOnboardingHint = () => {
     if (!mapOnboardingHint) return;
+    try {
+      if (localStorage.getItem("sf.mapOnboardingHint.seen")) {
+        dismissOnboardingHint();
+        return;
+      }
+      localStorage.setItem("sf.mapOnboardingHint.seen", "1");
+    } catch {}
     runtimeState.onboardingDismissed = false;
     mapOnboardingHint.classList.remove("is-hidden");
     mapOnboardingHint.setAttribute("aria-hidden", "false");
@@ -1640,7 +1669,9 @@ function initToolbar({ render } = {}) {
     showToast,
     t,
   });
+  const refreshHistoryPanel = bindHistoryPanel(document.getElementById("historyDropdown"));
   function updateHistoryUi() {
+    refreshHistoryPanel();
     updateHistoryButton(undoBtn, "Undo", getLatestHistoryEntry());
     updateHistoryButton(redoBtn, "Redo", state.historyFuture?.at(-1));
   }
@@ -1726,14 +1757,6 @@ function initToolbar({ render } = {}) {
     if (dismissHint) {
       dismissOnboardingHint();
     }
-    emitTransientFeedback(t(
-      runtimeState.brushModeEnabled
-        ? globalThis.matchMedia?.("(pointer: coarse)")?.matches
-          ? "Brush On · Drag to paint · Use two fingers or Shift+Drag to pan"
-          : "Brush On · Shift+Drag to pan"
-        : "Brush Off",
-      "ui"
-    ));
   };
 
   const runHistoryAction = (kind) => {
@@ -1968,6 +1991,18 @@ function initToolbar({ render } = {}) {
     dockCollapseBtn.dataset.bound = "true";
   }
 
+  protectPaint?.addEventListener("change", () => {
+    runtimeState.onlyUnpainted = protectPaint.checked;
+    markDirty("only-unpainted");
+  });
+  registerRuntimeHook(state, "cycleQuickFillLevelFn", () => {
+    if (runtimeState.currentTool !== "fill" || runtimeState.interactionGranularity !== "subdivision" || runtimeState.brushModeEnabled) return false;
+    const next = getNextQuickFillLevel(runtimeState);
+    setBatchFillScopeState(runtimeState, next.value);
+    refreshQuickFillControls();
+    showToast(next.label, { title: t("Double-click quick fill scope", "ui"), duration: 1400 });
+    return true;
+  });
   bindQuickFillControls();
 
   bindScenarioContextBarEvents();
@@ -2013,15 +2048,29 @@ function initToolbar({ render } = {}) {
       if (presetPolitical.disabled) return;
       presetPolitical.disabled = true;
       presetPolitical.classList.add("is-loading");
-      const nextOceanFill = applyAutoFillOceanColor();
-      dismissOnboardingHint();
       try {
-        await Promise.resolve();
+        if (!await confirmAutoFill(runtimeState, showAppDialog)) return;
+        const nextOceanFill = applyAutoFillOceanColor();
+        dismissOnboardingHint();
+        const previousEntry = getLatestHistoryEntry();
         autoFillMap(runtimeState.colorMode || "political", {
           styleUpdates: {
             "ocean.fillColor": nextOceanFill,
           },
         });
+        const entry = getLatestHistoryEntry();
+        if (entry && entry !== previousEntry) {
+          showToast(t("Map auto-filled.", "ui"), {
+            actionLabel: t("Undo", "ui"),
+            onAction: () => {
+              if (getLatestHistoryEntry() !== entry) {
+                showToast(t("Newer edits prevent undoing auto-fill.", "ui"), { tone: "warning" });
+                return;
+              }
+              runHistoryAction("undo");
+            },
+          });
+        }
         markDirty("auto-fill");
         if (render) render();
       } finally {
