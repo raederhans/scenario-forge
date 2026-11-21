@@ -113,5 +113,4 @@ export {
   setZoomPercent,
   zoomByStep,
 } from "../map_renderer.js";
-export { commitMapLabelMove, deleteMapLabel, placeMapLabel, updateMapLabel } from "../renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
-export { syncMapLabelHandles } from "../renderer/map_label_handles_owner.js";
+export { commitMapLabelMove, placeMapLabel } from "../renderer/strategic_overlay_runtime/map_label_runtime_domain.js";

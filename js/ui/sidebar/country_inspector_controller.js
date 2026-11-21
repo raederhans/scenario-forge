@@ -1272,6 +1272,7 @@ export function createCountryInspectorController({
     markDirty("city-name");
     flushSidebarRender("city-name");
     renderCities();
+  }
   const convertButton = countryInspectorSelected?.querySelector("#convertCountryLabel");
   const territoryText = countryInspectorSelected?.querySelector("#countryTerritoryStats");
   let territoryKey = [], statsByCode, gains, losses;
