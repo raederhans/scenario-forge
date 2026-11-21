@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 336,
-    "feature_count": 21661,
+    "feature_count": 21824,
     "water_count": 0
   },
   "controller_changes": [],
@@ -793,19 +793,6 @@
     {
       "country_code": "AM",
       "critical": true,
-      "feature_id": "ARM-1555",
-      "feature_name": "Shirak",
-      "from_tag": "ARM",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "AM",
-      "critical": true,
       "feature_id": "ARM-1670",
       "feature_name": "Tavush",
       "from_tag": "ARM",
@@ -912,32 +899,6 @@
       "critical": true,
       "feature_id": "AT111",
       "feature_name": "Mittelburgenland",
-      "from_tag": "AUS",
-      "notes": "Anschluss: Austria and attached states are merged into Germany by 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_germany_annexes_austria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "AT",
-      "critical": true,
-      "feature_id": "AT112",
-      "feature_name": "Nordburgenland",
-      "from_tag": "AUS",
-      "notes": "Anschluss: Austria and attached states are merged into Germany by 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_germany_annexes_austria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "AT",
-      "critical": true,
-      "feature_id": "AT113",
-      "feature_name": "Südburgenland",
       "from_tag": "AUS",
       "notes": "Anschluss: Austria and attached states are merged into Germany by 1939.",
       "quality": "manual_reviewed",
@@ -19706,19 +19667,6 @@
       "to_tag": "EGY"
     },
     {
-      "country_code": "EG",
-      "critical": false,
-      "feature_id": "EGY-1558",
-      "feature_name": "Shamal Sina'",
-      "from_tag": "EGY",
-      "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
-      "quality": "manual_reviewed",
-      "rule_id": "egypt_kingdom",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "EGY"
-    },
-    {
       "country_code": "GE",
       "critical": true,
       "feature_id": "GEO-3015",
@@ -19851,19 +19799,6 @@
     {
       "country_code": "GE",
       "critical": true,
-      "feature_id": "GEO-3038",
-      "feature_name": "Samtskhe-Javakheti",
-      "from_tag": "GEO",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "GE",
-      "critical": true,
       "feature_id": "GEO-3039",
       "feature_name": "Shida Kartli",
       "from_tag": "GEO",
@@ -19918,32 +19853,6 @@
       "critical": true,
       "feature_id": "HR024",
       "feature_name": "Brodsko-posavska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
-      "feature_id": "HR025",
-      "feature_name": "Osječko-baranjska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
-      "feature_id": "HR026",
-      "feature_name": "Vukovarsko-srijemska županija",
       "from_tag": "CRO",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
@@ -23760,19 +23669,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "RAJ"
-    },
-    {
-      "country_code": "IL",
-      "critical": false,
-      "feature_id": "ISR-3053",
-      "feature_name": "HaDarom",
-      "from_tag": "ISR",
-      "notes": "Approximate Mandatory Palestine using current Israel runtime geography.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "palestine_mandate",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "PAL"
     },
     {
       "country_code": "IL",
@@ -29107,34 +29003,8 @@
     {
       "country_code": "RS",
       "critical": true,
-      "feature_id": "RS121",
-      "feature_name": "Западнобачка област",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "RS",
-      "critical": true,
       "feature_id": "RS122",
       "feature_name": "Јужнобанатска област",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "RS",
-      "critical": true,
-      "feature_id": "RS123",
-      "feature_name": "Јужнобачка област",
       "from_tag": "",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
@@ -29174,19 +29044,6 @@
       "critical": true,
       "feature_id": "RS126",
       "feature_name": "Средњобанатска област",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "RS",
-      "critical": true,
-      "feature_id": "RS127",
-      "feature_name": "Сремска област",
       "from_tag": "",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
@@ -29265,19 +29122,6 @@
       "critical": true,
       "feature_id": "RS216",
       "feature_name": "Расинска област",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "RS",
-      "critical": true,
-      "feature_id": "RS217",
-      "feature_name": "Рашка област",
       "from_tag": "",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
@@ -32305,19 +32149,6 @@
     {
       "country_code": "ME",
       "critical": true,
-      "feature_id": "ME_ADM1_MNE-1509",
-      "feature_name": "Berane",
-      "from_tag": "MNT",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "ME",
-      "critical": true,
       "feature_id": "ME_ADM1_MNE-1510",
       "feature_name": "Bijelo Polje",
       "from_tag": "MNT",
@@ -34970,19 +34801,6 @@
     {
       "country_code": "SK",
       "critical": true,
-      "feature_id": "SK_ADM2_56367889B4918056975771",
-      "feature_name": "District of Gala",
-      "from_tag": "SLO",
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_slovakia_puppet_state",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SLO"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
       "feature_id": "SK_ADM2_56367889B79782640664984",
       "feature_name": "District of Topolcany",
       "from_tag": "SLO",
@@ -35187,19 +35005,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SLO"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B15407569919112",
-      "feature_name": "District of Levice",
-      "from_tag": "SLO",
-      "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
-      "quality": "manual_reviewed",
-      "rule_id": "hungary_south_slovakia_1939",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "HUN"
     },
     {
       "country_code": "SK",
@@ -35594,19 +35399,6 @@
     {
       "country_code": "BY",
       "critical": true,
-      "feature_id": "BY_RAY_67162791B59963656038120",
-      "feature_name": "Kamenets",
-      "from_tag": "BLR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
-    },
-    {
-      "country_code": "BY",
-      "critical": true,
       "feature_id": "BY_RAY_67162791B65560195088656",
       "feature_name": "Rasony",
       "from_tag": "BLR",
@@ -35661,19 +35453,6 @@
       "critical": true,
       "feature_id": "BY_RAY_67162791B89656925241953",
       "feature_name": "Iwye",
-      "from_tag": "BLR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
-    },
-    {
-      "country_code": "BY",
-      "critical": true,
-      "feature_id": "BY_INT_BREST",
-      "feature_name": "Brest Interior",
       "from_tag": "BLR",
       "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
       "quality": "manual_reviewed",
@@ -199177,10 +198956,10 @@
     "EGY": {
       "base_iso2": "EG",
       "continent_label": "Africa",
-      "controller_feature_count": 27,
+      "controller_feature_count": 35,
       "display_name": "Kingdom of Egypt",
       "entry_kind": "scenario_subject",
-      "feature_count": 27,
+      "feature_count": 35,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199241,10 +199020,10 @@
     "ENG": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 493,
+      "controller_feature_count": 496,
       "display_name": "Britain",
       "entry_kind": "",
-      "feature_count": 493,
+      "feature_count": 496,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199372,10 +199151,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 849,
+      "controller_feature_count": 851,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 849,
+      "feature_count": 851,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199718,10 +199497,10 @@
     "HUN": {
       "base_iso2": "HU",
       "continent_label": "Europe",
-      "controller_feature_count": 72,
+      "controller_feature_count": 89,
       "display_name": "Hungary",
       "entry_kind": "",
-      "feature_count": 72,
+      "feature_count": 89,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199816,10 +199595,10 @@
     "IRE": {
       "base_iso2": "IE",
       "continent_label": "Europe",
-      "controller_feature_count": 8,
+      "controller_feature_count": 13,
       "display_name": "Ireland",
       "entry_kind": "",
-      "feature_count": 8,
+      "feature_count": 13,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199846,10 +199625,10 @@
     "IRQ": {
       "base_iso2": "IQ",
       "continent_label": "Asia",
-      "controller_feature_count": 21,
+      "controller_feature_count": 35,
       "display_name": "Iraq",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 35,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199876,10 +199655,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 154,
+      "controller_feature_count": 166,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 154,
+      "feature_count": 166,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200037,10 +199816,10 @@
     "LAT": {
       "base_iso2": "LV",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 24,
       "display_name": "Latvia",
       "entry_kind": "",
-      "feature_count": 14,
+      "feature_count": 24,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200699,10 +200478,10 @@
     "PAL": {
       "base_iso2": "IL",
       "continent_label": "Asia",
-      "controller_feature_count": 8,
+      "controller_feature_count": 15,
       "display_name": "Palestine",
       "entry_kind": "scenario_subject",
-      "feature_count": 8,
+      "feature_count": 15,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200858,10 +200637,10 @@
     "POL": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 345,
+      "controller_feature_count": 380,
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 345,
+      "feature_count": 380,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201149,10 +200928,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 163,
+      "controller_feature_count": 165,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 163,
+      "feature_count": 165,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201408,10 +201187,10 @@
     "SLO": {
       "base_iso2": "SK",
       "continent_label": "Europe",
-      "controller_feature_count": 55,
+      "controller_feature_count": 58,
       "display_name": "Slovakia",
       "entry_kind": "",
-      "feature_count": 55,
+      "feature_count": 58,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201489,7 +201268,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 11937
+        "manual_reviewed": 11935
       },
       "rule_sources": [
         "soviet_union"
@@ -201838,10 +201617,10 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 83,
+      "controller_feature_count": 103,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 83,
+      "feature_count": 103,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202088,10 +201867,10 @@
     "YUG": {
       "base_iso2": "RS",
       "continent_label": "Europe",
-      "controller_feature_count": 131,
+      "controller_feature_count": 151,
       "display_name": "Yugoslavia",
       "entry_kind": "",
-      "feature_count": 131,
+      "feature_count": 151,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203140,41 +202919,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "9deba75f117e6427ec29c2e546f0334e816fdb96db56ae6d3b78123d044ac9de",
+  "snapshot_fingerprint": "d206e24e30efa6aa65631e137482092e878d48ef274cb71cbb748e2227b8c27a",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "8cb0baf51a1efe2ac45cf17b55c15c7ac209070ce39846784fadfe1d4c929d04",
-    "detail_chunk_manifest_sha256": "d171d9fccabb65478e4c6ad516594a59e29a38c7e54db6da34363288f45835a0",
+    "build_snapshot_sha256": "c6aa2657cb8a8ed9b1fc75f85c511638e64f7910857524ae5ffe09540bec59c6",
+    "detail_chunk_manifest_sha256": "b77cce6bf6dc402d99796dfcb8ab8b97013d03cd8803dbeeb1fed00ee5d55d0d",
     "runtime_bootstrap_topology_sha256": "faaaa257491556eca37ca3108d6d1d55d4c3372e072df00b5089f88225307d93",
-    "runtime_topology_sha256": "62db1316789d825c538ca04bd39f8cc13908153188246d669bdd23d0259e64b8"
+    "runtime_topology_sha256": "204103e95a39ce91ab13b710ed3cb1a52ddfdaaf3fe3f041631bf85950f043cf"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15216,
+    "changed_feature_count": 15199,
     "controller_count": 328,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 21661,
+    "feature_count": 21824,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14777,
+    "manual_reviewed_feature_count": 14761,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 328,
     "quality_counts": {
-      "approx_existing_geometry": 439,
+      "approx_existing_geometry": 438,
       "direct_country_copy": 5744,
-      "manual_reviewed": 14777
+      "manual_reviewed": 14761
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 17,
-      "manual_rule": 15194
+      "manual_rule": 15177
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

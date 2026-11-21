@@ -408,8 +408,10 @@
           "name_zh": "布尔根兰",
           "feature_ids": [
             "AT111",
-            "AT112",
-            "AT113",
+            "AT112__SPLIT_NORTH_BURGENLAND",
+            "AT112__SPLIT_SOPRON",
+            "AT113__SPLIT_BURGENLAND",
+            "AT113__SPLIT_SZOMBATHELY",
             "AT122",
             "AT127",
             "AT130"
@@ -3085,14 +3087,19 @@
           "name_zh": "西斯洛伐克",
           "feature_ids": [
             "SK_ADM2_56367889B13739678014174",
-            "SK_ADM2_56367889B15407569919112",
+            "SK_ADM2_56367889B15407569919112__SPLIT_LEVICE",
+            "SK_ADM2_56367889B15407569919112__SPLIT_PODHAJSKA",
+            "SK_ADM2_56367889B15407569919112__SPLIT_SURANY",
             "SK_ADM2_56367889B17286119603144",
             "SK_ADM2_56367889B27848609458937",
             "SK_ADM2_56367889B31819457643233",
             "SK_ADM2_56367889B34538662559621",
             "SK_ADM2_56367889B40480781512108",
             "SK_ADM2_56367889B42847558326348",
-            "SK_ADM2_56367889B4918056975771",
+            "SK_ADM2_56367889B4918056975771__SPLIT_GALANTA",
+            "SK_ADM2_56367889B4918056975771__SPLIT_SAFA",
+            "SK_ADM2_56367889B4918056975771__SPLIT_SOUTH_NYITRA",
+            "SK_ADM2_56367889B4918056975771__SPLIT_WESTERN_SLOVAKIA",
             "SK_ADM2_56367889B51237059400968__SPLIT_DEVIN",
             "SK_ADM2_56367889B51237059400968__SPLIT_REST",
             "SK_ADM2_56367889B51514564384482",
@@ -3567,7 +3574,10 @@
           "name_en": "Northern Ireland",
           "name_zh": "北爱尔兰",
           "feature_ids": [
-            "GB_NUTS1_UKN",
+            "GB_NUTS1_UKN__SPLIT_ARMAGH",
+            "GB_NUTS1_UKN__SPLIT_BELFAST",
+            "GB_NUTS1_UKN__SPLIT_ENNISKILLEN",
+            "GB_NUTS1_UKN__SPLIT_NORTHERN_IRELAND",
             "GB_SHELL_FB_001",
             "GB_SHELL_FB_002",
             "GB_SHELL_FB_003",
@@ -6578,10 +6588,15 @@
           "name_en": "Transtisza",
           "name_zh": "特兰蒂萨",
           "feature_ids": [
-            "HU311",
+            "HU311__SPLIT_CIGAND",
+            "HU311__SPLIT_HRAN",
+            "HU311__SPLIT_MEZOKOVESD",
+            "HU311__SPLIT_MISKOLC",
             "HU321",
             "HU322",
-            "HU323",
+            "HU323__SPLIT_CIGAND",
+            "HU323__SPLIT_NYIREGYHAZA",
+            "HU323__SPLIT_SZATMARCSEKE",
             "HU332"
           ]
         },
@@ -6591,8 +6606,15 @@
           "name_zh": "北外多瑙",
           "feature_ids": [
             "HU213",
-            "HU221",
-            "HU222",
+            "HU221__SPLIT_ABDA",
+            "HU221__SPLIT_FERTOD",
+            "HU221__SPLIT_SOPRON",
+            "HU221__SPLIT_TET",
+            "HU221__SPLIT_VAMOSSZABADI",
+            "HU222__SPLIT_KAM",
+            "HU222__SPLIT_SZOMBATHELY",
+            "HU222__SPLIT_VASVAR",
+            "HU222__SPLIT_ZALALOVO",
             "HU223"
           ]
         },
@@ -6601,7 +6623,10 @@
           "name_en": "Bács-Kiskun",
           "name_zh": "巴奇-基什孔",
           "feature_ids": [
-            "HU331",
+            "HU331__SPLIT_BACS_KISKUN",
+            "HU331__SPLIT_BAJA",
+            "HU331__SPLIT_KECSKEMET",
+            "HU331__SPLIT_REM",
             "HU333"
           ]
         },
@@ -6903,7 +6928,12 @@
           "name_en": "Connaught",
           "name_zh": "康诺特",
           "feature_ids": [
-            "IE041",
+            "IE041__SPLIT_CAVAN_MONAGHAN",
+            "IE041__SPLIT_CLONES",
+            "IE041__SPLIT_DONEGAL",
+            "IE041__SPLIT_LOUGH_SWILLY",
+            "IE041__SPLIT_MANORHAMILTON",
+            "IE041__SPLIT_SLIGO",
             "IE042"
           ]
         },
@@ -6954,9 +6984,23 @@
           "name_zh": "摩苏尔",
           "feature_ids": [
             "IRQ-3046",
-            "IRQ-3049",
-            "IRQ-3050",
-            "IRQ-3051",
+            "IRQ-3049__SPLIT_ARBIL",
+            "IRQ-3049__SPLIT_KIRKUK",
+            "IRQ-3050__SPLIT_ARBIL",
+            "IRQ-3050__SPLIT_KIRKUK",
+            "IRQ-3050__SPLIT_SHAQLAWA",
+            "IRQ-3050__SPLIT_SORAN",
+            "IRQ-3050__SPLIT_SOUTH_SHAQLAWA",
+            "IRQ-3051__SPLIT_AL_SHIRQAT",
+            "IRQ-3051__SPLIT_BARDARASH",
+            "IRQ-3051__SPLIT_HATRA",
+            "IRQ-3051__SPLIT_MOSUL",
+            "IRQ-3051__SPLIT_QARYAT_AL_ASHIQ",
+            "IRQ-3051__SPLIT_SHAYKHAN",
+            "IRQ-3051__SPLIT_SOUTH_MOSUL",
+            "IRQ-3051__SPLIT_SOUTH_SHAQLAWA",
+            "IRQ-3051__SPLIT_SOUTH_SINJAR",
+            "IRQ-3051__SPLIT_TAL_AFAR",
             "IRQ-3242"
           ]
         },
@@ -7131,7 +7175,8 @@
             "ITH35",
             "ITH36",
             "ITH37",
-            "ITH41"
+            "ITH41__SPLIT_FRIULI",
+            "ITH41__SPLIT_NORTH_FRIULI"
           ]
         },
         "state_161": {
@@ -7179,7 +7224,18 @@
           "name_en": "Litorale",
           "name_zh": "滨海区",
           "feature_ids": [
-            "ITH42",
+            "ITH42__SPLIT_AUPA",
+            "ITH42__SPLIT_DOGNA",
+            "ITH42__SPLIT_FRIULI",
+            "ITH42__SPLIT_GORIZIA",
+            "ITH42__SPLIT_MARANO_LAGUNARE",
+            "ITH42__SPLIT_MORTEGLIANO",
+            "ITH42__SPLIT_NORTH_FRIULI",
+            "ITH42__SPLIT_NORTH_GORIZIA",
+            "ITH42__SPLIT_POCENIA",
+            "ITH42__SPLIT_TARVISIO",
+            "ITH42__SPLIT_VALBRUNA",
+            "ITH42__SPLIT_VKENTZI",
             "ITH43",
             "ITH44"
           ]
@@ -8146,7 +8202,17 @@
           "name_en": "Latgale",
           "name_zh": "拉特加尔",
           "feature_ids": [
-            "LV005"
+            "LV005__SPLIT_BALVI",
+            "LV005__SPLIT_DAUGAVPILS",
+            "LV005__SPLIT_JEKABPILS",
+            "LV005__SPLIT_KRASLAVA",
+            "LV005__SPLIT_LATGALE",
+            "LV005__SPLIT_REZEKNE",
+            "LV005__SPLIT_REZEKNE_5789",
+            "LV005__SPLIT_SKRUDALIENA",
+            "LV005__SPLIT_TILZA",
+            "LV005__SPLIT_ZEMGALE",
+            "LV005__SPLIT_ZILUPE"
           ]
         }
       }
@@ -10313,10 +10379,18 @@
           "name_zh": "卢布林",
           "feature_ids": [
             "PL_MRG_4df6ad2dc703",
-            "PL_MRG_c5cfb391c06f",
+            "PL_MRG_c5cfb391c06f__SPLIT_JANOWKA",
+            "PL_MRG_c5cfb391c06f__SPLIT_LUBLIN",
+            "PL_MRG_c5cfb391c06f__SPLIT_LUKOW",
+            "PL_MRG_c5cfb391c06f__SPLIT_WEST_CHELM",
             "PL_MRG_cb41a08029c6",
             "PL_MRG_d8ea546338a5",
-            "PL_POW_0601",
+            "PL_POW_0601__SPLIT_EAST_OKUNINKA",
+            "PL_POW_0601__SPLIT_JANOWKA",
+            "PL_POW_0601__SPLIT_KOROLOWKA",
+            "PL_POW_0601__SPLIT_OKUNINKA",
+            "PL_POW_0601__SPLIT_WEST_CHELM",
+            "PL_POW_0601__SPLIT_WLODAWA",
             "PL_POW_0603",
             "PL_POW_0604",
             "PL_POW_0619",
@@ -10387,9 +10461,29 @@
           "name_en": "Polesie",
           "name_zh": "波莱谢",
           "feature_ids": [
-            "BY_INT_BREST",
+            "BY_INT_BREST__SPLIT_CHERNYANY",
+            "BY_INT_BREST__SPLIT_DOBROMYSL",
+            "BY_INT_BREST__SPLIT_DUBICHNO",
+            "BY_INT_BREST__SPLIT_DYMNA",
+            "BY_INT_BREST__SPLIT_KAMENETS",
+            "BY_INT_BREST__SPLIT_KHOTYNICHI",
+            "BY_INT_BREST__SPLIT_LUSINO",
+            "BY_INT_BREST__SPLIT_MALKOVICHI",
+            "BY_INT_BREST__SPLIT_MEDNO",
+            "BY_INT_BREST__SPLIT_NORTH_PINSK",
+            "BY_INT_BREST__SPLIT_NOWOGRODEK",
+            "BY_INT_BREST__SPLIT_OGORODNIKI",
+            "BY_INT_BREST__SPLIT_PINSK",
+            "BY_INT_BREST__SPLIT_POLESIE",
+            "BY_INT_BREST__SPLIT_VYGONOSCHI",
             "BY_RAY_67162791B30498032594927",
-            "BY_RAY_67162791B59963656038120"
+            "BY_RAY_67162791B59963656038120__SPLIT_DUBICHNO",
+            "BY_RAY_67162791B59963656038120__SPLIT_DYMNA",
+            "BY_RAY_67162791B59963656038120__SPLIT_KAMENETS",
+            "BY_RAY_67162791B59963656038120__SPLIT_MEDNO",
+            "BY_RAY_67162791B59963656038120__SPLIT_MUCHAVEC",
+            "BY_RAY_67162791B59963656038120__SPLIT_NORTH_VOLCHIN",
+            "BY_RAY_67162791B59963656038120__SPLIT_OGORODNIKI"
           ]
         },
         "state_95": {
@@ -10413,7 +10507,14 @@
           "name_en": "Białystok",
           "name_zh": "比亚韦斯托克",
           "feature_ids": [
-            "PL_MRG_44c900e7cbdd",
+            "PL_MRG_44c900e7cbdd__SPLIT_BIALYSTOK",
+            "PL_MRG_44c900e7cbdd__SPLIT_EAST_BIALYSTOK",
+            "PL_MRG_44c900e7cbdd__SPLIT_GONIADZ",
+            "PL_MRG_44c900e7cbdd__SPLIT_MSCIWUJE",
+            "PL_MRG_44c900e7cbdd__SPLIT_NAGORKI",
+            "PL_MRG_44c900e7cbdd__SPLIT_PLATNICA",
+            "PL_MRG_44c900e7cbdd__SPLIT_POPKI",
+            "PL_MRG_44c900e7cbdd__SPLIT_WLODKI",
             "PL_POW_2001__SPLIT_MONKI",
             "PL_POW_2001__SPLIT_SZELIGI",
             "PL_POW_2002",
@@ -11405,7 +11506,9 @@
             "MDA-1616",
             "MDA-1617",
             "RO212",
-            "RO215",
+            "RO215__SPLIT_INNER_MOLDOVA",
+            "RO215__SPLIT_SOUTHERN_BUCOVINA",
+            "RO215__SPLIT_SUCEAVA",
             "UA_RAY_74538382B66987741978303",
             "UA_SHELL_FB_093"
           ]
@@ -23275,7 +23378,10 @@
           "feature_ids": [
             "ARM-1553",
             "ARM-1554",
-            "ARM-1555",
+            "ARM-1555__SPLIT_BASKOY",
+            "ARM-1555__SPLIT_KARAKALE",
+            "ARM-1555__SPLIT_KIRAC",
+            "ARM-1555__SPLIT_SALUT",
             "ARM-1670",
             "ARM-1671",
             "ARM-1672",
@@ -23325,7 +23431,9 @@
             "GEO-3030",
             "GEO-3036",
             "GEO-3037",
-            "GEO-3038",
+            "GEO-3038__SPLIT_JAVAKH",
+            "GEO-3038__SPLIT_SAMTSKHE",
+            "GEO-3038__SPLIT_TURKGOZU",
             "GEO-3039"
           ]
         },
@@ -23533,11 +23641,23 @@
           "feature_ids": [
             "TR901",
             "TR904",
-            "TR905",
+            "TR905__SPLIT_ARTVIN",
+            "TR905__SPLIT_HOPA",
+            "TR905__SPLIT_SAVSAT",
+            "TR905__SPLIT_YUSUFELI",
             "TR906",
-            "TRA11",
+            "TRA11__SPLIT_ASKALE",
+            "TRA11__SPLIT_ERZURUM",
+            "TRA11__SPLIT_HORASAN",
+            "TRA11__SPLIT_ISPIR",
+            "TRA11__SPLIT_OLTU",
+            "TRA11__SPLIT_PASINLER",
+            "TRA11__SPLIT_PAZARYOLU",
             "TRA13",
-            "TRA24"
+            "TRA24__SPLIT_ARDAHAN",
+            "TRA24__SPLIT_CILDIR",
+            "TRA24__SPLIT_KOLKOY",
+            "TRA24__SPLIT_TURKGOZU"
           ]
         },
         "state_355": {
@@ -23588,7 +23708,15 @@
           "name_zh": "凡城",
           "feature_ids": [
             "TRA21",
-            "TRA22",
+            "TRA22__SPLIT_BASKOY",
+            "TRA22__SPLIT_CILDIR",
+            "TRA22__SPLIT_DIGOR",
+            "TRA22__SPLIT_KAGIZMAN",
+            "TRA22__SPLIT_KARAKALE",
+            "TRA22__SPLIT_KARS",
+            "TRA22__SPLIT_KIRAC",
+            "TRA22__SPLIT_ODALAR",
+            "TRA22__SPLIT_SARIKAMIS",
             "TRA23",
             "TRB21",
             "TRB22",
@@ -26519,14 +26647,28 @@
           "name_zh": "伏伊伏丁那",
           "feature_ids": [
             "BA_ADM1_54001226B82378099338701",
-            "HR025",
-            "HR026",
-            "RS121",
-            "RS123",
+            "HR025__SPLIT_OSIJEK",
+            "HR025__SPLIT_SARVAS",
+            "HR025__SPLIT_VINKOVCI",
+            "HR026__SPLIT_OTOK",
+            "HR026__SPLIT_VINKOVCI",
+            "HR026__SPLIT_VUKOVAR",
+            "RS121__SPLIT_KULA",
+            "RS121__SPLIT_OSIJEK",
+            "RS121__SPLIT_SOMBOR",
+            "RS123__SPLIT_BECEJ",
+            "RS123__SPLIT_ILOK",
+            "RS123__SPLIT_KULA",
+            "RS123__SPLIT_SYRMIA",
+            "RS123__SPLIT_TEMERIN",
             "RS124",
             "RS125",
             "RS126",
-            "RS127"
+            "RS127__SPLIT_IRIG",
+            "RS127__SPLIT_JAMENA",
+            "RS127__SPLIT_KUSMIN",
+            "RS127__SPLIT_SREMSKA_MITROVICA",
+            "RS127__SPLIT_SYRMIA"
           ]
         },
         "state_102": {
@@ -26615,7 +26757,11 @@
             "RS212",
             "RS213",
             "RS214",
-            "RS217",
+            "RS217__SPLIT_DRAGA",
+            "RS217__SPLIT_DUBNICA",
+            "RS217__SPLIT_KRALJEVO",
+            "RS217__SPLIT_NOVI_PAZAR",
+            "RS217__SPLIT_SJENICA",
             "RS218"
           ]
         },
@@ -26672,7 +26818,9 @@
             "ME_ADM1_MNE-1501",
             "ME_ADM1_MNE-1503",
             "ME_ADM1_MNE-1508",
-            "ME_ADM1_MNE-1509",
+            "ME_ADM1_MNE-1509__SPLIT_ANDRIJEVICA",
+            "ME_ADM1_MNE-1509__SPLIT_PETNIJCA",
+            "ME_ADM1_MNE-1509__SPLIT_SOUTH_KOLASIN",
             "ME_ADM1_MNE-1510",
             "XK_ADM1_KOS-5886",
             "XK_ADM1_KOS-5887",

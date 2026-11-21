@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "283f04a7822a3d7c663eee09c3b2f9f9d3dc45e4d115fb4d443ea4d01023353e",
+  "baseline_hash": "5941fa33ed6cdb1349ca6c4f33b5765c97c4e91b264015e2f1a8357dbc15de96",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -2457,6 +2457,12 @@
         "AL034__SPLIT_GALICHITSA",
         "AL034__SPLIT_POGRADEC"
       ],
+      "ARM-1555": [
+        "ARM-1555__SPLIT_BASKOY",
+        "ARM-1555__SPLIT_KIRAC",
+        "ARM-1555__SPLIT_KARAKALE",
+        "ARM-1555__SPLIT_SALUT"
+      ],
       "AR_ADM1_ARG-1299": [
         "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_19",
         "AR_ADM1_ARG-1299__SPLIT_PLAYA_SALT_FLAT_20",
@@ -2481,6 +2487,14 @@
       "AR_ADM1_ARG-1304": [
         "AR_ADM1_ARG-1304__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA",
         "AR_ADM1_ARG-1304__SPLIT_REST"
+      ],
+      "AT112": [
+        "AT112__SPLIT_SOPRON",
+        "AT112__SPLIT_NORTH_BURGENLAND"
+      ],
+      "AT113": [
+        "AT113__SPLIT_BURGENLAND",
+        "AT113__SPLIT_SZOMBATHELY"
       ],
       "AT211": [
         "AT211__SPLIT_VOLKERMARKT",
@@ -2580,6 +2594,23 @@
         "BW_ADM1_BWA-2630__SPLIT_PLAYA_MAKGADIKGADI_PANS",
         "BW_ADM1_BWA-2630__SPLIT_REST"
       ],
+      "BY_INT_BREST": [
+        "BY_INT_BREST__SPLIT_POLESIE",
+        "BY_INT_BREST__SPLIT_NOWOGRODEK",
+        "BY_INT_BREST__SPLIT_NORTH_PINSK",
+        "BY_INT_BREST__SPLIT_LUSINO",
+        "BY_INT_BREST__SPLIT_MALKOVICHI",
+        "BY_INT_BREST__SPLIT_KHOTYNICHI",
+        "BY_INT_BREST__SPLIT_VYGONOSCHI",
+        "BY_INT_BREST__SPLIT_KAMENETS",
+        "BY_INT_BREST__SPLIT_OGORODNIKI",
+        "BY_INT_BREST__SPLIT_DOBROMYSL",
+        "BY_INT_BREST__SPLIT_MEDNO",
+        "BY_INT_BREST__SPLIT_DYMNA",
+        "BY_INT_BREST__SPLIT_DUBICHNO",
+        "BY_INT_BREST__SPLIT_CHERNYANY",
+        "BY_INT_BREST__SPLIT_PINSK"
+      ],
       "BY_INT_GRODNO": [
         "BY_INT_GRODNO__SPLIT_OSZMIANA",
         "BY_INT_GRODNO__SPLIT_ZELWA",
@@ -2612,6 +2643,15 @@
         "BY_RAY_67162791B18933715013959__SPLIT_STAKAI",
         "BY_RAY_67162791B18933715013959__SPLIT_BYENYAKONI",
         "BY_RAY_67162791B18933715013959__SPLIT_HALSHANY"
+      ],
+      "BY_RAY_67162791B59963656038120": [
+        "BY_RAY_67162791B59963656038120__SPLIT_KAMENETS",
+        "BY_RAY_67162791B59963656038120__SPLIT_MUCHAVEC",
+        "BY_RAY_67162791B59963656038120__SPLIT_MEDNO",
+        "BY_RAY_67162791B59963656038120__SPLIT_DYMNA",
+        "BY_RAY_67162791B59963656038120__SPLIT_DUBICHNO",
+        "BY_RAY_67162791B59963656038120__SPLIT_NORTH_VOLCHIN",
+        "BY_RAY_67162791B59963656038120__SPLIT_OGORODNIKI"
       ],
       "BY_RAY_67162791B66420794580046": [
         "BY_RAY_67162791B66420794580046__SPLIT_PIESKI",
@@ -2789,6 +2829,17 @@
         "EGY-1556__SPLIT_HALAIB",
         "EGY-1556__SPLIT_REST"
       ],
+      "EGY-1558": [
+        "EGY-1558__SPLIT_NORTH_SINAI",
+        "EGY-1558__SPLIT_HASNA",
+        "EGY-1558__SPLIT_ZARANIK",
+        "EGY-1558__SPLIT_RAFAH",
+        "EGY-1558__SPLIT_BIR_AL_ABED",
+        "EGY-1558__SPLIT_EAST_BIR_AL_ABED",
+        "EGY-1558__SPLIT_WEST_RAFAH",
+        "EGY-1558__SPLIT_SOUTH_ARISH",
+        "EGY-1558__SPLIT_NEKHEL"
+      ],
       "EH_ADMIN0_PASSTHROUGH": [
         "EH_ADMIN0_PASSTHROUGH__SPLIT_SHM",
         "EH_ADMIN0_PASSTHROUGH__SPLIT_RDO"
@@ -2865,6 +2916,17 @@
       "FR_ARR_68002": [
         "FR_ARR_68002__SPLIT_KINTZHEIM",
         "FR_ARR_68002__SPLIT_COLMAR"
+      ],
+      "GB_NUTS1_UKN": [
+        "GB_NUTS1_UKN__SPLIT_NORTHERN_IRELAND",
+        "GB_NUTS1_UKN__SPLIT_ENNISKILLEN",
+        "GB_NUTS1_UKN__SPLIT_ARMAGH",
+        "GB_NUTS1_UKN__SPLIT_BELFAST"
+      ],
+      "GEO-3038": [
+        "GEO-3038__SPLIT_JAVAKH",
+        "GEO-3038__SPLIT_SAMTSKHE",
+        "GEO-3038__SPLIT_TURKGOZU"
       ],
       "GH_ADM1_GHA-2155": [
         "GH_ADM1_GHA-2155__SPLIT_WTO__SPLIT_LAKE_VOLTA",
@@ -2944,6 +3006,16 @@
         "GR_ADM1_GRC-3013__SPLIT_DODECANESE",
         "GR_ADM1_GRC-3013__SPLIT_CYCLADES"
       ],
+      "HR025": [
+        "HR025__SPLIT_VINKOVCI",
+        "HR025__SPLIT_SARVAS",
+        "HR025__SPLIT_OSIJEK"
+      ],
+      "HR026": [
+        "HR026__SPLIT_OTOK",
+        "HR026__SPLIT_VUKOVAR",
+        "HR026__SPLIT_VINKOVCI"
+      ],
       "HR031": [
         "HR031__SPLIT_FIUME",
         "HR031__SPLIT_ABBAZIA",
@@ -2984,6 +3056,44 @@
       "HU110": [
         "HU110__SPLIT_BUDA",
         "HU110__SPLIT_PEST"
+      ],
+      "HU221": [
+        "HU221__SPLIT_SOPRON",
+        "HU221__SPLIT_ABDA",
+        "HU221__SPLIT_VAMOSSZABADI",
+        "HU221__SPLIT_TET",
+        "HU221__SPLIT_FERTOD"
+      ],
+      "HU222": [
+        "HU222__SPLIT_SZOMBATHELY",
+        "HU222__SPLIT_ZALALOVO",
+        "HU222__SPLIT_KAM",
+        "HU222__SPLIT_VASVAR"
+      ],
+      "HU311": [
+        "HU311__SPLIT_CIGAND",
+        "HU311__SPLIT_HRAN",
+        "HU311__SPLIT_MISKOLC",
+        "HU311__SPLIT_MEZOKOVESD"
+      ],
+      "HU323": [
+        "HU323__SPLIT_NYIREGYHAZA",
+        "HU323__SPLIT_CIGAND",
+        "HU323__SPLIT_SZATMARCSEKE"
+      ],
+      "HU331": [
+        "HU331__SPLIT_BACS_KISKUN",
+        "HU331__SPLIT_BAJA",
+        "HU331__SPLIT_REM",
+        "HU331__SPLIT_KECSKEMET"
+      ],
+      "IE041": [
+        "IE041__SPLIT_CAVAN_MONAGHAN",
+        "IE041__SPLIT_LOUGH_SWILLY",
+        "IE041__SPLIT_SLIGO",
+        "IE041__SPLIT_CLONES",
+        "IE041__SPLIT_MANORHAMILTON",
+        "IE041__SPLIT_DONEGAL"
       ],
       "IN_ADM2_76128533B75922461866405": [
         "IN_ADM2_76128533B75922461866405__SPLIT_PLAYA_RANN_OF_KUTCH",
@@ -3085,6 +3195,29 @@
         "IRN-3248__SPLIT_PLAYA_KAVIR_E_NAMAK_E_SIRJAN",
         "IRN-3248__SPLIT_REST"
       ],
+      "IRQ-3049": [
+        "IRQ-3049__SPLIT_ARBIL",
+        "IRQ-3049__SPLIT_KIRKUK"
+      ],
+      "IRQ-3050": [
+        "IRQ-3050__SPLIT_ARBIL",
+        "IRQ-3050__SPLIT_KIRKUK",
+        "IRQ-3050__SPLIT_SHAQLAWA",
+        "IRQ-3050__SPLIT_SOUTH_SHAQLAWA",
+        "IRQ-3050__SPLIT_SORAN"
+      ],
+      "IRQ-3051": [
+        "IRQ-3051__SPLIT_MOSUL",
+        "IRQ-3051__SPLIT_SHAYKHAN",
+        "IRQ-3051__SPLIT_BARDARASH",
+        "IRQ-3051__SPLIT_AL_SHIRQAT",
+        "IRQ-3051__SPLIT_HATRA",
+        "IRQ-3051__SPLIT_TAL_AFAR",
+        "IRQ-3051__SPLIT_SOUTH_SINJAR",
+        "IRQ-3051__SPLIT_SOUTH_MOSUL",
+        "IRQ-3051__SPLIT_SOUTH_SHAQLAWA",
+        "IRQ-3051__SPLIT_QARYAT_AL_ASHIQ"
+      ],
       "IRQ-3052": [
         "IRQ-3052__SPLIT_BUHAYRAT_ATH_THARTHAR",
         "IRQ-3052__SPLIT_REST"
@@ -3093,6 +3226,16 @@
         "IRQ-3471__SPLIT_BUHAYRAT_ATH_THARTHAR",
         "IRQ-3471__SPLIT_PLAYA_SALT_FLAT_40",
         "IRQ-3471__SPLIT_REST"
+      ],
+      "ISR-3053": [
+        "ISR-3053__SPLIT_NEGEV_HIGHLANDS",
+        "ISR-3053__SPLIT_EILAT",
+        "ISR-3053__SPLIT_LAHAV",
+        "ISR-3053__SPLIT_NEGEV",
+        "ISR-3053__SPLIT_EZUZ",
+        "ISR-3053__SPLIT_YERUHAM",
+        "ISR-3053__SPLIT_TLALIM",
+        "ISR-3053__SPLIT_DIMONA"
       ],
       "ITH10": [
         "ITH10__SPLIT_SUDTIROL",
@@ -3110,6 +3253,24 @@
         "ITH20__SPLIT_NORTH_TRENTINO",
         "ITH20__SPLIT_ROVERETO",
         "ITH20__SPLIT_WEST_TRENTINO"
+      ],
+      "ITH41": [
+        "ITH41__SPLIT_FRIULI",
+        "ITH41__SPLIT_NORTH_FRIULI"
+      ],
+      "ITH42": [
+        "ITH42__SPLIT_FRIULI",
+        "ITH42__SPLIT_TARVISIO",
+        "ITH42__SPLIT_GORIZIA",
+        "ITH42__SPLIT_NORTH_GORIZIA",
+        "ITH42__SPLIT_VALBRUNA",
+        "ITH42__SPLIT_DOGNA",
+        "ITH42__SPLIT_AUPA",
+        "ITH42__SPLIT_MARANO_LAGUNARE",
+        "ITH42__SPLIT_POCENIA",
+        "ITH42__SPLIT_MORTEGLIANO",
+        "ITH42__SPLIT_VKENTZI",
+        "ITH42__SPLIT_NORTH_FRIULI"
       ],
       "ITH59": [
         "ITH59__SPLIT_SAN_MARINO",
@@ -3164,6 +3325,19 @@
         "LT029__SPLIT_POLISH",
         "LT029__SPLIT_REST"
       ],
+      "LV005": [
+        "LV005__SPLIT_LATGALE",
+        "LV005__SPLIT_ZEMGALE",
+        "LV005__SPLIT_ZILUPE",
+        "LV005__SPLIT_SKRUDALIENA",
+        "LV005__SPLIT_DAUGAVPILS",
+        "LV005__SPLIT_JEKABPILS",
+        "LV005__SPLIT_BALVI",
+        "LV005__SPLIT_REZEKNE",
+        "LV005__SPLIT_REZEKNE_5789",
+        "LV005__SPLIT_TILZA",
+        "LV005__SPLIT_KRASLAVA"
+      ],
       "MAR-1445": [
         "MAR-1445__SPLIT_TANGIER",
         "MAR-1445__SPLIT_REST"
@@ -3191,6 +3365,11 @@
       "MDA-1652": [
         "MDA-1652__SPLIT_LEFT",
         "MDA-1652__SPLIT_RIGHT"
+      ],
+      "ME_ADM1_MNE-1509": [
+        "ME_ADM1_MNE-1509__SPLIT_ANDRIJEVICA",
+        "ME_ADM1_MNE-1509__SPLIT_PETNIJCA",
+        "ME_ADM1_MNE-1509__SPLIT_SOUTH_KOLASIN"
       ],
       "MK003": [
         "MK003__SPLIT_PCINJA",
@@ -3335,6 +3514,16 @@
         "PA_ADM1_PAN-1340__SPLIT_PCZ",
         "PA_ADM1_PAN-1340__SPLIT_REST"
       ],
+      "PL_MRG_44c900e7cbdd": [
+        "PL_MRG_44c900e7cbdd__SPLIT_BIALYSTOK",
+        "PL_MRG_44c900e7cbdd__SPLIT_EAST_BIALYSTOK",
+        "PL_MRG_44c900e7cbdd__SPLIT_PLATNICA",
+        "PL_MRG_44c900e7cbdd__SPLIT_NAGORKI",
+        "PL_MRG_44c900e7cbdd__SPLIT_WLODKI",
+        "PL_MRG_44c900e7cbdd__SPLIT_POPKI",
+        "PL_MRG_44c900e7cbdd__SPLIT_MSCIWUJE",
+        "PL_MRG_44c900e7cbdd__SPLIT_GONIADZ"
+      ],
       "PL_MRG_727dd6268093": [
         "PL_MRG_727dd6268093__SPLIT_DANZIG",
         "PL_MRG_727dd6268093__SPLIT_REST__SPLIT_LAUENBURG",
@@ -3361,6 +3550,12 @@
         "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_NORTH_KUYAVIA",
         "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_POMORZE_GDANSKIE"
       ],
+      "PL_MRG_c5cfb391c06f": [
+        "PL_MRG_c5cfb391c06f__SPLIT_LUBLIN",
+        "PL_MRG_c5cfb391c06f__SPLIT_WEST_CHELM",
+        "PL_MRG_c5cfb391c06f__SPLIT_JANOWKA",
+        "PL_MRG_c5cfb391c06f__SPLIT_LUKOW"
+      ],
       "PL_MRG_c908eb11c602": [
         "PL_MRG_c908eb11c602__SPLIT_ALLENSTEIN",
         "PL_MRG_c908eb11c602__SPLIT_MARIENWERDER",
@@ -3383,6 +3578,14 @@
         "PL_MRG_c93ffd9ad4b7__SPLIT_KISIELICE",
         "PL_MRG_c93ffd9ad4b7__SPLIT_NORTH_KUYAVIA",
         "PL_MRG_c93ffd9ad4b7__SPLIT_GRUZIADZ"
+      ],
+      "PL_POW_0601": [
+        "PL_POW_0601__SPLIT_WEST_CHELM",
+        "PL_POW_0601__SPLIT_WLODAWA",
+        "PL_POW_0601__SPLIT_KOROLOWKA",
+        "PL_POW_0601__SPLIT_JANOWKA",
+        "PL_POW_0601__SPLIT_EAST_OKUNINKA",
+        "PL_POW_0601__SPLIT_OKUNINKA"
       ],
       "PL_POW_1465": [
         "PL_POW_1465__SPLIT_PRAGA",
@@ -3512,6 +3715,11 @@
         "RO124__SPLIT_NORTH_PASUL_TULGHES",
         "RO124__SPLIT_MOINESTI"
       ],
+      "RO215": [
+        "RO215__SPLIT_SOUTHERN_BUCOVINA",
+        "RO215__SPLIT_INNER_MOLDOVA",
+        "RO215__SPLIT_SUCEAVA"
+      ],
       "RO421": [
         "RO421__SPLIT_CRISANA",
         "RO421__SPLIT_OTELU_ROSU",
@@ -3533,6 +3741,32 @@
         "RO424__SPLIT_SATCHINEZ",
         "RO424__SPLIT_DEVA",
         "RO424__SPLIT_TIMISORA"
+      ],
+      "RS121": [
+        "RS121__SPLIT_OSIJEK",
+        "RS121__SPLIT_KULA",
+        "RS121__SPLIT_SOMBOR"
+      ],
+      "RS123": [
+        "RS123__SPLIT_SYRMIA",
+        "RS123__SPLIT_ILOK",
+        "RS123__SPLIT_TEMERIN",
+        "RS123__SPLIT_KULA",
+        "RS123__SPLIT_BECEJ"
+      ],
+      "RS127": [
+        "RS127__SPLIT_JAMENA",
+        "RS127__SPLIT_KUSMIN",
+        "RS127__SPLIT_SREMSKA_MITROVICA",
+        "RS127__SPLIT_IRIG",
+        "RS127__SPLIT_SYRMIA"
+      ],
+      "RS217": [
+        "RS217__SPLIT_SJENICA",
+        "RS217__SPLIT_NOVI_PAZAR",
+        "RS217__SPLIT_DUBNICA",
+        "RS217__SPLIT_DRAGA",
+        "RS217__SPLIT_KRALJEVO"
       ],
       "RU_ARCTIC_FB_2558": [
         "RU_ARCTIC_FB_2558__SPLIT_VOLGOGRAD_RESERVOIR",
@@ -3954,6 +4188,17 @@
         "SK_ADM2_56367889B14569056094647__SPLIT_HU",
         "SK_ADM2_56367889B14569056094647__SPLIT_REST"
       ],
+      "SK_ADM2_56367889B15407569919112": [
+        "SK_ADM2_56367889B15407569919112__SPLIT_PODHAJSKA",
+        "SK_ADM2_56367889B15407569919112__SPLIT_SURANY",
+        "SK_ADM2_56367889B15407569919112__SPLIT_LEVICE"
+      ],
+      "SK_ADM2_56367889B4918056975771": [
+        "SK_ADM2_56367889B4918056975771__SPLIT_SOUTH_NYITRA",
+        "SK_ADM2_56367889B4918056975771__SPLIT_SAFA",
+        "SK_ADM2_56367889B4918056975771__SPLIT_GALANTA",
+        "SK_ADM2_56367889B4918056975771__SPLIT_WESTERN_SLOVAKIA"
+      ],
       "SK_ADM2_56367889B51237059400968": [
         "SK_ADM2_56367889B51237059400968__SPLIT_DEVIN",
         "SK_ADM2_56367889B51237059400968__SPLIT_REST"
@@ -4010,6 +4255,38 @@
         "TR631__SPLIT_NORTH",
         "TR631__SPLIT_KESSAB",
         "TR631__SPLIT_SANJAK"
+      ],
+      "TR905": [
+        "TR905__SPLIT_SAVSAT",
+        "TR905__SPLIT_ARTVIN",
+        "TR905__SPLIT_HOPA",
+        "TR905__SPLIT_YUSUFELI"
+      ],
+      "TRA11": [
+        "TRA11__SPLIT_PASINLER",
+        "TRA11__SPLIT_ASKALE",
+        "TRA11__SPLIT_HORASAN",
+        "TRA11__SPLIT_ISPIR",
+        "TRA11__SPLIT_PAZARYOLU",
+        "TRA11__SPLIT_OLTU",
+        "TRA11__SPLIT_ERZURUM"
+      ],
+      "TRA22": [
+        "TRA22__SPLIT_ODALAR",
+        "TRA22__SPLIT_CILDIR",
+        "TRA22__SPLIT_BASKOY",
+        "TRA22__SPLIT_KIRAC",
+        "TRA22__SPLIT_KARAKALE",
+        "TRA22__SPLIT_DIGOR",
+        "TRA22__SPLIT_KAGIZMAN",
+        "TRA22__SPLIT_SARIKAMIS",
+        "TRA22__SPLIT_KARS"
+      ],
+      "TRA24": [
+        "TRA24__SPLIT_TURKGOZU",
+        "TRA24__SPLIT_KOLKOY",
+        "TRA24__SPLIT_CILDIR",
+        "TRA24__SPLIT_ARDAHAN"
       ],
       "TUN-101": [
         "TUN-101__SPLIT_PLAYA_CHOTT_EL_DJERID",
@@ -4213,12 +4490,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "9deba75f117e6427ec29c2e546f0334e816fdb96db56ae6d3b78123d044ac9de",
+  "snapshot_fingerprint": "d206e24e30efa6aa65631e137482092e878d48ef274cb71cbb748e2227b8c27a",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "d171d9fccabb65478e4c6ad516594a59e29a38c7e54db6da34363288f45835a0",
+    "detail_chunk_manifest_sha256": "b77cce6bf6dc402d99796dfcb8ab8b97013d03cd8803dbeeb1fed00ee5d55d0d",
     "runtime_bootstrap_topology_sha256": "faaaa257491556eca37ca3108d6d1d55d4c3372e072df00b5089f88225307d93",
-    "runtime_topology_sha256": "62db1316789d825c538ca04bd39f8cc13908153188246d669bdd23d0259e64b8"
+    "runtime_topology_sha256": "204103e95a39ce91ab13b710ed3cb1a52ddfdaaf3fe3f041631bf85950f043cf"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -4236,29 +4513,29 @@
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15216,
+    "changed_feature_count": 15199,
     "controller_count": 328,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 21661,
+    "feature_count": 21824,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14777,
+    "manual_reviewed_feature_count": 14761,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 328,
     "quality_counts": {
-      "approx_existing_geometry": 439,
+      "approx_existing_geometry": 438,
       "direct_country_copy": 5744,
-      "manual_reviewed": 14777
+      "manual_reviewed": 14761
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 17,
-      "manual_rule": 15194
+      "manual_rule": 15177
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

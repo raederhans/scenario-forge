@@ -33,6 +33,22 @@
       "en": "Prespa",
       "zh": "普雷斯帕"
     },
+    "id::ARM-1555__SPLIT_BASKOY": {
+      "en": "Garnarrich",
+      "zh": "加尔纳里奇"
+    },
+    "id::ARM-1555__SPLIT_KARAKALE": {
+      "en": "Gyumri",
+      "zh": "久姆里"
+    },
+    "id::ARM-1555__SPLIT_KIRAC": {
+      "en": "Meghrashat",
+      "zh": "梅格拉沙特"
+    },
+    "id::ARM-1555__SPLIT_SALUT": {
+      "en": "Artik",
+      "zh": "阿尔蒂克"
+    },
     "id::AR_ADM1_ARG-1299__SPLIT_PLAYA_SALINAS_DE_AMBARGASTA": {
       "en": "Córdoba · Salinas de Ambargasta",
       "zh": "科尔多瓦 · 安巴加斯塔盐沼"
@@ -92,6 +108,22 @@
     "id::AR_ADM1_ARG-1304__SPLIT_REST": {
       "en": "Santiago del Estero",
       "zh": "圣地亚哥·德尔·埃斯特罗"
+    },
+    "id::AT112__SPLIT_NORTH_BURGENLAND": {
+      "en": "Eisenstadt",
+      "zh": "艾森斯塔特"
+    },
+    "id::AT112__SPLIT_SOPRON": {
+      "en": "Loipersbach im Burgenland",
+      "zh": "布尔根兰州洛伊珀斯巴赫"
+    },
+    "id::AT113__SPLIT_BURGENLAND": {
+      "en": "Oberwart",
+      "zh": "上瓦特"
+    },
+    "id::AT113__SPLIT_SZOMBATHELY": {
+      "en": "Güssing",
+      "zh": "居辛"
     },
     "id::AT211__SPLIT_EBRIACH": {
       "en": "Ebriach",
@@ -349,6 +381,66 @@
       "en": "Central",
       "zh": "中央"
     },
+    "id::BY_INT_BREST__SPLIT_CHERNYANY": {
+      "en": "Chernyany",
+      "zh": "切尔尼亚内"
+    },
+    "id::BY_INT_BREST__SPLIT_DOBROMYSL": {
+      "en": "Ivatsevichi",
+      "zh": "伊瓦采维奇"
+    },
+    "id::BY_INT_BREST__SPLIT_DUBICHNO": {
+      "en": "Dubichno",
+      "zh": "杜比奇诺"
+    },
+    "id::BY_INT_BREST__SPLIT_DYMNA": {
+      "en": "Dymna",
+      "zh": "德姆纳"
+    },
+    "id::BY_INT_BREST__SPLIT_KAMENETS": {
+      "en": "Kamenets",
+      "zh": "卡梅内茨"
+    },
+    "id::BY_INT_BREST__SPLIT_KHOTYNICHI": {
+      "en": "Khotynichi",
+      "zh": "霍特尼奇"
+    },
+    "id::BY_INT_BREST__SPLIT_LUSINO": {
+      "en": "Lusino",
+      "zh": "卢西诺"
+    },
+    "id::BY_INT_BREST__SPLIT_MALKOVICHI": {
+      "en": "Malkovichi",
+      "zh": "马尔科维奇"
+    },
+    "id::BY_INT_BREST__SPLIT_MEDNO": {
+      "en": "Medno",
+      "zh": "梅德诺"
+    },
+    "id::BY_INT_BREST__SPLIT_NORTH_PINSK": {
+      "en": "Ivanovo",
+      "zh": "伊万诺沃"
+    },
+    "id::BY_INT_BREST__SPLIT_NOWOGRODEK": {
+      "en": "Baranavichy",
+      "zh": "巴拉诺维奇"
+    },
+    "id::BY_INT_BREST__SPLIT_OGORODNIKI": {
+      "en": "Ogorodniki",
+      "zh": "奥戈罗德尼基"
+    },
+    "id::BY_INT_BREST__SPLIT_PINSK": {
+      "en": "Pinsk",
+      "zh": "平斯克"
+    },
+    "id::BY_INT_BREST__SPLIT_POLESIE": {
+      "en": "Kobryn",
+      "zh": "科布林"
+    },
+    "id::BY_INT_BREST__SPLIT_VYGONOSCHI": {
+      "en": "Vygonoschi",
+      "zh": "维戈诺希"
+    },
     "id::BY_INT_GRODNO__SPLIT_BAKSHTY": {
       "en": "Bakshty",
       "zh": "巴克什蒂"
@@ -456,6 +548,34 @@
     "id::BY_RAY_67162791B18933715013959__SPLIT_STAKAI": {
       "en": "Stakai",
       "zh": "斯塔凯"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_DUBICHNO": {
+      "en": "Dubichno",
+      "zh": "杜比奇诺"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_DYMNA": {
+      "en": "Dymna",
+      "zh": "德姆纳"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_KAMENETS": {
+      "en": "Kamenets",
+      "zh": "卡梅内茨"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_MEDNO": {
+      "en": "Medno",
+      "zh": "梅德诺"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_MUCHAVEC": {
+      "en": "Muchavec",
+      "zh": "穆哈韦茨"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_NORTH_VOLCHIN": {
+      "en": "North Volchin",
+      "zh": "北沃尔钦"
+    },
+    "id::BY_RAY_67162791B59963656038120__SPLIT_OGORODNIKI": {
+      "en": "Ogorodniki",
+      "zh": "奥戈罗德尼基"
     },
     "id::BY_RAY_67162791B66420794580046__SPLIT_EAST_ASTRYNA": {
       "en": "East Astryna",
@@ -833,6 +953,42 @@
       "en": "Red Sea Governorate",
       "zh": "红海省"
     },
+    "id::EGY-1558__SPLIT_BIR_AL_ABED": {
+      "en": "Bi'r al 'Abd",
+      "zh": "比尔阿卜德"
+    },
+    "id::EGY-1558__SPLIT_EAST_BIR_AL_ABED": {
+      "en": "East Bir Al-Abed",
+      "zh": "东比尔阿卜德"
+    },
+    "id::EGY-1558__SPLIT_HASNA": {
+      "en": "Al Kuntillah",
+      "zh": "昆提拉"
+    },
+    "id::EGY-1558__SPLIT_NEKHEL": {
+      "en": "Nekhel",
+      "zh": "奈赫勒"
+    },
+    "id::EGY-1558__SPLIT_NORTH_SINAI": {
+      "en": "North Sinai",
+      "zh": "北西奈"
+    },
+    "id::EGY-1558__SPLIT_RAFAH": {
+      "en": "Ash Shaykh Zuwayd",
+      "zh": "谢赫祖韦德"
+    },
+    "id::EGY-1558__SPLIT_SOUTH_ARISH": {
+      "en": "Al Hasana",
+      "zh": "哈萨纳"
+    },
+    "id::EGY-1558__SPLIT_WEST_RAFAH": {
+      "en": "East Arish",
+      "zh": "东阿里什"
+    },
+    "id::EGY-1558__SPLIT_ZARANIK": {
+      "en": "Arish",
+      "zh": "阿里什"
+    },
     "id::EH_ADMIN0_PASSTHROUGH__SPLIT_RDO": {
       "en": "Western Sahara · Rio de Oro",
       "zh": "西撒哈拉 · 里奥德奥罗"
@@ -1025,6 +1181,34 @@
       "en": "Kintzheim",
       "zh": "金茨海姆"
     },
+    "id::GB_NUTS1_UKN__SPLIT_ARMAGH": {
+      "en": "Armagh",
+      "zh": "阿马"
+    },
+    "id::GB_NUTS1_UKN__SPLIT_BELFAST": {
+      "en": "Belfast",
+      "zh": "贝尔法斯特"
+    },
+    "id::GB_NUTS1_UKN__SPLIT_ENNISKILLEN": {
+      "en": "Enniskillen",
+      "zh": "恩尼斯基林"
+    },
+    "id::GB_NUTS1_UKN__SPLIT_NORTHERN_IRELAND": {
+      "en": "Londonderry-Tyrone",
+      "zh": "伦敦德里-蒂龙"
+    },
+    "id::GEO-3038__SPLIT_JAVAKH": {
+      "en": "Javakh",
+      "zh": "贾瓦赫季"
+    },
+    "id::GEO-3038__SPLIT_SAMTSKHE": {
+      "en": "Borjomi",
+      "zh": "博尔若米"
+    },
+    "id::GEO-3038__SPLIT_TURKGOZU": {
+      "en": "Akhaltsikhe",
+      "zh": "阿哈尔齐赫"
+    },
     "id::GH_ADM1_GHA-2155__SPLIT_REST": {
       "en": "Northern · Remainder",
       "zh": "北方 · 余部"
@@ -1209,6 +1393,30 @@
       "en": "Dodecanese",
       "zh": "多德卡尼斯群岛"
     },
+    "id::HR025__SPLIT_OSIJEK": {
+      "en": "North Osijek",
+      "zh": "北奥西耶克"
+    },
+    "id::HR025__SPLIT_SARVAS": {
+      "en": "Sarvas",
+      "zh": "萨尔瓦什"
+    },
+    "id::HR025__SPLIT_VINKOVCI": {
+      "en": "South Osijek",
+      "zh": "南奥西耶克"
+    },
+    "id::HR026__SPLIT_OTOK": {
+      "en": "Otok",
+      "zh": "奥托克"
+    },
+    "id::HR026__SPLIT_VINKOVCI": {
+      "en": "Vinkovci",
+      "zh": "温科夫齐"
+    },
+    "id::HR026__SPLIT_VUKOVAR": {
+      "en": "Vukovar",
+      "zh": "武科瓦尔"
+    },
     "id::HR031__SPLIT_ABBAZIA": {
       "en": "Abbazia",
       "zh": "阿巴齐亚"
@@ -1308,6 +1516,110 @@
     "id::HU110__SPLIT_PEST": {
       "en": "Budapest · Pest",
       "zh": "布达佩斯 · 佩斯"
+    },
+    "id::HU221__SPLIT_ABDA": {
+      "en": "Abda",
+      "zh": "奥布道"
+    },
+    "id::HU221__SPLIT_FERTOD": {
+      "en": "Mosonmagyarovar",
+      "zh": "莫雄马扎尔古堡"
+    },
+    "id::HU221__SPLIT_SOPRON": {
+      "en": "Sopron",
+      "zh": "肖普朗"
+    },
+    "id::HU221__SPLIT_TET": {
+      "en": "Tet",
+      "zh": "泰特"
+    },
+    "id::HU221__SPLIT_VAMOSSZABADI": {
+      "en": "Győr",
+      "zh": "杰尔"
+    },
+    "id::HU222__SPLIT_KAM": {
+      "en": "Szombathely",
+      "zh": "松博特海伊"
+    },
+    "id::HU222__SPLIT_SZOMBATHELY": {
+      "en": "Sarvar",
+      "zh": "沙尔堡"
+    },
+    "id::HU222__SPLIT_VASVAR": {
+      "en": "Vasvar",
+      "zh": "沃什堡"
+    },
+    "id::HU222__SPLIT_ZALALOVO": {
+      "en": "Zalalovo",
+      "zh": "佐洛勒沃"
+    },
+    "id::HU311__SPLIT_CIGAND": {
+      "en": "Tiszaujvaros",
+      "zh": "蒂萨新城"
+    },
+    "id::HU311__SPLIT_HRAN": {
+      "en": "Satoraljaujhely",
+      "zh": "沙托劳尔尧乌伊海伊"
+    },
+    "id::HU311__SPLIT_MEZOKOVESD": {
+      "en": "Miskolc",
+      "zh": "米什科尔茨"
+    },
+    "id::HU311__SPLIT_MISKOLC": {
+      "en": "Encs",
+      "zh": "恩奇"
+    },
+    "id::HU323__SPLIT_CIGAND": {
+      "en": "Kemecse",
+      "zh": "凯梅切"
+    },
+    "id::HU323__SPLIT_NYIREGYHAZA": {
+      "en": "Nyiregyhaza",
+      "zh": "尼赖吉哈佐"
+    },
+    "id::HU323__SPLIT_SZATMARCSEKE": {
+      "en": "Mateszalka",
+      "zh": "马泰绍尔考"
+    },
+    "id::HU331__SPLIT_BACS_KISKUN": {
+      "en": "Kiskunfelegyhaza",
+      "zh": "基什孔费莱吉哈佐"
+    },
+    "id::HU331__SPLIT_BAJA": {
+      "en": "Baja",
+      "zh": "鲍姚"
+    },
+    "id::HU331__SPLIT_KECSKEMET": {
+      "en": "Kecskemet",
+      "zh": "凯奇凯梅特"
+    },
+    "id::HU331__SPLIT_REM": {
+      "en": "Kiskunhalas",
+      "zh": "基什孔豪洛什"
+    },
+    "id::IE041__SPLIT_CAVAN_MONAGHAN": {
+      "en": "Cavan-Monaghan",
+      "zh": "卡文-莫纳亨"
+    },
+    "id::IE041__SPLIT_CLONES": {
+      "en": "Monaghan",
+      "zh": "莫纳亨"
+    },
+    "id::IE041__SPLIT_DONEGAL": {
+      "en": "Letterkenny",
+      "zh": "莱特肯尼"
+    },
+    "id::IE041__SPLIT_LOUGH_SWILLY": {
+      "en": "Lough Swilly",
+      "zh": "斯威利湾"
+    },
+    "id::IE041__SPLIT_MANORHAMILTON": {
+      "en": "Carrick-on-Shannon",
+      "zh": "香农河畔卡里克"
+    },
+    "id::IE041__SPLIT_SLIGO": {
+      "en": "Sligo",
+      "zh": "斯莱戈"
     },
     "id::IN_ADM2_76128533B75922461866405__SPLIT_PLAYA_RANN_OF_KUTCH": {
       "en": "Barmer · Rann of Kutch",
@@ -1533,6 +1845,74 @@
       "en": "Kerman",
       "zh": "克尔曼"
     },
+    "id::IRQ-3049__SPLIT_ARBIL": {
+      "en": "Hawija",
+      "zh": "哈维杰"
+    },
+    "id::IRQ-3049__SPLIT_KIRKUK": {
+      "en": "Kirkuk",
+      "zh": "基尔库克"
+    },
+    "id::IRQ-3050__SPLIT_ARBIL": {
+      "en": "Erbil",
+      "zh": "埃尔比勒"
+    },
+    "id::IRQ-3050__SPLIT_KIRKUK": {
+      "en": "Koysinceq",
+      "zh": "科伊桑贾克"
+    },
+    "id::IRQ-3050__SPLIT_SHAQLAWA": {
+      "en": "Barzan",
+      "zh": "巴尔赞"
+    },
+    "id::IRQ-3050__SPLIT_SORAN": {
+      "en": "Soran",
+      "zh": "索兰"
+    },
+    "id::IRQ-3050__SPLIT_SOUTH_SHAQLAWA": {
+      "en": "Shaqlawa",
+      "zh": "沙克拉瓦"
+    },
+    "id::IRQ-3051__SPLIT_AL_SHIRQAT": {
+      "en": "Al-Hamdaniya",
+      "zh": "哈姆达尼耶"
+    },
+    "id::IRQ-3051__SPLIT_BARDARASH": {
+      "en": "Zummar",
+      "zh": "祖马尔"
+    },
+    "id::IRQ-3051__SPLIT_HATRA": {
+      "en": "Hatra",
+      "zh": "哈特拉"
+    },
+    "id::IRQ-3051__SPLIT_MOSUL": {
+      "en": "Mosul",
+      "zh": "摩苏尔"
+    },
+    "id::IRQ-3051__SPLIT_QARYAT_AL_ASHIQ": {
+      "en": "Sinjar",
+      "zh": "辛贾尔"
+    },
+    "id::IRQ-3051__SPLIT_SHAYKHAN": {
+      "en": "Fishkhabur",
+      "zh": "菲什哈布尔"
+    },
+    "id::IRQ-3051__SPLIT_SOUTH_MOSUL": {
+      "en": "Tallkayf",
+      "zh": "泰勒凯夫"
+    },
+    "id::IRQ-3051__SPLIT_SOUTH_SHAQLAWA": {
+      "en": "'Aqrah",
+      "zh": "阿克拉"
+    },
+    "id::IRQ-3051__SPLIT_SOUTH_SINJAR": {
+      "en": "Rabia",
+      "zh": "拉比亚"
+    },
+    "id::IRQ-3051__SPLIT_TAL_AFAR": {
+      "en": "North Tal Afar",
+      "zh": "北泰勒阿费尔"
+    },
     "id::IRQ-3052__SPLIT_BUHAYRAT_ATH_THARTHAR": {
       "en": "Sala ad-Din · Buhayrat ath Tharthar site",
       "zh": "阿丁厅 · 塞尔萨尔湖库址"
@@ -1552,6 +1932,38 @@
     "id::IRQ-3471__SPLIT_REST": {
       "en": "Al-Anbar",
       "zh": "安巴尔"
+    },
+    "id::ISR-3053__SPLIT_DIMONA": {
+      "en": "Dimona",
+      "zh": "迪莫纳"
+    },
+    "id::ISR-3053__SPLIT_EILAT": {
+      "en": "Eilat",
+      "zh": "埃拉特"
+    },
+    "id::ISR-3053__SPLIT_EZUZ": {
+      "en": "Mitzpe Ramon",
+      "zh": "米茨佩拉蒙"
+    },
+    "id::ISR-3053__SPLIT_LAHAV": {
+      "en": "Kiryat Gat",
+      "zh": "基里亚特加特"
+    },
+    "id::ISR-3053__SPLIT_NEGEV": {
+      "en": "Ashdod",
+      "zh": "阿什杜德"
+    },
+    "id::ISR-3053__SPLIT_NEGEV_HIGHLANDS": {
+      "en": "Nitzana",
+      "zh": "尼察纳"
+    },
+    "id::ISR-3053__SPLIT_TLALIM": {
+      "en": "Tlalim",
+      "zh": "特拉利姆"
+    },
+    "id::ISR-3053__SPLIT_YERUHAM": {
+      "en": "Beersheba",
+      "zh": "贝尔谢巴"
     },
     "id::ITH10__SPLIT_BRUNICO": {
       "en": "Brunico",
@@ -1604,6 +2016,62 @@
     "id::ITH20__SPLIT_WEST_TRENTINO": {
       "en": "Trento",
       "zh": "特伦托"
+    },
+    "id::ITH41__SPLIT_FRIULI": {
+      "en": "Pordenone",
+      "zh": "波代诺内"
+    },
+    "id::ITH41__SPLIT_NORTH_FRIULI": {
+      "en": "Maniago",
+      "zh": "马尼亚戈"
+    },
+    "id::ITH42__SPLIT_AUPA": {
+      "en": "Aupa",
+      "zh": "奥帕"
+    },
+    "id::ITH42__SPLIT_DOGNA": {
+      "en": "Dogna",
+      "zh": "多尼亚"
+    },
+    "id::ITH42__SPLIT_FRIULI": {
+      "en": "Codroipo",
+      "zh": "科德罗伊波"
+    },
+    "id::ITH42__SPLIT_GORIZIA": {
+      "en": "Manzano",
+      "zh": "曼扎诺"
+    },
+    "id::ITH42__SPLIT_MARANO_LAGUNARE": {
+      "en": "San Giorgio di Nogaro",
+      "zh": "圣乔尔焦迪诺加罗"
+    },
+    "id::ITH42__SPLIT_MORTEGLIANO": {
+      "en": "Osoppo",
+      "zh": "奥索波"
+    },
+    "id::ITH42__SPLIT_NORTH_FRIULI": {
+      "en": "Udine",
+      "zh": "乌迪内"
+    },
+    "id::ITH42__SPLIT_NORTH_GORIZIA": {
+      "en": "Cividale del Friuli",
+      "zh": "奇维达莱德尔弗留利"
+    },
+    "id::ITH42__SPLIT_POCENIA": {
+      "en": "Marano Lagunare",
+      "zh": "马拉诺拉古纳雷"
+    },
+    "id::ITH42__SPLIT_TARVISIO": {
+      "en": "Tarvisio",
+      "zh": "塔尔维西奥"
+    },
+    "id::ITH42__SPLIT_VALBRUNA": {
+      "en": "Valbruna",
+      "zh": "瓦尔布鲁纳"
+    },
+    "id::ITH42__SPLIT_VKENTZI": {
+      "en": "Cave del Predil",
+      "zh": "卡韦德尔普雷迪尔"
     },
     "id::ITH59__SPLIT_REST": {
       "en": "Rimini",
@@ -1729,6 +2197,50 @@
       "en": "Utena County (Lithuanian part)",
       "zh": "乌田纳县（立陶宛控制部分）"
     },
+    "id::LV005__SPLIT_BALVI": {
+      "en": "Viļaka",
+      "zh": "维利亚卡"
+    },
+    "id::LV005__SPLIT_DAUGAVPILS": {
+      "en": "Daugavpils",
+      "zh": "陶格夫匹尔斯"
+    },
+    "id::LV005__SPLIT_JEKABPILS": {
+      "en": "Līvāni",
+      "zh": "利瓦尼"
+    },
+    "id::LV005__SPLIT_KRASLAVA": {
+      "en": "Kraslava",
+      "zh": "克拉斯拉瓦"
+    },
+    "id::LV005__SPLIT_LATGALE": {
+      "en": "Viļāni",
+      "zh": "维利亚尼"
+    },
+    "id::LV005__SPLIT_REZEKNE": {
+      "en": "West Rezekne",
+      "zh": "西雷泽克内"
+    },
+    "id::LV005__SPLIT_REZEKNE_5789": {
+      "en": "East Rezekne",
+      "zh": "东雷泽克内"
+    },
+    "id::LV005__SPLIT_SKRUDALIENA": {
+      "en": "Skrudaliena",
+      "zh": "斯克鲁达列纳"
+    },
+    "id::LV005__SPLIT_TILZA": {
+      "en": "Tilza",
+      "zh": "蒂尔扎"
+    },
+    "id::LV005__SPLIT_ZEMGALE": {
+      "en": "Subate",
+      "zh": "苏巴特"
+    },
+    "id::LV005__SPLIT_ZILUPE": {
+      "en": "Zilupe",
+      "zh": "济卢佩"
+    },
     "id::MAR-1445__SPLIT_REST": {
       "en": "Tanger - Tétouan · Remainder",
       "zh": "丹吉尔 - 得土安 · 余部"
@@ -1784,6 +2296,18 @@
     "id::MDA-1652__SPLIT_RIGHT": {
       "en": "Camenca (right bank)",
       "zh": "卡缅卡（德涅斯特河右岸）"
+    },
+    "id::ME_ADM1_MNE-1509__SPLIT_ANDRIJEVICA": {
+      "en": "Andrijevica",
+      "zh": "安德里耶维察"
+    },
+    "id::ME_ADM1_MNE-1509__SPLIT_PETNIJCA": {
+      "en": "Petnjica",
+      "zh": "佩特尼察"
+    },
+    "id::ME_ADM1_MNE-1509__SPLIT_SOUTH_KOLASIN": {
+      "en": "Berane",
+      "zh": "贝拉内"
     },
     "id::MK003__SPLIT_BOJANE": {
       "en": "Bojane",
@@ -2069,6 +2593,38 @@
       "en": "Panamá · Remainder",
       "zh": "巴拿马 · 余部"
     },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_BIALYSTOK": {
+      "en": "Brańsk",
+      "zh": "布兰斯克"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_EAST_BIALYSTOK": {
+      "en": "Bielsk Podlaski",
+      "zh": "波德拉谢地区别尔斯克"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_GONIADZ": {
+      "en": "Goniadz",
+      "zh": "戈尼翁兹"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_MSCIWUJE": {
+      "en": "Msciwuje",
+      "zh": "姆希武耶"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_NAGORKI": {
+      "en": "Zambrow",
+      "zh": "赞布鲁夫"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_PLATNICA": {
+      "en": "Ciechanowiec",
+      "zh": "切哈诺维茨"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_POPKI": {
+      "en": "Lomza",
+      "zh": "沃姆扎"
+    },
+    "id::PL_MRG_44c900e7cbdd__SPLIT_WLODKI": {
+      "en": "Wlodki",
+      "zh": "弗沃德基"
+    },
     "id::PL_MRG_727dd6268093__SPLIT_DANZIG": {
       "en": "Pomeranian · North · Free City rural district",
       "zh": "滨海省·北部 · 但泽自由市乡村区"
@@ -2116,6 +2672,22 @@
     "id::PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_SUSZ": {
       "en": "Susz",
       "zh": "苏什"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_JANOWKA": {
+      "en": "Janowka",
+      "zh": "亚努夫卡"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_LUBLIN": {
+      "en": "Lubartow",
+      "zh": "卢巴尔图夫"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_LUKOW": {
+      "en": "Pulawy",
+      "zh": "普瓦维"
+    },
+    "id::PL_MRG_c5cfb391c06f__SPLIT_WEST_CHELM": {
+      "en": "West Chelm",
+      "zh": "西海乌姆"
     },
     "id::PL_MRG_c908eb11c602__SPLIT_ALLENSTEIN": {
       "en": "Allenstein",
@@ -2192,6 +2764,30 @@
     "id::PL_MRG_c93ffd9ad4b7__SPLIT_NORTH_KUYAVIA": {
       "en": "North Kuyavia",
       "zh": "北库亚维"
+    },
+    "id::PL_POW_0601__SPLIT_EAST_OKUNINKA": {
+      "en": "Terespol",
+      "zh": "泰雷斯波尔"
+    },
+    "id::PL_POW_0601__SPLIT_JANOWKA": {
+      "en": "Miedzyrzec Podlaski",
+      "zh": "波德拉谢地区缅济热茨"
+    },
+    "id::PL_POW_0601__SPLIT_KOROLOWKA": {
+      "en": "Korolowka",
+      "zh": "科罗卢夫卡"
+    },
+    "id::PL_POW_0601__SPLIT_OKUNINKA": {
+      "en": "Okuninka",
+      "zh": "奥库宁卡"
+    },
+    "id::PL_POW_0601__SPLIT_WEST_CHELM": {
+      "en": "Biala Podlaska",
+      "zh": "比亚瓦波德拉斯卡"
+    },
+    "id::PL_POW_0601__SPLIT_WLODAWA": {
+      "en": "Wlodawa",
+      "zh": "弗沃达瓦"
     },
     "id::PL_POW_1465__SPLIT_LEFT": {
       "en": "Warsaw · Left bank",
@@ -2497,6 +3093,18 @@
       "en": "Roznov",
       "zh": "罗兹诺夫"
     },
+    "id::RO215__SPLIT_INNER_MOLDOVA": {
+      "en": "Inner Moldova",
+      "zh": "内摩尔多瓦"
+    },
+    "id::RO215__SPLIT_SOUTHERN_BUCOVINA": {
+      "en": "Southern Bucovina",
+      "zh": "南布科维纳"
+    },
+    "id::RO215__SPLIT_SUCEAVA": {
+      "en": "Suceava",
+      "zh": "苏恰瓦"
+    },
     "id::RO421__SPLIT_BELUS": {
       "en": "Belus",
       "zh": "贝卢什"
@@ -2560,6 +3168,78 @@
     "id::RO424__SPLIT_TIMISORA": {
       "en": "South Timișoara",
       "zh": "南蒂米什瓦拉"
+    },
+    "id::RS121__SPLIT_KULA": {
+      "en": "Kula",
+      "zh": "库拉"
+    },
+    "id::RS121__SPLIT_OSIJEK": {
+      "en": "Apatin",
+      "zh": "阿帕廷"
+    },
+    "id::RS121__SPLIT_SOMBOR": {
+      "en": "Sombor",
+      "zh": "松博尔"
+    },
+    "id::RS123__SPLIT_BECEJ": {
+      "en": "Novi Sad",
+      "zh": "诺维萨德"
+    },
+    "id::RS123__SPLIT_ILOK": {
+      "en": "Backa Palanka",
+      "zh": "巴奇卡帕兰卡"
+    },
+    "id::RS123__SPLIT_KULA": {
+      "en": "Bač",
+      "zh": "巴奇"
+    },
+    "id::RS123__SPLIT_SYRMIA": {
+      "en": "Titel",
+      "zh": "蒂特尔"
+    },
+    "id::RS123__SPLIT_TEMERIN": {
+      "en": "Vrbas",
+      "zh": "弗尔巴斯"
+    },
+    "id::RS127__SPLIT_IRIG": {
+      "en": "East Sremska Mitrovica",
+      "zh": "东斯雷姆斯卡米特罗维察"
+    },
+    "id::RS127__SPLIT_JAMENA": {
+      "en": "Jamena",
+      "zh": "亚梅纳"
+    },
+    "id::RS127__SPLIT_KUSMIN": {
+      "en": "Kuzmin",
+      "zh": "库兹明"
+    },
+    "id::RS127__SPLIT_SREMSKA_MITROVICA": {
+      "en": "West Sremska Mitrovica",
+      "zh": "西斯雷姆斯卡米特罗维察"
+    },
+    "id::RS127__SPLIT_SYRMIA": {
+      "en": "Ruma",
+      "zh": "鲁马"
+    },
+    "id::RS217__SPLIT_DRAGA": {
+      "en": "Raška",
+      "zh": "拉什卡"
+    },
+    "id::RS217__SPLIT_DUBNICA": {
+      "en": "Jošanička Banja",
+      "zh": "约沙尼奇卡矿泉镇"
+    },
+    "id::RS217__SPLIT_KRALJEVO": {
+      "en": "Kraljevo",
+      "zh": "克拉列沃"
+    },
+    "id::RS217__SPLIT_NOVI_PAZAR": {
+      "en": "Novi Pazar",
+      "zh": "新帕扎尔"
+    },
+    "id::RS217__SPLIT_SJENICA": {
+      "en": "Ušće",
+      "zh": "乌什切"
     },
     "id::RU_ARCTIC_FB_2558__SPLIT_REST": {
       "en": "Russia Shell Fallback 2558",
@@ -3409,6 +4089,34 @@
       "en": "Snina District (Slovak part)",
       "zh": "斯尼纳县（斯洛伐克部分）"
     },
+    "id::SK_ADM2_56367889B15407569919112__SPLIT_LEVICE": {
+      "en": "Levice",
+      "zh": "莱维采"
+    },
+    "id::SK_ADM2_56367889B15407569919112__SPLIT_PODHAJSKA": {
+      "en": "Želiezovce",
+      "zh": "热列佐夫采"
+    },
+    "id::SK_ADM2_56367889B15407569919112__SPLIT_SURANY": {
+      "en": "Tekovské Lužany",
+      "zh": "泰科夫斯凯卢扎尼"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_GALANTA": {
+      "en": "Selice",
+      "zh": "塞利采"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_SAFA": {
+      "en": "South Šaľa",
+      "zh": "南沙拉"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_SOUTH_NYITRA": {
+      "en": "South Nyitra",
+      "zh": "南尼特拉"
+    },
+    "id::SK_ADM2_56367889B4918056975771__SPLIT_WESTERN_SLOVAKIA": {
+      "en": "North Šaľa",
+      "zh": "北沙拉"
+    },
     "id::SK_ADM2_56367889B51237059400968__SPLIT_DEVIN": {
       "en": "Devín (Theben)",
       "zh": "德温（特本）"
@@ -3524,6 +4232,102 @@
     "id::TR631__SPLIT_SANJAK": {
       "en": "Sanjak of Alexandretta",
       "zh": "亚历山大勒塔桑贾克"
+    },
+    "id::TR905__SPLIT_ARTVIN": {
+      "en": "Artvin",
+      "zh": "阿尔特温"
+    },
+    "id::TR905__SPLIT_HOPA": {
+      "en": "Hopa",
+      "zh": "霍帕"
+    },
+    "id::TR905__SPLIT_SAVSAT": {
+      "en": "Savsat",
+      "zh": "萨夫沙特"
+    },
+    "id::TR905__SPLIT_YUSUFELI": {
+      "en": "Yusufeli",
+      "zh": "优素费利"
+    },
+    "id::TRA11__SPLIT_ASKALE": {
+      "en": "Askale",
+      "zh": "阿什卡莱"
+    },
+    "id::TRA11__SPLIT_ERZURUM": {
+      "en": "Erzurum",
+      "zh": "埃尔祖鲁姆"
+    },
+    "id::TRA11__SPLIT_HORASAN": {
+      "en": "Narman",
+      "zh": "纳尔曼"
+    },
+    "id::TRA11__SPLIT_ISPIR": {
+      "en": "Ispir",
+      "zh": "伊斯皮尔"
+    },
+    "id::TRA11__SPLIT_OLTU": {
+      "en": "Oltu",
+      "zh": "奥尔图"
+    },
+    "id::TRA11__SPLIT_PASINLER": {
+      "en": "Hinis",
+      "zh": "赫内斯"
+    },
+    "id::TRA11__SPLIT_PAZARYOLU": {
+      "en": "Pazaryolu",
+      "zh": "帕扎尔约卢"
+    },
+    "id::TRA22__SPLIT_BASKOY": {
+      "en": "Baskoy",
+      "zh": "巴什柯伊"
+    },
+    "id::TRA22__SPLIT_CILDIR": {
+      "en": "Cildir",
+      "zh": "彻尔德尔"
+    },
+    "id::TRA22__SPLIT_DIGOR": {
+      "en": "Digor",
+      "zh": "迪戈尔"
+    },
+    "id::TRA22__SPLIT_KAGIZMAN": {
+      "en": "Kagizman",
+      "zh": "卡厄兹曼"
+    },
+    "id::TRA22__SPLIT_KARAKALE": {
+      "en": "Karakale",
+      "zh": "卡拉卡莱"
+    },
+    "id::TRA22__SPLIT_KARS": {
+      "en": "Kars",
+      "zh": "卡尔斯"
+    },
+    "id::TRA22__SPLIT_KIRAC": {
+      "en": "Kirac",
+      "zh": "克拉奇"
+    },
+    "id::TRA22__SPLIT_ODALAR": {
+      "en": "Odalar",
+      "zh": "奥达拉尔"
+    },
+    "id::TRA22__SPLIT_SARIKAMIS": {
+      "en": "Sarikamis",
+      "zh": "萨勒卡默什"
+    },
+    "id::TRA24__SPLIT_ARDAHAN": {
+      "en": "Ardahan",
+      "zh": "阿尔达汉"
+    },
+    "id::TRA24__SPLIT_CILDIR": {
+      "en": "Cildir",
+      "zh": "彻尔德尔"
+    },
+    "id::TRA24__SPLIT_KOLKOY": {
+      "en": "Kolkoy",
+      "zh": "科尔柯伊"
+    },
+    "id::TRA24__SPLIT_TURKGOZU": {
+      "en": "Turkgozu",
+      "zh": "蒂尔克格聚"
     },
     "id::TUN-101__SPLIT_PLAYA_CHOTT_EL_DJERID": {
       "en": "Tozeur · Chott el Djerid",

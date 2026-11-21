@@ -126500,7 +126500,7 @@
       }
     },
     {
-      "id": 20782,
+      "id": 20744,
       "type": "Feature",
       "properties": {
         "id": "RU_CITY_MOSCOW__SPLIT_SOUTHWEST",
@@ -129035,7 +129035,7 @@
       }
     },
     {
-      "id": 20783,
+      "id": 20745,
       "type": "Feature",
       "properties": {
         "id": "RU_CITY_MOSCOW__SPLIT_CITY",
@@ -131940,7 +131940,7 @@
       }
     },
     {
-      "id": 21108,
+      "id": 21070,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_06348d287b63__SPLIT_RYBINSK_RESERVOIR",
@@ -132581,7 +132581,7 @@
       }
     },
     {
-      "id": 21109,
+      "id": 21071,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_06348d287b63__SPLIT_REST",
@@ -133726,7 +133726,7 @@
       }
     },
     {
-      "id": 21124,
+      "id": 21086,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_465e54ee3c98__SPLIT_RYBINSK_RESERVOIR",
@@ -133837,7 +133837,7 @@
       }
     },
     {
-      "id": 21125,
+      "id": 21087,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_465e54ee3c98__SPLIT_REST",
@@ -134490,7 +134490,7 @@
       }
     },
     {
-      "id": 21159,
+      "id": 21121,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4615cedcd6d__SPLIT_RYBINSK_RESERVOIR",
@@ -134823,7 +134823,7 @@
       }
     },
     {
-      "id": 21160,
+      "id": 21122,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4615cedcd6d__SPLIT_REST",
@@ -135526,7 +135526,7 @@
       }
     },
     {
-      "id": 21161,
+      "id": 21123,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_cb7ab64b43b7__SPLIT_RYBINSK_RESERVOIR",
@@ -135602,7 +135602,7 @@
       }
     },
     {
-      "id": 21162,
+      "id": 21124,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_cb7ab64b43b7__SPLIT_REST",
@@ -136184,7 +136184,7 @@
       }
     },
     {
-      "id": 21206,
+      "id": 21168,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B42465403886102__SPLIT_RYBINSK_RESERVOIR",
@@ -136279,7 +136279,7 @@
       }
     },
     {
-      "id": 21207,
+      "id": 21169,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B42465403886102__SPLIT_REST",
@@ -136690,7 +136690,7 @@
       }
     },
     {
-      "id": 21270,
+      "id": 21232,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B91001506415746__SPLIT_RYBINSK_RESERVOIR",
@@ -136893,7 +136893,7 @@
       }
     },
     {
-      "id": 21271,
+      "id": 21233,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B91001506415746__SPLIT_REST",

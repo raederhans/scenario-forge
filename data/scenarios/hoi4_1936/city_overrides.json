@@ -17425,7 +17425,7 @@
     "CITY::gn::753895": {
       "city_id": "CITY::gn::753895",
       "stable_key": "id::CITY::gn::753895",
-      "host_feature_id": "PL_MRG_44c900e7cbdd"
+      "host_feature_id": "PL_MRG_44c900e7cbdd__SPLIT_NAGORKI"
     },
     "CITY::gn::755889": {
       "city_id": "CITY::gn::755889",
@@ -17500,12 +17500,12 @@
     "CITY::gn::760680": {
       "city_id": "CITY::gn::760680",
       "stable_key": "id::CITY::gn::760680",
-      "host_feature_id": "PL_MRG_c5cfb391c06f"
+      "host_feature_id": "PL_MRG_c5cfb391c06f__SPLIT_LUKOW"
     },
     "CITY::gn::760924": {
       "city_id": "CITY::gn::760924",
       "stable_key": "id::CITY::gn::760924",
-      "host_feature_id": "PL_MRG_c5cfb391c06f"
+      "host_feature_id": "PL_MRG_c5cfb391c06f__SPLIT_LUKOW"
     },
     "CITY::gn::761131": {
       "city_id": "CITY::gn::761131",
@@ -17535,17 +17535,17 @@
     "CITY::gn::765749": {
       "city_id": "CITY::gn::765749",
       "stable_key": "id::CITY::gn::765749",
-      "host_feature_id": "PL_MRG_c5cfb391c06f"
+      "host_feature_id": "PL_MRG_c5cfb391c06f__SPLIT_LUKOW"
     },
     "CITY::gn::765927": {
       "city_id": "CITY::gn::765927",
       "stable_key": "id::CITY::gn::765927",
-      "host_feature_id": "PL_MRG_c5cfb391c06f"
+      "host_feature_id": "PL_MRG_c5cfb391c06f__SPLIT_LUBLIN"
     },
     "CITY::gn::766027": {
       "city_id": "CITY::gn::766027",
       "stable_key": "id::CITY::gn::766027",
-      "host_feature_id": "PL_MRG_44c900e7cbdd"
+      "host_feature_id": "PL_MRG_44c900e7cbdd__SPLIT_POPKI"
     },
     "CITY::gn::766307": {
       "city_id": "CITY::gn::766307",
@@ -17595,7 +17595,7 @@
     "CITY::gn::773357": {
       "city_id": "CITY::gn::773357",
       "stable_key": "id::CITY::gn::773357",
-      "host_feature_id": "PL_MRG_c5cfb391c06f"
+      "host_feature_id": "PL_MRG_c5cfb391c06f__SPLIT_LUKOW"
     },
     "CITY::gn::773380": {
       "city_id": "CITY::gn::773380",
@@ -17620,7 +17620,7 @@
     "CITY::gn::775986": {
       "city_id": "CITY::gn::775986",
       "stable_key": "id::CITY::gn::775986",
-      "host_feature_id": "PL_MRG_44c900e7cbdd"
+      "host_feature_id": "PL_MRG_44c900e7cbdd__SPLIT_EAST_BIALYSTOK"
     },
     "CITY::gn::819740": {
       "city_id": "CITY::gn::819740",
@@ -23253,7 +23253,8 @@
       "aliases": [
         "Leninakan",
         "Gyumri"
-      ]
+      ],
+      "host_feature_id": "ARM-1555__SPLIT_KARAKALE"
     },
     "CITY::ne::1159132163": {
       "city_id": "CITY::ne::1159132163",
@@ -23410,7 +23411,8 @@
       "aliases": [
         "Baranowicze",
         "Baranavichy"
-      ]
+      ],
+      "host_feature_id": "BY_INT_BREST__SPLIT_NOWOGRODEK"
     },
     "CITY::ne::1159139051": {
       "city_id": "CITY::ne::1159139051",
@@ -31644,6 +31646,521 @@
       "city_id": "CITY::ne::1159145133",
       "stable_key": "id::CITY::ne::1159145133",
       "host_feature_id": "BY_INT_GRODNO__SPLIT_VAVERKA"
+    },
+    "CITY::gn::2641520": {
+      "city_id": "CITY::gn::2641520",
+      "stable_key": "id::CITY::gn::2641520",
+      "host_feature_id": "GB_NUTS1_UKN__SPLIT_BELFAST"
+    },
+    "CITY::gn::2644849": {
+      "city_id": "CITY::gn::2644849",
+      "stable_key": "id::CITY::gn::2644849",
+      "host_feature_id": "GB_NUTS1_UKN__SPLIT_BELFAST"
+    },
+    "CITY::gn::295620": {
+      "city_id": "CITY::gn::295620",
+      "stable_key": "id::CITY::gn::295620",
+      "host_feature_id": "ISR-3053__SPLIT_NEGEV"
+    },
+    "CITY::gn::295629": {
+      "city_id": "CITY::gn::295629",
+      "stable_key": "id::CITY::gn::295629",
+      "host_feature_id": "ISR-3053__SPLIT_NEGEV"
+    },
+    "CITY::gn::2962961": {
+      "city_id": "CITY::gn::2962961",
+      "stable_key": "id::CITY::gn::2962961",
+      "host_feature_id": "IE041__SPLIT_DONEGAL"
+    },
+    "CITY::gn::302824": {
+      "city_id": "CITY::gn::302824",
+      "stable_key": "id::CITY::gn::302824",
+      "host_feature_id": "TRA11__SPLIT_ERZURUM"
+    },
+    "CITY::gn::3045190": {
+      "city_id": "CITY::gn::3045190",
+      "stable_key": "id::CITY::gn::3045190",
+      "host_feature_id": "HU221__SPLIT_SOPRON"
+    },
+    "CITY::gn::3045487": {
+      "city_id": "CITY::gn::3045487",
+      "stable_key": "id::CITY::gn::3045487",
+      "host_feature_id": "HU222__SPLIT_SZOMBATHELY"
+    },
+    "CITY::gn::3046768": {
+      "city_id": "CITY::gn::3046768",
+      "stable_key": "id::CITY::gn::3046768",
+      "host_feature_id": "HU233"
+    },
+    "CITY::gn::3047896": {
+      "city_id": "CITY::gn::3047896",
+      "stable_key": "id::CITY::gn::3047896",
+      "host_feature_id": "HU221__SPLIT_FERTOD"
+    },
+    "CITY::gn::3049880": {
+      "city_id": "CITY::gn::3049880",
+      "stable_key": "id::CITY::gn::3049880",
+      "host_feature_id": "HU331__SPLIT_REM"
+    },
+    "CITY::gn::3049885": {
+      "city_id": "CITY::gn::3049885",
+      "stable_key": "id::CITY::gn::3049885",
+      "host_feature_id": "HU331__SPLIT_BACS_KISKUN"
+    },
+    "CITY::gn::3049896": {
+      "city_id": "CITY::gn::3049896",
+      "stable_key": "id::CITY::gn::3049896",
+      "host_feature_id": "HU331__SPLIT_KECSKEMET"
+    },
+    "CITY::gn::3050719": {
+      "city_id": "CITY::gn::3050719",
+      "stable_key": "id::CITY::gn::3050719",
+      "host_feature_id": "HU331__SPLIT_REM"
+    },
+    "CITY::gn::3055685": {
+      "city_id": "CITY::gn::3055685",
+      "stable_key": "id::CITY::gn::3055685",
+      "host_feature_id": "HU331__SPLIT_BAJA"
+    },
+    "CITY::gn::3057769": {
+      "city_id": "CITY::gn::3057769",
+      "stable_key": "id::CITY::gn::3057769",
+      "host_feature_id": "SK_ADM2_56367889B4918056975771__SPLIT_WESTERN_SLOVAKIA"
+    },
+    "CITY::gn::3059101": {
+      "city_id": "CITY::gn::3059101",
+      "stable_key": "id::CITY::gn::3059101",
+      "host_feature_id": "SK_ADM2_56367889B15407569919112__SPLIT_LEVICE"
+    },
+    "CITY::gn::310004": {
+      "city_id": "CITY::gn::310004",
+      "stable_key": "id::CITY::gn::310004",
+      "host_feature_id": "TRA11__SPLIT_PASINLER"
+    },
+    "CITY::gn::312114": {
+      "city_id": "CITY::gn::312114",
+      "stable_key": "id::CITY::gn::312114",
+      "host_feature_id": "TRA11__SPLIT_PASINLER"
+    },
+    "CITY::gn::3168730": {
+      "city_id": "CITY::gn::3168730",
+      "stable_key": "id::CITY::gn::3168730",
+      "host_feature_id": "ITH41__SPLIT_FRIULI"
+    },
+    "CITY::gn::3170147": {
+      "city_id": "CITY::gn::3170147",
+      "stable_key": "id::CITY::gn::3170147",
+      "host_feature_id": "ITH41__SPLIT_FRIULI"
+    },
+    "CITY::gn::3178112": {
+      "city_id": "CITY::gn::3178112",
+      "stable_key": "id::CITY::gn::3178112",
+      "host_feature_id": "ITH41__SPLIT_FRIULI"
+    },
+    "CITY::gn::3187047": {
+      "city_id": "CITY::gn::3187047",
+      "stable_key": "id::CITY::gn::3187047",
+      "host_feature_id": "HR026__SPLIT_VUKOVAR"
+    },
+    "CITY::gn::3187297": {
+      "city_id": "CITY::gn::3187297",
+      "stable_key": "id::CITY::gn::3187297",
+      "host_feature_id": "RS123__SPLIT_TEMERIN"
+    },
+    "CITY::gn::3187719": {
+      "city_id": "CITY::gn::3187719",
+      "stable_key": "id::CITY::gn::3187719",
+      "host_feature_id": "HR026__SPLIT_VINKOVCI"
+    },
+    "CITY::gn::3190103": {
+      "city_id": "CITY::gn::3190103",
+      "stable_key": "id::CITY::gn::3190103",
+      "host_feature_id": "RS127__SPLIT_IRIG"
+    },
+    "CITY::gn::3190342": {
+      "city_id": "CITY::gn::3190342",
+      "stable_key": "id::CITY::gn::3190342",
+      "host_feature_id": "RS121__SPLIT_SOMBOR"
+    },
+    "CITY::gn::3191429": {
+      "city_id": "CITY::gn::3191429",
+      "stable_key": "id::CITY::gn::3191429",
+      "host_feature_id": "RS127__SPLIT_SYRMIA"
+    },
+    "CITY::gn::319357": {
+      "city_id": "CITY::gn::319357",
+      "stable_key": "id::CITY::gn::319357",
+      "host_feature_id": "TRA11__SPLIT_ERZURUM"
+    },
+    "CITY::gn::3200802": {
+      "city_id": "CITY::gn::3200802",
+      "stable_key": "id::CITY::gn::3200802",
+      "host_feature_id": "RS123__SPLIT_TEMERIN"
+    },
+    "CITY::gn::3202220": {
+      "city_id": "CITY::gn::3202220",
+      "stable_key": "id::CITY::gn::3202220",
+      "host_feature_id": "HR025__SPLIT_VINKOVCI"
+    },
+    "CITY::gn::3204674": {
+      "city_id": "CITY::gn::3204674",
+      "stable_key": "id::CITY::gn::3204674",
+      "host_feature_id": "RS123__SPLIT_ILOK"
+    },
+    "CITY::gn::3204793": {
+      "city_id": "CITY::gn::3204793",
+      "stable_key": "id::CITY::gn::3204793",
+      "host_feature_id": "RS121__SPLIT_OSIJEK"
+    },
+    "CITY::gn::353471": {
+      "city_id": "CITY::gn::353471",
+      "stable_key": "id::CITY::gn::353471",
+      "host_feature_id": "EGY-1558__SPLIT_RAFAH"
+    },
+    "CITY::gn::410142": {
+      "city_id": "CITY::gn::410142",
+      "stable_key": "id::CITY::gn::410142",
+      "host_feature_id": "EGY-1558__SPLIT_BIR_AL_ABED"
+    },
+    "CITY::gn::448149": {
+      "city_id": "CITY::gn::448149",
+      "stable_key": "id::CITY::gn::448149",
+      "host_feature_id": "IRQ-3051__SPLIT_QARYAT_AL_ASHIQ"
+    },
+    "CITY::gn::615860": {
+      "city_id": "CITY::gn::615860",
+      "stable_key": "id::CITY::gn::615860",
+      "host_feature_id": "GEO-3038__SPLIT_TURKGOZU"
+    },
+    "CITY::gn::616887": {
+      "city_id": "CITY::gn::616887",
+      "stable_key": "id::CITY::gn::616887",
+      "host_feature_id": "ARM-1555__SPLIT_SALUT"
+    },
+    "CITY::gn::622997": {
+      "city_id": "CITY::gn::622997",
+      "stable_key": "id::CITY::gn::622997",
+      "host_feature_id": "BY_INT_BREST__SPLIT_POLESIE"
+    },
+    "CITY::gn::625818": {
+      "city_id": "CITY::gn::625818",
+      "stable_key": "id::CITY::gn::625818",
+      "host_feature_id": "BY_INT_BREST__SPLIT_PINSK"
+    },
+    "CITY::gn::627145": {
+      "city_id": "CITY::gn::627145",
+      "stable_key": "id::CITY::gn::627145",
+      "host_feature_id": "BY_INT_BREST__SPLIT_POLESIE"
+    },
+    "CITY::gn::627800": {
+      "city_id": "CITY::gn::627800",
+      "stable_key": "id::CITY::gn::627800",
+      "host_feature_id": "BY_INT_BREST__SPLIT_DOBROMYSL"
+    },
+    "CITY::gn::627811": {
+      "city_id": "CITY::gn::627811",
+      "stable_key": "id::CITY::gn::627811",
+      "host_feature_id": "BY_INT_BREST__SPLIT_NORTH_PINSK"
+    },
+    "CITY::gn::629454": {
+      "city_id": "CITY::gn::629454",
+      "stable_key": "id::CITY::gn::629454",
+      "host_feature_id": "BY_INT_BREST__SPLIT_POLESIE"
+    },
+    "CITY::gn::663100": {
+      "city_id": "CITY::gn::663100",
+      "stable_key": "id::CITY::gn::663100",
+      "host_feature_id": "RO215__SPLIT_SUCEAVA"
+    },
+    "CITY::gn::669289": {
+      "city_id": "CITY::gn::669289",
+      "stable_key": "id::CITY::gn::669289",
+      "host_feature_id": "RO215__SPLIT_SUCEAVA"
+    },
+    "CITY::gn::676527": {
+      "city_id": "CITY::gn::676527",
+      "stable_key": "id::CITY::gn::676527",
+      "host_feature_id": "RO215__SPLIT_SUCEAVA"
+    },
+    "CITY::gn::678459": {
+      "city_id": "CITY::gn::678459",
+      "stable_key": "id::CITY::gn::678459",
+      "host_feature_id": "RO215__SPLIT_SUCEAVA"
+    },
+    "CITY::gn::681845": {
+      "city_id": "CITY::gn::681845",
+      "stable_key": "id::CITY::gn::681845",
+      "host_feature_id": "RO215__SPLIT_SUCEAVA"
+    },
+    "CITY::gn::714697": {
+      "city_id": "CITY::gn::714697",
+      "stable_key": "id::CITY::gn::714697",
+      "host_feature_id": "HU311__SPLIT_CIGAND"
+    },
+    "CITY::gn::715839": {
+      "city_id": "CITY::gn::715839",
+      "stable_key": "id::CITY::gn::715839",
+      "host_feature_id": "HU311__SPLIT_HRAN"
+    },
+    "CITY::gn::716671": {
+      "city_id": "CITY::gn::716671",
+      "stable_key": "id::CITY::gn::716671",
+      "host_feature_id": "HU311__SPLIT_MEZOKOVESD"
+    },
+    "CITY::gn::717652": {
+      "city_id": "CITY::gn::717652",
+      "stable_key": "id::CITY::gn::717652",
+      "host_feature_id": "HU311__SPLIT_MEZOKOVESD"
+    },
+    "CITY::gn::717771": {
+      "city_id": "CITY::gn::717771",
+      "stable_key": "id::CITY::gn::717771",
+      "host_feature_id": "HU323__SPLIT_SZATMARCSEKE"
+    },
+    "CITY::gn::718739": {
+      "city_id": "CITY::gn::718739",
+      "stable_key": "id::CITY::gn::718739",
+      "host_feature_id": "HU323__SPLIT_SZATMARCSEKE"
+    },
+    "CITY::gn::719311": {
+      "city_id": "CITY::gn::719311",
+      "stable_key": "id::CITY::gn::719311",
+      "host_feature_id": "HU311__SPLIT_MEZOKOVESD"
+    },
+    "CITY::gn::721378": {
+      "city_id": "CITY::gn::721378",
+      "stable_key": "id::CITY::gn::721378",
+      "host_feature_id": "HU311__SPLIT_MEZOKOVESD"
+    },
+    "CITY::gn::740088": {
+      "city_id": "CITY::gn::740088",
+      "stable_key": "id::CITY::gn::740088",
+      "host_feature_id": "TRA22__SPLIT_KARS"
+    },
+    "CITY::gn::741160": {
+      "city_id": "CITY::gn::741160",
+      "stable_key": "id::CITY::gn::741160",
+      "host_feature_id": "TRA11__SPLIT_OLTU"
+    },
+    "CITY::gn::744873": {
+      "city_id": "CITY::gn::744873",
+      "stable_key": "id::CITY::gn::744873",
+      "host_feature_id": "TRA22__SPLIT_KAGIZMAN"
+    },
+    "CITY::gn::745527": {
+      "city_id": "CITY::gn::745527",
+      "stable_key": "id::CITY::gn::745527",
+      "host_feature_id": "TRA11__SPLIT_PASINLER"
+    },
+    "CITY::gn::745530": {
+      "city_id": "CITY::gn::745530",
+      "stable_key": "id::CITY::gn::745530",
+      "host_feature_id": "TR905__SPLIT_HOPA"
+    },
+    "CITY::gn::751931": {
+      "city_id": "CITY::gn::751931",
+      "stable_key": "id::CITY::gn::751931",
+      "host_feature_id": "TR905__SPLIT_HOPA"
+    },
+    "CITY::gn::751952": {
+      "city_id": "CITY::gn::751952",
+      "stable_key": "id::CITY::gn::751952",
+      "host_feature_id": "TRA24__SPLIT_ARDAHAN"
+    },
+    "CITY::gn::764862": {
+      "city_id": "CITY::gn::764862",
+      "stable_key": "id::CITY::gn::764862",
+      "host_feature_id": "PL_POW_0601__SPLIT_JANOWKA"
+    },
+    "CITY::gn::785559": {
+      "city_id": "CITY::gn::785559",
+      "stable_key": "id::CITY::gn::785559",
+      "host_feature_id": "RS127__SPLIT_SYRMIA"
+    },
+    "CITY::gn::787595": {
+      "city_id": "CITY::gn::787595",
+      "stable_key": "id::CITY::gn::787595",
+      "host_feature_id": "RS217__SPLIT_NOVI_PAZAR"
+    },
+    "CITY::gn::787615": {
+      "city_id": "CITY::gn::787615",
+      "stable_key": "id::CITY::gn::787615",
+      "host_feature_id": "RS127__SPLIT_SYRMIA"
+    },
+    "CITY::gn::789107": {
+      "city_id": "CITY::gn::789107",
+      "stable_key": "id::CITY::gn::789107",
+      "host_feature_id": "RS217__SPLIT_KRALJEVO"
+    },
+    "CITY::gn::790015": {
+      "city_id": "CITY::gn::790015",
+      "stable_key": "id::CITY::gn::790015",
+      "host_feature_id": "RS127__SPLIT_SYRMIA"
+    },
+    "CITY::gn::792814": {
+      "city_id": "CITY::gn::792814",
+      "stable_key": "id::CITY::gn::792814",
+      "host_feature_id": "RS123__SPLIT_BECEJ"
+    },
+    "CITY::gn::90353": {
+      "city_id": "CITY::gn::90353",
+      "stable_key": "id::CITY::gn::90353",
+      "host_feature_id": "IRQ-3051__SPLIT_SOUTH_MOSUL"
+    },
+    "CITY::gn::92002": {
+      "city_id": "CITY::gn::92002",
+      "stable_key": "id::CITY::gn::92002",
+      "host_feature_id": "IRQ-3050__SPLIT_SORAN"
+    },
+    "CITY::gn::92430": {
+      "city_id": "CITY::gn::92430",
+      "stable_key": "id::CITY::gn::92430",
+      "host_feature_id": "IRQ-3051__SPLIT_AL_SHIRQAT"
+    },
+    "CITY::gn::94220": {
+      "city_id": "CITY::gn::94220",
+      "stable_key": "id::CITY::gn::94220",
+      "host_feature_id": "IRQ-3050__SPLIT_KIRKUK"
+    },
+    "CITY::gn::96961": {
+      "city_id": "CITY::gn::96961",
+      "stable_key": "id::CITY::gn::96961",
+      "host_feature_id": "IRQ-3050__SPLIT_SORAN"
+    },
+    "CITY::gn::98822": {
+      "city_id": "CITY::gn::98822",
+      "stable_key": "id::CITY::gn::98822",
+      "host_feature_id": "IRQ-3051__SPLIT_SOUTH_SHAQLAWA"
+    },
+    "CITY::gn::99071": {
+      "city_id": "CITY::gn::99071",
+      "stable_key": "id::CITY::gn::99071",
+      "host_feature_id": "IRQ-3051__SPLIT_MOSUL"
+    },
+    "CITY::ne::1159113561": {
+      "city_id": "CITY::ne::1159113561",
+      "stable_key": "id::CITY::ne::1159113561",
+      "host_feature_id": "TR905__SPLIT_ARTVIN"
+    },
+    "CITY::ne::1159119463": {
+      "city_id": "CITY::ne::1159119463",
+      "stable_key": "id::CITY::ne::1159119463",
+      "host_feature_id": "IE041__SPLIT_CLONES"
+    },
+    "CITY::ne::1159121147": {
+      "city_id": "CITY::ne::1159121147",
+      "stable_key": "id::CITY::ne::1159121147",
+      "host_feature_id": "AT112__SPLIT_NORTH_BURGENLAND"
+    },
+    "CITY::ne::1159127709": {
+      "city_id": "CITY::ne::1159127709",
+      "stable_key": "id::CITY::ne::1159127709",
+      "host_feature_id": "HU222__SPLIT_KAM"
+    },
+    "CITY::ne::1159127719": {
+      "city_id": "CITY::ne::1159127719",
+      "stable_key": "id::CITY::ne::1159127719",
+      "host_feature_id": "HU331__SPLIT_KECSKEMET"
+    },
+    "CITY::ne::1159127743": {
+      "city_id": "CITY::ne::1159127743",
+      "stable_key": "id::CITY::ne::1159127743",
+      "host_feature_id": "HU323__SPLIT_NYIREGYHAZA"
+    },
+    "CITY::ne::1159127833": {
+      "city_id": "CITY::ne::1159127833",
+      "stable_key": "id::CITY::ne::1159127833",
+      "host_feature_id": "RO215__SPLIT_SUCEAVA"
+    },
+    "CITY::ne::1159128241": {
+      "city_id": "CITY::ne::1159128241",
+      "stable_key": "id::CITY::ne::1159128241",
+      "host_feature_id": "LV005__SPLIT_REZEKNE_5789"
+    },
+    "CITY::ne::1159129697": {
+      "city_id": "CITY::ne::1159129697",
+      "stable_key": "id::CITY::ne::1159129697",
+      "host_feature_id": "IE041__SPLIT_DONEGAL"
+    },
+    "CITY::ne::1159129767": {
+      "city_id": "CITY::ne::1159129767",
+      "stable_key": "id::CITY::ne::1159129767",
+      "host_feature_id": "ITH42__SPLIT_NORTH_FRIULI"
+    },
+    "CITY::ne::1159130717": {
+      "city_id": "CITY::ne::1159130717",
+      "stable_key": "id::CITY::ne::1159130717",
+      "host_feature_id": "ISR-3053__SPLIT_YERUHAM"
+    },
+    "CITY::ne::1159135215": {
+      "city_id": "CITY::ne::1159135215",
+      "stable_key": "id::CITY::ne::1159135215",
+      "host_feature_id": "TRA11__SPLIT_ERZURUM"
+    },
+    "CITY::ne::1159135355": {
+      "city_id": "CITY::ne::1159135355",
+      "stable_key": "id::CITY::ne::1159135355",
+      "host_feature_id": "TRA22__SPLIT_KARS"
+    },
+    "CITY::ne::1159135449": {
+      "city_id": "CITY::ne::1159135449",
+      "stable_key": "id::CITY::ne::1159135449",
+      "host_feature_id": "HU221__SPLIT_VAMOSSZABADI"
+    },
+    "CITY::ne::1159135463": {
+      "city_id": "CITY::ne::1159135463",
+      "stable_key": "id::CITY::ne::1159135463",
+      "host_feature_id": "HU311__SPLIT_MEZOKOVESD"
+    },
+    "CITY::ne::1159139415": {
+      "city_id": "CITY::ne::1159139415",
+      "stable_key": "id::CITY::ne::1159139415",
+      "host_feature_id": "IE041__SPLIT_SLIGO"
+    },
+    "CITY::ne::1159140485": {
+      "city_id": "CITY::ne::1159140485",
+      "stable_key": "id::CITY::ne::1159140485",
+      "host_feature_id": "EGY-1558__SPLIT_ZARANIK"
+    },
+    "CITY::ne::1159140689": {
+      "city_id": "CITY::ne::1159140689",
+      "stable_key": "id::CITY::ne::1159140689",
+      "host_feature_id": "HR025__SPLIT_VINKOVCI"
+    },
+    "CITY::ne::1159142271": {
+      "city_id": "CITY::ne::1159142271",
+      "stable_key": "id::CITY::ne::1159142271",
+      "host_feature_id": "IRQ-3051__SPLIT_HATRA"
+    },
+    "CITY::ne::1159144059": {
+      "city_id": "CITY::ne::1159144059",
+      "stable_key": "id::CITY::ne::1159144059",
+      "host_feature_id": "RS123__SPLIT_BECEJ"
+    },
+    "CITY::ne::1159145111": {
+      "city_id": "CITY::ne::1159145111",
+      "stable_key": "id::CITY::ne::1159145111",
+      "host_feature_id": "BY_INT_BREST__SPLIT_PINSK"
+    },
+    "CITY::ne::1159147267": {
+      "city_id": "CITY::ne::1159147267",
+      "stable_key": "id::CITY::ne::1159147267",
+      "host_feature_id": "IRQ-3050__SPLIT_ARBIL"
+    },
+    "CITY::ne::1159148307": {
+      "city_id": "CITY::ne::1159148307",
+      "stable_key": "id::CITY::ne::1159148307",
+      "host_feature_id": "LV005__SPLIT_DAUGAVPILS"
+    },
+    "CITY::ne::1159150085": {
+      "city_id": "CITY::ne::1159150085",
+      "stable_key": "id::CITY::ne::1159150085",
+      "host_feature_id": "IRQ-3049__SPLIT_KIRKUK"
+    },
+    "CITY::ne::1159150087": {
+      "city_id": "CITY::ne::1159150087",
+      "stable_key": "id::CITY::ne::1159150087",
+      "host_feature_id": "IRQ-3051__SPLIT_MOSUL"
     }
   },
   "audit": {
