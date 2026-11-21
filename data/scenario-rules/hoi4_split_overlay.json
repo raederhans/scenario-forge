@@ -10276,6 +10276,197 @@
       "notes": "Porajärvi/Porosozero stayed in Soviet Karelia under the 1920 Tartu treaty."
     },
     {
+      "id": "poland_interwar_ignalina",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "POL",
+      "select": {
+        "feature_ids": [
+          "LT029__SPLIT_POLISH"
+        ]
+      },
+      "only_from_owners": [
+        "LIT"
+      ],
+      "notes": "Ignalina and Turmantas lay on the Polish side of the 1922-1939 demarcation line."
+    },
+    {
+      "id": "estonia_interwar_petseri_narva",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "EST",
+      "select": {
+        "feature_ids": [
+          "RU_RAY_50074027B90555869339870__SPLIT_PETSERI",
+          "RU_RAY_50074027B99227036451137__SPLIT_JAANILINN",
+          "RU_RAY_50074027B5223158268211__SPLIT_NARVATAGUSE"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Petseri County and the land east of the Narva (Jaanilinn/Ivangorod) were Estonian under the 1920 Tartu treaty."
+    },
+    {
+      "id": "latvia_interwar_abrene",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "LAT",
+      "select": {
+        "feature_ids": [
+          "RU_RAY_50074027B88274438285408__SPLIT_ABRENE",
+          "RU_RAY_50074027B19741518738580__SPLIT_KACENI",
+          "RU_RAY_50074027B90555869339870__SPLIT_LATVIAN"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Abrene district (Pytalovo, Kacēni/Kachanovo) was Latvian from 1920 to 1940."
+    },
+    {
+      "id": "spanish_morocco_eastern_rif",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SMR",
+      "select": {
+        "feature_ids": [
+          "MAR-1454__SPLIT_SPANISH"
+        ]
+      },
+      "only_from_owners": [
+        "MOR"
+      ],
+      "notes": "Nador, Driouch and the Kert valley lay in the Spanish protectorate."
+    },
+    {
+      "id": "french_morocco_taza_taounate",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MOR",
+      "select": {
+        "feature_ids": [
+          "MAR-1447__SPLIT_FRENCH"
+        ]
+      },
+      "only_from_owners": [
+        "SMR"
+      ],
+      "notes": "Taza, Taounate and Guercif lay in the French protectorate; only the Al Hoceima coast was Spanish."
+    },
+    {
+      "id": "italy_tende_la_brigue",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ITA",
+      "select": {
+        "feature_ids": [
+          "FR_ARR_06002__SPLIT_REST__SPLIT_TENDE"
+        ]
+      },
+      "only_from_owners": [
+        "FRA"
+      ],
+      "notes": "Tende, La Brigue and the high Tinée/Vésubie valleys stayed Italian until 1947."
+    },
+    {
+      "id": "poland_spisz_orava_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "POL",
+      "select": {
+        "feature_ids": [
+          "SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA",
+          "SK_ADM2_56367889B83569782265262__SPLIT_ORAVA"
+        ]
+      },
+      "only_from_owners": [
+        "SLO"
+      ],
+      "notes": "Javorina, Hladovka and Suchá Hora were ceded to Poland in November 1938. The partial Kysuce and Lesnica cessions are not separated."
+    },
+    {
+      "id": "spain_llivia",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SPR",
+      "select": {
+        "feature_ids": [
+          "FR_ARR_66003__SPLIT_LLIVIA"
+        ]
+      },
+      "only_from_owners": [
+        "FRA"
+      ],
+      "notes": "Spanish exclave of Llívia."
+    },
+    {
+      "id": "germany_busingen",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GER",
+      "select": {
+        "feature_ids": [
+          "CH057__SPLIT_BUSINGEN"
+        ]
+      },
+      "only_from_owners": [
+        "SWI"
+      ],
+      "notes": "German exclave of Büsingen."
+    },
+    {
+      "id": "italy_campione",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ITA",
+      "select": {
+        "feature_ids": [
+          "CH070__SPLIT_CAMPIONE"
+        ]
+      },
+      "only_from_owners": [
+        "SWI"
+      ],
+      "notes": "Italian exclave of Campione d'Italia."
+    },
+    {
+      "id": "sudan_halaib_triangle",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SUD",
+      "select": {
+        "feature_ids": [
+          "EGY-1556__SPLIT_HALAIB"
+        ]
+      },
+      "only_from_owners": [
+        "EGY"
+      ],
+      "notes": "The Hala'ib triangle was administered from Sudan under the 1902 administrative line."
+    },
+    {
       "id": "ang_family_colour_hoi4_1936",
       "scenarios": [
         "hoi4_1936"
