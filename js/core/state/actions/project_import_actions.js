@@ -10,6 +10,7 @@ export function captureProjectImportState(target) {
     onlyUnpainted: target.onlyUnpainted,
     batchFillScope: target.batchFillScope,
     customPresets: target.customPresets,
+    legendConfig: target.legendConfig,
     countryNameOverrides: target.countryNameOverrides,
     cityNameOverrides: target.cityNameOverrides,
     devClipboardFallbackText: target.devClipboardFallbackText,

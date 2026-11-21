@@ -13,6 +13,7 @@ import { restoreProjectImportFields as restoreAppearanceVisibilityImportFields }
 import { restoreProjectImportFields as restoreAppearanceReferenceImportFields } from "../state/actions/appearance_reference_actions.js";
 import { restoreProjectImportFields as restoreTransportImportFields } from "../state/actions/transport_actions.js";
 import { restoreProjectImportFields as restoreRendererInteractionImportFields } from "../state/actions/renderer_interaction_actions.js";
+import { patchLegendState } from "../state/actions/legend_actions.js";
 import { applyProjectImportPatch } from "../state/actions/project_import_actions.js";
 
 import {
@@ -41,6 +42,7 @@ export function commitImportedProjectPatch(target, patch) {
   restoreAppearanceReferenceImportFields(target, patch);
   restoreTransportImportFields(target, patch);
   restoreRendererInteractionImportFields(target, patch);
+  if (patch.legendConfig) patchLegendState(target, { legendConfig: patch.legendConfig });
   applyProjectImportPatch(target, patch);
 }
 

@@ -7,6 +7,7 @@ import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js"
 import { createUiIcon } from "../components/ui_icons.js";
 import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
+import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { markDirty } from "../../core/dirty_state.js";
 import { filterLegendEditorEntries } from "../../core/legend_state_normalizers.js";
 import {
@@ -628,7 +629,22 @@ export function createProjectSupportDiagnosticsController({
     modernOrderInput.addEventListener("change", () => syncVisibility({ markUserChange: true }));
     syncVisibility();
 
-    shell.append(modeLabel, continentLabel, modernOrderLabel, actionRow);
+    const appearance = documentRef.getElementById("legendAppearanceFields").content.cloneNode(true);
+    for (const label of appearance.querySelectorAll("[data-i18n]")) label.textContent = t(label.dataset.i18n, "ui");
+    for (const input of appearance.querySelectorAll("[name]")) {
+      const property = input.type === "checkbox" ? "checked" : "value";
+      input[property] = config[input.name];
+      input.addEventListener("change", () => {
+        const before = captureHistoryState({ legendConfig: true });
+        legendManager.updateConfig(state, { [input.name]: input[property] });
+        const after = captureHistoryState({ legendConfig: true });
+        if (pushHistoryEntry({ kind: "legend-appearance", before, after })) {
+          markDirty("legend-appearance");
+          mapRenderer.renderLegend();
+        }
+      });
+    }
+    shell.append(appearance, modeLabel, continentLabel, modernOrderLabel, actionRow);
     return shell;
   };
 

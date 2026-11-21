@@ -306,6 +306,7 @@ function stageImportedProjectPatch(data, preparedImport) {
   draft.intensityFields = normalizeIntensityFieldsState(data.intensityFields);
   draft.appearancePresets = normalizeAppearancePresetsState(data.appearancePresets);
   restoreImportedLayerVisibilityState(draft, data.layerVisibility);
+  draft.legendConfig = data.legendConfig;
   draft.countryNameOverrides = data.countryNameOverrides;
   draft.cityNameOverrides = data.cityNameOverrides;
   draft.customPresets =

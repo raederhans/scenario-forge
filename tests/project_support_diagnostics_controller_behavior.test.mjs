@@ -180,7 +180,9 @@ function getNodeText(node) {
 }
 
 function createController(projectSaveStatus, overrides = {}) {
-  const elements = { projectSaveStatus, ...overrides.elements };
+  const elements = { projectSaveStatus, legendAppearanceFields: {
+    content: { cloneNode: () => createElementNode("fragment") },
+  }, ...overrides.elements };
   const elementIds = {
     scenarioAuditSection: "scenarioAuditPanel",
     legendList: "legendEditorList",
