@@ -1,4 +1,70 @@
 {
+  "Autosave": {
+    "en": "Autosave",
+    "zh": "自动保存"
+  },
+  "Deferred autosave": {
+    "en": "Deferred autosave",
+    "zh": "已延后的自动保存"
+  },
+  "Manual snapshot": {
+    "en": "Manual snapshot",
+    "zh": "手动快照"
+  },
+  "Local history": {
+    "en": "Local history",
+    "zh": "本地历史"
+  },
+  "Local history unavailable.": {
+    "en": "Local history unavailable.",
+    "zh": "无法访问本地历史。"
+  },
+  "No local history yet.": {
+    "en": "No local history yet.",
+    "zh": "暂无本地历史。"
+  },
+  "Snapshot note (optional)": {
+    "en": "Snapshot note (optional)",
+    "zh": "快照备注（可选）"
+  },
+  "Save a snapshot now": {
+    "en": "Save a snapshot now",
+    "zh": "立即存一份快照"
+  },
+  "Territory change summary": {
+    "en": "Territory change summary",
+    "zh": "本图改动摘要"
+  },
+  "No territory changes.": {
+    "en": "No territory changes.",
+    "zh": "领土归属没有变化。"
+  },
+  "Copy as text": {
+    "en": "Copy as text",
+    "zh": "复制为文字"
+  },
+  "Export CSV": {
+    "en": "Export CSV",
+    "zh": "导出 CSV"
+  },
+  "Untitled project": {
+    "en": "Untitled project",
+    "zh": "未命名项目"
+  },
+  "Found {count} unsaved projects.": {
+    "en": {
+      "one": "Found {count} unsaved project.",
+      "other": "Found {count} unsaved projects."
+    },
+    "zh": "发现 {count} 份未保存的工作。"
+  },
+  "{to} gained {count} parcels from {from} ({examples}).": {
+    "en": {
+      "one": "{to} gained {count} parcel from {from} ({examples}).",
+      "other": "{to} gained {count} parcels from {from} ({examples})."
+    },
+    "zh": "{to}从{from}获得 {count} 块（{examples}）。"
+  },
   "--- Presets ---": {
     "en": "--- Presets ---",
     "zh": "--- 预设 ---"

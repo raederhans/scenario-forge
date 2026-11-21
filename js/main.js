@@ -73,8 +73,10 @@ const bootstrapDeferredUi = deferredUiBootstrapper.bootstrapDeferredUi;
 
 async function startProjectAutosave() {
   const { startAutosave } = await import("./core/autosave_manager.js");
-  const autosave = startAutosave();
-  postReadyScheduler.scheduleTask("autosave-recovery", () => autosave.recover(), {
+  const { mountLocalHistoryPanel } = await import("./ui/local_history_panel.js");
+  const autosave = startAutosave({ onHistoryChange: () => panel.refreshHistory() });
+  const panel = mountLocalHistoryPanel(autosave);
+  postReadyScheduler.scheduleTask("autosave-recovery", () => autosave.recover(panel.openHistory), {
     canStart: () => state.bootPhase === "ready"
       && (!startupSampleProjectId || ["success", "error"].includes(state.sampleProjectDeeplink?.status)),
     allowChunkBacklog: true,

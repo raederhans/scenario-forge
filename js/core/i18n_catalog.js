@@ -792,6 +792,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "自治区域",
     "en": "Autonomous Region"
   },
+  "Autosave": {
+    "zh": "自动保存",
+    "en": "Autosave"
+  },
   "Availability": {
     "zh": "可用性",
     "en": "Availability"
@@ -2308,6 +2312,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "复制名称 + ID",
     "en": "Copy Names + ID"
   },
+  "Copy as text": {
+    "zh": "复制为文字",
+    "en": "Copy as text"
+  },
   "Copy members from layer": {
     "zh": "从图层复制成员",
     "en": "Copy members from layer"
@@ -2763,6 +2771,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Defensive Line": {
     "zh": "防御线",
     "en": "Defensive Line"
+  },
+  "Deferred autosave": {
+    "zh": "已延后的自动保存",
+    "en": "Deferred autosave"
   },
   "Delete": {
     "zh": "删除",
@@ -3627,6 +3639,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "导出",
     "en": "Export"
   },
+  "Export CSV": {
+    "zh": "导出 CSV",
+    "en": "Export CSV"
+  },
   "Export Map": {
     "zh": "导出地图",
     "en": "Export Map"
@@ -4040,6 +4056,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": {
       "one": "Found unsaved work from {count} minute ago ({scenario}).",
       "other": "Found unsaved work from {count} minutes ago ({scenario})."
+    }
+  },
+  "Found {count} unsaved projects.": {
+    "zh": "发现 {count} 份未保存的工作。",
+    "en": {
+      "one": "Found {count} unsaved project.",
+      "other": "Found {count} unsaved projects."
     }
   },
   "Frontline": {
@@ -5458,6 +5481,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "本地连接器",
     "en": "Local connector"
   },
+  "Local history": {
+    "zh": "本地历史",
+    "en": "Local history"
+  },
+  "Local history unavailable.": {
+    "zh": "无法访问本地历史。",
+    "en": "Local history unavailable."
+  },
   "Local layer board": {
     "zh": "本地图层排序板",
     "en": "Local layer board"
@@ -5712,6 +5743,10 @@ export const UI_COPY_CATALOG = Object.freeze({
       "one": "Manual colors will be cleared from {count} region",
       "other": "Manual colors will be cleared from {count} regions"
     }
+  },
+  "Manual snapshot": {
+    "zh": "手动快照",
+    "en": "Manual snapshot"
   },
   "Manual-reviewed": {
     "zh": "人工校审",
@@ -6333,6 +6368,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "没有可复制图层",
     "en": "No layers to copy from"
   },
+  "No local history yet.": {
+    "zh": "暂无本地历史。",
+    "en": "No local history yet."
+  },
   "No logistics hub selected": {
     "zh": "未选择物流中心",
     "en": "No logistics hub selected"
@@ -6488,6 +6527,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "No symbols match the current filter.": {
     "zh": "没有符号与当前过滤器匹配。",
     "en": "No symbols match the current filter."
+  },
+  "No territory changes.": {
+    "zh": "领土归属没有变化。",
+    "en": "No territory changes."
   },
   "No transport schema loaded yet": {
     "zh": "尚未加载交通数据结构",
@@ -8604,6 +8647,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "保存预设",
     "en": "Save Preset"
   },
+  "Save a snapshot now": {
+    "zh": "立即存一份快照",
+    "en": "Save a snapshot now"
+  },
   "Save and restore the complete working state.": {
     "zh": "保存和恢复完整工作状态。",
     "en": "Save and restore the complete working state."
@@ -9684,6 +9731,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "快照失败",
     "en": "Snapshot failed"
   },
+  "Snapshot note (optional)": {
+    "zh": "快照备注（可选）",
+    "en": "Snapshot note (optional)"
+  },
   "Socialism ideology": {
     "zh": "社会主义意识形态",
     "en": "Socialism ideology"
@@ -10255,6 +10306,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Territory": {
     "zh": "领土",
     "en": "Territory"
+  },
+  "Territory change summary": {
+    "zh": "本图改动摘要",
+    "en": "Territory change summary"
   },
   "Tertiary": {
     "zh": "第三",
@@ -11051,6 +11106,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Unsupported runtime country": {
     "zh": "运行时国家未收录",
     "en": "Unsupported runtime country"
+  },
+  "Untitled project": {
+    "zh": "未命名项目",
+    "en": "Untitled project"
   },
   "Updated {count} entries to the current map regions.": {
     "zh": "已将 {count} 条记录更新到当前地图区域。",
@@ -11895,6 +11954,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "{seconds}s / day": {
     "zh": "{seconds} 秒 / 天",
     "en": "{seconds}s / day"
+  },
+  "{to} gained {count} parcels from {from} ({examples}).": {
+    "zh": "{to}从{from}获得 {count} 块（{examples}）。",
+    "en": {
+      "one": "{to} gained {count} parcel from {from} ({examples}).",
+      "other": "{to} gained {count} parcels from {from} ({examples})."
+    }
   },
   "≈ {km} km": {
     "zh": "约 {km} 公里",
