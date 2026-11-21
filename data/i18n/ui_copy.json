@@ -11569,5 +11569,45 @@
   "面积模式优先现代大国排序": {
     "en": "Prefer modern major-power order for area modes",
     "zh": "面积模式优先现代大国排序"
+  },
+  "Annexed": {
+    "en": "Annexed",
+    "zh": "已吞并"
+  },
+  "Convert to editable text": {
+    "en": "Convert to editable text",
+    "zh": "转为可编辑文字"
+  },
+  "Loaded regions only": {
+    "en": "Loaded regions only",
+    "zh": "仅统计已加载地块"
+  },
+  "Unregistered color {color}": {
+    "en": "Unregistered color {color}",
+    "zh": "未登记颜色 {color}"
+  },
+  "{count} regions · approx. {area} km² · gained {gained} / lost {lost}": {
+    "en": "{count} regions · approx. {area} km² · gained {gained} / lost {lost}",
+    "zh": "实际 {count} 块 · 约 {area} km² · 获得 {gained} 块 / 失去 {lost} 块"
+  },
+  "{name} (originally {origin})": {
+    "en": "{name} (originally {origin})",
+    "zh": "{name}（原属{origin}）"
+  },
+  "Country name not displayed. Use manual map text.": {
+    "en": "Country name not displayed. Use manual map text.",
+    "zh": "国名尚未显示，可使用手动地图文字。"
+  },
+  "No reference territory. Release to generate a country name.": {
+    "en": "No reference territory. Release to generate a country name.",
+    "zh": "无参考版图，释放后生成国名。"
+  },
+  "From {countries}": {
+    "en": "From {countries}",
+    "zh": "来源：{countries}"
+  },
+  "To {countries}": {
+    "en": "To {countries}",
+    "zh": "去向：{countries}"
   }
 }

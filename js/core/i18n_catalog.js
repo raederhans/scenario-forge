@@ -528,6 +528,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "锚点：省份 / 自由",
     "en": "Anchor: Province / Free"
   },
+  "Annexed": {
+    "zh": "已吞并",
+    "en": "Annexed"
+  },
   "Annexed (all regions painted in other countries’ colors)": {
     "zh": "已被吞并（全部地块涂成他国颜色）",
     "en": "Annexed (all regions painted in other countries’ colors)"
@@ -2172,6 +2176,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "控制存活的最低重要性站。",
     "en": "Controls the lowest station importance that survives."
   },
+  "Convert to editable text": {
+    "zh": "转为可编辑文字",
+    "en": "Convert to editable text"
+  },
   "Copied": {
     "zh": "已复制",
     "en": "Copied"
@@ -2335,6 +2343,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Country indicators · Scenario reference": {
     "zh": "国家统计专题 · 剧本参考",
     "en": "Country indicators · Scenario reference"
+  },
+  "Country name not displayed. Use manual map text.": {
+    "zh": "国名尚未显示，可使用手动地图文字。",
+    "en": "Country name not displayed. Use manual map text."
   },
   "Country name opacity": {
     "zh": "国名不透明度",
@@ -3830,6 +3842,10 @@ export const UI_COPY_CATALOG = Object.freeze({
       "other": "Found unsaved work from {count} minutes ago ({scenario})."
     }
   },
+  "From {countries}": {
+    "zh": "来源：{countries}",
+    "en": "From {countries}"
+  },
   "Frontline": {
     "zh": "前线",
     "en": "Frontline"
@@ -5126,6 +5142,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已加载类别：",
     "en": "Loaded classes:"
   },
+  "Loaded regions only": {
+    "zh": "仅统计已加载地块",
+    "en": "Loaded regions only"
+  },
   "Loaded rows": {
     "zh": "已加载行数",
     "en": "Loaded rows"
@@ -6188,6 +6208,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "No reference regions were recolored.": {
     "zh": "没有参考区域被重新着色。",
     "en": "No reference regions were recolored."
+  },
+  "No reference territory. Release to generate a country name.": {
+    "zh": "无参考版图，释放后生成国名。",
+    "en": "No reference territory. Release to generate a country name."
   },
   "No regional presets": {
     "zh": "没有可用区域预设",
@@ -10360,6 +10384,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "倾向强度",
     "en": "Tint Strength"
   },
+  "To {countries}": {
+    "zh": "去向：{countries}",
+    "en": "To {countries}"
+  },
   "Toggle Atlantropa-style scenario regions without affecting the base map.": {
     "zh": "切换 Atlantropa 风格的剧本区域而不影响基础地图。",
     "en": "Toggle Atlantropa-style scenario regions without affecting the base map."
@@ -10671,6 +10699,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Unnamed facility": {
     "zh": "未命名设施",
     "en": "Unnamed facility"
+  },
+  "Unregistered color {color}": {
+    "zh": "未登记颜色 {color}",
+    "en": "Unregistered color {color}"
   },
   "Unreviewed": {
     "zh": "未审核",
@@ -11511,6 +11543,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "{count} regions affected": {
     "zh": "影响 {count} 个区域",
     "en": "{count} regions affected"
+  },
+  "{count} regions · approx. {area} km² · gained {gained} / lost {lost}": {
+    "zh": "实际 {count} 块 · 约 {area} km² · 获得 {gained} 块 / 失去 {lost} 块",
+    "en": "{count} regions · approx. {area} km² · gained {gained} / lost {lost}"
+  },
+  "{name} (originally {origin})": {
+    "zh": "{name}（原属{origin}）",
+    "en": "{name} (originally {origin})"
   },
   "{seconds}s / day": {
     "zh": "{seconds} 秒 / 天",

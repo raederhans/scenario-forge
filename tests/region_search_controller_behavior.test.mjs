@@ -154,7 +154,7 @@ test("same normalized country preserves input and results; a changed or empty co
   assert.equal(h.input.value, "");
   assert.equal(h.results.children.length, 0);
   h.controller.setCountry("");
-  assert.equal(h.block.classList.contains("hidden"), true);
+  assert.equal(h.block.classList.contains("hidden"), false);
 });
 
 test("click selects and failure announces that the region is not loaded", () => {

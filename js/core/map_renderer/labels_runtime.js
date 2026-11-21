@@ -503,6 +503,7 @@ export function createLabelsRuntime({
   function getCountryLabelSourceOwner() {
     countryLabelSourceOwner ||= createCountryLabelSourceOwner({
       state: runtimeState,
+      resolveBorderIdentity,
       topojson: globalThis.topojson,
       ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
       getCountryName,
@@ -742,6 +743,7 @@ export function createLabelsRuntime({
     ensureCountryLabelsReadyForExport,
     getVisibleMapLabels,
     getCountryLabelStatus,
+    getSuppressedCodes: coverage.getSuppressedCodes,
     getCountryLabelReadiness,
     getCountryLabelSuppressionSignature,
     getPlacedMapLabels() {

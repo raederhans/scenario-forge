@@ -3,7 +3,9 @@ import { getCountryNameOverride, setCountryNameOverride } from "../../core/count
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { commitChange } from "../../core/state/changes.js";
 import { callRuntimeHook, on, STATE_BUS_EVENTS } from "../../core/state/index.js";
-import { getCountryMemberIds, getCountryOverrideIds, resetCountryOverrides } from "../../core/country_override_reset_command.js";
+import { getCountryLocateIds, getCountryMemberIds, getCountryOverrideIds, resetCountryOverrides } from "../../core/country_override_reset_command.js";
+import { collectOwnerStats } from "../../core/legend_manager.js";
+import { getOwnershipDisplayName } from "../../core/i18n.js";
 import { showAppDialog } from "../components/app_dialog.js";
 import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
 import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
@@ -82,6 +84,7 @@ export function createCountryInspectorController({
   countryInspectorDetail,
   countryInspectorSelected,
   getCountryLabelStatus,
+  convertCountryLabelToMapLabel,
   countryInspectorColorRow,
   countryInspectorColorSwatch,
   countryInspectorColorInput,
@@ -461,6 +464,19 @@ export function createCountryInspectorController({
     countryInspectorColorInput.blur();
   };
 
+  let suppressedCodes = new Set();
+  const syncAnnexationBadges = () => {
+    const next = callRuntimeHook(runtimeState, "getSuppressedCountryCodesFn");
+    if (suppressedCodes.size === (next?.size || 0) && [...suppressedCodes].every(code => next.has(code))) return;
+    suppressedCodes = new Set(next);
+    countryRowRefsByCode?.forEach((refs, code) => {
+      const hidden = !suppressedCodes.has(code);
+      for (const { badge } of refs) {
+        if (badge && badge.hidden !== hidden) badge.hidden = hidden;
+      }
+    });
+  };
+
   const syncCountryRowVisuals = (ref, countryState) => {
     if (!ref || !countryState) return;
     const isSelected = runtimeState.selectedInspectorCountryCode === countryState.code;
@@ -653,6 +669,11 @@ export function createCountryInspectorController({
     identityLine.className = "country-select-identity-line";
     identityLine.appendChild(flag);
     identityLine.appendChild(title);
+    const badge = document.createElement("small");
+    badge.className = "country-select-meta";
+    badge.textContent = t("Annexed", "ui");
+    badge.hidden = !suppressedCodes.has(countryState.code);
+    side.appendChild(badge);
     identityLine.classList.toggle("has-hgo-flag", !flag.classList.contains("hidden"));
     main.appendChild(identityLine);
     main.appendChild(meta);
@@ -671,6 +692,7 @@ export function createCountryInspectorController({
           wrapper: null,
           main,
           flag,
+          badge,
           swatch,
           title,
           meta,
@@ -712,6 +734,7 @@ export function createCountryInspectorController({
         wrapper,
         main,
         flag,
+        badge,
         swatch,
         title,
         meta,
@@ -1195,17 +1218,72 @@ export function createCountryInspectorController({
   };
 
   const getLoadedCountryFeatures = (code) => {
-    const ids = getCountryMemberIds(runtimeState, code);
+    const ids = getCountryLocateIds(runtimeState, code);
     return ids.map((id) => runtimeState.landIndex?.get(id)).filter((feature) => feature?.geometry);
   };
 
   const resetButton = countryInspectorSelected?.querySelector("#resetCountryOverrides");
   const nameInput = countryInspectorSelected?.querySelector("#countryNameOverride");
   const statusText = countryInspectorSelected?.querySelector("#countryLabelStatus");
+  const convertButton = countryInspectorSelected?.querySelector("#convertCountryLabel");
+  const territoryText = countryInspectorSelected?.querySelector("#countryTerritoryStats");
+  let territoryKey = [], statsByCode, gains, losses;
+  function updateTerritoryStats() {
+    const code = runtimeState.selectedInspectorCountryCode;
+    if (!territoryText || !code) return;
+    const key = [runtimeState.activeScenarioId, runtimeState.landData?.features, runtimeState.colorRevision,
+      runtimeState.scenarioBaselineOwnersByFeatureId, runtimeState.scenarioCountriesByTag, runtimeState.riverPaint,
+      runtimeState.sovereignBaseColors];
+    if (key.some((value, i) => value !== territoryKey[i]) || !statsByCode) {
+      gains = new Map();
+      losses = new Map();
+      const record = (table, owner, other) => {
+        if (!table.has(owner)) table.set(owner, new Map());
+        const counts = table.get(owner);
+        counts.set(other, (counts.get(other) || 0) + 1);
+      };
+      const stats = collectOwnerStats(runtimeState, { mode: "country-area" }, {
+        measureArea(feature) {
+          const area = globalThis.d3.geoArea(feature);
+          return Math.min(area, 4 * Math.PI - area);
+        },
+        onOwner(actual, origin) {
+          if (origin && actual !== origin) {
+            record(gains, actual, origin);
+            record(losses, origin, actual);
+          }
+        },
+      });
+      statsByCode = new Map(stats.map(entry => [entry.code, entry]));
+      territoryKey = key;
+    }
+    const stat = statsByCode.get(code);
+    const gained = gains.get(code) || new Map(), lost = losses.get(code) || new Map();
+    const total = counts => [...counts.values()].reduce((sum, count) => sum + count, 0);
+    const partners = counts => [...counts].map(([other, count]) => `${getOwnershipDisplayName(other)} × ${count}`).join(", ");
+    const chunked = runtimeState.activeScenarioManifest?.detail_chunk_manifest_url
+      || runtimeState.scenarioBundleCacheById?.[runtimeState.activeScenarioId]?.chunkRegistry;
+    const summary = t("{count} regions · approx. {area} km² · gained {gained} / lost {lost}", "ui", {
+      count: stat?.featureCount || 0, area: Math.round((stat?.area || 0) * 6371 ** 2).toLocaleString(runtimeState.currentLanguage),
+      gained: total(gained), lost: total(lost),
+    });
+    territoryText.textContent = [summary, chunked && t("Loaded regions only", "ui"),
+      gained.size > 0 && t("From {countries}", "ui", { countries: partners(gained) }),
+      lost.size > 0 && t("To {countries}", "ui", { countries: partners(lost) }),
+    ].filter(Boolean).join(" · ");
+  }
   function updateLabelStatus() {
     const code = runtimeState.selectedInspectorCountryCode;
     if (code && statusText) {
-      const text = t(getCountryLabelStatus(code), "ui");
+      const status = getCountryLabelStatus(code);
+      const noReference = status === "Does not fit or is obscured in this view"
+        && runtimeState.scenarioCountriesByTag?.[code]?.releasable && !getCountryMemberIds(runtimeState, code).length;
+      let text = t(status, "ui");
+      if (noReference) {
+        text = statsByCode?.get(code)?.featureCount
+          ? t("Country name not displayed. Use manual map text.", "ui")
+          : t("No reference territory. Release to generate a country name.", "ui");
+      }
       if (statusText.textContent !== text) statusText.textContent = text;
     }
   }
@@ -1278,6 +1356,7 @@ export function createCountryInspectorController({
       nameInput.defaultValue = getCountryInspectorDisplayName(countryState, getCountryHgoIdentity(countryState));
       nameInput.value = nameInput.defaultValue;
     }
+    updateTerritoryStats();
     updateLabelStatus();
     renderInspectorBreadcrumb(countryState);
     renderInspectorModernPlaceNames(countryState);
@@ -1314,6 +1393,7 @@ export function createCountryInspectorController({
     const priorityOrderMap = getPriorityCountryOrderMap();
     setLatestCountryStatesByCode(new Map(countryStates.map((countryState) => [countryState.code, countryState])));
     countryRowRefsByCode.clear();
+    syncAnnexationBadges();
     ensureSelectedInspectorCountry();
     renderHgoIdentityControls(visibleCountryStates);
     renderSelectedLandCountryQuickTab();
@@ -1387,6 +1467,10 @@ export function createCountryInspectorController({
   };
 
   const bindEvents = () => {
+    if (convertButton && typeof convertCountryLabelToMapLabel === "function" && convertButton.hidden) {
+      convertButton.hidden = false;
+      convertButton.addEventListener("click", () => convertCountryLabelToMapLabel(runtimeState.selectedInspectorCountryCode));
+    }
     if (nameInput && !nameInput.dataset.bound) {
       nameInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter" && !event.isComposing) {
@@ -1408,10 +1492,12 @@ export function createCountryInspectorController({
         commitChange({ domains: ["countryList"], reason: "country-name" });
       });
       on("labels:drawn", updateLabelStatus);
+      on("labels:drawn", syncAnnexationBadges);
       nameInput.dataset.bound = "true";
     }
     if (resetButton && !resetButton.dataset.bound) {
       on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateResetCount);
+      on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateTerritoryStats);
       resetButton.addEventListener("click", async () => {
         const ids = getCountryOverrideIds(runtimeState, runtimeState.selectedInspectorCountryCode);
         if (!ids.length) return;

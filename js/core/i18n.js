@@ -5,6 +5,7 @@ import { getThematicIndicator, formatThematicIndicatorValue } from "./thematic/t
 import { getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES } from "./thematic/strategic_values_view_model.js";
 // Translation helpers (Phase 13)
 import { state as runtimeState } from "./state.js";
+import { callRuntimeHook } from "./state/index.js";
 import { UI_COPY_CATALOG } from "./i18n_catalog.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import {
@@ -330,26 +331,36 @@ function normalizeTooltipComparisonValue(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+export function getOwnershipDisplayName(code) {
+  if (code.startsWith("color:")) {
+    const color = code.slice(6);
+    return runtimeState.legendLabels?.[color] || t("Unregistered color {color}", "ui", { color });
+  }
+  return getCountryNameOverride(runtimeState, code) || getLocalizedScenarioCountryName(
+    runtimeState.scenarioCountriesByTag?.[code],
+    runtimeState.countryNames?.[code] || code,
+    getDirectGeoLabel,
+  ) || code;
+}
+
 function getTooltipCountryContext(feature) {
   if (runtimeState.mapSemanticMode === "blank") {
     return {
       countryCode: "",
       countryDisplayName: "",
+      originalDisplayName: "",
     };
   }
   const featureId = getTooltipFeatureId(feature);
   const scenarioBaselineCode = runtimeState.activeScenarioId
-    ? normalizeTooltipCountryCode(runtimeState.scenarioBaselineOwnersByFeatureId?.[featureId] || "")
+    ? normalizeTooltipCountryCode(runtimeState.scenarioBaselineOwnersByFeatureId?.[feature?.properties?.__riverParentId || featureId] || "")
     : "";
-  const countryCode = scenarioBaselineCode || getTooltipFeatureCountryCode(feature, { useIdFallback: true });
-  const countryDisplayName = getCountryNameOverride(runtimeState, countryCode) || getLocalizedScenarioCountryName(
-    runtimeState.scenarioCountriesByTag?.[countryCode],
-    runtimeState.countryNames?.[countryCode] || countryCode,
-    getDirectGeoLabel,
-  ) || countryCode;
+  const reference = scenarioBaselineCode || getTooltipFeatureCountryCode(feature, { useIdFallback: true });
+  const countryCode = callRuntimeHook(runtimeState, "resolveBorderIdentityFn", featureId, feature) || reference;
   return {
     countryCode,
-    countryDisplayName,
+    countryDisplayName: getOwnershipDisplayName(countryCode),
+    originalDisplayName: reference && reference !== countryCode ? getOwnershipDisplayName(reference) : "",
   };
 }
 
@@ -423,7 +434,7 @@ function buildTooltipModel(feature) {
   }
 
   const regionName = getTooltipRegionName(feature, t("Unknown Region", "ui"));
-  const { countryCode, countryDisplayName } = getTooltipCountryContext(feature);
+  const { countryCode, countryDisplayName, originalDisplayName } = getTooltipCountryContext(feature);
   const admin1Name = getTooltipAdmin1Name(feature, {
     regionName,
     countryDisplayName,
@@ -433,7 +444,9 @@ function buildTooltipModel(feature) {
     lines.push(admin1Name);
   }
   if (countryDisplayName) {
-    lines.push(countryCode ? `${countryDisplayName} (${countryCode})` : countryDisplayName);
+    const name = countryCode && !countryCode.startsWith("color:") && !originalDisplayName
+      ? `${countryDisplayName} (${countryCode})` : countryDisplayName;
+    lines.push(originalDisplayName ? t("{name} (originally {origin})", "ui", { name, origin: originalDisplayName }) : name);
   }
 
   return {
