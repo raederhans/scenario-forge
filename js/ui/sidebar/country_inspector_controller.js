@@ -1275,7 +1275,17 @@ export function createCountryInspectorController({
   }
   const convertButton = countryInspectorSelected?.querySelector("#convertCountryLabel");
   const territoryText = countryInspectorSelected?.querySelector("#countryTerritoryStats");
+  const territoryAreas = new WeakMap();
+  let territoryUpdatePending = false;
   let territoryKey = [], statsByCode, gains, losses;
+  function scheduleTerritoryStats() {
+    if (territoryUpdatePending || !territoryText || !runtimeState.selectedInspectorCountryCode) return;
+    territoryUpdatePending = true;
+    requestAnimationFrame(() => {
+      territoryUpdatePending = false;
+      updateTerritoryStats();
+    });
+  }
   function updateTerritoryStats() {
     const code = runtimeState.selectedInspectorCountryCode;
     if (!territoryText || !code) return;
@@ -1292,8 +1302,12 @@ export function createCountryInspectorController({
       };
       const stats = collectOwnerStats(runtimeState, { mode: "country-area" }, {
         measureArea(feature) {
-          const area = globalThis.d3.geoArea(feature);
-          return Math.min(area, 4 * Math.PI - area);
+          const geometry = feature.geometry ?? feature;
+          if (!territoryAreas.has(geometry)) {
+            const area = globalThis.d3.geoArea(feature);
+            territoryAreas.set(geometry, Math.min(area, 4 * Math.PI - area));
+          }
+          return territoryAreas.get(geometry);
         },
         onOwner(actual, origin) {
           if (origin && actual !== origin) {
@@ -1554,7 +1568,7 @@ export function createCountryInspectorController({
     }
     if (resetButton && !resetButton.dataset.bound) {
       on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateResetCount);
-      on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateTerritoryStats);
+      on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, scheduleTerritoryStats);
       resetButton.addEventListener("click", async () => {
         const ids = getCountryOverrideIds(runtimeState, runtimeState.selectedInspectorCountryCode);
         if (!ids.length) return;
