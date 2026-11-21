@@ -34,6 +34,13 @@ function isEditableTarget(target) {
   return false;
 }
 
+function shouldPreventSpaceScroll(target) {
+  return target === document.body || (target instanceof Element
+    && target.closest("#mapContainer")
+    && !target.closest('button, summary, a, [role="button"]')
+    && !isEditableTarget(target));
+}
+
 function flushShortcutRender(reason = "shortcut") {
   return flushRenderBoundary(reason);
 }
@@ -191,7 +198,7 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
       return;
     case "brushPan":
       if (key === " ") {
-        event.preventDefault();
+        if (shouldPreventSpaceScroll(event.target)) event.preventDefault();
         spaceHeld = true;
       }
       setBrushPanModifier(true);
@@ -288,7 +295,7 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
     if (event.key !== "Shift" && event.key !== " ") return;
     if (event.key === " ") {
       if (!spaceHeld) return;
-      if (!isEditableTarget(event.target)) event.preventDefault();
+      if (shouldPreventSpaceScroll(event.target)) event.preventDefault();
       spaceHeld = false;
     }
     setBrushPanModifier(spaceHeld || !!event.shiftKey);

@@ -11792,6 +11792,22 @@
     "en": "Rename country",
     "zh": "重命名国家"
   },
+  "Rename city": {
+    "en": "Rename city",
+    "zh": "重命名城市"
+  },
+  "Edit map title": {
+    "en": "Edit map title",
+    "zh": "编辑地图标题"
+  },
+  "Change legend appearance": {
+    "en": "Change legend appearance",
+    "zh": "修改图例外观"
+  },
+  "Change annotation visibility": {
+    "en": "Change annotation visibility",
+    "zh": "修改注记可见性"
+  },
   "Replace color": {
     "en": "Replace color",
     "zh": "替换颜色"

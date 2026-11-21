@@ -19,6 +19,10 @@ const eraseKinds = new Set([
 const actionNames = {
   "interaction": "Edit map",
   "country-name": "Rename country",
+  "city-name": "Rename city",
+  "map-title": "Edit map title",
+  "legend-appearance": "Change legend appearance",
+  "annotation-visibility": "Change annotation visibility",
   "replace-color": "Replace color",
   "reset-country-overrides": "Reset country overrides",
   "country-override-reset": "Reset country overrides",

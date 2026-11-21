@@ -78,7 +78,7 @@ test("file shortcuts, G and overlapping pan modifiers use their registered actio
   }
   initShortcuts();
   const send = (type, key, options = {}) => {
-    const e = { key, ...options, preventDefault() { this.defaultPrevented = true; } };
+    const e = { key, target: document.body, ...options, preventDefault() { this.defaultPrevented = true; } };
     listeners[type](e);
     return !!e.defaultPrevented;
   };
