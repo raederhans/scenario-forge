@@ -120,14 +120,14 @@ test("only territorial coverage demotes the scenario capital marker and name", a
   await runtime.prepareLabelsPass();
   state.mapLabels = [normalizeMapLabel({ lon: 0, lat: 0, countryCode: "AAA" }, "manual")];
   state.annotationView = { showMapLabels: false };
-  assert.equal(runtime.getCountryLabelSuppressionSignature(), "AAA");
+  assert.equal(runtime.getCountryLabelSuppressionSignature(), "");
   for (const [identity, shape, weight] of [
     ["AAA", "star", "600"], ["BBB", "circle", "400"], ["AAA", "star", "600"],
   ]) {
     owner = identity;
     runtime.notifyCountryLabelColorsChanged(["one"]);
     assert.equal(runtime.getCountryLabelStatus("AAA"), owner === "BBB"
-      ? "Annexed (all regions painted in other countries’ colors)" : "Replaced by manual map text");
+      ? "Annexed (all regions painted in other countries’ colors)" : "Does not fit or is obscured in this view");
     labels.length = markers.length = 0;
     runtime.drawLabelsPassContent(12);
     assert.deepEqual(markers, [shape]);

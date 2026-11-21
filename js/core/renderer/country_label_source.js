@@ -111,18 +111,26 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   function sync() {
     if (disposed) return;
     const c = context();
-    if (sourceToken !== c.identity) {
-      buildRequest?.controller.abort();
-      buildRequest?.client.terminate(new DOMException('Country label scene replaced', 'AbortError'));
-      sourceToken = c.identity; revision++; status = 'pending'; error = '';
+    if (buildRequest && buildRequest.identity !== c.identity) {
+      buildRequest.controller.abort();
+      buildRequest.client.terminate(new DOMException('Country label scene replaced', 'AbortError'));
+      buildRequest = null;
+    }
+    if (sourceToken !== c.world) {
+      sourceToken = c.world; revision++; status = 'pending'; error = '';
       geometryRecords = countries = features = EMPTY; nameKey = '';
       memberIndex = null;
-      if (publishedWorld?.world !== c.world) publishedWorld = null;
+      publishedWorld = null;
       if (retained?.identity !== c.identity) retained = null;
     }
     if (c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank') { status = 'disabled'; return; }
-    if (status === 'ready') { publishNames(); return; }
     if (failedIdentity === c.identity) { status = 'error'; return; }
+    error = '';
+    status = publishedWorld ? 'ready' : 'pending';
+    if (publishedWorld) {
+      publishNames();
+      if (publishedWorld.releases === c.releases) return;
+    }
     let input;
     if (!publishedWorld && c.chunked) {
       if (!c.bases.length) return;
@@ -202,13 +210,19 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   async function build(c, input, signal, client) {
     try {
       await yieldTask();
-      if (disposed || context().identity !== c.identity) return;
+      if (disposed || signal.aborted || context().identity !== c.identity) return;
       const { groups, members, retainedRecords } = publishedWorld ? groupReleasedTerritory(c, publishedWorld) : groupWorld(c, input);
+      if (publishedWorld && !groups.size) {
+        publishedWorld.releases = c.releases;
+        return;
+      }
       const updates = groups.size ? await buildGroups(groups, c, signal, client) : [];
       if (disposed || signal.aborted || context().identity !== c.identity) return;
+      if (publishedWorld) revision++;
       geometryRecords = retainedRecords.concat(updates);
+      nameKey = '';
       memberIndex = members;
-      publishedWorld = { world: c.world, releases: c.releases, members: memberIndex, records: geometryRecords };
+      publishedWorld = { releases: c.releases, members: memberIndex, records: geometryRecords };
       status = 'ready'; retained = null; publishNames(); onChange();
     } catch (failure) {
       if (disposed || signal.aborted || context().identity !== c.identity) return;
@@ -244,7 +258,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       if (disposed || request !== owned || state.activeScenarioId !== owned.scenarioId
         || state.sceneGeneration !== owned.generation || current.bundle !== owned.bundle
         || (owned.registry && owned.registry !== owned.bundle.chunkRegistry)) return;
-      sourceToken = current.identity; failedIdentity = current.identity;
+      sourceToken = current.world; failedIdentity = current.identity;
       status = 'error'; error = text(failure?.message || failure); onChange();
     }).finally(() => { if (request === owned) request = null; });
     return owned.promise;
@@ -257,7 +271,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
     peekSource() {
       const c = context();
       const disabled = c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank';
-      const current = sourceToken === c.identity && (status !== 'ready' || nameKey === currentNameKey());
+      const current = sourceToken === c.world && (status !== 'ready' || nameKey === currentNameKey());
       return { status: disposed ? 'disposed' : disabled ? 'disabled' : current ? status : 'pending',
         sourceToken, revision, features, countries, memberIndex: current ? memberIndex : null, error: current ? error : '' };
     },

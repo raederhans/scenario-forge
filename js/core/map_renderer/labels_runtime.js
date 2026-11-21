@@ -461,6 +461,7 @@ export function createLabelsRuntime({
   function getBoundCountryCodes() {
     const { mapLabels, scenarioCountriesByTag } = runtimeState;
     boundCodes = new Set();
+    if (runtimeState.annotationView?.showMapLabels === false) return boundCodes;
     if (mapLabels?.length) {
       const parents = getParentMergedParents(scenarioCountriesByTag);
       for (const label of mapLabels) {
