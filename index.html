@@ -2972,6 +2972,21 @@
                   <span class="sidebar-field-label" data-i18n="Project name (optional)">Project name (optional)</span>
                   <input id="projectName" type="text" class="text-input">
                 </label>
+                <details id="localHistory">
+                  <summary data-i18n="Local history">Local history</summary>
+                  <label>
+                    <span class="sidebar-field-label" data-i18n="Snapshot note (optional)">Snapshot note (optional)</span>
+                    <input type="text" id="snapshotNote" class="text-input">
+                  </label>
+                  <button type="button" id="saveSnapshot" class="btn-secondary" data-i18n="Save a snapshot now">Save a snapshot now</button>
+                  <ul id="localHistoryList"></ul>
+                </details>
+                <button type="button" id="territorySummaryButton" class="btn-secondary" aria-controls="territorySummaryPanel" aria-expanded="false" data-i18n="Territory change summary">Territory change summary</button>
+                <div id="territorySummaryPanel" hidden>
+                  <textarea id="territorySummaryText" class="text-input" rows="4" readonly aria-label="Territory change summary" data-i18n-aria-label="Territory change summary"></textarea>
+                  <button type="button" id="copyTerritorySummary" class="btn-secondary" data-i18n="Copy as text">Copy as text</button>
+                  <button type="button" id="exportTerritoryChanges" class="btn-secondary" data-i18n="Export CSV">Export CSV</button>
+                </div>
               </div>
             </details>
 

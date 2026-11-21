@@ -46,7 +46,8 @@ test("later edits and export preserve the three newest deferred versions for rec
   clearDirty("project-export");
   await nextTurn();
   const importProject = t.mock.fn(() => ({ status: "committed" }));
-  await start({ dialog: () => true, importProject }).recover();
+  const manager = start({ dialog: () => true, importProject });
+  await manager.restoreSnapshot((await manager.listHistory())[0]);
   assert.equal(importProject.mock.calls[0].arguments[1].projectPayload.customPresets.color, "black");
 });
 
@@ -60,7 +61,8 @@ test("restoring an autosave preserves the original default export name", async t
   await edit("red");
   state.projectFileStem = "";
   clearDirty("project-import");
-  await start({ dialog: () => true }).recover();
+  const manager = start({ dialog: () => true });
+  await manager.restoreSnapshot((await manager.listHistory())[0]);
   assert.equal(state.isDirty, true);
   assert.equal(buildDefaultFileStem(state, new Date(2026, 10, 21, 10, 30)), "germany.v2_20261121-1030");
 });
