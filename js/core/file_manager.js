@@ -549,6 +549,7 @@ class FileManager {
       recentColors: normalizeRecentColors(appState.recentColors),
       legendLabels: LegendManager.normalizeLabels(appState.legendLabels),
       countryNameOverrides: appState.countryNameOverrides || {},
+      cityNameOverrides: appState.cityNameOverrides || {},
       legendConfig: LegendManager.normalizeConfig(appState.legendConfig),
       legendControl: LegendManager.normalizeControl(appState.legendControl),
       layerVisibility,
@@ -739,6 +740,7 @@ class FileManager {
     data.recentColors = normalizeRecentColors(data.recentColors);
     data.legendLabels = LegendManager.normalizeLabels(data.legendLabels);
     data.countryNameOverrides ??= {};
+    data.cityNameOverrides ??= {};
     data.legendConfig = LegendManager.normalizeConfig(data.legendConfig);
     data.legendControl = LegendManager.normalizeControl(data.legendControl);
     data.parentBordersVisible = data.parentBordersVisible !== false;

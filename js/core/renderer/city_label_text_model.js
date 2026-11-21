@@ -1,4 +1,5 @@
 import { formatModernPlaceName, isRenamedPlace } from "./modern_place_name.js";
+import { getCityOverrideId } from "../city_name_overrides.js";
 
 const CITY_LABEL_MAX_WIDTH_PX = {
   sparse: { capital: 212, major: 186, regional: 164, minor: 150 },
@@ -162,7 +163,7 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     ).trim();
   }
 
-  function resolveCityDisplayLabel(feature) {
+  function resolveScenarioCityDisplayLabel(feature) {
     const props = feature?.properties || {};
     const overrideLabel = getCityOverrideDisplayLabel(feature);
     if (overrideLabel) {
@@ -231,8 +232,14 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     return cleaned || rawLabel;
   }
 
-  function getCityDisplayLabel(feature, { showModernPlaceNames = !!runtimeState.showModernPlaceNames } = {}) {
-    const label = cleanCityMapLabelText(resolveCityDisplayLabel(feature), feature);
+  function getProjectCityName(feature) {
+    return runtimeState.cityNameOverrides?.[getCityOverrideId(feature)]?.[runtimeState.currentLanguage === "zh" ? "zh" : "en"];
+  }
+
+  function resolveCityDisplayLabel(feature, { showModernPlaceNames = !!runtimeState.showModernPlaceNames } = {}) {
+    const projectName = getProjectCityName(feature);
+    if (projectName) return projectName;
+    const label = cleanCityMapLabelText(resolveScenarioCityDisplayLabel(feature), feature);
     if (!showModernPlaceNames || !getCityOverrideDisplayLabel(feature)) return label;
     const props = feature?.properties || {};
     // 只给真正的改名加对照：英文名不同才算改名，简繁或译名差异不括注。
@@ -295,13 +302,14 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
   }
 
   function formatCityMapLabel(fullLabel, { entry = null, context: labelContext = null, config = {}, scale = 1 } = {}) {
-    const rawLabel = cleanCityMapLabelText(fullLabel, entry?.feature);
+    const projectName = getProjectCityName(entry?.feature);
+    const rawLabel = projectName || cleanCityMapLabelText(fullLabel, entry?.feature);
     if (!rawLabel || !labelContext?.measureText) {
       return rawLabel;
     }
     const maxWidthPx = getCityMapLabelMaxWidth(entry, config);
     const measureWidth = (candidate) => Number(labelContext.measureText(String(candidate || "")).width || 0) * scale;
-    const cleanedLabel = cleanCityMapLabelText(rawLabel);
+    const cleanedLabel = projectName || cleanCityMapLabelText(rawLabel);
     if (cleanedLabel && measureWidth(cleanedLabel) <= maxWidthPx) {
       return cleanedLabel;
     }
@@ -312,5 +320,5 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     return truncateCityLabelToWidth(abbreviatedLabel || cleanedLabel || rawLabel, maxWidthPx, measureWidth);
   }
 
-  return Object.freeze({ getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel });
+  return Object.freeze({ getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel: resolveCityDisplayLabel, formatCityMapLabel });
 }

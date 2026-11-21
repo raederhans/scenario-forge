@@ -79,6 +79,7 @@ function captureHistoryState({
   stylePaths = [],
   legend = false,
   countryNameOverrides = false,
+  cityNameOverrides = false,
   strategicOverlay = false,
   intensityFieldChannels = [],
   appearancePresets = false,
@@ -117,6 +118,7 @@ function captureHistoryState({
   }
 
   if (countryNameOverrides) snapshot.countryNameOverrides = cloneStructuredValue(runtimeState.countryNameOverrides || {});
+  if (cityNameOverrides) snapshot.cityNameOverrides = cloneStructuredValue(runtimeState.cityNameOverrides || {});
 
   if (strategicOverlay) {
     const defaults = {
@@ -330,6 +332,7 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
   applyStyleSnapshot(snapshot.styleConfig);
   if (snapshot.countryNameOverrides) runtimeState.countryNameOverrides = cloneStructuredValue(snapshot.countryNameOverrides);
+  if (snapshot.cityNameOverrides) runtimeState.cityNameOverrides = cloneStructuredValue(snapshot.cityNameOverrides);
   if (snapshot.legendLabels) {
     patchLegendState(runtimeState, { legendLabels: snapshot.legendLabels, legendColorOrder: snapshot.legendColorOrder });
   }
