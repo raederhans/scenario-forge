@@ -1364,6 +1364,7 @@ const getStrategicOverlayHelpersOwner = lazyOwner(() => createStrategicOverlayHe
   groupGetters: {
     getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs(),
     getOperationalLinesGroup: () => rendererSurfaceHost.getOperationalLinesGroup(),
+    getOperationGraphicsEditorGroup: () => rendererSurfaceHost.getOperationGraphicsEditorGroup(),
     getOperationGraphicsGroup: () => rendererSurfaceHost.getOperationGraphicsGroup(),
     getUnitCountersGroup: () => rendererSurfaceHost.getUnitCountersGroup(),
     getSpecialZonesGroup: () => rendererSurfaceHost.getSpecialZonesGroup(),

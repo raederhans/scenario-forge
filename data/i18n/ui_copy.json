@@ -255,6 +255,10 @@
     "en": "Add imported ids",
     "zh": "添加导入 ID"
   },
+  "Add map text": {
+    "en": "Add map text",
+    "zh": "添加地图文字"
+  },
   "Add more vertices before switching this graphic to a closed style.": {
     "en": "Add more vertices before switching this graphic to a closed style.",
     "zh": "在将此图形切换为闭合样式之前添加更多顶点。"
@@ -525,6 +529,10 @@
   "Anchor: Province / Free": {
     "en": "Anchor: Province / Free",
     "zh": "锚点：省份 / 自由"
+  },
+  "Annotation visibility": {
+    "en": "Annotation visibility",
+    "zh": "注记显示"
   },
   "Antarctica": {
     "en": "Antarctica",
@@ -1257,6 +1265,14 @@
   "Category {index}": {
     "en": "Category {index}",
     "zh": "类别 {index}"
+  },
+  "Click the map to place · Esc to cancel": {
+    "en": "Click the map to place · Esc to cancel",
+    "zh": "单击地图放置 · Esc 取消"
+  },
+  "Place a label to start lettering the map.": {
+    "en": "Place a label to start lettering the map.",
+    "zh": "点击「放置文字」添加第一条地图文字。"
   },
   "Search legend or country name": {
     "en": "Search legend or country name",

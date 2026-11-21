@@ -888,6 +888,9 @@ function createDefaultAnnotationView() {
     unitCounterFixedScaleMultiplier: 1.5,
     showUnitLabels: true,
     showMapLabels: true,
+    showOperationalLines: true,
+    showOperationGraphics: true,
+    showUnitCounters: true,
   };
 }
 
@@ -906,6 +909,9 @@ function normalizeAnnotationView(rawConfig) {
       2.0,
     ),
     showMapLabels: raw.showMapLabels === undefined ? defaults.showMapLabels : !!raw.showMapLabels,
+    showOperationalLines: raw.showOperationalLines === undefined ? defaults.showOperationalLines : !!raw.showOperationalLines,
+    showOperationGraphics: raw.showOperationGraphics === undefined ? defaults.showOperationGraphics : !!raw.showOperationGraphics,
+    showUnitCounters: raw.showUnitCounters === undefined ? defaults.showUnitCounters : !!raw.showUnitCounters,
     showUnitLabels: raw.showUnitLabels === undefined ? defaults.showUnitLabels : !!raw.showUnitLabels,
   };
 }

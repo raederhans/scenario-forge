@@ -257,6 +257,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "添加导入 ID",
     "en": "Add imported ids"
   },
+  "Add map text": {
+    "zh": "添加地图文字",
+    "en": "Add map text"
+  },
   "Add more vertices before switching this graphic to a closed style.": {
     "zh": "在将此图形切换为闭合样式之前添加更多顶点。",
     "en": "Add more vertices before switching this graphic to a closed style."
@@ -531,6 +535,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Annexed (all regions painted in other countries’ colors)": {
     "zh": "已被吞并（全部地块涂成他国颜色）",
     "en": "Annexed (all regions painted in other countries’ colors)"
+  },
+  "Annotation visibility": {
+    "zh": "注记显示",
+    "en": "Annotation visibility"
   },
   "Antarctica": {
     "zh": "南极洲",
@@ -1711,6 +1719,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Click the map to place vertices. Double-click or press Finish to commit the operational line.": {
     "zh": "单击地图放置顶点。双击或按“完成”以提交作战线。",
     "en": "Click the map to place vertices. Double-click or press Finish to commit the operational line."
+  },
+  "Click the map to place · Esc to cancel": {
+    "zh": "单击地图放置 · Esc 取消",
+    "en": "Click the map to place · Esc to cancel"
   },
   "Click to inspect a region or country. Press F to switch to fill before painting.": {
     "zh": "点击查看区域或国家。绘制前按 F 切换到填充工具。",
@@ -6927,6 +6939,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Pilot scope stays on motorway, trunk, and primary.": {
     "zh": "试点范围停留在高速公路、主干道和主干道上。",
     "en": "Pilot scope stays on motorway, trunk, and primary."
+  },
+  "Place a label to start lettering the map.": {
+    "zh": "点击「放置文字」添加第一条地图文字。",
+    "en": "Place a label to start lettering the map."
   },
   "Place label": {
     "zh": "放置文字",
