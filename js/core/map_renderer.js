@@ -12893,6 +12893,15 @@ function resetZoomToFit({ centerContent = false, centerX = true, centerY = false
   return getViewportCommandOwner().resetZoomToFit({ centerContent, centerX, centerY, animate });
 }
 
+export function panMapByPixels(dx, dy) {
+  const rect = rendererSurfaceHost.getInteractionRect();
+  const zoom = rendererSurfaceHost.getZoomBehavior();
+  if (!rect?.node() || !zoom) return;
+  rect.interrupt();
+  const scale = globalThis.d3.zoomTransform(rect.node()).k;
+  rect.call(zoom.translateBy, dx / scale, dy / scale);
+}
+
 function zoomByStep(direction = 1) {
   return getViewportCommandOwner().zoomByStep(direction);
 }
@@ -12952,6 +12961,11 @@ function initMap({
   getRendererSurfaceLifecycleOwner().resolveDomHandles({ containerId });
   getFacilityInteractionRuntime().resolveDomHandles();
   runtimeState.refreshColorStateFn = refreshColorState;
+  registerRuntimeHook(runtimeState, "cancelBrushStrokeFn", () => {
+    if (!brushSession?.dragging) return false;
+    cancelBrushSession();
+    return true;
+  });
   registerRuntimeHook(runtimeState, "stepUpInspectorSelectionFn", stepUpInspectorSelection);
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
   registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);

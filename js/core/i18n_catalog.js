@@ -492,6 +492,10 @@ export const UI_COPY_CATALOG = Object.freeze({
       "other": "Also update {count} regions painted in {country}'s old color?"
     }
   },
+  "Alt+Click": {
+    "zh": "Alt+单击",
+    "en": "Alt+Click"
+  },
   "Aluminium": {
     "zh": "铝",
     "en": "Aluminium"
@@ -1240,6 +1244,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "取消导入",
     "en": "Cancel Import"
   },
+  "Cancel stroke or exit current mode": {
+    "zh": "取消笔画或逐级退出当前模式",
+    "en": "Cancel stroke or exit current mode"
+  },
   "Candidate": {
     "zh": "候选人",
     "en": "Candidate"
@@ -1379,6 +1387,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Choose a pack for this layer": {
     "zh": "请选择此图层的数据包",
     "en": "Choose a pack for this layer"
+  },
+  "Choose a quick color": {
+    "zh": "选择快捷色",
+    "en": "Choose a quick color"
   },
   "Choose a sea or strait from the map or list. To select lakes, first enable lake interaction in settings.": {
     "zh": "从地图或列表选择海域或海峡。要选择湖泊，请先在设置中开启湖泊交互。",
@@ -1891,6 +1903,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Color scale": {
     "zh": "色带",
     "en": "Color scale"
+  },
+  "Colors": {
+    "zh": "颜色",
+    "en": "Colors"
   },
   "Colors reset": {
     "zh": "颜色已重置",
@@ -2936,6 +2952,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "双击快速填色",
     "en": "Double-Click Quick Fill"
   },
+  "Double-click": {
+    "zh": "双击",
+    "en": "Double-click"
+  },
   "Double-click fill: whole country (no parent) · {count} regions": {
     "zh": "双击填充：整国（无上级区域）· {count} 个地块",
     "en": {
@@ -3055,6 +3075,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Drop to open project": {
     "zh": "松开以打开项目",
     "en": "Drop to open project"
+  },
+  "Drop to use as a reference image": {
+    "zh": "放下作为参考图",
+    "en": "Drop to use as a reference image"
   },
   "Duplicate layer": {
     "zh": "复制图层",
@@ -3647,6 +3671,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "虚构或架空历史",
     "en": "Fictional / alt-history"
   },
+  "File": {
+    "zh": "文件",
+    "en": "File"
+  },
   "File type": {
     "zh": "文件类型",
     "en": "File type"
@@ -3913,6 +3941,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Geometry source": {
     "zh": "几何来源",
     "en": "Geometry source"
+  },
+  "Gestures": {
+    "zh": "手势",
+    "en": "Gestures"
   },
   "Global oceans": {
     "zh": "全球海洋",
@@ -4226,6 +4258,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "命中来源",
     "en": "Hit Source"
   },
+  "Hold Alt and click to sample a color": {
+    "zh": "按住 Alt 点击取色",
+    "en": "Hold Alt and click to sample a color"
+  },
+  "Hold and drag to pan": {
+    "zh": "按住并拖动以平移地图",
+    "en": "Hold and drag to pan"
+  },
   "Hold to Compare Baseline": {
     "zh": "按住以比较基线",
     "en": "Hold to Compare Baseline"
@@ -4289,6 +4329,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Ignored {count} entries that are not valid for this map.": {
     "zh": "已忽略 {count} 条不适用于当前地图的记录。",
     "en": "Ignored {count} entries that are not valid for this map."
+  },
+  "Images can be used as a reference map": {
+    "zh": "图片可作为参考图",
+    "en": "Images can be used as a reference map"
   },
   "Import": {
     "zh": "导入",
@@ -6058,8 +6102,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "No facility details available yet."
   },
   "No file selected": {
-    "zh": "未选择文件",
-    "en": "No file selected"
+    "zh": "未选择文件。也可以把项目文件拖到地图上。",
+    "en": "No file selected. You can also drop a project file onto the map."
   },
   "No frontline control split in current scenario.": {
     "zh": "当前情况下没有前线控制分裂。",
@@ -6417,6 +6461,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "一次点击需要影响一个组、一个区域、一条前线或一项计划行动时使用。",
     "en": "One click should affect a group, a region, a frontline, or a planned operation."
   },
+  "Only .json/.zip project files can be opened": {
+    "zh": "只能打开 .json/.zip 项目文件",
+    "en": "Only .json/.zip project files can be opened"
+  },
   "Only approved local subtypes enter the live energy pack.": {
     "zh": "只有经过批准的本地子类型才能进入实时能量包。",
     "en": "Only approved local subtypes enter the live energy pack."
@@ -6476,6 +6524,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Open grid": {
     "zh": "稀疏方格",
     "en": "Open grid"
+  },
+  "Open project": {
+    "zh": "打开项目",
+    "en": "Open project"
   },
   "Open reference tools, export utilities, language toggle, and development workspace access.": {
     "zh": "打开参考工具、导出功能、语言切换和开发工作区入口。",
@@ -6816,6 +6868,22 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "调色板恢复已跳过",
     "en": "Palette restore skipped"
   },
+  "Pan down on focused map (Shift for larger steps)": {
+    "zh": "地图获得焦点时向下平移（按住 Shift 加大步长）",
+    "en": "Pan down on focused map (Shift for larger steps)"
+  },
+  "Pan left on focused map (Shift for larger steps)": {
+    "zh": "地图获得焦点时向左平移（按住 Shift 加大步长）",
+    "en": "Pan left on focused map (Shift for larger steps)"
+  },
+  "Pan right on focused map (Shift for larger steps)": {
+    "zh": "地图获得焦点时向右平移（按住 Shift 加大步长）",
+    "en": "Pan right on focused map (Shift for larger steps)"
+  },
+  "Pan up on focused map (Shift for larger steps)": {
+    "zh": "地图获得焦点时向上平移（按住 Shift 加大步长）",
+    "en": "Pan up on focused map (Shift for larger steps)"
+  },
   "Panels": {
     "zh": "面板",
     "en": "Panels"
@@ -6931,6 +6999,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Place label": {
     "zh": "放置文字",
     "en": "Place label"
+  },
+  "Place map text": {
+    "zh": "放置地图文字",
+    "en": "Place map text"
   },
   "Placed Counters": {
     "zh": "已放置计数器",
@@ -7523,6 +7595,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Quick edit dock": {
     "zh": "快捷编辑栏",
     "en": "Quick edit dock"
+  },
+  "Quick fill": {
+    "zh": "快速填色",
+    "en": "Quick fill"
   },
   "Quick path": {
     "zh": "快速路径",
@@ -9468,6 +9544,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "后续主权绘制将把区域分配给当前选中的可释放国家。",
     "en": "Sovereignty painting will now assign regions to the selected releasable country."
   },
+  "Space": {
+    "zh": "空格",
+    "en": "Space"
+  },
   "Sparse": {
     "zh": "稀疏",
     "en": "Sparse"
@@ -10368,6 +10448,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "切换所选",
     "en": "Toggle Selected"
   },
+  "Toggle bottom dock": {
+    "zh": "开关底栏",
+    "en": "Toggle bottom dock"
+  },
   "Toggle current tile": {
     "zh": "切换当前地块",
     "en": "Toggle current tile"
@@ -10375,6 +10459,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Toggle details": {
     "zh": "切换详细信息",
     "en": "Toggle details"
+  },
+  "Toggle developer mode": {
+    "zh": "开关开发者模式",
+    "en": "Toggle developer mode"
   },
   "Toggle development workspace": {
     "zh": "切换开发工作区",

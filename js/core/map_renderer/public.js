@@ -94,6 +94,7 @@ export {
   focusRiverPaintParentById,
   applyRiverPaintCellById,
   getZoomPercent,
+  panMapByPixels,
   resetZoomToFit,
   setDebugMode,
   setZoomPercent,
