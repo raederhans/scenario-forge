@@ -30,9 +30,9 @@ test("auto-fill asks before clearing land, river cells or country colors", async
     assert.equal(await confirmAutoFill(paint, cancel), false);
     assert.ok(dialogs.at(-1).message.includes(count + " 块手涂颜色"));
   }
-  for (const kind of ["auto-fill-region", "auto-fill-political"]) {
-    assert.equal(getHistoryActionLabel("Undo", { kind }), "撤销：自动填色");
-  }
+  // 两种自动填色各自说明范围，便于用户分辨撤销的是哪一种。
+  assert.equal(getHistoryActionLabel("Undo", { kind: "auto-fill-region" }), "撤销：按区域自动填色");
+  assert.notEqual(getHistoryActionLabel("Undo", { kind: "auto-fill-political" }), "撤销");
 });
 
 function brushHarness() {

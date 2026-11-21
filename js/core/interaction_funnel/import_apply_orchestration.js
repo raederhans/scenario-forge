@@ -42,7 +42,6 @@ export function commitImportedProjectPatch(target, patch) {
   restoreAppearanceReferenceImportFields(target, patch);
   restoreTransportImportFields(target, patch);
   restoreRendererInteractionImportFields(target, patch);
-  if (patch.legendConfig) patchLegendState(target, { legendConfig: patch.legendConfig });
   applyProjectImportPatch(target, patch);
 }
 

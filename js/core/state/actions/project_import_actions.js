@@ -93,6 +93,8 @@ export function applyProjectImportPatch(target, patch) {
   if (Object.hasOwn(patch, "onlyUnpainted")) target.onlyUnpainted = patch.onlyUnpainted;
   if (Object.hasOwn(patch, "annotationView")) target.annotationView = patch.annotationView;
   if (Object.hasOwn(patch, "customPresets")) target.customPresets = patch.customPresets;
+  // 文件导入时已归一化；回滚要恢复原对象引用。
+  if (Object.hasOwn(patch, "legendConfig")) target.legendConfig = patch.legendConfig;
   if (Object.hasOwn(patch, "countryNameOverrides")) target.countryNameOverrides = patch.countryNameOverrides;
   if (Object.hasOwn(patch, "cityNameOverrides")) target.cityNameOverrides = patch.cityNameOverrides;
   if (Object.hasOwn(patch, "devClipboardFallbackText")) target.devClipboardFallbackText = patch.devClipboardFallbackText;

@@ -130,8 +130,6 @@ export function getHistoryActionLabel(direction, entry) {
     const [code] = Object.keys(entry.after.sovereignBaseColors);
     const country = getLocalizedScenarioCountryName(state.scenarioCountriesByTag?.[code], state.countryNames?.[code] || code, t);
     action = t("Change {country} color", "ui", { country });
-  } else if (kind === "auto-fill-political" || kind === "auto-fill-region") {
-    action = t("Auto-fill map", "ui");
   } else if (kind === "clear-map" || kind === "reset-country-colors") {
     action = t(kind === "clear-map" ? "Clear Map" : "Reset Country Colors", "ui");
   } else if (Object.hasOwn(actionNames, kind)) {
