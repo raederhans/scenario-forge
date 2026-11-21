@@ -132,6 +132,9 @@ function bindUnitCounterOverlayInteractions() {
 function renderOperationalLinesOverlay() {
   const operationalLinesGroup = groupGetters.getOperationalLinesGroup?.() || null;
   if (!operationalLinesGroup) return;
+  const hidden = state.annotationView?.showOperationalLines === false;
+  operationalLinesGroup.attr("display", hidden ? "none" : null);
+  if (hidden) return;
   renderStrategicDefs();
   ensureOperationalLineEditorState();
   const lines = Array.isArray(state.operationalLines) ? state.operationalLines : [];
@@ -246,6 +249,10 @@ function renderOperationalLinesOverlay() {
 function renderOperationGraphicsOverlay() {
   const operationGraphicsGroup = groupGetters.getOperationGraphicsGroup?.() || null;
   if (!operationGraphicsGroup) return;
+  const hidden = state.annotationView?.showOperationGraphics === false;
+  operationGraphicsGroup.attr("display", hidden ? "none" : null);
+  groupGetters.getOperationGraphicsEditorGroup?.()?.attr("display", hidden ? "none" : null);
+  if (hidden) return;
   renderStrategicDefs();
   const graphics = Array.isArray(state.operationGraphics) ? state.operationGraphics : [];
   const selectedId = String(state.operationGraphicsEditor?.selectedId || "");
@@ -410,6 +417,9 @@ function syncUnitCounterScalesDuringZoom() {
 function renderUnitCountersOverlay() {
   const unitCountersGroup = groupGetters.getUnitCountersGroup?.() || null;
   if (!unitCountersGroup) return;
+  const hidden = state.annotationView?.showUnitCounters === false;
+  unitCountersGroup.attr("display", hidden ? "none" : null);
+  if (hidden) return;
   ensureUnitCounterEditorState();
   const selectedId = String(state.unitCounterEditor?.selectedId || "");
   const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));

@@ -2212,6 +2212,7 @@
             </button>
           </div>
 
+          <div id="mapLabelPlacementHint" class="tool-hud-chip is-visible" hidden role="status" data-i18n="Click the map to place · Esc to cancel">Click the map to place · Esc to cancel</div>
           <div id="toolHudChip" class="tool-hud-chip hidden" aria-live="polite"></div>
           <div id="parcelSelectionPanel" class="map-onboarding-hint hidden" style="top: 12px; transform: translateX(-50%); width: max-content">
             <span id="parcelSelectionCount" aria-live="polite"></span>
@@ -2313,6 +2314,7 @@
                       <path d="m8 16 8.5-8.5a2.12 2.12 0 0 0-3-3L5 13v3h3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                     </svg>
                   </button>
+                  <button id="toolMapTextBtn" class="dock-icon-btn dock-tool-btn" type="button" aria-label="Add map text" title="Add map text" data-i18n-aria-label="Add map text" data-i18n-title="Add map text">T</button>
                   <button id="brushModeBtn" class="dock-icon-btn dock-tool-btn" type="button" aria-label="Brush" title="Brush" data-i18n-aria-label="Brush" data-i18n-title="Brush">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M7 15c-1.5 1-2 2.3-2 3.5 0 1.4 1.1 2.5 2.5 2.5 2.3 0 4.5-1.8 4.5-4.8 0-.7-.2-1.5-.6-2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -3090,6 +3092,13 @@
                 <p class="sidebar-tool-hint inspector-frontline-intro hidden sidebar-help-copy" data-i18n="Frontlines and strategic annotations workspace.">
                   Frontlines and strategic annotations workspace.
                 </p>
+                <fieldset class="inspector-stack">
+                  <legend data-i18n="Annotation visibility">Annotation visibility</legend>
+                  <label><input type="checkbox" data-annotation-view="showMapLabels" checked> <span data-i18n="Map lettering">Map lettering</span></label>
+                  <label><input type="checkbox" data-annotation-view="showOperationalLines" checked> <span data-i18n="Operational lines">Operational lines</span></label>
+                  <label><input type="checkbox" data-annotation-view="showOperationGraphics" checked> <span data-i18n="Operation graphics">Operation graphics</span></label>
+                  <label><input type="checkbox" data-annotation-view="showUnitCounters" checked> <span data-i18n="Unit counters">Unit counters</span></label>
+                </fieldset>
                 <div id="frontlineTabStack" class="inspector-frontline-stack"></div>
               </div>
             </details>
