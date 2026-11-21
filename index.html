@@ -2691,7 +2691,10 @@
                     <span data-i18n="Country display name">Country display name</span>
                     <input id="countryNameOverride" class="input" type="text" autocomplete="off" />
                   </label>
-                  <div><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span></div>
+                  <div><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span>
+                    <button id="convertCountryLabel" type="button" class="sidebar-action-secondary" data-i18n="Convert to editable text" hidden>Convert to editable text</button>
+                  </div>
+                  <div id="countryTerritoryStats" class="country-select-meta"></div>
                   <details id="countryCities" class="mt-2" hidden>
                     <summary data-i18n="Cities in this country">Cities in this country</summary>
                     <label class="field-label">

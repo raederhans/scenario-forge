@@ -25,6 +25,7 @@ function eligible(feature) {
 export function createCountryLabelSourceOwner({ state, topojson = globalThis.topojson, geoArea = globalThis.d3?.geoArea,
   geoContains = globalThis.d3?.geoContains, geoBounds = globalThis.d3?.geoBounds,
   ensureSources, getCountryName = code => getCountryNameOverride(state, code) || state.countryNames?.[code] || code,
+  resolveBorderIdentity,
   isEligible = () => true, onChange = () => {},
   createWorker = () => new Worker(new URL('../../workers/country_label_geometry.worker.js', import.meta.url), { type: 'module' }),
   isWorkerSupported = () => typeof Worker === 'function',
@@ -33,6 +34,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   let sourceToken = '', revision = 0, status = 'pending', error = '';
   let geometryRecords = EMPTY, countries = EMPTY, features = EMPTY, nameKey = '';
   let memberIndex = null;
+  let publishedWorld = null, paintKey = [], releaseAssignments = new Map(), releaseRevision = 0;
   let retained = null, request = null, buildRequest = null, failedIdentity = '', disposed = false;
   async function buildGroups(groups, c, signal, client) {
     const isCurrent = () => !disposed && !signal.aborted && context().identity === c.identity;
@@ -60,7 +62,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       .filter(chunk => chunk.globalCoverage === true && chunk.lod === 'coarse');
     const topology = scenarioId ? state.scenarioRuntimeTopologyData : state.topologyPrimary || state.topology;
     // Immutable registry descriptors identify the world, not viewport residency.
-    const identity = JSON.stringify([scenarioId, state.sceneGeneration || 0,
+    const world = JSON.stringify([scenarioId, state.sceneGeneration || 0,
       getObjectIdentityToken(bundle), getObjectIdentityToken(bundle?.chunkRegistry),
       bases.map(({ id, sha256, url }) => [id, sha256, url]),
       chunked ? '' : getObjectIdentityToken(topology),
@@ -69,7 +71,22 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       // not re-dissolve every country outline.
       [...getParentMergedParents(state.scenarioCountriesByTag)],
       state.mapSemanticMode || '']);
-    return { scenarioId, bundle, chunked, bases, topology, identity };
+    const key = [world, state.colorRevision, state.visualOverrides, state.sovereignBaseColors, state.scenarioCountriesByTag];
+    if (key.some((value, i) => value !== paintKey[i])) {
+      paintKey = key;
+      const next = new Map();
+      if (scenarioId && resolveBorderIdentity) {
+        for (const id of Object.keys(state.visualOverrides || {})) {
+          const code = resolveBorderIdentity(id, state.landIndex?.get(id));
+          if (state.scenarioCountriesByTag?.[code]?.releasable) next.set(id, code);
+        }
+      }
+      if (next.size !== releaseAssignments.size || [...next].some(([id, code]) => releaseAssignments.get(id) !== code)) {
+        releaseAssignments = next;
+        releaseRevision++;
+      }
+    }
+    return { scenarioId, bundle, chunked, bases, topology, world, releases: releaseAssignments, identity: world + releaseRevision };
   }
 
   function currentNameKey() {
@@ -100,18 +117,19 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       sourceToken = c.identity; revision++; status = 'pending'; error = '';
       geometryRecords = countries = features = EMPTY; nameKey = '';
       memberIndex = null;
+      if (publishedWorld?.world !== c.world) publishedWorld = null;
       if (retained?.identity !== c.identity) retained = null;
     }
     if (c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank') { status = 'disabled'; return; }
     if (status === 'ready') { publishNames(); return; }
     if (failedIdentity === c.identity) { status = 'error'; return; }
     let input;
-    if (c.chunked) {
+    if (!publishedWorld && c.chunked) {
       if (!c.bases.length) return;
       input = retained?.payloads || c.bases.map(({ id }) => c.bundle?.chunkPayloadCacheById?.[id]?.payload
         || state.activeScenarioChunks?.payloadByChunkId?.[id]?.payload);
       if (input.length !== c.bases.length || input.some(payload => !Array.isArray(payload?.features))) return;
-    } else if (!c.topology?.objects?.political) return;
+    } else if (!c.chunked && !c.topology?.objects?.political) return;
     if (typeof topojson?.merge !== 'function') return;
     if (buildRequest?.identity === c.identity) return;
     const owned = { identity: c.identity, controller: new AbortController(),
@@ -125,49 +143,75 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
     });
   }
 
+  function groupReleasedTerritory(c, previous) {
+    const changed = new Set();
+    for (const id of new Set([...previous.releases.keys(), ...c.releases.keys()])) {
+      const original = previous.members.groupCodeById.get(id);
+      if (!original) continue;
+      const before = previous.releases.get(id) || original, after = c.releases.get(id) || original;
+      if (before !== after) { changed.add(before); changed.add(after); }
+    }
+    const groups = new Map();
+    for (const [id, original] of previous.members.groupCodeById) {
+      const code = c.releases.get(id) || original;
+      if (!changed.has(code)) continue;
+      if (!groups.has(code)) groups.set(code, []);
+      groups.get(code).push(previous.members.featureById.get(id));
+    }
+    return { groups, members: previous.members, retainedRecords: previous.records.filter(record => !changed.has(record.countryCode)) };
+  }
+
+  function groupWorld(c, input) {
+    const groups = new Map(), seen = new Set();
+    const groupCodeById = new Map(), featureById = new Map(), memberCountByCode = new Map();
+    const parents = getParentMergedParents(state.scenarioCountriesByTag);
+    const add = (feature, geometry = null) => {
+      const id = getFeatureId(feature);
+      if (id && seen.has(id)) return;
+      if (id) seen.add(id);
+      if (!eligible(feature) || !isEligible(feature, id)) return;
+      // Scenario reference is complete and immutable. Never borrow geographic
+      // identity when a historical scenario has not assigned this feature.
+      const ownerCode = c.scenarioId ? reference.getScenarioGroupCode(id) : reference.getBaseGroupCode(feature);
+      const code = parents.get(ownerCode) || ownerCode;
+      if (!code) return;
+      const labelCode = c.releases.get(id) || code;
+      if (!groups.has(labelCode)) groups.set(labelCode, []);
+      groups.get(labelCode).push(geometry || feature);
+      if (id) {
+        groupCodeById.set(id, code);
+        featureById.set(id, feature);
+        memberCountByCode.set(code, (memberCountByCode.get(code) || 0) + 1);
+      }
+    };
+    if (c.chunked) input.forEach(payload => payload.features.forEach(feature => {
+      if (polygons(feature?.geometry).length) add(feature);
+    }));
+    else {
+      const visit = geometry => {
+        if (geometry?.type === 'GeometryCollection') (geometry.geometries || []).forEach(visit);
+        else if (geometry?.type === 'Polygon' || geometry?.type === 'MultiPolygon') add(geometry, geometry);
+      };
+      visit(c.topology.objects.political);
+    }
+    const members = Object.freeze({ groupCodeById: freezeMap(groupCodeById),
+      featureById: freezeMap(featureById), memberCountByCode: freezeMap(memberCountByCode) });
+    return { groups, members, retainedRecords: EMPTY };
+  }
+
   async function build(c, input, signal, client) {
     try {
       await yieldTask();
       if (disposed || context().identity !== c.identity) return;
-      const groups = new Map(), seen = new Set();
-      const groupCodeById = new Map(), featureById = new Map(), memberCountByCode = new Map();
-      const parents = getParentMergedParents(state.scenarioCountriesByTag);
-      const add = (feature, geometry = null) => {
-        const id = getFeatureId(feature);
-        if (id && seen.has(id)) return;
-        if (id) seen.add(id);
-        if (!eligible(feature) || !isEligible(feature, id)) return;
-        // Scenario reference is complete and immutable. Never borrow geographic
-        // identity when a historical scenario has not assigned this feature.
-        const ownerCode = c.scenarioId ? reference.getScenarioGroupCode(id) : reference.getBaseGroupCode(feature);
-        const code = parents.get(ownerCode) || ownerCode;
-        if (!code) return;
-        if (!groups.has(code)) groups.set(code, []);
-        groups.get(code).push(geometry || feature);
-        if (id) {
-          groupCodeById.set(id, code);
-          featureById.set(id, feature);
-          memberCountByCode.set(code, (memberCountByCode.get(code) || 0) + 1);
-        }
-      };
-      if (c.chunked) input.forEach(payload => payload.features.forEach(feature => {
-        if (polygons(feature?.geometry).length) add(feature);
-      }));
-      else {
-        const visit = geometry => {
-          if (geometry?.type === 'GeometryCollection') (geometry.geometries || []).forEach(visit);
-          else if (geometry?.type === 'Polygon' || geometry?.type === 'MultiPolygon') add(geometry, geometry);
-        };
-        visit(c.topology.objects.political);
-      }
-      const records = await buildGroups(groups, c, signal, client);
+      const { groups, members, retainedRecords } = publishedWorld ? groupReleasedTerritory(c, publishedWorld) : groupWorld(c, input);
+      const updates = groups.size ? await buildGroups(groups, c, signal, client) : [];
       if (disposed || signal.aborted || context().identity !== c.identity) return;
-      geometryRecords = records;
-      memberIndex = Object.freeze({ groupCodeById: freezeMap(groupCodeById),
-        featureById: freezeMap(featureById), memberCountByCode: freezeMap(memberCountByCode) });
+      geometryRecords = retainedRecords.concat(updates);
+      memberIndex = members;
+      publishedWorld = { world: c.world, releases: c.releases, members: memberIndex, records: geometryRecords };
       status = 'ready'; retained = null; publishNames(); onChange();
     } catch (failure) {
-      if (disposed || context().identity !== c.identity) return;
+      if (disposed || signal.aborted || context().identity !== c.identity) return;
       status = 'error'; error = text(failure?.message || failure); failedIdentity = c.identity;
       onChange();
     }
@@ -222,6 +266,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       disposed = true; buildRequest?.controller.abort(); buildRequest?.client.terminate();
       retained = request = buildRequest = null; geometryRecords = countries = features = EMPTY;
       memberIndex = null;
+      publishedWorld = null;
     },
   });
 }

@@ -2142,6 +2142,8 @@ const {
   getRiverContourRenderOwner,
 });
 
+registerRuntimeHook(runtimeState, "resolveBorderIdentityFn", resolveBorderIdentity);
+
 function getBoundaryPathViewport() {
   // Deleting fully offscreen segments changes native GPU stroke coverage.
   // Preserve complete Path2D geometry; batch only independent native paints.
@@ -9960,6 +9962,7 @@ export function freezeVisibleCountryLabels() {
 export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove, applyMapLabelStyleToPreset } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
 export function getPlacedMapLabels() { return labelsRuntime.getPlacedMapLabels(); }
 export function getVisibleMapLabels() { return labelsRuntime.getVisibleMapLabels(); }
+registerRuntimeHook(runtimeState, "getSuppressedCountryCodesFn", labelsRuntime.getSuppressedCodes);
 export function getCountryLabelStatus(code) { return labelsRuntime.getCountryLabelStatus(code); }
 
 export function getCountryLabelReadiness() { return labelsRuntime.getCountryLabelReadiness(); }
@@ -12141,7 +12144,9 @@ function clearInspectorLandSelection() {
 
 function syncInspectorCountryToLandSelection(feature, featureId, hit = null, event = null) {
   if (event?.detail >= 2) return false;
-  const ownerCode = canonicalCountryCode(getFeatureOwnerCode(featureId));
+  const identity = resolveBorderIdentity(featureId, feature);
+  if (identity?.startsWith("color:")) return clearInspectorLandSelection();
+  const ownerCode = canonicalCountryCode(identity);
   const featureCode = canonicalCountryCode(
     ownerCode
       || hit?.countryCode
