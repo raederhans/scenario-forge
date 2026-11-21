@@ -6170,8 +6170,8 @@
     "zh": "暂时没有可用的 facility 详情。"
   },
   "No file selected": {
-    "en": "No file selected",
-    "zh": "未选择文件"
+    "en": "Open a project file or drop a project file onto the map.",
+    "zh": "打开项目文件，或将文件拖到地图上。"
   },
   "No frontline control split in current scenario.": {
     "en": "No frontline control split in current scenario.",
