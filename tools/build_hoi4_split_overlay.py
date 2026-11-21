@@ -944,6 +944,33 @@ add("finland_interwar_isthmus_salla", B, "FIN", None, None,
     notes="Terijoki, Kellomäki, Kuokkala (north of the Sestra) and old Salla east of today's border were Finnish until 1940.")
 add("karelia_porosozero", B, "KRL", None, None, FI("RU_RAY_50074027B39999494546000__SPLIT_SOVIET"), only=["FIN"],
     notes="Porajärvi/Porosozero stayed in Soviet Karelia under the 1920 Tartu treaty.")
+# Fourth wave; the __SPLIT_ ids come from hoi4_border_refinements_w4.geometry_splits.json.
+RU = "RU_RAY_50074027B"
+add("poland_interwar_ignalina", B, "POL", None, None, FI("LT029__SPLIT_POLISH"), only=["LIT"],
+    notes="Ignalina and Turmantas lay on the Polish side of the 1922-1939 demarcation line.")
+add("estonia_interwar_petseri_narva", B, "EST", None, None,
+    FI(RU + "90555869339870__SPLIT_PETSERI", RU + "99227036451137__SPLIT_JAANILINN",
+       RU + "5223158268211__SPLIT_NARVATAGUSE"), only=["SOV"],
+    notes="Petseri County and the land east of the Narva (Jaanilinn/Ivangorod) were Estonian under the 1920 Tartu treaty.")
+add("latvia_interwar_abrene", B, "LAT", None, None,
+    FI(RU + "88274438285408__SPLIT_ABRENE", RU + "19741518738580__SPLIT_KACENI", RU + "90555869339870__SPLIT_LATVIAN"),
+    only=["SOV"], notes="Abrene district (Pytalovo, Kacēni/Kachanovo) was Latvian from 1920 to 1940.")
+add("spanish_morocco_eastern_rif", B, "SMR", None, None, FI("MAR-1454__SPLIT_SPANISH"), only=["MOR"],
+    notes="Nador, Driouch and the Kert valley lay in the Spanish protectorate.")
+add("french_morocco_taza_taounate", B, "MOR", None, None, FI("MAR-1447__SPLIT_FRENCH"), only=["SMR"],
+    notes="Taza, Taounate and Guercif lay in the French protectorate; only the Al Hoceima coast was Spanish.")
+add("italy_tende_la_brigue", B, "ITA", None, None, FI("FR_ARR_06002__SPLIT_REST__SPLIT_TENDE"), only=["FRA"],
+    notes="Tende, La Brigue and the high Tinée/Vésubie valleys stayed Italian until 1947.")
+add("poland_spisz_orava_1939", Y39, "POL", None, None,
+    FI("SK_ADM2_56367889B94927774956455__SPLIT_JAVORINA", "SK_ADM2_56367889B83569782265262__SPLIT_ORAVA"),
+    only=["SLO"], notes="Javorina, Hladovka and Suchá Hora were ceded to Poland in November 1938. The partial "
+                        "Kysuce and Lesnica cessions are not separated.")
+add("spain_llivia", B, "SPR", None, None, FI("FR_ARR_66003__SPLIT_LLIVIA"), only=["FRA"], notes="Spanish exclave of Llívia.")
+add("germany_busingen", B, "GER", None, None, FI("CH057__SPLIT_BUSINGEN"), only=["SWI"], notes="German exclave of Büsingen.")
+add("italy_campione", B, "ITA", None, None, FI("CH070__SPLIT_CAMPIONE"), only=["SWI"],
+    notes="Italian exclave of Campione d'Italia.")
+add("sudan_halaib_triangle", B, "SUD", None, None, FI("EGY-1556__SPLIT_HALAIB"), only=["EGY"],
+    notes="The Hala'ib triangle was administered from Sudan under the 1902 administrative line.")
 E.append({"id": "shell_sliver_adoption", "scenarios": B,
           "adopt_shell_slivers": {"id_pattern": r"_(ARCTIC|SHELL)_FB_\d+$", "max_area_km2": 3000}})
 

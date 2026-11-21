@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 332,
-    "feature_count": 21151,
+    "feature_count": 21661,
     "water_count": 0
   },
   "controller_changes": [],
@@ -2581,19 +2581,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "YUN"
-    },
-    {
-      "country_code": "CN",
-      "critical": true,
-      "feature_id": "CN_CITY_17275852B14447575237215",
-      "feature_name": "Tuokexunxian",
-      "from_tag": "CHI",
-      "notes": "Sinkiang override.",
-      "quality": "manual_reviewed",
-      "rule_id": "sinkiang",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SIK"
     },
     {
       "country_code": "CN",
@@ -8496,19 +8483,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "YUE"
-    },
-    {
-      "country_code": "CN",
-      "critical": true,
-      "feature_id": "CN_CITY_17275852B47937532060975",
-      "feature_name": "Ruoqiangxian",
-      "from_tag": "CHI",
-      "notes": "Sinkiang override.",
-      "quality": "manual_reviewed",
-      "rule_id": "sinkiang",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SIK"
     },
     {
       "country_code": "CN",
@@ -14454,19 +14428,6 @@
     {
       "country_code": "CN",
       "critical": true,
-      "feature_id": "CN_CITY_17275852B82973388541806",
-      "feature_name": "Tulufan",
-      "from_tag": "CHI",
-      "notes": "Sinkiang override.",
-      "quality": "manual_reviewed",
-      "rule_id": "sinkiang",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SIK"
-    },
-    {
-      "country_code": "CN",
-      "critical": true,
       "feature_id": "CN_CITY_17275852B83006271829254",
       "feature_name": "Linjiang",
       "from_tag": "CHI",
@@ -18224,45 +18185,6 @@
     {
       "country_code": "DZ",
       "critical": false,
-      "feature_id": "DZA-2189",
-      "feature_name": "Tamanghasset",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
-      "feature_id": "DZA-2190",
-      "feature_name": "El Bayadh",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
-      "feature_id": "DZA-2191",
-      "feature_name": "El Oued",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
       "feature_id": "DZA-2192",
       "feature_name": "Ghardaïa",
       "from_tag": "ALG",
@@ -18408,32 +18330,6 @@
       "critical": false,
       "feature_id": "DZA-2203",
       "feature_name": "Relizane",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
-      "feature_id": "DZA-2204",
-      "feature_name": "Saïda",
-      "from_tag": "ALG",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_algeria",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ALG"
-    },
-    {
-      "country_code": "DZ",
-      "critical": false,
-      "feature_id": "DZA-2205",
-      "feature_name": "Tiaret",
       "from_tag": "ALG",
       "notes": "French Algeria represented as a separate colonial administration.",
       "quality": "manual_reviewed",
@@ -18913,19 +18809,6 @@
     {
       "country_code": "EG",
       "critical": false,
-      "feature_id": "EGY-1548",
-      "feature_name": "Aswan",
-      "from_tag": "EGY",
-      "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
-      "quality": "manual_reviewed",
-      "rule_id": "egypt_kingdom",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "EGY"
-    },
-    {
-      "country_code": "EG",
-      "critical": false,
       "feature_id": "EGY-1549",
       "feature_name": "Asyut",
       "from_tag": "EGY",
@@ -18967,19 +18850,6 @@
       "critical": false,
       "feature_id": "EGY-1552",
       "feature_name": "Suhaj",
-      "from_tag": "EGY",
-      "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
-      "quality": "manual_reviewed",
-      "rule_id": "egypt_kingdom",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "EGY"
-    },
-    {
-      "country_code": "EG",
-      "critical": false,
-      "feature_id": "EGY-1556",
-      "feature_name": "Al Bahr al Ahmar",
       "from_tag": "EGY",
       "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
       "quality": "manual_reviewed",
@@ -19266,71 +19136,6 @@
       "critical": true,
       "feature_id": "HR028",
       "feature_name": "Sisačko-moslavačka županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
-      "feature_id": "HR032",
-      "feature_name": "Ličko-senjska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
-      "feature_id": "HR034",
-      "feature_name": "Šibensko-kninska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
-      "feature_id": "HR035",
-      "feature_name": "Splitsko-dalmatinska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
-      "feature_id": "HR036",
-      "feature_name": "Istarska županija",
-      "from_tag": "CRO",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "HR",
-      "critical": true,
-      "feature_id": "HR037",
-      "feature_name": "Dubrovačko-neretvanska županija",
       "from_tag": "CRO",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
@@ -22332,19 +22137,6 @@
     {
       "country_code": "IN",
       "critical": true,
-      "feature_id": "IN_ADM2_76128533B75922461866405",
-      "feature_name": "Barmer",
-      "from_tag": "",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_raj",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "RAJ"
-    },
-    {
-      "country_code": "IN",
-      "critical": true,
       "feature_id": "IN_ADM2_76128533B7606365706860",
       "feature_name": "Gandhinagar",
       "from_tag": "",
@@ -22826,19 +22618,6 @@
     {
       "country_code": "IN",
       "critical": true,
-      "feature_id": "IN_ADM2_76128533B91881382098572",
-      "feature_name": "Kachchh",
-      "from_tag": "",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_raj",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "RAJ"
-    },
-    {
-      "country_code": "IN",
-      "critical": true,
       "feature_id": "IN_ADM2_76128533B91943656836526",
       "feature_name": "Jhalawar",
       "from_tag": "",
@@ -23229,34 +23008,8 @@
     {
       "country_code": "KZ",
       "critical": true,
-      "feature_id": "KAZ-3195",
-      "feature_name": "Aqtöbe",
-      "from_tag": "KAZ",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "KZ",
-      "critical": true,
       "feature_id": "KAZ-3196",
       "feature_name": "Qostanay",
-      "from_tag": "KAZ",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "KZ",
-      "critical": true,
-      "feature_id": "KAZ-3197",
-      "feature_name": "Qyzylorda",
       "from_tag": "KAZ",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -24568,19 +24321,6 @@
     {
       "country_code": "LY",
       "critical": false,
-      "feature_id": "LBY-2982",
-      "feature_name": "Al Jabal al Akhdar",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
       "feature_id": "LBY-2983",
       "feature_name": "Ajdabiya",
       "from_tag": "LBA",
@@ -24609,19 +24349,6 @@
       "critical": false,
       "feature_id": "LBY-2985",
       "feature_name": "Surt",
-      "from_tag": "LBA",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "italian_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "LBA"
-    },
-    {
-      "country_code": "LY",
-      "critical": false,
-      "feature_id": "LBY-2986",
-      "feature_name": "Al Qubbah",
       "from_tag": "LBA",
       "notes": "Italian Libya represented as a distinct colonial administration.",
       "quality": "approx_existing_geometry",
@@ -24997,19 +24724,6 @@
     {
       "country_code": "MA",
       "critical": false,
-      "feature_id": "MAR-1447",
-      "feature_name": "Taza - Al Hoceima - Taounate",
-      "from_tag": "MOR",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SMR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
       "feature_id": "MAR-1448",
       "feature_name": "Gharb - Chrarda - Béni Hssen",
       "from_tag": "MOR",
@@ -25077,19 +24791,6 @@
       "critical": false,
       "feature_id": "MAR-1453",
       "feature_name": "Tadla - Azilal",
-      "from_tag": "MOR",
-      "notes": "French Morocco represented as the remaining protectorate area after Spanish Morocco and Spanish Sahara are split out.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MOR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
-      "feature_id": "MAR-1454",
-      "feature_name": "Oriental",
       "from_tag": "MOR",
       "notes": "French Morocco represented as the remaining protectorate area after Spanish Morocco and Spanish Sahara are split out.",
       "quality": "manual_reviewed",
@@ -25673,19 +25374,6 @@
     {
       "country_code": "MK",
       "critical": true,
-      "feature_id": "MK003",
-      "feature_name": "Југозападен",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "MK",
-      "critical": true,
       "feature_id": "MK004",
       "feature_name": "Југоисточен",
       "from_tag": "",
@@ -25701,32 +25389,6 @@
       "critical": true,
       "feature_id": "MK005",
       "feature_name": "Пелагониски",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "MK",
-      "critical": true,
-      "feature_id": "MK006",
-      "feature_name": "Полошки",
-      "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "MK",
-      "critical": true,
-      "feature_id": "MK007",
-      "feature_name": "Североисточен",
       "from_tag": "",
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "quality": "manual_reviewed",
@@ -28078,19 +27740,6 @@
     {
       "country_code": "PL",
       "critical": true,
-      "feature_id": "PL_POW_2802",
-      "feature_name": "braniewski",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
       "feature_id": "PL_POW_2803",
       "feature_name": "działdowski",
       "from_tag": "POL",
@@ -28104,34 +27753,8 @@
     {
       "country_code": "PL",
       "critical": true,
-      "feature_id": "PL_POW_2804",
-      "feature_name": "elbląski",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
       "feature_id": "PL_POW_2805",
       "feature_name": "ełcki",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
-      "feature_id": "PL_POW_2808",
-      "feature_name": "kętrzyński",
       "from_tag": "POL",
       "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
       "quality": "manual_reviewed",
@@ -28197,32 +27820,6 @@
       "critical": true,
       "feature_id": "PL_POW_2816",
       "feature_name": "piski",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
-      "feature_id": "PL_POW_2817",
-      "feature_name": "szczycieński",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
-      "feature_id": "PL_POW_2818",
-      "feature_name": "gołdapski",
       "from_tag": "POL",
       "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
       "quality": "manual_reviewed",
@@ -29168,32 +28765,6 @@
       "to_tag": "YUG"
     },
     {
-      "country_code": "SI",
-      "critical": true,
-      "feature_id": "SI043",
-      "feature_name": "Goriška",
-      "from_tag": "SLV",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
-      "country_code": "SI",
-      "critical": true,
-      "feature_id": "SI044",
-      "feature_name": "Obalno-kraška",
-      "from_tag": "SLV",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUG"
-    },
-    {
       "country_code": "SY",
       "critical": false,
       "feature_id": "SYR-134",
@@ -29521,19 +29092,6 @@
     {
       "country_code": "TN",
       "critical": false,
-      "feature_id": "TUN-101",
-      "feature_name": "Tozeur",
-      "from_tag": "TUN",
-      "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_tunisia",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "TUN"
-    },
-    {
-      "country_code": "TN",
-      "critical": false,
       "feature_id": "TUN-102",
       "feature_name": "Manubah",
       "from_tag": "TUN",
@@ -29640,19 +29198,6 @@
       "critical": false,
       "feature_id": "TUN-110",
       "feature_name": "Kassérine",
-      "from_tag": "TUN",
-      "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_tunisia",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "TUN"
-    },
-    {
-      "country_code": "TN",
-      "critical": false,
-      "feature_id": "TUN-111",
-      "feature_name": "Gabès",
       "from_tag": "TUN",
       "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
       "quality": "manual_reviewed",
@@ -29783,19 +29328,6 @@
       "critical": false,
       "feature_id": "TUN-96",
       "feature_name": "Médenine",
-      "from_tag": "TUN",
-      "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_tunisia",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "TUN"
-    },
-    {
-      "country_code": "TN",
-      "critical": false,
-      "feature_id": "TUN-97",
-      "feature_name": "Kebili",
       "from_tag": "TUN",
       "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
       "quality": "manual_reviewed",
@@ -30108,19 +29640,6 @@
       "critical": true,
       "feature_id": "UZB-355",
       "feature_name": "Khorezm",
-      "from_tag": "UZB",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UZ",
-      "critical": true,
-      "feature_id": "UZB-356",
-      "feature_name": "Karakalpakstan",
       "from_tag": "UZB",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -32474,19 +31993,6 @@
       "critical": false,
       "feature_id": "SR_ADM1_SUR-37",
       "feature_name": "Nickerie",
-      "from_tag": "SUR",
-      "notes": "Dutch Suriname approximation outside the East Indies.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "dutch_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "HOL"
-    },
-    {
-      "country_code": "SR",
-      "critical": false,
-      "feature_id": "SR_ADM1_SUR-66",
-      "feature_name": "Brokopondo",
       "from_tag": "SUR",
       "notes": "Dutch Suriname approximation outside the East Indies.",
       "quality": "approx_existing_geometry",
@@ -34890,34 +34396,8 @@
     {
       "country_code": "SK",
       "critical": true,
-      "feature_id": "SK_ADM2_56367889B94927774956455",
-      "feature_name": "District of Poprad",
-      "from_tag": "SLO",
-      "notes": "Czechoslovakia baseline override across Czechia and Slovakia.",
-      "quality": "manual_reviewed",
-      "rule_id": "czechoslovakia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "CZE"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
       "feature_id": "SK_ADM2_56367889B98399677297130",
       "feature_name": "District of Ilava",
-      "from_tag": "SLO",
-      "notes": "Czechoslovakia baseline override across Czechia and Slovakia.",
-      "quality": "manual_reviewed",
-      "rule_id": "czechoslovakia_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "CZE"
-    },
-    {
-      "country_code": "SK",
-      "critical": true,
-      "feature_id": "SK_ADM2_56367889B83569782265262",
-      "feature_name": "District of Tvrdo",
       "from_tag": "SLO",
       "notes": "Czechoslovakia baseline override across Czechia and Slovakia.",
       "quality": "manual_reviewed",
@@ -35072,19 +34552,6 @@
     {
       "country_code": "BY",
       "critical": true,
-      "feature_id": "BY_RAY_67162791B13547290723272",
-      "feature_name": "Grodno",
-      "from_tag": "BLR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
-    },
-    {
-      "country_code": "BY",
-      "critical": true,
       "feature_id": "BY_RAY_67162791B14569635979911",
       "feature_name": "Kastsyukovichy",
       "from_tag": "BLR",
@@ -35126,19 +34593,6 @@
       "critical": true,
       "feature_id": "BY_RAY_67162791B18102707107362",
       "feature_name": "Braslaw",
-      "from_tag": "BLR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
-    },
-    {
-      "country_code": "BY",
-      "critical": true,
-      "feature_id": "BY_RAY_67162791B18933715013959",
-      "feature_name": "Ashmyany",
       "from_tag": "BLR",
       "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
       "quality": "manual_reviewed",
@@ -35319,19 +34773,6 @@
     {
       "country_code": "BY",
       "critical": true,
-      "feature_id": "BY_RAY_67162791B66420794580046",
-      "feature_name": "Shchuchyn",
-      "from_tag": "BLR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
-    },
-    {
-      "country_code": "BY",
-      "critical": true,
       "feature_id": "BY_RAY_67162791B72598168140482",
       "feature_name": "Vietka",
       "from_tag": "BLR",
@@ -35432,19 +34873,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SOV"
-    },
-    {
-      "country_code": "BY",
-      "critical": true,
-      "feature_id": "BY_INT_GRODNO",
-      "feature_name": "Grodno Interior",
-      "from_tag": "BLR",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
-      "quality": "manual_reviewed",
-      "rule_id": "poland_kresy_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "POL"
     },
     {
       "country_code": "BY",
@@ -36996,99 +36424,8 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B38321108376859",
-      "feature_name": "Дубовский район",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B75402656675224",
       "feature_name": "Volgodonsk",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B4882309977182",
-      "feature_name": "Kotelnikovsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B22819891790259",
-      "feature_name": "Tsimlyansky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B66955592022274",
-      "feature_name": "Oktyabrsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B6068395788556",
-      "feature_name": "Чернышковский район",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B15993714165206",
-      "feature_name": "Surovikinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B97827439207559",
-      "feature_name": "Kalachyovsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -37451,19 +36788,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B884948676219",
-      "feature_name": "Kamyshinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B52521252875752",
       "feature_name": "Zhirnovsky District",
       "from_tag": "",
@@ -37659,32 +36983,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B94816741297533",
-      "feature_name": "Nikolayevsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B34579677769219",
-      "feature_name": "Staropoltavsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B95256084907759",
       "feature_name": "Pitersky District",
       "from_tag": "",
@@ -37763,32 +37061,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B88958089507858",
-      "feature_name": "Gorodishchensky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B3691210145247",
-      "feature_name": "Ilovlinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B54184638100605",
       "feature_name": "Dubovsky District",
       "from_tag": "",
@@ -37804,58 +37076,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B30801426940346",
       "feature_name": "Bykovsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B23214282298262",
-      "feature_name": "Engelssky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B39404018386654",
-      "feature_name": "Saratov",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B97557760790791",
-      "feature_name": "Saratovsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B65758721423350",
-      "feature_name": "Voskresensky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -37932,19 +37152,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B43084003717333",
-      "feature_name": "Balakovsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B71601382884380",
       "feature_name": "Bolshechernigovsky District",
       "from_tag": "",
@@ -37973,19 +37180,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B34939639698741",
       "feature_name": "Bazarno-Karabulaksky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B68349842384732",
-      "feature_name": "Volsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -38038,19 +37232,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B75697889650200",
       "feature_name": "Khvorostyansky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B72026568542942",
-      "feature_name": "Privolzhsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -38129,19 +37310,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B35912731621053",
       "feature_name": "Oktyabrsk",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B44960058886802",
-      "feature_name": "Syzransky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -38933,71 +38101,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B18920333631541",
-      "feature_name": "Stavropolsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B84391084656620",
-      "feature_name": "Shigonsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B58494309327601",
-      "feature_name": "Tolyatti",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B68460090008050",
-      "feature_name": "Sengileyevsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B3936819954606",
-      "feature_name": "городской округ Новоульяно",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B4469096099560",
       "feature_name": "городской округ Октябрьски",
       "from_tag": "",
@@ -39024,47 +38127,8 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B64412298842231",
-      "feature_name": "Cherdaklinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B20925327326281",
       "feature_name": "Koshkinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B67860704242461",
-      "feature_name": "городской округ Ульяновск",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B97493150269350",
-      "feature_name": "Ulyanovsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -39102,34 +38166,8 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B61660763245932",
-      "feature_name": "Staromaynsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B75875360813754",
       "feature_name": "Alkeyevsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B47970821426630",
-      "feature_name": "Tetyushsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -39234,19 +38272,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B66682375731534",
       "feature_name": "Ichalkovsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B87542455562769",
-      "feature_name": "Spassky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -39986,47 +39011,8 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B99457892446306",
-      "feature_name": "Lyskovsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B44365109797977",
       "feature_name": "Nizhny Novgorod",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B81093411628760",
-      "feature_name": "Yuryevetsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B55061952513406",
-      "feature_name": "Kineshemsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -40493,19 +39479,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B66856367478499",
-      "feature_name": "Ononsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B90632265551754",
       "feature_name": "Priargunsky District",
       "from_tag": "",
@@ -40573,19 +39546,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B14990510856215",
       "feature_name": "Kyakhtinsky Rayon",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B64669214156055",
-      "feature_name": "Borzinsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -41533,19 +40493,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B14040427045082",
-      "feature_name": "Krutikhinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B59094736613024",
       "feature_name": "Okinsky Rayon",
       "from_tag": "",
@@ -41756,19 +40703,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B94588175534962",
       "feature_name": "Okhinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B90244452662579",
-      "feature_name": "Zeysky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -42703,19 +41637,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B33581045729564",
-      "feature_name": "Нижнеилимский район",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B95387741431040",
       "feature_name": "Tuguro-Chumikansky Rayon",
       "from_tag": "",
@@ -42898,19 +41819,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B89196470968911",
-      "feature_name": "Ust-Ilimsky",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B42772585169334",
       "feature_name": "Мамско-Чуйский район",
       "from_tag": "",
@@ -43067,47 +41975,8 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B20716795967188",
-      "feature_name": "Morgaushsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B16961904381699",
-      "feature_name": "Cheboksarsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B91746933948416",
       "feature_name": "Novocheboksarsk",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B22241988675108",
-      "feature_name": "Vorotynsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -43197,60 +42066,8 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B57067541625780",
-      "feature_name": "городской округ Чебоксары",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B96655496117027",
       "feature_name": "Kozmodemyansk",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B54726203316693",
-      "feature_name": "Gornomariysky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B85030315682895",
-      "feature_name": "Yurinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B31803957515687",
-      "feature_name": "Kilemarsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -43485,19 +42302,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B41842513634160",
       "feature_name": "Perm",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B60091493242386",
-      "feature_name": "Чусовской район",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -44484,19 +43288,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B88274438285408",
-      "feature_name": "Pytalovsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B93968807426390",
       "feature_name": "Ostashkovsky District",
       "from_tag": "",
@@ -44640,34 +43431,8 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B19741518738580",
-      "feature_name": "Palkinsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B64963077612696",
       "feature_name": "Demyansky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B90555869339870",
-      "feature_name": "Pechorsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -44837,19 +43602,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B11673707761487",
       "feature_name": "Laukaa District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B5223158268211",
-      "feature_name": "Slantsevsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -45056,19 +43808,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B51121921202406",
-      "feature_name": "Kadyysky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B44706978372394",
       "feature_name": "Totemsky District",
       "from_tag": "",
@@ -45084,19 +43823,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B65544968176864",
       "feature_name": "городской округ Рыбинск",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B91001506415746",
-      "feature_name": "Рыбинский район",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -45290,19 +44016,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B42465403886102",
-      "feature_name": "Vesyegonsky District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B55270503343274",
       "feature_name": "Belozersky District",
       "from_tag": "",
@@ -45344,19 +44057,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B56817088939843",
       "feature_name": "Tusina District",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B99227036451137",
-      "feature_name": "Jaama District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -46018,19 +44718,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_RAY_50074027B61732353469918",
-      "feature_name": "Katangsky Rayon",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_RAY_50074027B92925268599817",
       "feature_name": "Khangalassky Ulus",
       "from_tag": "",
@@ -46059,19 +44746,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B33321279608248",
       "feature_name": "Suntarsky Ulus",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B34454529298169",
-      "feature_name": "Mirninsky Ulus",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -46371,19 +45045,6 @@
       "critical": true,
       "feature_id": "RU_RAY_50074027B15872482411826",
       "feature_name": "городской округ Норильск",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_RAY_50074027B66849950652275",
-      "feature_name": "Taymyrsky Dolgano-Nenetsky District",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -47110,19 +45771,6 @@
     {
       "country_code": "UA",
       "critical": true,
-      "feature_id": "UA_RAY_74538382B61089393980714",
-      "feature_name": "Kakhovka",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
       "feature_id": "UA_RAY_74538382B42205538030067",
       "feature_name": "Novotroitske",
       "from_tag": "UKR",
@@ -47201,19 +45849,6 @@
     {
       "country_code": "UA",
       "critical": true,
-      "feature_id": "UA_RAY_74538382B60808123109786",
-      "feature_name": "Beryslav",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
       "feature_id": "UA_RAY_74538382B65177906747126",
       "feature_name": "Hornostaivka",
       "from_tag": "UKR",
@@ -47242,32 +45877,6 @@
       "critical": true,
       "feature_id": "UA_RAY_74538382B83290488809947",
       "feature_name": "Velyka Lepetkya",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B88832969225176",
-      "feature_name": "Verkhniy Rohackyk",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B85739457006484",
-      "feature_name": "Novovorontsovka",
       "from_tag": "UKR",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -47682,34 +46291,8 @@
     {
       "country_code": "UA",
       "critical": true,
-      "feature_id": "UA_RAY_74538382B3314448443504",
-      "feature_name": "Kamianka Dniprovska",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
       "feature_id": "UA_RAY_74538382B95492559683598",
       "feature_name": "Melitopol",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B86672078093677",
-      "feature_name": "Zaporizhia",
       "from_tag": "UKR",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -48061,45 +46644,6 @@
       "critical": true,
       "feature_id": "UA_RAY_74538382B36709578446445",
       "feature_name": "Milove",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B71954626153569",
-      "feature_name": "Tomakivka",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B8704633300515",
-      "feature_name": "Nikopol",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B1179884845086",
-      "feature_name": "Apostolove",
       "from_tag": "UKR",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -48488,19 +47032,6 @@
     {
       "country_code": "UA",
       "critical": true,
-      "feature_id": "UA_RAY_74538382B332128375794",
-      "feature_name": "Svitlovodsk",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
       "feature_id": "UA_RAY_74538382B33094259068281",
       "feature_name": "Kompaniivka",
       "from_tag": "UKR",
@@ -48529,19 +47060,6 @@
       "critical": true,
       "feature_id": "UA_RAY_74538382B39784518508744",
       "feature_name": "Poltava",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B15303326410198",
-      "feature_name": "Hlobyne",
       "from_tag": "UKR",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -48724,32 +47242,6 @@
       "critical": true,
       "feature_id": "UA_RAY_74538382B45068545633774",
       "feature_name": "Seredyna-Buda",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B23530210512837",
-      "feature_name": "Chyhyryn",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
-      "feature_id": "UA_RAY_74538382B28718545705075",
-      "feature_name": "Cherkasy",
       "from_tag": "UKR",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -50971,19 +49463,6 @@
     {
       "country_code": "BW",
       "critical": false,
-      "feature_id": "BW_ADM1_BWA-2630",
-      "feature_name": "Central",
-      "from_tag": "BOT",
-      "notes": "Fallback to mapped current-country tag BOT for BW; historical review pending.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "fallback_mapped_tag",
-      "source": "fallback_mapped_tag",
-      "synthetic_owner": true,
-      "to_tag": "BOT"
-    },
-    {
-      "country_code": "BW",
-      "critical": false,
       "feature_id": "BW_ADM1_BWA-2646",
       "feature_name": "Kgatleng",
       "from_tag": "BOT",
@@ -51344,19 +49823,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "RCG"
-    },
-    {
-      "country_code": "CM",
-      "critical": false,
-      "feature_id": "CM_ADM1_CMR-1462",
-      "feature_name": "Far North",
-      "from_tag": "CMR",
-      "notes": "French Equatorial Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_equatorial_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AEF"
     },
     {
       "country_code": "CM",
@@ -51985,34 +50451,8 @@
     {
       "country_code": "TD",
       "critical": false,
-      "feature_id": "TD_ADM1_TCD-1464",
-      "feature_name": "Hadjer-Lamis",
-      "from_tag": "CHA",
-      "notes": "French Equatorial Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_equatorial_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AEF"
-    },
-    {
-      "country_code": "TD",
-      "critical": false,
       "feature_id": "TD_ADM1_TCD-1465",
       "feature_name": "Kanem",
-      "from_tag": "CHA",
-      "notes": "French Equatorial Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_equatorial_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AEF"
-    },
-    {
-      "country_code": "TD",
-      "critical": false,
-      "feature_id": "TD_ADM1_TCD-1466",
-      "feature_name": "Lac",
       "from_tag": "CHA",
       "notes": "French Equatorial Africa represented as a macro-level colonial federation.",
       "quality": "manual_reviewed",
@@ -52908,34 +51348,8 @@
     {
       "country_code": "GH",
       "critical": false,
-      "feature_id": "GH_ADM1_GHA-2159",
-      "feature_name": "Brong-Ahafo",
-      "from_tag": "GHA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "GH",
-      "critical": false,
       "feature_id": "GH_ADM1_GHA-2160",
       "feature_name": "Central",
-      "from_tag": "GHA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "GH",
-      "critical": false,
-      "feature_id": "GH_ADM1_GHA-2161",
-      "feature_name": "Eastern",
       "from_tag": "GHA",
       "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
       "quality": "manual_reviewed",
@@ -53896,19 +52310,6 @@
     {
       "country_code": "MZ",
       "critical": false,
-      "feature_id": "MZ_ADM1_MOZ-1190",
-      "feature_name": "Tete",
-      "from_tag": "MZB",
-      "notes": "Portuguese Mozambique represented as a separate colonial administration.",
-      "quality": "manual_reviewed",
-      "rule_id": "portuguese_mozambique",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MZB"
-    },
-    {
-      "country_code": "MZ",
-      "critical": false,
       "feature_id": "MZ_ADM1_MOZ-1192",
       "feature_name": "Manica",
       "from_tag": "MZB",
@@ -54182,19 +52583,6 @@
     {
       "country_code": "NA",
       "critical": false,
-      "feature_id": "NA_ADM1_NAM-3355",
-      "feature_name": "Oshikoto",
-      "from_tag": "NMB",
-      "notes": "South West Africa approximation under South African control.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "south_africa_mandate",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SAF"
-    },
-    {
-      "country_code": "NA",
-      "critical": false,
       "feature_id": "NA_ADM1_NAM-3356",
       "feature_name": "Zambezi",
       "from_tag": "NMB",
@@ -54210,32 +52598,6 @@
       "critical": false,
       "feature_id": "NE_ADM1_NER-4859",
       "feature_name": "Tillabéri",
-      "from_tag": "NGR",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "NE",
-      "critical": false,
-      "feature_id": "NE_ADM1_NER-796",
-      "feature_name": "Diffa",
-      "from_tag": "NGR",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "NE",
-      "critical": false,
-      "feature_id": "NE_ADM1_NER-800",
-      "feature_name": "Agadez",
       "from_tag": "NGR",
       "notes": "French West Africa represented as a macro-level colonial federation.",
       "quality": "manual_reviewed",
@@ -54418,19 +52780,6 @@
       "critical": false,
       "feature_id": "NG_ADM1_NGA-2850",
       "feature_name": "Lagos",
-      "from_tag": "NGA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "NG",
-      "critical": false,
-      "feature_id": "NG_ADM1_NGA-2851",
-      "feature_name": "Niger State",
       "from_tag": "NGA",
       "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
       "quality": "manual_reviewed",
@@ -54717,19 +53066,6 @@
       "critical": false,
       "feature_id": "NG_ADM1_NGA-2873",
       "feature_name": "Yobe State",
-      "from_tag": "NGA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "NG",
-      "critical": false,
-      "feature_id": "NG_ADM1_NGA-2879",
-      "feature_name": "Kebbi State",
       "from_tag": "NGA",
       "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
       "quality": "manual_reviewed",
@@ -55469,19 +53805,6 @@
     {
       "country_code": "SD",
       "critical": false,
-      "feature_id": "SD_ADM1_SDN-878",
-      "feature_name": "Northern",
-      "from_tag": "SUD",
-      "notes": "Anglo-Egyptian Sudan represented as a condominium under British primacy with Egyptian linkage retained in metadata.",
-      "quality": "manual_reviewed",
-      "rule_id": "anglo_egyptian_sudan",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SUD"
-    },
-    {
-      "country_code": "SD",
-      "critical": false,
       "feature_id": "SD_ADM1_SDN-879",
       "feature_name": "White Nile",
       "from_tag": "SUD",
@@ -56210,19 +54533,6 @@
     {
       "country_code": "ZM",
       "critical": false,
-      "feature_id": "ZM_ADM1_ZMB-522",
-      "feature_name": "Southern",
-      "from_tag": "ZAM",
-      "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "british_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ENG"
-    },
-    {
-      "country_code": "ZM",
-      "critical": false,
       "feature_id": "ZM_ADM1_ZMB-523",
       "feature_name": "Western",
       "from_tag": "ZAM",
@@ -56264,19 +54574,6 @@
       "critical": false,
       "feature_id": "ZW_ADM1_ZWE-525",
       "feature_name": "Harare",
-      "from_tag": "ZIM",
-      "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "british_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ENG"
-    },
-    {
-      "country_code": "ZW",
-      "critical": false,
-      "feature_id": "ZW_ADM1_ZWE-526",
-      "feature_name": "Matabeleland North",
       "from_tag": "ZIM",
       "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
       "quality": "approx_existing_geometry",
@@ -56355,19 +54652,6 @@
       "critical": false,
       "feature_id": "ZW_ADM1_ZWE-532",
       "feature_name": "Masvingo",
-      "from_tag": "ZIM",
-      "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
-      "quality": "approx_existing_geometry",
-      "rule_id": "british_colonies",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "ENG"
-    },
-    {
-      "country_code": "ZW",
-      "critical": false,
-      "feature_id": "ZW_ADM1_ZWE-533",
-      "feature_name": "Mashonaland West",
       "from_tag": "ZIM",
       "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
       "quality": "approx_existing_geometry",
@@ -56665,19 +54949,6 @@
     {
       "country_code": "CI",
       "critical": false,
-      "feature_id": "CI_ADM1_83157122B20352934117266",
-      "feature_name": "Lacs",
-      "from_tag": "IVO",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "CI",
-      "critical": false,
       "feature_id": "CI_ADM1_83157122B28791092437733",
       "feature_name": "Savanes",
       "from_tag": "IVO",
@@ -56691,47 +54962,8 @@
     {
       "country_code": "CI",
       "critical": false,
-      "feature_id": "CI_ADM1_83157122B30232425959699",
-      "feature_name": "District Autonome De Yamoussoukro",
-      "from_tag": "IVO",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "CI",
-      "critical": false,
       "feature_id": "CI_ADM1_83157122B34711482467037",
       "feature_name": "Goh-Djiboua",
-      "from_tag": "IVO",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "CI",
-      "critical": false,
-      "feature_id": "CI_ADM1_83157122B58892240487392",
-      "feature_name": "Woroba",
-      "from_tag": "IVO",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "CI",
-      "critical": false,
-      "feature_id": "CI_ADM1_83157122B62906982633778",
-      "feature_name": "Valle Du Bandama",
       "from_tag": "IVO",
       "notes": "French West Africa represented as a macro-level colonial federation.",
       "quality": "manual_reviewed",
@@ -56758,19 +54990,6 @@
       "critical": false,
       "feature_id": "CI_ADM1_83157122B73612976130091",
       "feature_name": "Lagunes",
-      "from_tag": "IVO",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "AOF"
-    },
-    {
-      "country_code": "CI",
-      "critical": false,
-      "feature_id": "CI_ADM1_83157122B74959515955757",
-      "feature_name": "Sassandra-Marahoue",
       "from_tag": "IVO",
       "notes": "French West Africa represented as a macro-level colonial federation.",
       "quality": "manual_reviewed",
@@ -90894,19 +89113,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_2558",
-      "feature_name": "Russia Shell Fallback 2558",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_2559",
       "feature_name": "Russia Shell Fallback 2559",
       "from_tag": "",
@@ -91871,19 +90077,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_2633",
       "feature_name": "Russia Shell Fallback 2633",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_2634",
-      "feature_name": "Russia Shell Fallback 2634",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -96941,19 +95134,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_3023",
       "feature_name": "Russia Shell Fallback 3023",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_3024",
-      "feature_name": "Russia Shell Fallback 3024",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -165345,19 +163525,6 @@
     {
       "country_code": "UA",
       "critical": true,
-      "feature_id": "UA_SHELL_FB_269",
-      "feature_name": "Ukraine Shell Fallback 269",
-      "from_tag": "UKR",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "UA",
-      "critical": true,
       "feature_id": "UA_SHELL_FB_270",
       "feature_name": "Ukraine Shell Fallback 270",
       "from_tag": "UKR",
@@ -199175,10 +197342,10 @@
     "AEF": {
       "base_iso2": "TD",
       "continent_label": "Africa",
-      "controller_feature_count": 60,
+      "controller_feature_count": 62,
       "display_name": "French Equatorial Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 60,
+      "feature_count": 62,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199241,10 +197408,10 @@
     "AFG": {
       "base_iso2": "AF",
       "continent_label": "Asia",
-      "controller_feature_count": 34,
+      "controller_feature_count": 36,
       "display_name": "Afghanistan",
       "entry_kind": "",
-      "feature_count": 34,
+      "feature_count": 36,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199271,10 +197438,10 @@
     "ALB": {
       "base_iso2": "AL",
       "continent_label": "Europe",
-      "controller_feature_count": 12,
+      "controller_feature_count": 15,
       "display_name": "Albania",
       "entry_kind": "",
-      "feature_count": 12,
+      "feature_count": 15,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199301,10 +197468,10 @@
     "ALG": {
       "base_iso2": "DZ",
       "continent_label": "Africa",
-      "controller_feature_count": 13,
+      "controller_feature_count": 17,
       "display_name": "French Algeria",
       "entry_kind": "scenario_subject",
-      "feature_count": 13,
+      "feature_count": 17,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199369,10 +197536,10 @@
     "AOF": {
       "base_iso2": "SN",
       "continent_label": "Africa",
-      "controller_feature_count": 91,
+      "controller_feature_count": 98,
       "display_name": "French West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 91,
+      "feature_count": 98,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199403,10 +197570,10 @@
     "ARG": {
       "base_iso2": "AR",
       "continent_label": "South America",
-      "controller_feature_count": 24,
+      "controller_feature_count": 34,
       "display_name": "Argentina",
       "entry_kind": "",
-      "feature_count": 24,
+      "feature_count": 34,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199433,10 +197600,10 @@
     "AST": {
       "base_iso2": "PG",
       "continent_label": "Oceania",
-      "controller_feature_count": 10,
+      "controller_feature_count": 12,
       "display_name": "Australia",
       "entry_kind": "scenario_subject",
-      "feature_count": 10,
+      "feature_count": 12,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199468,10 +197635,10 @@
     "AUS": {
       "base_iso2": "AT",
       "continent_label": "Europe",
-      "controller_feature_count": 35,
+      "controller_feature_count": 45,
       "display_name": "Austria",
       "entry_kind": "",
-      "feature_count": 35,
+      "feature_count": 45,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199532,10 +197699,10 @@
     "BEL": {
       "base_iso2": "BE",
       "continent_label": "Europe",
-      "controller_feature_count": 25,
+      "controller_feature_count": 33,
       "display_name": "Belgium",
       "entry_kind": "",
-      "feature_count": 25,
+      "feature_count": 33,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199592,10 +197759,10 @@
     "BOL": {
       "base_iso2": "BO",
       "continent_label": "South America",
-      "controller_feature_count": 9,
+      "controller_feature_count": 12,
       "display_name": "Bolivia",
       "entry_kind": "",
-      "feature_count": 9,
+      "feature_count": 12,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199622,10 +197789,10 @@
     "BOT": {
       "base_iso2": "BW",
       "continent_label": "Africa",
-      "controller_feature_count": 15,
+      "controller_feature_count": 16,
       "display_name": "Botswana",
       "entry_kind": "",
-      "feature_count": 15,
+      "feature_count": 16,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199652,10 +197819,10 @@
     "BRA": {
       "base_iso2": "BR",
       "continent_label": "South America",
-      "controller_feature_count": 27,
+      "controller_feature_count": 42,
       "display_name": "Brazil",
       "entry_kind": "",
-      "feature_count": 27,
+      "feature_count": 42,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199716,10 +197883,10 @@
     "BUL": {
       "base_iso2": "BG",
       "continent_label": "Europe",
-      "controller_feature_count": 26,
+      "controller_feature_count": 34,
       "display_name": "Bulgaria",
       "entry_kind": "",
-      "feature_count": 26,
+      "feature_count": 34,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199780,10 +197947,10 @@
     "CAN": {
       "base_iso2": "CA",
       "continent_label": "North America",
-      "controller_feature_count": 270,
+      "controller_feature_count": 274,
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 270,
+      "feature_count": 274,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199874,10 +198041,10 @@
     "CHL": {
       "base_iso2": "CL",
       "continent_label": "South America",
-      "controller_feature_count": 16,
+      "controller_feature_count": 18,
       "display_name": "Chile",
       "entry_kind": "",
-      "feature_count": 16,
+      "feature_count": 18,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200026,10 +198193,10 @@
     "CZE": {
       "base_iso2": "CZ",
       "continent_label": "Europe",
-      "controller_feature_count": 274,
+      "controller_feature_count": 276,
       "display_name": "Czechoslovakia",
       "entry_kind": "",
-      "feature_count": 274,
+      "feature_count": 276,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200059,10 +198226,10 @@
     "DEN": {
       "base_iso2": "DK",
       "continent_label": "Europe",
-      "controller_feature_count": 12,
+      "controller_feature_count": 13,
       "display_name": "Denmark",
       "entry_kind": "",
-      "feature_count": 12,
+      "feature_count": 13,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200149,10 +198316,10 @@
     "EGY": {
       "base_iso2": "EG",
       "continent_label": "Africa",
-      "controller_feature_count": 26,
+      "controller_feature_count": 27,
       "display_name": "Kingdom of Egypt",
       "entry_kind": "scenario_subject",
-      "feature_count": 26,
+      "feature_count": 27,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200281,10 +198448,10 @@
     "EST": {
       "base_iso2": "EE",
       "continent_label": "Europe",
-      "controller_feature_count": 5,
+      "controller_feature_count": 10,
       "display_name": "Estonia",
       "entry_kind": "",
-      "feature_count": 5,
+      "feature_count": 10,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200374,10 +198541,10 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 322,
+      "controller_feature_count": 347,
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 322,
+      "feature_count": 347,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200407,10 +198574,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 671,
+      "controller_feature_count": 710,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 671,
+      "feature_count": 710,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200532,10 +198699,10 @@
     "GRE": {
       "base_iso2": "GR",
       "continent_label": "Europe",
-      "controller_feature_count": 65,
+      "controller_feature_count": 93,
       "display_name": "Greece",
       "entry_kind": "",
-      "feature_count": 65,
+      "feature_count": 93,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200684,10 +198851,10 @@
     "HOL": {
       "base_iso2": "NL",
       "continent_label": "Europe",
-      "controller_feature_count": 29,
+      "controller_feature_count": 31,
       "display_name": "Netherlands",
       "entry_kind": "",
-      "feature_count": 29,
+      "feature_count": 31,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200871,10 +199038,10 @@
     "IRQ": {
       "base_iso2": "IQ",
       "continent_label": "Asia",
-      "controller_feature_count": 18,
+      "controller_feature_count": 21,
       "display_name": "Iraq",
       "entry_kind": "",
-      "feature_count": 18,
+      "feature_count": 21,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200901,10 +199068,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 116,
+      "controller_feature_count": 138,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 116,
+      "feature_count": 138,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201061,10 +199228,10 @@
     "LAT": {
       "base_iso2": "LV",
       "continent_label": "Europe",
-      "controller_feature_count": 6,
+      "controller_feature_count": 14,
       "display_name": "Latvia",
       "entry_kind": "",
-      "feature_count": 6,
+      "feature_count": 14,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201091,10 +199258,10 @@
     "LBA": {
       "base_iso2": "LY",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 24,
       "display_name": "Libya",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 24,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201417,10 +199584,10 @@
     "MEX": {
       "base_iso2": "MX",
       "continent_label": "North America",
-      "controller_feature_count": 300,
+      "controller_feature_count": 307,
       "display_name": "Mexico",
       "entry_kind": "",
-      "feature_count": 300,
+      "feature_count": 307,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201477,10 +199644,10 @@
     "MON": {
       "base_iso2": "MN",
       "continent_label": "Asia",
-      "controller_feature_count": 38,
+      "controller_feature_count": 40,
       "display_name": "Mongolia",
       "entry_kind": "",
-      "feature_count": 38,
+      "feature_count": 40,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201507,10 +199674,10 @@
     "MOR": {
       "base_iso2": "MA",
       "continent_label": "Africa",
-      "controller_feature_count": 11,
+      "controller_feature_count": 12,
       "display_name": "French Morocco",
       "entry_kind": "scenario_subject",
-      "feature_count": 11,
+      "feature_count": 12,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201571,10 +199738,10 @@
     "MZB": {
       "base_iso2": "MZ",
       "continent_label": "Africa",
-      "controller_feature_count": 11,
+      "controller_feature_count": 12,
       "display_name": "Mozambique",
       "entry_kind": "scenario_subject",
-      "feature_count": 11,
+      "feature_count": 12,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201820,10 +199987,10 @@
     "PAR": {
       "base_iso2": "PY",
       "continent_label": "South America",
-      "controller_feature_count": 18,
+      "controller_feature_count": 20,
       "display_name": "Paraguay",
       "entry_kind": "",
-      "feature_count": 18,
+      "feature_count": 20,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201850,10 +200017,10 @@
     "PER": {
       "base_iso2": "IR",
       "continent_label": "Asia",
-      "controller_feature_count": 31,
+      "controller_feature_count": 52,
       "display_name": "Iran",
       "entry_kind": "",
-      "feature_count": 31,
+      "feature_count": 52,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201914,10 +200081,10 @@
     "POL": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 306,
+      "controller_feature_count": 341,
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 306,
+      "feature_count": 341,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202104,10 +200271,10 @@
     "RAJ": {
       "base_iso2": "IN",
       "continent_label": "Asia",
-      "controller_feature_count": 287,
+      "controller_feature_count": 290,
       "display_name": "British Raj",
       "entry_kind": "scenario_subject",
-      "feature_count": 287,
+      "feature_count": 290,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202202,10 +200369,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 123,
+      "controller_feature_count": 163,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 123,
+      "feature_count": 163,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202396,10 +200563,10 @@
     "SIK": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 78,
+      "controller_feature_count": 82,
       "display_name": "Sinkiang",
       "entry_kind": "",
-      "feature_count": 78,
+      "feature_count": 82,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202428,10 +200595,10 @@
     "SMR": {
       "base_iso2": "MA",
       "continent_label": "Africa",
-      "controller_feature_count": 3,
+      "controller_feature_count": 4,
       "display_name": "Spanish Morocco",
       "entry_kind": "scenario_subject",
-      "feature_count": 3,
+      "feature_count": 4,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202496,10 +200663,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 9390,
+      "controller_feature_count": 9457,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 9390,
+      "feature_count": 9457,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202511,7 +200678,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 12016
+        "manual_reviewed": 11937
       },
       "rule_sources": [
         "soviet_union"
@@ -202528,10 +200695,10 @@
     "SPR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 53,
+      "controller_feature_count": 54,
       "display_name": "Spain",
       "entry_kind": "",
-      "feature_count": 53,
+      "feature_count": 54,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202595,10 +200762,10 @@
     "SUD": {
       "base_iso2": "SD",
       "continent_label": "Africa",
-      "controller_feature_count": 27,
+      "controller_feature_count": 29,
       "display_name": "Anglo-Egyptian Sudan",
       "entry_kind": "scenario_subject",
-      "feature_count": 27,
+      "feature_count": 29,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202825,10 +200992,10 @@
     "TUN": {
       "base_iso2": "TN",
       "continent_label": "Africa",
-      "controller_feature_count": 23,
+      "controller_feature_count": 28,
       "display_name": "French Tunisia",
       "entry_kind": "scenario_subject",
-      "feature_count": 23,
+      "feature_count": 28,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202889,10 +201056,10 @@
     "URG": {
       "base_iso2": "UY",
       "continent_label": "South America",
-      "controller_feature_count": 19,
+      "controller_feature_count": 22,
       "display_name": "Uruguay",
       "entry_kind": "",
-      "feature_count": 19,
+      "feature_count": 22,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202919,10 +201086,10 @@
     "USA": {
       "base_iso2": "US",
       "continent_label": "North America",
-      "controller_feature_count": 817,
+      "controller_feature_count": 828,
       "display_name": "America",
       "entry_kind": "",
-      "feature_count": 817,
+      "feature_count": 828,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202949,10 +201116,10 @@
     "VEN": {
       "base_iso2": "VE",
       "continent_label": "South America",
-      "controller_feature_count": 26,
+      "controller_feature_count": 27,
       "display_name": "Venezuela",
       "entry_kind": "",
-      "feature_count": 26,
+      "feature_count": 27,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203137,10 +201304,10 @@
     "YUG": {
       "base_iso2": "RS",
       "continent_label": "Europe",
-      "controller_feature_count": 117,
+      "controller_feature_count": 131,
       "display_name": "Yugoslavia",
       "entry_kind": "",
-      "feature_count": 117,
+      "feature_count": 131,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204184,41 +202351,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "45c964ff4055c66e6b0a0b834515a5267ffda6697a60a12143b87de88a3a9192",
+  "snapshot_fingerprint": "3cc8a7f400e955a816b3acf96062625ce7150a81aae8c32400bc200cba036f7f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "57f2250662f2a64dacfcfe3ce7784e31e82755b8d27683cd29a4a79dede66b55",
-    "detail_chunk_manifest_sha256": "ea54b7cdd68d35e0f5f9ad0679ecc4e53f0a834918a204bf095fca49498d4766",
-    "runtime_bootstrap_topology_sha256": "5b62828e0bcb3c1c310e57d61c92b45b0aeffa96006c85f649ad4982e7b34bc9",
-    "runtime_topology_sha256": "2dec06bcf29dbf8892cd19a319cb87fb5c4dad0379c9aed64df5d337e7fb6b75"
+    "build_snapshot_sha256": "3f6a264bddf816ec38d4a6220e55da79da31809ff326d91821205beefcdaa0d8",
+    "detail_chunk_manifest_sha256": "c2e994f5680aeb9c437550b0769fe20e0c49bbddad9183c85c1fb2978cd6c2de",
+    "runtime_bootstrap_topology_sha256": "faaaa257491556eca37ca3108d6d1d55d4c3372e072df00b5089f88225307d93",
+    "runtime_topology_sha256": "62db1316789d825c538ca04bd39f8cc13908153188246d669bdd23d0259e64b8"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15285,
+    "changed_feature_count": 15144,
     "controller_count": 323,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21151,
+    "feature_count": 21661,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14838,
+    "manual_reviewed_feature_count": 14705,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 323,
     "quality_counts": {
-      "approx_existing_geometry": 447,
+      "approx_existing_geometry": 439,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14838
+      "manual_reviewed": 14705
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
-      "fallback_mapped_tag": 18,
-      "manual_rule": 15262
+      "fallback_mapped_tag": 17,
+      "manual_rule": 15122
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

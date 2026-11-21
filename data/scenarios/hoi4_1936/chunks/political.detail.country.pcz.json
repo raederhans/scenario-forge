@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "features": [
     {
-      "id": 21048,
+      "id": 20756,
       "type": "Feature",
       "properties": {
         "id": "PA_ADM1_PAN-1337__SPLIT_PCZ",
@@ -105,7 +105,7 @@
       }
     },
     {
-      "id": 21050,
+      "id": 20758,
       "type": "Feature",
       "properties": {
         "id": "PA_ADM1_PAN-1340__SPLIT_PCZ",
