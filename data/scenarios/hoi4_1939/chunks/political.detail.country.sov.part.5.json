@@ -92023,7 +92023,7 @@
       }
     },
     {
-      "id": 21098,
+      "id": 21061,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_69fe24997bd8__SPLIT_NOVOSIBIRSK_RESERVOIR",
@@ -92190,7 +92190,7 @@
       }
     },
     {
-      "id": 21099,
+      "id": 21062,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_69fe24997bd8__SPLIT_REST",
@@ -92707,7 +92707,7 @@
       }
     },
     {
-      "id": 21102,
+      "id": 21065,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7973a5d85acb__SPLIT_NOVOSIBIRSK_RESERVOIR",
@@ -92806,7 +92806,7 @@
       }
     },
     {
-      "id": 21103,
+      "id": 21066,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7973a5d85acb__SPLIT_REST",
@@ -94085,7 +94085,7 @@
       }
     },
     {
-      "id": 21106,
+      "id": 21069,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_89888850a4dc__SPLIT_KRASNOYARSK_RESERVOIR",
@@ -94416,7 +94416,7 @@
       }
     },
     {
-      "id": 21107,
+      "id": 21070,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_89888850a4dc__SPLIT_REST",
@@ -95787,7 +95787,7 @@
       }
     },
     {
-      "id": 21110,
+      "id": 21073,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8d9e296327d0__SPLIT_KRASNOYARSK_RESERVOIR",
@@ -96056,7 +96056,7 @@
       }
     },
     {
-      "id": 21111,
+      "id": 21074,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8d9e296327d0__SPLIT_REST",
@@ -97529,7 +97529,7 @@
       }
     },
     {
-      "id": 21119,
+      "id": 21082,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_adcc83649ef9__SPLIT_NOVOSIBIRSK_RESERVOIR",
@@ -97688,7 +97688,7 @@
       }
     },
     {
-      "id": 21120,
+      "id": 21083,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_adcc83649ef9__SPLIT_REST",
@@ -98669,7 +98669,7 @@
       }
     },
     {
-      "id": 21125,
+      "id": 21088,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d3e6d3f9aa41__SPLIT_KRASNOYARSK_RESERVOIR",
@@ -98934,7 +98934,7 @@
       }
     },
     {
-      "id": 21126,
+      "id": 21089,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d3e6d3f9aa41__SPLIT_REST",
@@ -100087,7 +100087,7 @@
       }
     },
     {
-      "id": 21135,
+      "id": 21098,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B14040427045082__SPLIT_NOVOSIBIRSK_RESERVOIR",
@@ -100166,7 +100166,7 @@
       }
     },
     {
-      "id": 21136,
+      "id": 21099,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B14040427045082__SPLIT_REST",
@@ -100391,7 +100391,7 @@
       }
     },
     {
-      "id": 21202,
+      "id": 21165,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B66849950652275__SPLIT_KHANTAYSKOYE_RESERVOIR",

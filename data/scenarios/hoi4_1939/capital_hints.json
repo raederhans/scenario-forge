@@ -13,7 +13,7 @@
     },
     {
       "country_code": "AE",
-      "host_feature_id": "ARE-349",
+      "host_feature_id": "ARE-349__SPLIT_ABU_DHABI_CITY",
       "urban_match_id": "",
       "lon": 54.433609419711146,
       "lat": 24.533351824984454,
@@ -3237,7 +3237,7 @@
     },
     {
       "country_code": "SY",
-      "host_feature_id": "SYR-141",
+      "host_feature_id": "SYR-141__SPLIT_AL_HASEKE",
       "urban_match_id": "UA_FD98D75F8843",
       "lon": 40.74772,
       "lat": 36.50237,

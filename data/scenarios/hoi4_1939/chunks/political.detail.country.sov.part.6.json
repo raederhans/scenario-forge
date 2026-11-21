@@ -108108,7 +108108,7 @@
       }
     },
     {
-      "id": 21100,
+      "id": 21063,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_76bad646959e__SPLIT_BRATSK_RESERVOIR",
@@ -109497,7 +109497,7 @@
       }
     },
     {
-      "id": 21101,
+      "id": 21064,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_76bad646959e__SPLIT_REST",
@@ -111458,7 +111458,7 @@
       }
     },
     {
-      "id": 21117,
+      "id": 21080,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_aa1c4ed50e09__SPLIT_BRATSK_RESERVOIR",
@@ -111719,7 +111719,7 @@
       }
     },
     {
-      "id": 21118,
+      "id": 21081,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_aa1c4ed50e09__SPLIT_REST",
@@ -112750,7 +112750,7 @@
       }
     },
     {
-      "id": 21131,
+      "id": 21094,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e3d6057202ff__SPLIT_BRATSK_RESERVOIR",
@@ -113351,7 +113351,7 @@
       }
     },
     {
-      "id": 21132,
+      "id": 21095,
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e3d6057202ff__SPLIT_REST",
@@ -114414,7 +114414,7 @@
       }
     },
     {
-      "id": 21153,
+      "id": 21116,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B33581045729564__SPLIT_BRATSK_RESERVOIR",
@@ -114529,7 +114529,7 @@
       }
     },
     {
-      "id": 21154,
+      "id": 21117,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B33581045729564__SPLIT_UST_ILIMSK_RESERVOIR",
@@ -115012,7 +115012,7 @@
       }
     },
     {
-      "id": 21155,
+      "id": 21118,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B33581045729564__SPLIT_REST",
@@ -115937,7 +115937,7 @@
       }
     },
     {
-      "id": 21194,
+      "id": 21157,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B61732353469918__SPLIT_VILYUY_RESERVOIR",
@@ -116088,7 +116088,7 @@
       }
     },
     {
-      "id": 21195,
+      "id": 21158,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B61732353469918__SPLIT_REST",
@@ -117627,7 +117627,7 @@
       }
     },
     {
-      "id": 21198,
+      "id": 21161,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B64669214156055__SPLIT_PLAYA_SALT_FLAT_46",
@@ -117746,7 +117746,7 @@
       }
     },
     {
-      "id": 21199,
+      "id": 21162,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B64669214156055__SPLIT_REST",
@@ -118107,7 +118107,7 @@
       }
     },
     {
-      "id": 21203,
+      "id": 21166,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B66849950652275__SPLIT_REST",
@@ -131126,7 +131126,7 @@
       }
     },
     {
-      "id": 21204,
+      "id": 21167,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B66856367478499__SPLIT_PLAYA_SALT_FLAT_46",
@@ -131295,7 +131295,7 @@
       }
     },
     {
-      "id": 21205,
+      "id": 21168,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B66856367478499__SPLIT_REST",
@@ -131628,7 +131628,7 @@
       }
     },
     {
-      "id": 21228,
+      "id": 21191,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B89196470968911__SPLIT_UST_ILIMSK_RESERVOIR",
@@ -132153,7 +132153,7 @@
       }
     },
     {
-      "id": 21229,
+      "id": 21192,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B89196470968911__SPLIT_REST",
@@ -133322,7 +133322,7 @@
       }
     },
     {
-      "id": 21230,
+      "id": 21193,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B90244452662579__SPLIT_ZEYA_RESERVOIR",
@@ -134485,7 +134485,7 @@
       }
     },
     {
-      "id": 21231,
+      "id": 21194,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B90244452662579__SPLIT_REST",

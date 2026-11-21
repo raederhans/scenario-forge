@@ -1546,7 +1546,7 @@
       }
     },
     {
-      "id": 20823,
+      "id": 20786,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B90555869339870__SPLIT_LATVIAN",
@@ -1751,7 +1751,7 @@
       }
     },
     {
-      "id": 20828,
+      "id": 20791,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B88274438285408__SPLIT_ABRENE",
@@ -1944,7 +1944,7 @@
       }
     },
     {
-      "id": 20830,
+      "id": 20793,
       "type": "Feature",
       "properties": {
         "id": "RU_RAY_50074027B19741518738580__SPLIT_KACENI",
@@ -2081,7 +2081,7 @@
       }
     },
     {
-      "id": 21687,
+      "id": 21650,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_LATGALE",
@@ -2204,7 +2204,7 @@
       }
     },
     {
-      "id": 21688,
+      "id": 21651,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_ZEMGALE",
@@ -2283,7 +2283,7 @@
       }
     },
     {
-      "id": 21689,
+      "id": 21652,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_ZILUPE",
@@ -2430,7 +2430,7 @@
       }
     },
     {
-      "id": 21690,
+      "id": 21653,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_SKRUDALIENA",
@@ -2489,7 +2489,7 @@
       }
     },
     {
-      "id": 21691,
+      "id": 21654,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_DAUGAVPILS",
@@ -2660,7 +2660,7 @@
       }
     },
     {
-      "id": 21692,
+      "id": 21655,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_JEKABPILS",
@@ -2777,7 +2777,7 @@
       }
     },
     {
-      "id": 21693,
+      "id": 21656,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_BALVI",
@@ -2844,7 +2844,7 @@
       }
     },
     {
-      "id": 21694,
+      "id": 21657,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_REZEKNE",
@@ -2957,7 +2957,7 @@
       }
     },
     {
-      "id": 21695,
+      "id": 21658,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_REZEKNE_5789",
@@ -3120,7 +3120,7 @@
       }
     },
     {
-      "id": 21696,
+      "id": 21659,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_TILZA",
@@ -3295,7 +3295,7 @@
       }
     },
     {
-      "id": 21697,
+      "id": 21660,
       "type": "Feature",
       "properties": {
         "id": "LV005__SPLIT_KRASLAVA",
