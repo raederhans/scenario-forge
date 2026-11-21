@@ -435,7 +435,7 @@ export function createExportBakeRuntime({
     }
     if (passNames.includes("political")) { drawThematicWgiExportLegend(workingCanvas, runtimeState); drawPopulationExportLegend(workingCanvas, runtimeState); }
     if (exportUi.textVisibility?.legend) drawPoliticalExportLegend(workingCanvas, runtimeState, dimensions?.pixelRatio);
-    drawMapTitles(workingCanvas, exportUi.mapTitles, dimensions?.pixelRatio ?? (runtimeState.dpr || 1));
+    drawMapTitles(workingCanvas, exportUi.mapTitles, workingCanvas.width / (runtimeState.width || workingCanvas.width));
     return workingCanvas;
   };
 
