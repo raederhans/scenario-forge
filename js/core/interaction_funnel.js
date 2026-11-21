@@ -3,7 +3,7 @@ import { normalizePaintMode } from "./map_editing_policy.js";
 import { clearDirty } from "./dirty_state.js";
 import { getPhysicalContextLayerRequests } from "./state_defaults.js";
 import { createProjectImportCompletion } from "./interaction_funnel/import_completion.js";
-import { createImportRecoveryUi } from "./interaction_funnel/import_recovery_ui.js";
+import { createImportRecoveryUi, importResourceLabel, notifyUnmatchedRegions } from "./interaction_funnel/import_recovery_ui.js";
 import { commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason } from "./state/actions/boot_actions.js";
 import { captureProjectImportState } from "./state/actions/project_import_actions.js";
 import { clearHistory } from "./history_manager.js";
@@ -341,7 +341,7 @@ function isImportDocumentCurrent(identity) {
   return identity();
 }
 
-async function applyImportedProjectState(data, { ui, hooks, request, fileName }) {
+async function applyImportedProjectState(data, { ui, hooks, request, fileName, fileHandle }) {
   debugState.importPhase = "begin";
   const preparedImport = await prepareImportedProjectState({
     data, ui, debugState, getScenarioResourcesModule,
@@ -362,6 +362,7 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName })
     throw error;
   }
   state.projectName = data.projectName;
+  state.projectFileBinding = { handle: fileHandle || null };
   state.projectFileStem = fileName.replace(/\.[^.]*$/, "");
   const warnings = [];
   // Both APIs update their state before notifying UI observers. An observer failure
@@ -387,6 +388,7 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName })
   // landData. Seeding ownership earlier would copy outgoing TNO/Atlantropa/global
   // feature IDs into this document, and its next import would correctly reject them.
   { name: "ownership-index", run: () => ensureSovereigntyState({ force: true }) }];
+  if (data.viewState) required.push({ name: "map-view", run: () => callRuntimeHook(state, "restoreProjectViewFn", data.viewState) });
   const optional = [];
   const complete = (name, run) => optional.push({ name, run });
   const paletteId = String(data.activePaletteId || "").trim();
@@ -415,7 +417,7 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName })
   let uiInitialized = false;
   const retry = async resource => {
     const restored = await job.retry(resource);
-    if (restored) ui.showToast(`${ui.t("Restored", "ui")}: ${resource}`, { tone: "success" });
+    if (restored) ui.showToast(`${ui.t("Restored", "ui")}: ${importResourceLabel(resource, ui.t)}`, { tone: "success" });
     return restored;
   };
   const updateRecoveryUi = createImportRecoveryUi({ t: ui.t, retry });
@@ -436,9 +438,12 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName })
         hooks.onProjectImportRecoveryState?.(recovery);
       }
     },
-    onFailure: (resource, error) => ui.showToast(`${ui.t("Project imported", "ui")}: ${resource} — ${String(error?.message || error)}`, {
-      tone: "warning", duration: 12000, actionLabel: ui.t("Retry", "ui"), onAction: () => retry(resource),
-    }),
+    onFailure: (resource, error) => {
+      console.warn("Project recovery failed", resource, error);
+      ui.showToast(ui.t("Could not restore {resource}.", "ui").replace("{resource}", importResourceLabel(resource, ui.t)), {
+        tone: "warning", duration: 12000, actionLabel: ui.t("Retry", "ui"), onAction: () => retry(resource),
+      });
+    },
   });
   if (request) request.completionJob = job;
   await job.start();
@@ -450,6 +455,9 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName })
   const completion = initialRecovery.editable ? job.startOptional() : Promise.resolve(initialRecovery);
   if (initialRecovery.editable && optional.length) ui.showToast(ui.t("Project ready. Loading optional layers…", "ui"), {
     duration: 12000, actionLabel: ui.t("Stop loading", "ui"), onAction: () => job.cancel(),
+  });
+  notifyUnmatchedRegions(preparedImport.importSummary, ui, regions => {
+    if (activeImportRequest === request) callRuntimeHook(state, "showProjectMigrationDetailsFn", regions);
   });
   return {
     status: warnings.length ? "committed-with-warnings" : "committed",
@@ -481,7 +489,7 @@ async function runProjectImport(input, options, source) {
   try {
     const { FileManager } = await getFileManagerModule();
     const callback = async data => {
-      result = await applyImportedProjectState(data, { ui, hooks, request, fileName });
+      result = await applyImportedProjectState(data, { ui, hooks, request, fileName, fileHandle: options.fileHandle });
       return result;
     };
     const observers = {

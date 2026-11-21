@@ -98,9 +98,9 @@ function resolveProjectImportObservers(observers = {}) {
 function showProjectImportFailure(error) {
   const tone = String(error?.toastTone || "error");
   const title = String(error?.toastTitle || t("Import failed", "ui"));
-  const message = String(
-    error?.userMessage || t("Invalid project file. Please select a valid map_project.json.", "ui")
-  );
+  const message = error?.code === "PROJECT_FEATURE_MIGRATION_REVIEW_REQUIRED"
+    ? t("Some saved regions could not be matched safely. Open the project with its original map data.", "ui")
+    : error?.userMessage || t("Invalid project file. Please select a valid map_project.json.", "ui");
   showToast(message, {
     title,
     tone,
@@ -109,7 +109,7 @@ function showProjectImportFailure(error) {
 }
 
 function showProjectReadFailure(error) {
-  showToast(String(error?.message || t("Unable to read the selected file.", "ui")), {
+  showToast(t(error?.userMessage || "Unable to read the selected file.", "ui"), {
     title: t("Import failed", "ui"),
     tone: "error",
     duration: 4200,
@@ -515,6 +515,7 @@ class FileManager {
     const payload = {
       schemaVersion: appState.riverPaint?.pack ? 23 : 22,
       projectName: appState.projectName || "",
+      viewState: appState === runtimeState ? callRuntimeHook(appState, "captureProjectViewFn") ?? null : appState.viewState ?? null,
       ...(appState.riverPaint?.pack ? { riverPaint: normalizeRiverPaintState(appState.riverPaint) } : {}),
       sovereignBaseColors: appState.sovereignBaseColors || {},
       visualOverrides: appState.visualOverrides || {},
@@ -614,24 +615,21 @@ class FileManager {
     return payload;
   }
 
-  static async writeBlobDownload(blob, filename, { destination = "picker", pickerTypes = [] } = {}) {
-    const normalizedDestination = String(destination || "picker").trim().toLowerCase();
-    if (
-      normalizedDestination === "picker"
-      && typeof globalThis.showSaveFilePicker === "function"
-      && typeof blob?.stream === "function"
-    ) {
+  static async writeBlobDownload(blob, filename, { destination = "picker", pickerTypes = [], currentHandle } = {}) {
+    const usePicker = String(destination || "picker").trim().toLowerCase() === "picker"
+      && typeof globalThis.showSaveFilePicker === "function" && typeof blob?.stream === "function";
+    if (currentHandle || usePicker) {
       try {
         const pickerOptions = { suggestedName: filename };
         if (Array.isArray(pickerTypes) && pickerTypes.length) {
           pickerOptions.types = pickerTypes;
           pickerOptions.excludeAcceptAllOption = true;
         }
-        const handle = await globalThis.showSaveFilePicker(pickerOptions);
+        const handle = currentHandle || await globalThis.showSaveFilePicker(pickerOptions);
         const writable = await handle.createWritable();
         await writable.write(blob);
         await writable.close();
-        return true;
+        return handle;
       } catch (error) {
         if (error?.name === "AbortError") return false;
         throw error;
@@ -684,19 +682,28 @@ class FileManager {
     const payload = FileManager.buildProjectPayload(appState);
     if (!payload) return;
 
-    const download = await FileManager.buildProjectDownloadPayload(payload, options, appState.projectFileStem);
+    const documentBinding = appState.projectFileBinding;
+    const currentHandle = options.saveAs ? null : documentBinding?.handle;
+    const format = currentHandle ? (/\.zip$/i.test(currentHandle.name) ? "zip" : "json") : options.format;
+    const download = await FileManager.buildProjectDownloadPayload(payload, { ...options, format }, appState.projectFileStem);
     const wroteFile = await FileManager.writeBlobDownload(download.blob, download.filename, {
-      ...options,
+      destination: options.saveAs ? "picker" : options.destination,
+      currentHandle,
       pickerTypes: download.pickerTypes,
     });
     if (!wroteFile) return false;
-    showToast(t(download.label, "ui"), {
+    const sameDocument = appState.projectFileBinding === documentBinding;
+    if (wroteFile.name && sameDocument) {
+      appState.projectFileBinding = { handle: wroteFile };
+      appState.projectFileStem = wroteFile.name.replace(/\.[^.]*$/, "");
+    }
+    showToast(wroteFile.name ? t("Saved to {file}", "ui", { file: wroteFile.name }) : t(download.label, "ui"), {
       title: t("Project saved", "ui"),
       tone: "success",
     });
     // A completed write only saves the revision captured before async packaging
     // and file I/O. Exporting a detached snapshot cannot save the active project.
-    if (appState === runtimeState && Number(runtimeState.dirtyRevision || 0) === savedRevision) {
+    if (appState === runtimeState && sameDocument && Number(runtimeState.dirtyRevision || 0) === savedRevision) {
       clearDirty("project-export");
     }
     return true;
@@ -707,6 +714,9 @@ class FileManager {
       throw new Error("Invalid project file");
     }
     let data = migrateImportedProjectData(rawData);
+    const view = data.viewState;
+    data.viewState = Array.isArray(view?.center) && view.center.length === 2 && view.center.every(Number.isFinite)
+      && Number.isFinite(view.k) && view.k > 0 ? { center: [...view.center], k: view.k } : null;
     data.projectName = typeof data.projectName === "string" ? data.projectName : "";
     if (data.riverPaint != null) data.riverPaint = normalizeRiverPaintState(data.riverPaint);
 
@@ -918,7 +928,9 @@ class FileManager {
         await verifyApprovedRiverPack(data.riverPaint.pack);
         if (data.scenario?.id !== data.riverPaint.pack.sceneId
           || data.scenario?.baselineHash !== data.riverPaint.pack.source.baselineHash) {
-          throw new Error("Saved river partitions do not match the project scenario baseline");
+          throw Object.assign(new Error("Saved river partitions do not match the project scenario baseline"), {
+            userMessage: t("The saved river regions require the original version of the map.", "ui"),
+          });
         }
       }
       let importResult = null;
