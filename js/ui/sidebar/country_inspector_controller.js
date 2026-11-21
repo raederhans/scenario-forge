@@ -1,5 +1,7 @@
 import { ensureHgoIdentitySettings } from "./hgo_identity_state.js";
 import { getCountryNameOverride, setCountryNameOverride } from "../../core/country_name_overrides.js";
+import { getCityOverrideId, setCityNameOverride } from "../../core/city_name_overrides.js";
+import { getEffectiveCityCollection } from "../../core/map_renderer/public.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { commitChange } from "../../core/state/changes.js";
 import { callRuntimeHook, on, STATE_BUS_EVENTS } from "../../core/state/index.js";
@@ -1202,6 +1204,52 @@ export function createCountryInspectorController({
   const resetButton = countryInspectorSelected?.querySelector("#resetCountryOverrides");
   const nameInput = countryInspectorSelected?.querySelector("#countryNameOverride");
   const statusText = countryInspectorSelected?.querySelector("#countryLabelStatus");
+  const cities = countryInspectorSelected?.querySelector("#countryCities");
+  const picker = cities?.querySelector("#inspectorCity");
+  const cityName = cities?.querySelector("#cityNameOverride");
+  const hidden = cities?.querySelector("#inspectorCityHidden");
+  function syncCityFields() {
+    const id = picker.value;
+    const language = runtimeState.currentLanguage === "zh" ? "zh" : "en";
+    const entry = runtimeState.cityNameOverrides?.[id];
+    cityName.disabled = hidden.disabled = !id;
+    cityName.placeholder = picker.selectedOptions[0]?.textContent || "";
+    if (cityName !== document.activeElement || cityName.dataset.id !== id || cityName.dataset.language !== language) {
+      cityName.value = entry?.[language] || "";
+      cityName.dataset.id = id;
+      cityName.dataset.language = language;
+    }
+    hidden.checked = entry?.hidden === true;
+  }
+  function renderCities() {
+    if (!cities?.open) return;
+    const code = runtimeState.selectedInspectorCountryCode;
+    const members = new Set(getCountryMemberIds(runtimeState, code));
+    const previous = picker.value;
+    const language = runtimeState.currentLanguage === "zh" ? "zh" : "en";
+    const options = [];
+    for (const feature of getEffectiveCityCollection()?.features || []) {
+      const p = feature.properties;
+      const host = p.__city_host_feature_id || p.host_feature_id;
+      if (!members.has(host) && (host || normalizeCountryCode(p.__city_country_code || p.country_code) !== code)) continue;
+      const id = getCityOverrideId(feature);
+      const name = runtimeState.cityNameOverrides?.[id]?.[language] || p.__city_display_name_override?.[language]
+        || p.__city_locale?.[language] || p[`label_${language}`] || p[`name_${language}`] || p.name || id;
+      options.push(new Option(name, id));
+    }
+    picker.replaceChildren(...options);
+    if (options.some(option => option.value === previous)) picker.value = previous;
+    syncCityFields();
+  }
+  function editCity(id, field, value) {
+    if (!id) return;
+    const before = captureHistoryState({ cityNameOverrides: true });
+    if (!setCityNameOverride(runtimeState, id, field, value)) return;
+    pushHistoryEntry({ kind: "city-name", before, after: captureHistoryState({ cityNameOverrides: true }) });
+    markDirty("city-name");
+    flushSidebarRender("city-name");
+    renderCities();
+  }
   function updateLabelStatus() {
     const code = runtimeState.selectedInspectorCountryCode;
     if (code && statusText) {
@@ -1282,6 +1330,8 @@ export function createCountryInspectorController({
     renderInspectorBreadcrumb(countryState);
     renderInspectorModernPlaceNames(countryState);
     renderCountryLocateButton(selectedCode);
+    if (cities) cities.hidden = false;
+    renderCities();
     updateResetCount();
 
     if (countryInspectorColorRow) {
@@ -1387,6 +1437,13 @@ export function createCountryInspectorController({
   };
 
   const bindEvents = () => {
+    if (cities && !cities.dataset.bound) {
+      cities.addEventListener("toggle", renderCities);
+      picker.addEventListener("change", syncCityFields);
+      cityName.addEventListener("change", () => editCity(cityName.dataset.id, cityName.dataset.language, cityName.value));
+      hidden.addEventListener("change", () => editCity(picker.value, "hidden", hidden.checked));
+      cities.dataset.bound = "true";
+    }
     if (nameInput && !nameInput.dataset.bound) {
       nameInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter" && !event.isComposing) {
