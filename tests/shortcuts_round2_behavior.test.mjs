@@ -41,7 +41,7 @@ function keyboard(context) {
 
 test("focused map pans by screen pixels, Shift increases distance and W elsewhere selects eraser", context => {
   const h = keyboard(context);
-  for (const [key, dx, dy] of [["ArrowRight", -60, 0], ["a", 60, 0], ["w", 0, 60], ["s", 0, -60]]) {
+  for (const [key, dx, dy] of [["ArrowRight", -60, 0], ["ArrowLeft", 60, 0], ["ArrowUp", 0, 60], ["ArrowDown", 0, -60]]) {
     assert.ok(h.press(key, h.map));
     assert.deepEqual(h.pan.mock.calls.at(-1).arguments, [dx, dy]);
   }

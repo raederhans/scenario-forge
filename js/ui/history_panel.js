@@ -46,6 +46,7 @@ export function bindHistoryPanel(dropdown) {
   });
   doc.addEventListener("keydown", (event) => {
     if (dropdown.open && event.key === "Escape") {
+      event.preventDefault();
       dropdown.open = false;
       summary.focus();
     }

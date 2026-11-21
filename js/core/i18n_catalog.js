@@ -1396,6 +1396,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "中间派共和制",
     "en": "Centrist republic"
   },
+  "Change annotation visibility": {
+    "zh": "修改注记可见性",
+    "en": "Change annotation visibility"
+  },
   "Change drafting grid": {
     "zh": "更改制图网格",
     "en": "Change drafting grid"
@@ -1415,6 +1419,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Change lake outline": {
     "zh": "更改湖泊轮廓",
     "en": "Change lake outline"
+  },
+  "Change legend appearance": {
+    "zh": "修改图例外观",
+    "en": "Change legend appearance"
   },
   "Change ocean region names display": {
     "zh": "更改海域名称显示",
@@ -3494,6 +3502,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Edit map membership": {
     "zh": "编辑地图成员",
     "en": "Edit map membership"
+  },
+  "Edit map title": {
+    "zh": "编辑地图标题",
+    "en": "Edit map title"
   },
   "Edit members on map": {
     "zh": "在地图上编辑成员",
@@ -8577,6 +8589,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Remove zone members": {
     "zh": "移除特殊区域成员",
     "en": "Remove zone members"
+  },
+  "Rename city": {
+    "zh": "重命名城市",
+    "en": "Rename city"
   },
   "Rename country": {
     "zh": "重命名国家",
