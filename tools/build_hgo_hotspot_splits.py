@@ -92,6 +92,38 @@ LOCAL_SEATS = {
                     "Tlalim": (34.77, 30.99), "Bir Al-Abed": (33.01, 31.02)},
 }
 
+# Name corrections from the regional review: (parent, suffix) -> (English, Chinese).
+NAME_FIXES = {
+    ('LV005', 'BALVI'): ('Viļaka', '维利亚卡'),
+    ('RS123', 'SYRMIA'): ('Titel', '蒂特尔'),
+    ('RS123', 'KULA'): ('Bač', '巴奇'),
+    ('RS127', 'KUSMIN'): ('Kuzmin', '库兹明'),
+    ('ITH42', 'FRIULI'): ('Codroipo', '科德罗伊波'),
+    ('ITH42', 'NORTH_GORIZIA'): ('Cividale del Friuli', '奇维达莱德尔弗留利'),
+    ('ITH42', 'VKENTZI'): ('Cave del Predil', '卡韦德尔普雷迪尔'),
+    ('ITH41', 'remainder'): ('Maniago', '马尼亚戈'),
+    ('TRA11', 'HORASAN'): ('Narman', '纳尔曼'),
+    ('GEO-3038', 'SAMTSKHE'): ('Borjomi', '博尔若米'),
+    ('GB_NUTS1_UKN', 'ARMAGH'): ('Armagh', '阿马'),
+    ('GB_NUTS1_UKN', 'NORTHERN_IRELAND'): ('Londonderry-Tyrone', '伦敦德里-蒂龙'),
+    ('IE041', 'MANORHAMILTON'): ('Carrick-on-Shannon', '香农河畔卡里克'),
+    ('EGY-1558', 'HASNA'): ('Al Kuntillah', '昆提拉'),
+    ('EGY-1558', 'SOUTH_ARISH'): ('Al Hasana', '哈萨纳'),
+    ('EGY-1558', 'WEST_RAFAH'): ('East Arish', '东阿里什'),
+    ('ISR-3053', 'LAHAV'): ('Kiryat Gat', '基里亚特加特'),
+    ('IRQ-3051', 'MOSUL'): ('Mosul', '摩苏尔'),
+    ('IRQ-3051', 'SHAYKHAN'): ('Fishkhabur', '菲什哈布尔'),
+    ('IRQ-3051', 'BARDARASH'): ('Zummar', '祖马尔'),
+    ('IRQ-3051', 'HATRA'): ('Hatra', '哈特拉'),
+    ('IRQ-3050', 'SHAQLAWA'): ('Barzan', '巴尔赞'),
+    ('IRQ-3050', 'SOUTH_SHAQLAWA'): ('Shaqlawa', '沙克拉瓦'),
+    ('PL_POW_0601', 'WEST_CHELM'): ('Biala Podlaska', '比亚瓦波德拉斯卡'),
+    ('PL_POW_0601', 'EAST_OKUNINKA'): ('Terespol', '泰雷斯波尔'),
+    ('SK_ADM2_56367889B15407569919112', 'SURANY'): ('Tekovské Lužany', '泰科夫斯凯卢扎尼'),
+    ('HU323', 'CIGAND'): ('Kemecse', '凯梅切'),
+    ('SK_ADM2_56367889B4918056975771', 'GALANTA'): ('Selice', '塞利采'),
+}
+
 # Exclude state footprints that spill across a border into the neighbouring parent.
 OUTSIDE_PARENT = {
     "southern_bukovina": {"RO215": {5537, 5538, 5539}},  # Neamț seats supply registration controls only.
@@ -582,6 +614,13 @@ def main(argv=None):
             parts = partition(parent, candidates, pixel_counts, merge_counts)
             labels = part_names(parts, {sid: names[sid] for sid in states}, city_tree, city_features, seat_points)
             entry, masks = build_entry(fid, parts, labels, source_path, state_rows)
+            if entry:
+                named = [(p["suffix"], p) for p in entry["parts"]]
+                if entry.get("remainder"):
+                    named.append(("remainder", entry["remainder"]))
+                for suffix, part in named:
+                    if (fid, suffix) in NAME_FIXES:
+                        part["name_en"], part["name_zh"] = NAME_FIXES[(fid, suffix)]
             if entry:
                 rules["entries"].append(entry)
                 features.extend(masks)

@@ -14,8 +14,8 @@
       "parts": [
         {
           "suffix": "FRIULI",
-          "name_en": "Friuli",
-          "name_zh": "弗留利",
+          "name_en": "Codroipo",
+          "name_zh": "科德罗伊波",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -54,7 +54,7 @@
         {
           "suffix": "NORTH_GORIZIA",
           "name_en": "Cividale del Friuli",
-          "name_zh": "弗留利地区奇维达莱",
+          "name_zh": "奇维达莱德尔弗留利",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -144,8 +144,8 @@
         },
         {
           "suffix": "VKENTZI",
-          "name_en": "Pulfero",
-          "name_zh": "普尔费罗",
+          "name_en": "Cave del Predil",
+          "name_zh": "卡韦德尔普雷迪尔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -191,8 +191,8 @@
       ],
       "remainder": {
         "suffix": "NORTH_FRIULI",
-        "name_en": "North Friuli",
-        "name_zh": "弗留利北部",
+        "name_en": "Maniago",
+        "name_zh": "马尼亚戈",
         "full_name": true
       }
     },
@@ -445,8 +445,8 @@
       "parts": [
         {
           "suffix": "SYRMIA",
-          "name_en": "Syrmia",
-          "name_zh": "斯雷姆",
+          "name_en": "Titel",
+          "name_zh": "蒂特尔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -484,8 +484,8 @@
         },
         {
           "suffix": "KULA",
-          "name_en": "Kula",
-          "name_zh": "库拉",
+          "name_en": "Bač",
+          "name_zh": "巴奇",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -656,7 +656,7 @@
         },
         {
           "suffix": "KUSMIN",
-          "name_en": "Kusmin",
+          "name_en": "Kuzmin",
           "name_zh": "库兹明",
           "full_name": true,
           "polygon_source": {
@@ -738,8 +738,8 @@
         },
         {
           "suffix": "GALANTA",
-          "name_en": "Galanta",
-          "name_zh": "加兰塔",
+          "name_en": "Selice",
+          "name_zh": "塞利采",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -781,8 +781,8 @@
         },
         {
           "suffix": "SURANY",
-          "name_en": "Surany",
-          "name_zh": "舒拉尼",
+          "name_en": "Tekovské Lužany",
+          "name_zh": "泰科夫斯凯卢扎尼",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -880,8 +880,8 @@
         },
         {
           "suffix": "CIGAND",
-          "name_en": "Cigand",
-          "name_zh": "齐甘德",
+          "name_en": "Kemecse",
+          "name_zh": "凯梅切",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -988,8 +988,8 @@
         },
         {
           "suffix": "BALVI",
-          "name_en": "Balvi",
-          "name_zh": "巴尔维",
+          "name_en": "Viļaka",
+          "name_zh": "维利亚卡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -1515,8 +1515,8 @@
       "parts": [
         {
           "suffix": "WEST_CHELM",
-          "name_en": "West Chelm",
-          "name_zh": "西海乌姆",
+          "name_en": "Biala Podlaska",
+          "name_zh": "比亚瓦波德拉斯卡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -1567,8 +1567,8 @@
         },
         {
           "suffix": "EAST_OKUNINKA",
-          "name_en": "East Okuninka",
-          "name_zh": "东奥库宁卡",
+          "name_en": "Terespol",
+          "name_zh": "泰雷斯波尔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -1623,8 +1623,8 @@
         },
         {
           "suffix": "HORASAN",
-          "name_en": "Horasan",
-          "name_zh": "霍拉桑",
+          "name_en": "Narman",
+          "name_zh": "纳尔曼",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -1994,8 +1994,8 @@
         },
         {
           "suffix": "SAMTSKHE",
-          "name_en": "Samtskhe",
-          "name_zh": "萨姆茨赫",
+          "name_en": "Borjomi",
+          "name_zh": "博尔若米",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2024,8 +2024,8 @@
       "parts": [
         {
           "suffix": "MOSUL",
-          "name_en": "Al Mawsil al Jadidah",
-          "name_zh": "新摩苏尔",
+          "name_en": "Mosul",
+          "name_zh": "摩苏尔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2037,8 +2037,8 @@
         },
         {
           "suffix": "SHAYKHAN",
-          "name_en": "Shaykhan",
-          "name_zh": "谢汉",
+          "name_en": "Fishkhabur",
+          "name_zh": "菲什哈布尔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2050,8 +2050,8 @@
         },
         {
           "suffix": "BARDARASH",
-          "name_en": "Bardarash",
-          "name_zh": "巴尔达拉什",
+          "name_en": "Zummar",
+          "name_zh": "祖马尔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2076,8 +2076,8 @@
         },
         {
           "suffix": "HATRA",
-          "name_en": "South Tal Afar",
-          "name_zh": "南泰勒阿费尔",
+          "name_en": "Hatra",
+          "name_zh": "哈特拉",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2214,8 +2214,8 @@
         },
         {
           "suffix": "SHAQLAWA",
-          "name_en": "Shaqlawa",
-          "name_zh": "沙克拉瓦",
+          "name_en": "Barzan",
+          "name_zh": "巴尔赞",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2227,8 +2227,8 @@
         },
         {
           "suffix": "SOUTH_SHAQLAWA",
-          "name_en": "South Shaqlawa",
-          "name_zh": "南沙克拉瓦",
+          "name_en": "Shaqlawa",
+          "name_zh": "沙克拉瓦",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2309,8 +2309,8 @@
         },
         {
           "suffix": "MANORHAMILTON",
-          "name_en": "Manorhamilton",
-          "name_zh": "马诺哈密尔顿",
+          "name_en": "Carrick-on-Shannon",
+          "name_zh": "香农河畔卡里克",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2339,8 +2339,8 @@
       "parts": [
         {
           "suffix": "NORTHERN_IRELAND",
-          "name_en": "Londonderry County Borough",
-          "name_zh": "伦敦德里",
+          "name_en": "Londonderry-Tyrone",
+          "name_zh": "伦敦德里-蒂龙",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2365,8 +2365,8 @@
         },
         {
           "suffix": "ARMAGH",
-          "name_en": "Craigavon",
-          "name_zh": "克雷加文",
+          "name_en": "Armagh",
+          "name_zh": "阿马",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2563,8 +2563,8 @@
         },
         {
           "suffix": "HASNA",
-          "name_en": "Hasna",
-          "name_zh": "哈斯纳",
+          "name_en": "Al Kuntillah",
+          "name_zh": "昆提拉",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2628,8 +2628,8 @@
         },
         {
           "suffix": "WEST_RAFAH",
-          "name_en": "West Rafah",
-          "name_zh": "西拉法",
+          "name_en": "East Arish",
+          "name_zh": "东阿里什",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2641,8 +2641,8 @@
         },
         {
           "suffix": "SOUTH_ARISH",
-          "name_en": "South Arish",
-          "name_zh": "阿里什南部",
+          "name_en": "Al Hasana",
+          "name_zh": "哈萨纳",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
@@ -2697,8 +2697,8 @@
         },
         {
           "suffix": "LAHAV",
-          "name_en": "Lahav",
-          "name_zh": "拉哈夫",
+          "name_en": "Kiryat Gat",
+          "name_zh": "基里亚特加特",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots_2.sources.geojson",
