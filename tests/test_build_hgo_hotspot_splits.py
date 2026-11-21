@@ -100,3 +100,17 @@ def test_bas_rhin_and_trentino_with_native_states():
     assert "Trento" in {p["name_en"] for p in entries["ITH20"]}
     assert any(p["name_en"].endswith("Rovereto") for p in entries["ITH20"])
     assert not {"Bassano Del Grappa", "Cittadella", "Possagno"} & {p["name_en"] for p in entries["ITH20"]}
+
+
+def test_second_batch_parent_coverage_and_names():
+    prefix = build.PREFIX.with_name("hoi4_hgo_hotspots_2")
+    regions = build.read(prefix.with_suffix(".regions.json"))
+    entries = build.read(prefix.with_suffix(".geometry_splits.json"))["entries"]
+    parents = [fid for entry in entries for fid in entry["feature_ids"]]
+    assert sorted(parents) == sorted(fid for region in regions for fid in region["parent_ids"])
+    for entry in entries:
+        parts = apply.entry_parts(entry)
+        assert len(parts) >= 2, entry["id"]
+        for language in ("name_en", "name_zh"):
+            names = [part[language].strip().casefold() for part in parts]
+            assert all(names) and len(set(names)) == len(parts), entry["id"]

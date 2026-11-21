@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "features": [
     {
-      "id": 20752,
+      "id": 20714,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2156__SPLIT_WTO",
@@ -69,7 +69,7 @@
       }
     },
     {
-      "id": 20985,
+      "id": 20947,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2155__SPLIT_WTO__SPLIT_LAKE_VOLTA",
@@ -218,7 +218,7 @@
       }
     },
     {
-      "id": 20986,
+      "id": 20948,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2155__SPLIT_WTO__SPLIT_REST",
@@ -577,7 +577,7 @@
       }
     },
     {
-      "id": 20993,
+      "id": 20955,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2173__SPLIT_WTO__SPLIT_LAKE_VOLTA",
@@ -1768,7 +1768,7 @@
       }
     },
     {
-      "id": 20994,
+      "id": 20956,
       "type": "Feature",
       "properties": {
         "id": "GH_ADM1_GHA-2173__SPLIT_WTO__SPLIT_REST",

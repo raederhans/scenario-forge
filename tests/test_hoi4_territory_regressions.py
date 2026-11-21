@@ -78,7 +78,7 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
                 owners = json.loads((directory / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
                 countries = json.loads((directory / "countries.json").read_text(encoding="utf-8"))["countries"]
                 cities = json.loads((directory / "city_overrides.json").read_text(encoding="utf-8"))
-                self.assertEqual(len(owners), 21661)
+                self.assertEqual(len(owners), 21824)
                 # Wave-4 border parcels, water-shaped parcels and HGO hotspot subdivisions.
                 self.assertEqual(owners["LT029__SPLIT_POLISH"], "POL")
                 self.assertEqual(owners["CH057__SPLIT_BUSINGEN"], "GER")
@@ -88,6 +88,11 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
                 self.assertEqual(owners["RU_MRG_465e54ee3c98__SPLIT_RYBINSK_RESERVOIR"], "SOV")
                 self.assertEqual(owners["FR_ARR_57009__SPLIT_METZ"], "FRA")
                 self.assertEqual(owners["ITH10__SPLIT_BRUNICO"], "ITA")
+                # Second HGO hotspot batch keeps each parent's owner.
+                self.assertEqual(owners["LV005__SPLIT_DAUGAVPILS"], "LAT")
+                self.assertEqual(owners["BY_INT_BREST__SPLIT_PINSK"], "POL")
+                self.assertEqual(owners["TRA22__SPLIT_KARS"], "TUR")
+                self.assertEqual(owners["GB_NUTS1_UKN__SPLIT_BELFAST"], "ENG")
                 self.assertEqual(owners["AU_ADM1_AUS-2653"], "AST")
                 self.assertEqual(owners["AU_ADM1_AUS-2650"], "NTR")
                 self.assertEqual(owners["CN_CITY_17275852B99290886399570"], "QMA")
