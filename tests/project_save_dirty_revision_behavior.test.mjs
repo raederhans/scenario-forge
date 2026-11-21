@@ -97,7 +97,7 @@ test("picker cancellation retains the runtime dirty state and revision", async t
 
 test("a failed file write retains the runtime dirty state and revision", async t => {
   mount(t, async () => { throw new Error("disk full"); });
-  await assert.rejects(FileManager.exportProject(state), /disk full/);
+  await assert.rejects(FileManager.exportProject(state), error => error.cause?.message === "disk full");
   assert.equal(state.isDirty, true);
   assert.equal(state.dirtyRevision, 7);
 });

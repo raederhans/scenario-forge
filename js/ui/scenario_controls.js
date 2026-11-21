@@ -28,6 +28,12 @@ import { createScenarioIntroCard } from "./scenario_intro_card.js";
 const state = runtimeState;
 let disposeActiveScenarioControls = null;
 
+function clearPreviousProject() {
+  state.projectFileBinding = { handle: null };
+  state.projectFileStem = "";
+  clearHistory();
+}
+
 export function initScenarioControls({ applyScenario = applyScenarioByIdCommand } = {}) {
   disposeActiveScenarioControls?.();
   const events = new AbortController();
@@ -270,7 +276,7 @@ export function initScenarioControls({ applyScenario = applyScenarioByIdCommand 
           markDirtyReason: "scenario-apply",
           showToastOnComplete: true,
         });
-        if (normalizeScenarioId(state.activeScenarioId) === scenarioId) clearHistory();
+        if (normalizeScenarioId(state.activeScenarioId) === scenarioId) clearPreviousProject();
         applyScenarioOpeningView(runtimeState.activeScenarioManifest, { animate: true });
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
@@ -298,7 +304,7 @@ export function initScenarioControls({ applyScenario = applyScenarioByIdCommand 
         showToastOnComplete: true,
       });
       if (changed) {
-        clearHistory();
+        clearPreviousProject();
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       }
@@ -315,7 +321,7 @@ export function initScenarioControls({ applyScenario = applyScenarioByIdCommand 
           markDirtyReason: "scenario-clear",
           showToastOnComplete: true,
         });
-        clearHistory();
+        clearPreviousProject();
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       } catch (error) {
