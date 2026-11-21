@@ -1,4 +1,5 @@
 import { t } from "../i18n.js";
+import { getRiverPartitionIndex } from "../river_paint/partition_model.js";
 import { getMapDataBoundary } from "../map_data_boundary.js";
 import { createQuickFillHierarchyResolver, normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
 
@@ -62,7 +63,16 @@ export function createFillTargetPolicy(runtimeState, {
   }
 
   function unprotectedIds(ids) {
-    return runtimeState.onlyUnpainted ? ids.filter(id => !Object.hasOwn(runtimeState.visualOverrides || {}, id)) : ids;
+    if (!runtimeState.onlyUnpainted) return ids;
+    const river = runtimeState.riverPaint;
+    const parents = getRiverPartitionIndex(river?.pack)?.parents;
+    return ids.filter(id => !Object.hasOwn(runtimeState.visualOverrides || {}, id)
+      && !parents?.get(id)?.cells.some(cell => Object.hasOwn(river.overrides, cell.id)));
+  }
+
+  function usesVisibleColorFallback(id) {
+    const adjacency = getColorAdjacency(id);
+    return !adjacency || !Array.isArray(adjacency.graph[adjacency.index ?? adjacency.ids.indexOf(id)]);
   }
 
   function getGestureScope(event) {
@@ -84,6 +94,7 @@ export function createFillTargetPolicy(runtimeState, {
     const targetIds = unprotectedIds(resolution.targetIds);
     return {
       targetIds,
+      ...(requestedScope === "color" ? { matchingIds: resolution.targetIds } : {}),
       ...(resolution.visibleColorFallback ? { visibleColorFallback: true } : {}),
       ...(runtimeState.onlyUnpainted ? { skippedCount: resolution.targetIds.length - targetIds.length } : {}),
       kind: country ? "fill-country-batch" : "fill-parent-group",
@@ -100,5 +111,5 @@ export function createFillTargetPolicy(runtimeState, {
     return !!buildDoubleClickBatchPlan(feature, hit.id, getGestureScope(event));
   }
 
-  return Object.freeze({ getGestureScope, unprotectedIds, resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isBatchFillDoubleClickBaseEligible, isDoubleClickBatchEligible });
+  return Object.freeze({ getGestureScope, unprotectedIds, usesVisibleColorFallback, resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isBatchFillDoubleClickBaseEligible, isDoubleClickBatchEligible });
 }

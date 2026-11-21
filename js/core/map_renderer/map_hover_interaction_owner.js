@@ -1,5 +1,6 @@
 import { requireFunction } from "../renderer/require_named_function.js";
 import { t } from "../i18n.js";
+import { enqueueFrameTask } from "../frame_scheduler.js";
 import {
   setClickHoverOverlayDirtyState,
   setHoveredFeatureIdsState,
@@ -85,6 +86,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
   let hoverHitFrame = null;
   let pendingPointer = null;
   let fillPreview = null;
+  let pendingColorPreview = null;
   const getGlobal = getters.getGlobal || (() => globalThis);
 
   function scheduleFrame(callback) {
@@ -109,7 +111,6 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     return Boolean(state.hoveredId || state.hoveredWaterRegionId || state.hoveredSpecialRegionId);
   }
   function setHoverIds({ landId = null, riverCellId = null, waterId = null, specialId = null } = {}) {
-    if (landId !== state.hoveredId) fillPreview = null;
     setHoveredFeatureIdsState(state, { landId, riverCellId, waterId, specialId });
   }
   function getHoveredFacilityEntry() { return hoveredFacilityEntry; }
@@ -172,6 +173,8 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     setTooltipRafHandleState(state, tooltipFrame.handle);
   }
   function resetTooltipState() {
+    pendingColorPreview?.cancel();
+    pendingColorPreview = null;
     tooltipFrame?.cancel();
     tooltipFrame = null;
     setTooltipRafHandleState(state, null);
@@ -278,7 +281,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     return createSummary({ branch, hit, cursor, tooltipVisible: true });
   }
 
-  function getFeatureTooltip(feature, hit, event) {
+  function getFeatureTooltip(feature, hit, event, idlePreview) {
     const text = getterApi.getTooltipTextForFeature(feature);
     if (hit.targetType !== "land" || hit.riverBlockedReason || state.startupReadonly
       || state.operationalLineEditor?.active || state.operationGraphicsEditor?.active) return text;
@@ -288,12 +291,27 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
       return text;
     }
     const scope = policy.getGestureScope(event);
-    const inputs = [hit.id, feature, scope, state.onlyUnpainted, state.currentLanguage, state.topologyRevision,
+    const inputs = [scope, state.onlyUnpainted, state.currentLanguage, state.topologyRevision,
       state.activeScenarioId, state.mapSemanticMode, state.hierarchyData, state.activeScenarioManifest,
       state.scenarioDistrictGroupsData];
+    if (scope !== "color") inputs.push(hit.id, feature);
     if (scope === "color" || state.onlyUnpainted) inputs.push(state.colorRevision);
-    if (scope === "color") inputs.push(state.zoomTransform);
-    if (!fillPreview || inputs.some((value, i) => value !== fillPreview.inputs[i])) {
+    if (state.onlyUnpainted) inputs.push(state.riverPaint);
+    let reuse = fillPreview && inputs.every((value, i) => value === fillPreview.inputs[i]);
+    if (scope === "color") {
+      reuse = reuse && fillPreview.members.has(hit.id);
+      if (!reuse || fillPreview.visibleOnly) {
+        const visibleOnly = policy.usesVisibleColorFallback(hit.id);
+        reuse = reuse && visibleOnly && fillPreview.view === state.zoomTransform;
+        if (!reuse && visibleOnly && !idlePreview) {
+          pendingColorPreview = enqueueFrameTask(() => {
+            handleMouseMove(event, { frameCoalesced: true, idlePreview: true });
+          }, { priority: "low", deferOnContinuousInput: true });
+          return text;
+        }
+      }
+    }
+    if (!reuse) {
       const plan = policy.buildDoubleClickBatchPlan(feature, hit.id, scope);
       let line = "";
       if (plan) {
@@ -304,18 +322,21 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
         line = t(key, "ui", { count: plan.targetIds.length, group: plan.groupLabel });
         if (plan.skippedCount) line += "\n" + t("Skipping {count} painted regions", "ui", { count: plan.skippedCount });
       }
-      fillPreview = { inputs, line };
+      fillPreview = { inputs, line, members: scope === "color" ? new Set(plan?.matchingIds) : null,
+        visibleOnly: !!plan?.visibleColorFallback, view: state.zoomTransform };
     }
     return fillPreview.line ? `${text}\n${fillPreview.line}` : text;
   }
 
-  function handleMouseMove(event, { frameCoalesced = false } = {}) {
+  function handleMouseMove(event, { frameCoalesced = false, idlePreview = false } = {}) {
     const now = getterApi.nowMs();
     const throttleMs = Number(state.MOUSE_THROTTLE_MS || 0);
     const lastMouseMoveTime = Number(state.lastMouseMoveTime || 0);
     if (!frameCoalesced && now - lastMouseMoveTime < throttleMs) {
       return createSummary({ branch: "throttled", skipped: true });
     }
+    pendingColorPreview?.cancel();
+    pendingColorPreview = null;
     setLastMouseMoveTimeState(state, now);
     if (!(state.landData || state.waterRegionsData || state.scenarioSpecialRegionsData)) {
       return createSummary({ branch: "no-hover-data", skipped: true });
@@ -372,7 +393,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     if (feature) {
       return queueVisibleTooltip(
         event,
-        getFeatureTooltip(feature, hit, event),
+        getFeatureTooltip(feature, hit, event, idlePreview),
         "feature-tooltip",
         hit,
         cursor,
