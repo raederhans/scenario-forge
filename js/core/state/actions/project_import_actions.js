@@ -7,6 +7,7 @@ export function captureProjectImportState(target) {
     allowOpenOceanSelect: target.allowOpenOceanSelect,
     annotationView: target.annotationView,
     appearancePresets: target.appearancePresets,
+    onlyUnpainted: target.onlyUnpainted,
     batchFillScope: target.batchFillScope,
     customPresets: target.customPresets,
     countryNameOverrides: target.countryNameOverrides,
@@ -87,6 +88,7 @@ export function captureProjectImportState(target) {
 }
 
 export function applyProjectImportPatch(target, patch) {
+  if (Object.hasOwn(patch, "onlyUnpainted")) target.onlyUnpainted = patch.onlyUnpainted;
   if (Object.hasOwn(patch, "annotationView")) target.annotationView = patch.annotationView;
   if (Object.hasOwn(patch, "customPresets")) target.customPresets = patch.customPresets;
   if (Object.hasOwn(patch, "countryNameOverrides")) target.countryNameOverrides = patch.countryNameOverrides;

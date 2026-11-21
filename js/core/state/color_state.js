@@ -38,6 +38,7 @@ export function createDefaultColorState() {
     activeSovereignCode: "",
     sovereignContrastWarnings: [],
     interactionGranularity: "subdivision",
+    onlyUnpainted: false,
     batchFillScope: "parent",
     paletteRegistry: null,
     activePaletteId: "hoi4_vanilla",

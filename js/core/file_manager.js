@@ -525,6 +525,7 @@ class FileManager {
       mapSemanticMode: normalizeMapSemanticMode(appState.mapSemanticMode),
       paintMode: normalizePaintMode(appState.paintMode),
       interactionGranularity: normalizeInteractionGranularity(appState.interactionGranularity),
+      onlyUnpainted: appState.onlyUnpainted === true,
       batchFillScope: normalizeBatchFillScope(appState.batchFillScope),
       activeSovereignCode: appState.activeSovereignCode || "",
       activePaletteId: normalizeActivePaletteId(appState.activePaletteId),
@@ -727,6 +728,7 @@ class FileManager {
     delete data.scenarioControllersByFeatureId;
     data.mapSemanticMode = normalizeMapSemanticMode(data.mapSemanticMode);
     data.interactionGranularity = normalizeInteractionGranularity(data.interactionGranularity);
+    data.onlyUnpainted = data.onlyUnpainted === true;
     data.batchFillScope = normalizeBatchFillScope(data.batchFillScope);
     data.activePaletteId = normalizeActivePaletteId(data.activePaletteId);
     data.dynamicBordersDirty = !!data.dynamicBordersDirty;

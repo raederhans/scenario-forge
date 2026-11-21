@@ -78,7 +78,7 @@ export function createToolGuidance({ documentRef = document, state, t }) {
   view.addEventListener("resize", hide);
   const sync = () => {
     controls.forEach(({ button }) => button.removeAttribute("title"));
-    const text = t("Shift / Space + drag to pan", "ui");
+    const text = t(globalThis.matchMedia?.("(pointer: coarse)")?.matches ? "Drag with two fingers to pan" : "Shift / Space + drag to pan", "ui");
     if (brushHint.textContent !== text) brushHint.textContent = text;
     const hidden = !state.brushModeEnabled;
     if (brushHint.hidden !== hidden) brushHint.hidden = hidden;

@@ -634,6 +634,7 @@ export function restoreImportedWorkbenchUiState(
   Object.assign(target, {
     recentColors: Array.isArray(importedState.recentColors) ? [...importedState.recentColors] : [],
     interactionGranularity: importedState.interactionGranularity || "subdivision",
+    onlyUnpainted: importedState.onlyUnpainted === true,
     batchFillScope: importedState.batchFillScope || "parent",
     referenceImageState: {
       ...(target.referenceImageState || {}),

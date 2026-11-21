@@ -732,6 +732,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "自动填充视觉色",
     "en": "Auto-Fill Visuals"
   },
+  "Auto-fill also resets the ocean color. You can undo this from history.": {
+    "zh": "自动填色还会重设海洋颜色。可从历史记录撤销。",
+    "en": "Auto-fill also resets the ocean color. You can undo this from history."
+  },
+  "Auto-fill map": {
+    "zh": "自动填色",
+    "en": "Auto-fill map"
+  },
   "Automatic": {
     "zh": "自动",
     "en": "Automatic"
@@ -1627,6 +1635,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Clear the current map?": {
     "zh": "清空当前地图吗？",
     "en": "Clear the current map?"
+  },
+  "Clear {count} manually painted regions and reset country colors?": {
+    "zh": "将清除 {count} 块手涂颜色并重设国家配色，是否继续？",
+    "en": {
+      "one": "Clear {count} manually painted region and reset country colors?",
+      "other": "Clear {count} manually painted regions and reset country colors?"
+    }
   },
   "Cleared": {
     "zh": "已清除",
@@ -3039,6 +3054,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.": {
     "zh": "拖动白色手柄以移动顶点，单击中点以插入，然后根据需要删除选定的顶点。",
     "en": "Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed."
+  },
+  "Drag with two fingers to pan": {
+    "zh": "双指拖动平移",
+    "en": "Drag with two fingers to pan"
   },
   "Drawing in progress: click map to add vertices, double-click to finish.": {
     "zh": "绘图进行中：点击地图添加顶点，双击完成。",
@@ -5509,6 +5528,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "地图外观",
     "en": "Map appearance"
   },
+  "Map auto-filled.": {
+    "zh": "已自动填色。",
+    "en": "Map auto-filled."
+  },
   "Map cleared. Undo is available from history.": {
     "zh": "地图已清空。可通过历史记录撤销。",
     "en": "Map cleared. Undo is available from history."
@@ -5956,6 +5979,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "New region": {
     "zh": "新建区域",
     "en": "New region"
+  },
+  "Newer edits prevent undoing auto-fill.": {
+    "zh": "已有后续编辑，无法直接撤销这次自动填色。",
+    "en": "Newer edits prevent undoing auto-fill."
   },
   "Next page": {
     "zh": "下一页",
@@ -6760,6 +6787,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Paint mode color": {
     "zh": "着色",
     "en": "Color"
+  },
+  "Paint only unpainted regions": {
+    "zh": "只涂未涂过的地块",
+    "en": "Paint only unpainted regions"
   },
   "Paint regions to generate a legend.": {
     "zh": "为区域上色以生成图例。",
@@ -9080,6 +9111,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "庇护所/特殊用途",
     "en": "Shelter / special-use"
   },
+  "Shift + double-click: country. Space + double-click: parent. G: next level.": {
+    "zh": "Shift + 双击填整国，空格 + 双击填上级区域，G 切换层级。",
+    "en": "Shift + double-click: country. Space + double-click: parent. G: next level."
+  },
   "Shift / Space + drag to pan": {
     "zh": "Shift / 空格 + 拖动平移",
     "en": "Shift / Space + drag to pan"
@@ -9315,6 +9350,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Skip to map workspace": {
     "zh": "跳转到地图工作区",
     "en": "Skip to map workspace"
+  },
+  "Skipping {count} painted regions": {
+    "zh": "将跳过 {count} 块已涂地块",
+    "en": {
+      "one": "Skipping {count} painted region",
+      "other": "Skipping {count} painted regions"
+    }
   },
   "Small": {
     "zh": "小的",
