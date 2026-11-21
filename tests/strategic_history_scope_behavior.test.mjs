@@ -47,7 +47,7 @@ test("graphic vertex history clones one collection and undo/redo preserves unrel
   const lineReference = state.operationalLines;
   const counterReference = state.unitCounters;
   const legacy = captureHistoryState({ strategicOverlay: true });
-  assert.equal(Object.keys(legacy).length, 6);
+  assert.equal(Object.keys(legacy).length, 7);
   assert.equal(owner.insertOperationGraphicVertex(1, [0.5, 0.5]), true);
   const entry = state.historyPast.at(-1);
   assert.deepEqual(Object.keys(entry.before), ["operationGraphics"]);

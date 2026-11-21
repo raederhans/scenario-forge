@@ -1,13 +1,19 @@
+import { applyColorReplacement, withCountryColorReplacement } from "./replace_color_command.js";
 import { normalizeHexColor } from "./palette_manager.js";
+import { getLegendPaintColors } from "./legend_state_normalizers.js";
+import { getMapDataBoundary } from "./map_data_boundary.js";
+import { migrateLegendColorState } from "./state/actions/legend_actions.js";
 
 // The composition root supplies history, refresh, and synchronous paint selection.
 // Recent-color feedback and the final render follow the applied result.
 /**
  * Missing required services throw TypeError at construction, before any edits.
  * The returned operation reports invalid-color/no-target without side effects,
- * or applied after committing the existing synchronous color/history sequence.
+ * or applied after committing the color/history sequence.
  */
 export function createPaletteLibraryOperation({
+  state,
+  dialog,
   getApplyTarget,
   getOwnerFeatureIds,
   getCountryFeatureIds = getOwnerFeatureIds,
@@ -53,31 +59,55 @@ export function createPaletteLibraryOperation({
     const featureIds = explicitCountry ? countryIds : isFeature
       ? target.featureIds
       : getOwnerFeatureIds(target.ownerCode);
-    const historyScope = explicitCountry ? { featureIds, ownerCodes: [explicitCountry] } : isFeature
-      ? { featureIds }
-      : { ownerCodes: [target.ownerCode] };
-    const kind = explicitCountry ? "palette-country-color" : isFeature ? "palette-library-apply-color" : "palette-library-apply-owner-color";
-    const before = captureHistoryState(historyScope);
-    if (isFeature) {
-      applyFeatureColor(featureIds, color);
-    } else {
-      applyOwnerColor(target.ownerCode, color);
-      if (explicitCountry) applyFeatureColor(featureIds, color);
-    }
+    const oldColor = !isFeature && normalizeHexColor(state.sovereignBaseColors?.[target.ownerCode]
+      || state.countryPalette?.[target.ownerCode]
+      || state.resolvedDefaultCountryPalette?.[target.ownerCode]
+      || state.colors?.[featureIds[0]]);
+    return withCountryColorReplacement(state, target.ownerCode, oldColor, color, commit, dialog, countryIds);
 
-    if (featureIds.length) {
-      refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
-    } else {
-      refreshColorState({ renderNow: false });
+    function commit(replacement) {
+      const historyScope = { ...replacement };
+      if (!isFeature) historyScope.ownerCodes = [target.ownerCode];
+      if (explicitCountry || isFeature) {
+        historyScope.featureIds = replacement ? [...new Set([...featureIds, ...replacement.featureIds])] : featureIds;
+      }
+      const kind = replacement ? "replace-color" : explicitCountry ? "palette-country-color"
+        : isFeature ? "palette-library-apply-color" : "palette-library-apply-owner-color";
+      const before = captureHistoryState(historyScope);
+      if (isFeature) {
+        applyFeatureColor(featureIds, color);
+      } else {
+        applyOwnerColor(target.ownerCode, color);
+        if (explicitCountry) applyFeatureColor(featureIds, color);
+      }
+
+      if (replacement) {
+        applyColorReplacement(state, replacement, oldColor, color);
+        refreshColorState({ renderNow: false });
+      } else if (featureIds.length) {
+        refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
+      } else {
+        refreshColorState({ renderNow: false });
+      }
+      if (!replacement && oldColor && oldColor !== color && (state.legendLabels?.[oldColor] || state.legendColorOrder?.includes(oldColor))) {
+        const boundary = getMapDataBoundary(state);
+        const used = getLegendPaintColors(state).has(oldColor) || boundary.reference.getScenarioFeatureIds().some(id =>
+          !Object.hasOwn(state.colors || {}, id) && boundary.paint.resolveFeatureColor(id).color === oldColor);
+        if (!used) {
+          Object.assign(before, captureHistoryState({ legend: true }));
+          historyScope.legend = true;
+          migrateLegendColorState(state, oldColor, color);
+        }
+      }
+      markDirty(kind);
+      pushHistoryEntry({
+        kind,
+        before,
+        after: captureHistoryState(historyScope),
+        meta: { affectsSovereignty: false },
+      });
+      return { status: "applied", color, target, ...(explicitCountry ? { featureCount: featureIds.length } : {}) };
     }
-    markDirty(kind);
-    pushHistoryEntry({
-      kind,
-      before,
-      after: captureHistoryState(historyScope),
-      meta: { affectsSovereignty: false },
-    });
-    return { status: "applied", color, target, ...(explicitCountry ? { featureCount: featureIds.length } : {}) };
   }
   return Object.freeze({ applyColor });
 }

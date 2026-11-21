@@ -1,4 +1,5 @@
 import { requireFunction } from "../renderer/require_named_function.js";
+import { t } from "../i18n.js";
 import {
   setClickHoverOverlayDirtyState,
   setHoveredFeatureIdsState,
@@ -17,6 +18,7 @@ const REQUIRED_GETTER_NAMES = Object.freeze([
   "isFacilityDetailsSurfaceActive",
   "getHoveredCityTooltipEntry",
   "getTooltipTextForFeature",
+  "getFillTargetPolicy",
   "getOverlayProjectionSignature",
   "getSelectedFacilityEntry",
   "shouldBlockUnderlyingSelectionForFacility"
@@ -82,6 +84,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
   let tooltipFrame = null;
   let hoverHitFrame = null;
   let pendingPointer = null;
+  let fillPreview = null;
   const getGlobal = getters.getGlobal || (() => globalThis);
 
   function scheduleFrame(callback) {
@@ -106,6 +109,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     return Boolean(state.hoveredId || state.hoveredWaterRegionId || state.hoveredSpecialRegionId);
   }
   function setHoverIds({ landId = null, riverCellId = null, waterId = null, specialId = null } = {}) {
+    if (landId !== state.hoveredId) fillPreview = null;
     setHoveredFeatureIdsState(state, { landId, riverCellId, waterId, specialId });
   }
   function getHoveredFacilityEntry() { return hoveredFacilityEntry; }
@@ -175,6 +179,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     applyTooltipState();
   }
   function cancelPendingHoverWork() {
+    fillPreview = null;
     hoverHitFrame?.cancel();
     hoverHitFrame = null;
     pendingPointer = null;
@@ -196,7 +201,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     });
   }
   function setMapInteractionCursor(nextCursor = "") {
-    surfaceHost.getInteractionRect()?.style("cursor", nextCursor || null);
+    surfaceHost.getInteractionRect()?.style("cursor", state.mapLabelEditor?.active ? "crosshair" : nextCursor || null);
   }
   function clearUnderlyingHoverForFacilityEntry(entry) {
     if (!getterApi.shouldBlockUnderlyingSelectionForFacility(entry)) return false;
@@ -273,6 +278,33 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     return createSummary({ branch, hit, cursor, tooltipVisible: true });
   }
 
+  function getFeatureTooltip(feature, hit) {
+    const text = getterApi.getTooltipTextForFeature(feature);
+    if (hit.targetType !== "land" || hit.riverBlockedReason || state.startupReadonly
+      || state.operationalLineEditor?.active || state.operationGraphicsEditor?.active) return text;
+    const policy = getterApi.getFillTargetPolicy();
+    if (!policy.isBatchFillDoubleClickBaseEligible(hit, feature)) {
+      fillPreview = null;
+      return text;
+    }
+    const inputs = [hit.id, feature, state.batchFillScope, state.currentLanguage, state.topologyRevision,
+      state.activeScenarioId, state.mapSemanticMode, state.hierarchyData, state.activeScenarioManifest,
+      state.scenarioDistrictGroupsData];
+    if (!fillPreview || inputs.some((value, i) => value !== fillPreview.inputs[i])) {
+      const plan = policy.buildDoubleClickBatchPlan(feature, hit.id);
+      let line = "";
+      if (plan) {
+        const key = plan.fallbackToCountry ? "Double-click fill: whole country (no parent) · {count} regions"
+          : plan.kind === "fill-country-batch" ? "Double-click fill: whole country · {count} regions"
+          : plan.groupLabel ? "Double-click fill: {count} regions ({group})"
+          : "Double-click fill: {count} regions (parent region)";
+        line = t(key, "ui", { count: plan.targetIds.length, group: plan.groupLabel });
+      }
+      fillPreview = { inputs, line };
+    }
+    return fillPreview.line ? `${text}\n${fillPreview.line}` : text;
+  }
+
   function handleMouseMove(event, { frameCoalesced = false } = {}) {
     const now = getterApi.nowMs();
     const throttleMs = Number(state.MOUSE_THROTTLE_MS || 0);
@@ -336,7 +368,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     if (feature) {
       return queueVisibleTooltip(
         event,
-        getterApi.getTooltipTextForFeature(feature),
+        getFeatureTooltip(feature, hit),
         "feature-tooltip",
         hit,
         cursor,

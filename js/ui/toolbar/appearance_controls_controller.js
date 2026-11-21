@@ -109,6 +109,9 @@ export function createAppearanceControlsController({
   const urbanAdaptiveTintStrengthValue = document.getElementById("urbanAdaptiveTintStrengthValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
   const displayQuality = document.getElementById("displayQuality");
+  const countryLabelSizeScale = document.getElementById("countryLabelSizeScale");
+  const countryLabelOpacity = document.getElementById("countryLabelOpacity");
+  const countryLabelUppercase = document.getElementById("countryLabelUppercase");
   const toggleCountryLabels = document.getElementById("toggleCountryLabels");
   const mapContentStack = document.getElementById("mapContentStack");
   const mapContentPanelSpecs = [
@@ -588,7 +591,11 @@ export function createAppearanceControlsController({
   };
 
   const renderAppearanceStyleControlsUi = () => {
-    if (toggleCountryLabels) toggleCountryLabels.checked = runtimeState.styleConfig?.countryLabels?.enabled !== false;
+    const countryLabels = runtimeState.styleConfig?.countryLabels || {};
+    if (toggleCountryLabels) toggleCountryLabels.checked = countryLabels.enabled !== false;
+    if (countryLabelUppercase) countryLabelUppercase.checked = countryLabels.uppercase !== false;
+    if (countryLabelSizeScale) countryLabelSizeScale.value = countryLabels.sizeScale ?? 1;
+    if (countryLabelOpacity) countryLabelOpacity.value = countryLabels.opacity ?? 1;
     // 先让子 owner 刷到各自的稳定视图，再回填这个 shell 仍然直接拥有的原始 toggle/value。
     // 这样 transport/city/physical 的派生状态不会被后面的简单 DOM 赋值覆盖回旧值。
     cityPointsOwner.renderCityPointsUi();
@@ -637,12 +644,19 @@ export function createAppearanceControlsController({
   const renderParentBorderCountryList = () => parentBorderOwner.renderCountryList();
 
   const bindEvents = () => {
-    if (toggleCountryLabels && toggleCountryLabels.dataset.bound !== "true") {
-      toggleCountryLabels.addEventListener("change", () => {
-        patchAppearanceStyleGroupState(runtimeState, "countryLabels", { enabled: toggleCountryLabels.checked });
-        scheduleLayerRenderDirty("toggle-country-labels");
+    for (const [control, field] of [
+      [toggleCountryLabels, "enabled"], [countryLabelUppercase, "uppercase"],
+      [countryLabelSizeScale, "sizeScale"], [countryLabelOpacity, "opacity"],
+    ]) {
+      if (!control || control.dataset.bound === "true") continue;
+      const isToggle = field === "enabled" || field === "uppercase";
+      control.addEventListener(isToggle ? "change" : "input", () => {
+        patchAppearanceStyleGroupState(runtimeState, "countryLabels", {
+          [field]: isToggle ? control.checked : Number(control.value),
+        });
+        scheduleLayerRenderDirty(field === "enabled" ? "toggle-country-labels" : "country-label-style");
       });
-      toggleCountryLabels.dataset.bound = "true";
+      control.dataset.bound = "true";
     }
     if (displayQuality && displayQuality.dataset.bound !== "true") {
       displayQuality.addEventListener("change", () => {

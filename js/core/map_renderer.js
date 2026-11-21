@@ -251,6 +251,7 @@ import { isScenarioStrategicValuesUsable } from "./scenario/strategic_values.js"
 import { createColorResolutionStrategyOwner, isColorResolutionOceanFeature } from "./renderer/color_resolution_strategy.js";
 import { createStrategicOverlayHelpersOwner } from "./renderer/strategic_overlay_helpers.js";
 import { createStrategicOverlayRenderOwner } from "./renderer/strategic_overlay_render_owner.js";
+import { renderMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
 import { createPoliticalCollectionOwner } from "./renderer/political_collection_owner.js";
 import { createContextLayerResolverOwner } from "./renderer/context_layer_resolver.js";
@@ -301,6 +302,7 @@ import { createHitCanvasSchedulingOwner } from "./map_renderer/hit_canvas_schedu
 import { createMapHoverInteractionOwner } from "./map_renderer/map_hover_interaction_owner.js";
 import {
   createClickSelectionTransactionOwner,
+  createPickedColorHandler,
 } from "./map_renderer/click_selection_transaction_owner.js";
 import { createRendererTransactionResetOwner } from "./map_renderer/renderer_transaction_reset_owner.js";
 import { createScenarioRefreshRuntime } from "./map_renderer/scenario_refresh_runtime.js";
@@ -787,6 +789,7 @@ const getRenderPassSignaturePolicy = lazyOwner(() => createRenderPassSignaturePo
     getPaintContourRevision: () => [getPaintContourRuntimeOwner().getRevision(),
       getRiverInternalContourOwner().getRevision(), hasVisibleRiverPartitions()].join("|"),
     getPoliticalBorderRevision: () => getPoliticalBorderRuntimeOwner().getRevision(),
+    getCountryLabelSuppressionSignature: () => labelsRuntime.getCountryLabelSuppressionSignature(),
     getBorderAppearanceRevision: () => String(runtimeState.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase() === "manual"
       ? 0 : getCountryFillPaletteOwner().getAppearanceRevision(),
   }));
@@ -1300,6 +1303,7 @@ const getMapHoverInteractionOwner = lazyOwner(() => createMapHoverInteractionOwn
     isFacilityDetailsSurfaceActive: getFacilityInteractionRuntime().isFacilityDetailsSurfaceActive,
     getHoveredCityTooltipEntry: labelsRuntime.getHoveredCityTooltipEntry,
     getTooltipTextForFeature: getTooltipText,
+    getFillTargetPolicy,
     getFeatureForHit: (hit) => {
       const id = hit?.id;
       if (!id) return null;
@@ -2067,13 +2071,15 @@ function getRiverContourRenderOwner() {
   });
   return riverContourRenderOwner;
 }
+const selectPickedColor = createPickedColorHandler(runtimeState, {
+  selectTool: tool => callRuntimeHook(runtimeState, "runToolSelectionFn", tool),
+  notifyPicked: () => showToast(t("Color picked", "ui"), { duration: 1200 }),
+});
+
 const getRiverPaintEditorOwner = lazyOwner(() => createRiverPaintEditorOwner({
   state: runtimeState, captureHistoryState, commitHistoryEntry,
   refreshParents: refreshResolvedColorsForFeatures, markDirty, addRecentColor, nowMs,
-  selectColor: color => {
-    setClickSelectedColorState(runtimeState, color);
-    runtimeState.updateSwatchUIFn?.();
-  },
+  selectColor: selectPickedColor,
   announce: reason => showToast(runtimeState.currentLanguage === "zh"
     ? `沿河分区暂不可编辑：${reason}。未修改整块颜色。`
     : `River cell not editable: ${reason}. The parent was not painted.`, { tone: "warning" }),
@@ -2085,6 +2091,7 @@ const {
   ensurePaintContoursReady,
   getPaintContourDiagnostics,
   resolveBorderIdentity,
+  getBorderPaletteRevision,
   getClassifiedBorderMeshes,
   disposePaintContoursIfCreated,
   notifyPaintContourSourcePublished,
@@ -2908,6 +2915,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
       specialZoneEditor: runtimeState.specialZoneEditor,
       startupReadonly: runtimeState.startupReadonly,
       unitCounterEditor: runtimeState.unitCounterEditor,
+      mapLabelEditor: runtimeState.mapLabelEditor,
       waterRegionsById: runtimeState.waterRegionsById,
       waterRegionsData: runtimeState.waterRegionsData,
     }),
@@ -2931,10 +2939,8 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     setClickCountryColors: (countryCode, color) => setClickCountryColorsState(runtimeState, countryCode, color),
     setClickHoverOverlayDirty: (dirty) => setClickHoverOverlayDirtyState(runtimeState, dirty),
     setClickSelectedColor: (color, { updateSwatch = false } = {}) => {
-      setClickSelectedColorState(runtimeState, color);
-      if (updateSwatch && typeof runtimeState.updateSwatchUIFn === "function") {
-        runtimeState.updateSwatchUIFn();
-      }
+      if (updateSwatch) selectPickedColor(color);
+      else setClickSelectedColorState(runtimeState, color);
     },
     setClickSelectedSpecialRegionId: (regionId) => setClickSelectedSpecialRegionIdState(runtimeState, regionId),
     setClickSelectedWaterRegionId: (regionId) => setClickSelectedWaterRegionIdState(runtimeState, regionId),
@@ -2957,8 +2963,9 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     commitHistoryEntry,
     dismissOnboardingHint,
     ensureLeafDetailReady,
+    fillFromDoubleClick,
     getFeatureCountryCodeNormalized,
-    handleRiverPaintClick: hit => getRiverPaintEditorOwner().handleClick(hit),
+    handleRiverPaintClick: (hit, options) => getRiverPaintEditorOwner().handleClick(hit, options),
     getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
       getSafeColor: getSafeCanvasColor,
       getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
@@ -2979,6 +2986,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     noteRenderAction,
     nowMs,
     placeUnitCounterFromEvent,
+    placeMapLabelFromEvent: event => getStrategicOverlayRuntimeOwner().placeMapLabelFromEvent(event),
     queueTooltipUpdate,
     refreshSidebarAfterPaint,
     refreshSpecialRegionSidebarRowsNow,
@@ -3914,6 +3922,7 @@ const getStrategicOverlayRuntimeOwner = lazyOwner(() => createStrategicOverlayRu
     ensureSpecialZoneEditorState,
     ensureUnitCounterCounter,
     ensureUnitCounterEditorState,
+    resolveBorderIdentity,
     getDisplayOwnerCode,
     getFeatureOwnerCode,
     getHitFromEvent,
@@ -6745,6 +6754,7 @@ function rebuildResolvedColors() {
     });
   }
   getCountryFillPaletteOwner().invalidate();
+  labelsRuntime.invalidateCountryLabelCoverage();
   notifyPaintContourColorsChanged();
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
   invalidateRenderPasses(getPhysicalInputInvalidationPasses(colorsChanged
@@ -7226,6 +7236,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
     });
   }
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
+  labelsRuntime.notifyCountryLabelColorsChanged(ids);
   notifyPaintContourColorsChanged(getRiverPaintRuntime(runtimeState).expandDirtyIds(ids));
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
     startedAt: inputStartedAt,
@@ -8739,6 +8750,7 @@ function reconcilePoliticalDerivedColors(delta) {
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
   }
   getCountryFillPaletteOwner().invalidate();
+  labelsRuntime.invalidateCountryLabelCoverage();
   recordRenderPerfMetric("reconcilePoliticalColors", nowMs() - startedAt, {
     resolvedFeatureCount: delta.changedIds.length, removedFeatureCount: delta.removedIds.length,
     sourceFeatureCount: delta.features.size, colorChanged: changed,
@@ -9855,6 +9867,8 @@ function getPhysicalExactRefreshPasses() {
 }
 
 const labelsRuntime = createLabelsRuntime({
+  resolveBorderIdentity,
+  getBorderPaletteRevision,
   runtimeState,
   rendererSurfaceHost,
   TEXTURE_LABEL_SERIF_STACK,
@@ -9911,7 +9925,10 @@ async function ensureCountryLabelsReadyForExport(passNames) { return labelsRunti
 
 // Labels placed by the last full labels pass that touch the visible viewport:
 // city IDs and country codes. Off-screen paint margins are excluded.
+export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove } from "./renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+export function getPlacedMapLabels() { return labelsRuntime.getPlacedMapLabels(); }
 export function getVisibleMapLabels() { return labelsRuntime.getVisibleMapLabels(); }
+export function getCountryLabelStatus(code) { return labelsRuntime.getCountryLabelStatus(code); }
 
 export function getCountryLabelReadiness() { return labelsRuntime.getCountryLabelReadiness(); }
 
@@ -10399,7 +10416,12 @@ function drawBordersPass(k, { interactive = false } = {}) {
 }
 
 function drawLabelsPass(k, { interactive = false } = {}) {
-  return recordLabelPass("labels", () => labelsRuntime.drawLabelsPassContent(k, { interactive }));
+  const result = recordLabelPass("labels", () => labelsRuntime.drawLabelsPassContent(k, { interactive }));
+  if (!exportRenderInProgress) renderMapLabelHandles({
+    group: rendererSurfaceHost.getMapSvg()?.querySelector(".map-label-handles"),
+    state, placed: labelsRuntime.getPlacedMapLabels(), k, projection: rendererSurfaceHost.getProjection(), handleClick,
+  });
+  return result;
 }
 
 function recordLabelPass(passName, draw) {
@@ -10478,8 +10500,12 @@ function focusWaterRegionById(id) {
   const bounds = chooseMarineFocusBounds(focusParts.map((entry) => entry.bounds));
   if (!bounds || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
   const focusPart = focusParts.find((entry) => entry.bounds === bounds)?.part;
-  const projection = rendererSurfaceHost.getProjection();
   const geoBounds = focusPart && globalThis.d3.geoBounds ? globalThis.d3.geoBounds(focusPart) : null;
+  return focusRegionBounds(bounds, focusPart, geoBounds, { animate: true });
+}
+
+function focusRegionBounds(bounds, geometry, geoBounds, options) {
+  const projection = rendererSurfaceHost.getProjection();
   const wrapsDateLine = Array.isArray(geoBounds) && Number(geoBounds[0]?.[0]) > Number(geoBounds[1]?.[0]);
   const midLatitude = geoBounds ? (Number(geoBounds[0][1]) + Number(geoBounds[1][1])) / 2 : 0;
   const worldLeft = wrapsDateLine ? projection?.([-179.9, midLatitude]) : null;
@@ -10489,23 +10515,23 @@ function focusWaterRegionById(id) {
   const worldWidth = Math.abs(Number(worldRight?.[0]) - Number(worldLeft?.[0]));
   const wrappedWidth = wrapsDateLine ? Math.abs(worldWidth - Math.abs(Number(west?.[0]) - Number(east?.[0]))) : 0;
   if (wrapsDateLine && !(wrappedWidth > 0 && Number.isFinite(wrappedWidth))) return false;
-  const geoCenter = wrapsDateLine && globalThis.d3.geoCentroid ? globalThis.d3.geoCentroid(focusPart) : null;
+  const geoCenter = wrapsDateLine && globalThis.d3.geoCentroid ? globalThis.d3.geoCentroid(geometry) : null;
   const wrappedCenter = geoCenter && projection ? projection(geoCenter) : null;
   if (wrapsDateLine && (!wrappedCenter || !wrappedCenter.every(Number.isFinite))) return false;
   const extentX = Math.max(1, wrapsDateLine ? wrappedWidth : bounds.maxX - bounds.minX);
   const extentY = Math.max(1, bounds.maxY - bounds.minY);
   const centerX = wrapsDateLine ? wrappedCenter[0] : (bounds.minX + bounds.maxX) / 2;
   const centerY = wrapsDateLine ? wrappedCenter[1] : (bounds.minY + bounds.maxY) / 2;
-  return focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate: true });
+  return focusProjectedBounds({ extentX, extentY, centerX, centerY }, options);
 }
 
-function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate, pinWorldTop = false }) {
+function focusProjectedBounds({ extentX, extentY, centerX, centerY }, { animate, pinWorldTop = false, maxScale = MAX_ZOOM_SCALE }) {
   const interactionRect = rendererSurfaceHost.getInteractionRect();
   const zoomBehavior = rendererSurfaceHost.getZoomBehavior();
   if (!interactionRect?.node() || !zoomBehavior || !globalThis.d3?.zoomIdentity
     || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
   const fitScale = Math.min(runtimeState.width * 0.72 / extentX, runtimeState.height * 0.72 / extentY);
-  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, fitScale));
+  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, maxScale, fitScale));
   const node = interactionRect.node();
   updateZoomTranslateExtent();
   // zoom.transform 不经过平移范围约束；先按 translateExtent 约束，避免视角越过世界边缘。
@@ -10538,15 +10564,18 @@ function pinTransformToWorldTop(transform) {
   return globalThis.d3.zoomIdentity.translate(transform.x, transform.y - topOnScreen).scale(transform.k);
 }
 
-function focusGeoBounds([west, south, east, north], { animate = false } = {}) {
+function focusGeoBounds([west, south, east, north], { animate = false, geometry, maxScale } = {}) {
   const projection = rendererSurfaceHost.getProjection();
   if (!projection || !globalThis.d3?.geoPath) return false;
-  const bounds = globalThis.d3.geoPath(projection).bounds({
+  const bounds = globalThis.d3.geoPath(projection).bounds(geometry || {
     type: "Polygon",
     coordinates: [[[west, north], [east, north], [east, south], [west, south], [west, north]]],
   });
   if (!bounds.flat().every(Number.isFinite)) return false;
   const [[minX, minY], [maxX, maxY]] = bounds;
+  if (geometry) {
+    return focusRegionBounds({ minX, minY, maxX, maxY }, geometry, [[west, south], [east, north]], { animate, maxScale });
+  }
   return focusProjectedBounds({
     extentX: Math.max(1, maxX - minX),
     extentY: Math.max(1, maxY - minY),
@@ -12775,7 +12804,6 @@ async function handleDoubleClick(event, _interactionContext = null) {
     blockStartupReadonlyInteraction();
     return;
   }
-  const actionStart = nowMs();
   if (runtimeState.specialZoneEditor?.active) {
     if (event?.preventDefault) event.preventDefault();
     finishSpecialZoneDraw();
@@ -12791,6 +12819,11 @@ async function handleDoubleClick(event, _interactionContext = null) {
     finishOperationGraphicDraw();
     return;
   }
+  return getClickSelectionTransactionOwner().handleDoubleClickFill(event);
+}
+
+async function fillFromDoubleClick(event) {
+  const actionStart = nowMs();
   if (!runtimeState.landData) return;
   if (event?.preventDefault) event.preventDefault();
 
@@ -13165,6 +13198,7 @@ export async function prepareScenarioPoliticalChunkPromotion({ politicalPayload,
     if (colorsChanged) bumpColorRevision(state);
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild(Number(colorRevision || 0));
     getCountryFillPaletteOwner().invalidate();
+    labelsRuntime.invalidateCountryLabelCoverage();
     notifyPaintContourColorsChanged();
     queueIndexUiRefresh({ renderCountryList: true, renderWaterRegionList: true, renderSpecialRegionList: true }, "deferred");
     finalizeIndexBuildEffects();

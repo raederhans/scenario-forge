@@ -171,7 +171,7 @@ test("bindBoundary receives schedule, flush, and detail topology functions", () 
   ]);
 });
 
-test("runtime hooks register renderNowFn, ensureDetailTopologyFn, and showToastFn", () => {
+test("runtime hooks register renderNowFn, ensureDetailTopologyFn, showToastFn, and showAppDialogFn", () => {
   const harness = createHarness();
   const binding = createStartupRenderRuntimeBinding(harness.options);
 
@@ -196,6 +196,11 @@ test("runtime hooks register renderNowFn, ensureDetailTopologyFn, and showToastF
         sameState: true,
         hookName: "showToastFn",
         callback: harness.options.showToastFn,
+      },
+      {
+        sameState: true,
+        hookName: "showAppDialogFn",
+        callback: harness.calls.registerHook[3].callback,
       },
     ],
   );

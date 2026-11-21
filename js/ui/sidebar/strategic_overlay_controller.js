@@ -11,8 +11,57 @@ import {
   refreshUnitCounterPreviewSection,
 } from "./strategic_overlay/unit_counter_render_helpers.js";
 import { patchStrategicOverlayEditorState } from "../../core/state/actions/strategic_overlay_actions.js";
+import { deleteMapLabel, updateMapLabel } from "../../core/renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+import { getLocalizedScenarioCountryName } from "../../core/scenario/scenario_country_display.js";
+import { syncMapLabelHandles } from "../../core/renderer/map_label_handles_owner.js";
 import { loadDefenseLinePresets, buildScenarioDefenseLineEntries } from "../../core/scenario/defense_line_presets.js";
 import { OPERATIONAL_LINE_KIND_LABELS, OPERATION_GRAPHIC_KIND_LABELS } from "./strategic_overlay/type_labels.js";
+
+export function bindMapLabelPanel({ section, state, startPlacement, refresh, focusGeoBounds, countryName }) {
+  const selectedId = () => state.mapLabelEditor.selectedId;
+  section.querySelector("#mapLabelPlace").addEventListener("click", startPlacement);
+  const list = section.querySelector("#mapLabelList");
+  const focusSelection = () => {
+    const label = state.mapLabels.find(item => item.id === list.value);
+    if (!label) return;
+    patchStrategicOverlayEditorState(state, "mapLabelEditor", { selectedId: label.id });
+    const { lon, lat } = label;
+    focusGeoBounds([lon, lat, lon, lat], {
+      geometry: { type: "Point", coordinates: [lon, lat] }, maxScale: state.zoomTransform?.k || 1,
+    });
+    refresh();
+  };
+  list.addEventListener("click", focusSelection);
+  list.addEventListener("change", () => {
+    if (list.matches(":focus-visible")) focusSelection();
+  });
+  for (const field of section.querySelectorAll("[data-label-field]")) {
+    const key = field.dataset.labelField;
+    const commit = () => {
+      const value = field.type === "range" ? Number(field.value) : field.value;
+      const patch = { [key]: value };
+      if (key === "countryCode") patch.fallbackName = value ? countryName(value) : "";
+      if (updateMapLabel(selectedId(), patch)) refresh();
+    };
+    field.addEventListener(key === "text" ? "blur" : "change", commit);
+    if (key === "text") field.addEventListener("keydown", event => {
+      if (event.ctrlKey && event.key === "Enter") {
+        event.preventDefault();
+        field.blur();
+      }
+    });
+  }
+  const remove = () => {
+    if (deleteMapLabel(selectedId())) refresh();
+  };
+  section.querySelector("#mapLabelDelete").addEventListener("click", remove);
+  section.ownerDocument.addEventListener("keydown", event => {
+    if (!state.strategicOverlayUi.modalOpen || state.strategicOverlayUi.modalSection !== "label" || !selectedId()) return;
+    if (!["Delete", "Backspace"].includes(event.key) || event.target.closest?.("input,textarea,select,[contenteditable=true]")) return;
+    event.preventDefault();
+    remove();
+  });
+}
 
 /**
  * Owns the strategic overlay workspace inside the sidebar:
@@ -157,6 +206,10 @@ export function createStrategicOverlayController({
   let defenseLineLoading = false;
   let defenseLineButton;
   let defenseLineStatus;
+  const { mapLabelSection, mapLabelSectionToggle } = elements;
+  const countryName = code => getLocalizedScenarioCountryName(state.scenarioCountriesByTag?.[code],
+    state.countryNames?.[code] || code, name => t(name, "geo"));
+  let placingLabel = false;
 
   function refreshDefenseLinePresets() {
     if (!defenseLineButton) return;
@@ -330,9 +383,10 @@ export function createStrategicOverlayController({
     const lineCount = Array.isArray(state.operationalLines) ? state.operationalLines.length : 0;
     const graphicCount = Array.isArray(state.operationGraphics) ? state.operationGraphics.length : 0;
     const counterCount = Array.isArray(state.unitCounters) ? state.unitCounters.length : 0;
-    const nextText = `${lineCount} ${t("lines", "ui")} · ${graphicCount} ${t("graphics", "ui")} · ${counterCount} ${t("counters", "ui")} · ${t("Export as Strategic annotations", "ui")}`;
+    const countText = `${state.mapLabels?.length || 0} ${t("map labels", "ui")}`;
+    const nextText = `${lineCount} ${t("lines", "ui")} · ${graphicCount} ${t("graphics", "ui")} · ${counterCount} ${t("counters", "ui")} · ${countText} · ${t("Export as Strategic annotations", "ui")}`;
     const nextTitle = t("Project export saves Strategic annotations.", "ui");
-    const nextLabel = `${lineCount} ${t("lines", "ui")}, ${graphicCount} ${t("graphics", "ui")}, ${counterCount} ${t("counters", "ui")}. ${nextTitle}`;
+    const nextLabel = `${lineCount} ${t("lines", "ui")}, ${graphicCount} ${t("graphics", "ui")}, ${counterCount} ${t("counters", "ui")}, ${countText}. ${nextTitle}`;
     if (strategicOverlayPublishStatus.textContent !== nextText) {
       strategicOverlayPublishStatus.textContent = nextText;
     }
@@ -349,7 +403,7 @@ export function createStrategicOverlayController({
     const nextIsOpen = !!nextOpen;
     patchStrategicOverlayEditorState(state, "strategicOverlayUi", {
       modalOpen: nextIsOpen,
-      modalSection: section === "counter" ? "counter" : "line",
+      modalSection: section,
     });
     // 工作台 modal 和 counter editor modal 不能同时抢焦点；
     // 这里把两者的开关关系集中收口，避免 sidebar / overlay / body class 各自漂移。
@@ -363,7 +417,14 @@ export function createStrategicOverlayController({
     if (strategicOverlaySection) {
       strategicOverlaySection.classList.toggle("is-workspace-modal", nextIsOpen);
       strategicOverlaySection.classList.toggle("is-visual-workspace", nextIsOpen);
-      strategicOverlaySection.dataset.workspaceSection = section === "counter" ? "counter" : "line";
+      strategicOverlaySection.dataset.workspaceSection = section;
+    }
+    if (mapLabelSection) {
+      const open = nextIsOpen && section === "label";
+      mapLabelSection.hidden = !open;
+      mapLabelSectionToggle.hidden = !nextIsOpen && !document.body.classList.contains("frontline-mode-active");
+      syncMapLabelHandles(document.querySelector("#map-svg .map-label-handles"), state);
+      mapLabelSectionToggle.textContent = t(open ? "Strategic Annotations" : "Map lettering", "ui");
     }
     if (strategicWorkspaceBackdropEl) {
       strategicWorkspaceBackdropEl.classList.toggle("hidden", !nextIsOpen);
@@ -409,6 +470,37 @@ export function createStrategicOverlayController({
     // 这样外层只要声明“哪块脏了”，而不是分别记住几十个局部刷新函数。
     ensureStrategicOverlayUiState();
     refreshStrategicOverlayPublishStatus();
+    if (mapLabelSection) {
+      const { selectedId, active } = state.mapLabelEditor;
+      const selected = state.mapLabels.find(label => label.id === selectedId);
+      const list = mapLabelSection.querySelector("#mapLabelList");
+      syncSelectOptions(list, state.mapLabels.map(label => ({
+        value: label.id, label: label.text || label.fallbackName || label.countryCode || t("Enter name", "ui"),
+      })), { value: selectedId });
+      mapLabelSection.querySelector("#mapLabelFields").hidden = !selected;
+      if (selected) {
+        const countries = state.activeScenarioId ? state.scenarioCountriesByTag : state.sovereignBaseColors;
+        const codes = new Set(Object.keys(countries || {}));
+        if (selected.countryCode) codes.add(selected.countryCode);
+        syncSelectOptions(mapLabelSection.querySelector("#mapLabelCountry"), [
+          { value: "", label: t("None", "ui") },
+          ...Array.from(codes).sort().map(code => ({ value: code, label: countryName(code) })),
+        ], { value: selected.countryCode });
+        for (const field of mapLabelSection.querySelectorAll("[data-label-field]")) {
+          if (field !== document.activeElement) field.value = selected[field.dataset.labelField] ?? 0;
+        }
+      }
+      if (active !== placingLabel) {
+        const surface = document.querySelector("#map-svg .interaction-layer");
+        if (surface) surface.style.cursor = active ? "crosshair" : "";
+        strategicOverlaySection.style.visibility = active ? "hidden" : "";
+        if (strategicWorkspaceBackdropEl) strategicWorkspaceBackdropEl.style.visibility = active ? "hidden" : "";
+        if (!active && !mapLabelSection.hidden && selected && !selected.text && !selected.countryCode) {
+          mapLabelSection.querySelector("textarea").focus();
+        }
+        placingLabel = active;
+      }
+    }
     if (hasStrategicOverlayScope(normalizedScopes, "workspaceChrome")) {
       recordStrategicOverlayPerfCounter("workspaceChrome");
       setStrategicWorkspaceModalState(
@@ -715,6 +807,21 @@ export function createStrategicOverlayController({
   };
 
   const bindEvents = () => {
+  if (mapLabelSection && !mapLabelSection.dataset.bound) {
+    mapLabelSectionToggle.addEventListener("click", () => {
+      const next = state.strategicOverlayUi.modalOpen && state.strategicOverlayUi.modalSection === "label" ? "line" : "label";
+      cancelStrategicEditingModes();
+      setStrategicWorkspaceModalState(true, next);
+      refreshStrategicOverlayUI();
+    });
+    bindMapLabelPanel({ section: mapLabelSection, state, countryName, focusGeoBounds: mapRenderer.focusGeoBounds,
+      refresh: refreshStrategicOverlayUI, startPlacement: () => {
+        cancelStrategicEditingModes();
+        patchStrategicOverlayEditorState(state, "mapLabelEditor", { active: true });
+        refreshStrategicOverlayUI();
+      } });
+    mapLabelSection.dataset.bound = "true";
+  }
   if (strategicOverlayOpenWorkspaceBtn && !strategicOverlayOpenWorkspaceBtn.dataset.bound) {
     strategicOverlayOpenWorkspaceBtn.addEventListener("click", () => {
       const currentSection = String(state.strategicOverlayUi?.modalSection || "line");

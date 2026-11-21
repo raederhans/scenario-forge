@@ -3,6 +3,7 @@ import { createSpecialZonePatternPreviewStyle, getSpecialZoneLayerDisplayName } 
 export function createLegendControlOwner({
   getMapContainer,
   getViewportSize = () => ({ width: 1, height: 1 }),
+  isSmallViewport = () => globalThis.matchMedia?.("(max-width: 767px)").matches ?? false,
   getLanguage,
   getLegendModel,
   getControlState,
@@ -21,6 +22,7 @@ export function createLegendControlOwner({
   let legendResizeSession = null;
   let lastLegendKey = null;
   let lastHeaderKey = null;
+  let defaultCollapsed;
 
   function getLegendControlText(key, count = 0) {
     const zh = String(getLanguage() || "").toLowerCase().startsWith("zh");
@@ -311,7 +313,10 @@ export function createLegendControlOwner({
     toggleButton.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      const next = toggleControlCollapsed();
+      const next = getControlState().collapsed == null
+        ? updateControlState({ collapsed: !defaultCollapsed })
+        : toggleControlCollapsed();
+      lastHeaderKey = null;
       element.classList.toggle("is-collapsed", next.collapsed);
       setLegendControlButtonIcon(
         toggleButton,
@@ -445,8 +450,8 @@ export function createLegendControlOwner({
     const controlElement = ensureLegendControlElement();
     if (!controlElement || !legendControlBodyElement) return;
 
-    const controlState = getControlState();
-    if (!controlState.visible) {
+    const state = getControlState();
+    if (!state.visible) {
       controlElement.hidden = true;
       stopLegendDrag();
       stopLegendResize();
@@ -476,6 +481,8 @@ export function createLegendControlOwner({
       return;
     }
 
+    defaultCollapsed ??= isSmallViewport();
+    const controlState = state.collapsed == null ? { ...state, collapsed: defaultCollapsed } : state;
     controlElement.hidden = false;
     const headerKey = JSON.stringify([getLanguage(), colorRows.length + specialZoneLegendLayers.length, controlState.collapsed]);
     if (headerKey !== lastHeaderKey) {

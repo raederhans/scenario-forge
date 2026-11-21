@@ -6,12 +6,7 @@ const MAX_CANDIDATES_PER_POLYGON = 32;
 const MAX_FIT_CANDIDATES = 20;
 const DEFAULT_MAX_GRID_SIZE = 32;
 const MAX_GLYPH_ANGLE = 30 * Math.PI / 180;
-// 国名标签的基础字距与按路径长度撑开的上限（单位 em）。
-// 中文字形本身方正，上限放到 0.9em 会让短名读成逐字拆开，因此收紧到 0.25em。
-export const COUNTRY_LABEL_TRACKING = Object.freeze({
-  chinese: Object.freeze({ tracking: 0.12, maxTracking: 0.25 }),
-  latin: Object.freeze({ tracking: 0.08, maxTracking: 0.6 }),
-});
+export { COUNTRY_LABEL_TRACKING } from "./country_label_text_style.js";
 function finiteNumber(value, fallback = 0) {
   return Number.isFinite(Number(value)) ? Number(value) : fallback;
 }

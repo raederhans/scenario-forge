@@ -30,6 +30,21 @@ function fixture(extra = {}, helpers = {}) {
   return { owner, state, bundle, payload };
 }
 
+test('renaming and clearing republish the default country label without rebuilding geometry', async () => {
+  const { state, owner } = fixture({ countryNames: { AAA: 'Original' } }, { getCountryName: undefined });
+  await owner.prepare();
+  const original = owner.getSource().countries.find(country => country.countryCode === 'AAA');
+  assert.equal(original.name, 'Original');
+  for (const [overrides, name] of [[{ AAA: { en: 'New' } }, 'New'], [{}, 'Original']]) {
+    state.countryNameOverrides = overrides;
+    assert.equal(owner.peekSource().status, 'pending');
+    const country = owner.getSource().countries.find(entry => entry.countryCode === 'AAA');
+    assert.equal(country.feature.properties.label, name);
+    assert.equal(country.geometry, original.geometry);
+  }
+  owner.dispose();
+});
+
 test('readiness peeks never prepare or replace a source and detect stale scene and names', async () => {
   let yields = 0, changes = 0;
   const { owner, state } = fixture({}, { isWorkerSupported: () => false,
@@ -277,6 +292,9 @@ test('complete coarse world dissolves provinces by immutable reference, independ
   const source = owner.getSource();
   assert.equal(source.status, 'ready');
   assert.deepEqual(source.countries.map(c => c.countryCode), ['AAA', 'BBB']);
+  assert.deepEqual([...source.memberIndex.groupCodeById], [['one', 'AAA'], ['two', 'AAA'], ['three', 'BBB']]);
+  assert.deepEqual([...source.memberIndex.memberCountByCode], [['AAA', 2], ['BBB', 1]]);
+  assert.throws(() => source.memberIndex.groupCodeById.clear(), TypeError);
   assert.equal(source.countries[0].geometry.coordinates.length, 1);
   const points = source.countries[0].geometry.coordinates[0][0];
   assert.ok(points.some(p => p[0] === 0) && points.some(p => p[0] === 2));
@@ -285,6 +303,7 @@ test('complete coarse world dissolves provinces by immutable reference, independ
   state.landData = { features: [feature('one', 80)] }; state.topologyDetail = {};
   state.runtimePoliticalTopology = {}; state.scenarioShellOverlayRevision = 9;
   assert.equal(owner.getSource().countries, source.countries);
+  assert.equal(owner.peekSource().memberIndex, source.memberIndex);
   assert.equal(owner.getSource().sourceToken, source.sourceToken);
 });
 

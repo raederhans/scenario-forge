@@ -48,6 +48,8 @@ import {
   updateSelectedOperationalLine,
   updateSelectedUnitCounter,
   getCachedEffectiveCityCollection,
+  getCountryLabelStatus,
+  focusGeoBounds,
   selectLandFeatureById,
 } from "../core/map_renderer/public.js";
 import { applyCountryColor, resetCountryColors } from "../core/country_color_commands.js";
@@ -149,6 +151,7 @@ function requestHgoIdentityAssetsForSettings(settings, loadAssets) {
 // Batch 5: sidebar controllers consume a curated renderer helper surface so
 // renderer API drift stays visible in one place instead of hiding in namespace imports.
 const mapRenderer = Object.freeze({
+  focusGeoBounds,
   cancelActiveStrategicInteractionModes,
   cancelOperationGraphicDraw,
   cancelOperationalLineDraw,
@@ -1140,6 +1143,7 @@ function initSidebar({ render } = {}) {
     t,
     getFeatureOwnerCode,
     getFeatureLabel: getGeoFeatureDisplayLabel,
+    focusGeoBounds,
     selectLandFeatureById,
   });
   regionSearchController.mount(countryInspectorDetail);
@@ -1147,6 +1151,7 @@ function initSidebar({ render } = {}) {
 
   const renamedPlacesCache = { features: null, hasAny: false };
   const countryInspectorController = createCountryInspectorController({
+    focusGeoBounds,
     resolveInspectorGroup: (code, id) => callRuntimeHook(runtimeState, "resolveInspectorGroupForFeatureFn", code, id),
     stepUpInspectorSelection: () => callRuntimeHook(runtimeState, "stepUpInspectorSelectionFn"),
     getInspectorFeatureLabel: (id) => getGeoFeatureDisplayLabel(runtimeState.landIndex.get(id)),
@@ -1179,6 +1184,7 @@ function initSidebar({ render } = {}) {
     selectedCountryActionsSection,
     countryInspectorDetail,
     countryInspectorSelected,
+    getCountryLabelStatus,
     countryInspectorColorRow,
     countryInspectorColorSwatch,
     countryInspectorColorInput,

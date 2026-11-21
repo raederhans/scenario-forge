@@ -1,5 +1,6 @@
 import { getPaletteCountryTargets } from "../../core/palette_country_targets.js";
 import { normalizeHexColor } from "../../core/palette_manager.js";
+import { findNearCountryColor, getCountryColorHintText } from "../../core/near_country_color_hint.js";
 import { getScenarioCountryDisplayName } from "../../core/scenario/scenario_country_display.js";
 
 export function createPaletteCountryEditor({ state, host, applyColor }) {
@@ -45,18 +46,30 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
       ? (zh() ? `${ids.size} 个地区 · 改色会覆盖局部涂色，可撤销` : `${ids.size} regions · Replaces local paint; undo available`)
       : (zh() ? "选择国家" : "Choose a country");
   }
-  function commit(raw) {
+  async function commit(raw) {
     const color = normalizeHexColor(raw);
     if (!color) {
       hex.setCustomValidity(zh() ? "请输入有效的十六进制颜色" : "Enter a valid hexadecimal color");
       hex.reportValidity();
       return;
     }
-    const result = applyColor(color, select.value);
+    const match = findNearCountryColor(state, color, select.value);
+    const result = await applyColor(color, select.value);
     if (result?.status !== "applied") { render(); return; }
     picker.value = hex.value = color;
     hex.setCustomValidity("");
     hint.textContent = zh() ? `已更新 ${result.featureCount} 个地区，可撤销` : `Updated ${result.featureCount} regions; undo available`;
+    if (match) {
+      const { message, actionLabel } = getCountryColorHintText(state, match);
+      hint.append(` · ${message}`);
+      if (!match.exact) {
+        const useColor = doc.createElement("button");
+        useColor.type = "button";
+        useColor.textContent = actionLabel;
+        useColor.addEventListener("click", () => commit(match.color));
+        hint.append(" ", useColor);
+      }
+    }
   }
   select.addEventListener("change", syncColor);
   picker.addEventListener("change", () => commit(picker.value));

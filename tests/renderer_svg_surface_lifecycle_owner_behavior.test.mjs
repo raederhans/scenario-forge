@@ -18,6 +18,7 @@ const VIEWPORT_GROUP_ORDER = Object.freeze([
   "operation-graphics-layer",
   "operation-graphics-editor-layer",
   "unit-counters-layer",
+  "map-label-handles",
   "special-zones-layer",
   "special-zone-editor-layer",
   "hover-layer",

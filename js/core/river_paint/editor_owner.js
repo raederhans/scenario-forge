@@ -14,7 +14,7 @@ export function createRiverPaintEditorOwner({ state, captureHistoryState, commit
     return hit.riverPackId !== pack?.packId || runtime.getCellFeature(hit.riverCellId)?.properties?.__riverParentId !== hit.id
       ? 'stale' : true;
   }
-  function apply(hit, { brushSession = null } = {}) {
+  function apply(hit, { brushSession = null, pickColor = false } = {}) {
     const accepted = eligible(hit);
     if (!accepted) return { consumed: false, changed: false };
     if (hit.riverBlockedReason || accepted === 'stale') {
@@ -22,7 +22,7 @@ export function createRiverPaintEditorOwner({ state, captureHistoryState, commit
       return { consumed: true, changed: false };
     }
     const cellId = hit.riverCellId;
-    if (state.currentTool === 'eyedropper') {
+    if (pickColor || state.currentTool === 'eyedropper') {
       const color = getMapDataBoundary(state).paint.resolveRiverCellColor(cellId).color;
       if (color) selectColor(color);
       return { consumed: true, changed: false };
@@ -62,7 +62,7 @@ export function createRiverPaintEditorOwner({ state, captureHistoryState, commit
     return { consumed: true, changed: true };
   }
   return Object.freeze({
-    handleClick(hit) { return apply(hit).consumed; },
+    handleClick(hit, options) { return apply(hit, options).consumed; },
     handleBrush(hit, brushSession) { return apply(hit, { brushSession }); },
   });
 }

@@ -425,7 +425,7 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
       .filter({ hasText: "Map snapshot downloaded." })
       .last();
     await expect(snapshotSuccessToast).toBeVisible();
-    expect(download.suggestedFilename()).toBe("map_snapshot.png");
+    expect(download.suggestedFilename()).toMatch(/^tno-1962-atlantropa-briefing\.project_\d{8}-\d{4}_snapshot\.png$/);
     expect(await download.failure()).toBeNull();
     const pngBuffer = await readDownloadBuffer(download);
     expect(pngBuffer.length).toBeGreaterThan(1024);

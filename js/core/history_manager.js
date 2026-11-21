@@ -1,5 +1,6 @@
 import { collectRiverCellIdsForParents, getRiverPartitionIndex } from "./river_paint/partition_model.js";
 import { restoreRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
+import { patchLegendState } from "./state/actions/legend_actions.js";
 import { coalesceQuickFillGesture } from "./history_quick_fill_gesture.js";
 import { state as runtimeState } from "./state.js";
 import {
@@ -76,6 +77,8 @@ function captureHistoryState({
   specialRegionIds = [],
   ownerCodes = [],
   stylePaths = [],
+  legend = false,
+  countryNameOverrides = false,
   strategicOverlay = false,
   intensityFieldChannels = [],
   appearancePresets = false,
@@ -108,10 +111,16 @@ function captureHistoryState({
   if (styleKeys.length) {
     snapshot.styleConfig = captureStylePaths(styleKeys);
   }
+  if (legend) {
+    snapshot.legendLabels = { ...runtimeState.legendLabels };
+    snapshot.legendColorOrder = [...(runtimeState.legendColorOrder || [])];
+  }
+
+  if (countryNameOverrides) snapshot.countryNameOverrides = cloneStructuredValue(runtimeState.countryNameOverrides || {});
 
   if (strategicOverlay) {
     const defaults = {
-      annotationView: {}, operationalLines: [], operationGraphics: [], unitCounters: [],
+      annotationView: {}, operationalLines: [], operationGraphics: [], unitCounters: [], mapLabels: [],
       specialZoneLayers: {}, specialZoneMembershipBrushMode: "add",
     };
     // true preserves legacy callers; scoped callers clone only the collections they edit.
@@ -320,6 +329,10 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
   applyStyleSnapshot(snapshot.styleConfig);
+  if (snapshot.countryNameOverrides) runtimeState.countryNameOverrides = cloneStructuredValue(snapshot.countryNameOverrides);
+  if (snapshot.legendLabels) {
+    patchLegendState(runtimeState, { legendLabels: snapshot.legendLabels, legendColorOrder: snapshot.legendColorOrder });
+  }
   if (hasAnnotationView) {
     runtimeState.annotationView = cloneStructuredValue(snapshot.annotationView);
   }
@@ -351,6 +364,7 @@ function applyHistorySnapshot(snapshot, direction, entry) {
       "operationalLinesDirty",
       "operationGraphicsDirty",
       "unitCountersDirty",
+      "mapLabelsDirty",
     ]) {
       setStrategicOverlayDirtyState(runtimeState, dirtyKey);
     }

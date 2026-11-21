@@ -36,6 +36,43 @@ import {
 } from "../js/core/state/index.js";
 import { unzipSync, zipSync, strFromU8, strToU8 } from "../vendor/fflate.browser.js";
 
+test("project name survives import and save while the source filename stays local", async () => {
+  const payload = await exportProjectPayload({ projectName: "Atlas: North", projectFileStem: "old", styleConfig: {} });
+  assert.equal(payload.projectName, "Atlas: North");
+  assert.equal(Object.hasOwn(payload, "projectFileStem"), false);
+  await importProjectThroughFunnelPayload(payload);
+  assert.equal(state.projectName, "Atlas: North");
+  assert.equal(state.projectFileStem, "map_project");
+  assert.equal(FileManager.buildProjectPayload(state).projectName, "Atlas: North");
+
+  delete payload.projectName;
+  await importProjectThroughFunnelPayload(payload);
+  assert.equal(state.projectName, "");
+  assert.equal(state.projectFileStem, "map_project");
+});
+
+test("project round trip preserves manual lettering and discards invalid coordinates", async () => {
+  const label = { id: "map_label_9", text: "Title", countryCode: "GER", fallbackName: "Germany",
+    lon: 2.5, lat: -10, size: 7.1, rotation: 24, tracking: 0.2, uppercase: false, colorMode: "light" };
+  const payload = await exportProjectPayload({ mapLabels: [label, { lon: null, lat: 0 }],
+    styleConfig: {}, annotationView: { showMapLabels: false } });
+  assert.deepEqual(payload.mapLabels, [label]);
+  payload.mapLabels.push({ lon: 5 }, { lon: "bad", lat: 1 });
+  const imported = (await importProjectPayload(payload)).successes[0];
+  assert.deepEqual(imported.mapLabels, [label]);
+  assert.equal(imported.annotationView.showMapLabels, false);
+  await importProjectThroughFunnelPayload(payload);
+  assert.deepEqual(state.mapLabels, [label]);
+  assert.equal(state.annotationView.showMapLabels, false);
+  delete payload.mapLabels;
+  delete payload.annotationView.showMapLabels;
+  const legacy = (await importProjectPayload(payload)).successes[0];
+  assert.deepEqual(legacy.mapLabels, []);
+  assert.equal(legacy.annotationView.showMapLabels, true);
+  await importProjectThroughFunnelPayload(payload);
+  assert.deepEqual(state.mapLabels, []);
+});
+
 test("import summary counts rejected entries while preserving valid unloaded regions and migration", async () => {
   // Isolate the module's migration-asset promise from other project-import cases.
   const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?import-summary");
@@ -1250,7 +1287,7 @@ test("project save picker receives json file type options by default", async () 
     });
 
     assert.equal(result, true);
-    assert.equal(calls[0].suggestedName, "map_project.json");
+    assert.match(calls[0].suggestedName, /^tno_1962_\d{8}-\d{4}\.json$/);
     assert.equal(calls[0].excludeAcceptAllOption, true);
     assert.deepEqual(calls[0].types[0].accept, { "application/json": [".json"] });
     assert.equal(writes[0].type, "application/json");
@@ -1289,7 +1326,7 @@ test("project zip save picker receives zip file type options", async () => {
     }, { format: "zip" });
 
     assert.equal(result, true);
-    assert.equal(calls[0].suggestedName, "map_project.zip");
+    assert.match(calls[0].suggestedName, /^tno_1962_\d{8}-\d{4}\.zip$/);
     assert.equal(calls[0].excludeAcceptAllOption, true);
     assert.deepEqual(calls[0].types[0].accept, { "application/zip": [".zip"] });
   } finally {

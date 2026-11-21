@@ -1,4 +1,5 @@
 import { getMapDataBoundary } from '../map_data_boundary.js';
+import { getCountryNameOverride } from '../country_name_overrides.js';
 import { getFeatureId } from '../feature_identity.js';
 import { getObjectIdentityToken } from './object_identity.js';
 import { getParentMergedParents } from './parent_merged_presentation.js';
@@ -9,6 +10,10 @@ import { yieldToBackground } from "../background_yield.js";
 
 const EMPTY = Object.freeze([]);
 const text = value => String(value ?? '').trim();
+function freezeMap(map) {
+  const reject = () => { throw new TypeError('Country label membership is read-only'); };
+  return Object.freeze(Object.assign(map, { set: reject, delete: reject, clear: reject }));
+}
 function eligible(feature) {
   const props = feature?.properties || {}, id = getFeatureId(feature);
   return !props.water_type && !/water|ocean|marine|sea/.test(text(props.geometry_role).toLowerCase())
@@ -19,7 +24,7 @@ function eligible(feature) {
 
 export function createCountryLabelSourceOwner({ state, topojson = globalThis.topojson, geoArea = globalThis.d3?.geoArea,
   geoContains = globalThis.d3?.geoContains, geoBounds = globalThis.d3?.geoBounds,
-  ensureSources, getCountryName = code => state.countryNames?.[code] || code,
+  ensureSources, getCountryName = code => getCountryNameOverride(state, code) || state.countryNames?.[code] || code,
   isEligible = () => true, onChange = () => {},
   createWorker = () => new Worker(new URL('../../workers/country_label_geometry.worker.js', import.meta.url), { type: 'module' }),
   isWorkerSupported = () => typeof Worker === 'function',
@@ -27,6 +32,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   const reference = getMapDataBoundary(state).reference;
   let sourceToken = '', revision = 0, status = 'pending', error = '';
   let geometryRecords = EMPTY, countries = EMPTY, features = EMPTY, nameKey = '';
+  let memberIndex = null;
   let retained = null, request = null, buildRequest = null, failedIdentity = '', disposed = false;
   async function buildGroups(groups, c, signal, client) {
     const isCurrent = () => !disposed && !signal.aborted && context().identity === c.identity;
@@ -69,6 +75,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   function currentNameKey() {
     return JSON.stringify([state.currentLanguage, getObjectIdentityToken(state.scenarioCountriesByTag),
       getObjectIdentityToken(state.countryNames), getObjectIdentityToken(state.locales?.geo),
+      getObjectIdentityToken(state.countryNameOverrides),
       getObjectIdentityToken(state.geoAliasToStableKey)]);
   }
 
@@ -92,6 +99,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       buildRequest?.client.terminate(new DOMException('Country label scene replaced', 'AbortError'));
       sourceToken = c.identity; revision++; status = 'pending'; error = '';
       geometryRecords = countries = features = EMPTY; nameKey = '';
+      memberIndex = null;
       if (retained?.identity !== c.identity) retained = null;
     }
     if (c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank') { status = 'disabled'; return; }
@@ -122,6 +130,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       await yieldTask();
       if (disposed || context().identity !== c.identity) return;
       const groups = new Map(), seen = new Set();
+      const groupCodeById = new Map(), featureById = new Map(), memberCountByCode = new Map();
       const parents = getParentMergedParents(state.scenarioCountriesByTag);
       const add = (feature, geometry = null) => {
         const id = getFeatureId(feature);
@@ -135,6 +144,11 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
         if (!code) return;
         if (!groups.has(code)) groups.set(code, []);
         groups.get(code).push(geometry || feature);
+        if (id) {
+          groupCodeById.set(id, code);
+          featureById.set(id, feature);
+          memberCountByCode.set(code, (memberCountByCode.get(code) || 0) + 1);
+        }
       };
       if (c.chunked) input.forEach(payload => payload.features.forEach(feature => {
         if (polygons(feature?.geometry).length) add(feature);
@@ -149,6 +163,8 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       const records = await buildGroups(groups, c, signal, client);
       if (disposed || signal.aborted || context().identity !== c.identity) return;
       geometryRecords = records;
+      memberIndex = Object.freeze({ groupCodeById: freezeMap(groupCodeById),
+        featureById: freezeMap(featureById), memberCountByCode: freezeMap(memberCountByCode) });
       status = 'ready'; retained = null; publishNames(); onChange();
     } catch (failure) {
       if (disposed || context().identity !== c.identity) return;
@@ -191,7 +207,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   }
 
   return Object.freeze({
-    getSource() { sync(); return { status, sourceToken, revision, features, countries, error }; },
+    getSource() { sync(); return { status, sourceToken, revision, features, countries, memberIndex, error }; },
     // Acceptance observers may inspect completion without selecting a source,
     // loading chunks, or starting/replacing a geometry worker.
     peekSource() {
@@ -199,12 +215,13 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       const disabled = c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank';
       const current = sourceToken === c.identity && (status !== 'ready' || nameKey === currentNameKey());
       return { status: disposed ? 'disposed' : disabled ? 'disabled' : current ? status : 'pending',
-        sourceToken, revision, features, countries, error: current ? error : '' };
+        sourceToken, revision, features, countries, memberIndex: current ? memberIndex : null, error: current ? error : '' };
     },
     prepare,
     dispose() {
       disposed = true; buildRequest?.controller.abort(); buildRequest?.client.terminate();
       retained = request = buildRequest = null; geometryRecords = countries = features = EMPTY;
+      memberIndex = null;
     },
   });
 }

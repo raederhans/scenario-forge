@@ -5,6 +5,7 @@ export const STRATEGIC_OVERLAY_COLLECTION_KEYS = Object.freeze([
   "operationalLines",
   "operationGraphics",
   "unitCounters",
+  "mapLabels",
 ]);
 
 export const STRATEGIC_OVERLAY_ENTITY_FIELD_KEYS = Object.freeze({
@@ -15,6 +16,7 @@ export const STRATEGIC_OVERLAY_ENTITY_FIELD_KEYS = Object.freeze({
   operationGraphics: Object.freeze([
     "kind", "label", "points", "stylePreset", "stroke", "width", "opacity",
   ]),
+  mapLabels: Object.freeze(["text", "countryCode", "fallbackName", "lon", "lat", "size", "rotation", "tracking", "uppercase", "colorMode"]),
   unitCounters: Object.freeze([
     "renderer", "label", "sidc", "symbolCode", "nationTag", "nationSource", "presetId",
     "iconId", "unitType", "echelon", "subLabel", "strengthText", "baseFillColor",
@@ -32,6 +34,7 @@ export const STRATEGIC_OVERLAY_EDITOR_FIELD_KEYS = Object.freeze({
     "active", "mode", "collection", "points", "kind", "label", "stylePreset", "stroke",
     "width", "opacity", "selectedId", "selectedVertexIndex", "counter",
   ]),
+  mapLabelEditor: Object.freeze(["active", "selectedId", "draggingId", "counter"]),
   unitCounterEditor: Object.freeze([
     "active", "renderer", "label", "sidc", "symbolCode", "nationTag", "nationSource",
     "presetId", "iconId", "unitType", "echelon", "subLabel", "strengthText", "layoutAnchor",
@@ -49,6 +52,7 @@ const COLLECTION_DIRTY_KEY = Object.freeze({
   operationalLines: "operationalLinesDirty",
   operationGraphics: "operationGraphicsDirty",
   unitCounters: "unitCountersDirty",
+  mapLabels: "mapLabelsDirty",
 });
 
 function assertStateTarget(target) {
@@ -157,6 +161,12 @@ export function commitStrategicOverlayCollectionsState(
   if (Object.hasOwn(prepared.assignments, "operationGraphicsDirty")) {
     target.operationGraphicsDirty = prepared.assignments.operationGraphicsDirty;
   }
+  if (Object.hasOwn(prepared.assignments, "mapLabels")) {
+    target.mapLabels = prepared.assignments.mapLabels;
+  }
+  if (Object.hasOwn(prepared.assignments, "mapLabelsDirty")) {
+    target.mapLabelsDirty = prepared.assignments.mapLabelsDirty;
+  }
   if (Object.hasOwn(prepared.assignments, "unitCounters")) {
     target.unitCounters = prepared.assignments.unitCounters;
   }
@@ -197,11 +207,7 @@ export function patchStrategicOverlayEntityGroupState(
     throw new Error(`[strategic_overlay_actions] unknown entity collection key: ${collectionKey}`);
   }
   const normalizedCollectionKey = detachActionInputs({ collectionKey }).collectionKey;
-  const sourceCollection = normalizedCollectionKey === "operationalLines"
-    ? target.operationalLines
-    : normalizedCollectionKey === "operationGraphics"
-      ? target.operationGraphics
-      : target.unitCounters;
+  const sourceCollection = target[normalizedCollectionKey];
   if (!Array.isArray(sourceCollection)) {
     throw new TypeError(`[strategic_overlay_actions] ${normalizedCollectionKey} must be an array`);
   }
@@ -269,6 +275,9 @@ export function patchStrategicOverlayEntityGroupState(
     } else if (inputs.collectionKey === "operationGraphics") {
       target.operationGraphics = nextCollection;
       if (inputs.markDirty !== false) target.operationGraphicsDirty = true;
+    } else if (inputs.collectionKey === "mapLabels") {
+      target.mapLabels = nextCollection;
+      if (inputs.markDirty !== false) target.mapLabelsDirty = true;
     } else {
       target.unitCounters = nextCollection;
       if (inputs.markDirty !== false) target.unitCountersDirty = true;
@@ -370,6 +379,8 @@ export function patchStrategicOverlayEditorState(
     target.operationalLineEditor = current;
   } else if (inputs.editorKey === "operationGraphicsEditor") {
     target.operationGraphicsEditor = current;
+  } else if (inputs.editorKey === "mapLabelEditor") {
+    target.mapLabelEditor = current;
   } else if (inputs.editorKey === "unitCounterEditor") {
     target.unitCounterEditor = current;
   } else {
@@ -383,6 +394,7 @@ export function setStrategicOverlayDirtyState(target, dirtyKey, value = true) {
   if (
     dirtyKey !== "operationalLinesDirty"
     && dirtyKey !== "operationGraphicsDirty"
+    && dirtyKey !== "mapLabelsDirty"
     && dirtyKey !== "unitCountersDirty"
   ) {
     throw new Error(`[strategic_overlay_actions] unknown dirty key: ${dirtyKey}`);
@@ -393,6 +405,8 @@ export function setStrategicOverlayDirtyState(target, dirtyKey, value = true) {
     target.operationalLinesDirty = nextValue;
   } else if (inputs.dirtyKey === "operationGraphicsDirty") {
     target.operationGraphicsDirty = nextValue;
+  } else if (inputs.dirtyKey === "mapLabelsDirty") {
+    target.mapLabelsDirty = nextValue;
   } else {
     target.unitCountersDirty = nextValue;
   }
@@ -408,6 +422,9 @@ export function restoreProjectImportFields(target, patch) {
   if (Object.hasOwn(patch, "operationalLines")) target.operationalLines = patch.operationalLines;
   if (Object.hasOwn(patch, "operationalLinesDirty")) target.operationalLinesDirty = patch.operationalLinesDirty;
   if (Object.hasOwn(patch, "strategicOverlayUi")) target.strategicOverlayUi = patch.strategicOverlayUi;
+  if (Object.hasOwn(patch, "mapLabels")) target.mapLabels = patch.mapLabels;
+  if (Object.hasOwn(patch, "mapLabelEditor")) target.mapLabelEditor = patch.mapLabelEditor;
+  if (Object.hasOwn(patch, "mapLabelsDirty")) target.mapLabelsDirty = patch.mapLabelsDirty;
   if (Object.hasOwn(patch, "unitCounterEditor")) target.unitCounterEditor = patch.unitCounterEditor;
   if (Object.hasOwn(patch, "unitCounters")) target.unitCounters = patch.unitCounters;
   if (Object.hasOwn(patch, "unitCountersDirty")) target.unitCountersDirty = patch.unitCountersDirty;

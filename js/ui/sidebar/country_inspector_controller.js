@@ -1,10 +1,16 @@
 import { ensureHgoIdentitySettings } from "./hgo_identity_state.js";
-import { callRuntimeHook } from "../../core/state/index.js";
+import { getCountryNameOverride, setCountryNameOverride } from "../../core/country_name_overrides.js";
+import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
+import { commitChange } from "../../core/state/changes.js";
+import { callRuntimeHook, on, STATE_BUS_EVENTS } from "../../core/state/index.js";
+import { getCountryMemberIds, getCountryOverrideIds, resetCountryOverrides } from "../../core/country_override_reset_command.js";
+import { showAppDialog } from "../components/app_dialog.js";
 import { resolveDataUrl, isExternalDataUrl } from "../../core/data_base_url.js";
 import { clearInspectorSelectionState, selectInspectorCountryState } from "../../core/state/actions/editor_input_actions.js";
 import { setUiIcon } from "../components/ui_icons.js";
 import { formatModernPlaceName } from "../../core/renderer/modern_place_name.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
+import { focusLandFeatures } from "./region_search_controller.js";
 import {
   ensureInspectorExpansionState,
   markInspectorExpansionInitializedState,
@@ -69,11 +75,13 @@ const HGO_VARIANT_LABEL_SUFFIXES = Object.freeze(
 
 export function createCountryInspectorController({
   runtimeState,
+  focusGeoBounds,
   list,
   searchInput,
   selectedCountryActionsSection,
   countryInspectorDetail,
   countryInspectorSelected,
+  getCountryLabelStatus,
   countryInspectorColorRow,
   countryInspectorColorSwatch,
   countryInspectorColorInput,
@@ -161,6 +169,8 @@ export function createCountryInspectorController({
   };
 
   const getCountryInspectorDisplayName = (countryState, identity = null) => {
+    const override = getCountryNameOverride(runtimeState, countryState?.code);
+    if (override) return override;
     const settings = ensureHgoIdentitySettings(runtimeState);
     if (settings.enabled && settings.nameMode === "hgo" && identity?.displayName) {
       return identity.displayName;
@@ -1184,6 +1194,47 @@ export function createCountryInspectorController({
     }
   };
 
+  const getLoadedCountryFeatures = (code) => {
+    const ids = getCountryMemberIds(runtimeState, code);
+    return ids.map((id) => runtimeState.landIndex?.get(id)).filter((feature) => feature?.geometry);
+  };
+
+  const resetButton = countryInspectorSelected?.querySelector("#resetCountryOverrides");
+  const nameInput = countryInspectorSelected?.querySelector("#countryNameOverride");
+  const statusText = countryInspectorSelected?.querySelector("#countryLabelStatus");
+  function updateLabelStatus() {
+    const code = runtimeState.selectedInspectorCountryCode;
+    if (code && statusText) {
+      const text = t(getCountryLabelStatus(code), "ui");
+      if (statusText.textContent !== text) statusText.textContent = text;
+    }
+  }
+  const resetCount = resetButton?.querySelector("[data-reset-count]");
+  const updateResetCount = () => {
+    if (!resetButton) return;
+    const count = getCountryOverrideIds(runtimeState, runtimeState.selectedInspectorCountryCode).length;
+    resetCount.textContent = `(${count})`;
+    resetButton.disabled = count === 0;
+  };
+
+  let locateButton;
+  const renderCountryLocateButton = (code) => {
+    if (!locateButton) {
+      locateButton = document.createElement("button");
+      locateButton.type = "button";
+      locateButton.className = "sidebar-action-secondary mt-2";
+      locateButton.dataset.i18n = "Locate on Map";
+      locateButton.addEventListener("click", () => {
+        const features = getLoadedCountryFeatures(runtimeState.selectedInspectorCountryCode);
+        locateButton.disabled = !features.length;
+        if (features.length) focusLandFeatures(features, focusGeoBounds);
+      });
+      countryInspectorSelected.appendChild(locateButton);
+    }
+    locateButton.textContent = t("Locate on Map", "ui");
+    locateButton.disabled = !getLoadedCountryFeatures(code).length;
+  };
+
   const renderCountryInspectorDetail = () => {
     if (!countryInspectorSelected) return;
     incrementSidebarCounter?.("inspectorRenders");
@@ -1220,8 +1271,18 @@ export function createCountryInspectorController({
     }
 
     renderHgoIdentityDetail(countryState);
+    if (nameInput && (nameInput !== document.activeElement || nameInput.dataset.code !== selectedCode ||
+      nameInput.dataset.language !== runtimeState.currentLanguage)) {
+      nameInput.dataset.code = selectedCode;
+      nameInput.dataset.language = runtimeState.currentLanguage;
+      nameInput.defaultValue = getCountryInspectorDisplayName(countryState, getCountryHgoIdentity(countryState));
+      nameInput.value = nameInput.defaultValue;
+    }
+    updateLabelStatus();
     renderInspectorBreadcrumb(countryState);
     renderInspectorModernPlaceNames(countryState);
+    renderCountryLocateButton(selectedCode);
+    updateResetCount();
 
     if (countryInspectorColorRow) {
       countryInspectorColorRow.classList.add("hidden");
@@ -1326,6 +1387,45 @@ export function createCountryInspectorController({
   };
 
   const bindEvents = () => {
+    if (nameInput && !nameInput.dataset.bound) {
+      nameInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.isComposing) {
+          event.preventDefault();
+          nameInput.blur();
+        }
+      });
+      nameInput.addEventListener("blur", () => {
+        const { code, language } = nameInput.dataset;
+        if (nameInput.value === nameInput.defaultValue) return;
+        const before = captureHistoryState({ countryNameOverrides: true });
+        if (!setCountryNameOverride(runtimeState, code, language, nameInput.value)) {
+          nameInput.value = nameInput.defaultValue;
+          return;
+        }
+        pushHistoryEntry({ kind: "country-name", before, after: captureHistoryState({ countryNameOverrides: true }) });
+        markDirty("country-name");
+        flushSidebarRender("country-name");
+        commitChange({ domains: ["countryList"], reason: "country-name" });
+      });
+      on("labels:drawn", updateLabelStatus);
+      nameInput.dataset.bound = "true";
+    }
+    if (resetButton && !resetButton.dataset.bound) {
+      on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateResetCount);
+      resetButton.addEventListener("click", async () => {
+        const ids = getCountryOverrideIds(runtimeState, runtimeState.selectedInspectorCountryCode);
+        if (!ids.length) return;
+        const title = t("Restore original country color", "ui");
+        const confirmed = await showAppDialog({
+          title,
+          message: t("Manual colors will be cleared from {count} regions", "ui", { count: ids.length }),
+          confirmLabel: title,
+          tone: "warning",
+        });
+        if (confirmed) resetCountryOverrides(ids);
+      });
+      resetButton.dataset.bound = "true";
+    }
     if (searchInput && !searchInput.dataset.bound) {
       searchInput.addEventListener("input", () => {
         renderList();
@@ -1349,7 +1449,7 @@ export function createCountryInspectorController({
     }
 
     if (countryInspectorColorInput && !countryInspectorColorInput.dataset.bound) {
-      countryInspectorColorInput.addEventListener("change", (event) => {
+      countryInspectorColorInput.addEventListener("change", async (event) => {
         const latestCountryStatesByCode = getLatestCountryStatesByCode();
         const selectedCode = ensureSelectedInspectorCountry();
         if (!selectedCode) return;
@@ -1362,7 +1462,7 @@ export function createCountryInspectorController({
           renderCountryInspectorDetail();
           return;
         }
-        applyCountryColor(selectedCode, nextColor);
+        await applyCountryColor(selectedCode, nextColor);
         closeCountryInspectorColorPicker();
         markDirty("inspector-country-color");
         refreshCountryRows({

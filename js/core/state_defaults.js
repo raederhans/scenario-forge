@@ -887,6 +887,7 @@ function createDefaultAnnotationView() {
     unitRendererDefault: "game",
     unitCounterFixedScaleMultiplier: 1.5,
     showUnitLabels: true,
+    showMapLabels: true,
   };
 }
 
@@ -904,6 +905,7 @@ function normalizeAnnotationView(rawConfig) {
       0.5,
       2.0,
     ),
+    showMapLabels: raw.showMapLabels === undefined ? defaults.showMapLabels : !!raw.showMapLabels,
     showUnitLabels: raw.showUnitLabels === undefined ? defaults.showUnitLabels : !!raw.showUnitLabels,
   };
 }
@@ -1327,6 +1329,7 @@ const EXPORT_WORKBENCH_TEXT_LAYER_IDS = Object.freeze([
   "render-labels",
   "special-zones",
   "svg-annotations",
+  "legend",
 ]);
 const EXPORT_WORKBENCH_BAKE_LAYER_IDS = new Set(["color", "line", "text", "composite"]);
 const EXPORT_WORKBENCH_LEGACY_LAYER_ID_ALIASES = Object.freeze({
@@ -1422,10 +1425,12 @@ function normalizeExportWorkbenchTextVisibility(rawVisibility, includeTextLayer 
     ])
   );
   return Object.fromEntries(
-    EXPORT_WORKBENCH_TEXT_LAYER_IDS.map((layerId) => [
-      layerId,
-      normalizedSource[layerId] === undefined ? !!includeTextLayer : !!normalizedSource[layerId],
-    ])
+    EXPORT_WORKBENCH_TEXT_LAYER_IDS
+      .filter((layerId) => layerId !== "legend" || normalizedSource.legend !== undefined)
+      .map((layerId) => [
+        layerId,
+        normalizedSource[layerId] === undefined ? !!includeTextLayer : !!normalizedSource[layerId],
+      ])
   );
 }
 

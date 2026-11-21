@@ -1,9 +1,10 @@
-import { registerRuntimeHook } from "../../core/state/index.js";
+import { bindProjectFileDrop } from "../project_file_drop.js";
+import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { createUiIcon } from "../components/ui_icons.js";
 import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
-import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
+import { filterLegendEditorEntries } from "../../core/legend_state_normalizers.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   createSpecialZonePatternPreviewStyle,
@@ -248,6 +249,7 @@ export function createProjectSupportDiagnosticsController({
   let projectExportBusy = false;
   const uploadProjectBtn = documentRef.getElementById("uploadProjectBtn");
   const projectDownloadFormat = documentRef.getElementById("projectDownloadFormat");
+  const projectName = documentRef.getElementById("projectName");
   const projectDownloadDestination = documentRef.getElementById("projectDownloadDestination");
   const projectPackageContents = documentRef.getElementById("projectPackageContents");
   const projectFileInput = documentRef.getElementById("projectFileInput");
@@ -440,6 +442,7 @@ export function createProjectSupportDiagnosticsController({
     return message;
   };
   const refreshProjectSaveStatus = (message = "") => {
+    if (projectName && projectName.value !== (state.projectName || "")) projectName.value = state.projectName || "";
     // 保存状态只读 dirty contract 与最近一次项目事务，避免各按钮各自拼接状态文案。
     const lastChange = String(state.lastDirtyReason || "").trim();
     if (workspaceSaveStatus) {
@@ -1055,19 +1058,22 @@ export function createProjectSupportDiagnosticsController({
 
 
   const LEGEND_EDITOR_PAGE_SIZE = 10;
-  const LEGEND_EDITOR_MAX_ITEMS = 30;
+  const legendSearch = legendList && documentRef.createElement("input");
+  const legendRows = legendList && documentRef.createElement("div");
+  let editorEntries = [];
+  if (legendSearch) {
+    legendSearch.type = "search";
+    legendSearch.className = "legend-input legend-search";
+    legendRows.style.display = "contents";
+    legendSearch.addEventListener("input", () => {
+      legendEditorPageIndex = 0;
+      renderLegendRows();
+    });
+  }
   let legendEditorPageIndex = 0;
   let lastLegendKey = null;
 
-  const clearLegendList = () => {
-    if (typeof legendList.replaceChildren === "function") {
-      legendList.replaceChildren();
-      return;
-    }
-    legendList.innerHTML = "";
-  };
-
-  const createLegendLabelRow = (color, index, colors) => {
+  const createLegendLabelRow = ({ color, countryName, index }) => {
     const row = document.createElement("div");
     row.className = "legend-row";
 
@@ -1078,17 +1084,28 @@ export function createProjectSupportDiagnosticsController({
     const input = document.createElement("input");
     input.type = "text";
     input.className = "legend-input";
-    input.placeholder = t("Category {index}", "ui").replace("{index}", String(index + 1));
+    input.placeholder = countryName || t("Category {index}", "ui").replace("{index}", String(index + 1));
     input.setAttribute("aria-label", `${t("Legend", "ui")} ${index + 1}: ${color}`);
     input.value = legendManager.getLabel(color, state);
-    input.addEventListener("input", (event) => {
-      legendManager.setLabel(color, event.target.value, state);
+    const saveLabel = () => {
+      legendManager.setLabel(color, input.value, state);
       markDirty("legend-label");
-      mapRenderer.renderLegend(colors, legendManager.getLabels(state));
-    });
+      mapRenderer.renderLegend(legendManager.getUniqueColors(state), legendManager.getLabels(state));
+    };
+    input.addEventListener("input", saveLabel);
 
     row.appendChild(swatch);
     row.appendChild(input);
+    if (countryName) {
+      const fill = documentRef.createElement("button");
+      fill.type = "button";
+      fill.textContent = t("Fill country name", "ui");
+      fill.addEventListener("click", () => {
+        input.value = countryName;
+        saveLabel();
+      });
+      row.appendChild(fill);
+    }
     return row;
   };
 
@@ -1104,8 +1121,7 @@ export function createProjectSupportDiagnosticsController({
     previousButton.disabled = pageIndex <= 0;
     previousButton.addEventListener("click", () => {
       legendEditorPageIndex = Math.max(0, legendEditorPageIndex - 1);
-      lastLegendKey = null;
-      refreshLegendEditor();
+      renderLegendRows();
     });
 
     const pageStatus = document.createElement("span");
@@ -1120,68 +1136,78 @@ export function createProjectSupportDiagnosticsController({
     nextButton.disabled = pageIndex >= pageCount - 1;
     nextButton.addEventListener("click", () => {
       legendEditorPageIndex = Math.min(pageCount - 1, legendEditorPageIndex + 1);
-      lastLegendKey = null;
-      refreshLegendEditor();
+      renderLegendRows();
     });
 
     pager.append(previousButton, pageStatus, nextButton);
     return pager;
   };
 
-  const readLegendColors = createRevisionedLegendColorReader((appState) => legendManager.getUniqueColors(appState));
-  const refreshLegendEditor = () => {
-    if (!legendList) return;
-    incrementSidebarCounter("legendRenders");
-    const colors = readLegendColors(state);
-    const specialZoneLegendLayers = getVisibleSpecialZoneLegendLayers();
-    const specialZoneLegendKey = legendManager.getSpecialZoneSignature(state);
-    const colorItems = colors.map((color, index) => ({ type: "color", color, index }));
-    const specialZoneItems = specialZoneLegendLayers.map((layer) => ({ type: "special-zone", layer }));
-    const cappedItems = [...colorItems, ...specialZoneItems].slice(0, LEGEND_EDITOR_MAX_ITEMS);
-    const pageCount = Math.max(1, Math.ceil(cappedItems.length / LEGEND_EDITOR_PAGE_SIZE));
+  const renderLegendRows = () => {
+    const query = legendSearch.value.trim().toLowerCase();
+    const colors = filterLegendEditorEntries(editorEntries, legendManager.getLabels(state), query);
+    const colorItems = colors.map((entry, index) => ({ ...entry, type: "color", index }));
+    const specialZoneItems = getVisibleSpecialZoneLegendLayers()
+      .filter(layer => layer.name.toLowerCase().includes(query))
+      .map(layer => ({ type: "special-zone", layer }));
+    const items = [...colorItems, ...specialZoneItems];
+    const pageCount = Math.max(1, Math.ceil(items.length / LEGEND_EDITOR_PAGE_SIZE));
     legendEditorPageIndex = Math.min(Math.max(legendEditorPageIndex, 0), pageCount - 1);
     const pageStart = legendEditorPageIndex * LEGEND_EDITOR_PAGE_SIZE;
-    const pageItems = cappedItems.slice(pageStart, pageStart + LEGEND_EDITOR_PAGE_SIZE);
+    const pageItems = items.slice(pageStart, pageStart + LEGEND_EDITOR_PAGE_SIZE);
     const visibleLegendRows = Math.min(Math.max(pageItems.length, 1), LEGEND_EDITOR_PAGE_SIZE);
     const pagerReserve = pageCount > 1 ? 38 : 0;
     legendList.dataset.pageCount = String(pageCount);
     legendList.dataset.paged = pageCount > 1 ? "true" : "false";
     legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 168 + (visibleLegendRows * 52) + pagerReserve)}px`);
-    const key = [
-      colors.join("|"),
-      specialZoneLegendKey,
-      JSON.stringify(legendManager.getConfig(state)),
-      legendEditorPageIndex,
-    ].join("::");
-    if (key === lastLegendKey && legendList.dataset.ready === "true") return;
-    lastLegendKey = key;
-    legendList.dataset.ready = "true";
-    clearLegendList();
-    legendList.appendChild(createLegendGeneratorControls());
+    legendRows.replaceChildren();
 
-    if (!colors.length && !specialZoneLegendKey) {
+    if (!items.length && !query) {
       const empty = document.createElement("div");
       empty.className = "legend-empty-state";
       empty.textContent = t("先生成或填充地图颜色，再在这里修改图例名称。", "ui");
-      legendList.appendChild(empty);
+      legendRows.appendChild(empty);
       return;
     }
 
     pageItems.filter((item) => item.type === "color").forEach((item) => {
-      legendList.appendChild(createLegendLabelRow(item.color, item.index, colors));
+      legendRows.appendChild(createLegendLabelRow(item));
     });
     const visibleSpecialZoneLayers = pageItems
       .filter((item) => item.type === "special-zone")
       .map((item) => item.layer);
-    appendSpecialZoneLegendRows(visibleSpecialZoneLayers);
+    appendSpecialZoneLegendRows(visibleSpecialZoneLayers, legendRows);
     if (pageCount > 1) {
-      legendList.appendChild(createLegendPagerControls(legendEditorPageIndex, pageCount));
+      legendRows.appendChild(createLegendPagerControls(legendEditorPageIndex, pageCount));
     }
   };
 
+  const refreshLegendEditor = () => {
+    if (!legendList) return;
+    incrementSidebarCounter("legendRenders");
+    editorEntries = legendManager.getEditorEntries(state);
+    const key = JSON.stringify([
+      editorEntries, legendManager.getLabels(state), legendManager.getConfig(state),
+      legendManager.getSpecialZoneSignature(state), state.currentLanguage,
+    ]);
+    if (key === lastLegendKey && legendList.dataset.ready === "true") return;
+    lastLegendKey = key;
+    legendList.dataset.ready = "true";
+    legendSearch.placeholder = t("Search legend or country name", "ui");
+    legendSearch.setAttribute("aria-label", legendSearch.placeholder);
+    legendList.replaceChildren(createLegendGeneratorControls(), legendSearch, legendRows);
+    renderLegendRows();
+  };
 
   const bindEvents = () => {
     refreshProjectSaveStatus();
+    if (projectName && !projectName.dataset.bound) {
+      projectName.addEventListener("input", () => {
+        state.projectName = projectName.value;
+        markDirty("project-name");
+      });
+      projectName.dataset.bound = "true";
+    }
     syncProjectPackageContentAvailability();
     if (projectDownloadFormat?.dataset && !projectDownloadFormat.dataset.packageContentsBound) {
       projectDownloadFormat.addEventListener?.("change", syncProjectPackageContentAvailability);
@@ -1218,91 +1244,95 @@ export function createProjectSupportDiagnosticsController({
       button.dataset.bound = "true";
     });
 
+    const importProjectFile = async (file) => {
+      if (file && !(await confirmReplaceCurrentProject())) return;
+      projectImportController?.abort();
+      const importController = new AbortController();
+      projectImportController = importController;
+      if (!file) {
+        projectImportController = null;
+        if (projectFileName) {
+          if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
+          projectFileName.textContent = t("No file selected", "ui");
+        }
+        refreshProjectSaveStatus(t("No file selected", "ui"));
+        return;
+      }
+      if (projectFileName) {
+        if (projectFileName.dataset) projectFileName.dataset.projectFileState = "selected";
+        projectFileName.textContent = file.name;
+      }
+      refreshProjectSaveStatus(t("Project import started. Appearance and transport settings will be restored from the file.", "ui"));
+      lastProjectImportSummary = null;
+      try {
+        const { file: importFile, preview, projectPayload } = await prepareProjectImportFile(file, {
+          materializeFile: false,
+          signal: importController.signal,
+        });
+        if (importController.signal.aborted) return;
+        const confirmed = await confirmProjectPackagePreview(preview);
+        if (importController.signal.aborted) return;
+        if (!confirmed) {
+          refreshProjectSaveStatus(t("Project import cancelled.", "ui"));
+          return;
+        }
+        const outcome = await importProjectThroughFunnel(importFile, {
+          projectPayload,
+          fileName: file.name,
+          signal: importController.signal,
+          ui: {
+            t,
+            showAppDialog,
+            showToast,
+          },
+          hooks: {
+            refreshColorState: mapRenderer.refreshColorState,
+            onProjectImportComplete: completeProjectImportStatus,
+            onProjectImportError: failProjectImportStatus,
+            onProjectImportRecoveryState: recovery => {
+              if (projectImportController && projectImportController !== importController) return;
+              if (recovery.phase === "complete") refreshProjectSaveStatus();
+              else if (recovery.warnings.length) refreshProjectSaveStatus(
+                `${t("Project imported", "ui")}: ${recovery.warnings.map(item => item.resource).join(", ")}`
+              );
+            },
+          },
+        });
+        if (importController.signal.aborted) return;
+        if (outcome?.status === "committed-with-warnings") {
+          refreshProjectSaveStatus(`${t("Project imported", "ui")}: ${outcome.warnings.map(item => item.resource).join(", ")}`);
+        } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
+          refreshProjectSaveStatus(t("Project import is already in progress.", "ui"));
+        }
+      } catch (error) {
+        if (importController.signal.aborted) return;
+        const message = String(error?.message || error || "");
+        refreshProjectSaveStatus(message);
+        if (typeof showToast === "function") {
+          showToast(message, {
+            title: t("Project import failed", "ui"),
+            tone: "error",
+          });
+        }
+      } finally {
+        if (projectImportController === importController) {
+          projectImportController = null;
+        }
+      }
+    };
+    registerRuntimeHook(state, "runProjectImportFileFn", importProjectFile);
+    bindProjectFileDrop(documentRef.getElementById("mapContainer"), state, t);
+
     if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
-      uploadProjectBtn.addEventListener("click", async () => {
-        if (!(await confirmReplaceCurrentProject())) return;
-        projectFileInput.click();
-      });
+      uploadProjectBtn.addEventListener("click", () => projectFileInput.click());
       uploadProjectBtn.dataset.bound = "true";
     }
 
     if (projectFileInput && !projectFileInput.dataset.bound) {
-      projectFileInput.addEventListener("change", async () => {
-        projectImportController?.abort();
-        const importController = new AbortController();
-        projectImportController = importController;
+      projectFileInput.addEventListener("change", () => {
         const file = projectFileInput.files?.[0];
-        if (!file) {
-          projectImportController = null;
-          if (projectFileName) {
-            if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
-            projectFileName.textContent = t("No file selected", "ui");
-          }
-          refreshProjectSaveStatus(t("No file selected", "ui"));
-          return;
-        }
-        if (projectFileName) {
-          if (projectFileName.dataset) projectFileName.dataset.projectFileState = "selected";
-          projectFileName.textContent = file.name;
-        }
-        refreshProjectSaveStatus(t("Project import started. Appearance and transport settings will be restored from the file.", "ui"));
-        lastProjectImportSummary = null;
-        try {
-          const { file: importFile, preview, projectPayload } = await prepareProjectImportFile(file, {
-            materializeFile: false,
-            signal: importController.signal,
-          });
-          if (importController.signal.aborted) return;
-          const confirmed = await confirmProjectPackagePreview(preview);
-          if (importController.signal.aborted) return;
-          if (!confirmed) {
-            refreshProjectSaveStatus(t("Project import cancelled.", "ui"));
-            return;
-          }
-          const outcome = await importProjectThroughFunnel(importFile, {
-            projectPayload,
-            fileName: file.name,
-            signal: importController.signal,
-            ui: {
-              t,
-              showAppDialog,
-              showToast,
-            },
-            hooks: {
-              refreshColorState: mapRenderer.refreshColorState,
-              onProjectImportComplete: completeProjectImportStatus,
-                onProjectImportError: failProjectImportStatus,
-                onProjectImportRecoveryState: recovery => {
-                  if (projectImportController && projectImportController !== importController) return;
-                  if (recovery.phase === "complete") refreshProjectSaveStatus();
-                  else if (recovery.warnings.length) refreshProjectSaveStatus(
-                    `${t("Project imported", "ui")}: ${recovery.warnings.map(item => item.resource).join(", ")}`
-                  );
-                },
-            },
-          });
-          if (importController.signal.aborted) return;
-          if (outcome?.status === "committed-with-warnings") {
-            refreshProjectSaveStatus(`${t("Project imported", "ui")}: ${outcome.warnings.map(item => item.resource).join(", ")}`);
-          } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
-            refreshProjectSaveStatus(t("Project import is already in progress.", "ui"));
-          }
-        } catch (error) {
-          if (importController.signal.aborted) return;
-          const message = String(error?.message || error || "");
-          refreshProjectSaveStatus(message);
-          if (typeof showToast === "function") {
-            showToast(message, {
-              title: t("Project import failed", "ui"),
-              tone: "error",
-            });
-          }
-        } finally {
-          if (projectImportController === importController) {
-            projectFileInput.value = "";
-            projectImportController = null;
-          }
-        }
+        projectFileInput.value = "";
+        return callRuntimeHook(state, "runProjectImportFileFn", file);
       });
       projectFileInput.dataset.bound = "true";
     }

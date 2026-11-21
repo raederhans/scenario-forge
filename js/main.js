@@ -71,6 +71,17 @@ const deferredMilsymbolLoader = createDeferredMilsymbolLoader();
 const deferredUiBootstrapper = createDeferredUiBootstrapper();
 const bootstrapDeferredUi = deferredUiBootstrapper.bootstrapDeferredUi;
 
+async function startProjectAutosave() {
+  const { startAutosave } = await import("./core/autosave_manager.js");
+  const autosave = startAutosave();
+  postReadyScheduler.scheduleTask("autosave-recovery", () => autosave.recover(), {
+    canStart: () => state.bootPhase === "ready"
+      && (!startupSampleProjectId || ["success", "error"].includes(state.sampleProjectDeeplink?.status)),
+    allowChunkBacklog: true,
+    idleQuietMs: 0,
+  });
+}
+
 const bootOverlayController = createStartupBootOverlayController();
 const {
   checkpointBootMetric,
@@ -480,6 +491,7 @@ async function bootstrap() {
         runPostScenarioUiReplay,
         handleUiBootstrapReady: async () => {
           deferredUiBootstrapper.setInteractionState("ready");
+          void startProjectAutosave();
           void tryScheduleStartupSampleProjectDeeplink();
         },
         handleUiBootstrapFailure: async (uiBootstrapError) => {
@@ -522,6 +534,7 @@ async function bootstrap() {
       renderDispatcher = uiShellBootResult.renderDispatcher;
       getStartupReadyHandoffOwner().markUiHydrationReady();
       deferredUiBootstrapper.setInteractionState("ready");
+      void startProjectAutosave();
       return;
     }
     // Phase: 加载基础拓扑 | Input: 启动配置与 bootstrap 资源 promise | Output: startupBaseData + 已注入基础 state 字段。

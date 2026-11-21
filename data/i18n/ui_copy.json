@@ -483,6 +483,13 @@
     "en": "Already using this boundary variant.",
     "zh": "已经在使用这个边界变体。"
   },
+  "Also update {count} regions painted in {country}'s old color?": {
+    "en": {
+      "one": "Also update {count} region painted in {country}'s old color?",
+      "other": "Also update {count} regions painted in {country}'s old color?"
+    },
+    "zh": "同时更新涂成 {country} 旧颜色的 {count} 个地块？"
+  },
   "Aluminium": {
     "en": "Aluminium",
     "zh": "铝"
@@ -1251,6 +1258,14 @@
     "en": "Category {index}",
     "zh": "类别 {index}"
   },
+  "Search legend or country name": {
+    "en": "Search legend or country name",
+    "zh": "搜索图例名称或国家名"
+  },
+  "Fill country name": {
+    "en": "Fill country name",
+    "zh": "填入国名"
+  },
   "Centrist monarchism": {
     "en": "Centrist monarchism",
     "zh": "中间派君主制"
@@ -1258,6 +1273,10 @@
   "Centrist republic": {
     "en": "Centrist republic",
     "zh": "中间派共和制"
+  },
+  "Change {country} color": {
+    "en": "Change color of {country}",
+    "zh": "修改 {country} 颜色"
   },
   "Changes to this order stay in the workbench.": {
     "en": "Changes to this order stay in the workbench.",
@@ -1743,6 +1762,10 @@
     "en": "Close scenario introduction",
     "zh": "关闭剧本简介"
   },
+  "Close to {country}'s color. Painting will create a border.": {
+    "en": "Close to {country}'s color. Painting will create a border.",
+    "zh": "接近{country}颜色，涂上会形成国界"
+  },
   "Close transport workbench": {
     "en": "Close transport workbench",
     "zh": "关闭交通工作台"
@@ -1850,6 +1873,10 @@
   "Color bake": {
     "en": "Color bake",
     "zh": "颜色烘焙"
+  },
+  "Color picked": {
+    "en": "Color picked",
+    "zh": "已取色"
   },
   "Color scale": {
     "en": "Color scale",
@@ -2290,6 +2317,42 @@
   "Country indicators · Scenario reference": {
     "en": "Country indicators · Scenario reference",
     "zh": "国家统计专题 · 剧本参考"
+  },
+  "Country display name": {
+    "en": "Country display name",
+    "zh": "国家显示名称"
+  },
+  "Automatic country name": {
+    "en": "Automatic country name",
+    "zh": "自动国名"
+  },
+  "Displayed": {
+    "en": "Displayed",
+    "zh": "已显示"
+  },
+  "Country names are off": {
+    "en": "Country names are off",
+    "zh": "国名已关闭"
+  },
+  "Annexed (all regions painted in other countries’ colors)": {
+    "en": "Annexed (all regions painted in other countries’ colors)",
+    "zh": "已被吞并（全部地块涂成他国颜色）"
+  },
+  "Replaced by manual map text": {
+    "en": "Replaced by manual map text",
+    "zh": "有手动地图文字代替"
+  },
+  "Does not fit or is obscured in this view": {
+    "en": "Does not fit or is obscured in this view",
+    "zh": "当前视图放不下或被遮挡"
+  },
+  "Country name opacity": {
+    "en": "Country name opacity",
+    "zh": "国名不透明度"
+  },
+  "Country name size": {
+    "en": "Country name size",
+    "zh": "国名字号倍率"
   },
   "Country names": {
     "en": "Country names",
@@ -2871,6 +2934,34 @@
     "en": "Double-Click Quick Fill",
     "zh": "双击快速填色"
   },
+  "Double-click fill: whole country (no parent) · {count} regions": {
+    "en": {
+      "one": "Double-click fill: whole country (no parent) · {count} region",
+      "other": "Double-click fill: whole country (no parent) · {count} regions"
+    },
+    "zh": "双击填充：整国（无上级区域）· {count} 个地块"
+  },
+  "Double-click fill: whole country · {count} regions": {
+    "en": {
+      "one": "Double-click fill: whole country · {count} region",
+      "other": "Double-click fill: whole country · {count} regions"
+    },
+    "zh": "双击填充：整个国家 · {count} 个地块"
+  },
+  "Double-click fill: {count} regions ({group})": {
+    "en": {
+      "one": "Double-click fill: {count} region ({group})",
+      "other": "Double-click fill: {count} regions ({group})"
+    },
+    "zh": "双击填充：{count} 个地块（{group}）"
+  },
+  "Double-click fill: {count} regions (parent region)": {
+    "en": {
+      "one": "Double-click fill: {count} region (parent region)",
+      "other": "Double-click fill: {count} regions (parent region)"
+    },
+    "zh": "双击填充：{count} 个地块（上级区域）"
+  },
   "Double-click quick fill scope": {
     "en": "Double-click quick fill scope",
     "zh": "双击快速填充范围"
@@ -2958,6 +3049,10 @@
   "Drawing vertices.": {
     "en": "Drawing vertices.",
     "zh": "正在绘制顶点。"
+  },
+  "Drop to open project": {
+    "en": "Drop to open project",
+    "zh": "松开以打开项目"
   },
   "Duplicate layer": {
     "en": "Duplicate layer",
@@ -3214,6 +3309,13 @@
   "Erase": {
     "en": "Erase",
     "zh": "擦除"
+  },
+  "Erase paint from {count} regions": {
+    "en": {
+      "one": "Erase paint from {count} region",
+      "other": "Erase paint from {count} regions"
+    },
+    "zh": "擦除 {count} 个地块的填色"
   },
   "Eraser": {
     "en": "Eraser",
@@ -3706,6 +3808,13 @@
   "Format": {
     "en": "Format",
     "zh": "格式"
+  },
+  "Found unsaved work from {count} minutes ago ({scenario}).": {
+    "en": {
+      "one": "Found unsaved work from {count} minute ago ({scenario}).",
+      "other": "Found unsaved work from {count} minutes ago ({scenario})."
+    },
+    "zh": "发现 {count} 分钟前未保存的工作（{scenario}）。"
   },
   "Frontline": {
     "en": "Frontline",
@@ -5343,6 +5452,13 @@
     "en": "Manual Zones",
     "zh": "手动区域"
   },
+  "Manual colors will be cleared from {count} regions": {
+    "en": {
+      "one": "Manual colors will be cleared from {count} region",
+      "other": "Manual colors will be cleared from {count} regions"
+    },
+    "zh": "将清除 {count} 个地块的手动颜色"
+  },
   "Manual-reviewed": {
     "en": "Manual-reviewed",
     "zh": "人工校审"
@@ -5394,6 +5510,50 @@
   "Map labels": {
     "en": "Map labels",
     "zh": "地图标签"
+  },
+  "Automatic": {
+    "en": "Automatic",
+    "zh": "自动"
+  },
+  "Bound country": {
+    "en": "Bound country",
+    "zh": "绑定国家"
+  },
+  "Dark": {
+    "en": "Dark",
+    "zh": "深色"
+  },
+  "Enter name": {
+    "en": "Enter name",
+    "zh": "输入名称"
+  },
+  "Font size": {
+    "en": "Font size",
+    "zh": "字号"
+  },
+  "Label text": {
+    "en": "Label text",
+    "zh": "文字内容"
+  },
+  "Letter spacing": {
+    "en": "Letter spacing",
+    "zh": "字距"
+  },
+  "Map lettering": {
+    "en": "Map lettering",
+    "zh": "地图文字"
+  },
+  "Place label": {
+    "en": "Place label",
+    "zh": "放置文字"
+  },
+  "Rotation": {
+    "en": "Rotation",
+    "zh": "旋转"
+  },
+  "map labels": {
+    "en": "map labels",
+    "zh": "文字"
   },
   "Map mode": {
     "en": "Map mode",
@@ -6151,6 +6311,10 @@
     "en": "Not in current view",
     "zh": "当前视野内没有要素"
   },
+  "Not now": {
+    "en": "Not now",
+    "zh": "暂不恢复"
+  },
   "Not saved yet": {
     "en": "Not saved yet",
     "zh": "尚未保存"
@@ -6630,6 +6794,13 @@
   "Paint water regions to create an override list.": {
     "en": "Paint water regions to create an override list.",
     "zh": "绘制水域以创建覆盖列表。"
+  },
+  "Paint {count} regions": {
+    "en": {
+      "one": "Paint {count} region",
+      "other": "Paint {count} regions"
+    },
+    "zh": "填色 {count} 个地块"
   },
   "Paints with this country's current color; can be undone.": {
     "en": "Paints with this country's current color; can be undone.",
@@ -7283,6 +7454,10 @@
     "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.",
     "zh": "已导入项目：{scenario}。已恢复 {colors} 条上色记录和 {owners} 条归属记录。"
   },
+  "Project name (optional)": {
+    "en": "Project name (optional)",
+    "zh": "项目名（可选）"
+  },
   "Project only": {
     "en": "Project only",
     "zh": "仅项目"
@@ -7514,6 +7689,10 @@
   "Redo": {
     "en": "Redo",
     "zh": "重做"
+  },
+  "Redo: {action}": {
+    "en": "Redo: {action}",
+    "zh": "重做：{action}"
   },
   "Reduce the visible hub set while keeping the logistics layer point-based.": {
     "en": "Reduce the visible hub set while keeping the logistics layer point-based.",
@@ -7762,6 +7941,14 @@
   "Resource type": {
     "en": "Resource type",
     "zh": "资源种类"
+  },
+  "Restore": {
+    "en": "Restore",
+    "zh": "恢复"
+  },
+  "Restore original country color": {
+    "en": "Restore original country color",
+    "zh": "恢复本国原色"
   },
   "Restored": {
     "en": "Restored",
@@ -10439,6 +10626,10 @@
     "en": "Undo applied",
     "zh": "已撤销"
   },
+  "Undo: {action}": {
+    "en": "Undo: {action}",
+    "zh": "撤销：{action}"
+  },
   "Union with layer": {
     "en": "Union with layer",
     "zh": "与图层并集"
@@ -10522,6 +10713,10 @@
   "Upsert District": {
     "en": "Upsert District",
     "zh": "新增或更新分区"
+  },
+  "Uppercase English country names": {
+    "en": "Uppercase English country names",
+    "zh": "英文国名全大写"
   },
   "Urban Areas": {
     "en": "Urban Areas",
@@ -10682,6 +10877,10 @@
   "Use when": {
     "en": "Use when",
     "zh": "使用场景"
+  },
+  "Use {country}'s color": {
+    "en": "Use {country}'s color",
+    "zh": "改用{country}颜色"
   },
   "User guide": {
     "en": "User guide",
@@ -10962,6 +11161,10 @@
   "Width": {
     "en": "Width",
     "zh": "宽度"
+  },
+  "Will merge into {country}": {
+    "en": "Will merge into {country}",
+    "zh": "将并入{country}"
   },
   "Workbench inspector tabs": {
     "en": "Workbench inspector tabs",

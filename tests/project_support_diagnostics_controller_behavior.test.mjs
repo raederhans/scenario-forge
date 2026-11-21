@@ -1,6 +1,7 @@
 import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 
+import { LegendManager } from "../js/core/legend_manager.js";
 import { state } from "../js/core/state.js";
 import { registerRuntimeHook } from "../js/core/state/index.js";
 import { markDirty, clearDirty } from "../js/core/dirty_state.js";
@@ -192,7 +193,7 @@ function createController(projectSaveStatus, overrides = {}) {
     documentRef: overrides.documentRef || {
       getElementById: (id) => nodesById.get(id) || null,
       querySelectorAll: selector => [...nodesById.values()].filter(node => node?.getAttribute?.("aria-modal") === "true" && selector === '[aria-modal="true"]'),
-      createElement: (...args) => globalThis.document.createElement(...args),
+      createElement: createElementNode,
       createElementNS: (_namespace, tagName) => createElementNode(tagName),
       addEventListener: (...args) => globalThis.document.addEventListener(...args),
       get body() { return globalThis.document.body; },
@@ -633,7 +634,7 @@ test("legend generator config changes mark the project dirty", () => {
           { id: "all", label: "All" },
           { id: "asia", label: "Asia" },
         ],
-        getUniqueColors: () => [],
+        getEditorEntries: () => [],
         getSpecialZoneLayers: () => [],
         getSpecialZoneSignature: () => "",
         getSignature: () => "",
@@ -698,6 +699,7 @@ test("legend label edits render with current project labels", () => {
           maxItems: 15,
         }),
         getContinentOptions: () => [{ id: "all", label: "All" }],
+        getEditorEntries: () => [{ color: "#abcdef", countryName: "" }],
         getUniqueColors: () => ["#abcdef"],
         getSpecialZoneLayers: () => [],
         getSpecialZoneSignature: () => "",
@@ -742,39 +744,29 @@ test("legend label edits render with current project labels", () => {
   }
 });
 
-test("legend editor paginates sidebar rows at ten items and caps at thirty", () => {
+test("legend editor paginates and searches all colors, fills the country label and preserves the overlay limit", () => {
   const previousDocument = globalThis.document;
   const legendList = createElementNode("div");
   const colors = Array.from({ length: 35 }, (_, index) => (
     `#${String(index + 1).padStart(6, "0")}`
   ));
+  const countryColor = colors[34];
+  const overlayOrder = [colors[3], colors[1]];
+  const project = {
+    colors: Object.fromEntries(colors.map((color, index) => ["land" + index, color])),
+    legendConfig: { maxItems: 2 },
+    legendColorOrder: overlayOrder,
+    legendLabels: { [colors[30]]: "Northern ports", [colors[31]]: "Southern ports" },
+    scenarioCountriesByTag: { GER: { display_name_en: "Germany" } },
+    sovereignBaseColors: { GER: countryColor },
+  };
+  const renderCalls = [];
   const controller = createController(createStatusNode(), {
-    elements: {
-      legendList,
-    },
+    state: project,
+    elements: { legendList },
     helpers: {
-      legendManager: {
-        getConfig: () => ({
-          mode: "weighted-random",
-          continent: "all",
-          useModernMajorOrder: false,
-          maxItems: 15,
-        }),
-        updateConfig: (_state, patch = {}) => ({
-          mode: patch.mode || "weighted-random",
-          continent: patch.continent || "all",
-          useModernMajorOrder: !!patch.useModernMajorOrder,
-          maxItems: 15,
-        }),
-        getContinentOptions: () => [{ id: "all", label: "All" }],
-        getUniqueColors: () => colors,
-        getSpecialZoneLayers: () => [],
-        getSpecialZoneSignature: () => "",
-        getSignature: () => "",
-        getLabel: () => "",
-        getLabels: () => ({}),
-        setLabel: () => {},
-      },
+      legendManager: LegendManager,
+      mapRenderer: { renderLegend: (...args) => renderCalls.push(args) },
     },
   });
 
@@ -788,7 +780,7 @@ test("legend editor paginates sidebar rows at ten items and caps at thirty", () 
 
     const firstPageRows = collectNodes(legendList, (node) => node.className === "legend-row");
     assert.equal(firstPageRows.length, 10);
-    assert.equal(legendList.dataset.pageCount, "3");
+    assert.equal(legendList.dataset.pageCount, "4");
     assert.equal(legendList.dataset.paged, "true");
     assert.equal(firstPageRows[0].children[1].placeholder, "Category 1");
     assert.equal(firstPageRows[9].children[1].placeholder, "Category 10");
@@ -810,13 +802,34 @@ test("legend editor paginates sidebar rows at ten items and caps at thirty", () 
     secondNextButton.listeners.click();
 
     const thirdPageRows = collectNodes(legendList, (node) => node.className === "legend-row");
-    const disabledNextButton = collectNodes(legendList, (node) =>
+    const thirdNextButton = collectNodes(legendList, (node) =>
       node.className.split(/\s+/).includes("legend-editor-page-btn") && node.ariaLabel === "Next page"
     )[0];
     assert.equal(thirdPageRows.length, 10);
     assert.equal(thirdPageRows[0].children[1].placeholder, "Category 21");
     assert.equal(thirdPageRows[9].children[1].placeholder, "Category 30");
-    assert.equal(disabledNextButton.disabled, true);
+    thirdNextButton.listeners.click();
+    const rows = () => collectNodes(legendList, node => node.className === "legend-row");
+    assert.equal(rows().length, 5);
+
+    const search = findNode(legendList, node => node.type === "search");
+    const filter = query => {
+      search.value = query;
+      search.listeners.input();
+      return rows();
+    };
+    assert.equal(filter("PORTS").length, 2);
+    assert.equal(filter("unmatched").length, 0);
+    const matches = filter("germ");
+    assert.equal(matches.length, 1);
+    const input = findNode(matches[0], node => node.type === "text");
+    assert.equal(input.placeholder, "Germany");
+    assert.equal(input.value, "");
+    findNode(matches[0], node => node.textContent === "Fill country name").listeners.click();
+    assert.equal(input.value, "Germany");
+    assert.equal(project.legendLabels[countryColor], "Germany");
+    assert.deepEqual(renderCalls, [[overlayOrder, project.legendLabels]]);
+    assert.equal(filter("").length, 10);
   } finally {
     globalThis.document = previousDocument;
   }
@@ -874,6 +887,7 @@ test("local project zip load unwraps editable project before import funnel", asy
   let importedOptions;
   const dialogs = [];
   const controller = createController(projectSaveStatus, {
+    state: { isDirty: false },
     elements: {
       projectFileInput,
       projectFileName,
@@ -959,6 +973,7 @@ test("local project zip preview cancel clears selected file input", async () => 
   };
   let importCalled = false;
   const controller = createController(projectSaveStatus, {
+    state: { isDirty: false },
     elements: {
       projectFileInput,
       projectFileName,

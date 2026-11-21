@@ -78,6 +78,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   getBorderAppearanceRevision = () => runtimeState.colorRevision || 0,
   getPaintContourRevision = () => runtimeState.colorRevision || 0,
   getPoliticalBorderRevision = () => 0,
+  getCountryLabelSuppressionSignature = () => "",
 }) {
   let observedTopologyRevision = Number(runtimeState.topologyRevision || 0);
   const topologyRevisionByPass = new Map();
@@ -316,6 +317,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       ].join("::");
     }
     if (passName === "labels") {
+      const countryLabels = runtimeState.styleConfig?.countryLabels;
       const physicalStyle = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {});
       return [
         transformSignature,
@@ -323,9 +325,16 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         stableJson(runtimeState.styleConfig?.physical?.atlasClassVisibility || {}),
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
+        getObjectIdentityToken(runtimeState.mapLabels),
+        `map-label-dragging:${runtimeState.mapLabelEditor?.draggingId || ""}`,
+        runtimeState.annotationView?.showMapLabels !== false,
+        getObjectIdentityToken(runtimeState.scenarioCountriesByTag),
+        getObjectIdentityToken(runtimeState.countryNames),
+        getObjectIdentityToken(runtimeState.countryNameOverrides),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
-        runtimeState.styleConfig?.countryLabels?.enabled !== false ? "country-labels:on" : "country-labels:off",
+        countryLabels?.enabled !== false
+          ? `country-labels:on:${countryLabels?.sizeScale ?? 1}:${countryLabels?.uppercase !== false}:${countryLabels?.opacity ?? 1}:${getCountryLabelSuppressionSignature()}` : "country-labels:off",
         runtimeState.showWaterRegions ? "marine:on" : "marine:off",
         runtimeState.showOpenOceanRegions || runtimeState.allowOpenOceanPaint ? "open-ocean-labels:on" : "open-ocean-labels:off",
         `marine-selected:${String(runtimeState.selectedWaterRegionId || "")}`,

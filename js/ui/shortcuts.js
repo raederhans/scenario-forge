@@ -180,6 +180,15 @@ function initShortcuts() {
       setBrushPanModifier(true);
     }
 
+    if (modifier && !event.shiftKey && !event.altKey && lower === "o") {
+      const button = document.getElementById("uploadProjectBtn");
+      if (button) {
+        event.preventDefault();
+        button.click();
+      }
+      return;
+    }
+
     if (modifier && lower === "s") {
       event.preventDefault();
       return saveProject();

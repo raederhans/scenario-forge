@@ -485,6 +485,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已经在使用这个边界变体。",
     "en": "Already using this boundary variant."
   },
+  "Also update {count} regions painted in {country}'s old color?": {
+    "zh": "同时更新涂成 {country} 旧颜色的 {count} 个地块？",
+    "en": {
+      "one": "Also update {count} region painted in {country}'s old color?",
+      "other": "Also update {count} regions painted in {country}'s old color?"
+    }
+  },
   "Aluminium": {
     "zh": "铝",
     "en": "Aluminium"
@@ -520,6 +527,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Anchor: Province / Free": {
     "zh": "锚点：省份 / 自由",
     "en": "Anchor: Province / Free"
+  },
+  "Annexed (all regions painted in other countries’ colors)": {
+    "zh": "已被吞并（全部地块涂成他国颜色）",
+    "en": "Annexed (all regions painted in other countries’ colors)"
   },
   "Antarctica": {
     "zh": "南极洲",
@@ -721,9 +732,17 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "自动填充视觉色",
     "en": "Auto-Fill Visuals"
   },
+  "Automatic": {
+    "zh": "自动",
+    "en": "Automatic"
+  },
   "Automatic (raster for TNO)": {
     "zh": "自动（TNO 优先栅格）",
     "en": "Automatic (raster for TNO)"
+  },
+  "Automatic country name": {
+    "zh": "自动国名",
+    "en": "Automatic country name"
   },
   "Autonomous Region": {
     "zh": "自治区域",
@@ -1065,6 +1084,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "边界已更新",
     "en": "Borders up to date"
   },
+  "Bound country": {
+    "zh": "绑定国家",
+    "en": "Bound country"
+  },
   "Boundary Variants": {
     "zh": "边界变体",
     "en": "Boundary Variants"
@@ -1260,6 +1283,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Centrist republic": {
     "zh": "中间派共和制",
     "en": "Centrist republic"
+  },
+  "Change {country} color": {
+    "zh": "修改 {country} 颜色",
+    "en": "Change color of {country}"
   },
   "Changes to this order stay in the workbench.": {
     "zh": "此顺序的更改仅保留在工作台中。",
@@ -1745,6 +1772,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "关闭剧本简介",
     "en": "Close scenario introduction"
   },
+  "Close to {country}'s color. Painting will create a border.": {
+    "zh": "接近{country}颜色，涂上会形成国界",
+    "en": "Close to {country}'s color. Painting will create a border."
+  },
   "Close transport workbench": {
     "zh": "关闭交通工作台",
     "en": "Close transport workbench"
@@ -1852,6 +1883,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Color bake": {
     "zh": "颜色烘焙",
     "en": "Color bake"
+  },
+  "Color picked": {
+    "zh": "已取色",
+    "en": "Color picked"
   },
   "Color scale": {
     "zh": "色带",
@@ -2277,6 +2312,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "国家颜色已恢复。",
     "en": "Country colors were restored."
   },
+  "Country display name": {
+    "zh": "国家显示名称",
+    "en": "Country display name"
+  },
   "Country file": {
     "zh": "国家文件",
     "en": "Country file"
@@ -2297,9 +2336,21 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "国家统计专题 · 剧本参考",
     "en": "Country indicators · Scenario reference"
   },
+  "Country name opacity": {
+    "zh": "国名不透明度",
+    "en": "Country name opacity"
+  },
+  "Country name size": {
+    "zh": "国名字号倍率",
+    "en": "Country name size"
+  },
   "Country names": {
     "zh": "国家名称",
     "en": "Country names"
+  },
+  "Country names are off": {
+    "zh": "国名已关闭",
+    "en": "Country names are off"
   },
   "Coverage": {
     "zh": "覆盖范围",
@@ -2484,6 +2535,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Dam": {
     "zh": "大坝",
     "en": "Dam"
+  },
+  "Dark": {
+    "zh": "深色",
+    "en": "Dark"
   },
   "Dash": {
     "zh": "虚线",
@@ -2817,6 +2872,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "显示画质",
     "en": "Display quality"
   },
+  "Displayed": {
+    "zh": "已显示",
+    "en": "Displayed"
+  },
   "Disputed": {
     "zh": "争议区",
     "en": "Disputed"
@@ -2853,6 +2912,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "停用",
     "en": "Disused"
   },
+  "Does not fit or is obscured in this view": {
+    "zh": "当前视图放不下或被遮挡",
+    "en": "Does not fit or is obscured in this view"
+  },
   "Dominion": {
     "zh": "统治",
     "en": "Dominion"
@@ -2872,6 +2935,34 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Double-Click Quick Fill": {
     "zh": "双击快速填色",
     "en": "Double-Click Quick Fill"
+  },
+  "Double-click fill: whole country (no parent) · {count} regions": {
+    "zh": "双击填充：整国（无上级区域）· {count} 个地块",
+    "en": {
+      "one": "Double-click fill: whole country (no parent) · {count} region",
+      "other": "Double-click fill: whole country (no parent) · {count} regions"
+    }
+  },
+  "Double-click fill: whole country · {count} regions": {
+    "zh": "双击填充：整个国家 · {count} 个地块",
+    "en": {
+      "one": "Double-click fill: whole country · {count} region",
+      "other": "Double-click fill: whole country · {count} regions"
+    }
+  },
+  "Double-click fill: {count} regions (parent region)": {
+    "zh": "双击填充：{count} 个地块（上级区域）",
+    "en": {
+      "one": "Double-click fill: {count} region (parent region)",
+      "other": "Double-click fill: {count} regions (parent region)"
+    }
+  },
+  "Double-click fill: {count} regions ({group})": {
+    "zh": "双击填充：{count} 个地块（{group}）",
+    "en": {
+      "one": "Double-click fill: {count} region ({group})",
+      "other": "Double-click fill: {count} regions ({group})"
+    }
   },
   "Double-click quick fill scope": {
     "zh": "双击快速填充范围",
@@ -2960,6 +3051,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Drawing vertices.": {
     "zh": "正在绘制顶点。",
     "en": "Drawing vertices."
+  },
+  "Drop to open project": {
+    "zh": "松开以打开项目",
+    "en": "Drop to open project"
   },
   "Duplicate layer": {
     "zh": "复制图层",
@@ -3201,6 +3296,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "输入简短代码，例如 HQ、ARM 或 INF。",
     "en": "Enter a short code such as HQ, ARM or INF."
   },
+  "Enter name": {
+    "zh": "输入名称",
+    "en": "Enter name"
+  },
   "Enter owner tag (e.g. GER, FRA, BRA)": {
     "zh": "输入归属标签（如 GER、FRA、BRA）",
     "en": "Enter owner tag (e.g. GER, FRA, BRA)"
@@ -3216,6 +3315,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Erase": {
     "zh": "擦除",
     "en": "Erase"
+  },
+  "Erase paint from {count} regions": {
+    "zh": "擦除 {count} 个地块的填色",
+    "en": {
+      "one": "Erase paint from {count} region",
+      "other": "Erase paint from {count} regions"
+    }
   },
   "Eraser": {
     "zh": "橡皮擦",
@@ -3573,6 +3679,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "填充父级分组",
     "en": "Fill Parent Group"
   },
+  "Fill country name": {
+    "zh": "填入国名",
+    "en": "Fill country name"
+  },
   "Fill opacity": {
     "zh": "填充不透明度",
     "en": "Fill opacity"
@@ -3693,6 +3803,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "纯蓝模式仅保留干净的海洋底色，不叠加测深效果。",
     "en": "Flat Blue keeps the ocean fill clean with no bathymetry overlay."
   },
+  "Font size": {
+    "zh": "字号",
+    "en": "Font size"
+  },
   "For 1936, 1939 and TNO. Detail is restored after navigation.": {
     "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。",
     "en": "For 1936, 1939 and TNO. Detail is restored after navigation."
@@ -3708,6 +3822,13 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Format": {
     "zh": "格式",
     "en": "Format"
+  },
+  "Found unsaved work from {count} minutes ago ({scenario}).": {
+    "zh": "发现 {count} 分钟前未保存的工作（{scenario}）。",
+    "en": {
+      "one": "Found unsaved work from {count} minute ago ({scenario}).",
+      "other": "Found unsaved work from {count} minutes ago ({scenario})."
+    }
   },
   "Frontline": {
     "zh": "前线",
@@ -4645,6 +4766,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "标签分离",
     "en": "Label separation"
   },
+  "Label text": {
+    "zh": "文字内容",
+    "en": "Label text"
+  },
   "Labels": {
     "zh": "标签",
     "en": "Labels"
@@ -4832,6 +4957,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Less fields": {
     "zh": "收起字段",
     "en": "Less fields"
+  },
+  "Letter spacing": {
+    "zh": "字距",
+    "en": "Letter spacing"
   },
   "Level 1 region": {
     "zh": "1级区域",
@@ -5345,6 +5474,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "手动区域",
     "en": "Manual Zones"
   },
+  "Manual colors will be cleared from {count} regions": {
+    "zh": "将清除 {count} 个地块的手动颜色",
+    "en": {
+      "one": "Manual colors will be cleared from {count} region",
+      "other": "Manual colors will be cleared from {count} regions"
+    }
+  },
   "Manual-reviewed": {
     "zh": "人工校审",
     "en": "Manual-reviewed"
@@ -5396,6 +5532,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Map labels": {
     "zh": "地图标签",
     "en": "Map labels"
+  },
+  "Map lettering": {
+    "zh": "地图文字",
+    "en": "Map lettering"
   },
   "Map mode": {
     "zh": "地图模式",
@@ -6153,6 +6293,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "当前视野内没有要素",
     "en": "Not in current view"
   },
+  "Not now": {
+    "zh": "暂不恢复",
+    "en": "Not now"
+  },
   "Not saved yet": {
     "zh": "尚未保存",
     "en": "Not saved yet"
@@ -6633,6 +6777,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "绘制水域以创建覆盖列表。",
     "en": "Paint water regions to create an override list."
   },
+  "Paint {count} regions": {
+    "zh": "填色 {count} 个地块",
+    "en": {
+      "one": "Paint {count} region",
+      "other": "Paint {count} regions"
+    }
+  },
   "Paints with this country's current color; can be undone.": {
     "zh": "按本国当前颜色涂色；可撤销",
     "en": "Paints with this country's current color; can be undone."
@@ -6776,6 +6927,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Pilot scope stays on motorway, trunk, and primary.": {
     "zh": "试点范围停留在高速公路、主干道和主干道上。",
     "en": "Pilot scope stays on motorway, trunk, and primary."
+  },
+  "Place label": {
+    "zh": "放置文字",
+    "en": "Place label"
   },
   "Placed Counters": {
     "zh": "已放置计数器",
@@ -7285,6 +7440,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已导入项目：{scenario}。已恢复 {colors} 条上色记录和 {owners} 条归属记录。",
     "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries."
   },
+  "Project name (optional)": {
+    "zh": "项目名（可选）",
+    "en": "Project name (optional)"
+  },
   "Project only": {
     "zh": "仅项目",
     "en": "Project only"
@@ -7517,6 +7676,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "重做",
     "en": "Redo"
   },
+  "Redo: {action}": {
+    "zh": "重做：{action}",
+    "en": "Redo: {action}"
+  },
   "Reduce the visible hub set while keeping the logistics layer point-based.": {
     "zh": "减少可见枢纽集，同时保持物流层基于点。",
     "en": "Reduce the visible hub set while keeping the logistics layer point-based."
@@ -7717,6 +7880,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "用导入 ID 替换",
     "en": "Replace with imported ids"
   },
+  "Replaced by manual map text": {
+    "zh": "有手动地图文字代替",
+    "en": "Replaced by manual map text"
+  },
   "Report": {
     "zh": "举报",
     "en": "Report"
@@ -7764,6 +7931,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Resource type": {
     "zh": "资源种类",
     "en": "Resource type"
+  },
+  "Restore": {
+    "zh": "恢复",
+    "en": "Restore"
+  },
+  "Restore original country color": {
+    "zh": "恢复本国原色",
+    "en": "Restore original country color"
   },
   "Restored": {
     "zh": "已恢复",
@@ -7956,6 +8131,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Rotate preview 90 degrees": {
     "zh": "将预览旋转 90 度",
     "en": "Rotate preview 90 degrees"
+  },
+  "Rotation": {
+    "zh": "旋转",
+    "en": "Rotation"
   },
   "Royal Violet": {
     "zh": "王室紫标",
@@ -8504,6 +8683,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Search layers": {
     "zh": "搜索图层",
     "en": "Search layers"
+  },
+  "Search legend or country name": {
+    "zh": "搜索图例名称或国家名",
+    "en": "Search legend or country name"
   },
   "Search options": {
     "zh": "搜索选项",
@@ -10441,6 +10624,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已撤销",
     "en": "Undo applied"
   },
+  "Undo: {action}": {
+    "zh": "撤销：{action}",
+    "en": "Undo: {action}"
+  },
   "Union with layer": {
     "zh": "与图层并集",
     "en": "Union with layer"
@@ -10520,6 +10707,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets.": {
     "zh": "上传图像，先调透明度保证可读，再调缩放，最后微调水平和垂直偏移。",
     "en": "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets."
+  },
+  "Uppercase English country names": {
+    "zh": "英文国名全大写",
+    "en": "Uppercase English country names"
   },
   "Upsert District": {
     "zh": "新增或更新分区",
@@ -10684,6 +10875,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Use when": {
     "zh": "使用场景",
     "en": "Use when"
+  },
+  "Use {country}'s color": {
+    "zh": "改用{country}颜色",
+    "en": "Use {country}'s color"
   },
   "User guide": {
     "zh": "使用指南",
@@ -10965,6 +11160,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "宽度",
     "en": "Width"
   },
+  "Will merge into {country}": {
+    "zh": "将并入{country}",
+    "en": "Will merge into {country}"
+  },
   "Workbench inspector tabs": {
     "zh": "工作台检查器选项卡",
     "en": "Workbench inspector tabs"
@@ -11164,6 +11363,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "major stations Phase B": {
     "zh": "主要车站 Phase B",
     "en": "major stations Phase B"
+  },
+  "map labels": {
+    "zh": "文字",
+    "en": "map labels"
   },
   "members in current layer": {
     "zh": "当前图层成员",

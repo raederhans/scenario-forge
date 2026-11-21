@@ -27,6 +27,29 @@ export function createDefaultOperationGraphicsEditorState() {
   };
 }
 
+export function normalizeMapLabel(raw, id) {
+  const numberInRange = (value, min, max, fallback) =>
+    Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
+  if (!Number.isFinite(raw?.lon) || !Number.isFinite(raw?.lat)) return null;
+  return {
+    id,
+    text: String(raw.text ?? "").trim(),
+    countryCode: String(raw.countryCode ?? "").trim().toUpperCase(),
+    fallbackName: String(raw.fallbackName ?? "").trim(),
+    lon: numberInRange(raw.lon, -180, 180),
+    lat: numberInRange(raw.lat, -90, 90),
+    size: numberInRange(raw.size, 0.12, 512, 18),
+    rotation: numberInRange(raw.rotation, -180, 180, 0),
+    tracking: numberInRange(raw.tracking, 0, 1, null),
+    uppercase: typeof raw.uppercase === "boolean" ? raw.uppercase : null,
+    colorMode: ["light", "dark"].includes(raw.colorMode) ? raw.colorMode : "auto",
+  };
+}
+
+export function createDefaultMapLabelEditorState() {
+  return { active: false, selectedId: null, draggingId: null, counter: 1 };
+}
+
 export function createDefaultUnitCounterEditorState({
   renderer = "game",
   presetId = "inf",
@@ -99,6 +122,7 @@ export function createDefaultStrategicOverlayState(options = {}) {
   return {
     specialZoneEditor: createDefaultSpecialZoneEditorState(),
     operationGraphicsEditor: createDefaultOperationGraphicsEditorState(),
+    mapLabelEditor: createDefaultMapLabelEditorState(),
     unitCounterEditor: createDefaultUnitCounterEditorState(options.unitCounterEditor),
     operationalLineEditor: createDefaultOperationalLineEditorState(),
     strategicOverlayUi: createDefaultStrategicOverlayUiState(),
@@ -118,6 +142,7 @@ export function resetStrategicOverlayEditorState(
     specialZoneEditor: createDefaultSpecialZoneEditorState(),
     operationalLineEditor: createDefaultOperationalLineEditorState(),
     operationGraphicsEditor: createDefaultOperationGraphicsEditorState(),
+    mapLabelEditor: createDefaultMapLabelEditorState(),
     unitCounterEditor: createDefaultUnitCounterEditorState({
       renderer: unitCounterRenderer,
     }),
@@ -127,6 +152,7 @@ export function resetStrategicOverlayEditorState(
     specialZoneEditor: target.specialZoneEditor,
     operationalLineEditor: target.operationalLineEditor,
     operationGraphicsEditor: target.operationGraphicsEditor,
+    mapLabelEditor: target.mapLabelEditor,
     unitCounterEditor: target.unitCounterEditor,
     strategicOverlayUi: target.strategicOverlayUi,
   };

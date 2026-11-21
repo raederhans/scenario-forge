@@ -1,4 +1,6 @@
 import { lazyOwner } from "./lazy_owner.js";
+import { getCountryNameOverride } from "../country_name_overrides.js";
+import { claimScreenLabelPlacement } from "../renderer/screen_label_placement.js";
 import { getMapLabelHierarchy } from "../renderer/map_label_hierarchy.js";
 import { getProjectionGeometryGeneration } from "../renderer/projection_geometry_identity.js";
 import { createMarineLabelOwner, shouldShowMarineRegionNames } from "../renderer/marine_label_owner.js";
@@ -6,6 +8,10 @@ import { createUrbanAdaptivePaintModel } from "../renderer/urban_adaptive_paint_
 import { createCityLabelTextModel } from "../renderer/city_label_text_model.js";
 import { createCityGeometryPresentation } from "../renderer/city_geometry_presentation.js";
 import { createCountryLabelSourceOwner } from "../renderer/country_label_source.js";
+import { DARK_LABEL_COLORS, LIGHT_LABEL_COLORS } from "../renderer/country_label_text_style.js";
+import { drawManualMapLabels } from "../renderer/manual_map_label_render_owner.js";
+import { getParentMergedParents } from "../renderer/parent_merged_presentation.js";
+import { createCountryLabelCoverageOwner } from "../renderer/country_label_coverage.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "../renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "../renderer/urban_layer_render_owner.js";
 import {
@@ -39,7 +45,7 @@ import { normalizeCityLayerStyleConfig, normalizeMapSemanticMode, normalizeUrban
 import { getCanvasColorRelativeLuminance, getSafeCanvasColor } from "../renderer/canvas_color_helpers.js";
 import { getGeoFeatureDisplayLabel, getPreferredGeoLabel, getStrictGeoLabel, renderTooltipText, t } from "../i18n.js";
 import { getLocalizedScenarioCountryName } from "../scenario/scenario_country_display.js";
-import { callRuntimeHook } from "../state/index.js";
+import { callRuntimeHook, emit } from "../state/index.js";
 import { createUrbanCityPolicyOwner } from "../renderer/urban_city_policy.js";
 import { createCityPaintStyleModel } from "../renderer/city_paint_style_model.js";
 import { createCityLabelOwner } from "../renderer/city_label_owner.js";
@@ -54,6 +60,8 @@ export function createLabelsRuntime({
   clamp,
   normalizeLongitude,
   getDisplayOwnerCode,
+  resolveBorderIdentity,
+  getBorderPaletteRevision,
   getResolvedFeatureColor,
   getSignedHashUnit,
   collectContextMetric,
@@ -337,7 +345,10 @@ export function createLabelsRuntime({
   }
 
   function getCityVisualCapitalState(entry, config = {}) {
-    return !!entry?.isCapital && config.showCapitalOverlay !== false;
+    if (!entry?.isCapital || config.showCapitalOverlay === false) return false;
+    const props = entry.feature?.properties;
+    const code = entry.scenarioTag || String(props?.__city_country_code || props?.country_code || "").trim().toUpperCase();
+    return !coverage.getSuppressedCodes().has(code);
   }
 
   function getHoveredCityEntryFromEvent(event) {
@@ -384,56 +395,117 @@ export function createLabelsRuntime({
     return String(props.name || props.label || id || "").trim();
   }
 
-  function drawBlankFeatureLabelsPass(k, { interactive = false } = {}) {
+  function drawBlankFeatureLabelsPass(k, occupiedBoxes, interactive) {
     if (interactive) return;
     if (normalizeMapSemanticMode(runtimeState.mapSemanticMode) !== "blank") return;
     if (String(runtimeState.activeScenarioId || "") !== "blank_base") return;
     if (!runtimeState.showBlankFeatureLabels) return;
-    if (!runtimeState.landData?.features?.length || !rendererSurfaceHost.getContext() || typeof rendererSurfaceHost.getPathCanvas()?.centroid !== "function") return;
+    const context = rendererSurfaceHost.getContext();
+    const path = rendererSurfaceHost.getPathCanvas();
+    if (!runtimeState.landData?.features?.length || !context || !path) return;
     const visibleItems = collectVisibleLandSpatialItems();
-    const items = Array.isArray(visibleItems) && visibleItems.length
-      ? visibleItems
-      : runtimeState.landData.features.map((feature, index) => ({
-        feature,
-        id: getFeatureId(feature) || `feature-${index}`,
-      }));
-    const maxLabels = Math.max(24, Math.min(140, Math.round(44 * Math.max(1, Number(k) || 1))));
-    const step = Math.max(1, Math.ceil(items.length / maxLabels));
-    const fontSize = Math.max(7, Math.min(12, 11 / Math.max(0.75, Number(k) || 1)));
-    rendererSurfaceHost.getContext().save();
-    rendererSurfaceHost.getContext().font = `${fontSize}px system-ui, sans-serif`;
-    rendererSurfaceHost.getContext().textAlign = "center";
-    rendererSurfaceHost.getContext().textBaseline = "middle";
-    rendererSurfaceHost.getContext().lineWidth = Math.max(1.8 / Math.max(0.75, Number(k) || 1), 0.7);
-    rendererSurfaceHost.getContext().strokeStyle = "rgba(248, 250, 252, 0.82)";
-    rendererSurfaceHost.getContext().fillStyle = "rgba(31, 41, 55, 0.86)";
-    for (let index = 0; index < items.length; index += step) {
-      const item = items[index];
-      const feature = item?.feature || item;
-      const id = item?.id || getFeatureId(feature) || "";
-      const label = getBlankFeatureLabel(feature, id);
-      if (!label) continue;
-      const centroid = rendererSurfaceHost.getPathCanvas().centroid(feature);
-      if (!centroid || !Number.isFinite(centroid[0]) || !Number.isFinite(centroid[1])) continue;
-      rendererSurfaceHost.getContext().strokeText(label, centroid[0], centroid[1]);
-      rendererSurfaceHost.getContext().fillText(label, centroid[0], centroid[1]);
+    const items = visibleItems ?? runtimeState.landData.features.map((feature, index) => ({
+      feature,
+      id: getFeatureId(feature) || `feature-${index}`,
+    }));
+    const { x: tx = 0, y: ty = 0 } = runtimeState.zoomTransform || {};
+    const fontSize = 11 / k;
+    context.save();
+    context.font = `${fontSize}px system-ui, sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineWidth = 1.8 / k;
+    context.strokeStyle = "rgba(248, 250, 252, 0.82)";
+    context.fillStyle = "rgba(31, 41, 55, 0.86)";
+    const height = fontSize + context.lineWidth;
+    const candidates = [];
+    for (const item of items) {
+      const feature = item.feature || item;
+      const bounds = item.minX != null ? item : getProjectedFeatureBounds(feature);
+      if (!bounds) continue;
+      const w = bounds.maxX - bounds.minX, h = bounds.maxY - bounds.minY;
+      if (h < height || w <= context.lineWidth) continue;
+      if (bounds.maxX * k + tx < 0 || bounds.maxY * k + ty < 0
+        || bounds.minX * k + tx > runtimeState.width || bounds.minY * k + ty > runtimeState.height) continue;
+      candidates.push({ feature, id: item.id, bounds, area: w * h });
     }
-    rendererSurfaceHost.getContext().restore();
+    candidates.sort((a, b) => b.area - a.area);
+    const candidateLimit = Math.ceil(300 * k);
+    for (const { feature, id, bounds } of candidates.slice(0, candidateLimit)) {
+      const label = getBlankFeatureLabel(feature, id || getFeatureId(feature));
+      if (!label) continue;
+      const width = context.measureText(label).width + context.lineWidth;
+      if (width > bounds.maxX - bounds.minX) continue;
+      const [x, y] = path.centroid(feature);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      const left = x - width / 2;
+      const top = y - height / 2;
+      if (left < bounds.minX || top < bounds.minY || left + width > bounds.maxX || top + height > bounds.maxY) continue;
+      const box = { x: left * k + tx, y: top * k + ty, w: width * k, h: height * k };
+      if (!claimScreenLabelPlacement([{ box }], occupiedBoxes)) continue;
+      context.strokeText(label, x, y);
+      context.fillText(label, x, y);
+    }
+    context.restore();
   }
 
   let countryLabelSourceOwner = null;
   let countryLabelRenderOwner = null;
+  let lastCountryLabels = [];
+  const coverage = createCountryLabelCoverageOwner({ state: runtimeState, resolveBorderIdentity, getBorderPaletteRevision,
+    peekSource: () => countryLabelSourceOwner?.peekSource() });
+
+  let placedBounds = new Map();
+  let boundCodes = new Set();
+  let bindingLabels, bindingCountries;
+  function getBoundCountryCodes() {
+    const { mapLabels, scenarioCountriesByTag } = runtimeState;
+    if (bindingLabels !== mapLabels || bindingCountries !== scenarioCountriesByTag) {
+      bindingLabels = mapLabels;
+      bindingCountries = scenarioCountriesByTag;
+      boundCodes = new Set();
+      if (mapLabels?.length) {
+        const parents = getParentMergedParents(scenarioCountriesByTag);
+        for (const { countryCode } of mapLabels) {
+          if (countryCode) boundCodes.add(parents.get(countryCode) || countryCode);
+        }
+      }
+    }
+    return boundCodes;
+  }
+
+  function getCountryLabelSuppressionSignature() {
+    const bound = getBoundCountryCodes();
+    if (!bound.size) return coverage.getSignature();
+    return [...new Set([...coverage.getSuppressedCodes(), ...bound])].sort().join(",");
+  }
+
+  function getCountryName(code, fallbackName) {
+    const override = getCountryNameOverride(runtimeState, code);
+    if (override) return override;
+    if (fallbackName !== undefined && !runtimeState.scenarioCountriesByTag?.[code]) return fallbackName;
+    return getLocalizedScenarioCountryName(runtimeState.scenarioCountriesByTag?.[code],
+      runtimeState.countryNames?.[code] || code, name => t(name, "geo"));
+  }
+
+  function getCountryLabelColors(code) {
+    const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
+    return Number.isFinite(luminance) && luminance < 0.18 ? LIGHT_LABEL_COLORS : DARK_LABEL_COLORS;
+  }
+
+  let suppressedCodes = new Set();
+  function observeCountryLabelSource(source) {
+    getBoundCountryCodes();
+    suppressedCodes = coverage.getSuppressedCodes();
+    return source;
+  }
 
   function getCountryLabelSourceOwner() {
     countryLabelSourceOwner ||= createCountryLabelSourceOwner({
       state: runtimeState,
       topojson: globalThis.topojson,
       ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
-      getCountryName: (code) => getLocalizedScenarioCountryName(
-        runtimeState.scenarioCountriesByTag?.[code],
-        runtimeState.countryNames?.[code] || code,
-        (name) => t(name, "geo"),
-      ),
+      getCountryName,
       onChange: () => {
         invalidateRenderPasses("labels", "country-label-source");
         requestRendererRender("country-label-source", { flush: false });
@@ -454,13 +526,9 @@ export function createLabelsRuntime({
         getPaintBounds: getLabelPaintBounds,
         getTransform: () => runtimeState.zoomTransform,
         getLanguage: () => runtimeState.currentLanguage || "en",
-        getCountryLabelSource: () => getCountryLabelSourceOwner().getSource(),
-        getCountryLabelColors: (code) => {
-          const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
-          return Number.isFinite(luminance) && luminance < 0.18
-            ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.3)" }
-            : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.22)" };
-        },
+        getCountryLabelSource: () => observeCountryLabelSource(getCountryLabelSourceOwner().getSource()),
+        isCountryLabelSuppressed: code => suppressedCodes.has(code) || boundCodes.has(code),
+        getCountryLabelColors,
       },
       helpers: {
         isPrivatePreparationEnabled: () => !isExportRenderInProgress() && isPrivateSceneActive() && !runtimeState.isInteracting,
@@ -534,6 +602,8 @@ export function createLabelsRuntime({
   }
 
   function drawLabelsPassContent(k, { interactive = false } = {}) {
+    const screenPass = !isExportRenderInProgress();
+    if (screenPass) lastCountryLabels = [];
     if (labelScenarioId !== runtimeState.activeScenarioId
       || labelSceneGeneration !== runtimeState.sceneGeneration) {
       previousPreferCountries = undefined;
@@ -542,8 +612,17 @@ export function createLabelsRuntime({
     }
     const hierarchy = getMapLabelHierarchy(k, runtimeState, previousPreferCountries);
     previousPreferCountries = hierarchy.preferCountries;
-    drawBlankFeatureLabelsPass(k, { interactive });
     const occupiedBoxes = [];
+    if (runtimeState.mapLabels?.length && runtimeState.annotationView?.showMapLabels !== false) {
+      const { requestChineseTextGlyphs } = getCountryLabelRenderOwner();
+      placedBounds = drawManualMapLabels({ state: runtimeState, ctx: rendererSurfaceHost.getContext(),
+        projection: rendererSurfaceHost.getProjection(), k, occupiedBoxes, getCountryName, getCountryLabelColors,
+        requestChineseTextGlyphs });
+    } else if (placedBounds.size) {
+      placedBounds.clear();
+    }
+    // 用户手放的文字先占位，空白底图地块名避让它。
+    drawBlankFeatureLabelsPass(k, occupiedBoxes, interactive);
     if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
       getMarineLabelOwner().drawOrdinaryMarineLabels(k, occupiedBoxes);
     }
@@ -562,7 +641,9 @@ export function createLabelsRuntime({
         getCountryLabelSourceOwner().prepare();
         const startedAt = nowMs();
         getCountryLabelRenderOwner().drawCountryLabels(k, { occupiedBoxes });
-        recordRenderPerfMetric("countryLabels", nowMs() - startedAt, getCountryLabelRenderOwner().getDiagnostics());
+        const diagnostics = getCountryLabelRenderOwner().getDiagnostics();
+        recordRenderPerfMetric("countryLabels", nowMs() - startedAt, diagnostics);
+        if (screenPass) lastCountryLabels = diagnostics.lastLabels;
       }
       if (countryLabelsFirst) {
         getCityPointsRenderOwner().drawLabelsPass(k, { occupiedBoxes, overviewLayout });
@@ -570,6 +651,7 @@ export function createLabelsRuntime({
       drawPendingTransportLabels(k, { occupiedBoxes });
       drawPhysicalRegionLabels(k, { occupiedBoxes });
     }
+    if (screenPass) emit("labels:drawn");
     return hierarchy;
   }
 
@@ -602,6 +684,16 @@ export function createLabelsRuntime({
       pendingCountryFits: Number(countryDiagnostics?.pendingFits) || 0 };
   }
 
+  function getCountryLabelStatus(code) {
+    if (runtimeState.styleConfig?.countryLabels?.enabled === false) return "Country names are off";
+    if (coverage.getSuppressedCodes().has(code)) return "Annexed (all regions painted in other countries’ colors)";
+    if (getBoundCountryCodes().has(code)) return "Replaced by manual map text";
+    if (lastCountryLabels.some(({ countryCode, bounds }) => countryCode === code &&
+      bounds.x + bounds.w >= 0 && bounds.y + bounds.h >= 0 &&
+      bounds.x <= runtimeState.width && bounds.y <= runtimeState.height)) return "Displayed";
+    return "Does not fit or is obscured in this view";
+  }
+
   function getCountryLabelReadiness() {
     const expected = runtimeState.styleConfig?.countryLabels?.enabled !== false;
     if (!expected) return { expected, ready: true, sourceStatus: "disabled" };
@@ -610,7 +702,7 @@ export function createLabelsRuntime({
     if (!source || source.status !== "ready" || !countryLabelRenderOwner) {
       return { expected, ready: false, sourceStatus: source?.status || "uninitialized" };
     }
-    const readiness = countryLabelRenderOwner.getReadinessForCurrentView(source);
+    const readiness = countryLabelRenderOwner.getReadinessForCurrentView(observeCountryLabelSource(source));
     return { expected, ...readiness, sourceStatus: source.status,
       ready: readiness.ready && !runtimeState.renderPassCache?.dirty?.labels };
   }
@@ -632,6 +724,7 @@ export function createLabelsRuntime({
   }
 
   function reset() {
+    lastCountryLabels = [];
     previousPreferCountries = undefined;
     cancelCityPreparation();
     countryLabelRenderOwner?.cancelPreparation();
@@ -648,7 +741,17 @@ export function createLabelsRuntime({
     getEffectiveCityCollection,
     ensureCountryLabelsReadyForExport,
     getVisibleMapLabels,
+    getCountryLabelStatus,
     getCountryLabelReadiness,
+    getCountryLabelSuppressionSignature,
+    getPlacedMapLabels() {
+      return (runtimeState.mapLabels || []).map(({ id, text, countryCode }) => {
+        const bounds = runtimeState.annotationView?.showMapLabels !== false && placedBounds.get(id);
+        return { id, text, countryCode, drawn: !!bounds, bounds: bounds ? { ...bounds } : null };
+      });
+    },
+    notifyCountryLabelColorsChanged: coverage.notifyColorsChanged,
+    invalidateCountryLabelCoverage: coverage.invalidate,
     drawUrbanLayer,
     getUrbanCityPolicyOwner,
     getFeatureGeoCentroid,
