@@ -2344,6 +2344,18 @@
     "en": "Country Inspector",
     "zh": "国家检查器"
   },
+  "Cities in this country": {
+    "en": "Cities in this country",
+    "zh": "本国城市"
+  },
+  "City display name": {
+    "en": "City display name",
+    "zh": "城市显示名"
+  },
+  "Hide city": {
+    "en": "Hide city",
+    "zh": "隐藏城市"
+  },
   "Country Name Editor": {
     "en": "Country Name Editor",
     "zh": "国家名称编辑器"

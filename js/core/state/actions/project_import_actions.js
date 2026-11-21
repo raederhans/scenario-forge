@@ -10,6 +10,7 @@ export function captureProjectImportState(target) {
     batchFillScope: target.batchFillScope,
     customPresets: target.customPresets,
     countryNameOverrides: target.countryNameOverrides,
+    cityNameOverrides: target.cityNameOverrides,
     devClipboardFallbackText: target.devClipboardFallbackText,
     devClipboardPreviewFormat: target.devClipboardPreviewFormat,
     devHoverHit: target.devHoverHit,
@@ -90,6 +91,7 @@ export function applyProjectImportPatch(target, patch) {
   if (Object.hasOwn(patch, "annotationView")) target.annotationView = patch.annotationView;
   if (Object.hasOwn(patch, "customPresets")) target.customPresets = patch.customPresets;
   if (Object.hasOwn(patch, "countryNameOverrides")) target.countryNameOverrides = patch.countryNameOverrides;
+  if (Object.hasOwn(patch, "cityNameOverrides")) target.cityNameOverrides = patch.cityNameOverrides;
   if (Object.hasOwn(patch, "devClipboardFallbackText")) target.devClipboardFallbackText = patch.devClipboardFallbackText;
   if (Object.hasOwn(patch, "devClipboardPreviewFormat")) target.devClipboardPreviewFormat = patch.devClipboardPreviewFormat;
   if (Object.hasOwn(patch, "devHoverHit")) target.devHoverHit = patch.devHoverHit;

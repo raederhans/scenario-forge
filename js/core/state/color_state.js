@@ -62,6 +62,7 @@ export function createDefaultColorState() {
     selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],
     legendLabels: {},
     countryNameOverrides: {},
+    cityNameOverrides: {},
     legendConfig: {
       mode: "direct-area",
       continent: "all",

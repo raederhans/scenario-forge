@@ -1620,6 +1620,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "铬",
     "en": "Chromium"
   },
+  "Cities in this country": {
+    "zh": "本国城市",
+    "en": "Cities in this country"
+  },
   "City Lights": {
     "zh": "城市灯光",
     "en": "City Lights"
@@ -1631,6 +1635,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "City and map labels from the labels pass": {
     "zh": "来自 labels pass 的城市与地图标签",
     "en": "City and map labels from the labels pass"
+  },
+  "City display name": {
+    "zh": "城市显示名",
+    "en": "City display name"
   },
   "City hierarchy": {
     "zh": "城市层级",
@@ -4328,6 +4336,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Hide Details": {
     "zh": "隐藏详细信息",
     "en": "Hide Details"
+  },
+  "Hide city": {
+    "zh": "隐藏城市",
+    "en": "Hide city"
   },
   "Hide development workspace": {
     "zh": "隐藏开发工作台",
