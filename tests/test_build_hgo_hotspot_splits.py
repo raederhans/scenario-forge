@@ -45,6 +45,32 @@ def test_single_eligible_state_emits_no_entry():
     assert build.build_entry("P", parts, {}, "masks.geojson") == (None, [])
 
 
+def test_scraps_edge_strips_and_duplicate_city_names():
+    parent = box(0, 0, 0.3, 0.1)
+    west, east = box(0, 0, 0.15, 0.1), box(0.15, 0, 0.3, 0.1)
+    scrap = box(0.24, 0.04, 0.25, 0.05)
+    strip = box(0, 0.09, 0.15, 0.1)
+    parts = {1: west.difference(strip).union(scrap), 2: east.difference(scrap), 3: strip}
+    assert apply.area_km2(scrap) < 3 < apply.area_km2(strip)
+    assert build.merge_scraps(parent, parts) == 2
+    assert parts[1].equals(west) and parts[2].equals(east)
+    points = shapely.STRtree([shapely.Point(0.03, 0.03), shapely.Point(0.06, 0.06)])
+    cities = [dict(properties=dict(id="a", name_en="Small", population=100, name_zh="小城")),
+              dict(properties=dict(id="b", name_en="Ortelsburg", population=200, name_zh="奥尔特尔斯堡"))]
+    names = build.part_names(parts, {1: ("A", "甲"), 2: ("Ortelsburg", "奥尔特尔斯堡")}, points, cities)
+    assert names == {1: ("West Ortelsburg", "西奥尔特尔斯堡"), 2: ("East Ortelsburg", "东奥尔特尔斯堡")}
+
+
+def test_detached_parent_island_belongs_to_remainder():
+    west, east = box(0, 0, 0.2, 0.1), box(0.2, 0, 0.3, 0.1)
+    island = box(0.31, 0.04, 0.32, 0.05)
+    parts = {1: west, 2: east.union(island)}
+    parent = shapely.union_all(list(parts.values()))
+    assert build.merge_scraps(parent, parts) == 1
+    assert parts[1].equals(west.union(island))
+    assert parts[2].equals(east)
+
+
 def test_local_registration():
     grid = np.stack(np.meshgrid(np.arange(5), np.arange(5)), axis=-1).astype(float)
     coords = [(1, 1), (2, 1), (1, 2)]
@@ -69,5 +95,6 @@ def test_bas_rhin_and_trentino_with_native_states(tmp_path):
     entries = {e["id"]: apply.entry_parts(e) for e in build.read(rules)["entries"]}
     assert set(entries) == {fid for region in regions for fid in region["parent_ids"]}
     assert all(len(parts) >= 2 for parts in entries.values())
-    assert {"Rovereto", "Trentino", "North Trentino", "West Trentino"} <= {p["name_en"] for p in entries["ITH20"]}
+    assert "Trento" in {p["name_en"] for p in entries["ITH20"]}
+    assert any(p["name_en"].endswith("Rovereto") for p in entries["ITH20"])
     assert not {"Bassano Del Grappa", "Cittadella", "Possagno"} & {p["name_en"] for p in entries["ITH20"]}

@@ -15,7 +15,7 @@
         {
           "suffix": "THIONVILLE",
           "name_en": "Thionville",
-          "name_zh": "迪登霍芬",
+          "name_zh": "蒂永维尔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -41,7 +41,7 @@
         {
           "suffix": "BRIEY",
           "name_en": "Briey",
-          "name_zh": "布里茨",
+          "name_zh": "布里耶",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -91,19 +91,6 @@
             "property": "unit",
             "values": [
               "FR_ARR_57009_2059"
-            ]
-          }
-        },
-        {
-          "suffix": "THIONVILLE",
-          "name_en": "Thionville",
-          "name_zh": "迪登霍芬",
-          "full_name": true,
-          "polygon_source": {
-            "path": "hoi4_hgo_hotspots.sources.geojson",
-            "property": "unit",
-            "values": [
-              "FR_ARR_57009_2061"
             ]
           }
         },
@@ -277,8 +264,8 @@
       ],
       "remainder": {
         "suffix": "MOSELLE",
-        "name_en": "Moselle",
-        "name_zh": "摩泽尔",
+        "name_en": "Sarreguemines",
+        "name_zh": "萨尔格米讷",
         "full_name": true
       }
     },
@@ -402,8 +389,8 @@
       "parts": [
         {
           "suffix": "COLMAR",
-          "name_en": "Colmar",
-          "name_zh": "科尔马",
+          "name_en": "Selestat",
+          "name_zh": "塞莱斯塔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -475,8 +462,8 @@
         },
         {
           "suffix": "SPA",
-          "name_en": "Spa",
-          "name_zh": "斯帕",
+          "name_en": "West Verviers",
+          "name_zh": "西维尔维耶",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -527,8 +514,8 @@
         },
         {
           "suffix": "VERVIERS",
-          "name_en": "Verviers",
-          "name_zh": "维尔维耶",
+          "name_en": "East Verviers",
+          "name_zh": "东维尔维耶",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -553,8 +540,8 @@
         },
         {
           "suffix": "KELMIS",
-          "name_en": "Kelmis",
-          "name_zh": "凯尔米斯",
+          "name_en": "Eupen",
+          "name_zh": "欧本",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -570,8 +557,8 @@
       ],
       "remainder": {
         "suffix": "HASSELT",
-        "name_en": "Hasselt",
-        "name_zh": "哈瑟尔特",
+        "name_en": "Huy",
+        "name_zh": "于伊",
         "full_name": true
       }
     },
@@ -583,7 +570,7 @@
       "parts": [
         {
           "suffix": "TONDERN",
-          "name_en": "Tondern",
+          "name_en": "Tonder",
           "name_zh": "滕德",
           "full_name": true,
           "polygon_source": {
@@ -600,8 +587,8 @@
       ],
       "remainder": {
         "suffix": "SYDJYLLAND",
-        "name_en": "Sydjylland",
-        "name_zh": "南日德兰",
+        "name_en": "Sonderborg",
+        "name_zh": "森讷堡",
         "full_name": true
       }
     },
@@ -613,8 +600,8 @@
       "parts": [
         {
           "suffix": "SCHLESWIG",
-          "name_en": "Schleswig",
-          "name_zh": "石勒苏益格",
+          "name_en": "North Schleswig",
+          "name_zh": "北石勒苏益格",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -656,8 +643,8 @@
       ],
       "remainder": {
         "suffix": "DAMP",
-        "name_en": "Damp",
-        "name_zh": "达姆普",
+        "name_en": "South Schleswig",
+        "name_zh": "南石勒苏益格",
         "full_name": true
       }
     },
@@ -738,8 +725,8 @@
         },
         {
           "suffix": "RENDSBURG",
-          "name_en": "Rendsburg",
-          "name_zh": "伦茨堡",
+          "name_en": "West Rendsburg",
+          "name_zh": "西伦茨堡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -751,8 +738,8 @@
         },
         {
           "suffix": "DAMP",
-          "name_en": "Damp",
-          "name_zh": "达姆普",
+          "name_en": "Eckernfoerde",
+          "name_zh": "埃肯弗德",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -764,8 +751,8 @@
         },
         {
           "suffix": "SOUTH_DAMP",
-          "name_en": "South Damp",
-          "name_zh": "南达姆普",
+          "name_en": "East Rendsburg",
+          "name_zh": "东伦茨堡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -781,8 +768,8 @@
       ],
       "remainder": {
         "suffix": "WEST_SCHLESWIG",
-        "name_en": "West-Schleswig",
-        "name_zh": "西石勒苏益格",
+        "name_en": "Heide",
+        "name_zh": "海德",
         "full_name": true
       }
     },
@@ -794,8 +781,8 @@
       "parts": [
         {
           "suffix": "SUDTIROL",
-          "name_en": "Südtirol",
-          "name_zh": "南蒂罗尔",
+          "name_en": "Bolzano",
+          "name_zh": "波尔查诺",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -807,8 +794,8 @@
         },
         {
           "suffix": "WEST_SUDTIROL",
-          "name_en": "West-Sudtirol",
-          "name_zh": "西南蒂罗尔",
+          "name_en": "West Merano",
+          "name_zh": "西梅拉诺",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -889,8 +876,8 @@
       ],
       "remainder": {
         "suffix": "MERANO",
-        "name_en": "Merano",
-        "name_zh": "梅拉诺",
+        "name_en": "East Merano",
+        "name_zh": "东梅拉诺",
         "full_name": true
       }
     },
@@ -901,22 +888,9 @@
       ],
       "parts": [
         {
-          "suffix": "SUDTIROL",
-          "name_en": "Südtirol",
-          "name_zh": "南蒂罗尔",
-          "full_name": true,
-          "polygon_source": {
-            "path": "hoi4_hgo_hotspots.sources.geojson",
-            "property": "unit",
-            "values": [
-              "ITH20_39"
-            ]
-          }
-        },
-        {
           "suffix": "TRENTINO",
-          "name_en": "Trentino",
-          "name_zh": "特伦蒂诺",
+          "name_en": "East Rovereto",
+          "name_zh": "东罗韦雷托",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -954,8 +928,8 @@
         },
         {
           "suffix": "ROVERETO",
-          "name_en": "Rovereto",
-          "name_zh": "罗韦雷托",
+          "name_en": "West Rovereto",
+          "name_zh": "西罗韦雷托",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -971,8 +945,8 @@
       ],
       "remainder": {
         "suffix": "WEST_TRENTINO",
-        "name_en": "West Trentino",
-        "name_zh": "特伦蒂诺西部",
+        "name_en": "Trento",
+        "name_zh": "特伦托",
         "full_name": true
       }
     },
@@ -997,8 +971,8 @@
         },
         {
           "suffix": "MEDOLINO",
-          "name_en": "Medolino",
-          "name_zh": "梅杜林",
+          "name_en": "South Pula",
+          "name_zh": "南普拉",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1040,8 +1014,8 @@
       ],
       "remainder": {
         "suffix": "POLA",
-        "name_en": "Pola",
-        "name_zh": "普拉",
+        "name_en": "North Pola",
+        "name_zh": "北普拉",
         "full_name": true
       }
     },
@@ -1096,8 +1070,8 @@
       ],
       "remainder": {
         "suffix": "IDRIA",
-        "name_en": "Idria",
-        "name_zh": "伊德里亚",
+        "name_en": "Gorizia",
+        "name_zh": "戈里齐亚",
         "full_name": true
       }
     },
@@ -1139,8 +1113,8 @@
       ],
       "remainder": {
         "suffix": "SOUTH_IDRIA",
-        "name_en": "South Idria",
-        "name_zh": "南伊德里亚",
+        "name_en": "Koper",
+        "name_zh": "科佩尔",
         "full_name": true
       }
     },
@@ -1225,8 +1199,8 @@
       ],
       "remainder": {
         "suffix": "DALMATIA",
-        "name_en": "Dalmatia",
-        "name_zh": "达尔马提亚",
+        "name_en": "Solin",
+        "name_zh": "索林",
         "full_name": true
       }
     },
@@ -1238,8 +1212,8 @@
       "parts": [
         {
           "suffix": "MURVICA",
-          "name_en": "Murvica",
-          "name_zh": "穆尔维察",
+          "name_en": "Šibenik",
+          "name_zh": "希贝尼克",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1311,7 +1285,7 @@
       ],
       "remainder": {
         "suffix": "WEST_DUBORVNIK",
-        "name_en": "West Duborvnik",
+        "name_en": "West Dubrovnik",
         "name_zh": "西杜布罗夫尼克",
         "full_name": true
       }
@@ -1324,8 +1298,8 @@
       "parts": [
         {
           "suffix": "VOLKERMARKT",
-          "name_en": "Volkermarkt",
-          "name_zh": "弗尔克拉马克特",
+          "name_en": "Klagenfurt",
+          "name_zh": "克拉根福",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1354,8 +1328,8 @@
       ],
       "remainder": {
         "suffix": "KLAGENFURT_LAND",
-        "name_en": "Klagenfurt-Land",
-        "name_zh": "克拉根福郊区",
+        "name_en": "Villach",
+        "name_zh": "菲拉赫",
         "full_name": true
       }
     },
@@ -1449,8 +1423,8 @@
       "parts": [
         {
           "suffix": "WOLFSBERG",
-          "name_en": "Wolfsberg",
-          "name_zh": "沃尔夫斯贝格",
+          "name_en": "West Wolfsberg",
+          "name_zh": "西沃尔夫斯贝格",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1492,8 +1466,8 @@
       ],
       "remainder": {
         "suffix": "VOLKERMARKT",
-        "name_en": "Volkermarkt",
-        "name_zh": "弗尔克拉马克特",
+        "name_en": "East Wolfsberg",
+        "name_zh": "东沃尔夫斯贝格",
         "full_name": true
       }
     },
@@ -1544,8 +1518,8 @@
         },
         {
           "suffix": "ORTELSBURG",
-          "name_en": "Ortelsburg",
-          "name_zh": "奥尔特尔斯堡",
+          "name_en": "West Ortelsburg",
+          "name_zh": "西奥尔特尔斯堡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1570,8 +1544,8 @@
         },
         {
           "suffix": "RASTENBURG",
-          "name_en": "Rastenburg",
-          "name_zh": "拉斯滕堡",
+          "name_en": "Lidzbark Warminski",
+          "name_zh": "瓦尔米亚地区利兹巴克",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1609,8 +1583,8 @@
         },
         {
           "suffix": "SENSBURG",
-          "name_en": "Sensburg",
-          "name_zh": "森斯堡",
+          "name_en": "Gizycko",
+          "name_zh": "吉日茨科",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1622,8 +1596,8 @@
         },
         {
           "suffix": "ORTELSBURG_7428",
-          "name_en": "Ortelsburg",
-          "name_zh": "奥尔特尔斯堡",
+          "name_en": "East Ortelsburg",
+          "name_zh": "东奥尔特尔斯堡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1704,8 +1678,8 @@
       ],
       "remainder": {
         "suffix": "NIKOLAIKEN",
-        "name_en": "Nikolaiken",
-        "name_zh": "尼古拉肯",
+        "name_en": "Mragowo",
+        "name_zh": "姆龙戈沃",
         "full_name": true
       }
     },
@@ -1790,8 +1764,8 @@
       ],
       "remainder": {
         "suffix": "WORMDITT",
-        "name_en": "Wormditt",
-        "name_zh": "沃尔姆迪特",
+        "name_en": "Braniewo",
+        "name_zh": "布拉涅沃",
         "full_name": true
       }
     },
@@ -1833,8 +1807,8 @@
       ],
       "remainder": {
         "suffix": "MAZURIA",
-        "name_en": "Mazuria",
-        "name_zh": "马祖里",
+        "name_en": "Szczytno",
+        "name_zh": "什奇特诺",
         "full_name": true
       }
     },
@@ -1846,7 +1820,7 @@
       "parts": [
         {
           "suffix": "OSTPREUEN",
-          "name_en": "Ostpreußen",
+          "name_en": "East Prussia",
           "name_zh": "东普鲁士",
           "full_name": true,
           "polygon_source": {
@@ -1863,8 +1837,8 @@
       ],
       "remainder": {
         "suffix": "LISSEN",
-        "name_en": "Lissen",
-        "name_zh": "利森",
+        "name_en": "Gierloz",
+        "name_zh": "盖尔沃日",
         "full_name": true
       }
     },
@@ -1932,8 +1906,8 @@
       "parts": [
         {
           "suffix": "KARTUZY",
-          "name_en": "Kartuzy",
-          "name_zh": "卡尔图济",
+          "name_en": "Koscierzyna",
+          "name_zh": "科希切日纳",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -1971,8 +1945,8 @@
         },
         {
           "suffix": "SOUTH_KARTUZY",
-          "name_en": "South Kartuzy",
-          "name_zh": "南卡尔图济",
+          "name_en": "Chojnice",
+          "name_zh": "霍伊尼采",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2001,8 +1975,8 @@
       ],
       "remainder": {
         "suffix": "POMORZE_GDANSKIE",
-        "name_en": "Pomorze Gdanskie",
-        "name_zh": "格但斯克波美拉尼亚",
+        "name_en": "Starogard Gdanski",
+        "name_zh": "格但斯克旧城",
         "full_name": true
       }
     },
@@ -2014,8 +1988,8 @@
       "parts": [
         {
           "suffix": "KISIELICE",
-          "name_en": "Kisielice",
-          "name_zh": "基谢利采",
+          "name_en": "Grudziądz",
+          "name_zh": "格鲁琼兹",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2044,8 +2018,8 @@
       ],
       "remainder": {
         "suffix": "GRUZIADZ",
-        "name_en": "Gruziadz",
-        "name_zh": "格鲁琼兹",
+        "name_en": "Swiecie",
+        "name_zh": "希维切",
         "full_name": true
       }
     },
@@ -2100,8 +2074,8 @@
       ],
       "remainder": {
         "suffix": "EAST_BUTOW",
-        "name_en": "East Butow",
-        "name_zh": "东比托夫",
+        "name_en": "Bytow",
+        "name_zh": "比图夫",
         "full_name": true
       }
     },
@@ -2113,8 +2087,8 @@
       "parts": [
         {
           "suffix": "OSZMIANA",
-          "name_en": "Oszmiana",
-          "name_zh": "奥什米亚内",
+          "name_en": "Smarhon",
+          "name_zh": "斯莫尔贡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2152,8 +2126,8 @@
         },
         {
           "suffix": "VAVERKA",
-          "name_en": "Vaverka",
-          "name_zh": "瓦韦尔卡",
+          "name_en": "Lida",
+          "name_zh": "利达",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2165,8 +2139,8 @@
         },
         {
           "suffix": "BYAROZAWKA",
-          "name_en": "Byarozawka",
-          "name_zh": "比亚罗扎夫卡",
+          "name_en": "Novogrudok",
+          "name_zh": "新格鲁多克",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2321,8 +2295,8 @@
         },
         {
           "suffix": "WEST_BOROVIKI",
-          "name_en": "West Boroviki",
-          "name_zh": "西博罗维基",
+          "name_en": "Volkovysk",
+          "name_zh": "沃尔科维斯克",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2351,8 +2325,8 @@
       "parts": [
         {
           "suffix": "GRODNO",
-          "name_en": "Grodno",
-          "name_zh": "格罗德诺",
+          "name_en": "East Grodno",
+          "name_zh": "东格罗德诺",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2364,8 +2338,8 @@
         },
         {
           "suffix": "SZTABIN",
-          "name_en": "Sztabin",
-          "name_zh": "什塔宾",
+          "name_en": "West Grodno",
+          "name_zh": "西格罗德诺",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2463,8 +2437,8 @@
       ],
       "remainder": {
         "suffix": "HALSHANY",
-        "name_en": "Halshany",
-        "name_zh": "戈尔沙内",
+        "name_en": "Oshmyany",
+        "name_zh": "奥什米亚内",
         "full_name": true
       }
     },
@@ -2476,8 +2450,8 @@
       "parts": [
         {
           "suffix": "PIESKI",
-          "name_en": "Pieski",
-          "name_zh": "皮耶斯基",
+          "name_en": "Shchuchyn",
+          "name_zh": "舒钦",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2536,8 +2510,8 @@
       ],
       "remainder": {
         "suffix": "SZELIGI",
-        "name_en": "Szeligi",
-        "name_zh": "谢利吉",
+        "name_en": "Augustow",
+        "name_zh": "奥古斯图夫",
         "full_name": true
       }
     },
@@ -2618,8 +2592,8 @@
       ],
       "remainder": {
         "suffix": "ORADEA_COUNTY",
-        "name_en": "Oradea County",
-        "name_zh": "奥拉迪亚县",
+        "name_en": "Oradea",
+        "name_zh": "奥拉迪亚",
         "full_name": true
       }
     },
@@ -2670,8 +2644,8 @@
         },
         {
           "suffix": "DOBA",
-          "name_en": "Doba",
-          "name_zh": "多巴",
+          "name_en": "Carei",
+          "name_zh": "卡雷伊",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2700,8 +2674,8 @@
       "parts": [
         {
           "suffix": "MARAMURES",
-          "name_en": "Maramures",
-          "name_zh": "马拉穆列什",
+          "name_en": "Sighetu Marmatiei",
+          "name_zh": "锡盖图马尔马切伊",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2713,8 +2687,8 @@
         },
         {
           "suffix": "ROHIA",
-          "name_en": "Rohia",
-          "name_zh": "罗希亚",
+          "name_en": "Baia Sprie",
+          "name_zh": "巴亚斯普列",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2739,8 +2713,8 @@
         },
         {
           "suffix": "CAVNIC",
-          "name_en": "Cavnic",
-          "name_zh": "卡夫尼克",
+          "name_en": "Baia Mare",
+          "name_zh": "巴亚马雷",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2851,8 +2825,8 @@
       "parts": [
         {
           "suffix": "CLUJ",
-          "name_en": "Cluj",
-          "name_zh": "克卢日",
+          "name_en": "Cluj-Napoca",
+          "name_zh": "克卢日-纳波卡",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2894,8 +2868,8 @@
       ],
       "remainder": {
         "suffix": "NORTH_TRANSILVANIA",
-        "name_en": "North Transilvania",
-        "name_zh": "北特兰西瓦尼亚",
+        "name_en": "Turda",
+        "name_zh": "图尔达",
         "full_name": true
       }
     },
@@ -2950,8 +2924,8 @@
       ],
       "remainder": {
         "suffix": "NORTH_TRANSILVANIA",
-        "name_en": "North Transilvania",
-        "name_zh": "北特兰西瓦尼亚",
+        "name_en": "Bistrița",
+        "name_zh": "比斯特里察",
         "full_name": true
       }
     },
@@ -2976,8 +2950,8 @@
         },
         {
           "suffix": "NORTH_PASUL_TULGHES",
-          "name_en": "North Pasul Tulghes",
-          "name_zh": "图尔盖什山口北部",
+          "name_en": "East Miercurea-Ciuc",
+          "name_zh": "东米耶尔库雷亚丘克",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -2993,8 +2967,8 @@
       ],
       "remainder": {
         "suffix": "MOINESTI",
-        "name_en": "Moinesti",
-        "name_zh": "莫伊内什蒂",
+        "name_en": "West Miercurea Ciuc",
+        "name_zh": "西米耶尔库雷亚丘克",
         "full_name": true
       }
     },
@@ -3006,8 +2980,8 @@
       "parts": [
         {
           "suffix": "COVASNA",
-          "name_en": "Covasna",
-          "name_zh": "科瓦斯纳",
+          "name_en": "Sfântu Gheorghe",
+          "name_zh": "圣格奥尔基",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3023,8 +2997,8 @@
       ],
       "remainder": {
         "suffix": "PASUL_TULGHES",
-        "name_en": "Pasul Tulghes",
-        "name_zh": "图尔盖什山口",
+        "name_en": "Targu Secuiesc",
+        "name_zh": "特尔古塞奎斯克",
         "full_name": true
       }
     },
@@ -3036,8 +3010,8 @@
       "parts": [
         {
           "suffix": "CARANSEBES",
-          "name_en": "Caransebes",
-          "name_zh": "卡兰塞贝什",
+          "name_en": "Lugoj",
+          "name_zh": "卢戈日",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3088,8 +3062,8 @@
         },
         {
           "suffix": "FIBIS",
-          "name_en": "Fibis",
-          "name_zh": "菲比什",
+          "name_en": "North Timișoara",
+          "name_zh": "北蒂米什瓦拉",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3131,8 +3105,8 @@
       ],
       "remainder": {
         "suffix": "TIMISORA",
-        "name_en": "Timisora",
-        "name_zh": "蒂米什瓦拉",
+        "name_en": "South Timișoara",
+        "name_zh": "南蒂米什瓦拉",
         "full_name": true
       }
     },
@@ -3144,8 +3118,8 @@
       "parts": [
         {
           "suffix": "CRISANA",
-          "name_en": "Crisana",
-          "name_zh": "克里沙纳",
+          "name_en": "Arad",
+          "name_zh": "阿拉德",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3243,8 +3217,8 @@
       ],
       "remainder": {
         "suffix": "BANAT",
-        "name_en": "Banat",
-        "name_zh": "巴纳特",
+        "name_en": "Reșița",
+        "name_zh": "雷希察",
         "full_name": true
       }
     },
@@ -3282,8 +3256,8 @@
         },
         {
           "suffix": "EAST_KASTORIA",
-          "name_en": "East Kastoria",
-          "name_zh": "东卡斯托里亚",
+          "name_en": "Ptolemaida",
+          "name_zh": "托勒迈达",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3321,8 +3295,8 @@
         },
         {
           "suffix": "KOZANI",
-          "name_en": "Kozani",
-          "name_zh": "科扎尼",
+          "name_en": "West Kozani",
+          "name_zh": "西科扎尼",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3338,8 +3312,8 @@
       ],
       "remainder": {
         "suffix": "PTOLEMAIDA",
-        "name_en": "Ptolemaida",
-        "name_zh": "托勒迈达",
+        "name_en": "East Kozani",
+        "name_zh": "东科扎尼",
         "full_name": true
       }
     },
@@ -3351,8 +3325,8 @@
       "parts": [
         {
           "suffix": "CHALKIDIKI",
-          "name_en": "Chalkidiki",
-          "name_zh": "哈尔基季基",
+          "name_en": "Thessaloniki",
+          "name_zh": "塞萨洛尼基",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3381,8 +3355,8 @@
       ],
       "remainder": {
         "suffix": "CENTRAL_MACEDONIA",
-        "name_en": "Central Macedonia",
-        "name_zh": "中马其顿",
+        "name_en": "Veroia",
+        "name_zh": "韦里亚",
         "full_name": true
       }
     },
@@ -3394,8 +3368,8 @@
       "parts": [
         {
           "suffix": "PCINJA",
-          "name_en": "Pcinja",
-          "name_zh": "普奇尼亚",
+          "name_en": "Ohrid",
+          "name_zh": "奥赫里德",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3424,8 +3398,8 @@
       ],
       "remainder": {
         "suffix": "WEST_MACEDONIA",
-        "name_en": "West Macedonia",
-        "name_zh": "西马其顿",
+        "name_en": "Centar Zupa",
+        "name_zh": "中茹帕",
         "full_name": true
       }
     },
@@ -3437,8 +3411,8 @@
       "parts": [
         {
           "suffix": "BOJANE",
-          "name_en": "Bojane",
-          "name_zh": "博亚内",
+          "name_en": "Brvenica",
+          "name_zh": "布尔韦尼察",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3450,8 +3424,8 @@
         },
         {
           "suffix": "ELEZ_HAN",
-          "name_en": "Elez Han",
-          "name_zh": "埃莱兹汉",
+          "name_en": "Tetovo",
+          "name_zh": "泰托沃",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3467,8 +3441,8 @@
       ],
       "remainder": {
         "suffix": "TETOVO",
-        "name_en": "Tetovo",
-        "name_zh": "泰托沃",
+        "name_en": "Gostivar",
+        "name_zh": "戈斯蒂瓦尔",
         "full_name": true
       }
     },
@@ -3493,7 +3467,7 @@
         },
         {
           "suffix": "KRIVE_PALANKA",
-          "name_en": "Krive Palanka",
+          "name_en": "Kriva Palanka",
           "name_zh": "克里瓦帕兰卡",
           "full_name": true,
           "polygon_source": {
@@ -3510,8 +3484,8 @@
       ],
       "remainder": {
         "suffix": "MACEDONIA",
-        "name_en": "Macedonia",
-        "name_zh": "马其顿",
+        "name_en": "Kumanovo",
+        "name_zh": "库马诺沃",
         "full_name": true
       }
     },
@@ -3553,8 +3527,8 @@
       ],
       "remainder": {
         "suffix": "SANDANSKI",
-        "name_en": "Sandanski",
-        "name_zh": "桑丹斯基",
+        "name_en": "Blagoevgrad",
+        "name_zh": "布拉戈耶夫格勒",
         "full_name": true
       }
     },
@@ -3592,8 +3566,8 @@
         },
         {
           "suffix": "LULEBURGAZ",
-          "name_en": "Luleburgaz",
-          "name_zh": "吕莱布尔加兹",
+          "name_en": "Orestiada",
+          "name_zh": "奥雷斯蒂亚达",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3618,8 +3592,8 @@
         },
         {
           "suffix": "KESAN",
-          "name_en": "Kesan",
-          "name_zh": "凯尚",
+          "name_en": "Alexandroupoli",
+          "name_zh": "亚历山德鲁波利斯",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3635,8 +3609,8 @@
       ],
       "remainder": {
         "suffix": "ALEXANDROUPOLI",
-        "name_en": "Alexandroupoli",
-        "name_zh": "亚历山德鲁波利斯",
+        "name_en": "Xanthi",
+        "name_zh": "克桑西",
         "full_name": true
       }
     },
@@ -3661,8 +3635,8 @@
         },
         {
           "suffix": "ORMENIO",
-          "name_en": "Ormenio",
-          "name_zh": "奥尔梅尼奥",
+          "name_en": "Haskovo",
+          "name_zh": "哈斯科沃",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3700,8 +3674,8 @@
         },
         {
           "suffix": "SVILENGRAD",
-          "name_en": "Svilengrad",
-          "name_zh": "斯维伦格勒",
+          "name_en": "Dimitrovgrad",
+          "name_zh": "季米特洛夫格勒",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3730,8 +3704,8 @@
       ],
       "remainder": {
         "suffix": "EDIRNE",
-        "name_en": "Edirne",
-        "name_zh": "埃迪尔内",
+        "name_en": "Harmanli",
+        "name_zh": "哈曼利",
         "full_name": true
       }
     },
@@ -3769,8 +3743,8 @@
         },
         {
           "suffix": "GALICHITSA",
-          "name_en": "Galichitsa",
-          "name_zh": "加利奇察",
+          "name_en": "Pogradec",
+          "name_zh": "波格拉德茨",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3786,8 +3760,8 @@
       ],
       "remainder": {
         "suffix": "POGRADEC",
-        "name_en": "Pogradec",
-        "name_zh": "波格拉德茨",
+        "name_en": "Korçë",
+        "name_zh": "科尔察",
         "full_name": true
       }
     },
@@ -3881,8 +3855,8 @@
       ],
       "remainder": {
         "suffix": "METSOVO",
-        "name_en": "Metsovo",
-        "name_zh": "梅措沃",
+        "name_en": "Ioannina",
+        "name_zh": "约阿尼纳",
         "full_name": true
       }
     },
@@ -3920,8 +3894,8 @@
         },
         {
           "suffix": "WEST_IOANNINA",
-          "name_en": "West Ioannina",
-          "name_zh": "约阿尼纳西部",
+          "name_en": "East Arta",
+          "name_zh": "东阿尔塔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -3933,8 +3907,8 @@
         },
         {
           "suffix": "ARTA",
-          "name_en": "Arta",
-          "name_zh": "阿尔塔",
+          "name_en": "West Arta",
+          "name_zh": "西阿尔塔",
           "full_name": true,
           "polygon_source": {
             "path": "hoi4_hgo_hotspots.sources.geojson",
@@ -4015,8 +3989,8 @@
       ],
       "remainder": {
         "suffix": "METSOVO",
-        "name_en": "Metsovo",
-        "name_zh": "梅措沃",
+        "name_en": "Ioannina",
+        "name_zh": "约阿尼纳",
         "full_name": true
       }
     }

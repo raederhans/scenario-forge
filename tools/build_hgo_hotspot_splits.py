@@ -11,7 +11,7 @@ import sys
 import numpy as np
 import shapely
 from pyproj import Geod
-from shapely.affinity import affine_transform
+from shapely.affinity import affine_transform, scale
 from shapely.geometry import mapping
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,12 +38,8 @@ OUTSIDE_REGION = {
 STATE_CITY_CONTROLS = {
     "alsace_lorraine": {2059: "Metz", 2061: "Thionville", 5359: "Strasbourg",
                         5360: "Haguenau", 5573: "Colmar", 5587: "Hayange"},
-    "south_tyrol_trentino": {39: "Bolzano", 975: "Trento", 4801: "Brunico",
-                             7533: "Rovereto", 8410: "Laces", 8411: "Melago"},
+    "south_tyrol_trentino": {39: "Bolzano", 975: "Trento", 7533: "Rovereto"},
 }
-# Approximate town centres absent from the editor city layer, in lon/lat.
-ALPINE_TOWNS = {"BRUNICO": [[11.94, 46.80]], "LACES": [[10.86, 46.62]],
-                "MELAGO": [[10.66, 46.84]]}
 
 TRANSLATIONS = {
     76: "塞克勒地区", 83: "克里沙纳", 736: "普拉", 779: "奥伊彭-马尔梅迪",
@@ -170,7 +166,7 @@ def registration(shapes, target, places, cities, grid, step, state_anchors=()):
     matrix = None
     if len(src) >= 3:
         fit, _, rank, _ = np.linalg.lstsq(src, dst, rcond=None)
-        if rank == 3:
+        if rank == 3 and (not state_anchors or np.linalg.det(fit[:2]) > 0):
             matrix = [*fit[:2, 0], *fit[:2, 1], *fit[2]]
             method = "city/state-anchor affine" if state_anchors else "city affine"
     if matrix is None:
@@ -188,7 +184,49 @@ def registration(shapes, target, places, cities, grid, step, state_anchors=()):
     return matrix, f"{method}, cities={len(src)}, RMS={residual}"
 
 
-def partition(parent, states, pixel_counts=None):
+def edge_strip(piece, parent):
+    if not piece.boundary.intersection(parent.boundary).length:
+        return False
+    km = scale(piece, xfact=111.32 * np.cos(np.deg2rad(piece.centroid.y)), yfact=111.13)
+    sides = np.linalg.norm(np.diff(km.minimum_rotated_rectangle.exterior.coords, axis=0), axis=1)
+    return min(sides) <= 3.5 and max(sides) >= 4 * min(sides)
+
+
+def merge_scraps(parent, parts):
+    merged = 0
+    detached = []
+    while len(parts) > 1:
+        moved = False
+        for sid in list(parts):
+            for piece in polygons(parts[sid]):
+                small = area_km2(piece) < 3
+                if not small and not edge_strip(piece, parent):
+                    continue
+                edges = {k: part.boundary.intersection(piece.boundary).length
+                         for k, part in parts.items() if k != sid}
+                other = max(edges, key=edges.get)
+                if edges[other] > 0:
+                    parts[other] = parts[other].union(piece)
+                    merged += 1
+                elif small:
+                    detached.append((sid, piece))
+                else:
+                    continue
+                parts[sid] = parts[sid].difference(piece)
+                if parts[sid].is_empty:
+                    del parts[sid]
+                moved = True
+                break
+            if moved:
+                break
+        if not moved:
+            break
+    remainder = max(parts, key=lambda k: parts[k].area)
+    parts[remainder] = shapely.union_all([parts[remainder], *(p for _, p in detached)])
+    return merged + sum(sid != remainder for sid, _ in detached)
+
+
+def partition(parent, states, pixel_counts=None, merge_counts=None):
     # Leave a narrow collar. Triangulating it preserves the parent's original arc vertices.
     interior = parent.buffer(-0.002)
     seeds = {}
@@ -221,22 +259,78 @@ def partition(parent, states, pixel_counts=None):
             sid = min(seeds, key=lambda k: seeds[k].distance(point))
             additions[sid].append(tri)
     parts = {sid: shapely.union_all(additions[sid]) for sid in seeds}
-    # Move detached scraps to the part with the longest common edge.
-    for sid in parts:
-        for scrap in list(polygons(parts[sid])):
-            if area_km2(scrap) >= 3:
-                continue
-            edges = {k: parts[k].boundary.intersection(scrap.boundary).length for k in parts if k != sid}
-            other = max(edges, key=edges.get) if any(edges.values()) else min(
-                seeds, key=lambda k: seeds[k].distance(scrap))
-            if other == sid:
-                continue
-            parts[sid] = parts[sid].difference(scrap)
-            parts[other] = parts[other].union(scrap)
-    return parts
+    merged = merge_scraps(parent, parts)
+    if merge_counts is not None:
+        merge_counts.append(merged)
+    return parts if len(parts) >= 2 else {}
 
 
-def build_entry(parent_id, parts, names, source_path):
+STATE_NAMES = {
+    778: ("East Prussia", "东普鲁士"), 2061: ("Thionville", "蒂永维尔"),
+    3509: ("Briey", "布里耶"), 7352: ("West Dubrovnik", "西杜布罗夫尼克"),
+    2272: ("Timișoara", "蒂米什瓦拉"),
+}
+
+CITY_ZH = {
+    "Sarreguemines": "萨尔格米讷", "Selestat": "塞莱斯塔", "Sonderborg": "森讷堡",
+    "Tonder": "滕德", "Heide": "海德", "Eckernfoerde": "埃肯弗德",
+    "Bressanone": "布雷萨诺内", "Gorizia": "戈里齐亚", "Koper": "科佩尔",
+    "Solin": "索林", "Villach": "菲拉赫", "Lidzbark Warminski": "瓦尔米亚地区利兹巴克",
+    "Gizycko": "吉日茨科", "Mragowo": "姆龙戈沃", "Braniewo": "布拉涅沃",
+    "Gierloz": "盖尔沃日", "Starogard Gdanski": "格但斯克旧城", "Koscierzyna": "科希切日纳",
+    "Chojnice": "霍伊尼采", "Swiecie": "希维切", "Bytow": "比图夫", "Grudziądz": "格鲁琼兹",
+    "Smarhon": "斯莫尔贡", "Novogrudok": "新格鲁多克", "Volkovysk": "沃尔科维斯克",
+    "Oshmyany": "奥什米亚内", "Shchuchyn": "舒钦", "Sighetu Marmatiei": "锡盖图马尔马切伊",
+    "Baia Sprie": "巴亚斯普列", "Miercurea-Ciuc": "米耶尔库雷亚丘克",
+    "Targu Secuiesc": "特尔古塞奎斯克", "Lugoj": "卢戈日", "Veroia": "韦里亚",
+    "Centar Zupa": "中茹帕", "Ohrid": "奥赫里德", "Brvenica": "布尔韦尼察",
+    "Gostivar": "戈斯蒂瓦尔", "Kumanovo": "库马诺沃", "Kriva Palanka": "克里瓦帕兰卡",
+    "Blagoevgrad": "布拉戈耶夫格勒", "Harmanli": "哈曼利", "Dimitrovgrad": "季米特洛夫格勒",
+}
+
+
+def part_names(parts, states, city_tree, city_features):
+    by_name = {code(en.casefold()): (en, zh) for en, zh in states.values()}
+    labels = {}
+    for sid, geom in parts.items():
+        cities = (city_features[i]["properties"] for i in city_tree.query(geom, predicate="covers"))
+        city = max(cities, key=lambda p: (p["population"], p["id"]), default=None)
+        if city is None:
+            labels[sid] = states[sid]
+            continue
+        en = city["name_en"] or city["name_ascii"]
+        match = by_name.get(code(en.casefold()))
+        if match:
+            labels[sid] = match
+        else:
+            zh = city["name_zh"]
+            if not any("\u4e00" <= char <= "\u9fff" for char in zh) or en in CITY_ZH:
+                zh = CITY_ZH[en]
+            labels[sid] = en, zh
+
+    # Split each collision along the axis on which the parts are furthest apart.
+    for language in (0, 1):
+        while True:
+            groups = defaultdict(list)
+            for sid, label in labels.items():
+                key = code(label[0].casefold()) if language == 0 else label[1]
+                groups[key].append(sid)
+            group = next((ids for ids in groups.values() if len(ids) > 1), None)
+            if group is None:
+                break
+            centers = np.array([[parts[i].centroid.x, parts[i].centroid.y] for i in group])
+            centers[:, 0] *= np.cos(np.deg2rad(centers[:, 1].mean()))
+            axis = np.argmax(np.ptp(centers, axis=0))
+            directions = (("West", "西"), ("East", "东")) if axis == 0 else (("South", "南"), ("North", "北"))
+            for rank, j in enumerate(np.argsort(centers[:, axis], kind="stable")):
+                sid = group[j]
+                en, zh = labels[sid]
+                prefix, chinese = directions[int(rank >= len(group) // 2)]
+                labels[sid] = f"{prefix} {en}", chinese + zh
+    return labels
+
+
+def build_entry(parent_id, parts, names, source_path, state_rows=None):
     if len(parts) < 2:
         return None, []
     entry = dict(id=parent_id, feature_ids=[parent_id], parts=[],
@@ -245,7 +339,7 @@ def build_entry(parent_id, parts, names, source_path):
     remainder = max(parts, key=lambda sid: parts[sid].area)
     for sid, geom in parts.items():
         en, zh = names[sid]
-        suffix = code(en)
+        suffix = code(state_rows[sid]["name"] if state_rows is not None else en)
         if suffix in suffixes:
             suffix += f"_{sid}"
         suffixes.add(suffix)
@@ -291,8 +385,10 @@ def main(argv=None):
         sid = s["id"]
         if sid in shapes:
             zh = catalog.get(s["nameKey"], {}).get("names", {}).get("zh") or locale[str(sid)].get("zh")
-            names[sid] = s["name"], zh or TRANSLATIONS[sid]
-    cities = city_index(read(DATA / "world_cities.geojson")["features"])
+            names[sid] = STATE_NAMES.get(sid, (s["name"], zh or TRANSLATIONS[sid]))
+    city_features = read(DATA / "world_cities.geojson")["features"]
+    cities = city_index(city_features)
+    city_tree = shapely.STRtree([shapely.Point(f["geometry"]["coordinates"]) for f in city_features])
     places = read(ASSETS / "default/places.json")["places"]
     topology = _absolute_topology(read(DATA / "scenarios/hoi4_1936/runtime_topology.topo.json"))
     rows = {r["properties"]["id"]: r for r in topology["objects"]["political"]["geometries"]}
@@ -306,15 +402,15 @@ def main(argv=None):
         controls = STATE_CITY_CONTROLS.get(region["region_id"], {})
         anchors = [dict(name=name, stateId=sid, x=state_rows[sid]["anchor"][0], y=state_rows[sid]["anchor"][1])
                    for sid, name in controls.items() if sid in states]
-        city_points = ALPINE_TOWNS | cities if region["region_id"] == "south_tyrol_trentino" else cities
         matrix, report = registration(states, shapely.union_all(list(parents.values())),
-                                      places, city_points, grid, step, anchors)
+                                      places, cities, grid, step, anchors)
         pixel_counts = {sid: state_rows[sid]["pixelCount"] for sid in states} if controls else None
         states = {sid: affine_transform(g, matrix) for sid, g in states.items()}
-        count, skipped = 0, []
+        count, skipped, merge_counts = 0, [], []
         for fid, parent in parents.items():
-            parts = partition(parent, states, pixel_counts)
-            entry, masks = build_entry(fid, parts, names, source_path)
+            parts = partition(parent, states, pixel_counts, merge_counts)
+            labels = part_names(parts, {sid: names[sid] for sid in states}, city_tree, city_features)
+            entry, masks = build_entry(fid, parts, labels, source_path, state_rows)
             if entry:
                 rules["entries"].append(entry)
                 features.extend(masks)
@@ -322,7 +418,7 @@ def main(argv=None):
             else:
                 skipped.append(fid)
         print(f"{region['region_id']}: parents={len(parents)}, parts={count}, "
-              f"net={count-len(parents)+len(skipped)}, {report}, skipped (<2)={skipped}", flush=True)
+              f"net={count-len(parents)+len(skipped)}, merged={sum(merge_counts)}, {report}, skipped (<2)={skipped}", flush=True)
     validate_partition_plan(rules)
     write(args.rules, rules)
     write(args.sources, dict(type="FeatureCollection", features=features))
