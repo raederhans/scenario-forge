@@ -10,6 +10,7 @@ export const shortcuts = [
     ["toolEyedropperBtn", "Eyedropper tool", "I"],
     ["brushModeBtn", "Brush", "B"],
     ["text", "Place map text", "T"],
+    ["cycleQuickFillLevelFn", "Cycle quick fill level", "G"],
     ["escape", "Cancel stroke or exit current mode", "Escape"],
   ]),
   ...bindings("Colors", [
@@ -34,6 +35,8 @@ export const shortcuts = [
   ]),
   ...bindings("File", [
     ["save", "Save project", "Mod+S"],
+    ["saveAs", "Save a copy…", "Mod+Shift+S"],
+    ["runQuickReexportFn", "Export with last settings", "Mod+Shift+E"],
     ["open", "Open project", "Mod+O"],
   ]),
   ...bindings("History", [
@@ -44,6 +47,14 @@ export const shortcuts = [
     ["brushPan", "Hold and drag to pan", "Shift", "Space"],
     ["pick", "Hold Alt and click to sample a color", "Alt+Click"],
     ["quickFill", "Quick fill", "Double-click"],
+    ["fillCountry", "Quick fill whole country", "Shift+Double-click"],
+    ["fillParent", "Quick fill parent region", "Space+Double-click"],
+    ["toggleSelection", "Toggle parcel selection", "Mod+Click", "Shift+Click"],
+    ["placeMoreText", "Place another map label", "Shift+Click"],
+    ["copyLabel", "Duplicate selected map label", "Ctrl+D"],
+    ["nudgeLabel", "Nudge selected map label", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
+    ["deleteLabel", "Delete map label", "Delete", "Backspace"],
+    ["commitLabel", "Apply label text", "Ctrl+Enter"],
   ]),
 ];
 

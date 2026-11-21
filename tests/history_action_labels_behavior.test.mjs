@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { shortcutLabel } from "../js/ui/command_palette.js";
 import { getHistoryActionLabel } from "../js/core/history_action_labels.js";
 import { coalesceQuickFillGesture } from "../js/core/history_quick_fill_gesture.js";
 import { state } from "../js/core/state.js";
@@ -55,10 +56,10 @@ test("switching language keeps the next action in both button attributes", async
     globalThis.document = original;
   });
   updateUIText();
-  assert.deepEqual([undo.title, undo["aria-label"], undo.disabled], ["撤销：填色 1 个地块", "撤销：填色 1 个地块", false]);
+  assert.deepEqual([undo.title, undo["aria-label"], undo.disabled], [`撤销：填色 1 个地块 (${shortcutLabel("undo")})`, "撤销：填色 1 个地块", false]);
   await toggleLanguage();
-  assert.deepEqual([undo.title, undo["aria-label"], undo.disabled], ["Undo: Paint 1 region", "Undo: Paint 1 region", false]);
-  assert.deepEqual([redo.title, redo["aria-label"], redo.disabled], ["Redo", "Redo", true]);
+  assert.deepEqual([undo.title, undo["aria-label"], undo.disabled], [`Undo: Paint 1 region (${shortcutLabel("undo")})`, "Undo: Paint 1 region", false]);
+  assert.deepEqual([redo.title, redo["aria-label"], redo.disabled], [`Redo (${shortcutLabel("redo")})`, "Redo", true]);
 });
 
 test("named edits in the history list and toolbar use the active language", () => {

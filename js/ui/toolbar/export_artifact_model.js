@@ -1,3 +1,5 @@
+import { hasMapTitles } from "../../core/map_renderer/public.js";
+
 export const EXPORT_MAX_DIMENSION_PX = 7680;
 export const EXPORT_MAX_PIXELS = 7680 * 4320;
 
@@ -95,7 +97,7 @@ export function getBakePackLayerIds(exportUi) {
   );
   const hasVisibleMainLayers = visibleMainLayers.length > 0;
   const hasEffectsLayer = visibleMainLayers.includes("effects");
-  const hasTextLayer = Object.values(exportUi?.textVisibility || {}).some(Boolean);
+  const hasTextLayer = Object.values(exportUi?.textVisibility || {}).some(Boolean) || hasMapTitles(exportUi?.mapTitles);
   const next = [];
   if (hasVisibleMainLayers) next.push("color");
   if (hasEffectsLayer) next.push("line");
@@ -145,6 +147,7 @@ export function buildPerLayerExportPlan(exportUi) {
   if (exportUi?.textVisibility?.["svg-annotations"]) outputs.push({ id: "svg-annotations" });
   if (exportUi?.textVisibility?.["special-zones"]) outputs.push({ id: "special-zones" });
   if (exportUi?.textVisibility?.legend) outputs.push({ id: "legend" });
+  if (hasMapTitles(exportUi?.mapTitles)) outputs.push({ id: "map-titles" });
   return outputs;
 }
 

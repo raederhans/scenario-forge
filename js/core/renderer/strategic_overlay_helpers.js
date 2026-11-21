@@ -252,7 +252,10 @@ function renderOperationGraphicsOverlay() {
   const hidden = state.annotationView?.showOperationGraphics === false;
   operationGraphicsGroup.attr("display", hidden ? "none" : null);
   groupGetters.getOperationGraphicsEditorGroup?.()?.attr("display", hidden ? "none" : null);
-  if (hidden) return;
+  if (hidden) {
+    renderOperationGraphicsEditorOverlay();
+    return;
+  }
   renderStrategicDefs();
   const graphics = Array.isArray(state.operationGraphics) ? state.operationGraphics : [];
   const selectedId = String(state.operationGraphicsEditor?.selectedId || "");

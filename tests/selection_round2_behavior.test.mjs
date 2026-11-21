@@ -73,7 +73,7 @@ test("color quick fill crosses borders, stops at different colors and falls back
     shouldExcludePoliticalInteractionFeature: () => false,
   });
   // The leading click has already repainted a. Its original color determines the component.
-  const plan = () => policy.buildDoubleClickBatchPlan(landIndex.get("a"), "a", "#123456");
+  const plan = () => policy.buildDoubleClickBatchPlan(landIndex.get("a"), "a", "color", "#123456");
   assert.deepEqual(plan().targetIds, ["a", "b"]);
   adjacency = null;
   assert.deepEqual(plan().targetIds, ["a", "b", "e"]);

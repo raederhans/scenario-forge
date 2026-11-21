@@ -33,14 +33,14 @@ function labelStyle(label) {
   return { size, rotation, tracking, uppercase, colorMode, italic, weight, color, opacity, preset };
 }
 
-export function placeMapLabel(options) {
+export function placeMapLabel(options, keepPlacing = false) {
   const counter = ensureMapLabelCounter();
   const id = `map_label_${counter}`;
   const previous = state.mapLabels.find(label => label.id === state.mapLabelEditor.selectedId) ?? state.mapLabels.at(-1);
   const style = previous ? labelStyle(previous) : { size: 18 / (state.zoomTransform?.k || 1) };
   const label = normalizeMapLabel({ ...style, ...options }, id);
   if (!label) return false;
-  commitLabels("place-map-label", [...state.mapLabels, label], { active: false, counter: counter + 1, selectedId: id });
+  commitLabels("place-map-label", [...state.mapLabels, label], { active: keepPlacing, counter: counter + 1, selectedId: id });
   return id;
 }
 

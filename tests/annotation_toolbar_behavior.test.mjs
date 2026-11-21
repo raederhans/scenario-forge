@@ -27,7 +27,7 @@ test("hiding a category hides its SVG group and graphic editing handles", () => 
   const getter = key => () => ({ attr(name, value) {
     if (name === "display") groups[key] = value;
   } });
-  const owner = createStrategicOverlayHelpersOwner({ state, groupGetters: {
+  const owner = createStrategicOverlayHelpersOwner({ state, helpers: { renderOperationGraphicsEditorOverlay() {} }, groupGetters: {
     getOperationalLinesGroup: getter("lines"), getOperationGraphicsGroup: getter("graphics"),
     getOperationGraphicsEditorGroup: getter("handles"), getUnitCountersGroup: getter("counters"),
   } });
@@ -137,13 +137,14 @@ test("dragging a slider updates its readout and typing an exact size commits a n
   bindMapLabelPanel({ state, startPlacement() {}, refresh() {}, section: {
     ownerDocument: new EventTarget(), querySelector: key => readouts[key] || new Control(), querySelectorAll: () => [...fields, size],
   } });
-  for (const [index, value] of ["7.15", "-25"].entries()) {
+  state.zoomTransform = { k: 2, x: 0, y: 0 };
+  for (const [index, value] of ["3", "-25"].entries()) {
     fields[index].value = value;
     fields[index].dispatchEvent(new Event("input"));
   }
-  assert.equal(size.value, "7.15");
+  assert.equal(size.value, 16);
   assert.equal(rotation.value, "-25");
   size.value = "3.75";
   size.dispatchEvent(new Event("change"));
-  assert.equal(state.mapLabels.find(label => label.id === id).size, 3.75);
+  assert.equal(state.mapLabels.find(label => label.id === id).size, 1.875);
 });

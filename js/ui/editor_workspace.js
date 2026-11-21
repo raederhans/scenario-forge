@@ -632,8 +632,9 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   const commandPalette = initCommandPalette({ documentRef, t, getCommands: () => [
     ...[...propertyEntries].filter(([, entry]) => entry.task === "layers").map(([key, entry]) => ({ key, label: entry.label, button: entry.trigger, group: "Layers" })),
     ...objectEntries.map((entry) => ({ key: entry.key, label: propertyEntries.get(entry.key).label, button: entry.button, group: "Objects" })),
-    ...shortcuts.filter(({ group, action }) => group === "Tools" && get(action))
-      .map(({ action, label, keys, group }) => ({ key: action, label, shortcut: formatShortcut(keys), button: get(action), group })),
+    ...shortcuts.filter(({ group }) => group === "Tools")
+      .map(({ action, label, keys, group }) => ({ key: action, label, shortcut: formatShortcut(keys),
+        button: get(action === "text" ? "toolMapTextBtn" : action), group })),
     ...[
       ["workspaceSaveBtn", "Save project"], ["workspaceExportBtn", "Export image"],
       ["quickReexportBtn", "Export with last settings"],

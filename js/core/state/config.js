@@ -129,8 +129,6 @@ export const STATE_HANDLER_HOOK_NAMES = Object.freeze([
   "showOnboardingHintFn",
   "dismissOnboardingHintFn",
   "commitZoomInputValueFn",
-  "runMapTextToolFn",
-  "cancelBrushStrokeFn",
   "runZoomStepFn",
   "runZoomResetFn",
   "runProjectSaveFn",

@@ -54,7 +54,8 @@ export function createOperationGraphicsEditorRenderOwner(runtimeState, {
   function syncInteractionLayerPointerEvents() {
     if (!rendererSurfaceHost.getInteractionRect()) return;
     const operationGraphicEditor = runtimeState.operationGraphicsEditor || {};
-    const hasEditableOperationGraphic = !operationGraphicEditor.active
+    const hasEditableOperationGraphic = runtimeState.annotationView?.showOperationGraphics !== false
+      && !operationGraphicEditor.active
       && String(operationGraphicEditor.mode || "") === "edit"
       && !!String(operationGraphicEditor.selectedId || "").trim()
       && Array.isArray(operationGraphicEditor.points)
@@ -67,7 +68,7 @@ export function createOperationGraphicsEditorRenderOwner(runtimeState, {
   function renderOperationGraphicsEditorOverlay(onVertexClick) {
     if (!rendererSurfaceHost.getOperationGraphicsEditorGroup()) return;
     ensureOperationGraphicsEditorState();
-    const editorModel = getOperationGraphicEditorModel();
+    const editorModel = runtimeState.annotationView?.showOperationGraphics === false ? null : getOperationGraphicEditorModel();
     const points = Array.isArray(editorModel?.points) ? editorModel.points : [];
     const isDrawing = editorModel?.mode === "draw";
     if (!editorModel || points.length === 0) {

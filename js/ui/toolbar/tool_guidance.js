@@ -41,6 +41,9 @@ export function createToolGuidance({ documentRef = document, state, t }) {
     hide();
     active = entry;
     label.textContent = t(entry.key, "ui");
+    if (entry.button.id === "toolFillBtn" || entry.button.id === "toolEraserBtn") {
+      label.append(documentRef.createElement("br"), t("Hold Alt and click to sample a color", "ui"));
+    }
     shortcut.textContent = entry.shortcut;
     const ids = (entry.button.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
     entry.button.setAttribute("aria-describedby", [...new Set([...ids, tooltip.id])].join(" "));
@@ -78,9 +81,15 @@ export function createToolGuidance({ documentRef = document, state, t }) {
   view.addEventListener("resize", hide);
   const sync = () => {
     controls.forEach(({ button }) => button.removeAttribute("title"));
-    const text = t(globalThis.matchMedia?.("(pointer: coarse)")?.matches ? "Drag with two fingers to pan" : "Shift / Space + drag to pan", "ui");
+    const hints = [];
+    if (state.brushModeEnabled) {
+      hints.push(t(globalThis.matchMedia?.("(pointer: coarse)")?.matches ? "Drag with two fingers to pan" : "Shift / Space + drag to pan", "ui"));
+    }
+    if (["fill", "eraser"].includes(state.currentTool)) hints.push(t("Hold Alt and click to sample a color", "ui"));
+    const text = hints.join("\n");
+    brushHint.style.whiteSpace = "pre-line";
     if (brushHint.textContent !== text) brushHint.textContent = text;
-    const hidden = !state.brushModeEnabled;
+    const hidden = !hints.length;
     if (brushHint.hidden !== hidden) brushHint.hidden = hidden;
     if (active?.button.disabled) hide();
     else if (active) show(active);

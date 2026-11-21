@@ -1,3 +1,4 @@
+import { positionMapTitleAwareLegend } from "./map_title_render_owner.js";
 import { getPopulationLegend } from "../thematic/population_spatial_view_model.js";
 
 export function drawPopulationExportLegend(canvas, state) {
@@ -9,7 +10,7 @@ export function drawPopulationExportLegend(canvas, state) {
   const width = 340;
   const height = 108 + legend.entries.length * 18 + (legend.referenceNote ? 32 : 0);
   const scale = Math.min(canvas.width / Math.max(1, state.width || canvas.width), canvas.width / (width + 24), canvas.height / (height + 24));
-  const x = 12, y = canvas.height / scale - height - 12;
+  const [x, y] = positionMapTitleAwareLegend(canvas, state, scale, width, height);
   ctx.save(); ctx.setTransform(scale, 0, 0, scale, 0, 0); ctx.globalAlpha = 1;
   ctx.fillStyle = "#ffffff"; ctx.fillRect(x, y, width, height);
   ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1; ctx.strokeRect(x, y, width, height);

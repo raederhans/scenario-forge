@@ -1,3 +1,4 @@
+import { replacesCountryLabel } from "../state/strategic_overlay_state.js";
 import { lazyOwner } from "./lazy_owner.js";
 import { getCountryNameOverride } from "../country_name_overrides.js";
 import { claimScreenLabelPlacement } from "../renderer/screen_label_placement.js";
@@ -457,18 +458,14 @@ export function createLabelsRuntime({
 
   let placedBounds = new Map();
   let boundCodes = new Set();
-  let bindingLabels, bindingCountries;
   function getBoundCountryCodes() {
     const { mapLabels, scenarioCountriesByTag } = runtimeState;
-    if (bindingLabels !== mapLabels || bindingCountries !== scenarioCountriesByTag) {
-      bindingLabels = mapLabels;
-      bindingCountries = scenarioCountriesByTag;
-      boundCodes = new Set();
-      if (mapLabels?.length) {
-        const parents = getParentMergedParents(scenarioCountriesByTag);
-        for (const { countryCode } of mapLabels) {
-          if (countryCode) boundCodes.add(parents.get(countryCode) || countryCode);
-        }
+    boundCodes = new Set();
+    if (mapLabels?.length) {
+      const parents = getParentMergedParents(scenarioCountriesByTag);
+      for (const label of mapLabels) {
+        const code = label.countryCode;
+        if (code && replacesCountryLabel(label, getCountryName(code))) boundCodes.add(parents.get(code) || code);
       }
     }
     return boundCodes;

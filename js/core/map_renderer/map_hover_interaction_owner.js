@@ -191,7 +191,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     // DOM currentTarget is cleared after dispatch. The hit path supplies its
     // own SVG target to d3.pointer, so retain only stable event coordinates.
     pendingPointer = { clientX: event.clientX, clientY: event.clientY,
-      pageX: event.pageX, pageY: event.pageY };
+      pageX: event.pageX, pageY: event.pageY, shiftKey: event.shiftKey };
     if (hoverHitFrame) return;
     hoverHitFrame = scheduleFrame(() => {
       hoverHitFrame = null;
@@ -278,7 +278,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     return createSummary({ branch, hit, cursor, tooltipVisible: true });
   }
 
-  function getFeatureTooltip(feature, hit) {
+  function getFeatureTooltip(feature, hit, event) {
     const text = getterApi.getTooltipTextForFeature(feature);
     if (hit.targetType !== "land" || hit.riverBlockedReason || state.startupReadonly
       || state.operationalLineEditor?.active || state.operationGraphicsEditor?.active) return text;
@@ -287,12 +287,14 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
       fillPreview = null;
       return text;
     }
-    const inputs = [hit.id, feature, state.batchFillScope, state.currentLanguage, state.topologyRevision,
+    const scope = policy.getGestureScope(event);
+    const inputs = [hit.id, feature, scope, state.onlyUnpainted, state.currentLanguage, state.topologyRevision,
       state.activeScenarioId, state.mapSemanticMode, state.hierarchyData, state.activeScenarioManifest,
       state.scenarioDistrictGroupsData];
-    if (state.batchFillScope === "color") inputs.push(state.colorRevision, state.zoomTransform);
+    if (scope === "color" || state.onlyUnpainted) inputs.push(state.colorRevision);
+    if (scope === "color") inputs.push(state.zoomTransform);
     if (!fillPreview || inputs.some((value, i) => value !== fillPreview.inputs[i])) {
-      const plan = policy.buildDoubleClickBatchPlan(feature, hit.id);
+      const plan = policy.buildDoubleClickBatchPlan(feature, hit.id, scope);
       let line = "";
       if (plan) {
         const key = plan.fallbackToCountry ? "Double-click fill: whole country (no parent) · {count} regions"
@@ -300,6 +302,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
           : plan.groupLabel ? "Double-click fill: {count} regions ({group})"
           : "Double-click fill: {count} regions (parent region)";
         line = t(key, "ui", { count: plan.targetIds.length, group: plan.groupLabel });
+        if (plan.skippedCount) line += "\n" + t("Skipping {count} painted regions", "ui", { count: plan.skippedCount });
       }
       fillPreview = { inputs, line };
     }
@@ -369,7 +372,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     if (feature) {
       return queueVisibleTooltip(
         event,
-        getFeatureTooltip(feature, hit),
+        getFeatureTooltip(feature, hit, event),
         "feature-tooltip",
         hit,
         cursor,
