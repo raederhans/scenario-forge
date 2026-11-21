@@ -29,6 +29,15 @@ GEOD = Geod(ellps="WGS84")
 
 # Geographically identified out-of-region candidates would stretch the fallback extent.
 OUTSIDE_REGION = {
+    "friuli": {1229, 5940},  # East Tyrol and the Gulf of Trieste
+    "burgenland_sopron": {7946, 10534},  # Pápa and Rusovce
+    "backa_baranja_srem": {5369, 7620, 7992},  # Slatina, Taraš and Szolnok
+    "upper_hungary_ruthenia": {2495, 4823, 7984},  # Chop, Eger and Gyöngyös
+    "grodno_bialystok_polesie": {4836},  # Zamość
+    "kars_ardahan": {2033, 2034, 3400, 7103, 7122, 7123, 7127},  # Adjara, Rize, Ağrı and Muş
+    "mosul_vilayet": {1376, 3347, 5895, 5896, 6980, 6981, 9028, 9862},  # Anbar and central Iraq
+    "sandzak": {3649, 8438, 8439},  # Požega and Kosovo
+    "negev_sinai": {1205, 2305, 3376, 3386, 3405},  # Jerusalem, Gaza and the West Bank
     "south_tyrol_trentino": {4802, 7538, 7539, 7540, 7542, 7543, 7544, 7545, 7546, 7547},  # Ötztal and Veneto
     "carinthia": {1229, 4150, 4115, 4152, 5952, 8407},  # East Tyrol and Styria
 }
@@ -36,9 +45,98 @@ OUTSIDE_REGION = {
 # HGO label anchors for towns and the two provincial seats. Merano has two
 # different HGO labels for the same town, so neither is a registration control.
 STATE_CITY_CONTROLS = {
+    "friuli": {1309: "Tarvisio", 5942: "Valbruna", 5943: "Dogna", 7548: "Marano Lagunare",
+               7549: "Pocenia", 2284: "Gorizia"},
+    "burgenland_sopron": {793: "Oberwart", 2471: "Sopron", 4819: "Eisenstadt", 4820: "Fertod",
+                          7400: "Abda", 7948: "Tet", 7949: "Vasvar"},
+    "sandzak": {1801: "Novi Pazar", 3641: "Andrijevica", 7628: "Konjuhe", 7630: "Petnjica"},
     "alsace_lorraine": {2059: "Metz", 2061: "Thionville", 5359: "Strasbourg",
                         5360: "Haguenau", 5573: "Colmar", 5587: "Hayange"},
     "south_tyrol_trentino": {39: "Bolzano", 975: "Trento", 7533: "Rovereto"},
+    "backa_baranja_srem": {818: "Osijek", 2207: "Baja", 3201: "Vinkovci", 5040: "Vukovar",
+                           7377: "Sremska Mitrovica", 7382: "Becej", 7384: "Sombor", 7991: "Kecskemet"},
+    "upper_hungary_ruthenia": {4824: "Nyiregyhaza", 7396: "Galanta",
+                               7983: "Miskolc", 7994: "Mezokovesd", 8004: "Levice"},
+    "latgale": {3542: "Daugavpils", 4847: "Jekabpils", 5789: "Rezekne"},
+    "grodno_bialystok_polesie": {92: "Lublin", 95: "Nowogrodek", 97: "Bialystok",
+                                 2227: "Pinsk", 4841: "Slonim", 5559: "Lukow"},
+    "kars_ardahan": {353: "Pasinler", 1139: "Ardahan", 3398: "Erzurum", 4982: "Horasan",
+                     7101: "Artvin", 7102: "Hopa", 7111: "Oltu", 7112: "Kars", 7114: "Kagizman"},
+    "mosul_vilayet": {676: "Mosul", 1362: "Arbil", 1363: "Kirkuk", 4989: "Soran", 6985: "Tal Afar"},
+    "ulster_border": {1827: "Donegal", 1828: "Belfast", 4970: "Sligo"},
+    "southern_bukovina": {5344: "Suceava", 5537: "Roznov", 5538: "Ceahlau", 5539: "Varatec"},
+    "negev_sinai": {6795: "Rafah", 454: "Dimona", 453: "Nekhel", 6796: "Ezuz",
+                    6797: "Yeruham", 6798: "Tlalim", 6936: "Bir Al-Abed"},
+}
+
+# Small town seats absent from the world city index, in longitude/latitude order.
+LOCAL_SEATS = {
+    "friuli": {"Tarvisio": (13.58, 46.51), "Valbruna": (13.49, 46.49), "Dogna": (13.32, 46.45),
+               "Marano Lagunare": (13.17, 45.76), "Pocenia": (13.10, 45.84),
+               "Cividale del Friuli": (13.43, 46.09), "Manzano": (13.38, 45.99),
+               "San Giorgio di Nogaro": (13.21, 45.83), "Osoppo": (13.08, 46.26), "Pulfero": (13.48, 46.17)},
+    "burgenland_sopron": {"Oberwart": (16.20, 47.29), "Fertod": (16.87, 47.62), "Abda": (17.54, 47.69),
+                          "Tet": (17.52, 47.52), "Vasvar": (16.80, 47.05), "Güssing": (16.32, 47.06),
+                          "Loipersbach im Burgenland": (16.48, 47.695)},
+    "mosul_vilayet": {"Hawija": (43.77, 35.33), "Rabia": (42.10, 36.81)},
+    "upper_hungary_ruthenia": {"Encs": (21.12, 48.33), "Želiezovce": (18.65, 48.05)},
+    "latgale": {"Līvāni": (26.18, 56.35), "Subate": (25.91, 56.00), "Viļāni": (26.92, 56.55)},
+    "grodno_bialystok_polesie": {"Brańsk": (22.84, 52.74), "Ciechanowiec": (22.50, 52.68)},
+    "kars_ardahan": {"Garnarrich": (43.62, 41.07), "Meghrashat": (43.66, 40.95)},
+    "sandzak": {"Berane": (19.86, 42.84), "Andrijevica": (19.79, 42.74), "Konjuhe": (19.74, 42.69),
+                "Petnjica": (19.96, 42.91), "Raška": (20.62, 43.29), "Ušće": (20.61, 43.47),
+                "Jošanička Banja": (20.75, 43.39)},
+    "southern_bukovina": {"Roznov": (26.51, 46.84), "Ceahlau": (25.97, 47.05), "Varatec": (26.28, 47.14)},
+    "negev_sinai": {"Dimona": (35.033, 31.071), "Mitzpe Ramon": (34.80, 30.61), "Nitzana": (34.42, 30.89),
+                    "Nekhel": (33.75, 29.91), "Ezuz": (34.47, 30.79), "Yeruham": (34.93, 30.99),
+                    "Tlalim": (34.77, 30.99), "Bir Al-Abed": (33.01, 31.02)},
+}
+
+# Exclude state footprints that spill across a border into the neighbouring parent.
+OUTSIDE_PARENT = {
+    "southern_bukovina": {"RO215": {5537, 5538, 5539}},  # Neamț seats supply registration controls only.
+    "burgenland_sopron": {
+        "AT113": {7639, 7950},
+        "AT112": {4820},
+        "HU221": {4819},
+    },
+    "backa_baranja_srem": {
+        "HU331": {7374, 7384},
+        "RS123": {5040, 5041, 7377, 7378, 7379},
+        "RS121": {2207, 5041, 7373},
+        "HR026": {5041, 7375},
+        "RS127": {5040},
+    },
+    "upper_hungary_ruthenia": {
+        "HU311": {664, 1221},
+        "HU323": {7983},
+    },
+    "grodno_bialystok_polesie": {
+        "BY_RAY_67162791B59963656038120": {5734},
+        "PL_MRG_c5cfb391c06f": {5733},
+    },
+    "kars_ardahan": {
+        "TRA11": {2487, 7112},
+        "TRA22": {4982, 7111},
+        "TRA24": {2486, 7111, 7112},
+        "TR905": {7106, 7111},
+        "ARM-1555": {2035, 4142, 7113},
+    },
+    "mosul_vilayet": {
+        "IRQ-3051": {1362, 4989, 5680, 9029},
+        "IRQ-3050": {5893, 5894},
+    },
+    "ulster_border": {
+        "IE041": {119, 4961},
+        "GB_NUTS1_UKN": {1832, 6091, 7482},
+    },
+    "sandzak": {
+        "RS217": {7630},
+    },
+    "negev_sinai": {
+        "EGY-1558": {1204, 3366, 3375, 9830},
+        "ISR-3053": {3366, 3367, 6795},
+    },
 }
 
 TRANSLATIONS = {
@@ -103,6 +201,47 @@ TRANSLATIONS = {
     8045: "东索尔道", 8061: "南卡尔图济", 8062: "北库亚维", 8088: "北耶乌德",
     8089: "南博尔沙", 8104: "帕德堡", 8105: "鲁德伯尔", 8407: "福伊茨贝格",
     8409: "梅拉诺", 8410: "拉切斯", 8411: "梅拉戈", 11894: "南达姆普",
+    94: "波列西耶", 95: "新格鲁多克", 353: "帕辛莱尔", 453: "奈赫勒",
+    454: "迪莫纳", 792: "南布科维纳", 814: "斯雷姆", 1212: "奥托克",
+    1213: "南尼特拉", 1221: "索特马尔切凯", 1293: "斯克鲁达列纳", 1309: "塔尔维西奥",
+    1374: "奥达拉尔", 1376: "加伊姆", 1733: "谢尼察", 1801: "新帕扎尔",
+    1832: "卡文-莫纳亨", 1886: "谢汉", 2034: "胡洛", 2035: "贾瓦赫季",
+    2207: "鲍姚", 2276: "内摩尔多瓦", 2295: "杜布尼察", 2305: "贝特谢梅什",
+    2381: "马卡拉瓦", 2487: "优素费利", 2495: "乔普地区", 3201: "温科夫齐",
+    3205: "斯威利湾", 3229: "西海乌姆", 3296: "阿什卡莱", 3347: "奥贝迪",
+    3367: "哈斯纳", 3378: "恩戈地", 3381: "拉哈夫", 3386: "梅沃霍龙",
+    3400: "瓦尔托", 3491: "戈尼翁兹", 3649: "波热加", 4142: "卡尔察希",
+    4756: "萨姆茨赫", 4820: "费尔特德", 4838: "奥库宁卡", 4961: "恩尼斯基林",
+    4982: "霍拉桑", 4989: "索兰", 5040: "武科瓦尔", 5041: "萨尔瓦什",
+    5369: "斯拉蒂纳", 5497: "卢西诺", 5498: "马尔科维奇", 5499: "霍特尼奇",
+    5500: "维戈诺希", 5501: "科萨瓦", 5503: "奥戈罗德尼基", 5505: "多布罗梅斯利",
+    5539: "沃勒泰克", 5559: "武库夫", 5678: "阿希克村", 5679: "巴尔达拉什",
+    5680: "沙克拉瓦", 5733: "弗沃达瓦", 5734: "科罗卢夫卡", 5736: "亚努夫卡",
+    5737: "普瓦特尼察", 5739: "纳古尔基", 5740: "弗沃德基", 5741: "波普基",
+    5742: "姆希武耶", 5790: "蒂尔扎", 5893: "舍尔加特", 5894: "哈特拉",
+    5895: "奈拜", 5896: "拜莱德", 5923: "德拉加", 5924: "格鲁贝蒂采",
+    5940: "杜伊诺", 5942: "瓦尔布鲁纳", 5943: "多尼亚", 5944: "奥帕",
+    5984: "穆哈韦茨", 5985: "梅德诺", 5986: "德姆纳", 5987: "杜比奇诺",
+    5988: "切尔尼亚内", 6019: "齐甘德", 6091: "克洛尼斯", 6794: "扎拉尼克",
+    6795: "拉法", 6796: "埃祖兹", 6797: "耶鲁哈姆", 6798: "特拉利姆",
+    6936: "比尔阿卜德", 6937: "东比尔阿卜德", 6980: "北拜莱德", 6981: "北哈迪塞",
+    7094: "萨卢特", 7095: "蒂尔克格聚", 7096: "科尔柯伊", 7097: "彻尔德尔",
+    7098: "巴什柯伊", 7099: "克拉奇", 7100: "卡拉卡莱", 7102: "霍帕",
+    7103: "帕扎尔", 7106: "伊斯皮尔", 7110: "帕扎尔约卢", 7111: "奥尔图",
+    7113: "迪戈尔", 7114: "卡厄兹曼", 7122: "埃莱什基尔特", 7123: "图塔克",
+    7127: "马拉兹吉尔特", 7335: "克拉列沃", 7372: "伊洛克", 7373: "埃尔杜特",
+    7374: "里吉察", 7375: "亚梅纳", 7376: "库兹明", 7377: "斯雷姆斯卡米特罗维察",
+    7378: "伊里格", 7379: "贝什卡", 7381: "阿达", 7382: "贝切伊",
+    7383: "泰梅林", 7384: "松博尔", 7385: "库拉", 7390: "瓦莫什米科洛",
+    7392: "波德海斯卡", 7393: "舒拉尼", 7395: "沙拉", 7396: "加兰塔",
+    7400: "奥布道", 7482: "马诺哈密尔顿", 7548: "马拉诺拉古纳雷", 7549: "波切尼亚",
+    7550: "莫尔泰利亚诺", 7593: "萨勒卡默什", 7620: "塔拉什", 7628: "科纽赫",
+    7630: "佩特尼察", 7639: "佐洛勒沃", 7641: "瓦莫绍鲍迪", 7946: "帕波",
+    7948: "泰特", 7949: "沃什堡", 7950: "卡姆", 7975: "赫拉尼",
+    7984: "珍珠市", 7990: "雷姆", 7994: "迈泽克韦什德", 8004: "莱维采",
+    8044: "南蒙基", 8052: "北沃尔钦", 8438: "伊斯托格", 8439: "乌恰",
+    9028: "东加伊姆", 9029: "东哈特拉", 9842: "东奥库宁卡", 9859: "南辛贾尔",
+    9862: "南舍尔加特", 9863: "南沙克拉瓦", 9881: "西拉法", 10534: "奥罗斯堡",
 }
 
 
@@ -269,9 +408,31 @@ STATE_NAMES = {
     778: ("East Prussia", "东普鲁士"), 2061: ("Thionville", "蒂永维尔"),
     3509: ("Briey", "布里耶"), 7352: ("West Dubrovnik", "西杜布罗夫尼克"),
     2272: ("Timișoara", "蒂米什瓦拉"),
+    7395: ("Šaľa", "沙拉"), 7630: ("Petnjica", "佩特尼察"),
 }
 
 CITY_ZH = {
+    "Cividale del Friuli": "弗留利地区奇维达莱", "Manzano": "曼扎诺",
+    "San Giorgio di Nogaro": "圣乔尔焦迪诺加罗", "Oberwart": "上瓦特",
+    "Güssing": "居辛", "Loipersbach im Burgenland": "布尔根兰州洛伊珀斯巴赫",
+    "Hawija": "哈维杰", "Rabia": "拉比亚", "Encs": "恩奇", "Želiezovce": "热列佐夫采",
+    "Līvāni": "利瓦尼", "Subate": "苏巴特", "Viļāni": "维利亚尼",
+    "Raška": "拉什卡", "Berane": "贝拉内", "Ušće": "乌什切", "Jošanička Banja": "约沙尼奇卡矿泉镇",
+    "Brańsk": "布兰斯克", "Ciechanowiec": "切哈诺维茨", "Garnarrich": "加尔纳里奇",
+    "Mitzpe Ramon": "米茨佩拉蒙", "Nitzana": "尼察纳", "Osoppo": "奥索波", "Pulfero": "普尔费罗",
+    "Meghrashat": "梅格拉沙特",
+    "Pordenone": "波代诺内", "Mosonmagyarovar": "莫雄马扎尔古堡", "Sarvar": "沙尔堡",
+    "Kiskunfelegyhaza": "基什孔费莱吉哈佐", "Kiskunhalas": "基什孔豪洛什", "Backa Palanka": "巴奇卡帕兰卡",
+    "Vrbas": "弗尔巴斯", "Apatin": "阿帕廷", "Ruma": "鲁马", "Tiszaujvaros": "蒂萨新城",
+    "Satoraljaujhely": "沙托劳尔尧乌伊海伊", "Mateszalka": "马泰绍尔考",
+    "Ivanovo": "伊万诺沃", "Ivatsevichi": "伊瓦采维奇", "Bielsk Podlaski": "波德拉谢地区别尔斯克",
+    "Zambrow": "赞布鲁夫", "Lomza": "沃姆扎", "Lubartow": "卢巴尔图夫", "Pulawy": "普瓦维",
+    "Miedzyrzec Podlaski": "波德拉谢地区缅济热茨", "Hinis": "赫内斯", "Artik": "阿尔蒂克",
+    "Akhaltsikhe": "阿哈尔齐赫", "Al Mawsil al Jadidah": "新摩苏尔", "Sinjar": "辛贾尔",
+    "Al-Hamdaniya": "哈姆达尼耶", "Tallkayf": "泰勒凯夫", "'Aqrah": "阿克拉", "Koysinceq": "科伊桑贾克",
+    "Letterkenny": "莱特肯尼", "Londonderry County Borough": "伦敦德里", "Craigavon": "克雷加文",
+    "Ash Shaykh Zuwayd": "谢赫祖韦德",
+    "Bi'r al 'Abd": "比尔阿卜德", "Ashdod": "阿什杜德",
     "Sarreguemines": "萨尔格米讷", "Selestat": "塞莱斯塔", "Sonderborg": "森讷堡",
     "Tonder": "滕德", "Heide": "海德", "Eckernfoerde": "埃肯弗德",
     "Bressanone": "布雷萨诺内", "Gorizia": "戈里齐亚", "Koper": "科佩尔",
@@ -289,7 +450,7 @@ CITY_ZH = {
 }
 
 
-def part_names(parts, states, city_tree, city_features):
+def part_names(parts, states, city_tree, city_features, local_seats=()):
     by_name = {code(en.casefold()): (en, zh) for en, zh in states.values()}
     labels = {}
     for sid, geom in parts.items():
@@ -297,6 +458,11 @@ def part_names(parts, states, city_tree, city_features):
         city = max(cities, key=lambda p: (p["population"], p["id"]), default=None)
         if city is None:
             labels[sid] = states[sid]
+            for name, point in local_seats:
+                if geom.covers(point):
+                    match = by_name.get(code(name.casefold()))
+                    labels[sid] = match or (name, CITY_ZH[name])
+                    break
             continue
         en = city["name_en"] or city["name_ascii"]
         match = by_name.get(code(en.casefold()))
@@ -397,19 +563,24 @@ def main(argv=None):
     source_path = Path(os.path.relpath(args.sources, args.rules.parent)).as_posix()
     for region in regions:
         parents = {fid: _decode_geometry(topology, rows[fid]) for fid in region["parent_ids"]}
+        seats = LOCAL_SEATS.get(region["region_id"], {})
+        seat_points = [(name, shapely.Point(xy)) for name, xy in seats.items()]
         outside = OUTSIDE_REGION.get(region["region_id"], set())
         states = {sid: shapes[sid] for sid in region["hgo_state_ids"] if sid not in outside}
         controls = STATE_CITY_CONTROLS.get(region["region_id"], {})
         anchors = [dict(name=name, stateId=sid, x=state_rows[sid]["anchor"][0], y=state_rows[sid]["anchor"][1])
                    for sid, name in controls.items() if sid in states]
+        local_cities = cities | {code(name): [xy] for name, xy in seats.items()} if seats else cities
         matrix, report = registration(states, shapely.union_all(list(parents.values())),
-                                      places, cities, grid, step, anchors)
+                                      places, local_cities, grid, step, anchors)
         pixel_counts = {sid: state_rows[sid]["pixelCount"] for sid in states} if controls else None
         states = {sid: affine_transform(g, matrix) for sid, g in states.items()}
         count, skipped, merge_counts = 0, [], []
+        outside_parents = OUTSIDE_PARENT.get(region["region_id"], {})
         for fid, parent in parents.items():
-            parts = partition(parent, states, pixel_counts, merge_counts)
-            labels = part_names(parts, {sid: names[sid] for sid in states}, city_tree, city_features)
+            candidates = {sid: geom for sid, geom in states.items() if sid not in outside_parents.get(fid, ())}
+            parts = partition(parent, candidates, pixel_counts, merge_counts)
+            labels = part_names(parts, {sid: names[sid] for sid in states}, city_tree, city_features, seat_points)
             entry, masks = build_entry(fid, parts, labels, source_path, state_rows)
             if entry:
                 rules["entries"].append(entry)
