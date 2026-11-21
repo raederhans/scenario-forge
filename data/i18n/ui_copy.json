@@ -11569,5 +11569,45 @@
   "面积模式优先现代大国排序": {
     "en": "Prefer modern major-power order for area modes",
     "zh": "面积模式优先现代大国排序"
+  },
+  "Color health check": {
+    "en": "Color health check",
+    "zh": "颜色体检"
+  },
+  "Locate": {
+    "en": "Locate",
+    "zh": "定位"
+  },
+  "No color conflicts or fragments found.": {
+    "en": "No color conflicts or fragments found.",
+    "zh": "未发现近色冲突或同色碎片。"
+  },
+  "{a} and {b} · ΔE {distance}": {
+    "en": "{a} and {b} · ΔE {distance}",
+    "zh": "{a} 与 {b} · ΔE {distance}"
+  },
+  "{color} · disconnected fragment ({count} regions)": {
+    "en": "{color} · disconnected fragment ({count} regions)",
+    "zh": "{color} · 不相连的小碎片（{count} 块）"
+  },
+  "{count} regions · Only regions still belonging to this country will change.": {
+    "en": "{count} regions · Only regions still belonging to this country will change.",
+    "zh": "共 {count} 块，仅更改仍属本国的地块。"
+  },
+  "Updated {updated} regions. Preserved {preserved} belonging to other countries or custom colors.": {
+    "en": "Updated {updated} regions. Preserved {preserved} belonging to other countries or custom colors.",
+    "zh": "已更新 {updated} 块，保留 {preserved} 块已归他国或自定义颜色的地块。"
+  },
+  "Edit legend color {color}": {
+    "en": "Edit legend color {color}",
+    "zh": "编辑图例颜色 {color}"
+  },
+  "Global recolor": {
+    "en": "Global recolor",
+    "zh": "全局换色"
+  },
+  "Merge into country…": {
+    "en": "Merge into country…",
+    "zh": "并入某国…"
   }
 }

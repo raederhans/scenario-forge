@@ -196,7 +196,7 @@ export function getLegendEditorEntries(appState, getFeatureArea, getCountryName)
   } else {
     ranking = rankLegendEditorColors(appState, getFeatureArea);
   }
-  return ranking.map(({ color, owner }) => ({ color, countryName: owner ? getCountryName(appState, owner) : "" }));
+  return ranking.map(({ color, owner }) => ({ color, owner, countryName: owner ? getCountryName(appState, owner) : "" }));
 }
 
 export function filterLegendEditorEntries(entries, labels, query) {

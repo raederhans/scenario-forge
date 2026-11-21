@@ -1884,6 +1884,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "颜色烘焙",
     "en": "Color bake"
   },
+  "Color health check": {
+    "zh": "颜色体检",
+    "en": "Color health check"
+  },
   "Color picked": {
     "zh": "已取色",
     "en": "Color picked"
@@ -3128,6 +3132,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "编辑国家颜色",
     "en": "Edit country color"
   },
+  "Edit legend color {color}": {
+    "zh": "编辑图例颜色 {color}",
+    "en": "Edit legend color {color}"
+  },
   "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": {
     "zh": "根据剧本参考分组编辑地图颜色。参考边界保持不变。",
     "en": "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged."
@@ -3921,6 +3929,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Global oceans · raster-derived bathymetry": {
     "zh": "全球海洋 · 栅格推导测深",
     "en": "Global oceans · raster-derived bathymetry"
+  },
+  "Global recolor": {
+    "zh": "全局换色",
+    "en": "Global recolor"
   },
   "Glow": {
     "zh": "辉光",
@@ -5246,6 +5258,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "本地化名称",
     "en": "Localized name"
   },
+  "Locate": {
+    "zh": "定位",
+    "en": "Locate"
+  },
   "Locate and zoom": {
     "zh": "定位并放大",
     "en": "Locate and zoom"
@@ -5649,6 +5665,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "合并连续的段",
     "en": "Merge contiguous segments"
   },
+  "Merge into country…": {
+    "zh": "并入某国…",
+    "en": "Merge into country…"
+  },
   "Metropolis": {
     "zh": "大都会",
     "en": "Metropolis"
@@ -6008,6 +6028,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "No changes": {
     "zh": "没有变化",
     "en": "No changes"
+  },
+  "No color conflicts or fragments found.": {
+    "zh": "未发现近色冲突或同色碎片。",
+    "en": "No color conflicts or fragments found."
   },
   "No community saves yet": {
     "zh": "暂无社区存档",
@@ -10692,6 +10716,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "已将 {count} 条记录更新到当前地图区域。",
     "en": "Updated {count} entries to the current map regions."
   },
+  "Updated {updated} regions. Preserved {preserved} belonging to other countries or custom colors.": {
+    "zh": "已更新 {updated} 块，保留 {preserved} 块已归他国或自定义颜色的地块。",
+    "en": "Updated {updated} regions. Preserved {preserved} belonging to other countries or custom colors."
+  },
   "Upland Plateaus": {
     "zh": "高地高原",
     "en": "Upland Plateaus"
@@ -11492,6 +11520,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "工作台排序板",
     "en": "workbench board"
   },
+  "{a} and {b} · ΔE {distance}": {
+    "zh": "{a} 与 {b} · ΔE {distance}",
+    "en": "{a} and {b} · ΔE {distance}"
+  },
+  "{color} · disconnected fragment ({count} regions)": {
+    "zh": "{color} · 不相连的小碎片（{count} 块）",
+    "en": "{color} · disconnected fragment ({count} regions)"
+  },
   "{count} features selected.": {
     "zh": "已选择 {count} 个地块。",
     "en": "{count} features selected."
@@ -11511,6 +11547,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "{count} regions affected": {
     "zh": "影响 {count} 个区域",
     "en": "{count} regions affected"
+  },
+  "{count} regions · Only regions still belonging to this country will change.": {
+    "zh": "共 {count} 块，仅更改仍属本国的地块。",
+    "en": "{count} regions · Only regions still belonging to this country will change."
   },
   "{seconds}s / day": {
     "zh": "{seconds} 秒 / 天",
