@@ -99,6 +99,7 @@ export function createMapInteractionEventBindingOwner({
 
     interactionRect.on("mousemove", requireFunction(handlers, "handleMouseMove"));
     interactionRect.on("pointerdown.fieldTool", handlePointerDown);
+    if (handlers.marquee) interactionRect.on("contextmenu.marquee", () => handlers.marquee.cancel());
     interactionRect.on("pointermove.fieldTool", handlePointerMove);
     interactionRect.on("mousedown.brush", requireFunction(handlers, "handleBrushPointerDown"));
     interactionRect.on("mouseleave", requireFunction(handlers, "handleMouseLeave"));

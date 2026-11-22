@@ -12,7 +12,7 @@ import {
   refreshUnitCounterPreviewSection,
 } from "./strategic_overlay/unit_counter_render_helpers.js";
 import { patchStrategicOverlayEditorState } from "../../core/state/actions/strategic_overlay_actions.js";
-import { commitMapLabelMove, deleteMapLabel, placeMapLabel, syncMapLabelHandles, updateMapLabel } from "../../core/map_renderer/public.js";
+import { commitMapLabelMove, deleteMapLabel, normalizeOperationLabelSize, placeMapLabel, syncMapLabelHandles, updateMapLabel } from "../../core/map_renderer/public.js";
 import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { getCountryNameOverride } from "../../core/country_name_overrides.js";
 import { getLocalizedScenarioCountryName } from "../../core/scenario/scenario_country_display.js";
@@ -592,9 +592,10 @@ export function createStrategicOverlayController({
     syncSelectOptions(operationalLineKindSelect, Object.entries(OPERATIONAL_LINE_KIND_LABELS).map(([value, label]) => ({ value, label: t(label, "ui") })), {
       value: operationalLineKind,
     });
-    if (operationalLineLabelSizeInput) operationalLineLabelSizeInput.value = String(operationalLineEditor.labelSize ?? 9);
+    const labelSource = hasSelectedOperationalLine && !isOperationalLineDrawing ? selectedOperationalLine : operationalLineEditor;
+    if (operationalLineLabelSizeInput) operationalLineLabelSizeInput.value = String(normalizeOperationLabelSize(labelSource.labelSize));
     if (operationalLineLabelOnPathInput) {
-      operationalLineLabelOnPathInput.checked = operationalLineEditor.labelOnPath === true;
+      operationalLineLabelOnPathInput.checked = labelSource.labelOnPath === true;
     }
     if (operationalLineLabelInput) operationalLineLabelInput.value = String(operationalLineEditor.label || selectedOperationalLine?.label || "");
     if (operationalLineStrokeInput) operationalLineStrokeInput.value = operationalLineStroke || "#7f1d1d";
@@ -666,9 +667,10 @@ export function createStrategicOverlayController({
     syncSelectOptions(operationGraphicKindSelect, Object.entries(OPERATION_GRAPHIC_KIND_LABELS).map(([value, label]) => ({ value, label: t(label, "ui") })), {
       value: operationKind,
     });
-    if (operationGraphicLabelSizeInput) operationGraphicLabelSizeInput.value = String(operationEditor.labelSize ?? 9);
+    const labelSource = useSelectedGraphicValues ? selectedGraphic : operationEditor;
+    if (operationGraphicLabelSizeInput) operationGraphicLabelSizeInput.value = String(normalizeOperationLabelSize(labelSource.labelSize));
     if (operationGraphicLabelOnPathInput) {
-      operationGraphicLabelOnPathInput.checked = operationEditor.labelOnPath === true;
+      operationGraphicLabelOnPathInput.checked = labelSource.labelOnPath === true;
       operationGraphicLabelOnPathInput.disabled = ["encirclement", "theater"].includes(operationKind);
       operationGraphicLabelOnPathInput.title = operationGraphicLabelOnPathInput.disabled ? t("Along line is only available for open lines.", "ui") : "";
     }
@@ -969,10 +971,14 @@ export function createStrategicOverlayController({
   ]) {
     if (!input || input.dataset.bound) continue;
     input.addEventListener("change", () => {
-      const value = key === "labelOnPath" ? input.checked : Math.max(4, Math.min(64, Number(input.value || 9)));
+      const value = key === "labelOnPath" ? input.checked : normalizeOperationLabelSize(input.value);
+      const { active, selectedId } = state[editor];
+      const entities = editor === "operationalLineEditor" ? state.operationalLines : state.operationGraphics;
+      const selected = !active && selectedId && entities?.find(entity => String(entity.id) === String(selectedId));
+      if (selected && value === (key === "labelOnPath" ? selected.labelOnPath === true : normalizeOperationLabelSize(selected.labelSize))) return;
       const patch = { [key]: value };
       patchStrategicOverlayEditorState(state, editor, patch);
-      if (!state[editor].active && state[editor].selectedId) update(patch);
+      if (selected) update(patch);
       else if (render) render();
       refreshStrategicOverlayUI();
     });

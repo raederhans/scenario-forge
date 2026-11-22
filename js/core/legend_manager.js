@@ -1,7 +1,7 @@
 import { getCountryNameOverride } from "./country_name_overrides.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { createBorderIdentityResolver } from "./renderer/border_identity.js";
-import { getRiverPaintRuntime } from "./river_paint/runtime.js";
+import { createRiverPaintRuntime, getRiverPaintRuntime } from "./river_paint/runtime.js";
 import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
 // Legend manager (Phase 13)
 
@@ -317,11 +317,14 @@ export function collectPresentOwnerTags(appState) {
 
   const owners = new Set();
   const { river, resolveOwner } = createLandOwnerResolver(appState);
-  for (const feature of river.surfaces(features)) {
+  const fullRiver = full?.length && full !== appState.landData?.features
+    ? cached?.fullRiver || createRiverPaintRuntime(appState)
+    : null;
+  for (const feature of fullRiver ? fullRiver.surfaces(full) : river.surfaces()) {
     const owner = resolveOwner(getFeatureId(feature), feature);
     if (owner && !owner.startsWith("color:")) owners.add(owner);
   }
-  presentOwnerCache.set(appState, { key, owners });
+  presentOwnerCache.set(appState, { key, owners, fullRiver });
   return owners;
 }
 
