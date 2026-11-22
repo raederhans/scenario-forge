@@ -517,7 +517,9 @@ export function createStrategicOverlayController({
         if (selected.countryCode) codes.add(selected.countryCode);
         syncSelectOptions(mapLabelSection.querySelector("#mapLabelCountry"), [
           { value: "", label: t("None", "ui") },
-          ...Array.from(codes).sort().map(code => ({ value: code, label: countryName(code) })),
+          ...Array.from(codes).sort().map(code => ({
+            value: code, label: t("{name} ({code})", "ui", { name: countryName(code), code }),
+          })),
         ], { value: selected.countryCode });
         for (const readout of mapLabelSection.querySelectorAll("output[data-label-readout]")) {
           if (readout !== document.activeElement) readout.value = selected[readout.dataset.labelReadout];

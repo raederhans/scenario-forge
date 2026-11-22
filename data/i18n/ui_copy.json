@@ -12680,5 +12680,13 @@
   "Apply label text": {
     "en": "Apply label text",
     "zh": "确认文字内容"
+  },
+  "{name} ({code})": {
+    "en": "{name} ({code})",
+    "zh": "{name}（{code}）"
+  },
+  "No reference territory.": {
+    "en": "No reference territory.",
+    "zh": "无参考领土。"
   }
 }

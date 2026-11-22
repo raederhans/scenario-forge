@@ -6815,6 +6815,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "没有参考区域被重新着色。",
     "en": "No reference regions were recolored."
   },
+  "No reference territory.": {
+    "zh": "无参考领土。",
+    "en": "No reference territory."
+  },
   "No reference territory. Release to generate a country name.": {
     "zh": "无参考版图，释放后生成国名。",
     "en": "No reference territory. Release to generate a country name."
@@ -12615,6 +12619,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "{name} (originally {origin})": {
     "zh": "{name}（原属{origin}）",
     "en": "{name} (originally {origin})"
+  },
+  "{name} ({code})": {
+    "zh": "{name}（{code}）",
+    "en": "{name} ({code})"
   },
   "{seconds}s / day": {
     "zh": "{seconds} 秒 / 天",
