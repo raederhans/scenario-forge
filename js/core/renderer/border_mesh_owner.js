@@ -23,8 +23,8 @@ import {
 } from "../state/actions/renderer_cache_actions.js";
 
 import { getBorderCountryAssignmentRevision, isAtlantropaCoastlineLandVisible } from "./border_mesh_queries.js";
-import { getRegionalCoastlineDecision, selectPoliticalBorderTopology } from "./regional_backdrop.js";
-import { isRegionalScenario } from "../scenario/scenario_region.js";
+import { buildRegionalMemberCoastline, getRegionalCoastlineDecision, selectPoliticalBorderTopology } from "./regional_backdrop.js";
+import { hidesRegionalBackdrop, isRegionalScenario } from "../scenario/scenario_region.js";
 
 export function createBorderMeshOwner({
   state,
@@ -327,6 +327,7 @@ export function createBorderMeshOwner({
     const scenarioSurfaceVersionSignal = [
       String(getScenarioSurfaceVersionSignal() || ""),
       `coastline-land:${atlantropaLandVisible}`,
+      ...(hidesRegionalBackdrop(state.activeScenarioManifest) ? ["member-coast"] : []),
       `topology:${Number(state.topologyRevision || 0)}`,
     ].join("|");
 
@@ -378,6 +379,7 @@ export function createBorderMeshOwner({
   }
 
   function buildGlobalCoastlineMesh(primaryTopology) {
+    if (hidesRegionalBackdrop(state.activeScenarioManifest)) return buildRegionalMemberCoastline(state);
     return buildGlobalCoastlineMeshFromSources({
       topologyInput: primaryTopology,
       shouldExcludeOwnerBorderEntity,
@@ -403,8 +405,10 @@ export function createBorderMeshOwner({
     const topology = decision?.topology;
     const objectName = decision?.source === "scenario" ? decision.runtimeObjectName : decision?.primaryObjectName;
     const object = topology?.objects?.[objectName];
+    const members = hidesRegionalBackdrop(state.activeScenarioManifest) ? state.scenarioRuntimeTopologyData : null;
     const lodKey = [mid.epsilon || 0, mid.minLength || 0, low.epsilon || 0, low.minLength || 0].join("|");
     if (object && coastlineMeshCache?.topology === topology
+      && coastlineMeshCache.members === members && coastlineMeshCache.reason === decision.reason
       && coastlineMeshCache.object === object && coastlineMeshCache.arcs === topology.arcs
       && coastlineMeshCache.transform === topology.transform && coastlineMeshCache.lodKey === lodKey
       && coastlineMeshCache.meshFunction === globalThis.topojson?.mesh) {
@@ -426,7 +430,7 @@ export function createBorderMeshOwner({
     };
     replaceCachedCoastlineMeshesState(state, collections);
     coastlineMeshCache = {
-      topology, object, arcs: topology?.arcs, transform: topology?.transform, lodKey,
+      topology, object, members, reason: decision?.reason, arcs: topology?.arcs, transform: topology?.transform, lodKey,
       meshFunction: globalThis.topojson?.mesh,
       collections,
     };

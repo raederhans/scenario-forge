@@ -15,3 +15,7 @@ export function getScenarioRegion(manifestOrBundle) {
 export function isRegionalScenario(manifestOrBundle) {
   return !!getScenarioRegion(manifestOrBundle);
 }
+
+export function hidesRegionalBackdrop(manifest) {
+  return getScenarioRegion(manifest)?.backdrop === "none";
+}

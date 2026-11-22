@@ -1,7 +1,7 @@
 // Scenario water, special-region and Atlantropa overlays share one pass and cache lifecycle.
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
 import { isLakeRegion } from "./effective_water_regions.js";
-import { usesRegionalMarineMask } from "./regional_backdrop.js";
+import { clipRegionalLakeOutline, usesRegionalMarineMask } from "./regional_backdrop.js";
 import { shouldDrawLakeOutline } from "./lake_outline_style.js";
 import { normalizeLakeStyleConfig } from "../state_defaults.js";
 import { createWaterHighlightDisplay } from "./water_highlight_display.js";
@@ -24,6 +24,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   getWaterRegionColor,
   getOceanSurfacePattern = () => null,
   applyOceanClipMask,
+  applyPhysicalLandClipMask,
   getEffectiveAtlantropaFeatures,
   getLogicalCanvasDimensions,
   shouldExcludePoliticalVisualFeature,
@@ -449,11 +450,12 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         ? normalizeLakeStyleConfig(runtimeState.styleConfig?.lakes) : null;
       const outlineLake = lakeStyle && visibleParts.some((part) =>
         shouldDrawLakeOutline(feature, getScenarioWaterPartBounds(part), k, lakeStyle));
-      const fillWaterPath = (path = null) => {
+      const fillWaterPath = (path = null, parts = visibleParts) => {
         if (path) context.fill(path); else context.fill();
         // Shore styling affects presentation only; the original path still fills the lake.
         if (outlineLake) {
           context.save();
+          clipRegionalLakeOutline(runtimeState, rendererSurfaceHost, applyPhysicalLandClipMask, path, parts);
           context.globalAlpha = fillOpacity * lakeStyle.outlineOpacity;
           context.strokeStyle = getSafeCanvasColor(lakeStyle.outlineColor, "#54738f");
           context.lineWidth = lakeStyle.outlineWidth / Math.max(0.0001, k);
@@ -480,7 +482,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
           } else if (rendererSurfaceHost.getPathCanvas()) {
             rendererSurfaceHost.getContext().beginPath();
             rendererSurfaceHost.getPathCanvas()(part);
-            fillWaterPath();
+            fillWaterPath(null, [part]);
             didFill = true;
           }
         });

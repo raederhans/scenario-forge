@@ -17,6 +17,7 @@ import { getProjectionGeometryGeneration } from "../js/core/renderer/projection_
 import { createPoliticalIdRasterCoordinateSpace } from "../js/core/renderer/political_id_raster_coordinates.js";
 import { createProjectionInverseParams, invertProjectedPoint } from "../js/core/renderer/bathymetry_texture_math.js";
 import { createMapExportCanvas } from "../js/core/renderer/regional_camera.js";
+import { getRegionalBackgroundColor } from "../js/core/renderer/regional_backdrop.js";
 import { createCachedPassCompositorOwner } from "../js/core/renderer/cached_pass_compositor_owner.js";
 import { createExportBakeRuntime } from "../js/ui/toolbar/export_bake_runtime.js";
 
@@ -350,7 +351,7 @@ test("regional export frame clips cached passes, target-resolution passes and su
   const { state } = f;
   const document = { createElement: recordingExportCanvas };
   const ocean = "#19568b";
-  const getExportFrame = () => f.fit.getExportFrame(() => ocean);
+  const getExportFrame = () => f.fit.getExportFrame(() => getRegionalBackgroundColor(state.activeScenarioManifest, ocean));
   const passes = { background: { id: "background" }, labels: { id: "labels" } };
   const compositor = createCachedPassCompositorOwner({
     constants: { renderPassNames: Object.keys(passes) },
@@ -378,7 +379,11 @@ test("regional export frame clips cached passes, target-resolution passes and su
   const ui = { textVisibility: { "render-labels": true }, adjustments: { brightness: 140 },
     mapTitles: { title: { enabled: true, text: "Russia", position: "top-center" } } };
   state.dpr = 1.5;
-  for (const active of [manifest, null]) {
+  for (const [active, fill] of [
+    [{ region: { ...manifest.region, backdrop: "none", backdrop_fill: "#343434" } }, "#343434"],
+    [{ region: { ...manifest.region, backdrop: "none" } }, ocean],
+    [manifest, ocean], [null, null],
+  ]) {
     f.activate(active);
     f.commands.setZoomPercent(125);
     f.rect.call(f.zoom.translateBy, 20, 5);
@@ -402,7 +407,7 @@ test("regional export frame clips cached passes, target-resolution passes and su
       assert.deepEqual(images.map(draw => draw.clip), [clip, clip]);
       assert.deepEqual(canvas.draws.at(-1), { kind: "text", clip });
       if (active) {
-        assert.deepEqual(canvas.draws[0], { kind: "fill", color: ocean, rect: [0, 0, canvas.width, canvas.height], clip: null });
+        assert.deepEqual(canvas.draws[0], { kind: "fill", color: fill, rect: [0, 0, canvas.width, canvas.height], clip: null });
         assert.deepEqual(canvas.draws[1], { kind: "clear", rect: clip, clip });
       } else {
         assert.equal(canvas.draws[0].kind, "image");
@@ -410,7 +415,7 @@ test("regional export frame clips cached passes, target-resolution passes and su
       const adjusted = runtime.applyExportAdjustmentsToCanvas(canvas, ui, { width: 330, height: 675 });
       assert.deepEqual(adjusted.draws.at(-1).clip, expectedClip(adjusted));
       assert.match(adjusted.draws.at(-1).filter, /brightness\(1\.400\)/);
-      if (active) assert.equal(adjusted.draws[0].color, ocean);
+      if (active) assert.equal(adjusted.draws[0].color, fill);
       else assert.equal(adjusted.draws.length, 1);
     }
     if (active) {
@@ -418,7 +423,7 @@ test("regional export frame clips cached passes, target-resolution passes and su
       f.activate(null);
       const copy = runtime.applyExportAdjustmentsToCanvas(titleLayer, ui);
       assert.deepEqual(copy.draws.at(-1).clip, clip);
-      assert.equal(copy.draws[0].color, ocean);
+      assert.equal(copy.draws[0].color, fill);
     }
   }
 });

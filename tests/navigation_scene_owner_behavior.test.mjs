@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
 import test from "node:test";
 
 import { createNavigationSceneOwner } from "../js/core/renderer/navigation_scene_owner.js";
+import { getRegionalBackgroundColor } from "../js/core/renderer/regional_backdrop.js";
 import { createNavigationFrameOwner } from "../js/core/renderer/navigation_frame_owner.js";
 import { createLabelDrawSnapshotOwner } from "../js/core/renderer/label_draw_snapshot.js";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
@@ -221,6 +223,36 @@ function paintLayer(layer) {
   layer.items.forEach((item) => layer.drawItem(context, item));
   return painted;
 }
+
+test("regional navigation paints the same backdrop on canvas and in the worker after mode changes", t => withGeoPath(async () => {
+  const previous = globalThis.topojson;
+  globalThis.topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
+  t.after(() => previous ? globalThis.topojson = previous : delete globalThis.topojson);
+  const region = { bounds: [0, 0, 20, 10] };
+  let packet;
+  const f = fixture({ activeScenarioManifest: { region }, showWaterRegions: false,
+    contextLayerExternalDataByName: {}, topologyPrimary: { type: "Topology", arcs: [], objects: {
+      land: { type: "Point", coordinates: [15, 5] },
+    } } }, { yieldTask: () => {}, createWorkerClient: () => ({
+      available: () => true, request: value => { packet = value; }, dispose() {},
+    }) });
+  t.after(f.owner.dispose);
+  f.setProjection(Object.assign(point => point, { rotate: () => [0, 0, 0] }));
+  f.helpers.getOceanBaseFillColor = () => getRegionalBackgroundColor(f.state.activeScenarioManifest, "#227799");
+  for (const [backdrop, fill, expected] of [
+    ["none", "#343434", ["#343434", "#canonical-land"]],
+    ["none", undefined, ["#227799", "#canonical-land"]],
+    ["land", undefined, ["#227799", "#b9b7b2", "#canonical-land"]],
+  ]) {
+    Object.assign(region, { backdrop, backdrop_fill: fill });
+    f.owner.prepare();
+    const frame = f.calls.prepare.at(-1);
+    assert.equal(frame.backgroundColor, backdrop === "none" ? expected[0] : "transparent");
+    assert.deepEqual(frame.layers.flatMap(paintLayer).map(item => item.color), expected);
+    await frame.renderRaster({ width: 20, height: 10, bounds: frame.bounds, signal: new AbortController().signal });
+    assert.deepEqual(packet.entries.map(entry => entry.fillColor), expected);
+  }
+}));
 
 test("whole-scene source uses global coarse base instead of selected viewport detail", () => withGeoPath(() => {
   const a = feature("base-a");
