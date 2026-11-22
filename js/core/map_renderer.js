@@ -358,6 +358,7 @@ import { createRenderTransformReusePolicyOwner, VIEWPORT_CULL_OVERSCAN_PX } from
 import { createProjectedGeometryBoundsOwner } from "./renderer/projected_geometry_bounds_owner.js";
 import { createViewportReadModelOwner } from "./renderer/viewport_read_model_owner.js";
 import { createRenderSnapshotOwner } from "./renderer/render_snapshot.js";
+import { createMapExportCanvas, wrapLongitude } from "./renderer/regional_camera.js";
 import { createViewportCommandOwner } from "./renderer/viewport_command_owner.js";
 import { createRendererViewportUpdateOwner } from "./renderer/renderer_viewport_update_owner.js";
 import { createRendererStartupTransactionOwner } from "./renderer/renderer_startup_transaction_owner.js";
@@ -1064,6 +1065,7 @@ const getSetMapDataTransactionOwner = lazyOwner(() => createSetMapDataTransactio
   state,
   getters: {
     nowMs,
+    needsScenarioRefit: () => getRendererFitProjectionOwner().needsScenarioRefit(),
     getActiveScenarioId: () => runtimeState.activeScenarioId,
     getLandFeatureCount: () => Array.isArray(runtimeState.landData?.features)
       ? runtimeState.landData.features.length
@@ -2715,13 +2717,14 @@ function getViewportReadModelOwner() {
       getViewportDpr: () => Number(runtimeState.dpr || 1),
     },
     capabilities: {
+      getRegionalBounds,
       getProjectionSnapshot: () => {
         const projection = rendererSurfaceHost.getProjection();
         if (!projection || typeof projection.scale !== "function" || typeof projection.translate !== "function") {
           return null;
         }
         const translate = projection.translate() || [0, 0];
-        return { scale: projection.scale(), translate: [translate[0], translate[1]] };
+        return { scale: projection.scale(), translate, rotate: projection.rotate() };
       },
       invertProjectionPoint: (point) => {
         const projection = rendererSurfaceHost.getProjection();
@@ -2769,6 +2772,7 @@ const getViewportCommandOwner = lazyOwner(() => createViewportCommandOwner({
     canAnimateCamera: () => !!runtimeState.firstVisibleFramePainted
       && (!!tnoRasterSceneOwner?.isActive() || !!navigationSceneOwner?.isReady()),
     calculatePanExtent,
+    getRegionalBounds,
     getCenteredFitZoomTransform,
   },
   effects: {
@@ -2880,6 +2884,7 @@ const getZoomInteractionLifecycleOwner = lazyOwner(() => createZoomInteractionLi
     isZoomRenderScheduled: () => !!runtimeState.zoomRenderScheduled,
   },
   helpers: {
+    constrainCamera: (transform) => getViewportCommandOwner().constrainCamera(transform),
     cloneZoomTransform,
     shouldAllowZoomEvent,
     nowMs,
@@ -3877,7 +3882,10 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
         targetTransform: cloneZoomTransform(transform),
         transform: presented ? cloneZoomTransform(transform) : cache.lastFrame?.transform,
       };
-      if (presented) getRendererViewportUpdateOwner().applyViewportTransform(transform);
+      if (presented) {
+        getRendererViewportUpdateOwner().applyViewportTransform(transform);
+        getRendererFitProjectionOwner().syncRegionalFrameClip(transform);
+      }
     },
   },
 }));
@@ -10550,10 +10558,12 @@ function focusWaterRegionById(id) {
 
 function focusRegionBounds(bounds, geometry, geoBounds, options) {
   const projection = rendererSurfaceHost.getProjection();
-  const wrapsDateLine = Array.isArray(geoBounds) && Number(geoBounds[0]?.[0]) > Number(geoBounds[1]?.[0]);
+  const meridian = -(projection?.rotate()[0] || 0);
+  const wrapsDateLine = Array.isArray(geoBounds)
+    && wrapLongitude(geoBounds[0][0] - meridian) > wrapLongitude(geoBounds[1][0] - meridian);
   const midLatitude = geoBounds ? (Number(geoBounds[0][1]) + Number(geoBounds[1][1])) / 2 : 0;
-  const worldLeft = wrapsDateLine ? projection?.([-179.9, midLatitude]) : null;
-  const worldRight = wrapsDateLine ? projection?.([179.9, midLatitude]) : null;
+  const worldLeft = wrapsDateLine ? projection?.([meridian - 179.9, midLatitude]) : null;
+  const worldRight = wrapsDateLine ? projection?.([meridian + 179.9, midLatitude]) : null;
   const west = wrapsDateLine ? projection?.([geoBounds[0][0], midLatitude]) : null;
   const east = wrapsDateLine ? projection?.([geoBounds[1][0], midLatitude]) : null;
   const worldWidth = Math.abs(Number(worldRight?.[0]) - Number(worldLeft?.[0]));
@@ -10608,9 +10618,12 @@ function pinTransformToWorldTop(transform) {
   return globalThis.d3.zoomIdentity.translate(transform.x, transform.y - topOnScreen).scale(transform.k);
 }
 
-function focusGeoBounds([west, south, east, north], { animate = false, geometry, maxScale } = {}) {
+function focusGeoBounds([west, south, east, north], { animate = false, geometry, maxScale, suppressRender = false } = {}) {
   const projection = rendererSurfaceHost.getProjection();
   if (!projection || !globalThis.d3?.geoPath) return false;
+  if (!geometry && getRegionalBounds()) {
+    return getViewportCommandOwner().focusRegionalGeoBounds(projection, [west, south, east, north], { animate, maxScale, suppressRender });
+  }
   const bounds = globalThis.d3.geoPath(projection).bounds(geometry || {
     type: "Polygon",
     coordinates: [[[west, north], [east, north], [east, south], [west, south], [west, north]]],
@@ -10983,6 +10996,10 @@ function getExportRenderBytes(passNames, pixelRatio) {
   });
 }
 
+function getMapExportFrame() {
+  return getRendererFitProjectionOwner().getExportFrame(getOceanBaseFillColor);
+}
+
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   passNames = filterCurrentEnabledRenderPasses(passNames);
   if (passNames.includes("populationHeatmap")) assertPopulationHeatmapReadyForExport();
@@ -11036,13 +11053,14 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
       exportRenderInProgress = previousExportState;
     }
   }
-  const exportCanvas = document.createElement("canvas");
-  exportCanvas.width = redrawAtTargetResolution ? Math.round(logicalWidth * targetDpr) : width;
-  exportCanvas.height = redrawAtTargetResolution ? Math.round(logicalHeight * targetDpr) : height;
+  const exportCanvas = createMapExportCanvas(
+    document,
+    redrawAtTargetResolution ? Math.round(logicalWidth * targetDpr) : width,
+    redrawAtTargetResolution ? Math.round(logicalHeight * targetDpr) : height,
+    getMapExportFrame(),
+  );
   const exportContext = exportCanvas.getContext("2d");
   if (!exportContext) return null;
-  exportContext.setTransform(1, 0, 0, 1, 0, 0);
-  exportContext.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
   if (!redrawAtTargetResolution) {
     composeRenderPassesToTarget(exportContext, passNames, runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
     assertBathymetryDetailReadyForExport(passNames);
@@ -12976,6 +12994,10 @@ async function fillFromDoubleClick(event) {
   noteRenderAction("double-click-fill", actionStart);
 }
 
+function getRegionalBounds() {
+  return getRendererFitProjectionOwner().getRegionalBounds();
+}
+
 function calculatePanExtent() {
   return getViewportReadModelOwner().calculatePanExtent();
 }
@@ -13371,6 +13393,8 @@ function setMapData({
 
 scenarioRefreshRuntime = createScenarioRefreshRuntime({
   runtimeState,
+  needsScenarioRefit: () => getRendererFitProjectionOwner().needsScenarioRefit(),
+  fitProjection, resetZoomToFit,
   ensureLayerDataFromTopology,
   getProjectionIdentity: () => getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
   requestScopedRender: (reason) => requestRendererRender(reason, { flush: false }),
@@ -13596,6 +13620,7 @@ export {
   applyRiverPaintCellById,
   isExportRenderOverBudget,
   getOceanBaseFillColor,
+  getMapExportFrame,
   renderExportPassesToCanvas,
   captureRenderSnapshot,
 

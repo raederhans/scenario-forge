@@ -1,3 +1,5 @@
+import { constrainRegionalTransform, projectGeoBounds } from "./regional_camera.js";
+
 const DEFAULT_MIN_ZOOM_SCALE = 0.35;
 const DEFAULT_MAX_ZOOM_SCALE = 50;
 const CAMERA_TRANSITION_MS = 180;
@@ -50,11 +52,36 @@ export function createViewportCommandOwner({
     return typeof getters.calculatePanExtent === "function" ? getters.calculatePanExtent() : null;
   }
 
+  function minimumScale() {
+    return getters.getRegionalBounds?.() ? 1 : minZoomScale;
+  }
+
+  function constrainCamera(transform) {
+    return constrainRegionalTransform(transform, getters.getRegionalBounds?.(),
+      state.width, state.height, maxZoomScale, getD3()?.zoomIdentity);
+  }
+
+  function focusRegionalGeoBounds(projection, bounds, { animate, maxScale = maxZoomScale, suppressRender = false }) {
+    const zoom = getZoomBehavior();
+    const selection = selectInteractionRect();
+    if (!zoom || !selection) return false;
+    const [[x0, y0], [x1, y1]] = projectGeoBounds(projection, bounds);
+    const scale = Math.min(maxScale, state.width / (x1 - x0), state.height / (y1 - y0));
+    const transform = constrainCamera(getD3().zoomIdentity.translate(state.width / 2, state.height / 2)
+      .scale(scale).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+    selection.interrupt();
+    if (suppressRender) effects.setZoomTransform?.(transform);
+    const target = animate && !suppressRender && globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches !== true
+      ? selection.transition().duration(420) : selection;
+    target.call(zoom.transform, transform);
+    return true;
+  }
+
   function updateZoomTranslateExtent() {
     const zoomBehavior = getZoomBehavior();
     const { width, height } = getViewportDimensions();
     if (!zoomBehavior || width <= 0 || height <= 0) return;
-    zoomBehavior.scaleExtent([minZoomScale, maxZoomScale]);
+    zoomBehavior.scaleExtent([minimumScale(), maxZoomScale]);
     zoomBehavior.extent([[0, 0], [width, height]]);
     zoomBehavior.translateExtent(calculatePanExtent());
   }
@@ -110,7 +137,7 @@ export function createViewportCommandOwner({
     const selection = selectInteractionRect();
     if (!zoomBehavior || !d3 || !selection) return;
     updateZoomTranslateExtent();
-    const transform = centerContent
+    const transform = centerContent && !getters.getRegionalBounds?.()
       ? (getCenteredFitZoomTransform({ centerX, centerY }) || d3.zoomIdentity)
       : d3.zoomIdentity;
     if (animate && canAnimateCamera(selection)) {
@@ -133,7 +160,7 @@ export function createViewportCommandOwner({
     const currentScale = d3?.zoomTransform?.(getInteractionRectNode())?.k;
     if (canAnimateCamera(selection) && Number.isFinite(currentScale)) {
       const baseScale = pendingScale ?? currentScale;
-      const nextScale = Math.min(maxZoomScale, Math.max(minZoomScale, baseScale * factor));
+      const nextScale = Math.min(maxZoomScale, Math.max(minimumScale(), baseScale * factor));
       applyZoomCommand(selection, zoomBehavior, zoomBehavior.scaleTo, [nextScale], nextScale);
     } else {
       applyZoomCommand(selection, zoomBehavior, zoomBehavior.scaleBy, [factor]);
@@ -148,7 +175,7 @@ export function createViewportCommandOwner({
       ? Number(String(percent).trim().replace(/%/g, ""))
       : Number(percent);
     if (!Number.isFinite(rawPercent)) return;
-    const nextScale = Math.min(maxZoomScale, Math.max(minZoomScale, rawPercent / 100));
+    const nextScale = Math.min(maxZoomScale, Math.max(minimumScale(), rawPercent / 100));
     applyZoomCommand(selection, zoomBehavior, zoomBehavior.scaleTo, [nextScale], nextScale);
   }
 
@@ -159,17 +186,17 @@ export function createViewportCommandOwner({
     selection.interrupt?.();
     pendingScale = null;
     pendingCommand = null;
-    if (suppressRender) {
+    if (suppressRender || getters.getRegionalBounds?.()) {
       const d3 = getD3();
       const node = getInteractionRectNode();
-      const constrained = zoomBehavior.constrain()(
+      const constrained = constrainCamera(zoomBehavior.constrain()(
         d3.zoomTransform(node),
         zoomBehavior.extent().call(node, node.__data__, 0, [node]),
         zoomBehavior.translateExtent(),
-      );
+      ));
       // Keep D3 and renderer state aligned before D3 emits zoom events. The
       // lifecycle's same-transform guard then avoids an early map draw.
-      effects.setZoomTransform?.(constrained);
+      if (suppressRender) effects.setZoomTransform?.(constrained);
       selection.call(zoomBehavior.transform, constrained);
       return;
     }
@@ -179,6 +206,8 @@ export function createViewportCommandOwner({
   return Object.freeze({
     updateZoomTranslateExtent,
     resetZoomToFit,
+    constrainCamera,
+    focusRegionalGeoBounds,
     zoomByStep,
     setZoomPercent,
     enforceZoomConstraints,

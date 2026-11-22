@@ -166,11 +166,19 @@ export function createZoomInteractionLifecycleOwner({
     effects.dismissOnboardingHint?.();
   }
 
+  function constrainedEventTransform(transform) {
+    const constrained = helpers.constrainCamera?.(transform) || transform;
+    // zoom.transform and transition interpolation bypass D3's constrain callback.
+    if (constrained !== transform) getInteractionRect().node().__zoom = constrained;
+    return constrained;
+  }
+
   function handleZoom(event = {}) {
     if (disposed || !event.transform) return;
-    if (!gestureActive && transformsEqual(event.transform, getCurrentTransform())) return;
+    const transform = constrainedEventTransform(event.transform);
+    if (!gestureActive && transformsEqual(transform, getCurrentTransform())) return;
     activateGesture();
-    effects.setPendingZoomTransform?.(event.transform);
+    effects.setPendingZoomTransform?.(transform);
     if (isZoomRenderScheduled()) return;
     effects.setZoomRenderScheduled?.(true);
     scheduleLatestZoomTransformFlush();
@@ -195,7 +203,7 @@ export function createZoomInteractionLifecycleOwner({
   function handleZoomEnd(event = {}) {
     if (disposed) return;
     releaseMousePointer();
-    const endTransform = event.transform || getPendingZoomTransform() || getCurrentTransform();
+    const endTransform = constrainedEventTransform(event.transform || getPendingZoomTransform() || getCurrentTransform());
     if (!gestureActive && !transformsEqual(endTransform, getCurrentTransform())) activateGesture();
     frameGeneration += 1;
     effects.setPendingZoomTransform?.(null);

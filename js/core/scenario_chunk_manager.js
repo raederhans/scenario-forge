@@ -27,6 +27,11 @@ function normalizeBounds(rawBounds) {
   if (Array.isArray(rawBounds) && rawBounds.length >= 4) {
     const [minLon, minLat, maxLon, maxLat] = rawBounds.map((value) => Number(value));
     if ([minLon, minLat, maxLon, maxLat].every(Number.isFinite)) {
+      // A regional viewport that crosses 180° reports west > east. Chunk selection
+      // treats it as the full longitude span so neither side of the dateline is dropped.
+      if (minLon > maxLon) {
+        return [-180, Math.max(-90, Math.min(90, minLat)), 180, Math.max(-90, Math.min(90, maxLat))];
+      }
       return [
         Math.max(-180, Math.min(180, minLon)),
         Math.max(-90, Math.min(90, minLat)),

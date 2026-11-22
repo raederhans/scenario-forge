@@ -2,6 +2,9 @@ import { createGeometryRasterWorkerClient } from "../geometry_raster_worker_clie
 import { getPoliticalDisplayModeSignature } from "../political_display_mode.js";
 import { getThematicWgiSignature } from "../thematic/thematic_wgi_view_model.js";
 import { packGeometryCooperatively } from "../cooperative_geometry_transport.js";
+import { getScenarioRegion } from "../scenario/scenario_region.js";
+import { projectGeoBounds } from "./regional_camera.js";
+import { getRegionalBackdrop } from "./regional_backdrop.js";
 import { createNavigationFrameOwner } from "./navigation_frame_owner.js";
 import { getObjectIdentityToken } from "./object_identity.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
@@ -115,6 +118,11 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     reconcileWorker();
     discardStaleSources();
     const bundle = state.scenarioBundleCacheById?.[state.activeScenarioId];
+    if (getScenarioRegion(state.activeScenarioManifest)) {
+      prewarmedSourceIdentity = getSourceIdentity();
+      prepare();
+      return;
+    }
     if (!bundle) return;
     prewarmedSourceIdentity = getSourceIdentity();
     const layers = ["political", "water", "scenario_atlantropa"]
@@ -206,7 +214,8 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     ]);
   }
 
-  function getWholeSceneLand() {
+  function getWholeSceneLand(region) {
+    if (region) return state.landDataFull?.features;
     const bundle = state.scenarioBundleCacheById?.[state.activeScenarioId];
     const bases = (bundle?.chunkRegistry?.byLayer?.political || []).filter(isScenarioPoliticalBaseChunk);
     if (bases.length) {
@@ -229,7 +238,8 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     if (frame.isReady()) { sourcePayloads = null; return; }
     if (requestedIdentity === identity) return;
     const projection = surface.getProjection();
-    const land = getWholeSceneLand();
+    const region = getScenarioRegion(state.activeScenarioManifest);
+    const land = getWholeSceneLand(region);
     if (!projection || !globalThis.d3?.geoPath) return;
     const waterPayloads = getWholeLayerPayloads("water");
     const atlantropaPayloads = getWholeLayerPayloads("scenario_atlantropa");
@@ -248,7 +258,8 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     if (!land?.length) return;
     const path = globalThis.d3.geoPath(projection);
     path.digits?.(6);
-    const bounds = path.bounds({ type: "Sphere" });
+    const bounds = region ? projectGeoBounds(projection, region.bounds) : path.bounds({ type: "Sphere" });
+    const backdrop = region && getRegionalBackdrop(state);
     const atlantropa = h.getEffectiveAtlantropaFeatures(atlantropaPayloads?.flatMap((payload) => payload.features));
     function fillGeometry(context, geometries) {
       if (globalThis.Path2D) {
@@ -288,15 +299,29 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
       (state.showWaterRegions || sharedLakeIds.has(h.getFeatureId(feature))) && h.isWaterRegionRenderable(feature)
     ));
     const layers = [
-      { items: [{ type: "Sphere" }], drawItem(context, sphere) {
-        context.fillStyle = h.getOceanBaseFillColor();
-        context.beginPath();
-        path.context(context)(sphere);
-        context.fill();
-      } },
+      { items: [{ type: "Sphere" }],
+        rasterEntry: () => ({ feature: sphereFeature, fillColor: h.getOceanBaseFillColor(), alpha: 1 }),
+        drawItem(context, sphere) {
+          context.fillStyle = h.getOceanBaseFillColor();
+          context.beginPath();
+          path.context(context)(sphere);
+          context.fill();
+        } },
+      ...(backdrop?.collection ? [{
+        items: backdrop.collection.features || [backdrop.collection],
+        rasterEntry: (feature) => ({ feature, fillColor: backdrop.fill, alpha: 1 }),
+        drawItem(context, feature) {
+          context.fillStyle = backdrop.fill;
+          fillGeometry(context, [feature]);
+        },
+      }] : []),
       { items: land, drawItem: drawLand },
       { items: [...atlantropa.land, ...atlantropa.shoal, ...atlantropa.relief], drawItem: drawLand },
-      { items: water, drawItem(context, feature) {
+      { items: water, rasterEntry(feature) {
+        const alpha = h.getWaterRegionDefaultStyle(feature).opacity;
+        if (alpha > 0) return { feature: waterRasterFeature(feature),
+          fillColor: h.getWaterRegionColor(h.getFeatureId(feature), feature), alpha };
+      }, drawItem(context, feature) {
         const opacity = h.getWaterRegionDefaultStyle(feature).opacity;
         if (!(opacity > 0)) return;
         context.globalAlpha = opacity;
@@ -332,14 +357,7 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
           for (let index = 0; index < items.length; index++) {
             if (signal.aborted) return null;
             const item = items[index];
-            let entry;
-            if (layerIndex === 0) {
-              entry = { feature: sphereFeature, fillColor: h.getOceanBaseFillColor(), alpha: 1 };
-            } else if (layerIndex === 3) {
-              const alpha = h.getWaterRegionDefaultStyle(item).opacity;
-              if (alpha > 0) entry = { feature: waterRasterFeature(item),
-                fillColor: h.getWaterRegionColor(h.getFeatureId(item), item), alpha };
-            } else entry = landEntry(item);
+            const entry = (layers[layerIndex].rasterEntry || landEntry)(item);
             if (entry) entries.push({ ...entry, id: `${layerIndex}:${index}` });
             if (performance.now() - sliceStartedAt >= 4) {
               await yieldTask();
