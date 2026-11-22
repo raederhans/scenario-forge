@@ -3,10 +3,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from shapely.geometry import box, mapping
+from shapely.geometry import Point, box, mapping
+from shapely.ops import unary_union
 
-from map_builder.regional_geometry import _encode_exact_coverage
-from tools.build_regional_scenario import build, select_members
+from map_builder.regional_geometry import _decode_geometry, _encode_exact_coverage
+from tools.build_regional_scenario import CuttingUnits, build, partition, rebuild_split_topology, select_members, split_features
 
 
 def unit(name, polygon):
@@ -59,6 +60,8 @@ class RegionalScenario(unittest.TestCase):
         ]}
         self.reference = {"XX": {"base_iso2": "XX", "continent_id": "continent_asia", "continent_label": "Asia",
                                  "subregion_id": "subregion_central_asia", "subregion_label": "Central Asia"}}
+        self.splits = {"subtract": {}, "adm2_partitions": [], "district_partitions": [],
+                       "min_area_fraction": .02, "min_area_km2": 150}
 
     def select(self):
         return select_members(self.base, self.base_owners, self.units, self.membership, self.rules)
@@ -91,7 +94,8 @@ class RegionalScenario(unittest.TestCase):
             for number in ["first", "second"]:
                 out = Path(tmp, number, "fixture")
                 build(out, self.base, self.base_owners, self.units, self.membership, self.rules,
-                      self.bookmark, self.cities, "2026-11-22T00:00:00Z", "fixture", self.reference)
+                      self.bookmark, self.cities, "2026-11-22T00:00:00Z", "fixture", self.reference,
+                      self.splits, {"features": []})
                 copies.append({p.name: p.read_bytes() for p in out.iterdir()})
         self.assertEqual(copies[0], copies[1])
         products = {k: json.loads(v) for k, v in copies[0].items()}
@@ -120,6 +124,111 @@ class RegionalScenario(unittest.TestCase):
         self.assertLess(len(topology["arcs"]), len(self.base["arcs"]))
         self.assertTrue(all(arc in self.base["arcs"] for arc in topology["arcs"]))
         self.assertEqual(topology["bbox"], [-179, 0, 23.2, 1])
+
+    def test_sliver_joins_longest_shared_edge(self):
+        parent = box(0, 0, 4, 4)
+        sliver = box(1, 1, 1.02, 2)
+        left = box(0, 0, 1, 1.5)
+        right = parent.difference(unary_union([left, sliver]))
+        cuts = CuttingUnits([unit("a", left), unit("b", right), unit("c", sliver)])
+        pieces, count = partition(parent, cuts, .02, 0)
+        self.assertEqual(count, 1)
+        self.assertTrue(pieces["P/b"].covers(sliver))
+        self.assertTrue(unary_union(list(pieces.values())).equals(parent))
+        self.assertEqual(pieces["P/a"].intersection(pieces["P/b"]).area, 0)
+        one = CuttingUnits([unit("thin", box(0, 0, .01, 4)), unit("wide", box(.01, 0, 4, 4))])
+        self.assertEqual(partition(parent, one, .02, 0), ({}, 1))
+
+    def test_two_complete_builds_with_cuts(self):
+        for row in self.base["objects"]["political"]["geometries"]:
+            row["properties"]["name"] = row["properties"]["id"]
+        results = []
+        with TemporaryDirectory() as tmp:
+            for n in ("a", "b"):
+                out = Path(tmp, n, "fixture")
+                build(out, self.base, self.base_owners, self.units, self.membership, self.rules,
+                      self.bookmark, self.cities, "2026-11-22T00:00:00Z", "fixture", self.reference,
+                      {**self.splits, "district_partitions": ["P"]}, {"features": []})
+                results.append({p.name: p.read_bytes() for p in out.iterdir()})
+        self.assertEqual(results[0], results[1])
+        self.assertEqual(json.loads(results[0]["audit.json"])["geometry_splits"]["children_by_parent"]["A"],
+                         ["A__RCW_P_one", "A__RCW_P_two"])
+
+    def test_uncovered_child_inherits_prototype_owner(self):
+        self.units["features"] = [unit("one", box(20, 0, 20.6, 1))]
+        for row in self.base["objects"]["political"]["geometries"]:
+            row["properties"]["name"] = row["properties"]["id"]
+        with TemporaryDirectory() as tmp:
+            out = Path(tmp, "fixture")
+            build(out, self.base, self.base_owners, self.units, self.membership, self.rules,
+                  self.bookmark, self.cities, "2026-11-22T00:00:00Z", "fixture", self.reference,
+                  {**self.splits, "district_partitions": ["P"]}, {"features": []})
+            cid = "A__RCW_REMAINDER"
+            self.assertEqual(json.loads((out/"owners.by_feature.json").read_bytes())["owners"][cid], "D")
+            entry = json.loads((out/"audit.json").read_bytes())["geometry_splits"]["zero_intersection_inheritance"][cid]
+            self.assertEqual((entry["parent_id"], entry["owner"]), ("A", "D"))
+            self.assertGreater(entry["area_km2"], 0)
+
+    def test_subtraction_preserves_city_and_single_piece_ids(self):
+        polygons = [box(20, 0, 22, 1), box(21.5, .25, 22.5, .75)]
+        ids = ["district", "city"]
+        t = _encode_exact_coverage(ids, polygons)
+        t["bbox"] = [20, 0, 22.5, 1]
+        for row in t["objects"]["political"]["geometries"]:
+            row["properties"]["name"] = row["properties"]["id"]
+        rules = {**self.splits, "subtract": {"district": "city"}, "district_partitions": ["P"]}
+        r, audit = split_features(t, dict(zip(ids, polygons)), dict.fromkeys(ids, "G"),
+                                  {"features": [unit("one", box(0, 0, 25, 5))]}, {"features": []},
+                                  rules, self.rules)
+        result = rebuild_split_topology(t, r)
+        restored = {row["properties"]["id"]: _decode_geometry(result, row)
+                    for row in result["objects"]["political"]["geometries"]}
+        self.assertEqual(set(restored), set(ids))
+        self.assertEqual(audit["children_by_parent"], {})
+        self.assertEqual([k for k, g in restored.items() if g.covers(Point(21.75, .5))], ["city"])
+        self.assertTrue(restored["city"].equals(polygons[1]))
+        self.assertTrue(restored["district"].equals(polygons[0].difference(polygons[1])))
+
+    def test_split_ids_shared_arcs_and_neighbors(self):
+        ids = ["parent", "neighbor"]
+        polygons = [box(20, 0, 22, 1), box(22, 0, 23, 1)]
+        t = _encode_exact_coverage(ids, polygons)
+        t["bbox"] = [20, 0, 23, 1]
+        for row in t["objects"]["political"]["geometries"]:
+            row["properties"]["name"] = row["properties"]["id"]
+        features = [unit("one", box(20, 0, 22, .4)), unit("two", box(20, .4, 22, 1))]
+        copies = []
+        for units in (features, features[::-1]):
+            r, audit = split_features(t, dict(zip(ids, polygons)), dict.fromkeys(ids, "G"),
+                                      {"features": units}, {"features": []},
+                                      {**self.splits, "district_partitions": ["P"]}, self.rules)
+            copies.append(rebuild_split_topology(t, r))
+            self.assertEqual(audit["children_by_parent"]["parent"], ["parent__RCW_P_one", "parent__RCW_P_two"])
+            self.assertEqual(audit["residual_km2_by_parent"]["parent"], 0)
+        self.assertEqual(copies[0], copies[1])
+        political = copies[0]["objects"]["political"]
+        refs = [{ref if ref >= 0 else ~ref for ref in row["arcs"][0]} for row in political["geometries"]]
+        self.assertTrue(refs[0] & refs[1] and refs[1] & refs[2] and refs[0] & refs[2])
+        self.assertEqual(political["computed_neighbors"], [[1, 2], [0, 2], [0, 1]])
+
+
+class HierarchyOverridesTest(unittest.TestCase):
+    def test_base_overrides_project_onto_regional_leaves(self):
+        from tools.build_regional_scenario import hierarchy_overrides
+        base = {
+            "feature_splits": {"A": ["A__X", "A__Y"], "OUT": ["OUT__1"], "B": ["B__KEEP", "B__GONE"]},
+            "feature_merges": {"M1": ["P", "Q"], "M2": ["R", "S"], "M_OUT": ["T", "U"]},
+        }
+        members = {"A__X__RCW_1", "A__X__RCW_2", "A__Y", "B__KEEP", "C__RCW_1", "C__RCW_2", "M1", "M2__RCW_1", "M2__RCW_2"}
+        children = {"A__X": ["A__X__RCW_1", "A__X__RCW_2"], "C": ["C__RCW_1", "C__RCW_2"],
+                    "M2": ["M2__RCW_1", "M2__RCW_2"]}
+        result = hierarchy_overrides(base, members, children)
+        self.assertEqual(result["feature_splits"], {
+            "A": ["A__X__RCW_1", "A__X__RCW_2", "A__Y"], "B": ["B__KEEP"],
+            "C": ["C__RCW_1", "C__RCW_2"], "M2": ["M2__RCW_1", "M2__RCW_2"],
+        })
+        self.assertEqual(result["feature_merges"], {"M1": ["P", "Q"], "M2": ["R", "S"]})
+        self.assertEqual(hierarchy_overrides(None, members, {}), {"feature_merges": {}, "feature_splits": {}})
 
 
 if __name__ == "__main__":

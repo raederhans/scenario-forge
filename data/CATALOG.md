@@ -2,7 +2,7 @@
 
 - generated_at: 2026-11-08T02:57:05Z
 - version: 1
-- entries: 1380
+- entries: 1381
 
 ## Counts by role
 
@@ -55,7 +55,7 @@
 | runtime_asset_registry | 1 |
 | runtime_political_topology | 1 |
 | scenario_registry | 1 |
-| source_ledger_asset | 7 |
+| source_ledger_asset | 8 |
 | special_zones | 1 |
 | terrain_contours_major_topology | 1 |
 | terrain_contours_minor_topology | 1 |
@@ -150,6 +150,7 @@
 | manifest_output:runtime_asset_registry.json | data/runtime_asset_registry.json | runtime_asset_registry | json | json | schema://json/object/v1 | data/manifest.json::outputs::runtime_asset_registry.json::sha256 | default | data/runtime_asset_registry.json |  |
 | source:geoboundaries_mmr_adm3_9469f09 | data/scenario-rules/modern_world.sources/myanmar/geoBoundaries-MMR-ADM3.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::geoboundaries_mmr_adm3_9469f09::current_local_sha256 | default | source_ledger | geoboundaries_mmr_adm3_9469f09 |
 | source:natural_earth_disputed_v5_1_2 | data/scenario-rules/modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::natural_earth_disputed_v5_1_2::current_local_sha256 | default | source_ledger | natural_earth_disputed_v5_1_2 |
+| source:gb_uzb_adm2_rcw | data/scenario-rules/rcw.sources/adm2_units.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::gb_uzb_adm2_rcw::current_local_sha256 | default | source_ledger | gb_uzb_adm2_rcw |
 | source:ristat_districts_1897 | data/scenario-rules/rcw.sources/units_1897.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::ristat_districts_1897::current_local_sha256 | default | source_ledger | ristat_districts_1897 |
 | political_id_raster:hoi4_1936 | data/scenarios/hoi4_1936/political_id_raster/manifest.json | political_id_raster_manifest | json | json | schema://political-id-raster/manifest/v1 |  | no-cache | runtime_asset_registry.assets.political_id_raster:hoi4_1936 |  |
 | political_id_raster:hoi4_1939 | data/scenarios/hoi4_1939/political_id_raster/manifest.json | political_id_raster_manifest | json | json | schema://political-id-raster/manifest/v1 |  | no-cache | runtime_asset_registry.assets.political_id_raster:hoi4_1939 |  |

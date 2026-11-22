@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-11-08T02:57:05Z",
   "counts": {
-    "entries": 1380,
+    "entries": 1381,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -51,7 +51,7 @@
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
       "scenario_registry": 1,
-      "source_ledger_asset": 7,
+      "source_ledger_asset": 8,
       "special_zones": 1,
       "terrain_contours_major_topology": 1,
       "terrain_contours_minor_topology": 1,
@@ -74,13 +74,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 156,
+      "geojson": 157,
       "javascript": 2,
       "json": 1050,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1378,
+      "json": 1379,
       "module": 2
     }
   },
@@ -1024,6 +1024,25 @@
       "sourceId": "natural_earth_disputed_v5_1_2",
       "readMode": "json",
       "aliases": []
+    },
+    {
+      "key": "source:gb_uzb_adm2_rcw",
+      "url": "data/scenario-rules/rcw.sources/adm2_units.geojson",
+      "role": "source_ledger_asset",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "data/source_ledger.json::gb_uzb_adm2_rcw::current_local_sha256",
+      "owner": "source_ledger",
+      "cachePolicy": "default",
+      "sourceId": "gb_uzb_adm2_rcw",
+      "readMode": "json",
+      "aliases": [
+        "source:gb_kaz_adm2_rcw",
+        "source:gb_kgz_adm2_rcw",
+        "source:gb_ltu_adm2_rcw",
+        "source:gb_tjk_adm2_rcw",
+        "source:gb_tkm_adm2_rcw"
+      ]
     },
     {
       "key": "source:ristat_districts_1897",
