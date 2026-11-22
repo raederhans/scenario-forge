@@ -19,6 +19,7 @@ import {
 } from "./city_reveal_policy.js";
 import { yieldToBackground } from "../background_yield.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+import { getRegionalLayerFilter } from "./regional_layer_filter.js";
 
 // Yield after every merge write, including tail copies: a large sorted run
 // must remain interruptible even when the comparator always prefers one side.
@@ -739,6 +740,7 @@ export function createUrbanCityPolicyOwner({
 
   function getEffectiveCityCollectionSource() {
     return {
+      regionFilter: getRegionalLayerFilter(state),
       baseRef: state?.worldCitiesData || null,
       scenarioRef: state?.scenarioCityOverridesData || null,
       strategicValuesRef: state?.scenarioStrategicValuesData || null,
@@ -848,6 +850,26 @@ export function createUrbanCityPolicyOwner({
       }, 0, { sourceLabel: "project" });
       featuresByKey.set(getCityFeatureKey(feature), feature);
       yield;
+    }
+
+    if (source.regionFilter) {
+      const { ids, hostAt } = source.regionFilter;
+      for (const [key, feature] of featuresByKey) {
+        yield;
+        const props = feature.properties;
+        const host = props.__city_host_feature_id || props.host_feature_id;
+        if (ids.has(host)) continue;
+        const resolved = hostAt(feature.geometry?.coordinates);
+        if (resolved) {
+          featuresByKey.set(key, cloneCityFeature(feature, { host_feature_id: resolved, __city_host_feature_id: resolved }));
+        } else {
+          featuresByKey.delete(key);
+        }
+      }
+      for (const [alias, key] of aliasToKey) {
+        yield;
+        if (!featuresByKey.has(key)) aliasToKey.delete(alias);
+      }
     }
 
     const capitalTagsByKey = new Map();

@@ -92,21 +92,24 @@ export function createRendererFitProjectionOwner({
   let regionalBounds = null;
   let previousWorldProjection = null;
   let appliedClip = "";
+  let appliedFill = "";
 
-  function syncRegionalFrameClip(transform) {
+  function syncRegionalFrameClip(transform, oceanFill) {
     let clip = "";
     if (regionalBounds) {
       const [[left, top], [right, bottom]] = regionalScreenBounds(regionalBounds, transform);
       const insets = [top, state.width - right, state.height - bottom, left];
       clip = `inset(${insets.map((value) => Math.max(0, value) + "px").join(" ")})`;
     }
-    if (clip === appliedClip) return;
+    const fill = clip ? oceanFill : "";
+    if (clip === appliedClip && fill === appliedFill) return;
     appliedClip = clip;
+    appliedFill = fill;
     for (const layer of [surfaceHost.getMapCanvas(), surfaceHost.getInteractionOverlayCanvas(),
       surfaceHost.getPoliticalPatchCanvas(), surfaceHost.getMapSvg()]) {
       if (layer) layer.style.clipPath = clip;
     }
-    surfaceHost.getMapContainer().style.backgroundColor = clip ? "#b9b7b2" : "";
+    surfaceHost.getMapContainer().style.backgroundColor = fill;
   }
 
   function getExportFrame(getOceanFill) {
