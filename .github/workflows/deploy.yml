@@ -36,8 +36,9 @@ jobs:
           cache: 'npm'
       - name: Install Node dependencies
         run: npm ci
+      - name: Install political geometry dependency
+        run: python -m pip install --constraint requirements-dev.lock.txt shapely
       - name: Build the Pages artifact
-        # Stdlib-only: the builder needs no Python packages.
         run: python tools/build_pages_dist.py --output-root "$SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"
       - name: Check the Pages artifact startup shell
         run: python -m unittest tests.test_pages_dist_startup_shell -q

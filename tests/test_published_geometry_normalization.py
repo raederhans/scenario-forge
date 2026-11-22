@@ -6,6 +6,8 @@ import subprocess
 import tempfile
 import unittest
 
+from shapely.geometry import shape
+
 from tools.published_geometry_normalization import normalize_published_geometry, round_water_geometry
 from tools.runtime_json_packing import pack_published_runtime_data
 from tools.scenario_chunk_format import decode_political_chunk, feature_collection_to_topology
@@ -117,7 +119,7 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
             if scenario == 'tno_1962':
                 for feature in expected['features']:
                     for point in feature['geometry']['coordinates'][0]:
-                        point[0] = round(point[0], 5)
+                        point[0] = round(point[0], 6)
             coarse = self.stage(feature_collection_to_topology(before), 'political', 'coarse.json', lod='coarse')
             detail = self.stage(before, 'political', 'detail.json', lod='detail', feature_bounds=[], bounds=[0, 0, 5, 5])
             pack_published_runtime_data(self.app)
@@ -131,7 +133,7 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
                     self.assertTrue(all('sphericalArea' not in f for f in after['features']))
             if scenario == 'tno_1962':
                 chunk = json.loads((self.scenario / 'detail_chunks.manifest.json').read_bytes())['chunks'][1]
-                self.assertEqual(chunk['feature_bounds'], [[0.12346, 0, 4, 4]] * 2)
+                self.assertEqual(chunk['feature_bounds'], [[0.123457, 0, 4, 4]] * 2)
                 self.assertEqual(chunk['bounds'], [0, 0, 5, 5])
 
     def test_country_detail_bounds_follow_published_features_and_grid_stays_fixed(self):
@@ -141,8 +143,8 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
         payload['features'][0]['geometry']['coordinates'][0] = [[x + 10, y + 10] for x, y in ring]
         for point in payload['features'][1]['geometry']['coordinates'][0]:
             if point[0] < 1:
-                point[0] = 0.123454
-        country_bounds = [0.123454, 0, 14, 14]
+                point[0] = 0.1234544
+        country_bounds = [0.1234544, 0, 14, 14]
         grid_bounds = [-180, -90, 180, 90]
         self.stage(payload, 'political', 'political.detail.country.afg.part.0.json',
                    lod='detail', owner_code='AFG', bounds=country_bounds, feature_bounds=[])
@@ -150,15 +152,15 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
                    lod='coarse', bounds=grid_bounds, feature_bounds=[])
         pack_published_runtime_data(self.app)
         country, grid = json.loads((self.scenario / 'detail_chunks.manifest.json').read_bytes())['chunks']
-        self.assertEqual(country['bounds'], [0.12345, 0, 14, 14])
+        self.assertEqual(country['bounds'], [0.123454, 0, 14, 14])
         self.assertEqual(grid['bounds'], grid_bounds)
 
     def test_point_protection_rescans_shared_vertices_and_retains_short_arcs(self):
         self.use_scenario('tno_1962')
-        a, b, c = [0.0000011, 0], [0.0000022, 0.0000022], [0.0000033, 0]
-        d, e = [1.12345678, 0], [1.12345789, 0]
+        a, b, c = [0.00000011, 0], [0.00000022, 0.00000022], [0.00000033, 0]
+        d, e = [1.12345671, 0], [1.12345679, 0]
         outline = [a, b, c, d, e, [1, 1], [0, 1], a]
-        tiny = [b, [0.0000021, 0.0000023], [0.0000024, 0.0000024], b]
+        tiny = [b, [0.00000021, 0.00000023], [0.00000024, 0.00000024], b]
         collinear_after_rounding = [[2.0000001, 3], [3, 3.0000002], [4.0000001, 3], [2.0000001, 3]]
         detail_payload = {'type': 'FeatureCollection', 'features': [
             {'type': 'Feature', 'id': str(i), 'properties': {},
@@ -175,11 +177,11 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
         self.assertEqual(report['layers']['detail']['protected_rings'], 3)
         self.assertEqual(report['layers']['coarse']['protected_rings'], 1)
         after = json.loads(gzip.decompress(coarse.with_suffix('.json.gz').read_bytes()))
-        self.assertEqual(after['arcs'][1], [[1.12346, 0]] * 2)
+        self.assertEqual(after['arcs'][1], [[1.123457, 0]] * 2)
         features = json.loads(gzip.decompress(detail.with_suffix('.json.gz').read_bytes()))['features']
         self.assertEqual(decode_political_chunk(after)['features'][0]['geometry'], features[0]['geometry'])
         rings = [feature['geometry']['coordinates'][0] for feature in features]
-        for actual, expected in zip(rings, [[a, b, c, [1.12346, 0], [1.12346, 0], [1, 1], [0, 1], a],
+        for actual, expected in zip(rings, [[a, b, c, [1.123457, 0], [1.123457, 0], [1, 1], [0, 1], a],
                                             tiny, collinear_after_rounding]):
             self.assertIn(actual, [expected, expected[::-1]])
 
@@ -191,12 +193,60 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
         before['features'] = before['features'][:1]
         before['features'][0]['geometry']['coordinates'] = [ring]
         naive = copy.deepcopy(before)
-        naive['features'][0]['geometry']['coordinates'] = [[[round(v, 5) for v in point] for point in ring]]
+        naive['features'][0]['geometry']['coordinates'] = [[[round(v, 6) for v in point] for point in ring]]
         self.assertEqual(measure(before, naive)['after'], 1)
         path = self.stage(before, 'political', lod='detail')
         pack_published_runtime_data(self.app)
         after = json.loads(gzip.decompress(path.with_suffix('.json.gz').read_bytes()))
         self.assertEqual(measure(before, after), {'count': 1, 'before': 0, 'after': 0, 'invariant': True})
+
+    def pack_polygon(self, kind, polygons):
+        self.use_scenario('tno_1962')
+        geometry = {'type': kind, 'coordinates': polygons}
+        feature = {'type': 'Feature', 'id': 'region', 'properties': {}, 'geometry': geometry}
+        payload = {'type': 'FeatureCollection', 'features': [feature]}
+        coarse = self.stage(feature_collection_to_topology(payload), 'political', 'coarse.json', lod='coarse')
+        detail = self.stage(payload, 'political', 'detail.json', lod='detail')
+        stats = pack_published_runtime_data(self.app)['geometry_normalization'][-1]
+        outputs = []
+        for path in [coarse, detail]:
+            packed = json.loads(gzip.decompress(path.with_suffix('.json.gz').read_bytes()))
+            outputs.append(decode_political_chunk(packed)['features'][0]['geometry'])
+        self.assertEqual(outputs[0], outputs[1])
+        return shape(outputs[0]), stats
+
+    def test_rounding_preserves_a_notch_above_a_nonadjacent_edge(self):
+        tip = [0.4, 0.0000013]
+        ring = [[0, 0], [1, 0.000003], [1.123456789, 1], tip, [0, 1], [0, 0]]
+        naive = [[round(x, 6), round(y, 6)] for x, y in ring]
+        self.assertFalse(shape({'type': 'Polygon', 'coordinates': [naive]}).is_valid)
+        result, stats = self.pack_polygon('Polygon', [ring])
+        self.assertTrue(result.is_valid)
+        self.assertIn(tuple(tip), result.exterior.coords)
+        self.assertIn((1.123457, 1), result.exterior.coords)
+        self.assertEqual(stats['protected_points'], 1)
+
+    def test_rounding_keeps_two_faces_touching_only_at_a_point(self):
+        lower = [[0, 0], [1, 0.000003], [1, -1], [0, 0]]
+        upper = [[0, 0], [0.4, 0.0000013], [0.8, 1], [0, 1], [0, 0]]
+        naive = [[[[round(x, 6), round(y, 6)] for x, y in ring]] for ring in [lower, upper]]
+        a, b = shape({'type': 'MultiPolygon', 'coordinates': naive}).geoms
+        self.assertGreater(a.intersection(b).area, 0)
+        result, stats = self.pack_polygon('MultiPolygon', [[lower], [upper]])
+        a, b = result.geoms
+        self.assertTrue(result.is_valid)
+        self.assertEqual(a.intersection(b).geom_type, 'Point')
+        self.assertEqual(stats['protected_points'], 1)
+
+    def test_preexisting_face_overlap_is_counted(self):
+        ring = [[0, 0], [1, 1], [1, 0], [0, 0]]
+        result, stats = self.pack_polygon('MultiPolygon', [[ring], [ring]])
+        self.assertFalse(result.is_valid)
+        self.assertEqual(stats['protected_points'], 0)
+        for layer in stats['layers'].values():
+            self.assertEqual(layer['source_invalid_features'], 1)
+            self.assertEqual(layer['source_overlap_features'], 1)
+            self.assertEqual(layer['source_overlap_pairs'], 1)
 
     def test_shared_edge_negative_indices_and_multiple_arcs(self):
         payload = {'type': 'Topology', 'arcs': [

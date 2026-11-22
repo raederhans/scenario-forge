@@ -8,9 +8,12 @@ from pathlib import Path
 import subprocess
 from tempfile import NamedTemporaryFile
 
+import numpy as np
+import shapely
+
 from tools.political_detail_partition import feature_bounds
 
-POLITICAL_DECIMALS = {"tno_1962": 5}
+POLITICAL_DECIMALS = {"tno_1962": 6}
 
 
 def round_water_geometry(payload):
@@ -91,6 +94,152 @@ def _round_xy(point, decimals):
     return (round(point[0], decimals) or 0, round(point[1], decimals) or 0)
 
 
+def _feature_indices(chunks, point_ids):
+    vertices = []
+    rings, polygons, features = [0], [0], [0]
+    locations = []
+    for chunk, path in chunks:
+        ring_offset = len(rings) - 1
+        for index, feature in enumerate(_chunk_features(json.loads(path.read_bytes()))):
+            geometry = feature.get("geometry") or {}
+            kind = geometry.get("type")
+            if kind not in {"Polygon", "MultiPolygon"}:
+                continue
+            coords = geometry["coordinates"]
+            for polygon in [coords] if kind == "Polygon" else coords:
+                for ring in polygon:
+                    vertices.extend(point_ids[tuple(point[:2])] for point in ring)
+                    rings.append(len(vertices))
+                polygons.append(len(rings) - 1)
+            features.append(len(polygons) - 1)
+            locations.append((chunk["lod"], path, index, ring_offset))
+    return np.asarray(vertices, dtype=np.intp), tuple(map(np.asarray, (rings, polygons, features))), locations
+
+
+def _source_overlap_pairs(geometry):
+    parts = list(geometry.geoms)
+    if len(parts) < 2:
+        return 0
+    parts = np.asarray([part if part.is_valid else shapely.make_valid(part) for part in parts])
+    left, right = shapely.STRtree(parts).query(parts)
+    keep = left < right
+    return int(shapely.relate_pattern(parts[left[keep]], parts[right[keep]], "2********").sum())
+
+
+def _conflicting_edge_pairs(edges, projected, invalid_geometry, decimals):
+    edges = edges[(projected[edges[:, 0]] != projected[edges[:, 1]]).any(axis=1)]
+    lines = shapely.linestrings(projected[edges])
+    tree = shapely.STRtree(lines)
+    left, right = tree.query(lines, predicate="intersects")
+    keep = left < right
+    left, right = left[keep], right[keep]
+    interior = shapely.relate_pattern(lines[left], lines[right], "T********")
+    pairs = set()
+    for a, b in zip(edges[left[interior]], edges[right[interior]]):
+        pairs.add(tuple(sorted((tuple(sorted(a)), tuple(sorted(b))))))
+    if pairs:
+        return pairs, []
+    # Containment or a vertex contact can invalidate a face without crossing two edge interiors.
+    _, _, position = shapely.is_valid_reason(invalid_geometry).partition("[")
+    if not position:
+        return pairs, []
+    witness = shapely.Point(*map(float, position.rstrip("]").split()))
+    nearby = tree.query(witness, predicate="dwithin", distance=2 ** 0.5 * 10 ** -decimals)
+    return pairs, np.unique(edges[nearby])
+
+
+def _restore_edge_endpoints(pairs, source, projected, needed):
+    """Choose the fewest additional endpoints that recover the source DE-9IM relation."""
+    if not pairs:
+        return
+    ids = np.asarray(sorted(pairs)).reshape(-1, 4)
+    original, current = source[ids], projected[ids]
+
+    def relations(coords):
+        return shapely.relate(shapely.linestrings(coords[:, :2]), shapely.linestrings(coords[:, 2:]))
+
+    expected = relations(original)
+    bits = np.array([8, 4, 2, 1])
+    allowed = []
+    for mask in range(16):
+        trial = np.where(((mask & bits) != 0)[None, :, None], original, current)
+        allowed.append(relations(trial) == expected)
+    masks = sorted(range(16), key=int.bit_count)
+    for endpoints, matches in zip(ids, np.asarray(allowed).T):
+        fixed = sum(bit for i, bit in zip(endpoints, bits) if i in needed or (source[i] == projected[i]).all())
+        for mask in masks:
+            if mask & fixed != fixed or not matches[mask]:
+                continue
+            selected = endpoints[(mask & bits) != 0]
+            # A shared endpoint has one state on both edges.
+            if not set(selected).isdisjoint(endpoints[(mask & bits) == 0]):
+                continue
+            needed.update(i for i in selected if (source[i] != projected[i]).any())
+            break
+
+
+def _feature_protection(chunks, grid, protected, decimals, remaining_scans, affected_rings, whole_features):
+    points = list(grid)
+    vertices, offsets, locations = _feature_indices(chunks, {point: i for i, point in enumerate(points)})
+    stats = {chunk["lod"]: dict(source_invalid_features=0, source_overlap_features=0, source_overlap_pairs=0)
+             for chunk, _ in chunks}
+    if not locations:
+        return set(), 0, stats
+    rings, polygons, features = offsets
+    source = np.asarray(points)
+    projected = np.asarray([point if point in protected else _round_xy(point, decimals) for point in points])
+
+    def geometries(xy):
+        return shapely.from_ragged_array(shapely.GeometryType.MULTIPOLYGON, xy[vertices], offsets)
+
+    source_shapes = geometries(source)
+    valid = shapely.is_valid(source_shapes)
+    for i in np.flatnonzero(~valid):
+        counts = stats[locations[i][0]]
+        pairs = _source_overlap_pairs(source_shapes[i])
+        counts["source_invalid_features"] += 1
+        counts["source_overlap_features"] += int(pairs > 0)
+        counts["source_overlap_pairs"] += pairs
+    del source_shapes
+
+    restored = set()
+    for scan in range(remaining_scans):
+        shapes = geometries(projected)
+        invalid = np.flatnonzero(valid & ~shapely.is_valid(shapes))
+        if not len(invalid):
+            return {points[i] for i in restored}, scan, stats
+        pairs = set()
+        needed = set()
+        affected = []
+        for i in invalid:
+            lod, path, index, ring_offset = locations[i]
+            edge_lists = []
+            for r in range(polygons[features[i]], polygons[features[i + 1]]):
+                ring = vertices[rings[r]:rings[r + 1]]
+                edge_lists.append(np.column_stack((ring[:-1], ring[1:])))
+                affected.append(((lod, path, r - ring_offset), ring))
+            edges = np.concatenate(edge_lists)
+            conflicts, nearby = _conflicting_edge_pairs(edges, projected, shapes[i], decimals)
+            if conflicts:
+                pairs.update(conflicts)
+                continue
+            if len(nearby):
+                movable = nearby[(source[nearby] != projected[nearby]).any(axis=1)]
+                if len(movable):
+                    needed.update(movable)
+                    continue
+            whole_features.add((lod, path, index))
+            needed.update(np.unique(edges))
+        _restore_edge_endpoints(pairs, source, projected, needed)
+        added = list(needed)
+        projected[added] = source[added]
+        changed = np.zeros(len(points), dtype=bool)
+        changed[added] = True
+        affected_rings.update(key for key, ring in affected if changed[ring].any())
+        restored.update(needed)
+    raise ValueError("Political feature protection did not converge in ten scans")
+
+
 def _ring_protection(original, mapped):
     seen = set()
     revisited = {}
@@ -168,6 +317,8 @@ def round_published_political_chunks(app_root, manifest_path, manifest, excluded
     grid = {}
     protected = set()
     affected_rings = set()
+    whole_features = set()
+    feature_stats = None
     with ExitStack() as staging:
         targets = []
         for _, path in chunks:
@@ -176,7 +327,9 @@ def round_published_political_chunks(app_root, manifest_path, manifest, excluded
             staging.callback(target.unlink, missing_ok=True)
             targets.append(target)
         pairs = [[str(path), str(target)] for (_, path), target in zip(chunks, targets)]
-        for iteration in range(1, 11):
+        iteration = 0
+        while iteration < 10:
+            iteration += 1
             required = set()
             layers = {}
             for (chunk, path), target in zip(chunks, targets):
@@ -194,11 +347,19 @@ def round_published_political_chunks(app_root, manifest_path, manifest, excluded
                     for index, ring in rings:
                         affected_rings.add((chunk["lod"], path, index))
                         required.update(tuple(point[:2]) for point in ring)
+            if required:
+                feature_stats = None
+            elif feature_stats is None:
+                required, updates, feature_stats = _feature_protection(
+                    chunks, grid, protected, decimals, 11 - iteration, affected_rings, whole_features)
+                iteration += max(0, updates - 1)
             if not required:
                 for (_, path), target in zip(chunks, targets):
                     target.replace(path)
                 for lod, stats in layers.items():
                     stats["protected_rings"] = sum(layer == lod for layer, _, _ in affected_rings)
+                    stats["whole_features"] = sum(layer == lod for layer, _, _ in whole_features)
+                    stats.update(feature_stats[lod])
                 return dict(scenario_id=scenario, decimals=decimals, distinct_points=len(grid),
                             protected_points=len(protected), scans=iteration, layers=layers)
             added = required - protected
