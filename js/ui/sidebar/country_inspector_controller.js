@@ -1,5 +1,7 @@
 import { ensureHgoIdentitySettings } from "./hgo_identity_state.js";
 import { getCountryNameOverride, setCountryNameOverride } from "../../core/country_name_overrides.js";
+import { isProjectCountry } from "../../core/project_countries.js";
+import { recolorProjectCountry, registerColorAsProjectCountry, renameProjectCountry, unregisterProjectCountry } from "../../core/project_country_commands.js";
 import { getCityOverrideId, setCityNameOverride } from "../../core/city_name_overrides.js";
 import { getEffectiveCityCollection } from "../../core/map_renderer/public.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
@@ -115,6 +117,7 @@ export function createCountryInspectorController({
   getHgoIdentityCoverage = null,
   getHgoIdentityStatus = null,
   getSelectedLandInspectorCountryCode = null,
+  getSelectedLandColorIdentity = null,
   onHgoIdentityRetry = null,
   onHgoIdentitySettingsChange = null,
   onSelectedCountryRendered = null,
@@ -415,8 +418,19 @@ export function createCountryInspectorController({
     }
 
     const countryState = resolveSelectedLandInspectorCountryState();
-    tab.classList.toggle("is-empty", !countryState);
+    const identity = !countryState && getSelectedLandColorIdentity?.();
+    tab.classList.toggle("is-empty", !countryState && !identity);
     tab.replaceChildren();
+    if (identity) {
+      const color = identity.slice(6);
+      const register = document.createElement("button");
+      register.type = "button";
+      register.className = "sidebar-action-secondary";
+      register.textContent = [t("Unregistered color {color}", "ui", { color }), t("Register as new country", "ui")].join(" · ");
+      register.addEventListener("click", () => registerColorAsProjectCountry(color));
+      tab.appendChild(register);
+      return;
+    }
     if (!countryState) {
       const hint = document.createElement("p");
       hint.className = "selected-land-country-quick-empty";
@@ -507,7 +521,7 @@ export function createCountryInspectorController({
   const ensureSelectedInspectorCountry = () => {
     const latestCountryStatesByCode = getLatestCountryStatesByCode();
     const normalized = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
-    const resolved = normalized && latestCountryStatesByCode.has(normalized)
+    const resolved = normalized && (latestCountryStatesByCode.has(normalized) || isProjectCountry(runtimeState, normalized))
       ? normalized
       : "";
 
@@ -1225,6 +1239,7 @@ export function createCountryInspectorController({
   };
 
   const resetButton = countryInspectorSelected?.querySelector("#resetCountryOverrides");
+  const unregisterButton = countryInspectorSelected?.querySelector("#unregisterProjectCountry");
   const nameInput = countryInspectorSelected?.querySelector("#countryNameOverride");
   const statusText = countryInspectorSelected?.querySelector("#countryLabelStatus");
   const cities = countryInspectorSelected?.querySelector("#countryCities");
@@ -1339,12 +1354,13 @@ export function createCountryInspectorController({
     if (code && statusText) {
       const status = getCountryLabelStatus(code);
       const noReference = status === "Does not fit or is obscured in this view"
-        && runtimeState.scenarioCountriesByTag?.[code]?.releasable && !getCountryMemberIds(runtimeState, code).length;
+        && (runtimeState.scenarioCountriesByTag?.[code]?.releasable || isProjectCountry(runtimeState, code))
+        && !getCountryMemberIds(runtimeState, code).length;
       let text = t(status, "ui");
       if (noReference) {
         text = statsByCode?.get(code)?.featureCount
           ? t("Country name not displayed. Use manual map text.", "ui")
-          : t("No reference territory. Release to generate a country name.", "ui");
+          : t(isProjectCountry(runtimeState, code) ? "No reference territory." : "No reference territory. Release to generate a country name.", "ui");
       }
       if (statusText.textContent !== text) statusText.textContent = text;
     }
@@ -1386,6 +1402,8 @@ export function createCountryInspectorController({
     onSelectedCountryRendered?.(selectedCode || "");
     const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
     const isEmpty = !countryState;
+    const project = isProjectCountry(runtimeState, selectedCode);
+    if (unregisterButton) unregisterButton.hidden = !project;
     renderSelectedLandCountryQuickTab();
 
     if (countryInspectorDetail) {
@@ -1428,10 +1446,14 @@ export function createCountryInspectorController({
     updateResetCount();
 
     if (countryInspectorColorRow) {
-      countryInspectorColorRow.classList.add("hidden");
+      countryInspectorColorRow.classList.toggle("hidden", !project);
     }
     if (countryInspectorColorInput) {
-      countryInspectorColorInput.disabled = true;
+      countryInspectorColorInput.disabled = !project;
+      if (project) {
+        countryInspectorColorInput.value = getDisplayCountryColor(countryState);
+        if (countryInspectorColorSwatch) countryInspectorColorSwatch.style.backgroundColor = countryInspectorColorInput.value;
+      }
       countryInspectorColorInput.style.removeProperty("left");
       countryInspectorColorInput.style.removeProperty("top");
     }
@@ -1455,6 +1477,10 @@ export function createCountryInspectorController({
     const visibleCountryStates = countryStates.filter((countryState) => !countryState?.hiddenFromCountryList);
     const topLevelCountryStates = buildInspectorTopLevelCountryEntries(visibleCountryStates);
     const priorityOrderMap = getPriorityCountryOrderMap();
+    const selectedCode = runtimeState.selectedInspectorCountryCode;
+    if (isProjectCountry(runtimeState, selectedCode) && !getLatestCountryStatesByCode().has(selectedCode)) {
+      setInspectorContinentExpandedState(runtimeState, getInspectorGroupExpansionKey("project_countries"), true);
+    }
     setLatestCountryStatesByCode(new Map(countryStates.map((countryState) => [countryState.code, countryState])));
     countryRowRefsByCode.clear();
     syncAnnexationBadges();
@@ -1531,6 +1557,10 @@ export function createCountryInspectorController({
   };
 
   const bindEvents = () => {
+    if (unregisterButton && !unregisterButton.dataset.bound) {
+      unregisterButton.addEventListener("click", () => unregisterProjectCountry(runtimeState.selectedInspectorCountryCode));
+      unregisterButton.dataset.bound = "true";
+    }
     if (cities && !cities.dataset.bound) {
       cities.addEventListener("toggle", renderCities);
       picker.addEventListener("change", syncCityFields);
@@ -1552,6 +1582,10 @@ export function createCountryInspectorController({
       nameInput.addEventListener("blur", () => {
         const { code, language } = nameInput.dataset;
         if (nameInput.value === nameInput.defaultValue) return;
+        if (isProjectCountry(runtimeState, code)) {
+          if (!renameProjectCountry(code, nameInput.value)) nameInput.value = nameInput.defaultValue;
+          return;
+        }
         const before = captureHistoryState({ countryNameOverrides: true });
         if (!setCountryNameOverride(runtimeState, code, language, nameInput.value)) {
           nameInput.value = nameInput.defaultValue;
@@ -1615,6 +1649,12 @@ export function createCountryInspectorController({
         const nextColor = normalizeHexColor(event.target.value);
         const currentColor = getDisplayCountryColor(countryState);
         if (!nextColor || nextColor === currentColor) {
+          closeCountryInspectorColorPicker();
+          renderCountryInspectorDetail();
+          return;
+        }
+        if (isProjectCountry(runtimeState, selectedCode)) {
+          recolorProjectCountry(selectedCode, nextColor);
           closeCountryInspectorColorPicker();
           renderCountryInspectorDetail();
           return;
