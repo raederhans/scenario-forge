@@ -39,7 +39,7 @@ test("effective cities rebind recut hosts after relocation, before capitals, lab
     __city_settlement_rank: "metropolis",
   });
   const cities = collection(city("foreign", 17, "former", 9000000), city("inside", 3, "local", 5000000),
-    city("moved", 25, "former", 1000000));
+    city("moved", 25, "former", 1000000), city("leaver", 4, "local", 2000000), city("stayer", 4.5, "local", 1500000));
   Object.assign(state, { worldCitiesData: cities, showCityPoints: true, zoomTransform: d3.zoomIdentity.scale(10),
     sovereigntyByFeatureId: { local: "AA", former: "AA" }, scenarioCountriesByTag: { AA: {} },
     styleConfig: { cityPoints: { showLabels: true } } });
@@ -59,15 +59,19 @@ test("effective cities rebind recut hosts after relocation, before capitals, lab
   assert.equal(hover(17), "foreign");
   state.activeScenarioManifest = manifest;
   state.scenarioCityOverridesData = { capitals_by_tag: { AA: "foreign" },
-    cities: { moved: { city_id: "moved", lon: 11, lat: 5 } } };
+    cities: { moved: { city_id: "moved", lon: 11, lat: 5 }, leaver: { city_id: "leaver", lon: 25, lat: 5 },
+      stayer: { city_id: "stayer", lon: 6, lat: 5 } } };
   const effective = policy.getEffectiveCityCollection();
-  assert.deepEqual(ids(effective.features), ["inside", "moved"]);
+  // A city moved out of the region loses membership even though its old host was a member.
+  assert.deepEqual(ids(effective.features), ["inside", "moved", "stayer"]);
+  assert.deepEqual(effective.features[2].geometry.coordinates, [6, 5]);
+  assert.equal(effective.features[2].properties.__city_host_feature_id, "local");
   assert.deepEqual(ids(effective.features.filter(f => f.properties.__city_is_capital)), ["inside"]);
   assert.equal(effective.features[1].properties.__city_host_feature_id, "local");
   assert.equal(policy.getCityScenarioTag(effective.features[1]), "AA");
   const rendered = view();
   for (const entries of [rendered.markerEntries, rendered.labelEntries]) {
-    assert.deepEqual(entries.map(e => e.cityId).sort(), ["inside", "moved"]);
+    assert.deepEqual(entries.map(e => e.cityId).sort(), ["inside", "moved", "stayer"]);
   }
   assert.equal(hover(17), undefined);
   assert.equal(hover(11), "moved");

@@ -428,6 +428,8 @@ export function createUrbanCityPolicyOwner({
       nextFeature.geometry = { type: "Point", coordinates: [overrideEntry.lon, overrideEntry.lat] };
       nextFeature.properties.lon = overrideEntry.lon;
       nextFeature.properties.lat = overrideEntry.lat;
+      // The inherited host describes the old position unless the override names a new one.
+      nextFeature.properties.__city_relocated_without_host = !overrideEntry.host_feature_id;
     }
     return nextFeature;
   }
@@ -858,7 +860,7 @@ export function createUrbanCityPolicyOwner({
         yield;
         const props = feature.properties;
         const host = props.__city_host_feature_id || props.host_feature_id;
-        if (ids.has(host)) continue;
+        if (ids.has(host) && !props.__city_relocated_without_host) continue;
         const resolved = hostAt(feature.geometry?.coordinates);
         if (resolved) {
           featuresByKey.set(key, cloneCityFeature(feature, { host_feature_id: resolved, __city_host_feature_id: resolved }));
