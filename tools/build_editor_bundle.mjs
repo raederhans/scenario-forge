@@ -49,6 +49,31 @@ const rebaseMetaUrlPlugin = (stats) => ({
   },
 });
 
+const publishedPopulationTilesPlugin = (appRoot) => ({
+  name: "published-population-tiles",
+  setup(build) {
+    build.onLoad({ filter: /[/\\](?:CATALOG|runtime_asset_registry)\.json$/ }, async ({ path: sourcePath }) => {
+      const name = path.basename(sourcePath);
+      const publishedPath = path.join(appRoot, "data", name);
+      if (!fs.existsSync(publishedPath)) return undefined;
+      const source = JSON.parse(await fs.promises.readFile(sourcePath, "utf8"));
+      const published = JSON.parse(await fs.promises.readFile(publishedPath, "utf8"));
+      if (name === "CATALOG.json") {
+        const bySourceUrl = new Map(published.entries
+          .filter((entry) => entry.role === "population_spatial_tile")
+          .map((entry) => [entry.url.replace(/\.gz$/, ""), entry]));
+        source.entries = source.entries.map((entry) => entry.role === "population_spatial_tile"
+          ? bySourceUrl.get(entry.url) : entry);
+      } else {
+        for (const [key, asset] of Object.entries(source.assets)) {
+          if (asset.role === "population_spatial_tile") source.assets[key] = published.assets[key];
+        }
+      }
+      return { contents: JSON.stringify(source), loader: "json" };
+    });
+  },
+});
+
 export async function buildEditorBundle({ appRoot, minify = true, sourcemap = false } = {}) {
   if (!appRoot) throw new Error("appRoot is required");
   const outdir = path.join(appRoot, "js", BUNDLE_DIR_NAME);
@@ -69,7 +94,7 @@ export async function buildEditorBundle({ appRoot, minify = true, sourcemap = fa
     logLevel: "warning",
     // data_service.js loads its data modules (city lights) through a computed import()
     // specifier, which esbuild leaves alone; they load from the raw js/ tree at runtime.
-    plugins: [rebaseMetaUrlPlugin(stats)],
+    plugins: [rebaseMetaUrlPlugin(stats), publishedPopulationTilesPlugin(appRoot)],
   });
   const outputs = Object.entries(result.metafile.outputs)
     .filter(([file]) => file.endsWith(".js"))

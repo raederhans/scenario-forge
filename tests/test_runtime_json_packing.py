@@ -13,6 +13,44 @@ from tools.political_detail_partition import feature_bounds, partition_political
 
 
 class RuntimeJsonPackingTests(unittest.TestCase):
+    def test_population_detail_delivery_records_match_the_gzip_file(self):
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            app = Path(temporary)
+            layer = app / "data/thematic_layers/population/ghsl_population_2020_v1"
+            (layer / "tiles").mkdir(parents=True)
+            tile = layer / "tiles/r0_c0.json"
+            tile.write_bytes(b'{"cells":[[7,123.45678901234567890,0.25]]}')
+            original = tile.read_bytes()
+            url = tile.relative_to(app).as_posix()
+            key = url.removeprefix("data/")
+            (layer / "manifest.json").write_text(json.dumps({"raster": {"detail_tiles": [{"url": url}]}}))
+            registry = {"assets": {"population_spatial_tile:r0_c0": {"url": url}}}
+            data = app / "data"
+            for name, payload in {
+                "manifest.json": {"outputs": {key: {}}, "runtime_asset_registry": registry},
+                "runtime_asset_registry.json": registry,
+                "CATALOG.json": {"entries": [{"url": url}]},
+            }.items():
+                (data / name).write_text(json.dumps(payload))
+
+            pack_published_runtime_data(app)
+            published = json.loads((layer / "manifest.json").read_bytes())["raster"]["detail_tiles"][0]
+            encoded = (app / published["url"]).read_bytes()
+            self.assertFalse(tile.exists())
+            self.assertEqual(gzip.decompress(encoded), original)
+            self.assertEqual(published, {"url": url + ".gz", "byte_size": len(encoded),
+                                        "sha256": hashlib.sha256(encoded).hexdigest()})
+            manifest = json.loads((data / "manifest.json").read_bytes())
+            self.assertEqual(manifest["outputs"], {key + ".gz": {"size_bytes": len(encoded), "sha256": published["sha256"]}})
+            published_registry = json.loads((data / "runtime_asset_registry.json").read_bytes())
+            self.assertEqual(published_registry, manifest["runtime_asset_registry"])
+            self.assertEqual(published_registry["assets"]["population_spatial_tile:r0_c0"]["url"], published["url"])
+            entry = json.loads((data / "CATALOG.json").read_bytes())["entries"][0]
+            self.assertEqual(entry["url"], published["url"])
+            self.assertEqual(entry["hashRef"], f"data/manifest.json::outputs::{key}.gz::sha256")
+
     def test_water_normalization_precedes_delivery_hashes(self):
         runtime = Path(__file__).resolve().parents[1] / '.runtime/tmp'
         runtime.mkdir(parents=True, exist_ok=True)

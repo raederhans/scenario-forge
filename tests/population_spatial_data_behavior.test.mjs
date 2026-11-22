@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { gzipSync } from "node:zlib";
 import { loadPopulationData, POPULATION_LAYER_ID, POPULATION_DATA_VERSION,
   POPULATION_SCENARIO_IDS, normalizePopulationTile, samplePopulationDensityLonLat,
   loadPopulationRasterTile, loadPopulationRasterTiles, lonLatToPopulationGrid } from "../js/core/thematic/population_spatial_data.js";
@@ -115,6 +116,20 @@ test("population grid projection matches pyproj ESRI:54009 WGS84 coordinates", (
   assert.ok(Math.abs(polar[0] - 1381.0010722437403) < 0.1);
   assert.ok(Math.abs(polar[1] - 9020047.742355583) < 0.1);
   assert.ok(lonLatToPopulationGrid(0, 89.9999999).every(Number.isFinite), "valid near-pole input cannot produce NaN coordinates");
+});
+
+test("the raster loader returns identical cells from plain and gzip tile URLs", async (t) => {
+  const raw = JSON.stringify(tile());
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (url) => {
+    requests.push(url);
+    return new Response(url.endsWith(".gz") ? gzipSync(raw) : raw);
+  });
+  const plain = await loadPopulationRasterTile("tiles/test.json");
+  const compressed = await loadPopulationRasterTile("tiles/test.json.gz");
+  assert.deepEqual(plain, tile());
+  assert.deepEqual(compressed, plain);
+  assert.deepEqual(requests.map((url) => url.split("/").pop()), ["test.json", "test.json.gz"]);
 });
 
 test("failed raster requests can retry while successful requests share one tile", async () => {
