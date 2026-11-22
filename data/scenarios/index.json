@@ -8,7 +8,9 @@
     "hoi4_1939",
     "tno_1962"
   ],
-  "developer_preview_ids": [],
+  "developer_preview_ids": [
+    "rcw_1919"
+  ],
   "scenarios": [
     {
       "scenario_id": "blank_base",
@@ -119,6 +121,32 @@
           "Atlantropa: the Gibraltar dam has lowered the Mediterranean, exposing salt flats and a new coastline",
           "Congo Lake",
           "Preset special zones (off by default): demilitarised zones, Gotenland settlement area, Suez"
+        ]
+      }
+    },
+    {
+      "scenario_id": "rcw_1919",
+      "display_name": "Russian Civil War 1919",
+      "manifest_url": "data/scenarios/rcw_1919/manifest.json",
+      "audit_url": "data/scenarios/rcw_1919/audit.json",
+      "presentation": {
+        "year": 1919,
+        "title": "Russian Civil War",
+        "tagline": "October 1919 · The Whites at their furthest advance",
+        "intro": "Mid-October 1919. Denikin's Volunteer Army has taken Orel and stands some 350 km from Moscow; Yudenich's North-Western Army is at the gates of Petrograd; Kolchak still holds Siberia behind the Tobol. Around the collapsing empire, Finland, the Baltic states, Poland, Ukraine and the Caucasus republics fight for their own borders, while Makhno's insurgents cut through the White rear. This is a regional scenario: only the former Russian Empire and its neighbours are included, in finer detail than the world maps.",
+        "powers": [
+          "SOV",
+          "VOLR",
+          "DON",
+          "RUS",
+          "YDNC",
+          "MILL",
+          "POL",
+          "UNRP"
+        ],
+        "layers": [
+          "Alliance view: Reds, Whites, national governments, neighbours, intervention, partisans",
+          "City names as of 1919"
         ]
       }
     }

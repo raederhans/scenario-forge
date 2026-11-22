@@ -399,6 +399,7 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
 
   const releaseState = await readPublicReleaseGateState(page);
   expect(releaseState.optionValues).toContain("tno_1962");
+  expect(releaseState.optionValues).toContain("rcw_1919");
   expect(releaseState.optionValues).not.toContain("hgo_1936");
   expect(releaseState.optionValues).not.toContain("__hgo_runtime_preview__");
   expect(releaseState.hgoPreviewEnabled).toBe(false);

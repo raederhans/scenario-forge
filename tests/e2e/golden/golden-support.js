@@ -4,8 +4,8 @@
 const { expect } = require("@playwright/test");
 
 const GOLDEN_APP_PATH = "/app/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=0";
-const SCENARIO_IDS = ["blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"];
-// Interior Western Australia (Gibson Desert): a large region in every scenario,
+const SCENARIO_IDS = ["blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962", "rcw_1919"];
+// Interior Western Australia (Gibson Desert): a large region in the world scenarios,
 // with no city markers or country labels nearby.
 const PROBE_LON_LAT = [121.5, -25.5];
 

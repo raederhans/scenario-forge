@@ -485,6 +485,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "阵营名称",
     "en": "Alliance name"
   },
+  "Alliance view: Reds, Whites, national governments, neighbours, intervention, partisans": {
+    "zh": "阵营视图：红方、白方、民族政权、邻国、干涉与占领、游击与起义",
+    "en": "Alliance view: Reds, Whites, national governments, neighbours, intervention, partisans"
+  },
   "Alliances": {
     "zh": "阵营",
     "en": "Alliances"
@@ -1751,6 +1755,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "City hierarchy": {
     "zh": "城市层级",
     "en": "City hierarchy"
+  },
+  "City names as of 1919": {
+    "zh": "1919 年的城市地名",
+    "en": "City names as of 1919"
   },
   "City points": {
     "zh": "城市点",
@@ -6379,6 +6387,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "大都会",
     "en": "Metropolis"
   },
+  "Mid-October 1919. Denikin's Volunteer Army has taken Orel and stands some 350 km from Moscow; Yudenich's North-Western Army is at the gates of Petrograd; Kolchak still holds Siberia behind the Tobol. Around the collapsing empire, Finland, the Baltic states, Poland, Ukraine and the Caucasus republics fight for their own borders, while Makhno's insurgents cut through the White rear. This is a regional scenario: only the former Russian Empire and its neighbours are included, in finer detail than the world maps.": {
+    "zh": "1919 年 10 月中旬。邓尼金的志愿军攻下奥廖尔，距莫斯科约 350 公里；尤登尼奇的西北军兵临彼得格勒；高尔察克仍据有托博尔河以东的西伯利亚。在崩解的帝国周围，芬兰、波罗的海三国、波兰、乌克兰和高加索诸共和国各自为疆界而战，马赫诺的起义军在白军后方纵横。这是一个区域剧本：只包含前俄罗斯帝国及其邻国，地块比世界剧本更细。",
+    "en": "Mid-October 1919. Denikin's Volunteer Army has taken Orel and stands some 350 km from Moscow; Yudenich's North-Western Army is at the gates of Petrograd; Kolchak still holds Siberia behind the Tobol. Around the collapsing empire, Finland, the Baltic states, Poland, Ukraine and the Caucasus republics fight for their own borders, while Makhno's insurgents cut through the White rear. This is a regional scenario: only the former Russian Empire and its neighbours are included, in finer detail than the world maps."
+  },
   "Mid-depth Fill Exit": {
     "zh": "中层色带退出",
     "en": "Mid-depth Fill Exit"
@@ -7154,6 +7166,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Oceania": {
     "zh": "大洋洲",
     "en": "Oceania"
+  },
+  "October 1919 · The Whites at their furthest advance": {
+    "zh": "1919 年 10 月 · 白军推进最远之时",
+    "en": "October 1919 · The Whites at their furthest advance"
   },
   "Off": {
     "zh": "关闭",
@@ -9209,6 +9225,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Russia Region": {
     "zh": "俄罗斯区域",
     "en": "Russia Region"
+  },
+  "Russian Civil War": {
+    "zh": "俄国内战",
+    "en": "Russian Civil War"
   },
   "SIDC (e.g. 130310001412110000000000000000)": {
     "zh": "SIDC（例如 130310001412110000000000000000）",

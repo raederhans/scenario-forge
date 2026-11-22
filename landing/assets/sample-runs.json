@@ -9,7 +9,7 @@
     "hoi4_1939",
     "tno_1962"
   ],
-  "developer_preview_exclusions": [],
+  "developer_preview_exclusions": ["rcw_1919"],
   "sample_projects": [
     {
       "id": "blank-base-starter",
