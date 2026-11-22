@@ -175,7 +175,9 @@ function getFeatureContinentId(feature, appState, ownerCode = "") {
 }
 
 function getFeatureOwner(feature, appState) {
-  const reference = getMapDataBoundary(appState).reference.getBaseGroupCode(feature);
+  const { reference: boundary } = getMapDataBoundary(appState);
+  const parentId = feature?.properties?.__riverParentId;
+  const reference = (parentId && boundary.getBaseGroupCode(parentId)) || boundary.getBaseGroupCode(feature);
   if (reference || appState.mapSemanticMode === "blank") return reference;
   return normalizeCode(
     feature?.properties?.ISO_A3
@@ -288,9 +290,9 @@ function addStat(stats, key, ownerCode, area, feature, continentId, displayColor
   stats.set(key, prior);
 }
 
-export function collectOwnerStats(appState, config, { onOwner, measureArea = getFeatureArea } = {}) {
-  const stats = new Map();
-  if (!appState) return [];
+const presentOwnerCache = new WeakMap();
+
+function createLandOwnerResolver(appState) {
   const river = getRiverPaintRuntime(appState);
   const tags = getScenarioCountryTags(appState.scenarioCountriesByTag);
   const getOverrideColor = (id, feature) => feature?.properties?.__riverParentId
@@ -302,6 +304,31 @@ export function collectOwnerStats(appState, config, { onOwner, measureArea = get
     getReferenceOwner: (id, feature) => getFeatureOwner(river.getParentFeature(feature) || feature, appState),
     getOverrideColor,
   });
+  return { river, resolveOwner, getOverrideColor };
+}
+
+export function collectPresentOwnerTags(appState) {
+  const full = appState.landDataFull?.features;
+  const features = full?.length ? full : appState.landData?.features;
+  const key = [appState.activeScenarioId, features, appState.landData?.features, appState.colorRevision, appState.scenarioBaselineOwnersByFeatureId,
+    appState.scenarioCountriesByTag, appState.riverPaint, appState.sovereignBaseColors];
+  const cached = presentOwnerCache.get(appState);
+  if (cached && key.every((value, index) => value === cached.key[index])) return cached.owners;
+
+  const owners = new Set();
+  const { river, resolveOwner } = createLandOwnerResolver(appState);
+  for (const feature of river.surfaces(features)) {
+    const owner = resolveOwner(getFeatureId(feature), feature);
+    if (owner && !owner.startsWith("color:")) owners.add(owner);
+  }
+  presentOwnerCache.set(appState, { key, owners });
+  return owners;
+}
+
+export function collectOwnerStats(appState, config, { onOwner, measureArea = getFeatureArea } = {}) {
+  const stats = new Map();
+  if (!appState) return [];
+  const { river, resolveOwner, getOverrideColor } = createLandOwnerResolver(appState);
   river.surfaces().forEach((feature) => {
     const id = getFeatureId(feature);
     const ownerCode = resolveOwner(id, feature);

@@ -120,6 +120,8 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "sovereigntyInitialized",
   "visualOverrides",
   "capitalOverrides",
+  "politicalOverrides",
+  "politicalAlliances",
   "projectCities",
   "cityNameOverrides",
   "riverPaint",
@@ -232,7 +234,7 @@ function cloneScenarioRollbackCaptureValues(snapshot, cloneValue) {
   return Object.fromEntries(
     Object.entries(snapshot.values).map(([key, value]) => [
       key,
-      cloneValue(value),
+      key === "politicalOverrides" || key === "politicalAlliances" ? value : cloneValue(value),
     ]),
   );
 }
@@ -409,6 +411,8 @@ function buildScenarioTransactionRollbackStatePatch(snapshot) {
       sovereigntyInitialized: !!snapshot.sovereigntyInitialized,
       visualOverrides: cloneScenarioStateValue(snapshot.visualOverrides),
       capitalOverrides: cloneScenarioStateValue(snapshot.capitalOverrides),
+      politicalOverrides: snapshot.politicalOverrides,
+      politicalAlliances: snapshot.politicalAlliances,
       projectCities: cloneScenarioStateValue(snapshot.projectCities),
       cityNameOverrides: cloneScenarioStateValue(snapshot.cityNameOverrides),
       riverPaint: cloneScenarioStateValue(snapshot.riverPaint),

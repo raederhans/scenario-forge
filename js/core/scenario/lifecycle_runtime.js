@@ -152,6 +152,8 @@ function createScenarioLifecycleRuntime({
     runtimeState.parentBordersVisible = false;
     runtimeState.visualOverrides = {};
     runtimeState.capitalOverrides = {};
+    runtimeState.politicalOverrides = {};
+    runtimeState.politicalAlliances = {};
     runtimeState.projectCities = [];
     runtimeState.cityNameOverrides = baseCityNameOverrides(runtimeState.cityNameOverrides);
     getRiverPaintRuntime(runtimeState).cancel();
@@ -282,6 +284,8 @@ function createScenarioLifecycleRuntime({
     runtimeState.sovereigntyInitialized = false;
     runtimeState.visualOverrides = {};
     runtimeState.capitalOverrides = {};
+    runtimeState.politicalOverrides = {};
+    runtimeState.politicalAlliances = {};
     runtimeState.projectCities = [];
     runtimeState.cityNameOverrides = baseCityNameOverrides(runtimeState.cityNameOverrides);
     getRiverPaintRuntime(runtimeState).cancel();

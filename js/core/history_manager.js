@@ -85,6 +85,7 @@ function captureHistoryState({
   countryNameOverrides = false,
   cityNameOverrides = false,
   capitalOverrides = false,
+  politicalOverrides = false,
   projectCities = false,
   strategicOverlay = false,
   intensityFieldChannels = [],
@@ -129,6 +130,10 @@ function captureHistoryState({
   if (countryNameOverrides) snapshot.countryNameOverrides = cloneStructuredValue(runtimeState.countryNameOverrides || {});
   if (cityNameOverrides) snapshot.cityNameOverrides = cloneStructuredValue(runtimeState.cityNameOverrides || {});
   if (capitalOverrides) snapshot.capitalOverrides = cloneStructuredValue(runtimeState.capitalOverrides || {});
+  if (politicalOverrides) {
+    snapshot.politicalOverrides = runtimeState.politicalOverrides;
+    snapshot.politicalAlliances = runtimeState.politicalAlliances;
+  }
   if (projectCities) snapshot.projectCities = cloneStructuredValue(runtimeState.projectCities || []);
 
   if (strategicOverlay) {
@@ -314,7 +319,7 @@ function refreshUiAfterHistory(direction, entry) {
         "tool",
         "appearance",
         "activeSovereign",
-        ...(!entry || entry.before?.projectCountries || entry.before?.countryNameOverrides || entry.before?.capitalOverrides || entry.before?.projectCities ? ["inspector"] : []),
+        ...(!entry || entry.before?.projectCountries || entry.before?.countryNameOverrides || entry.before?.politicalOverrides || entry.before?.capitalOverrides || entry.before?.projectCities ? ["inspector"] : []),
         "countryList",
         "waterRegionList",
         "specialRegionList",
@@ -355,6 +360,10 @@ function applyHistorySnapshot(snapshot) {
   if (snapshot.countryNameOverrides) runtimeState.countryNameOverrides = cloneStructuredValue(snapshot.countryNameOverrides);
   if (snapshot.cityNameOverrides) runtimeState.cityNameOverrides = cloneStructuredValue(snapshot.cityNameOverrides);
   if (snapshot.capitalOverrides) runtimeState.capitalOverrides = cloneStructuredValue(snapshot.capitalOverrides);
+  if (snapshot.politicalOverrides) {
+    runtimeState.politicalOverrides = snapshot.politicalOverrides;
+    runtimeState.politicalAlliances = snapshot.politicalAlliances;
+  }
   if (snapshot.projectCities) runtimeState.projectCities = cloneStructuredValue(snapshot.projectCities);
   if (snapshot.mapTitles) {
     runtimeState.exportWorkbenchUi.mapTitles = cloneStructuredValue(snapshot.mapTitles);

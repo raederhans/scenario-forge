@@ -478,6 +478,8 @@ function createScenarioApplyPipeline({
       sovereigntyInitialized: false,
       visualOverrides: {},
       capitalOverrides: {},
+      politicalOverrides: {},
+      politicalAlliances: {},
       projectCities: [],
       cityNameOverrides: baseCityNameOverrides(runtimeState.cityNameOverrides),
       riverPaint: createDefaultRiverPaintState(),

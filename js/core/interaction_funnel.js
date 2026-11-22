@@ -320,6 +320,8 @@ export function stageImportedProjectPatch(data, preparedImport) {
   draft.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
   draft.capitalOverrides = data.capitalOverrides;
+  draft.politicalOverrides = data.politicalOverrides;
+  draft.politicalAlliances = data.politicalAlliances;
   draft.projectCities = data.projectCities;
   const scenarioTags = new Set(Object.keys(draft.scenarioCountriesByTag || {}));
   const projectCountries = Array.isArray(data.projectCountries) ? data.projectCountries : [];

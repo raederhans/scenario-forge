@@ -1,4 +1,5 @@
 import { normalizeProjectCountriesPayload, serializeProjectCountries } from "./project_countries.js";
+import { normalizePoliticalOverrides, normalizePoliticalAlliances } from "./political_overrides.js";
 import { normalizeCapitalOverrides, normalizeProjectCities } from "./capital_overrides.js";
 import { buildDefaultFileStem } from "./file_name_policy.js";
 import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
@@ -559,6 +560,8 @@ class FileManager {
       cityNameOverrides: appState.cityNameOverrides || {},
       ...(appState.activeScenarioId ? { projectCountries: serializeProjectCountries(appState) } : {}),
       capitalOverrides: appState.capitalOverrides || {},
+      politicalOverrides: appState.politicalOverrides || {},
+      politicalAlliances: appState.politicalAlliances || {},
       projectCities: appState.projectCities || [],
       legendConfig: LegendManager.normalizeConfig(appState.legendConfig),
       legendControl: LegendManager.normalizeControl(appState.legendControl),
@@ -771,6 +774,8 @@ class FileManager {
     data.countryNameOverrides ??= {};
     data.cityNameOverrides ??= {};
     data.projectCountries = normalizeProjectCountriesPayload(data.projectCountries);
+    data.politicalOverrides = normalizePoliticalOverrides(data.politicalOverrides);
+    data.politicalAlliances = normalizePoliticalAlliances(data.politicalAlliances);
     data.capitalOverrides = normalizeCapitalOverrides(data.capitalOverrides);
     data.projectCities = normalizeProjectCities(data.projectCities);
     data.legendConfig = LegendManager.normalizeConfig(data.legendConfig);

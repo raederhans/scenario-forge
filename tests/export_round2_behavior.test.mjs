@@ -195,8 +195,11 @@ test("legend layout uses columns, ellipses, opaque text and saved background set
 
 test("political modes export their categories and alliance explanation", () => {
   const state = { politicalDisplayMode: "alliance", currentLanguage: "zh", activeScenarioId: "map",
+    landDataFull: { features: [{ id: "land" }] }, scenarioBaselineOwnersByFeatureId: { land: "A" },
     scenarioBundleCacheById: { map: { countriesPayload: { countries: { A: { ruling_ideology: "democratic", alliance: "allies" } } } } } };
-  assert.ok(draw(state).texts.some(([s]) => s === "未结盟国家按政体浅色显示"));
+  const labels = draw(state).texts.map(([label]) => label);
+  assert.ok(labels.includes("allies（1 国）"));
+  assert.ok(labels.includes("未结盟国家按政体浅色显示"));
   state.politicalDisplayMode = "government";
   assert.ok(draw(state).texts.some(([s]) => s === "民主"));
 });
