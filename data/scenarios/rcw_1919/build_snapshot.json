@@ -7,7 +7,7 @@
     "capital_hints.json": "09f47ee46a3ca273ebcc6cc9d77e4a0d6e2c825a30ec3b0e525f6cf3bc64fb1f",
     "city_overrides.json": "184afffa0a872b8fe7bc361d3f077a23caea04e1172d189496eac01d84955f44",
     "cores.by_feature.json": "0e02910112bc8fc0a229b1186cb182912db9acf8a32618fc4e0f06e7fd69887c",
-    "countries.json": "6530ea281479da1f5f03ba3eced0ca91d5263d688365bd8934a94606fb698a5e",
+    "countries.json": "ed88bbb684fea162a2d8f454ec231f3a359866a3c03a87802bc7244f82158e20",
     "owners.by_feature.json": "a0badce2aa81c1268c91aa3b65eb7bc4d03b3509e4ea2498a326c60cee495823",
     "runtime_topology.topo.json": "e864897a1ccbe697462ef16aefcd4bd997b2e82d03c35d97602c40557acbf1f3",
     "special_zone_layers.json": "f4e90316923fff66338de1586d64ecb6915aa3417f475e81d997c06c0c6e32f0"
@@ -16,7 +16,7 @@
   "feature_count": 5515,
   "water_count": 0,
   "chunk_count": 0,
-  "snapshot_fingerprint": "7e444798030bb5a4c2dbece7cda7e52d54dd808671a54d95baeeeef091071d05",
+  "snapshot_fingerprint": "0e2c7cebd56331fa63426122295685114ef40b0bd7e4f0b7b197f888a96b2d8b",
   "generated_at": "2026-11-22T00:00:00Z",
   "environment": {},
   "durations": {},
