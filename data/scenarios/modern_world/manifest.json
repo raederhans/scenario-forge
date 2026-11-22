@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/modern_world/audit.json",
-  "baseline_hash": "c68a8d2be1dc5cb8d3d1d8c83c265b6f804a8fbab1417a6b4b7c094a30b06940",
+  "baseline_hash": "0a9fd627934150753a22cf30f37556ab0f05b91880c74789d0f03f5b02ba5b6c",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Modern-world baseline with matched The Fire Rises country colors.",
   "bookmark_name": "Modern World",
@@ -26,6 +26,8 @@
   ],
   "generated_at": "2026-09-27T13:55:57.885587+00:00",
   "geo_locale_patch_url": "data/scenarios/modern_world/geo_locale_patch.json",
+  "geo_locale_patch_url_en": "data/scenarios/modern_world/geo_locale_patch.en.json",
+  "geo_locale_patch_url_zh": "data/scenarios/modern_world/geo_locale_patch.zh.json",
   "hierarchy_overrides": {
     "feature_merges": {
       "DE_MRG_0fbf2afc9b39": [
@@ -2519,12 +2521,12 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "5fa949bc56e43567077da28f93dc278ae1a7c24167f5fd9c712a8869cf10367f",
+  "snapshot_fingerprint": "08f6a71e46164d8190c6c60e44bf9e1b6843c027efbf5634205ef08e82361bec",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "5904e4f5a25bbcc24f9b6fabca3bd18c268b94f40088e85dc119c86f5449d3e1",
+    "runtime_topology_sha256": "de4197d9ed9714a541e63e77438490eb85db852b1a2bf85209f0c4770e335631",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "special_zone_layers_url": "data/scenarios/modern_world/special_zone_layers.json",
@@ -2542,20 +2544,20 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 20643,
+    "feature_count": 12668,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 259,
     "quality_counts": {
-      "direct_country_copy": 18856,
-      "manual_reviewed": 1787
+      "direct_country_copy": 11088,
+      "manual_reviewed": 1580
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 18856,
-      "manual_rule": 1787
+      "canonical_baseline": 11088,
+      "manual_rule": 1580
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

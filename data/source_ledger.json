@@ -603,25 +603,6 @@
     "local_presence": "required"
   },
   {
-    "source_id": "ghsl_population_2020_r2023a_1km",
-    "local_path": "data/thematic_layers/population/ghsl_population_2020_v1/source_ledger.json",
-    "origin_kind": "derived",
-    "upstream_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_1000/V1-0/GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0.zip",
-    "immutable_ref": "GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0",
-    "current_local_sha256": "9e5d6c2df6b72e66a560179d71aa64bd85a3d41272ccb64d41e758409dc111fa",
-    "license": "CC-BY-4.0",
-    "citation": "https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE",
-    "consumers": [
-      "map_builder/population_spatial.py",
-      "data/thematic_layers/population/ghsl_population_2020_v1/manifest.json"
-    ],
-    "rebuild_command": "npm run build:population-spatial",
-    "provenance_sidecar": "data/thematic_layers/population/ghsl_population_2020_v1/source_ledger.json",
-    "status": "frozen_verified",
-    "local_presence": "required",
-    "description": "Provenance mirror; original source raster is an optional .runtime cache, not a browser asset."
-  },
-  {
     "source_id": "natural_earth_disputed_v5_1_2",
     "local_path": "data/scenario-rules/modern_world.sources/regions/ne_10m_admin_0_disputed_areas.geojson",
     "origin_kind": "download",
@@ -686,5 +667,24 @@
     "consumers": [
       "tools/build_hoi4_water_shape_splits.py"
     ]
+  },
+  {
+    "source_id": "ghsl_population_2020_r2023a_1km",
+    "local_path": "data/thematic_layers/population/ghsl_population_2020_v1/source_ledger.json",
+    "origin_kind": "derived",
+    "upstream_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_1000/V1-0/GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0.zip",
+    "immutable_ref": "GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0",
+    "current_local_sha256": "9e5d6c2df6b72e66a560179d71aa64bd85a3d41272ccb64d41e758409dc111fa",
+    "license": "CC-BY-4.0",
+    "citation": "https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE",
+    "consumers": [
+      "map_builder/population_spatial.py",
+      "data/thematic_layers/population/ghsl_population_2020_v1/manifest.json"
+    ],
+    "rebuild_command": "npm run build:population-spatial",
+    "provenance_sidecar": "data/thematic_layers/population/ghsl_population_2020_v1/source_ledger.json",
+    "status": "frozen_verified",
+    "local_presence": "required",
+    "description": "Provenance mirror; original source raster is an optional .runtime cache, not a browser asset."
   }
 ]

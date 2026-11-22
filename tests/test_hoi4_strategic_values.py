@@ -75,7 +75,7 @@ class Hoi4StrategicValuesTest(unittest.TestCase):
         manifest = json.loads((root / "data/scenarios/hoi4_1936/manifest.json").read_text(encoding="utf-8"))
         topology = json.loads((root / manifest["runtime_topology_url"]).read_text(encoding="utf-8"))
         centroids = decode_runtime_feature_centroids(topology)
-        self.assertGreater(len(centroids), 20000)
+        self.assertGreater(len(centroids), 14000)
         outside = [fid for fid, (lon, lat) in centroids.items() if not (-180 <= lon <= 180 and -90 <= lat <= 90)]
         self.assertEqual(outside, [])
         # 巴黎所在地块（FR_ARR_75001）的代表点应在巴黎市中心 15 km 内。

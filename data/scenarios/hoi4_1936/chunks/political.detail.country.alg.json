@@ -1573,7 +1573,7 @@
       }
     },
     {
-      "id": 20895,
+      "id": 13482,
       "type": "Feature",
       "properties": {
         "id": "DZA-2189__SPLIT_PLAYA_SALT_FLAT_18",
@@ -1978,7 +1978,7 @@
       }
     },
     {
-      "id": 20896,
+      "id": 13483,
       "type": "Feature",
       "properties": {
         "id": "DZA-2189__SPLIT_REST",
@@ -2595,7 +2595,7 @@
       }
     },
     {
-      "id": 20897,
+      "id": 13484,
       "type": "Feature",
       "properties": {
         "id": "DZA-2190__SPLIT_PLAYA_CHOTT_ECH_CHERGUI",
@@ -2778,7 +2778,7 @@
       }
     },
     {
-      "id": 20898,
+      "id": 13485,
       "type": "Feature",
       "properties": {
         "id": "DZA-2190__SPLIT_REST",
@@ -3087,7 +3087,7 @@
       }
     },
     {
-      "id": 20899,
+      "id": 13486,
       "type": "Feature",
       "properties": {
         "id": "DZA-2191__SPLIT_PLAYA_CHOTT_MELRHIR",
@@ -3298,7 +3298,7 @@
       }
     },
     {
-      "id": 20900,
+      "id": 13487,
       "type": "Feature",
       "properties": {
         "id": "DZA-2191__SPLIT_PLAYA_CHOTT_EL_GHARSA",
@@ -3369,7 +3369,7 @@
       }
     },
     {
-      "id": 20901,
+      "id": 13488,
       "type": "Feature",
       "properties": {
         "id": "DZA-2191__SPLIT_REST",
@@ -3806,7 +3806,7 @@
       }
     },
     {
-      "id": 21884,
+      "id": 14471,
       "type": "Feature",
       "properties": {
         "id": "DZA-2188__SPLIT_IN_AMENAS",
@@ -4347,7 +4347,7 @@
       }
     },
     {
-      "id": 21885,
+      "id": 14472,
       "type": "Feature",
       "properties": {
         "id": "DZA-2188__SPLIT_EAST_AIN_SALAH",
@@ -4430,7 +4430,7 @@
       }
     },
     {
-      "id": 21886,
+      "id": 14473,
       "type": "Feature",
       "properties": {
         "id": "DZA-2188__SPLIT_CENTRAL_IN_AMENAS",
@@ -4797,7 +4797,7 @@
       }
     },
     {
-      "id": 21887,
+      "id": 14474,
       "type": "Feature",
       "properties": {
         "id": "DZA-2188__SPLIT_SOUTH_AIN_SALAH",
@@ -4950,7 +4950,7 @@
       }
     },
     {
-      "id": 21888,
+      "id": 14475,
       "type": "Feature",
       "properties": {
         "id": "DZA-2188__SPLIT_SOUTH_IN_DAMENAS",
@@ -5097,7 +5097,7 @@
       }
     },
     {
-      "id": 21889,
+      "id": 14476,
       "type": "Feature",
       "properties": {
         "id": "DZA-2188__SPLIT_OUTER_IN_DAMENAS",
@@ -5188,7 +5188,7 @@
       }
     },
     {
-      "id": 21890,
+      "id": 14477,
       "type": "Feature",
       "properties": {
         "id": "DZA-2188__SPLIT_EAST_IN_DAMENAS",
@@ -5389,7 +5389,7 @@
       }
     },
     {
-      "id": 21916,
+      "id": 14503,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_TINDOUF",
@@ -5612,7 +5612,7 @@
       }
     },
     {
-      "id": 21917,
+      "id": 14504,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_OUM_EL_ASSEL",
@@ -5751,7 +5751,7 @@
       }
     },
     {
-      "id": 21918,
+      "id": 14505,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_WEST_TINDOUF",
@@ -5946,7 +5946,7 @@
       }
     },
     {
-      "id": 21919,
+      "id": 14506,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_SOUTH_TINDOUF",
@@ -6121,7 +6121,7 @@
       }
     },
     {
-      "id": 21920,
+      "id": 14507,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_WEST_ERG_CHECH",
@@ -6334,7 +6334,7 @@
       }
     },
     {
-      "id": 21921,
+      "id": 14508,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_SOUTHWEST_TINDOUF",
@@ -6565,7 +6565,7 @@
       }
     },
     {
-      "id": 21922,
+      "id": 14509,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_NORTH_ERG_CHECH",
@@ -6784,7 +6784,7 @@
       }
     },
     {
-      "id": 21923,
+      "id": 14510,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_SOUTH_CENTRAL_TINDOUF",
@@ -6977,7 +6977,7 @@
       }
     },
     {
-      "id": 21924,
+      "id": 14511,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_NORTH_CENTRAL_TINDOUF",
@@ -7072,7 +7072,7 @@
       }
     },
     {
-      "id": 21925,
+      "id": 14512,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_OUTER_TINDOUF",
@@ -7163,7 +7163,7 @@
       }
     },
     {
-      "id": 21926,
+      "id": 14513,
       "type": "Feature",
       "properties": {
         "id": "DZA-2150__SPLIT_EAST_TINDOUF",
@@ -7562,7 +7562,7 @@
       }
     },
     {
-      "id": 21938,
+      "id": 14525,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_BENI_OUNIF",
@@ -7789,7 +7789,7 @@
       }
     },
     {
-      "id": 21939,
+      "id": 14526,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_TINDOUF",
@@ -7856,7 +7856,7 @@
       }
     },
     {
-      "id": 21940,
+      "id": 14527,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_OUM_EL_ASSEL",
@@ -8135,7 +8135,7 @@
       }
     },
     {
-      "id": 21941,
+      "id": 14528,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_EASTERN_OUM_EL_ASSEL",
@@ -8298,7 +8298,7 @@
       }
     },
     {
-      "id": 21942,
+      "id": 14529,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_EAST_ADRAR",
@@ -8409,7 +8409,7 @@
       }
     },
     {
-      "id": 21943,
+      "id": 14530,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_DJENIENE_BOUREZG",
@@ -8530,7 +8530,7 @@
       }
     },
     {
-      "id": 21944,
+      "id": 14531,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_NORTH_BENI_OUNIF",
@@ -8725,7 +8725,7 @@
       }
     },
     {
-      "id": 21945,
+      "id": 14532,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_WEST_BENI_OUNIF",
@@ -8942,7 +8942,7 @@
       }
     },
     {
-      "id": 21946,
+      "id": 14533,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_NORTH_ADRAR",
@@ -9213,7 +9213,7 @@
       }
     },
     {
-      "id": 21947,
+      "id": 14534,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_SOUTH_AIN_SEFRA",
@@ -9332,7 +9332,7 @@
       }
     },
     {
-      "id": 21948,
+      "id": 14535,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_EAST_TINDOUF",
@@ -9499,7 +9499,7 @@
       }
     },
     {
-      "id": 21949,
+      "id": 14536,
       "type": "Feature",
       "properties": {
         "id": "DZA-2148__SPLIT_AIN_SEFRA",

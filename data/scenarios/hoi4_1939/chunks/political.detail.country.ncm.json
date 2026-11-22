@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "features": [
     {
-      "id": 20673,
+      "id": 13262,
       "type": "Feature",
       "properties": {
         "id": "NG_ADM1_NGA-2881__SPLIT_NCM",
@@ -253,7 +253,7 @@
       }
     },
     {
-      "id": 20675,
+      "id": 13264,
       "type": "Feature",
       "properties": {
         "id": "NG_ADM1_NGA-2848__SPLIT_NCM",
@@ -426,7 +426,7 @@
       }
     },
     {
-      "id": 21006,
+      "id": 13595,
       "type": "Feature",
       "properties": {
         "id": "NG_ADM1_NGA-2839__SPLIT_NCM__SPLIT_LAKE_CHAD",
@@ -595,7 +595,7 @@
       }
     },
     {
-      "id": 21007,
+      "id": 13596,
       "type": "Feature",
       "properties": {
         "id": "NG_ADM1_NGA-2839__SPLIT_NCM__SPLIT_REST",

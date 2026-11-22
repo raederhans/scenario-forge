@@ -1426,7 +1426,7 @@
       }
     },
     {
-      "id": 21950,
+      "id": 14537,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_AL_HASEKE",
@@ -1641,7 +1641,7 @@
       }
     },
     {
-      "id": 21951,
+      "id": 14538,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_RAQQA",
@@ -1756,7 +1756,7 @@
       }
     },
     {
-      "id": 21952,
+      "id": 14539,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_DEIR_EZ_ZOR",
@@ -1851,7 +1851,7 @@
       }
     },
     {
-      "id": 21953,
+      "id": 14540,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_AALOUA",
@@ -1934,7 +1934,7 @@
       }
     },
     {
-      "id": 21954,
+      "id": 14541,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_TAL_ERPHAN",
@@ -2041,7 +2041,7 @@
       }
     },
     {
-      "id": 21955,
+      "id": 14542,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_TALL_TAMR",
@@ -2216,7 +2216,7 @@
       }
     },
     {
-      "id": 21956,
+      "id": 14543,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_AL_MNAJEER",
@@ -2383,7 +2383,7 @@
       }
     },
     {
-      "id": 21957,
+      "id": 14544,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_NORTH_DEIR_EZ_ZOR",
@@ -2474,7 +2474,7 @@
       }
     },
     {
-      "id": 21958,
+      "id": 14545,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_SOUTH_AALOUA",
@@ -2561,7 +2561,7 @@
       }
     },
     {
-      "id": 21959,
+      "id": 14546,
       "type": "Feature",
       "properties": {
         "id": "SYR-141__SPLIT_GER_ZERO",
@@ -2770,7 +2770,7 @@
       }
     },
     {
-      "id": 21960,
+      "id": 14547,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_ALEPPO",
@@ -2875,7 +2875,7 @@
       }
     },
     {
-      "id": 21961,
+      "id": 14548,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_MANBIJ",
@@ -2974,7 +2974,7 @@
       }
     },
     {
-      "id": 21962,
+      "id": 14549,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_RESAFA",
@@ -3073,7 +3073,7 @@
       }
     },
     {
-      "id": 21963,
+      "id": 14550,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_AL_SAFIRAH",
@@ -3208,7 +3208,7 @@
       }
     },
     {
-      "id": 21964,
+      "id": 14551,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_ANADAN",
@@ -3323,7 +3323,7 @@
       }
     },
     {
-      "id": 21965,
+      "id": 14552,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_DABIQ",
@@ -3454,7 +3454,7 @@
       }
     },
     {
-      "id": 21966,
+      "id": 14553,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_KOBANE",
@@ -3589,7 +3589,7 @@
       }
     },
     {
-      "id": 21967,
+      "id": 14554,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_AL_TABQAH",
@@ -3680,7 +3680,7 @@
       }
     },
     {
-      "id": 21968,
+      "id": 14555,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_SOUTH_ANADAN",
@@ -3747,7 +3747,7 @@
       }
     },
     {
-      "id": 21969,
+      "id": 14556,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_SOUTH_AL_BAB",
@@ -3834,7 +3834,7 @@
       }
     },
     {
-      "id": 21970,
+      "id": 14557,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_SOUTH_MANBIJ",
@@ -3901,7 +3901,7 @@
       }
     },
     {
-      "id": 21971,
+      "id": 14558,
       "type": "Feature",
       "properties": {
         "id": "SYR-137__SPLIT_AL_BAB",
@@ -4036,7 +4036,7 @@
       }
     },
     {
-      "id": 21972,
+      "id": 14559,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_MANBIJ",
@@ -4159,7 +4159,7 @@
       }
     },
     {
-      "id": 21973,
+      "id": 14560,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_RESAFA",
@@ -4274,7 +4274,7 @@
       }
     },
     {
-      "id": 21974,
+      "id": 14561,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_MADAN",
@@ -4373,7 +4373,7 @@
       }
     },
     {
-      "id": 21975,
+      "id": 14562,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_KOBANE",
@@ -4502,7 +4502,7 @@
       }
     },
     {
-      "id": 21976,
+      "id": 14563,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_AL_TABQAH",
@@ -4601,7 +4601,7 @@
       }
     },
     {
-      "id": 21977,
+      "id": 14564,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_SOUTH_MADAN",
@@ -4724,7 +4724,7 @@
       }
     },
     {
-      "id": 21978,
+      "id": 14565,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_MARKADAH",
@@ -4799,7 +4799,7 @@
       }
     },
     {
-      "id": 21979,
+      "id": 14566,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_EAST_MANBIJ",
@@ -4938,7 +4938,7 @@
       }
     },
     {
-      "id": 21980,
+      "id": 14567,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_SOUTH_MANBIJ",
@@ -5037,7 +5037,7 @@
       }
     },
     {
-      "id": 21981,
+      "id": 14568,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_SOUTHERN_RAQQA",
@@ -5104,7 +5104,7 @@
       }
     },
     {
-      "id": 21982,
+      "id": 14569,
       "type": "Feature",
       "properties": {
         "id": "SYR-136__SPLIT_RAQQA",
@@ -5275,7 +5275,7 @@
       }
     },
     {
-      "id": 21983,
+      "id": 14570,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_RAQQA",
@@ -5346,7 +5346,7 @@
       }
     },
     {
-      "id": 21984,
+      "id": 14571,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_DEIR_EZ_ZOR",
@@ -5481,7 +5481,7 @@
       }
     },
     {
-      "id": 21985,
+      "id": 14572,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_AL_MAYADIN",
@@ -5712,7 +5712,7 @@
       }
     },
     {
-      "id": 21986,
+      "id": 14573,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_AL_MNAJEER",
@@ -5767,7 +5767,7 @@
       }
     },
     {
-      "id": 21987,
+      "id": 14574,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_HAJIN",
@@ -5848,7 +5848,7 @@
       }
     },
     {
-      "id": 21988,
+      "id": 14575,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_AL_TABQAH",
@@ -5923,7 +5923,7 @@
       }
     },
     {
-      "id": 21989,
+      "id": 14576,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_SOUTH_MADAN",
@@ -6002,7 +6002,7 @@
       }
     },
     {
-      "id": 21990,
+      "id": 14577,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_MARKADAH",
@@ -6145,7 +6145,7 @@
       }
     },
     {
-      "id": 21991,
+      "id": 14578,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_ABU_HAMAN",
@@ -6312,7 +6312,7 @@
       }
     },
     {
-      "id": 21992,
+      "id": 14579,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_EAST_MANBIJ",
@@ -6359,7 +6359,7 @@
       }
     },
     {
-      "id": 21993,
+      "id": 14580,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_SOUTHERN_RAQQA",
@@ -6430,7 +6430,7 @@
       }
     },
     {
-      "id": 21994,
+      "id": 14581,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_NORTH_DEIR_EZ_ZOR",
@@ -6517,7 +6517,7 @@
       }
     },
     {
-      "id": 21995,
+      "id": 14582,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_SOUTH_AL_BUKAMAL",
@@ -6588,7 +6588,7 @@
       }
     },
     {
-      "id": 21996,
+      "id": 14583,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_SOUTH_AL_MAYADIN",
@@ -6655,7 +6655,7 @@
       }
     },
     {
-      "id": 21997,
+      "id": 14584,
       "type": "Feature",
       "properties": {
         "id": "SYR-142__SPLIT_AL_BUKAMAL",

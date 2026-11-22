@@ -78,7 +78,7 @@ class Hoi4TerritoryRegressionsTest(unittest.TestCase):
                 owners = json.loads((directory / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
                 countries = json.loads((directory / "countries.json").read_text(encoding="utf-8"))["countries"]
                 cities = json.loads((directory / "city_overrides.json").read_text(encoding="utf-8"))
-                self.assertEqual(len(owners), 22206)
+                self.assertEqual(len(owners), {"hoi4_1936": 14793, "hoi4_1939": 14795}[scenario])
                 # Wave-4 border parcels, water-shaped parcels and HGO hotspot subdivisions.
                 self.assertEqual(owners["LT029__SPLIT_POLISH"], "POL")
                 self.assertEqual(owners["CH057__SPLIT_BUSINGEN"], "GER")

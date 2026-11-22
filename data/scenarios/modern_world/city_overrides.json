@@ -8696,7 +8696,7 @@
     "CITY::gn::1494456": {
       "city_id": "CITY::gn::1494456",
       "stable_key": "id::CITY::gn::1494456",
-      "host_feature_id": "RU_ARCTIC_FB_5492"
+      "host_feature_id": "RU_MRG_04f6e9aa1398"
     },
     "CITY::gn::1495974": {
       "city_id": "CITY::gn::1495974",
@@ -14081,7 +14081,7 @@
     "CITY::gn::7117885": {
       "city_id": "CITY::gn::7117885",
       "stable_key": "id::CITY::gn::7117885",
-      "host_feature_id": "RU_ARCTIC_FB_1441"
+      "host_feature_id": "RU_MRG_2b1beade3bbf"
     },
     "CITY::gn::7259034": {
       "city_id": "CITY::gn::7259034",
@@ -15216,7 +15216,7 @@
     "CITY::ne::1159128517": {
       "city_id": "CITY::ne::1159128517",
       "stable_key": "id::CITY::ne::1159128517",
-      "host_feature_id": "RU_ARCTIC_FB_7794"
+      "host_feature_id": "RU_RAY_50074027B87731900886085"
     },
     "CITY::ne::1159128521": {
       "city_id": "CITY::ne::1159128521",
@@ -15471,7 +15471,7 @@
     "CITY::ne::1159129099": {
       "city_id": "CITY::ne::1159129099",
       "stable_key": "id::CITY::ne::1159129099",
-      "host_feature_id": "RU_ARCTIC_FB_7308"
+      "host_feature_id": "RU_MRG_1a060b8af0ae"
     },
     "CITY::ne::1159129497": {
       "city_id": "CITY::ne::1159129497",
@@ -17691,7 +17691,7 @@
     "CITY::ne::1159139301": {
       "city_id": "CITY::ne::1159139301",
       "stable_key": "id::CITY::ne::1159139301",
-      "host_feature_id": "RU_ARCTIC_FB_7868"
+      "host_feature_id": "RU_RAY_50074027B87755515311585"
     },
     "CITY::ne::1159139305": {
       "city_id": "CITY::ne::1159139305",
@@ -18186,7 +18186,7 @@
     "CITY::ne::1159146497": {
       "city_id": "CITY::ne::1159146497",
       "stable_key": "id::CITY::ne::1159146497",
-      "host_feature_id": "RU_ARCTIC_FB_7934"
+      "host_feature_id": "RU_RAY_50074027B50212076410442"
     },
     "CITY::ne::1159146505": {
       "city_id": "CITY::ne::1159146505",
@@ -18621,12 +18621,12 @@
     "CITY::ne::1159146755": {
       "city_id": "CITY::ne::1159146755",
       "stable_key": "id::CITY::ne::1159146755",
-      "host_feature_id": "RU_ARCTIC_FB_7273"
+      "host_feature_id": "RU_RAY_50074027B39972680453550"
     },
     "CITY::ne::1159146757": {
       "city_id": "CITY::ne::1159146757",
       "stable_key": "id::CITY::ne::1159146757",
-      "host_feature_id": "RU_ARCTIC_FB_7043"
+      "host_feature_id": "RU_RAY_50074027B95387741431040"
     },
     "CITY::ne::1159146759": {
       "city_id": "CITY::ne::1159146759",
@@ -18646,7 +18646,7 @@
     "CITY::ne::1159146767": {
       "city_id": "CITY::ne::1159146767",
       "stable_key": "id::CITY::ne::1159146767",
-      "host_feature_id": "RU_ARCTIC_FB_7247"
+      "host_feature_id": "RU_MRG_bba373fa6104"
     },
     "CITY::ne::1159146769": {
       "city_id": "CITY::ne::1159146769",
@@ -19396,7 +19396,7 @@
     "CITY::ne::1159149651": {
       "city_id": "CITY::ne::1159149651",
       "stable_key": "id::CITY::ne::1159149651",
-      "host_feature_id": "RU_ARCTIC_FB_7372"
+      "host_feature_id": "RU_RAY_50074027B46260605120744"
     },
     "CITY::ne::1159149653": {
       "city_id": "CITY::ne::1159149653",
@@ -19586,7 +19586,7 @@
     "CITY::ne::1159150739": {
       "city_id": "CITY::ne::1159150739",
       "stable_key": "id::CITY::ne::1159150739",
-      "host_feature_id": "RU_ARCTIC_FB_6850"
+      "host_feature_id": "RU_RAY_50074027B58297077135629"
     },
     "CITY::ne::1159150741": {
       "city_id": "CITY::ne::1159150741",
@@ -20811,7 +20811,7 @@
     "CITY::gn::462745": {
       "city_id": "CITY::gn::462745",
       "stable_key": "id::CITY::gn::462745",
-      "host_feature_id": "RU_ARCTIC_FB_938"
+      "host_feature_id": "RU_MRG_a2baa07b60af"
     },
     "CITY::gn::463829": {
       "city_id": "CITY::gn::463829",
@@ -20866,7 +20866,7 @@
     "CITY::gn::477377": {
       "city_id": "CITY::gn::477377",
       "stable_key": "id::CITY::gn::477377",
-      "host_feature_id": "RU_ARCTIC_FB_879"
+      "host_feature_id": "RU_RAY_50074027B96351262112158"
     },
     "CITY::gn::481453": {
       "city_id": "CITY::gn::481453",
@@ -20956,7 +20956,7 @@
     "CITY::gn::502018": {
       "city_id": "CITY::gn::502018",
       "stable_key": "id::CITY::gn::502018",
-      "host_feature_id": "RU_ARCTIC_FB_936"
+      "host_feature_id": "RU_MRG_a2baa07b60af"
     },
     "CITY::gn::502971": {
       "city_id": "CITY::gn::502971",

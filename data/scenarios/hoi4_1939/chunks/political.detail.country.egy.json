@@ -2836,7 +2836,7 @@
       }
     },
     {
-      "id": 20810,
+      "id": 13399,
       "type": "Feature",
       "properties": {
         "id": "EGY-1556__SPLIT_REST",
@@ -3395,7 +3395,7 @@
       }
     },
     {
-      "id": 20906,
+      "id": 13495,
       "type": "Feature",
       "properties": {
         "id": "EGY-1548__SPLIT_LAKE_NASSER",
@@ -4714,7 +4714,7 @@
       }
     },
     {
-      "id": 20907,
+      "id": 13496,
       "type": "Feature",
       "properties": {
         "id": "EGY-1548__SPLIT_REST",
@@ -6293,7 +6293,7 @@
       }
     },
     {
-      "id": 21770,
+      "id": 14359,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_NORTH_SINAI",
@@ -6434,7 +6434,7 @@
       }
     },
     {
-      "id": 21771,
+      "id": 14360,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_HASNA",
@@ -6497,7 +6497,7 @@
       }
     },
     {
-      "id": 21772,
+      "id": 14361,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_ZARANIK",
@@ -6588,7 +6588,7 @@
       }
     },
     {
-      "id": 21773,
+      "id": 14362,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_RAFAH",
@@ -6659,7 +6659,7 @@
       }
     },
     {
-      "id": 21774,
+      "id": 14363,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_BIR_AL_ABED",
@@ -6818,7 +6818,7 @@
       }
     },
     {
-      "id": 21775,
+      "id": 14364,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_EAST_BIR_AL_ABED",
@@ -6959,7 +6959,7 @@
       }
     },
     {
-      "id": 21776,
+      "id": 14365,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_WEST_RAFAH",
@@ -7010,7 +7010,7 @@
       }
     },
     {
-      "id": 21777,
+      "id": 14366,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_SOUTH_ARISH",
@@ -7119,7 +7119,7 @@
       }
     },
     {
-      "id": 21778,
+      "id": 14367,
       "type": "Feature",
       "properties": {
         "id": "EGY-1558__SPLIT_NEKHEL",
@@ -7276,7 +7276,7 @@
       }
     },
     {
-      "id": 21800,
+      "id": 14389,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_MARSA_MATRUH",
@@ -7547,7 +7547,7 @@
       }
     },
     {
-      "id": 21801,
+      "id": 14390,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_SIDI_BARRANI",
@@ -7818,7 +7818,7 @@
       }
     },
     {
-      "id": 21802,
+      "id": 14391,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_CARA",
@@ -7989,7 +7989,7 @@
       }
     },
     {
-      "id": 21803,
+      "id": 14392,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_NORTH_CARA",
@@ -8132,7 +8132,7 @@
       }
     },
     {
-      "id": 21804,
+      "id": 14393,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_WEST_SIWA",
@@ -8219,7 +8219,7 @@
       }
     },
     {
-      "id": 21805,
+      "id": 14394,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_EL_SALLOUM",
@@ -8290,7 +8290,7 @@
       }
     },
     {
-      "id": 21806,
+      "id": 14395,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_SOUTH_EL_SALLOUM",
@@ -8361,7 +8361,7 @@
       }
     },
     {
-      "id": 21807,
+      "id": 14396,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_SOUTH_QATTARA",
@@ -8672,7 +8672,7 @@
       }
     },
     {
-      "id": 21808,
+      "id": 14397,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_QATTARA_CANAL_SITE",
@@ -8739,7 +8739,7 @@
       }
     },
     {
-      "id": 21809,
+      "id": 14398,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_EAST_QATTARA",
@@ -8950,7 +8950,7 @@
       }
     },
     {
-      "id": 21810,
+      "id": 14399,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_BORG_EL_ARAB",
@@ -9029,7 +9029,7 @@
       }
     },
     {
-      "id": 21811,
+      "id": 14400,
       "type": "Feature",
       "properties": {
         "id": "EGY-1540__SPLIT_SIWA_OASIS",
