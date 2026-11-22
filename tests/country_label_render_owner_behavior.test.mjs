@@ -176,6 +176,81 @@ test("suppressed countries neither reserve glyph boxes nor wait for a view fit",
   assert.equal(fitCalls.length, 1);
 });
 
+function createReplacementHarness() {
+  const callbacks = [], messages = [];
+  const handle = createCountryLabelLayoutWorkerHandler();
+  let worker, now = 0, hidden = false, repaints = 0;
+  const h = createHarness({ isCountryLabelSuppressed: () => hidden, helperOptions: {
+    nowMs: () => now, onInvalidate: () => repaints++, scheduleWork: callback => callbacks.push(callback),
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  const draw = () => h.owner.drawCountryLabels(1);
+  const bounds = () => h.owner.getDiagnostics().lastLabels[0]?.bounds;
+  const reply = () => worker.onmessage({ data: handle(messages.shift()) });
+  const dispatch = () => callbacks.shift()();
+  assert.equal(draw(), 0);
+  dispatch();
+  reply();
+  assert.equal(draw(), 1);
+  const original = bounds();
+  function move(x) {
+    h.source.countries[0].feature.geometry = { type: "Polygon", coordinates: [squareRing(x, 20, 150)] };
+    h.source.revision++;
+  }
+  return { ...h, draw, bounds, original, move, dispatch, reply, hide: () => { hidden = true; },
+    setTime: value => { now = value; }, repaints: () => repaints };
+}
+
+test("a changed country keeps its painted bounds until the replacement worker fit arrives", () => {
+  const h = createReplacementHarness();
+  h.move(320);
+  assert.equal(h.draw(), 1);
+  assert.deepEqual(h.bounds(), h.original);
+  assert.equal(h.owner.isReadyForCurrentView(), false);
+  h.dispatch();
+  assert.equal(h.draw(), 1);
+  assert.deepEqual(h.bounds(), h.original);
+  h.reply();
+  assert.equal(h.draw(), 1);
+  assert.ok(Math.abs(h.bounds().x - h.original.x - 300) < 1e-6);
+  assert.equal(h.owner.isReadyForCurrentView(), true);
+});
+
+test("successive shapes share the original two-second deadline and count discarded worker requests", () => {
+  const h = createReplacementHarness();
+  h.move(250);
+  h.draw();
+  const [expire] = h.timers.values();
+  h.dispatch();
+  h.setTime(1999);
+  h.move(400);
+  assert.equal(h.draw(), 1);
+  assert.deepEqual(h.bounds(), h.original);
+  assert.equal(h.owner.getDiagnostics().discardedRevisionRequests, 1);
+  h.setTime(2000);
+  const before = h.repaints();
+  expire();
+  assert.equal(h.repaints(), before + 1);
+  assert.equal(h.draw(), 0);
+  assert.equal(h.bounds(), undefined);
+});
+
+for (const [reason, invalidate] of [
+  ["coverage", h => h.hide()],
+  ["removal", h => { h.source.countries = []; h.source.revision++; }],
+  ["source replacement", h => { h.source.sourceToken = {}; }],
+  ["projection replacement", h => h.setProjectionIdentity(2)],
+]) {
+  test(`a country in transition disappears immediately after ${reason}`, () => {
+    const h = createReplacementHarness();
+    h.move(320);
+    assert.equal(h.draw(), 1);
+    invalidate(h);
+    assert.equal(h.draw(), 0);
+    assert.deepEqual(h.owner.getDiagnostics().lastLabels, []);
+  });
+}
+
 test("font family invalidation retains other language fits and metrics", () => {
   const { owner, state } = createHarness();
   owner.drawCountryLabels(1);
