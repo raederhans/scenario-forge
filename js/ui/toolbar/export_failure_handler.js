@@ -6,6 +6,7 @@ import { t } from "../i18n.js";
 import { showToast } from "../components/toast.js";
 
 const EXPORT_FAILURE_KINDS = Object.freeze({
+  CLIPBOARD_FAILED: "clipboard-failed",
   ARTIFACT_FAILED: "artifact-failed",
   DOWNLOAD_FAILED: "download-failed",
   INVALID_PARAMS: "invalid-params",
@@ -46,6 +47,10 @@ function createExportFailureToastHandler({
 
   return (error) => {
     const failureKind = classifyExportFailure(error);
+    if (failureKind === EXPORT_FAILURE_KINDS.CLIPBOARD_FAILED) {
+      presentToast(translate("Could not copy image. Check clipboard permissions or download the snapshot.", "ui"), { tone: "warning" });
+      return failureKind;
+    }
     if (failureKind === EXPORT_FAILURE_KINDS.OUT_OF_MEMORY) {
       presentToast(
         translate("Export failed: not enough available memory. Reduce export resolution (for example 2× → 1×), close heavy tabs, then retry.", "ui"),

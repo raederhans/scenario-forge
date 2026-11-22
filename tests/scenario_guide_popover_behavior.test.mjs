@@ -17,38 +17,19 @@ function element(dataset = {}) {
   };
 }
 
-test("main quick guide remains independent while the HGO guide links to its own editor", () => {
+test("HGO guidance is available in its own tab", () => {
   const state = { activeScenarioId: "tno_1962" };
-  const identity = element();
-  const ownerHeading = element();
-  const editHeading = element();
   const hgoNav = element({ guideSection: "hgo" });
   const hgoPanel = element({ guidePanel: "hgo" });
-  const nodes = new Map([
-    ["#scenarioGuideStepActive", identity],
-    ["#scenarioGuideStepOwner strong", ownerHeading],
-    ["#scenarioGuideStepApplyActions strong", editHeading],
-  ]);
   const controller = createScenarioGuidePopoverController({
     state,
-    scenarioGuidePopover: { querySelector: (selector) => nodes.get(selector) },
     scenarioGuideNavButtons: [hgoNav], scenarioGuidePanels: [hgoPanel],
     t: (key) => UI_COPY_CATALOG[key]?.zh || key,
   });
   controller.renderScenarioGuideSection("quick");
-  assert.equal(identity.hidden, true);
-  assert.equal(identity.classList.contains("hidden"), true);
-  assert.equal(ownerHeading["data-i18n"], "3. Set the active owner");
-  assert.equal(editHeading.textContent, "4. 编辑、调整样式并保存");
+  assert.equal(hgoPanel.hidden, true);
   state.activeScenarioId = "hgo_1936";
-  controller.syncScenarioGuideTriggerButtons();
-  assert.equal(identity.hidden, true);
-  assert.equal(identity.classList.contains("hidden"), true);
-  assert.equal(ownerHeading["data-i18n"], "3. Set the active owner");
-  assert.equal(editHeading.textContent, "4. 编辑、调整样式并保存");
-  state.activeScenarioId = "";
   controller.renderScenarioGuideSection("hgo");
-  assert.equal(identity.hidden, true);
   assert.equal(hgoPanel.hidden, false);
   assert.equal(hgoNav["aria-selected"], "true");
 });
@@ -56,8 +37,7 @@ test("main quick guide remains independent while the HGO guide links to its own 
 test("new workspace labels agree across runtime and manual catalogs without changing generic Color", () => {
   const manual = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL("../data/i18n/ui_copy.json", import.meta.url), "utf8"))).map(([key, entry]) => [key, entry.zh]));
   const keys = ["Save project", "Export image", "Not saved yet", "Unsaved changes", "Project downloaded",
-    "Advanced settings", "Paint mode color", "Ownership", "Close panels", "3. Set the active owner",
-    "4. Set the active owner", "4. Edit, style, then save", "5. Edit, style, then save"];
+    "Advanced settings", "Paint mode color", "Ownership", "Close panels"];
   for (const key of keys) assert.equal(UI_COPY_CATALOG[key].zh, manual[key], key);
   assert.equal(manual.Color, "颜色");
   assert.equal(UI_COPY_CATALOG["Paint mode color"].en, "Color");

@@ -288,7 +288,7 @@ function addStat(stats, key, ownerCode, area, feature, continentId, displayColor
   stats.set(key, prior);
 }
 
-function collectOwnerStats(appState, config) {
+export function collectOwnerStats(appState, config, { onOwner, measureArea = getFeatureArea } = {}) {
   const stats = new Map();
   if (!appState) return [];
   const river = getRiverPaintRuntime(appState);
@@ -306,9 +306,10 @@ function collectOwnerStats(appState, config) {
     const id = getFeatureId(feature);
     const ownerCode = resolveOwner(id, feature);
     if (!ownerCode) return;
+    if (onOwner) onOwner(ownerCode, getFeatureOwner(river.getParentFeature(feature) || feature, appState));
     const continentId = getFeatureContinentId(feature, appState, ownerCode);
     if (config.mode === "continent-area" && config.continent !== "all" && continentId !== config.continent) return;
-    const area = getFeatureArea(feature);
+    const area = measureArea(feature);
     const statKey = config.mode === "realm-area" && !ownerCode.startsWith("color:")
       ? getRealmRootCode(appState, ownerCode)
       : ownerCode;

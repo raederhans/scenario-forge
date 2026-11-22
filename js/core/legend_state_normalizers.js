@@ -9,6 +9,9 @@ export const DEFAULT_LEGEND_CONFIG = Object.freeze({
   continent: "all",
   useModernMajorOrder: false,
   maxItems: 15,
+  title: "",
+  exportBackground: "light",
+  exportOpaque: false,
 });
 
 export const DEFAULT_LEGEND_CONTROL = Object.freeze({
@@ -71,6 +74,9 @@ export function normalizeLegendConfig(value) {
     continent,
     useModernMajorOrder: !!source.useModernMajorOrder,
     maxItems,
+    title: String(source.title || "").trim(),
+    exportBackground: ["dark", "none"].includes(source.exportBackground) ? source.exportBackground : "light",
+    exportOpaque: source.exportOpaque === true,
   };
 }
 
@@ -196,7 +202,7 @@ export function getLegendEditorEntries(appState, getFeatureArea, getCountryName)
   } else {
     ranking = rankLegendEditorColors(appState, getFeatureArea);
   }
-  return ranking.map(({ color, owner }) => ({ color, countryName: owner ? getCountryName(appState, owner) : "" }));
+  return ranking.map(({ color, owner }) => ({ color, owner, countryName: owner ? getCountryName(appState, owner) : "" }));
 }
 
 export function filterLegendEditorEntries(entries, labels, query) {

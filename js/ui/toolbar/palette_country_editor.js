@@ -1,7 +1,89 @@
+import { t } from "../../core/i18n.js";
+import { checkColorHealth } from "../../core/color_health_check.js";
+import { applyCountryColor } from "../../core/country_color_commands.js";
+import { replaceFeatureColor } from "../../core/replace_color_command.js";
+import { markDirty } from "../../core/dirty_state.js";
+import { focusGeoBounds } from "../../core/map_renderer/public.js";
+import { getFeatureId } from "../../core/feature_identity.js";
+import { focusLandFeatures } from "../sidebar/region_search_controller.js";
 import { getPaletteCountryTargets } from "../../core/palette_country_targets.js";
 import { normalizeHexColor } from "../../core/palette_manager.js";
 import { findNearCountryColor, getCountryColorHintText } from "../../core/near_country_color_hint.js";
 import { getScenarioCountryDisplayName } from "../../core/scenario/scenario_country_display.js";
+
+export function openLegendColorEditor(doc, state, { color, owner }, refresh) {
+  const dialog = doc.createElement("dialog");
+  const title = t("Edit legend color {color}", "ui", { color });
+  dialog.setAttribute("aria-label", title);
+  const label = doc.createElement("label");
+  label.textContent = t("Global recolor", "ui");
+  const picker = doc.createElement("input");
+  picker.type = "color";
+  picker.value = color;
+  label.append(picker);
+  const hint = doc.createElement("p");
+  const merge = doc.createElement("select");
+  if (!owner) {
+    const placeholder = doc.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = t("Merge into country…", "ui");
+    merge.setAttribute("aria-label", placeholder.textContent);
+    merge.append(placeholder);
+    const codes = state.activeScenarioId ? Object.keys(state.scenarioCountriesByTag || {}) : [...getPaletteCountryTargets(state).keys()];
+    for (const code of codes.sort()) {
+      const base = normalizeHexColor(state.sovereignBaseColors?.[code]);
+      if (!base) continue;
+      const option = doc.createElement("option");
+      option.value = base;
+      option.textContent = code;
+      merge.append(option);
+    }
+    merge.addEventListener("change", () => {
+      if (merge.value) picker.value = merge.value;
+      hint.textContent = "";
+    });
+  }
+  picker.addEventListener("input", () => {
+    merge.value = "";
+    const match = findNearCountryColor(state, picker.value, owner);
+    hint.textContent = match ? getCountryColorHintText(state, match).message : "";
+  });
+  const apply = doc.createElement("button");
+  apply.textContent = t("Apply", "ui");
+  apply.addEventListener("click", async () => {
+    const next = picker.value;
+    dialog.close();
+    if (color === next) return;
+    if (owner) {
+      await applyCountryColor(owner, next);
+      markDirty("inspector-country-color");
+    } else {
+      replaceFeatureColor(color, next);
+    }
+    refresh();
+  });
+  const cancel = doc.createElement("button");
+  cancel.textContent = t("Cancel", "ui");
+  cancel.addEventListener("click", () => dialog.close());
+  dialog.append(label);
+  if (!owner) dialog.append(merge);
+  dialog.append(hint, apply, cancel);
+  dialog.addEventListener("close", () => dialog.remove());
+  doc.body.append(dialog);
+  dialog.showModal();
+}
+
+function locateRegions(state, ids) {
+  const topology = state.runtimePoliticalTopology || state.topology;
+  const features = ids.map(id => {
+    const feature = state.landIndex?.get(id);
+    if (feature?.geometry) return feature;
+    const geometry = topology?.objects?.political?.geometries.find(item => getFeatureId(item) === id);
+    return geometry && globalThis.topojson.feature(topology, geometry);
+  }).filter(Boolean);
+  if (features.length) focusLandFeatures(features, focusGeoBounds);
+  return features.length;
+}
 
 export function createPaletteCountryEditor({ state, host, applyColor }) {
   if (!host) return { render() {} };
@@ -30,7 +112,29 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
   hint.className = "body-text";
   hint.setAttribute("role", "status");
   row.append(picker, hex);
-  box.append(label, select, row, hint);
+  const check = doc.createElement("button");
+  check.type = "button";
+  const results = doc.createElement("div");
+  check.addEventListener("click", () => {
+    results.replaceChildren();
+    const issues = checkColorHealth(state);
+    if (!issues.length) results.textContent = t("No color conflicts or fragments found.", "ui");
+    for (const issue of issues) {
+      const item = doc.createElement("div");
+      item.textContent = issue.type === "pair"
+        ? t("{a} and {b} · ΔE {distance}", "ui", { ...issue, distance: issue.distance.toFixed(2) })
+        : t("{color} · disconnected fragment ({count} regions)", "ui", { color: issue.color, count: issue.featureIds.length });
+      const locate = doc.createElement("button");
+      locate.type = "button";
+      locate.textContent = t("Locate", "ui");
+      locate.addEventListener("click", () => {
+        if (!locateRegions(state, issue.featureIds)) hint.textContent = t("Region is not loaded yet.", "ui");
+      });
+      item.append(" ", locate);
+      results.append(item);
+    }
+  });
+  box.append(check, results, label, select, row, hint);
   host.prepend(box);
   let scene = null;
   let groups = new Map();
@@ -43,7 +147,7 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
     picker.value = hex.value = color;
     hex.setCustomValidity("");
     hint.textContent = ids?.size
-      ? (zh() ? `${ids.size} 个地区 · 改色会覆盖局部涂色，可撤销` : `${ids.size} regions · Replaces local paint; undo available`)
+      ? t("{count} regions · Only regions still belonging to this country will change.", "ui", { count: ids.size })
       : (zh() ? "选择国家" : "Choose a country");
   }
   async function commit(raw) {
@@ -58,7 +162,7 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
     if (result?.status !== "applied") { render(); return; }
     picker.value = hex.value = color;
     hex.setCustomValidity("");
-    hint.textContent = zh() ? `已更新 ${result.featureCount} 个地区，可撤销` : `Updated ${result.featureCount} regions; undo available`;
+    hint.textContent = t("Updated {updated} regions. Preserved {preserved} belonging to other countries or custom colors.", "ui", { updated: result.featureCount, preserved: result.preservedCount });
     if (match) {
       const { message, actionLabel } = getCountryColorHintText(state, match);
       hint.append(` · ${message}`);
@@ -86,6 +190,8 @@ export function createPaletteCountryEditor({ state, host, applyColor }) {
     const selected = nextScene === scene ? select.value : "";
     scene = nextScene;
     groups = getPaletteCountryTargets(state);
+    check.textContent = t("Color health check", "ui");
+    results.replaceChildren();
     label.textContent = zh() ? "全国改色" : "Country color";
     picker.setAttribute("aria-label", zh() ? "国家颜色" : "Country color");
     hex.setAttribute("aria-label", zh() ? "国家颜色十六进制值" : "Country color hex value");

@@ -5,6 +5,7 @@ export function createLegendControlOwner({
   getViewportSize = () => ({ width: 1, height: 1 }),
   isSmallViewport = () => globalThis.matchMedia?.("(max-width: 767px)").matches ?? false,
   getLanguage,
+  getTitle = () => "",
   getLegendModel,
   getControlState,
   getControlLimits,
@@ -25,6 +26,7 @@ export function createLegendControlOwner({
   let defaultCollapsed;
 
   function getLegendControlText(key, count = 0) {
+    if (key === "title" && getTitle()) return getTitle();
     const zh = String(getLanguage() || "").toLowerCase().startsWith("zh");
     const catalog = zh
       ? {
@@ -484,7 +486,7 @@ export function createLegendControlOwner({
     defaultCollapsed ??= isSmallViewport();
     const controlState = state.collapsed == null ? { ...state, collapsed: defaultCollapsed } : state;
     controlElement.hidden = false;
-    const headerKey = JSON.stringify([getLanguage(), colorRows.length + specialZoneLegendLayers.length, controlState.collapsed]);
+    const headerKey = JSON.stringify([getLanguage(), getTitle(), colorRows.length + specialZoneLegendLayers.length, controlState.collapsed]);
     if (headerKey !== lastHeaderKey) {
       controlElement.classList.toggle("is-collapsed", controlState.collapsed);
       setLegendControlHeader(colorRows.length + specialZoneLegendLayers.length, controlState.collapsed);

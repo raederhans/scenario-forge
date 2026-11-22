@@ -2079,6 +2079,7 @@
                     <label for="populationSummaryScope" class="range-label" data-i18n="Summary scope">Summary scope</label>
                     <select id="populationSummaryScope" class="select-input"></select>
                     <p id="populationSummary" class="city-points-advanced-hint" role="status"></p>
+                    <p class="hint" data-i18n="With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.">With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.</p>
                     <button id="populationSummarizeSelection" type="button" class="btn-secondary" data-i18n="Summarize selected parcels">Summarize selected parcels</button>
                     <button id="populationExportStats" type="button" class="btn-secondary" data-i18n="Export parcel statistics (CSV)">Export parcel statistics (CSV)</button>
                   </details>
@@ -2198,6 +2199,7 @@
             <img id="referenceImage" class="reference-image" alt="" />
             <canvas id="colorCanvas" class="map-layer" data-i18n="Interactive map color layer.">Interactive map color layer.</canvas>
             <canvas id="lineCanvas" class="map-layer map-layer-top" data-i18n="Interactive map line layer.">Interactive map line layer.</canvas>
+            <canvas id="mapTitleCanvas" class="map-layer map-layer-top" style="display:none;z-index:4" aria-hidden="true"></canvas>
           </div>
 
           <button id="sidebarDrawerBackdrop" type="button" class="sidebar-drawer-backdrop hidden" tabindex="-1" aria-label="Close panels" data-i18n-aria-label="Close panels"></button>
@@ -2210,7 +2212,13 @@
             </button>
           </div>
 
+          <div id="mapLabelPlacementHint" class="tool-hud-chip is-visible" hidden role="status" data-i18n="Click the map to place · Esc to cancel">Click the map to place · Esc to cancel</div>
           <div id="toolHudChip" class="tool-hud-chip hidden" aria-live="polite"></div>
+          <div id="parcelSelectionPanel" class="map-onboarding-hint hidden" style="top: 12px; transform: translateX(-50%); width: max-content">
+            <span id="parcelSelectionCount" aria-live="polite"></span>
+            <button type="button" id="fillSelectedParcels" class="btn-secondary" data-i18n="Fill with current color">Fill with current color</button>
+            <button type="button" id="clearSelectedParcels" class="btn-secondary" data-i18n="Clear">Clear</button>
+          </div>
           <div id="mapOnboardingHint" class="map-onboarding-hint" data-i18n="Click to inspect a region or country. Press F to switch to fill before painting.">
             Click to inspect a region or country. Press F to switch to fill before painting.
           </div>
@@ -2306,6 +2314,7 @@
                       <path d="m8 16 8.5-8.5a2.12 2.12 0 0 0-3-3L5 13v3h3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                     </svg>
                   </button>
+                  <button id="toolMapTextBtn" class="dock-icon-btn dock-tool-btn" type="button" aria-label="Add map text" title="Add map text" data-i18n-aria-label="Add map text" data-i18n-title="Add map text">T</button>
                   <button id="brushModeBtn" class="dock-icon-btn dock-tool-btn" type="button" aria-label="Brush" title="Brush" data-i18n-aria-label="Brush" data-i18n-title="Brush">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M7 15c-1.5 1-2 2.3-2 3.5 0 1.4 1.1 2.5 2.5 2.5 2.3 0 4.5-1.8 4.5-4.8 0-.7-.2-1.5-.6-2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -2313,6 +2322,7 @@
                     </svg>
                   </button>
                 </div>
+                <label><input type="checkbox" id="onlyUnpainted"> <span data-i18n="Paint only unpainted regions">Paint only unpainted regions</span></label>
               </div>
 
               <div class="dock-group dock-group-mode" role="group" aria-label="Mode" data-i18n-aria-label="Mode" title="Mode" data-i18n-title="Mode">
@@ -2370,6 +2380,7 @@
                 <div id="dockQuickFillRow" class="dock-utility-popover dock-quick-fill-popover hidden" role="dialog" aria-label="Quick Fill">
                     <div class="dock-popover-copy">
                       <div class="dock-popover-title" data-i18n="Double-Click Quick Fill">Double-Click Quick Fill</div>
+                      <div class="dock-popover-hint" data-i18n="Shift + double-click: country. Space + double-click: parent. G: next level.">Shift + double-click: country. Space + double-click: parent. G: next level.</div>
                       <div id="dockQuickFillHint" class="dock-popover-hint" data-i18n="Single-click: one subdivision | Double-click: parent">Single-click: one subdivision | Double-click: parent</div>
                     </div>
                     <div class="mode-toggle-row dock-paint-toggle-row" role="group" data-i18n-aria-label="Double-click quick fill scope">
@@ -2395,6 +2406,10 @@
                         <path d="M4 12h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       </svg>
                     </button>
+                    <details id="historyDropdown">
+                      <summary class="dock-icon-btn" aria-label="History" data-i18n-aria-label="History" title="History" data-i18n-title="History">▾</summary>
+                      <div id="historyPanel" class="dock-utility-popover" role="group" aria-labelledby="lblHistory"></div>
+                    </details>
                   </div>
                 </div>
                 <div class="dock-inline-divider" aria-hidden="true"></div>
@@ -2676,7 +2691,22 @@
                     <span data-i18n="Country display name">Country display name</span>
                     <input id="countryNameOverride" class="input" type="text" autocomplete="off" />
                   </label>
-                  <div><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span></div>
+                  <div><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span>
+                    <button id="convertCountryLabel" type="button" class="sidebar-action-secondary" data-i18n="Convert to editable text" hidden>Convert to editable text</button>
+                  </div>
+                  <div id="countryTerritoryStats" class="country-select-meta"></div>
+                  <details id="countryCities" class="mt-2" hidden>
+                    <summary data-i18n="Cities in this country">Cities in this country</summary>
+                    <label class="field-label">
+                      <span data-i18n="Cities in this country">Cities in this country</span>
+                      <select id="inspectorCity"></select>
+                    </label>
+                    <label class="field-label">
+                      <span data-i18n="City display name">City display name</span>
+                      <input id="cityNameOverride" class="input" type="text" autocomplete="off" />
+                    </label>
+                    <label><input id="inspectorCityHidden" type="checkbox" /> <span data-i18n="Hide city">Hide city</span></label>
+                  </details>
                   <button id="resetCountryOverrides" type="button" class="sidebar-action-secondary mt-2" disabled>
                     <span data-i18n="Restore original country color">Restore original country color</span>
                     <span data-reset-count>(0)</span>
@@ -2972,6 +3002,21 @@
                   <span class="sidebar-field-label" data-i18n="Project name (optional)">Project name (optional)</span>
                   <input id="projectName" type="text" class="text-input">
                 </label>
+                <details id="localHistory">
+                  <summary data-i18n="Local history">Local history</summary>
+                  <label>
+                    <span class="sidebar-field-label" data-i18n="Snapshot note (optional)">Snapshot note (optional)</span>
+                    <input type="text" id="snapshotNote" class="text-input">
+                  </label>
+                  <button type="button" id="saveSnapshot" class="btn-secondary" data-i18n="Save a snapshot now">Save a snapshot now</button>
+                  <ul id="localHistoryList"></ul>
+                </details>
+                <button type="button" id="territorySummaryButton" class="btn-secondary" aria-controls="territorySummaryPanel" aria-expanded="false" data-i18n="Territory change summary">Territory change summary</button>
+                <div id="territorySummaryPanel" hidden>
+                  <textarea id="territorySummaryText" class="text-input" rows="4" readonly aria-label="Territory change summary" data-i18n-aria-label="Territory change summary"></textarea>
+                  <button type="button" id="copyTerritorySummary" class="btn-secondary" data-i18n="Copy as text">Copy as text</button>
+                  <button type="button" id="exportTerritoryChanges" class="btn-secondary" data-i18n="Export CSV">Export CSV</button>
+                </div>
               </div>
             </details>
 
@@ -3021,6 +3066,21 @@
 
               </summary>
 
+              <template id="legendAppearanceFields">
+                <label class="legend-generator-field"><span data-i18n="Legend title">Legend title</span>
+                  <input class="legend-input" type="text" name="title">
+                </label>
+                <label class="legend-generator-field"><span data-i18n="Legend background">Legend background</span>
+                  <select class="legend-generator-select" name="exportBackground">
+                    <option value="light" data-i18n="Light">Light</option>
+                    <option value="dark" data-i18n="Dark">Dark</option>
+                    <option value="none" data-i18n="None">None</option>
+                  </select>
+                </label>
+                <label class="legend-generator-check"><input type="checkbox" name="exportOpaque">
+                  <span data-i18n="Opaque on export">Opaque on export</span>
+                </label>
+              </template>
               <div id="legendEditorStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
@@ -3035,6 +3095,13 @@
                 <p class="sidebar-tool-hint inspector-frontline-intro hidden sidebar-help-copy" data-i18n="Frontlines and strategic annotations workspace.">
                   Frontlines and strategic annotations workspace.
                 </p>
+                <fieldset class="inspector-stack">
+                  <legend data-i18n="Annotation visibility">Annotation visibility</legend>
+                  <label><input type="checkbox" data-annotation-view="showMapLabels" checked> <span data-i18n="Map lettering">Map lettering</span></label>
+                  <label><input type="checkbox" data-annotation-view="showOperationalLines" checked> <span data-i18n="Operational lines">Operational lines</span></label>
+                  <label><input type="checkbox" data-annotation-view="showOperationGraphics" checked> <span data-i18n="Operation graphics">Operation graphics</span></label>
+                  <label><input type="checkbox" data-annotation-view="showUnitCounters" checked> <span data-i18n="Unit counters">Unit counters</span></label>
+                </fieldset>
                 <div id="frontlineTabStack" class="inspector-frontline-stack"></div>
               </div>
             </details>
@@ -3065,6 +3132,7 @@
                   </div>
                 </div>
                 <div class="sidebar-support-actions" role="group" aria-label="Export actions" data-i18n-aria-label="Export actions">
+                  <button id="quickReexportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Export with last settings">Export with last settings</button>
                   <button id="dockExportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Open workbench">Open workbench</button>
                 </div>
               </div>
@@ -3382,6 +3450,7 @@
               </div>
               <div id="exportWorkbenchPreviewCanvas" class="export-workbench-preview-canvas" aria-live="polite">
                 <div id="exportWorkbenchPreviewStage" class="export-workbench-preview-stage"></div>
+                <div id="exportJobStatus" class="export-workbench-preview-state" role="status" hidden></div>
                 <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state" data-i18n="Export preview ready">
                   Export preview ready
                 </div>
@@ -3403,6 +3472,36 @@
                     <span class="export-workbench-group-hint" data-i18n="Text and annotations">Text and annotations</span>
                   </div>
                   <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list"></div>
+                  <div id="exportMapTitleFields" role="group" aria-label="Layout text" data-i18n-aria-label="Layout text"></div>
+                  <template id="exportMapTitleField">
+                    <fieldset class="export-workbench-control">
+                      <legend></legend>
+                      <label><input type="checkbox" name="enabled" /> <span data-i18n="Visible">Visible</span></label>
+                      <label><span data-i18n="Text">Text</span><input class="input" name="text" type="text" /></label>
+                      <label><span data-i18n="Position">Position</span>
+                        <select name="position" class="select-input">
+                          <option value="top-left" data-i18n="Top left">Top left</option>
+                          <option value="top-center" data-i18n="Top center">Top center</option>
+                          <option value="top-right" data-i18n="Top right">Top right</option>
+                          <option value="bottom-left" data-i18n="Bottom left">Bottom left</option>
+                          <option value="bottom-right" data-i18n="Bottom right">Bottom right</option>
+                        </select>
+                      </label>
+                      <label><span data-i18n="Font size">Font size</span>
+                        <select name="size" class="select-input">
+                          <option value="small" data-i18n="Small">Small</option>
+                          <option value="medium" data-i18n="Medium">Medium</option>
+                          <option value="large" data-i18n="Large">Large</option>
+                        </select>
+                      </label>
+                      <label><span data-i18n="Background">Background</span>
+                        <select name="background" class="select-input">
+                          <option value="light" data-i18n="Light">Light</option>
+                          <option value="dark" data-i18n="Dark">Dark</option>
+                        </select>
+                      </label>
+                    </fieldset>
+                  </template>
                 </div>
               </div>
             </section>
@@ -3422,17 +3521,20 @@
               <option value="png">PNG</option>
               <option value="jpg">JPG</option>
             </select>
+            <label><input id="exportTransparentBackground" type="checkbox"> <span data-i18n="Transparent background">Transparent background</span></label>
+            <small id="exportJpegHint" hidden data-i18n="JPG uses the ocean color behind transparent areas.">JPG uses the ocean color behind transparent areas.</small>
             </div>
             <div class="export-workbench-field">
             <label id="lblExportWorkbenchScale" class="sidebar-field-label" for="exportWorkbenchScale" data-i18n="Export Resolution">Export Resolution</label>
             <select id="exportWorkbenchScale" name="export-workbench-scale" autocomplete="off" class="select-input export-workbench-format-select">
-              <option value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
-              <option value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
-              <option value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
-              <option value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
+              <option value="1">1×</option>
+              <option value="1.5">1.5×</option>
+              <option value="2" selected>2×</option>
+              <option value="4">4×</option>
             </select>
             </div>
             <p id="exportWorkbenchResolutionHint" class="sidebar-help-copy" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
+            <button id="exportCopyBtn" class="btn-secondary" type="button" data-i18n="Copy image">Copy image</button>
             <button id="exportWorkbenchSnapshotBtn" class="btn-primary export-workbench-snapshot-btn" type="button" data-i18n="Download Snapshot">
               Download Snapshot
             </button>
@@ -3571,24 +3673,23 @@
           <ol class="scenario-guide-list mt-2">
             <li id="scenarioGuideStepApply" class="scenario-guide-step">
               <strong data-i18n="1. Apply Scenario">1. Apply Scenario</strong>
-              <span class="scenario-guide-step-line" data-i18n="Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.">Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.</span>
+              <span class="scenario-guide-step-line" data-guide-controls="scenarioSelectButton" data-i18n="Choose a scenario with two neighboring countries and apply it.">Choose a scenario with two neighboring countries and apply it.</span>
             </li>
             <li id="scenarioGuideStepSelect" class="scenario-guide-step">
-              <strong data-i18n="2. Select the target country in Inspector">2. Select the target country in Inspector</strong>
-              <span class="scenario-guide-step-line" data-i18n="Choose Objects → Countries on the left, select a country, then review its properties on the right.">Choose Objects → Countries on the left, select a country, then review its properties on the right.</span>
-              <button id="scenarioGuideSelectCountryBtn" class="btn-secondary scenario-guide-step-action" type="button" data-i18n="Go to country list">Go to country list</button>
+              <strong data-i18n="2. Pick the receiving country’s color">2. Pick the receiving country’s color</strong>
+              <span class="scenario-guide-step-line" data-guide-controls="paletteLibraryList toolFillBtn" data-i18n="Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.">Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.</span>
             </li>
-            <li id="scenarioGuideStepActive" class="scenario-guide-step">
-              <strong data-i18n="3. Confirm HGO identity when needed">3. Confirm HGO identity when needed</strong>
-              <span class="scenario-guide-step-line" data-i18n="When the selected country comes from HGO data, review its HGO names, flag option, and ideology label before changing ownership.">When the selected country comes from HGO data, review its HGO names, flag option, and ideology label before changing ownership.</span>
+            <li id="scenarioGuideStepTransfer" class="scenario-guide-step">
+              <strong data-i18n="3. Transfer a border province">3. Transfer a border province</strong>
+              <span class="scenario-guide-step-line" data-guide-controls="toolFillBtn dockQuickFillBtn" data-i18n="With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it.">With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it.</span>
             </li>
-            <li id="scenarioGuideStepOwner" class="scenario-guide-step">
-              <strong data-i18n="4. Set the active owner">4. Set the active owner</strong>
-              <span class="scenario-guide-step-line" data-i18n="Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.">Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.</span>
+            <li id="scenarioGuideStepLabel" class="scenario-guide-step">
+              <strong data-i18n="4. Label the map">4. Label the map</strong>
+              <span class="scenario-guide-step-line" data-guide-controls="frontlineTabStack legendProjectSection" data-i18n="Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key.">Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key.</span>
             </li>
             <li id="scenarioGuideStepApplyActions" class="scenario-guide-step">
-              <strong data-i18n="5. Edit, style, then save">5. Edit, style, then save</strong>
-              <span class="scenario-guide-step-line" data-i18n="Use Activate or Scenario Actions for map edits, tune Appearance and Transport for readability, then save a project JSON before export.">Use Activate or Scenario Actions for map edits, tune Appearance and Transport for readability, then save a project JSON before export.</span>
+              <strong data-i18n="5. Save the project and export an image">5. Save the project and export an image</strong>
+              <span class="scenario-guide-step-line" data-guide-controls="workspaceSaveBtn workspaceExportBtn" data-i18n="Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map.">Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map.</span>
             </li>
           </ol>
         </section>
@@ -3596,13 +3697,13 @@
         <section id="scenarioGuideSectionPrepare" class="scenario-guide-manual-section hidden" data-guide-panel="prepare" role="tabpanel" aria-labelledby="scenarioGuideTabPrepare scenarioGuidePreparationTitle" hidden>
           <h4 id="scenarioGuidePreparationTitle" class="scenario-guide-manual-title" data-i18n="Before you edit">Before you edit</h4>
           <div class="scenario-guide-bilingual-copy">
-            <p data-i18n="Before editing, look at the chips at the top of the map. Mode shows the active tool, View shows the map state you are seeing, and Split shows how many countries have split ownership. If any chip looks wrong, switch to the correct scenario or project first.">Before editing, look at the chips at the top of the map. Mode shows the active tool, View shows the map state you are seeing, and Split shows how many countries have split ownership. If any chip looks wrong, switch to the correct scenario or project first.</p>
+            <p data-i18n="The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color.">The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color.</p>
           </div>
           <div class="scenario-guide-bilingual-copy">
-            <p data-i18n="Before a large edit or before loading another project, save a backup: open Project Management and download the current project JSON. Loading a project replaces the current map, notes, and export settings.">Before a large edit or before loading another project, save a backup: open Project Management and download the current project JSON. Loading a project replaces the current map, notes, and export settings.</p>
+            <p data-i18n="Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings.">Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings.</p>
           </div>
           <div class="scenario-guide-bilingual-copy">
-            <p data-i18n="After loading a project, check the Inspector again. Confirm the target country and active owner, then review frontlines, reference image alignment, and export settings. When these match your plan, continue with Activate, Scenario Actions, or Export.">After loading a project, check the Inspector again. Confirm the target country and active owner, then review frontlines, reference image alignment, and export settings. When these match your plan, continue with Activate, Scenario Actions, or Export.</p>
+            <p data-i18n="To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits.">To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits.</p>
           </div>
         </section>
 
@@ -3678,34 +3779,35 @@
 
         <section id="scenarioGuideSectionEditing" class="scenario-guide-manual-section hidden" data-guide-panel="editing" role="tabpanel" aria-labelledby="scenarioGuideTabEditing scenarioGuideEditingTitle" hidden>
           <h4 id="scenarioGuideEditingTitle" class="scenario-guide-manual-title" data-i18n="Editing tools">Editing tools</h4>
-          <p class="scenario-guide-manual-lead" data-i18n="Use these tools for ownership edits, batch changes, annotations, and source-aligned visual work.">Use these tools for ownership edits, batch changes, annotations, and source-aligned visual work.</p>
+          <p class="scenario-guide-manual-lead" data-guide-controls="toolFillBtn dockQuickFillBtn brushModeBtn" data-i18n="Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke.">Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke.</p>
           <div class="scenario-guide-tool-accordion">
             <details class="scenario-guide-tool-panel" open>
               <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Inspector and active owner">Inspector and active owner</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="Pick the target and the owner before painting.">Pick the target and the owner before painting.</span>
+                <span class="scenario-guide-tool-title" data-i18n="Paint with country colors">Paint with country colors</span>
+                <span class="scenario-guide-tool-summary-copy" data-i18n="In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map.">In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map.</span>
               </summary>
               <div class="scenario-guide-tool-body">
-                <p data-i18n="The Inspector tells you what country or feature is selected. The Active Owner tells paint and ownership actions which country receives the edit.">The Inspector tells you what country or feature is selected. The Active Owner tells paint and ownership actions which country receives the edit.</p>
+                <p data-guide-controls="toolEyedropperBtn toolFillBtn" data-i18n="Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools.">Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools.</p>
                 <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You are about to change ownership, controller, cores, labels, or any feature-level state.">You are about to change ownership, controller, cores, labels, or any feature-level state.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Select the map feature, read Inspector, set Active Owner, then use Activate, Fill, Eraser, or Scenario Actions.">Select the map feature, read Inspector, set Active Owner, then use Activate, Fill, Eraser, or Scenario Actions.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="The top chips and Inspector should agree on mode, selected target, active owner, and split status.">The top chips and Inspector should agree on mode, selected target, active owner, and split status.</span></li>
+                  <li><strong data-i18n="Quick Fill">Quick Fill</strong><span data-guide-controls="dockQuickFillBtn" data-i18n="To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision.">To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision.</span></li>
+                  <li><strong data-i18n="Brush">Brush</strong><span data-guide-controls="brushModeBtn" data-i18n="Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke.">Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke.</span></li>
+                  <li><strong data-i18n="Check">Check</strong><span data-i18n="Check the border, country name and legend after painting.">Check the border, country name and legend after painting.</span></li>
                 </ul>
               </div>
             </details>
             <details class="scenario-guide-tool-panel">
               <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Batch and annotation tools">Batch and annotation tools</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="Use broad edits and strategic marks deliberately.">Use broad edits and strategic marks deliberately.</span>
+                <span class="scenario-guide-tool-title" data-i18n="Annexation and country colors">Annexation and country colors</span>
+                <span class="scenario-guide-tool-summary-copy" data-i18n="Transfer territory or change a country’s base color.">Transfer territory or change a country’s base color.</span>
               </summary>
               <div class="scenario-guide-tool-body">
-                <p data-i18n="Scenario Actions, Quick Fill, special zones, frontlines, operational graphics, and unit counters help you move from single-country edits to a readable campaign map.">Scenario Actions, Quick Fill, special zones, frontlines, operational graphics, and unit counters help you move from single-country edits to a readable campaign map.</p>
+                <p data-i18n="To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.">To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.</p>
                 <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="One click should affect a group, a region, a frontline, or a planned operation.">One click should affect a group, a region, a frontline, or a planned operation.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Make a project save, choose the exact scope, run the batch action, then inspect several affected countries.">Make a project save, choose the exact scope, run the batch action, then inspect several affected countries.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="After a broad edit, review View, Split, labels, frontlines, and export preview before the next broad action.">After a broad edit, review View, Split, labels, frontlines, and export preview before the next broad action.</span></li>
+                  <li><strong data-i18n="Country color">Country color</strong><span data-guide-controls="countryList countryInspectorColorSwatch" data-i18n="Select the country in the country list, then click its color swatch in the Inspector to change its base color.">Select the country in the country list, then click its color swatch in the Inspector to change its base color.</span></li>
+                  <li><strong data-i18n="Advanced actions">Advanced actions</strong><span data-i18n="For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.">For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.</span></li>
+                  <li><strong data-i18n="Map lettering">Map lettering</strong><span data-guide-controls="frontlineTabStack legendProjectSection workspaceExportBtn" data-i18n="For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.">For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.</span></li>
                 </ul>
+                <button id="scenarioGuideSelectCountryBtn" class="btn-secondary scenario-guide-step-action" type="button" data-i18n="Go to country list">Go to country list</button>
               </div>
             </details>
           </div>
@@ -3721,7 +3823,7 @@
                 <span class="scenario-guide-tool-summary-copy" data-i18n="Save and restore the complete working state.">Save and restore the complete working state.</span>
               </summary>
               <div class="scenario-guide-tool-body">
-                <p data-i18n="Contains Download Project, Load Project, selected file status, and import safety checks.">Contains Download Project, Load Project, selected file status, and import safety checks.</p>
+                <p data-i18n="Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.">Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.</p>
                 <ul class="scenario-guide-tool-steps">
                   <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You are about to make broad ownership, frontline, transport, or overlay changes.">You are about to make broad ownership, frontline, transport, or overlay changes.</span></li>
                   <li><strong data-i18n="Order">Order</strong><span data-i18n="Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.">Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.</span></li>
@@ -3784,10 +3886,10 @@
                 <span class="scenario-guide-tool-summary-copy" data-i18n="The editable handoff file.">The editable handoff file.</span>
               </summary>
               <div class="scenario-guide-tool-body">
-                <p data-i18n="Use Download Project to save the current editable state: scenario choice, ownership edits, appearance, transport, strategic annotations, reference alignment values, and export settings.">Use Download Project to save the current editable state: scenario choice, ownership edits, appearance, transport, strategic annotations, reference alignment values, and export settings.</p>
+                <p data-i18n="Save project downloads the editable map, including its colors, annotations and export settings.">Save project downloads the editable map, including its colors, annotations and export settings.</p>
                 <ul class="scenario-guide-tool-steps">
                   <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.">You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Download the JSON, reload it once with Load Project, then confirm the same scenario, annotations, labels, and export settings return.">Download the JSON, reload it once with Load Project, then confirm the same scenario, annotations, labels, and export settings return.</span></li>
+                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.">Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.</span></li>
                   <li><strong data-i18n="Check">Check</strong><span data-i18n="The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.">The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.</span></li>
                 </ul>
               </div>

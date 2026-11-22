@@ -57,7 +57,7 @@ test("empty hit returns exact empty target and false decision", async () => {
   });
 });
 
-test("land ctrl or meta requests dev selection while shift and alt stay inert", async () => {
+test("land Ctrl, Cmd or Shift toggles selection with the select tool", async () => {
   const resolveClickSelectionDecision = await loadResolver();
   const resolvedHit = createResolvedHit({
     targetType: "land",
@@ -69,6 +69,8 @@ test("land ctrl or meta requests dev selection while shift and alt stay inert", 
   for (const modifiers of [
     createReadonlyModifiers({ ctrlKey: true }),
     createReadonlyModifiers({ metaKey: true }),
+    createReadonlyModifiers({ shiftKey: true }),
+    createReadonlyModifiers({ shiftKey: true, altKey: true }),
     createReadonlyModifiers({ ctrlKey: true, metaKey: true, shiftKey: true, altKey: true }),
   ]) {
     const result = resolveClickSelectionDecision(resolvedHit, modifiers);
@@ -83,9 +85,7 @@ test("land ctrl or meta requests dev selection while shift and alt stay inert", 
 
   for (const modifiers of [
     createReadonlyModifiers(),
-    createReadonlyModifiers({ shiftKey: true }),
     createReadonlyModifiers({ altKey: true }),
-    createReadonlyModifiers({ shiftKey: true, altKey: true }),
   ]) {
     assert.equal(
       resolveClickSelectionDecision(resolvedHit, modifiers).decision.devSelectionRequested,
@@ -472,6 +472,7 @@ test("special water and land candidates retain their distinct transaction priori
   ]);
 
   const water = await createTransactionOwner({
+    state: { currentTool: "select" },
     services: { getHitFromEvent: () => ({ targetType: "water", id: "water-1", countryCode: null, runtimeCountryCode: null }) },
   });
   await water.owner.handleClick({ ctrlKey: true, preventDefault() { water.trace.push(["preventDefault"]); } });
@@ -481,6 +482,7 @@ test("special water and land candidates retain their distinct transaction priori
   ]);
 
   const land = await createTransactionOwner({
+    state: { currentTool: "select" },
     services: {
       getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
       toggleFeatureInDevSelection: () => {

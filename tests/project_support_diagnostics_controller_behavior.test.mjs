@@ -180,7 +180,9 @@ function getNodeText(node) {
 }
 
 function createController(projectSaveStatus, overrides = {}) {
-  const elements = { projectSaveStatus, ...overrides.elements };
+  const elements = { projectSaveStatus, legendAppearanceFields: {
+    content: { cloneNode: () => createElementNode("fragment") },
+  }, ...overrides.elements };
   const elementIds = {
     scenarioAuditSection: "scenarioAuditPanel",
     legendList: "legendEditorList",
@@ -371,6 +373,7 @@ test("project download passes selected file format and destination", async () =>
   const downloadProjectBtn = createButtonNode();
   const calls = [];
   const controller = createController(projectSaveStatus, {
+    state: { isDirty: false },
     elements: {
       downloadProjectBtn,
       projectDownloadFormat: { value: "zip" },
@@ -946,7 +949,7 @@ test("local project import reports restored entries and keeps cancellation disti
     restoredColorEntries: 2, restoredOwnershipEntries: 1, ignoredEntries: 3, migratedEntries: 0,
   });
   assert.equal(projectSaveStatus.textContent,
-    "Project imported: HOI4 1936. Restored 2 color entries and 1 ownership entries. Ignored 3 entries that are not valid for this map.");
+    "Project imported: HOI4 1936. Restored 2 color entries. Ignored 3 entries that are not valid for this map.");
   controller.refreshProjectSaveStatus();
   assert.match(projectSaveStatus.textContent, /Ignored 3 entries/);
   hooks.onProjectImportComplete({
@@ -1023,9 +1026,9 @@ test("local project zip load reports missing editable project", async () => {
   controller.bindEvents();
   await projectFileInput.listeners.change();
 
-  assert.equal(projectSaveStatus.textContent, "Project ZIP must include project/map_project.json or map_project.json.");
+  assert.equal(projectSaveStatus.textContent, "The project ZIP could not be opened. Ask the sender to export it again.");
   assert.deepEqual(toasts, [{
-    message: "Project ZIP must include project/map_project.json or map_project.json.",
+    message: "The project ZIP could not be opened. Ask the sender to export it again.",
     options: {
       title: "Project import failed",
       tone: "error",

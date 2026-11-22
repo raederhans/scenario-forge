@@ -1,3 +1,4 @@
+import { hasMapTitles, normalizeMapTitles } from "./renderer/map_title_render_owner.js";
 // Centralized app state (Phase 13 scaffold)
 
 import {
@@ -888,6 +889,9 @@ function createDefaultAnnotationView() {
     unitCounterFixedScaleMultiplier: 1.5,
     showUnitLabels: true,
     showMapLabels: true,
+    showOperationalLines: true,
+    showOperationGraphics: true,
+    showUnitCounters: true,
   };
 }
 
@@ -906,6 +910,9 @@ function normalizeAnnotationView(rawConfig) {
       2.0,
     ),
     showMapLabels: raw.showMapLabels === undefined ? defaults.showMapLabels : !!raw.showMapLabels,
+    showOperationalLines: raw.showOperationalLines === undefined ? defaults.showOperationalLines : !!raw.showOperationalLines,
+    showOperationGraphics: raw.showOperationGraphics === undefined ? defaults.showOperationGraphics : !!raw.showOperationGraphics,
+    showUnitCounters: raw.showUnitCounters === undefined ? defaults.showUnitCounters : !!raw.showUnitCounters,
     showUnitLabels: raw.showUnitLabels === undefined ? defaults.showUnitLabels : !!raw.showUnitLabels,
   };
 }
@@ -1445,6 +1452,7 @@ function normalizeExportWorkbenchUiState(rawUi) {
     : raw.layerVisibility;
   const includeTextLayer = raw.includeTextLayer === undefined ? true : !!raw.includeTextLayer;
   const textVisibility = normalizeExportWorkbenchTextVisibility(raw.textVisibility, includeTextLayer);
+  const mapTitles = normalizeMapTitles(raw.mapTitles);
   const rawPreviewLayerId = String(raw.previewLayerId || raw.previewSource || "background").trim().toLowerCase();
   const previewLayerId = EXPORT_WORKBENCH_LEGACY_LAYER_ID_ALIASES[rawPreviewLayerId]
     || EXPORT_WORKBENCH_TEXT_LAYER_ID_ALIASES[rawPreviewLayerId]
@@ -1452,10 +1460,11 @@ function normalizeExportWorkbenchUiState(rawUi) {
   return {
     target: EXPORT_WORKBENCH_TARGETS.has(normalizedTarget) ? normalizedTarget : "composite",
     format: String(raw.format || "").trim().toLowerCase() === "jpg" ? "jpg" : "png",
-    includeTextLayer: Object.values(textVisibility).some(Boolean),
+    includeTextLayer: Object.values(textVisibility).some(Boolean) || hasMapTitles(mapTitles),
     layerOrder: normalizeExportWorkbenchLayerOrder(raw.layerOrder),
     visibility: normalizeExportWorkbenchVisibility(visibilitySource),
     textVisibility,
+    mapTitles,
     previewMode: String(raw.previewMode || "").trim().toLowerCase() === "layer" ? "layer" : "main",
     previewLayerId: [
       ...EXPORT_WORKBENCH_LAYER_IDS,

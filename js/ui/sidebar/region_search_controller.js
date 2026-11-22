@@ -7,7 +7,7 @@ export function focusLandFeatures(features, focusGeoBounds) {
 }
 
 export function createRegionSearchController({
-  documentRef, state, t, getFeatureOwnerCode, getFeatureLabel,
+  documentRef, state, t, getFeatureOwnerCode, getFeatureLabel, getOwnerLabel = code => code,
   selectLandFeatureById, focusGeoBounds, maxResults = 30,
 }) {
   const tr = (key) => t(key, "ui");
@@ -60,9 +60,10 @@ export function createRegionSearchController({
     results.replaceChildren();
     close();
     status.textContent = "";
-    if (!query || !country) return;
+    if (!query) return;
     for (const [id, feature] of state.landIndex) {
-      if (normalizeCode(getFeatureOwnerCode(id)) !== country) continue;
+      const owner = getFeatureOwnerCode(id, feature) || "";
+      if (country && normalizeCode(owner) !== country) continue;
       const label = getFeatureLabel(feature, id);
       // The source name stays searchable when the UI shows a translated label.
       const sourceName = String(feature?.properties?.name || "").trim();
@@ -71,6 +72,7 @@ export function createRegionSearchController({
         matches.push({
           id,
           label,
+          owner,
           sourceName: sourceName && sourceName !== label ? sourceName : "",
           prefix: keys.some((value) => value.startsWith(query)),
         });
@@ -79,7 +81,7 @@ export function createRegionSearchController({
     matches.sort((a, b) => Number(b.prefix) - Number(a.prefix) || a.label.localeCompare(b.label));
     const count = matches.length;
     matches = matches.slice(0, maxResults);
-    matches.forEach(({ id, label, sourceName }, index) => {
+    matches.forEach(({ id, label, sourceName, owner }, index) => {
       const option = documentRef.createElement("li");
       option.id = `regionSearchOption-${index}`;
       option.setAttribute("role", "option");
@@ -89,7 +91,7 @@ export function createRegionSearchController({
       name.textContent = label;
       const detail = documentRef.createElement("span");
       detail.className = "region-search-id";
-      detail.textContent = sourceName ? `${id} · ${sourceName}` : id;
+      detail.textContent = [id, sourceName, !country && owner && getOwnerLabel(owner)].filter(Boolean).join(" · ");
       option.append(name, detail);
       option.addEventListener("click", () => select(index));
       results.appendChild(option);
@@ -141,7 +143,6 @@ export function createRegionSearchController({
   function mount(container) {
     block = documentRef.createElement("div");
     block.className = "card-flat inspector-search-block region-search-block";
-    block.classList.toggle("hidden", !country);
     const label = documentRef.createElement("label");
     label.className = "visually-hidden";
     label.setAttribute("for", "regionSearchInput");
@@ -181,7 +182,6 @@ export function createRegionSearchController({
     if (next === country) return;
     country = next;
     clear();
-    block.classList.toggle("hidden", !country);
   }
 
   function destroy() {

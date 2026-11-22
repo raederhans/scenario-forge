@@ -2,10 +2,17 @@
 // 这个模块负责 export workbench 的状态归一、列表渲染、预览、导出动作和面板内部事件绑定。
 // toolbar.js 继续保留 overlay 外壳、跨面板仲裁、URL/focus 协调和 open/close facade。
 
+import { getExportScaleInfo, getBakePackLayerIds, getBakePassNamesForLayer, encodeExportCanvas } from "./export_artifact_model.js";
+import { createExportError } from "./export_failure_handler.js";
 import { resolveSampleExportRecommendationContext } from "../../core/sample_export_recommendation.js";
-import { getPoliticalExportLegend } from "../../core/renderer/political_export_legend.js";
+import { getPoliticalExportLegend, hasMapTitles } from "../../core/map_renderer/public.js";
+import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
+import { markDirty } from "../../core/dirty_state.js";
+import { requestRender } from "../../core/render_boundary.js";
+import { registerRuntimeHook } from "../../core/state/index.js";
 import {
   ensureExportWorkbenchUiState as ensureExportWorkbenchUiAction,
+  commitExportWorkbenchUiState,
   setExportAdjustmentsState,
   setExportBakeState,
   setExportLayerOrderState,
@@ -149,7 +156,7 @@ function ensureExportWorkbenchUiState(state, normalizeExportWorkbenchUiState) {
     normalizeState: normalizeExportWorkbenchUiState,
   });
   ui.textVisibility = normalizeExportWorkbenchTextVisibility(ui.textVisibility, ui.includeTextLayer, state.legendControl?.visible !== false);
-  ui.includeTextLayer = Object.values(ui.textVisibility).some(Boolean);
+  ui.includeTextLayer = Object.values(ui.textVisibility).some(Boolean) || hasMapTitles(ui.mapTitles);
   return ui;
 }
 
@@ -192,6 +199,7 @@ function getExportPreviewSourceKey(state, exportUi, renderPassNames, svgMarkup =
     exportUi.layerOrder,
     exportUi.visibility,
     exportUi.textVisibility,
+    exportUi.mapTitles,
     state.activeScenarioId,
     state.renderTransactionDiagnostics?.scenarioApplyEpoch,
     state.sceneGeneration,
@@ -255,7 +263,8 @@ function createExportWorkbenchController({
   buildBakePackOutputs,
   buildBakePackPackage,
   buildCompositeExportCanvas,
-  getSelectedExportScale,
+  isExportRenderOverBudget = () => false,
+  exportCopyBtn, exportJobStatus, quickReexportBtn, transparentBackground, jpegHint, openSettings,
   triggerCanvasDownload,
   triggerBlobDownload,
   bakeLayer,
@@ -285,11 +294,26 @@ function createExportWorkbenchController({
 
   const getExportUi = () => ensureExportWorkbenchUiState(state, normalizeExportWorkbenchUiState);
 
-  const getExportScaleLabel = (scaleValue) => {
-    if (String(scaleValue || "") === "1") return t("Current preview (1×)", "ui");
-    if (String(scaleValue || "") === "1.5") return t("High (1.5×)", "ui");
-    if (String(scaleValue || "") === "4") return t("Maximum detail (4×)", "ui");
-    return t("Ultra (2×)", "ui");
+  const getScaleInfo = (ui, scale, target = ui.target) => {
+    const visiblePasses = resolveExportPassSequence(ui, renderPassNames)
+      .filter(name => name !== "labels" || ui.textVisibility["render-labels"]);
+    let groups = [visiblePasses];
+    if (target === "per-layer") {
+      groups = ui.layerOrder.filter(id => ui.visibility[id] && (id !== "labels" || ui.textVisibility["render-labels"]))
+        .map(id => EXPORT_MAIN_LAYER_MODEL_BY_ID.get(id).passNames);
+    } else if (target === "bake-pack") {
+      groups = getBakePackLayerIds(ui).map(id => getBakePassNamesForLayer(id, ui, {
+        resolvePassSequence: resolveExportPassSequence, renderPassNames,
+      }));
+    }
+    return getExportScaleInfo(state, scale, groups, isExportRenderOverBudget, target === "bake-pack" ? null : Number(scale));
+  };
+
+  const scaleLabel = (scale, { width, height, reason }) => {
+    const parts = [`${scale}×`, `${width}×${height}`];
+    if (Number(scale) === 1 && Number(state.dpr) > 1) parts.push(t("Below screen resolution", "ui"));
+    if (reason) parts.push(t(reason, "ui"));
+    return parts.join(" · ");
   };
 
   const getExportTextLayerEntries = () => {
@@ -348,9 +372,35 @@ function createExportWorkbenchController({
           ? "PNG"
           : exportUi.format.toUpperCase();
     }
-    if (exportSectionSummaryScale) {
-      exportSectionSummaryScale.textContent = getExportScaleLabel(exportUi.scale);
+    const selected = getScaleInfo(exportUi, exportUi.scale);
+    if (exportSectionSummaryScale) exportSectionSummaryScale.textContent = scaleLabel(exportUi.scale, selected);
+    for (const option of exportScale?.options || []) {
+      const info = getScaleInfo(exportUi, option.value);
+      option.textContent = scaleLabel(option.value, info);
+      option.disabled = !!info.reason;
     }
+    const busy = exportJobsInFlight > 0;
+    if (exportBtn) {
+      exportBtn.disabled = busy || !!selected.reason;
+      exportBtn.setAttribute("aria-busy", String(busy));
+      const label = busy ? "Exporting…" : exportUi.target === "bake-pack" ? "Download Bake Pack"
+        : exportUi.target === "per-layer" ? "Download Layers" : "Download Snapshot";
+      exportBtn.dataset.i18n = label;
+      exportBtn.textContent = t(label, "ui");
+    }
+    if (quickReexportBtn) quickReexportBtn.disabled = busy || !!selected.reason;
+    if (exportCopyBtn) {
+      const supported = !!globalThis.ClipboardItem && !!globalThis.navigator?.clipboard?.write;
+      const reason = supported ? getScaleInfo(exportUi, exportUi.scale, "composite").reason : "Image clipboard unavailable";
+      exportCopyBtn.disabled = busy || !!reason;
+      exportCopyBtn.title = reason ? t(reason, "ui") : "";
+    }
+    const jpg = exportUi.target === "composite" && exportUi.format === "jpg";
+    if (transparentBackground) {
+      transparentBackground.checked = !jpg && !exportUi.visibility.background;
+      transparentBackground.disabled = jpg;
+    }
+    if (jpegHint) jpegHint.hidden = !jpg;
   };
 
   const renderExportWorkbenchSampleContext = () => {
@@ -654,8 +704,56 @@ function createExportWorkbenchController({
     return startPreviewWork();
   };
 
+  const syncMapTitleFields = (ui) => {
+    const document = exportWorkbenchOverlay?.ownerDocument;
+    const host = document?.getElementById("exportMapTitleFields");
+    if (!host) return;
+    const template = document.getElementById("exportMapTitleField");
+    const labels = { title: "Map title", subtitle: "Subtitle", attribution: "Attribution" };
+    for (const [key, label] of Object.entries(labels)) {
+      let field = host.querySelector(`[data-title-field="${key}"]`);
+      if (!field) {
+        field = template.content.firstElementChild.cloneNode(true);
+        field.dataset.titleField = key;
+        const edit = (patch) => {
+          const current = getExportUi();
+          const before = captureHistoryState({ mapTitles: true });
+          Object.assign(current.mapTitles[key], patch);
+          const updated = commitExportWorkbenchUiState(state, current);
+          const after = captureHistoryState({ mapTitles: true });
+          if (!pushHistoryEntry({ kind: "map-title", before, after })) return;
+          markDirty("map-title");
+          requestRender("map-title");
+          syncMapTitleFields(updated);
+          void renderExportWorkbenchPreview();
+        };
+        field.addEventListener("change", ({ target }) => {
+          edit({ [target.name]: target.type === "checkbox" ? target.checked : target.value });
+        });
+        if (key === "title") {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "btn-secondary";
+          button.dataset.i18n = "Use project name";
+          button.addEventListener("click", () => edit({ enabled: true, text: state.projectName }));
+          field.append(button);
+        }
+        host.append(field);
+      }
+      field.querySelector("legend").textContent = t(label, "ui");
+      for (const node of field.querySelectorAll("[data-i18n]")) node.textContent = t(node.dataset.i18n, "ui");
+      for (const control of field.querySelectorAll("[name]")) {
+        if (control.type === "checkbox") control.checked = ui.mapTitles[key].enabled;
+        else control.value = ui.mapTitles[key][control.name];
+      }
+      const button = field.querySelector("button");
+      if (button) button.disabled = !state.projectName;
+    }
+  };
+
   const syncExportWorkbenchControlsFromState = () => {
     const exportUiState = getExportUi();
+    syncMapTitleFields(exportUiState);
     if (exportTarget) {
       exportTarget.value = exportUiState.target;
     }
@@ -716,19 +814,6 @@ function createExportWorkbenchController({
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
-    if (exportBtn) {
-      const buttonLabel = exportUi.target === "bake-pack"
-        ? t("Download Bake Pack", "ui")
-        : exportUi.target === "per-layer"
-          ? t("Download Layers", "ui")
-          : t("Download Snapshot", "ui");
-      exportBtn.dataset.i18n = exportUi.target === "bake-pack"
-        ? "Download Bake Pack"
-        : exportUi.target === "per-layer"
-          ? "Download Layers"
-          : "Download Snapshot";
-      exportBtn.textContent = buttonLabel;
-    }
     if (!isOpen) {
       exportWorkbenchPreviewRenderToken += 1;
       previewSession += 1;
@@ -758,60 +843,80 @@ function createExportWorkbenchController({
     }));
   };
 
-  const handleExportAction = async () => {
-    if (exportJobsInFlight >= exportMaxConcurrentJobs) {
-      showToast(
-        t("An export is already in progress. Wait for it to finish before starting another export.", "ui"),
-        { title: t("Export queue is full", "ui"), tone: "warning", duration: 4200 }
-      );
+  const handleExportAction = async ({ copy = false } = {}) => {
+    if (exportJobsInFlight >= exportMaxConcurrentJobs) return;
+    const ui = getExportUi();
+    const scale = Number(ui.scale);
+    const target = copy ? "composite" : ui.target;
+    const { reason } = getScaleInfo(ui, scale, target);
+    if (reason) {
+      showToast(t(reason, "ui"), { tone: "warning" });
       return;
     }
-    exportJobsInFlight += 1;
+    const stage = key => {
+      if (exportJobStatus) exportJobStatus.textContent = t(key, "ui");
+    };
+    exportJobsInFlight++;
+    syncExportSectionSummary();
+    if (exportJobStatus) exportJobStatus.hidden = false;
+    if (exportWorkbenchPreviewState) exportWorkbenchPreviewState.hidden = true;
+    stage("Preparing export data…");
+    const showStage = async key => {
+      stage(key);
+      if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden")) {
+        await new Promise(resolve => requestPreviewFrame(() => setTimeout(resolve, 0)));
+      }
+    };
+    const rendering = () => showStage("Rendering map…");
+    const encoding = () => showStage("Encoding image…");
     try {
-      let exportUi = syncExportWorkbenchControlsFromState();
-      const scaleMultiplier = getSelectedExportScale();
-      setExportOutputState(state, { scale: String(scaleMultiplier) });
-      exportUi = getExportUi();
-      const extension = exportUi.target === "per-layer" || exportUi.target === "bake-pack"
-        ? "png"
-        : (exportUi.format === "jpg" ? "jpg" : "png");
-      if (exportUi.target === "composite") {
-        setExportOutputState(state, { format: extension });
-        exportUi = getExportUi();
-      }
-      const exportTargetKind = exportUi.target;
-      if (exportTargetKind === "per-layer") {
-        const layerPackage = await buildPerLayerExportPackage(exportUi, scaleMultiplier);
-        triggerBlobDownload(layerPackage.blob, layerPackage.extension, layerPackage.fileStem);
-        showToast(t("Layer package downloaded.", "ui"), {
-          title: t("Layer package exported", "ui"),
-          tone: "success",
-        });
-      } else if (exportTargetKind === "bake-pack") {
-        const bakePackage = await buildBakePackPackage(exportUi, scaleMultiplier);
-        triggerBlobDownload(bakePackage.blob, bakePackage.extension, bakePackage.fileStem);
-        renderExportWorkbenchUi(true);
-        showToast(t("Bake package downloaded.", "ui"), {
-          title: t("Bake pack exported", "ui"),
-          tone: "success",
-        });
+      let message, title;
+      if (target === "composite") {
+        const canvas = buildCompositeExportCanvas(ui, scale, rendering);
+        if (copy) {
+          const png = canvas.then(async image => {
+            await encoding();
+            return encodeExportCanvas(image, "image/png");
+          });
+          const [image, clipboard] = await Promise.allSettled([
+            png, navigator.clipboard.write([new ClipboardItem({ "image/png": png })]),
+          ]);
+          if (image.status === "rejected") throw image.reason;
+          if (clipboard.status === "rejected") throw createExportError("clipboard-failed", "Clipboard write failed.");
+          message = "Image copied. Paste it into a chat.";
+        } else {
+          const image = await canvas;
+          await encoding();
+          await triggerCanvasDownload(image, ui.format, "map_snapshot");
+          title = "Snapshot exported";
+          message = "Map snapshot downloaded.";
+        }
       } else {
-        const exportCanvas = await buildCompositeExportCanvas(exportUi, scaleMultiplier);
-        triggerCanvasDownload(exportCanvas, extension, "map_snapshot");
-        showToast(t("Map snapshot downloaded.", "ui"), {
-          title: t("Snapshot exported", "ui"),
-          tone: "success",
-        });
+        const bake = target === "bake-pack";
+        await rendering();
+        const bundle = await (bake ? buildBakePackPackage : buildPerLayerExportPackage)(ui, scale, encoding);
+        triggerBlobDownload(bundle.blob, bundle.extension, bundle.fileStem);
+        if (bake && exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden")) renderExportWorkbenchBakeArtifactList();
+        title = bake ? "Bake pack exported" : "Layer package exported";
+        message = bake ? "Bake package downloaded." : "Layer package downloaded.";
       }
+      showToast(t(message, "ui"), { title: title ? t(title, "ui") : "", tone: "success", actionLabel: t("Adjust settings", "ui"), onAction: openSettings });
     } catch (error) {
-      console.error("Snapshot export failed:", error);
       showExportFailureToast(error);
     } finally {
-      exportJobsInFlight = Math.max(0, exportJobsInFlight - 1);
+      exportJobsInFlight--;
+      if (exportJobStatus) exportJobStatus.hidden = true;
+      if (exportWorkbenchPreviewState) exportWorkbenchPreviewState.hidden = false;
+      syncExportSectionSummary();
     }
   };
 
   const bindExportWorkbenchEvents = () => {
+    registerRuntimeHook(state, "refreshExportMapTitlesFn", () => {
+      if (exportWorkbenchOverlay?.getAttribute("aria-hidden") !== "false") return;
+      syncMapTitleFields(getExportUi());
+      void renderExportWorkbenchPreview();
+    });
     if (exportWorkbenchCloseBtn && !exportWorkbenchCloseBtn.dataset.bound) {
       exportWorkbenchCloseBtn.addEventListener("click", () => {
         onRequestClose?.({ restoreFocus: true });
@@ -929,16 +1034,30 @@ function createExportWorkbenchController({
       exportWorkbenchClearBakeBtn.dataset.bound = "true";
     }
 
+    if (transparentBackground && !transparentBackground.dataset.bound) {
+      transparentBackground.addEventListener("change", () => {
+        setExportVisibilityState(state, "background", !transparentBackground.checked);
+        renderExportWorkbenchUi(true);
+      });
+      transparentBackground.dataset.bound = "true";
+    }
+    for (const button of [quickReexportBtn, exportCopyBtn]) {
+      if (!button || button.dataset.bound) continue;
+      button.addEventListener("click", () => handleExportAction({ copy: button === exportCopyBtn }));
+      button.dataset.bound = "true";
+    }
     if (exportBtn && !exportBtn.dataset.bound) {
       exportBtn.addEventListener("click", async () => {
         await handleExportAction();
       });
+      globalThis.window?.addEventListener("resize", () => requestPreviewFrame(syncExportSectionSummary));
       exportBtn.dataset.bound = "true";
     }
   };
 
   return {
     bindExportWorkbenchEvents,
+    handleExportAction,
     ensureExportWorkbenchUiState: getExportUi,
     renderExportWorkbenchBakeArtifactList,
     renderExportWorkbenchLayerList,

@@ -13,6 +13,7 @@ import { restoreProjectImportFields as restoreAppearanceVisibilityImportFields }
 import { restoreProjectImportFields as restoreAppearanceReferenceImportFields } from "../state/actions/appearance_reference_actions.js";
 import { restoreProjectImportFields as restoreTransportImportFields } from "../state/actions/transport_actions.js";
 import { restoreProjectImportFields as restoreRendererInteractionImportFields } from "../state/actions/renderer_interaction_actions.js";
+import { patchLegendState } from "../state/actions/legend_actions.js";
 import { applyProjectImportPatch } from "../state/actions/project_import_actions.js";
 
 import {
@@ -51,7 +52,13 @@ export async function prepareImportedProjectState({
   getScenarioResourcesModule,
   getScenarioManagerModule,
 }) {
-  const scenarioImportAudit = await resolveScenarioImportAudit(data, ui, getScenarioResourcesModule);
+  const original = data;
+  const validation = data.scenario?.id
+    ? await (await getScenarioResourcesModule()).validateImportedScenarioBaseline(data.scenario) : null;
+  if (validation && !validation.ok && validation.reason !== "baseline_mismatch") {
+    await resolveScenarioImportAudit(data, ui, validation, 0);
+  }
+  const unmatched = new Map();
   debugState.importPhase = "validated";
   await waitForScenarioApplyIdle();
   await waitForStartupReadonlyUnlock();
@@ -79,8 +86,12 @@ export async function prepareImportedProjectState({
     landData: scenarioImportValidFeatureIds ? null : state.landData,
     validFeatureIds: scenarioImportValidFeatureIds,
     scenarioManifest: preparedScenario?.bundle?.manifest || null,
+    onDiscard: (featureId, targetIds) => unmatched.set(featureId, {
+      featureId, targetIds, color: original.visualOverrides?.[featureId] || null,
+    }),
     onMigration: (summary) => { migrationSummary = summary; },
   });
+  const scenarioImportAudit = await resolveScenarioImportAudit(original, ui, validation, unmatched.size);
   debugState.importPhase = "migration-done";
   return {
     data,
@@ -92,20 +103,18 @@ export async function prepareImportedProjectState({
       scenarioId: String(scenarioState.activeScenarioId || ""),
       scenarioName: String(scenarioState.activeScenarioManifest?.display_name || scenarioState.activeScenarioId || ""),
       restoredColorEntries: Object.keys(data.visualOverrides || {}).length,
-      restoredOwnershipEntries: 0,
+      unmatchedRegions: [...unmatched.values()],
       ignoredEntries: migrationSummary?.ignoredEntries ?? null,
       migratedEntries: migrationSummary?.migratedEntries ?? 0,
     },
   };
 }
 
-async function resolveScenarioImportAudit(data, ui, getScenarioResourcesModule) {
+async function resolveScenarioImportAudit(data, ui, validation, count) {
   let scenarioImportAudit = data.scenario?.importAudit || null;
   if (!data.scenario?.id) {
     return scenarioImportAudit;
   }
-  const { validateImportedScenarioBaseline } = await getScenarioResourcesModule();
-  const validation = await validateImportedScenarioBaseline(data.scenario);
   if (validation.ok) {
     return scenarioImportAudit;
   }
@@ -113,11 +122,9 @@ async function resolveScenarioImportAudit(data, ui, getScenarioResourcesModule) 
     validation.reason === "baseline_mismatch"
       ? await ui.showAppDialog({
           title: ui.t("Scenario Baseline Mismatch", "ui"),
-          message: validation.message,
-          details: ui.t(
-            "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.",
-            "ui"
-          ),
+          message: ui.t("This project uses different map data. Colors will be migrated. {count} regions could not be matched.", "ui")
+            .replace("{count}", count),
+          details: `v${data.scenario.version || 1} → v${validation.currentVersion}\n${data.scenario.baselineHash || "—"} → ${validation.currentBaselineHash || "—"}`,
           confirmLabel: ui.t("Load Anyway", "ui"),
           cancelLabel: ui.t("Cancel Import", "ui"),
           tone: "warning",
@@ -130,7 +137,7 @@ async function resolveScenarioImportAudit(data, ui, getScenarioResourcesModule) 
     error.toastTone = validation.reason === "baseline_mismatch" ? "warning" : "error";
     error.userMessage =
       validation.reason === "missing_scenario"
-        ? validation.message
+        ? ui.t("The saved scenario is unavailable in this version of the map.", "ui")
         : ui.t(
             "Project import cancelled because the saved scenario baseline does not match the current assets.",
             "ui"

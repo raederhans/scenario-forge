@@ -27,6 +27,19 @@ export function createDefaultOperationGraphicsEditorState() {
   };
 }
 
+export const MAP_LABEL_PRESETS = Object.freeze({
+  country: { italic: false, weight: null, color: "", tracking: null },
+  region: { italic: false, weight: 500, color: "#62676b", tracking: 0.32 },
+  sea: { italic: true, weight: 400, color: "#325d85", tracking: 0.16 },
+  terrain: { italic: true, weight: 400, color: "#526c58", tracking: 0.08 },
+  note: { italic: false, weight: 400, color: "", tracking: 0 },
+});
+
+export function replacesCountryLabel(label, currentName) {
+  return Boolean(label.countryCode) && (label.replaceCountryName
+    ?? (!label.text || label.text.toLocaleLowerCase() === currentName.toLocaleLowerCase()));
+}
+
 export function normalizeMapLabel(raw, id) {
   const numberInRange = (value, min, max, fallback) =>
     Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
@@ -42,6 +55,12 @@ export function normalizeMapLabel(raw, id) {
     rotation: numberInRange(raw.rotation, -180, 180, 0),
     tracking: numberInRange(raw.tracking, 0, 1, null),
     uppercase: typeof raw.uppercase === "boolean" ? raw.uppercase : null,
+    replaceCountryName: typeof raw.replaceCountryName === "boolean" ? raw.replaceCountryName : null,
+    preset: Object.hasOwn(MAP_LABEL_PRESETS, raw.preset) ? raw.preset : raw.countryCode ? "country" : "note",
+    italic: raw.italic === true,
+    weight: numberInRange(raw.weight, 100, 900, null),
+    color: /^#[0-9a-f]{6}$/i.test(raw.color) ? raw.color : "",
+    opacity: numberInRange(raw.opacity, 0, 1, null),
     colorMode: ["light", "dark"].includes(raw.colorMode) ? raw.colorMode : "auto",
   };
 }

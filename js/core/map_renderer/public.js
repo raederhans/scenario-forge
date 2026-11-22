@@ -1,3 +1,7 @@
+export { drawMapTitles, hasMapTitles } from "../renderer/map_title_render_owner.js";
+export { drawThematicWgiExportLegend } from "../renderer/thematic_wgi_export_legend.js";
+export { drawPopulationExportLegend } from "../renderer/population_export_legend.js";
+export { drawPoliticalExportLegend, getPoliticalExportLegend } from "../renderer/political_export_legend.js";
 // Stable app/UI facade for map_renderer.
 // Internal bridge and core helper imports stay on ../map_renderer.js this round.
 export {
@@ -7,6 +11,9 @@ export {
   getPoliticalIdRasterDiagnostics,
   getVisibleMapLabels,
   getCountryLabelStatus,
+  convertCountryLabelToMapLabel,
+  freezeVisibleCountryLabels,
+  applyMapLabelStyleToPreset,
   getPlacedMapLabels,
   getCountryLabelReadiness,
   setPoliticalIdRasterTrialEnabled,
@@ -23,6 +30,7 @@ export {
   applyDevMacroFillCurrentOwnerScope,
   applyDevMacroFillCurrentParentGroup,
   applyDevSelectionFill,
+  fillSelectedParcels,
   autoFillMap,
   clearDevSelection,
   removeLastDevSelection,
@@ -77,6 +85,8 @@ export {
   getEffectiveCityCollection,
   getWaterRegionColor,
   rebuildStaticMeshes,
+  isExportRenderOverBudget,
+  getOceanBaseFillColor,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
   ensureBathymetryReadyForExport,
@@ -94,8 +104,11 @@ export {
   focusRiverPaintParentById,
   applyRiverPaintCellById,
   getZoomPercent,
+  panMapByPixels,
   resetZoomToFit,
   setDebugMode,
   setZoomPercent,
   zoomByStep,
 } from "../map_renderer.js";
+export { commitMapLabelMove, deleteMapLabel, placeMapLabel, updateMapLabel } from "../renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+export { syncMapLabelHandles } from "../renderer/map_label_handles_owner.js";

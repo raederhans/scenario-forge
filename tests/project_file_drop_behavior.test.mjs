@@ -38,7 +38,7 @@ test("map shows a project drop hint and imports the dropped file once", () => {
 
   const image = { files: [], items: [{ kind: "file", type: "image/png" }], types: ["Files"] };
   drag("dragover", image);
-  assert.equal(map.dataset.projectDropLabel, undefined);
+  assert.equal(map.dataset.projectDropLabel, "Drop to use as a reference image");
   image.files.push({ name: "map.png", type: "image/png" });
   drag("drop", image);
   const row = { files: [], items: [{ kind: "string", type: "text/plain" }], types: ["text/plain"] };

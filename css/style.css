@@ -5925,17 +5925,16 @@ body.counter-editor-modal-open {
 
 .export-workbench-layer-groups {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: 12px;
-  min-height: 0;
 }
 
 .export-workbench-layer-group {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: 8px;
-  min-height: 0;
 }
 
 .export-workbench-group-header {

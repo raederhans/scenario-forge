@@ -1,3 +1,4 @@
+import { readMapLabelField, syncMapLabelField } from "./strategic_panel_view.js";
 import {
   createUnitCounterCatalog,
 } from "./strategic_overlay/unit_counter_catalog_helper.js";
@@ -11,9 +12,10 @@ import {
   refreshUnitCounterPreviewSection,
 } from "./strategic_overlay/unit_counter_render_helpers.js";
 import { patchStrategicOverlayEditorState } from "../../core/state/actions/strategic_overlay_actions.js";
-import { deleteMapLabel, updateMapLabel } from "../../core/renderer/strategic_overlay_runtime/map_label_runtime_domain.js";
+import { commitMapLabelMove, deleteMapLabel, placeMapLabel, syncMapLabelHandles, updateMapLabel } from "../../core/map_renderer/public.js";
+import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
+import { getCountryNameOverride } from "../../core/country_name_overrides.js";
 import { getLocalizedScenarioCountryName } from "../../core/scenario/scenario_country_display.js";
-import { syncMapLabelHandles } from "../../core/renderer/map_label_handles_owner.js";
 import { loadDefenseLinePresets, buildScenarioDefenseLineEntries } from "../../core/scenario/defense_line_presets.js";
 import { OPERATIONAL_LINE_KIND_LABELS, OPERATION_GRAPHIC_KIND_LABELS } from "./strategic_overlay/type_labels.js";
 
@@ -38,11 +40,18 @@ export function bindMapLabelPanel({ section, state, startPlacement, refresh, foc
   for (const field of section.querySelectorAll("[data-label-field]")) {
     const key = field.dataset.labelField;
     const commit = () => {
-      const value = field.type === "range" ? Number(field.value) : field.value;
+      const value = readMapLabelField(field, state.zoomTransform?.k || 1);
       const patch = { [key]: value };
       if (key === "countryCode") patch.fallbackName = value ? countryName(value) : "";
       if (updateMapLabel(selectedId(), patch)) refresh();
     };
+    if (field.type === "range") field.addEventListener("input", () => {
+      const readout = section.querySelector(`[data-label-readout="${key}"]`);
+      if (readout && key === "size") {
+        const k = state.zoomTransform?.k || 1;
+        syncMapLabelField(readout, { size: readMapLabelField(field, k) }, k);
+      } else if (readout) readout.value = field.value;
+    });
     field.addEventListener(key === "text" ? "blur" : "change", commit);
     if (key === "text") field.addEventListener("keydown", event => {
       if (event.ctrlKey && event.key === "Enter") {
@@ -57,9 +66,27 @@ export function bindMapLabelPanel({ section, state, startPlacement, refresh, foc
   section.querySelector("#mapLabelDelete").addEventListener("click", remove);
   section.ownerDocument.addEventListener("keydown", event => {
     if (!state.strategicOverlayUi.modalOpen || state.strategicOverlayUi.modalSection !== "label" || !selectedId()) return;
-    if (!["Delete", "Backspace"].includes(event.key) || event.target.closest?.("input,textarea,select,[contenteditable=true]")) return;
-    event.preventDefault();
-    remove();
+    if (event.defaultPrevented || event.target.closest?.("input,textarea,[contenteditable=true]")) return;
+    if (event.target !== list && event.target.closest?.("select")) return;
+    const selected = state.mapLabels.find(label => label.id === selectedId());
+    if (!selected) return;
+    const step = 0.1 / (state.zoomTransform?.k || 1);
+    if (event.ctrlKey && event.key.toLowerCase() === "d" && !event.altKey && !event.shiftKey) {
+      event.preventDefault();
+      placeMapLabel({ ...selected, lon: selected.lon + (selected.lon > 0 ? -1 : 1) * step * 5,
+        lat: selected.lat + (selected.lat > 0 ? -1 : 1) * step * 5 });
+      refresh();
+      return;
+    }
+    if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
+    const delta = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[event.key];
+    if (delta) {
+      event.preventDefault();
+      if (commitMapLabelMove(selected.id, selected.lon + delta[0] * step, selected.lat + delta[1] * step)) refresh();
+    } else if (["Delete", "Backspace"].includes(event.key)) {
+      event.preventDefault();
+      remove();
+    }
   });
 }
 
@@ -207,9 +234,12 @@ export function createStrategicOverlayController({
   let defenseLineButton;
   let defenseLineStatus;
   const { mapLabelSection, mapLabelSectionToggle } = elements;
-  const countryName = code => getLocalizedScenarioCountryName(state.scenarioCountriesByTag?.[code],
+  const countryName = code => getCountryNameOverride(state, code) || getLocalizedScenarioCountryName(state.scenarioCountriesByTag?.[code],
     state.countryNames?.[code] || code, name => t(name, "geo"));
   let placingLabel = false;
+  const annotationToggles = mapLabelSection ? mapLabelSection.ownerDocument.querySelectorAll("[data-annotation-view]") : [];
+  const placementHint = mapLabelSection?.ownerDocument.getElementById("mapLabelPlacementHint");
+  const textTool = mapLabelSection?.ownerDocument.getElementById("toolMapTextBtn");
 
   function refreshDefenseLinePresets() {
     if (!defenseLineButton) return;
@@ -422,7 +452,6 @@ export function createStrategicOverlayController({
     if (mapLabelSection) {
       const open = nextIsOpen && section === "label";
       mapLabelSection.hidden = !open;
-      mapLabelSectionToggle.hidden = !nextIsOpen && !document.body.classList.contains("frontline-mode-active");
       syncMapLabelHandles(document.querySelector("#map-svg .map-label-handles"), state);
       mapLabelSectionToggle.textContent = t(open ? "Strategic Annotations" : "Map lettering", "ui");
     }
@@ -444,6 +473,7 @@ export function createStrategicOverlayController({
     refreshDefenseLinePresets();
     const normalizedScopes = normalizeStrategicOverlayRefreshScopes(scopes);
     const annotationView = normalizeAnnotationView(state.annotationView);
+    for (const toggle of annotationToggles) toggle.checked = annotationView[toggle.dataset.annotationView];
     const syncSelectOptions = (selectEl, options, { value, disabled, signatureKey = "optionsSignature" } = {}) => {
       if (!(selectEl instanceof HTMLSelectElement)) {
         return;
@@ -474,9 +504,12 @@ export function createStrategicOverlayController({
       const { selectedId, active } = state.mapLabelEditor;
       const selected = state.mapLabels.find(label => label.id === selectedId);
       const list = mapLabelSection.querySelector("#mapLabelList");
-      syncSelectOptions(list, state.mapLabels.map(label => ({
+      const options = state.mapLabels.map(label => ({
         value: label.id, label: label.text || label.fallbackName || label.countryCode || t("Enter name", "ui"),
-      })), { value: selectedId });
+      }));
+      syncSelectOptions(list, options.length ? options : [{ value: "", label: t("Place a label to start lettering the map.", "ui") }], {
+        value: selectedId, disabled: !options.length,
+      });
       mapLabelSection.querySelector("#mapLabelFields").hidden = !selected;
       if (selected) {
         const countries = state.activeScenarioId ? state.scenarioCountriesByTag : state.sovereignBaseColors;
@@ -486,10 +519,17 @@ export function createStrategicOverlayController({
           { value: "", label: t("None", "ui") },
           ...Array.from(codes).sort().map(code => ({ value: code, label: countryName(code) })),
         ], { value: selected.countryCode });
+        for (const readout of mapLabelSection.querySelectorAll("output[data-label-readout]")) {
+          if (readout !== document.activeElement) readout.value = selected[readout.dataset.labelReadout];
+        }
         for (const field of mapLabelSection.querySelectorAll("[data-label-field]")) {
-          if (field !== document.activeElement) field.value = selected[field.dataset.labelField] ?? 0;
+          if (field !== document.activeElement) {
+            syncMapLabelField(field, selected, state.zoomTransform?.k || 1, state.styleConfig?.countryLabels);
+          }
         }
       }
+      placementHint.hidden = !active;
+      textTool.setAttribute("aria-pressed", String(active));
       if (active !== placingLabel) {
         const surface = document.querySelector("#map-svg .interaction-layer");
         if (surface) surface.style.cursor = active ? "crosshair" : "";
@@ -814,12 +854,27 @@ export function createStrategicOverlayController({
       setStrategicWorkspaceModalState(true, next);
       refreshStrategicOverlayUI();
     });
+    const startPlacement = () => {
+      cancelStrategicEditingModes();
+      document.getElementById("editorLayer-annotations")?.click();
+      setStrategicWorkspaceModalState(true, "label");
+      patchStrategicOverlayEditorState(state, "mapLabelEditor", { active: true });
+      refreshStrategicOverlayUI({ scopes: "workspaceChrome" });
+    };
+    registerRuntimeHook(state, "runMapTextToolFn", startPlacement);
+    textTool.addEventListener("click", () => callRuntimeHook(state, "runMapTextToolFn"));
+    for (const toggle of annotationToggles) {
+      toggle.addEventListener("change", () => {
+        const snapshot = () => captureHistoryState({ strategicOverlay: ["annotationView"] });
+        const before = snapshot();
+        state.annotationView = normalizeAnnotationView({ ...state.annotationView, [toggle.dataset.annotationView]: toggle.checked });
+        pushHistoryEntry({ kind: "annotation-visibility", before, after: snapshot() });
+        markDirty("annotation-visibility");
+        render();
+      });
+    }
     bindMapLabelPanel({ section: mapLabelSection, state, countryName, focusGeoBounds: mapRenderer.focusGeoBounds,
-      refresh: refreshStrategicOverlayUI, startPlacement: () => {
-        cancelStrategicEditingModes();
-        patchStrategicOverlayEditorState(state, "mapLabelEditor", { active: true });
-        refreshStrategicOverlayUI();
-      } });
+      refresh: refreshStrategicOverlayUI, startPlacement });
     mapLabelSection.dataset.bound = "true";
   }
   if (strategicOverlayOpenWorkspaceBtn && !strategicOverlayOpenWorkspaceBtn.dataset.bound) {

@@ -1,14 +1,18 @@
+import { t } from "../i18n.js";
+import { getRiverPartitionIndex } from "../river_paint/partition_model.js";
 import { getMapDataBoundary } from "../map_data_boundary.js";
 import { createQuickFillHierarchyResolver, normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
 
 // Owns fill target policy decisions; inputs remain live.
 export function createFillTargetPolicy(runtimeState, {
+  getColorAdjacency, getFeaturePaintColor, getVisibleFeatureIds,
   getAdmin1Group,
   getFeatureCountryCodeNormalized,
   getFeatureInteractionCountryCodeNormalized,
   shouldExcludePoliticalInteractionFeature,
 }) {
   const hierarchy = createQuickFillHierarchyResolver(runtimeState, {
+    getColorAdjacency, getFeaturePaintColor, getVisibleFeatureIds,
     getAdmin1Group, getFeatureCountryCodeNormalized,
     getFeatureInteractionCountryCodeNormalized, shouldExcludePoliticalInteractionFeature,
   });
@@ -54,14 +58,32 @@ export function createFillTargetPolicy(runtimeState, {
     return true;
   }
 
-  function resolveQuickFillPlan(feature, featureId, scope = runtimeState.batchFillScope) {
-    return hierarchy.resolve(feature, featureId, scope);
+  function resolveQuickFillPlan(feature, featureId, scope = runtimeState.batchFillScope, seedColor) {
+    return hierarchy.resolve(feature, featureId, scope, seedColor);
   }
 
-  function buildDoubleClickBatchPlan(feature, featureId) {
+  function unprotectedIds(ids) {
+    if (!runtimeState.onlyUnpainted) return ids;
+    const river = runtimeState.riverPaint;
+    const parents = getRiverPartitionIndex(river?.pack)?.parents;
+    return ids.filter(id => !Object.hasOwn(runtimeState.visualOverrides || {}, id)
+      && !parents?.get(id)?.cells.some(cell => Object.hasOwn(river.overrides, cell.id)));
+  }
+
+  function usesVisibleColorFallback(id) {
+    const adjacency = getColorAdjacency(id);
+    return !adjacency || !Array.isArray(adjacency.graph[adjacency.index ?? adjacency.ids.indexOf(id)]);
+  }
+
+  function getGestureScope(event) {
+    if (event?.shiftKey) return "country";
+    if (runtimeState.brushPanModifierActive) return "parent";
+    return normalizeQuickFillScope(runtimeState.batchFillScope);
+  }
+
+  function buildDoubleClickBatchPlan(feature, featureId, requestedScope = normalizeQuickFillScope(runtimeState.batchFillScope), seedColor) {
     if (!isBatchFillDoubleClickBaseEligible({ id: featureId }, feature)) return null;
-    const requestedScope = normalizeQuickFillScope(runtimeState.batchFillScope);
-    let resolution = resolveQuickFillPlan(feature, featureId, requestedScope);
+    let resolution = resolveQuickFillPlan(feature, featureId, requestedScope, seedColor);
     let fallbackToCountry = false;
     if (requestedScope === "parent" && resolution.status === "no_parent_level") {
       resolution = resolveQuickFillPlan(feature, featureId, "country");
@@ -69,19 +91,25 @@ export function createFillTargetPolicy(runtimeState, {
     }
     if (resolution.status !== "ready" || !resolution.targetIds.length) return null;
     const country = requestedScope === "country" || fallbackToCountry;
+    const targetIds = unprotectedIds(resolution.targetIds);
     return {
-      targetIds: resolution.targetIds,
+      targetIds,
+      ...(requestedScope === "color" ? { matchingIds: resolution.targetIds } : {}),
+      ...(resolution.visibleColorFallback ? { visibleColorFallback: true } : {}),
+      ...(runtimeState.onlyUnpainted ? { skippedCount: resolution.targetIds.length - targetIds.length } : {}),
       kind: country ? "fill-country-batch" : "fill-parent-group",
       dirtyReason: country ? "fill-country-batch" : "fill-parent-group",
       fallbackToCountry,
-      groupLabel: requestedScope.startsWith("level:") ? resolution.label : null,
+      groupLabel: requestedScope === "color"
+        ? t(resolution.visibleColorFallback ? "Matching parcels in view" : "Connected parcels of the same color", "ui")
+        : requestedScope.startsWith("level:") ? resolution.label : null,
     };
   }
 
-  function isDoubleClickBatchEligible(hit, feature) {
+  function isDoubleClickBatchEligible(hit, feature, event) {
     if (!isBatchFillDoubleClickBaseEligible(hit, feature)) return false;
-    return !!buildDoubleClickBatchPlan(feature, hit.id);
+    return !!buildDoubleClickBatchPlan(feature, hit.id, getGestureScope(event));
   }
 
-  return Object.freeze({ resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isBatchFillDoubleClickBaseEligible, isDoubleClickBatchEligible });
+  return Object.freeze({ getGestureScope, unprotectedIds, usesVisibleColorFallback, resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isBatchFillDoubleClickBaseEligible, isDoubleClickBatchEligible });
 }

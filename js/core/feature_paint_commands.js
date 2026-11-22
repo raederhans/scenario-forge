@@ -22,7 +22,9 @@ export function commitFeaturePaint(batches, {
   const featureIds = [...paints.keys()];
   if (!featureIds.length) return { featureIds, changed: 0 };
 
-  const before = captureHistoryState({ featureIds });
+  const historyIds = gesture?.type === "double-click" && gesture.leadingClickTimeStamp && state.onlyUnpainted
+    ? [...featureIds, gesture.featureId] : featureIds;
+  const before = captureHistoryState({ featureIds: historyIds });
   // Last batch wins for overlapping targets. Apply each color as a batch so
   // parent/river cleanup is not repeated once per feature on large fills.
   const idsByColor = new Map();
@@ -33,7 +35,7 @@ export function commitFeaturePaint(batches, {
   for (const [color, ids] of idsByColor) {
     applyFeaturePaintState(state, ids, color, { remove: color === null });
   }
-  const after = captureHistoryState({ featureIds });
+  const after = captureHistoryState({ featureIds: historyIds });
   const changed = featureIds.filter((id) => before.visualOverrides[id] !== after.visualOverrides[id]).length;
   // A parent color can stay equal while its river-cell overrides are cleared.
   // Map/inspector clicks retain their existing feedback for unchanged edits;

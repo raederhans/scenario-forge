@@ -1,3 +1,4 @@
+import { normalizeHexColor } from "./color_hex_utils.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 // Semantic quick-fill membership. No rendering thresholds, DOM, or state writes.
 // Hierarchy payloads are immutable snapshots; replacing a snapshot invalidates the index.
@@ -13,7 +14,7 @@ const unique = (values) => Array.from(new Set((Array.isArray(values) ? values : 
 
 export function normalizeQuickFillScope(value) {
   const scope = text(value);
-  return scope === "country" || /^level:[a-z][a-z0-9_]{0,39}$/.test(scope) ? scope : "parent";
+  return scope === "color" || scope === "country" || /^level:[a-z][a-z0-9_]{0,39}$/.test(scope) ? scope : "parent";
 }
 
 function newLevel(label = "Parent", status = "complete") {
@@ -101,6 +102,7 @@ function getDistrictIndex(payload) {
 const result = (status, extra = {}) => ({ status, targetIds: [], ...extra });
 
 export function createQuickFillHierarchyResolver(state, {
+  getColorAdjacency, getFeaturePaintColor, getVisibleFeatureIds,
   getAdmin1Group,
   getFeatureCountryCodeNormalized,
   shouldExcludePoliticalInteractionFeature,
@@ -152,10 +154,34 @@ export function createQuickFillHierarchyResolver(state, {
     return admitMembers(group.members, feature, id, { ...metadata, groupId: key, label: group.label });
   }
 
-  function resolve(feature, id, requestedScope = state.batchFillScope) {
+  function resolveColor(id, seedColor) {
+    const normalizeColor = value => normalizeHexColor(value) || value.toLowerCase();
+    const color = normalizeColor(seedColor ?? getFeaturePaintColor(id));
+    const matches = candidate => !excluded(state.landIndex.get(candidate), candidate)
+      && normalizeColor(getFeaturePaintColor(candidate)) === color;
+    const adjacency = getColorAdjacency(id);
+    const start = adjacency?.index ?? adjacency?.ids.indexOf(id) ?? -1;
+    if (start < 0 || !Array.isArray(adjacency.graph[start])) {
+      const targetIds = [id, ...getVisibleFeatureIds().filter(candidate => candidate !== id && matches(candidate))];
+      return result("ready", { targetIds, visibleColorFallback: true });
+    }
+    const queue = [start];
+    const visited = new Set(queue);
+    for (let i = 0; i < queue.length; i++) {
+      for (const next of adjacency.graph[queue[i]] || []) {
+        if (visited.has(next)) continue;
+        visited.add(next);
+        if (matches(adjacency.ids[next])) queue.push(next);
+      }
+    }
+    return result("ready", { targetIds: queue.map(index => adjacency.ids[index]) });
+  }
+
+  function resolve(feature, id, requestedScope = state.batchFillScope, seedColor) {
     if (!id || !state.landIndex?.has(id)) return result("loading");
     if (excluded(feature, id)) return result("excluded");
     const scope = normalizeQuickFillScope(requestedScope);
+    if (scope === "color") return resolveColor(id, seedColor);
     const countryCode = code(getFeatureCountryCodeNormalized(feature));
     const scenario = usesScenarioGroups() ? text(state.activeScenarioId) : "";
     const metadata = { scope, countryCode, ownerTag: scenario ? owner(id) : "" };
