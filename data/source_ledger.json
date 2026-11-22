@@ -686,5 +686,22 @@
     "status": "frozen_verified",
     "local_presence": "required",
     "description": "Provenance mirror; original source raster is an optional .runtime cache, not a browser asset."
+  },
+  {
+    "source_id": "ristat_districts_1897",
+    "local_path": "data/scenario-rules/rcw.sources/units_1897.geojson",
+    "local_presence": "required",
+    "origin_kind": "manual_import",
+    "upstream_url": "https://doi.org/10.34894/NQOASN",
+    "immutable_ref": "districts.gpkg sha256:063ffa41856ac5bbbe44d1c2f0d023574fb315f612fef58210f0f34e9254260a",
+    "current_local_sha256": "88073da32297c732314ff6b037ea12f50fe44edfa944ec32a157ab8b4f9f1053",
+    "license": "CC0",
+    "citation": "Kessler & Markevich, Electronic Repository of Russian Historical Statistics, doi:10.34894/NQOASN",
+    "consumers": [
+      "tools/build_regional_scenario.py"
+    ],
+    "rebuild_command": "python tools/prepare_rcw_sources.py",
+    "provenance_sidecar": "data/scenario-rules/rcw.sources/units_1897.provenance.json",
+    "status": "frozen_verified"
   }
 ]

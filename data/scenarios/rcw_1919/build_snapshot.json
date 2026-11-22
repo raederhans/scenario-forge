@@ -1,0 +1,24 @@
+{
+  "scenario_id": "rcw_1919",
+  "profile": "lightweight_base",
+  "contract_version": "2026-05-01.v1",
+  "builder_version": "scenario-data-governance-v1",
+  "input_sha": {
+    "capital_hints.json": "1d2b669b804fcd46c855178827b217db3afe74b873f130766a7c2a42f3d38b5a",
+    "city_overrides.json": "b58f47fdd7e2d2c6f0ffa31df90e66f0c96153043a8e0b3864251b05eef6017d",
+    "cores.by_feature.json": "d40ea52c06d6c56d8cefe7825666e3e18d7736b779db8b104de32448ddd64816",
+    "countries.json": "8e37a8a584be9bcee4b5f7e45990500aca394afd395c826354880d84a6d44ccb",
+    "owners.by_feature.json": "ec34636948b42d7e771620f976b9931a0fe65dcb39ae7e3a458374017f827ffa",
+    "runtime_topology.topo.json": "282624779e90d3398a0bbacb302771efbcec809da7a66a9cc3c046c7d4150aab",
+    "special_zone_layers.json": "b60e37e342741112d31c80baadb2cbeb062a09ffb88444976aa64537c6338dec"
+  },
+  "output_sha": {},
+  "feature_count": 4673,
+  "water_count": 0,
+  "chunk_count": 0,
+  "snapshot_fingerprint": "b2afef6317eeed908af4233ec6b2da5794aa4a17e6dab303f0633fedd4fd30aa",
+  "generated_at": "2026-11-22T00:00:00Z",
+  "environment": {},
+  "durations": {},
+  "report_paths": {}
+}
