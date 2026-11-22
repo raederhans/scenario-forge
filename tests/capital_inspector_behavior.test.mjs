@@ -16,6 +16,7 @@ function scene(ctx, tag) {
   const owners = { port: "P01", east: "AA", west: "AA" };
   const countries = { AA: { code: "AA" }, P01: { code: "P01", project_country: true } };
   Object.assign(state, {
+    landIndex: new Map(Object.keys(owners).map(id => [id, { id }])),
     activeScenarioId: "sample", currentLanguage: "zh", selectedInspectorCountryCode: tag,
     scenarioCountriesByTag: countries, sovereigntyByFeatureId: { port: "AA", east: "AA", west: "AA" },
     scenarioCityOverridesData: { capitals_by_tag: { AA: "old" } },

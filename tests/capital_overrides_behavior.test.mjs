@@ -127,9 +127,9 @@ test("a river city uses its cell even outside river editing mode", async t => {
   assert.equal(visibility.isCapitalVisible(city("old")), false);
 });
 
-test("a free project capital follows the last surviving territory of its country", () => {
+test("a project capital follows its host while the country loses territory", () => {
   const { state, city, visibility, options } = fixture();
-  const id = addProjectCity(state, { name: { en: "Free" }, lon: 0, lat: 0 });
+  const id = addProjectCity(state, { name: { en: "Town" }, lon: 0, lat: 0, hostFeatureId: "N" });
   assert.equal(setCapitalOverride(state, "AA", id, options), true);
   state.visualOverrides.P = "#bbbbbb";
   assert.equal(visibility.isCapitalVisible(city(id)), true);

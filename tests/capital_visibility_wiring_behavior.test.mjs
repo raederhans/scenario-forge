@@ -31,7 +31,7 @@ test("capital markers and hover text follow occupation, recovery, uniform recolo
     worldCitiesData: { features: [{ type: "Feature", id: "old",
       properties: { name: "Old", __city_id: "old", __city_host_feature_id: "seat", __city_settlement_rank: "large" },
       geometry: { type: "Point", coordinates: [10, 10] } }] },
-    projectCities: [{ id: "new", name: { en: "New", zh: "New" }, lon: 40, lat: 10, tier: "major" }],
+    projectCities: [{ id: "new", name: { en: "New", zh: "New" }, lon: 40, lat: 10, hostFeatureId: "province", tier: "major" }],
   };
   const resolve = createBorderIdentityResolver({
     sovereignBaseColors: () => state.sovereignBaseColors,
@@ -74,7 +74,7 @@ test("capital markers and hover text follow occupation, recovery, uniform recolo
   state.capitalOverrides = { AA: { cityId: "new" } };
   visited.length = 0;
   drawAndCheck(40);
-  assert.deepEqual(visited, ["foreign", "seat"]);
+  assert.deepEqual(visited, ["province"]);
   visited.length = 0;
   drawAndCheck(40);
   assert.deepEqual(visited, []);
