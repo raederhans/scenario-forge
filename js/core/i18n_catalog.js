@@ -5144,6 +5144,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "取特殊区域成员交集",
     "en": "Intersect zone members"
   },
+  "Invalid colors: {count}": {
+    "zh": "无效颜色：{count}",
+    "en": "Invalid colors: {count}"
+  },
   "Invalid project file. Please select a valid map_project.json.": {
     "zh": "项目文件无效，请选择有效的 map_project.json。",
     "en": "Invalid project file. Please select a valid map_project.json."
@@ -6382,6 +6386,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Middle East": {
     "zh": "中东",
     "en": "Middle East"
+  },
+  "Migrated parcels: {count}": {
+    "zh": "已迁移的地块：{count}",
+    "en": "Migrated parcels: {count}"
   },
   "Migrated {updated} entries. Could not match {count} regions.": {
     "zh": "已迁移 {updated} 处记录，{count} 个地块无法对应。",
@@ -10430,6 +10438,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "跳转到地图工作区",
     "en": "Skip to map workspace"
   },
+  "Skipped": {
+    "zh": "已跳过",
+    "en": "Skipped"
+  },
+  "Skipped parcels: {count}": {
+    "zh": "跳过的地块：{count}",
+    "en": "Skipped parcels: {count}"
+  },
   "Skipped {count} already painted parcels.": {
     "zh": "已跳过 {count} 个已涂色的地块。",
     "en": "Skipped {count} already painted parcels."
@@ -11268,6 +11284,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "The live slice stays on motorway, trunk, primary, and dedicated reference labels. Links are carried for review but stay filtered by default.": {
     "zh": "当前 live 预览聚焦高速公路、主干道、一级道路和独立参考标签。连接线会保留给审查使用，但默认继续过滤。",
     "en": "The live slice stays on motorway, trunk, primary, and dedicated reference labels. Links are carried for review but stay filtered by default."
+  },
+  "The map changed. Review the updated merge report.": {
+    "zh": "地图已更改，请重新核对合并报告。",
+    "en": "The map changed. Review the updated merge report."
   },
   "The map is ready for a composite image, per-layer PNG set, or bake pack handoff.": {
     "zh": "地图已经准备好输出为合成图片、分层 PNG 或 bake pack 交接包时使用。",
@@ -12416,6 +12436,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "WGI thematic layer is off.": {
     "zh": "WGI 图层已关闭。",
     "en": "WGI thematic layer is off."
+  },
+  "Wait for the scenario to finish loading.": {
+    "zh": "请等待剧本加载完成。",
+    "en": "Wait for the scenario to finish loading."
   },
   "Waiting for airports Japan pack": {
     "zh": "等待机场日本包",

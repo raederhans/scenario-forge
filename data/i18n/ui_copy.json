@@ -1,4 +1,28 @@
 {
+  "Wait for the scenario to finish loading.": {
+    "en": "Wait for the scenario to finish loading.",
+    "zh": "请等待剧本加载完成。"
+  },
+  "The map changed. Review the updated merge report.": {
+    "en": "The map changed. Review the updated merge report.",
+    "zh": "地图已更改，请重新核对合并报告。"
+  },
+  "Skipped parcels: {count}": {
+    "en": "Skipped parcels: {count}",
+    "zh": "跳过的地块：{count}"
+  },
+  "Migrated parcels: {count}": {
+    "en": "Migrated parcels: {count}",
+    "zh": "已迁移的地块：{count}"
+  },
+  "Invalid colors: {count}": {
+    "en": "Invalid colors: {count}",
+    "zh": "无效颜色：{count}"
+  },
+  "Skipped": {
+    "en": "Skipped",
+    "zh": "已跳过"
+  },
   "Map index is not ready.": {
     "en": "Map index is not ready.",
     "zh": "地图索引尚未就绪。"
