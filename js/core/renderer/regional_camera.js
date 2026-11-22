@@ -49,6 +49,44 @@ export function fitRegionalProjection(projection, region, width, height) {
   return [[x + scale * x0, y + scale * y0], [x + scale * x1, y + scale * y1]];
 }
 
+export function regionalScreenBounds([[x0, y0], [x1, y1]], { x, y, k }) {
+  return [[x + k * x0, y + k * y0], [x + k * x1, y + k * y1]];
+}
+
+const exportFrames = new WeakMap();
+
+export function getCanvasExportFrame(canvas) {
+  return exportFrames.get(canvas);
+}
+
+export function createMapExportCanvas(documentRef, width, height, frame) {
+  const canvas = documentRef.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  if (!frame) return canvas;
+  exportFrames.set(canvas, frame);
+  const [[x0, y0], [x1, y1]] = frame.bounds;
+  const scaleX = canvas.width / frame.viewportWidth;
+  const scaleY = canvas.height / frame.viewportHeight;
+  const left = Math.round(x0 * scaleX);
+  const top = Math.round(y0 * scaleY);
+  const rectWidth = Math.round(x1 * scaleX) - left;
+  const rectHeight = Math.round(y1 * scaleY) - top;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+  ctx.save();
+  ctx.fillStyle = frame.oceanFill;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+  // The initial clip also applies to annotations painted after the pass composite.
+  ctx.beginPath();
+  ctx.rect(left, top, rectWidth, rectHeight);
+  ctx.clip();
+  ctx.clearRect(left, top, rectWidth, rectHeight);
+  ctx.beginPath();
+  return canvas;
+}
+
 export function constrainRegionalTransform(transform, bounds, width, height, maxScale, identity) {
   if (!bounds) return transform;
   if (transform.k <= 1) return identity;

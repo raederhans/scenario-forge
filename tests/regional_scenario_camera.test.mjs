@@ -16,6 +16,9 @@ import { createGeometryRasterProjection } from "../js/core/renderer/geometry_ras
 import { getProjectionGeometryGeneration } from "../js/core/renderer/projection_geometry_identity.js";
 import { createPoliticalIdRasterCoordinateSpace } from "../js/core/renderer/political_id_raster_coordinates.js";
 import { createProjectionInverseParams, invertProjectedPoint } from "../js/core/renderer/bathymetry_texture_math.js";
+import { createMapExportCanvas } from "../js/core/renderer/regional_camera.js";
+import { createCachedPassCompositorOwner } from "../js/core/renderer/cached_pass_compositor_owner.js";
+import { createExportBakeRuntime } from "../js/ui/toolbar/export_bake_runtime.js";
 
 const require = createRequire(import.meta.url);
 const d3 = require("../vendor/d3.v7.min.js");
@@ -320,4 +323,100 @@ test("global camera and opening behavior persist through full refresh, clear and
   refresh();
   assert.notEqual(getProjectionGeometryGeneration(f.projection), before);
   assertBoxVisible(f, dateline);
+});
+
+function recordingExportCanvas() {
+  let path, clip = null;
+  const stack = [], draws = [];
+  const ctx = {
+    save() { stack.push([clip, this.fillStyle]); },
+    restore() { [clip, this.fillStyle] = stack.pop(); },
+    beginPath() { path = null; },
+    rect(...rect) { path = rect; },
+    clip() { clip = path; },
+    fillRect(...rect) { draws.push({ kind: "fill", color: this.fillStyle, rect, clip }); },
+    clearRect(...rect) { draws.push({ kind: "clear", rect, clip }); },
+    drawImage(image) { draws.push({ kind: "image", image, clip, filter: this.filter }); },
+    setTransform: noop, measureText: () => ({ width: 60 }),
+    fillText() { draws.push({ kind: "text", clip }); },
+  };
+  return { draws, getContext: () => ctx };
+}
+
+test("regional export frame clips cached passes, target-resolution passes and subsequent overlay draws", async () => {
+  const f = fixture(440, 900);
+  const { state } = f;
+  const document = { createElement: recordingExportCanvas };
+  const ocean = "#19568b";
+  const getExportFrame = () => f.fit.getExportFrame(() => ocean);
+  const passes = { background: { id: "background" }, labels: { id: "labels" } };
+  const compositor = createCachedPassCompositorOwner({
+    constants: { renderPassNames: Object.keys(passes) },
+    getters: {
+      getActiveTargetContext: noop, getRenderPhase: () => "idle", isRenderDiagnosticsEnabled: () => false,
+      getRenderPassCacheSnapshot: () => ({ canvases: passes }),
+      getRenderPassLayout: () => ({ offsetX: 0, offsetY: 0 }),
+      getPassReferenceTransform: () => state.zoomTransform, getDpr: () => state.dpr,
+    },
+    helpers: { cloneZoomTransform: t => t, areZoomTransformsEquivalent: (a, b) => a === b },
+    effects: { recordTransformedPassDiagnostics: noop },
+  });
+  const runtime = createExportBakeRuntime({
+    state, document, getExportFrame, renderPassNames: Object.keys(passes),
+    ...effects("ensureScenarioPoliticalDetailForExport ensurePaintContoursReady ensureCountryLabelsReadyForExport ensureBathymetryReadyForExport"),
+    renderExportPassesToCanvas(names, { pixelRatio }) {
+      const ratio = pixelRatio ?? state.dpr;
+      const canvas = createMapExportCanvas(document, Math.round(state.width * ratio), Math.round(state.height * ratio), getExportFrame());
+      const result = compositor.composeRenderPassesToTarget(canvas.getContext("2d"), names, state.zoomTransform,
+        { requireAllPasses: pixelRatio !== undefined });
+      assert.equal(result.ok, true);
+      return canvas;
+    },
+  });
+  const ui = { textVisibility: { "render-labels": true }, adjustments: { brightness: 140 },
+    mapTitles: { title: { enabled: true, text: "Russia", position: "top-center" } } };
+  state.dpr = 1.5;
+  for (const active of [manifest, null]) {
+    f.activate(active);
+    f.commands.setZoomPercent(125);
+    f.rect.call(f.zoom.translateBy, 20, 5);
+    function expectedClip(canvas) {
+      if (!active) return null;
+      const { bounds } = manifest.region;
+      const [x0, y1] = f.screen([bounds[0], bounds[1]]);
+      const [x1] = f.screen([bounds[2], bounds[1]]);
+      const [, y0] = f.screen([bounds[0], bounds[3]]);
+      const left = Math.round(x0 * canvas.width / state.width), top = Math.round(y0 * canvas.height / state.height);
+      assert.ok(top > 0 && y1 < state.height);
+      return [left, top, Math.round(x1 * canvas.width / state.width) - left, Math.round(y1 * canvas.height / state.height) - top];
+    }
+    const titleLayer = await runtime.buildSingleExportSourceCanvas(ui, "map-titles", { width: 440, height: 900, pixelRatio: 1 });
+    assert.deepEqual(titleLayer.draws.at(-1), { kind: "text", clip: expectedClip(titleLayer) });
+    for (const dimensions of [null, { pixelRatio: 3, width: 1320, height: 2700 }]) {
+      const canvas = await runtime.buildCompositeSourceCanvas(ui, dimensions);
+      const clip = expectedClip(canvas);
+      const images = canvas.draws.filter(draw => draw.kind === "image");
+      assert.deepEqual(images.map(draw => draw.image), Object.values(passes));
+      assert.deepEqual(images.map(draw => draw.clip), [clip, clip]);
+      assert.deepEqual(canvas.draws.at(-1), { kind: "text", clip });
+      if (active) {
+        assert.deepEqual(canvas.draws[0], { kind: "fill", color: ocean, rect: [0, 0, canvas.width, canvas.height], clip: null });
+        assert.deepEqual(canvas.draws[1], { kind: "clear", rect: clip, clip });
+      } else {
+        assert.equal(canvas.draws[0].kind, "image");
+      }
+      const adjusted = runtime.applyExportAdjustmentsToCanvas(canvas, ui, { width: 330, height: 675 });
+      assert.deepEqual(adjusted.draws.at(-1).clip, expectedClip(adjusted));
+      assert.match(adjusted.draws.at(-1).filter, /brightness\(1\.400\)/);
+      if (active) assert.equal(adjusted.draws[0].color, ocean);
+      else assert.equal(adjusted.draws.length, 1);
+    }
+    if (active) {
+      const clip = expectedClip(titleLayer);
+      f.activate(null);
+      const copy = runtime.applyExportAdjustmentsToCanvas(titleLayer, ui);
+      assert.deepEqual(copy.draws.at(-1).clip, clip);
+      assert.equal(copy.draws[0].color, ocean);
+    }
+  }
 });

@@ -358,7 +358,7 @@ import { createRenderTransformReusePolicyOwner, VIEWPORT_CULL_OVERSCAN_PX } from
 import { createProjectedGeometryBoundsOwner } from "./renderer/projected_geometry_bounds_owner.js";
 import { createViewportReadModelOwner } from "./renderer/viewport_read_model_owner.js";
 import { createRenderSnapshotOwner } from "./renderer/render_snapshot.js";
-import { wrapLongitude } from "./renderer/regional_camera.js";
+import { createMapExportCanvas, wrapLongitude } from "./renderer/regional_camera.js";
 import { createViewportCommandOwner } from "./renderer/viewport_command_owner.js";
 import { createRendererViewportUpdateOwner } from "./renderer/renderer_viewport_update_owner.js";
 import { createRendererStartupTransactionOwner } from "./renderer/renderer_startup_transaction_owner.js";
@@ -10996,6 +10996,10 @@ function getExportRenderBytes(passNames, pixelRatio) {
   });
 }
 
+function getMapExportFrame() {
+  return getRendererFitProjectionOwner().getExportFrame(getOceanBaseFillColor);
+}
+
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   passNames = filterCurrentEnabledRenderPasses(passNames);
   if (passNames.includes("populationHeatmap")) assertPopulationHeatmapReadyForExport();
@@ -11049,13 +11053,14 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
       exportRenderInProgress = previousExportState;
     }
   }
-  const exportCanvas = document.createElement("canvas");
-  exportCanvas.width = redrawAtTargetResolution ? Math.round(logicalWidth * targetDpr) : width;
-  exportCanvas.height = redrawAtTargetResolution ? Math.round(logicalHeight * targetDpr) : height;
+  const exportCanvas = createMapExportCanvas(
+    document,
+    redrawAtTargetResolution ? Math.round(logicalWidth * targetDpr) : width,
+    redrawAtTargetResolution ? Math.round(logicalHeight * targetDpr) : height,
+    getMapExportFrame(),
+  );
   const exportContext = exportCanvas.getContext("2d");
   if (!exportContext) return null;
-  exportContext.setTransform(1, 0, 0, 1, 0, 0);
-  exportContext.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
   if (!redrawAtTargetResolution) {
     composeRenderPassesToTarget(exportContext, passNames, runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
     assertBathymetryDetailReadyForExport(passNames);
@@ -13615,6 +13620,7 @@ export {
   applyRiverPaintCellById,
   isExportRenderOverBudget,
   getOceanBaseFillColor,
+  getMapExportFrame,
   renderExportPassesToCanvas,
   captureRenderSnapshot,
 

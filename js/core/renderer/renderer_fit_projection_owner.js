@@ -1,6 +1,6 @@
 import { markProjectionGeometryChanged } from "./projection_geometry_identity.js";
 import { getScenarioRegion } from "../scenario/scenario_region.js";
-import { centralMeridian, fitRegionalProjection } from "./regional_camera.js";
+import { centralMeridian, fitRegionalProjection, regionalScreenBounds } from "./regional_camera.js";
 
 function getLandFeatures(state) {
   const features = state?.landData?.features;
@@ -93,11 +93,11 @@ export function createRendererFitProjectionOwner({
   let previousWorldProjection = null;
   let appliedClip = "";
 
-  function syncRegionalFrameClip({ x, y, k }) {
+  function syncRegionalFrameClip(transform) {
     let clip = "";
     if (regionalBounds) {
-      const [[x0, y0], [x1, y1]] = regionalBounds;
-      const insets = [y + k * y0, state.width - x - k * x1, state.height - y - k * y1, x + k * x0];
+      const [[left, top], [right, bottom]] = regionalScreenBounds(regionalBounds, transform);
+      const insets = [top, state.width - right, state.height - bottom, left];
       clip = `inset(${insets.map((value) => Math.max(0, value) + "px").join(" ")})`;
     }
     if (clip === appliedClip) return;
@@ -107,6 +107,16 @@ export function createRendererFitProjectionOwner({
       if (layer) layer.style.clipPath = clip;
     }
     surfaceHost.getMapContainer().style.backgroundColor = clip ? "#b9b7b2" : "";
+  }
+
+  function getExportFrame(getOceanFill) {
+    if (!regionalBounds) return null;
+    return {
+      bounds: regionalScreenBounds(regionalBounds, state.zoomTransform),
+      viewportWidth: state.width,
+      viewportHeight: state.height,
+      oceanFill: getOceanFill(),
+    };
   }
 
   function regionKey(region) {
@@ -174,6 +184,7 @@ export function createRendererFitProjectionOwner({
   return Object.freeze({
     fitProjection,
     syncRegionalFrameClip,
+    getExportFrame,
     needsScenarioRefit,
     getRegionalBounds: () => regionalBounds,
   });
