@@ -32,9 +32,14 @@ async function waitForSettled(page, { scenarioId = "", editable = true, timeout 
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
+// Opening or switching a scenario can leave two overlays above the map: the guide popover and
+// the scenario introduction card. Both cover map pixels and swallow wheel and click input, so
+// they are dismissed, as a user would, before any probe point is used.
 async function closeScenarioGuide(page) {
   const guide = page.locator("#scenarioGuidePopover");
   if (await guide.isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
+  const introClose = page.locator(".scenario-intro-card .scenario-intro-close");
+  if (await introClose.isVisible()) await introClose.click();
 }
 
 // 取点前显式建立视角前提：用户可见的快捷键 0 把视角复位到全图，等缩放回到 1 且渲染稳定。
