@@ -228,7 +228,7 @@ async function loadFeatureMigrationMap({ fetchImpl = globalThis.fetch } = {}) {
   return featureMigrationMapPromise;
 }
 
-async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = globalThis.fetch, scenarioId = "", featureSplits = {}, onDiscard } = {}) {
+async function loadFeatureMergeLineage({ fetchImpl = globalThis.fetch } = {}) {
   if (!featureMergeLineagePromise) {
     featureMergeLineagePromise = (async () => {
       if (typeof fetchImpl !== "function") return null;
@@ -248,9 +248,71 @@ async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = g
   const lineage = await featureMergeLineagePromise;
   if (!Array.isArray(lineage?.plans)) {
     featureMergeLineagePromise = null;
-    return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(null, scenarioId, featureSplits), validFeatureIds, onDiscard);
+    return null;
   }
-  return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(lineage, scenarioId, featureSplits), validFeatureIds, onDiscard);
+  return lineage;
+}
+
+function scenarioLineage(lineage, scenarioId, manifest) {
+  const hierarchy = manifest?.hierarchy_overrides;
+  return resolveFeatureMergeLineage(lineage || { plans: [{ groups: hierarchy?.feature_merges }] },
+    scenarioId, hierarchy?.feature_splits);
+}
+
+export function migrateScenarioPaintEntries(entries, {
+  sourceScenarioId, lineageScenarioId, sourceManifest, scenarioManifest, lineage,
+  validFeatureIds, migrationMap = {}, onDiscard,
+}) {
+  const origins = new Map();
+  const originsOf = id => origins.get(id) || [id];
+  const remap = (target, sources) => origins.set(target, [...new Set(sources.flatMap(originsOf))]);
+  const discard = (id, candidates) => {
+    for (const original of originsOf(id)) {
+      if (!shouldIgnoreInvalidFeatureScopedId(original)) onDiscard?.(original, candidates);
+    }
+  };
+  const paint = new Map(Object.entries(entries));
+  if (sourceScenarioId !== lineageScenarioId) {
+    const source = scenarioLineage(lineage, sourceScenarioId, sourceManifest);
+    const splits = Object.entries(source.splits).sort((a, b) => b[1].length - a[1].length);
+    for (const [parent, children] of splits) {
+      if (!children.length || children.every(id => validFeatureIds.has(id))) continue;
+      const color = paint.get(children[0]);
+      if (color === undefined || !children.every(id => paint.get(id) === color)) continue;
+      for (const id of children) paint.delete(id);
+      paint.set(parent, color);
+      remap(parent, children);
+    }
+    for (const [id, color] of [...paint]) {
+      const leaves = source.leavesOf(id);
+      if (leaves.has(id)) continue;
+      paint.delete(id);
+      for (const leaf of leaves) {
+        if (paint.has(leaf)) continue;
+        paint.set(leaf, color);
+        remap(leaf, [id]);
+      }
+    }
+  }
+  const target = scenarioLineage(lineage, lineageScenarioId, scenarioManifest);
+  const merged = migrateMergedFeatureProjectData({ visualOverrides: Object.fromEntries(paint) },
+    target, validFeatureIds, discard, remap).data.visualOverrides;
+  const mapped = new Map(Object.entries(merged).filter(([id]) => validFeatureIds.has(id)));
+  for (const [id, color] of Object.entries(merged)) {
+    if (validFeatureIds.has(id) || shouldIgnoreInvalidFeatureScopedId(id)) continue;
+    const successors = Array.isArray(migrationMap[id]) ? migrationMap[id].filter(next => validFeatureIds.has(next)) : [];
+    const available = successors.filter(next => !mapped.has(next));
+    if (!available.length) discard(id, successors);
+    for (const next of available) {
+      mapped.set(next, color);
+      remap(next, [id]);
+    }
+  }
+  const migrated = new Set();
+  for (const id of mapped.keys()) {
+    for (const original of originsOf(id)) if (original !== id) migrated.add(original);
+  }
+  return { visualOverrides: Object.fromEntries(mapped), originsOf, migratedEntries: migrated.size };
 }
 
 function remapFeatureScopedEntries(entries, validFeatureIds, migrationMap) {
@@ -324,7 +386,8 @@ function partitionFeatureScopedEntries(entries, validFeatureIds) {
 
 async function migrateFeatureScopedProjectDataToCurrentTopology(
   data,
-  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null, onDiscard, scenarioManifest = null } = {}
+  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null, onDiscard,
+    scenarioManifest = null, lineageScenarioId, sourceScenarioId, sourceManifest } = {}
 ) {
   let payload = data && typeof data === "object" ? { ...data } : {};
   delete payload.sovereigntyByFeatureId;
@@ -347,6 +410,23 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     validFeatureIds: normalizedValidFeatureIds,
   });
   if (explicitMigration) payload = explicitMigration.data;
+  if ((sourceScenarioId !== undefined || lineageScenarioId !== undefined) && normalizedValidFeatureIds) {
+    const ignored = new Set();
+    const sourceId = sourceScenarioId ?? payload.scenario?.id;
+    const targetId = lineageScenarioId ?? scenarioManifest?.scenario_id ?? sourceId;
+    const [lineage, migrationMap] = await Promise.all([loadFeatureMergeLineage({ fetchImpl }), loadFeatureMigrationMap({ fetchImpl })]);
+    const migrated = migrateScenarioPaintEntries(payload.visualOverrides || {}, {
+      sourceScenarioId: sourceId, lineageScenarioId: targetId,
+      sourceManifest, scenarioManifest, lineage, migrationMap, validFeatureIds: normalizedValidFeatureIds,
+      onDiscard(id, candidates) { ignored.add(id); onDiscard?.(id, candidates); },
+    });
+    const auxiliary = migrateMergedFeatureProjectData({ ...payload, visualOverrides: {} },
+      scenarioLineage(lineage, targetId, scenarioManifest),
+      normalizedValidFeatureIds, onDiscard);
+    onMigration?.({ migratedEntries: migrated.migratedEntries + auxiliary.summary.auxiliary.migratedEntries
+      + (explicitMigration?.summary.migratedEntries || 0), ignoredEntries: ignored.size + auxiliary.summary.auxiliary.droppedEntries });
+    return { ...auxiliary.data, visualOverrides: migrated.visualOverrides };
+  }
   if (!normalizedValidFeatureIds?.size) {
     return payload;
   }
@@ -357,10 +437,9 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     .flatMap((members) => (Array.isArray(members) ? members : [])));
   Object.keys(scenarioManifest?.hierarchy_overrides?.feature_splits || {}).forEach((id) => scopedMembers.add(id));
   const mergeMigration = collectProjectFeatureIds(payload).some((id) => !normalizedValidFeatureIds.has(id) || scopedMembers.has(id))
-    ? await migrateAcrossFeatureMerges(payload, normalizedValidFeatureIds, {
-      fetchImpl, onDiscard, scenarioId: String(payload.scenario?.id || scenarioManifest?.scenario_id || "").trim(),
-      featureSplits: scenarioManifest?.hierarchy_overrides?.feature_splits || {},
-    })
+    ? migrateMergedFeatureProjectData(payload, resolveFeatureMergeLineage(await loadFeatureMergeLineage({ fetchImpl }),
+      String(payload.scenario?.id || scenarioManifest?.scenario_id || "").trim(),
+      scenarioManifest?.hierarchy_overrides?.feature_splits || {}), normalizedValidFeatureIds, onDiscard)
     : null;
   if (mergeMigration) payload = mergeMigration.data;
   const mergedVisual = mergeMigration?.summary.visualOverrides || { migratedEntries: 0, droppedEntries: 0, createdEntries: 0 };
@@ -370,7 +449,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   const reportMigration = (migratedEntries = 0, migrationMap = {}) => {
     if (onDiscard) {
       for (const id of Object.keys(nextVisualOverrides)) {
-        if (!normalizedValidFeatureIds.has(id) && !(Array.isArray(migrationMap[id]) && migrationMap[id].some(target => normalizedValidFeatureIds.has(target)))) {
+        if (!shouldIgnoreInvalidFeatureScopedId(id) && !normalizedValidFeatureIds.has(id) && !(Array.isArray(migrationMap[id]) && migrationMap[id].some(target => normalizedValidFeatureIds.has(target)))) {
           onDiscard(id, []);
         }
       }
@@ -449,5 +528,7 @@ export {
 
 
   migrateImportedProjectData,
+  loadFeatureMigrationMap,
+  loadFeatureMergeLineage,
   migrateFeatureScopedProjectDataToCurrentTopology,
 };
