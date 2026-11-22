@@ -524,6 +524,7 @@ export {
   getCityLocaleEntry,
   mergeCityLocalizationData,
   normalizeCityText,
+  normalizeCityFeature,
   normalizeCityFeatureCollection,
   normalizeCityFeatureCollectionSteps,
   normalizeScenarioCityOverridesPayload,

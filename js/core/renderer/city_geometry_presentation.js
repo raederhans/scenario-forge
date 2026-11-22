@@ -4,6 +4,7 @@ export function createCityGeometryPresentation({
   state,
   surfaceHost,
   getCityDisplayLabel,
+  isCapitalVisible = () => true,
   getDisplayOwnerCode,
   getLocalizedScenarioCountryName,
   getFeatureGeoCentroid,
@@ -112,7 +113,7 @@ export function createCityGeometryPresentation({
   }
 
   function getCityCapitalDescriptor(entry) {
-    if (entry?.feature?.properties?.__city_is_country_capital) {
+    if (entry?.feature?.properties?.__city_is_country_capital && isCapitalVisible(entry.feature)) {
       return state.currentLanguage === "zh" ? "\u9996\u90fd" : "Capital";
     }
     if (entry?.feature?.properties?.__city_is_admin_capital) {
