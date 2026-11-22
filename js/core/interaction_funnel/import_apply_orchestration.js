@@ -14,7 +14,7 @@ import { restoreProjectImportFields as restoreAppearanceReferenceImportFields } 
 import { restoreProjectImportFields as restoreTransportImportFields } from "../state/actions/transport_actions.js";
 import { restoreProjectImportFields as restoreRendererInteractionImportFields } from "../state/actions/renderer_interaction_actions.js";
 import { patchLegendState } from "../state/actions/legend_actions.js";
-import { applyProjectImportPatch } from "../state/actions/project_import_actions.js";
+import { applyProjectImportPatch, captureProjectImportState } from "../state/actions/project_import_actions.js";
 
 import {
   migrateFeatureScopedProjectDataToCurrentTopology,
@@ -27,6 +27,10 @@ import {
 } from "./wait_readiness.js";
 
 // Commit and rollback use the same synchronous workflow; each action retains its domain.
+export function captureImportedProjectPatch(target) {
+  return { ...captureProjectImportState(target), legendLabels: target.legendLabels };
+}
+
 export function commitImportedProjectPatch(target, patch) {
   restoreScenarioPresentationImportFields(target, patch);
   restoreUiVisibilityImportFields(target, patch);
@@ -42,6 +46,7 @@ export function commitImportedProjectPatch(target, patch) {
   restoreAppearanceReferenceImportFields(target, patch);
   restoreTransportImportFields(target, patch);
   restoreRendererInteractionImportFields(target, patch);
+  if (Object.hasOwn(patch, "legendLabels")) patchLegendState(target, { legendLabels: patch.legendLabels });
   applyProjectImportPatch(target, patch);
 }
 
