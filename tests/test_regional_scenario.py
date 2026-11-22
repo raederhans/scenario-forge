@@ -69,6 +69,26 @@ class RegionalScenario(unittest.TestCase):
     def select(self):
         return select_members(self.base, self.base_owners, self.units, self.membership, self.rules)
 
+    def test_neighbor_tag_can_be_limited_by_representative_point(self):
+        self.membership["base_owner_regions"] = {"X": {"bounds": [12.9, 0, 21, 1]}}
+        self.rules["neighbor_owner_map"]["X"] = "X"
+        self.base_owners.update(neighbor="X", outside="X", far="X", A="X")
+        owners, _, _ = self.select()
+        self.assertEqual(owners["neighbor"], "X")
+        self.assertEqual(owners["A"], "X")
+        self.assertNotIn("outside", owners)
+        self.assertNotIn("far", owners)
+
+    def test_custom_city_replaces_only_nearby_public_namesakes(self):
+        near, far = self.cities["features"]
+        for city in (near, far):
+            city["properties"]["aliases"] = ["Historical"]
+        far["geometry"]["coordinates"] = [22, .5]
+        coord = {"name_en": "Historical", "name_zh": "旧名", "lon": 20.6, "lat": .5, "add_city": True}
+        _, _, additions, _ = resolve_capitals([{**faction("D"), "capital_coordinates": coord}],
+                                               self.cities, {"A": box(20, 0, 21, 1)}, {"A": "D"}, 90)
+        self.assertEqual(additions["RCW_CITY_HISTORICAL"]["replace_ids"], ["D"])
+
     def test_membership_union_district_override_and_shells(self):
         owners, _, dropped = self.select()
         self.assertEqual(owners, {"A": "D", "B": "G", "fringe": "F", "neighbor": "N", "east_FB_1": "G"})

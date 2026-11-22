@@ -64,7 +64,9 @@
     "BTUM": "RCW_CITY_BATUM",
     "RTAS": "RCW_CITY_TASEYEVO",
     "GLN": "CITY::ne::1159148683",
-    "CERR": "CITY::ne::1159151397"
+    "CERR": "CITY::ne::1159151397",
+    "GER": "CITY::ne::1159149527",
+    "SIK": "CITY::ne::1159151531"
   },
   "capital_city_hints": {
     "SOV": {
@@ -963,6 +965,36 @@
       "lat": 45.75,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
+    },
+    "GER": {
+      "tag": "GER",
+      "city_id": "CITY::ne::1159149527",
+      "stable_key": "id::CITY::ne::1159149527",
+      "city_name": "Königsberg",
+      "name_ascii": "Kaliningrad",
+      "country_code": "RU",
+      "display_name": "German Reich",
+      "host_feature_id": "RU_MRG_742985642ff9",
+      "lon": 20.511,
+      "lat": 54.7064,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "柯尼斯堡"
+    },
+    "SIK": {
+      "tag": "SIK",
+      "city_id": "CITY::ne::1159151531",
+      "stable_key": "id::CITY::ne::1159151531",
+      "city_name": "Tihwa",
+      "name_ascii": "UEruemqi",
+      "country_code": "CN",
+      "display_name": "Xinjiang Province",
+      "host_feature_id": "CN_CITY_17275852B35279738214019",
+      "lon": 87.6005,
+      "lat": 43.801,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "迪化"
     }
   },
   "cities": {
@@ -1401,6 +1433,9 @@
         "en": "Batum",
         "zh": "巴统"
       },
+      "replace_ids": [
+        "CITY::ne::1159147265"
+      ],
       "host_feature_id": "GEO-3027"
     },
     "RCW_CITY_TASEYEVO": {
@@ -1432,6 +1467,29 @@
     },
     "CITY::ne::1159151397": {
       "host_feature_id": "CN_CITY_17275852B62742745762805"
+    },
+    "CITY::ne::1159149527": {
+      "host_feature_id": "RU_MRG_742985642ff9",
+      "display_name": {
+        "en": "Königsberg",
+        "zh": "柯尼斯堡"
+      },
+      "aliases": [
+        "Königsberg",
+        "Kaliningrad"
+      ]
+    },
+    "CITY::ne::1159151531": {
+      "host_feature_id": "CN_CITY_17275852B35279738214019",
+      "display_name": {
+        "en": "Tihwa",
+        "zh": "迪化"
+      },
+      "aliases": [
+        "Tihwa",
+        "Ürümqi",
+        "Urumqi"
+      ]
     },
     "CITY::ne::1159150105": {
       "host_feature_id": "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B5390352263066",
@@ -2147,6 +2205,106 @@
       "aliases": [
         "Zhitomir",
         "Zhytomyr"
+      ]
+    },
+    "CITY::ne::1159137111": {
+      "host_feature_id": "RU_RAY_50074027B93509676978918",
+      "display_name": {
+        "en": "Tilsit",
+        "zh": "提尔西特"
+      },
+      "aliases": [
+        "Tilsit",
+        "Sovetsk"
+      ]
+    },
+    "CITY::ne::1159128521": {
+      "host_feature_id": "RU_MRG_742985642ff9",
+      "display_name": {
+        "en": "Insterburg",
+        "zh": "因斯特堡"
+      },
+      "aliases": [
+        "Insterburg",
+        "Chernyakhovsk"
+      ]
+    },
+    "CITY::gn::557882": {
+      "host_feature_id": "RU_RAY_50074027B27880509956465",
+      "display_name": {
+        "en": "Gumbinnen",
+        "zh": "贡宾嫩"
+      },
+      "aliases": [
+        "Gumbinnen",
+        "Gusev"
+      ]
+    },
+    "CITY::ne::1159129483": {
+      "host_feature_id": "PL_POW_2862",
+      "display_name": {
+        "en": "Allenstein",
+        "zh": "阿伦施泰因"
+      },
+      "aliases": [
+        "Allenstein",
+        "Olsztyn"
+      ]
+    },
+    "CITY::ne::1159129491": {
+      "host_feature_id": "PL_POW_2861",
+      "display_name": {
+        "en": "Elbing",
+        "zh": "埃尔宾"
+      },
+      "aliases": [
+        "Elbing",
+        "Elbląg"
+      ]
+    },
+    "CITY::ne::1159150885": {
+      "host_feature_id": "CN_CITY_17275852B98393646664938",
+      "display_name": {
+        "en": "Kashgar",
+        "zh": "喀什噶尔"
+      },
+      "aliases": [
+        "Kashgar",
+        "Kashgar City"
+      ]
+    },
+    "CITY::ne::1159149877": {
+      "host_feature_id": "CN_CITY_17275852B85233502536199",
+      "display_name": {
+        "en": "Kuldja",
+        "zh": "固勒扎"
+      },
+      "aliases": [
+        "Kuldja",
+        "Yining City",
+        "Yining"
+      ]
+    },
+    "CITY::ne::1159150881": {
+      "host_feature_id": "CN_CITY_17275852B89914758736867",
+      "display_name": {
+        "en": "Hami",
+        "zh": "哈密"
+      },
+      "aliases": [
+        "Hami",
+        "Yizhou"
+      ]
+    },
+    "CITY::ne::1159140707": {
+      "host_feature_id": "CN_CITY_17275852B82973388541806__SPLIT_REST",
+      "display_name": {
+        "en": "Turfan",
+        "zh": "吐鲁番"
+      },
+      "aliases": [
+        "Turfan",
+        "Turpan"
       ]
     }
   }

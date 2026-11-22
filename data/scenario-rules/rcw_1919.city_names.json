@@ -382,5 +382,49 @@
  "Zhytomyr": {
   "en": "Zhitomir",
   "zh": "日托米尔"
+ },
+ "Kaliningrad": {
+  "en": "Königsberg",
+  "zh": "柯尼斯堡"
+ },
+ "Sovetsk": {
+  "en": "Tilsit",
+  "zh": "提尔西特"
+ },
+ "Chernyakhovsk": {
+  "en": "Insterburg",
+  "zh": "因斯特堡"
+ },
+ "Gusev": {
+  "en": "Gumbinnen",
+  "zh": "贡宾嫩"
+ },
+ "Olsztyn": {
+  "en": "Allenstein",
+  "zh": "阿伦施泰因"
+ },
+ "Elbląg": {
+  "en": "Elbing",
+  "zh": "埃尔宾"
+ },
+ "Urumqi": {
+  "en": "Tihwa",
+  "zh": "迪化"
+ },
+ "Kashgar": {
+  "en": "Kashgar",
+  "zh": "喀什噶尔"
+ },
+ "Yining": {
+  "en": "Kuldja",
+  "zh": "固勒扎"
+ },
+ "Hami": {
+  "en": "Hami",
+  "zh": "哈密"
+ },
+ "Turpan": {
+  "en": "Turfan",
+  "zh": "吐鲁番"
  }
 }

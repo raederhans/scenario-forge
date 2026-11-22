@@ -25,7 +25,8 @@
       -169.739897398974,
       81.8550621431373
     ],
-    "central_meridian": 90
+    "central_meridian": 90,
+    "backdrop": "none"
   },
   "opening_view": {
     "bounds": [
@@ -44,17 +45,17 @@
       "fillColor": "#3b4a55"
     }
   },
-  "baseline_hash": "15c09ba628a4c481cbedaf3f1283f6c1bcf073a732d3b2e5e3183e0c22fb36d6",
+  "baseline_hash": "6f3824cf11dcdab195d2b3c4902d2b14f9c10bd2dc9f590e3287cb5de350520f",
   "summary": {
-    "feature_count": 5515,
-    "owner_count": 62,
-    "shell_feature_count": 2088
+    "feature_count": 5696,
+    "owner_count": 64,
+    "shell_feature_count": 2118
   },
   "source": {
     "base_scenario": "hoi4_1936",
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "base_scenario_runtime_topology_sha256": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326",
-    "runtime_topology_sha256": "e6313f8b3296d436862c0330c7513cb0851a4be1df3aaf2778d5d482cac93710"
+    "runtime_topology_sha256": "227adedd24db8cb91802816c8e8ae192fe66872c42a5e3f6f3393ba355b4d63a"
   },
   "runtime_topology_url": "data/scenarios/rcw_1919/runtime_topology.topo.json",
   "countries_url": "data/scenarios/rcw_1919/countries.json",
@@ -713,6 +714,12 @@
         "RU_MRG_61ce738540d1",
         "RU_MRG_25eea59124e3",
         "RU_MRG_fbedb5ba4063"
+      ],
+      "RU_MRG_742985642ff9": [
+        "RU_RAY_50074027B5014175331817",
+        "RU_RAY_50074027B28549884825225",
+        "RU_MRG_f00dfba16127",
+        "RU_MRG_b18e5b7f00a3"
       ],
       "RU_MRG_745a97b6a49a": [
         "RU_RAY_50074027B27017715662805",
@@ -1602,6 +1609,19 @@
         "BY_RAY_67162791B66420794580046__SPLIT_MASTY",
         "BY_RAY_67162791B66420794580046__SPLIT_EAST_ASTRYNA"
       ],
+      "CN_CITY_17275852B14447575237215": [
+        "CN_CITY_17275852B14447575237215__SPLIT_PLAYA_SALT_FLAT_70",
+        "CN_CITY_17275852B14447575237215__SPLIT_REST"
+      ],
+      "CN_CITY_17275852B47937532060975": [
+        "CN_CITY_17275852B47937532060975__SPLIT_LOP_NUR",
+        "CN_CITY_17275852B47937532060975__SPLIT_PLAYA_LOP_NUR",
+        "CN_CITY_17275852B47937532060975__SPLIT_REST"
+      ],
+      "CN_CITY_17275852B82973388541806": [
+        "CN_CITY_17275852B82973388541806__SPLIT_PLAYA_SALT_FLAT_70",
+        "CN_CITY_17275852B82973388541806__SPLIT_REST"
+      ],
       "CN_CITY_17275852B83272093468807": [
         "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG",
         "CN_CITY_17275852B83272093468807__SPLIT_REST"
@@ -2306,6 +2326,24 @@
         "PL_MRG_c5cfb391c06f__SPLIT_JANOWKA",
         "PL_MRG_c5cfb391c06f__SPLIT_LUKOW"
       ],
+      "PL_MRG_c908eb11c602": [
+        "PL_MRG_c908eb11c602__SPLIT_ALLENSTEIN",
+        "PL_MRG_c908eb11c602__SPLIT_MARIENWERDER",
+        "PL_MRG_c908eb11c602__SPLIT_DZIALDOWO",
+        "PL_MRG_c908eb11c602__SPLIT_ORTELSBURG",
+        "PL_MRG_c908eb11c602__SPLIT_PASSENHEIM",
+        "PL_MRG_c908eb11c602__SPLIT_RASTENBURG",
+        "PL_MRG_c908eb11c602__SPLIT_GARDIENEN",
+        "PL_MRG_c908eb11c602__SPLIT_ARYS",
+        "PL_MRG_c908eb11c602__SPLIT_SENSBURG",
+        "PL_MRG_c908eb11c602__SPLIT_ORTELSBURG_7428",
+        "PL_MRG_c908eb11c602__SPLIT_HOHENSTEIN",
+        "PL_MRG_c908eb11c602__SPLIT_GUTTSTADT",
+        "PL_MRG_c908eb11c602__SPLIT_PLOSNICA",
+        "PL_MRG_c908eb11c602__SPLIT_KURKI",
+        "PL_MRG_c908eb11c602__SPLIT_EAST_SOLDAU",
+        "PL_MRG_c908eb11c602__SPLIT_NIKOLAIKEN"
+      ],
       "PL_MRG_c93ffd9ad4b7": [
         "PL_MRG_c93ffd9ad4b7__SPLIT_KISIELICE",
         "PL_MRG_c93ffd9ad4b7__SPLIT_NORTH_KUYAVIA",
@@ -2327,14 +2365,54 @@
         "PL_POW_2001__SPLIT_MONKI",
         "PL_POW_2001__SPLIT_SZELIGI"
       ],
+      "PL_POW_2209": [
+        "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG",
+        "PL_POW_2209__SPLIT_REST"
+      ],
+      "PL_POW_2209__SPLIT_DANZIG": [
+        "PL_POW_2209__SPLIT_DANZIG__SPLIT_MARIENBURG"
+      ],
+      "PL_POW_2210": [
+        "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG",
+        "PL_POW_2210__SPLIT_REST"
+      ],
+      "PL_POW_2210__SPLIT_DANZIG": [
+        "PL_POW_2210__SPLIT_DANZIG__SPLIT_KAHLBERG"
+      ],
       "PL_POW_2405": [
         "PL_POW_2405__SPLIT_POLISH"
       ],
       "PL_POW_2478": [
         "PL_POW_2478__SPLIT_POLISH"
       ],
+      "PL_POW_2802": [
+        "PL_POW_2802__SPLIT_HEILSBERG",
+        "PL_POW_2802__SPLIT_SCHONFELD",
+        "PL_POW_2802__SPLIT_BRAUNSBERG",
+        "PL_POW_2802__SPLIT_WORMDITT"
+      ],
+      "PL_POW_2804": [
+        "PL_POW_2804__SPLIT_SCHONFELD",
+        "PL_POW_2804__SPLIT_MALDEUTEN"
+      ],
       "PL_POW_2807": [
-        "PL_POW_2807__SPLIT_LUBAWA"
+        "PL_POW_2807__SPLIT_LUBAWA",
+        "PL_POW_2807__SPLIT_REST"
+      ],
+      "PL_POW_2808": [
+        "PL_POW_2808__SPLIT_OSTPREUEN",
+        "PL_POW_2808__SPLIT_LISSEN"
+      ],
+      "PL_POW_2817": [
+        "PL_POW_2817__SPLIT_DZIALDOWO",
+        "PL_POW_2817__SPLIT_KURKI",
+        "PL_POW_2817__SPLIT_MAZURIA"
+      ],
+      "PL_POW_2818": [
+        "PL_POW_2818__SPLIT_GOLDAP",
+        "PL_POW_2818__SPLIT_ANGERBURG",
+        "PL_POW_2818__SPLIT_DARKEHMEN",
+        "PL_POW_2818__SPLIT_LOTZEN"
       ],
       "RO111": [
         "RO111__SPLIT_CAREI",

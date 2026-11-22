@@ -58,6 +58,20 @@ before(() => commitBaseCitySupportData(runtimeState, {
   geoAliases: baseLocalization.geoAliases,
 }));
 
+test("the regional Batum capital replaces public Batumi in the effective city collection", () => {
+  const overrides = normalizeScenarioCityOverridesPayload(read("../data/scenarios/rcw_1919/city_overrides.json"));
+  const state = { activeScenarioId: "rcw_1919", worldCitiesData: base, scenarioCityOverridesData: overrides };
+  const labels = createCityLabelTextModel(state, { getStrictGeoLabel, getPreferredGeoLabel });
+  const owner = createUrbanCityPolicyOwner({ state, caches: { cityLayerCache: {} }, helpers: {
+    getCityFeatureKey: labels.getCityFeatureKey, getCityFeatureAliases: labels.getCityFeatureAliases,
+    getCityCanonicalId: f => f.properties.__city_id,
+    getCityTier: policy.getCityTier, getDefaultCityMinZoomForTier: policy.getDefaultCityMinZoomForTier,
+  } });
+  const batum = [overrides.capitals_by_tag.BTUM, "CITY::ne::1159147265"];
+  const effectiveIds = owner.getEffectiveCityCollection().features.map(f => f.properties.__city_id);
+  assert.deepEqual(effectiveIds.filter(id => batum.includes(id)), ["RCW_CITY_BATUM"]);
+});
+
 for (const scenarioId of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", "blank_base"]) {
   test(`${scenarioId}: every active capital resolves to the saved point in an owned feature`, (t) => {
     const directory = `../data/scenarios/${scenarioId}/`;

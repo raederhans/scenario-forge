@@ -862,6 +862,35 @@
     "Harbin"
    ],
    "ruling_ideology": "neutrality"
+  },
+  {
+   "tag": "GER",
+   "name_en": "German Reich",
+   "name_zh": "德意志国",
+   "color_hex": "#6b6f76",
+   "parent": "",
+   "parent_merged": false,
+   "alliance": "rcw_neighbor",
+   "base_iso2": "DE",
+   "capital_city": [
+    "Kaliningrad"
+   ],
+   "ruling_ideology": "neutrality"
+  },
+  {
+   "tag": "SIK",
+   "name_en": "Xinjiang Province",
+   "name_zh": "新疆省",
+   "color_hex": "#cdb88a",
+   "parent": "",
+   "parent_merged": false,
+   "alliance": "rcw_neighbor",
+   "base_iso2": "CN",
+   "capital_city": [
+    "Urumqi",
+    "Ürümqi"
+   ],
+   "ruling_ideology": "neutrality"
   }
  ],
  "default_country": "SOV",

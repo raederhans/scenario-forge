@@ -16,10 +16,12 @@
   "excluded_districts": ["Sakhalin island/Korsakovskii"],
   "majority_threshold": 0.5,
   "neighbor_tags": ["FIN", "EST", "LAT", "LIT", "POL", "ROM", "MON", "TAN", "KWT", "MAN"],
+  "base_owner_regions": {"GER": {"bounds": [19.0, 53.0, 23.2, 55.6]}, "SIK": {}},
   "neighbor_exclusion_bounds": {"MAN": [116, 40, 120.5, 43.5]},
   "border_tags": ["PER", "TUR"],
   "border_distance_km": 150,
   "central_meridian": 90,
+  "backdrop": "none",
   "opening_bounds": [18, 36, 112, 72],
   "generated_at": "2026-11-22T00:00:00Z"
 }
