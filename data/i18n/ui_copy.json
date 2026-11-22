@@ -1,4 +1,16 @@
 {
+  "Map index is not ready.": {
+    "en": "Map index is not ready.",
+    "zh": "地图索引尚未就绪。"
+  },
+  "All selected parcels were skipped.": {
+    "en": "All selected parcels were skipped.",
+    "zh": "已跳过所有选中的地块。"
+  },
+  "Some countries are still loading details. Only loaded parcels will be filled.": {
+    "en": "Some countries are still loading details. Only loaded parcels will be filled.",
+    "zh": "部分国家仍在加载细节，将只为已加载的地块填色。"
+  },
   "This color already belongs to another country. Use “Merge into country”.": {
     "en": "This color already belongs to another country. Use “Merge into country”.",
     "zh": "该颜色已属于其他国家，可用“合并到国家”"

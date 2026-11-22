@@ -197,3 +197,12 @@ test("drag preview retains the screen glyphs and scaled size after an export", (
     assert.equal(preview.children[i].attrs.transform, `translate(${glyph.x} ${glyph.y}) rotate(${glyph.angle * 180 / Math.PI})`);
   }
 });
+
+test("straightening a curved label back to zero is a real, undoable edit", () => {
+  clearHistory();
+  state.mapLabels = [normalizeMapLabel({ lon: 1, lat: 1, text: "Arc", curve: 60 }, "map_label_curve")];
+  assert.equal(updateMapLabel("map_label_curve", { curve: 0 }), true);
+  assert.equal(state.mapLabels[0].curve ?? 0, 0);
+  undoHistory();
+  assert.equal(state.mapLabels[0].curve, 60);
+});

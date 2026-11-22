@@ -48,7 +48,10 @@ function editLabel(kind, id, patch) {
   const existing = state.mapLabels.find(label => label.id === id);
   if (!existing) return false;
   const next = normalizeMapLabel({ ...existing, ...patch }, id);
-  if (!next || Object.keys(next).every(key => next[key] === existing[key])) return false;
+  if (!next) return false;
+  // 规范化会省略默认值字段（如 curve=0），所以键数变化也算编辑。
+  const keys = Object.keys(next);
+  if (keys.length === Object.keys(existing).length && keys.every(key => next[key] === existing[key])) return false;
   commitLabels(kind, state.mapLabels.map(label => label === existing ? next : label));
   return true;
 }

@@ -469,6 +469,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "全部成员 ID",
     "en": "All member ids"
   },
+  "All selected parcels were skipped.": {
+    "zh": "已跳过所有选中的地块。",
+    "en": "All selected parcels were skipped."
+  },
   "Alliance": {
     "zh": "阵营",
     "en": "Alliance"
@@ -6211,6 +6215,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "地图索引尚未就绪。",
     "en": "Map index is not ready yet."
   },
+  "Map index is not ready.": {
+    "zh": "地图索引尚未就绪。",
+    "en": "Map index is not ready."
+  },
   "Map labels": {
     "zh": "地图标签",
     "en": "Map labels"
@@ -10492,6 +10500,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Some bathymetry sources failed to load": {
     "zh": "部分测深数据源加载失败",
     "en": "Some bathymetry sources failed to load"
+  },
+  "Some countries are still loading details. Only loaded parcels will be filled.": {
+    "zh": "部分国家仍在加载细节，将只为已加载的地块填色。",
+    "en": "Some countries are still loading details. Only loaded parcels will be filled."
   },
   "Some data failed to load": {
     "zh": "部分数据加载失败",
