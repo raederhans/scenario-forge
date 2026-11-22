@@ -22,7 +22,6 @@ import {
 import { prepareScenarioLocalizationState } from "../core/scenario/scenario_localization_state.js";
 import { syncCountryUi } from "../core/scenario/scenario_ui_sync.js";
 import {
-  SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS,
   SCENARIO_STARTUP_GEO_ALIASES_FILENAME,
   SCENARIO_STARTUP_LOCALES_FILENAME,
 } from "../core/scenario/locale_asset_contract.js";
@@ -674,19 +673,6 @@ export function createStartupDataPipelineOwner({
     return d3Client.json(resolveDataUrl(manifestUrl));
   }
 
-  function resolveStartupBundleUrlFromManifest(manifest, language, scenarioId) {
-    if (!manifest) {
-      return getStartupBundleUrl(scenarioId, language);
-    }
-    const normalizedLanguage = String(language || "en").trim().toLowerCase() === "zh" ? "zh" : "en";
-    const languageField = SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS[normalizedLanguage];
-    return String(
-      manifest?.[languageField]
-      || manifest?.startup_bundle_url
-      || ""
-    ).trim();
-  }
-
   /**
    * Startup阶段：场景引导解析。
    * 位置：base-data 入口，早于基础拓扑注入与场景 apply。
@@ -728,10 +714,10 @@ export function createStartupDataPipelineOwner({
           scenarioRegistryPromise,
           scenarioId: defaultScenarioId,
         });
-        const startupBundleUrl = resolveStartupBundleUrlFromManifest(
-          startupScenarioManifest,
+        const startupBundleUrl = getStartupBundleUrl(
+          defaultScenarioId,
           startupBundleLanguage,
-          defaultScenarioId
+          startupScenarioManifest
         );
         if (!startupBundleUrl) {
           return {

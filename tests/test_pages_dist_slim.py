@@ -56,6 +56,25 @@ class PagesDistSlimTests(unittest.TestCase):
         pages.copy_runtime_data()
         self.assertEqual(self.bundle.read_bytes(), (self.scenarios / "sample/startup.bundle.en.json").read_bytes())
 
+    def test_tno_standalone_water_is_lossless_from_both_manifests(self):
+        base = "data/scenarios/tno_1962"
+        url = f"{base}/water_regions.geojson"
+        source = self.write(url, {"type": "FeatureCollection", "features": []})
+        self.write(f"{base}/manifest.json", {"water_regions_url": url})
+        self.write(f"{base}/startup.bundle.en.json", {"manifest_subset": {"water_regions_url": url}})
+        pages.copy_runtime_data()
+        manifest = json.loads((self.app / base / "manifest.json").read_bytes())
+        bundle = json.loads((self.app / base / "startup.bundle.en.json").read_bytes())
+        self.assertEqual(bundle["manifest_subset"]["water_regions_url"], manifest["water_regions_url"])
+        self.assertEqual(manifest["water_regions_url"], url + ".gz")
+        self.assertEqual(gzip.decompress((self.app / manifest["water_regions_url"]).read_bytes()), source.read_bytes())
+        self.assertFalse((self.app / url).exists())
+        self.write("index.html", {})
+        self.write("landing/index.html", {})
+        inventory = source_graph.build_source_inventory(self.root)
+        self.assertEqual(inventory[f"app/{url}.gz"], source)
+        self.assertNotIn(f"app/{url}", inventory)
+
     def test_gzip_url_validation_rejects_missing_bundle_and_subset_resource(self):
         self.compress_bundle()
         pages.copy_runtime_data()

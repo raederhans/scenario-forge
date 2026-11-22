@@ -513,6 +513,7 @@ async function handleLoadStartupBundle(message) {
   if (!payload) {
     throw new Error(`[startup_worker] Startup bundle payload missing or invalid at ${startupBundleUrl}.`);
   }
+  payload.language = language;
   const scenarioId = String(payload.scenario_id || payload.manifest_subset?.scenario_id || "").trim();
   if (!scenarioId) {
     throw new Error("[startup_worker] Startup bundle is missing scenario_id.");

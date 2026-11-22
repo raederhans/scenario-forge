@@ -64,11 +64,11 @@ test("landing work-card maps expose source-backed metadata", () => {
 });
 
 test("TNO work-card map uses dissolved detail sources without visible topology blocks", () => {
+  const svg = readFileSync(new URL(`../landing/assets/work-alt-history-med.svg`, import.meta.url), "utf8");
+  assert.ok(svg.includes('class="political-countries"'), `missing dissolved country layer`);
+  assert.ok(!svg.includes('class="scenario-water"'), `TNO work map must not render blocky scenario water`);
   for (const assetRoot of ["landing", PAGES_DIST_RELATIVE]) {
-    const svg = readFileSync(new URL(`../${assetRoot}/assets/work-alt-history-med.svg`, import.meta.url), "utf8");
     const metadata = JSON.parse(readFileSync(new URL(`../${assetRoot}/assets/work-alt-history-med.json`, import.meta.url), "utf8"));
-    assert.ok(svg.includes('class="political-countries"'), `missing dissolved country layer for ${assetRoot}`);
-    assert.ok(!svg.includes('class="scenario-water"'), `TNO work map must not render blocky scenario water for ${assetRoot}`);
     assert.equal(
       metadata.counts?.rendered_atlantropa_features,
       metadata.counts?.source_atlantropa_features,

@@ -559,7 +559,7 @@ test("startup bundle transfers dequantized arcs and decoded coordinates through 
   const restored = restoreWorkerResponse(reply);
   const expected = expectedTopology(topology);
   assert.deepEqual(restored.payload, {
-    ...payload, base: { topology_primary: expected }, scenario: { ...payload.scenario, runtime_topology_bootstrap: expected },
+    ...payload, language: "en", base: { topology_primary: expected }, scenario: { ...payload.scenario, runtime_topology_bootstrap: expected },
   });
   assert.deepEqual(restored.baseDecodedCollections.landData, decodeArcFeatureCollection(expected, expected.objects.political));
   assert.deepEqual(restored.runtimeDecodedCollections.politicalData, decodeArcFeatureCollection(expected, expected.objects.political));
@@ -692,7 +692,7 @@ for (const chunkType of ["political", "runtime-topology"]) {
 
 test("gzip-only startup bundle loads its explicit resource and retains Float64 transfer", { timeout: 2_000 }, async () => {
   const topology = largeArcTopology();
-  const payload = { scenario_id: "gzip-fixture", base: { topology_primary: topology }, scenario: { runtime_topology_bootstrap: null } };
+  const payload = { scenario_id: "gzip-fixture", language: "en", base: { topology_primary: topology }, scenario: { runtime_topology_bootstrap: null } };
   const compressed = gzipSync(JSON.stringify(payload));
   const urls = [];
   let resolveResponse;
@@ -705,7 +705,7 @@ test("gzip-only startup bundle loads its explicit resource and retains Float64 t
       return { ok: true, arrayBuffer: async () => compressed.buffer.slice(compressed.byteOffset, compressed.byteOffset + compressed.byteLength) };
     },
   });
-  self.onmessage({ data: { type: "LOAD_STARTUP_BUNDLE", taskId: "gzip-startup", startupBundleUrl: "/startup.bundle.json.gz", scenarioId: "gzip-fixture" } });
+  self.onmessage({ data: { type: "LOAD_STARTUP_BUNDLE", taskId: "gzip-startup", startupBundleUrl: "/startup.bundle.json.gz", scenarioId: "gzip-fixture", language: "zh" } });
   await responseReady;
   assert.deepEqual(urls, ["https://example.test/startup.bundle.json.gz"]);
   assert.equal(posted.length, 1);
@@ -713,7 +713,7 @@ test("gzip-only startup bundle loads its explicit resource and retains Float64 t
   assert.equal(posted[0].geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(transferLists[0].length, 2);
   assert.deepEqual(restoreWorkerResponse(posted[0]).payload, {
-    ...payload, base: { topology_primary: expectedTopology(topology) },
+    ...payload, language: "zh", base: { topology_primary: expectedTopology(topology) },
   });
 });
 

@@ -1694,28 +1694,21 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "assets/hgo-world.webp",
             "assets/hgo-europe.webp",
             "assets/product-workspace.webp",
-            "assets/hero-blank.svg",
             "assets/hero-blank.webp",
             "assets/hero-blank.json",
-            "assets/hero-hoi4-1936.svg",
             "assets/hero-hoi4-1936.webp",
             "assets/hero-hoi4-1936.json",
-            "assets/hero-hoi4-1939.svg",
             "assets/hero-hoi4-1939.webp",
             "assets/hero-hoi4-1939.json",
-            "assets/hero-tno-1962.svg",
             "assets/hero-tno-1962.webp",
             "assets/hero-tno-1962.json",
-            "assets/work-alt-history-med.svg",
             "assets/work-alt-history-med.webp",
             "assets/work-alt-history-med.json",
-            "assets/work-scenario-switch-europe.svg",
             "assets/work-scenario-switch-europe.webp",
             "assets/work-scenario-switch-europe.json",
-            "assets/work-atlas-japan-corridor.svg",
             "assets/work-atlas-japan-corridor.webp",
             "assets/work-atlas-japan-corridor.json",
-            "assets/social-preview.svg",
+            "assets/favicon.svg",
             "assets/social-preview.png",
             "assets/sample-runs.json",
             "assets/sample-projects/blank-base-starter.project.json",
@@ -1723,13 +1716,9 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "assets/sample-projects/hoi4-1936-europe-briefing.project.json",
             "assets/sample-projects/hoi4-1939-europe-switch.project.json",
             "assets/sample-projects/tno-1962-atlantropa-briefing.project.json",
-            "assets/japan-preview-transport.svg",
             "assets/japan-preview-transport.webp",
-            "assets/japan-preview-cities.svg",
             "assets/japan-preview-cities.webp",
-            "assets/japan-preview-terrain.svg",
             "assets/japan-preview-terrain.webp",
-            "assets/japan-preview-night.svg",
             "assets/japan-preview-night.webp",
             "assets/japan-preview.json",
         )
@@ -1788,6 +1777,14 @@ class PagesDistStartupShellTest(unittest.TestCase):
         ):
             with self.subTest(expected_path=expected_path):
                 self.assertIn(expected_path, paths)
+
+        from tools.rasterize_landing_assets import ALL_RASTER_TARGETS
+        for source, raster, *_ in ALL_RASTER_TARGETS:
+            self.assertNotIn(f"assets/{source}", paths)
+            self.assertIn(f"assets/{raster}", paths)
+        samples = json.loads((PAGES_DIST_ROOT / "assets/sample-runs.json").read_bytes())
+        for run in samples["featured_runs"]:
+            self.assertIn(run["image_url"].removeprefix("./"), paths)
 
         # The vector bathymetry topology only feeds the landing generator now.
         self.assertNotIn("app/data/global_bathymetry.topo.json", paths)
@@ -2322,6 +2319,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
                         if isinstance(chunk_url, str) and chunk_url:
                             checked_urls += 1
                             self.assertIn(f"app/{chunk_url}", dist_paths)
+                if manifest.get("startup_bundle_url_en"):
+                    self.assertEqual(manifest["startup_bundle_url_en"], manifest["startup_bundle_url_zh"])
+                    bundles = list((PAGES_DIST_ROOT / manifest_path).parent.glob("startup.bundle.*"))
+                    self.assertEqual([p.name for p in bundles], ["startup.bundle.en.json.gz"])
                 for language in ("en", "zh"):
                     bundle_url = manifest.get(f"startup_bundle_url_{language}")
                     if not isinstance(bundle_url, str) or not bundle_url:

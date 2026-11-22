@@ -56,6 +56,42 @@ def _local_data_path(app_root: Path, url: str) -> Path:
     return path
 
 
+def gzip_published_json(path: Path) -> tuple[int, bytes]:
+    decoded = path.read_bytes()
+    encoded = portable_gzip_bytes(decoded)
+    path.with_suffix(path.suffix + ".gz").write_bytes(encoded)
+    path.unlink()
+    return len(decoded), encoded
+
+
+def _pack_population_detail_tiles(app_root: Path) -> set[str]:
+    layer = app_root / "data/thematic_layers/population/ghsl_population_2020_v1"
+    manifest_path = layer / "manifest.json"
+    if not manifest_path.is_file():
+        return set()
+    manifest = json.loads(manifest_path.read_bytes())
+    packed_urls = set()
+    for tile in manifest["raster"]["detail_tiles"]:
+        url = tile["url"]
+        path = _local_data_path(app_root, url)
+        if path.parent != layer / "tiles":
+            raise ValueError(f"Population detail URL is outside its tiles directory: {url}")
+        if path.suffix == ".gz":
+            continue
+        _, encoded = gzip_published_json(path)
+        tile.update(url=url + ".gz", byte_size=len(encoded), sha256=hashlib.sha256(encoded).hexdigest())
+        packed_urls.add(url)
+    if packed_urls:
+        _write_json(manifest_path, manifest)
+    return packed_urls
+
+
+def _update_population_registry_urls(registry: dict, packed_urls: set[str]) -> None:
+    for asset in registry.get("assets", {}).values():
+        if asset.get("url") in packed_urls:
+            asset["url"] += ".gz"
+
+
 def _raw_feature_tokens(raw: bytes) -> list[bytes]:
     """Extract original JSON feature tokens without rewriting coordinate numbers."""
     text = raw.decode("utf-8")
@@ -228,20 +264,17 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
                 continue
             if path.suffix not in _JSON_SUFFIXES or not path.is_file():
                 raise ValueError(f"Missing or unsupported published chunk: {url}")
-            decoded = path.read_bytes()
-            encoded = portable_gzip_bytes(decoded)
+            decoded_size, encoded = gzip_published_json(path)
             encoded_path = path.with_name(path.name + ".gz")
-            encoded_path.write_bytes(encoded)
             chunk.update(
                 url=url + ".gz", encoding="gzip", byte_size=len(encoded),
-                decoded_byte_size=len(decoded),
-                cache_byte_size=max(int(chunk.get("cache_byte_size") or 0), source_sizes.get(path, len(decoded))),
+                decoded_byte_size=decoded_size,
+                cache_byte_size=max(int(chunk.get("cache_byte_size") or 0), source_sizes.get(path, decoded_size)),
                 sha256=hashlib.sha256(encoded).hexdigest(),
             )
             referenced_paths.add(encoded_path)
-            path.unlink()
             chunk_count += 1
-            gzip_saved += len(decoded) - len(encoded)
+            gzip_saved += decoded_size - len(encoded)
         _write_json(manifest_path, manifest)
         # Old whole-owner files may remain after a scoped source rebuild. Only
         # copied generated chunks are pruned, never anything in source data/.
@@ -263,9 +296,34 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
         if plain.is_file() and plain.resolve() not in excluded:
             path.write_bytes(portable_gzip_bytes(plain.read_bytes()))
 
+    packed_urls = _pack_population_detail_tiles(app_root)
+    registry_path = data_root / "runtime_asset_registry.json"
+    if packed_urls and registry_path.is_file():
+        registry = json.loads(registry_path.read_bytes())
+        _update_population_registry_urls(registry, packed_urls)
+        _write_json(registry_path, registry)
+
+    catalog_path = data_root / "CATALOG.json"
+    if packed_urls and catalog_path.is_file():
+        catalog = json.loads(catalog_path.read_bytes())
+        for entry in catalog["entries"]:
+            if entry["url"] in packed_urls:
+                entry["url"] += ".gz"
+                output_key = entry["url"].removeprefix("data/")
+                entry["key"] = f"manifest_output:{output_key}"
+                entry["hashRef"] = f"data/manifest.json::outputs::{output_key}::sha256"
+        _write_json(catalog_path, catalog)
+
     manifest_path = data_root / "manifest.json"
     if manifest_path.is_file():
         manifest = json.loads(manifest_path.read_bytes())
+        if packed_urls:
+            _update_population_registry_urls(manifest.get("runtime_asset_registry", {}), packed_urls)
+            outputs = manifest.get("outputs", {})
+            for url in sorted(packed_urls):
+                key = url.removeprefix("data/")
+                if key in outputs:
+                    outputs[key + ".gz"] = outputs.pop(key)
         for name, record in manifest.get("outputs", {}).items():
             path = _local_data_path(app_root, "data/" + name)
             if not path.is_file() or not isinstance(record, dict):

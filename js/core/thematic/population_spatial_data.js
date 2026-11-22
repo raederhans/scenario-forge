@@ -1,4 +1,5 @@
 import { resolveDataUrl } from "../data_base_url.js";
+import "../json_resource_decoder_shared.js";
 export const POPULATION_LAYER_ID = "population_ghsl_2020_v1";
 export const POPULATION_DATA_VERSION = "ghsl-r2023a-e2020-v1";
 export const POPULATION_YEAR = 2020;
@@ -14,6 +15,10 @@ const ROW_STATUSES = Object.freeze(["ok", "partial_coverage", "no_data", "invali
 async function defaultFetchJson(url) {
   const response = await fetch(resolveDataUrl(url));
   if (!response.ok) throw new Error(`Population data request failed: ${response.status}`);
+  const decoder = globalThis.__scenarioForgeJsonResourceDecoderShared;
+  if (decoder.isExplicitGzipJsonUrl(url)) {
+    return (await decoder.decodeResponsePayload(response, { url, label: "population tile" })).payload;
+  }
   return response.json();
 }
 
