@@ -297,5 +297,6 @@ catalogs, feature migrations, special zones, hierarchy overrides), when it has
 no eligible host, when it is larger than `--max-fragment-km2` (default 3000), or
 when absorbing it would move or drop a boundary shared with a third parcel. The
 tool is idempotent and prints the counts per scenario; `--dry-run` writes
-nothing. Afterwards run `python tools/register_population_spatial_assets.py` and
+nothing. Afterwards run `python tools/build_hoi4_state_districts.py` (state
+membership follows the new adjacency), `python tools/register_population_spatial_assets.py` and
 the downstream steps above for the processed scenarios.

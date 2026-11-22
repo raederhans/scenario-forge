@@ -3695,6 +3695,7 @@
             "GB_SHELL_FB_184",
             "GB_SHELL_FB_185",
             "GB_SHELL_FB_187",
+            "GB_SHELL_FB_188",
             "GB_SHELL_FB_190",
             "GB_SHELL_FB_191",
             "GB_SHELL_FB_192",
@@ -3802,7 +3803,6 @@
           "name_en": "Bermuda",
           "name_zh": "百慕大",
           "feature_ids": [
-            "GB_SHELL_FB_188",
             "UKM73",
             "UKM75",
             "UKM78",
@@ -10328,7 +10328,6 @@
             "PL_POW_0601__SPLIT_WEST_CHELM",
             "PL_POW_0601__SPLIT_WLODAWA",
             "PL_POW_0603",
-            "PL_POW_0604",
             "PL_POW_0619",
             "PL_POW_0661",
             "PL_POW_0662",
@@ -10341,6 +10340,7 @@
           "name_en": "Wołyn",
           "name_zh": "沃伦",
           "feature_ids": [
+            "PL_POW_0604",
             "UA_MRG_76b1b94d5856",
             "UA_MRG_8c4b9e4808b7",
             "UA_MRG_93291f71dff3",
@@ -11563,7 +11563,10 @@
             "RO214",
             "RO216",
             "RO224",
-            "RO226"
+            "RO226",
+            "UA_RAY_74538382B44725547103458",
+            "UA_RAY_74538382B92147387256537",
+            "UA_RAY_74538382B95291552499633"
           ]
         },
         "state_80": {
@@ -11694,9 +11697,6 @@
             "UA_MRG_08e978d66245",
             "UA_RAY_74538382B34887074672752",
             "UA_RAY_74538382B4443211725898",
-            "UA_RAY_74538382B44725547103458",
-            "UA_RAY_74538382B92147387256537",
-            "UA_RAY_74538382B95291552499633",
             "UA_RAY_74538382B97641778556925",
             "UA_RAY_74538382B97836372307066",
             "UA_SHELL_FB_204__SPLIT_AKKERMAN"
@@ -14254,8 +14254,6 @@
           "feature_ids": [
             "RU_ARCTIC_FB_3838",
             "RU_ARCTIC_FB_3880",
-            "RU_ARCTIC_FB_3915",
-            "RU_ARCTIC_FB_3977",
             "RU_ARCTIC_FB_4036",
             "RU_ARCTIC_FB_4141",
             "RU_ARCTIC_FB_4156",
@@ -14274,7 +14272,6 @@
             "RU_RAY_50074027B62555187301125",
             "RU_RAY_50074027B68145102947423",
             "RU_RAY_50074027B75775802654148",
-            "RU_RAY_50074027B78384695872642",
             "RU_RAY_50074027B80784778261580",
             "RU_RAY_50074027B86150609365879",
             "RU_RAY_50074027B90298108562486"
@@ -14418,6 +14415,7 @@
             "RU_ARCTIC_FB_10156",
             "RU_ARCTIC_FB_10159",
             "RU_ARCTIC_FB_10162",
+            "RU_ARCTIC_FB_10166",
             "RU_ARCTIC_FB_6624",
             "RU_ARCTIC_FB_6628",
             "RU_ARCTIC_FB_6635",
@@ -14440,8 +14438,11 @@
             "RU_ARCTIC_FB_7211",
             "RU_ARCTIC_FB_7278",
             "RU_ARCTIC_FB_7304",
+            "RU_ARCTIC_FB_7333",
             "RU_ARCTIC_FB_7338",
             "RU_ARCTIC_FB_7343",
+            "RU_ARCTIC_FB_7384",
+            "RU_ARCTIC_FB_7387",
             "RU_ARCTIC_FB_7392",
             "RU_ARCTIC_FB_8999",
             "RU_ARCTIC_FB_9001",
@@ -14459,6 +14460,7 @@
             "RU_ARCTIC_FB_9049",
             "RU_ARCTIC_FB_9055",
             "RU_ARCTIC_FB_9056",
+            "RU_ARCTIC_FB_9064",
             "RU_ARCTIC_FB_9350",
             "RU_ARCTIC_FB_9351",
             "RU_ARCTIC_FB_9352",
@@ -14506,11 +14508,13 @@
             "RU_ARCTIC_FB_9985",
             "RU_ARCTIC_FB_9986",
             "RU_MRG_1ff20bc12a63",
+            "RU_MRG_6d75fce89eb2",
             "RU_MRG_b255df743ce5",
             "RU_MRG_bba373fa6104",
             "RU_MRG_bec756719bb4",
             "RU_MRG_c84f2ed9c6ef",
             "RU_MRG_d85f19b13cb8",
+            "RU_MRG_eefc121c2bf0__SPLIT_REST",
             "RU_MRG_f59762cc8677",
             "RU_RAY_50074027B12241106743918",
             "RU_RAY_50074027B18749905524628",
@@ -14540,6 +14544,7 @@
             "RU_RAY_50074027B90244452662579__SPLIT_REST",
             "RU_RAY_50074027B90244452662579__SPLIT_ZEYA_RESERVOIR",
             "RU_RAY_50074027B91760241420643",
+            "RU_RAY_50074027B94588175534962",
             "RU_RAY_50074027B95387741431040"
           ]
         },
@@ -15486,8 +15491,11 @@
             "RU_ARCTIC_FB_3892",
             "RU_ARCTIC_FB_3897",
             "RU_ARCTIC_FB_3898",
+            "RU_ARCTIC_FB_3915",
+            "RU_ARCTIC_FB_3977",
             "RU_ARCTIC_FB_4023",
-            "RU_MRG_83d38d63f890"
+            "RU_MRG_83d38d63f890",
+            "RU_RAY_50074027B78384695872642"
           ]
         },
         "state_653": {
@@ -15985,7 +15993,6 @@
             "RU_ARCTIC_FB_10010",
             "RU_ARCTIC_FB_10016",
             "RU_ARCTIC_FB_10026",
-            "RU_ARCTIC_FB_10166",
             "RU_ARCTIC_FB_10171",
             "RU_ARCTIC_FB_10172",
             "RU_ARCTIC_FB_10174",
@@ -15994,9 +16001,6 @@
             "RU_ARCTIC_FB_10189",
             "RU_ARCTIC_FB_10198",
             "RU_ARCTIC_FB_7231",
-            "RU_ARCTIC_FB_7333",
-            "RU_ARCTIC_FB_7384",
-            "RU_ARCTIC_FB_7387",
             "RU_ARCTIC_FB_7408",
             "RU_ARCTIC_FB_7413",
             "RU_ARCTIC_FB_7418",
@@ -16029,7 +16033,6 @@
             "RU_ARCTIC_FB_7828",
             "RU_ARCTIC_FB_7830",
             "RU_ARCTIC_FB_7837",
-            "RU_ARCTIC_FB_9064",
             "RU_ARCTIC_FB_9080",
             "RU_ARCTIC_FB_9086",
             "RU_ARCTIC_FB_9088",
@@ -16073,8 +16076,6 @@
             "RU_ARCTIC_FB_9842",
             "RU_ARCTIC_FB_9997",
             "RU_ARCTIC_FB_9998",
-            "RU_MRG_6d75fce89eb2",
-            "RU_MRG_eefc121c2bf0__SPLIT_REST",
             "RU_RAY_50074027B28144113624552",
             "RU_RAY_50074027B46260605120744",
             "RU_RAY_50074027B57985783040710",
@@ -16084,7 +16085,6 @@
             "RU_RAY_50074027B85754260597476",
             "RU_RAY_50074027B87273501478717",
             "RU_RAY_50074027B91375405563028",
-            "RU_RAY_50074027B94588175534962",
             "RU_RAY_50074027B95321834439264"
           ]
         },
@@ -17947,7 +17947,6 @@
             "UA_RAY_74538382B99908513430661",
             "UA_SHELL_FB_492",
             "UA_SHELL_FB_502",
-            "UA_SHELL_FB_545",
             "UA_SHELL_FB_546"
           ]
         },
@@ -17965,14 +17964,20 @@
           "name_zh": "苏梅",
           "feature_ids": [
             "UA_MRG_07e4f868c3fb",
+            "UA_MRG_91f1c11e596f",
+            "UA_MRG_98ce0c6febb4",
             "UA_MRG_c8f134fbd5da",
+            "UA_RAY_74538382B16544098233158",
             "UA_RAY_74538382B23907235979788",
             "UA_RAY_74538382B2732576684893",
             "UA_RAY_74538382B34689599554445",
+            "UA_RAY_74538382B37171380171685",
             "UA_RAY_74538382B3760492540112",
             "UA_RAY_74538382B53011721841283",
+            "UA_RAY_74538382B63843280303146",
             "UA_RAY_74538382B72285239783987",
             "UA_RAY_74538382B73193392833506",
+            "UA_RAY_74538382B88368635206807",
             "UA_RAY_74538382B98557569749448"
           ]
         },
@@ -17990,7 +17995,6 @@
             "UA_RAY_74538382B42847215196778",
             "UA_RAY_74538382B52051409545176",
             "UA_RAY_74538382B55212312657182",
-            "UA_RAY_74538382B6869191817667",
             "UA_RAY_74538382B8481477190191",
             "UA_RAY_74538382B85307919179669",
             "UA_RAY_74538382B92549368661816",
@@ -18054,7 +18058,8 @@
           "name_en": "Belgorod",
           "name_zh": "别尔哥罗德",
           "feature_ids": [
-            "UA_RAY_74538382B35301744305605"
+            "UA_RAY_74538382B35301744305605",
+            "UA_SHELL_FB_545"
           ]
         },
         "state_245": {
@@ -18082,20 +18087,15 @@
             "UA_MRG_5e1a623ff8e3",
             "UA_MRG_6057d7f77511",
             "UA_MRG_7e91c55da78e",
-            "UA_MRG_91f1c11e596f",
-            "UA_MRG_98ce0c6febb4",
             "UA_MRG_c2b5f29d91e8",
             "UA_MRG_c74c01b39f8e",
             "UA_RAY_74538382B15303326410198__SPLIT_KREMENCHUK_RESERVOIR",
             "UA_RAY_74538382B15303326410198__SPLIT_REST",
             "UA_RAY_74538382B15383579018603",
-            "UA_RAY_74538382B16544098233158",
             "UA_RAY_74538382B29845079622826",
-            "UA_RAY_74538382B37171380171685",
             "UA_RAY_74538382B39784518508744",
-            "UA_RAY_74538382B63843280303146",
+            "UA_RAY_74538382B6869191817667",
             "UA_RAY_74538382B79975421345437",
-            "UA_RAY_74538382B88368635206807",
             "UA_RAY_74538382B89155529549277"
           ]
         },
@@ -19490,15 +19490,6 @@
     "YAK": {
       "tag": "YAK",
       "districts": {
-        "state_563": {
-          "district_id": "state_563",
-          "name_en": "Chita",
-          "name_zh": "赤塔",
-          "feature_ids": [
-            "RU_ARCTIC_FB_6413",
-            "RU_RAY_50074027B29205817441204"
-          ]
-        },
         "state_574": {
           "district_id": "state_574",
           "name_en": "Yakutsk",
@@ -19516,6 +19507,7 @@
             "RU_ARCTIC_FB_6398",
             "RU_ARCTIC_FB_6405",
             "RU_ARCTIC_FB_6409",
+            "RU_ARCTIC_FB_6413",
             "RU_ARCTIC_FB_6418",
             "RU_ARCTIC_FB_6436",
             "RU_ARCTIC_FB_6446",
@@ -19604,6 +19596,7 @@
             "RU_RAY_50074027B24324052900188",
             "RU_RAY_50074027B2556018304316",
             "RU_RAY_50074027B26762093153483",
+            "RU_RAY_50074027B29205817441204",
             "RU_RAY_50074027B33321279608248",
             "RU_RAY_50074027B34454529298169__SPLIT_REST",
             "RU_RAY_50074027B34454529298169__SPLIT_VILYUY_RESERVOIR",
