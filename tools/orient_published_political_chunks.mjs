@@ -49,10 +49,49 @@ export function orientPublishedPoliticalPayload(payload) {
   return { changed: features.some((feature, index) => feature.geometry !== before[index]) };
 }
 
+function readPayload(file) {
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+
+function changedWinding(before, after) {
+  const a = context.d3.geoArea(before);
+  const b = context.d3.geoArea(after);
+  const hemisphere = 2 * Math.PI;
+  const signed = area => area > hemisphere ? area - 2 * hemisphere : area;
+  return (a > hemisphere) !== (b > hemisphere) || Math.sign(signed(a)) !== Math.sign(signed(b));
+}
+
+function windingProtection([source, candidate]) {
+  const features = file => {
+    const payload = readPayload(file);
+    if (payload.type === "Topology") return context.topojson.feature(payload, payload.objects.political).features;
+    return payload.type === "Feature" ? [payload] : payload.features;
+  };
+  const before = features(source);
+  const after = features(candidate);
+  const rings = geometry => geometry?.type === "Polygon" ? geometry.coordinates
+    : geometry?.type === "MultiPolygon" ? geometry.coordinates.flat() : [];
+  const polygon = ring => ({ type: "Polygon", coordinates: [ring] });
+  const required = [];
+  let offset = 0;
+  before.forEach((feature, i) => {
+    const original = rings(feature.geometry);
+    const rounded = rings(after[i].geometry);
+    const changed = original.flatMap((ring, r) =>
+      changedWinding(polygon(ring), polygon(rounded[r])) ? [[offset + r, ring]] : []);
+    if (changed.length) required.push(...changed);
+    else if (changedWinding(feature, after[i])) {
+      original.forEach((ring, r) => required.push([offset + r, ring]));
+    }
+    offset += original.length;
+  });
+  return required;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const files = JSON.parse(fs.readFileSync(0, "utf8"));
-  const results = files.map(file => {
-    const payload = JSON.parse(fs.readFileSync(file, "utf8"));
+  const results = process.argv[2] === "--check-winding" ? files.map(windingProtection) : files.map(file => {
+    const payload = readPayload(file);
     const result = orientPublishedPoliticalPayload(payload);
     if (result.changed) fs.writeFileSync(file, JSON.stringify(payload));
     return { file, ...result };
