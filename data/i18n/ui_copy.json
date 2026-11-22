@@ -12772,5 +12772,237 @@
   "Choose a city within this country": {
     "en": "Choose a city within this country",
     "zh": "请选择本国境内的城市"
+  },
+  "Curve": {
+    "en": "Curve",
+    "zh": "弯度"
+  },
+  "Label size": {
+    "en": "Label size",
+    "zh": "标签字号"
+  },
+  "Along line": {
+    "en": "Along line",
+    "zh": "沿线排字"
+  },
+  "Along line is only available for open lines.": {
+    "en": "Along line is only available for open lines.",
+    "zh": "只有开放线条支持沿线排字。"
+  },
+  "Ctrl/⌘ + drag: box select · Ctrl/⌘ + Shift + drag: lasso": {
+    "en": "Ctrl/⌘ + drag: box select · Ctrl/⌘ + Shift + drag: lasso",
+    "zh": "Ctrl/⌘ + 拖动：框选 · Ctrl/⌘ + Shift + 拖动：套索"
+  },
+  "Set to country": {
+    "en": "Set to country",
+    "zh": "设为某国颜色"
+  },
+  "Choose country": {
+    "en": "Choose country",
+    "zh": "选择国家"
+  },
+  "Skipped {count} already painted parcels.": {
+    "en": "Skipped {count} already painted parcels.",
+    "zh": "已跳过 {count} 个已涂色的地块。"
+  },
+  "No parcels changed: all were already painted.": {
+    "en": "No parcels changed: all were already painted.",
+    "zh": "所有选中地块都已涂色，没有更改。"
+  },
+  "Map index is not ready yet.": {
+    "en": "Map index is not ready yet.",
+    "zh": "地图索引尚未就绪。"
+  },
+  "{name} shares this color with {other}; ownership may not change.": {
+    "en": "{name} shares this color with {other}; ownership may not change.",
+    "zh": "{name} 与 {other} 使用相同颜色，地块归属可能不会改变。"
+  },
+  "Some parcels still need detail loading.": {
+    "en": "Some parcels still need detail loading.",
+    "zh": "部分地块的细节尚未加载。"
+  },
+  "Alliance": {
+    "en": "Alliance",
+    "zh": "阵营"
+  },
+  "Government": {
+    "en": "Government",
+    "zh": "政体"
+  },
+  "Scenario default ({value})": {
+    "en": "Scenario default ({value})",
+    "zh": "剧本默认（{value}）"
+  },
+  "Inherited from parent ({value})": {
+    "en": "Inherited from parent ({value})",
+    "zh": "继承自母国（{value}）"
+  },
+  "Unaligned": {
+    "en": "Unaligned",
+    "zh": "不结盟"
+  },
+  "New alliance…": {
+    "en": "New alliance…",
+    "zh": "新建阵营…"
+  },
+  "Alliance name": {
+    "en": "Alliance name",
+    "zh": "阵营名称"
+  },
+  "Alliance color": {
+    "en": "Alliance color",
+    "zh": "阵营颜色"
+  },
+  "This color is already used.": {
+    "en": "This color is already used.",
+    "zh": "此颜色已被使用。"
+  },
+  "Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.": {
+    "en": "Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.",
+    "zh": "地图模式只改变地图的显示方式。在检查器中设置的阵营和政体会随项目保存。"
+  },
+  "Open shared project?": {
+    "en": "Open shared project?",
+    "zh": "打开共享项目？"
+  },
+  "Source: {host}": {
+    "en": "Source: {host}",
+    "zh": "来源：{host}"
+  },
+  "This replaces the current map. Nothing of yours is uploaded. Only open links you trust.": {
+    "en": "This replaces the current map. Nothing of yours is uploaded. Only open links you trust.",
+    "zh": "打开后将替换当前地图。应用不会上传你的任何内容。请只打开你信任的链接。"
+  },
+  "Unsaved changes will be discarded.": {
+    "en": "Unsaved changes will be discarded.",
+    "zh": "未保存的更改将被丢弃。"
+  },
+  "Open": {
+    "en": "Open",
+    "zh": "打开"
+  },
+  "Don't open": {
+    "en": "Don't open",
+    "zh": "不打开"
+  },
+  "Viewing a shared project (from {host})": {
+    "en": "Viewing a shared project (from {host})",
+    "zh": "正在查看他人的项目（来自 {host}）"
+  },
+  "Save a copy to keep editing.": {
+    "en": "Save a copy to keep editing.",
+    "zh": "另存为副本后可继续编辑。"
+  },
+  "Save as copy": {
+    "en": "Save as copy",
+    "zh": "另存为副本"
+  },
+  "Download original file": {
+    "en": "Download original file",
+    "zh": "下载原始文件"
+  },
+  "The project link is invalid.": {
+    "en": "The project link is invalid.",
+    "zh": "项目链接无效。"
+  },
+  "Only HTTPS project links are supported.": {
+    "en": "Only HTTPS project links are supported.",
+    "zh": "项目链接仅支持 HTTPS。"
+  },
+  "Could not download the project file.": {
+    "en": "Could not download the project file.",
+    "zh": "无法下载项目文件。"
+  },
+  "The server does not allow this app to read the file across origins (CORS).": {
+    "en": "The server does not allow this app to read the file across origins (CORS).",
+    "zh": "对方服务器不允许此应用跨站读取文件（CORS）。"
+  },
+  "The project file is too large.": {
+    "en": "The project file is too large.",
+    "zh": "项目文件过大。"
+  },
+  "The project download timed out.": {
+    "en": "The project download timed out.",
+    "zh": "下载项目文件超时。"
+  },
+  "This file is not a project file.": {
+    "en": "This file is not a project file.",
+    "zh": "此文件不是项目文件。"
+  },
+  "The project contains unsafe fields.": {
+    "en": "The project contains unsafe fields.",
+    "zh": "项目包含不安全的字段。"
+  },
+  "Open this HGO project in the HGO editor.": {
+    "en": "Open this HGO project in the HGO editor.",
+    "zh": "请在 HGO 编辑器中打开此项目。"
+  },
+  "Could not import the project.": {
+    "en": "Could not import the project.",
+    "zh": "无法导入项目。"
+  },
+  "Share link": {
+    "en": "Share link",
+    "zh": "分享链接"
+  },
+  "Raw file URL": {
+    "en": "Raw file URL",
+    "zh": "原始文件地址"
+  },
+  "Generate and copy link": {
+    "en": "Generate and copy link",
+    "zh": "生成并复制链接"
+  },
+  "Link copied.": {
+    "en": "Link copied.",
+    "zh": "已复制链接。"
+  },
+  "The app does not upload anything. Use a public file URL that supports CORS, such as a Gist Raw URL or a raw.githubusercontent.com URL. Anyone with the link can view the file. File size limits apply.": {
+    "en": "The app does not upload anything. Use a public file URL that supports CORS, such as a Gist Raw URL or a raw.githubusercontent.com URL. Anyone with the link can view the file. File size limits apply.",
+    "zh": "应用不会上传任何内容。请使用支持 CORS 的公开文件地址，例如 Gist Raw 或 raw.githubusercontent.com。链接公开可见，任何获得链接的人都可以查看文件。项目文件有大小上限。"
+  },
+  "Merge into current map…": {
+    "en": "Merge into current map…",
+    "zh": "合并到当前地图…"
+  },
+  "Overwrite painted parcels": {
+    "en": "Overwrite painted parcels",
+    "zh": "覆盖已涂色的地块"
+  },
+  "Fill blank parcels only": {
+    "en": "Fill blank parcels only",
+    "zh": "仅填色未涂色的地块"
+  },
+  "Merge project paint: {name}": {
+    "en": "Merge project paint: {name}",
+    "zh": "合并项目涂色：{name}"
+  },
+  "Use current base colors": {
+    "en": "Use current base colors",
+    "zh": "使用当前底色"
+  },
+  "Keep original colors": {
+    "en": "Keep original colors",
+    "zh": "保留原色"
+  },
+  "Will write {count} parcels": {
+    "en": "Will write {count} parcels",
+    "zh": "将为 {count} 个地块写入涂色"
+  },
+  "Unmatched parcels: {count}": {
+    "en": "Unmatched parcels: {count}",
+    "zh": "无法对应的地块：{count}"
+  },
+  "Copy IDs": {
+    "en": "Copy IDs",
+    "zh": "复制编号"
+  },
+  "Colors not in this scenario: {count}": {
+    "en": "Colors not in this scenario: {count}",
+    "zh": "当前剧本没有的颜色：{count}"
+  },
+  "Project country {from} → {to}": {
+    "en": "Project country {from} → {to}",
+    "zh": "项目国家 {from} → {to}"
   }
 }
