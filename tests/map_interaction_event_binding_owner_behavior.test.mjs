@@ -83,6 +83,10 @@ function createHarness({
     flushBrushSession: createHandler("flushBrushSession", calls),
   };
 
+  const effects = {
+    bindMapContainerResizeObserver() { calls.effects.push("bindMapContainerResizeObserver"); },
+    bindBrowserZoomObservers() { calls.effects.push("bindBrowserZoomObservers"); },
+  };
   const owner = createMapInteractionEventBindingOwner({
     getters: {
       getInteractionRect: () => interactionRect,
@@ -90,18 +94,12 @@ function createHarness({
       getInteractionRectNode: () => node,
     },
     handlers,
-    effects: {
-      bindMapContainerResizeObserver() {
-        calls.effects.push("bindMapContainerResizeObserver");
-      },
-      bindBrowserZoomObservers() {
-        calls.effects.push("bindBrowserZoomObservers");
-      },
-    },
+    effects,
   });
 
   return {
     calls,
+    effects,
     fakeWindow,
     handlers,
     interactionRect,
@@ -169,6 +167,31 @@ test("mouseup and sidebar refresh callbacks preserve host behavior", () => {
       { name: "handleResize", args: ["sidebar-layout-refresh"] },
     ],
   );
+});
+
+test("each pointerdown clears stale click suppression before tools claim the gesture", () => {
+  const { calls, effects, fakeWindow, handlers, interactionRect, node, owner } = createHarness();
+  let suppressed = true;
+  let intensity = false;
+  effects.clearSuppressedClick = () => { suppressed = false; };
+  handlers.handlePhysicalIntensityPointerDown = () => { assert.equal(suppressed, false); return intensity; };
+  handlers.marquee = Object.fromEntries(["down", "move", "end", "cancel"].map(key => [key, createHandler(key, calls)]));
+  owner.bindEvents();
+  const mouse = { pointerId: 3, pointerType: "mouse" };
+  interactionRect.dispatch("pointerdown.fieldTool", mouse);
+  interactionRect.dispatch("pointermove.fieldTool", mouse);
+  fakeWindow.dispatch("pointerup", mouse);
+  fakeWindow.dispatch("pointercancel", mouse);
+  node.dispatch("lostpointercapture", mouse);
+  fakeWindow.dispatch("blur");
+  assert.deepEqual(calls.handlers.map(call => call.name), [
+    "down", "handlePhysicalIntensityPointerMove", "move", "handlePhysicalIntensityPointerEnd", "end",
+    "handlePhysicalIntensityPointerEnd", "end", "handlePhysicalIntensityPointerEnd", "cancel", "cancel",
+  ]);
+  intensity = true;
+  suppressed = true;
+  interactionRect.dispatch("pointerdown.fieldTool", mouse);
+  assert.equal(calls.handlers.at(-1).name, "cancel");
 });
 
 test("lostpointercapture is optional when the native node has no listener API", () => {
