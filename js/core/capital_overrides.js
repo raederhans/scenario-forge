@@ -71,6 +71,9 @@ export function removeProjectCity(state, id) {
 const queryOwners = new WeakMap();
 function getCities(state, options) {
   if (options.cityCollection) return options.cityCollection.features;
+  // 优先复用渲染器已合并好的城市集合；只有未注册（如单元测试）时才自建一份。
+  const shared = callRuntimeHook(state, "getEffectiveCityCollectionFn");
+  if (Array.isArray(shared?.features)) return shared.features;
   if (!queryOwners.has(state)) {
     const { getCityFeatureKey, getCityFeatureAliases } = createCityLabelTextModel(state, {});
     queryOwners.set(state, createUrbanCityPolicyOwner({ state, caches: { cityLayerCache: {} }, helpers: {

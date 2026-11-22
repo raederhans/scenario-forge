@@ -157,6 +157,7 @@ export const STATE_HANDLER_HOOK_NAMES = Object.freeze([
   "releaseDeferredContextBasePassFn",
   "resolveBorderIdentityFn",
   "getSuppressedCountryCodesFn",
+  "getEffectiveCityCollectionFn",
   "ensureDetailTopologyFn",
   "getStrategicOverlayPerfCountersFn",
 ]);

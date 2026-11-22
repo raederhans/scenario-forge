@@ -9965,6 +9965,7 @@ export { placeMapLabel, updateMapLabel, deleteMapLabel, commitMapLabelMove, appl
 export function getPlacedMapLabels() { return labelsRuntime.getPlacedMapLabels(); }
 export function getVisibleMapLabels() { return labelsRuntime.getVisibleMapLabels(); }
 registerRuntimeHook(runtimeState, "getSuppressedCountryCodesFn", labelsRuntime.getSuppressedCodes);
+registerRuntimeHook(runtimeState, "getEffectiveCityCollectionFn", () => labelsRuntime.getEffectiveCityCollection());
 export function getCountryLabelStatus(code) { return labelsRuntime.getCountryLabelStatus(code); }
 
 export function getCountryLabelReadiness() { return labelsRuntime.getCountryLabelReadiness(); }

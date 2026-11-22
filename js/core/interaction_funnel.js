@@ -322,12 +322,13 @@ export function stageImportedProjectPatch(data, preparedImport) {
   draft.capitalOverrides = data.capitalOverrides;
   draft.projectCities = data.projectCities;
   const scenarioTags = new Set(Object.keys(draft.scenarioCountriesByTag || {}));
-  const restoreColors = data.projectCountries.some(({ tag }) => scenarioTags.has(tag))
+  const projectCountries = Array.isArray(data.projectCountries) ? data.projectCountries : [];
+  const restoreColors = projectCountries.some(({ tag }) => scenarioTags.has(tag))
     ? uniquifyScenarioDefaultColors(scenarioBaseColors, {
       tags: scenarioTags, preferred: Object.keys(scenarioBaseColors),
       deferred: new Set(getParentMergedParents(draft.scenarioCountriesByTag).keys()),
     }) : scenarioBaseColors;
-  const { dropped } = restoreProjectCountries(draft, data.projectCountries, {
+  const { dropped } = restoreProjectCountries(draft, projectCountries, {
     scenarioBaseColors: restoreColors, savedBaseColors: data.sovereignBaseColors,
   });
   return { patch: captureProjectImportState(draft), dropped };
