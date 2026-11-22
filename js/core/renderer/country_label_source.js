@@ -42,10 +42,11 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   let geometryRecords = EMPTY, countries = EMPTY, features = EMPTY, nameKey = '';
   let memberIndex = null;
   let publishedAssignments = null, paintKey = [], assignments = new Map(), assignmentRevision = 0;
+  let acquiredCodes = new Set();
   let membershipError = '', failedAssignmentRevision = null;
   const debounce = isMembershipEditSettled && membershipScheduler;
   let gate = null, timer = null;
-  let retained = null, request = null, buildRequest = null, failedIdentity = null, disposed = false;
+  let retained = null, request = null, buildRequest = null, disposed = false;
   async function buildGroups(groups, c, signal, client) {
     const isCurrent = () => !disposed && !signal.aborted && context().world === c.world;
     if (!isWorkerSupported()) return mergeCountryLabelGroups([...groups], {
@@ -102,6 +103,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       }
       if (!sameAssignments(assignments, next)) {
         assignments = sameAssignments(publishedAssignments, next) ? publishedAssignments : next;
+        acquiredCodes = new Set(assignments.values());
         assignmentRevision++;
         if (assignments === publishedAssignments) {
           clearGate();
@@ -167,7 +169,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
     return true;
   }
 
-  function sync() {
+  function sync(flush = false) {
     if (disposed) return;
     const c = context();
     if (buildRequest && buildRequest.world !== c.world) {
@@ -181,16 +183,14 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       memberIndex = null;
       clearGate();
       assignments = new Map(); paintKey = [];
+      acquiredCodes = new Set();
       membershipError = ''; failedAssignmentRevision = null;
       publishedAssignments = null;
       if (retained?.world !== c.world) retained = null;
     }
     if (c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank') { status = 'disabled'; return; }
+    if (status === 'error') return;
     scanAssignments(c);
-    if (failedIdentity?.world === c.world && failedIdentity.assignmentRevision === assignmentRevision) {
-      status = 'error';
-      return;
-    }
     error = '';
     status = publishedAssignments ? 'ready' : 'pending';
     if (publishedAssignments) publishNames();
@@ -203,7 +203,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
         clearGate();
         return;
       }
-      if (waitForQuiet()) return;
+      if (!flush && waitForQuiet()) return;
     }
     let input;
     if (!publishedAssignments && c.chunked) {
@@ -317,14 +317,15 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
         membershipError = text(failure?.message || failure); failedAssignmentRevision = c.assignmentRevision;
       } else {
         status = 'error'; error = text(failure?.message || failure);
-        failedIdentity = { world: c.world, assignmentRevision: c.assignmentRevision };
+        memberIndex = null;
+        paintKey = [];
       }
       onChange();
     }
   }
 
-  async function prepare() {
-    sync();
+  async function prepare({ flush = false } = {}) {
+    sync(flush);
     const c = context();
     if (buildRequest) return buildRequest.promise;
     if (disposed || status !== 'pending' || !c.chunked || !c.bundle || typeof ensureSources !== 'function') return;
@@ -350,7 +351,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       if (disposed || request !== owned || state.activeScenarioId !== owned.scenarioId
         || state.sceneGeneration !== owned.generation || current.bundle !== owned.bundle
         || (owned.registry && owned.registry !== owned.bundle.chunkRegistry)) return;
-      sourceToken = current.world; failedIdentity = { world: current.world, assignmentRevision };
+      sourceToken = current.world;
       status = 'error'; error = text(failure?.message || failure); onChange();
     }).finally(() => { if (request === owned) request = null; });
     return owned.promise;
@@ -363,7 +364,8 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   }
 
   return Object.freeze({
-    getSource() { sync(); return { status, sourceToken, revision, features, countries, memberIndex, error,
+    getSource() { sync(); return { status, sourceToken, revision, features, countries, memberIndex, error, acquiredCodes,
+      membershipStale: !!publishedAssignments && assignments !== publishedAssignments,
       membershipError, failedAssignmentRevision, membershipPending: membershipPending() }; },
     // Acceptance observers may inspect completion without selecting a source,
     // loading chunks, or starting/replacing a geometry worker.
@@ -374,6 +376,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       if (current) scanAssignments(c);
       return { status: disposed ? 'disposed' : disabled ? 'disabled' : current ? status : 'pending',
         sourceToken, revision, features, countries, memberIndex: current ? memberIndex : null, error: current ? error : '',
+        acquiredCodes: current ? acquiredCodes : null,
         membershipError: current ? membershipError : '', failedAssignmentRevision: current ? failedAssignmentRevision : null,
         membershipPending: current && membershipPending() };
     },

@@ -330,6 +330,7 @@ export function createLabelsRuntime({
     getLocalizedScenarioCountryName,
     getFeatureGeoCentroid,
     isCapitalVisible,
+    getCapitalTag: capitalVisibility.getCapitalTag,
     normalizeLongitude,
     clamp,
     t,
@@ -681,7 +682,7 @@ export function createLabelsRuntime({
     if (!passNames.includes("labels")) return;
     await waitForCountryLabelsForExport({
       isDisabled: () => runtimeState.styleConfig?.countryLabels?.enabled === false,
-      prepareSource: () => getCountryLabelSourceOwner().prepare(),
+      prepareSource: getCountryLabelSourceOwner().prepare,
       getSource: () => getCountryLabelSourceOwner().getSource(),
       getDiagnostics: () => getCountryLabelRenderOwner().getDiagnostics(),
       requestRender: () => {
@@ -732,9 +733,10 @@ export function createLabelsRuntime({
   function assertCountryLabelsReadyForExport(passNames) {
     if (passNames.includes("labels")
       && runtimeState.styleConfig?.countryLabels?.enabled !== false) {
-      const sourceStatus = getCountryLabelSourceOwner().getSource().status;
+      const source = getCountryLabelSourceOwner().getSource();
       const labelStatus = countryLabelRenderOwner?.getDiagnostics();
-      if (sourceStatus !== "disabled" && (sourceStatus !== "ready"
+      if (source.membershipError) throw new Error(source.membershipError);
+      if (source.status !== "disabled" && (source.status !== "ready" || source.membershipStale
         || !labelStatus || labelStatus.pendingFits > 0 || labelStatus.workerErrors > 0)) {
         throw new Error("Country names are still preparing or failed to prepare; wait for labels before exporting, or disable country names.");
       }
