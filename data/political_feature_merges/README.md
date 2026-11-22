@@ -278,3 +278,24 @@ post-build ownership overlay `data/scenario-rules/hoi4_split_overlay.json`
 the merge plans are replayed, run `python tools/apply_hoi4_split_overlay.py`
 and then the downstream script for both HOI4 scenarios. The overlay resolves
 its selectors against the merged runtime parcels and is idempotent.
+
+### Shell fallback fragments
+
+`python tools/absorb_shell_fragments.py` is the last replay step, after the merge
+plans, `tools/fill_political_coverage_gaps.py` and the split and ownership
+overlays. It merges the geometry of shell fallback fragments
+(`*_ARCTIC_FB_<n>`, `*_SHELL_FB_<n>`) into an adjacent ordinary parcel of the
+same owner (same `cntr_code` in `blank_base`) and, in the HOI4 scenarios, the
+same HOI4 state. The host keeps its ID and properties; the fragment leaves the
+scenario, and cities, population and district membership follow the host. It
+only rewrites the scenario runtime topologies: the base topologies keep their
+fragments, because the split rules and overlays that run earlier select them by
+ID.
+
+A fragment stays when a rule or list names its ID (scenario rules, releasable
+catalogs, feature migrations, special zones, hierarchy overrides), when it has
+no eligible host, when it is larger than `--max-fragment-km2` (default 3000), or
+when absorbing it would move or drop a boundary shared with a third parcel. The
+tool is idempotent and prints the counts per scenario; `--dry-run` writes
+nothing. Afterwards run `python tools/register_population_spatial_assets.py` and
+the downstream steps above for the processed scenarios.

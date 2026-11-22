@@ -2072,7 +2072,7 @@
       }
     },
     {
-      "id": 20703,
+      "id": 13290,
       "type": "Feature",
       "properties": {
         "id": "HU110__SPLIT_BUDA",
@@ -2255,7 +2255,7 @@
       }
     },
     {
-      "id": 20704,
+      "id": 13291,
       "type": "Feature",
       "properties": {
         "id": "HU110__SPLIT_PEST",
@@ -2468,7 +2468,7 @@
       }
     },
     {
-      "id": 20734,
+      "id": 13321,
       "type": "Feature",
       "properties": {
         "id": "SK_ADM2_56367889B690835779632__SPLIT_REST",
@@ -2923,7 +2923,7 @@
       }
     },
     {
-      "id": 21604,
+      "id": 14191,
       "type": "Feature",
       "properties": {
         "id": "HU221__SPLIT_SOPRON",
@@ -2986,7 +2986,7 @@
       }
     },
     {
-      "id": 21605,
+      "id": 14192,
       "type": "Feature",
       "properties": {
         "id": "HU221__SPLIT_ABDA",
@@ -3073,7 +3073,7 @@
       }
     },
     {
-      "id": 21606,
+      "id": 14193,
       "type": "Feature",
       "properties": {
         "id": "HU221__SPLIT_VAMOSSZABADI",
@@ -3188,7 +3188,7 @@
       }
     },
     {
-      "id": 21607,
+      "id": 14194,
       "type": "Feature",
       "properties": {
         "id": "HU221__SPLIT_TET",
@@ -3311,7 +3311,7 @@
       }
     },
     {
-      "id": 21608,
+      "id": 14195,
       "type": "Feature",
       "properties": {
         "id": "HU221__SPLIT_FERTOD",
@@ -3494,7 +3494,7 @@
       }
     },
     {
-      "id": 21609,
+      "id": 14196,
       "type": "Feature",
       "properties": {
         "id": "HU222__SPLIT_SZOMBATHELY",
@@ -3593,7 +3593,7 @@
       }
     },
     {
-      "id": 21610,
+      "id": 14197,
       "type": "Feature",
       "properties": {
         "id": "HU222__SPLIT_ZALALOVO",
@@ -3684,7 +3684,7 @@
       }
     },
     {
-      "id": 21611,
+      "id": 14198,
       "type": "Feature",
       "properties": {
         "id": "HU222__SPLIT_KAM",
@@ -3803,7 +3803,7 @@
       }
     },
     {
-      "id": 21612,
+      "id": 14199,
       "type": "Feature",
       "properties": {
         "id": "HU222__SPLIT_VASVAR",
@@ -3938,7 +3938,7 @@
       }
     },
     {
-      "id": 21613,
+      "id": 14200,
       "type": "Feature",
       "properties": {
         "id": "HU331__SPLIT_BACS_KISKUN",
@@ -4065,7 +4065,7 @@
       }
     },
     {
-      "id": 21614,
+      "id": 14201,
       "type": "Feature",
       "properties": {
         "id": "HU331__SPLIT_BAJA",
@@ -4192,7 +4192,7 @@
       }
     },
     {
-      "id": 21615,
+      "id": 14202,
       "type": "Feature",
       "properties": {
         "id": "HU331__SPLIT_REM",
@@ -4331,7 +4331,7 @@
       }
     },
     {
-      "id": 21616,
+      "id": 14203,
       "type": "Feature",
       "properties": {
         "id": "HU331__SPLIT_KECSKEMET",
@@ -4466,7 +4466,7 @@
       }
     },
     {
-      "id": 21643,
+      "id": 14230,
       "type": "Feature",
       "properties": {
         "id": "HU311__SPLIT_CIGAND",
@@ -4647,7 +4647,7 @@
       }
     },
     {
-      "id": 21644,
+      "id": 14231,
       "type": "Feature",
       "properties": {
         "id": "HU311__SPLIT_HRAN",
@@ -4790,7 +4790,7 @@
       }
     },
     {
-      "id": 21645,
+      "id": 14232,
       "type": "Feature",
       "properties": {
         "id": "HU311__SPLIT_MISKOLC",
@@ -4945,7 +4945,7 @@
       }
     },
     {
-      "id": 21646,
+      "id": 14233,
       "type": "Feature",
       "properties": {
         "id": "HU311__SPLIT_MEZOKOVESD",
@@ -5224,7 +5224,7 @@
       }
     },
     {
-      "id": 21647,
+      "id": 14234,
       "type": "Feature",
       "properties": {
         "id": "HU323__SPLIT_NYIREGYHAZA",
@@ -5361,7 +5361,7 @@
       }
     },
     {
-      "id": 21648,
+      "id": 14235,
       "type": "Feature",
       "properties": {
         "id": "HU323__SPLIT_CIGAND",
@@ -5500,7 +5500,7 @@
       }
     },
     {
-      "id": 21649,
+      "id": 14236,
       "type": "Feature",
       "properties": {
         "id": "HU323__SPLIT_SZATMARCSEKE",

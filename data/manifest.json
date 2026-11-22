@@ -966,7 +966,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_manifest.schema.json",
       "size_bytes": 187827,
-      "sha256": "a584ebb14fb86fdadd5c542e60d6d4d6d94de3098f0ac7766897b764bed8702c",
+      "sha256": "4384898f2f3dec86bd5b20dbc7512f3d006dd59ddc1a16e4cadf568d3b9fdb27",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/overview.json": {
@@ -985,8 +985,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 5606714,
-      "sha256": "fdd1a4cf16cd90fd0dd4635bfc98499d564698f159a37e8b6716160fe8cc80d5",
+      "size_bytes": 3659096,
+      "sha256": "e58a2986bdb085be5ce0fd8800016aa3a1fc75c34318b0ee2d7a10491171de07",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1936.json": {
@@ -995,8 +995,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 6282045,
-      "sha256": "68f7eb3ecfb3741e889973cbda2e1ab9ec7b6e527b939207e3bfdfd31dbf7cf1",
+      "size_bytes": 4391690,
+      "sha256": "e8600b709759692cfd707018d19db058a278674d04decc063e99b8123bb0e5fd",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1939.json": {
@@ -1005,8 +1005,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 6282045,
-      "sha256": "679881912b48eca1bee86cb7b267d73ec64f2ee5cfca0882b131c4f286dcb819",
+      "size_bytes": 4392202,
+      "sha256": "b786f6cf86e695f8e4fb4143aa5632732496fd2f7ce4e6011ae910fc72e72be2",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/tno_1962.json": {

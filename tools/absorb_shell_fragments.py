@@ -1,4 +1,8 @@
-"""Absorb adjacent same-owner shell fallback polygons after a scenario rebuild."""
+"""Absorb adjacent same-owner shell fallback polygons after a scenario rebuild.
+
+Last replay step: run after apply_political_feature_merges, fill_political_coverage_gaps
+and the split and ownership overlays (see data/political_feature_merges/README.md).
+"""
 from __future__ import annotations
 
 import argparse
@@ -132,9 +136,9 @@ def facing_strips(fragment, tree):
                 yield strip
 
 
-def assignments(geometries, owners, pending, fragments, districts):
+def assignments(geometries, owners, pending, fragments, districts, locked=frozenset()):
     tree = STRtree(geometries)
-    hosts = {i: i for i in range(len(geometries)) if i not in fragments}
+    hosts = {i: i for i in range(len(geometries)) if i not in fragments and i not in locked}
     assigned = defaultdict(list)
     buffers = {}
     edge_trees = {}
@@ -366,7 +370,7 @@ def absorb_group(topology, rows, geometries, host, entries, tags, arc_users, pol
     attempt(entries)
 
 
-def absorb_topology(topology, owners=None, named=(), max_fragment_km2=3000, *, memberships=None):
+def absorb_topology(topology, owners=None, named=(), max_fragment_km2=3000, *, memberships=None, locked_hosts=()):
     absolute = _absolute_topology(topology) if "transform" in topology else topology
     political = absolute["objects"]["political"]
     features_before = len(political["geometries"])
@@ -396,7 +400,8 @@ def absorb_topology(topology, owners=None, named=(), max_fragment_km2=3000, *, m
                     if "arcs" in row:
                         index_arcs(arc_users, row)
             political_rows = {id(row) for row in rows}
-            groups = assignments(geometries, tags, pending, fragments, districts)
+            locked = {i for i, key in enumerate(ids) if key in locked_hosts}
+            groups = assignments(geometries, tags, pending, fragments, districts, locked)
             for host, entries in groups.items():
                 absorb_group(absolute, rows, geometries, host, entries, tags, arc_users, political_rows,
                              removed, failures)
@@ -551,11 +556,27 @@ def write_scenario(directory, topology, mapping, population_paths):
         rewrite(path.parent.parent / "manifest.json", update_layer)
 
 
+def river_pack_parcels(data, scenario):
+    """Parents and contour supports of this scenario's reviewed river-paint packs.
+
+    Their geometry fingerprints are part of each pack identity, so they never host a fragment.
+    """
+    locked = set()
+    for path in sorted(data.glob("river_partitions/*.json")):
+        if path.name.endswith(".transport.json"):
+            continue
+        pack = read_json_source(path)
+        if pack.get("sceneId") == scenario:
+            locked.update(entry["parentId"] for key in ("parents", "support") for entry in pack.get(key, ()))
+    return locked
+
+
 def process_scenario(directory, named, max_fragment_km2, dry_run):
     topology = read_json_source(directory / "runtime_topology.topo.json")
     owners = None if directory.name == "blank_base" else read_json_source(directory / "owners.by_feature.json")["owners"]
     mapping, report = absorb_topology(topology, owners, named, max_fragment_km2,
-                                      memberships=district_memberships(directory))
+                                      memberships=district_memberships(directory),
+                                      locked_hosts=river_pack_parcels(directory.parent.parent, directory.name))
     if mapping and not dry_run:
         data = directory.parent.parent
         population = list(data.glob(f"thematic_layers/population/*/features/{directory.name}.json"))

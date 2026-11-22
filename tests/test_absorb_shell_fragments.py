@@ -259,3 +259,20 @@ def test_materialized_sidecars_and_dry_run(tmp_path):
     after = snapshot()
     assert process_scenario(scene, named, 3000, False)["absorbed"] == 0
     assert snapshot() == after
+
+
+def test_locked_host_is_skipped_for_the_next_best_neighbour(tmp_path):
+    from tools.absorb_shell_fragments import river_pack_parcels
+    f = "RU_ARCTIC_FB_001"
+    t = topology([("river", box(0, 0, .1, .2)), (f, box(.1, 0, .2, .2)), ("plain", box(.2, 0, .3, .1))])
+    before = geometries(t)["river"].wkb
+    assert absorb_topology(t, locked_hosts={"river"})[0] == {f: "plain"}
+    assert geometries(t)["river"].wkb == before
+    only = topology([("river", box(0, 0, .1, .2)), (f, box(.1, 0, .2, .2))])
+    assert absorb_topology(only, locked_hosts={"river"})[1]["retained_by_reason"]["no_host"] == 1
+    packs = tmp_path / "river_partitions"
+    packs.mkdir()
+    (packs / "a.json").write_text(json.dumps({"sceneId": "modern_world", "parents": [{"parentId": "river"}],
+                                              "support": [{"parentId": "bank"}]}), encoding="utf-8")
+    (packs / "b.json").write_text(json.dumps({"sceneId": "hoi4_1936", "parents": [{"parentId": "other"}]}), encoding="utf-8")
+    assert river_pack_parcels(tmp_path, "modern_world") == {"river", "bank"}

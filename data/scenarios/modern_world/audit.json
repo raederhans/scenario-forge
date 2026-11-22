@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 0,
-    "feature_count": 20643,
+    "feature_count": 12668,
     "water_count": 0
   },
   "diagnostics": {
@@ -645,13 +645,13 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "5fa949bc56e43567077da28f93dc278ae1a7c24167f5fd9c712a8869cf10367f",
+  "snapshot_fingerprint": "08f6a71e46164d8190c6c60e44bf9e1b6843c027efbf5634205ef08e82361bec",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "132ed8312bcecdef9d0974b7d69b659467a468662f5a263d8304139d900e2a39",
+    "build_snapshot_sha256": "e85d3a8648a5a2a0121759b5abddf51607603340bc24b819e640bc5a50f4d276",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "5904e4f5a25bbcc24f9b6fabca3bd18c268b94f40088e85dc119c86f5449d3e1",
+    "runtime_topology_sha256": "de4197d9ed9714a541e63e77438490eb85db852b1a2bf85209f0c4770e335631",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "summary": {
@@ -663,20 +663,20 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 20643,
+    "feature_count": 12668,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 259,
     "quality_counts": {
-      "direct_country_copy": 18856,
-      "manual_reviewed": 1787
+      "direct_country_copy": 11088,
+      "manual_reviewed": 1580
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 18856,
-      "manual_rule": 1787
+      "canonical_baseline": 11088,
+      "manual_rule": 1580
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,
