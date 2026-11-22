@@ -1,3 +1,4 @@
+import { baseCityNameOverrides } from "../capital_overrides.js";
 import { serializeProjectCountries, unregisterProjectCountryState } from "../project_countries.js";
 import { callRuntimeHook } from "../state/index.js";
 import { getRiverPaintRuntime } from "../river_paint/runtime.js";
@@ -152,6 +153,7 @@ function createScenarioLifecycleRuntime({
     runtimeState.visualOverrides = {};
     runtimeState.capitalOverrides = {};
     runtimeState.projectCities = [];
+    runtimeState.cityNameOverrides = baseCityNameOverrides(runtimeState.cityNameOverrides);
     getRiverPaintRuntime(runtimeState).cancel();
     setRiverPaintState(runtimeState, null);
     for (const { tag } of serializeProjectCountries(runtimeState)) unregisterProjectCountryState(runtimeState, tag);
@@ -281,6 +283,7 @@ function createScenarioLifecycleRuntime({
     runtimeState.visualOverrides = {};
     runtimeState.capitalOverrides = {};
     runtimeState.projectCities = [];
+    runtimeState.cityNameOverrides = baseCityNameOverrides(runtimeState.cityNameOverrides);
     getRiverPaintRuntime(runtimeState).cancel();
     setRiverPaintState(runtimeState, null);
     const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });

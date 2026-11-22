@@ -54,6 +54,7 @@ const ACTIVATION_KEYS = Object.freeze([
   "visualOverrides",
   "capitalOverrides",
   "projectCities",
+  "cityNameOverrides",
   "riverPaint",
   "scenarioGeneratedColorTags",
   "scenarioFixedOwnerColors",

@@ -872,12 +872,12 @@ export function createUrbanCityPolicyOwner({
         const country = scenarioCountriesRef[rawTag];
         const capitalHint = scenarioRef?.capital_city_hints?.[tag];
         const projectCountry = country?.entry_kind === "project_country" || country?.project_country === true;
-        if (!projectCountry && scenarioId !== "blank_base" && country?.feature_count === 0) continue;
         const override = source.capitalOverrides?.[tag];
         if (override?.cityId === null) continue;
         const projectKey = keyByCityId.get(override?.cityId);
         let resolvedKey = projectKey;
         if (!resolvedKey) {
+          if (scenarioId !== "blank_base" && country?.feature_count === 0) continue;
           if (capitalHint?.resolution_method === "no_capital" || projectCountry) continue;
           resolvedKey = resolveCityFeatureKey(scenarioRef?.capitals_by_tag?.[tag], featuresByKey, aliasToKey)
             || resolveCityFeatureKey(capitalHint?.city_id, featuresByKey, aliasToKey);

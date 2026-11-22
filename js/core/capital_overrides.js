@@ -1,6 +1,6 @@
 import { normalizeCountryCodeAlias as canonicalCountryCode } from "./country_code_aliases.js";
 import { callRuntimeHook } from "./state/index.js";
-import { createCityTerritoryQuery } from "./renderer/capital_visibility.js";
+import { createCityTerritoryQuery, getCityTerritoryHostId, resolveCityHostId } from "./renderer/capital_visibility.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
 import {
   getCityCanonicalId, getCityCapitalScore, getCityTier, getCityTierWeight, getDefaultCityMinZoomForTier,
@@ -22,7 +22,7 @@ export function normalizeCapitalOverrides(raw) {
   return result;
 }
 
-function normalizeProjectCity(city) {
+function normalizeProjectCity(city, landIndex) {
   if (typeof city?.id !== "string" || !/^project_city_[1-9]\d*$/.test(city.id)
     || !Number.isSafeInteger(Number(city.id.slice(PROJECT_CITY_PREFIX.length)))
     || !Number.isFinite(city.lon) || Math.abs(city.lon) > 180
@@ -30,27 +30,41 @@ function normalizeProjectCity(city) {
   const en = typeof city.name?.en === "string" ? city.name.en.trim() : "";
   const zh = typeof city.name?.zh === "string" ? city.name.zh.trim() : "";
   if (!en && !zh) return null;
+  const hostId = typeof city.hostFeatureId === "string" ? city.hostFeatureId.trim() : "";
   return {
     id: city.id, name: { en: en || zh, zh: zh || en }, lon: city.lon, lat: city.lat,
-    hostFeatureId: typeof city.hostFeatureId === "string" ? city.hostFeatureId.trim() : "",
+    hostFeatureId: landIndex ? resolveCityHostId(landIndex, hostId, [city.lon, city.lat]) : hostId,
     tier: ["major", "regional", "minor"].includes(city.tier) ? city.tier : "minor",
   };
 }
 
-export function normalizeProjectCities(raw) {
+export function normalizeProjectCities(raw, landIndex) {
   const cities = new Map();
   for (const entry of Array.isArray(raw) ? raw : []) {
-    const city = normalizeProjectCity(entry);
+    const city = normalizeProjectCity(entry, landIndex);
     if (city) cities.set(city.id, city);
   }
   return [...cities.values()];
 }
 
+export function baseCityNameOverrides(overrides) {
+  return Object.fromEntries(Object.entries(overrides || {}).filter(([id]) => !id.startsWith(PROJECT_CITY_PREFIX)));
+}
+
 export function addProjectCity(state, entry) {
   const cities = state.projectCities || [];
-  const next = cities.reduce((max, city) => Math.max(max, Number(city.id.slice(PROJECT_CITY_PREFIX.length))), 0) + 1;
-  const city = normalizeProjectCity({ ...entry, id: `${PROJECT_CITY_PREFIX}${next}` });
+  const reserved = new Set(Object.keys(state.cityNameOverrides || {}));
+  for (const entry of [...(state.historyPast || []), ...(state.historyFuture || [])]) {
+    for (const snapshot of [entry.before, entry.after]) {
+      for (const city of snapshot?.projectCities || []) reserved.add(city.id);
+      for (const id of Object.keys(snapshot?.cityNameOverrides || {})) reserved.add(id);
+    }
+  }
+  let next = cities.reduce((max, city) => Math.max(max, Number(city.id.slice(PROJECT_CITY_PREFIX.length))), 0) + 1;
+  while (Number.isSafeInteger(next) && reserved.has(`${PROJECT_CITY_PREFIX}${next}`)) next++;
+  const city = normalizeProjectCity({ ...entry, id: `${PROJECT_CITY_PREFIX}${next}` }, state.landIndex);
   if (!city) return null;
+  if (!city.hostFeatureId) return false;
   state.projectCities = [...cities, city];
   return city.id;
 }
@@ -110,10 +124,10 @@ export function listCountryCities(state, rawTag, options = {}) {
   const inCountry = territoryQuery(state, options);
   const entries = [];
   for (const city of getCities(state, options)) {
-    const host = city.properties.__city_host_feature_id;
+    const host = getCityTerritoryHostId(state, city);
     const id = getCityCanonicalId(city);
     if (!host && state.capitalOverrides?.[tag]?.cityId !== id) continue;
-    const inTerritory = inCountry(city, tag);
+    const inTerritory = inCountry(city, tag, host);
     if (inTerritory || canonicalCountryCode(state.sovereigntyByFeatureId?.[host]) === tag
       || (!host && state.capitalOverrides?.[tag]?.cityId === id)) {
       entries.push({ id, feature: city, inTerritory });

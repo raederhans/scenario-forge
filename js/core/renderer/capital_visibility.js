@@ -3,6 +3,20 @@ import { getActiveRiverPack, getRiverParentCompatibility } from "../river_paint/
 import { isRiverPaintSourceCompatible } from "../river_paint/pilot_manifest.js";
 import { getParentMergedParents as readMergedParents } from "./parent_merged_presentation.js";
 
+export function resolveCityHostId(landIndex, hostId, coordinates) {
+  if (hostId && landIndex?.has(hostId)) return hostId;
+  for (const [id, feature] of landIndex || []) {
+    if (feature.geometry && globalThis.d3.geoContains(feature, coordinates)) return id;
+  }
+  return "";
+}
+
+export function getCityTerritoryHostId(state, city) {
+  const hostId = city.properties.__city_host_feature_id;
+  if (!hostId && city.properties.__city_source !== "project") return "";
+  return resolveCityHostId(state.landIndex, hostId, city.geometry.coordinates);
+}
+
 export function createCityTerritoryQuery({
   state, resolveBorderIdentity, getParentMergedParents = readMergedParents, getSuppressedCodes,
 }) {
@@ -24,20 +38,12 @@ export function createCityTerritoryQuery({
     return identity === tag || getParentMergedParents(state.scenarioCountriesByTag).get(identity) === tag;
   }
 
-  return function inTerritory(city, tag) {
-    const hostId = city.properties.__city_host_feature_id;
-    if (hostId) {
-      const host = state.landIndex?.get(hostId);
-      const cells = cellsFor(hostId, host);
-      const hits = cells?.filter(cell => globalThis.d3.geoContains(cell.geometry, city.geometry.coordinates));
-      return matches(tag, hostId, host, hits?.length === 1 ? hits[0] : null);
-    }
-    if (city.properties.__city_source !== "project") return false;
-    for (const [id, feature] of state.landIndex || []) {
-      const cells = cellsFor(id, feature);
-      if (cells ? cells.some(cell => matches(tag, id, feature, cell)) : matches(tag, id, feature)) return true;
-    }
-    return false;
+  return function inTerritory(city, tag, hostId = getCityTerritoryHostId(state, city)) {
+    if (!hostId) return false;
+    const host = state.landIndex.get(hostId);
+    const cells = cellsFor(hostId, host);
+    const hits = cells?.filter(cell => globalThis.d3.geoContains(cell.geometry, city.geometry.coordinates));
+    return matches(tag, hostId, host, hits?.length === 1 ? hits[0] : null);
   };
 }
 
