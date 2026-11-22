@@ -80,7 +80,10 @@ import { getProjectionGeometryGeneration } from "./renderer/projection_geometry_
 import { cancelMapPointPick, isMapPointPickActive } from "./map_point_picker.js";
 import { isBrushPanGesture, createBrushInteractionSessionOwner } from "./renderer/brush_interaction_session_owner.js";
 import { createPhysicalIntensityPreviewOwner } from "./renderer/physical_intensity_preview_owner.js";
-import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
+import {
+  createRuntimePoliticalFeaturePolicy, getAtlantropaRenderLayer,
+  getAtlantropaColorRule, isAtlantropaFieldDrivenFeature, isBaseGeographyScenarioFeature,
+} from "./renderer/political_feature_policy.js";
 import { createScenarioRegionOverlayRenderOwner } from "./renderer/scenario_region_overlay_render_owner.js";
 import { chooseMarineFocusBounds } from "./renderer/marine_label_owner.js";
 import { getUrbanFeatureOwnerId } from "./renderer/urban_adaptive_paint_model.js";
@@ -260,7 +263,7 @@ import { freezeCountryLabels } from "./renderer/strategic_overlay_runtime/map_la
 export { syncMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { renderMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
-import { createPoliticalCollectionOwner } from "./renderer/political_collection_owner.js";
+import { createPoliticalCollectionOwner, getDetailTier, INTERACTIVE_AGGREGATE_TIER_FILTERS } from "./renderer/political_collection_owner.js";
 import { createContextLayerResolverOwner } from "./renderer/context_layer_resolver.js";
 import { createRendererAssetUrlPolicyOwner } from "./renderer/asset_url_policy.js";
 import {
@@ -280,6 +283,10 @@ import { createCityLightsRenderOwner } from "./renderer/city_lights_render_owner
 import { createCityLightsAssetProvider } from "./renderer/city_lights_asset_provider.js";
 import { createTransportOverviewRenderOwner } from "./renderer/transport_overview_render_owner.js";
 import { createBorderMeshOwner } from "./renderer/border_mesh_owner.js";
+import {
+  clipOceanOutsideLand, getOceanMaskMode, getPoliticalBorderSources,
+  getRegionalBackdrop, OCEAN_MASK_MODE_SPHERE_MINUS_LAND,
+} from "./renderer/regional_backdrop.js";
 import {
   getLatitudeAdjustedSimplifyEpsilon,
   sanitizePolyline,
@@ -428,10 +435,6 @@ const TNO_COASTAL_ACCENT_COLOR = "rgba(214, 232, 244, 0.88)";
 const GIANT_FEATURE_CULL_RATIO = 0.95;
 const GIANT_FEATURE_ALLOWLIST = new Set(["RU", "CA", "CN", "US", "AQ", "ATA"]);
 const HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST = new Set(["US", "CN", "RU", "JP", "DE", "GB", "FR", "IN", "BR", "CA"]);
-const INTERACTIVE_AGGREGATE_TIER_FILTERS = {
-  GB: new Set(["nuts1_basic"]),
-  GR: new Set(["adm1_basic"]),
-};
 const WRAP_ARTIFACT_WIDTH_RATIO = 0.9;
 const WRAP_ARTIFACT_HEIGHT_RATIO = 0.3;
 const WRAP_ARTIFACT_AREA_RATIO = 0.35;
@@ -557,7 +560,6 @@ const BOUNDARY_DEFAULT_LINE_JOIN = "round";
 const BOUNDARY_DEFAULT_LINE_CAP = "round";
 const BOUNDARY_DEFAULT_MITER_LIMIT = 2.4;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
-const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
 
@@ -5207,10 +5209,6 @@ function getWaterRegionType(feature) {
   return String(feature?.properties?.water_type || "water_region").trim().toLowerCase();
 }
 
-function isBaseGeographyScenarioFeature(feature) {
-  return feature?.properties?.render_as_base_geography === true;
-}
-
 function isOpenOceanWaterRegion(feature) {
   return getWaterRegionType(feature) === "ocean";
 }
@@ -5318,20 +5316,8 @@ function isWaterRegionExcludedByScenario(feature, exclusions = null) {
   return !!(regionGroup && excludedGroups.has(regionGroup));
 }
 
-function getAtlantropaRenderLayer(feature) {
-  return String(feature?.properties?.atl_render_layer || "").trim().toLowerCase();
-}
-
-function getAtlantropaColorRule(feature) {
-  return String(feature?.properties?.atl_color_rule || "").trim().toLowerCase();
-}
-
 function isScenarioAtlantropaVisible() {
   return runtimeState.showScenarioAtlantropa !== false;
-}
-
-function isAtlantropaFieldDrivenFeature(feature) {
-  return !!(getAtlantropaRenderLayer(feature) || getAtlantropaColorRule(feature));
 }
 
 function getEffectiveAtlantropaFeatures(sourceFeatures = runtimeState.scenarioAtlantropaData?.features) {
@@ -5624,17 +5610,6 @@ function getAtlantropaRuleColor(rule) {
     return getAtlantropaShoalManifestFillColor();
   }
   return "";
-}
-
-function isInteractiveAtlantropaBooleanWeldIslandFeature(feature, featureId = null) {
-  const candidate = String(
-    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
-  ).trim().toUpperCase();
-  if (!candidate.startsWith("ATLISL_")) {
-    return false;
-  }
-  return getAtlantropaGeometryRole(feature) === "donor_island"
-    && getAtlantropaJoinMode(feature) === "boolean_weld";
 }
 
 function getAtlantropaSeaPoliticalFillColor() {
@@ -6241,17 +6216,11 @@ function isAdmin0ShellFeature(feature, featureId) {
 }
 
 function composePoliticalFeaturePolicy() {
-  const owner = createPoliticalFeaturePolicy(runtimeState, {
+  const owner = createRuntimePoliticalFeaturePolicy(runtimeState, {
     getSafeCanvasColor,
     hasPendingPoliticalColorEdit,
     getRenderPassCacheState,
-    getFeatureId,
     isStablePaintOrderEnabled: hasVisibleRiverPartitions,
-    getFeatureCountryCodeNormalized,
-    isAtlantropaFieldDrivenFeature,
-    isInteractiveAtlantropaBooleanWeldIslandFeature,
-    isScenarioAtlantropaVisible,
-    isBaseGeographyScenarioFeature,
   });
   return owner;
 }
@@ -6262,8 +6231,6 @@ const {
   orderPoliticalShellUnderlayFirst,
   getStablePoliticalDrawRank,
   shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature,
-  getAtlantropaGeometryRole,
-  getAtlantropaJoinMode,
   isAntarcticSectorFeature,
   shouldExcludePoliticalVisualFeature,
   isPoliticalInteractionRenderableFeature,
@@ -7666,12 +7633,6 @@ function getAdmin1Group(entity) {
   return String(value).trim();
 }
 
-function getDetailTier(entity) {
-  const value = entity?.properties?.detail_tier;
-  if (value === null || value === undefined) return "";
-  return String(value).trim();
-}
-
 function isAdmDetailTier(entity) {
   return getDetailTier(entity).toLowerCase().startsWith("adm2");
 }
@@ -7857,6 +7818,7 @@ function scheduleDeferredContextBaseEnhancements() {
 function getBorderMeshWorkerRuntime() {
   borderMeshWorkerRuntime ||= createBorderMeshWorkerRuntime({
     state: runtimeState,
+    getSourceTopologies: () => getPoliticalBorderSources(runtimeState),
     getGeometrySourceSignature: (topology) => String(getProjectionGeometryGeneration(topology)),
     asFeatureLike,
     getFeatureCountryCodeNormalized: getFeatureBorderMeshCountryCodeNormalized,
@@ -7976,10 +7938,7 @@ function ensureCountrySourceBorderMeshes(countryCode, {
 
   const nextProvinceMeshes = [];
   const nextLocalMeshes = [];
-  const sources = [
-    { key: "detail", topology: runtimeState.topologyDetail },
-    { key: "primary", topology: runtimeState.topologyPrimary || runtimeState.topology },
-  ];
+  const sources = getPoliticalBorderSources(runtimeState);
   for (const { key, topology } of sources) {
     if (!topology?.objects?.political) continue;
     if (!staticMeshSourceCountries[key]?.has(normalizedCode)) continue;
@@ -9261,7 +9220,7 @@ function resolveOceanMask() {
   }
 
   if (runtimeState.oceanData && quality >= OCEAN_MASK_MIN_QUALITY) {
-    mode = OCEAN_MASK_MODE_TOPOLOGY;
+    mode = getOceanMaskMode(runtimeState, OCEAN_MASK_MODE_TOPOLOGY);
   }
 
   runtimeState.oceanMaskMode = mode;
@@ -9271,6 +9230,8 @@ function resolveOceanMask() {
 
 function applyOceanClipMask(maskMode) {
   const startedAt = nowMs();
+  const backdrop = getRegionalBackdrop(runtimeState);
+  if (backdrop) maskMode = OCEAN_MASK_MODE_SPHERE_MINUS_LAND;
   rendererSurfaceHost.getContext().beginPath();
   if (maskMode === OCEAN_MASK_MODE_TOPOLOGY && runtimeState.oceanData) {
     const cachedPath = getProjectedGeographicPath(runtimeState.oceanData);
@@ -9291,22 +9252,11 @@ function applyOceanClipMask(maskMode) {
     return;
   }
 
-  const maskInfo = getPhysicalLandMaskInfo();
+  const maskInfo = backdrop || getPhysicalLandMaskInfo();
   const landMask = maskInfo.collection;
 
   if (landMask) {
-    const exclusionPath = getOceanExclusionPath(landMask);
-    if (exclusionPath) {
-      rendererSurfaceHost.getContext().clip(exclusionPath, "evenodd");
-    } else {
-      rendererSurfaceHost.getPathCanvas()(oceanSphereGeometry);
-      rendererSurfaceHost.getPathCanvas()(landMask);
-      try {
-        rendererSurfaceHost.getContext().clip("evenodd");
-      } catch (error) {
-        rendererSurfaceHost.getContext().clip();
-      }
-    }
+    clipOceanOutsideLand(rendererSurfaceHost, oceanSphereGeometry, landMask, getOceanExclusionPath(landMask));
     recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
       applied: true,
       maskMode,
@@ -9318,7 +9268,7 @@ function applyOceanClipMask(maskMode) {
     return;
   }
 
-  if (runtimeState.oceanData) {
+  if (!backdrop && runtimeState.oceanData) {
     rendererSurfaceHost.getContext().beginPath();
     const cachedPath = getProjectedGeographicPath(runtimeState.oceanData);
     if (cachedPath) rendererSurfaceHost.getContext().clip(cachedPath);
@@ -10344,6 +10294,7 @@ function drawPoliticalPass(k) {
 function getScenarioRegionOverlayRenderOwner() {
   if (!scenarioRegionOverlayRenderOwner) {
     scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner(runtimeState, {
+      applyOceanClipMask,
       rendererSurfaceHost,
       scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
       getScenarioWaterRasterLayout: () => !exportRenderInProgress && isTnoRasterSceneSelected()

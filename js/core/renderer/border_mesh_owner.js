@@ -1,5 +1,5 @@
 import {
-  evaluateCoastlineTopologyDiagnostics,
+  evaluateCoastlineTopologySource,
 } from "./border_mesh_diagnostics.js";
 import {
   buildCountryParentBorderMeshes as buildCountryParentBorderMeshesFromSources,
@@ -23,6 +23,8 @@ import {
 } from "../state/actions/renderer_cache_actions.js";
 
 import { getBorderCountryAssignmentRevision, isAtlantropaCoastlineLandVisible } from "./border_mesh_queries.js";
+import { getRegionalCoastlineDecision, selectPoliticalBorderTopology } from "./regional_backdrop.js";
+import { isRegionalScenario } from "../scenario/scenario_region.js";
 
 export function createBorderMeshOwner({
   state,
@@ -210,7 +212,7 @@ export function createBorderMeshOwner({
 
   const buildDetailAdmBorderMesh = (topology, includedCountries) =>
     buildDetailAdmBorderMeshRuntime({
-      topology,
+      topology: selectPoliticalBorderTopology(state, topology),
       includedCountries,
       asFeatureLike,
       shouldExcludePoliticalInteractionFeature,
@@ -218,13 +220,19 @@ export function createBorderMeshOwner({
       isAdmDetailTier,
     });
 
+  function resolveSourceCountrySets(sets) {
+    return isRegionalScenario(state.activeScenarioManifest)
+      ? { primary: new Set(), detail: new Set([...sets.primary, ...sets.detail]) }
+      : sets;
+  }
+
   function getSourceCountrySets() {
-    return getSourceCountrySetsFromSelection({
+    return resolveSourceCountrySets(getSourceCountrySetsFromSelection({
       state,
       getFeatureCountryCodeNormalized: getFeatureBorderMeshCountryCodeNormalized,
       getFeatureId,
       shouldExcludePoliticalInteractionFeature,
-    });
+    }));
   }
 
   async function prepareSourceCountrySets({
@@ -250,7 +258,7 @@ export function createBorderMeshOwner({
         if (next.done) {
           maxSliceMs = Math.max(maxSliceMs, preparationNowMs() - sliceStartedAt);
           if (!isCurrent()) break;
-          return { status: "prepared", sourceCountries: next.value, sourceFeatures, maxSliceMs, yieldCount };
+          return { status: "prepared", sourceCountries: resolveSourceCountrySets(next.value), sourceFeatures, maxSliceMs, yieldCount };
         }
         if (++work % 512 === 0) {
           const sliceMs = preparationNowMs() - sliceStartedAt;
@@ -300,7 +308,7 @@ export function createBorderMeshOwner({
 
   function buildGlobalCountryBorderMesh(primaryTopology) {
     return buildGlobalCountryBorderMeshFromSources({
-      primaryTopology,
+      primaryTopology: selectPoliticalBorderTopology(state, primaryTopology),
       asFeatureLike,
       shouldExcludePoliticalInteractionFeature,
       getFeatureCountryCodeNormalized,
@@ -330,7 +338,7 @@ export function createBorderMeshOwner({
     if (cacheMatches && scenarioCoastlineSourceCache.decision) {
       return scenarioCoastlineSourceCache.decision;
     }
-    const { decision } = evaluateCoastlineTopologyDiagnostics({
+    const { topology, ...decision } = getRegionalCoastlineDecision(state) || evaluateCoastlineTopologySource({
       primaryTopology,
       runtimeTopology: hasDedicatedCoastline && !atlantropaLandVisible ? null : runtimeTopology,
       scenarioId,
@@ -339,14 +347,14 @@ export function createBorderMeshOwner({
       scenarioCoastlineMaxInteriorRingCount,
       scenarioCoastlineMaxInteriorRingRatio,
       isWorldBounds,
-    });
+    }).decision;
     const publishedDiagnostics = publishScenarioCoastlineDecision({
       ...decision,
       scenarioSurfaceVersionSignal,
     });
     const publishedDecision = {
       ...publishedDiagnostics,
-      topology: decision.source === "scenario" ? runtimeTopology : primaryTopology,
+      topology,
     };
 
     if (scenarioId) {

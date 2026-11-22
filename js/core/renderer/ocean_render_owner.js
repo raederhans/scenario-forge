@@ -1,3 +1,5 @@
+import { getOceanMaskMode } from "./regional_backdrop.js";
+
 export function createOceanRenderOwner({
   state = {},
   constants = {},
@@ -119,7 +121,7 @@ export function createOceanRenderOwner({
     const oceanStyle = getOceanStyleConfig();
     const visibility = { status: "off", lod: "overview", backend: null, missingTileCount: 0,
       loadedTileCount: 0, globalVisibleCount: 0, scenarioVisibleCount: 0, visibleCount: 0 };
-    runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
+    runtimeState.oceanMaskMode = getOceanMaskMode(runtimeState, OCEAN_MASK_MODE_TOPOLOGY);
     runtimeState.oceanMaskQuality = 0;
     if (!oceanStyle.experimentalAdvancedStyles || oceanStyle.preset === "flat") {
       publishBathymetryVisibility(visibility);
@@ -136,7 +138,7 @@ export function createOceanRenderOwner({
     context.restore();
     const ready = result.status === "ready";
     if (ready) {
-      runtimeState.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY;
+      runtimeState.oceanMaskMode = getOceanMaskMode(runtimeState, OCEAN_MASK_MODE_BATHYMETRY);
       runtimeState.oceanMaskQuality = 1;
     }
     publishBathymetryVisibility({

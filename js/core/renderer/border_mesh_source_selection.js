@@ -1,3 +1,5 @@
+import { getPoliticalBorderSources } from "./regional_backdrop.js";
+
 // Topology geometry is immutable within one political object identity. Country
 // assignment is not: its caller-owned revision invalidates only country groups.
 const politicalGeometryIndexes = new WeakMap();
@@ -119,10 +121,7 @@ export function buildCountryParentBorderMeshes({
   const normalizedCode = canonicalCountryCode(countryCode);
   if (!normalizedCode || !globalThis.topojson) return [];
   const sourceCountries = getStaticMeshSourceCountries();
-  const sources = [
-    { key: "detail", topology: state.topologyDetail },
-    { key: "primary", topology: state.topologyPrimary || state.topology },
-  ];
+  const sources = getPoliticalBorderSources(state);
   const meshes = [];
 
   sources.forEach(({ key, topology }) => {

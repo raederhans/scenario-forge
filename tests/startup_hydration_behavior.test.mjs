@@ -244,6 +244,43 @@ test("missing runtime source sha enters hydration health gate", () => {
   assert.equal(result.overlayConsistency.reason, "missing-runtime-source-sha");
 });
 
+test("regional full-only startup checks published membership and overlay identity", async () => {
+  const features = ["AA-1", "AA-2"].map(id => ({ properties: { id } }));
+  const full = { type: "FeatureCollection", features };
+  const manifest = { scenario_id: "region", region: { bounds: [0, 0, 20, 10] } };
+  const state = {
+    activeScenarioId: "region", activeScenarioManifest: manifest,
+    scenarioRuntimeTopologyData: { objects: { political: { geometries: features } } },
+    sovereigntyByFeatureId: { "AA-1": "AA", "AA-2": "AA" },
+    scenarioLandMaskData: { features: [] },
+  };
+  const controller = createMinimalHydrationController(state);
+  const bundle = { manifest, bundleLevel: "full", source: { runtime_topology_sha256: "full-sha" } };
+  const tag = controller.buildScenarioRuntimeVersionTag(bundle, state.scenarioRuntimeTopologyData);
+  assert.equal(tag, "region:full-sha");
+  state.scenarioRuntimeTopologyVersionTag = state.scenarioLandMaskVersionTag = tag;
+  const check = phase => controller.evaluateScenarioHydrationHealthGateState({ phase });
+  assert.equal(check("startup").ok, true);
+  state.landDataFull = state.landData = { features: [] };
+  assert.equal(check("startup").ok, false);
+  state.landDataFull = state.landData = full;
+  const result = await controller.enforceScenarioHydrationHealthGate({ renderNow: false });
+  assert.equal(result.ok, true);
+  assert.equal(result.attemptedRetry, false);
+
+  state.landData = { features: [features[0], { id: "BB-outside" }] };
+  assert.equal(check("deferred").ok, false);
+  state.landDataFull = state.landData = { features: features.slice(0, 1) };
+  assert.equal(check("deferred").ok, false);
+  state.landDataFull = state.landData = full;
+  state.scenarioLandMaskVersionTag = "region:old";
+  assert.equal(check("deferred").overlayConsistency.reason, "land-mask-version-mismatch");
+  state.scenarioRuntimeTopologyVersionTag = controller.buildScenarioRuntimeVersionTag({
+    ...bundle, source: { runtime_bootstrap_topology_sha256: "bootstrap-only" },
+  }, state.scenarioRuntimeTopologyData);
+  assert.equal(check("startup").overlayConsistency.reason, "missing-runtime-source-sha");
+});
+
 test("startup hydration marks unrenderable runtime topology as fatal and keeps readonly", () => {
   for (const initialSince of [4321, 0]) {
     const state = {
