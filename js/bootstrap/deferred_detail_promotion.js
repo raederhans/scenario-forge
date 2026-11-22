@@ -14,6 +14,7 @@ import { patchScenarioChunkLoadState } from "../core/state/actions/scenario_chun
 import { setDefaultRuntimePoliticalTopologyState } from "../core/state/actions/scenario_chunk_promotion_actions.js";
 import { isScenarioRefreshSceneCurrent } from "../core/map_renderer/scenario_refresh_scope.js";
 import { scenarioSupportsChunkedRuntime } from "../core/scenario/bundle_loader.js";
+import { isRegionalScenario } from "../core/scenario/scenario_region.js";
 import { getDeferredPromotionDelay } from "./startup_bootstrap_support.js";
 
 const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
@@ -161,6 +162,9 @@ export function createDeferredDetailPromotionOwner({
     deferInteractionInfrastructure = false,
     flushPendingFocusRefresh = true,
   } = {}) {
+    if (isRegionalScenario(runtimeState.activeScenarioManifest)) {
+      return !!runtimeState.scenarioRuntimeTopologyData?.objects?.political?.geometries?.length;
+    }
     prioritizeViewportFocusCountry({
       reason: "detail-promotion-focus",
       flushPending: flushPendingFocusRefresh,
