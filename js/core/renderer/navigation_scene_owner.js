@@ -2,7 +2,7 @@ import { createGeometryRasterWorkerClient } from "../geometry_raster_worker_clie
 import { getPoliticalDisplayModeSignature } from "../political_display_mode.js";
 import { getThematicWgiSignature } from "../thematic/thematic_wgi_view_model.js";
 import { packGeometryCooperatively } from "../cooperative_geometry_transport.js";
-import { getScenarioRegion } from "../scenario/scenario_region.js";
+import { getScenarioRegion, hidesRegionalBackdrop } from "../scenario/scenario_region.js";
 import { projectGeoBounds } from "./regional_camera.js";
 import { getRegionalBackdrop } from "./regional_backdrop.js";
 import { createNavigationFrameOwner } from "./navigation_frame_owner.js";
@@ -192,6 +192,7 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     }
     return JSON.stringify([
       state.activeScenarioId, state.sceneGeneration,
+      state.activeScenarioManifest?.region?.backdrop, state.activeScenarioManifest?.region?.backdrop_fill,
       getProjectionGeometryGeneration(surface.getProjection()),
       getObjectIdentityToken(state.topologyPrimary || state.topology),
       getObjectIdentityToken(state.topologyDetail), getObjectIdentityToken(state.ruCityOverrides),
@@ -395,7 +396,8 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
         }
       }
     };
-    if (frame.prepare({ bounds, layers, renderRaster, backgroundColor: "transparent" }) !== false) {
+    const backgroundColor = hidesRegionalBackdrop(state.activeScenarioManifest) ? h.getOceanBaseFillColor() : "transparent";
+    if (frame.prepare({ bounds, layers, renderRaster, backgroundColor }) !== false) {
       requestedIdentity = identity;
       sourcePayloads = null;
     }
