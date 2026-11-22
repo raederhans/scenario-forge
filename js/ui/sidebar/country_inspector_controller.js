@@ -4,6 +4,7 @@ import { isProjectCountry } from "../../core/project_countries.js";
 import { recolorProjectCountry, registerColorAsProjectCountry, renameProjectCountry, unregisterProjectCountry } from "../../core/project_country_commands.js";
 import { getCityOverrideId, setCityNameOverride } from "../../core/city_name_overrides.js";
 import { placeProjectCapital, removeProjectCity, resetCountryCapital, setCountryCapital } from "../../core/capital_commands.js";
+import { showToast } from "../components/toast.js";
 import { listCountryCities, pickLargestCity } from "../../core/capital_overrides.js";
 import { cancelMapPointPick, getEffectiveCityCollection, startMapPointPick } from "../../core/map_renderer/public.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
@@ -1662,8 +1663,10 @@ export function createCountryInspectorController({
         const result = startMapPointPick({ purpose: "capital" });
         syncPlacement();
         const point = await result;
-        if (point && tag === selectedTag() && scenarioId === runtimeState.activeScenarioId) {
-          placeProjectCapital(tag, { ...point, name: { en: name, zh: name } });
+        if (point && tag === selectedTag() && scenarioId === runtimeState.activeScenarioId
+          && !placeProjectCapital(tag, { ...point, name: { en: name, zh: name } })) {
+          // 落点在他国实际版图内时命令会拒绝，告诉用户原因而不是静默失败。
+          showToast(t("The capital must be placed inside this country's territory", "ui"), { tone: "warning" });
         }
         renderCountryInspectorDetail();
       });

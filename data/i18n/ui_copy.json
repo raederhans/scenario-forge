@@ -15,6 +15,10 @@
     "en": "Place capital",
     "zh": "放置首都"
   },
+  "The capital must be placed inside this country's territory": {
+    "en": "The capital must be placed inside this country's territory",
+    "zh": "首都只能放在本国实际版图内"
+  },
   "Delete project city": {
     "en": "Delete project city",
     "zh": "删除项目城市"

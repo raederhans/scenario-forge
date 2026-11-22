@@ -10977,6 +10977,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "首都不在本国境内（地图上不显示星标）",
     "en": "The capital is outside this country (its map star is hidden)"
   },
+  "The capital must be placed inside this country's territory": {
+    "zh": "首都只能放在本国实际版图内",
+    "en": "The capital must be placed inside this country's territory"
+  },
   "The carrier now renders one variant at a time. Internal stays the default review track, while the open variant stays source-separated and opt-in.": {
     "zh": "carrier 每次只渲染一个 variant。内部版保持默认 review track，开放版保持来源分离并需要主动选择。",
     "en": "The carrier now renders one variant at a time. Internal stays the default review track, while the open variant stays source-separated and opt-in."
