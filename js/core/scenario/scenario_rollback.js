@@ -119,6 +119,8 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
+  "capitalOverrides",
+  "projectCities",
   "riverPaint",
   "sovereignBaseColors",
   "activeSovereignCode",
@@ -405,6 +407,8 @@ function buildScenarioTransactionRollbackStatePatch(snapshot) {
         cloneScenarioStateValue(snapshot.sovereigntyByFeatureId),
       sovereigntyInitialized: !!snapshot.sovereigntyInitialized,
       visualOverrides: cloneScenarioStateValue(snapshot.visualOverrides),
+      capitalOverrides: cloneScenarioStateValue(snapshot.capitalOverrides),
+      projectCities: cloneScenarioStateValue(snapshot.projectCities),
       riverPaint: cloneScenarioStateValue(snapshot.riverPaint),
       sovereignBaseColors:
         cloneScenarioStateValue(snapshot.sovereignBaseColors),

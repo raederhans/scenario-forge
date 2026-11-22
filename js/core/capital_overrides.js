@@ -90,10 +90,14 @@ function territoryQuery(state, options) {
   });
 }
 
+export function findCapitalCityFeature(state, cityId, options = {}) {
+  return getCities(state, options).find(feature => getCityCanonicalId(feature) === cityId);
+}
+
 export function isCityInCountryTerritory(state, rawTag, cityId, options = {}) {
   const tag = canonicalCountryCode(rawTag);
   if (!state.scenarioCountriesByTag?.[tag]) return false;
-  const city = getCities(state, options).find(feature => getCityCanonicalId(feature) === cityId);
+  const city = findCapitalCityFeature(state, cityId, options);
   return !!city && territoryQuery(state, options)(city, tag);
 }
 

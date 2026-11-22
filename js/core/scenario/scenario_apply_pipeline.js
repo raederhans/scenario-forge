@@ -476,6 +476,8 @@ function createScenarioApplyPipeline({
       sovereigntyByFeatureId: staged.resolvedOwners,
       sovereigntyInitialized: false,
       visualOverrides: {},
+      capitalOverrides: {},
+      projectCities: [],
       riverPaint: createDefaultRiverPaintState(),
       scenarioGeneratedColorTags: staged.scenarioGeneratedColorTags || [],
       scenarioFixedOwnerColors: fixedOwnerColors,

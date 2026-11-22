@@ -64,6 +64,8 @@ export function createDefaultColorState() {
     legendLabels: {},
     countryNameOverrides: {},
     cityNameOverrides: {},
+    capitalOverrides: {},
+    projectCities: [],
     legendConfig: {
       mode: "direct-area",
       continent: "all",

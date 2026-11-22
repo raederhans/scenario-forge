@@ -1812,6 +1812,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "清空烘焙缓存",
     "en": "Clear baked cache"
   },
+  "Clear capital": {
+    "zh": "清除首都",
+    "en": "Clear capital"
+  },
   "Clear color search": {
     "zh": "清空颜色搜索",
     "en": "Clear color search"
@@ -2978,6 +2982,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Delete operational line": {
     "zh": "删除作战线",
     "en": "Delete operational line"
+  },
+  "Delete project city": {
+    "zh": "删除项目城市",
+    "en": "Delete project city"
   },
   "Delete the selected operation graphic?": {
     "zh": "删除所选行动图形？",
@@ -7626,6 +7634,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "连续放置地图文字",
     "en": "Place another map label"
   },
+  "Place capital": {
+    "zh": "放置首都",
+    "en": "Place capital"
+  },
   "Place intensity point": {
     "zh": "添加强度点",
     "en": "Place intensity point"
@@ -8753,6 +8765,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Restore original country color": {
     "zh": "恢复本国原色",
     "en": "Restore original country color"
+  },
+  "Restore scenario capital": {
+    "zh": "恢复剧本首都",
+    "en": "Restore scenario capital"
   },
   "Restored": {
     "zh": "已恢复",
@@ -9917,6 +9933,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Set base borders and water first, add physical or day-night layers, then adjust labels, textures, and presets.": {
     "zh": "先设置基础边界和水域，再加入物理或昼夜图层，最后调整标签、纹理和预设。",
     "en": "Set base borders and water first, add physical or day-night layers, then adjust labels, textures, and presets."
+  },
+  "Set capital to {name}": {
+    "zh": "设定首都 {name}",
+    "en": "Set capital to {name}"
   },
   "Set the owner tag for all selected features": {
     "zh": "为所有选中地块设置归属标签",
