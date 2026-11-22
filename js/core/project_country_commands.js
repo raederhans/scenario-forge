@@ -3,7 +3,7 @@ import { getCountryNameOverride, setCountryNameOverride } from "./country_name_o
 import { markDirty } from "./dirty_state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { t } from "./i18n.js";
-import { allocateProjectCountryTag, isProjectCountry, registerProjectCountryState, unregisterProjectCountryState } from "./project_countries.js";
+import { allocateProjectCountryTag, isProjectCountry, normalizeProjectCountryName, registerProjectCountryState, unregisterProjectCountryState } from "./project_countries.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { applyColorReplacement, replacementScope } from "./replace_color_command.js";
 import { getRiverPartitionIndex } from "./river_paint/partition_model.js";
@@ -32,9 +32,9 @@ export function registerColorAsProjectCountry(color, { name } = {}) {
     && !paint.riverCellIds.some(id => matches(id, getRiverPaintRuntime(state).getCellFeature(id)))) return false;
   const tag = allocateProjectCountryTag(state);
   if (!tag) return false;
-  const countryName = name?.trim() || state.legendLabels?.[hex] || t("New country {n}", "ui", {
+  const countryName = normalizeProjectCountryName(name?.trim() || state.legendLabels?.[hex] || t("New country {n}", "ui", {
     n: Number(tag.slice(1)) + (tag.startsWith("Q") ? 99 : 0),
-  });
+  }));
   const scope = { ownerCodes: [tag], projectCountries: [tag] };
   const before = captureHistoryState(scope);
   registerProjectCountryState(state, { tag, color: hex, name: countryName });
@@ -77,7 +77,7 @@ export function renameProjectCountry(tag, name) {
   const oldName = displayName(tag);
   const scope = { countryNameOverrides: true, legend: true };
   const before = captureHistoryState(scope);
-  if (!setCountryNameOverride(state, tag, state.currentLanguage, name)) return false;
+  if (!setCountryNameOverride(state, tag, state.currentLanguage, normalizeProjectCountryName(name))) return false;
   const next = displayName(tag);
   const color = state.sovereignBaseColors[tag];
   if (state.legendLabels?.[color] === oldName) state.legendLabels = { ...state.legendLabels, [color]: next };

@@ -4,6 +4,9 @@ import { getLegendPaintColors } from "./legend_state_normalizers.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { migrateLegendColorState } from "./state/actions/legend_actions.js";
 import { createPaletteOwnerResolver } from "./palette_country_targets.js";
+import { isProjectCountry } from "./project_countries.js";
+import { recolorProjectCountry } from "./project_country_commands.js";
+import { getCountryLocateIds } from "./country_override_reset_command.js";
 
 // The composition root supplies history, refresh, and synchronous paint selection.
 // Recent-color feedback and the final render follow the applied result.
@@ -50,10 +53,16 @@ export function createPaletteLibraryOperation({
     const color = normalizeHexColor(rawColor);
     if (!color) return { status: "invalid-color" };
     const explicitCountry = String(countryCode || "").trim().toUpperCase();
-    const countryIds = explicitCountry ? getCountryFeatureIds(explicitCountry) : [];
-    if (explicitCountry && !countryIds.length) return { status: "no-target" };
     const target = explicitCountry ? { type: "owner", ownerCode: explicitCountry } : getApplyTarget();
     if (!target) return { status: "no-target" };
+    if (target.type === "owner" && isProjectCountry(state, target.ownerCode)) {
+      if (!recolorProjectCountry(target.ownerCode, color)) return { status: "no-target" };
+      selectPaintColor(color);
+      return { status: "applied", color, target, ...(explicitCountry
+        ? { featureCount: getCountryLocateIds(state, explicitCountry).length, preservedCount: 0 } : {}) };
+    }
+    const countryIds = explicitCountry ? getCountryFeatureIds(explicitCountry) : [];
+    if (explicitCountry && !countryIds.length) return { status: "no-target" };
 
     selectPaintColor(color);
     const isFeature = target.type === "feature";

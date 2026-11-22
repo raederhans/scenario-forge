@@ -73,7 +73,16 @@ export function serializeProjectCountries(state) {
 }
 
 export function getProjectCountryBaseColors(state) {
-  return Object.fromEntries(serializeProjectCountries(state).map(({ tag }) => [tag, state.sovereignBaseColors[tag]]));
+  const colors = {};
+  for (const { tag } of serializeProjectCountries(state)) {
+    const color = normalizeHexColor(state.sovereignBaseColors?.[tag]);
+    if (color) colors[tag] = color;
+  }
+  return colors;
+}
+
+export function normalizeProjectCountryName(name) {
+  return Array.from(name.trim()).slice(0, 120).join("").trimEnd();
 }
 
 export function normalizeProjectCountriesPayload(raw) {
@@ -81,8 +90,8 @@ export function normalizeProjectCountriesPayload(raw) {
   const seen = new Set();
   for (const entry of Array.isArray(raw) ? raw : []) {
     const tag = String(entry?.tag || "").trim().toUpperCase();
-    const name = typeof entry?.name === "string" ? entry.name.trim() : "";
-    if (!/^[PQ](?:0[1-9]|[1-9]\d)$/.test(tag) || !name || name.length > 120 || seen.has(tag)) continue;
+    const name = typeof entry?.name === "string" ? normalizeProjectCountryName(entry.name) : "";
+    if (!/^[PQ](?:0[1-9]|[1-9]\d)$/.test(tag) || !name || seen.has(tag)) continue;
     seen.add(tag);
     result.push({ tag, name });
   }
