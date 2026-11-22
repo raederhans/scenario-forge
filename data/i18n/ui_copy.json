@@ -1,4 +1,72 @@
 {
+  "This color already belongs to another country. Use “Merge into country”.": {
+    "en": "This color already belongs to another country. Use “Merge into country”.",
+    "zh": "该颜色已属于其他国家，可用“合并到国家”"
+  },
+  "Set capital to {name}": {
+    "en": "Set capital to {name}",
+    "zh": "设定首都 {name}"
+  },
+  "Clear capital": {
+    "en": "Clear capital",
+    "zh": "清除首都"
+  },
+  "Restore scenario capital": {
+    "en": "Restore scenario capital",
+    "zh": "恢复剧本首都"
+  },
+  "Place capital": {
+    "en": "Place capital",
+    "zh": "放置首都"
+  },
+  "The capital must be placed inside this country's territory": {
+    "en": "The capital must be placed inside this country's territory",
+    "zh": "首都只能放在本国实际版图内"
+  },
+  "Delete project city": {
+    "en": "Delete project city",
+    "zh": "删除项目城市"
+  },
+  "Project countries": {
+    "en": "Project countries",
+    "zh": "项目国家"
+  },
+  "Register as new country": {
+    "en": "Register as new country",
+    "zh": "登记为新国家"
+  },
+  "Unregister country": {
+    "en": "Unregister country",
+    "zh": "取消登记国家"
+  },
+  "New country {n}": {
+    "en": "New country {n}",
+    "zh": "新国家 {n}"
+  },
+  "Register new country {name}": {
+    "en": "Register new country {name}",
+    "zh": "登记新国家 {name}"
+  },
+  "Unregister {name}": {
+    "en": "Unregister {name}",
+    "zh": "取消登记 {name}"
+  },
+  "Change {name} color": {
+    "en": "Change {name} color",
+    "zh": "更改 {name} 的颜色"
+  },
+  "Rename country to {name}": {
+    "en": "Rename country to {name}",
+    "zh": "将国家改名为 {name}"
+  },
+  "This color is already used by another country.": {
+    "en": "This color is already used by another country.",
+    "zh": "已有其他国家使用此颜色。"
+  },
+  "Project countries without a base color were skipped: {tags}": {
+    "en": "Project countries without a base color were skipped: {tags}",
+    "zh": "已跳过缺少底色的项目国家：{tags}"
+  },
   "Autosave": {
     "en": "Autosave",
     "zh": "自动保存"
@@ -12640,5 +12708,69 @@
   "Apply label text": {
     "en": "Apply label text",
     "zh": "确认文字内容"
+  },
+  "{name} ({code})": {
+    "en": "{name} ({code})",
+    "zh": "{name}（{code}）"
+  },
+  "No reference territory.": {
+    "en": "No reference territory.",
+    "zh": "无参考领土。"
+  },
+  "The capital is outside this country (its map star is hidden)": {
+    "en": "The capital is outside this country (its map star is hidden)",
+    "zh": "首都不在本国境内（地图上不显示星标）"
+  },
+  "Set as capital": {
+    "en": "Set as capital",
+    "zh": "设为首都"
+  },
+  "No capital": {
+    "en": "No capital",
+    "zh": "无首都"
+  },
+  "Use largest city": {
+    "en": "Use largest city",
+    "zh": "用最大城市"
+  },
+  "Delete this city": {
+    "en": "Delete this city",
+    "zh": "删除此城市"
+  },
+  "New capital city name": {
+    "en": "New capital city name",
+    "zh": "新首都城市名"
+  },
+  "Place capital on map…": {
+    "en": "Place capital on map…",
+    "zh": "在地图上放置首都…"
+  },
+  "Click the map to place the capital. Press Esc to cancel.": {
+    "en": "Click the map to place the capital. Press Esc to cancel.",
+    "zh": "在地图上点击放置首都，Esc 取消"
+  },
+  "Scenario default": {
+    "en": "Scenario default",
+    "zh": "剧本默认"
+  },
+  "Project setting": {
+    "en": "Project setting",
+    "zh": "项目设定"
+  },
+  "Explicitly no capital": {
+    "en": "Explicitly no capital",
+    "zh": "已设为无首都"
+  },
+  "Not set": {
+    "en": "Not set",
+    "zh": "未设定"
+  },
+  "{name} (outside territory)": {
+    "en": "{name} (outside territory)",
+    "zh": "{name}（境外）"
+  },
+  "Choose a city within this country": {
+    "en": "Choose a city within this country",
+    "zh": "请选择本国境内的城市"
   }
 }

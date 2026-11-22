@@ -1460,6 +1460,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "修改 {country} 颜色",
     "en": "Change color of {country}"
   },
+  "Change {name} color": {
+    "zh": "更改 {name} 的颜色",
+    "en": "Change {name} color"
+  },
   "Changes to this order stay in the workbench.": {
     "zh": "此顺序的更改仅保留在工作台中。",
     "en": "Changes to this order stay in the workbench."
@@ -1523,6 +1527,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Choose a city marker treatment first, then tune how many point markers and labels are allowed to surface.": {
     "zh": "先选一种城市点位表现方式，再调整允许显示的点标记和标签数量。",
     "en": "Choose a city marker treatment first, then tune how many point markers and labels are allowed to surface."
+  },
+  "Choose a city within this country": {
+    "zh": "请选择本国境内的城市",
+    "en": "Choose a city within this country"
   },
   "Choose a country above to edit its color, active sovereign state, groups, and presets.": {
     "zh": "在上方选择一个国家，以编辑其颜色、当前主权状态、分组和预设。",
@@ -1808,6 +1816,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "清空烘焙缓存",
     "en": "Clear baked cache"
   },
+  "Clear capital": {
+    "zh": "清除首都",
+    "en": "Clear capital"
+  },
   "Clear color search": {
     "zh": "清空颜色搜索",
     "en": "Clear color search"
@@ -1910,6 +1922,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Click parcels to add or remove; press Esc to finish.": {
     "zh": "点击地块加入或移除，按 Esc 结束",
     "en": "Click parcels to add or remove; press Esc to finish."
+  },
+  "Click the map to place the capital. Press Esc to cancel.": {
+    "zh": "在地图上点击放置首都，Esc 取消",
+    "en": "Click the map to place the capital. Press Esc to cancel."
   },
   "Click the map to place vertices. Double-click or press Finish to commit the line.": {
     "zh": "单击地图以放置折点。双击或按“完成”以提交该行。",
@@ -2975,6 +2991,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "删除作战线",
     "en": "Delete operational line"
   },
+  "Delete project city": {
+    "zh": "删除项目城市",
+    "en": "Delete project city"
+  },
   "Delete the selected operation graphic?": {
     "zh": "删除所选行动图形？",
     "en": "Delete the selected operation graphic?"
@@ -2990,6 +3010,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Delete the selected unit counter?": {
     "zh": "删除所选单位计数器？",
     "en": "Delete the selected unit counter?"
+  },
+  "Delete this city": {
+    "zh": "删除此城市",
+    "en": "Delete this city"
   },
   "Delete unit counter": {
     "zh": "删除兵棋",
@@ -3821,6 +3845,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Explain rule intent only. Do not fabricate pack statistics.": {
     "zh": "仅解释规则意图。不要伪造包统计数据。",
     "en": "Explain rule intent only. Do not fabricate pack statistics."
+  },
+  "Explicitly no capital": {
+    "zh": "已设为无首都",
+    "en": "Explicitly no capital"
   },
   "Export": {
     "zh": "导出",
@@ -6551,6 +6579,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "新组标签",
     "en": "New Group Label"
   },
+  "New capital city name": {
+    "zh": "新首都城市名",
+    "en": "New capital city name"
+  },
+  "New country {n}": {
+    "zh": "新国家 {n}",
+    "en": "New country {n}"
+  },
   "New layer": {
     "zh": "新建图层",
     "en": "New layer"
@@ -6610,6 +6646,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "No bathymetry coverage in this view": {
     "zh": "当前视图无测深覆盖",
     "en": "No bathymetry coverage in this view"
+  },
+  "No capital": {
+    "zh": "无首都",
+    "en": "No capital"
   },
   "No changes": {
     "zh": "没有变化",
@@ -6807,6 +6847,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "没有参考区域被重新着色。",
     "en": "No reference regions were recolored."
   },
+  "No reference territory.": {
+    "zh": "无参考领土。",
+    "en": "No reference territory."
+  },
   "No reference territory. Release to generate a country name.": {
     "zh": "无参考版图，释放后生成国名。",
     "en": "No reference territory. Release to generate a country name."
@@ -6926,6 +6970,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Not saved yet": {
     "zh": "尚未保存",
     "en": "Not saved yet"
+  },
+  "Not set": {
+    "zh": "未设定",
+    "en": "Not set"
   },
   "Note": {
     "zh": "注释",
@@ -7618,6 +7666,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "连续放置地图文字",
     "en": "Place another map label"
   },
+  "Place capital": {
+    "zh": "放置首都",
+    "en": "Place capital"
+  },
+  "Place capital on map…": {
+    "zh": "在地图上放置首都…",
+    "en": "Place capital on map…"
+  },
   "Place intensity point": {
     "zh": "添加强度点",
     "en": "Place intensity point"
@@ -8086,6 +8142,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "项目面板",
     "en": "Project controls"
   },
+  "Project countries": {
+    "zh": "项目国家",
+    "en": "Project countries"
+  },
+  "Project countries without a base color were skipped: {tags}": {
+    "zh": "已跳过缺少底色的项目国家：{tags}",
+    "en": "Project countries without a base color were skipped: {tags}"
+  },
   "Project data": {
     "zh": "项目数据",
     "en": "Project data"
@@ -8189,6 +8253,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Project saved": {
     "zh": "项目已保存",
     "en": "Project saved"
+  },
+  "Project setting": {
+    "zh": "项目设定",
+    "en": "Project setting"
   },
   "Project tools": {
     "zh": "项目工具",
@@ -8530,6 +8598,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "注册",
     "en": "Register"
   },
+  "Register as new country": {
+    "zh": "登记为新国家",
+    "en": "Register as new country"
+  },
+  "Register new country {name}": {
+    "zh": "登记新国家 {name}",
+    "en": "Register new country {name}"
+  },
   "Regulatory quality": {
     "zh": "监管质量",
     "en": "Regulatory quality"
@@ -8597,6 +8673,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Rename country": {
     "zh": "重命名国家",
     "en": "Rename country"
+  },
+  "Rename country to {name}": {
+    "zh": "将国家改名为 {name}",
+    "en": "Rename country to {name}"
   },
   "Rename zone layer": {
     "zh": "重命名特殊区域图层",
@@ -8725,6 +8805,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Restore original country color": {
     "zh": "恢复本国原色",
     "en": "Restore original country color"
+  },
+  "Restore scenario capital": {
+    "zh": "恢复剧本首都",
+    "en": "Restore scenario capital"
   },
   "Restored": {
     "zh": "已恢复",
@@ -9281,6 +9365,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Scenario data": {
     "zh": "剧本数据",
     "en": "Scenario data"
+  },
+  "Scenario default": {
+    "zh": "剧本默认",
+    "en": "Scenario default"
   },
   "Scenario depth is schematic": {
     "zh": "剧本深度为示意",
@@ -9886,9 +9974,17 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "取消当前",
     "en": "Set Inactive"
   },
+  "Set as capital": {
+    "zh": "设为首都",
+    "en": "Set as capital"
+  },
   "Set base borders and water first, add physical or day-night layers, then adjust labels, textures, and presets.": {
     "zh": "先设置基础边界和水域，再加入物理或昼夜图层，最后调整标签、纹理和预设。",
     "en": "Set base borders and water first, add physical or day-night layers, then adjust labels, textures, and presets."
+  },
+  "Set capital to {name}": {
+    "zh": "设定首都 {name}",
+    "en": "Set capital to {name}"
   },
   "Set the owner tag for all selected features": {
     "zh": "为所有选中地块设置归属标签",
@@ -10877,6 +10973,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "当前来源类别决定预览中显示哪些地点。",
     "en": "The active track determines which sites appear in the preview."
   },
+  "The capital is outside this country (its map star is hidden)": {
+    "zh": "首都不在本国境内（地图上不显示星标）",
+    "en": "The capital is outside this country (its map star is hidden)"
+  },
+  "The capital must be placed inside this country's territory": {
+    "zh": "首都只能放在本国实际版图内",
+    "en": "The capital must be placed inside this country's territory"
+  },
   "The carrier now renders one variant at a time. Internal stays the default review track, while the open variant stays source-separated and opt-in.": {
     "zh": "carrier 每次只渲染一个 variant。内部版保持默认 review track，开放版保持来源分离并需要主动选择。",
     "en": "The carrier now renders one variant at a time. Internal stays the default review track, while the open variant stays source-separated and opt-in."
@@ -11144,6 +11248,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "This browser cannot read the project ZIP. Open the editable JSON file instead.": {
     "zh": "当前浏览器无法读取项目压缩包，请打开其中可编辑的 JSON 文件。",
     "en": "This browser cannot read the project ZIP. Open the editable JSON file instead."
+  },
+  "This color already belongs to another country. Use “Merge into country”.": {
+    "zh": "该颜色已属于其他国家，可用“合并到国家”",
+    "en": "This color already belongs to another country. Use “Merge into country”."
+  },
+  "This color is already used by another country.": {
+    "zh": "已有其他国家使用此颜色。",
+    "en": "This color is already used by another country."
   },
   "This family has not exposed extra manifest or audit cards in the current shell.": {
     "zh": "这个 family 目前还没有在这个 shell 里暴露额外的 manifest 或 audit 卡片。",
@@ -11665,6 +11777,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "未命名设施",
     "en": "Unnamed facility"
   },
+  "Unregister country": {
+    "zh": "取消登记国家",
+    "en": "Unregister country"
+  },
+  "Unregister {name}": {
+    "zh": "取消登记 {name}",
+    "en": "Unregister {name}"
+  },
   "Unregistered color {color}": {
     "zh": "未登记颜色 {color}",
     "en": "Unregistered color {color}"
@@ -11828,6 +11948,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Use geographic anchors and dominant logistics function, then merge labels when corridor density spikes.": {
     "zh": "使用地理锚点和主导物流功能，然后在走廊密度激增时合并标签。",
     "en": "Use geographic anchors and dominant logistics function, then merge labels when corridor density spikes."
+  },
+  "Use largest city": {
+    "zh": "用最大城市",
+    "en": "Use largest city"
   },
   "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.": {
     "zh": "用线型和淡化效果区分铁路状态，干线比支线和作业线更醒目。",
@@ -12575,6 +12699,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "{name} (originally {origin})": {
     "zh": "{name}（原属{origin}）",
     "en": "{name} (originally {origin})"
+  },
+  "{name} (outside territory)": {
+    "zh": "{name}（境外）",
+    "en": "{name} (outside territory)"
+  },
+  "{name} ({code})": {
+    "zh": "{name}（{code}）",
+    "en": "{name} ({code})"
   },
   "{seconds}s / day": {
     "zh": "{seconds} 秒 / 天",

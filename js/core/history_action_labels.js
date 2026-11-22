@@ -17,6 +17,15 @@ const eraseKinds = new Set([
 ]);
 
 const actionNames = {
+  "set-country-capital": "Set capital to {name}",
+  "hide-country-capital": "Clear capital",
+  "reset-country-capital": "Restore scenario capital",
+  "place-project-capital": "Place capital",
+  "remove-project-city": "Delete project city",
+  "register-project-country": "Register new country {name}",
+  "unregister-project-country": "Unregister {name}",
+  "recolor-project-country": "Change {name} color",
+  "rename-project-country": "Rename country to {name}",
   "interaction": "Edit map",
   "country-name": "Rename country",
   "city-name": "Rename city",
@@ -137,7 +146,7 @@ export function getHistoryActionLabel(direction, entry) {
   } else if (kind === "clear-map" || kind === "reset-country-colors") {
     action = t(kind === "clear-map" ? "Clear Map" : "Reset Country Colors", "ui");
   } else if (Object.hasOwn(actionNames, kind)) {
-    action = t(actionNames[kind], "ui");
+    action = t(actionNames[kind], "ui", entry.meta);
   } else if (entry?.label) {
     action = t(entry.label, "ui");
   }

@@ -1,3 +1,4 @@
+import { baseCityNameOverrides } from "../capital_overrides.js";
 import { createDefaultRiverPaintState } from "../river_paint/partition_model.js";
 // Scenario apply pipeline.
 // 这个模块只负责“准备 staged apply runtimeState”和“把 staged runtimeState 落到 runtime runtimeState”。
@@ -476,6 +477,9 @@ function createScenarioApplyPipeline({
       sovereigntyByFeatureId: staged.resolvedOwners,
       sovereigntyInitialized: false,
       visualOverrides: {},
+      capitalOverrides: {},
+      projectCities: [],
+      cityNameOverrides: baseCityNameOverrides(runtimeState.cityNameOverrides),
       riverPaint: createDefaultRiverPaintState(),
       scenarioGeneratedColorTags: staged.scenarioGeneratedColorTags || [],
       scenarioFixedOwnerColors: fixedOwnerColors,

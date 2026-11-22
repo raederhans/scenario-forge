@@ -10,6 +10,12 @@ import { yieldToBackground } from "../background_yield.js";
 
 const EMPTY = Object.freeze([]);
 const text = value => String(value ?? '').trim();
+function sameAssignments(a, b) {
+  if (a === b) return true;
+  if (!a || a.size !== b.size) return false;
+  for (const [id, code] of b) if (a.get(id) !== code) return false;
+  return true;
+}
 function freezeMap(map) {
   const reject = () => { throw new TypeError('Country label membership is read-only'); };
   return Object.freeze(Object.assign(map, { set: reject, delete: reject, clear: reject }));
@@ -25,7 +31,8 @@ function eligible(feature) {
 export function createCountryLabelSourceOwner({ state, topojson = globalThis.topojson, geoArea = globalThis.d3?.geoArea,
   geoContains = globalThis.d3?.geoContains, geoBounds = globalThis.d3?.geoBounds,
   ensureSources, getCountryName = code => getCountryNameOverride(state, code) || state.countryNames?.[code] || code,
-  resolveBorderIdentity,
+  resolveBorderIdentity, isMembershipEditSettled, membershipScheduler,
+  nowMs = () => performance.now(), recordRenderPerfMetric,
   isEligible = () => true, onChange = () => {},
   createWorker = () => new Worker(new URL('../../workers/country_label_geometry.worker.js', import.meta.url), { type: 'module' }),
   isWorkerSupported = () => typeof Worker === 'function',
@@ -34,10 +41,14 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   let sourceToken = '', revision = 0, status = 'pending', error = '';
   let geometryRecords = EMPTY, countries = EMPTY, features = EMPTY, nameKey = '';
   let memberIndex = null;
-  let publishedWorld = null, paintKey = [], releaseAssignments = new Map(), releaseRevision = 0;
-  let retained = null, request = null, buildRequest = null, failedIdentity = '', disposed = false;
+  let publishedAssignments = null, paintKey = [], assignments = new Map(), assignmentRevision = 0;
+  let acquiredCodes = new Set();
+  let membershipError = '', failedAssignmentRevision = null;
+  const debounce = isMembershipEditSettled && membershipScheduler;
+  let gate = null, timer = null;
+  let retained = null, request = null, buildRequest = null, disposed = false;
   async function buildGroups(groups, c, signal, client) {
-    const isCurrent = () => !disposed && !signal.aborted && context().identity === c.identity;
+    const isCurrent = () => !disposed && !signal.aborted && context().world === c.world;
     if (!isWorkerSupported()) return mergeCountryLabelGroups([...groups], {
       topology: c.chunked ? null : c.topology, topojson, geoArea, geoContains, geoBounds, yieldTask, isCurrent });
     const entries = [...groups].flatMap(([countryCode, members]) => members.map(feature => ({ countryCode, feature })));
@@ -71,22 +82,40 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       // not re-dissolve every country outline.
       [...getParentMergedParents(state.scenarioCountriesByTag)],
       state.mapSemanticMode || '']);
-    const key = [world, state.colorRevision, state.visualOverrides, state.sovereignBaseColors, state.scenarioCountriesByTag];
-    if (key.some((value, i) => value !== paintKey[i])) {
+    return { scenarioId, bundle, chunked, bases, topology, world };
+  }
+
+  function scanAssignments(c) {
+    const key = [memberIndex, state.colorRevision, state.visualOverrides, state.sovereignBaseColors, state.scenarioCountriesByTag];
+    if (c.scenarioId && resolveBorderIdentity && memberIndex && key.some((value, i) => value !== paintKey[i])) {
+      const started = nowMs();
       paintKey = key;
       const next = new Map();
-      if (scenarioId && resolveBorderIdentity) {
-        for (const id of Object.keys(state.visualOverrides || {})) {
-          const code = resolveBorderIdentity(id, state.landIndex?.get(id));
-          if (state.scenarioCountriesByTag?.[code]?.releasable) next.set(id, code);
+      const parents = getParentMergedParents(state.scenarioCountriesByTag);
+      for (const id of Object.keys(state.visualOverrides || {})) {
+        const original = memberIndex.groupCodeById.get(id);
+        if (!original) continue;
+        const resolved = resolveBorderIdentity(id, state.landIndex?.get(id));
+        const code = parents.get(resolved) || resolved;
+        if (state.scenarioCountriesByTag?.[code] && !code.startsWith('color:') && code !== original) {
+          next.set(id, code);
         }
       }
-      if (next.size !== releaseAssignments.size || [...next].some(([id, code]) => releaseAssignments.get(id) !== code)) {
-        releaseAssignments = next;
-        releaseRevision++;
+      if (!sameAssignments(assignments, next)) {
+        assignments = sameAssignments(publishedAssignments, next) ? publishedAssignments : next;
+        acquiredCodes = new Set(assignments.values());
+        assignmentRevision++;
+        if (assignments === publishedAssignments) {
+          clearGate();
+        } else if (debounce && publishedAssignments) {
+          const now = nowMs();
+          gate = { quietUntil: now + 250, deadline: gate?.deadline ?? now + 2000 };
+        }
       }
+      recordRenderPerfMetric?.('countryLabelMembershipScan', nowMs() - started);
     }
-    return { scenarioId, bundle, chunked, bases, topology, world, releases: releaseAssignments, identity: world + releaseRevision };
+    c.assignments = assignments;
+    c.assignmentRevision = assignmentRevision;
   }
 
   function currentNameKey() {
@@ -96,22 +125,54 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       getObjectIdentityToken(state.geoAliasToStableKey)]);
   }
 
-  function publishNames() {
+  function publishNames(records = geometryRecords) {
     const next = currentNameKey();
-    if (next === nameKey) return;
-    nameKey = next;
-    countries = geometryRecords.map(({ countryCode, geometry }) => {
+    if (next === nameKey && records === geometryRecords) return;
+    const previous = new Map(countries.map(country => [country.countryCode, country]));
+    countries = records.map(({ countryCode, geometry }) => {
       const name = text(getCountryName(countryCode)) || countryCode;
+      const existing = previous.get(countryCode);
+      if (existing?.geometry === geometry && existing.name === name) return existing;
       const feature = { type: 'Feature', id: countryCode, properties: { countryCode, label: name }, geometry };
       return { countryCode, name, feature, geometry };
     });
     features = countries.map(country => country.feature);
+    nameKey = next;
+    geometryRecords = records;
   }
 
-  function sync() {
+  function clearGate() {
+    if (timer !== null) membershipScheduler.clearTimeout(timer);
+    timer = gate = null;
+  }
+
+  function gateOpen() {
+    if (!debounce) return true;
+    if (!gate) return false;
+    const now = nowMs();
+    return now >= gate.deadline || (now >= gate.quietUntil && isMembershipEditSettled());
+  }
+
+  function waitForQuiet() {
+    if (!debounce) return false;
+    const now = nowMs();
+    gate ??= { quietUntil: now + 250, deadline: now + 2000 };
+    if (gateOpen()) return false;
+    if (timer === null) {
+      const wake = Math.min(gate.deadline, gate.quietUntil > now ? gate.quietUntil : now + 250);
+      timer = membershipScheduler.setTimeout(() => {
+        timer = null;
+        sync();
+        if (buildRequest) onChange();
+      }, wake - now);
+    }
+    return true;
+  }
+
+  function sync(flush = false) {
     if (disposed) return;
     const c = context();
-    if (buildRequest && buildRequest.identity !== c.identity) {
+    if (buildRequest && buildRequest.world !== c.world) {
       buildRequest.controller.abort();
       buildRequest.client.terminate(new DOMException('Country label scene replaced', 'AbortError'));
       buildRequest = null;
@@ -120,60 +181,70 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       sourceToken = c.world; revision++; status = 'pending'; error = '';
       geometryRecords = countries = features = EMPTY; nameKey = '';
       memberIndex = null;
-      publishedWorld = null;
-      if (retained?.identity !== c.identity) retained = null;
+      clearGate();
+      assignments = new Map(); paintKey = [];
+      acquiredCodes = new Set();
+      membershipError = ''; failedAssignmentRevision = null;
+      publishedAssignments = null;
+      if (retained?.world !== c.world) retained = null;
     }
     if (c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank') { status = 'disabled'; return; }
-    if (failedIdentity === c.identity) { status = 'error'; return; }
+    if (status === 'error') return;
+    scanAssignments(c);
     error = '';
-    status = publishedWorld ? 'ready' : 'pending';
-    if (publishedWorld) {
-      publishNames();
-      if (publishedWorld.releases === c.releases) return;
+    status = publishedAssignments ? 'ready' : 'pending';
+    if (publishedAssignments) publishNames();
+    if (buildRequest) return;
+    if (publishedAssignments) {
+      if (failedAssignmentRevision !== assignmentRevision) {
+        membershipError = ''; failedAssignmentRevision = null;
+      }
+      if (publishedAssignments === assignments || failedAssignmentRevision === assignmentRevision) {
+        clearGate();
+        return;
+      }
+      if (!flush && waitForQuiet()) return;
     }
     let input;
-    if (!publishedWorld && c.chunked) {
+    if (!publishedAssignments && c.chunked) {
       if (!c.bases.length) return;
       input = retained?.payloads || c.bases.map(({ id }) => c.bundle?.chunkPayloadCacheById?.[id]?.payload
         || state.activeScenarioChunks?.payloadByChunkId?.[id]?.payload);
       if (input.length !== c.bases.length || input.some(payload => !Array.isArray(payload?.features))) return;
     } else if (!c.chunked && !c.topology?.objects?.political) return;
     if (typeof topojson?.merge !== 'function') return;
-    if (buildRequest?.identity === c.identity) return;
-    const owned = { identity: c.identity, controller: new AbortController(),
+    const owned = { world: c.world, controller: new AbortController(),
+      forced: gate && nowMs() >= gate.deadline,
       client: createWorkerTaskClient({ createWorker, resolveMessage: message => unpackCountryLabelTransport(message.result) }) };
+    clearGate();
     buildRequest = owned;
     // A frame only selects an immutable world source. Expensive dissolution
     // runs after it yields, and releases the main thread between countries.
     owned.promise = build(c, input, owned.controller.signal, owned.client).finally(() => {
       owned.client.terminate();
-      if (buildRequest === owned) buildRequest = null;
+      if (buildRequest === owned) {
+        buildRequest = null;
+        sync();
+        return buildRequest?.promise;
+      }
     });
   }
 
-  function groupReleasedTerritory(c, previous) {
+  function changedCountries(previous, next) {
     const changed = new Set();
-    for (const id of new Set([...previous.releases.keys(), ...c.releases.keys()])) {
-      const original = previous.members.groupCodeById.get(id);
-      if (!original) continue;
-      const before = previous.releases.get(id) || original, after = c.releases.get(id) || original;
+    for (const id of new Set([...previous.keys(), ...next.keys()])) {
+      const original = memberIndex.groupCodeById.get(id);
+      const before = previous.get(id) || original, after = next.get(id) || original;
       if (before !== after) { changed.add(before); changed.add(after); }
     }
-    const groups = new Map();
-    for (const [id, original] of previous.members.groupCodeById) {
-      const code = c.releases.get(id) || original;
-      if (!changed.has(code)) continue;
-      if (!groups.has(code)) groups.set(code, []);
-      groups.get(code).push(previous.members.featureById.get(id));
-    }
-    return { groups, members: previous.members, retainedRecords: previous.records.filter(record => !changed.has(record.countryCode)) };
+    return changed;
   }
 
   function groupWorld(c, input) {
     const groups = new Map(), seen = new Set();
     const groupCodeById = new Map(), featureById = new Map(), memberCountByCode = new Map();
     const parents = getParentMergedParents(state.scenarioCountriesByTag);
-    const add = (feature, geometry = null) => {
+    const add = feature => {
       const id = getFeatureId(feature);
       if (id && seen.has(id)) return;
       if (id) seen.add(id);
@@ -183,9 +254,8 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       const ownerCode = c.scenarioId ? reference.getScenarioGroupCode(id) : reference.getBaseGroupCode(feature);
       const code = parents.get(ownerCode) || ownerCode;
       if (!code) return;
-      const labelCode = c.releases.get(id) || code;
-      if (!groups.has(labelCode)) groups.set(labelCode, []);
-      groups.get(labelCode).push(geometry || feature);
+      if (!groups.has(code)) groups.set(code, []);
+      groups.get(code).push(feature);
       if (id) {
         groupCodeById.set(id, code);
         featureById.set(id, feature);
@@ -198,46 +268,69 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
     else {
       const visit = geometry => {
         if (geometry?.type === 'GeometryCollection') (geometry.geometries || []).forEach(visit);
-        else if (geometry?.type === 'Polygon' || geometry?.type === 'MultiPolygon') add(geometry, geometry);
+        else if (geometry?.type === 'Polygon' || geometry?.type === 'MultiPolygon') add(geometry);
       };
       visit(c.topology.objects.political);
     }
     const members = Object.freeze({ groupCodeById: freezeMap(groupCodeById),
       featureById: freezeMap(featureById), memberCountByCode: freezeMap(memberCountByCode) });
-    return { groups, members, retainedRecords: EMPTY };
+    return { groups, members };
   }
 
   async function build(c, input, signal, client) {
     try {
       await yieldTask();
-      if (disposed || signal.aborted || context().identity !== c.identity) return;
-      const { groups, members, retainedRecords } = publishedWorld ? groupReleasedTerritory(c, publishedWorld) : groupWorld(c, input);
-      if (publishedWorld && !groups.size) {
-        publishedWorld.releases = c.releases;
-        return;
+      if (disposed || signal.aborted || context().world !== c.world) return;
+      const started = nowMs();
+      let groups = new Map();
+      if (!publishedAssignments) {
+        const indexed = groupWorld(c, input);
+        groups = indexed.groups;
+        memberIndex = indexed.members;
+        scanAssignments(c);
+      }
+      const changed = changedCountries(publishedAssignments || new Map(), c.assignments);
+      let memberCount = 0;
+      if (changed.size) {
+        for (const code of changed) groups.delete(code);
+        for (const [id, original] of memberIndex.groupCodeById) {
+          const code = c.assignments.get(id) || original;
+          if (!changed.has(code)) continue;
+          if (!groups.has(code)) groups.set(code, []);
+          groups.get(code).push(memberIndex.featureById.get(id));
+          memberCount++;
+        }
       }
       const updates = groups.size ? await buildGroups(groups, c, signal, client) : [];
-      if (disposed || signal.aborted || context().identity !== c.identity) return;
-      if (publishedWorld) revision++;
-      geometryRecords = retainedRecords.concat(updates);
-      nameKey = '';
-      memberIndex = members;
-      publishedWorld = { releases: c.releases, members: memberIndex, records: geometryRecords };
-      status = 'ready'; retained = null; publishNames(); onChange();
+      if (disposed || signal.aborted || context().world !== c.world) return;
+      publishNames(geometryRecords.filter(record => !changed.has(record.countryCode)).concat(updates));
+      if (publishedAssignments) {
+        revision++;
+        recordRenderPerfMetric?.('countryLabelMembershipBuild', nowMs() - started, { changedCountryCount: changed.size, memberCount });
+      }
+      publishedAssignments = sameAssignments(c.assignments, assignments) ? assignments : c.assignments;
+      membershipError = ''; failedAssignmentRevision = null;
+      status = 'ready'; retained = null; onChange();
     } catch (failure) {
-      if (disposed || signal.aborted || context().identity !== c.identity) return;
-      status = 'error'; error = text(failure?.message || failure); failedIdentity = c.identity;
+      if (disposed || signal.aborted || context().world !== c.world) return;
+      if (publishedAssignments) {
+        membershipError = text(failure?.message || failure); failedAssignmentRevision = c.assignmentRevision;
+      } else {
+        status = 'error'; error = text(failure?.message || failure);
+        memberIndex = null;
+        paintKey = [];
+      }
       onChange();
     }
   }
 
-  async function prepare() {
-    sync();
+  async function prepare({ flush = false } = {}) {
+    sync(flush);
     const c = context();
-    if (buildRequest?.identity === c.identity) return buildRequest.promise;
+    if (buildRequest) return buildRequest.promise;
     if (disposed || status !== 'pending' || !c.chunked || !c.bundle || typeof ensureSources !== 'function') return;
-    if (request?.identity === c.identity) return request.promise;
-    const owned = { identity: c.identity, scenarioId: c.scenarioId, bundle: c.bundle,
+    if (request?.world === c.world) return request.promise;
+    const owned = { world: c.world, scenarioId: c.scenarioId, bundle: c.bundle,
       generation: state.sceneGeneration, registry: c.bundle.chunkRegistry };
     request = owned;
     owned.promise = Promise.resolve().then(() => ensureSources(['political'])).then(result => {
@@ -250,7 +343,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       const current = context(), payloads = result.political;
       if (!current.bases.length || !Array.isArray(payloads) || payloads.length !== current.bases.length
         || payloads.some(payload => !Array.isArray(payload?.features))) throw new Error('Incomplete country label world source');
-      retained = { identity: current.identity, payloads };
+      retained = { world: current.world, payloads };
       sync();
       return buildRequest?.promise;
     }).catch(failure => {
@@ -258,29 +351,42 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       if (disposed || request !== owned || state.activeScenarioId !== owned.scenarioId
         || state.sceneGeneration !== owned.generation || current.bundle !== owned.bundle
         || (owned.registry && owned.registry !== owned.bundle.chunkRegistry)) return;
-      sourceToken = current.world; failedIdentity = current.identity;
+      sourceToken = current.world;
       status = 'error'; error = text(failure?.message || failure); onChange();
     }).finally(() => { if (request === owned) request = null; });
     return owned.promise;
   }
 
+  function membershipPending() {
+    if (disposed || failedAssignmentRevision === assignmentRevision) return false;
+    if (buildRequest) return !debounce || !publishedAssignments || !!buildRequest.forced || isMembershipEditSettled();
+    return !!publishedAssignments && publishedAssignments !== assignments && gateOpen();
+  }
+
   return Object.freeze({
-    getSource() { sync(); return { status, sourceToken, revision, features, countries, memberIndex, error }; },
+    getSource() { sync(); return { status, sourceToken, revision, features, countries, memberIndex, error, acquiredCodes,
+      membershipStale: !!publishedAssignments && assignments !== publishedAssignments,
+      membershipError, failedAssignmentRevision, membershipPending: membershipPending() }; },
     // Acceptance observers may inspect completion without selecting a source,
     // loading chunks, or starting/replacing a geometry worker.
     peekSource() {
       const c = context();
       const disabled = c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank';
       const current = sourceToken === c.world && (status !== 'ready' || nameKey === currentNameKey());
+      if (current) scanAssignments(c);
       return { status: disposed ? 'disposed' : disabled ? 'disabled' : current ? status : 'pending',
-        sourceToken, revision, features, countries, memberIndex: current ? memberIndex : null, error: current ? error : '' };
+        sourceToken, revision, features, countries, memberIndex: current ? memberIndex : null, error: current ? error : '',
+        acquiredCodes: current ? acquiredCodes : null,
+        membershipError: current ? membershipError : '', failedAssignmentRevision: current ? failedAssignmentRevision : null,
+        membershipPending: current && membershipPending() };
     },
     prepare,
     dispose() {
+      clearGate();
       disposed = true; buildRequest?.controller.abort(); buildRequest?.client.terminate();
       retained = request = buildRequest = null; geometryRecords = countries = features = EMPTY;
       memberIndex = null;
-      publishedWorld = null;
+      publishedAssignments = null;
     },
   });
 }

@@ -1,3 +1,4 @@
+import { clearProjectCountrySelection } from "./project_countries.js";
 import { collectRiverCellIdsForParents, getRiverPartitionIndex } from "./river_paint/partition_model.js";
 import { restoreRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { patchLegendState } from "./state/actions/legend_actions.js";
@@ -76,12 +77,15 @@ function captureHistoryState({
   waterRegionIds = [],
   specialRegionIds = [],
   ownerCodes = [],
+  projectCountries = [],
   stylePaths = [],
   legend = false,
   mapTitles = false,
   legendConfig = false,
   countryNameOverrides = false,
   cityNameOverrides = false,
+  capitalOverrides = false,
+  projectCities = false,
   strategicOverlay = false,
   intensityFieldChannels = [],
   appearancePresets = false,
@@ -106,6 +110,7 @@ function captureHistoryState({
     snapshot.waterRegionOverrides = captureEntries(runtimeState.waterRegionOverrides || {}, waterIds);
   }
 
+  if (projectCountries.length) snapshot.projectCountries = captureEntries(runtimeState.scenarioCountriesByTag, projectCountries);
   if (ownerKeys.length) {
     snapshot.sovereignBaseColors = captureEntries(runtimeState.sovereignBaseColors || {}, ownerKeys);
     snapshot.countryPalette = captureEntries(runtimeState.countryPalette || {}, ownerKeys);
@@ -123,6 +128,8 @@ function captureHistoryState({
 
   if (countryNameOverrides) snapshot.countryNameOverrides = cloneStructuredValue(runtimeState.countryNameOverrides || {});
   if (cityNameOverrides) snapshot.cityNameOverrides = cloneStructuredValue(runtimeState.cityNameOverrides || {});
+  if (capitalOverrides) snapshot.capitalOverrides = cloneStructuredValue(runtimeState.capitalOverrides || {});
+  if (projectCities) snapshot.projectCities = cloneStructuredValue(runtimeState.projectCities || []);
 
   if (strategicOverlay) {
     const defaults = {
@@ -307,7 +314,7 @@ function refreshUiAfterHistory(direction, entry) {
         "tool",
         "appearance",
         "activeSovereign",
-        ...(!entry ? ["inspector"] : []),
+        ...(!entry || entry.before?.projectCountries || entry.before?.countryNameOverrides || entry.before?.capitalOverrides || entry.before?.projectCities ? ["inspector"] : []),
         "countryList",
         "waterRegionList",
         "specialRegionList",
@@ -333,11 +340,22 @@ function applyHistorySnapshot(snapshot) {
   restoreRiverPaintOverridesState(runtimeState, snapshot.riverPaintOverrides);
   applyEntries(runtimeState.visualOverrides, snapshot.visualOverrides);
   applyEntries(runtimeState.waterRegionOverrides, snapshot.waterRegionOverrides);
+  if (snapshot.projectCountries) {
+    runtimeState.scenarioCountriesByTag = { ...runtimeState.scenarioCountriesByTag };
+    applyEntries(runtimeState.scenarioCountriesByTag, snapshot.projectCountries);
+    runtimeState.sovereignBaseColors = { ...runtimeState.sovereignBaseColors };
+    runtimeState.countryPalette = { ...runtimeState.countryPalette };
+    for (const tag of Object.keys(snapshot.projectCountries)) {
+      if (!runtimeState.scenarioCountriesByTag[tag]) clearProjectCountrySelection(runtimeState, tag);
+    }
+  }
   applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
   applyStyleSnapshot(snapshot.styleConfig);
   if (snapshot.countryNameOverrides) runtimeState.countryNameOverrides = cloneStructuredValue(snapshot.countryNameOverrides);
   if (snapshot.cityNameOverrides) runtimeState.cityNameOverrides = cloneStructuredValue(snapshot.cityNameOverrides);
+  if (snapshot.capitalOverrides) runtimeState.capitalOverrides = cloneStructuredValue(snapshot.capitalOverrides);
+  if (snapshot.projectCities) runtimeState.projectCities = cloneStructuredValue(snapshot.projectCities);
   if (snapshot.mapTitles) {
     runtimeState.exportWorkbenchUi.mapTitles = cloneStructuredValue(snapshot.mapTitles);
     callRuntimeHook(state, "refreshExportMapTitlesFn");
@@ -396,13 +414,18 @@ function canRedoHistory() {
 function moveHistory(source, destination, steps, direction) {
   if (!Number.isInteger(steps) || steps < 1 || steps > source.length) return false;
   const singleEntry = steps === 1 ? source.at(-1) : null;
+  let applied = false;
   for (let i = 0; i < steps; i++) {
     const entry = source.pop();
     destination.push(entry);
+    if (entry.meta?.scenarioId !== undefined && entry.meta.scenarioId !== runtimeState.activeScenarioId) continue;
+    applied = true;
     applyHistorySnapshot(direction === "undo" ? entry.before : entry.after);
   }
-  markDirty(`history-${direction}`);
-  refreshUiAfterHistory(direction, singleEntry);
+  if (applied) {
+    markDirty(`history-${direction}`);
+    refreshUiAfterHistory(direction, singleEntry);
+  }
   commitChange({ domains: ["history"], reason: `history-${direction}` });
   return true;
 }

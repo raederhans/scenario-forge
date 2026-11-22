@@ -2695,12 +2695,32 @@
                     <button id="convertCountryLabel" type="button" class="sidebar-action-secondary" data-i18n="Convert to editable text" hidden>Convert to editable text</button>
                   </div>
                   <div id="countryTerritoryStats" class="country-select-meta"></div>
+                  <button id="unregisterProjectCountry" type="button" class="sidebar-action-secondary mt-2" data-i18n="Unregister country" hidden>Unregister country</button>
                   <details id="countryCities" class="mt-2" hidden>
                     <summary data-i18n="Cities in this country">Cities in this country</summary>
+                    <div id="inspectorCapital" class="mt-2">
+                      <strong data-i18n="Capital">Capital</strong> · <span id="capitalStatus" aria-live="polite"></span>
+                      <div id="capitalOutside" class="country-select-meta" data-i18n="The capital is outside this country (its map star is hidden)" hidden>The capital is outside this country (its map star is hidden)</div>
+                    </div>
                     <label class="field-label">
                       <span data-i18n="Cities in this country">Cities in this country</span>
                       <select id="inspectorCity"></select>
                     </label>
+                    <div id="capitalActions">
+                      <div class="flex flex-wrap gap-2">
+                        <button id="setCapital" type="button" class="sidebar-action-secondary" data-i18n="Set as capital">Set as capital</button>
+                        <button id="resetCapital" type="button" class="sidebar-action-secondary" data-i18n="Restore scenario capital">Restore scenario capital</button>
+                        <button id="clearCapital" type="button" class="sidebar-action-secondary" data-i18n="No capital">No capital</button>
+                        <button id="largestCapital" type="button" class="sidebar-action-secondary" data-i18n="Use largest city">Use largest city</button>
+                        <button id="deleteCapitalCity" type="button" class="sidebar-action-secondary" data-i18n="Delete this city" hidden>Delete this city</button>
+                      </div>
+                      <label class="field-label">
+                        <span data-i18n="New capital city name">New capital city name</span>
+                        <input id="capitalCityName" class="input" type="text" autocomplete="off" />
+                      </label>
+                      <button id="placeCapital" type="button" class="sidebar-action-secondary" disabled></button>
+                      <div id="capitalPickHint" role="status" data-i18n="Click the map to place the capital. Press Esc to cancel." hidden>Click the map to place the capital. Press Esc to cancel.</div>
+                    </div>
                     <label class="field-label">
                       <span data-i18n="City display name">City display name</span>
                       <input id="cityNameOverride" class="input" type="text" autocomplete="off" />

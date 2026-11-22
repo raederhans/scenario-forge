@@ -4,6 +4,7 @@ import { createRiverPaintControls } from "./river_paint_controls.js";
 import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
 import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
+import { getProjectCountryBaseColors } from "../core/project_countries.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
 // Toolbar UI (Phase 13)
 import {
@@ -52,6 +53,7 @@ import {
 } from "../core/palette_manager.js";
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario/scenario_resources.js";
 import { getDirectGeoLabel, toggleLanguage, updateHistoryButton, updateUIText, t } from "./i18n.js";
+import { getOwnershipDisplayName } from "../core/i18n.js";
 import { showToast } from "./components/toast.js";
 import { getNextQuickFillLevel } from "./toolbar/quick_fill_level_controls.js";
 import { setBatchFillScopeState } from "../core/state/actions/scenario_presentation_actions.js";
@@ -1001,7 +1003,7 @@ function initToolbar({ render } = {}) {
   const getPrimaryActionLabel = () => t("Auto-Fill Visuals", "ui");
 
   const normalizeCountryCode = (rawCode) =>
-    String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+    String(rawCode || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 
   const getFeatureDisplayName = (feature, fallback = "") => {
     const props = feature?.properties || {};
@@ -1024,8 +1026,8 @@ function initToolbar({ render } = {}) {
 
     const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
     if (selectedCode) {
-      const label = String(runtimeState.countryNames?.[selectedCode] || selectedCode).trim() || selectedCode;
-      return `${getDirectGeoLabel(label) || label} (${selectedCode})`;
+      // 剧本国家、项目新国家（如 P01）与改名都经归属名称解析，不再只查基础国名表。
+      return `${getOwnershipDisplayName(selectedCode)} (${selectedCode})`;
     }
 
     return t("No selection", "ui");
@@ -1252,8 +1254,7 @@ function initToolbar({ render } = {}) {
       if (!code) {
         activeSovereignLabel.textContent = t("None selected", "ui");
       } else {
-        const label = String(runtimeState.countryNames?.[code] || code).trim() || code;
-        activeSovereignLabel.textContent = `${getDirectGeoLabel(label) || label} (${code})`;
+        activeSovereignLabel.textContent = `${getOwnershipDisplayName(code)} (${code})`;
       }
     }
     refreshScenarioContextBar();
@@ -2114,7 +2115,7 @@ function initToolbar({ render } = {}) {
       runtimeState.colors = {};
       runtimeState.visualOverrides = {};
       clearAllRiverPaintOverridesState(runtimeState);
-      runtimeState.sovereignBaseColors = {};
+      runtimeState.sovereignBaseColors = getProjectCountryBaseColors(runtimeState);
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();

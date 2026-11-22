@@ -1,4 +1,6 @@
 import { setUiIcon } from "../components/ui_icons.js";
+import { getCountryNameOverride } from "../../core/country_name_overrides.js";
+import { getLocalizedScenarioCountryName } from "../../core/scenario/scenario_country_display.js";
 import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 
 const SCENARIO_BAR_LEFT_OFFSET = 24;
@@ -47,6 +49,10 @@ function createScenarioContextBarController({
   let scenarioGuideTimerId = null;
   const translateUi = (label) => translate(label, "ui");
   const translateGeo = (label) => translate(label, "geo") || label;
+  // 改名 → 剧本条目（含项目新国家）→ 基础国名，与悬停和检查器的取名顺序一致。
+  const getCountryLabel = (code) => getCountryNameOverride(runtimeState, code)
+    || getLocalizedScenarioCountryName(runtimeState.scenarioCountriesByTag?.[code], runtimeState.countryNames?.[code] || code, translateGeo)
+    || code;
 
   const refreshScenarioSelectionChip = () => {
     const selectionLabel = getWorkspaceSelectionLabel();
@@ -109,9 +115,7 @@ function createScenarioContextBarController({
     if (!scenarioContextBar) return;
     const activeScenario = String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "").trim();
     const activeCode = String(runtimeState.activeSovereignCode || "").trim().toUpperCase();
-    const activeLabel = activeCode
-      ? translateGeo(runtimeState.countryNames?.[activeCode] || activeCode)
-      : translateUi("None");
+    const activeLabel = activeCode ? getCountryLabel(activeCode) : translateUi("None");
     const modeLabel = getPaintModeLabel();
     const activeValue = activeCode ? `${activeLabel} (${activeCode})` : translateUi("None");
     scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);

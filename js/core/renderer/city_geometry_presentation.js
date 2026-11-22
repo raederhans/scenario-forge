@@ -4,6 +4,8 @@ export function createCityGeometryPresentation({
   state,
   surfaceHost,
   getCityDisplayLabel,
+  isCapitalVisible = () => true,
+  getCapitalTag,
   getDisplayOwnerCode,
   getLocalizedScenarioCountryName,
   getFeatureGeoCentroid,
@@ -112,7 +114,7 @@ export function createCityGeometryPresentation({
   }
 
   function getCityCapitalDescriptor(entry) {
-    if (entry?.feature?.properties?.__city_is_country_capital) {
+    if (entry?.feature?.properties?.__city_is_country_capital && isCapitalVisible(entry.feature)) {
       return state.currentLanguage === "zh" ? "\u9996\u90fd" : "Capital";
     }
     if (entry?.feature?.properties?.__city_is_admin_capital) {
@@ -127,7 +129,8 @@ export function createCityGeometryPresentation({
     const hostFeatureId = String(props.__city_host_feature_id || "").trim();
     const hostFeature = hostFeatureId ? state.landIndex?.get(hostFeatureId) : null;
     const countryCode = String(
-      (hostFeature ? getDisplayOwnerCode(hostFeature, hostFeatureId) : "")
+      (props.__city_is_country_capital && isCapitalVisible(entry.feature) && getCapitalTag?.(entry.feature))
+        || (hostFeature ? getDisplayOwnerCode(hostFeature, hostFeatureId) : "")
         || props.__city_scenario_tag
         || props.__city_country_code
         || props.country_code

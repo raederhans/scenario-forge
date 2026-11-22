@@ -8,6 +8,7 @@ import { createMarineLabelOwner, shouldShowMarineRegionNames } from "../renderer
 import { createUrbanAdaptivePaintModel } from "../renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "../renderer/city_label_text_model.js";
 import { createCityGeometryPresentation } from "../renderer/city_geometry_presentation.js";
+import { createCapitalVisibility } from "../renderer/capital_visibility.js";
 import { createCountryLabelSourceOwner } from "../renderer/country_label_source.js";
 import { DARK_LABEL_COLORS, LIGHT_LABEL_COLORS } from "../renderer/country_label_text_style.js";
 import { drawManualMapLabels } from "../renderer/manual_map_label_render_owner.js";
@@ -62,6 +63,7 @@ export function createLabelsRuntime({
   normalizeLongitude,
   getDisplayOwnerCode,
   resolveBorderIdentity,
+  isMembershipEditSettled,
   getBorderPaletteRevision,
   getResolvedFeatureColor,
   getSignedHashUnit,
@@ -327,6 +329,8 @@ export function createLabelsRuntime({
     getDisplayOwnerCode,
     getLocalizedScenarioCountryName,
     getFeatureGeoCentroid,
+    isCapitalVisible,
+    getCapitalTag: capitalVisibility.getCapitalTag,
     normalizeLongitude,
     clamp,
     t,
@@ -347,9 +351,7 @@ export function createLabelsRuntime({
 
   function getCityVisualCapitalState(entry, config = {}) {
     if (!entry?.isCapital || config.showCapitalOverlay === false) return false;
-    const props = entry.feature?.properties;
-    const code = entry.scenarioTag || String(props?.__city_country_code || props?.country_code || "").trim().toUpperCase();
-    return !coverage.getSuppressedCodes().has(code);
+    return isCapitalVisible(entry.feature);
   }
 
   function getHoveredCityEntryFromEvent(event) {
@@ -455,6 +457,23 @@ export function createLabelsRuntime({
   let lastCountryLabels = [];
   const coverage = createCountryLabelCoverageOwner({ state: runtimeState, resolveBorderIdentity, getBorderPaletteRevision,
     peekSource: () => countryLabelSourceOwner?.peekSource() });
+  const capitalVisibility = createCapitalVisibility({
+    state: runtimeState, resolveBorderIdentity, getSuppressedCodes: coverage.getSuppressedCodes,
+  });
+  let capitalVisibilityKey = null;
+  let visibleByCity;
+  function isCapitalVisible(city) {
+    if (!runtimeState.activeScenarioId) return true;
+    const key = [runtimeState.colorRevision, runtimeState.visualOverrides, runtimeState.sovereignBaseColors,
+      runtimeState.scenarioCountriesByTag, runtimeState.riverPaint?.overrides,
+      runtimeState.capitalOverrides, runtimeState.projectCities];
+    if (!capitalVisibilityKey || key.some((value, index) => value !== capitalVisibilityKey[index])) {
+      capitalVisibilityKey = key;
+      visibleByCity = new WeakMap();
+    }
+    if (!visibleByCity.has(city)) visibleByCity.set(city, capitalVisibility.isCapitalVisible(city));
+    return visibleByCity.get(city);
+  }
 
   let placedBounds = new Map();
   let boundCodes = new Set();
@@ -502,10 +521,15 @@ export function createLabelsRuntime({
     countryLabelSourceOwner ||= createCountryLabelSourceOwner({
       state: runtimeState,
       resolveBorderIdentity,
+      isMembershipEditSettled,
+      membershipScheduler: globalThis,
+      nowMs,
+      recordRenderPerfMetric,
       topojson: globalThis.topojson,
       ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
       getCountryName,
       onChange: () => {
+        capitalVisibilityKey = null;
         invalidateRenderPasses("labels", "country-label-source");
         requestRendererRender("country-label-source", { flush: false });
       },
@@ -658,7 +682,7 @@ export function createLabelsRuntime({
     if (!passNames.includes("labels")) return;
     await waitForCountryLabelsForExport({
       isDisabled: () => runtimeState.styleConfig?.countryLabels?.enabled === false,
-      prepareSource: () => getCountryLabelSourceOwner().prepare(),
+      prepareSource: getCountryLabelSourceOwner().prepare,
       getSource: () => getCountryLabelSourceOwner().getSource(),
       getDiagnostics: () => getCountryLabelRenderOwner().getDiagnostics(),
       requestRender: () => {
@@ -703,15 +727,16 @@ export function createLabelsRuntime({
     }
     const readiness = countryLabelRenderOwner.getReadinessForCurrentView(observeCountryLabelSource(source));
     return { expected, ...readiness, sourceStatus: source.status,
-      ready: readiness.ready && !runtimeState.renderPassCache?.dirty?.labels };
+      ready: readiness.ready && !source.membershipPending && !runtimeState.renderPassCache?.dirty?.labels };
   }
 
   function assertCountryLabelsReadyForExport(passNames) {
     if (passNames.includes("labels")
       && runtimeState.styleConfig?.countryLabels?.enabled !== false) {
-      const sourceStatus = getCountryLabelSourceOwner().getSource().status;
+      const source = getCountryLabelSourceOwner().getSource();
       const labelStatus = countryLabelRenderOwner?.getDiagnostics();
-      if (sourceStatus !== "disabled" && (sourceStatus !== "ready"
+      if (source.membershipError) throw new Error(source.membershipError);
+      if (source.status !== "disabled" && (source.status !== "ready" || source.membershipStale
         || !labelStatus || labelStatus.pendingFits > 0 || labelStatus.workerErrors > 0)) {
         throw new Error("Country names are still preparing or failed to prepare; wait for labels before exporting, or disable country names.");
       }
@@ -752,8 +777,14 @@ export function createLabelsRuntime({
         return { id, text, countryCode, drawn: !!bounds, bounds: bounds ? { ...bounds } : null };
       });
     },
-    notifyCountryLabelColorsChanged: coverage.notifyColorsChanged,
-    invalidateCountryLabelCoverage: coverage.invalidate,
+    notifyCountryLabelColorsChanged(ids) {
+      coverage.notifyColorsChanged(ids);
+      capitalVisibilityKey = null;
+    },
+    invalidateCountryLabelCoverage() {
+      coverage.invalidate();
+      capitalVisibilityKey = null;
+    },
     drawUrbanLayer,
     getUrbanCityPolicyOwner,
     getFeatureGeoCentroid,

@@ -1,0 +1,64 @@
+import { normalizeCountryCodeAlias } from "../country_code_aliases.js";
+import { getActiveRiverPack, getRiverParentCompatibility } from "../river_paint/partition_model.js";
+import { isRiverPaintSourceCompatible } from "../river_paint/pilot_manifest.js";
+import { getParentMergedParents as readMergedParents } from "./parent_merged_presentation.js";
+
+export function resolveCityHostId(landIndex, hostId, coordinates) {
+  if (hostId && landIndex?.has(hostId)) return hostId;
+  // 宿主地块缺失（如地块编号迁移）时按坐标反查当前宿主；反查不到就保留原 id，按参考归属判定。
+  if (Array.isArray(coordinates) && coordinates.every(Number.isFinite)) {
+    for (const [id, feature] of landIndex || []) {
+      if (feature.geometry && globalThis.d3.geoContains(feature, coordinates)) return id;
+    }
+  }
+  return hostId || "";
+}
+
+export function getCityTerritoryHostId(state, city) {
+  const hostId = city.properties.__city_host_feature_id;
+  if (!hostId && city.properties.__city_source !== "project") return "";
+  return resolveCityHostId(state.landIndex, hostId, city.geometry?.coordinates);
+}
+
+export function createCityTerritoryQuery({
+  state, resolveBorderIdentity, getParentMergedParents = readMergedParents, getSuppressedCodes,
+}) {
+  function cellsFor(id, feature) {
+    const pack = getActiveRiverPack(state.riverPaint, state.activeScenarioId, state.scenarioBaselineHash || "");
+    if (!pack || !isRiverPaintSourceCompatible(pack, state.activeScenarioManifest)) return null;
+    const { parent, status } = getRiverParentCompatibility(pack, feature, id);
+    return status === "ready" ? parent.cells : null;
+  }
+
+  function matches(tag, hostId, host, cell) {
+    const feature = cell ? { ...host, id: cell.id, geometry: cell.geometry,
+      properties: { ...host.properties, id: cell.id, __riverParentId: hostId } } : host;
+    const identity = resolveBorderIdentity(cell?.id || hostId, feature);
+    if (identity?.startsWith("color:")) {
+      return normalizeCountryCodeAlias(state.sovereigntyByFeatureId?.[hostId]) === tag
+        && !getSuppressedCodes?.()?.has(tag);
+    }
+    return identity === tag || getParentMergedParents(state.scenarioCountriesByTag).get(identity) === tag;
+  }
+
+  return function inTerritory(city, tag, hostId = getCityTerritoryHostId(state, city)) {
+    if (!hostId) return false;
+    const host = state.landIndex?.get(hostId);
+    const cells = cellsFor(hostId, host);
+    const hits = cells?.filter(cell => globalThis.d3.geoContains(cell.geometry, city.geometry.coordinates));
+    return matches(tag, hostId, host, hits?.length === 1 ? hits[0] : null);
+  };
+}
+
+export function createCapitalVisibility(options) {
+  const inTerritory = createCityTerritoryQuery(options);
+  function getCapitalTag(city) {
+    const tags = city?.properties?.__city_capital_tags || [];
+    return tags.length > 1 ? tags.find(tag => inTerritory(city, tag)) || tags[0] : tags[0] || "";
+  }
+  function isCapitalVisible(city) {
+    if (!options.state.activeScenarioId) return !!city?.properties?.__city_is_capital;
+    return !!city?.properties?.__city_capital_tags?.some(tag => inTerritory(city, tag));
+  }
+  return { getCapitalTag, isCapitalVisible };
+}

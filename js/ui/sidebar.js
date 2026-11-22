@@ -1220,6 +1220,7 @@ function initSidebar({ render } = {}) {
     markDirty,
     getHgoIdentity: resolveHgoIdentityForCountry,
     getSelectedLandInspectorCountryCode: () => getLastSelectedLandInspectorCountryCode(),
+    getSelectedLandColorIdentity: () => getLastSelectedLandColorIdentity(),
     getHgoIdentityCoverage,
     getHgoIdentityStatus: () => hgoIdentityLoadState,
     onHgoIdentityRetry: () => {
@@ -1565,6 +1566,14 @@ function initSidebar({ render } = {}) {
     const selectedFeatureIds = getSelectedLandFeatureIdsForCountryInference();
     const lastFeatureId = selectedFeatureIds[selectedFeatureIds.length - 1] || "";
     return resolveSelectedLandFeatureCountryCode(lastFeatureId);
+  };
+
+  const getLastSelectedLandColorIdentity = () => {
+    if (!runtimeState.activeScenarioId) return "";
+    const id = getSelectedLandFeatureIdsForCountryInference().at(-1);
+    if (!id) return "";
+    const identity = callRuntimeHook(runtimeState, "resolveBorderIdentityFn", id, runtimeState.landIndex.get(id));
+    return identity?.startsWith("color:") ? identity : "";
   };
 
   const inferCountryCodesFromSelectedLand = () => {

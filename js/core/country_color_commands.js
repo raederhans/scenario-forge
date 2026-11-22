@@ -1,3 +1,5 @@
+import { getProjectCountryBaseColors } from "./project_countries.js";
+import { clearAllRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { normalizeHexColor } from "./color_hex_utils.js";
 import { applyColorReplacement, withCountryColorReplacement } from "./replace_color_command.js";
 // Shared map logic helpers (Phase 13)
@@ -45,10 +47,11 @@ function resetCountryColors() {
     ...Object.keys(runtimeState.countryPalette || {}),
   ]));
   const featureIds = Object.keys(runtimeState.visualOverrides || {});
-  const before = captureHistoryState({
-    featureIds,
-    ownerCodes,
-  });
+  const riverCellIds = Object.keys(runtimeState.riverPaint?.overrides || {});
+  const scope = { featureIds, riverCellIds, ownerCodes };
+  const before = captureHistoryState(scope);
+  const projectColors = getProjectCountryBaseColors(runtimeState);
+  if (Object.keys(projectColors).length) runtimeState.countryPalette = { ...runtimeState.countryPalette };
   const resolvedDefaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: true });
   Object.keys(countryPalette).forEach((code) => {
     delete countryPalette[code];
@@ -56,22 +59,24 @@ function resetCountryColors() {
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });
-  const fixedColors = runtimeState.activeScenarioId ? runtimeState.scenarioFixedOwnerColors || {} : {};
+  const fixedColors = runtimeState.activeScenarioId ? { ...runtimeState.scenarioFixedOwnerColors, ...projectColors } : {};
+  const reservedColors = new Set(Object.values(projectColors));
+  const deferred = new Set(Object.keys(fixedColors).filter(tag => !Object.hasOwn(projectColors, tag)
+    && reservedColors.has(normalizeHexColor(fixedColors[tag]))));
+  Object.assign(runtimeState.countryPalette, projectColors);
   runtimeState.sovereignBaseColors = uniquifyScenarioDefaultColors({ ...resolvedDefaults, ...fixedColors }, {
     tags: runtimeState.activeScenarioId ? getScenarioCountryTags(runtimeState.scenarioCountriesByTag) : null,
-    preferred: Object.keys(fixedColors),
+    preferred: Object.keys(fixedColors), deferred,
   });
   runtimeState.colors = {};
   runtimeState.visualOverrides = {};
+  clearAllRiverPaintOverridesState(runtimeState);
 
   refreshColorState({ renderNow: true });
   pushHistoryEntry({
     kind: "reset-country-colors",
     before,
-    after: captureHistoryState({
-      featureIds,
-      ownerCodes,
-    }),
+    after: captureHistoryState(scope),
     meta: {
       affectsSovereignty: false,
     },

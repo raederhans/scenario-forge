@@ -50,6 +50,7 @@ export function createCountryInspectorModel(runtimeState, t, {
     anchorId: "continent_europe",
   });
   const INSPECTOR_GROUP_LABEL_CATALOG = Object.freeze({
+    "Project countries": Object.freeze({ zh: "项目新国家", en: "Project countries" }),
     "China Region": Object.freeze({ zh: "中国区域", en: "China Region" }),
     "Russia Region": Object.freeze({ zh: "俄罗斯区域", en: "Russia Region" }),
   });

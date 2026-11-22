@@ -13,6 +13,9 @@ export function captureProjectImportState(target) {
     legendConfig: target.legendConfig,
     countryNameOverrides: target.countryNameOverrides,
     cityNameOverrides: target.cityNameOverrides,
+    countryPalette: target.countryPalette,
+    capitalOverrides: target.capitalOverrides,
+    projectCities: target.projectCities,
     devClipboardFallbackText: target.devClipboardFallbackText,
     devClipboardPreviewFormat: target.devClipboardPreviewFormat,
     devHoverHit: target.devHoverHit,
@@ -97,6 +100,9 @@ export function applyProjectImportPatch(target, patch) {
   if (Object.hasOwn(patch, "legendConfig")) target.legendConfig = patch.legendConfig;
   if (Object.hasOwn(patch, "countryNameOverrides")) target.countryNameOverrides = patch.countryNameOverrides;
   if (Object.hasOwn(patch, "cityNameOverrides")) target.cityNameOverrides = patch.cityNameOverrides;
+  if (Object.hasOwn(patch, "countryPalette")) target.countryPalette = patch.countryPalette;
+  if (Object.hasOwn(patch, "capitalOverrides")) target.capitalOverrides = patch.capitalOverrides;
+  if (Object.hasOwn(patch, "projectCities")) target.projectCities = patch.projectCities;
   if (Object.hasOwn(patch, "devClipboardFallbackText")) target.devClipboardFallbackText = patch.devClipboardFallbackText;
   if (Object.hasOwn(patch, "devClipboardPreviewFormat")) target.devClipboardPreviewFormat = patch.devClipboardPreviewFormat;
   if (Object.hasOwn(patch, "devHoverHit")) target.devHoverHit = patch.devHoverHit;

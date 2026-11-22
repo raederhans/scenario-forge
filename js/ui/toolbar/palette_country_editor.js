@@ -1,4 +1,7 @@
-import { t } from "../../core/i18n.js";
+import { getOwnershipDisplayName, t } from "../../core/i18n.js";
+import { showToast } from "../components/toast.js";
+import { isProjectCountry } from "../../core/project_countries.js";
+import { recolorProjectCountry, registerColorAsProjectCountry } from "../../core/project_country_commands.js";
 import { checkColorHealth } from "../../core/color_health_check.js";
 import { applyCountryColor } from "../../core/country_color_commands.js";
 import { replaceFeatureColor } from "../../core/replace_color_command.js";
@@ -35,7 +38,8 @@ export function openLegendColorEditor(doc, state, { color, owner }, refresh) {
       if (!base) continue;
       const option = doc.createElement("option");
       option.value = base;
-      option.textContent = code;
+      const name = getOwnershipDisplayName(code);
+      option.textContent = name === code ? code : t("{name} ({code})", "ui", { name, code });
       merge.append(option);
     }
     merge.addEventListener("change", () => {
@@ -54,7 +58,11 @@ export function openLegendColorEditor(doc, state, { color, owner }, refresh) {
     const next = picker.value;
     dialog.close();
     if (color === next) return;
-    if (owner) {
+    if (isProjectCountry(state, owner)) {
+      if (!recolorProjectCountry(owner, next)) {
+        showToast(t("This color already belongs to another country. Use “Merge into country”.", "ui"), { tone: "warning" });
+      }
+    } else if (owner) {
       await applyCountryColor(owner, next);
       markDirty("inspector-country-color");
     } else {
@@ -67,6 +75,25 @@ export function openLegendColorEditor(doc, state, { color, owner }, refresh) {
   cancel.addEventListener("click", () => dialog.close());
   dialog.append(label);
   if (!owner) dialog.append(merge);
+  if (!owner && state.activeScenarioId) {
+    const name = doc.createElement("input");
+    name.type = "text";
+    name.maxLength = 120;
+    name.className = "input";
+    name.placeholder = t("Country name", "ui");
+    name.setAttribute("aria-label", name.placeholder);
+    name.value = state.legendLabels?.[color] || "";
+    const register = doc.createElement("button");
+    register.type = "button";
+    register.textContent = t("Register as new country", "ui");
+    register.addEventListener("click", () => {
+      if (registerColorAsProjectCountry(color, { name: name.value })) {
+        dialog.close();
+        refresh();
+      }
+    });
+    dialog.append(name, register);
+  }
   dialog.append(hint, apply, cancel);
   dialog.addEventListener("close", () => dialog.remove());
   doc.body.append(dialog);

@@ -8,6 +8,8 @@
  * projection/context helpers, and render-only shared helpers.
  */
 import { isScenarioStrategicValuesUsable } from "../scenario/strategic_values.js";
+import { normalizeCityFeature } from "../data_loader/city_normalization.js";
+import { normalizeCountryCodeAlias } from "../country_code_aliases.js";
 import {
   getCityDetailProgress, getCitySettlementRank, getCitySettlementRankWeight,
   getCityCountryTierFromScenarioRecord, getCityCountryVisibilityClass,
@@ -741,6 +743,8 @@ export function createUrbanCityPolicyOwner({
       scenarioRef: state?.scenarioCityOverridesData || null,
       strategicValuesRef: state?.scenarioStrategicValuesData || null,
       scenarioCountriesRef: state?.scenarioCountriesByTag || null,
+      capitalOverrides: state?.capitalOverrides,
+      projectCities: state?.projectCities,
       sovereigntyRef: state?.sovereigntyByFeatureId || null,
       scenarioId: String(state?.activeScenarioId || ""),
       cityLayerRevision: Number(state?.cityLayerRevision || 0),
@@ -836,13 +840,25 @@ export function createUrbanCityPolicyOwner({
       yield* setFeature(nextFeature, key);
     }
 
-    const activeCapitalCityIds = new Set();
+    for (const city of source.projectCities || []) {
+      const feature = normalizeCityFeature({
+        type: "Feature", id: city.id, geometry: { type: "Point", coordinates: [city.lon, city.lat] },
+        properties: { name_en: city.name.en, name_zh: city.name.zh, host_feature_id: city.hostFeatureId,
+          base_tier: city.tier, __city_has_display_name_override: true, __city_display_name_override: city.name },
+      }, 0, { sourceLabel: "project" });
+      featuresByKey.set(getCityFeatureKey(feature), feature);
+      yield;
+    }
+
+    const capitalTagsByKey = new Map();
     if (scenarioId && scenarioCountriesRef && typeof scenarioCountriesRef === "object") {
       const candidatesByTag = new Map();
+      const keyByCityId = new Map();
       for (const [key, feature] of featuresByKey) {
         yield;
+        keyByCityId.set(getCityCanonicalId(feature), key);
         const tag = getCityScenarioTag(feature, sovereigntyRef);
-        if (!tag) continue;
+        if (!tag || feature.properties.__city_source === "project") continue;
         const current = candidatesByTag.get(tag) || [];
         current.push({ key, feature });
         candidatesByTag.set(tag, current);
@@ -851,18 +867,22 @@ export function createUrbanCityPolicyOwner({
       for (const rawTag in scenarioCountriesRef) {
         if (!Object.hasOwn(scenarioCountriesRef, rawTag)) continue;
         yield;
-        const tag = String(rawTag || "").trim().toUpperCase();
+        const tag = normalizeCountryCodeAlias(rawTag);
         if (!tag) continue;
         const country = scenarioCountriesRef[rawTag];
         const capitalHint = scenarioRef?.capital_city_hints?.[tag];
-        if ((scenarioId !== "blank_base" && country?.feature_count === 0)
-          || capitalHint?.resolution_method === "no_capital") continue;
-        const explicitKey = resolveCityFeatureKey(scenarioRef?.capitals_by_tag?.[tag], featuresByKey, aliasToKey);
-        const hintedKey = explicitKey
-          ? ""
-          : resolveCityFeatureKey(scenarioRef?.capital_city_hints?.[tag]?.city_id, featuresByKey, aliasToKey);
-        let resolvedKey = explicitKey || hintedKey;
+        const projectCountry = country?.entry_kind === "project_country" || country?.project_country === true;
+        const override = source.capitalOverrides?.[tag];
+        if (override?.cityId === null) continue;
+        const projectKey = keyByCityId.get(override?.cityId);
+        let resolvedKey = projectKey;
         if (!resolvedKey) {
+          if (scenarioId !== "blank_base" && country?.feature_count === 0) continue;
+          if (capitalHint?.resolution_method === "no_capital" || projectCountry) continue;
+          resolvedKey = resolveCityFeatureKey(scenarioRef?.capitals_by_tag?.[tag], featuresByKey, aliasToKey)
+            || resolveCityFeatureKey(capitalHint?.city_id, featuresByKey, aliasToKey);
+        }
+        if (!resolvedKey && !country?.releasable && country?.entry_kind !== "releasable") {
           const candidateEntries = candidatesByTag.get(tag) || [];
           if (candidateEntries.length) {
             const preferredCountryCodes = getScenarioCountryCodesForTag(tag, scenarioCountriesRef);
@@ -872,25 +892,27 @@ export function createUrbanCityPolicyOwner({
           }
         }
         if (!resolvedKey || !featuresByKey.has(resolvedKey)) continue;
-        const resolvedCityId = getCityCanonicalId(featuresByKey.get(resolvedKey)) || resolvedKey;
-        if (resolvedCityId) {
-          activeCapitalCityIds.add(resolvedCityId);
-        }
+        const tags = capitalTagsByKey.get(resolvedKey) || [];
+        if (resolvedKey === projectKey) tags.unshift(tag);
+        else tags.push(tag);
+        capitalTagsByKey.set(resolvedKey, tags);
       }
     }
 
     const finalFeatures = [];
     for (const [key, feature] of featuresByKey) {
       yield;
-      const cityId = getCityCanonicalId(feature) || key;
-      const nextIsCapital = scenarioId ? activeCapitalCityIds.has(cityId) : !!feature?.properties?.__city_is_capital;
+      const capitalTags = capitalTagsByKey.get(key);
+      const nextIsCapital = scenarioId ? !!capitalTags : !!feature?.properties?.__city_is_capital;
       // Country-capital priority must follow the scenario, including newly
       // promoted regional cities and former modern capitals being demoted.
       const nextIsCountryCapital = scenarioId ? nextIsCapital : !!feature?.properties?.__city_is_country_capital;
       const nextFeature = feature?.properties?.__city_is_capital === nextIsCapital
+          && feature?.properties?.__city_capital_tags === capitalTags
           && feature?.properties?.__city_is_country_capital === nextIsCountryCapital
         ? feature
         : cloneCityFeature(feature, {
+          __city_capital_tags: capitalTags,
           __city_is_capital: nextIsCapital,
           __city_is_country_capital: nextIsCountryCapital,
         });

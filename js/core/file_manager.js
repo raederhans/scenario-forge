@@ -1,3 +1,5 @@
+import { normalizeProjectCountriesPayload, serializeProjectCountries } from "./project_countries.js";
+import { normalizeCapitalOverrides, normalizeProjectCities } from "./capital_overrides.js";
 import { buildDefaultFileStem } from "./file_name_policy.js";
 import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
 import { TNO_TAG_MIGRATION_VERSION } from "./country_code_aliases.js";
@@ -555,6 +557,9 @@ class FileManager {
       legendLabels: LegendManager.normalizeLabels(appState.legendLabels),
       countryNameOverrides: appState.countryNameOverrides || {},
       cityNameOverrides: appState.cityNameOverrides || {},
+      ...(appState.activeScenarioId ? { projectCountries: serializeProjectCountries(appState) } : {}),
+      capitalOverrides: appState.capitalOverrides || {},
+      projectCities: appState.projectCities || [],
       legendConfig: LegendManager.normalizeConfig(appState.legendConfig),
       legendControl: LegendManager.normalizeControl(appState.legendControl),
       layerVisibility,
@@ -765,6 +770,9 @@ class FileManager {
     data.legendLabels = LegendManager.normalizeLabels(data.legendLabels);
     data.countryNameOverrides ??= {};
     data.cityNameOverrides ??= {};
+    data.projectCountries = normalizeProjectCountriesPayload(data.projectCountries);
+    data.capitalOverrides = normalizeCapitalOverrides(data.capitalOverrides);
+    data.projectCities = normalizeProjectCities(data.projectCities);
     data.legendConfig = LegendManager.normalizeConfig(data.legendConfig);
     data.legendControl = LegendManager.normalizeControl(data.legendControl);
     data.parentBordersVisible = data.parentBordersVisible !== false;

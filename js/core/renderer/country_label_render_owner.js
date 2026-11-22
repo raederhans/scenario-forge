@@ -255,7 +255,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     workerCandidateBuildMs: 0, workerMaxCandidateBuildMs: 0, workerPreparedBuildMs: 0, workerMaxPreparedBuildMs: 0,
     preparedGeometryHits: 0, preparedGeometryBuilds: 0, preparedGeometryBytes: 0,
     workerCount: 0, workersCreated: 0, workerPoolLimit: maxLayoutWorkers,
-    maxWorkerQueue: 0, maxPendingWorkerFits: 0,
+    maxWorkerQueue: 0, maxPendingWorkerFits: 0, discardedRevisionRequests: 0,
     rejectedByVisibility: 0, rejectedByCollision: 0, rejectedByViewport: 0, noFit: 0, rejectedLabels: [],
     skippedByVisibilityUpperBound: 0, chineseGlyphRequests: 0,
   };
@@ -291,6 +291,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
   }
 
   function storeFit(entry, key, fit) {
+    entry.replacing = null;
     entry.fits.delete(key);
     entry.fits.set(key, fit);
     while (entry.fits.size > MAX_CACHED_FITS) entry.fits.delete(entry.fits.keys().next().value);
@@ -505,6 +506,8 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     deferredPreparation = null;
     const previousEntries = sameSource && !workerFailed
       ? new Map(geometryCache.entries.map(entry => [entry.countryCode, entry])) : null;
+    const expiresAt = nowMs() + 2000;
+    let startedTransition = false;
     const entries = (source.countries || []).map((record, index) => {
       const shape = record.geometry || record.feature?.geometry;
       const previous = previousEntries?.get(record.countryCode);
@@ -514,10 +517,20 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       }
       const inputPolygons = shape?.type === "MultiPolygon" ? shape.coordinates
         : shape?.type === "Polygon" ? [shape.coordinates] : [];
-      return { countryCode: record.countryCode, shape, inputPolygons, projectedPolygons: [], polygonCursor: 0,
+      let replacing = null;
+      if (previous && !isCountryLabelSuppressed(record.countryCode)) {
+        if ([...previous.fits.values()].some(Boolean)) {
+          replacing = { entry: previous, expiresAt };
+          startedTransition = true;
+        } else {
+          replacing = previous.replacing;
+        }
+      }
+      return { countryCode: record.countryCode, shape, replacing, inputPolygons, projectedPolygons: [], polygonCursor: 0,
         polygons: null, bounds: null, components: [], candidates: null, fits: new Map(),
         workerPending: new Set(), workerHasGeometry: false, workerSlot: index % maxLayoutWorkers };
     });
+    if (sameSource) diagnostics.discardedRevisionRequests += workerRequests.size;
     if (!previousEntries || workerRequests.size) terminateLayoutWorkers();
     for (const pending of workerRequests.values()) {
       clearRequestTimeout(pending.timeout);
@@ -536,6 +549,18 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     diagnostics.projectedCountries = entries.filter(entry => entry.polygons?.length).length;
     diagnostics.candidateCount = 0;
     geometryCache = { sourceToken: source.sourceToken, revision: source.revision, projection, identity, entries };
+    if (startedTransition && helpers.onInvalidate) {
+      setRequestTimeout(() => {
+        let expired = false;
+        for (const entry of geometryCache.entries) {
+          if (entry.replacing?.expiresAt === expiresAt) {
+            entry.replacing = null;
+            expired = true;
+          }
+        }
+        if (expired) helpers.onInvalidate();
+      }, 2000);
+    }
     // A replaced source/projection also releases obsolete text measurements.
     if (!previousEntries) glyphMetrics.clear();
     if (typeof helpers.onInvalidate !== "function") {
@@ -809,21 +834,23 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
         reject(entry, text, null, "Visibility", visibleTerritoryArea(entry, transform, paintBounds));
       };
       const fitted = geometry.entries.map((entry) => {
-        const request = getViewFitRequest(entry, fitView, onInvisible);
+        let request = getViewFitRequest(entry, fitView, onInvisible);
+        if (request && !entry.fits.has(request.key)) {
+          if (!entry.polygons || deferred) pending.push(request);
+          else prepareFit(entry, context, request.text, request.key, isChinese, font, fitView);
+        }
+        if (entry.replacing) {
+          if (nowMs() >= entry.replacing.expiresAt || isCountryLabelSuppressed(entry.countryCode)) {
+            entry.replacing = null;
+          } else {
+            entry = entry.replacing.entry;
+            request = getViewFitRequest(entry, fitView, onInvisible);
+          }
+        }
         if (!request) return null;
         const { text, key } = request;
-        if (!entry.polygons) {
-          pending.push(request);
-          return null;
-        }
-        let fit = entry.fits.get(key);
-        if (!entry.fits.has(key) && deferred) {
-          pending.push({ entry, text, key });
-          return null;
-        } else if (!entry.fits.has(key)) {
-          prepareFit(entry, context, text, key, isChinese, font, fitView);
-          fit = entry.fits.get(key);
-        }
+        if (!entry.fits.has(key)) return null;
+        const fit = entry.fits.get(key);
         const visibleArea = visibleTerritoryArea(entry, transform, paintBounds);
         if (!fit) reject(entry, text, null, "noFit", visibleArea);
         if (!fit) return null;
@@ -969,7 +996,8 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
         for (const key of glyphMetrics.keys()) {
           if (fonts.has(key.split("\n")[0])) glyphMetrics.delete(key);
         }
-        for (const entry of geometryCache?.entries || []) {
+        for (const entry of (geometryCache?.entries || []).flatMap(current =>
+          current.replacing ? [current, current.replacing.entry] : [current])) {
           for (const key of entry.fits.keys()) {
             if (fonts.has(key.split("\n")[2])) entry.fits.delete(key);
           }
@@ -987,7 +1015,10 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       cancelPrivatePreparation();
       textGeneration += 1;
       glyphMetrics.clear();
-      for (const entry of geometryCache?.entries || []) entry.fits.clear();
+      for (const entry of geometryCache?.entries || []) {
+        entry.replacing = null;
+        entry.fits.clear();
+      }
       return true;
     },
     isReadyForCurrentView: () => getPendingFitsForCurrentView() === 0 && diagnostics.workerErrors === 0,
@@ -1015,19 +1046,23 @@ export async function waitForCountryLabelsForExport({
 }) {
   if (isDisabled()) return;
   const started = now();
-  await prepareSource();
+  await prepareSource({ flush: true });
   requestRender();
   for (;;) {
     if (isDisabled()) return;
     const source = getSource();
     if (source.status === "disabled") return;
     const layout = getDiagnostics();
-    if (source.status === "error" || layout.workerErrors > 0) {
-      throw new Error(source.error || "Country names failed to prepare for export.");
+    if (source.status === "error" || source.membershipError || layout.workerErrors > 0) {
+      throw new Error(source.error || source.membershipError || "Country names failed to prepare for export.");
     }
-    if (source.status === "ready" && layout.pendingFits === 0) return;
+    if (source.status === "ready" && !source.membershipStale && layout.pendingFits === 0) return;
     if (now() - started >= timeoutMs) {
       throw new Error("Country names are still preparing; try exporting again when the labels are ready.");
+    }
+    if (source.membershipStale) {
+      await prepareSource({ flush: true });
+      requestRender();
     }
     await wait();
   }

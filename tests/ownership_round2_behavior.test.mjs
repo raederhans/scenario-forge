@@ -104,7 +104,9 @@ test("release and undo update only affected label geometries and locate painted 
   ctx.after(() => source.dispose());
   const geometry = code => source.getSource().countries.find(item => item.countryCode === code)?.geometry;
   await source.prepare();
-  const france = geometry("FRA");
+  // 国名按实际版图：east 已涂成法国色，开局就计入法国国名形状。
+  assert.equal(d3.geoContains(geometry("FRA"), d3.geoCentroid(features[0])), true);
+  assert.equal(d3.geoContains(geometry("GER"), d3.geoCentroid(features[0])), false);
   assert.deepEqual(getCountryLocateIds(state, "REL"), []);
   state.visualOverrides = { east: "#333333", remote: "#333333" };
   state.colorRevision++;
@@ -117,7 +119,8 @@ test("release and undo update only affected label geometries and locate painted 
   state.colorRevision++;
   await source.prepare();
   const restoredFrance = geometry("FRA");
-  assert.deepEqual(restoredFrance, france);
+  assert.equal(d3.geoContains(restoredFrance, d3.geoCentroid(features[2])), true);
+  assert.equal(d3.geoContains(restoredFrance, d3.geoCentroid(features[0])), false);
   state.visualOverrides = {};
   state.colorRevision++;
   await source.prepare();

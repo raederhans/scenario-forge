@@ -313,6 +313,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         stableJson(runtimeState.styleConfig?.strategicValues || {}),
         ...getTransportPresentationSignatureParts(),
         ...getUrbanCityRenderPassSignatureParts(runtimeState, "contextMarkers"),
+        getObjectIdentityToken(runtimeState.capitalOverrides),
+        getObjectIdentityToken(runtimeState.projectCities),
         getObjectIdentityToken(runtimeState.cityNameOverrides),
         stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
       ].join("::");
@@ -344,6 +346,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.showBlankFeatureLabels ? "blank-feature-labels:on" : "blank-feature-labels:off",
         runtimeState.showCityPoints ? "cities:on" : "cities:off",
         ...getUrbanCityRenderPassSignatureParts(runtimeState, "labels"),
+        getObjectIdentityToken(runtimeState.capitalOverrides),
+        getObjectIdentityToken(runtimeState.projectCities),
         ...getTransportPresentationSignatureParts(),
         stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
       ].join("::");
