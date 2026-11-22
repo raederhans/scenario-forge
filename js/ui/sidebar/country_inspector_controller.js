@@ -3,7 +3,9 @@ import { getCountryNameOverride, setCountryNameOverride } from "../../core/count
 import { isProjectCountry } from "../../core/project_countries.js";
 import { recolorProjectCountry, registerColorAsProjectCountry, renameProjectCountry, unregisterProjectCountry } from "../../core/project_country_commands.js";
 import { getCityOverrideId, setCityNameOverride } from "../../core/city_name_overrides.js";
-import { getEffectiveCityCollection } from "../../core/map_renderer/public.js";
+import { placeProjectCapital, removeProjectCity, resetCountryCapital, setCountryCapital } from "../../core/capital_commands.js";
+import { listCountryCities, pickLargestCity } from "../../core/capital_overrides.js";
+import { cancelMapPointPick, getEffectiveCityCollection, startMapPointPick } from "../../core/map_renderer/public.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { commitChange } from "../../core/state/changes.js";
 import { callRuntimeHook, on, STATE_BUS_EVENTS } from "../../core/state/index.js";
@@ -1246,12 +1248,43 @@ export function createCountryInspectorController({
   const picker = cities?.querySelector("#inspectorCity");
   const cityName = cities?.querySelector("#cityNameOverride");
   const hidden = cities?.querySelector("#inspectorCityHidden");
+  const capitalRow = cities?.querySelector("#inspectorCapital");
+  const capitalActions = cities?.querySelector("#capitalActions");
+  const capitalStatus = cities?.querySelector("#capitalStatus");
+  const capitalOutside = cities?.querySelector("#capitalOutside");
+  const setCapital = cities?.querySelector("#setCapital");
+  const resetCapital = cities?.querySelector("#resetCapital");
+  const clearCapital = cities?.querySelector("#clearCapital");
+  const largestCapital = cities?.querySelector("#largestCapital");
+  const deleteCity = cities?.querySelector("#deleteCapitalCity");
+  const placementName = cities?.querySelector("#capitalCityName");
+  const placeCapital = cities?.querySelector("#placeCapital");
+  const pickHint = cities?.querySelector("#capitalPickHint");
+
+  function cityLabel(feature) {
+    const id = getCityOverrideId(feature);
+    const p = feature.properties;
+    const language = runtimeState.currentLanguage === "zh" ? "zh" : "en";
+    return runtimeState.cityNameOverrides?.[id]?.[language] || p.__city_display_name_override?.[language]
+      || p.__city_locale?.[language] || p[`label_${language}`] || p[`name_${language}`] || p.name || id;
+  }
+
+  function syncPlacement() {
+    const picking = runtimeState.mapPointPicker?.active && runtimeState.mapPointPicker.purpose === "capital";
+    placeCapital.textContent = t(picking ? "Cancel" : "Place capital on map…", "ui");
+    placeCapital.disabled = !picking && !placementName.value.trim();
+    pickHint.hidden = !picking;
+  }
+
   function syncCityFields() {
     const id = picker.value;
     const language = runtimeState.currentLanguage === "zh" ? "zh" : "en";
     const entry = runtimeState.cityNameOverrides?.[id];
     cityName.disabled = hidden.disabled = !id;
-    cityName.placeholder = picker.selectedOptions[0]?.textContent || "";
+    const selected = picker.selectedOptions[0];
+    cityName.placeholder = selected?.dataset.name || "";
+    setCapital.disabled = !id || selected?.dataset.outside === "true";
+    setCapital.title = selected?.dataset.outside === "true" ? t("Choose a city within this country", "ui") : "";
     if (cityName !== document.activeElement || cityName.dataset.id !== id || cityName.dataset.language !== language) {
       cityName.value = entry?.[language] || "";
       cityName.dataset.id = id;
@@ -1262,19 +1295,48 @@ export function createCountryInspectorController({
   function renderCities() {
     if (!cities?.open) return;
     const code = runtimeState.selectedInspectorCountryCode;
-    const members = new Set(getCountryMemberIds(runtimeState, code));
+    const collection = getEffectiveCityCollection();
+    const features = collection?.features || [];
     const previous = picker.value;
-    const language = runtimeState.currentLanguage === "zh" ? "zh" : "en";
-    const options = [];
-    for (const feature of getEffectiveCityCollection()?.features || []) {
-      const p = feature.properties;
-      const host = p.__city_host_feature_id || p.host_feature_id;
-      if (!members.has(host) && (host || normalizeCountryCode(p.__city_country_code || p.country_code) !== code)) continue;
-      const id = getCityOverrideId(feature);
-      const name = runtimeState.cityNameOverrides?.[id]?.[language] || p.__city_display_name_override?.[language]
-        || p.__city_locale?.[language] || p[`label_${language}`] || p[`name_${language}`] || p.name || id;
-      options.push(new Option(name, id));
+    const scenario = !!runtimeState.activeScenarioId;
+    capitalRow.hidden = capitalActions.hidden = !scenario;
+    let entries;
+    let capital;
+    if (scenario) {
+      entries = listCountryCities(runtimeState, code, { cityCollection: collection });
+      const override = runtimeState.capitalOverrides?.[code];
+      capital = override
+        ? features.find(feature => getCityOverrideId(feature) === override.cityId)
+        : features.find(feature => feature.properties.__city_capital_tags?.includes(code));
+      const source = override ? (override.cityId === null ? "Explicitly no capital" : "Project setting")
+        : (capital ? "Scenario default" : "Not set");
+      capitalStatus.textContent = [capital && cityLabel(capital), t(source, "ui")].filter(Boolean).join(" · ");
+      capitalOutside.hidden = !capital || entries.some(entry => entry.feature === capital && entry.inTerritory);
+      resetCapital.disabled = !override;
+      resetCapital.hidden = isProjectCountry(runtimeState, code);
+      largestCapital.disabled = !entries.some(entry => entry.inTerritory);
+      deleteCity.hidden = capital?.properties.__city_source !== "project";
+      deleteCity.dataset.id = capital ? getCityOverrideId(capital) : "";
+      if (placementName.dataset.code !== code) {
+        placementName.value = "";
+        placementName.dataset.code = code;
+      }
+      syncPlacement();
+    } else {
+      const members = new Set(getCountryMemberIds(runtimeState, code));
+      entries = features.filter(({ properties: p }) => {
+        const host = p.__city_host_feature_id || p.host_feature_id;
+        return host ? members.has(host) : normalizeCountryCode(p.__city_country_code || p.country_code) === code;
+      }).map(feature => ({ id: getCityOverrideId(feature), feature, inTerritory: true }));
     }
+    const options = entries.map(({ id, feature, inTerritory }) => {
+      const name = cityLabel(feature);
+      const label = inTerritory ? name : t("{name} (outside territory)", "ui", { name });
+      const option = new Option(feature === capital ? `★ ${label}` : label, id);
+      option.dataset.name = name;
+      option.dataset.outside = String(!inTerritory);
+      return option;
+    });
     picker.replaceChildren(...options);
     if (options.some(option => option.value === previous)) picker.value = previous;
     syncCityFields();
@@ -1566,6 +1628,45 @@ export function createCountryInspectorController({
       picker.addEventListener("change", syncCityFields);
       cityName.addEventListener("change", () => editCity(cityName.dataset.id, cityName.dataset.language, cityName.value));
       hidden.addEventListener("change", () => editCity(picker.value, "hidden", hidden.checked));
+      const selectedTag = () => runtimeState.selectedInspectorCountryCode;
+      setCapital.addEventListener("click", () => {
+        setCountryCapital(selectedTag(), picker.value);
+        renderCountryInspectorDetail();
+      });
+      resetCapital.addEventListener("click", () => {
+        resetCountryCapital(selectedTag());
+        renderCountryInspectorDetail();
+      });
+      clearCapital.addEventListener("click", () => {
+        setCountryCapital(selectedTag(), null);
+        renderCountryInspectorDetail();
+      });
+      largestCapital.addEventListener("click", () => {
+        const id = pickLargestCity(runtimeState, selectedTag());
+        if (id) setCountryCapital(selectedTag(), id);
+        renderCountryInspectorDetail();
+      });
+      deleteCity.addEventListener("click", () => {
+        removeProjectCity(deleteCity.dataset.id);
+        renderCountryInspectorDetail();
+      });
+      placementName.addEventListener("input", syncPlacement);
+      placeCapital.addEventListener("click", async () => {
+        if (runtimeState.mapPointPicker?.active && runtimeState.mapPointPicker.purpose === "capital") {
+          cancelMapPointPick();
+          return;
+        }
+        const tag = selectedTag();
+        const scenarioId = runtimeState.activeScenarioId;
+        const name = placementName.value.trim();
+        const result = startMapPointPick({ purpose: "capital" });
+        syncPlacement();
+        const point = await result;
+        if (point && tag === selectedTag() && scenarioId === runtimeState.activeScenarioId) {
+          placeProjectCapital(tag, { ...point, name: { en: name, zh: name } });
+        }
+        renderCountryInspectorDetail();
+      });
       cities.dataset.bound = "true";
     }
     if (convertButton && typeof convertCountryLabelToMapLabel === "function" && convertButton.hidden) {
