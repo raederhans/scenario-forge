@@ -62,6 +62,7 @@ export function createLabelsRuntime({
   normalizeLongitude,
   getDisplayOwnerCode,
   resolveBorderIdentity,
+  isMembershipEditSettled,
   getBorderPaletteRevision,
   getResolvedFeatureColor,
   getSignedHashUnit,
@@ -502,6 +503,10 @@ export function createLabelsRuntime({
     countryLabelSourceOwner ||= createCountryLabelSourceOwner({
       state: runtimeState,
       resolveBorderIdentity,
+      isMembershipEditSettled,
+      membershipScheduler: globalThis,
+      nowMs,
+      recordRenderPerfMetric,
       topojson: globalThis.topojson,
       ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
       getCountryName,
@@ -703,7 +708,7 @@ export function createLabelsRuntime({
     }
     const readiness = countryLabelRenderOwner.getReadinessForCurrentView(observeCountryLabelSource(source));
     return { expected, ...readiness, sourceStatus: source.status,
-      ready: readiness.ready && !runtimeState.renderPassCache?.dirty?.labels };
+      ready: readiness.ready && !source.membershipPending && !runtimeState.renderPassCache?.dirty?.labels };
   }
 
   function assertCountryLabelsReadyForExport(passNames) {
