@@ -107,6 +107,23 @@ function snapshot(scenarioId, age) {
   };
 }
 
+test("recovery defers the previous TNO autosave before the first edit to a shared project is saved", async t => {
+  const { records, manager } = setup(t, { dialog: () => false });
+  state.activeScenarioId = "tno_1962";
+  const previous = snapshot("tno_1962", 60_000);
+  records.set("tno_1962", previous);
+  clearDirty("project-import");
+  await manager.recover();
+  const deferred = records.get(`tno_1962@${previous.savedAt}`);
+  assert.equal(records.has("tno_1962"), false);
+  assert.equal(deferred.type, "deferred");
+  markDirty("shared-project-edit");
+  t.mock.timers.tick(30_000);
+  await nextTurn();
+  assert.equal(records.get("tno_1962").type, "auto");
+  assert.equal(records.get(deferred.scenarioId).payload, previous.payload);
+});
+
 test("startup opens history and restores only the selected version after discard confirmation", async t => {
   const dialog = t.mock.fn(() => true);
   const importProject = t.mock.fn(() => ({ status: "committed" }));

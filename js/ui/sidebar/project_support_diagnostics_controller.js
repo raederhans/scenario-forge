@@ -15,6 +15,7 @@ import {
   createSpecialZonePatternPreviewStyle,
 } from "../../core/special_zone_layers.js";
 import { prepareProjectImportFile } from "../../core/project_package_io.js";
+import { buildShareLink, SHARED_PROJECT_ERRORS } from "../../core/shared_project_url.js";
 
 export async function confirmDiscardDirtyWork(state, showAppDialog, options) {
   if (!state.isDirty) return true;
@@ -193,6 +194,38 @@ export function createProjectSupportDiagnosticsController({
       actions.appendChild(recent);
     }
     projectSection.appendChild(actions);
+    const shareSection = documentRef.createElement("details");
+    const shareTitle = documentRef.createElement("summary");
+    shareTitle.dataset.i18n = "Share link";
+    shareTitle.textContent = t("Share link", "ui");
+    const shareHint = documentRef.createElement("p");
+    shareHint.className = "sidebar-tool-hint";
+    shareHint.dataset.i18n = "The app does not upload anything. Use a public file URL that supports CORS, such as a Gist Raw URL or a raw.githubusercontent.com URL. Anyone with the link can view the file. File size limits apply.";
+    shareHint.textContent = t(shareHint.dataset.i18n, "ui");
+    const rawLabel = documentRef.createElement("label");
+    rawLabel.htmlFor = "sharedProjectRawUrl";
+    rawLabel.dataset.i18n = "Raw file URL";
+    rawLabel.textContent = t("Raw file URL", "ui");
+    const rawInput = documentRef.createElement("input");
+    rawInput.type = "url";
+    rawInput.className = "text-input";
+    rawInput.id = rawLabel.htmlFor;
+    const copy = documentRef.createElement("button");
+    copy.type = "button";
+    copy.className = "btn-secondary";
+    copy.dataset.i18n = "Generate and copy link";
+    copy.textContent = t(copy.dataset.i18n, "ui");
+    copy.addEventListener("click", async () => {
+      try {
+        const link = buildShareLink(rawInput.value, state.activeScenarioId);
+        await navigator.clipboard.writeText(link);
+        showToast(t("Link copied.", "ui"));
+      } catch (error) {
+        showToast(t(SHARED_PROJECT_ERRORS[error.code] || "Clipboard unavailable", "ui"), { tone: "error" });
+      }
+    });
+    shareSection.append(shareTitle, shareHint, rawLabel, rawInput, copy);
+    projectSection.appendChild(shareSection);
     projectManagementStack.appendChild(projectSection);
   }
 

@@ -162,6 +162,11 @@ export function setStartupScenarioBootstrapCacheStatus(target, status = "") {
   return status;
 }
 
+export function setSharedProjectLinkState(target, patch) {
+  target.sharedProjectLink = { ...target.sharedProjectLink, ...patch };
+  return target.sharedProjectLink;
+}
+
 export function replaceSampleProjectDeeplinkState(target, nextState = null) {
   if (!isStateTarget(target)) {
     return {};

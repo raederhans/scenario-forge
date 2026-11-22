@@ -11,6 +11,7 @@ import {
   replaceSampleProjectDeeplinkState,
 } from "./core/state/actions/boot_actions.js";
 import { getSampleProjectIdFromUrl } from "./core/sample_project_url.js";
+import { initializeSharedProjectLink, openStartupSharedProject } from "./bootstrap/startup_shared_project_link.js";
 import { createStartupBootOverlayController } from "./bootstrap/startup_boot_overlay.js";
 import { createStartupDataPipelineOwner } from "./bootstrap/startup_data_pipeline.js";
 import { createDeferredDetailPromotionOwner } from "./bootstrap/deferred_detail_promotion.js";
@@ -54,6 +55,7 @@ import { updateUIText } from "./ui/i18n.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
 
 const state = runtimeState;
+const startupSharedProject = initializeSharedProjectLink(state);
 const startupSampleProjectId = getSampleProjectIdFromUrl();
 configureStartupSupportKeyUsageAudit();
 
@@ -74,10 +76,20 @@ const bootstrapDeferredUi = deferredUiBootstrapper.bootstrapDeferredUi;
 async function startProjectAutosave() {
   const { startAutosave } = await import("./core/autosave_manager.js");
   const { mountLocalHistoryPanel } = await import("./ui/local_history_panel.js");
-  const autosave = startAutosave({ onHistoryChange: () => panel.refreshHistory() });
-  const panel = mountLocalHistoryPanel(autosave);
-  postReadyScheduler.scheduleTask("autosave-recovery", () => autosave.recover(panel.openHistory), {
+  let panel;
+  const start = () => startAutosave({ onHistoryChange: () => panel?.refreshHistory() });
+  const autosave = start();
+  if (startupSharedProject === null) panel = mountLocalHistoryPanel(autosave);
+  else autosave.dispose();
+  postReadyScheduler.scheduleTask("autosave-recovery", async () => {
+    if (panel) return autosave.recover(panel.openHistory);
+    let review = false;
+    await autosave.recover(() => { review = true; });
+    panel = mountLocalHistoryPanel(start());
+    if (review) await panel.openHistory();
+  }, {
     canStart: () => state.bootPhase === "ready"
+      && !["pending", "confirming", "loading", "importing"].includes(state.sharedProjectLink.status)
       && (!startupSampleProjectId || ["success", "error"].includes(state.sampleProjectDeeplink?.status)),
     allowChunkBacklog: true,
     idleQuietMs: 0,
@@ -168,7 +180,8 @@ function getStartupDataPipelineOwner() {
   return startupDataPipelineOwner;
 }
 
-async function tryScheduleStartupSampleProjectDeeplink() {
+async function openStartupProjectWhenReady() {
+  if (startupSharedProject !== null) return openStartupSharedProject(state, startupSharedProject);
   if (!startupSampleProjectId) return false;
   return runOptionalStartupTask({
     loadModule: startupSampleProjectDeeplinkModuleLoader.loadModuleOnce,
@@ -266,7 +279,7 @@ function getDeferredDetailPromotionOwner() {
       startBootMetric,
       startDeferredFullInteractionInfrastructureBuild:
         getStartupReadyHandoffOwner().startDeferredFullInteractionInfrastructureBuild,
-      tryScheduleStartupSampleProjectDeeplink,
+      tryScheduleStartupSampleProjectDeeplink: openStartupProjectWhenReady,
       warnOnStartupBundleIntegrity,
     },
   });
@@ -426,7 +439,7 @@ async function finalizeReadyState(renderDispatcher) {
       progress: 100,
       canContinueWithoutScenario: false,
     });
-    void tryScheduleStartupSampleProjectDeeplink();
+    void openStartupProjectWhenReady();
     getStartupReadyHandoffOwner().scheduleReadyPostBootWork(renderDispatcher, "ready-state");
     return;
   }
@@ -449,7 +462,7 @@ async function finalizeReadyState(renderDispatcher) {
     progress: 100,
     canContinueWithoutScenario: false,
   });
-  void tryScheduleStartupSampleProjectDeeplink();
+  void openStartupProjectWhenReady();
   getStartupReadyHandoffOwner().scheduleReadyPostBootWork(renderDispatcher, "ready-state");
 }
 
@@ -494,7 +507,7 @@ async function bootstrap() {
         handleUiBootstrapReady: async () => {
           deferredUiBootstrapper.setInteractionState("ready");
           void startProjectAutosave();
-          void tryScheduleStartupSampleProjectDeeplink();
+          void openStartupProjectWhenReady();
         },
         handleUiBootstrapFailure: async (uiBootstrapError) => {
           deferredUiBootstrapper.setInteractionState("failed");
@@ -537,6 +550,7 @@ async function bootstrap() {
       getStartupReadyHandoffOwner().markUiHydrationReady();
       deferredUiBootstrapper.setInteractionState("ready");
       void startProjectAutosave();
+      if (startupSharedProject !== null) void openStartupProjectWhenReady();
       return;
     }
     // Phase: 加载基础拓扑 | Input: 启动配置与 bootstrap 资源 promise | Output: startupBaseData + 已注入基础 state 字段。

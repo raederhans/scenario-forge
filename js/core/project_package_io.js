@@ -12,7 +12,7 @@ const PROJECT_PACKAGE_MANIFEST_PATH = "manifest.json";
 const PROJECT_PACKAGE_PROJECT_PATH = "project/map_project.json";
 const LEGACY_PROJECT_PATH = "map_project.json";
 const LEGACY_PROJECT_MANIFEST_PATH = "map_project_manifest.json";
-const MAX_PROJECT_PACKAGE_ZIP_BYTES = 32 * 1024 * 1024;
+export const MAX_PROJECT_PACKAGE_ZIP_BYTES = 32 * 1024 * 1024;
 const MAX_PROJECT_PACKAGE_ENTRY_COUNT = 128;
 const MAX_PROJECT_PACKAGE_UNZIPPED_BYTES = 64 * 1024 * 1024;
 
@@ -255,6 +255,7 @@ function buildJsonProjectFile(text, filename = "map_project.json") {
 
 function projectZipLimitError(message) {
   return Object.assign(new Error(message), {
+    code: "PROJECT_ZIP_LIMIT",
     userMessage: "This project ZIP exceeds the import limit. Export the project as JSON instead.",
   });
 }

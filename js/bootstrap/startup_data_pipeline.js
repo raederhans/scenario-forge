@@ -79,9 +79,10 @@ import {
   registerRuntimeHook,
 } from "../core/state/index.js";
 
-async function resolveStartupScenarioId(registry) {
-  const override = new URLSearchParams(globalThis.location?.search || "").get("default_scenario");
-  if (String(override || "").trim()) return getConfiguredDefaultScenarioId();
+export async function resolveStartupScenarioId(registry) {
+  const params = new URLSearchParams(globalThis.location?.search);
+  const override = params.get("default_scenario")?.trim();
+  if (override && registry.scenarios?.some(entry => entry.scenario_id === override)) return override;
   const sampleId = getSampleProjectIdFromUrl();
   if (sampleId) {
     let sampleProject;
@@ -105,11 +106,14 @@ async function resolveStartupScenarioId(registry) {
   const rememberedId = getRememberedScenarioId();
   if (rememberedId) {
     if (registry.scenarios?.some((entry) => entry.scenario_id === rememberedId)) return rememberedId;
-    try {
-      globalThis.localStorage.removeItem("map_last_scenario");
-    } catch (_error) {}
+    if (!params.has("project")) {
+      try {
+        globalThis.localStorage.removeItem("map_last_scenario");
+      } catch (_error) {}
+    }
   }
-  const scenarioId = getConfiguredDefaultScenarioId() || String(registry?.default_scenario_id || "").trim();
+  const configured = override ? "" : getConfiguredDefaultScenarioId();
+  const scenarioId = configured || String(registry?.default_scenario_id || "").trim();
   if (!scenarioId) {
     throw new Error(`Default scenario is not configured in ${resolveScenarioRegistryUrl()}.`);
   }
@@ -699,6 +703,7 @@ export function createStartupDataPipelineOwner({
     const registryDefaultScenarioIdPromise = defaultScenarioDisabled
       ? Promise.resolve("")
       : scenarioRegistryPromise.then(resolveStartupScenarioId, (error) => {
+        if (new URLSearchParams(globalThis.location?.search).get("default_scenario")?.trim()) throw error;
         if (!configuredDefaultScenarioId) throw error;
         console.warn(`[boot] Scenario registry lookup failed; using configured default scenario "${configuredDefaultScenarioId}".`);
         return configuredDefaultScenarioId;
