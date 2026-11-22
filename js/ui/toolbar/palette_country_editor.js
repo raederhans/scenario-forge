@@ -1,4 +1,5 @@
 import { getOwnershipDisplayName, t } from "../../core/i18n.js";
+import { showToast } from "../components/toast.js";
 import { isProjectCountry } from "../../core/project_countries.js";
 import { recolorProjectCountry, registerColorAsProjectCountry } from "../../core/project_country_commands.js";
 import { checkColorHealth } from "../../core/color_health_check.js";
@@ -58,7 +59,9 @@ export function openLegendColorEditor(doc, state, { color, owner }, refresh) {
     dialog.close();
     if (color === next) return;
     if (isProjectCountry(state, owner)) {
-      recolorProjectCountry(owner, next);
+      if (!recolorProjectCountry(owner, next)) {
+        showToast(t("This color already belongs to another country. Use “Merge into country”.", "ui"), { tone: "warning" });
+      }
     } else if (owner) {
       await applyCountryColor(owner, next);
       markDirty("inspector-country-color");
@@ -75,6 +78,7 @@ export function openLegendColorEditor(doc, state, { color, owner }, refresh) {
   if (!owner && state.activeScenarioId) {
     const name = doc.createElement("input");
     name.type = "text";
+    name.maxLength = 120;
     name.className = "input";
     name.placeholder = t("Country name", "ui");
     name.setAttribute("aria-label", name.placeholder);
