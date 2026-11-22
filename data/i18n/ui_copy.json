@@ -12708,5 +12708,61 @@
   "No reference territory.": {
     "en": "No reference territory.",
     "zh": "无参考领土。"
+  },
+  "The capital is outside this country (its map star is hidden)": {
+    "en": "The capital is outside this country (its map star is hidden)",
+    "zh": "首都不在本国境内（地图上不显示星标）"
+  },
+  "Set as capital": {
+    "en": "Set as capital",
+    "zh": "设为首都"
+  },
+  "No capital": {
+    "en": "No capital",
+    "zh": "无首都"
+  },
+  "Use largest city": {
+    "en": "Use largest city",
+    "zh": "用最大城市"
+  },
+  "Delete this city": {
+    "en": "Delete this city",
+    "zh": "删除此城市"
+  },
+  "New capital city name": {
+    "en": "New capital city name",
+    "zh": "新首都城市名"
+  },
+  "Place capital on map…": {
+    "en": "Place capital on map…",
+    "zh": "在地图上放置首都…"
+  },
+  "Click the map to place the capital. Press Esc to cancel.": {
+    "en": "Click the map to place the capital. Press Esc to cancel.",
+    "zh": "在地图上点击放置首都，Esc 取消"
+  },
+  "Scenario default": {
+    "en": "Scenario default",
+    "zh": "剧本默认"
+  },
+  "Project setting": {
+    "en": "Project setting",
+    "zh": "项目设定"
+  },
+  "Explicitly no capital": {
+    "en": "Explicitly no capital",
+    "zh": "已设为无首都"
+  },
+  "Not set": {
+    "en": "Not set",
+    "zh": "未设定"
+  },
+  "{name} (outside territory)": {
+    "en": "{name} (outside territory)",
+    "zh": "{name}（境外）"
+  },
+  "Choose a city within this country": {
+    "en": "Choose a city within this country",
+    "zh": "请选择本国境内的城市"
   }
 }
