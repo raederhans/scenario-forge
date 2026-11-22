@@ -2,7 +2,7 @@
   "version": 1,
   "scenario_id": "rcw_1919",
   "generated_at": "2026-11-22T00:00:00Z",
-  "baseline_hash": "e73016cde409b77f8620659f3e1de422fa2b3d1a5156fdfbfc9e37ffc09ce02d",
+  "baseline_hash": "f592c9df471d1e6bf16cf13b938a5fb2246359b78bc23bfd5aa801cb13e9433e",
   "cores": {
     "ARM-1553": [
       "ARM"
@@ -1013,7 +1013,7 @@
       "TSAR"
     ],
     "KAZ-4830": [
-      "ORN"
+      "RUS"
     ],
     "KGZ-1115": [
       "TSAR"
@@ -4229,7 +4229,7 @@
       "REF"
     ],
     "RU_RAY_50074027B23799547406598": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B28606060123578": [
       "REF"
@@ -4244,16 +4244,16 @@
       "RUS"
     ],
     "RU_MRG_2d5847dc88a8": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B86003485610467": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B29329231814048": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B21335467742043": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B28797922672810": [
       "REF"
@@ -4265,34 +4265,34 @@
       "REF"
     ],
     "RU_RAY_50074027B28971786615675": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B10637268431448": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B71461018269487": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B54524544237793": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B52838111466804": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B95202300265125": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B44152060141244": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B61219657375498": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B63935727212307": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B23262720042196": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B75983799969403": [
       "KONE"
@@ -4301,28 +4301,28 @@
       "REF"
     ],
     "RU_RAY_50074027B31496942337081": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B28906813018549": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B5850936607294": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B58285687326194": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B18123411923849": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B72993481609927": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B92092388399011": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B30219941944137": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B78981709111612": [
       "RSIX"
@@ -4334,16 +4334,16 @@
       "MILL"
     ],
     "RU_RAY_50074027B39292814865227": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B2325947694706": [
       "RUS"
     ],
     "RU_RAY_50074027B62501748698742": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B30864735873510": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B10379539839705": [
       "RUS"
@@ -4364,19 +4364,19 @@
       "MILL"
     ],
     "RU_RAY_50074027B34738491600615": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B1644674550414": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B56233113775442": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B78297177563949": [
       "MILL"
     ],
     "RU_RAY_50074027B57421544908828": [
-      "KONE"
+      "RUS"
     ],
     "RU_MRG_1439e9157b19": [
       "RWF"
@@ -9758,19 +9758,19 @@
       "REF"
     ],
     "RU_ARCTIC_FB_4672": [
-      "KONE"
+      "RUS"
     ],
     "RU_ARCTIC_FB_4707": [
       "KTWO"
     ],
     "RU_ARCTIC_FB_4716": [
-      "KONE"
+      "RUS"
     ],
     "RU_ARCTIC_FB_4718": [
       "KTWO"
     ],
     "RU_ARCTIC_FB_4751": [
-      "KONE"
+      "RUS"
     ],
     "RU_ARCTIC_FB_4778": [
       "KONE"
@@ -9797,7 +9797,7 @@
       "KTHR"
     ],
     "RU_ARCTIC_FB_4894": [
-      "KONE"
+      "RUS"
     ],
     "RU_ARCTIC_FB_4898": [
       "RUS"
@@ -13979,7 +13979,7 @@
       "RTKF"
     ],
     "KAZ-3202__RCW_KAZ_9891525B15592648176932": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B2325773906172__Akmola_region_Atbasarskii": [
       "ORN"
@@ -13988,19 +13988,19 @@
       "ORN"
     ],
     "KAZ-3202__RCW_KAZ_9891525B24357337483480": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B30379541145757__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B30379541145757__Akmola_region_Atbasarskii": [
       "ORN"
     ],
     "KAZ-3202__RCW_KAZ_9891525B32188509788858": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B36473427600822__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B36473427600822__Akmola_region_Atbasarskii": [
       "ORN"
@@ -14015,7 +14015,7 @@
       "RTKF"
     ],
     "KAZ-3202__RCW_KAZ_9891525B43673993839483__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B43673993839483__Akmola_region_Atbasarskii": [
       "ORN"
@@ -14027,7 +14027,7 @@
       "ORN"
     ],
     "KAZ-3202__RCW_KAZ_9891525B49691587242628__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B49691587242628__Akmola_region_Kokchetavskii": [
       "ORN"
@@ -14051,7 +14051,7 @@
       "RTKF"
     ],
     "KAZ-3202__RCW_KAZ_9891525B83013347039658__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B83013347039658__Akmola_region_Atbasarskii": [
       "ORN"
@@ -14060,13 +14060,13 @@
       "ORN"
     ],
     "KAZ-3202__RCW_KAZ_9891525B90656598279735": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3202__RCW_KAZ_9891525B99671027453568": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B17920128744537__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B17920128744537__Semipalatinsk_region_Karkaralinskii": [
       "KAZ"
@@ -14075,13 +14075,13 @@
       "KAZ"
     ],
     "KAZ-3203__RCW_KAZ_9891525B24166085071276__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B24166085071276__Akmola_region_Atbasarskii": [
       "ORN"
     ],
     "KAZ-3203__RCW_KAZ_9891525B60028498041579__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B60028498041579__Semipalatinsk_region_Karkaralinskii": [
       "KAZ"
@@ -14099,16 +14099,16 @@
       "RTKF"
     ],
     "KAZ-3203__RCW_KAZ_9891525B79475728088691": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B82202485563630__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B82202485563630__Semipalatinsk_region_Pavlodarskii": [
       "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B92074395824295__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3203__RCW_KAZ_9891525B92074395824295__Semipalatinsk_region_Karkaralinskii": [
       "KAZ"
@@ -14159,7 +14159,7 @@
       "KTHR"
     ],
     "KAZ-3204__RCW_KAZ_9891525B73231455923468__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3204__RCW_KAZ_9891525B73231455923468__Akmola_region_Kokchetavskii": [
       "ORN"
@@ -14204,13 +14204,13 @@
       "RUS"
     ],
     "KAZ-3205__RCW_KAZ_9891525B30775471295398__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3205__RCW_KAZ_9891525B30775471295398__Semipalatinsk_region_Pavlodarskii": [
       "RUS"
     ],
     "KAZ-3205__RCW_KAZ_9891525B3395793098905__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3205__RCW_KAZ_9891525B3395793098905__Semipalatinsk_region_Pavlodarskii": [
       "RUS"
@@ -14477,7 +14477,7 @@
       "TSAR"
     ],
     "KAZ-3251__RCW_KAZ_9891525B85859186368254__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3251__RCW_KAZ_9891525B85859186368254__Akmola_region_Atbasarskii": [
       "ORN"
@@ -14546,7 +14546,7 @@
       "TSAR"
     ],
     "KAZ-3252__RCW_KAZ_9891525B77452281688660__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3252__RCW_KAZ_9891525B77452281688660__Semipalatinsk_region_Karkaralinskii": [
       "KAZ"
@@ -14558,7 +14558,7 @@
       "TSAR"
     ],
     "KAZ-3252__RCW_KAZ_9891525B89439479753564__Akmola_region_Akmolinskii": [
-      "ORN"
+      "RUS"
     ],
     "KAZ-3252__RCW_KAZ_9891525B89439479753564__Syr_Darya_region_Aulieatinskii": [
       "TSAR"
@@ -16061,7 +16061,7 @@
       "MILL"
     ],
     "RU_RAY_50074027B96103137717036__RCW_REMAINDER": [
-      "KONE"
+      "RUS"
     ],
     "RU_RAY_50074027B21050205315965__RCW_Arkhangelsk_governorate_Pechorskii": [
       "MILL"

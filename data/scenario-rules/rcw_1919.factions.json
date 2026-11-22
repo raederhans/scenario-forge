@@ -581,7 +581,13 @@
    "parent": "",
    "parent_merged": false,
    "alliance": "rcw_national",
-   "capital_city": ["Zaysan", "Karkaraly", "Karkaralinsk", "Oiyl", "Temir"],
+   "capital_city": [
+    "Zaysan",
+    "Karkaraly",
+    "Karkaralinsk",
+    "Oiyl",
+    "Temir"
+   ],
    "ruling_ideology": "neutrality",
    "base_iso2": "KZ"
   },
@@ -701,7 +707,7 @@
    "tag": "POL",
    "name_en": "Poland",
    "name_zh": "波兰",
-   "color_hex": "#d6668b",
+   "color_hex": "#f0bfd0",
    "parent": "",
    "parent_merged": false,
    "alliance": "rcw_neighbor",

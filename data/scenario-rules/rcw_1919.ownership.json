@@ -121,6 +121,7 @@
   "Łomża governorate": "POL"
  },
  "districts": {
+  "Akmola region/Akmolinskii": "RUS",
   "Akmola region/Omskii": "RUS",
   "Akmola region/Petropavlovskii": "KTHR",
   "Arkhangelsk governorate/Shenkurskii": "RSIX",
@@ -198,9 +199,11 @@
   "Suwałki governorate/Volkovyshskii": "LIT",
   "Taurida governorate/Berdianskii": "MAKF",
   "Tiflis governorate incl. Zakatalskii district/Zakatalskii": "AZR",
+  "Tobolsk governorate/Berezovskii": "RUS",
   "Tobolsk governorate/Ialutorovskii": "KTWO",
   "Tobolsk governorate/Ishimskii": "KTWO",
   "Tobolsk governorate/Kurganskii": "KTHR",
+  "Tobolsk governorate/Surgutskii": "RUS",
   "Tobolsk governorate/Tiukalinskii": "KTHR",
   "Tobolsk governorate/Tiumenskii": "REF",
   "Tobolsk governorate/Turinskii": "REF",

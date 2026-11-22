@@ -6,17 +6,17 @@
   "input_sha": {
     "capital_hints.json": "fa59c4bd5ee5ef6826a6ead0d6aa3cd2ff4f9adb5659d63fe725b7f6b7a73a6c",
     "city_overrides.json": "a2acd9b5ea834018ce352b28d248c44cedd069a66fe93c1d572c9f4aefe81e52",
-    "cores.by_feature.json": "b53a7a95e3d83823450174f707bbdaadbabb888ceb199badcf9f6fa892ceb003",
-    "countries.json": "6d2cfc6f2c9de0ba7397cc21f3043b8e2395dd96adc30d0797852f623e3fe217",
-    "owners.by_feature.json": "cc6cac338d7c4773f3969f3d64be4b1e7cffcc2cfb4ec2283cc2066cbcbc8b28",
+    "cores.by_feature.json": "455801e586fd35a2625da8b384b10af3eab35dda3c683855ff8da63c2a054fa6",
+    "countries.json": "4c89879133434cac715b153c19e42f8b4bfa64020693b4646b199cdd65e0eb33",
+    "owners.by_feature.json": "af4b09109e9f2f50c73c25569d725527c89f5fe2f776d3e615227cd07ee33fad",
     "runtime_topology.topo.json": "9340f5673ff96a61282468feeacfcb6547f0a4736c8c3c715dd13f9d0fd09491",
-    "special_zone_layers.json": "e776569ed223c5c953c35ab0173b0553218f689c14b357d8d856fc49686b8c6d"
+    "special_zone_layers.json": "032d90c8e791b95214bda73757610ed2baf5c957f3b2b6b50e6c4bf290cab28c"
   },
   "output_sha": {},
   "feature_count": 5551,
   "water_count": 0,
   "chunk_count": 0,
-  "snapshot_fingerprint": "8aa6e837d773f2f5f27df05e2d3bb1f7f566fc78f067e7827c3b966eb10ffa95",
+  "snapshot_fingerprint": "a9aa4146c0c8aaabb6e105b03fa56a863529c90755745a61882fd3c5eeba7ebb",
   "generated_at": "2026-11-22T00:00:00Z",
   "environment": {},
   "durations": {},
