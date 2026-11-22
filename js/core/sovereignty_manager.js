@@ -146,12 +146,15 @@ function resetFeatureOwnerCode() { return false; }
 function resetFeatureOwnerCodes() { return 0; }
 function resetAllFeatureOwnersToCanonical() { return false; }
 
-function getFeatureIdsForOwner(ownerCode) {
+// Shell fallback parcels are drawn and owned but not interactive. Outlines need
+// them (includeShells), or every shell inside a country gets its own edge.
+function getFeatureIdsForOwner(ownerCode, { includeShells = false } = {}) {
   const reference = getMapDataBoundary(runtimeState).reference;
   const ids = runtimeState.activeScenarioId && runtimeState.mapSemanticMode !== "blank"
     ? reference.getScenarioGroupFeatureIds(ownerCode)
     : reference.getGeographicCountryFeatureIds(ownerCode);
-  return Array.from(ids).filter(id => !shouldExcludeScenarioPoliticalFeature(runtimeState.landIndex?.get(id), id));
+  const excluded = includeShells ? isAntarcticSectorLikeFeature : shouldExcludeScenarioPoliticalFeature;
+  return Array.from(ids).filter(id => !excluded(runtimeState.landIndex?.get(id), id));
 }
 
 function migrateImportedProjectData(data) {

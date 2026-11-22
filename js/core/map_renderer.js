@@ -871,6 +871,7 @@ const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getFeatureId,
   getEntityFeatureId,
   getCountryFeatureIds: getFeatureIdsForOwner,
+  getCountryOutlineFeatureIds: (code) => getFeatureIdsForOwner(code, { includeShells: true }),
   getDevGroup: () => rendererSurfaceHost.getDevSelectionGroup(),
   getInspectorGroup: () => rendererSurfaceHost.getInspectorHighlightGroup(),
   getPath: () => rendererSurfaceHost.getPathSvg(),
