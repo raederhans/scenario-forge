@@ -207,7 +207,6 @@
   "Tobolsk governorate/Tiukalinskii": "KTHR",
   "Tobolsk governorate/Tiumenskii": "REF",
   "Tobolsk governorate/Turinskii": "REF",
-  "Tomsk governorate/Zmeinogorskii": "RALT",
   "Transcaspian region/Krasnovodskii": "TUC",
   "Transcaspian region/Mangyshlakskii": "TUC",
   "Turgay region/Kustanaiskii": "REF",
@@ -224,5 +223,205 @@
   "Volhynian governorate/Zhitomirskii": "RSOF",
   "Voronezh governorate/Zadonskii": "RSOF",
   "Voronezh governorate/Zemlianskii": "RSOF"
- }
+ },
+ "masks": [
+  {
+   "id": "ncem_vedeno",
+   "owner": "NCEM",
+   "note": "北高加索酋长国：韦杰诺、沙托伊、诺扎伊尤尔特山区",
+   "polygon": [
+    [
+     [
+      45.3,
+      42.7
+     ],
+     [
+      46.45,
+      42.7
+     ],
+     [
+      46.45,
+      43.12
+     ],
+     [
+      45.3,
+      43.12
+     ],
+     [
+      45.3,
+      42.7
+     ]
+    ]
+   ],
+   "within_provinces": [
+    "Terek region"
+   ]
+  },
+  {
+   "id": "ralt_kulunda",
+   "owner": "RALT",
+   "note": "阿尔泰游击区：斯拉夫哥罗德—卡缅—鲁布佐夫斯克草原",
+   "polygon": [
+    [
+     [
+      78.2,
+      51.25
+     ],
+     [
+      82.6,
+      51.25
+     ],
+     [
+      82.6,
+      53.95
+     ],
+     [
+      78.2,
+      53.95
+     ],
+     [
+      78.2,
+      51.25
+     ]
+    ]
+   ],
+   "within_provinces": [
+    "Tomsk governorate"
+   ]
+  },
+  {
+   "id": "rtas_taseevo",
+   "owner": "RTAS",
+   "note": "塔谢耶沃游击共和国：坎斯克县北部",
+   "polygon": [
+    [
+     [
+      93.8,
+      56.7
+     ],
+     [
+      96.8,
+      56.7
+     ],
+     [
+      96.8,
+      58.3
+     ],
+     [
+      93.8,
+      58.3
+     ],
+     [
+      93.8,
+      56.7
+     ]
+    ]
+   ],
+   "within_provinces": [
+    "Enisei governorate"
+   ]
+  },
+  {
+   "id": "frgn_east",
+   "owner": "FRGN",
+   "note": "费尔干纳东部山区：贾拉拉巴德、乌兹根、古尔恰",
+   "polygon": [
+    [
+     [
+      72.75,
+      40.15
+     ],
+     [
+      74.7,
+      40.15
+     ],
+     [
+      74.7,
+      41.6
+     ],
+     [
+      72.75,
+      41.6
+     ],
+     [
+      72.75,
+      40.15
+     ]
+    ]
+   ],
+   "within_provinces": [
+    "Fergana region"
+   ]
+  },
+  {
+   "id": "gln_gilan",
+   "owner": "GLN",
+   "note": "吉兰詹加里运动：拉什特、恩泽利周围",
+   "polygon": [
+    [
+     [
+      48.75,
+      36.75
+     ],
+     [
+      50.55,
+      36.75
+     ],
+     [
+      50.55,
+      37.75
+     ],
+     [
+      48.75,
+      37.75
+     ],
+     [
+      48.75,
+      36.75
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "cerr_harbin",
+   "owner": "CERR",
+   "note": "中东铁路附属地：哈尔滨、满洲里、海拉尔所在地块",
+   "points": [
+    [
+     126.63,
+     45.75
+    ],
+    [
+     117.43,
+     49.6
+    ],
+    [
+     119.75,
+     49.21
+    ]
+   ]
+  },
+  {
+   "id": "btum_batum",
+   "owner": "BTUM",
+   "note": "巴统城所在地块",
+   "points": [
+    [
+     41.72,
+     41.6
+    ]
+   ]
+  },
+  {
+   "id": "ncem_vedeno_pt",
+   "owner": "NCEM",
+   "note": "韦杰诺所在地块",
+   "points": [
+    [
+     45.99,
+     42.97
+    ]
+   ]
+  }
+ ]
 }

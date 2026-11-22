@@ -71,7 +71,8 @@
       "lon": 60.6153,
       "lat": 56.8573,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "叶卡捷琳堡"
     },
     {
       "tag": "RTKF",
@@ -85,7 +86,8 @@
       "lon": 50.1355,
       "lat": 53.2077,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "萨马拉"
     },
     {
       "tag": "RSIX",
@@ -119,7 +121,7 @@
       "tag": "LSSR",
       "city_id": "CITY::ne::1159128241",
       "stable_key": "id::CITY::ne::1159128241",
-      "city_name": "Rezekne",
+      "city_name": "Rezhitsa",
       "name_ascii": "Rezekne",
       "country_code": "LV",
       "display_name": "Latvian Socialist Soviet Republic",
@@ -127,7 +129,8 @@
       "lon": 27.34,
       "lat": 56.5103,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "雷日察"
     },
     {
       "tag": "BSH",
@@ -175,7 +178,7 @@
       "tag": "VOLR",
       "city_id": "CITY::ne::1159149333",
       "stable_key": "id::CITY::ne::1159149333",
-      "city_name": "Kharkiv",
+      "city_name": "Kharkov",
       "name_ascii": "Kharkiv",
       "country_code": "UA",
       "display_name": "Volunteer Army",
@@ -183,7 +186,8 @@
       "lon": 36.2548,
       "lat": 49.9818,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "哈尔科夫"
     },
     {
       "tag": "DON",
@@ -203,7 +207,7 @@
       "tag": "CAUA",
       "city_id": "CITY::ne::1159150697",
       "stable_key": "id::CITY::ne::1159150697",
-      "city_name": "Volgograd",
+      "city_name": "Tsaritsyn",
       "name_ascii": "Volgograd",
       "country_code": "RU",
       "display_name": "Caucasus Army",
@@ -211,13 +215,14 @@
       "lon": 44.4976,
       "lat": 48.7138,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "察里津"
     },
     {
       "tag": "KUB",
       "city_id": "CITY::ne::1159149549",
       "stable_key": "id::CITY::ne::1159149549",
-      "city_name": "Krasnodar",
+      "city_name": "Yekaterinodar",
       "name_ascii": "Krasnodar",
       "country_code": "RU",
       "display_name": "Kuban People's Republic",
@@ -225,7 +230,8 @@
       "lon": 38.9818,
       "lat": 45.0453,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "叶卡捷琳诺达尔"
     },
     {
       "tag": "BSEA",
@@ -253,13 +259,14 @@
       "lon": 44.6699,
       "lat": 43.041,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "弗拉季高加索"
     },
     {
       "tag": "KIEV",
       "city_id": "CITY::ne::1159151495",
       "stable_key": "id::CITY::ne::1159151495",
-      "city_name": "Kyiv",
+      "city_name": "Kiev",
       "name_ascii": "Kyiv",
       "country_code": "UA",
       "display_name": "Forces of the Kiev Region",
@@ -267,13 +274,14 @@
       "lon": 30.5238,
       "lat": 50.4547,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "基辅"
     },
     {
       "tag": "NOVR",
       "city_id": "CITY::ne::1159149325",
       "stable_key": "id::CITY::ne::1159149325",
-      "city_name": "Odesa",
+      "city_name": "Odessa",
       "name_ascii": "Odesa",
       "country_code": "UA",
       "display_name": "Forces of the Novorossiya Region",
@@ -281,13 +289,14 @@
       "lon": 30.7438,
       "lat": 46.4857,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "敖德萨"
     },
     {
       "tag": "TUC",
       "city_id": "CITY::ne::1159149335",
       "stable_key": "id::CITY::ne::1159149335",
-      "city_name": "Turkmenbashi",
+      "city_name": "Krasnovodsk",
       "name_ascii": "Tuerkmenbasy",
       "country_code": "TM",
       "display_name": "Turkestan Army",
@@ -295,13 +304,14 @@
       "lon": 52.9552,
       "lat": 40.0222,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "克拉斯诺沃茨克"
     },
     {
       "tag": "URAL",
       "city_id": "CITY::ne::1159150111",
       "stable_key": "id::CITY::ne::1159150111",
-      "city_name": "Atyrau",
+      "city_name": "Guryev",
       "name_ascii": "Atyrau",
       "country_code": "KZ",
       "display_name": "Ural Cossack Army",
@@ -309,7 +319,8 @@
       "lon": 51.8843,
       "lat": 47.1048,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "古里耶夫"
     },
     {
       "tag": "RUS",
@@ -357,7 +368,7 @@
       "tag": "KTHR",
       "city_id": "CITY::ne::1159147307",
       "stable_key": "id::CITY::ne::1159147307",
-      "city_name": "Petropavl",
+      "city_name": "Petropavlovsk",
       "name_ascii": "Petropavl",
       "country_code": "KZ",
       "display_name": "3rd Army",
@@ -365,13 +376,14 @@
       "lon": 69.1506,
       "lat": 54.8734,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "彼得罗巴甫洛夫斯克"
     },
     {
       "tag": "ORN",
       "city_id": "CITY::ne::1159147295",
       "stable_key": "id::CITY::ne::1159147295",
-      "city_name": "Kokshetau",
+      "city_name": "Kokchetav",
       "name_ascii": "Kokshetau",
       "country_code": "KZ",
       "display_name": "Orenburg Army",
@@ -379,13 +391,14 @@
       "lon": 69.3936,
       "lat": 53.2841,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "科克切塔夫"
     },
     {
       "tag": "SEMR",
       "city_id": "CITY::ne::1159147309",
       "stable_key": "id::CITY::ne::1159147309",
-      "city_name": "Ayagoz",
+      "city_name": "Sergiopol",
       "name_ascii": "Ayagoz",
       "country_code": "KZ",
       "display_name": "Semirechye Army",
@@ -393,7 +406,8 @@
       "lon": 80.4344,
       "lat": 47.9645,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "谢尔吉奥波尔"
     },
     {
       "tag": "ZBAI",
@@ -453,15 +467,15 @@
     },
     {
       "tag": "YDNC",
-      "city_id": "CITY::gn::548602",
-      "stable_key": "id::CITY::gn::548602",
-      "city_name": "Kingisepp",
-      "name_ascii": "Kingisepp",
+      "city_id": "CITY::ne::1159137151",
+      "stable_key": "id::CITY::ne::1159137151",
+      "city_name": "Gatchina",
+      "name_ascii": "Gatchina",
       "country_code": "RU",
       "display_name": "North-Western Army",
-      "host_feature_id": "RU_RAY_50074027B99227036451137__SPLIT_REST",
-      "lon": 28.6141,
-      "lat": 59.3763,
+      "host_feature_id": "RU_RAY_50074027B64055482679717",
+      "lon": 30.1283,
+      "lat": 59.5764,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     },
@@ -483,7 +497,7 @@
       "tag": "WRVA",
       "city_id": "CITY::ne::1159136381",
       "stable_key": "id::CITY::ne::1159136381",
-      "city_name": "Jelgava",
+      "city_name": "Mitau",
       "name_ascii": "Jelgava",
       "country_code": "LV",
       "display_name": "West Russian Volunteer Army",
@@ -491,13 +505,14 @@
       "lon": 23.7128,
       "lat": 56.65,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "米陶"
     },
     {
       "tag": "UNRP",
       "city_id": "CITY::ne::1159126743",
       "stable_key": "id::CITY::ne::1159126743",
-      "city_name": "Kamianets-Podilskyi",
+      "city_name": "Kamenets-Podolsk",
       "name_ascii": "Kamyanets-Podilskyy",
       "country_code": "UA",
       "display_name": "Ukrainian People's Republic",
@@ -505,13 +520,14 @@
       "lon": 26.5809,
       "lat": 48.6843,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "卡缅涅茨-波多利斯基"
     },
     {
       "tag": "WUK",
       "city_id": "CITY::ne::1159134213",
       "stable_key": "id::CITY::ne::1159134213",
-      "city_name": "Vinnytsia",
+      "city_name": "Vinnitsa",
       "name_ascii": "Vinnytsya",
       "country_code": "UA",
       "display_name": "Ukrainian Galician Army",
@@ -519,19 +535,34 @@
       "lon": 28.4687,
       "lat": 49.2322,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "文尼察"
     },
     {
       "tag": "MAKF",
-      "city_id": "CITY::ne::1159126903",
-      "stable_key": "id::CITY::ne::1159126903",
-      "city_name": "Berdyansk",
-      "name_ascii": "Berdyansk",
+      "city_id": "RCW_CITY_GULYAIPOLYE",
+      "stable_key": "id::RCW_CITY_GULYAIPOLYE",
+      "city_name": "Gulyai-Polye",
+      "name_ascii": "Gulyai-Polye",
       "country_code": "UA",
       "display_name": "Revolutionary Insurgent Army of Ukraine",
-      "host_feature_id": "UA_RAY_74538382B42406222783177",
-      "lon": 36.7882,
-      "lat": 46.7558,
+      "host_feature_id": "UA_MRG_9e7d5f1ce841",
+      "lon": 36.26,
+      "lat": 47.66,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city"
+    },
+    {
+      "tag": "NCEM",
+      "city_id": "RCW_CITY_VEDENO",
+      "stable_key": "id::RCW_CITY_VEDENO",
+      "city_name": "Vedeno",
+      "name_ascii": "Vedeno",
+      "country_code": "RU",
+      "display_name": "North Caucasian Emirate",
+      "host_feature_id": "RU_MRG_327478551c90",
+      "lon": 45.99,
+      "lat": 42.97,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     },
@@ -539,7 +570,7 @@
       "tag": "GEO",
       "city_id": "CITY::ne::1159150961",
       "stable_key": "id::CITY::ne::1159150961",
-      "city_name": "Tbilisi",
+      "city_name": "Tiflis",
       "name_ascii": "Tbilisi",
       "country_code": "GE",
       "display_name": "Democratic Republic of Georgia",
@@ -547,13 +578,14 @@
       "lon": 44.8341,
       "lat": 41.6914,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "梯弗里斯"
     },
     {
       "tag": "ARM",
       "city_id": "CITY::ne::1159151119",
       "stable_key": "id::CITY::ne::1159151119",
-      "city_name": "Yerevan",
+      "city_name": "Erivan",
       "name_ascii": "Yerevan",
       "country_code": "AM",
       "display_name": "Republic of Armenia",
@@ -561,7 +593,8 @@
       "lon": 44.5126,
       "lat": 40.1776,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "埃里温"
     },
     {
       "tag": "AZR",
@@ -621,15 +654,15 @@
     },
     {
       "tag": "FRGN",
-      "city_id": "CITY::ne::1159136477",
-      "stable_key": "id::CITY::ne::1159136477",
-      "city_name": "Osh",
-      "name_ascii": "Osh",
+      "city_id": "CITY::ne::1159136459",
+      "stable_key": "id::CITY::ne::1159136459",
+      "city_name": "Jalal-Abad",
+      "name_ascii": "Jalal-Abad",
       "country_code": "KG",
       "display_name": "Fergana Peasant Army and Basmachi",
-      "host_feature_id": "KGZ-1122__RCW_KGZ_92254566B53802085045884",
-      "lon": 72.7985,
-      "lat": 40.5283,
+      "host_feature_id": "KGZ-1120__RCW_KGZ_92254566B63974139076370",
+      "lon": 72.9931,
+      "lat": 40.945,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     },
@@ -637,7 +670,7 @@
       "tag": "MON",
       "city_id": "CITY::ne::1159150781",
       "stable_key": "id::CITY::ne::1159150781",
-      "city_name": "Ulaanbaatar",
+      "city_name": "Urga",
       "name_ascii": "Ulan Bator",
       "country_code": "MN",
       "display_name": "Bogd Khanate of Mongolia",
@@ -645,13 +678,14 @@
       "lon": 106.8832,
       "lat": 47.9077,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "库伦"
     },
     {
       "tag": "TAN",
       "city_id": "CITY::ne::1159149621",
       "stable_key": "id::CITY::ne::1159149621",
-      "city_name": "Kyzyl",
+      "city_name": "Belotsarsk",
       "name_ascii": "Kyzyl",
       "country_code": "RU",
       "display_name": "Uryankhay Krai",
@@ -659,13 +693,14 @@
       "lon": 94.4378,
       "lat": 51.7111,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "别洛察尔斯克"
     },
     {
       "tag": "FIN",
       "city_id": "CITY::ne::1159151419",
       "stable_key": "id::CITY::ne::1159151419",
-      "city_name": "Helsinki",
+      "city_name": "Helsingfors",
       "name_ascii": "Helsinki",
       "country_code": "FI",
       "display_name": "Finland",
@@ -673,13 +708,14 @@
       "lon": 24.9354,
       "lat": 60.1695,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "赫尔辛福斯"
     },
     {
       "tag": "EST",
       "city_id": "CITY::ne::1159150877",
       "stable_key": "id::CITY::ne::1159150877",
-      "city_name": "Tallinn",
+      "city_name": "Reval",
       "name_ascii": "Tallinn",
       "country_code": "EE",
       "display_name": "Estonia",
@@ -687,7 +723,8 @@
       "lon": 24.7535,
       "lat": 59.437,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "雷瓦尔"
     },
     {
       "tag": "LAT",
@@ -707,7 +744,7 @@
       "tag": "LIT",
       "city_id": "CITY::ne::1159136375",
       "stable_key": "id::CITY::ne::1159136375",
-      "city_name": "Kaunas",
+      "city_name": "Kovno",
       "name_ascii": "Kaunas",
       "country_code": "LT",
       "display_name": "Lithuania",
@@ -715,7 +752,8 @@
       "lon": 23.9091,
       "lat": 54.9016,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "科夫诺"
     },
     {
       "tag": "POL",
@@ -729,7 +767,8 @@
       "lon": 21.0118,
       "lat": 52.2298,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "华沙"
     },
     {
       "tag": "ROM",
@@ -743,13 +782,14 @@
       "lon": 26.1063,
       "lat": 44.4323,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "布加勒斯特"
     },
     {
       "tag": "NEA",
       "city_id": "CITY::ne::1159151377",
       "stable_key": "id::CITY::ne::1159151377",
-      "city_name": "Shenyang",
+      "city_name": "Mukden",
       "name_ascii": "Shenyang",
       "country_code": "CN",
       "display_name": "Fengtian Clique",
@@ -757,7 +797,8 @@
       "lon": 123.4328,
       "lat": 41.7922,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "奉天"
     },
     {
       "tag": "PER",
@@ -791,7 +832,7 @@
       "tag": "KWT",
       "city_id": "CITY::ne::1159149913",
       "stable_key": "id::CITY::ne::1159149913",
-      "city_name": "Dalian",
+      "city_name": "Dairen",
       "name_ascii": "Dalian",
       "country_code": "CN",
       "display_name": "Kwantung Leased Territory",
@@ -799,14 +840,70 @@
       "lon": 121.6022,
       "lat": 38.9122,
       "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "大连"
+    },
+    {
+      "tag": "BTUM",
+      "city_id": "RCW_CITY_BATUM",
+      "stable_key": "id::RCW_CITY_BATUM",
+      "city_name": "Batum",
+      "name_ascii": "Batum",
+      "country_code": "GE",
+      "display_name": "British-occupied Batum",
+      "host_feature_id": "GEO-3027",
+      "lon": 41.7,
+      "lat": 41.61,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city"
+    },
+    {
+      "tag": "RTAS",
+      "city_id": "RCW_CITY_TASEYEVO",
+      "stable_key": "id::RCW_CITY_TASEYEVO",
+      "city_name": "Taseyevo",
+      "name_ascii": "Taseyevo",
+      "country_code": "RU",
+      "display_name": "Taseyevo Partisan Republic",
+      "host_feature_id": "RU_MRG_abf0de7d54dd",
+      "lon": 94.88,
+      "lat": 57.21,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city"
+    },
+    {
+      "tag": "GLN",
+      "city_id": "CITY::ne::1159148683",
+      "stable_key": "id::CITY::ne::1159148683",
+      "city_name": "Resht",
+      "name_ascii": "Rasht",
+      "country_code": "IR",
+      "display_name": "Jangal Movement of Gilan",
+      "host_feature_id": "IRN-3240",
+      "lon": 49.5886,
+      "lat": 37.2761,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "拉什特"
+    },
+    {
+      "tag": "CERR",
+      "city_id": "CITY::ne::1159151397",
+      "stable_key": "id::CITY::ne::1159151397",
+      "city_name": "Harbin",
+      "name_ascii": "Harbin",
+      "country_code": "CN",
+      "display_name": "Chinese Eastern Railway Zone",
+      "host_feature_id": "CN_CITY_17275852B62742745762805",
+      "lon": 126.65,
+      "lat": 45.75,
+      "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     }
   ],
-  "entry_count": 57,
+  "entry_count": 62,
   "missing_tags": [
-    "AFSR",
-    "BTUM",
-    "NCEM"
+    "AFSR"
   ],
-  "missing_tag_count": 3
+  "missing_tag_count": 1
 }

@@ -44,17 +44,17 @@
       "fillColor": "#3b4a55"
     }
   },
-  "baseline_hash": "d7a8ecddfd1e6023a9510176cb4c989e8f0c5435eca549ce00202b3ce7c61a61",
+  "baseline_hash": "15c09ba628a4c481cbedaf3f1283f6c1bcf073a732d3b2e5e3183e0c22fb36d6",
   "summary": {
-    "feature_count": 5551,
-    "owner_count": 59,
+    "feature_count": 5515,
+    "owner_count": 62,
     "shell_feature_count": 2088
   },
   "source": {
     "base_scenario": "hoi4_1936",
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "base_scenario_runtime_topology_sha256": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326",
-    "runtime_topology_sha256": "9340f5673ff96a61282468feeacfcb6547f0a4736c8c3c715dd13f9d0fd09491"
+    "runtime_topology_sha256": "e6313f8b3296d436862c0330c7513cb0851a4be1df3aaf2778d5d482cac93710"
   },
   "runtime_topology_url": "data/scenarios/rcw_1919/runtime_topology.topo.json",
   "countries_url": "data/scenarios/rcw_1919/countries.json",
@@ -1679,12 +1679,6 @@
         "IRN-3245__SPLIT_REST"
       ],
       "KAZ-3195": [
-        "KAZ-3195__SPLIT_ARALBASIN",
-        "KAZ-3195__SPLIT_ARAL1987",
-        "KAZ-3195__SPLIT_ARAL2006",
-        "KAZ-3195__SPLIT_ARAL2009__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3195__SPLIT_ARAL2009__RCW_Turgay_region_Irgizskii",
-        "KAZ-3195__SPLIT_ARAL2009__RCW_Ural_region_Temirskii",
         "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B11861912196309__Transcaspian_region_Mangyshlakskii",
         "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B11861912196309__Ural_region_Gurevskii",
         "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B11861912196309__Ural_region_Temirskii",
@@ -1746,21 +1740,6 @@
         "KAZ-3196__RCW_KAZ_9891525B88932935012165__Turgay_region_Kustanaiskii"
       ],
       "KAZ-3197": [
-        "KAZ-3197__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARALBASIN__RCW_Turgay_region_Irgizskii",
-        "KAZ-3197__SPLIT_ARAL1973__RCW_KAZ_9891525B16415280148457",
-        "KAZ-3197__SPLIT_ARAL1973__RCW_KAZ_9891525B20568160586477",
-        "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B16415280148457",
-        "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B20568160586477__Turgay_region_Irgizskii",
-        "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B16415280148457",
-        "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477__Turgay_region_Irgizskii",
-        "KAZ-3197__SPLIT_ARAL2006__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL2006__RCW_Turgay_region_Irgizskii",
-        "KAZ-3197__SPLIT_ARAL2009__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL2009__RCW_Turgay_region_Irgizskii",
-        "KAZ-3197__SPLIT_ARAL2014",
         "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B16415280148457",
         "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii",
         "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B20568160586477__Turgay_region_Irgizskii",
@@ -3325,27 +3304,6 @@
         "UZB-355__RCW_UZB_79887680B99792663535597"
       ],
       "UZB-356": [
-        "UZB-356__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL1973",
-        "UZB-356__SPLIT_ARAL1987__RCW_KAZ_9891525B16415280148457",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B80838990154601__Transcaspian_region_Mangyshlakskii",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B80838990154601__Ural_region_Temirskii",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii",
-        "UZB-356__SPLIT_ARAL1999__RCW_KAZ_9891525B16415280148457",
-        "UZB-356__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477",
-        "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii",
-        "UZB-356__SPLIT_ARAL2006__RCW_Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL2006__RCW_Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL2006__RCW_Transcaspian_region_Mangyshlakskii",
-        "UZB-356__SPLIT_ARAL2009__RCW_KAZ_9891525B20568160586477",
-        "UZB-356__SPLIT_ARAL2009__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL2009__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL2014",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B22143596455299",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B3643857389786",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B51354655878923__Khiva_Khiva",
@@ -3359,7 +3317,6 @@
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii",
-        "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Ural_region_Temirskii",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B9862753118700__Khiva_Khiva",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B9862753118700__Syr_Darya_region_Amudarinskii_Otdel"
       ],
@@ -3533,5 +3490,6 @@
         "UZB-372__RCW_UZB_79887680B98166747305726"
       ]
     }
-  }
+  },
+  "water_regions_url": "data/scenarios/rcw_1919/water_regions.geojson"
 }

@@ -2,6 +2,17 @@
   "base_scenario": "hoi4_1936",
   "base_topology_sha256": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326",
   "units": "rcw.sources/units_1897.geojson",
+  "exclude_id_patterns": ["*__SPLIT_ARAL*"],
+  "historic_water": {
+    "source": "ne_10m_lakes_historic.zip",
+    "name": "Aral Sea",
+    "properties": {
+      "id": "aral_sea", "name": "Aral Sea", "label": "Aral Sea", "water_type": "inland_sea",
+      "region_group": "eurasia_lakes", "parent_id": "", "neighbors": "", "is_chokepoint": false,
+      "interactive": true, "source_standard": "natural_earth_lakes_historic"
+    }
+  },
+  "public_land_topology": "europe_topology.json",
   "excluded_districts": ["Sakhalin island/Korsakovskii"],
   "majority_threshold": 0.5,
   "neighbor_tags": ["FIN", "EST", "LAT", "LIT", "POL", "ROM", "MON", "TAN", "KWT", "MAN"],

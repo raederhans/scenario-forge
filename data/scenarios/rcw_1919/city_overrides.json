@@ -35,19 +35,20 @@
     "USSU": "CITY::ne::1159149653",
     "VLA": "CITY::ne::1159150739",
     "AMRW": "CITY::ne::1159149625",
-    "YDNC": "CITY::gn::548602",
+    "YDNC": "CITY::ne::1159137151",
     "MILL": "CITY::ne::1159150693",
     "WRVA": "CITY::ne::1159136381",
     "UNRP": "CITY::ne::1159126743",
     "WUK": "CITY::ne::1159134213",
-    "MAKF": "CITY::ne::1159126903",
+    "MAKF": "RCW_CITY_GULYAIPOLYE",
+    "NCEM": "RCW_CITY_VEDENO",
     "GEO": "CITY::ne::1159150961",
     "ARM": "CITY::ne::1159151119",
     "AZR": "CITY::ne::1159151123",
     "KAZ": "CITY::ne::1159142527",
     "BKH": "CITY::ne::1159149337",
     "KHI": "CITY::ne::1159134303",
-    "FRGN": "CITY::ne::1159136477",
+    "FRGN": "CITY::ne::1159136459",
     "MON": "CITY::ne::1159150781",
     "TAN": "CITY::ne::1159149621",
     "FIN": "CITY::ne::1159151419",
@@ -59,7 +60,11 @@
     "NEA": "CITY::ne::1159151377",
     "PER": "CITY::ne::1159150135",
     "TUR": "CITY::ne::1159135215",
-    "KWT": "CITY::ne::1159149913"
+    "KWT": "CITY::ne::1159149913",
+    "BTUM": "RCW_CITY_BATUM",
+    "RTAS": "RCW_CITY_TASEYEVO",
+    "GLN": "CITY::ne::1159148683",
+    "CERR": "CITY::ne::1159151397"
   },
   "capital_city_hints": {
     "SOV": {
@@ -130,7 +135,8 @@
       "lon": 60.6153,
       "lat": 56.8573,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "叶卡捷琳堡"
     },
     "RTKF": {
       "tag": "RTKF",
@@ -144,7 +150,8 @@
       "lon": 50.1355,
       "lat": 53.2077,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "萨马拉"
     },
     "RSIX": {
       "tag": "RSIX",
@@ -178,7 +185,7 @@
       "tag": "LSSR",
       "city_id": "CITY::ne::1159128241",
       "stable_key": "id::CITY::ne::1159128241",
-      "city_name": "Rezekne",
+      "city_name": "Rezhitsa",
       "name_ascii": "Rezekne",
       "country_code": "LV",
       "display_name": "Latvian Socialist Soviet Republic",
@@ -186,7 +193,8 @@
       "lon": 27.34,
       "lat": 56.5103,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "雷日察"
     },
     "BSH": {
       "tag": "BSH",
@@ -234,7 +242,7 @@
       "tag": "VOLR",
       "city_id": "CITY::ne::1159149333",
       "stable_key": "id::CITY::ne::1159149333",
-      "city_name": "Kharkiv",
+      "city_name": "Kharkov",
       "name_ascii": "Kharkiv",
       "country_code": "UA",
       "display_name": "Volunteer Army",
@@ -242,7 +250,8 @@
       "lon": 36.2548,
       "lat": 49.9818,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "哈尔科夫"
     },
     "DON": {
       "tag": "DON",
@@ -262,7 +271,7 @@
       "tag": "CAUA",
       "city_id": "CITY::ne::1159150697",
       "stable_key": "id::CITY::ne::1159150697",
-      "city_name": "Volgograd",
+      "city_name": "Tsaritsyn",
       "name_ascii": "Volgograd",
       "country_code": "RU",
       "display_name": "Caucasus Army",
@@ -270,13 +279,14 @@
       "lon": 44.4976,
       "lat": 48.7138,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "察里津"
     },
     "KUB": {
       "tag": "KUB",
       "city_id": "CITY::ne::1159149549",
       "stable_key": "id::CITY::ne::1159149549",
-      "city_name": "Krasnodar",
+      "city_name": "Yekaterinodar",
       "name_ascii": "Krasnodar",
       "country_code": "RU",
       "display_name": "Kuban People's Republic",
@@ -284,7 +294,8 @@
       "lon": 38.9818,
       "lat": 45.0453,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "叶卡捷琳诺达尔"
     },
     "BSEA": {
       "tag": "BSEA",
@@ -312,13 +323,14 @@
       "lon": 44.6699,
       "lat": 43.041,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "弗拉季高加索"
     },
     "KIEV": {
       "tag": "KIEV",
       "city_id": "CITY::ne::1159151495",
       "stable_key": "id::CITY::ne::1159151495",
-      "city_name": "Kyiv",
+      "city_name": "Kiev",
       "name_ascii": "Kyiv",
       "country_code": "UA",
       "display_name": "Forces of the Kiev Region",
@@ -326,13 +338,14 @@
       "lon": 30.5238,
       "lat": 50.4547,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "基辅"
     },
     "NOVR": {
       "tag": "NOVR",
       "city_id": "CITY::ne::1159149325",
       "stable_key": "id::CITY::ne::1159149325",
-      "city_name": "Odesa",
+      "city_name": "Odessa",
       "name_ascii": "Odesa",
       "country_code": "UA",
       "display_name": "Forces of the Novorossiya Region",
@@ -340,13 +353,14 @@
       "lon": 30.7438,
       "lat": 46.4857,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "敖德萨"
     },
     "TUC": {
       "tag": "TUC",
       "city_id": "CITY::ne::1159149335",
       "stable_key": "id::CITY::ne::1159149335",
-      "city_name": "Turkmenbashi",
+      "city_name": "Krasnovodsk",
       "name_ascii": "Tuerkmenbasy",
       "country_code": "TM",
       "display_name": "Turkestan Army",
@@ -354,13 +368,14 @@
       "lon": 52.9552,
       "lat": 40.0222,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "克拉斯诺沃茨克"
     },
     "URAL": {
       "tag": "URAL",
       "city_id": "CITY::ne::1159150111",
       "stable_key": "id::CITY::ne::1159150111",
-      "city_name": "Atyrau",
+      "city_name": "Guryev",
       "name_ascii": "Atyrau",
       "country_code": "KZ",
       "display_name": "Ural Cossack Army",
@@ -368,7 +383,8 @@
       "lon": 51.8843,
       "lat": 47.1048,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "古里耶夫"
     },
     "RUS": {
       "tag": "RUS",
@@ -416,7 +432,7 @@
       "tag": "KTHR",
       "city_id": "CITY::ne::1159147307",
       "stable_key": "id::CITY::ne::1159147307",
-      "city_name": "Petropavl",
+      "city_name": "Petropavlovsk",
       "name_ascii": "Petropavl",
       "country_code": "KZ",
       "display_name": "3rd Army",
@@ -424,13 +440,14 @@
       "lon": 69.1506,
       "lat": 54.8734,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "彼得罗巴甫洛夫斯克"
     },
     "ORN": {
       "tag": "ORN",
       "city_id": "CITY::ne::1159147295",
       "stable_key": "id::CITY::ne::1159147295",
-      "city_name": "Kokshetau",
+      "city_name": "Kokchetav",
       "name_ascii": "Kokshetau",
       "country_code": "KZ",
       "display_name": "Orenburg Army",
@@ -438,13 +455,14 @@
       "lon": 69.3936,
       "lat": 53.2841,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "科克切塔夫"
     },
     "SEMR": {
       "tag": "SEMR",
       "city_id": "CITY::ne::1159147309",
       "stable_key": "id::CITY::ne::1159147309",
-      "city_name": "Ayagoz",
+      "city_name": "Sergiopol",
       "name_ascii": "Ayagoz",
       "country_code": "KZ",
       "display_name": "Semirechye Army",
@@ -452,7 +470,8 @@
       "lon": 80.4344,
       "lat": 47.9645,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "谢尔吉奥波尔"
     },
     "ZBAI": {
       "tag": "ZBAI",
@@ -512,15 +531,15 @@
     },
     "YDNC": {
       "tag": "YDNC",
-      "city_id": "CITY::gn::548602",
-      "stable_key": "id::CITY::gn::548602",
-      "city_name": "Kingisepp",
-      "name_ascii": "Kingisepp",
+      "city_id": "CITY::ne::1159137151",
+      "stable_key": "id::CITY::ne::1159137151",
+      "city_name": "Gatchina",
+      "name_ascii": "Gatchina",
       "country_code": "RU",
       "display_name": "North-Western Army",
-      "host_feature_id": "RU_RAY_50074027B99227036451137__SPLIT_REST",
-      "lon": 28.6141,
-      "lat": 59.3763,
+      "host_feature_id": "RU_RAY_50074027B64055482679717",
+      "lon": 30.1283,
+      "lat": 59.5764,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     },
@@ -542,7 +561,7 @@
       "tag": "WRVA",
       "city_id": "CITY::ne::1159136381",
       "stable_key": "id::CITY::ne::1159136381",
-      "city_name": "Jelgava",
+      "city_name": "Mitau",
       "name_ascii": "Jelgava",
       "country_code": "LV",
       "display_name": "West Russian Volunteer Army",
@@ -550,13 +569,14 @@
       "lon": 23.7128,
       "lat": 56.65,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "米陶"
     },
     "UNRP": {
       "tag": "UNRP",
       "city_id": "CITY::ne::1159126743",
       "stable_key": "id::CITY::ne::1159126743",
-      "city_name": "Kamianets-Podilskyi",
+      "city_name": "Kamenets-Podolsk",
       "name_ascii": "Kamyanets-Podilskyy",
       "country_code": "UA",
       "display_name": "Ukrainian People's Republic",
@@ -564,13 +584,14 @@
       "lon": 26.5809,
       "lat": 48.6843,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "卡缅涅茨-波多利斯基"
     },
     "WUK": {
       "tag": "WUK",
       "city_id": "CITY::ne::1159134213",
       "stable_key": "id::CITY::ne::1159134213",
-      "city_name": "Vinnytsia",
+      "city_name": "Vinnitsa",
       "name_ascii": "Vinnytsya",
       "country_code": "UA",
       "display_name": "Ukrainian Galician Army",
@@ -578,19 +599,34 @@
       "lon": 28.4687,
       "lat": 49.2322,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "文尼察"
     },
     "MAKF": {
       "tag": "MAKF",
-      "city_id": "CITY::ne::1159126903",
-      "stable_key": "id::CITY::ne::1159126903",
-      "city_name": "Berdyansk",
-      "name_ascii": "Berdyansk",
+      "city_id": "RCW_CITY_GULYAIPOLYE",
+      "stable_key": "id::RCW_CITY_GULYAIPOLYE",
+      "city_name": "Gulyai-Polye",
+      "name_ascii": "Gulyai-Polye",
       "country_code": "UA",
       "display_name": "Revolutionary Insurgent Army of Ukraine",
-      "host_feature_id": "UA_RAY_74538382B42406222783177",
-      "lon": 36.7882,
-      "lat": 46.7558,
+      "host_feature_id": "UA_MRG_9e7d5f1ce841",
+      "lon": 36.26,
+      "lat": 47.66,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city"
+    },
+    "NCEM": {
+      "tag": "NCEM",
+      "city_id": "RCW_CITY_VEDENO",
+      "stable_key": "id::RCW_CITY_VEDENO",
+      "city_name": "Vedeno",
+      "name_ascii": "Vedeno",
+      "country_code": "RU",
+      "display_name": "North Caucasian Emirate",
+      "host_feature_id": "RU_MRG_327478551c90",
+      "lon": 45.99,
+      "lat": 42.97,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     },
@@ -598,7 +634,7 @@
       "tag": "GEO",
       "city_id": "CITY::ne::1159150961",
       "stable_key": "id::CITY::ne::1159150961",
-      "city_name": "Tbilisi",
+      "city_name": "Tiflis",
       "name_ascii": "Tbilisi",
       "country_code": "GE",
       "display_name": "Democratic Republic of Georgia",
@@ -606,13 +642,14 @@
       "lon": 44.8341,
       "lat": 41.6914,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "梯弗里斯"
     },
     "ARM": {
       "tag": "ARM",
       "city_id": "CITY::ne::1159151119",
       "stable_key": "id::CITY::ne::1159151119",
-      "city_name": "Yerevan",
+      "city_name": "Erivan",
       "name_ascii": "Yerevan",
       "country_code": "AM",
       "display_name": "Republic of Armenia",
@@ -620,7 +657,8 @@
       "lon": 44.5126,
       "lat": 40.1776,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "埃里温"
     },
     "AZR": {
       "tag": "AZR",
@@ -680,15 +718,15 @@
     },
     "FRGN": {
       "tag": "FRGN",
-      "city_id": "CITY::ne::1159136477",
-      "stable_key": "id::CITY::ne::1159136477",
-      "city_name": "Osh",
-      "name_ascii": "Osh",
+      "city_id": "CITY::ne::1159136459",
+      "stable_key": "id::CITY::ne::1159136459",
+      "city_name": "Jalal-Abad",
+      "name_ascii": "Jalal-Abad",
       "country_code": "KG",
       "display_name": "Fergana Peasant Army and Basmachi",
-      "host_feature_id": "KGZ-1122__RCW_KGZ_92254566B53802085045884",
-      "lon": 72.7985,
-      "lat": 40.5283,
+      "host_feature_id": "KGZ-1120__RCW_KGZ_92254566B63974139076370",
+      "lon": 72.9931,
+      "lat": 40.945,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     },
@@ -696,7 +734,7 @@
       "tag": "MON",
       "city_id": "CITY::ne::1159150781",
       "stable_key": "id::CITY::ne::1159150781",
-      "city_name": "Ulaanbaatar",
+      "city_name": "Urga",
       "name_ascii": "Ulan Bator",
       "country_code": "MN",
       "display_name": "Bogd Khanate of Mongolia",
@@ -704,13 +742,14 @@
       "lon": 106.8832,
       "lat": 47.9077,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "库伦"
     },
     "TAN": {
       "tag": "TAN",
       "city_id": "CITY::ne::1159149621",
       "stable_key": "id::CITY::ne::1159149621",
-      "city_name": "Kyzyl",
+      "city_name": "Belotsarsk",
       "name_ascii": "Kyzyl",
       "country_code": "RU",
       "display_name": "Uryankhay Krai",
@@ -718,13 +757,14 @@
       "lon": 94.4378,
       "lat": 51.7111,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "别洛察尔斯克"
     },
     "FIN": {
       "tag": "FIN",
       "city_id": "CITY::ne::1159151419",
       "stable_key": "id::CITY::ne::1159151419",
-      "city_name": "Helsinki",
+      "city_name": "Helsingfors",
       "name_ascii": "Helsinki",
       "country_code": "FI",
       "display_name": "Finland",
@@ -732,13 +772,14 @@
       "lon": 24.9354,
       "lat": 60.1695,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "赫尔辛福斯"
     },
     "EST": {
       "tag": "EST",
       "city_id": "CITY::ne::1159150877",
       "stable_key": "id::CITY::ne::1159150877",
-      "city_name": "Tallinn",
+      "city_name": "Reval",
       "name_ascii": "Tallinn",
       "country_code": "EE",
       "display_name": "Estonia",
@@ -746,7 +787,8 @@
       "lon": 24.7535,
       "lat": 59.437,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "雷瓦尔"
     },
     "LAT": {
       "tag": "LAT",
@@ -766,7 +808,7 @@
       "tag": "LIT",
       "city_id": "CITY::ne::1159136375",
       "stable_key": "id::CITY::ne::1159136375",
-      "city_name": "Kaunas",
+      "city_name": "Kovno",
       "name_ascii": "Kaunas",
       "country_code": "LT",
       "display_name": "Lithuania",
@@ -774,7 +816,8 @@
       "lon": 23.9091,
       "lat": 54.9016,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "科夫诺"
     },
     "POL": {
       "tag": "POL",
@@ -788,7 +831,8 @@
       "lon": 21.0118,
       "lat": 52.2298,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "华沙"
     },
     "ROM": {
       "tag": "ROM",
@@ -802,13 +846,14 @@
       "lon": 26.1063,
       "lat": 44.4323,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "布加勒斯特"
     },
     "NEA": {
       "tag": "NEA",
       "city_id": "CITY::ne::1159151377",
       "stable_key": "id::CITY::ne::1159151377",
-      "city_name": "Shenyang",
+      "city_name": "Mukden",
       "name_ascii": "Shenyang",
       "country_code": "CN",
       "display_name": "Fengtian Clique",
@@ -816,7 +861,8 @@
       "lon": 123.4328,
       "lat": 41.7922,
       "capital_kind": "country_capital",
-      "resolution_method": "owned_city"
+      "resolution_method": "owned_city",
+      "city_name_zh": "奉天"
     },
     "PER": {
       "tag": "PER",
@@ -850,13 +896,71 @@
       "tag": "KWT",
       "city_id": "CITY::ne::1159149913",
       "stable_key": "id::CITY::ne::1159149913",
-      "city_name": "Dalian",
+      "city_name": "Dairen",
       "name_ascii": "Dalian",
       "country_code": "CN",
       "display_name": "Kwantung Leased Territory",
       "host_feature_id": "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG",
       "lon": 121.6022,
       "lat": 38.9122,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "大连"
+    },
+    "BTUM": {
+      "tag": "BTUM",
+      "city_id": "RCW_CITY_BATUM",
+      "stable_key": "id::RCW_CITY_BATUM",
+      "city_name": "Batum",
+      "name_ascii": "Batum",
+      "country_code": "GE",
+      "display_name": "British-occupied Batum",
+      "host_feature_id": "GEO-3027",
+      "lon": 41.7,
+      "lat": 41.61,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city"
+    },
+    "RTAS": {
+      "tag": "RTAS",
+      "city_id": "RCW_CITY_TASEYEVO",
+      "stable_key": "id::RCW_CITY_TASEYEVO",
+      "city_name": "Taseyevo",
+      "name_ascii": "Taseyevo",
+      "country_code": "RU",
+      "display_name": "Taseyevo Partisan Republic",
+      "host_feature_id": "RU_MRG_abf0de7d54dd",
+      "lon": 94.88,
+      "lat": 57.21,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city"
+    },
+    "GLN": {
+      "tag": "GLN",
+      "city_id": "CITY::ne::1159148683",
+      "stable_key": "id::CITY::ne::1159148683",
+      "city_name": "Resht",
+      "name_ascii": "Rasht",
+      "country_code": "IR",
+      "display_name": "Jangal Movement of Gilan",
+      "host_feature_id": "IRN-3240",
+      "lon": 49.5886,
+      "lat": 37.2761,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "拉什特"
+    },
+    "CERR": {
+      "tag": "CERR",
+      "city_id": "CITY::ne::1159151397",
+      "stable_key": "id::CITY::ne::1159151397",
+      "city_name": "Harbin",
+      "name_ascii": "Harbin",
+      "country_code": "CN",
+      "display_name": "Chinese Eastern Railway Zone",
+      "host_feature_id": "CN_CITY_17275852B62742745762805",
+      "lon": 126.65,
+      "lat": 45.75,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
     }
@@ -875,10 +979,24 @@
       "host_feature_id": "RU_RAY_50074027B39404018386654__SPLIT_REST"
     },
     "CITY::ne::1159150701": {
-      "host_feature_id": "RU_RAY_50074027B76835864360350"
+      "host_feature_id": "RU_RAY_50074027B76835864360350",
+      "display_name": {
+        "en": "Yekaterinburg",
+        "zh": "叶卡捷琳堡"
+      },
+      "aliases": [
+        "Yekaterinburg"
+      ]
     },
     "CITY::ne::1159150703": {
-      "host_feature_id": "RU_RAY_50074027B12201890066789"
+      "host_feature_id": "RU_RAY_50074027B12201890066789",
+      "display_name": {
+        "en": "Samara",
+        "zh": "萨马拉"
+      },
+      "aliases": [
+        "Samara"
+      ]
     },
     "CITY::ne::1159149541": {
       "host_feature_id": "RU_MRG_aedb5f9ed3b1"
@@ -887,7 +1005,16 @@
       "host_feature_id": "UZB-4828"
     },
     "CITY::ne::1159128241": {
-      "host_feature_id": "LV005__SPLIT_REZEKNE_5789"
+      "host_feature_id": "LV005__SPLIT_REZEKNE_5789",
+      "display_name": {
+        "en": "Rezhitsa",
+        "zh": "雷日察"
+      },
+      "aliases": [
+        "Rezhitsa",
+        "Rēzekne",
+        "Rezekne"
+      ]
     },
     "CITY::ne::1159146525": {
       "host_feature_id": "RU_RAY_50074027B5244237471572"
@@ -899,34 +1026,98 @@
       "host_feature_id": "RU_MRG_d3e6d3f9aa41__SPLIT_REST"
     },
     "CITY::ne::1159149333": {
-      "host_feature_id": "UA_RAY_74538382B36501884751905"
+      "host_feature_id": "UA_RAY_74538382B36501884751905",
+      "display_name": {
+        "en": "Kharkov",
+        "zh": "哈尔科夫"
+      },
+      "aliases": [
+        "Kharkov",
+        "Kharkiv"
+      ]
     },
     "CITY::ne::1159128663": {
       "host_feature_id": "RU_RAY_50074027B32606930376124"
     },
     "CITY::ne::1159150697": {
-      "host_feature_id": "RU_CITY_VOLGOGRAD"
+      "host_feature_id": "RU_CITY_VOLGOGRAD",
+      "display_name": {
+        "en": "Tsaritsyn",
+        "zh": "察里津"
+      },
+      "aliases": [
+        "Tsaritsyn",
+        "Volgograd"
+      ]
     },
     "CITY::ne::1159149549": {
-      "host_feature_id": "RU_RAY_50074027B89252490479976"
+      "host_feature_id": "RU_RAY_50074027B89252490479976",
+      "display_name": {
+        "en": "Yekaterinodar",
+        "zh": "叶卡捷琳诺达尔"
+      },
+      "aliases": [
+        "Yekaterinodar",
+        "Krasnodar"
+      ]
     },
     "CITY::ne::1159149547": {
       "host_feature_id": "RU_RAY_50074027B2873749547467"
     },
     "CITY::ne::1159137065": {
-      "host_feature_id": "RU_RAY_50074027B27316284331880"
+      "host_feature_id": "RU_RAY_50074027B27316284331880",
+      "display_name": {
+        "en": "Vladikavkaz",
+        "zh": "弗拉季高加索"
+      },
+      "aliases": [
+        "Vladikavkaz"
+      ]
     },
     "CITY::ne::1159151495": {
-      "host_feature_id": "UA_RAY_74538382B60890943260132"
+      "host_feature_id": "UA_RAY_74538382B60890943260132",
+      "display_name": {
+        "en": "Kiev",
+        "zh": "基辅"
+      },
+      "aliases": [
+        "Kiev",
+        "Kyiv"
+      ]
     },
     "CITY::ne::1159149325": {
-      "host_feature_id": "UA_RAY_74538382B54958880930265"
+      "host_feature_id": "UA_RAY_74538382B54958880930265",
+      "display_name": {
+        "en": "Odessa",
+        "zh": "敖德萨"
+      },
+      "aliases": [
+        "Odessa",
+        "Odesa"
+      ]
     },
     "CITY::ne::1159149335": {
-      "host_feature_id": "TKM-351__RCW_TKM_10190150B25855408224134__Transcaspian_region_Krasnovodskii"
+      "host_feature_id": "TKM-351__RCW_TKM_10190150B25855408224134__Transcaspian_region_Krasnovodskii",
+      "display_name": {
+        "en": "Krasnovodsk",
+        "zh": "克拉斯诺沃茨克"
+      },
+      "aliases": [
+        "Krasnovodsk",
+        "Türkmenbaşy",
+        "Turkmenbashi"
+      ]
     },
     "CITY::ne::1159150111": {
-      "host_feature_id": "KAZ-3198__RCW_KAZ_9891525B53075937326736__Ural_region_Gurevskii"
+      "host_feature_id": "KAZ-3198__RCW_KAZ_9891525B53075937326736__Ural_region_Gurevskii",
+      "display_name": {
+        "en": "Guryev",
+        "zh": "古里耶夫"
+      },
+      "aliases": [
+        "Guryev",
+        "Atyrau"
+      ]
     },
     "CITY::ne::1159149579": {
       "host_feature_id": "RU_RAY_50074027B53792659884597__RCW_Akmola_region_Omskii"
@@ -938,13 +1129,37 @@
       "host_feature_id": "RU_MRG_1696ac5066c8"
     },
     "CITY::ne::1159147307": {
-      "host_feature_id": "KAZ-3204__RCW_KAZ_9891525B4175044781460__Akmola_region_Petropavlovskii"
+      "host_feature_id": "KAZ-3204__RCW_KAZ_9891525B4175044781460__Akmola_region_Petropavlovskii",
+      "display_name": {
+        "en": "Petropavlovsk",
+        "zh": "彼得罗巴甫洛夫斯克"
+      },
+      "aliases": [
+        "Petropavlovsk",
+        "Petropavl"
+      ]
     },
     "CITY::ne::1159147295": {
-      "host_feature_id": "KAZ-3202__RCW_KAZ_9891525B55992449235040"
+      "host_feature_id": "KAZ-3202__RCW_KAZ_9891525B55992449235040",
+      "display_name": {
+        "en": "Kokchetav",
+        "zh": "科克切塔夫"
+      },
+      "aliases": [
+        "Kokchetav",
+        "Kokshetau"
+      ]
     },
     "CITY::ne::1159147309": {
-      "host_feature_id": "KAZ-3206__RCW_KAZ_9891525B20116602637665__Semirechye_region_Lepsinskii"
+      "host_feature_id": "KAZ-3206__RCW_KAZ_9891525B20116602637665__Semirechye_region_Lepsinskii",
+      "display_name": {
+        "en": "Sergiopol",
+        "zh": "谢尔吉奥波尔"
+      },
+      "aliases": [
+        "Sergiopol",
+        "Ayagoz"
+      ]
     },
     "CITY::ne::1159150737": {
       "host_feature_id": "RU_RAY_50074027B52095363621144"
@@ -958,29 +1173,98 @@
     "CITY::ne::1159149625": {
       "host_feature_id": "RU_MRG_b255df743ce5"
     },
-    "CITY::gn::548602": {
-      "host_feature_id": "RU_RAY_50074027B99227036451137__SPLIT_REST"
+    "CITY::ne::1159137151": {
+      "host_feature_id": "RU_RAY_50074027B64055482679717"
     },
     "CITY::ne::1159150693": {
       "host_feature_id": "RU_CITY_ARKHANGELSK"
     },
     "CITY::ne::1159136381": {
-      "host_feature_id": "LV009__RCW_Kurland_governorate_Doblenskii"
+      "host_feature_id": "LV009__RCW_Kurland_governorate_Doblenskii",
+      "display_name": {
+        "en": "Mitau",
+        "zh": "米陶"
+      },
+      "aliases": [
+        "Mitau",
+        "Jelgava"
+      ]
     },
     "CITY::ne::1159126743": {
-      "host_feature_id": "UA_RAY_74538382B35313257426644"
+      "host_feature_id": "UA_RAY_74538382B35313257426644",
+      "display_name": {
+        "en": "Kamenets-Podolsk",
+        "zh": "卡缅涅茨-波多利斯基"
+      },
+      "aliases": [
+        "Kamenets-Podolsk",
+        "Kamianets-Podilskyi"
+      ]
     },
     "CITY::ne::1159134213": {
-      "host_feature_id": "UA_RAY_74538382B89307192182420"
+      "host_feature_id": "UA_RAY_74538382B89307192182420",
+      "display_name": {
+        "en": "Vinnitsa",
+        "zh": "文尼察"
+      },
+      "aliases": [
+        "Vinnitsa",
+        "Vinnytsia"
+      ]
     },
-    "CITY::ne::1159126903": {
-      "host_feature_id": "UA_RAY_74538382B42406222783177"
+    "RCW_CITY_GULYAIPOLYE": {
+      "name_en": "Gulyai-Polye",
+      "name_zh": "古利亚伊波列",
+      "lon": 36.26,
+      "lat": 47.66,
+      "name_ascii": "Gulyai-Polye",
+      "country_code": "UA",
+      "city_id": "RCW_CITY_GULYAIPOLYE",
+      "stable_key": "id::RCW_CITY_GULYAIPOLYE",
+      "add_city": true,
+      "display_name": {
+        "en": "Gulyai-Polye",
+        "zh": "古利亚伊波列"
+      },
+      "host_feature_id": "UA_MRG_9e7d5f1ce841"
+    },
+    "RCW_CITY_VEDENO": {
+      "name_en": "Vedeno",
+      "name_zh": "韦杰诺",
+      "lon": 45.99,
+      "lat": 42.97,
+      "name_ascii": "Vedeno",
+      "country_code": "RU",
+      "city_id": "RCW_CITY_VEDENO",
+      "stable_key": "id::RCW_CITY_VEDENO",
+      "add_city": true,
+      "display_name": {
+        "en": "Vedeno",
+        "zh": "韦杰诺"
+      },
+      "host_feature_id": "RU_MRG_327478551c90"
     },
     "CITY::ne::1159150961": {
-      "host_feature_id": "GEO-3036"
+      "host_feature_id": "GEO-3036",
+      "display_name": {
+        "en": "Tiflis",
+        "zh": "梯弗里斯"
+      },
+      "aliases": [
+        "Tiflis",
+        "Tbilisi"
+      ]
     },
     "CITY::ne::1159151119": {
-      "host_feature_id": "ARM-1675"
+      "host_feature_id": "ARM-1675",
+      "display_name": {
+        "en": "Erivan",
+        "zh": "埃里温"
+      },
+      "aliases": [
+        "Erivan",
+        "Yerevan"
+      ]
     },
     "CITY::ne::1159151123": {
       "host_feature_id": "AZE-1689"
@@ -994,35 +1278,97 @@
     "CITY::ne::1159134303": {
       "host_feature_id": "UZB-355__RCW_UZB_79887680B67856776963689"
     },
-    "CITY::ne::1159136477": {
-      "host_feature_id": "KGZ-1122__RCW_KGZ_92254566B53802085045884"
+    "CITY::ne::1159136459": {
+      "host_feature_id": "KGZ-1120__RCW_KGZ_92254566B63974139076370"
     },
     "CITY::ne::1159150781": {
-      "host_feature_id": "MNG-3331"
+      "host_feature_id": "MNG-3331",
+      "display_name": {
+        "en": "Urga",
+        "zh": "库伦"
+      },
+      "aliases": [
+        "Urga",
+        "Ulaanbaatar"
+      ]
     },
     "CITY::ne::1159149621": {
-      "host_feature_id": "RU_RAY_50074027B82563298264185"
+      "host_feature_id": "RU_RAY_50074027B82563298264185",
+      "display_name": {
+        "en": "Belotsarsk",
+        "zh": "别洛察尔斯克"
+      },
+      "aliases": [
+        "Belotsarsk",
+        "Kyzyl"
+      ]
     },
     "CITY::ne::1159151419": {
-      "host_feature_id": "FI1B1"
+      "host_feature_id": "FI1B1",
+      "display_name": {
+        "en": "Helsingfors",
+        "zh": "赫尔辛福斯"
+      },
+      "aliases": [
+        "Helsingfors",
+        "Helsinki"
+      ]
     },
     "CITY::ne::1159150877": {
-      "host_feature_id": "EE001__RCW_Estonia_governorate_Revelskii"
+      "host_feature_id": "EE001__RCW_Estonia_governorate_Revelskii",
+      "display_name": {
+        "en": "Reval",
+        "zh": "雷瓦尔"
+      },
+      "aliases": [
+        "Reval",
+        "Tallinn"
+      ]
     },
     "CITY::ne::1159150811": {
       "host_feature_id": "LV006"
     },
     "CITY::ne::1159136375": {
-      "host_feature_id": "LT022__RCW_LTU_59024439B6876723760209__Kovno_governorate_Kovenskii"
+      "host_feature_id": "LT022__RCW_LTU_59024439B6876723760209__Kovno_governorate_Kovenskii",
+      "display_name": {
+        "en": "Kovno",
+        "zh": "科夫诺"
+      },
+      "aliases": [
+        "Kovno",
+        "Kaunas"
+      ]
     },
     "CITY::ne::1159151299": {
-      "host_feature_id": "PL_POW_1465__SPLIT_LEFT"
+      "host_feature_id": "PL_POW_1465__SPLIT_LEFT",
+      "display_name": {
+        "en": "Warsaw",
+        "zh": "华沙"
+      },
+      "aliases": [
+        "Warsaw"
+      ]
     },
     "CITY::ne::1159151263": {
-      "host_feature_id": "RO321"
+      "host_feature_id": "RO321",
+      "display_name": {
+        "en": "Bucharest",
+        "zh": "布加勒斯特"
+      },
+      "aliases": [
+        "Bucharest"
+      ]
     },
     "CITY::ne::1159151377": {
-      "host_feature_id": "CN_CITY_17275852B24114902469869"
+      "host_feature_id": "CN_CITY_17275852B24114902469869",
+      "display_name": {
+        "en": "Mukden",
+        "zh": "奉天"
+      },
+      "aliases": [
+        "Mukden",
+        "Shenyang"
+      ]
     },
     "CITY::ne::1159150135": {
       "host_feature_id": "IRN-3238__SPLIT_TIBRIZ"
@@ -1031,7 +1377,777 @@
       "host_feature_id": "TRA11__SPLIT_ERZURUM"
     },
     "CITY::ne::1159149913": {
-      "host_feature_id": "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
+      "host_feature_id": "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG",
+      "display_name": {
+        "en": "Dairen",
+        "zh": "大连"
+      },
+      "aliases": [
+        "Dairen",
+        "Dalian"
+      ]
+    },
+    "RCW_CITY_BATUM": {
+      "name_en": "Batum",
+      "name_zh": "巴统",
+      "lon": 41.7,
+      "lat": 41.61,
+      "add_city": true,
+      "name_ascii": "Batum",
+      "country_code": "GE",
+      "city_id": "RCW_CITY_BATUM",
+      "stable_key": "id::RCW_CITY_BATUM",
+      "display_name": {
+        "en": "Batum",
+        "zh": "巴统"
+      },
+      "host_feature_id": "GEO-3027"
+    },
+    "RCW_CITY_TASEYEVO": {
+      "name_en": "Taseyevo",
+      "name_zh": "塔谢耶沃",
+      "lon": 94.88,
+      "lat": 57.21,
+      "add_city": true,
+      "name_ascii": "Taseyevo",
+      "country_code": "RU",
+      "city_id": "RCW_CITY_TASEYEVO",
+      "stable_key": "id::RCW_CITY_TASEYEVO",
+      "display_name": {
+        "en": "Taseyevo",
+        "zh": "塔谢耶沃"
+      },
+      "host_feature_id": "RU_MRG_abf0de7d54dd"
+    },
+    "CITY::ne::1159148683": {
+      "host_feature_id": "IRN-3240",
+      "display_name": {
+        "en": "Resht",
+        "zh": "拉什特"
+      },
+      "aliases": [
+        "Resht",
+        "Rasht"
+      ]
+    },
+    "CITY::ne::1159151397": {
+      "host_feature_id": "CN_CITY_17275852B62742745762805"
+    },
+    "CITY::ne::1159150105": {
+      "host_feature_id": "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B5390352263066",
+      "display_name": {
+        "en": "Aktyubinsk",
+        "zh": "阿克纠宾斯克"
+      },
+      "aliases": [
+        "Aktyubinsk",
+        "Aktobe"
+      ]
+    },
+    "CITY::ne::1159150969": {
+      "host_feature_id": "KAZ-4829",
+      "display_name": {
+        "en": "Verny",
+        "zh": "维尔内"
+      },
+      "aliases": [
+        "Verny",
+        "Almaty"
+      ]
+    },
+    "CITY::ne::1159150567": {
+      "host_feature_id": "TKM-352__RCW_TKM_10190150B31923585689840",
+      "display_name": {
+        "en": "Poltoratsk",
+        "zh": "波尔托拉茨克"
+      },
+      "aliases": [
+        "Poltoratsk",
+        "Ashgabat"
+      ]
+    },
+    "CITY::ne::1159150965": {
+      "host_feature_id": "KAZ-4830",
+      "display_name": {
+        "en": "Akmolinsk",
+        "zh": "阿克莫林斯克"
+      },
+      "aliases": [
+        "Akmolinsk",
+        "Nur-Sultan",
+        "Astana"
+      ]
+    },
+    "CITY::gn::141679": {
+      "host_feature_id": "IRN-3240",
+      "display_name": {
+        "en": "Enzeli",
+        "zh": "恩泽利"
+      },
+      "aliases": [
+        "Enzeli",
+        "Bandar-e Anzali"
+      ]
+    },
+    "CITY::ne::1159146507": {
+      "host_feature_id": "RU_RAY_50074027B40927192458411__RCW_Arkhangelsk_governorate_Kemskii",
+      "display_name": {
+        "en": "Soroka",
+        "zh": "索罗卡"
+      },
+      "aliases": [
+        "Soroka",
+        "Belomorsk"
+      ]
+    },
+    "CITY::ne::1159150813": {
+      "host_feature_id": "KGZ-1115",
+      "display_name": {
+        "en": "Pishpek",
+        "zh": "皮什佩克"
+      },
+      "aliases": [
+        "Pishpek",
+        "Bishkek"
+      ]
+    },
+    "CITY::ne::1159150351": {
+      "host_feature_id": "BY_RAY_67162791B30498032594927",
+      "display_name": {
+        "en": "Brest-Litovsk",
+        "zh": "布列斯特-立托夫斯克"
+      },
+      "aliases": [
+        "Brest-Litovsk",
+        "Brest"
+      ]
+    },
+    "CITY::ne::1159137913": {
+      "host_feature_id": "RU_RAY_50074027B37686910938427",
+      "display_name": {
+        "en": "Temir-Khan-Shura",
+        "zh": "铁米尔汗舒拉"
+      },
+      "aliases": [
+        "Temir-Khan-Shura",
+        "Buynaksk"
+      ]
+    },
+    "CITY::ne::1159126717": {
+      "host_feature_id": "UA_RAY_74538382B44220139144156",
+      "display_name": {
+        "en": "Chernigov",
+        "zh": "切尔尼戈夫"
+      },
+      "aliases": [
+        "Chernigov",
+        "Chernihiv"
+      ]
+    },
+    "CITY::ne::1159134177": {
+      "host_feature_id": "UA_RAY_74538382B32943992723151",
+      "display_name": {
+        "en": "Cernăuți",
+        "zh": "切尔诺夫策"
+      },
+      "aliases": [
+        "Cernăuți",
+        "Chernivtsi"
+      ]
+    },
+    "CITY::ne::1159150677": {
+      "host_feature_id": "MDA-1627",
+      "display_name": {
+        "en": "Kishinev",
+        "zh": "基什尼奥夫"
+      },
+      "aliases": [
+        "Kishinev",
+        "Chișinău",
+        "Chisinau"
+      ]
+    },
+    "CITY::ne::1159148307": {
+      "host_feature_id": "LV005__SPLIT_DAUGAVPILS",
+      "display_name": {
+        "en": "Dvinsk",
+        "zh": "德文斯克"
+      },
+      "aliases": [
+        "Dvinsk",
+        "Daugavpils"
+      ]
+    },
+    "CITY::ne::1159149329": {
+      "host_feature_id": "UA_RAY_74538382B23045356862491",
+      "display_name": {
+        "en": "Yekaterinoslav",
+        "zh": "叶卡捷琳诺斯拉夫"
+      },
+      "aliases": [
+        "Yekaterinoslav",
+        "Dnipro"
+      ]
+    },
+    "CITY::ne::1159149331": {
+      "host_feature_id": "UA_RAY_74538382B54113761495064",
+      "display_name": {
+        "en": "Yuzovka",
+        "zh": "尤佐夫卡"
+      },
+      "aliases": [
+        "Yuzovka",
+        "Donetsk"
+      ]
+    },
+    "CITY::ne::1159137681": {
+      "host_feature_id": "RU_RAY_50074027B23214282298262__SPLIT_REST",
+      "display_name": {
+        "en": "Pokrovsk",
+        "zh": "波克罗夫斯克"
+      },
+      "aliases": [
+        "Pokrovsk",
+        "Engels"
+      ]
+    },
+    "CITY::ne::1159146321": {
+      "host_feature_id": "UZB-364__RCW_UZB_79887680B63252769213541",
+      "display_name": {
+        "en": "Skobelev",
+        "zh": "斯科别列夫"
+      },
+      "aliases": [
+        "Skobelev",
+        "Fergana"
+      ]
+    },
+    "CITY::ne::1159132163": {
+      "host_feature_id": "AZE-1679",
+      "display_name": {
+        "en": "Ganja",
+        "zh": "甘贾"
+      },
+      "aliases": [
+        "Ganja"
+      ]
+    },
+    "CITY::ne::1159132151": {
+      "host_feature_id": "ARM-1555__SPLIT_KARAKALE",
+      "display_name": {
+        "en": "Alexandropol",
+        "zh": "亚历山德罗波尔"
+      },
+      "aliases": [
+        "Alexandropol",
+        "Gyumri"
+      ]
+    },
+    "CITY::ne::1159147723": {
+      "host_feature_id": "BY_INT_GOMEL",
+      "display_name": {
+        "en": "Gomel",
+        "zh": "戈梅利"
+      },
+      "aliases": [
+        "Gomel",
+        "Homyel"
+      ]
+    },
+    "CITY::ne::1159146473": {
+      "host_feature_id": "KGZ-1117__RCW_KGZ_92254566B94070763969745",
+      "display_name": {
+        "en": "Przhevalsk",
+        "zh": "普尔热瓦尔斯克"
+      },
+      "aliases": [
+        "Przhevalsk",
+        "Karakol"
+      ]
+    },
+    "CITY::ne::1159126729": {
+      "host_feature_id": "UA_RAY_74538382B37791268598116",
+      "display_name": {
+        "en": "Proskurov",
+        "zh": "普罗斯库罗夫"
+      },
+      "aliases": [
+        "Proskurov",
+        "Khmelnytskyi"
+      ]
+    },
+    "CITY::ne::1159146327": {
+      "host_feature_id": "TJK-369__RCW_TJK_16282066B88907719432894",
+      "display_name": {
+        "en": "Khodzhent",
+        "zh": "霍占特"
+      },
+      "aliases": [
+        "Khodzhent",
+        "Khujand"
+      ]
+    },
+    "CITY::gn::548602": {
+      "host_feature_id": "RU_RAY_50074027B99227036451137__SPLIT_REST",
+      "display_name": {
+        "en": "Yamburg",
+        "zh": "扬堡"
+      },
+      "aliases": [
+        "Yamburg",
+        "Kingisepp"
+      ]
+    },
+    "CITY::ne::1159149565": {
+      "host_feature_id": "RU_RAY_50074027B56747088904047",
+      "display_name": {
+        "en": "Vyatka",
+        "zh": "维亚特卡"
+      },
+      "aliases": [
+        "Vyatka",
+        "Kirov"
+      ]
+    },
+    "CITY::ne::1159147285": {
+      "host_feature_id": "KAZ-3196__RCW_KAZ_9891525B22727597704873",
+      "display_name": {
+        "en": "Kustanay",
+        "zh": "库斯塔奈"
+      },
+      "aliases": [
+        "Kustanay",
+        "Kostanay"
+      ]
+    },
+    "CITY::ne::1159134205": {
+      "host_feature_id": "UA_RAY_74538382B33094259068281",
+      "display_name": {
+        "en": "Yelisavetgrad",
+        "zh": "叶利沙维特格勒"
+      },
+      "aliases": [
+        "Yelisavetgrad",
+        "Kropyvnytskyi"
+      ]
+    },
+    "CITY::ne::1159150109": {
+      "host_feature_id": "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B78511175106534__Syr_Darya_region_Perovskii",
+      "display_name": {
+        "en": "Perovsk",
+        "zh": "彼罗夫斯克"
+      },
+      "aliases": [
+        "Perovsk",
+        "Kyzylorda"
+      ]
+    },
+    "CITY::ne::1159146449": {
+      "host_feature_id": "LV003__RCW_Kurland_governorate_Grobinskii",
+      "display_name": {
+        "en": "Libau",
+        "zh": "利巴瓦"
+      },
+      "aliases": [
+        "Libau",
+        "Liepāja",
+        "Liepaja"
+      ]
+    },
+    "CITY::ne::1159134241": {
+      "host_feature_id": "UA_RAY_74538382B91393089585676",
+      "display_name": {
+        "en": "Lugansk",
+        "zh": "卢甘斯克"
+      },
+      "aliases": [
+        "Lugansk",
+        "Luhansk"
+      ]
+    },
+    "CITY::ne::1159149323": {
+      "host_feature_id": "UA_RAY_74538382B46853229377150",
+      "display_name": {
+        "en": "Lwów",
+        "zh": "利沃夫"
+      },
+      "aliases": [
+        "Lwów",
+        "Lviv"
+      ]
+    },
+    "CITY::ne::1159145119": {
+      "host_feature_id": "BY_INT_MOGILEV",
+      "display_name": {
+        "en": "Mogilev",
+        "zh": "莫吉廖夫"
+      },
+      "aliases": [
+        "Mogilev",
+        "Mahilyow"
+      ]
+    },
+    "CITY::ne::1159146589": {
+      "host_feature_id": "RU_RAY_50074027B80443359996263",
+      "display_name": {
+        "en": "Petrovsk",
+        "zh": "彼得罗夫斯克"
+      },
+      "aliases": [
+        "Petrovsk",
+        "Makhachkala"
+      ]
+    },
+    "CITY::ne::1159149345": {
+      "host_feature_id": "TKM-360__RCW_TKM_10190150B2260035962137__Transcaspian_region_Mervskii",
+      "display_name": {
+        "en": "Merv",
+        "zh": "梅尔夫"
+      },
+      "aliases": [
+        "Merv",
+        "Mary"
+      ]
+    },
+    "CITY::ne::1159126699": {
+      "host_feature_id": "UA_RAY_74538382B2161330582129",
+      "display_name": {
+        "en": "Nikolayev",
+        "zh": "尼古拉耶夫"
+      },
+      "aliases": [
+        "Nikolayev",
+        "Mykolaiv"
+      ]
+    },
+    "CITY::ne::1159150695": {
+      "host_feature_id": "RU_RAY_50074027B44365109797977",
+      "display_name": {
+        "en": "Nizhny Novgorod",
+        "zh": "下诺夫哥罗德"
+      },
+      "aliases": [
+        "Nizhny Novgorod"
+      ]
+    },
+    "CITY::ne::1159150713": {
+      "host_feature_id": "RU_RAY_50074027B18253095483754",
+      "display_name": {
+        "en": "Novonikolayevsk",
+        "zh": "新尼古拉耶夫斯克"
+      },
+      "aliases": [
+        "Novonikolayevsk",
+        "Novosibirsk"
+      ]
+    },
+    "CITY::ne::1159148663": {
+      "host_feature_id": "KAZ-3201__RCW_KAZ_9891525B90796593834175__Ural_region_Uralskii",
+      "display_name": {
+        "en": "Uralsk",
+        "zh": "乌拉尔斯克"
+      },
+      "aliases": [
+        "Uralsk",
+        "Oral"
+      ]
+    },
+    "CITY::ne::1159149571": {
+      "host_feature_id": "RU_RAY_50074027B32234523409019",
+      "display_name": {
+        "en": "Orenburg",
+        "zh": "奥伦堡"
+      },
+      "aliases": [
+        "Orenburg"
+      ]
+    },
+    "CITY::ne::1159150121": {
+      "host_feature_id": "KAZ-3206__RCW_KAZ_9891525B91590173027779__Semipalatinsk_region_Ust_Kamenogorskii",
+      "display_name": {
+        "en": "Ust-Kamenogorsk",
+        "zh": "乌斯季卡缅诺戈尔斯克"
+      },
+      "aliases": [
+        "Ust-Kamenogorsk",
+        "Oskemen"
+      ]
+    },
+    "CITY::ne::1159150775": {
+      "host_feature_id": "RU_RAY_50074027B41842513634160",
+      "display_name": {
+        "en": "Perm",
+        "zh": "彼尔姆"
+      },
+      "aliases": [
+        "Perm"
+      ]
+    },
+    "CITY::gn::504003": {
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST",
+      "display_name": {
+        "en": "Tsarskoye Selo",
+        "zh": "皇村"
+      },
+      "aliases": [
+        "Tsarskoye Selo",
+        "Pushkin"
+      ]
+    },
+    "CITY::ne::1159150895": {
+      "host_feature_id": "CN_CITY_17275852B96399789734520",
+      "display_name": {
+        "en": "Tsitsihar",
+        "zh": "齐齐哈尔"
+      },
+      "aliases": [
+        "Tsitsihar",
+        "Qiqihar"
+      ]
+    },
+    "CITY::ne::1159134173": {
+      "host_feature_id": "UA_RAY_74538382B36980255523800",
+      "display_name": {
+        "en": "Rovno",
+        "zh": "罗夫诺"
+      },
+      "aliases": [
+        "Rovno",
+        "Rivne"
+      ]
+    },
+    "CITY::ne::1159151291": {
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG__SPLIT_REST",
+      "display_name": {
+        "en": "Petrograd",
+        "zh": "彼得格勒"
+      },
+      "aliases": [
+        "Petrograd",
+        "Saint Petersburg"
+      ]
+    },
+    "CITY::ne::1159146537": {
+      "host_feature_id": "RU_RAY_50074027B34738491600615",
+      "display_name": {
+        "en": "Obdorsk",
+        "zh": "奥布多尔斯克"
+      },
+      "aliases": [
+        "Obdorsk",
+        "Salekhard"
+      ]
+    },
+    "CITY::ne::1159150119": {
+      "host_feature_id": "KAZ-3206__RCW_KAZ_9891525B31322588303916__Semipalatinsk_region_Semipalatinskii",
+      "display_name": {
+        "en": "Semipalatinsk",
+        "zh": "塞米巴拉金斯克"
+      },
+      "aliases": [
+        "Semipalatinsk",
+        "Semey"
+      ]
+    },
+    "CITY::ne::1159150143": {
+      "host_feature_id": "KAZ-3251__RCW_KAZ_9891525B55423514815526__Syr_Darya_region_Chimkentskii",
+      "display_name": {
+        "en": "Chimkent",
+        "zh": "奇姆肯特"
+      },
+      "aliases": [
+        "Chimkent",
+        "Shymkent"
+      ]
+    },
+    "CITY::ne::1159128255": {
+      "host_feature_id": "LT026__RCW_LTU_59024439B75279860604324",
+      "display_name": {
+        "en": "Shavli",
+        "zh": "沙夫利"
+      },
+      "aliases": [
+        "Shavli",
+        "Šiauliai",
+        "Siauliai"
+      ]
+    },
+    "CITY::ne::1159148621": {
+      "host_feature_id": "GEO-3015",
+      "display_name": {
+        "en": "Sukhum",
+        "zh": "苏呼姆"
+      },
+      "aliases": [
+        "Sukhum",
+        "Sukhumi",
+        "Sokhumi"
+      ]
+    },
+    "CITY::ne::1159146669": {
+      "host_feature_id": "RU_RAY_50074027B8567553383469",
+      "display_name": {
+        "en": "Alekseyevsk",
+        "zh": "阿列克谢耶夫斯克"
+      },
+      "aliases": [
+        "Alekseyevsk",
+        "Svobodny"
+      ]
+    },
+    "CITY::ne::1159146551": {
+      "host_feature_id": "RU_RAY_50074027B71551288540526",
+      "display_name": {
+        "en": "Ust-Sysolsk",
+        "zh": "乌斯季瑟索利斯克"
+      },
+      "aliases": [
+        "Ust-Sysolsk",
+        "Syktyvkar"
+      ]
+    },
+    "CITY::ne::1159148453": {
+      "host_feature_id": "EE008__RCW_Livonia_governorate_Iurevskii",
+      "display_name": {
+        "en": "Dorpat",
+        "zh": "多尔帕特"
+      },
+      "aliases": [
+        "Dorpat",
+        "Tartu"
+      ]
+    },
+    "CITY::ne::1159147321": {
+      "host_feature_id": "KAZ-3251__RCW_KAZ_9891525B79835173187971__Syr_Darya_region_Chimkentskii",
+      "display_name": {
+        "en": "Turkestan",
+        "zh": "突厥斯坦"
+      },
+      "aliases": [
+        "Turkestan",
+        "Turkistan"
+      ]
+    },
+    "CITY::ne::1159149343": {
+      "host_feature_id": "TKM-359__RCW_TKM_10190150B55240389541589__Bukhara_Bukhara",
+      "display_name": {
+        "en": "Chardzhuy",
+        "zh": "查尔朱"
+      },
+      "aliases": [
+        "Chardzhuy",
+        "Türkmenabat",
+        "Turkmenabat"
+      ]
+    },
+    "CITY::ne::1159149539": {
+      "host_feature_id": "RU_RAY_50074027B77320350284147",
+      "display_name": {
+        "en": "Tver",
+        "zh": "特维尔"
+      },
+      "aliases": [
+        "Tver"
+      ]
+    },
+    "CITY::ne::1159149623": {
+      "host_feature_id": "RU_RAY_50074027B15921204725831",
+      "display_name": {
+        "en": "Verkhneudinsk",
+        "zh": "上乌金斯克"
+      },
+      "aliases": [
+        "Verkhneudinsk",
+        "Ulan-Ude"
+      ]
+    },
+    "CITY::ne::1159149577": {
+      "host_feature_id": "RU_RAY_50074027B67860704242461__SPLIT_REST",
+      "display_name": {
+        "en": "Simbirsk",
+        "zh": "辛比尔斯克"
+      },
+      "aliases": [
+        "Simbirsk",
+        "Ulyanovsk"
+      ]
+    },
+    "CITY::ne::1159146697": {
+      "host_feature_id": "RU_MRG_72d63d543d3d",
+      "display_name": {
+        "en": "Nikolsk-Ussuriysky",
+        "zh": "尼科利斯克-乌苏里斯基"
+      },
+      "aliases": [
+        "Nikolsk-Ussuriysky",
+        "Ussuriysk"
+      ]
+    },
+    "CITY::ne::1159150809": {
+      "host_feature_id": "LT011__SPLIT_WILNO",
+      "display_name": {
+        "en": "Wilno",
+        "zh": "维尔诺"
+      },
+      "aliases": [
+        "Wilno",
+        "Vilnius"
+      ]
+    },
+    "CITY::ne::1159148087": {
+      "host_feature_id": "RU_RAY_50074027B13545966526097",
+      "display_name": {
+        "en": "Viipuri",
+        "zh": "维堡"
+      },
+      "aliases": [
+        "Viipuri",
+        "Vyborg"
+      ]
+    },
+    "CITY::ne::1159137563": {
+      "host_feature_id": "RU_RAY_50074027B71432315029933",
+      "display_name": {
+        "en": "Tsarevokokshaysk",
+        "zh": "察廖沃科克沙伊斯克"
+      },
+      "aliases": [
+        "Tsarevokokshaysk",
+        "Yoshkar-Ola"
+      ]
+    },
+    "CITY::ne::1159146313": {
+      "host_feature_id": "UA_RAY_74538382B86672078093677__SPLIT_REST",
+      "display_name": {
+        "en": "Aleksandrovsk",
+        "zh": "亚历山德罗夫斯克"
+      },
+      "aliases": [
+        "Aleksandrovsk",
+        "Zaporizhzhia"
+      ]
+    },
+    "CITY::ne::1159129585": {
+      "host_feature_id": "KAZ-3207__RCW_KAZ_9891525B22712804397208__Semirechye_region_Dzharkentskii",
+      "display_name": {
+        "en": "Dzharkent",
+        "zh": "扎尔肯特"
+      },
+      "aliases": [
+        "Dzharkent",
+        "Zharkent"
+      ]
+    },
+    "CITY::ne::1159149327": {
+      "host_feature_id": "UA_RAY_74538382B57692221763967",
+      "display_name": {
+        "en": "Zhitomir",
+        "zh": "日托米尔"
+      },
+      "aliases": [
+        "Zhitomir",
+        "Zhytomyr"
+      ]
     }
   }
 }

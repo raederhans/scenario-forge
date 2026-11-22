@@ -3,11 +3,11 @@
   "scenario_id": "rcw_1919",
   "generated_at": "2026-11-22T00:00:00Z",
   "summary": {
-    "feature_count": 5551,
-    "owner_count": 59,
+    "feature_count": 5515,
+    "owner_count": 62,
     "shell_feature_count": 2088
   },
-  "snapshot_fingerprint": "580ea4e3c6d3316c2afef009b408378d953424a5b0f5bcc8fcc79a5d71872eeb",
+  "snapshot_fingerprint": "db2a4db4a931ae48d6377d096a625944e045b5dcf9d212bf5d505994e42a1236",
   "dropped_shell_ids": [
     "RU_ARCTIC_FB_009",
     "RU_ARCTIC_FB_016",
@@ -1602,19 +1602,6 @@
     "AFSR": {
       "city": "Taganrog",
       "reason": "outside_owned_land"
-    },
-    "NCEM": {
-      "city": [
-        "Vedeno",
-        "Botlikh",
-        "Khunzakh",
-        "Gunib"
-      ],
-      "reason": "name_not_found"
-    },
-    "BTUM": {
-      "city": "Batumi",
-      "reason": "outside_owned_land"
     }
   },
   "geometry_splits": {
@@ -2710,11 +2697,6 @@
         "LT029__SPLIT_REST__RCW_LTU_59024439B57491286310760__Kovno_governorate_Vilkomirskii",
         "LT029__SPLIT_REST__RCW_LTU_59024439B57491286310760__Vilna_governorate_Vilenskii"
       ],
-      "KAZ-3195__SPLIT_ARAL2009": [
-        "KAZ-3195__SPLIT_ARAL2009__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3195__SPLIT_ARAL2009__RCW_Turgay_region_Irgizskii",
-        "KAZ-3195__SPLIT_ARAL2009__RCW_Ural_region_Temirskii"
-      ],
       "KAZ-3195__SPLIT_REST": [
         "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B11861912196309__Transcaspian_region_Mangyshlakskii",
         "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B11861912196309__Ural_region_Gurevskii",
@@ -2741,32 +2723,6 @@
         "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B9195242261928__Turgay_region_Aktiubinskii",
         "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B9195242261928__Ural_region_Uralskii"
       ],
-      "KAZ-3197__SPLIT_ARALBASIN": [
-        "KAZ-3197__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARALBASIN__RCW_Turgay_region_Irgizskii"
-      ],
-      "KAZ-3197__SPLIT_ARAL1973": [
-        "KAZ-3197__SPLIT_ARAL1973__RCW_KAZ_9891525B16415280148457",
-        "KAZ-3197__SPLIT_ARAL1973__RCW_KAZ_9891525B20568160586477"
-      ],
-      "KAZ-3197__SPLIT_ARAL1987": [
-        "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B16415280148457",
-        "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B20568160586477__Turgay_region_Irgizskii"
-      ],
-      "KAZ-3197__SPLIT_ARAL1999": [
-        "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B16415280148457",
-        "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477__Turgay_region_Irgizskii"
-      ],
-      "KAZ-3197__SPLIT_ARAL2006": [
-        "KAZ-3197__SPLIT_ARAL2006__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL2006__RCW_Turgay_region_Irgizskii"
-      ],
-      "KAZ-3197__SPLIT_ARAL2009": [
-        "KAZ-3197__SPLIT_ARAL2009__RCW_Syr_Darya_region_Kazalinskii",
-        "KAZ-3197__SPLIT_ARAL2009__RCW_Turgay_region_Irgizskii"
-      ],
       "KAZ-3197__SPLIT_REST": [
         "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B16415280148457",
         "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii",
@@ -2783,35 +2739,6 @@
         "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B84924581617307__Syr_Darya_region_Chimkentskii",
         "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B84924581617307__Syr_Darya_region_Perovskii"
       ],
-      "UZB-356__SPLIT_ARALBASIN": [
-        "UZB-356__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Kazalinskii"
-      ],
-      "UZB-356__SPLIT_ARAL1987": [
-        "UZB-356__SPLIT_ARAL1987__RCW_KAZ_9891525B16415280148457",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B80838990154601__Transcaspian_region_Mangyshlakskii",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B80838990154601__Ural_region_Temirskii",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii"
-      ],
-      "UZB-356__SPLIT_ARAL1999": [
-        "UZB-356__SPLIT_ARAL1999__RCW_KAZ_9891525B16415280148457",
-        "UZB-356__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477",
-        "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii"
-      ],
-      "UZB-356__SPLIT_ARAL2006": [
-        "UZB-356__SPLIT_ARAL2006__RCW_Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL2006__RCW_Syr_Darya_region_Kazalinskii",
-        "UZB-356__SPLIT_ARAL2006__RCW_Transcaspian_region_Mangyshlakskii"
-      ],
-      "UZB-356__SPLIT_ARAL2009": [
-        "UZB-356__SPLIT_ARAL2009__RCW_KAZ_9891525B20568160586477",
-        "UZB-356__SPLIT_ARAL2009__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
-        "UZB-356__SPLIT_ARAL2009__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii"
-      ],
       "UZB-356__SPLIT_REST": [
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B22143596455299",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B3643857389786",
@@ -2826,7 +2753,6 @@
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii",
-        "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Ural_region_Temirskii",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B9862753118700__Khiva_Khiva",
         "UZB-356__SPLIT_REST__RCW_UZB_79887680B9862753118700__Syr_Darya_region_Amudarinskii_Otdel"
       ]
@@ -2892,7 +2818,7 @@
       "RU_RAY_50074027B24150612748554": 1.917831428460577e-11,
       "RU_RAY_50074027B66648864289993": 1.8755621513343035e-11,
       "RU_RAY_50074027B16928982325503": 1.2146972109007792e-11,
-      "RU_RAY_50074027B55874149600418": 1.4450188279020032e-11,
+      "RU_RAY_50074027B55874149600418": 1.5157348304001977e-11,
       "RU_RAY_50074027B11464632928939": 0.0,
       "RU_RAY_50074027B53792659884597": 9.173103222110887e-12,
       "RU_RAY_50074027B94648571764089": 1.5002823366836763e-11,
@@ -2900,7 +2826,7 @@
       "RU_RAY_50074027B96103137717036": 0.0,
       "RU_RAY_50074027B21050205315965": 1.2140917486019912e-11,
       "RU_RAY_50074027B41643930675404": 1.0214076221100321e-11,
-      "RU_RAY_50074027B29183274260449": 1.205557073369139e-11,
+      "RU_RAY_50074027B29183274260449": 1.2066885315097518e-11,
       "RU_RAY_50074027B34634777465880": 3.3705314819886174e-11,
       "RU_RAY_50074027B5563807985387": 1.0347144521131568e-10,
       "RU_RAY_50074027B45493241507504": 0.0,
@@ -2918,7 +2844,7 @@
       "RU_RAY_50074027B24281986961151": 0.0,
       "RU_RAY_50074027B87140445206542": 8.769520059534767e-12,
       "RU_RAY_50074027B40927192458411": 7.775676532772308e-11,
-      "RU_MRG_8ec2184da20a": 1.1653924319435151e-10,
+      "RU_MRG_8ec2184da20a": 1.1661571180417033e-10,
       "RU_RAY_50074027B18455261144282": 6.319897099741604e-10,
       "RU_RAY_50074027B88418643135218": 1.2948330866244025e-10,
       "RU_RAY_50074027B94330276236622": 1.1177817289589865e-10,
@@ -2928,20 +2854,8 @@
       "RU_RAY_50074027B55571784565288__SPLIT_REST": 8.911611140867415e-11,
       "RU_RAY_50074027B39999494546000__SPLIT_SOVIET": 2.155042290113789e-11,
       "LT029__SPLIT_REST": 0.0,
-      "KAZ-3195__SPLIT_ARAL2009": 5.934526043597111e-11,
       "KAZ-3195__SPLIT_REST": 0.0,
-      "KAZ-3197__SPLIT_ARALBASIN": 6.235076116827765e-12,
-      "KAZ-3197__SPLIT_ARAL1973": 2.1535726286579966e-12,
-      "KAZ-3197__SPLIT_ARAL1987": 1.8764447719752699e-10,
-      "KAZ-3197__SPLIT_ARAL1999": 7.849179692948278e-12,
-      "KAZ-3197__SPLIT_ARAL2006": 2.779772526162884e-10,
-      "KAZ-3197__SPLIT_ARAL2009": 2.7710345410023324e-10,
-      "KAZ-3197__SPLIT_REST": 1.6492636590854653e-09,
-      "UZB-356__SPLIT_ARALBASIN": 9.519464576303386e-12,
-      "UZB-356__SPLIT_ARAL1987": 1.4693463874351722e-10,
-      "UZB-356__SPLIT_ARAL1999": 1.8040009359509e-11,
-      "UZB-356__SPLIT_ARAL2006": 5.075863274684703e-12,
-      "UZB-356__SPLIT_ARAL2009": 3.8724515910267595e-12,
+      "KAZ-3197__SPLIT_REST": 1.5586168065829864e-09,
       "UZB-356__SPLIT_REST": 0.0,
       "RU_RAY_50074027B61241799946425": 0.0
     },
@@ -3310,8 +3224,174 @@
       "RU_RAY_50074027B61241799946425": 791.0876807001727,
       "RU_RAY_50074027B29183274260449": 266.27207834306546
     },
-    "merged_small_piece_count": 5635,
+    "merged_small_piece_count": 5563,
+    "shared_arc_shortfalls": [
+      {
+        "features": [
+          "CN_CITY_17275852B82946568901730",
+          "RCW_FILL_Amur_region_Amurskaia"
+        ],
+        "before_km": 3.7146260346449194,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3196__RCW_KAZ_9891525B27039214711297__Orenburg_governorate_Verkhneuralskii",
+          "RU_RAY_50074027B21488641063420"
+        ],
+        "before_km": 2.3758265995556185,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3196__RCW_KAZ_9891525B29142320833271__Orenburg_governorate_Orskii",
+          "RU_RAY_50074027B42894474720971"
+        ],
+        "before_km": 0.049694882839206866,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3196__RCW_KAZ_9891525B29142320833271__Turgay_region_Kustanaiskii",
+          "RU_RAY_50074027B42894474720971"
+        ],
+        "before_km": 1.586358198352124,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3201__RCW_KAZ_9891525B6552459074784__Ural_region_Uralskii",
+          "RU_RAY_50074027B20858489153060"
+        ],
+        "before_km": 2.4968298983894543,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3205__RCW_KAZ_9891525B65214582738908__Akmola_region_Omskii",
+          "RU_RAY_50074027B73257379170390"
+        ],
+        "before_km": 4.131141052048482,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3205__RCW_KAZ_9891525B65214582738908__Semipalatinsk_region_Pavlodarskii",
+          "RU_RAY_50074027B73257379170390"
+        ],
+        "before_km": 0.6524793051766451,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3206__RCW_KAZ_9891525B63367051987895__Tomsk_governorate_Zmeinogorskii",
+          "RU_RAY_50074027B92925758050684"
+        ],
+        "before_km": 8.132621521789453,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "LT024__RCW_LTU_59024439B26680693475402",
+          "PL_POW_2012"
+        ],
+        "before_km": 3.693273351800937,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B90298108562486",
+          "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B45366613377645"
+        ],
+        "before_km": 1.3858945517290944,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B90298108562486",
+          "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B75364407860375__Turgay_region_Aktiubinskii"
+        ],
+        "before_km": 0.9674893123248086,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B55874149600418__RCW_Turgay_region_Irgizskii",
+          "RCW_FILL_Turgay_region_Irgizskii"
+        ],
+        "before_km": 1.946132497129945,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B52585131638206",
+          "RCW_FILL_Amur_region_Amurskaia"
+        ],
+        "before_km": 2.6536553118665087,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B6450887110855",
+          "RCW_FILL_Transbaikal_region_Nerchinskii_Zavodskii"
+        ],
+        "before_km": 4.334878209578321,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B13114681801765",
+          "RCW_FILL_Amur_region_Amurskaia"
+        ],
+        "before_km": 1.6405619423076054,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B96103137717036__RCW_Arkhangelsk_governorate_Pechorskii",
+          "RU_RAY_50074027B78297177563949"
+        ],
+        "before_km": 0.054438010767067994,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B29183274260449__RCW_Arkhangelsk_governorate_Arkhangelskaia",
+          "RU_RAY_50074027B6686274683844__RCW_Arkhangelsk_governorate_Arkhangelskaia"
+        ],
+        "before_km": 14.661665171102925,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B29183274260449__RCW_Arkhangelsk_governorate_Arkhangelskaia",
+          "RU_CITY_ARKHANGELSK"
+        ],
+        "before_km": 0.1681094019344208,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B24281986961151__RCW_Arkhangelsk_governorate_Kolskii",
+          "RU_MRG_83744c263574"
+        ],
+        "before_km": 10.515911363832597,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_MRG_8ec2184da20a__RCW_Arkhangelsk_governorate_Kolskii",
+          "RU_ARCTIC_FB_302"
+        ],
+        "before_km": 0.2401719321175383,
+        "after_km": 0
+      }
+    ],
     "inserted_vertices_by_neighbor": {
+      "CN_CITY_17275852B26831530446211": 6,
+      "CN_CITY_17275852B40864949822732": 5,
+      "CN_CITY_17275852B65388914557323": 3,
+      "CN_CITY_17275852B82946568901730": 10,
       "EE00A": 4,
       "FI1D3": 2,
       "FI1D8": 11,
@@ -3322,7 +3402,7 @@
       "KAZ-4830": 8,
       "KGZ-1115": 10,
       "LV006": 1,
-      "PL_POW_2012": 3,
+      "PL_POW_2012": 5,
       "TJK-5491": 1,
       "UZB-4828": 10,
       "BY_HIST_POL_VITEBSK_WEST": 2,
@@ -3330,7 +3410,7 @@
       "BY_INT_VITEBSK": 3,
       "RU_RAY_50074027B5102078213757": 6,
       "RU_RAY_50074027B49435645657248": 10,
-      "RU_RAY_50074027B20858489153060": 8,
+      "RU_RAY_50074027B20858489153060": 9,
       "RU_RAY_50074027B85852796728949": 4,
       "RU_RAY_50074027B68317438478241": 4,
       "RU_RAY_50074027B44154738908147": 11,
@@ -3338,32 +3418,36 @@
       "RU_RAY_50074027B35283992627642": 3,
       "RU_RAY_50074027B85690776295658": 4,
       "RU_MRG_d1f63e4e9c78": 2,
+      "RU_RAY_50074027B42733914964900": 3,
       "RU_RAY_50074027B11056050899621": 6,
       "RU_RAY_50074027B36737161681879": 20,
       "RU_RAY_50074027B92064145614684": 5,
       "RU_MRG_8c032ccba409": 4,
       "RU_RAY_50074027B10943489160103": 2,
-      "RU_RAY_50074027B92925758050684": 9,
+      "RU_RAY_50074027B92925758050684": 14,
       "RU_RAY_50074027B55370730174848": 6,
       "RU_RAY_50074027B95632257634540": 4,
-      "RU_MRG_bb708c825b11": 2,
+      "RU_MRG_bb708c825b11": 5,
       "RU_RAY_50074027B75775802654148": 9,
-      "RU_RAY_50074027B90298108562486": 8,
+      "RU_RAY_50074027B90298108562486": 9,
       "RU_RAY_50074027B62555187301125": 8,
       "RU_RAY_50074027B80784778261580": 23,
       "RU_RAY_50074027B76424633116960": 9,
       "RU_MRG_69b237a8444a": 3,
       "RU_MRG_06b69386dedf": 3,
       "RU_RAY_50074027B36993675567197": 2,
-      "RU_RAY_50074027B42894474720971": 1,
+      "RU_RAY_50074027B42894474720971": 2,
       "RU_RAY_50074027B84484580118953": 8,
       "RU_RAY_50074027B11628373622146": 4,
-      "RU_RAY_50074027B21488641063420": 18,
+      "RU_RAY_50074027B21488641063420": 22,
       "RU_RAY_50074027B80768671311936": 4,
       "RU_RAY_50074027B66258945082472": 6,
       "RU_RAY_50074027B65250804095519": 7,
       "RU_RAY_50074027B15396054994341": 18,
-      "RU_RAY_50074027B73257379170390": 6,
+      "RU_RAY_50074027B73257379170390": 7,
+      "RU_RAY_50074027B52585131638206": 3,
+      "RU_RAY_50074027B6450887110855": 6,
+      "RU_RAY_50074027B13114681801765": 12,
       "RU_RAY_50074027B41938053987638": 14,
       "RU_RAY_50074027B42091681257278": 6,
       "RU_RAY_50074027B51076398001550": 3,
@@ -3409,7 +3493,7 @@
       "RU_RAY_50074027B57840246477228": 13,
       "RU_RAY_50074027B76249175703521": 8,
       "RU_CITY_VOLGOGRAD": 75,
-      "RU_CITY_ARKHANGELSK": 55,
+      "RU_CITY_ARKHANGELSK": 57,
       "RU_ARCTIC_FB_039": 2,
       "RU_ARCTIC_FB_041": 1,
       "RU_ARCTIC_FB_093": 3,
@@ -3465,6 +3549,10 @@
       "RU_ARCTIC_FB_5262": 3,
       "RU_ARCTIC_FB_5409": 1,
       "RU_ARCTIC_FB_5430": 1,
+      "RU_ARCTIC_FB_6595": 1,
+      "RU_ARCTIC_FB_6605": 1,
+      "RU_ARCTIC_FB_6617": 3,
+      "RU_ARCTIC_FB_6783": 1,
       "RU_ARCTIC_FB_8119": 1,
       "LT011__SPLIT_WILNO": 6,
       "LT011__SPLIT_REST": 51,
@@ -3476,12 +3564,9 @@
       "LT029__SPLIT_POLISH": 3,
       "RU_RAY_50074027B90555869339870__SPLIT_PETSERI": 5,
       "IRN-3245__SPLIT_REST": 27,
-      "KAZ-3195__SPLIT_ARALBASIN": 4,
-      "KAZ-3195__SPLIT_ARAL1987": 8,
       "RU_MRG_cb7ab64b43b7__SPLIT_REST": 3,
       "RU_RAY_50074027B88958089507858__SPLIT_REST": 4,
       "RU_RAY_50074027B97827439207559__SPLIT_REST": 1,
-      "UZB-356__SPLIT_ARAL2014": 6,
       "LV005__SPLIT_ZEMGALE": 6,
       "LV005__SPLIT_SKRUDALIENA": 2,
       "LV005__SPLIT_DAUGAVPILS": 4,
@@ -3491,5 +3576,163 @@
       "FI1D7__SPLIT_VUOTSO": 1
     },
     "max_neighbor_symmetric_difference_upper_bound_km2": 8.419455996104552e-11
-  }
+  },
+  "masks": {
+    "ncem_vedeno": {
+      "split_parents": [],
+      "triggered_split": false,
+      "minority_area_fraction": 0.28978961709365747,
+      "hit_count": 11
+    },
+    "ralt_kulunda": {
+      "split_parents": [],
+      "triggered_split": false,
+      "minority_area_fraction": 0.1599125629516513,
+      "hit_count": 14
+    },
+    "rtas_taseevo": {
+      "split_parents": [],
+      "triggered_split": false,
+      "minority_area_fraction": 0.4315276784568358,
+      "hit_count": 1
+    },
+    "frgn_east": {
+      "split_parents": [],
+      "triggered_split": false,
+      "minority_area_fraction": 0.11389574151978228,
+      "hit_count": 10
+    },
+    "gln_gilan": {
+      "split_parents": [],
+      "triggered_split": false,
+      "minority_area_fraction": 0.12404672425278708,
+      "hit_count": 1
+    },
+    "cerr_harbin": {
+      "split_parents": [],
+      "triggered_split": false,
+      "hit_count": 3
+    },
+    "btum_batum": {
+      "split_parents": [],
+      "triggered_split": false,
+      "hit_count": 1
+    },
+    "ncem_vedeno_pt": {
+      "split_parents": [],
+      "triggered_split": false,
+      "hit_count": 1
+    }
+  },
+  "land_holes": [
+    {
+      "area_km2": 6213.568930765858,
+      "location": [
+        63.38033737480234,
+        45.957077279272795
+      ],
+      "districts": [
+        "Syr-Darya region/Kazalinskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Syr_Darya_region_Kazalinskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 185.41828493646415,
+      "location": [
+        130.85032850328503,
+        47.894272887228865
+      ],
+      "districts": [
+        "Amur region/Amurskaia"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Amur_region_Amurskaia"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 172.82257384828944,
+      "location": [
+        61.35636650484152,
+        50.807877571775705
+      ],
+      "districts": [
+        "Turgay region/Irgizskii",
+        "Turgay region/Kustanaiskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Turgay_region_Irgizskii",
+        "RCW_FILL_Turgay_region_Kustanaiskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 156.8194869166107,
+      "location": [
+        78.88563363697178,
+        52.165303168031684
+      ],
+      "districts": [
+        "Semipalatinsk region/Pavlodarskii",
+        "Semipalatinsk region/Semipalatinskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Semipalatinsk_region_Pavlodarskii",
+        "RCW_FILL_Semipalatinsk_region_Semipalatinskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 128.70509617195327,
+      "location": [
+        124.44099581964825,
+        53.22273347953113
+      ],
+      "districts": [
+        "Amur region/Amurskaia"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Amur_region_Amurskaia"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 124.21580699510261,
+      "location": [
+        123.11454543116865,
+        53.50016286562865
+      ],
+      "districts": [
+        "Amur region/Amurskaia"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Amur_region_Amurskaia"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 111.99310547009746,
+      "location": [
+        121.62473065260826,
+        53.35348452434525
+      ],
+      "districts": [
+        "Amur region/Amurskaia",
+        "Transbaikal region/Nerchinskii-Zavodskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Amur_region_Amurskaia",
+        "RCW_FILL_Transbaikal_region_Nerchinskii_Zavodskii"
+      ],
+      "filled": true
+    }
+  ],
+  "unmatched_city_names": {
+    "Anadyr": [],
+    "Batumi": []
+  },
+  "capital_coordinate_offsets": {}
 }
