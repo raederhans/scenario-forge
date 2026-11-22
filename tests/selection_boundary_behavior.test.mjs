@@ -54,3 +54,18 @@ test('holes and enclaves follow membership and subunits resolve to their source 
   const hole = createSelectionBoundaryIndex(buildPaintContourGraph([features[3]]));
   assert.equal(segments(hole.getBoundaryLines(new Set(['outer']))).size, 8);
 });
+
+test('a passive parcel joins the group that holds most of its shared boundary', () => {
+  const row = [polygon('a', ring(0,0)), polygon('shell', ring(1,0)), polygon('b', ring(2,0)), polygon('c', ring(3,0))];
+  const index = createSelectionBoundaryIndex(buildPaintContourGraph(row), { isPassive: id => id === 'shell' });
+  const inner = edge([1,0],[1,1]), far = edge([2,0],[2,1]);
+  assert.equal(segments(index.getBoundaryLines(new Set(['a', 'b']))).has(inner), true);
+  const adopted = segments(index.getBoundaryLines(new Set(['a', 'b']), { adoptPassive: true }));
+  assert.equal(adopted.has(inner), false);
+  assert.equal(adopted.has(far), false);
+  assert.equal(adopted.has(edge([3,0],[3,1])), true);
+  // Shared evenly with a non-member: the passive parcel stays outside.
+  const alone = segments(index.getBoundaryLines(new Set(['a']), { adoptPassive: true }));
+  assert.equal(alone.has(inner), true);
+  assert.equal(alone.has(far), false);
+});

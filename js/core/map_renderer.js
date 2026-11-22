@@ -851,7 +851,7 @@ const getTransientOverlayRenderOwner = lazyOwner(() => createTransientOverlayRen
 
 const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getOverlayProjectionSignature,
-  getSelectionBoundary: ids => getPaintContourRuntimeOwner().getSelectionBoundary(ids),
+  getSelectionBoundary: (ids, options) => getPaintContourRuntimeOwner().getSelectionBoundary(ids, options),
   getSelectionBoundaryRevision: () => getPaintContourRuntimeOwner().getRevision(),
   getZoomScale: () => runtimeState.zoomTransform?.k || 1,
   getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
@@ -871,6 +871,7 @@ const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getFeatureId,
   getEntityFeatureId,
   getCountryFeatureIds: getFeatureIdsForOwner,
+  getCountryOutlineFeatureIds: (code) => getFeatureIdsForOwner(code, { includeShells: true }),
   getDevGroup: () => rendererSurfaceHost.getDevSelectionGroup(),
   getInspectorGroup: () => rendererSurfaceHost.getInspectorHighlightGroup(),
   getPath: () => rendererSurfaceHost.getPathSvg(),

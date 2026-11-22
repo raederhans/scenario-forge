@@ -47,7 +47,8 @@ function harness() {
     getFeatureId: (value) => value.id,
     getEntityFeatureId: (value) => value.id,
     getCountryFeatureIds: (code) => h.members[code] || [],
-    getSelectionBoundary: ids => { h.boundaryMembers = [...ids]; return h.boundary || null; },
+    getCountryOutlineFeatureIds: (code) => [...(h.members[code] || []), ...(h.shells?.[code] || [])],
+    getSelectionBoundary: (ids, options) => { h.boundaryMembers = [...ids]; h.boundaryOptions = options; return h.boundary || null; },
     getSelectionBoundaryRevision: () => h.boundaryRevision || 0,
     getZoomScale: () => h.zoom || 1,
     getDevGroup: () => h.devGroup,
@@ -249,4 +250,18 @@ test("complete active topology can merge members missing from the land index", (
   h.owner.renderInspectorHighlightOverlay();
   assert.deepEqual(h.merged[0].map(geometry => geometry.id), ['a', 'b']);
   assert.equal(h.inspectorGroup.rows.length, 2);
+});
+
+test("a country outline spans its shell parcels; an explicit group keeps its own IDs", () => {
+  const h = harness();
+  h.shells = { AA: ["AA_FB_001"] };
+  h.boundary = { type: "MultiLineString", coordinates: [[[0, 0], [1, 1]]] };
+  h.inspector = { featureIds: [], countryCode: "AA", groupMode: false, label: "Alpha" };
+  h.owner.renderInspectorHighlightOverlay();
+  assert.deepEqual(h.boundaryMembers, ["a", "b", "AA_FB_001"]);
+  assert.equal(h.boundaryOptions.adoptPassive, false);
+  h.inspector = { featureIds: ["a", "b"], countryCode: "", groupMode: true, label: "Group" };
+  h.owner.renderInspectorHighlightOverlay();
+  assert.deepEqual(h.boundaryMembers, ["a", "b"]);
+  assert.equal(h.boundaryOptions.adoptPassive, true);
 });
