@@ -15,6 +15,8 @@ export function captureProjectImportState(target) {
     cityNameOverrides: target.cityNameOverrides,
     countryPalette: target.countryPalette,
     capitalOverrides: target.capitalOverrides,
+    politicalOverrides: target.politicalOverrides,
+    politicalAlliances: target.politicalAlliances,
     projectCities: target.projectCities,
     devClipboardFallbackText: target.devClipboardFallbackText,
     devClipboardPreviewFormat: target.devClipboardPreviewFormat,
@@ -102,6 +104,8 @@ export function applyProjectImportPatch(target, patch) {
   if (Object.hasOwn(patch, "cityNameOverrides")) target.cityNameOverrides = patch.cityNameOverrides;
   if (Object.hasOwn(patch, "countryPalette")) target.countryPalette = patch.countryPalette;
   if (Object.hasOwn(patch, "capitalOverrides")) target.capitalOverrides = patch.capitalOverrides;
+  if (Object.hasOwn(patch, "politicalOverrides")) target.politicalOverrides = patch.politicalOverrides;
+  if (Object.hasOwn(patch, "politicalAlliances")) target.politicalAlliances = patch.politicalAlliances;
   if (Object.hasOwn(patch, "projectCities")) target.projectCities = patch.projectCities;
   if (Object.hasOwn(patch, "devClipboardFallbackText")) target.devClipboardFallbackText = patch.devClipboardFallbackText;
   if (Object.hasOwn(patch, "devClipboardPreviewFormat")) target.devClipboardPreviewFormat = patch.devClipboardPreviewFormat;

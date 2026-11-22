@@ -1,7 +1,7 @@
 import { normalizeHexColor } from "./color_hex_utils.js";
 import { COUNTRY_CODE_ALIASES } from "./country_code_aliases.js";
 
-const referenceTables = ["countryNameOverrides", "parentBorderEnabledByCountry", "customPresets", "capitalOverrides"];
+const referenceTables = ["countryNameOverrides", "parentBorderEnabledByCountry", "customPresets", "capitalOverrides", "politicalOverrides"];
 const selectionFields = ["selectedInspectorCountryCode", "inspectorHighlightCountryCode", "activeSovereignCode"];
 
 export function isProjectCountry(state, tag) {

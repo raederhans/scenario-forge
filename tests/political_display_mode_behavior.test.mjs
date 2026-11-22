@@ -8,7 +8,7 @@ const fixture = () => ({ activeScenarioId: "hoi4_1939", politicalDisplayMode: "c
     GER: { ruling_ideology: "fascism", alliance: "axis" }, ENG: { ruling_ideology: "democratic", alliance: "allies" },
     SOV: { ruling_ideology: "communism" }, NEU: { ruling_ideology: "neutrality" },
     EMPTY: {}, OTHER: { ruling_ideology: "unknown", alliance: "unknown" },
-  }, alliances: { axis: { name_zh: "轴心国", name_en: "Axis", member_count: 1 }, allies: { name_zh: "同盟国", name_en: "Allies", member_count: 1 } } } } } });
+  }, alliances: { axis: { name_zh: "轴心国", name_en: "Axis", member_count: 10 }, allies: { name_zh: "同盟国", name_en: "Allies", member_count: 10 } } } } } });
 
 test("country default, support and action only change runtime mode", () => {
   const state = fixture();
@@ -39,9 +39,13 @@ test("HOI4 government and alliance colors including unaligned and missing identi
 
 test("TNO ideologies use their specified palette", () => {
   const colors = { communist: "#a3201c", socialist: "#d9534f", progressivism: "#e8955a", liberalism: "#e3c449", liberal_conservatism: "#86b6d8", conservatism: "#2f6aa3", paternalism: "#6f8f58", despotism: "#8d7b68", fascism: "#7a4a26", national_socialism: "#3b3b3b", ultranationalism: "#5b3324" };
-  const state = { activeScenarioId: "tno_1962", politicalDisplayMode: "government", scenarioBundleCacheById: { tno_1962: { countriesPayload: { countries: Object.fromEntries(Object.keys(colors).map((id) => [id, { ruling_ideology: id }])) } } } };
-  for (const [id, color] of Object.entries(colors)) assert.equal(resolvePoliticalDisplayColor(state, id), color);
-  assert.equal(getPoliticalDisplayLegend(state).entries.length, 12);
+  const countries = Object.fromEntries(Object.keys(colors).map((id, i) => [`T${i}`, { ruling_ideology: id }]));
+  const state = { activeScenarioId: "tno_1962", politicalDisplayMode: "government",
+    scenarioBundleCacheById: { tno_1962: { countriesPayload: { countries } } } };
+  for (const [tag, country] of Object.entries(countries)) {
+    assert.equal(resolvePoliticalDisplayColor(state, tag), colors[country.ruling_ideology]);
+  }
+  assert.equal(getPoliticalDisplayLegend(state, { presentOwners: new Set(Object.keys(countries)) }).entries.length, 12);
 });
 
 test("signature tracks mode, scenario and payload identity and suspends during apply", () => {
@@ -66,12 +70,15 @@ test("signature tracks mode, scenario and payload identity and suspends during a
 test("legend lists only present categories, member counts, other and no data", () => {
   const state = fixture();
   state.politicalDisplayMode = "alliance";
-  let legend = getPoliticalDisplayLegend(state);
-  assert.deepEqual(legend.entries.map((entry) => entry.label), ["轴心国（1 国）", "同盟国（1 国）", "unknown（1 国）", "无数据"]);
+  const options = { presentOwners: new Set(["GER", "NEU", "OTHER"]) };
+  let legend = getPoliticalDisplayLegend(state, options);
+  assert.deepEqual(legend.entries.map((entry) => entry.label), ["轴心国（1 国）", "unknown（1 国）", "无数据"]);
   assert.equal(legend.note, "未结盟国家按政体浅色显示");
+  options.presentOwners.add("ENG");
+  assert.ok(getPoliticalDisplayLegend(state, options).entries.some(entry => entry.label === "同盟国（1 国）"));
   state.currentLanguage = "en";
-  assert.equal(getPoliticalDisplayLegend(state).entries[0].label, "Axis (1 countries)");
+  assert.equal(getPoliticalDisplayLegend(state, options).entries[0].label, "Axis (1 countries)");
   state.politicalDisplayMode = "government";
-  legend = getPoliticalDisplayLegend(state);
-  assert.deepEqual(legend.entries.map((entry) => entry.label), ["Fascism", "Democratic", "Communism", "Non-aligned", "Other", "No data"]);
+  legend = getPoliticalDisplayLegend(state, options);
+  assert.deepEqual(legend.entries.map((entry) => entry.label), ["Fascism", "Non-aligned", "Other", "Democratic", "No data"]);
 });
