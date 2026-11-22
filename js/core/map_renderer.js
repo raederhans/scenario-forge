@@ -9896,6 +9896,7 @@ function getPhysicalExactRefreshPasses() {
 
 const labelsRuntime = createLabelsRuntime({
   resolveBorderIdentity,
+  isMembershipEditSettled: () => !brushSession && !hasPendingPoliticalColorEdit() && !runtimeState.isInteracting,
   getBorderPaletteRevision,
   runtimeState,
   rendererSurfaceHost,
