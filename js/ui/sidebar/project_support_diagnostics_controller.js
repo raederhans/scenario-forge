@@ -15,6 +15,7 @@ import {
   createSpecialZonePatternPreviewStyle,
 } from "../../core/special_zone_layers.js";
 import { prepareProjectImportFile } from "../../core/project_package_io.js";
+import { prepareProjectMergeFile } from "../../core/project_merge_funnel.js";
 import { buildShareLink, SHARED_PROJECT_ERRORS } from "../../core/shared_project_url.js";
 
 export async function confirmDiscardDirtyWork(state, showAppDialog, options) {
@@ -25,6 +26,105 @@ export async function confirmDiscardDirtyWork(state, showAppDialog, options) {
   if (choice !== true) return false;
   const revision = state.dirtyRevision;
   return await state.runProjectSaveFn?.() === true && state.dirtyRevision === revision;
+}
+
+function showProjectMergeReport({ documentRef, state, t, showToast, mapRenderer, fileName, preview, checkImport }) {
+  const dialog = documentRef.createElement("dialog");
+  dialog.className = "app-dialog";
+  const element = (tag, text) => {
+    const node = documentRef.createElement(tag);
+    node.textContent = text;
+    return node;
+  };
+  const title = t("Merge project paint: {name}", "ui", { name: fileName });
+  dialog.setAttribute("aria-label", title);
+  const checkbox = (key) => {
+    const label = element("label", t(key, "ui"));
+    const input = documentRef.createElement("input");
+    input.type = "checkbox";
+    label.prepend(input);
+    dialog.appendChild(label);
+    return input;
+  };
+  dialog.appendChild(element("h2", title));
+  const overwrite = checkbox("Overwrite painted parcels");
+  const keepOriginal = checkbox("Keep original colors");
+  const details = documentRef.createElement("div");
+  details.className = "app-dialog-details";
+  details.setAttribute("aria-live", "polite");
+  const footer = documentRef.createElement("div");
+  footer.className = "app-dialog-footer";
+  const button = (key, onClick) => {
+    const node = element("button", t(key, "ui"));
+    node.type = "button";
+    node.className = "btn-secondary";
+    node.addEventListener("click", onClick);
+    footer.appendChild(node);
+    return node;
+  };
+  let plan;
+  const copy = button("Copy IDs", async () => {
+    try {
+      await navigator.clipboard.writeText(plan.report.unmatchedIds.join("\n"));
+      showToast(t("Copied", "ui"));
+    } catch {
+      showToast(t("Clipboard unavailable", "ui"), { tone: "error" });
+    }
+  });
+  const locate = button("Locate on Map", () => {
+    const features = plan.report.unmatchedIds.map(id => state.landIndex?.get(id)).filter(feature => feature?.geometry);
+    if (features.length) {
+      dialog.close();
+      focusLandFeatures(features, mapRenderer.focusGeoBounds);
+    }
+  });
+  button("Cancel", () => dialog.close());
+  const apply = button("Apply", () => update(true));
+  apply.className = "btn-primary";
+  dialog.append(details, footer);
+
+  function update(commit = false) {
+    try {
+      checkImport();
+      if (commit && plan.commit() !== "stale") {
+        dialog.close();
+        return;
+      }
+      plan = preview({ mode: overwrite.checked ? "overwrite" : "fill-blanks",
+        colorPolicy: keepOriginal.checked ? "keep-original" : "current-base" });
+      const report = plan.report;
+      const count = (key, value) => t(key, "ui").replace("{count}", value);
+      const actions = { matched: "Existing", registered: "Register", skipped: "Skipped" };
+      details.textContent = [
+        commit && t("The map changed. Review the updated merge report.", "ui"),
+        count("Will write {count} parcels", report.writtenCount),
+        count("Skipped parcels: {count}", report.skippedCount),
+        count("Migrated parcels: {count}", report.migratedCount),
+        count("Unmatched parcels: {count}", report.unmatchedIds.length),
+        ...report.unmatchedGroups.map(({ srcTag, color, count }) => `${[srcTag, color].filter(Boolean).join(" / ")} → ${count}`),
+        ...report.countryChanges.map(({ from, to, action, name, color, nextColor }) => [
+          t(actions[action], "ui"), t("Project country {from} → {to}", "ui", { from, to: to || "—" }), name,
+          color, nextColor && nextColor !== color ? `→ ${nextColor}` : "",
+        ].filter(Boolean).join(" · ")),
+        ...report.colorChanges.map(({ srcTag, currentTag, color, replacement, count }) =>
+          `${[srcTag, color].filter(Boolean).join(" / ")}${currentTag ? ` (${currentTag})` : ""} → ${replacement} × ${count}`),
+        ...report.addedLegendLabels.map(([color, label]) => `${t("Legend", "ui")} · ${color} → ${label}`),
+        report.missingColors.length && `${count("Colors not in this scenario: {count}", report.missingColors.length)} · ${report.missingColors.join(", ")}`,
+        report.invalidColors.length && count("Invalid colors: {count}", report.invalidColors.length),
+      ].filter(Boolean).join("\n");
+      copy.hidden = !report.unmatchedIds.length;
+      locate.hidden = !report.unmatchedIds.some(id => state.landIndex?.get(id)?.geometry);
+    } catch (error) {
+      dialog.close();
+      showToast(t(error.userMessage || "Apply failed", "ui"), { tone: "error" });
+    }
+  }
+  overwrite.addEventListener("change", () => update());
+  keepOriginal.addEventListener("change", () => update());
+  dialog.addEventListener("close", () => dialog.remove(), { once: true });
+  documentRef.body.appendChild(dialog);
+  dialog.showModal();
+  update();
 }
 
 /**
@@ -179,6 +279,39 @@ export function createProjectSupportDiagnosticsController({
     actions.appendChild(saveAsBtn);
     actions.appendChild(projectDownloadOptions);
     actions.appendChild(uploadBtn);
+    const mergeBtn = documentRef.createElement("button");
+    mergeBtn.id = "mergeProjectBtn";
+    mergeBtn.type = "button";
+    mergeBtn.className = "btn-secondary";
+    mergeBtn.dataset.i18n = "Merge into current map…";
+    mergeBtn.textContent = t(mergeBtn.dataset.i18n, "ui");
+    const mergeInput = documentRef.createElement("input");
+    mergeInput.id = "mergeProjectFileInput";
+    mergeInput.type = "file";
+    mergeInput.accept = fileInput.accept;
+    mergeInput.hidden = true;
+    mergeBtn.addEventListener("click", () => mergeInput.click());
+    mergeInput.addEventListener("change", async () => {
+      const file = mergeInput.files?.[0];
+      mergeInput.value = "";
+      if (!file) return;
+      const checkImport = () => {
+        if (projectImportController) throw Object.assign(new Error("import-in-progress"), {
+          userMessage: "Project import is already in progress.",
+        });
+      };
+      mergeBtn.disabled = true;
+      try {
+        checkImport();
+        const preview = await prepareProjectMergeFile(file);
+        showProjectMergeReport({ documentRef, state, t, showToast, mapRenderer, fileName: file.name, preview, checkImport });
+      } catch (error) {
+        showToast(t(error.userMessage || "Unable to read the selected file.", "ui"), { tone: "error" });
+      } finally {
+        mergeBtn.disabled = false;
+      }
+    });
+    actions.append(mergeBtn, mergeInput);
     actions.appendChild(projectSaveStatus);
     actions.appendChild(fileMeta);
     actions.appendChild(fileInput);

@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { state } from '../js/core/state.js';
 import { prepareImportedProjectState, commitImportedProjectPatch as applyProjectImportPatch } from '../js/core/interaction_funnel/import_apply_orchestration.js';
 import { getScenarioImportValidFeatureIds } from '../js/core/interaction_funnel/import_trust_projection.js';
-import { importProjectTextThroughFunnel, importProjectThroughFunnel, getInteractionFunnelDebugState } from '../js/core/interaction_funnel.js';
+import { importProjectTextThroughFunnel, importProjectThroughFunnel, getDocumentEditGate, getInteractionFunnelDebugState } from '../js/core/interaction_funnel.js';
+import { prepareProjectMergeFile } from '../js/core/project_merge_funnel.js';
+import { FileManager } from '../js/core/file_manager.js';
 import { registerRuntimeHook } from '../js/core/state/index.js';
 import { markDirty } from '../js/core/dirty_state.js';
 import { captureProjectImportState } from '../js/core/state/actions/project_import_actions.js';
@@ -133,6 +135,7 @@ test('file request is awaitable; duplicate pending imports and edits while readi
     const second = await importProjectTextThroughFunnel(JSON.stringify(payload()), { ui });
     assert.equal(second.status, 'failed');
     assert.equal(second.reason, 'import-in-progress');
+    await assert.rejects(prepareProjectMergeFile({ name: 'merge.json' }), /import-in-progress/);
     markDirty('edit-during-file-read');
     const colors = state.visualOverrides;
     reader.result = JSON.stringify(payload());
@@ -144,6 +147,85 @@ test('file request is awaitable; duplicate pending imports and edits while readi
     globalThis.document = oldDocument;
     globalThis.FileReader = oldReader;
   }
+});
+
+test('whole-project import restores exported legend labels and rolls them back if the commit fails', async t => {
+  const previousDocument = globalThis.document;
+  globalThis.document = { getElementById: () => null };
+  const previousLabels = state.legendLabels;
+  t.after(() => { globalThis.document = previousDocument; state.legendLabels = previousLabels; });
+  const labels = { '#112233': 'Border', '#abcdef': 'River' };
+  const project = FileManager.buildProjectPayload({ ...state, legendLabels: labels });
+  const open = () => importProjectTextThroughFunnel(JSON.stringify(project), { ui });
+  const result = await open();
+  await result.completion;
+  assert.equal(result.status, 'committed');
+  assert.deepEqual(state.legendLabels, labels);
+
+  const before = { '#445566': 'Current map' };
+  state.legendLabels = before;
+  const original = Object.getOwnPropertyDescriptor(state, 'onlyUnpainted');
+  t.after(() => Object.defineProperty(state, 'onlyUnpainted', original));
+  let duringCommit;
+  Object.defineProperty(state, 'onlyUnpainted', { configurable: true, get: () => original.value,
+    set() {
+      duringCommit = state.legendLabels;
+      Object.defineProperty(state, 'onlyUnpainted', original);
+      throw Error('Interrupted project commit');
+    },
+  });
+  const failed = await open();
+  assert.equal(failed.status, 'failed');
+  assert.match(failed.error.message, /Interrupted project commit/);
+  assert.deepEqual(duringCommit, labels);
+  assert.deepEqual(state.legendLabels, before);
+});
+
+test('merge checks document readiness at read, preview and commit and invalidates stale previews', async t => {
+  const original = { dirtyRevision: state.dirtyRevision, activeScenarioId: state.activeScenarioId,
+    historyPast: state.historyPast, historyFuture: state.historyFuture, startupReadonly: state.startupReadonly,
+    scenarioApplyInFlight: state.scenarioApplyInFlight };
+  t.after(() => Object.assign(state, original));
+  const source = { ...payload(), scenario: { id: 'source' },
+    riverPaint: { overrides: { UNKNOWN_CELL: '#abc' } }, legendLabels: { bad_key: 'invalid' } };
+  const file = { name: 'paint.json', text: async () => JSON.stringify(source) };
+  const loadReference = async id => { assert.equal(id, 'source'); return {}; };
+  state.startupReadonly = true;
+  await assert.rejects(prepareProjectMergeFile(file, { loadReference }), /startup-readonly/);
+  state.startupReadonly = false;
+  const preview = await prepareProjectMergeFile(file, { loadReference });
+  state.scenarioApplyInFlight = true;
+  assert.throws(() => preview(), /scenario-apply-in-progress/);
+  state.scenarioApplyInFlight = false;
+  const plan = preview();
+  assert.ok(plan.report.unmatchedIds.includes('UNKNOWN_CELL'));
+  assert.deepEqual(plan.report.invalidColors, [{ field: 'legendLabels', id: 'bad_key' }]);
+  state.startupReadonly = true;
+  assert.throws(() => plan.commit(), /startup-readonly/);
+  state.startupReadonly = false;
+  for (const [key, value] of Object.entries({ dirtyRevision: state.dirtyRevision + 1, activeScenarioId: 'other',
+    historyPast: [], historyFuture: [] })) {
+    const current = preview();
+    state[key] = value;
+    assert.equal(current.commit(), 'stale', key);
+  }
+  for (const envelope of [{ format: 'scenario-forge-hgo' }, { scenario: { id: 'hgo_1936' } }]) {
+    await assert.rejects(prepareProjectMergeFile({ ...file, text: async () => JSON.stringify(envelope) },
+      { loadReference }), error => error.userMessage === 'Open this HGO project in the HGO editor.');
+  }
+});
+
+test('required import recovery blocks merging until the failed resource is restored', async t => {
+  const previousDocument = globalThis.document;
+  globalThis.document = { getElementById: () => null };
+  t.after(() => { globalThis.document = previousDocument; registerRuntimeHook(state, 'clearExportBakeCacheFn', null); });
+  registerRuntimeHook(state, 'clearExportBakeCacheFn', () => { throw Error('map display unavailable'); });
+  const result = await importProjectTextThroughFunnel(JSON.stringify(payload()), { ui });
+  assert.equal(getDocumentEditGate().reason, 'import-recovery-required');
+  await assert.rejects(prepareProjectMergeFile({ name: 'paint.json' }), /import-recovery-required/);
+  registerRuntimeHook(state, 'clearExportBakeCacheFn', null);
+  assert.equal(await result.retry('document-refresh'), true);
+  assert.equal(getDocumentEditGate().editable, true);
 });
 
 test('a diagnostic scenario epoch change cancels an import even without dirty or request changes', async () => {
