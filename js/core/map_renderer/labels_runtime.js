@@ -11,7 +11,7 @@ import { createCityGeometryPresentation } from "../renderer/city_geometry_presen
 import { createCapitalVisibility } from "../renderer/capital_visibility.js";
 import { createCountryLabelSourceOwner } from "../renderer/country_label_source.js";
 import { DARK_LABEL_COLORS, LIGHT_LABEL_COLORS } from "../renderer/country_label_text_style.js";
-import { drawManualMapLabels } from "../renderer/manual_map_label_render_owner.js";
+import { clearManualMapLabelMetrics, drawManualMapLabels } from "../renderer/manual_map_label_render_owner.js";
 import { getParentMergedParents } from "../renderer/parent_merged_presentation.js";
 import { createCountryLabelCoverageOwner } from "../renderer/country_label_coverage.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "../renderer/country_label_render_owner.js";
@@ -475,7 +475,7 @@ export function createLabelsRuntime({
     return visibleByCity.get(city);
   }
 
-  let placedBounds = new Map();
+  let placedLabels = new Map();
   let boundCodes = new Set();
   function getBoundCountryCodes() {
     const { mapLabels, scenarioCountriesByTag } = runtimeState;
@@ -573,6 +573,7 @@ export function createLabelsRuntime({
         pendingFontFamilies = new Set();
         fontRefreshScheduled = false;
         if (!countryLabelRenderOwner.clearTextCache(families && [...families])) return;
+        clearManualMapLabelMetrics();
         previousPreferCountries = undefined;
         invalidateRenderPasses("labels", "country-label-fonts");
         requestRendererRender("country-label-fonts", { flush: false });
@@ -638,11 +639,12 @@ export function createLabelsRuntime({
     const occupiedBoxes = [];
     if (runtimeState.mapLabels?.length && runtimeState.annotationView?.showMapLabels !== false) {
       const { requestChineseTextGlyphs } = getCountryLabelRenderOwner();
-      placedBounds = drawManualMapLabels({ state: runtimeState, ctx: rendererSurfaceHost.getContext(),
+      const drawn = drawManualMapLabels({ state: runtimeState, ctx: rendererSurfaceHost.getContext(),
         projection: rendererSurfaceHost.getProjection(), k, occupiedBoxes, getCountryName, getCountryLabelColors,
         requestChineseTextGlyphs });
-    } else if (placedBounds.size) {
-      placedBounds.clear();
+      if (screenPass) placedLabels = drawn;
+    } else if (screenPass && placedLabels.size) {
+      placedLabels.clear();
     }
     // 用户手放的文字先占位，空白底图地块名避让它。
     drawBlankFeatureLabelsPass(k, occupiedBoxes, interactive);
@@ -773,8 +775,9 @@ export function createLabelsRuntime({
     getCountryLabelSuppressionSignature,
     getPlacedMapLabels() {
       return (runtimeState.mapLabels || []).map(({ id, text, countryCode }) => {
-        const bounds = runtimeState.annotationView?.showMapLabels !== false && placedBounds.get(id);
-        return { id, text, countryCode, drawn: !!bounds, bounds: bounds ? { ...bounds } : null };
+        const placed = runtimeState.annotationView?.showMapLabels !== false && placedLabels.get(id);
+        return { id, text, countryCode, drawn: !!placed, bounds: placed ? { ...placed.bounds } : null,
+          font: placed?.font, fontSize: placed?.fontSize, glyphs: placed?.glyphs?.map(glyph => ({ ...glyph })) ?? null };
       });
     },
     notifyCountryLabelColorsChanged(ids) {

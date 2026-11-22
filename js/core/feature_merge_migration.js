@@ -29,7 +29,7 @@ export function resolveFeatureMergeLineage(lineage, scenarioId = "", splits = {}
 // member means its default, not consent to copy a neighbour's edit.
 // A member stays valid in the shared base topology after a scenario-scoped
 // merge, so membership in this scenario's lineage decides, not ID validity.
-export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds, onDiscard) {
+export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds, onDiscard, onPaintRemap) {
   const { isMerged, resolve, leavesOf, splits = {} } = lineage;
   const counts = () => ({ migratedEntries: 0, droppedEntries: 0 });
   const summary = { visualOverrides: { ...counts(), createdEntries: 0 }, auxiliary: counts() };
@@ -63,6 +63,7 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds, 
       if (!Object.hasOwn(result, target) && covers(sources, target)
         && sources.every((source) => JSON.stringify(entries[source]) === value)) {
         result[target] = entries[sources[0]];
+        onPaintRemap?.(target, sources);
         created.add(target);
         visual.migratedEntries += sources.length;
         visual.createdEntries += 1;
@@ -75,12 +76,15 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds, 
       aLeaves.length - bLeaves.length || b.length - a.length);
     for (const [source, children] of nearestFirst) {
       if (!Object.hasOwn(result, source)) continue;
+      const createdBefore = visual.createdEntries;
       for (const child of children) {
         if (validFeatureIds.has(child) && !Object.hasOwn(result, child)) {
           result[child] = result[source];
+          onPaintRemap?.(child, [source]);
           visual.createdEntries += 1;
         }
       }
+      if (onPaintRemap && visual.createdEntries === createdBefore) onDiscard?.(source, children);
       delete result[source];
       visual.migratedEntries += 1;
       if (created.has(source)) {

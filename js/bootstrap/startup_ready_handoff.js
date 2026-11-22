@@ -89,6 +89,7 @@ export function createStartupReadyHandoffOwner({
   const requestedStartupSampleId = String(startupSampleProjectId || "").trim().toLowerCase();
 
   function hasPendingStartupSample() {
+    if (targetRuntime.sharedProjectLink?.status === "loading") return true;
     if (!requestedStartupSampleId || startupSampleSettled) return false;
     const sampleState = targetRuntime.sampleProjectDeeplink;
     if (targetRuntime.uiHydrationStatus === "failed"

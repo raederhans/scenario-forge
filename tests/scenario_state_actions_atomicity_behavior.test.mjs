@@ -53,6 +53,8 @@ const ACTIVATION_KEYS = Object.freeze([
   "sovereigntyInitialized",
   "visualOverrides",
   "capitalOverrides",
+  "politicalOverrides",
+  "politicalAlliances",
   "projectCities",
   "cityNameOverrides",
   "riverPaint",

@@ -1,6 +1,6 @@
 import { renderViewportMapTitles } from "./renderer/map_title_render_owner.js";
 import { getProjectCountryBaseColors } from "./project_countries.js";
-import { uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
+import { getScenarioCountryTags, uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
 import { createLabelsRuntime } from "./map_renderer/labels_runtime.js";
 import { createFacilityInteractionRuntime } from "./renderer/facility_interaction_runtime.js";
 import { createIndexUiRefreshScheduler } from "./renderer/index_ui_refresh_scheduler.js";
@@ -357,6 +357,8 @@ import { createViewportResizeLifecycleOwner } from "./renderer/viewport_resize_l
 import { createScenarioWaterCachePolicyOwner } from "./renderer/scenario_water_cache_policy_owner.js";
 import { createZoomInteractionLifecycleOwner } from "./renderer/zoom_interaction_lifecycle_owner.js";
 import { createMapInteractionEventBindingOwner } from "./renderer/map_interaction_event_binding_owner.js";
+import { createSelectionMarqueeOwner } from "./renderer/selection_marquee_owner.js";
+import { querySelectionShape } from "./renderer/selection_shape_query.js";
 import { createRendererSurfaceHost } from "./renderer/renderer_surface_host.js";
 import { createRendererSurfaceLifecycleOwner } from "./renderer/renderer_surface_lifecycle_owner.js";
 import { createRendererProjectionPathOwner } from "./renderer/renderer_projection_path_owner.js";
@@ -858,8 +860,7 @@ const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getSelectionBoundaryRevision: () => getPaintContourRuntimeOwner().getRevision(),
   getZoomScale: () => runtimeState.zoomTransform?.k || 1,
   getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
-  getDevSelectionIds: () => Array.isArray(runtimeState.devSelectionOrder)
-    ? Array.from(runtimeState.devSelectionOrder, (id) => String(id || "").trim()).filter(Boolean) : [],
+  getDevSelectionIds: () => runtimeState.devSelectionOrder,
   getInspectorSelection: () => ({
     featureIds: Array.isArray(runtimeState.inspectorHighlightFeatureIds)
       ? Array.from(runtimeState.inspectorHighlightFeatureIds, (id) => String(id || "").trim()).filter(Boolean) : [],
@@ -3042,6 +3043,25 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
   },
 }));
 
+const selectionMarquee = createSelectionMarqueeOwner({
+  state: runtimeState,
+  surfaceHost: rendererSurfaceHost,
+  getScreenPoint: event => d3.pointer(event, rendererSurfaceHost.getMapSvg()),
+  isPointPickActive: isMapPointPickActive,
+  query: shape => querySelectionShape({
+    shape, grid: runtimeState.spatialGrid, gridMeta: runtimeState.spatialGridMeta, items: runtimeState.spatialItems,
+    isEligible: isDevSelectionEligibleFeature,
+    getCentroid: feature => {
+      const point = labelsRuntime.getFeatureGeoCentroid(feature);
+      return point && rendererSurfaceHost.getProjection()(point);
+    },
+  }),
+  add: addFeaturesToDevSelection,
+  warnIndexUnavailable: () => showToast(t("Map index is not ready.", "ui"), { tone: "warning" }),
+  suppressNextClick: () => { suppressNextClickAfterBrush = true; },
+});
+const cancelSelectionMarquee = selectionMarquee.cancel;
+
 const getMapInteractionEventBindingOwner = lazyOwner(() => createMapInteractionEventBindingOwner({
   getters: {
     getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
@@ -3053,6 +3073,7 @@ const getMapInteractionEventBindingOwner = lazyOwner(() => createMapInteractionE
   handlers: {
     mapClick: handleClick,
     mapDoubleClick: handleDoubleClick,
+    marquee: selectionMarquee,
     handleMouseMove,
     handlePhysicalIntensityPointerDown,
     handlePhysicalIntensityPointerMove,
@@ -3069,6 +3090,7 @@ const getMapInteractionEventBindingOwner = lazyOwner(() => createMapInteractionE
     flushBrushSession,
   },
   effects: {
+    clearSuppressedClick: () => { suppressNextClickAfterBrush = false; },
     bindMapContainerResizeObserver,
     bindBrowserZoomObservers,
   },
@@ -12439,30 +12461,29 @@ function getDevSelectionIds() {
   return nextIds;
 }
 
-function addFeatureToDevSelection(featureId) {
-  const id = String(featureId || "").trim();
-  const feature = id ? runtimeState.landIndex?.get(id) : null;
-  if (!isDevSelectionEligibleFeature(feature, id)) return false;
-  runtimeState.devSelectionFeatureIds = runtimeState.devSelectionFeatureIds instanceof Set
-    ? runtimeState.devSelectionFeatureIds
-    : new Set();
-  runtimeState.devSelectionOrder = getDevSelectionIds();
-  if (runtimeState.devSelectionFeatureIds.has(id)) {
-    return false;
+function addFeaturesToDevSelection(featureIds) {
+  const selected = new Set(getDevSelectionIds());
+  const previousSize = selected.size;
+  const limit = Math.max(1, Number(runtimeState.devSelectionLimit) || 2000);
+  for (const value of featureIds) {
+    const id = String(value || "").trim();
+    if (selected.has(id) || !isDevSelectionEligibleFeature(runtimeState.landIndex?.get(id), id)) continue;
+    if (selected.size >= limit) {
+      showToast(t("Selection limit reached ({limit}).", "ui", { limit }), { tone: "warning", duration: 3600 });
+      break;
+    }
+    selected.add(id);
   }
-  const limit = Math.max(1, Number(runtimeState.devSelectionLimit) || 200);
-  if (runtimeState.devSelectionOrder.length >= limit) {
-    showToast(t("Selection limit reached ({limit}).", "ui", { limit }), {
-      tone: "warning",
-      duration: 3600,
-    });
-    return false;
-  }
-  runtimeState.devSelectionFeatureIds.add(id);
-  runtimeState.devSelectionOrder.push(id);
+  if (selected.size === previousSize) return 0;
+  runtimeState.devSelectionFeatureIds = selected;
+  runtimeState.devSelectionOrder = [...selected];
   setDevSelectionDirty();
   requestInteractionRender("dev-selection-add");
-  return true;
+  return selected.size - previousSize;
+}
+
+function addFeatureToDevSelection(featureId) {
+  return addFeaturesToDevSelection([featureId]) > 0;
 }
 
 function toggleFeatureInDevSelection(featureId) {
@@ -12648,9 +12669,30 @@ function applyDevMacroFillCurrentOwnerScope() {
   });
 }
 
-function fillSelectedParcels() {
-  if (blockStartupReadonlyInteraction()) return false;
-  return applyVisualSubdivisionFill(getDevSelectionIds(), runtimeState.selectedColor);
+function getDevSelectionCountryOptions() {
+  const tags = getScenarioCountryTags(runtimeState.scenarioCountriesByTag) || [];
+  return [...tags].filter(tag => runtimeState.sovereignBaseColors?.[tag]).sort().map(tag => ({
+    tag, name: labelsRuntime.getCountryName(tag), color: runtimeState.sovereignBaseColors[tag],
+  }));
+}
+
+function fillSelectedParcels(options = {}) {
+  const total = new Set(runtimeState.devSelectionOrder).size;
+  if (blockStartupReadonlyInteraction()) return { changed: 0, skipped: total };
+  const color = ColorManager.normalizeHexColor((options instanceof Event ? null : options.color) ?? runtimeState.selectedColor);
+  const riverParents = new Set(getEditedRiverParentIds(runtimeState.riverPaint));
+  const ids = getFillTargetPolicy().unprotectedIds(getDevSelectionIds()).filter(id =>
+    runtimeState.visualOverrides?.[id] !== color || riverParents.has(id));
+  if (!ids.length) {
+    if (total) showToast(t("All selected parcels were skipped.", "ui"), { tone: "info" });
+    return { changed: 0, skipped: total };
+  }
+  if (runtimeState.detailPromotionInFlight || Object.keys(runtimeState.runtimeChunkLoadState?.inFlightByChunkId || {})
+    .some(id => id.startsWith("political.detail."))) {
+    showToast(t("Some countries are still loading details. Only loaded parcels will be filled.", "ui"), { tone: "info" });
+  }
+  fillResolvedSubdivisions(ids, color);
+  return { changed: ids.length, skipped: total - ids.length };
 }
 
 function applyDevSelectionFill() {
@@ -12678,6 +12720,7 @@ function isBrushNavigationModifier(event) {
 
 function shouldAllowZoomEvent(event) {
   const type = String(event?.type || "").toLowerCase();
+  if (selectionMarquee.blocksZoom(event)) return false;
   if (type === "wheel") return true;
   if (type.startsWith("touch")) return getMapInteractionEventBindingOwner().shouldAllowTouchNavigation();
   if (event?.ctrlKey) return false;
@@ -12704,11 +12747,15 @@ function isDoubleClickBatchEligible(hit, feature, event) {
 }
 
 let lastQuickFillLeafClick = null;
-function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind, gesture = null } = {}) {
-  const actionStart = nowMs();
-  if (gesture?.type === "leaf-click") lastQuickFillLeafClick = null;
+function applyVisualSubdivisionFill(targetIds, selectedColor, options) {
+  if (options?.gesture?.type === "leaf-click") lastQuickFillLeafClick = null;
   const resolvedIds = getFillTargetPolicy().unprotectedIds(normalizeFeatureOverrideTargetIds(targetIds));
   if (!resolvedIds.length) return false;
+  return fillResolvedSubdivisions(resolvedIds, selectedColor, options);
+}
+
+function fillResolvedSubdivisions(resolvedIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind, gesture = null } = {}) {
+  const actionStart = nowMs();
   const color = getSafeCanvasColor(selectedColor, LAND_FILL_COLOR);
   const historyGesture = gesture ? { ...gesture, color, scenarioId: String(runtimeState.activeScenarioId || "") } : null;
   if (historyGesture?.type === "leaf-click") {
@@ -13570,6 +13617,9 @@ export {
 
   // Dev workspace selection and fill facade.
   addFeatureToDevSelection,
+  addFeaturesToDevSelection,
+  cancelSelectionMarquee,
+  getDevSelectionCountryOptions,
   toggleFeatureInDevSelection,
   removeLastDevSelection,
   clearDevSelection,

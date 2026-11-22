@@ -2093,7 +2093,7 @@
                   </select>
                   <p id="politicalDisplayModeStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
                   <div id="politicalDisplayModeLegend" class="thematic-wgi-legend" hidden></div>
-                  <p class="sidebar-tool-hint" data-i18n="Map modes only change how the map is shown; edits and saves are unaffected.">Map modes only change how the map is shown; edits and saves are unaffected.</p>
+                  <p class="sidebar-tool-hint" data-i18n="Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.">Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.</p>
                 </section>
                 <section id="thematicWgiPanel" class="appearance-control-card" aria-labelledby="thematicWgiTitle">
                   <h3 id="thematicWgiTitle" data-i18n="Country indicators">Country indicators</h3>
@@ -2217,6 +2217,8 @@
           <div id="parcelSelectionPanel" class="map-onboarding-hint hidden" style="top: 12px; transform: translateX(-50%); width: max-content">
             <span id="parcelSelectionCount" aria-live="polite"></span>
             <button type="button" id="fillSelectedParcels" class="btn-secondary" data-i18n="Fill with current color">Fill with current color</button>
+            <select id="parcelSelectionCountry" aria-label="Choose country" data-i18n-aria-label="Choose country"></select>
+            <button type="button" id="fillSelectedCountry" class="btn-secondary" data-i18n="Set to country">Set to country</button>
             <button type="button" id="clearSelectedParcels" class="btn-secondary" data-i18n="Clear">Clear</button>
           </div>
           <div id="mapOnboardingHint" class="map-onboarding-hint" data-i18n="Click to inspect a region or country. Press F to switch to fill before painting.">
@@ -2695,6 +2697,17 @@
                     <button id="convertCountryLabel" type="button" class="sidebar-action-secondary" data-i18n="Convert to editable text" hidden>Convert to editable text</button>
                   </div>
                   <div id="countryTerritoryStats" class="country-select-meta"></div>
+                  <div id="countryPoliticalFields" class="mt-2" hidden>
+                    <label class="field-label"><span data-i18n="Alliance">Alliance</span><select id="countryAlliance"></select></label>
+                    <button id="deleteCountryAlliance" type="button" class="sidebar-action-secondary" data-i18n="Delete" hidden>Delete</button>
+                    <div id="newAllianceFields" hidden>
+                      <label class="field-label"><span data-i18n="Alliance name">Alliance name</span><input id="newAllianceName" class="input" maxlength="120" /></label>
+                      <label class="field-label"><span data-i18n="Alliance color">Alliance color</span><input id="newAllianceColor" type="color" value="#008080" /></label>
+                      <span id="allianceColorConflict" class="country-select-meta" role="status" data-i18n="This color is already used." hidden>This color is already used.</span>
+                      <button id="createCountryAlliance" type="button" class="sidebar-action-secondary" data-i18n="Create" disabled>Create</button>
+                    </div>
+                    <label class="field-label"><span data-i18n="Government">Government</span><select id="countryIdeology"></select></label>
+                  </div>
                   <button id="unregisterProjectCountry" type="button" class="sidebar-action-secondary mt-2" data-i18n="Unregister country" hidden>Unregister country</button>
                   <details id="countryCities" class="mt-2" hidden>
                     <summary data-i18n="Cities in this country">Cities in this country</summary>
@@ -3052,7 +3065,9 @@
                 <h3 id="sampleProjectBannerTitle" class="sample-project-banner__title"></h3>
                 <p id="sampleProjectBannerBody" class="sample-project-banner__body"></p>
               </div>
-              <div class="sample-project-banner__actions" aria-label="Sample project actions" data-i18n-aria-label="Sample project actions">
+              <div class="sample-project-banner__actions">
+                <button id="sharedProjectSaveCopyBtn" type="button" class="btn-secondary sample-project-banner__action hidden"
+                  data-i18n="Save as copy" hidden>Save as copy</button>
                 <button
                   id="sampleProjectBannerOpenExportBtn"
                   type="button"
@@ -3065,7 +3080,6 @@
                   id="sampleProjectBannerDownloadOriginalLink"
                   class="btn-secondary sample-project-banner__action"
                   download
-                  data-i18n="Download original JSON"
                 >
                   Download original JSON
                 </a>

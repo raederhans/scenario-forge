@@ -6,7 +6,7 @@ export function createDefaultDevState() {
     devSelectedHit: null,
     devSelectionFeatureIds: new Set(),
     devSelectionOrder: [],
-    devSelectionLimit: 200,
+    devSelectionLimit: 2000,
     devSelectionOverlayDirty: true,
     devSelectionSortMode: "selection",
     devClipboardPreviewFormat: "names_with_ids",

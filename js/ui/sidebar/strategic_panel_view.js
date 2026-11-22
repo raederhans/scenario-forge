@@ -24,7 +24,7 @@ export function syncMapLabelField(field, label, k, countryStyle) {
   } else if (key === "opacity") {
     field.value = label.opacity ?? ((!label.text && label.countryCode ? countryStyle?.opacity : null) ?? 1);
   } else {
-    field.value = label[key] ?? (key === "tracking" ? 0 : "");
+    field.value = label[key] ?? (key === "tracking" || key === "curve" ? 0 : "");
   }
 }
 
@@ -63,6 +63,14 @@ export function createStrategicPanelView({
     text.textContent = t(label, "ui");
     shell.append(input, text);
     return shell;
+  };
+  const appendOperationLabelControls = (row, prefix) => {
+    const label = document.createElement("label");
+    label.textContent = t("Label size", "ui");
+    const size = buildInput(`${prefix}LabelSizeInput`, "", "number");
+    Object.assign(size, { min: "4", max: "64", step: "0.5", value: "9" });
+    label.appendChild(size);
+    row.append(label, buildCheckboxLabel(`${prefix}LabelOnPathInput`, "Along line", "checkbox-label"));
   };
   const buildCombatBar = ({ id, label, className }) => {
     const row = document.createElement("div");
@@ -268,6 +276,7 @@ export function createStrategicPanelView({
     operationalLineStyleRow.appendChild(operationalLineStrokeInput);
     operationalLineStyleRow.appendChild(operationalLineWidthInput);
     operationalLineStyleRow.appendChild(operationalLineOpacityInput);
+    appendOperationLabelControls(operationalLineStyleRow, "operationalLine");
 
     const operationalLineEditorHint = document.createElement("p");
     operationalLineEditorHint.id = "operationalLineEditorHint";
@@ -325,6 +334,7 @@ export function createStrategicPanelView({
     graphicsStyleRow.appendChild(graphicsStrokeInput);
     graphicsStyleRow.appendChild(graphicsWidthInput);
     graphicsStyleRow.appendChild(graphicsOpacityInput);
+    appendOperationLabelControls(graphicsStyleRow, "operationGraphic");
 
     const graphicsEditorHint = document.createElement("p");
     graphicsEditorHint.id = "operationGraphicEditorHint";
@@ -831,6 +841,7 @@ export function createStrategicPanelView({
     for (const [key, caption, min, max, step] of [
       ["size", "Font size", Math.log2(0.12), 9, "any"],
       ["opacity", "Opacity", 0, 1, 0.01],
+      ["curve", "Curve", -180, 180, 1],
       ["rotation", "Rotation", -90, 90, 1],
       ["tracking", "Letter spacing", 0, 1, 0.01],
     ]) {
@@ -838,7 +849,7 @@ export function createStrategicPanelView({
       Object.assign(range, { type: "range", min, max, step });
       addField(key, caption, range);
       if (key === "size") addField("size", "Size in this view (px)", pixels);
-      if (key === "rotation") {
+      if (key === "rotation" || key === "curve") {
         const output = document.createElement("output");
         output.dataset.labelReadout = key;
         range.parentElement.appendChild(output);
@@ -912,6 +923,8 @@ export function createStrategicPanelView({
   const strategicOverlayPublishStatus = document.getElementById("strategicOverlayPublishStatus");
   const operationalLineKindSelect = document.getElementById("operationalLineKindSelect");
   const operationalLineLabelInput = document.getElementById("operationalLineLabelInput");
+  const operationalLineLabelSizeInput = document.getElementById("operationalLineLabelSizeInput");
+  const operationalLineLabelOnPathInput = document.getElementById("operationalLineLabelOnPathInput");
   const operationalLineStrokeInput = document.getElementById("operationalLineStrokeInput");
   const operationalLineWidthInput = document.getElementById("operationalLineWidthInput");
   const operationalLineOpacityInput = document.getElementById("operationalLineOpacityInput");
@@ -924,6 +937,8 @@ export function createStrategicPanelView({
   const operationalLineList = document.getElementById("operationalLineList");
   const operationGraphicKindSelect = document.getElementById("operationGraphicKindSelect");
   const operationGraphicLabelInput = document.getElementById("operationGraphicLabelInput");
+  const operationGraphicLabelSizeInput = document.getElementById("operationGraphicLabelSizeInput");
+  const operationGraphicLabelOnPathInput = document.getElementById("operationGraphicLabelOnPathInput");
   const operationGraphicPresetSelect = document.getElementById("operationGraphicPresetSelect");
   const operationGraphicStrokeInput = document.getElementById("operationGraphicStrokeInput");
   const operationGraphicWidthInput = document.getElementById("operationGraphicWidthInput");
@@ -1000,6 +1015,8 @@ export function createStrategicPanelView({
       unitCounterDetailToggleBtn,
       operationalLineKindSelect,
       operationalLineLabelInput,
+      operationalLineLabelSizeInput,
+      operationalLineLabelOnPathInput,
       operationalLineStrokeInput,
       operationalLineWidthInput,
       operationalLineOpacityInput,
@@ -1013,6 +1030,8 @@ export function createStrategicPanelView({
       strategicCommandButtons,
       operationGraphicKindSelect,
       operationGraphicLabelInput,
+      operationGraphicLabelSizeInput,
+      operationGraphicLabelOnPathInput,
       operationGraphicPresetSelect,
       operationGraphicStrokeInput,
       operationGraphicWidthInput,

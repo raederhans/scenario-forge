@@ -57,6 +57,7 @@ export function createDefaultBootState() {
     bootMetrics: {},
     startupBootCacheState: createDefaultStartupBootCacheState(),
     sampleProjectDeeplink: createDefaultSampleProjectDeeplinkState(),
+    sharedProjectLink: { status: "idle", host: "", errorCode: "", originalFile: null },
   };
 }
 

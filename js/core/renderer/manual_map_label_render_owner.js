@@ -1,6 +1,23 @@
 import { CHINESE_FONT, ENGLISH_FONT, COUNTRY_LABEL_TRACKING, displayText, fontWeight,
   DARK_LABEL_COLORS, LIGHT_LABEL_COLORS, getVisibilityAlpha } from "./country_label_text_style.js";
-import { layoutManualMapLabel } from "./manual_map_label_layout.js";
+import { layoutManualMapLabel, layoutCurvedManualMapLabel } from "./manual_map_label_layout.js";
+
+const segmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
+const shapedText = /[\p{Script=Arabic}\p{Script=Hebrew}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Gurmukhi}\p{Script=Gujarati}\p{Script=Oriya}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Kannada}\p{Script=Malayalam}\p{Script=Sinhala}\p{Script=Thai}\p{Script=Lao}\p{Script=Myanmar}\p{Script=Khmer}\p{Script=Syriac}]/u;
+const glyphMetrics = new Map();
+
+export function clearManualMapLabelMetrics() {
+  glyphMetrics.clear();
+}
+
+function measureGlyph(ctx, text) {
+  const key = ctx.font + "\n" + text;
+  if (!glyphMetrics.has(key)) {
+    if (glyphMetrics.size >= 2048) glyphMetrics.delete(glyphMetrics.keys().next().value);
+    glyphMetrics.set(key, ctx.measureText(text));
+  }
+  return { text, metrics: glyphMetrics.get(key) };
+}
 
 export function drawManualMapLabels({ state, ctx, projection, k, getCountryName, getCountryLabelColors, requestChineseTextGlyphs, occupiedBoxes }) {
   const drawn = new Map();
@@ -30,29 +47,53 @@ export function drawManualMapLabels({ state, ctx, projection, k, getCountryName,
     ctx.font = `${label.italic ? "italic " : ""}${label.weight ?? fontWeight(font)} ${size}px ${font}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.letterSpacing = `${tracking * size}px`;
+    const curved = label.curve && segmenter && !shapedText.test(title);
+    ctx.letterSpacing = curved ? "0px" : `${tracking * size}px`;
     ctx.globalAlpha *= alpha;
     ctx.lineWidth = size * 0.14;
     ctx.lineJoin = "round";
     ctx.fillStyle = label.color || colors.fill;
     ctx.strokeStyle = colors.stroke;
-    const layout = layoutManualMapLabel({
-      lines: title.split(/\r?\n/).map(text => ({ text, metrics: ctx.measureText(text) })),
-      point, size, rotation: label.rotation, transform,
-    });
-    ctx.translate(...point);
-    ctx.rotate(layout.angle);
-    for (const { text, y, box } of layout.lines) {
-      ctx.strokeText(text, 0, y);
-      ctx.fillText(text, 0, y);
-      occupiedBoxes.push(box);
+    const lines = title.split(/\r?\n/);
+    const geometry = { point, size, rotation: label.rotation, transform };
+    let boxes, glyphs = null;
+    if (curved) {
+      const layout = layoutCurvedManualMapLabel({ ...geometry, curve: label.curve, spacing: tracking * size,
+        lines: lines.map(line => Array.from(segmenter.segment(line), ({ segment }) => measureGlyph(ctx, segment))) });
+      ctx.translate(...point);
+      ctx.rotate(layout.angle);
+      for (const paint of ["strokeText", "fillText"]) {
+        for (const glyph of layout.glyphs) {
+          ctx.save();
+          ctx.translate(glyph.x, glyph.y);
+          ctx.rotate(glyph.angle);
+          ctx[paint](glyph.text, 0, 0);
+          ctx.restore();
+        }
+      }
+      ({ boxes, glyphs } = layout);
+    } else {
+      const layout = layoutManualMapLabel({ ...geometry,
+        lines: lines.map(text => ({ text, metrics: ctx.measureText(text) })) });
+      ctx.translate(...point);
+      ctx.rotate(layout.angle);
+      for (const { text, y } of layout.lines) {
+        ctx.strokeText(text, 0, y);
+        ctx.fillText(text, 0, y);
+      }
+      boxes = layout.lines.map(line => line.box);
     }
     ctx.restore();
-    if (layout.lines.length) {
-      const boxes = layout.lines.map(line => line.box);
-      const x = Math.min(...boxes.map(box => box.x)), y = Math.min(...boxes.map(box => box.y));
-      drawn.set(label.id, { x, y, w: Math.max(...boxes.map(box => box.x + box.w)) - x,
-        h: Math.max(...boxes.map(box => box.y + box.h)) - y });
+    if (boxes.length) {
+      let x = Infinity, y = Infinity, right = -Infinity, bottom = -Infinity;
+      for (const box of boxes) {
+        occupiedBoxes.push(box);
+        x = Math.min(x, box.x);
+        y = Math.min(y, box.y);
+        right = Math.max(right, box.x + box.w);
+        bottom = Math.max(bottom, box.y + box.h);
+      }
+      drawn.set(label.id, { bounds: { x, y, w: right - x, h: bottom - y }, font, fontSize: size, glyphs });
     }
   }
   return drawn;

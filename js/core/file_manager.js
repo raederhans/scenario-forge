@@ -1,4 +1,6 @@
+import { normalizeOperationLabelSize } from "./renderer/operation_graphic_geometry.js";
 import { normalizeProjectCountriesPayload, serializeProjectCountries } from "./project_countries.js";
+import { normalizePoliticalOverrides, normalizePoliticalAlliances } from "./political_overrides.js";
 import { normalizeCapitalOverrides, normalizeProjectCities } from "./capital_overrides.js";
 import { buildDefaultFileStem } from "./file_name_policy.js";
 import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
@@ -325,11 +327,14 @@ function normalizeOperationGraphics(rawGraphics) {
         ? raw.points.map((point) => normalizeProjectCoordinatePair(point)).filter(Boolean)
         : [];
       if (points.length < (CLOSED_OPERATION_GRAPHIC_KINDS.has(kind) ? 3 : 2)) return null;
+      const labelSize = normalizeOperationLabelSize(raw.labelSize);
       const stroke = normalizeProjectHexColor(raw.stroke) || null;
       return {
         id: String(raw.id || `opg_${index + 1}`).trim() || `opg_${index + 1}`,
         kind,
         label: String(raw.label || "").trim(),
+        ...(labelSize !== 9 ? { labelSize } : {}),
+        ...(raw.labelOnPath === true ? { labelOnPath: true } : {}),
         points,
         stylePreset: normalizeStrategicKindToken(raw.stylePreset, kind),
         stroke,
@@ -350,6 +355,7 @@ function normalizeOperationalLines(rawLines) {
         ? raw.points.map((point) => normalizeProjectCoordinatePair(point)).filter(Boolean)
         : [];
       if (points.length < 2) return null;
+      const labelSize = normalizeOperationLabelSize(raw.labelSize);
       const stroke = normalizeProjectHexColor(raw.stroke) || null;
       const attachedCounterIds = Array.isArray(raw.attachedCounterIds)
         ? raw.attachedCounterIds.map((value) => String(value || "").trim()).filter(Boolean)
@@ -360,6 +366,8 @@ function normalizeOperationalLines(rawLines) {
         id: String(raw.id || `opl_${index + 1}`).trim() || `opl_${index + 1}`,
         kind,
         label: String(raw.label || "").trim(),
+        ...(labelSize !== 9 ? { labelSize } : {}),
+        ...(raw.labelOnPath === true ? { labelOnPath: true } : {}),
         points,
         stylePreset: normalizeStrategicKindToken(raw.stylePreset, kind),
         stroke,
@@ -559,6 +567,8 @@ class FileManager {
       cityNameOverrides: appState.cityNameOverrides || {},
       ...(appState.activeScenarioId ? { projectCountries: serializeProjectCountries(appState) } : {}),
       capitalOverrides: appState.capitalOverrides || {},
+      politicalOverrides: appState.politicalOverrides || {},
+      politicalAlliances: appState.politicalAlliances || {},
       projectCities: appState.projectCities || [],
       legendConfig: LegendManager.normalizeConfig(appState.legendConfig),
       legendControl: LegendManager.normalizeControl(appState.legendControl),
@@ -771,6 +781,8 @@ class FileManager {
     data.countryNameOverrides ??= {};
     data.cityNameOverrides ??= {};
     data.projectCountries = normalizeProjectCountriesPayload(data.projectCountries);
+    data.politicalOverrides = normalizePoliticalOverrides(data.politicalOverrides);
+    data.politicalAlliances = normalizePoliticalAlliances(data.politicalAlliances);
     data.capitalOverrides = normalizeCapitalOverrides(data.capitalOverrides);
     data.projectCities = normalizeProjectCities(data.projectCities);
     data.legendConfig = LegendManager.normalizeConfig(data.legendConfig);

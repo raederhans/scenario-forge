@@ -15,7 +15,10 @@ export function createMapInteractionEventBindingOwner({
   }
 
   function handlePointerDown(event) {
-    if (!isTouchPointer(event)) return handlers.handlePhysicalIntensityPointerDown(event);
+    effects.clearSuppressedClick?.();
+    if (!isTouchPointer(event)) {
+      return handlers.handlePhysicalIntensityPointerDown(event) || handlers.marquee?.down(event);
+    }
     activeTouchPointers.add(event.pointerId);
     if (activeTouchPointers.size > 1) {
       touchNavigation = true;
@@ -28,7 +31,9 @@ export function createMapInteractionEventBindingOwner({
 
   function handlePointerMove(event) {
     if (event.pointerType === "mouse" && getters.hasMouseBrushDrag?.()) return handlers.handleBrushPointerMove(event);
-    if (!isTouchPointer(event)) return handlers.handlePhysicalIntensityPointerMove(event);
+    if (!isTouchPointer(event)) {
+      return handlers.handlePhysicalIntensityPointerMove(event) || handlers.marquee?.move(event);
+    }
   }
 
   function handleWindowPointerMove(event) {
@@ -37,7 +42,9 @@ export function createMapInteractionEventBindingOwner({
   }
 
   function handlePointerEnd(event) {
-    if (!isTouchPointer(event)) return handlers.handlePhysicalIntensityPointerEnd(event);
+    if (!isTouchPointer(event)) {
+      return handlers.handlePhysicalIntensityPointerEnd(event) || handlers.marquee?.end(event);
+    }
     if (!activeTouchPointers.has(event.pointerId)) return;
     handlers.handleBrushPointerEnd(event);
     handlers.handlePhysicalIntensityPointerEnd(event);
@@ -92,6 +99,7 @@ export function createMapInteractionEventBindingOwner({
 
     interactionRect.on("mousemove", requireFunction(handlers, "handleMouseMove"));
     interactionRect.on("pointerdown.fieldTool", handlePointerDown);
+    if (handlers.marquee) interactionRect.on("contextmenu.marquee", () => handlers.marquee.cancel());
     interactionRect.on("pointermove.fieldTool", handlePointerMove);
     interactionRect.on("mousedown.brush", requireFunction(handlers, "handleBrushPointerDown"));
     interactionRect.on("mouseleave", requireFunction(handlers, "handleMouseLeave"));
@@ -104,8 +112,12 @@ export function createMapInteractionEventBindingOwner({
     targetWindow.addEventListener("pointercancel", handlePointerEnd);
     getInteractionRectNode(interactionRect)?.addEventListener?.(
       "lostpointercapture",
-      requireFunction(handlers, "handlePhysicalIntensityPointerEnd"),
+      event => {
+        handlers.handlePhysicalIntensityPointerEnd(event);
+        handlers.marquee?.cancel(event);
+      },
     );
+    if (handlers.marquee) targetWindow.addEventListener("blur", handlers.marquee.cancel);
     targetWindow.addEventListener("resize", requireFunction(handlers, "handleResize"));
     targetWindow.addEventListener("mapcreator:sidebar-layout-start", requireFunction(handlers, "handleSidebarLayoutStart"));
     targetWindow.addEventListener("mapcreator:sidebar-layout-refresh", bindSidebarLayoutRefresh);

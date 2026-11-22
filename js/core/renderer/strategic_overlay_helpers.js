@@ -129,6 +129,85 @@ function bindUnitCounterOverlayInteractions() {
   });
 }
 
+const labelFitCache = new WeakMap();
+
+function createReadableLabelPath(points, curved) {
+  const lengths = points.slice(1).map(([x, y], i) => Math.hypot(x - points[i][0], y - points[i][1]));
+  let remaining = lengths.reduce((sum, length) => sum + length, 0) / 2;
+  if (!remaining) return "";
+  for (const [i, length] of lengths.entries()) {
+    if (remaining <= length) {
+      const dx = points[i + 1][0] - points[i][0];
+      const dy = points[i + 1][1] - points[i][1];
+      const reverse = Math.abs(dx) < length * 0.001 ? dy > 0 : dx < 0;
+      const d3 = globalThis.d3;
+      return d3.line().curve(curved ? d3.curveCatmullRom.alpha(0.5) : d3.curveLinear)(reverse ? [...points].reverse() : points);
+    }
+    remaining -= length;
+  }
+}
+
+function renderOperationLabels(groups, isLine) {
+  const candidates = [];
+  const plates = [];
+  groups.each(function (datum, index) {
+    const entity = isLine ? datum.line : datum.graphic;
+    const group = globalThis.d3.select(this);
+    const label = group.select(isLine ? "g.operational-line-label" : "g.operation-graphic-label");
+    const anchor = datum.labelAnchor;
+    label.attr("display", entity.label && anchor ? null : "none")
+      .attr("transform", `translate(${anchor?.[0] ?? -9999},${anchor?.[1] ?? -9999})`);
+    const size = entity.labelSize ?? 9;
+    const text = label.select("text")
+      .attr("text-anchor", "middle").attr("dominant-baseline", "central")
+      .attr("font-family", strategicLineLabelFont).attr("font-size", size)
+      .attr("font-weight", isLine ? 700 : 600).attr("letter-spacing", isLine ? "0.05em" : "0.04em")
+      .attr("fill", "#1f2937").attr("dy", null).attr("stroke", null).attr("paint-order", null)
+      .text(entity.label || "");
+    const plate = label.select("rect").attr("display", null);
+    const d = entity.label && entity.labelOnPath && !datum.geometryPreset?.closed
+      ? createReadableLabelPath(datum.projectedPoints, (datum.geometryPreset ?? datum.stylePreset).curved !== false)
+      : "";
+    const paths = group.selectAll("path.operation-label-path").data(d ? [d] : []);
+    paths.exit().remove();
+    if (d) {
+      const id = `${isLine ? "opl" : "opg"}-label-path-${String(entity.id).replace(/[^A-Za-z0-9_-]/g, "_")}-${index}`;
+      const path = paths.enter().append("path").attr("class", "operation-label-path").merge(paths)
+        .attr("id", id).attr("d", d).attr("fill", "none").attr("stroke", "none");
+      candidates.push({ label, text, path, plate, id, entity, size, d, width: entity.width || datum.stylePreset.width });
+    } else {
+      plates.push({ text, plate });
+    }
+  });
+  const fits = candidates.filter(({ text, path, plate, entity, size, d }) => {
+    const node = text.node();
+    let cached = labelFitCache.get(node);
+    if (!cached || cached.text !== entity.label || cached.size !== size || cached.d !== d) {
+      const textLength = node.getComputedTextLength?.();
+      const pathLength = path.node().getTotalLength?.();
+      const fits = textLength == null || pathLength == null || textLength <= pathLength;
+      cached = { text: entity.label, size, d, fits };
+      labelFitCache.set(node, cached);
+    }
+    if (!cached.fits) plates.push({ text, plate });
+    return cached.fits;
+  });
+  for (const { text, plate } of plates) {
+    const bbox = text.node().getBBox?.();
+    const width = bbox ? bbox.width + (isLine ? 12 : 10) : (isLine ? 56 : 48);
+    const height = bbox ? bbox.height + 6 : 16;
+    plate.attr("x", -width / 2).attr("y", -height / 2).attr("width", width).attr("height", height)
+      .attr("rx", 2).attr("ry", 2).attr("fill", isLine ? "rgba(248, 244, 233, 0.94)" : "rgba(248, 244, 233, 0.92)")
+      .attr("stroke", "rgba(55, 65, 81, 0.55)").attr("stroke-width", 0.8);
+  }
+  for (const { label, text, plate, id, entity, width } of fits) {
+    label.attr("transform", null);
+    plate.attr("display", "none");
+    text.text("").attr("dy", width / 2 + 2).attr("stroke", "#f8f4e9").attr("paint-order", "stroke")
+      .append("textPath").attr("href", `#${id}`).attr("startOffset", "50%").text(entity.label);
+  }
+}
+
 function renderOperationalLinesOverlay() {
   const operationalLinesGroup = groupGetters.getOperationalLinesGroup?.() || null;
   if (!operationalLinesGroup) return;
@@ -205,37 +284,7 @@ function renderOperationalLinesOverlay() {
     .attr("stroke-width", (d) => Math.max(14, (d.line.width > 0 ? d.line.width : d.stylePreset.width) + 8))
     .attr("pointer-events", "stroke");
 
-  merged.select("g.operational-line-label")
-    .attr("display", (d) => (d.line.label && Array.isArray(d.labelAnchor) ? null : "none"))
-    .attr("transform", (d) => `translate(${d.labelAnchor?.[0] ?? -9999},${d.labelAnchor?.[1] ?? -9999})`);
-
-  merged.select("g.operational-line-label text")
-    .attr("text-anchor", "middle")
-    .attr("dominant-baseline", "central")
-    .attr("font-family", strategicLineLabelFont)
-    .attr("font-size", 9)
-    .attr("font-weight", 700)
-    .attr("letter-spacing", "0.05em")
-    .attr("fill", "#1f2937")
-    .text((d) => d.line.label || "");
-
-  merged.select("g.operational-line-label rect")
-    .each(function eachLabelPlate() {
-      const textNode = globalThis.d3.select(this.parentNode).select("text").node();
-      const bbox = textNode?.getBBox?.();
-      const width = bbox ? bbox.width + 12 : 56;
-      const height = bbox ? bbox.height + 6 : 16;
-      globalThis.d3.select(this)
-        .attr("x", -width / 2)
-        .attr("y", -height / 2)
-        .attr("width", width)
-        .attr("height", height)
-        .attr("rx", 2)
-        .attr("ry", 2)
-        .attr("fill", "rgba(248, 244, 233, 0.94)")
-        .attr("stroke", "rgba(55, 65, 81, 0.55)")
-        .attr("stroke-width", 0.8);
-    });
+  renderOperationLabels(merged, true);
 
   merged.on("click", (event, datum) => {
     event.stopPropagation();
@@ -328,37 +377,7 @@ function renderOperationGraphicsOverlay() {
     .attr("stroke-width", (d) => Math.max(10, (d.graphic.width > 0 ? d.graphic.width : d.stylePreset.width) + 7))
     .attr("pointer-events", "stroke");
 
-  merged.select("g.operation-graphic-label")
-    .attr("display", (d) => (d.graphic.label && Array.isArray(d.labelAnchor) ? null : "none"))
-    .attr("transform", (d) => `translate(${d.labelAnchor?.[0] ?? -9999},${d.labelAnchor?.[1] ?? -9999})`);
-
-  merged.select("g.operation-graphic-label text")
-    .attr("text-anchor", "middle")
-    .attr("dominant-baseline", "central")
-    .attr("font-family", strategicLineLabelFont)
-    .attr("font-size", 9)
-    .attr("font-weight", 600)
-    .attr("letter-spacing", "0.04em")
-    .attr("fill", "#1f2937")
-    .text((d) => d.graphic.label || "");
-
-  merged.select("g.operation-graphic-label rect")
-    .each(function eachLabelPlate() {
-      const textNode = globalThis.d3.select(this.parentNode).select("text").node();
-      const bbox = textNode?.getBBox?.();
-      const width = bbox ? bbox.width + 10 : 48;
-      const height = bbox ? bbox.height + 6 : 16;
-      globalThis.d3.select(this)
-        .attr("x", -width / 2)
-        .attr("y", -height / 2)
-        .attr("width", width)
-        .attr("height", height)
-        .attr("rx", 2)
-        .attr("ry", 2)
-        .attr("fill", "rgba(248, 244, 233, 0.92)")
-        .attr("stroke", "rgba(55, 65, 81, 0.55)")
-        .attr("stroke-width", 0.8);
-    });
+  renderOperationLabels(merged, false);
 
   merged.on("click", (event, datum) => {
     event.stopPropagation();

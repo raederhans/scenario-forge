@@ -1,7 +1,7 @@
 import { normalizeHexColor } from "./color_hex_utils.js";
 import { COUNTRY_CODE_ALIASES } from "./country_code_aliases.js";
 
-const referenceTables = ["countryNameOverrides", "parentBorderEnabledByCountry", "customPresets", "capitalOverrides"];
+const referenceTables = ["countryNameOverrides", "parentBorderEnabledByCountry", "customPresets", "capitalOverrides", "politicalOverrides"];
 const selectionFields = ["selectedInspectorCountryCode", "inspectorHighlightCountryCode", "activeSovereignCode"];
 
 export function isProjectCountry(state, tag) {
@@ -18,7 +18,7 @@ function reservedCountryTags(state, reservedTags) {
   return tags;
 }
 
-export function allocateProjectCountryTag(state, { reservedTags = [] } = {}) {
+export function allocateProjectCountryTag(state, { reservedTags = [], preferredTag = "" } = {}) {
   const used = reservedCountryTags(state, reservedTags);
   for (const key of ["sovereignBaseColors", "countryPalette", "countryNames", ...referenceTables]) {
     for (const tag of Object.keys(state[key] || {})) used.add(tag);
@@ -29,6 +29,7 @@ export function allocateProjectCountryTag(state, { reservedTags = [] } = {}) {
       for (const tag of Object.keys(entry.before?.projectCountries || {})) used.add(tag);
     }
   }
+  if (/^[PQ](?:0[1-9]|[1-9]\d)$/.test(preferredTag) && !used.has(preferredTag)) return preferredTag;
   for (const prefix of ["P", "Q"]) {
     for (let n = 1; n <= 99; n++) {
       const tag = prefix + String(n).padStart(2, "0");
@@ -36,6 +37,12 @@ export function allocateProjectCountryTag(state, { reservedTags = [] } = {}) {
     }
   }
   return "";
+}
+
+export function remapProjectCountryNames(names, newCountryTags) {
+  return Object.fromEntries(Array.from(newCountryTags)
+    .filter(([tag]) => Object.hasOwn(names || {}, tag))
+    .map(([tag, next]) => [next, { ...names[tag] }]));
 }
 
 export function buildProjectCountryEntry(tag, name) {

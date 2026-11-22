@@ -5,6 +5,8 @@ import { LegendManager } from "../js/core/legend_manager.js";
 import { state } from "../js/core/state.js";
 import { registerRuntimeHook } from "../js/core/state/index.js";
 import { markDirty, clearDirty } from "../js/core/dirty_state.js";
+import { t as translate } from "../js/core/i18n.js";
+import { undoHistory } from "../js/core/history_manager.js";
 import { createProjectSupportDiagnosticsController } from "../js/ui/sidebar/project_support_diagnostics_controller.js";
 import { strToU8, zipSync } from "../vendor/fflate.browser.js";
 
@@ -261,6 +263,12 @@ function createMountDocument() {
       add(name) { this.toggle(name, true); },
     };
     node.focus = () => { documentRef.activeElement = node; };
+    node.prepend = child => node.children.unshift(child);
+    if (tagName === "dialog") {
+      node.showModal = () => { node.open = true; };
+      node.close = () => { node.open = false; node.listeners.close(); };
+      node.remove = () => { node.parentNode.children = node.parentNode.children.filter(child => child !== node); };
+    }
     return node;
   };
   documentRef.body = documentRef.createElement("body");
@@ -300,6 +308,124 @@ test("project support mounts panels with original defaults", () => {
   assert.equal(get("downloadProjectBtn").getAttribute("data-i18n"), "Download Project");
   assert.equal(get("projectFileInput").getAttribute("data-i18n-aria-label"), "Load Project");
   assert.equal(get("projectSaveStatus").getAttribute("aria-live"), "polite");
+});
+
+test("merge previews ZIP paint, copies grouped missing IDs and requires a fresh confirmation after an edit", async context => {
+  const fixture = createMountDocument();
+  const get = fixture.documentRef.getElementById;
+  const initial = { activeScenarioId: "target", currentLanguage: "en", isDirty: true, dirtyRevision: 1,
+    historyPast: [], historyFuture: [], runtimeFeatureIds: ["A", "B"], scenarioBaselineOwnersByFeatureId: { A: "BBB" },
+    scenarioCountriesByTag: { AAA: {}, BBB: {} }, sovereignBaseColors: { AAA: "#aabbcc", BBB: "#123456" },
+    landIndex: new Map(), visualOverrides: { A: "#111111" }, projectFileBinding: { handle: { name: "local.json" } },
+    projectName: "Local", projectFileStem: "local" };
+  const saved = Object.fromEntries(Object.keys(initial).map(key => [key, state[key]]));
+  Object.assign(state, initial);
+  context.after(() => Object.assign(state, saved));
+  const alerts = [];
+  const dialogs = [];
+  createController(null, { ...fixture, helpers: { ...fixture.helpers, t: translate,
+    showToast: message => alerts.push(message), showAppDialog: options => dialogs.push(options.title) } }).bindEvents();
+  const selected = get("projectFileName");
+  selected.textContent = "local.json";
+  const input = get("mergeProjectFileInput");
+  let picked = 0;
+  input.click = () => { picked++; };
+  get("mergeProjectBtn").listeners.click();
+  assert.equal(picked, 1);
+  const project = { projectName: "Other", colors: { A: "#abc", B: "#def", LOST_1: "#abc", LOST_2: "#abc" },
+    legendLabels: { "#def": "River bank" } };
+  const zip = new Blob([zipSync({ "map_project.json": strToU8(JSON.stringify(project)) })], { type: "application/zip" });
+  input.files = [Object.assign(zip, { name: "merge.zip" })];
+  await input.listeners.change();
+  const dialog = findNode(fixture.documentRef.body, node => node.tagName === "dialog");
+  assert.ok(dialog?.open, alerts.join("\n"));
+  const details = findNode(dialog, node => node.className === "app-dialog-details");
+  const button = caption => findNode(dialog, node => node.tagName === "button" && node.textContent === caption);
+  assert.match(details.textContent, /Will write 1 parcels/);
+  assert.match(details.textContent, /Skipped parcels: 3/);
+  assert.match(details.textContent, /Migrated parcels: 0/);
+  assert.match(details.textContent, /Unmatched parcels: 2/);
+  assert.match(details.textContent, /#aabbcc → 2/);
+  assert.match(details.textContent, /Legend · #ddeeff → River bank/);
+  assert.doesNotMatch(details.textContent, /LOST_/);
+  assert.equal(button("Locate on Map").hidden, true);
+  const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  let copied;
+  const recentWrites = [];
+  Object.defineProperty(globalThis, "navigator", { configurable: true, value: {
+    clipboard: { writeText: text => { copied = text; } },
+    locks: { request: name => recentWrites.push(name) },
+  } });
+  context.after(() => {
+    if (navigatorDescriptor) Object.defineProperty(globalThis, "navigator", navigatorDescriptor);
+    else delete globalThis.navigator;
+  });
+  await button("Copy IDs").listeners.click();
+  assert.equal(copied, "LOST_1\nLOST_2");
+
+  const overwrite = findNode(dialog, node => node.textContent === "Overwrite painted parcels").children[0];
+  overwrite.checked = true;
+  overwrite.listeners.change();
+  assert.match(details.textContent, /Will write 2 parcels/);
+  assert.match(details.textContent, /#aabbcc \(AAA\) → #123456/);
+  const keepOriginal = findNode(dialog, node => node.textContent === "Keep original colors").children[0];
+  keepOriginal.checked = true;
+  keepOriginal.listeners.change();
+  assert.match(details.textContent, /#aabbcc \(AAA\) → #aabbcc/);
+  state.landIndex.set("LOST_2", { geometry: {} });
+  state.visualOverrides = { A: "#111111", B: "#ddeeff" };
+  markDirty("another-edit");
+  button("Apply").listeners.click();
+  assert.equal(dialog.open, true);
+  assert.equal(state.historyPast.length, 0);
+  assert.match(details.textContent, /Will write 1 parcels/);
+  assert.equal(button("Locate on Map").hidden, false);
+  const before = { ...state.visualOverrides };
+  button("Apply").listeners.click();
+  assert.equal(dialog.open, false);
+  assert.equal(state.visualOverrides.A, "#aabbcc");
+  assert.deepEqual(dialogs, []);
+  assert.equal(selected.textContent, "local.json");
+  assert.equal(state.projectName, "Local");
+  assert.equal(state.projectFileStem, "local");
+  assert.equal(state.projectFileBinding, initial.projectFileBinding);
+  assert.deepEqual(recentWrites, []);
+  assert.equal(state.historyPast.length, 1);
+  assert.equal(undoHistory(), true);
+  assert.deepEqual(state.visualOverrides, before);
+});
+
+test("a pending whole-project ZIP preview rejects a merge before the file is read", async () => {
+  const fixture = createMountDocument();
+  const get = fixture.documentRef.getElementById;
+  const alerts = [];
+  const order = [];
+  let opened, confirm;
+  const pending = new Promise(resolve => { opened = resolve; });
+  const controller = createController(null, { ...fixture, state: { isDirty: true }, helpers: {
+    ...fixture.helpers, showToast: text => alerts.push(text),
+    showAppDialog: ({ title }) => {
+      order.push(title);
+      if (title === "Load Project") return true;
+      opened();
+      return new Promise(resolve => { confirm = resolve; });
+    },
+    importProjectThroughFunnel: () => { order.push("import"); },
+  } });
+  controller.bindEvents();
+  const zip = new Blob([zipSync({ "map_project.json": strToU8("{}") })], { type: "application/zip" });
+  get("projectFileInput").files = [Object.assign(zip, { name: "open.zip" })];
+  const opening = get("projectFileInput").listeners.change();
+  await pending;
+  try {
+    get("mergeProjectFileInput").files = [{ name: "source.json" }];
+    await get("mergeProjectFileInput").listeners.change();
+    assert.deepEqual(alerts, ["Project import is already in progress."]);
+  } finally {
+    confirm(true);
+    await opening;
+  }
+  assert.deepEqual(order, ["Load Project", "Load Project Package", "import"]);
 });
 
 test("project support reuses mounted markup and preserves user values without duplicate nodes", () => {

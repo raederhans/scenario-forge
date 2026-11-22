@@ -887,6 +887,8 @@ function initToolbar({ render } = {}) {
     titleNode: sampleProjectBannerTitle,
     bodyNode: sampleProjectBannerBody,
     openExportButton: sampleProjectBannerOpenExportBtn,
+    saveCopyButton: document.getElementById("sharedProjectSaveCopyBtn"),
+    saveCopy: () => callRuntimeHook(state, "runProjectSaveAsFn"),
     downloadOriginalLink: sampleProjectBannerDownloadOriginalLink,
     dismissButton: sampleProjectBannerDismissBtn,
     t,

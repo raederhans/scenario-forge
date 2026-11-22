@@ -8,7 +8,6 @@ import { createImportRecoveryUi, importResourceLabel, notifyUnmatchedRegions } f
 import { commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason } from "./state/actions/boot_actions.js";
 import { uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
 import { getParentMergedParents } from "./renderer/parent_merged_presentation.js";
-import { captureProjectImportState } from "./state/actions/project_import_actions.js";
 import { clearHistory } from "./history_manager.js";
 import {
   buildScenarioReleasableIndex,
@@ -35,7 +34,7 @@ import {
 } from "./state/strategic_overlay_state.js";
 import { resetDevTransientImportState } from "./state/dev_state.js";
 import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
-import { prepareImportedProjectState, commitImportedProjectPatch } from "./interaction_funnel/import_apply_orchestration.js";
+import { prepareImportedProjectState, captureImportedProjectPatch, commitImportedProjectPatch } from "./interaction_funnel/import_apply_orchestration.js";
 import {
   applyTransportCountryOverlayState,
   clearTransportCountryOverlayState,
@@ -315,11 +314,14 @@ export function stageImportedProjectPatch(data, preparedImport) {
   draft.appearancePresets = normalizeAppearancePresetsState(data.appearancePresets);
   restoreImportedLayerVisibilityState(draft, data.layerVisibility);
   draft.legendConfig = data.legendConfig;
+  draft.legendLabels = data.legendLabels;
   draft.countryNameOverrides = data.countryNameOverrides;
   draft.cityNameOverrides = data.cityNameOverrides;
   draft.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
   draft.capitalOverrides = data.capitalOverrides;
+  draft.politicalOverrides = data.politicalOverrides;
+  draft.politicalAlliances = data.politicalAlliances;
   draft.projectCities = data.projectCities;
   const scenarioTags = new Set(Object.keys(draft.scenarioCountriesByTag || {}));
   const projectCountries = Array.isArray(data.projectCountries) ? data.projectCountries : [];
@@ -331,7 +333,7 @@ export function stageImportedProjectPatch(data, preparedImport) {
   const { dropped } = restoreProjectCountries(draft, projectCountries, {
     scenarioBaseColors: restoreColors, savedBaseColors: data.sovereignBaseColors,
   });
-  return { patch: captureProjectImportState(draft), dropped };
+  return { patch: captureImportedProjectPatch(draft), dropped };
 }
 
 // Required assets and the project patch are staged before changing the document.
@@ -339,7 +341,20 @@ export function stageImportedProjectPatch(data, preparedImport) {
 let activeImportRequest = null;
 let importRequestSequence = 0;
 
-function captureImportDocumentIdentity(target) {
+function getImportBlockReason() {
+  if (activeImportRequest?.pending) return "import-in-progress";
+  const recovery = activeImportRequest?.completionJob?.getState();
+  if (recovery && !recovery.editable && recovery.phase !== "cancelled") return "import-recovery-required";
+  return null;
+}
+
+export function getDocumentEditGate() {
+  const reason = getImportBlockReason() || (state.scenarioApplyInFlight && "scenario-apply-in-progress")
+    || ((state.startupReadonly || state.startupReadonlyUnlockInFlight) && "startup-readonly") || null;
+  return { editable: !reason, reason };
+}
+
+export function captureImportDocumentIdentity(target) {
   const dirtyRevision = target.dirtyRevision;
   const scenarioId = target.activeScenarioId;
   const epoch = target.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
@@ -373,7 +388,7 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName, f
   }
   data = preparedImport.data;
   const { patch, dropped } = stageImportedProjectPatch(data, preparedImport);
-  const previous = captureProjectImportState(state);
+  const previous = captureImportedProjectPatch(state);
   try {
     preparedImport.manager.commitScenarioForProjectImport(preparedImport.preparedScenario, () => {
       commitImportedProjectPatch(state, patch);
@@ -493,11 +508,8 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName, f
 
 async function runProjectImport(input, options, source) {
   if (options.signal?.aborted) return { status: "cancelled", reason: "import-aborted" };
-  if (activeImportRequest?.pending) return { status: "failed", reason: "import-in-progress" };
-  const recoveryState = activeImportRequest?.completionJob?.getState();
-  if (recoveryState && !recoveryState.editable && recoveryState.phase !== "cancelled") {
-    return { status: "failed", reason: "import-recovery-required" };
-  }
+  const reason = getImportBlockReason();
+  if (reason) return { status: "failed", reason };
   activeImportRequest?.completionJob?.cancel();
   const request = { id: ++importRequestSequence, pending: true, committed: false,
     signal: options.signal,

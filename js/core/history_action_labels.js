@@ -17,6 +17,7 @@ const eraseKinds = new Set([
 ]);
 
 const actionNames = {
+  "merge-project-paint": "Merge project paint: {name}",
   "set-country-capital": "Set capital to {name}",
   "hide-country-capital": "Clear capital",
   "reset-country-capital": "Restore scenario capital",

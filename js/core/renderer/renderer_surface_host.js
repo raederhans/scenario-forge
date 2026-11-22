@@ -29,6 +29,7 @@ const RENDERER_SURFACE_HANDLE_DEFINITIONS = Object.freeze([
   ["devSelectionGroup", "getDevSelectionGroup", "setDevSelectionGroup"],
   ["inspectorHighlightGroup", "getInspectorHighlightGroup", "setInspectorHighlightGroup"],
   ["intensityFieldPreviewGroup", "getIntensityFieldPreviewGroup", "setIntensityFieldPreviewGroup"],
+  ["selectionMarqueeGroup", "getSelectionMarqueeGroup", "setSelectionMarqueeGroup"],
 ]);
 
 export const RENDERER_SURFACE_HANDLE_KEYS = Object.freeze(

@@ -2,6 +2,7 @@ import {
   normalizeSampleExportRecommendation,
   resolveSampleExportRecommendationContext,
 } from "../../core/sample_export_recommendation.js";
+import { SHARED_PROJECT_ERRORS } from "../../core/shared_project_url.js";
 
 const SAMPLE_PROJECT_BANNER_VISIBLE_STATUSES = new Set(["success", "error"]);
 const SAMPLE_PROJECT_IN_FLIGHT_STATUSES = new Set(["pending", "loading", "importing"]);
@@ -267,6 +268,8 @@ export function createSampleProjectBannerController(runtimeState, {
   titleNode,
   bodyNode,
   openExportButton,
+  saveCopyButton,
+  saveCopy,
   downloadOriginalLink,
   dismissButton,
   t = identityT,
@@ -274,10 +277,39 @@ export function createSampleProjectBannerController(runtimeState, {
 } = {}) {
   let dismissedKey = "";
   let bound = false;
+  let originalUrl = "";
+  let visibleKey = "";
+
+  function getBannerView() {
+    const shared = runtimeState.sharedProjectLink;
+    if (!SAMPLE_PROJECT_BANNER_VISIBLE_STATUSES.has(shared?.status)
+      || runtimeState.sampleProjectDeeplink?.status === "success") {
+      return resolveSampleProjectBannerView(runtimeState.sampleProjectDeeplink, { t });
+    }
+    const success = shared.status === "success";
+    return {
+      dismissKey: `shared|${shared.host}|${shared.status}`,
+      tone: shared.status, status: shared.status,
+      title: success
+        ? t("Viewing a shared project (from {host})", "ui").replace("{host}", () => shared.host)
+        : t("Share link", "ui"),
+      body: success ? t("Save a copy to keep editing.", "ui") : t(SHARED_PROJECT_ERRORS[shared.errorCode], "ui"),
+      canSaveCopy: success, canDownloadOriginal: success,
+      downloadName: shared.originalFile?.name,
+      downloadOriginalLabel: t("Download original file", "ui"),
+      dismissLabel: t("Dismiss", "ui"),
+    };
+  }
 
   const controller = {
     render() {
-      const view = resolveSampleProjectBannerView(runtimeState?.sampleProjectDeeplink, { t });
+      const view = getBannerView();
+      visibleKey = view?.dismissKey || "";
+      if (originalUrl && (!view?.canSaveCopy || dismissedKey === visibleKey)) {
+        URL.revokeObjectURL(originalUrl);
+        originalUrl = "";
+        downloadOriginalLink.removeAttribute("href");
+      }
       if (!root || !view || dismissedKey === view.dismissKey) {
         setElementHidden(root, true);
         return null;
@@ -290,15 +322,15 @@ export function createSampleProjectBannerController(runtimeState, {
       if (titleNode) titleNode.textContent = view.title;
       if (bodyNode) bodyNode.textContent = view.body;
 
-      if (openExportButton) {
-        openExportButton.textContent = view.openExportLabel;
-      }
+      if (openExportButton && view.openExportLabel) openExportButton.textContent = view.openExportLabel;
       setActionHidden(openExportButton, !view.canOpenExport);
+      setActionHidden(saveCopyButton, !view.canSaveCopy);
 
       if (downloadOriginalLink) {
         downloadOriginalLink.textContent = view.downloadOriginalLabel;
         if (view.canDownloadOriginal) {
-          downloadOriginalLink.setAttribute("href", view.downloadHref);
+          if (view.canSaveCopy && !originalUrl) originalUrl = URL.createObjectURL(runtimeState.sharedProjectLink.originalFile);
+          downloadOriginalLink.setAttribute("href", originalUrl || view.downloadHref);
           if (view.downloadName) {
             downloadOriginalLink.setAttribute("download", view.downloadName);
           } else {
@@ -321,15 +353,15 @@ export function createSampleProjectBannerController(runtimeState, {
     bindEvents() {
       if (bound) return;
       bound = true;
+      saveCopyButton?.addEventListener("click", saveCopy);
       openExportButton?.addEventListener("click", () => {
         if (typeof openExportWorkbench === "function") {
           openExportWorkbench(openExportButton);
         }
       });
       dismissButton?.addEventListener("click", () => {
-        const view = resolveSampleProjectBannerView(runtimeState?.sampleProjectDeeplink, { t });
-        dismissedKey = view?.dismissKey || "";
-        setElementHidden(root, true);
+        dismissedKey = visibleKey;
+        controller.render();
       });
     },
   };
