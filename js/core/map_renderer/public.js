@@ -1,3 +1,4 @@
+export { normalizeOperationLabelSize } from "../renderer/operation_graphic_geometry.js";
 export { startMapPointPick, cancelMapPointPick } from "../map_point_picker.js";
 export { drawMapTitles, hasMapTitles } from "../renderer/map_title_render_owner.js";
 export { drawThematicWgiExportLegend } from "../renderer/thematic_wgi_export_legend.js";

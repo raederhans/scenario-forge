@@ -136,16 +136,24 @@ function sortSelectionEntries(entries = []) {
   return nextEntries;
 }
 
-function buildClipboardText(format = "names_with_ids") {
+let selectionClipboardCache;
+
+function getSelectionClipboard(format = "names_with_ids") {
+  const key = [runtimeState.devSelectionOrder, runtimeState.devSelectionOrder?.length,
+    runtimeState.devSelectionSortMode, format, runtimeState.landIndex, runtimeState.landIndex?.size, runtimeState.landData,
+    runtimeState.topologyRevision, runtimeState.currentLanguage, runtimeState.locales?.geo,
+    runtimeState.geoAliasToStableKey, runtimeState.scenarioGeoLocalePatchData];
+  if (selectionClipboardCache && key.every((value, i) => value === selectionClipboardCache.key[i])) {
+    return selectionClipboardCache;
+  }
   const entries = sortSelectionEntries(resolveSelectionEntries());
-  if (!entries.length) return "";
-  if (format === "names") {
-    return entries.map((entry) => entry.name).join("\n");
-  }
-  if (format === "ids") {
-    return entries.map((entry) => entry.id).join("\n");
-  }
-  return entries.map((entry) => `${entry.name} | ${entry.id}`).join("\n");
+  const text = entries.map(entry => {
+    if (format === "names") return entry.name;
+    if (format === "ids") return entry.id;
+    return `${entry.name} | ${entry.id}`;
+  }).join("\n");
+  selectionClipboardCache = { key, text, count: entries.length };
+  return selectionClipboardCache;
 }
 
 function resolveOwnershipTargetIds() {
@@ -581,7 +589,7 @@ function setExpandedState(nextValue, { bottomDock, panel, toggleBtn } = {}) {
 }
 
 function copySelectionToClipboard(format, previewEl) {
-  const text = buildClipboardText(format);
+  const { text, count } = getSelectionClipboard(format);
   runtimeState.devClipboardPreviewFormat = format;
   if (!text) {
     showToast(ui("No selected regions to copy."), {
@@ -607,8 +615,7 @@ function copySelectionToClipboard(format, previewEl) {
 
   globalThis.navigator.clipboard.writeText(text)
     .then(() => {
-      const entryCount = sortSelectionEntries(resolveSelectionEntries()).length;
-      showToast(formatUi("Copied {count} region entries to the clipboard.", { count: entryCount }), {
+      showToast(formatUi("Copied {count} region entries to the clipboard.", { count }), {
         title: ui("Selection copied"),
         tone: "success",
       });
@@ -781,15 +788,13 @@ function initDevWorkspace() {
       selectionSortMode.value = runtimeState.devSelectionSortMode;
     }
 
-    const entries = sortSelectionEntries(resolveSelectionEntries());
-    const entryCount = entries.length;
+    const { count: entryCount, text } = getSelectionClipboard(runtimeState.devClipboardPreviewFormat || "names_with_ids");
     if (selectionSummary) {
       selectionSummary.textContent = localizeSelectionSummary(entryCount);
     }
     if (selectionPreview) {
-      selectionPreview.value = buildClipboardText(runtimeState.devClipboardPreviewFormat || "names_with_ids")
-        || runtimeState.devClipboardFallbackText
-        || "";
+      const preview = text || runtimeState.devClipboardFallbackText || "";
+      if (selectionPreview.value !== preview) selectionPreview.value = preview;
     }
     const hoveredSelectionId = runtimeState.devHoverHit?.targetType === "land"
       ? String(runtimeState.devHoverHit.id || "").trim()

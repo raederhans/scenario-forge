@@ -10,7 +10,9 @@ export function createSelectionMarqueeOwner({
   let preview = null;
 
   function down(event) {
-    if (session || event.pointerType !== "mouse" || event.button !== 0 || !(event.ctrlKey || event.metaKey)
+    const platform = globalThis.navigator?.userAgentData?.platform || globalThis.navigator?.platform || "";
+    const modified = event.metaKey || (event.ctrlKey && !/^mac/i.test(platform));
+    if (session || event.pointerType !== "mouse" || event.button !== 0 || !modified
       || state.currentTool !== "select" || isPointPickActive(state) || state.intensityFieldTool?.active
       || state.specialZoneEditor?.active || state.operationalLineEditor?.active || state.operationGraphicsEditor?.active
       || state.unitCounterEditor?.active || state.mapLabelEditor?.active) return false;
