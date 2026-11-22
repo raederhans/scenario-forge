@@ -448,7 +448,13 @@
    "alliance": "rcw_white",
    "capital_city": "Kingisepp",
    "ruling_ideology": "neutrality",
-   "base_iso2": "RU"
+   "base_iso2": "RU",
+   "capital_coordinates": {
+    "name_en": "Gatchina",
+    "name_zh": "加特契纳",
+    "lon": 30.13,
+    "lat": 59.57
+   }
   },
   {
    "tag": "MILL",
@@ -518,7 +524,13 @@
     "Mariupol"
    ],
    "ruling_ideology": "socialist",
-   "base_iso2": "UA"
+   "base_iso2": "UA",
+   "capital_coordinates": {
+    "name_en": "Gulyai-Polye",
+    "name_zh": "古利亚伊波列",
+    "lon": 36.26,
+    "lat": 47.66
+   }
   },
   {
    "tag": "NCEM",
@@ -535,7 +547,13 @@
     "Gunib"
    ],
    "ruling_ideology": "neutrality",
-   "base_iso2": "RU"
+   "base_iso2": "RU",
+   "capital_coordinates": {
+    "name_en": "Vedeno",
+    "name_zh": "韦杰诺",
+    "lon": 45.99,
+    "lat": 42.97
+   }
   },
   {
    "tag": "GEO",
@@ -785,7 +803,65 @@
    "alliance": "rcw_intervention",
    "capital_city": "Batumi",
    "ruling_ideology": "neutrality",
-   "base_iso2": "GE"
+   "base_iso2": "GE",
+   "capital_coordinates": {
+    "name_en": "Batum",
+    "name_zh": "巴统",
+    "lon": 41.7,
+    "lat": 41.61,
+    "add_city": true
+   }
+  },
+  {
+   "tag": "RTAS",
+   "name_en": "Taseyevo Partisan Republic",
+   "name_zh": "塔谢耶沃游击共和国",
+   "color_hex": "#904253",
+   "parent": "SOV",
+   "parent_merged": false,
+   "alliance": "rcw_guerrilla",
+   "base_iso2": "RU",
+   "capital_city": [
+    "Taseyevo",
+    "Kansk"
+   ],
+   "ruling_ideology": "communism",
+   "capital_coordinates": {
+    "name_en": "Taseyevo",
+    "name_zh": "塔谢耶沃",
+    "lon": 94.88,
+    "lat": 57.21,
+    "add_city": true
+   }
+  },
+  {
+   "tag": "GLN",
+   "name_en": "Jangal Movement of Gilan",
+   "name_zh": "吉兰詹加里运动",
+   "color_hex": "#569760",
+   "parent": "",
+   "parent_merged": false,
+   "alliance": "rcw_guerrilla",
+   "base_iso2": "IR",
+   "capital_city": [
+    "Rasht",
+    "Bandar-e Anzali"
+   ],
+   "ruling_ideology": "neutrality"
+  },
+  {
+   "tag": "CERR",
+   "name_en": "Chinese Eastern Railway Zone",
+   "name_zh": "中东铁路区",
+   "color_hex": "#49978b",
+   "parent": "RUS",
+   "parent_merged": false,
+   "alliance": "rcw_white",
+   "base_iso2": "CN",
+   "capital_city": [
+    "Harbin"
+   ],
+   "ruling_ideology": "neutrality"
   }
  ],
  "default_country": "SOV",

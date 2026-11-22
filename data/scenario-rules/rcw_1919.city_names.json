@@ -1,0 +1,386 @@
+{
+ "Aktobe": {
+  "en": "Aktyubinsk",
+  "zh": "阿克纠宾斯克"
+ },
+ "Almaty": {
+  "en": "Verny",
+  "zh": "维尔内"
+ },
+ "Anadyr": {
+  "en": "Novo-Mariinsk",
+  "zh": "新马林斯克"
+ },
+ "Ashgabat": {
+  "en": "Poltoratsk",
+  "zh": "波尔托拉茨克"
+ },
+ "Astana": {
+  "en": "Akmolinsk",
+  "zh": "阿克莫林斯克"
+ },
+ "Atyrau": {
+  "en": "Guryev",
+  "zh": "古里耶夫"
+ },
+ "Ayagoz": {
+  "en": "Sergiopol",
+  "zh": "谢尔吉奥波尔"
+ },
+ "Bandar-e Anzali": {
+  "en": "Enzeli",
+  "zh": "恩泽利"
+ },
+ "Batumi": {
+  "en": "Batum",
+  "zh": "巴统"
+ },
+ "Belomorsk": {
+  "en": "Soroka",
+  "zh": "索罗卡"
+ },
+ "Bishkek": {
+  "en": "Pishpek",
+  "zh": "皮什佩克"
+ },
+ "Brest": {
+  "en": "Brest-Litovsk",
+  "zh": "布列斯特-立托夫斯克"
+ },
+ "Bucharest": {
+  "en": "Bucharest",
+  "zh": "布加勒斯特"
+ },
+ "Buynaksk": {
+  "en": "Temir-Khan-Shura",
+  "zh": "铁米尔汗舒拉"
+ },
+ "Chernihiv": {
+  "en": "Chernigov",
+  "zh": "切尔尼戈夫"
+ },
+ "Chernivtsi": {
+  "en": "Cernăuți",
+  "zh": "切尔诺夫策"
+ },
+ "Chisinau": {
+  "en": "Kishinev",
+  "zh": "基什尼奥夫"
+ },
+ "Dalian": {
+  "en": "Dairen",
+  "zh": "大连"
+ },
+ "Daugavpils": {
+  "en": "Dvinsk",
+  "zh": "德文斯克"
+ },
+ "Dnipro": {
+  "en": "Yekaterinoslav",
+  "zh": "叶卡捷琳诺斯拉夫"
+ },
+ "Donetsk": {
+  "en": "Yuzovka",
+  "zh": "尤佐夫卡"
+ },
+ "Engels": {
+  "en": "Pokrovsk",
+  "zh": "波克罗夫斯克"
+ },
+ "Fergana": {
+  "en": "Skobelev",
+  "zh": "斯科别列夫"
+ },
+ "Ganja": {
+  "en": "Ganja",
+  "zh": "甘贾"
+ },
+ "Gyumri": {
+  "en": "Alexandropol",
+  "zh": "亚历山德罗波尔"
+ },
+ "Helsinki": {
+  "en": "Helsingfors",
+  "zh": "赫尔辛福斯"
+ },
+ "Homyel": {
+  "en": "Gomel",
+  "zh": "戈梅利"
+ },
+ "Jelgava": {
+  "en": "Mitau",
+  "zh": "米陶"
+ },
+ "Kamianets-Podilskyi": {
+  "en": "Kamenets-Podolsk",
+  "zh": "卡缅涅茨-波多利斯基"
+ },
+ "Karakol": {
+  "en": "Przhevalsk",
+  "zh": "普尔热瓦尔斯克"
+ },
+ "Kaunas": {
+  "en": "Kovno",
+  "zh": "科夫诺"
+ },
+ "Kharkiv": {
+  "en": "Kharkov",
+  "zh": "哈尔科夫"
+ },
+ "Khmelnytskyi": {
+  "en": "Proskurov",
+  "zh": "普罗斯库罗夫"
+ },
+ "Khujand": {
+  "en": "Khodzhent",
+  "zh": "霍占特"
+ },
+ "Kingisepp": {
+  "en": "Yamburg",
+  "zh": "扬堡"
+ },
+ "Kirov": {
+  "en": "Vyatka",
+  "zh": "维亚特卡"
+ },
+ "Kokshetau": {
+  "en": "Kokchetav",
+  "zh": "科克切塔夫"
+ },
+ "Kostanay": {
+  "en": "Kustanay",
+  "zh": "库斯塔奈"
+ },
+ "Krasnodar": {
+  "en": "Yekaterinodar",
+  "zh": "叶卡捷琳诺达尔"
+ },
+ "Kropyvnytskyi": {
+  "en": "Yelisavetgrad",
+  "zh": "叶利沙维特格勒"
+ },
+ "Kyiv": {
+  "en": "Kiev",
+  "zh": "基辅"
+ },
+ "Kyzyl": {
+  "en": "Belotsarsk",
+  "zh": "别洛察尔斯克"
+ },
+ "Kyzylorda": {
+  "en": "Perovsk",
+  "zh": "彼罗夫斯克"
+ },
+ "Liepaja": {
+  "en": "Libau",
+  "zh": "利巴瓦"
+ },
+ "Luhansk": {
+  "en": "Lugansk",
+  "zh": "卢甘斯克"
+ },
+ "Lviv": {
+  "en": "Lwów",
+  "zh": "利沃夫"
+ },
+ "Mahilyow": {
+  "en": "Mogilev",
+  "zh": "莫吉廖夫"
+ },
+ "Makhachkala": {
+  "en": "Petrovsk",
+  "zh": "彼得罗夫斯克"
+ },
+ "Mary": {
+  "en": "Merv",
+  "zh": "梅尔夫"
+ },
+ "Mykolaiv": {
+  "en": "Nikolayev",
+  "zh": "尼古拉耶夫"
+ },
+ "Nizhny Novgorod": {
+  "en": "Nizhny Novgorod",
+  "zh": "下诺夫哥罗德"
+ },
+ "Novosibirsk": {
+  "en": "Novonikolayevsk",
+  "zh": "新尼古拉耶夫斯克"
+ },
+ "Odesa": {
+  "en": "Odessa",
+  "zh": "敖德萨"
+ },
+ "Oral": {
+  "en": "Uralsk",
+  "zh": "乌拉尔斯克"
+ },
+ "Orenburg": {
+  "en": "Orenburg",
+  "zh": "奥伦堡"
+ },
+ "Oskemen": {
+  "en": "Ust-Kamenogorsk",
+  "zh": "乌斯季卡缅诺戈尔斯克"
+ },
+ "Perm": {
+  "en": "Perm",
+  "zh": "彼尔姆"
+ },
+ "Petropavl": {
+  "en": "Petropavlovsk",
+  "zh": "彼得罗巴甫洛夫斯克"
+ },
+ "Pushkin": {
+  "en": "Tsarskoye Selo",
+  "zh": "皇村"
+ },
+ "Qiqihar": {
+  "en": "Tsitsihar",
+  "zh": "齐齐哈尔"
+ },
+ "Rasht": {
+  "en": "Resht",
+  "zh": "拉什特"
+ },
+ "Rezekne": {
+  "en": "Rezhitsa",
+  "zh": "雷日察"
+ },
+ "Rivne": {
+  "en": "Rovno",
+  "zh": "罗夫诺"
+ },
+ "Saint Petersburg": {
+  "en": "Petrograd",
+  "zh": "彼得格勒"
+ },
+ "Salekhard": {
+  "en": "Obdorsk",
+  "zh": "奥布多尔斯克"
+ },
+ "Samara": {
+  "en": "Samara",
+  "zh": "萨马拉"
+ },
+ "Semey": {
+  "en": "Semipalatinsk",
+  "zh": "塞米巴拉金斯克"
+ },
+ "Shenyang": {
+  "en": "Mukden",
+  "zh": "奉天"
+ },
+ "Shymkent": {
+  "en": "Chimkent",
+  "zh": "奇姆肯特"
+ },
+ "Siauliai": {
+  "en": "Shavli",
+  "zh": "沙夫利"
+ },
+ "Sokhumi": {
+  "en": "Sukhum",
+  "zh": "苏呼姆"
+ },
+ "Svobodny": {
+  "en": "Alekseyevsk",
+  "zh": "阿列克谢耶夫斯克"
+ },
+ "Syktyvkar": {
+  "en": "Ust-Sysolsk",
+  "zh": "乌斯季瑟索利斯克"
+ },
+ "Tallinn": {
+  "en": "Reval",
+  "zh": "雷瓦尔"
+ },
+ "Tartu": {
+  "en": "Dorpat",
+  "zh": "多尔帕特"
+ },
+ "Tbilisi": {
+  "en": "Tiflis",
+  "zh": "梯弗里斯"
+ },
+ "Turkistan": {
+  "en": "Turkestan",
+  "zh": "突厥斯坦"
+ },
+ "Turkmenabat": {
+  "en": "Chardzhuy",
+  "zh": "查尔朱"
+ },
+ "Turkmenbashi": {
+  "en": "Krasnovodsk",
+  "zh": "克拉斯诺沃茨克"
+ },
+ "Tver": {
+  "en": "Tver",
+  "zh": "特维尔"
+ },
+ "Ulaanbaatar": {
+  "en": "Urga",
+  "zh": "库伦"
+ },
+ "Ulan-Ude": {
+  "en": "Verkhneudinsk",
+  "zh": "上乌金斯克"
+ },
+ "Ulyanovsk": {
+  "en": "Simbirsk",
+  "zh": "辛比尔斯克"
+ },
+ "Ussuriysk": {
+  "en": "Nikolsk-Ussuriysky",
+  "zh": "尼科利斯克-乌苏里斯基"
+ },
+ "Vilnius": {
+  "en": "Wilno",
+  "zh": "维尔诺"
+ },
+ "Vinnytsia": {
+  "en": "Vinnitsa",
+  "zh": "文尼察"
+ },
+ "Vladikavkaz": {
+  "en": "Vladikavkaz",
+  "zh": "弗拉季高加索"
+ },
+ "Volgograd": {
+  "en": "Tsaritsyn",
+  "zh": "察里津"
+ },
+ "Vyborg": {
+  "en": "Viipuri",
+  "zh": "维堡"
+ },
+ "Warsaw": {
+  "en": "Warsaw",
+  "zh": "华沙"
+ },
+ "Yekaterinburg": {
+  "en": "Yekaterinburg",
+  "zh": "叶卡捷琳堡"
+ },
+ "Yerevan": {
+  "en": "Erivan",
+  "zh": "埃里温"
+ },
+ "Yoshkar-Ola": {
+  "en": "Tsarevokokshaysk",
+  "zh": "察廖沃科克沙伊斯克"
+ },
+ "Zaporizhzhia": {
+  "en": "Aleksandrovsk",
+  "zh": "亚历山德罗夫斯克"
+ },
+ "Zharkent": {
+  "en": "Dzharkent",
+  "zh": "扎尔肯特"
+ },
+ "Zhytomyr": {
+  "en": "Zhitomir",
+  "zh": "日托米尔"
+ }
+}

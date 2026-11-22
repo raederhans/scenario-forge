@@ -2,7 +2,7 @@
   "version": 1,
   "scenario_id": "rcw_1919",
   "generated_at": "2026-11-22T00:00:00Z",
-  "baseline_hash": "d7a8ecddfd1e6023a9510176cb4c989e8f0c5435eca549ce00202b3ce7c61a61",
+  "baseline_hash": "15c09ba628a4c481cbedaf3f1283f6c1bcf073a732d3b2e5e3183e0c22fb36d6",
   "cores": {
     "ARM-1553": [
       "ARM"
@@ -419,7 +419,7 @@
       "NEA"
     ],
     "CN_CITY_17275852B31670342403562": [
-      "NEA"
+      "CERR"
     ],
     "CN_CITY_17275852B32574814957612": [
       "NEA"
@@ -623,7 +623,7 @@
       "NEA"
     ],
     "CN_CITY_17275852B62742745762805": [
-      "NEA"
+      "CERR"
     ],
     "CN_CITY_17275852B64529865795141": [
       "NEA"
@@ -671,7 +671,7 @@
       "NEA"
     ],
     "CN_CITY_17275852B69502424824259": [
-      "NEA"
+      "CERR"
     ],
     "CN_CITY_17275852B70108594636400": [
       "NEA"
@@ -1004,7 +1004,7 @@
       "PER"
     ],
     "IRN-3240": [
-      "PER"
+      "GLN"
     ],
     "IRN-3246": [
       "PER"
@@ -2066,7 +2066,7 @@
       "TERC"
     ],
     "RU_MRG_327478551c90": [
-      "TERC"
+      "NCEM"
     ],
     "RU_RAY_50074027B27316284331880": [
       "TERC"
@@ -3290,7 +3290,7 @@
       "RUS"
     ],
     "RU_RAY_50074027B36737161681879": [
-      "RALT"
+      "RUS"
     ],
     "RU_RAY_50074027B15616734085439": [
       "TAN"
@@ -3350,7 +3350,7 @@
       "RALT"
     ],
     "RU_RAY_50074027B10943489160103": [
-      "RALT"
+      "RUS"
     ],
     "RU_RAY_50074027B92925758050684": [
       "RUS"
@@ -3362,7 +3362,7 @@
       "RALT"
     ],
     "RU_RAY_50074027B81632682072915": [
-      "RALT"
+      "RUS"
     ],
     "RU_RAY_50074027B95632257634540": [
       "RALT"
@@ -3428,13 +3428,13 @@
       "RALT"
     ],
     "RU_MRG_d08f911f009a": [
-      "RUS"
+      "RALT"
     ],
     "RU_MRG_ae16dca1a1ab": [
-      "RUS"
+      "RALT"
     ],
     "RU_MRG_bb708c825b11": [
-      "RUS"
+      "RALT"
     ],
     "RU_RAY_50074027B18749905524628": [
       "AMRW"
@@ -3578,7 +3578,7 @@
       "RUS"
     ],
     "RU_RAY_50074027B48281585258812": [
-      "RUS"
+      "RALT"
     ],
     "RU_MRG_ef463885ab7b": [
       "RUS"
@@ -4010,7 +4010,7 @@
       "RUS"
     ],
     "RU_MRG_abf0de7d54dd": [
-      "RUS"
+      "RTAS"
     ],
     "RU_RAY_50074027B57867069546875": [
       "RUS"
@@ -7808,7 +7808,7 @@
       "TERC"
     ],
     "RU_ARCTIC_FB_2517": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2518": [
       "TERC"
@@ -7820,13 +7820,13 @@
       "TERC"
     ],
     "RU_ARCTIC_FB_2533": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2544": [
       "TERC"
     ],
     "RU_ARCTIC_FB_2547": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2548": [
       "SOV"
@@ -7862,13 +7862,13 @@
       "TERC"
     ],
     "RU_ARCTIC_FB_2575": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2576": [
       "NCEM"
     ],
     "RU_ARCTIC_FB_2580": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2582": [
       "NCEM"
@@ -7883,10 +7883,10 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_2600": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2602": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2604": [
       "SOV"
@@ -7895,13 +7895,13 @@
       "RSIX"
     ],
     "RU_ARCTIC_FB_2609": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2614": [
       "NCEM"
     ],
     "RU_ARCTIC_FB_2617": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2624": [
       "CAUA"
@@ -7913,7 +7913,7 @@
       "NCEM"
     ],
     "RU_ARCTIC_FB_2632": [
-      "TERC"
+      "NCEM"
     ],
     "RU_ARCTIC_FB_2636": [
       "TERC"
@@ -9824,46 +9824,46 @@
       "RUS"
     ],
     "RU_ARCTIC_FB_5145": [
-      "RUS"
+      "RALT"
     ],
     "RU_ARCTIC_FB_5147": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5150": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5151": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5154": [
-      "RUS"
+      "RALT"
     ],
     "RU_ARCTIC_FB_5155": [
       "RUS"
     ],
     "RU_ARCTIC_FB_5167": [
-      "RUS"
+      "RALT"
     ],
     "RU_ARCTIC_FB_5171": [
       "RUS"
     ],
     "RU_ARCTIC_FB_5172": [
-      "RUS"
+      "RALT"
     ],
     "RU_ARCTIC_FB_5176": [
       "RUS"
     ],
     "RU_ARCTIC_FB_5178": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5181": [
-      "RUS"
+      "RALT"
     ],
     "RU_ARCTIC_FB_5183": [
       "RUS"
     ],
     "RU_ARCTIC_FB_5187": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5216": [
       "RUS"
@@ -9875,7 +9875,7 @@
       "RUS"
     ],
     "RU_ARCTIC_FB_5262": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5269": [
       "RUS"
@@ -9896,16 +9896,16 @@
       "RUS"
     ],
     "RU_ARCTIC_FB_5409": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5430": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5454": [
       "RUS"
     ],
     "RU_ARCTIC_FB_5464": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_5484": [
       "RUS"
@@ -12002,7 +12002,7 @@
       "REF"
     ],
     "RU_ARCTIC_FB_8877": [
-      "RALT"
+      "RUS"
     ],
     "RU_ARCTIC_FB_8895": [
       "RUS"
@@ -12399,18 +12399,6 @@
     ],
     "IRN-3245__SPLIT_REST": [
       "PER"
-    ],
-    "KAZ-3195__SPLIT_ARALBASIN": [
-      "TSAR"
-    ],
-    "KAZ-3195__SPLIT_ARAL1987": [
-      "KAZ"
-    ],
-    "KAZ-3195__SPLIT_ARAL2006": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL2014": [
-      "TSAR"
     ],
     "MNG-3319__SPLIT_PLAYA_TSAGAAN_NUUR": [
       "MON"
@@ -13053,12 +13041,6 @@
     ],
     "UA_SHELL_FB_269__SPLIT_KREMENCHUK_RESERVOIR": [
       "KIEV"
-    ],
-    "UZB-356__SPLIT_ARAL1973": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL2014": [
-      "TSAR"
     ],
     "PL_MRG_9e4e875a7bcd__SPLIT_REST__SPLIT_KARTUZY": [
       "POL"
@@ -14273,7 +14255,7 @@
       "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B31322588303916__Tomsk_governorate_Zmeinogorskii": [
-      "RALT"
+      "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B33209790854073__Semipalatinsk_region_Semipalatinskii": [
       "RUS"
@@ -14288,7 +14270,7 @@
       "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B3707090472903__Tomsk_governorate_Zmeinogorskii": [
-      "RALT"
+      "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B39771874668253": [
       "KAZ"
@@ -14297,7 +14279,7 @@
       "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B43029270255856__Tomsk_governorate_Zmeinogorskii": [
-      "RALT"
+      "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B49183104731371__Semipalatinsk_region_Ust_Kamenogorskii": [
       "RUS"
@@ -14309,7 +14291,7 @@
       "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B58334758086532__Tomsk_governorate_Zmeinogorskii": [
-      "RALT"
+      "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B60983742718144__Semipalatinsk_region_Karkaralinskii": [
       "KAZ"
@@ -14321,7 +14303,7 @@
       "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B63367051987895__Tomsk_governorate_Zmeinogorskii": [
-      "RALT"
+      "RUS"
     ],
     "KAZ-3206__RCW_KAZ_9891525B71087532878019__Semipalatinsk_region_Ust_Kamenogorskii": [
       "RUS"
@@ -14642,7 +14624,7 @@
       "TSAR"
     ],
     "KGZ-1118__RCW_KGZ_92254566B65067062849500__Fergana_region_Andizhanskii": [
-      "TSAR"
+      "FRGN"
     ],
     "KGZ-1118__RCW_KGZ_92254566B65067062849500__REMAINDER": [
       "TSAR"
@@ -14684,7 +14666,7 @@
       "TSAR"
     ],
     "KGZ-1120__RCW_KGZ_92254566B21007604083184": [
-      "TSAR"
+      "FRGN"
     ],
     "KGZ-1120__RCW_KGZ_92254566B39559079408831__Fergana_region_Namanganskii": [
       "TSAR"
@@ -14693,7 +14675,7 @@
       "TSAR"
     ],
     "KGZ-1120__RCW_KGZ_92254566B63974139076370": [
-      "TSAR"
+      "FRGN"
     ],
     "KGZ-1120__RCW_KGZ_92254566B64502136331534__Fergana_region_Namanganskii": [
       "TSAR"
@@ -14702,7 +14684,7 @@
       "TSAR"
     ],
     "KGZ-1120__RCW_KGZ_92254566B7375851562443__Fergana_region_Andizhanskii": [
-      "TSAR"
+      "FRGN"
     ],
     "KGZ-1120__RCW_KGZ_92254566B7375851562443__Semirechye_region_Pishpekskii": [
       "TSAR"
@@ -14759,7 +14741,7 @@
       "FRGN"
     ],
     "KGZ-1122__RCW_KGZ_92254566B62299131303841__Fergana_region_Andizhanskii": [
-      "TSAR"
+      "FRGN"
     ],
     "KGZ-1122__RCW_KGZ_92254566B62299131303841__Fergana_region_Oshskii": [
       "FRGN"
@@ -14777,7 +14759,7 @@
       "TSAR"
     ],
     "KGZ-1122__RCW_KGZ_92254566B85310994889224__Fergana_region_Andizhanskii": [
-      "TSAR"
+      "FRGN"
     ],
     "KGZ-1122__RCW_KGZ_92254566B85310994889224__Fergana_region_Oshskii": [
       "FRGN"
@@ -15731,7 +15713,7 @@
       "TSAR"
     ],
     "UZB-363__RCW_UZB_79887680B5008780353484": [
-      "TSAR"
+      "FRGN"
     ],
     "UZB-363__RCW_UZB_79887680B50454088446008": [
       "TSAR"
@@ -16387,15 +16369,6 @@
     "LT029__SPLIT_REST__RCW_LTU_59024439B57491286310760__Vilna_governorate_Vilenskii": [
       "POL"
     ],
-    "KAZ-3195__SPLIT_ARAL2009__RCW_Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "KAZ-3195__SPLIT_ARAL2009__RCW_Turgay_region_Irgizskii": [
-      "RTKF"
-    ],
-    "KAZ-3195__SPLIT_ARAL2009__RCW_Ural_region_Temirskii": [
-      "KAZ"
-    ],
     "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B11861912196309__Transcaspian_region_Mangyshlakskii": [
       "TUC"
     ],
@@ -16468,48 +16441,6 @@
     "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B9195242261928__Ural_region_Uralskii": [
       "RTKF"
     ],
-    "KAZ-3197__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARALBASIN__RCW_Turgay_region_Irgizskii": [
-      "RTKF"
-    ],
-    "KAZ-3197__SPLIT_ARAL1973__RCW_KAZ_9891525B16415280148457": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL1973__RCW_KAZ_9891525B20568160586477": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B16415280148457": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL1987__RCW_KAZ_9891525B20568160586477__Turgay_region_Irgizskii": [
-      "RTKF"
-    ],
-    "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B16415280148457": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477__Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477__Turgay_region_Irgizskii": [
-      "RTKF"
-    ],
-    "KAZ-3197__SPLIT_ARAL2006__RCW_Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL2006__RCW_Turgay_region_Irgizskii": [
-      "RTKF"
-    ],
-    "KAZ-3197__SPLIT_ARAL2009__RCW_Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "KAZ-3197__SPLIT_ARAL2009__RCW_Turgay_region_Irgizskii": [
-      "RTKF"
-    ],
     "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B16415280148457": [
       "TSAR"
     ],
@@ -16552,63 +16483,6 @@
     "KAZ-3197__SPLIT_REST__RCW_KAZ_9891525B84924581617307__Syr_Darya_region_Perovskii": [
       "TSAR"
     ],
-    "UZB-356__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Amudarinskii_Otdel": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARALBASIN__RCW_Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1987__RCW_KAZ_9891525B16415280148457": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B80838990154601__Transcaspian_region_Mangyshlakskii": [
-      "TUC"
-    ],
-    "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B80838990154601__Ural_region_Temirskii": [
-      "KAZ"
-    ],
-    "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1987__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii": [
-      "TUC"
-    ],
-    "UZB-356__SPLIT_ARAL1999__RCW_KAZ_9891525B16415280148457": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1999__RCW_KAZ_9891525B20568160586477": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL1999__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii": [
-      "TUC"
-    ],
-    "UZB-356__SPLIT_ARAL2006__RCW_Syr_Darya_region_Amudarinskii_Otdel": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL2006__RCW_Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL2006__RCW_Transcaspian_region_Mangyshlakskii": [
-      "TUC"
-    ],
-    "UZB-356__SPLIT_ARAL2009__RCW_KAZ_9891525B20568160586477": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL2009__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Amudarinskii_Otdel": [
-      "TSAR"
-    ],
-    "UZB-356__SPLIT_ARAL2009__RCW_UZB_79887680B8314614924968__Syr_Darya_region_Kazalinskii": [
-      "TSAR"
-    ],
     "UZB-356__SPLIT_REST__RCW_UZB_79887680B22143596455299": [
       "TSAR"
     ],
@@ -16648,14 +16522,32 @@
     "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Transcaspian_region_Mangyshlakskii": [
       "TUC"
     ],
-    "UZB-356__SPLIT_REST__RCW_UZB_79887680B8314614924968__Ural_region_Temirskii": [
-      "KAZ"
-    ],
     "UZB-356__SPLIT_REST__RCW_UZB_79887680B9862753118700__Khiva_Khiva": [
       "KHI"
     ],
     "UZB-356__SPLIT_REST__RCW_UZB_79887680B9862753118700__Syr_Darya_region_Amudarinskii_Otdel": [
       "TSAR"
+    ],
+    "RCW_FILL_Amur_region_Amurskaia": [
+      "AMRW"
+    ],
+    "RCW_FILL_Semipalatinsk_region_Pavlodarskii": [
+      "RUS"
+    ],
+    "RCW_FILL_Semipalatinsk_region_Semipalatinskii": [
+      "RUS"
+    ],
+    "RCW_FILL_Syr_Darya_region_Kazalinskii": [
+      "TSAR"
+    ],
+    "RCW_FILL_Transbaikal_region_Nerchinskii_Zavodskii": [
+      "ZBAI"
+    ],
+    "RCW_FILL_Turgay_region_Irgizskii": [
+      "RTKF"
+    ],
+    "RCW_FILL_Turgay_region_Kustanaiskii": [
+      "REF"
     ]
   }
 }

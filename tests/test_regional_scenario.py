@@ -3,11 +3,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
+import shapely
 from shapely.geometry import Point, box, mapping
 from shapely.ops import unary_union
 
 from map_builder.regional_geometry import _decode_geometry, _encode_exact_coverage
-from tools.build_regional_scenario import CuttingUnits, build, partition, rebuild_split_topology, select_members, split_features
+from tools.build_regional_scenario import (CuttingUnits, apply_masks, build, era_city_overrides, find_fills,
+                                           partition, rebuild_split_topology, resolve_capitals, select_members,
+                                           split_features)
 
 
 def unit(name, polygon):
@@ -70,6 +73,73 @@ class RegionalScenario(unittest.TestCase):
         owners, _, dropped = self.select()
         self.assertEqual(owners, {"A": "D", "B": "G", "fringe": "F", "neighbor": "N", "east_FB_1": "G"})
         self.assertEqual(dropped, ["bad_FB_1"])
+
+    def test_membership_excludes_matching_ids(self):
+        self.membership["exclude_id_patterns"] = ["east_FB_*", "neighbor"]
+        self.assertEqual(set(self.select()[0]), {"A", "B", "fringe"})
+
+    def test_masks_split_majority_and_province_filter(self):
+        shapes = {"A": box(0, 0, 4, 2), "B": box(4, 0, 5, 2)}
+        owners = dict.fromkeys(shapes, "G")
+        districts = CuttingUnits([unit("one", shapes["A"])])
+        masks = [{"id": "strip", "owner": "M", "within_provinces": ["P"],
+                  "polygon": mapping(box(3, 0, 5, 2))["coordinates"]},
+                 {"id": "point", "owner": "N", "points": [[4.5, 1]]}]
+        replacements = {}
+        assigned = {"A": districts.rows[0]}
+        audit = apply_masks(masks, shapes, owners, districts, assigned, self.rules, self.splits, replacements,
+                            {"A": "A", "B": "B"})
+        self.assertEqual(audit["strip"]["split_parents"], ["A"])
+        self.assertEqual(audit["strip"]["hit_count"], 1)
+        self.assertEqual(owners, {"A__RCW_strip": "M", "A__RCW_strip_OUT": "D", "B": "N"})
+        self.assertTrue(shapes["A__RCW_strip"].equals(box(3, 0, 4, 2)))
+        masks.append({"id": "second", "owner": "G", "points": [[4.75, 1]]})
+        with self.assertRaisesRegex(ValueError, "Conflicting mask owners.*B"):
+            apply_masks(masks, shapes, owners, districts, assigned, self.rules, self.splits, replacements, {})
+
+    def test_only_enclosed_land_is_filled_and_shares_arcs(self):
+        hole = box(1, 1, 2, 2)
+        outer = box(0, 0, 4, 4).difference(hole).difference(box(2.5, 1, 3.5, 2))
+        county = unit("one", box(0, 0, 4, 4))
+        county["properties"]["Name_ENG"] = "One"
+        fills, audit = find_fills({"A": outer}, shapely.STRtree([hole]), shapely.STRtree([]), CuttingUnits([county]))
+        self.assertEqual(len(audit), 1)
+        fid, name, geom = fills[0]
+        self.assertEqual((fid, name), ("RCW_FILL_P_one", "One"))
+        self.assertTrue(geom.equals(hole))
+        base = _encode_exact_coverage(["A"], [outer])
+        base["bbox"] = list(outer.bounds)
+        topo = rebuild_split_topology(base, {}, fills)
+        rows = topo["objects"]["political"]["geometries"]
+        refs = lambda ring: {i if i >= 0 else ~i for i in ring}
+        self.assertIn(refs(rows[1]["arcs"][0]), [refs(ring) for ring in rows[0]["arcs"][1:]])
+
+    def test_mask_splits_when_minority_intersections_cover_most_of_mask(self):
+        shapes = {"small": box(0, 0, 1, 1), "large": box(1, 0, 7, 1)}
+        owners = dict.fromkeys(shapes, "G")
+        mask = {"id": "front", "owner": "M", "polygon": mapping(box(0, 0, 3, 1))["coordinates"]}
+        audit = apply_masks([mask], shapes, owners, CuttingUnits([]), {}, self.rules, self.splits, {},
+                            {fid: fid for fid in shapes})
+        self.assertEqual(audit["front"]["split_parents"], ["large"])
+        self.assertEqual({fid for fid, owner in owners.items() if owner == "M"}, {"small", "large__RCW_front"})
+
+    def test_local_capital_and_era_name_aliases(self):
+        coords = {"name_en": "Local", "name_zh": "地方", "lon": 21.5, "lat": .5}
+        owners = {"A": "D", "B": "N"}
+        shapes = {"A": box(20, 0, 21, 1), "B": box(21, 0, 22, 1)}
+        factions = [faction("D"), {**faction("N"), "capital_coordinates": coords}]
+        city = self.cities["features"][0]
+        city["properties"].update(name_en="D", aliases=["Modern"])
+        hints, unresolved, additions, _ = resolve_capitals(factions, self.cities, shapes, owners, 90)
+        self.assertFalse(unresolved)
+        rules = {"Modern": {"en": "Era", "zh": "古称"}, "Absent": {"en": "Other", "zh": "其他"}}
+        overrides, missing = era_city_overrides(rules, self.cities, shapes, 90, hints, additions)
+        self.assertEqual(missing, {"Absent": []})
+        self.assertEqual(hints["D"]["city_name"], "Era")
+        self.assertIn("Modern", overrides["D"]["aliases"])
+        local = overrides[hints["N"]["city_id"]]
+        self.assertTrue(local["add_city"])
+        self.assertEqual((local["host_feature_id"], local["lon"], local["lat"]), ("B", 21.5, .5))
 
     def test_unassigned_members_are_reported_together(self):
         self.rules["provinces"] = {}
@@ -168,6 +238,74 @@ class RegionalScenario(unittest.TestCase):
             entry = json.loads((out/"audit.json").read_bytes())["geometry_splits"]["zero_intersection_inheritance"][cid]
             self.assertEqual((entry["parent_id"], entry["owner"]), ("A", "D"))
             self.assertGreater(entry["area_km2"], 0)
+
+    def test_trace_county_overlap_inherits_parent_and_is_audited(self):
+        parent = box(20, 0, 21, 1)
+        noise = box(21 - 1e-9, 0, 21, 1)
+        historical = {"features": [unit("one", box(20, 0, 20.6, 1)), unit("noise", noise)]}
+        topo = _encode_exact_coverage(["A"], [parent])
+        topo["objects"]["political"]["geometries"][0]["properties"]["name"] = "A"
+        shapes, owners = {"A": parent}, {"A": "D"}
+        _, audit = split_features(topo, shapes, owners, historical, {"features": []},
+                                  {**self.splits, "district_partitions": ["P"]}, self.rules)
+        cid = "A__RCW_REMAINDER"
+        overlap = shapes[cid].intersection(noise).area
+        self.assertGreater(overlap, 0)
+        self.assertLess(overlap, shapes[cid].area * 1e-6)
+        self.assertEqual(owners[cid], "D")
+        inherited = audit["zero_intersection_inheritance"][cid]
+        self.assertEqual((inherited["parent_id"], inherited["owner"]), ("A", "D"))
+
+    def test_mask_children_but_not_fills_enter_manifest_splits(self):
+        extent = box(20, 0, 24, 4)
+        hole = box(21, 1, 23, 3)
+        water = box(21, 1, 21.4, 3)
+        historic = box(20.8, 1.5, 21.6, 2.5)
+        excluded = box(22, 1, 23, 3)
+        base = _encode_exact_coverage(["parent", "lake__SPLIT_ARAL"], [extent.difference(hole), excluded])
+        base["objects"]["political"]["computed_neighbors"] = [[], []]
+        county = unit("one", extent)
+        county["properties"]["Name_ENG"] = "One"
+        mask = {"id": "west", "owner": "D", "polygon": mapping(box(20, 0, 20.7, 4))["coordinates"]}
+        with TemporaryDirectory() as tmp:
+            out = Path(tmp, "fixture")
+            build(out, base, {}, {"features": [county]}, {**self.membership, "exclude_id_patterns": ["*__SPLIT_ARAL*"]},
+                  {**self.rules, "masks": [mask]}, self.bookmark, self.cities, "fixed", "fixture", self.reference,
+                  self.splits, {"features": []}, public_land=shapely.STRtree([extent]),
+                  public_water=shapely.STRtree([water]), historic_water=historic)
+            splits = json.loads((out / "manifest.json").read_bytes())["hierarchy_overrides"]["feature_splits"]
+            self.assertEqual(set(splits), {"parent"})
+            self.assertCountEqual(splits["parent"], ["parent__RCW_west", "parent__RCW_west_OUT"])
+            topology = json.loads((out / "runtime_topology.topo.json").read_bytes())
+            fill = next(r for r in topology["objects"]["political"]["geometries"] if r["id"].startswith("RCW_FILL_"))
+            self.assertTrue(_decode_geometry(topology, fill).equals(hole.difference(water.union(excluded).union(historic))))
+            for row in topology["objects"]["political"]["geometries"]:
+                self.assertEqual(_decode_geometry(topology, row).intersection(historic).area, 0)
+
+    def test_mask_point_on_shared_boundary_reports_both_hosts(self):
+        shapes = {"A": box(20, 0, 21, 1), "B": box(21, 0, 22, 1)}
+        with self.assertRaisesRegex(ValueError, r"boundary.*21.*'A'.*'B'"):
+            apply_masks([{"id": "boundary", "owner": "D", "points": [[21, .5]]}], shapes,
+                        dict.fromkeys(shapes, "G"), CuttingUnits([]), {}, self.rules, self.splits, {}, {})
+
+    def test_custom_capital_outside_moves_to_nearest_owned_edge(self):
+        coord = {"name_en": "D", "name_zh": "D", "lon": 20.5, "lat": 2, "add_city": True}
+        hints, _, additions, offsets = resolve_capitals([{**faction("D"), "capital_coordinates": coord}],
+            self.cities, {"A": box(20, 0, 21, 1)}, {"A": "D"}, 90)
+        self.assertEqual(hints["D"]["city_id"], "RCW_CITY_D")
+        self.assertEqual([additions["RCW_CITY_D"][key] for key in ("lon", "lat")], [20.5, 1])
+        self.assertAlmostEqual(offsets["D"]["distance_km"], 110.58, places=2)
+
+    def test_era_names_require_unique_maximum_population_within_members(self):
+        for city, population in zip(self.cities["features"], [10, 20]):
+            city["properties"].update(name_en="Modern", population=population)
+        rules = {"Modern": {"en": "Era", "zh": "旧称"}}
+        shapes = {"A": box(20, 0, 21, 1)}
+        overrides, missing = era_city_overrides(rules, self.cities, shapes, 90, {}, {})
+        self.assertEqual((list(overrides), missing), (["N"], {}))
+        self.cities["features"][0]["properties"]["population"] = 20
+        overrides, missing = era_city_overrides(rules, self.cities, shapes, 90, {}, {})
+        self.assertEqual((overrides, missing), ({}, {"Modern": ["D", "N"]}))
 
     def test_subtraction_preserves_city_and_single_piece_ids(self):
         polygons = [box(20, 0, 22, 1), box(21.5, .25, 22.5, .75)]
