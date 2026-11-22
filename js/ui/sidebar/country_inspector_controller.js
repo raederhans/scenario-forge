@@ -6,6 +6,8 @@ import { getCityOverrideId, setCityNameOverride } from "../../core/city_name_ove
 import { placeProjectCapital, removeProjectCity, resetCountryCapital, setCountryCapital } from "../../core/capital_commands.js";
 import { showToast } from "../components/toast.js";
 import { listCountryCities, pickLargestCity } from "../../core/capital_overrides.js";
+import { getAllianceOption, getIdeologyOption, getPoliticalIdentity, listAllianceOptions, listIdeologyOptions, MAX_CUSTOM_ALLIANCES, normalizeCustomAlliance } from "../../core/political_overrides.js";
+import { createCustomAlliance, deleteCustomAlliance, resetCountryPolitical, setCountryAlliance, setCountryIdeology } from "../../core/political_override_commands.js";
 import { cancelMapPointPick, getEffectiveCityCollection, startMapPointPick } from "../../core/map_renderer/public.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { commitChange } from "../../core/state/changes.js";
@@ -1355,6 +1357,70 @@ export function createCountryInspectorController({
   }
   const convertButton = countryInspectorSelected?.querySelector("#convertCountryLabel");
   const territoryText = countryInspectorSelected?.querySelector("#countryTerritoryStats");
+  const politicalFields = countryInspectorSelected?.querySelector("#countryPoliticalFields");
+  const allianceSelect = politicalFields?.querySelector("#countryAlliance");
+  const ideologySelect = politicalFields?.querySelector("#countryIdeology");
+  const newAllianceFields = politicalFields?.querySelector("#newAllianceFields");
+  const allianceName = politicalFields?.querySelector("#newAllianceName");
+  const allianceColor = politicalFields?.querySelector("#newAllianceColor");
+  const colorConflict = politicalFields?.querySelector("#allianceColorConflict");
+  const createAlliance = politicalFields?.querySelector("#createCountryAlliance");
+  const deleteAlliance = politicalFields?.querySelector("#deleteCountryAlliance");
+  let draftCountry = "";
+  let draftScenario = "";
+
+  function updateAllianceForm() {
+    const name = allianceName.value.trim();
+    const color = allianceColor.value;
+    colorConflict.hidden = !!normalizeCustomAlliance({ name: name || "-", color }, runtimeState.politicalAlliances);
+    createAlliance.disabled = !name || !colorConflict.hidden;
+  }
+
+  function renderPoliticalFields(tag) {
+    if (!politicalFields) return;
+    const scenario = runtimeState.activeScenarioId;
+    politicalFields.hidden = !scenario || !tag;
+    if (draftCountry !== tag || draftScenario !== scenario) {
+      draftCountry = "";
+      allianceName.value = "";
+      allianceColor.value = allianceColor.defaultValue;
+    }
+    if (politicalFields.hidden) return;
+    const overrides = runtimeState.politicalOverrides;
+    const entry = Object.hasOwn(overrides, tag) ? overrides[tag] : undefined;
+    const defaults = getPoliticalIdentity({
+      activeScenarioId: scenario,
+      scenarioBundleCacheById: runtimeState.scenarioBundleCacheById,
+      scenarioCountriesByTag: runtimeState.scenarioCountriesByTag,
+      politicalOverrides: entry ? { ...overrides, [tag]: {} } : overrides,
+    }, tag);
+    const defaultAlliance = defaults.alliance ? getAllianceOption(runtimeState, defaults.alliance).label : t("Unaligned", "ui");
+    const defaultIdeology = defaults.ideology
+      ? getIdeologyOption(defaults.ideology, runtimeState.currentLanguage === "zh").label : t("Not set", "ui");
+    const ideologySource = defaults.ideologySource === "inherited" ? "Inherited from parent ({value})" : "Scenario default ({value})";
+    const alliances = listAllianceOptions(runtimeState);
+    allianceSelect.replaceChildren(
+      new Option(t("Scenario default ({value})", "ui", { value: defaultAlliance }), ""),
+      new Option(t("Unaligned", "ui"), ":unaligned"),
+      ...alliances.map(({ label, id }) => new Option(label, id)),
+    );
+    if (entry?.alliance && !alliances.some(({ id }) => id === entry.alliance)) {
+      allianceSelect.appendChild(new Option(entry.alliance, entry.alliance));
+    }
+    const newOption = new Option(t("New alliance…", "ui"), ":new");
+    newOption.disabled = Object.keys(runtimeState.politicalAlliances).length >= MAX_CUSTOM_ALLIANCES;
+    allianceSelect.appendChild(newOption);
+    if (newOption.disabled) draftCountry = "";
+    allianceSelect.value = draftCountry ? ":new" : entry?.alliance === null ? ":unaligned" : entry?.alliance || "";
+    newAllianceFields.hidden = !draftCountry;
+    deleteAlliance.hidden = !alliances.some(option => option.custom && option.id === allianceSelect.value);
+    if (draftCountry) updateAllianceForm();
+    ideologySelect.replaceChildren(
+      new Option(t(ideologySource, "ui", { value: defaultIdeology }), ""),
+      ...listIdeologyOptions(runtimeState, tag).map(({ label, id }) => new Option(label, id)),
+    );
+    ideologySelect.value = entry?.ideology || "";
+  }
   const territoryAreas = new WeakMap();
   let territoryUpdatePending = false;
   let territoryKey = [], statsByCode, gains, losses;
@@ -1469,6 +1535,7 @@ export function createCountryInspectorController({
     }
     onSelectedCountryRendered?.(selectedCode || "");
     const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
+    renderPoliticalFields(countryState ? selectedCode : "");
     const isEmpty = !countryState;
     const project = isProjectCountry(runtimeState, selectedCode);
     if (unregisterButton) unregisterButton.hidden = !project;
@@ -1627,6 +1694,38 @@ export function createCountryInspectorController({
   };
 
   const bindEvents = () => {
+    if (politicalFields && !politicalFields.dataset.bound) {
+      const selectedTag = () => runtimeState.selectedInspectorCountryCode;
+      allianceSelect.addEventListener("change", () => {
+        const tag = selectedTag();
+        const value = allianceSelect.value;
+        draftCountry = value === ":new" ? tag : "";
+        draftScenario = runtimeState.activeScenarioId;
+        if (!value) resetCountryPolitical(tag, "alliance");
+        else if (!draftCountry) setCountryAlliance(tag, value === ":unaligned" ? null : value);
+        renderPoliticalFields(tag);
+      });
+      ideologySelect.addEventListener("change", () => {
+        const tag = selectedTag();
+        if (ideologySelect.value) setCountryIdeology(tag, ideologySelect.value);
+        else resetCountryPolitical(tag, "ideology");
+        renderPoliticalFields(tag);
+      });
+      allianceName.addEventListener("input", updateAllianceForm);
+      allianceColor.addEventListener("input", updateAllianceForm);
+      createAlliance.addEventListener("click", () => {
+        const id = createCustomAlliance({ name: allianceName.value, color: allianceColor.value });
+        if (!id) return;
+        draftCountry = "";
+        setCountryAlliance(selectedTag(), id);
+        renderPoliticalFields(selectedTag());
+      });
+      deleteAlliance.addEventListener("click", () => {
+        deleteCustomAlliance(allianceSelect.value);
+        renderPoliticalFields(selectedTag());
+      });
+      politicalFields.dataset.bound = "true";
+    }
     if (unregisterButton && !unregisterButton.dataset.bound) {
       unregisterButton.addEventListener("click", () => unregisterProjectCountry(runtimeState.selectedInspectorCountryCode));
       unregisterButton.dataset.bound = "true";
