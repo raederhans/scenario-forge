@@ -1,4 +1,6 @@
 import { renderViewportMapTitles } from "./renderer/map_title_render_owner.js";
+import { getProjectCountryBaseColors } from "./project_countries.js";
+import { uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
 import { createLabelsRuntime } from "./map_renderer/labels_runtime.js";
 import { createFacilityInteractionRuntime } from "./renderer/facility_interaction_runtime.js";
 import { createIndexUiRefreshScheduler } from "./renderer/index_ui_refresh_scheduler.js";
@@ -11805,6 +11807,23 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
         LAND_FILL_COLOR
       );
     });
+  }
+
+  if (runtimeState.activeScenarioId) {
+    const projectColors = getProjectCountryBaseColors(runtimeState);
+    const reserved = new Set(Object.values(projectColors));
+    const deferred = new Set();
+    for (const [tag, baseColor] of Object.entries(nextCountryBaseColors)) {
+      const color = ColorManager.normalizeHexColor(baseColor);
+      if (runtimeState.scenarioCountriesByTag?.[tag] && !Object.hasOwn(projectColors, tag) && reserved.has(color)) {
+        nextCountryBaseColors[tag] = color;
+        deferred.add(tag);
+      }
+    }
+    Object.assign(nextCountryBaseColors, projectColors);
+    if (deferred.size) Object.assign(nextCountryBaseColors, uniquifyScenarioDefaultColors(nextCountryBaseColors, {
+      tags: new Set([...Object.keys(projectColors), ...deferred]), deferred,
+    }));
   }
 
   const historyFeatureIds = [...new Set([...Object.keys(runtimeState.visualOverrides || {}), ...getEditedRiverParentIds(runtimeState.riverPaint)])];

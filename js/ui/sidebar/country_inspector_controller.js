@@ -1708,7 +1708,8 @@ export function createCountryInspectorController({
       on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, updateResetCount);
       on(STATE_BUS_EVENTS.UPDATE_HISTORY_UI, scheduleTerritoryStats);
       resetButton.addEventListener("click", async () => {
-        const ids = getCountryOverrideIds(runtimeState, runtimeState.selectedInspectorCountryCode);
+        const code = runtimeState.selectedInspectorCountryCode;
+        const ids = getCountryOverrideIds(runtimeState, code);
         if (!ids.length) return;
         const title = t("Restore original country color", "ui");
         const confirmed = await showAppDialog({
@@ -1717,7 +1718,7 @@ export function createCountryInspectorController({
           confirmLabel: title,
           tone: "warning",
         });
-        if (confirmed) resetCountryOverrides(ids);
+        if (confirmed) resetCountryOverrides(ids, code);
       });
       resetButton.dataset.bound = "true";
     }

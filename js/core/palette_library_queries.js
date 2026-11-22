@@ -1,5 +1,5 @@
 function normalizeOwnerCode(rawCode) {
-  return String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+  return String(rawCode || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
 export function resolvePaletteLibraryApplyTarget(inputs) {

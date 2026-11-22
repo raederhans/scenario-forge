@@ -1872,7 +1872,7 @@ test("project countries and capitals survive save, conflict remapping and legacy
   const malformed = FileManager.normalizeImportedProjectData({ ...payload, projectCountries: [
     { tag: "P00", name: "Invalid" }, { tag: "Q01", name: "x".repeat(121) }, ...payload.projectCountries,
   ] });
-  assert.deepEqual(malformed.projectCountries, payload.projectCountries);
+  assert.deepEqual(malformed.projectCountries, [{ tag: "Q01", name: "x".repeat(120) }, ...payload.projectCountries]);
   delete payload.sovereignBaseColors.P01;
   const missing = restore(payload, { P01: { tag: "P01" } }, { P01: "#654321" });
   assert.deepEqual(missing.dropped, ["P01"]);
