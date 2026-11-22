@@ -235,6 +235,7 @@ if (!isMainThread) {
       load: () => client.loadStartupBundleViaWorker({ startupBundleUrl: "/bundle.json", scenarioId: "transfer-fixture", language: "zh" }),
       check(result, resources) {
         const expectedBundle = structuredClone(resources["/bundle.json"]);
+        expectedBundle.language = "zh";
         expectedBundle.base.topology_primary = expectedTopology(expectedBundle.base.topology_primary);
         expectedBundle.scenario.runtime_topology_bootstrap = expectedTopology(expectedBundle.scenario.runtime_topology_bootstrap);
         assert.deepEqual(result.payload, expectedBundle);
@@ -438,6 +439,7 @@ if (!isMainThread) {
     resources["/bundle.json"].base.topology_primary = encodedTopology;
     const before = structuredClone(resources);
     const expectedBundle = structuredClone(resources["/bundle.json"]);
+    expectedBundle.language = "zh";
     expectedBundle.base.topology_primary = expectedTopology(baseTopology);
     expectedBundle.scenario.runtime_topology_bootstrap = expectedTopology(expectedBundle.scenario.runtime_topology_bootstrap);
     await withWorker(resources, async (adapter) => {
@@ -463,6 +465,7 @@ if (!isMainThread) {
       resources["/bundle.json"].scenario.runtime_topology_bootstrap = structuredClone(fixture.encoded);
       const before = structuredClone(resources);
       const expectedBundle = structuredClone(resources["/bundle.json"]);
+      expectedBundle.language = "zh";
       expectedBundle.base.topology_primary = expectedTopology(fixture.source);
       expectedBundle.scenario.runtime_topology_bootstrap = expectedTopology(fixture.source);
       await withWorker(resources, async (adapter) => {
