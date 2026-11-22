@@ -27,6 +27,9 @@ export {
 
   // Selection and fill tools.
   addFeatureToDevSelection,
+  addFeaturesToDevSelection,
+  cancelSelectionMarquee,
+  getDevSelectionCountryOptions,
   applyDevMacroFillCurrentCountry,
   applyDevMacroFillCurrentOwnerScope,
   applyDevMacroFillCurrentParentGroup,

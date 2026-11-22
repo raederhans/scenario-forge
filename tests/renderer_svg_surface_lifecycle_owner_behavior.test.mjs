@@ -7,6 +7,7 @@ import { createRendererSvgSurfaceLifecycleOwner } from "../js/core/renderer/rend
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const ROOT_CHILD_ORDER = Object.freeze([
+  "selection-marquee-layer",
   "interaction-layer",
   "viewport-layer",
   "strategic-overlay-defs",
@@ -40,6 +41,7 @@ const SETTER_ORDER = Object.freeze([
   "setDevSelectionGroup",
   "setInspectorHighlightGroup",
   "setIntensityFieldPreviewGroup",
+  "setSelectionMarqueeGroup",
   "setInteractionRect",
 ]);
 
@@ -176,6 +178,7 @@ function createSurfaceHost(mapContainer) {
     setHoverGroup: setter("setHoverGroup", "hoverGroup"),
     setInspectorHighlightGroup: setter("setInspectorHighlightGroup", "inspectorHighlightGroup"),
     setIntensityFieldPreviewGroup: setter("setIntensityFieldPreviewGroup", "intensityFieldPreviewGroup"),
+    setSelectionMarqueeGroup: setter("setSelectionMarqueeGroup", "selectionMarqueeGroup"),
     setInteractionRect: setter("setInteractionRect", "interactionRect"),
     setMapSvg: setter("setMapSvg", "mapSvg"),
     setOperationGraphicsEditorGroup: setter("setOperationGraphicsEditorGroup", "operationGraphicsEditorGroup"),

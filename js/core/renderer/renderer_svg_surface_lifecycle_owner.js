@@ -161,6 +161,7 @@ export function createRendererSvgSurfaceLifecycleOwner({
     setHoverGroup: requireFunction(host, "setHoverGroup", "surfaceHost"),
     setInspectorHighlightGroup: requireFunction(host, "setInspectorHighlightGroup", "surfaceHost"),
     setIntensityFieldPreviewGroup: requireFunction(host, "setIntensityFieldPreviewGroup", "surfaceHost"),
+    setSelectionMarqueeGroup: requireFunction(host, "setSelectionMarqueeGroup", "surfaceHost"),
     setInteractionRect: requireFunction(host, "setInteractionRect", "surfaceHost"),
     setMapSvg: requireFunction(host, "setMapSvg", "surfaceHost"),
     setOperationGraphicsEditorGroup: requireFunction(host, "setOperationGraphicsEditorGroup", "surfaceHost"),
@@ -218,6 +219,10 @@ export function createRendererSvgSurfaceLifecycleOwner({
         .style("display", "none"),
     );
 
+    const selectionMarqueeGroup = hostApi.setSelectionMarqueeGroup(
+      selectOrAppend(svg, "g.selection-marquee-layer", "g", "selection-marquee-layer")
+        .style("pointer-events", "none").attr("aria-hidden", "true"),
+    );
     let interactionRect = svg.select("rect.interaction-layer");
     if (interactionRect.empty()) {
       interactionRect = svg
@@ -230,10 +235,12 @@ export function createRendererSvgSurfaceLifecycleOwner({
       .style("pointer-events", "all")
       // Keep the shared hit target behind editor handles.
       .lower();
+    selectionMarqueeGroup.lower();
 
     return Object.freeze({
       ...handles,
       intensityFieldPreviewGroup,
+      selectionMarqueeGroup,
       interactionRect,
     });
   }
