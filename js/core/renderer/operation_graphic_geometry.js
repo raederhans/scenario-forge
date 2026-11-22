@@ -267,6 +267,11 @@ export function normalizeOperationGraphicStroke(value) {
   return /^#(?:[0-9a-f]{6})$/i.test(candidate) ? candidate.toLowerCase() : "";
 }
 
+export function normalizeOperationLabelSize(value) {
+  const size = typeof value === "string" && value.trim() ? Number(value) : value;
+  return Number.isFinite(size) ? Math.max(4, Math.min(64, size)) : 9;
+}
+
 export function normalizeOperationGraphicWidth(value) {
   return Math.max(0, Math.min(16, Number(value) || 0));
 }

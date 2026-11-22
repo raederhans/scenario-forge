@@ -1,3 +1,4 @@
+import { normalizeOperationLabelSize } from "./operation_graphic_geometry.js";
 import { cancelMapPointPick, isMapPointPickActive } from "../map_point_picker.js";
 import { placeMapLabel } from "./strategic_overlay_runtime/map_label_runtime_domain.js";
 import { createOperationGraphicsRuntimeDomain } from "./strategic_overlay_runtime/operation_graphics_runtime_domain.js";
@@ -201,6 +202,8 @@ export function createStrategicOverlayRuntimeOwner({
   function startOperationalLineDraw({
     kind = defaultOperationalLineKind,
     label = "",
+    labelSize = 9,
+    labelOnPath = false,
     stylePreset = defaultOperationalLineKind,
     stroke = "",
     width = 0,
@@ -216,6 +219,8 @@ export function createStrategicOverlayRuntimeOwner({
       points: [],
       kind: String(kind || defaultOperationalLineKind).trim().toLowerCase(),
       label: String(label || ""),
+      labelSize: normalizeOperationLabelSize(labelSize),
+      labelOnPath: labelOnPath === true,
       stylePreset: normalizeOperationalLineStylePreset(stylePreset, kind),
       stroke: normalizeOperationGraphicStroke(stroke),
       width: normalizeOperationGraphicWidth(width),
@@ -289,6 +294,8 @@ export function createStrategicOverlayRuntimeOwner({
         id,
         kind,
         label: String(state.operationalLineEditor.label || "").trim(),
+        labelSize: normalizeOperationLabelSize(state.operationalLineEditor.labelSize),
+        labelOnPath: state.operationalLineEditor.labelOnPath === true,
         points: [...points],
         stylePreset: normalizeOperationalLineStylePreset(state.operationalLineEditor.stylePreset, kind),
         stroke: normalizeOperationGraphicStroke(state.operationalLineEditor.stroke) || null,
@@ -333,6 +340,8 @@ export function createStrategicOverlayRuntimeOwner({
       Object.assign(editorPatch, {
         kind: String(line.kind || defaultOperationalLineKind),
         label: String(line.label || ""),
+        labelSize: normalizeOperationLabelSize(line.labelSize),
+        labelOnPath: line.labelOnPath === true,
         stylePreset: normalizeOperationalLineStylePreset(line.stylePreset, line.kind),
         stroke: normalizeOperationGraphicStroke(line.stroke),
         width: normalizeOperationGraphicWidth(line.width),
@@ -367,6 +376,8 @@ export function createStrategicOverlayRuntimeOwner({
     const entityPatch = {};
     if (partial.kind !== undefined) entityPatch.kind = nextKind;
     if (partial.label !== undefined) entityPatch.label = String(partial.label || "");
+    if (partial.labelSize !== undefined) entityPatch.labelSize = normalizeOperationLabelSize(partial.labelSize);
+    if (partial.labelOnPath !== undefined) entityPatch.labelOnPath = partial.labelOnPath === true;
     if (partial.stylePreset !== undefined) entityPatch.stylePreset = normalizeOperationalLineStylePreset(partial.stylePreset, nextKind);
     if (partial.stroke !== undefined) entityPatch.stroke = normalizeOperationGraphicStroke(partial.stroke) || null;
     if (partial.width !== undefined) entityPatch.width = normalizeOperationGraphicWidth(partial.width);

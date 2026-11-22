@@ -117,6 +117,8 @@ export function createStrategicOverlayController({
     unitCounterDetailToggleBtn,
     operationalLineKindSelect,
     operationalLineLabelInput,
+    operationalLineLabelSizeInput,
+    operationalLineLabelOnPathInput,
     operationalLineStrokeInput,
     operationalLineWidthInput,
     operationalLineOpacityInput,
@@ -130,6 +132,8 @@ export function createStrategicOverlayController({
     strategicCommandButtons,
     operationGraphicKindSelect,
     operationGraphicLabelInput,
+    operationGraphicLabelSizeInput,
+    operationGraphicLabelOnPathInput,
     operationGraphicPresetSelect,
     operationGraphicStrokeInput,
     operationGraphicWidthInput,
@@ -522,7 +526,7 @@ export function createStrategicOverlayController({
           })),
         ], { value: selected.countryCode });
         for (const readout of mapLabelSection.querySelectorAll("output[data-label-readout]")) {
-          if (readout !== document.activeElement) readout.value = selected[readout.dataset.labelReadout];
+          if (readout !== document.activeElement) readout.value = selected[readout.dataset.labelReadout] ?? 0;
         }
         for (const field of mapLabelSection.querySelectorAll("[data-label-field]")) {
           if (field !== document.activeElement) {
@@ -588,6 +592,10 @@ export function createStrategicOverlayController({
     syncSelectOptions(operationalLineKindSelect, Object.entries(OPERATIONAL_LINE_KIND_LABELS).map(([value, label]) => ({ value, label: t(label, "ui") })), {
       value: operationalLineKind,
     });
+    if (operationalLineLabelSizeInput) operationalLineLabelSizeInput.value = String(operationalLineEditor.labelSize ?? 9);
+    if (operationalLineLabelOnPathInput) {
+      operationalLineLabelOnPathInput.checked = operationalLineEditor.labelOnPath === true;
+    }
     if (operationalLineLabelInput) operationalLineLabelInput.value = String(operationalLineEditor.label || selectedOperationalLine?.label || "");
     if (operationalLineStrokeInput) operationalLineStrokeInput.value = operationalLineStroke || "#7f1d1d";
     if (operationalLineWidthInput) operationalLineWidthInput.value = String(Number(operationalLineWidth || 0).toFixed(1).replace(/\.0$/, ""));
@@ -658,6 +666,12 @@ export function createStrategicOverlayController({
     syncSelectOptions(operationGraphicKindSelect, Object.entries(OPERATION_GRAPHIC_KIND_LABELS).map(([value, label]) => ({ value, label: t(label, "ui") })), {
       value: operationKind,
     });
+    if (operationGraphicLabelSizeInput) operationGraphicLabelSizeInput.value = String(operationEditor.labelSize ?? 9);
+    if (operationGraphicLabelOnPathInput) {
+      operationGraphicLabelOnPathInput.checked = operationEditor.labelOnPath === true;
+      operationGraphicLabelOnPathInput.disabled = ["encirclement", "theater"].includes(operationKind);
+      operationGraphicLabelOnPathInput.title = operationGraphicLabelOnPathInput.disabled ? t("Along line is only available for open lines.", "ui") : "";
+    }
     if (operationGraphicLabelInput) {
       operationGraphicLabelInput.value = String(operationEditor.label || "");
     }
@@ -919,6 +933,8 @@ export function createStrategicOverlayController({
         kind: nextKind,
         stylePreset: nextKind,
         label: String(operationalLineLabelInput?.value || ""),
+        labelSize: state.operationalLineEditor?.labelSize,
+        labelOnPath: state.operationalLineEditor?.labelOnPath,
         stroke: String(operationalLineStrokeInput?.value || ""),
         width: Number(operationalLineWidthInput?.value || 0),
         opacity: Number(operationalLineOpacityInput?.value || 1),
@@ -944,6 +960,23 @@ export function createStrategicOverlayController({
       refreshStrategicOverlayUI();
     });
     operationalLineKindSelect.dataset.bound = "true";
+  }
+  for (const [input, key, editor, update] of [
+    [operationalLineLabelSizeInput, "labelSize", "operationalLineEditor", mapRenderer.updateSelectedOperationalLine],
+    [operationalLineLabelOnPathInput, "labelOnPath", "operationalLineEditor", mapRenderer.updateSelectedOperationalLine],
+    [operationGraphicLabelSizeInput, "labelSize", "operationGraphicsEditor", mapRenderer.updateSelectedOperationGraphic],
+    [operationGraphicLabelOnPathInput, "labelOnPath", "operationGraphicsEditor", mapRenderer.updateSelectedOperationGraphic],
+  ]) {
+    if (!input || input.dataset.bound) continue;
+    input.addEventListener("change", () => {
+      const value = key === "labelOnPath" ? input.checked : Math.max(4, Math.min(64, Number(input.value || 9)));
+      const patch = { [key]: value };
+      patchStrategicOverlayEditorState(state, editor, patch);
+      if (!state[editor].active && state[editor].selectedId) update(patch);
+      else if (render) render();
+      refreshStrategicOverlayUI();
+    });
+    input.dataset.bound = "true";
   }
   if (operationalLineLabelInput && !operationalLineLabelInput.dataset.bound) {
     operationalLineLabelInput.addEventListener("input", (event) => {
@@ -1010,6 +1043,8 @@ export function createStrategicOverlayController({
       mapRenderer.startOperationalLineDraw({
         kind: nextKind,
         label: String(operationalLineLabelInput?.value || state.operationalLineEditor?.label || ""),
+        labelSize: state.operationalLineEditor?.labelSize,
+        labelOnPath: state.operationalLineEditor?.labelOnPath,
         stylePreset: nextKind,
         stroke: String(operationalLineStrokeInput?.value || state.operationalLineEditor?.stroke || ""),
         width: Number(operationalLineWidthInput?.value || state.operationalLineEditor?.width || 0),
@@ -1158,6 +1193,8 @@ export function createStrategicOverlayController({
       mapRenderer.startOperationGraphicDraw({
         kind: String(operationGraphicKindSelect?.value || state.operationGraphicsEditor?.kind || "attack"),
         label: String(operationGraphicLabelInput?.value || state.operationGraphicsEditor?.label || ""),
+        labelSize: state.operationGraphicsEditor?.labelSize,
+        labelOnPath: state.operationGraphicsEditor?.labelOnPath,
         stylePreset: String(operationGraphicPresetSelect?.value || state.operationGraphicsEditor?.stylePreset || "attack"),
         stroke: String(operationGraphicStrokeInput?.value || state.operationGraphicsEditor?.stroke || ""),
         width: Number(operationGraphicWidthInput?.value || state.operationGraphicsEditor?.width || 0),
