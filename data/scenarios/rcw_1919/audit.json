@@ -7,7 +7,7 @@
     "owner_count": 62,
     "shell_feature_count": 2088
   },
-  "snapshot_fingerprint": "0e2c7cebd56331fa63426122295685114ef40b0bd7e4f0b7b197f888a96b2d8b",
+  "snapshot_fingerprint": "db2a4db4a931ae48d6377d096a625944e045b5dcf9d212bf5d505994e42a1236",
   "dropped_shell_ids": [
     "RU_ARCTIC_FB_009",
     "RU_ARCTIC_FB_016",
@@ -2818,7 +2818,7 @@
       "RU_RAY_50074027B24150612748554": 1.917831428460577e-11,
       "RU_RAY_50074027B66648864289993": 1.8755621513343035e-11,
       "RU_RAY_50074027B16928982325503": 1.2146972109007792e-11,
-      "RU_RAY_50074027B55874149600418": 1.4450188279020032e-11,
+      "RU_RAY_50074027B55874149600418": 1.5157348304001977e-11,
       "RU_RAY_50074027B11464632928939": 0.0,
       "RU_RAY_50074027B53792659884597": 9.173103222110887e-12,
       "RU_RAY_50074027B94648571764089": 1.5002823366836763e-11,
@@ -2826,7 +2826,7 @@
       "RU_RAY_50074027B96103137717036": 0.0,
       "RU_RAY_50074027B21050205315965": 1.2140917486019912e-11,
       "RU_RAY_50074027B41643930675404": 1.0214076221100321e-11,
-      "RU_RAY_50074027B29183274260449": 1.205557073369139e-11,
+      "RU_RAY_50074027B29183274260449": 1.2066885315097518e-11,
       "RU_RAY_50074027B34634777465880": 3.3705314819886174e-11,
       "RU_RAY_50074027B5563807985387": 1.0347144521131568e-10,
       "RU_RAY_50074027B45493241507504": 0.0,
@@ -2844,7 +2844,7 @@
       "RU_RAY_50074027B24281986961151": 0.0,
       "RU_RAY_50074027B87140445206542": 8.769520059534767e-12,
       "RU_RAY_50074027B40927192458411": 7.775676532772308e-11,
-      "RU_MRG_8ec2184da20a": 1.1653924319435151e-10,
+      "RU_MRG_8ec2184da20a": 1.1661571180417033e-10,
       "RU_RAY_50074027B18455261144282": 6.319897099741604e-10,
       "RU_RAY_50074027B88418643135218": 1.2948330866244025e-10,
       "RU_RAY_50074027B94330276236622": 1.1177817289589865e-10,
@@ -3225,11 +3225,173 @@
       "RU_RAY_50074027B29183274260449": 266.27207834306546
     },
     "merged_small_piece_count": 5563,
+    "shared_arc_shortfalls": [
+      {
+        "features": [
+          "CN_CITY_17275852B82946568901730",
+          "RCW_FILL_Amur_region_Amurskaia"
+        ],
+        "before_km": 3.7146260346449194,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3196__RCW_KAZ_9891525B27039214711297__Orenburg_governorate_Verkhneuralskii",
+          "RU_RAY_50074027B21488641063420"
+        ],
+        "before_km": 2.3758265995556185,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3196__RCW_KAZ_9891525B29142320833271__Orenburg_governorate_Orskii",
+          "RU_RAY_50074027B42894474720971"
+        ],
+        "before_km": 0.049694882839206866,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3196__RCW_KAZ_9891525B29142320833271__Turgay_region_Kustanaiskii",
+          "RU_RAY_50074027B42894474720971"
+        ],
+        "before_km": 1.586358198352124,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3201__RCW_KAZ_9891525B6552459074784__Ural_region_Uralskii",
+          "RU_RAY_50074027B20858489153060"
+        ],
+        "before_km": 2.4968298983894543,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3205__RCW_KAZ_9891525B65214582738908__Akmola_region_Omskii",
+          "RU_RAY_50074027B73257379170390"
+        ],
+        "before_km": 4.131141052048482,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3205__RCW_KAZ_9891525B65214582738908__Semipalatinsk_region_Pavlodarskii",
+          "RU_RAY_50074027B73257379170390"
+        ],
+        "before_km": 0.6524793051766451,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "KAZ-3206__RCW_KAZ_9891525B63367051987895__Tomsk_governorate_Zmeinogorskii",
+          "RU_RAY_50074027B92925758050684"
+        ],
+        "before_km": 8.132621521789453,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "LT024__RCW_LTU_59024439B26680693475402",
+          "PL_POW_2012"
+        ],
+        "before_km": 3.693273351800937,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B90298108562486",
+          "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B45366613377645"
+        ],
+        "before_km": 1.3858945517290944,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B90298108562486",
+          "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B75364407860375__Turgay_region_Aktiubinskii"
+        ],
+        "before_km": 0.9674893123248086,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B55874149600418__RCW_Turgay_region_Irgizskii",
+          "RCW_FILL_Turgay_region_Irgizskii"
+        ],
+        "before_km": 1.946132497129945,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B52585131638206",
+          "RCW_FILL_Amur_region_Amurskaia"
+        ],
+        "before_km": 2.6536553118665087,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B6450887110855",
+          "RCW_FILL_Transbaikal_region_Nerchinskii_Zavodskii"
+        ],
+        "before_km": 4.334878209578321,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B13114681801765",
+          "RCW_FILL_Amur_region_Amurskaia"
+        ],
+        "before_km": 1.6405619423076054,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B96103137717036__RCW_Arkhangelsk_governorate_Pechorskii",
+          "RU_RAY_50074027B78297177563949"
+        ],
+        "before_km": 0.054438010767067994,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B29183274260449__RCW_Arkhangelsk_governorate_Arkhangelskaia",
+          "RU_RAY_50074027B6686274683844__RCW_Arkhangelsk_governorate_Arkhangelskaia"
+        ],
+        "before_km": 14.661665171102925,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B29183274260449__RCW_Arkhangelsk_governorate_Arkhangelskaia",
+          "RU_CITY_ARKHANGELSK"
+        ],
+        "before_km": 0.1681094019344208,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_RAY_50074027B24281986961151__RCW_Arkhangelsk_governorate_Kolskii",
+          "RU_MRG_83744c263574"
+        ],
+        "before_km": 10.515911363832597,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "RU_MRG_8ec2184da20a__RCW_Arkhangelsk_governorate_Kolskii",
+          "RU_ARCTIC_FB_302"
+        ],
+        "before_km": 0.2401719321175383,
+        "after_km": 0
+      }
+    ],
     "inserted_vertices_by_neighbor": {
       "CN_CITY_17275852B26831530446211": 6,
       "CN_CITY_17275852B40864949822732": 5,
       "CN_CITY_17275852B65388914557323": 3,
-      "CN_CITY_17275852B82946568901730": 9,
+      "CN_CITY_17275852B82946568901730": 10,
       "EE00A": 4,
       "FI1D3": 2,
       "FI1D8": 11,
@@ -3240,7 +3402,7 @@
       "KAZ-4830": 8,
       "KGZ-1115": 10,
       "LV006": 1,
-      "PL_POW_2012": 3,
+      "PL_POW_2012": 5,
       "TJK-5491": 1,
       "UZB-4828": 10,
       "BY_HIST_POL_VITEBSK_WEST": 2,
@@ -3248,7 +3410,7 @@
       "BY_INT_VITEBSK": 3,
       "RU_RAY_50074027B5102078213757": 6,
       "RU_RAY_50074027B49435645657248": 10,
-      "RU_RAY_50074027B20858489153060": 8,
+      "RU_RAY_50074027B20858489153060": 9,
       "RU_RAY_50074027B85852796728949": 4,
       "RU_RAY_50074027B68317438478241": 4,
       "RU_RAY_50074027B44154738908147": 11,
@@ -3262,30 +3424,30 @@
       "RU_RAY_50074027B92064145614684": 5,
       "RU_MRG_8c032ccba409": 4,
       "RU_RAY_50074027B10943489160103": 2,
-      "RU_RAY_50074027B92925758050684": 9,
+      "RU_RAY_50074027B92925758050684": 14,
       "RU_RAY_50074027B55370730174848": 6,
       "RU_RAY_50074027B95632257634540": 4,
       "RU_MRG_bb708c825b11": 5,
       "RU_RAY_50074027B75775802654148": 9,
-      "RU_RAY_50074027B90298108562486": 8,
+      "RU_RAY_50074027B90298108562486": 9,
       "RU_RAY_50074027B62555187301125": 8,
       "RU_RAY_50074027B80784778261580": 23,
       "RU_RAY_50074027B76424633116960": 9,
       "RU_MRG_69b237a8444a": 3,
       "RU_MRG_06b69386dedf": 3,
       "RU_RAY_50074027B36993675567197": 2,
-      "RU_RAY_50074027B42894474720971": 1,
+      "RU_RAY_50074027B42894474720971": 2,
       "RU_RAY_50074027B84484580118953": 8,
       "RU_RAY_50074027B11628373622146": 4,
-      "RU_RAY_50074027B21488641063420": 18,
+      "RU_RAY_50074027B21488641063420": 22,
       "RU_RAY_50074027B80768671311936": 4,
       "RU_RAY_50074027B66258945082472": 6,
       "RU_RAY_50074027B65250804095519": 7,
       "RU_RAY_50074027B15396054994341": 18,
-      "RU_RAY_50074027B73257379170390": 6,
-      "RU_RAY_50074027B52585131638206": 1,
-      "RU_RAY_50074027B6450887110855": 5,
-      "RU_RAY_50074027B13114681801765": 11,
+      "RU_RAY_50074027B73257379170390": 7,
+      "RU_RAY_50074027B52585131638206": 3,
+      "RU_RAY_50074027B6450887110855": 6,
+      "RU_RAY_50074027B13114681801765": 12,
       "RU_RAY_50074027B41938053987638": 14,
       "RU_RAY_50074027B42091681257278": 6,
       "RU_RAY_50074027B51076398001550": 3,
@@ -3331,7 +3493,7 @@
       "RU_RAY_50074027B57840246477228": 13,
       "RU_RAY_50074027B76249175703521": 8,
       "RU_CITY_VOLGOGRAD": 75,
-      "RU_CITY_ARKHANGELSK": 55,
+      "RU_CITY_ARKHANGELSK": 57,
       "RU_ARCTIC_FB_039": 2,
       "RU_ARCTIC_FB_041": 1,
       "RU_ARCTIC_FB_093": 3,

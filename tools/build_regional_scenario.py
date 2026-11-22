@@ -27,7 +27,7 @@ if str(ROOT) not in sys.path:
 from map_builder.contracts import sha256_json_stable, sha256_path
 from map_builder.regional_geometry import _absolute_topology, _compact_arcs, _decode_geometry, _feature_id
 from tools.check_scenario_contracts import _compose_snapshot_payload
-from tools.lossless_topology import _geometry_arc_refs
+from tools.lossless_topology import _geometry_arc_refs, _rewrite_arc_tree
 
 
 RULES = ROOT / "data/scenario-rules"
@@ -496,7 +496,7 @@ def apply_masks(masks, shapes, owners, districts, assigned, ownership, rules, re
     return audit
 
 
-def rebuild_split_topology(topology, replacements, fills=()):
+def rebuild_split_topology(topology, replacements, fills=(), seam_audit=None):
     base = _absolute_topology(topology) if "transform" in topology else topology
     paths = [tuple(map(tuple, arc)) for arc in base["arcs"]]
     original_count = len(paths)
@@ -657,7 +657,157 @@ def rebuild_split_topology(topology, replacements, fills=()):
         result["political_precision_feature_ids"] = [
             child for fid in base["political_precision_feature_ids"]
             for child in ([r[0] for r in replacements[fid]] if fid in replacements else [fid])]
+    new_ids = {cid for parent, leaves in replacements.items() for cid, _, _ in leaves if cid != parent}
+    repair_shared_boundaries(result, new_ids | {cid for cid, _, _ in fills}, seam_audit)
     return result
+
+
+def arc_sets(rows):
+    return [{ref if ref >= 0 else ~ref for ref in _geometry_arc_refs(row)} for row in rows]
+
+
+def boundary_gaps(topology, changed, refs):
+    political = topology["objects"]["political"]
+    boundaries = [_decode_geometry(topology, row).boundary for row in political["geometries"]]
+    lines = [shapely.LineString(arc) for arc in topology["arcs"]]
+    lengths = shapely.length(lines)
+    gaps = {}
+    for i, adjacent in enumerate(political["computed_neighbors"]):
+        for j in adjacent:
+            if j <= i or not (changed[i] or changed[j]):
+                continue
+            shared = sorted(refs[i] & refs[j])
+            common = boundaries[i].intersection(boundaries[j])
+            if common.length - sum(lengths[k] for k in shared) <= 1e-12:
+                continue
+            missing = common.difference(shapely.union_all([lines[k] for k in shared]))
+            if missing.length > 1e-12:
+                gaps[i, j] = missing
+    return gaps
+
+
+def repair_shared_boundaries(topology, new_ids, audit):
+    """Node both copies of coincident boundaries without moving existing vertices."""
+    political = topology["objects"]["political"]
+    rows = political["geometries"]
+    ids = [_feature_id(row) for row in rows]
+    changed = [fid in new_ids for fid in ids]
+    refs = arc_sets(rows)
+    gaps = boundary_gaps(topology, changed, refs)
+    if not gaps:
+        return
+    paths = [list(map(tuple, arc)) for arc in topology["arcs"]]
+    working = paths.copy()
+    users = defaultdict(set)
+    for i, arcs in enumerate(refs):
+        for k in arcs:
+            users[k].add(i)
+    inserts = defaultdict(lambda: defaultdict(set))
+    modified = set()
+    indices = {}
+
+    def candidate_edges(row_index, start, end):
+        if row_index not in indices:
+            segments = [(k, n) for k in sorted(refs[row_index]) for n in range(len(paths[k]) - 1)
+                        if paths[k][n] != paths[k][n + 1]]
+            indices[row_index] = segments, shapely.STRtree(
+                [shapely.LineString(paths[k][n:n + 2]) for k, n in segments])
+        segments, tree = indices[row_index]
+        a, b = shapely.Point(start), shapely.Point(end)
+        candidates = []
+        for idx in tree.query(a, predicate="dwithin", distance=1e-12):
+            line = tree.geometries[idx]
+            distance = max(line.distance(a), line.distance(b))
+            if distance < 1e-12:
+                candidates.append((distance, *segments[idx]))
+        return [(k, n) for _, k, n in sorted(candidates)]
+
+    def expand(k):
+        coords = [paths[k][0]]
+        for n, (a, b) in enumerate(zip(paths[k], paths[k][1:])):
+            points = inserts[k].get(n, ())
+            coords.extend(sorted(points, key=lambda p: (
+                (p[0] - a[0]) * (b[0] - a[0]) + (p[1] - a[1]) * (b[1] - a[1]), p)))
+            coords.append(b)
+        return coords
+
+    def insert_common_edge(edges, start, end, inset):
+        # Anchor on the unchanged side when available. At sub-ULP slivers, placing
+        # a junction exactly at a tip can cross the return edge of a valid ring.
+        k, n = min(edges, key=lambda edge: all(changed[h] for h in users[edge[0]]))
+        endpoints = paths[k][n:n + 2]
+        line = shapely.LineString(endpoints)
+
+        def project(point):
+            nearest = min(endpoints, key=lambda p: math.dist(p, point))
+            if math.dist(nearest, point) < 1e-12:
+                return nearest
+            return line.interpolate(line.project(shapely.Point(point))).coords[0]
+
+        a, b = project(start), project(end)
+        ratio = inset / math.dist(start, end)
+        if ratio >= .5 or a == b:
+            return False
+        u = tuple(x + (y - x) * ratio for x, y in zip(a, b))
+        v = tuple(y + (x - y) * ratio for x, y in zip(a, b))
+        added = []
+        for k, n in edges:
+            for point in (u, v):
+                if point not in paths[k][n:n + 2] and point not in inserts[k][n]:
+                    inserts[k][n].add(point)
+                    added.append((k, n, point))
+            working[k] = expand(k)
+        incident = users[edges[0][0]] | users[edges[1][0]]
+        if (all(any((p, q) in ((u, v), (v, u)) for p, q in zip(working[k], working[k][1:])) for k, _ in edges)
+                and all(_decode_geometry({"arcs": working}, rows[h]).is_valid for h in incident)):
+            modified.update(k for k, _ in edges)
+            return True
+        for k, n, point in added:
+            inserts[k][n].remove(point)
+        for k, _ in edges:
+            working[k] = expand(k)
+        return False
+
+    for (i, j), missing in gaps.items():
+        for part in shapely.get_parts(missing):
+            if part.geom_type != "LineString":
+                continue
+            coords = list(part.coords)
+            for a, b in zip(coords, coords[1:]):
+                if math.dist(a, b) <= 1e-12:
+                    continue
+                pairs = [(left, right) for left in candidate_edges(i, a, b)
+                         for right in candidate_edges(j, a, b) if left[0] != right[0]]
+                for inset in (0, 1e-12, 1e-10):
+                    if any(insert_common_edge(pair, a, b, inset) for pair in pairs):
+                        break
+
+    arcs, lookup, remap = [], {}, []
+    for k, path in enumerate(working):
+        pieces = zip(path, path[1:]) if k in modified else [tuple(path)]
+        mapped = []
+        for piece in pieces:
+            key = min(piece, piece[::-1])
+            if key not in lookup:
+                lookup[key] = len(arcs)
+                arcs.append(key)
+            ref = lookup[key]
+            mapped.append(ref if key == piece else ~ref)
+        remap.append(mapped)
+    topology["arcs"] = arcs
+    for row in rows:
+        row["arcs"] = _rewrite_arc_tree(row["arcs"], remap)
+    polygons = [_decode_geometry(topology, r) for r in rows]
+    index = shapely.STRtree(polygons)
+    political["computed_neighbors"] = [
+        sorted(int(j) for j in index.query(g, predicate="intersects") if j != i) for i, g in enumerate(polygons)]
+    if audit is not None:
+        remaining = boundary_gaps(topology, changed, arc_sets(rows))
+        for pair in sorted(gaps.keys() | remaining.keys()):
+            i, j = pair
+            audit.append({"features": [ids[i], ids[j]],
+                          "before_km": GEOD.geometry_length(gaps[pair]) / 1000 if pair in gaps else 0,
+                          "after_km": GEOD.geometry_length(remaining[pair]) / 1000 if pair in remaining else 0})
 
 
 def city_key(name):
@@ -817,7 +967,7 @@ def country_tables(bookmark, owners, featured, reference_countries):
         if f["parent_merged"]:
             entry["presentation"] = "parent_merged"
         countries[tag] = entry
-        alliances[f["alliance"]] += 1
+        alliances[f["alliance"]] += counts[tag] > 0
     unknown = counts.keys() - countries.keys()
     if unknown:
         raise ValueError(f"Owners missing from factions: {sorted(unknown)}")
@@ -909,7 +1059,8 @@ def build(output, base, base_owners, units, membership, ownership, bookmark, cit
                                              if len(leaves) > 1})
     if replacements or fills:
         old = topology
-        topology = rebuild_split_topology(old, replacements, fills)
+        split_audit["shared_arc_shortfalls"] = []
+        topology = rebuild_split_topology(old, replacements, fills, split_audit["shared_arc_shortfalls"])
         original = {_feature_id(row): row for row in old["objects"]["political"]["geometries"]}
         noded, output_shapes = {}, {}
         max_neighbor_delta = 0.0
@@ -972,6 +1123,12 @@ def build(output, base, base_owners, units, membership, ownership, bookmark, cit
         "hierarchy_overrides": hierarchy_overrides(base_hierarchy, set(owners), split_audit["children_by_parent"]),
     }
     output.mkdir(parents=True, exist_ok=True)
+    if historic_water is not None and "historic_water" in membership:
+        manifest["water_regions_url"] = prefix + "water_regions.geojson"
+        water_properties = dict(membership["historic_water"]["properties"], scenario_id=scenario_id)
+        write(output / "water_regions.geojson", {"type": "FeatureCollection", "features": [
+            {"type": "Feature", "properties": water_properties, "geometry": mapping(historic_water)}
+        ]}, compact=True)
     write(output / "runtime_topology.topo.json", topology, compact=True)
     manifest["source"]["runtime_topology_sha256"] = sha256_path(output / "runtime_topology.topo.json")
     write(output / "special_zone_layers.json", {

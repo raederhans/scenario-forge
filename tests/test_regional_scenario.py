@@ -9,7 +9,7 @@ from shapely.ops import unary_union
 
 from map_builder.regional_geometry import _decode_geometry, _encode_exact_coverage
 from tools.build_regional_scenario import (CuttingUnits, apply_masks, build, era_city_overrides, find_fills,
-                                           partition, rebuild_split_topology, resolve_capitals, select_members,
+                                           partition, rebuild_split_topology, repair_shared_boundaries, resolve_capitals, select_members,
                                            split_features)
 
 
@@ -171,6 +171,7 @@ class RegionalScenario(unittest.TestCase):
         products = {k: json.loads(v) for k, v in copies[0].items()}
         countries = products["countries.json"]["countries"]
         self.assertEqual((countries["C"]["entry_kind"], countries["C"]["feature_count"]), ("scenario_container", 0))
+        self.assertEqual(products["countries.json"]["alliances"]["league"]["member_count"], 4)
         self.assertEqual(countries["D"]["parent_owner_tags"], ["C"])
         self.assertEqual(countries["D"]["presentation"], "parent_merged")
         for key, value in self.reference["XX"].items():
@@ -269,11 +270,18 @@ class RegionalScenario(unittest.TestCase):
         mask = {"id": "west", "owner": "D", "polygon": mapping(box(20, 0, 20.7, 4))["coordinates"]}
         with TemporaryDirectory() as tmp:
             out = Path(tmp, "fixture")
-            build(out, base, {}, {"features": [county]}, {**self.membership, "exclude_id_patterns": ["*__SPLIT_ARAL*"]},
+            membership = {**self.membership, "exclude_id_patterns": ["*__SPLIT_ARAL*"],
+                          "historic_water": {"properties": {"id": "lake", "interactive": True}}}
+            build(out, base, {}, {"features": [county]}, membership,
                   {**self.rules, "masks": [mask]}, self.bookmark, self.cities, "fixed", "fixture", self.reference,
                   self.splits, {"features": []}, public_land=shapely.STRtree([extent]),
                   public_water=shapely.STRtree([water]), historic_water=historic)
-            splits = json.loads((out / "manifest.json").read_bytes())["hierarchy_overrides"]["feature_splits"]
+            manifest = json.loads((out / "manifest.json").read_bytes())
+            water_path = Path(manifest["water_regions_url"]).name
+            feature, = json.loads((out / water_path).read_bytes())["features"]
+            self.assertEqual(feature["properties"], {"id": "lake", "interactive": True, "scenario_id": "fixture"})
+            self.assertTrue(shapely.geometry.shape(feature["geometry"]).equals(historic))
+            splits = manifest["hierarchy_overrides"]["feature_splits"]
             self.assertEqual(set(splits), {"parent"})
             self.assertCountEqual(splits["parent"], ["parent__RCW_west", "parent__RCW_west_OUT"])
             topology = json.loads((out / "runtime_topology.topo.json").read_bytes())
@@ -287,6 +295,21 @@ class RegionalScenario(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, r"boundary.*21.*'A'.*'B'"):
             apply_masks([{"id": "boundary", "owner": "D", "points": [[21, .5]]}], shapes,
                         dict.fromkeys(shapes, "G"), CuttingUnits([]), {}, self.rules, self.splits, {}, {})
+
+    def test_shared_boundary_uses_nodes_from_both_rings(self):
+        rows = [{"type": "Polygon", "properties": {"id": fid}, "arcs": [[i]]}
+                for i, fid in enumerate(["uncut", "child"])]
+        left = [(0, 0), (1, 0), (1, .7), (1, 1), (0, 1), (0, 0)]
+        right = [(1, 0), (2, 0), (2, 1), (1, 1), (1, .3), (1, 0)]
+        topology = {"arcs": [left, right], "objects": {"political": {
+            "geometries": rows, "computed_neighbors": [[1], [0]]}}}
+        audit = []
+        repair_shared_boundaries(topology, {"child"}, audit)
+        self.assertEqual(audit[0]["after_km"], 0)
+        arcs = [{v if v >= 0 else ~v for v in r["arcs"][0]} for r in rows]
+        common = shapely.union_all([shapely.LineString(topology["arcs"][k]) for k in arcs[0] & arcs[1]])
+        self.assertTrue(common.equals(shapely.LineString([(1, 0), (1, 1)])))
+        self.assertEqual(list(_decode_geometry(topology, rows[0]).exterior.coords), left[:2] + [(1, .3)] + left[2:])
 
     def test_custom_capital_outside_moves_to_nearest_owned_edge(self):
         coord = {"name_en": "D", "name_zh": "D", "lon": 20.5, "lat": 2, "add_city": True}

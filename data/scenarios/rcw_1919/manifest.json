@@ -54,7 +54,7 @@
     "base_scenario": "hoi4_1936",
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "base_scenario_runtime_topology_sha256": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326",
-    "runtime_topology_sha256": "e864897a1ccbe697462ef16aefcd4bd997b2e82d03c35d97602c40557acbf1f3"
+    "runtime_topology_sha256": "e6313f8b3296d436862c0330c7513cb0851a4be1df3aaf2778d5d482cac93710"
   },
   "runtime_topology_url": "data/scenarios/rcw_1919/runtime_topology.topo.json",
   "countries_url": "data/scenarios/rcw_1919/countries.json",
@@ -3490,5 +3490,6 @@
         "UZB-372__RCW_UZB_79887680B98166747305726"
       ]
     }
-  }
+  },
+  "water_regions_url": "data/scenarios/rcw_1919/water_regions.geojson"
 }
