@@ -12,7 +12,7 @@ function matchingIds(overrides, color) {
   return Object.keys(overrides || {}).filter(id => normalizeHexColor(overrides[id]) === color);
 }
 
-function replacementScope(target, oldColor) {
+export function replacementScope(target, oldColor) {
   return {
     featureIds: matchingIds(target.visualOverrides, oldColor),
     riverCellIds: matchingIds(target.riverPaint?.overrides, oldColor),

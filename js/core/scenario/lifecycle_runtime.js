@@ -1,3 +1,4 @@
+import { serializeProjectCountries, unregisterProjectCountryState } from "../project_countries.js";
 import { callRuntimeHook } from "../state/index.js";
 import { getRiverPaintRuntime } from "../river_paint/runtime.js";
 import { setRiverPaintState } from "../state/actions/river_paint_actions.js";
@@ -151,6 +152,7 @@ function createScenarioLifecycleRuntime({
     runtimeState.visualOverrides = {};
     getRiverPaintRuntime(runtimeState).cancel();
     setRiverPaintState(runtimeState, null);
+    for (const { tag } of serializeProjectCountries(runtimeState)) unregisterProjectCountryState(runtimeState, tag);
     runtimeState.sovereignBaseColors = { ...(runtimeState.scenarioFixedOwnerColors || {}) };
 
     runtimeState.activeSovereignCode = runtimeState.mapSemanticMode === "blank"
