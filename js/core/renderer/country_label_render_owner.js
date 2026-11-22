@@ -1046,19 +1046,23 @@ export async function waitForCountryLabelsForExport({
 }) {
   if (isDisabled()) return;
   const started = now();
-  await prepareSource();
+  await prepareSource({ flush: true });
   requestRender();
   for (;;) {
     if (isDisabled()) return;
     const source = getSource();
     if (source.status === "disabled") return;
     const layout = getDiagnostics();
-    if (source.status === "error" || layout.workerErrors > 0) {
-      throw new Error(source.error || "Country names failed to prepare for export.");
+    if (source.status === "error" || source.membershipError || layout.workerErrors > 0) {
+      throw new Error(source.error || source.membershipError || "Country names failed to prepare for export.");
     }
-    if (source.status === "ready" && layout.pendingFits === 0) return;
+    if (source.status === "ready" && !source.membershipStale && layout.pendingFits === 0) return;
     if (now() - started >= timeoutMs) {
       throw new Error("Country names are still preparing; try exporting again when the labels are ready.");
+    }
+    if (source.membershipStale) {
+      await prepareSource({ flush: true });
+      requestRender();
     }
     await wait();
   }

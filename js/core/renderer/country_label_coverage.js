@@ -2,7 +2,7 @@ import { getParentMergedParents } from './parent_merged_presentation.js';
 
 export function createCountryLabelCoverageOwner({ state, peekSource, resolveBorderIdentity,
   getBorderPaletteRevision = () => state.sovereignBaseColors }) {
-  let members = null, countries, parents, paletteRevision;
+  let members = null, countries, parents, paletteRevision, acquiredCodes;
   const identityById = new Map();
   const countsByCode = new Map();
   const suppressed = new Set();
@@ -21,8 +21,12 @@ export function createCountryLabelCoverageOwner({ state, peekSource, resolveBord
     }
     identityById.set(id, identity);
     counts.set(identity, (counts.get(identity) || 0) + 1);
-    const uniformRecolor = counts.size === 1 && /^color:#[0-9a-f]{6}$/.test(identity);
-    const hide = !counts.has(code) && !uniformRecolor;
+    updateSuppression(code, counts);
+  }
+
+  function updateSuppression(code, counts) {
+    const uniformRecolor = counts.size === 1 && /^color:#[0-9a-f]{6}$/.test(counts.keys().next().value);
+    const hide = !acquiredCodes?.has(code) && !counts.has(code) && !uniformRecolor;
     if (hide !== suppressed.has(code)) {
       if (hide) suppressed.add(code);
       else suppressed.delete(code);
@@ -45,6 +49,7 @@ export function createCountryLabelCoverageOwner({ state, peekSource, resolveBord
     if (members !== current || countries !== state.scenarioCountriesByTag || paletteRevision !== revision) {
       invalidate();
       members = current;
+      acquiredCodes = source?.acquiredCodes;
       countries = state.scenarioCountriesByTag;
       paletteRevision = revision;
       if (members) {
@@ -52,6 +57,9 @@ export function createCountryLabelCoverageOwner({ state, peekSource, resolveBord
         for (const code of members.memberCountByCode.keys()) countsByCode.set(code, new Map());
         for (const [id, code] of members.groupCodeById) update(id, code);
       }
+    } else if (acquiredCodes !== source?.acquiredCodes) {
+      acquiredCodes = source?.acquiredCodes;
+      for (const [code, counts] of countsByCode) updateSuppression(code, counts);
     }
     return suppressed;
   }
