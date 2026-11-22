@@ -142,8 +142,13 @@ def _round_political_chunk(path, target, chunk, decimals, grid, protected, stats
             point[:2] = x, y
     features = _chunk_features(payload)
     stats["points_after"] += sum(map(len, _political_rings(features)))
-    if "feature_bounds" in chunk:
-        chunk["feature_bounds"] = [feature_bounds(feature) for feature in features]
+    country_detail = chunk["lod"] == "detail" and chunk["id"].startswith("political.detail.country.")
+    if country_detail or "feature_bounds" in chunk:
+        bounds = [feature_bounds(feature) for feature in features]
+        chunk["feature_bounds"] = bounds
+        if country_detail and bounds:
+            chunk["bounds"] = [min(box[0] for box in bounds), min(box[1] for box in bounds),
+                               max(box[2] for box in bounds), max(box[3] for box in bounds)]
     target.write_bytes(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
     return required
 

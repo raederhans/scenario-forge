@@ -134,6 +134,25 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
                 self.assertEqual(chunk['feature_bounds'], [[0.12346, 0, 4, 4]] * 2)
                 self.assertEqual(chunk['bounds'], [0, 0, 5, 5])
 
+    def test_country_detail_bounds_follow_published_features_and_grid_stays_fixed(self):
+        self.use_scenario('tno_1962')
+        payload = collection()
+        ring = payload['features'][0]['geometry']['coordinates'][0]
+        payload['features'][0]['geometry']['coordinates'][0] = [[x + 10, y + 10] for x, y in ring]
+        for point in payload['features'][1]['geometry']['coordinates'][0]:
+            if point[0] < 1:
+                point[0] = 0.123454
+        country_bounds = [0.123454, 0, 14, 14]
+        grid_bounds = [-180, -90, 180, 90]
+        self.stage(payload, 'political', 'political.detail.country.afg.part.0.json',
+                   lod='detail', owner_code='AFG', bounds=country_bounds, feature_bounds=[])
+        self.stage(feature_collection_to_topology(payload), 'political', 'political.coarse.r0c0.json',
+                   lod='coarse', bounds=grid_bounds, feature_bounds=[])
+        pack_published_runtime_data(self.app)
+        country, grid = json.loads((self.scenario / 'detail_chunks.manifest.json').read_bytes())['chunks']
+        self.assertEqual(country['bounds'], [0.12345, 0, 14, 14])
+        self.assertEqual(grid['bounds'], grid_bounds)
+
     def test_point_protection_rescans_shared_vertices_and_retains_short_arcs(self):
         self.use_scenario('tno_1962')
         a, b, c = [0.0000011, 0], [0.0000022, 0.0000022], [0.0000033, 0]
