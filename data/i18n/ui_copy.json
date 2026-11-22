@@ -1,4 +1,8 @@
 {
+  "This color already belongs to another country. Use “Merge into country”.": {
+    "en": "This color already belongs to another country. Use “Merge into country”.",
+    "zh": "该颜色已属于其他国家，可用“合并到国家”"
+  },
   "Set capital to {name}": {
     "en": "Set capital to {name}",
     "zh": "设定首都 {name}"

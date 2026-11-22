@@ -11249,6 +11249,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "当前浏览器无法读取项目压缩包，请打开其中可编辑的 JSON 文件。",
     "en": "This browser cannot read the project ZIP. Open the editable JSON file instead."
   },
+  "This color already belongs to another country. Use “Merge into country”.": {
+    "zh": "该颜色已属于其他国家，可用“合并到国家”",
+    "en": "This color already belongs to another country. Use “Merge into country”."
+  },
   "This color is already used by another country.": {
     "zh": "已有其他国家使用此颜色。",
     "en": "This color is already used by another country."
