@@ -1,4 +1,5 @@
 import { baseCityNameOverrides } from "../capital_overrides.js";
+import { isRegionalScenario } from "./scenario_region.js";
 import { createDefaultRiverPaintState } from "../river_paint/partition_model.js";
 // Scenario apply pipeline.
 // 这个模块只负责“准备 staged apply runtimeState”和“把 staged runtimeState 落到 runtime runtimeState”。
@@ -302,12 +303,20 @@ function createScenarioApplyPipeline({
   async function stageScenarioReadinessPatch({
     startupReadonly,
     supportsChunkedPoliticalRuntime,
+    regional,
   }) {
-    if (startupReadonly || supportsChunkedPoliticalRuntime) {
+    if (regional || startupReadonly || supportsChunkedPoliticalRuntime) {
+      const patch = { ...captureScenarioReadinessState(runtimeState).values };
+      const enteringChunkedFromRegion = !regional && supportsChunkedPoliticalRuntime
+        && isRegionalScenario(runtimeState.activeScenarioManifest);
+      if (regional || enteringChunkedFromRegion) {
+        patch.detailDeferred = false;
+        patch.detailPromotionCompleted = true;
+        if (enteringChunkedFromRegion) patch.topologyBundleMode = "composite";
+      }
       return {
         detailPromoted: false,
-        scenarioReadinessPatch:
-          captureScenarioReadinessState(runtimeState).values,
+        scenarioReadinessPatch: patch,
       };
     }
     const stagedReadiness =
@@ -731,6 +740,7 @@ function createScenarioApplyPipeline({
     // apply 前半段先守住“能不能安全进入场景”这条线：
     // detail topology / palette / countries / owners 任一关键输入缺失，都在真正 commit 前直接失败。
     const startupReadonly = interactionLevel === "readonly-startup";
+    const regional = isRegionalScenario(bundle);
     const supportsChunkedPoliticalRuntime = scenarioSupportsChunkedRuntime(bundle)
       && (!!bundle?.manifest?.detail_chunk_manifest_url || !!bundle?.manifest?.runtime_meta_url);
     const {
@@ -739,6 +749,7 @@ function createScenarioApplyPipeline({
     } = await stageScenarioReadinessPatch({
       startupReadonly,
       supportsChunkedPoliticalRuntime,
+      regional,
     });
     const politicalChunkedReady =
       supportsChunkedPoliticalRuntime
@@ -747,7 +758,7 @@ function createScenarioApplyPipeline({
     const detailReady = (
       scenarioReadinessPatch.topologyBundleMode === "composite"
       && hasUsablePoliticalTopology(scenarioReadinessPatch.topologyDetail)
-    ) || !!detailPromoted || politicalChunkedReady;
+    ) || !!detailPromoted || politicalChunkedReady || regional;
     // detailReady 只表示“允许进入 apply 的最低入场条件已经满足”。
     // 后续的 hydration health gate、chunk 接管和 post-commit 细化仍可能继续补齐更多 runtime 面。
     // 所以 coarse 路径能继续，不等于场景已经完全稳定；真正 ready 还要看后续 owner 是否把细节面接管完整。
@@ -813,7 +824,7 @@ function createScenarioApplyPipeline({
     };
     const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
     if (
-      mapSemanticMode !== "blank"
+      (regional || mapSemanticMode !== "blank")
       && (
         !runtimeTopologyPayload
         || !Array.isArray(runtimeTopologyPayload?.objects?.political?.geometries)

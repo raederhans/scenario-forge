@@ -622,8 +622,8 @@ export async function loadMapData({
       : loadLocalizationData({
         d3Client,
         localeLevel: localizationUrls.localeLevel,
-        localesUrl: localizationUrls.localesUrl,
-        geoAliasesUrl: localizationUrls.geoAliasesUrl,
+        localesUrl: startupBootArtifacts?.regionalScenario ? null : localizationUrls.localesUrl,
+        geoAliasesUrl: startupBootArtifacts?.regionalScenario ? null : localizationUrls.geoAliasesUrl,
       })
   ));
   const topologyBundlePromise = startupBootArtifactsPromise.then((startupBootArtifacts) => (
@@ -635,14 +635,14 @@ export async function loadMapData({
       prefetchedPrimaryMetrics: startupBootArtifacts?.resourceMetrics?.topologyPrimary || null,
       // A scenario bootstrap brings its own political runtime, so the detail
       // topology must not hold startup back; the deferred promotion decides later.
-      deferDetail: !!startupBootArtifacts?.hasScenarioRuntimeBootstrap,
+      deferDetail: !!startupBootArtifacts?.hasScenarioRuntimeBootstrap || !!startupBootArtifacts?.regionalScenario,
     })
   ));
   const runtimePoliticalPromise = Promise.all([startupBootArtifactsPromise, topologyBundlePromise]).then(
     ([startupBootArtifacts, topologyBundle]) => {
       // 启动已经带了 scenario bootstrap，或者当前明确走 deferred detail，
       // 就不要在首轮完整加载里再抢跑 runtime political。
-      if (startupBootArtifacts?.hasScenarioRuntimeBootstrap || topologyBundle.detailDeferred) {
+      if (startupBootArtifacts?.hasScenarioRuntimeBootstrap || startupBootArtifacts?.regionalScenario || topologyBundle.detailDeferred) {
         return null;
       }
       return d3Client.json(resolveDataUrl(runtimePoliticalUrl)).catch((err) => {

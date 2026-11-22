@@ -1,4 +1,5 @@
 import { baseCityNameOverrides } from "../capital_overrides.js";
+import { isRegionalScenario } from "./scenario_region.js";
 import { serializeProjectCountries, unregisterProjectCountryState } from "../project_countries.js";
 import { callRuntimeHook } from "../state/index.js";
 import { getRiverPaintRuntime } from "../river_paint/runtime.js";
@@ -217,6 +218,7 @@ function createScenarioLifecycleRuntime({
     } = {}
   ) {
     const previousScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+    const clearingRegionalScenario = isRegionalScenario(runtimeState.activeScenarioManifest);
     const hasBaselineRuntimeTopology = !!runtimeState.defaultRuntimePoliticalTopology?.objects?.political;
     const hasBaselineDetailTopology = !!runtimeState.topologyDetail?.objects?.political;
     // Only a chunked scenario completes the promotion without the detail topology.
@@ -241,6 +243,7 @@ function createScenarioLifecycleRuntime({
     runtimeState.scenarioContextLandMaskVersionTag = "";
     runtimeState.mapSemanticMode = "blank";
     runtimeState.runtimePoliticalTopology = runtimeState.defaultRuntimePoliticalTopology || null;
+    if (clearingRegionalScenario) runtimeState.runtimePoliticalFeatureCollectionSeed = null;
     // 清空 scenario 后回到 startup baseline；coarse topology 可见时仍允许 detail promotion 延后完成。
     runtimeState.topologyBundleMode = hasBaselineDetailTopology ? "composite" : "single";
     runtimeState.detailDeferred = (hasBaselineRuntimeTopology || skippedDetailTopology) && !hasBaselineDetailTopology;

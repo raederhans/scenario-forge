@@ -1,4 +1,5 @@
 import { resolveDataUrl } from "../core/data_base_url.js";
+import { isRegionalScenario } from "../core/scenario/scenario_region.js";
 import {
   buildCityLocalizationPatchSteps,
   loadCitySupportData,
@@ -807,7 +808,7 @@ export function createStartupDataPipelineOwner({
         }
         const bundle = await loadScenarioBundle(defaultScenarioId, {
           d3Client,
-          bundleLevel: "bootstrap",
+          bundleLevel: isRegionalScenario(startupBundleResult.manifest) ? "full" : "bootstrap",
         });
         return {
           ok: true,
@@ -841,9 +842,10 @@ export function createStartupDataPipelineOwner({
     // Let loadMapData start bundle-independent assets now. Its topology/localization
     // branches still await this selection before deciding whether to reuse the bundle.
     const startupBootArtifactsOverride = Promise.resolve(startupBundleResultPromise).then(
-      (startupBundleResult) => startupBundleResult?.ok === true
-        ? startupBundleResult.startupBootArtifactsOverride
-        : null
+      (startupBundleResult) => {
+        if (isRegionalScenario(startupBundleResult?.manifest)) return { regionalScenario: true };
+        return startupBundleResult?.ok ? startupBundleResult.startupBootArtifactsOverride : null;
+      }
     );
     const startupScenarioLocalesUrl = getStartupScenarioSupportUrl(
       startupFallbackScenarioId,
