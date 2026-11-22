@@ -625,8 +625,27 @@ def check_neighbor_nodes(fid, previous, current):
     return inserted, delta
 
 
+def hierarchy_overrides(base, members, children):
+    """Project the base scenario's merge/split overrides onto the regional leaves."""
+    base = base or {}
+    base_splits = base.get("feature_splits") or {}
+    splits = {}
+    for parent, kids in base_splits.items():
+        leaves = [leaf for kid in kids for leaf in children.get(kid, [kid]) if leaf in members]
+        if leaves:
+            splits[parent] = leaves
+    nested = {kid for kids in base_splits.values() for kid in kids}
+    for parent, kids in children.items():
+        leaves = [kid for kid in kids if kid in members]
+        if parent not in nested and leaves:
+            splits[parent] = leaves
+    merges = {merged: list(parts) for merged, parts in (base.get("feature_merges") or {}).items()
+              if merged in members or merged in children}
+    return {"feature_merges": dict(sorted(merges.items())), "feature_splits": dict(sorted(splits.items()))}
+
+
 def build(output, base, base_owners, units, membership, ownership, bookmark, cities, generated_at, world_sha,
-          reference_countries, split_rules, adm2):
+          reference_countries, split_rules, adm2, base_hierarchy=None):
     owners, shapes, dropped = select_members(base, base_owners, units, membership, ownership)
     topology, bounds = crop_topology(base, owners, shapes)
     replacements, split_audit = split_features(topology, shapes, owners, units, adm2, split_rules, ownership)
@@ -688,6 +707,7 @@ def build(output, base, base_owners, units, membership, ownership, bookmark, cit
         "city_overrides_url": prefix + "city_overrides.json", "capital_hints_url": prefix + "capital_hints.json",
         "audit_url": prefix + "audit.json",
         "special_zone_layers_url": prefix + "special_zone_layers.json",
+        "hierarchy_overrides": hierarchy_overrides(base_hierarchy, set(owners), split_audit["children_by_parent"]),
     }
     output.mkdir(parents=True, exist_ok=True)
     write(output / "runtime_topology.topo.json", topology, compact=True)
@@ -731,7 +751,7 @@ def main():
           read(RULES / f"{scenario_id}.factions.json"), read(ROOT / "data/world_cities.geojson"),
           args.generated_at or membership["generated_at"], read(base / "manifest.json")["source"]["base_topology_sha256"],
           read(SCENARIOS / "modern_world/countries.json")["countries"], split_rules,
-          read(RULES / split_rules["adm2_source"]))
+          read(RULES / split_rules["adm2_source"]), read(base / "manifest.json").get("hierarchy_overrides"))
     print(f"Built {scenario_id} in {perf_counter() - start:.2f} seconds")
 
 

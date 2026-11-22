@@ -212,5 +212,24 @@ class RegionalScenario(unittest.TestCase):
         self.assertEqual(political["computed_neighbors"], [[1, 2], [0, 2], [0, 1]])
 
 
+class HierarchyOverridesTest(unittest.TestCase):
+    def test_base_overrides_project_onto_regional_leaves(self):
+        from tools.build_regional_scenario import hierarchy_overrides
+        base = {
+            "feature_splits": {"A": ["A__X", "A__Y"], "OUT": ["OUT__1"], "B": ["B__KEEP", "B__GONE"]},
+            "feature_merges": {"M1": ["P", "Q"], "M2": ["R", "S"], "M_OUT": ["T", "U"]},
+        }
+        members = {"A__X__RCW_1", "A__X__RCW_2", "A__Y", "B__KEEP", "C__RCW_1", "C__RCW_2", "M1", "M2__RCW_1", "M2__RCW_2"}
+        children = {"A__X": ["A__X__RCW_1", "A__X__RCW_2"], "C": ["C__RCW_1", "C__RCW_2"],
+                    "M2": ["M2__RCW_1", "M2__RCW_2"]}
+        result = hierarchy_overrides(base, members, children)
+        self.assertEqual(result["feature_splits"], {
+            "A": ["A__X__RCW_1", "A__X__RCW_2", "A__Y"], "B": ["B__KEEP"],
+            "C": ["C__RCW_1", "C__RCW_2"], "M2": ["M2__RCW_1", "M2__RCW_2"],
+        })
+        self.assertEqual(result["feature_merges"], {"M1": ["P", "Q"], "M2": ["R", "S"]})
+        self.assertEqual(hierarchy_overrides(None, members, {}), {"feature_merges": {}, "feature_splits": {}})
+
+
 if __name__ == "__main__":
     unittest.main()
