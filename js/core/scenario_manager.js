@@ -526,6 +526,7 @@ async function applyScenarioBundle(
   bundle,
   {
     renderNow = true,
+    rememberScenario = true,
     suppressRender = false,
     markDirtyReason = "scenario-apply",
     syncPalette = true,
@@ -1032,7 +1033,7 @@ async function applyScenarioBundle(
     throw error;
   }
   const activeScenarioId = runtimeState.activeScenarioId;
-  if (activeScenarioId && runtimeState.scenarioRegistry?.scenarios?.some((entry) => entry.scenario_id === activeScenarioId)) {
+  if (rememberScenario && activeScenarioId && runtimeState.scenarioRegistry?.scenarios?.some((entry) => entry.scenario_id === activeScenarioId)) {
     try {
       globalThis.localStorage.setItem("map_last_scenario", activeScenarioId);
     } catch (_error) {}

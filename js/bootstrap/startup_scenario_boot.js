@@ -96,11 +96,14 @@ export function createStartupScenarioBootOwner({
     runtimeState.scenarioApplyInFlight = true;
     callRuntimeHook(runtimeState, "updateScenarioUIFn");
 
+    const params = new URLSearchParams(globalThis.location?.search);
+    const rememberScenario = !["project", "default_scenario", "sample", "sample_project"].some(key => params.has(key));
     try {
       await applyScenarioBundleCommand(defaultScenarioBundle, {
         renderMode: "none",
         suppressRender: true,
         deferChunkPrewarm: canDeferStartupChunkPrewarm,
+        rememberScenario,
         markDirtyReason: "",
         showToastOnComplete: false,
         interactionLevel: startupInteractionMode === "readonly" ? "readonly-startup" : "full",
@@ -130,6 +133,7 @@ export function createStartupScenarioBootOwner({
       await applyScenarioBundleCommand(defaultScenarioBundle, {
         renderMode: "none",
         suppressRender: true,
+        rememberScenario,
         markDirtyReason: "",
         showToastOnComplete: false,
         interactionLevel: startupInteractionMode === "readonly" ? "readonly-startup" : "full",

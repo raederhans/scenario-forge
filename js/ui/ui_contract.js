@@ -52,6 +52,7 @@ const UI_URL_STATE_KEYS = Object.freeze({
   query: "query",
   page: "page",
   sample: "sample",
+  project: "project",
   legacySample: "sample_project",
   view: "view",
 });

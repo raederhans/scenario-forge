@@ -7,7 +7,7 @@ export const RENDER_SNAPSHOT_ERROR = Object.freeze({
   KIND_UNSUPPORTED: "RENDER_SNAPSHOT_KIND_UNSUPPORTED",
 });
 
-const UNSAFE_RECORD_KEYS = Object.freeze(["__proto__", "prototype", "constructor"]);
+export const UNSAFE_RECORD_KEYS = Object.freeze(["__proto__", "prototype", "constructor"]);
 
 export class RenderSnapshotError extends Error {
   constructor(code, message, details = {}) {
