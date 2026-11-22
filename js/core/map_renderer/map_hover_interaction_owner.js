@@ -204,7 +204,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     });
   }
   function setMapInteractionCursor(nextCursor = "") {
-    surfaceHost.getInteractionRect()?.style("cursor", state.mapLabelEditor?.active ? "crosshair" : nextCursor || null);
+    surfaceHost.getInteractionRect()?.style("cursor", (state.mapLabelEditor?.active || state.mapPointPicker?.active) ? "crosshair" : nextCursor || null);
   }
   function clearUnderlyingHoverForFacilityEntry(entry) {
     if (!getterApi.shouldBlockUnderlyingSelectionForFacility(entry)) return false;

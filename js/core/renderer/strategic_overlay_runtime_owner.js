@@ -1,3 +1,4 @@
+import { cancelMapPointPick, isMapPointPickActive } from "../map_point_picker.js";
 import { placeMapLabel } from "./strategic_overlay_runtime/map_label_runtime_domain.js";
 import { createOperationGraphicsRuntimeDomain } from "./strategic_overlay_runtime/operation_graphics_runtime_domain.js";
 import { createSpecialZonesRuntimeDomain } from "./strategic_overlay_runtime/special_zones_runtime_domain.js";
@@ -205,6 +206,7 @@ export function createStrategicOverlayRuntimeOwner({
     width = 0,
     opacity = 1,
   } = {}) {
+    cancelMapPointPick();
     ensureOperationalLineEditorState();
     ensureOperationGraphicsEditorState();
     patchStrategicOverlayEditorState(state, "operationGraphicsEditor", { selectedId: null });
@@ -547,7 +549,7 @@ export function createStrategicOverlayRuntimeOwner({
     return id;
   }
 
-  function cancelActiveStrategicInteractionModes() {
+  function cancelDrawingModes() {
     let cancelled = false;
     if (state.mapLabelEditor?.active) {
       patchStrategicOverlayEditorState(state, "mapLabelEditor", { active: false });
@@ -576,11 +578,30 @@ export function createStrategicOverlayRuntimeOwner({
     appendOperationalLineVertexFromEvent,
     applySpecialZoneMembershipDragFeature,
     beginSpecialZoneMembershipDrag,
-    cancelActiveStrategicInteractionModes,
+    cancelActiveStrategicInteractionModes() {
+      const cancelledPick = isMapPointPickActive(state) && cancelMapPointPick();
+      return cancelDrawingModes() || cancelledPick;
+    },
     cancelOperationalLineDraw,
     commitSpecialZoneMembershipClick,
     ...unitCounterHelpers,
     ...unitCounterDomain,
+    startOperationGraphicDraw(options) {
+      cancelMapPointPick();
+      return operationGraphicsDomain.startOperationGraphicDraw(options);
+    },
+    startUnitCounterPlacement(options) {
+      cancelMapPointPick();
+      return unitCounterDomain.startUnitCounterPlacement(options);
+    },
+    prepareMapPointPick() {
+      cancelDrawingModes();
+      if (state.specialZoneEditor?.active) specialZonesDomain.cancelSpecialZoneDraw();
+      if (state.strategicOverlayUi?.modalOpen) {
+        patchStrategicOverlayEditorState(state, "strategicOverlayUi", { modalOpen: false });
+        updateStrategicOverlayUi();
+      }
+    },
     deleteSelectedOperationalLine,
     finishOperationalLineDraw,
     addScenarioDefenseLinePresets,
