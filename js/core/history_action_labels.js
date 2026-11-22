@@ -17,6 +17,11 @@ const eraseKinds = new Set([
 ]);
 
 const actionNames = {
+  "set-country-capital": "Set capital to {name}",
+  "hide-country-capital": "Clear capital",
+  "reset-country-capital": "Restore scenario capital",
+  "place-project-capital": "Place capital",
+  "remove-project-city": "Delete project city",
   "register-project-country": "Register new country {name}",
   "unregister-project-country": "Unregister {name}",
   "recolor-project-country": "Change {name} color",

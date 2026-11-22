@@ -10,8 +10,13 @@ import {
   getInteractionFunnelDebugState,
   importProjectThroughFunnel,
   resetInteractionFunnelDebugState,
+  stageImportedProjectPatch,
   resolveImportedTransportCountryOverlayPackIds,
 } from "../js/core/interaction_funnel.js";
+import { commitImportedProjectPatch } from "../js/core/interaction_funnel/import_apply_orchestration.js";
+import { registerProjectCountryState } from "../js/core/project_countries.js";
+import { createBorderIdentityResolver } from "../js/core/renderer/border_identity.js";
+import { setCountryNameOverride } from "../js/core/country_name_overrides.js";
 import { prepareProjectImportFile } from "../js/core/project_package_io.js";
 import {
   getTransportOverviewVisibilityField,
@@ -1816,4 +1821,68 @@ test("era railway visibility survives project roundtrip and defaults on for old 
   const legacy = await importProjectPayload(payload);
   assert.equal(legacy.errors.length, 0);
   assert.equal(legacy.callbacks[0].layerVisibility.showEraRailways, true);
+});
+
+test("project countries and capitals survive save, conflict remapping and legacy imports", async () => {
+  const source = { activeScenarioId: "sample", styleConfig: {}, activeSovereignCode: "P01",
+    visualOverrides: { land: "#123456" }, mapLabels: [{ countryCode: "P01", lon: 1, lat: 2 }],
+    capitalOverrides: { P01: { cityId: "project_city_1" }, AA: { cityId: "late-city" } },
+    projectCities: [{ id: "project_city_1", name: { en: "Port", zh: "港口" }, lon: 1, lat: 2, hostFeatureId: "land", tier: "minor" }] };
+  registerProjectCountryState(source, { tag: "P01", name: "North", color: "#abcdef" });
+  setCountryNameOverride(source, "P01", "zh", "北国");
+  registerProjectCountryState(source, { tag: "P01", name: "North", color: "#123456" });
+  const payload = await exportProjectPayload(source);
+  assert.deepEqual(payload.projectCountries, [{ tag: "P01", name: "North" }]);
+  function restore(raw, countryMap, scenarioColorMap) {
+    const data = FileManager.normalizeImportedProjectData(structuredClone(raw));
+    const { patch, dropped } = stageImportedProjectPatch(data, {
+      scenarioState: { activeScenarioId: "sample", scenarioCountriesByTag: countryMap },
+      preparedScenario: { staged: { scenarioColorMap } }, importedOwnershipState: { sovereigntyByFeatureId: { land: "AA" } },
+    });
+    const target = {};
+    commitImportedProjectPatch(target, patch);
+    return { target, dropped };
+  }
+  for (const conflict of [false, true]) {
+    const native = { tag: "P01", display_name: "Native" };
+    const tag = conflict ? "P02" : "P01";
+    const { target, dropped } = restore(payload, conflict ? { P01: native } : {}, conflict ? { P01: "#654321" } : {});
+    assert.deepEqual(dropped, []);
+    assert.deepEqual(target.scenarioCountriesByTag[tag], { ...source.scenarioCountriesByTag.P01, tag, code: tag });
+    assert.equal(target.sovereignBaseColors[tag], "#123456");
+    assert.equal(target.countryPalette[tag], "#123456");
+    assert.deepEqual(target.countryNameOverrides, { [tag]: { zh: "北国" } });
+    assert.equal(target.mapLabels[0].countryCode, tag);
+    assert.equal(target.activeSovereignCode, tag);
+    assert.deepEqual(target.capitalOverrides, { [tag]: { cityId: "project_city_1" }, AA: { cityId: "late-city" } });
+    assert.deepEqual(target.projectCities, source.projectCities);
+    const resolve = createBorderIdentityResolver({ sovereignBaseColors: target.sovereignBaseColors,
+      getReferenceOwner: () => "AA", getOverrideColor: id => target.visualOverrides[id] });
+    assert.equal(resolve("land"), tag);
+    if (conflict) {
+      assert.deepEqual(target.scenarioCountriesByTag.P01, native);
+      assert.equal(target.sovereignBaseColors.P01, "#654321");
+      assert.equal(target.countryPalette.P01, "#654321");
+    }
+  }
+
+  const duplicate = restore(payload, { AA: {}, P01: {} }, { AA: "#654321", P01: "#654321" });
+  assert.equal(duplicate.target.sovereignBaseColors.P01, "#654322");
+  assert.equal(duplicate.target.countryPalette.P01, "#654322");
+  const malformed = FileManager.normalizeImportedProjectData({ ...payload, projectCountries: [
+    { tag: "P00", name: "Invalid" }, { tag: "Q01", name: "x".repeat(121) }, ...payload.projectCountries,
+  ] });
+  assert.deepEqual(malformed.projectCountries, payload.projectCountries);
+  delete payload.sovereignBaseColors.P01;
+  const missing = restore(payload, { P01: { tag: "P01" } }, { P01: "#654321" });
+  assert.deepEqual(missing.dropped, ["P01"]);
+  assert.equal(missing.target.scenarioCountriesByTag.P02, undefined);
+  assert.equal(missing.target.sovereignBaseColors.P01, "#654321");
+  delete payload.projectCountries;
+  delete payload.capitalOverrides;
+  delete payload.projectCities;
+  const { target } = restore(payload, {}, {});
+  assert.deepEqual(target.capitalOverrides, {});
+  assert.deepEqual(target.projectCities, []);
+  assert.equal(target.scenarioCountriesByTag.P01, undefined);
 });

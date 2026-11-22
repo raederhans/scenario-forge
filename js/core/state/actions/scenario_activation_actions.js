@@ -181,6 +181,8 @@ export const SCENARIO_ACTIVATION_STATE_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
+  "capitalOverrides",
+  "projectCities",
   "riverPaint",
   "scenarioGeneratedColorTags",
   "scenarioFixedOwnerColors",
@@ -608,6 +610,8 @@ export function commitScenarioActivationState(target, patch) {
   target.sovereigntyInitialized = patch.sovereigntyInitialized;
   target.visualOverrides = { ...(patch.visualOverrides || {}) };
   target.riverPaint = riverPaint;
+  target.capitalOverrides = patch.capitalOverrides;
+  target.projectCities = patch.projectCities;
   target.scenarioGeneratedColorTags =
     Array.isArray(patch.scenarioGeneratedColorTags)
       ? [...patch.scenarioGeneratedColorTags]
@@ -853,6 +857,10 @@ function restoreScenarioActivationBeforeColorDirtyStateFromValidated(
   } else {
     delete target.sovereigntyInitialized;
   }
+  if (presentKeys.has("capitalOverrides")) target.capitalOverrides = values.capitalOverrides;
+  else delete target.capitalOverrides;
+  if (presentKeys.has("projectCities")) target.projectCities = values.projectCities;
+  else delete target.projectCities;
   if (presentKeys.has("riverPaint")) target.riverPaint = values.riverPaint;
   else delete target.riverPaint;
   if (presentKeys.has("visualOverrides")) {

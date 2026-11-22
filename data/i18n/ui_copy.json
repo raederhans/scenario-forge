@@ -1,4 +1,24 @@
 {
+  "Set capital to {name}": {
+    "en": "Set capital to {name}",
+    "zh": "设定首都 {name}"
+  },
+  "Clear capital": {
+    "en": "Clear capital",
+    "zh": "清除首都"
+  },
+  "Restore scenario capital": {
+    "en": "Restore scenario capital",
+    "zh": "恢复剧本首都"
+  },
+  "Place capital": {
+    "en": "Place capital",
+    "zh": "放置首都"
+  },
+  "Delete project city": {
+    "en": "Delete project city",
+    "zh": "删除项目城市"
+  },
   "Project countries": {
     "en": "Project countries",
     "zh": "项目国家"

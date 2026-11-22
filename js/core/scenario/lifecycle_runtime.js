@@ -150,6 +150,8 @@ function createScenarioLifecycleRuntime({
     ensureSovereigntyState({ force: true });
     runtimeState.parentBordersVisible = false;
     runtimeState.visualOverrides = {};
+    runtimeState.capitalOverrides = {};
+    runtimeState.projectCities = [];
     getRiverPaintRuntime(runtimeState).cancel();
     setRiverPaintState(runtimeState, null);
     for (const { tag } of serializeProjectCountries(runtimeState)) unregisterProjectCountryState(runtimeState, tag);
@@ -277,6 +279,8 @@ function createScenarioLifecycleRuntime({
     runtimeState.sovereigntyByFeatureId = {};
     runtimeState.sovereigntyInitialized = false;
     runtimeState.visualOverrides = {};
+    runtimeState.capitalOverrides = {};
+    runtimeState.projectCities = [];
     getRiverPaintRuntime(runtimeState).cancel();
     setRiverPaintState(runtimeState, null);
     const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });

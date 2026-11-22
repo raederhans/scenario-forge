@@ -1,10 +1,13 @@
 import { cloneImportedUiValue as cloneImportedProjectValue } from "./state/ui_state.js";
+import { restoreProjectCountries, serializeProjectCountries } from "./project_countries.js";
 import { normalizePaintMode } from "./map_editing_policy.js";
 import { clearDirty } from "./dirty_state.js";
 import { getPhysicalContextLayerRequests } from "./state_defaults.js";
 import { createProjectImportCompletion } from "./interaction_funnel/import_completion.js";
 import { createImportRecoveryUi, importResourceLabel, notifyUnmatchedRegions } from "./interaction_funnel/import_recovery_ui.js";
 import { commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason } from "./state/actions/boot_actions.js";
+import { uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
+import { getParentMergedParents } from "./renderer/parent_merged_presentation.js";
 import { captureProjectImportState } from "./state/actions/project_import_actions.js";
 import { clearHistory } from "./history_manager.js";
 import {
@@ -214,7 +217,7 @@ async function restoreImportedTransportCountryOverlayState(target, importedState
   }
 }
 
-function stageImportedProjectPatch(data, preparedImport) {
+export function stageImportedProjectPatch(data, preparedImport) {
   const original = { ...state, ...preparedImport.scenarioState };
   // Capture the complete explicit import-owned field set, including equal values:
   // scenario activation may change those values before this patch lands.
@@ -229,6 +232,11 @@ function stageImportedProjectPatch(data, preparedImport) {
     ...(stagedScenario.coarseColorMap || {}),
     ...(stagedScenario.scenarioColorMap || {}),
   } : {};
+  const outgoingCountries = serializeProjectCountries(state);
+  if (outgoingCountries.length) {
+    draft.countryPalette = { ...draft.countryPalette };
+    for (const { tag } of outgoingCountries) delete draft.countryPalette[tag];
+  }
   draft.sovereignBaseColors = {
     ...scenarioBaseColors,
     ...(data.sovereignBaseColors || {}),
@@ -311,7 +319,18 @@ function stageImportedProjectPatch(data, preparedImport) {
   draft.cityNameOverrides = data.cityNameOverrides;
   draft.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
-  return captureProjectImportState(draft);
+  draft.capitalOverrides = data.capitalOverrides;
+  draft.projectCities = data.projectCities;
+  const scenarioTags = new Set(Object.keys(draft.scenarioCountriesByTag || {}));
+  const restoreColors = data.projectCountries.some(({ tag }) => scenarioTags.has(tag))
+    ? uniquifyScenarioDefaultColors(scenarioBaseColors, {
+      tags: scenarioTags, preferred: Object.keys(scenarioBaseColors),
+      deferred: new Set(getParentMergedParents(draft.scenarioCountriesByTag).keys()),
+    }) : scenarioBaseColors;
+  const { dropped } = restoreProjectCountries(draft, data.projectCountries, {
+    scenarioBaseColors: restoreColors, savedBaseColors: data.sovereignBaseColors,
+  });
+  return { patch: captureProjectImportState(draft), dropped };
 }
 
 // Required assets and the project patch are staged before changing the document.
@@ -352,7 +371,7 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName, f
     throw Object.assign(new Error("Project import superseded by a document change."), { code: "IMPORT_ABORTED" });
   }
   data = preparedImport.data;
-  const patch = stageImportedProjectPatch(data, preparedImport);
+  const { patch, dropped } = stageImportedProjectPatch(data, preparedImport);
   const previous = captureProjectImportState(state);
   try {
     preparedImport.manager.commitScenarioForProjectImport(preparedImport.preparedScenario, () => {
@@ -457,6 +476,10 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName, f
   if (initialRecovery.editable && optional.length) ui.showToast(ui.t("Project ready. Loading optional layers…", "ui"), {
     duration: 12000, actionLabel: ui.t("Stop loading", "ui"), onAction: () => job.cancel(),
   });
+  if (dropped.length) {
+    const message = ui.t("Project countries without a base color were skipped: {tags}", "ui");
+    ui.showToast(message.replace("{tags}", dropped.join(", ")), { tone: "warning" });
+  }
   notifyUnmatchedRegions(preparedImport.importSummary, ui, regions => {
     if (activeImportRequest === request) callRuntimeHook(state, "showProjectMigrationDetailsFn", regions);
   });
