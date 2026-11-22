@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-11-08T02:57:05Z",
   "counts": {
-    "entries": 1379,
+    "entries": 1380,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -51,7 +51,7 @@
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
       "scenario_registry": 1,
-      "source_ledger_asset": 6,
+      "source_ledger_asset": 7,
       "special_zones": 1,
       "terrain_contours_major_topology": 1,
       "terrain_contours_minor_topology": 1,
@@ -74,13 +74,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "geojson": 155,
+      "geojson": 156,
       "javascript": 2,
       "json": 1050,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1377,
+      "json": 1378,
       "module": 2
     }
   },
@@ -1022,6 +1022,19 @@
       "owner": "source_ledger",
       "cachePolicy": "default",
       "sourceId": "natural_earth_disputed_v5_1_2",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "source:ristat_districts_1897",
+      "url": "data/scenario-rules/rcw.sources/units_1897.geojson",
+      "role": "source_ledger_asset",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "data/source_ledger.json::ristat_districts_1897::current_local_sha256",
+      "owner": "source_ledger",
+      "cachePolicy": "default",
+      "sourceId": "ristat_districts_1897",
       "readMode": "json",
       "aliases": []
     },
