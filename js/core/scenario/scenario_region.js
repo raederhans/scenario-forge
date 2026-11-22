@@ -1,14 +1,15 @@
+export function isValidScenarioBounds(bounds, allowWrap = false) {
+  if (!Array.isArray(bounds) || bounds.length !== 4 || !bounds.every(Number.isFinite)) return false;
+  const [west, south, east, north] = bounds;
+  return Math.abs(west) <= 180 && Math.abs(east) <= 180
+    && (west < east || (allowWrap && west > east && west - east < 360))
+    && south >= -90 && north <= 90 && south < north;
+}
+
 export function getScenarioRegion(manifestOrBundle) {
   const manifest = manifestOrBundle?.manifest ?? manifestOrBundle;
   const region = manifest?.region;
-  const bounds = region?.bounds;
-  if (!Array.isArray(bounds) || bounds.length !== 4) return null;
-  const [west, south, east, north] = bounds;
-  return Number.isFinite(west) && Number.isFinite(east)
-    && Math.abs(west) <= 180 && Math.abs(east) <= 180 && west !== east
-    && !(west === 180 && east === -180)
-    && Number.isFinite(south) && Number.isFinite(north)
-    && south >= -90 && north <= 90 && south < north ? region : null;
+  return isValidScenarioBounds(region?.bounds, true) ? region : null;
 }
 
 export function isRegionalScenario(manifestOrBundle) {

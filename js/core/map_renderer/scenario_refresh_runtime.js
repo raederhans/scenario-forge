@@ -30,6 +30,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     recordScopedTopologyChange = () => {},
     ensureLayerDataFromTopology = () => {},
     getProjectionIdentity = () => 0,
+    needsScenarioRefit = () => false, fitProjection, resetZoomToFit,
     requestScopedRender = () => render(),
   } = deps;
 
@@ -651,10 +652,14 @@ function createScenarioRefreshRuntime(deps = {}) {
     refreshPlan = null,
     refreshKind = "scenario-apply",
     previousRefreshState = null,
+    applyOpeningView = null,
   } = {}) {
+    const cameraChanged = needsScenarioRefit();
     if (refreshKind === "deferred-detail") {
-      const scoped = refreshDeferredDetail({ previousRefreshState, suppressRender });
-      if (scoped) return scoped;
+      if (!cameraChanged) {
+        const scoped = refreshDeferredDetail({ previousRefreshState, suppressRender });
+        if (scoped) return scoped;
+      }
     } else if (refreshKind !== "scenario-apply") {
       throw new Error(`Unsupported scenario refresh kind: ${refreshKind}`);
     }
@@ -668,7 +673,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     resetRendererTransactionState({ hitCanvasDirty: true });
     rebuildPrimaryPoliticalDerivedState({
       scheduleUiMode: "deferred",
-      buildSpatial: true,
+      buildSpatial: !cameraChanged,
       includeSecondarySpatial: false,
     });
     clearLastGoodFrame("scenario-apply-refresh");
@@ -683,9 +688,14 @@ function createScenarioRefreshRuntime(deps = {}) {
     });
     invalidateBorderCache();
     updateDynamicBorderStatusUI();
-    updateSpecialZonesPaths();
-    renderSpecialZoneEditorOverlay();
-    updateZoomTranslateExtent();
+    if (cameraChanged) {
+      fitProjection();
+      resetZoomToFit();
+    } else {
+      updateSpecialZonesPaths();
+      renderSpecialZoneEditorOverlay();
+      updateZoomTranslateExtent();
+    }
     const atlantropaWaterFeatureCount = getEffectiveAtlantropaFeatures().water.length;
     resetScenarioWaterCacheAdaptiveState(rendererRefreshPlan.resetWaterCacheReason || "scenario-switch-complete");
     let atlantropaWaterIndexCount = 0;
@@ -712,6 +722,7 @@ function createScenarioRefreshRuntime(deps = {}) {
         reason: "scenario-apply-secondary-spatial",
       });
     }
+    applyOpeningView?.();
     if (!suppressRender) {
       render();
     }

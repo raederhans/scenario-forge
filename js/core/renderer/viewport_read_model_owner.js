@@ -1,3 +1,5 @@
+import { wrapLongitude } from "./regional_camera.js";
+
 const WORLD_GEO_BOUNDS = Object.freeze([-180, -90, 180, 90]);
 
 function normalizeProjectedBounds(bounds) {
@@ -76,7 +78,8 @@ export function createViewportReadModelOwner({
       : null;
     if (!projection) return "projection:na";
     const translate = projection.translate || [0, 0];
-    return [projection.scale || 0, translate[0] || 0, translate[1] || 0]
+    return [projection.scale || 0, translate[0] || 0, translate[1] || 0,
+      ...(projection.rotate?.some(Boolean) ? projection.rotate : [])]
       .map((value) => Number(Number(value).toFixed(3))).join("|");
   }
 
@@ -91,6 +94,7 @@ export function createViewportReadModelOwner({
     const { width, height } = getViewportDimensions({ min: 1 });
     const insetX = Math.min(width * viewportGeoBoundsInsetXRatio, viewportGeoBoundsInsetXMax);
     const insetY = Math.min(height * viewportGeoBoundsInsetYRatio, viewportGeoBoundsInsetYMax);
+    const regionalBounds = capabilities.getRegionalBounds?.();
     const samplePoints = [
       [insetX, insetY],
       [width * 0.5, insetY],
@@ -102,6 +106,7 @@ export function createViewportReadModelOwner({
       [width * 0.5, Math.max(insetY, height - insetY)],
       [Math.max(insetX, width - insetX), Math.max(insetY, height - insetY)],
     ];
+    const meridian = regionalBounds ? -capabilities.getProjectionSnapshot().rotate[0] : 0;
     const longitudes = [];
     const latitudes = [];
     samplePoints.forEach(([screenX, screenY]) => {
@@ -110,11 +115,14 @@ export function createViewportReadModelOwner({
           / Math.max(0.0001, Number(transform.k || 1));
         const mapY = (Number(screenY || 0) - Number(transform.y || 0))
           / Math.max(0.0001, Number(transform.k || 1));
-        const inverted = capabilities.invertProjectionPoint([mapX, mapY]);
+        const inverted = capabilities.invertProjectionPoint(regionalBounds ? [
+          Math.max(regionalBounds[0][0], Math.min(regionalBounds[1][0], mapX)),
+          Math.max(regionalBounds[0][1], Math.min(regionalBounds[1][1], mapY)),
+        ] : [mapX, mapY]);
         if (!Array.isArray(inverted) || inverted.length < 2) return;
         const [lon, lat] = inverted.map((value) => Number(value));
         if (!Number.isFinite(lon) || !Number.isFinite(lat)) return;
-        longitudes.push(Math.max(-180, Math.min(180, lon)));
+        longitudes.push(regionalBounds ? wrapLongitude(lon - meridian) : Math.max(-180, Math.min(180, lon)));
         latitudes.push(Math.max(-90, Math.min(90, lat)));
       } catch (_error) {
         // Projection inversion can fail near singularities; remaining samples still define the view.
@@ -124,10 +132,12 @@ export function createViewportReadModelOwner({
     const sortedLongitudes = [...longitudes].sort((left, right) => left - right);
     const sortedLatitudes = [...latitudes].sort((left, right) => left - right);
     const trimCount = sortedLongitudes.length >= 7 && sortedLatitudes.length >= 7 ? 1 : 0;
+    const longitudeAt = (index) => regionalBounds
+      ? wrapLongitude(sortedLongitudes[index] + meridian) : sortedLongitudes[index];
     return [
-      sortedLongitudes[trimCount],
+      longitudeAt(trimCount),
       sortedLatitudes[trimCount],
-      sortedLongitudes[sortedLongitudes.length - 1 - trimCount],
+      longitudeAt(sortedLongitudes.length - 1 - trimCount),
       sortedLatitudes[sortedLatitudes.length - 1 - trimCount],
     ];
   }
@@ -143,7 +153,10 @@ export function createViewportReadModelOwner({
       [-mapPanPaddingPx, -mapPanPaddingPx],
       [width + mapPanPaddingPx, height + mapPanPaddingPx],
     ];
-    const bounds = mergeProjectedBounds(readBoundsSnapshots("getPanContentBoundsSnapshots"));
+    const region = capabilities.getRegionalBounds?.();
+    const bounds = region
+      ? { minX: region[0][0], minY: region[0][1], maxX: region[1][0], maxY: region[1][1] }
+      : mergeProjectedBounds(readBoundsSnapshots("getPanContentBoundsSnapshots"));
     if (!bounds) return fallback;
     return [
       [bounds.minX - mapPanPaddingPx, bounds.minY - mapPanPaddingPx],
@@ -152,6 +165,8 @@ export function createViewportReadModelOwner({
   }
 
   function getProjectedRenderableContentBounds() {
+    const region = capabilities.getRegionalBounds?.();
+    if (region) return normalizeProjectedBounds({ minX: region[0][0], minY: region[0][1], maxX: region[1][0], maxY: region[1][1] });
     return mergeProjectedBounds(readBoundsSnapshots("getProjectedRenderableContentBoundsSnapshots"));
   }
 

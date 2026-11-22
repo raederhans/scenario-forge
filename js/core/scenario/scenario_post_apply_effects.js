@@ -13,6 +13,8 @@ import {
   refreshScenarioOpeningOwnerBorders,
   setMapData,
 } from "./scenario_renderer_bridge.js";
+import { applyScenarioOpeningView } from "./presentation_opening_view.js";
+import { isRegionalScenario } from "./scenario_region.js";
 import { rebuildPresetState } from "../releasable_manager.js";
 import { refreshScenarioDataHealth } from "./scenario_data_health.js";
 import {
@@ -695,6 +697,9 @@ async function runPostScenarioApplyEffects({
     isScenarioApplyRequestCurrent,
     reason: "scenario-post-apply",
   };
+  const applyOpeningView = isRegionalScenario(bundle?.manifest)
+    ? () => applyScenarioOpeningView(bundle.manifest, { suppressRender: useSingleFinalRender || suppressRender })
+    : null;
   let scenarioMapRefreshMode = "light";
   try {
     recordRenderTransactionSnapshot(runtimeState, {
@@ -711,6 +716,7 @@ async function runPostScenarioApplyEffects({
     refreshMapDataForScenarioApply({
       suppressRender: useSingleFinalRender ? true : suppressRender,
       refreshPlan,
+      applyOpeningView,
     });
     recordRenderTransactionSnapshot(runtimeState, {
       phase: "scenario-refresh-map-data-complete",
@@ -742,6 +748,7 @@ async function runPostScenarioApplyEffects({
       resetZoom: false,
       suppressRender: useSingleFinalRender ? true : suppressRender,
     });
+    applyOpeningView?.();
   }
   rebuildPresetState();
   refreshScenarioShellOverlays({

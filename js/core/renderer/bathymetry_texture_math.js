@@ -42,7 +42,8 @@ export function createProjectionInverseParams(projection) {
     offsetY: translate[1] + scale * origin[1], rotation: rotation[0] * RAD };
   // d3 projections expose no raw-projection identity; compare their observable mapping.
   for (const [lon, lat] of [[0, 0], [41, 23], [-73, -51], [120, 70]]) {
-    const lambda = ((lon * RAD + params.rotation + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+    let lambda = lon * RAD + params.rotation;
+    if (Math.abs(lambda) > Math.PI) lambda -= Math.round(lambda / (2 * Math.PI)) * 2 * Math.PI;
     const raw = equalEarthRaw(lambda, lat * RAD), actual = projection([lon, lat]);
     if (Math.abs(actual[0] - (params.offsetX + scale * raw[0])) > 1e-7
       || Math.abs(actual[1] - (params.offsetY - scale * raw[1])) > 1e-7) return null;
