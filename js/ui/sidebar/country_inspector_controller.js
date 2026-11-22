@@ -1331,9 +1331,9 @@ export function createCountryInspectorController({
         return host ? members.has(host) : normalizeCountryCode(p.__city_country_code || p.country_code) === code;
       }).map(feature => ({ id: getCityOverrideId(feature), feature, inTerritory: true }));
     }
-    const options = entries.map(({ id, feature, inTerritory }) => {
+    const options = entries.map(({ id, feature, inTerritory, hostless }) => {
       const name = cityLabel(feature);
-      const label = inTerritory ? name : t("{name} (outside territory)", "ui", { name });
+      const label = inTerritory || hostless ? name : t("{name} (outside territory)", "ui", { name });
       const option = new Option(feature === capital ? `★ ${label}` : label, id);
       option.dataset.name = name;
       option.dataset.source = feature.properties.__city_source;

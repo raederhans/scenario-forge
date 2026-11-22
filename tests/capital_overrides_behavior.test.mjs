@@ -144,3 +144,15 @@ test("normalization keeps unresolved ids and discards malformed records", () => 
   assert.deepEqual(normalizeProjectCities([null, valid, { ...valid, id: "project_city_2", lat: 100 }]),
     [{ ...valid, name: { en: "Name", zh: "Name" }, tier: "minor", hostFeatureId: "" }]);
 });
+
+test("a city without a host region stays editable in its country's list but cannot become the capital", () => {
+  const { state, options } = fixture();
+  const hostless = normalizeCityFeature({ type: "Feature", id: "nord", geometry: { type: "Point", coordinates: [5, 5] },
+    properties: { country_code: "AA", population: 5000 } }, 9);
+  const cityCollection = { features: [...state.worldCitiesData.features, hostless] };
+  const entry = listCountryCities(state, "AA", { ...options, cityCollection }).find(item => item.id === "nord");
+  assert.deepEqual(entry && { inTerritory: entry.inTerritory, hostless: entry.hostless }, { inTerritory: false, hostless: true });
+  assert.equal(listCountryCities(state, "BB", { ...options, cityCollection }).some(item => item.id === "nord"), false);
+  assert.notEqual(pickLargestCity(state, "AA", { ...options, cityCollection }), "nord");
+  assert.equal(setCapitalOverride(state, "AA", "nord", { ...options, cityCollection }), false);
+});

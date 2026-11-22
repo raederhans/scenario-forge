@@ -126,7 +126,12 @@ export function listCountryCities(state, rawTag, options = {}) {
   for (const city of getCities(state, options)) {
     const host = getCityTerritoryHostId(state, city);
     const id = getCityCanonicalId(city);
-    if (!host && state.capitalOverrides?.[tag]?.cityId !== id) continue;
+    if (!host && state.capitalOverrides?.[tag]?.cityId !== id) {
+      // 没有宿主地块的基础城市（如格陵兰的 Nord）仍按国家代码列出，供改名和隐藏；它无法判定境内，不能设为首都。
+      const code = canonicalCountryCode(city.properties.__city_country_code || city.properties.country_code);
+      if (city.properties.__city_source !== "project" && code === tag) entries.push({ id, feature: city, inTerritory: false, hostless: true });
+      continue;
+    }
     const inTerritory = inCountry(city, tag, host);
     if (inTerritory || canonicalCountryCode(state.sovereigntyByFeatureId?.[host]) === tag
       || (!host && state.capitalOverrides?.[tag]?.cityId === id)) {
