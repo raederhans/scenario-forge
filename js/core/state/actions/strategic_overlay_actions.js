@@ -10,13 +10,13 @@ export const STRATEGIC_OVERLAY_COLLECTION_KEYS = Object.freeze([
 
 export const STRATEGIC_OVERLAY_ENTITY_FIELD_KEYS = Object.freeze({
   operationalLines: Object.freeze([
-    "kind", "label", "points", "stylePreset", "stroke", "width", "opacity",
+    "kind", "label", "labelSize", "labelOnPath", "points", "stylePreset", "stroke", "width", "opacity",
     "attachedCounterIds",
   ]),
   operationGraphics: Object.freeze([
-    "kind", "label", "points", "stylePreset", "stroke", "width", "opacity",
+    "kind", "label", "labelSize", "labelOnPath", "points", "stylePreset", "stroke", "width", "opacity",
   ]),
-  mapLabels: Object.freeze(["text", "countryCode", "fallbackName", "lon", "lat", "size", "rotation", "tracking", "uppercase", "colorMode", "replaceCountryName", "preset", "italic", "weight", "color", "opacity"]),
+  mapLabels: Object.freeze(["text", "countryCode", "fallbackName", "lon", "lat", "size", "rotation", "curve", "tracking", "uppercase", "colorMode", "replaceCountryName", "preset", "italic", "weight", "color", "opacity"]),
   unitCounters: Object.freeze([
     "renderer", "label", "sidc", "symbolCode", "nationTag", "nationSource", "presetId",
     "iconId", "unitType", "echelon", "subLabel", "strengthText", "baseFillColor",
@@ -27,11 +27,11 @@ export const STRATEGIC_OVERLAY_ENTITY_FIELD_KEYS = Object.freeze({
 
 export const STRATEGIC_OVERLAY_EDITOR_FIELD_KEYS = Object.freeze({
   operationalLineEditor: Object.freeze([
-    "active", "mode", "points", "kind", "label", "stylePreset", "stroke", "width",
+    "active", "mode", "points", "kind", "label", "labelSize", "labelOnPath", "stylePreset", "stroke", "width",
     "opacity", "selectedId", "selectedVertexIndex", "counter",
   ]),
   operationGraphicsEditor: Object.freeze([
-    "active", "mode", "collection", "points", "kind", "label", "stylePreset", "stroke",
+    "active", "mode", "collection", "points", "kind", "label", "labelSize", "labelOnPath", "stylePreset", "stroke",
     "width", "opacity", "selectedId", "selectedVertexIndex", "counter",
   ]),
   mapLabelEditor: Object.freeze(["active", "selectedId", "draggingId", "counter"]),

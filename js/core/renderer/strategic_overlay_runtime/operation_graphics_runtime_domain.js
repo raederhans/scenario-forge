@@ -1,3 +1,4 @@
+import { normalizeOperationLabelSize } from "../operation_graphic_geometry.js";
 // Operation graphic runtime mutations.
 import {
   commitStrategicOverlayCollectionsState,
@@ -65,6 +66,8 @@ export function createOperationGraphicsRuntimeDomain({
   function startOperationGraphicDraw({
     kind = defaultOperationGraphicKind,
     label = "",
+    labelSize = 9,
+    labelOnPath = false,
     opacity = 1,
     stroke = "",
     stylePreset = defaultOperationGraphicKind,
@@ -77,6 +80,8 @@ export function createOperationGraphicsRuntimeDomain({
       points: [],
       kind: String(kind || defaultOperationGraphicKind),
       label: String(label || ""),
+      labelSize: normalizeOperationLabelSize(labelSize),
+      labelOnPath: labelOnPath === true,
       stylePreset: normalizeOperationGraphicStylePreset(stylePreset, kind),
       stroke: normalizeOperationGraphicStroke(stroke),
       width: normalizeOperationGraphicWidth(width),
@@ -128,6 +133,8 @@ export function createOperationGraphicsRuntimeDomain({
         id,
         kind,
         label: String(state.operationGraphicsEditor.label || "").trim(),
+        labelSize: normalizeOperationLabelSize(state.operationGraphicsEditor.labelSize),
+        labelOnPath: state.operationGraphicsEditor.labelOnPath === true,
         points: [...points],
         stylePreset: normalizeOperationGraphicStylePreset(state.operationGraphicsEditor.stylePreset, kind),
         stroke: normalizeOperationGraphicStroke(state.operationGraphicsEditor.stroke) || null,
@@ -163,6 +170,8 @@ export function createOperationGraphicsRuntimeDomain({
       Object.assign(editorPatch, {
         kind: String(graphic.kind || defaultOperationGraphicKind),
         label: String(graphic.label || ""),
+        labelSize: normalizeOperationLabelSize(graphic.labelSize),
+        labelOnPath: graphic.labelOnPath === true,
         stylePreset: normalizeOperationGraphicStylePreset(graphic.stylePreset, graphic.kind),
         stroke: normalizeOperationGraphicStroke(graphic.stroke),
         width: normalizeOperationGraphicWidth(graphic.width),
@@ -217,6 +226,8 @@ export function createOperationGraphicsRuntimeDomain({
     const entityPatch = {};
     if (partial.kind) entityPatch.kind = nextKind;
     if (partial.label !== undefined) entityPatch.label = String(partial.label || "");
+    if (partial.labelSize !== undefined) entityPatch.labelSize = normalizeOperationLabelSize(partial.labelSize);
+    if (partial.labelOnPath !== undefined) entityPatch.labelOnPath = partial.labelOnPath === true;
     if (partial.stylePreset !== undefined) {
       entityPatch.stylePreset = normalizeOperationGraphicStylePreset(partial.stylePreset, nextKind);
     }
@@ -226,6 +237,8 @@ export function createOperationGraphicsRuntimeDomain({
     patchStrategicOverlayEntityState(state, "operationGraphics", selectedId, entityPatch);
     patchStrategicOverlayEditorState(state, "operationGraphicsEditor", {
       points: Array.isArray(target.points) ? [...target.points] : [],
+      labelSize: entityPatch.labelSize ?? normalizeOperationLabelSize(target.labelSize),
+      labelOnPath: entityPatch.labelOnPath ?? (target.labelOnPath === true),
     });
     setStrategicOverlayDirtyState(state, "operationGraphicsDirty", true);
     commitHistoryEntry({

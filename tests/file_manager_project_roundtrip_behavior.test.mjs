@@ -79,6 +79,39 @@ test("project round trip preserves manual lettering and discards invalid coordin
   assert.deepEqual(state.mapLabels, []);
 });
 
+test("operation label settings and manual curvature survive save and import with sparse defaults", async () => {
+  const points = [[0, 0], [1, 1], [2, 0]];
+  const entries = [
+    { id: "custom", kind: "encirclement", points, labelSize: 14.5, labelOnPath: true },
+    { id: "defaults", points, labelSize: 9, labelOnPath: false },
+    { id: "legacy", points },
+  ];
+  const payload = await exportProjectPayload({
+    styleConfig: {}, operationalLines: entries, operationGraphics: entries,
+    mapLabels: [42, 0].map((curve, i) => ({ id: String(i), lon: 0, lat: 0, text: "Arc", curve })),
+  });
+  const imported = (await importProjectPayload(payload)).successes[0];
+  for (const project of [payload, imported]) {
+    assert.equal(project.mapLabels[0].curve, 42);
+    assert.equal(Object.hasOwn(project.mapLabels[1], "curve"), false);
+    for (const collection of [project.operationalLines, project.operationGraphics]) {
+      assert.equal(collection[0].labelSize, 14.5);
+      assert.equal(collection[0].labelOnPath, true);
+      for (const entry of collection.slice(1)) {
+        assert.equal(Object.hasOwn(entry, "labelSize"), false);
+        assert.equal(Object.hasOwn(entry, "labelOnPath"), false);
+      }
+    }
+  }
+  payload.operationGraphics[0].labelSize = 200;
+  payload.operationalLines[0].labelSize = -1;
+  payload.operationalLines[0].labelOnPath = "false";
+  const sanitized = (await importProjectPayload(payload)).successes[0];
+  assert.equal(sanitized.operationGraphics[0].labelSize, 64);
+  assert.equal(sanitized.operationalLines[0].labelSize, 4);
+  assert.equal(Object.hasOwn(sanitized.operationalLines[0], "labelOnPath"), false);
+});
+
 test("import summary counts rejected entries while preserving valid unloaded regions and migration", async () => {
   // Isolate the module's migration-asset promise from other project-import cases.
   const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?import-summary");
