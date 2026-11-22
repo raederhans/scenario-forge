@@ -6,6 +6,10 @@ import { buildShareLink, getSharedProjectLinkFromUrl, validateSharedProjectUrl }
 import { createDefaultBootState } from "../js/core/state/boot_state.js";
 import { resolveStartupScenarioId } from "../js/bootstrap/startup_data_pipeline.js";
 import { createSampleProjectBannerController } from "../js/ui/toolbar/sample_project_banner_controller.js";
+import { markDirty } from "../js/core/dirty_state.js";
+import { state as runtimeState } from "../js/core/state.js";
+import { registerOwnedRuntimeHook } from "../js/core/state/index.js";
+import { importProjectThroughFunnel } from "../js/core/interaction_funnel.js";
 
 const raw = "https://example.test/p.json";
 
@@ -23,7 +27,7 @@ test("share links require an absolute public HTTPS address", () => {
   assert.equal(getSharedProjectLinkFromUrl(link.search), source);
 });
 
-function setup(t, rawUrl = raw) {
+function setup(t, rawUrl = raw, state = createDefaultBootState()) {
   const location = new URL("https://app.test/app/?sample=test&sample_project=old&default_scenario=blank_base&tab=project#panel");
   location.searchParams.set("project", rawUrl);
   const history = { state: { tab: 1 }, replaceState(value, _, href) {
@@ -33,7 +37,7 @@ function setup(t, rawUrl = raw) {
   globalThis.location = location;
   globalThis.history = history;
   t.after(() => { delete globalThis.location; delete globalThis.history; });
-  const state = { ...createDefaultBootState(), bootPhase: "ready", uiHydrationStatus: "ready" };
+  Object.assign(state, { bootPhase: "ready", uiHydrationStatus: "ready" });
   const request = initializeSharedProjectLink(state);
   assert.equal(location.searchParams.has("sample"), false);
   assert.equal(location.searchParams.has("sample_project"), false);
@@ -83,15 +87,18 @@ test("only starts when both surfaces are ready, waits for consent, and cleans on
   assert.equal(options.showAppDialog.mock.callCount(), 0);
   state.uiHydrationStatus = "ready";
   state.isDirty = true;
-  let decide;
+  let decide, dialogShown;
+  const shown = new Promise(resolve => { dialogShown = resolve; });
   const pending = open({ fetchImpl, showAppDialog(dialog) {
     assert.match(dialog.message, /example\.test/);
     assert.match(dialog.details, /unsaved|未保存/i);
+    dialogShown();
     return new Promise(resolve => { decide = resolve; });
   } });
   assert.equal(state.sharedProjectLink.status, "confirming");
   assert.equal(fetchImpl.mock.callCount(), 0);
   await open(options);
+  await shown;
   decide(false);
   await pending;
   assert.equal(fetchImpl.mock.callCount(), 0);
@@ -100,6 +107,8 @@ test("only starts when both surfaces are ready, waits for consent, and cleans on
 });
 
 for (const [label, body, code] of [
+  ["ordinary JSON", '{"message":"File moved"}', "not-project"],
+  ["ordinary JSON in a package", zipSync({ "map_project.json": strToU8('{"message":"File moved"}') }), "not-project"],
   ["HTML", "<html>sign in", "not-project"],
   ["invalid UTF-8", Uint8Array.of(123, 34, 255, 34, 58, 49, 125), "not-project"],
   ["nested prototype pollution key", '{"layers":[{"__proto__":1}]}', "unsafe-project-keys"],
@@ -138,7 +147,7 @@ for (const zipped of [false, true]) {
         assert.equal(url, raw);
         const { signal, ...init } = options;
         assert.equal(signal.aborted, false);
-        assert.deepEqual(init, { mode: "cors", credentials: "omit", redirect: "follow",
+        assert.deepEqual(init, { mode: "cors", credentials: "omit", redirect: "manual",
           referrerPolicy: "no-referrer", cache: "no-store" });
         return response(new ReadableStream({ start(stream) {
           stream.enqueue(bytes.slice(0, 2)); stream.enqueue(bytes.slice(2)); stream.close();
@@ -196,18 +205,79 @@ test("one deadline covers the entire download including a stalled body", async t
 
 test("an unsuccessful funnel result is reported to the banner", async t => {
   const { open } = setup(t);
-  const result = await open({ showAppDialog: accept, fetchImpl: () => response("{}"),
+  const result = await open({ showAppDialog: accept, fetchImpl: () => response('{"colors":{}}'),
     importProject: () => ({ status: "failed" }) });
   assert.equal(result.errorCode, "import-failed");
 });
 
-test("shared banner downloads the fetched bytes, saves a copy and can be dismissed", async t => {
-  const element = () => Object.assign(new EventTarget(), {
+test("edits made after consent cancel the download's import and notify the user", async t => {
+  const { open, state } = setup(t);
+  const toast = t.mock.fn();
+  t.after(registerOwnedRuntimeHook(state, "showToastFn", toast));
+  const importProject = t.mock.fn(() => true);
+  const result = await open({ showAppDialog: accept, importProject, fetchImpl() {
+    state.dirtyRevision = 1;
+    state.historyPast = [{ label: "paint" }];
+    return response('{"schemaVersion":22}');
+  } });
+  assert.equal(result.status, "cancelled");
+  assert.equal(importProject.mock.callCount(), 0);
+  assert.equal(toast.mock.callCount(), 1);
+});
+
+test("a redirect stops at the original host and shows the final raw link hint", async t => {
+  const { open, state } = setup(t);
+  const importProject = t.mock.fn(() => true);
+  const requests = [];
+  const result = await open({ showAppDialog: accept, importProject, fetchImpl(url, options) {
+    requests.push(url);
+    if (options.redirect === "follow") requests.push("https://elsewhere.test/map.json");
+    return { type: "opaqueredirect", status: 0, ok: false, url: "" };
+  } });
+  assert.deepEqual(requests, [raw]);
+  assert.equal(result.errorCode, "redirect");
+  assert.equal(importProject.mock.callCount(), 0);
+  const root = bannerElement(), bodyNode = bannerElement();
+  createSampleProjectBannerController(state, { root, bodyNode }).render();
+  assert.equal(bodyNode.textContent, "This link redirects elsewhere. Use the final raw file link.");
+});
+
+function bannerElement() {
+  return Object.assign(new EventTarget(), {
     dataset: {}, classList: { toggle() {} },
     setAttribute(key, value) { this[key] = value; },
     removeAttribute(key) { delete this[key]; },
   });
-  const root = element(), copy = element(), download = element(), dismiss = element(), title = element();
+}
+
+test("opening another document clears the shared banner and releases the original download", async t => {
+  const { open, state } = setup(t, raw, runtimeState);
+  globalThis.document = { getElementById: () => null };
+  t.after(() => { delete globalThis.document; });
+  const root = bannerElement(), download = bannerElement();
+  const controller = createSampleProjectBannerController(state, { root, downloadOriginalLink: download });
+  controller.bindEvents();
+  t.after(registerOwnedRuntimeHook(state, "refreshSampleProjectBannerFn", () => controller.render()));
+  const result = await open({ showAppDialog: accept, fetchImpl: () => response('{"schemaVersion":22}') });
+  assert.equal(result.status, "success");
+  const original = download.href;
+  assert.match(original, /^blob:/);
+  markDirty("paint");
+  assert.equal(root.hidden, false);
+  const replacement = await importProjectThroughFunnel(null, { fileName: "p.json",
+    projectPayload: { schemaVersion: 22, projectName: "Local map" } });
+  assert.match(replacement.status, /^committed/);
+  assert.equal(state.projectName, "Local map");
+  assert.equal(state.sharedProjectLink.status, "idle");
+  assert.equal(state.sharedProjectLink.originalFile, null);
+  assert.equal(root.hidden, true);
+  assert.equal(download.href, undefined);
+  await assert.rejects(fetch(original), TypeError);
+  await replacement.completion;
+});
+
+test("shared banner downloads the fetched bytes, saves a copy and can be dismissed", async t => {
+  const root = bannerElement(), copy = bannerElement(), download = bannerElement(), dismiss = bannerElement(), title = bannerElement();
   const saveCopy = t.mock.fn();
   const shared = { status: "success", host: "example.test", originalFile: new File(["original"], "p.json") };
   const controller = createSampleProjectBannerController({ sharedProjectLink: shared }, {

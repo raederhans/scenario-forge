@@ -11517,6 +11517,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "此图层暂时无法添加到主地图。",
     "en": "This layer can't be added to the main map yet."
   },
+  "This link redirects elsewhere. Use the final raw file link.": {
+    "zh": "这个链接会跳转到其他地址，请使用最终的原始文件链接（raw 地址）。",
+    "en": "This link redirects elsewhere. Use the final raw file link."
+  },
   "This only removes the selected project-local strategic line.": {
     "zh": "这只会移除当前项目中的所选战略线。",
     "en": "This only removes the selected project-local strategic line."

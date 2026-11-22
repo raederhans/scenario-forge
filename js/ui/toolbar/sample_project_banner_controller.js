@@ -308,6 +308,7 @@ export function createSampleProjectBannerController(runtimeState, {
       if (originalUrl && (!view?.canSaveCopy || dismissedKey === visibleKey)) {
         URL.revokeObjectURL(originalUrl);
         originalUrl = "";
+        downloadOriginalLink.removeAttribute("href");
       }
       if (!root || !view || dismissedKey === view.dismissKey) {
         setElementHidden(root, true);

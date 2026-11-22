@@ -26,6 +26,7 @@ export async function openStartupSharedProject(state, raw, options = {}) {
   try {
     const url = validateSharedProjectUrl(raw);
     updateState({ host: url.host, status: "confirming" });
+    const { importSharedProject } = await import("../core/shared_project_import_workflow.js");
     const warning = t("This replaces the current map. Nothing of yours is uploaded. Only open links you trust.", "ui");
     const confirmed = await showAppDialog({
       title: t("Open shared project?", "ui"),
@@ -34,10 +35,8 @@ export async function openStartupSharedProject(state, raw, options = {}) {
       confirmLabel: t("Open", "ui"), cancelLabel: t("Don't open", "ui"), tone: "warning",
     });
     if (!confirmed) return updateState({ status: "cancelled" });
-    updateState({ status: "loading" });
-    const { importSharedProject } = await import("../core/shared_project_import_workflow.js");
     return await importSharedProject(url.href, {
-      ...options, updateState,
+      ...options, state, updateState,
       ui: { t, showAppDialog, showToast: (...args) => callRuntimeHook(state, "showToastFn", ...args) },
       hooks: { refreshColorState: patch => callRuntimeHook(state, "refreshColorStateFn", patch) },
     });

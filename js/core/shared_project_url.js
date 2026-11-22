@@ -2,6 +2,7 @@ export const SHARED_PROJECT_ERRORS = Object.freeze({
   "invalid-url": "The project link is invalid.",
   "not-https": "Only HTTPS project links are supported.",
   "fetch-failed": "Could not download the project file.",
+  redirect: "This link redirects elsewhere. Use the final raw file link.",
   "cors-blocked": "The server does not allow this app to read the file across origins (CORS).",
   "too-large": "The project file is too large.",
   timeout: "The project download timed out.",

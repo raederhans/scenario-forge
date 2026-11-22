@@ -12953,6 +12953,10 @@
     "en": "The server does not allow this app to read the file across origins (CORS).",
     "zh": "对方服务器不允许此应用跨站读取文件（CORS）。"
   },
+  "This link redirects elsewhere. Use the final raw file link.": {
+    "en": "This link redirects elsewhere. Use the final raw file link.",
+    "zh": "这个链接会跳转到其他地址，请使用最终的原始文件链接（raw 地址）。"
+  },
   "The project file is too large.": {
     "en": "The project file is too large.",
     "zh": "项目文件过大。"
