@@ -308,16 +308,17 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   }
   return Object.freeze({
     ensureReady,
-    getSelectionBoundary(memberIds) {
+    getSelectionBoundary(memberIds, options) {
       syncSource();
       if (status !== 'ready' || !acknowledgedGraph) return null;
       if (selectionGraph !== acknowledgedGraph) {
         selectionGraph = acknowledgedGraph;
         selectionIndex = createSelectionBoundaryIndex(selectionGraph, {
           resolveSourceFeatureId: id => resolveSourceFeatureId(featuresById.get(id), id),
+          isPassive: id => isCoverageOnly(featuresById.get(id), id),
         });
       }
-      return selectionIndex.getBoundaryLines(memberIds);
+      return selectionIndex.getBoundaryLines(memberIds, options);
     },
     hasPendingWork: () => scheduled || !!inFlight || status === 'building',
     getMeshes() { syncSource(); syncPaint(); return view?.getActiveArcCount() ? [view.getMesh()] : EMPTY; },

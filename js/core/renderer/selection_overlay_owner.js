@@ -152,9 +152,11 @@ export function createSelectionOverlayOwner({
       .map((featureId) => featureLookup.get(featureId))
       .filter(Boolean);
     const renderAsGroup = featureIds.length !== 1 || selectionState.groupMode === true;
-    // A country outline also spans its non-interactive shell parcels.
+    // A country outline also spans its non-interactive shell parcels: by owner for
+    // a country, by surrounding members for an explicit group.
     const outlineIds = featureIds.length ? memberIds : normalizeIds(Array.from(getCountryOutlineFeatureIds(code) || []));
-    let geometry = renderAsGroup ? getSelectionBoundary(new Set(outlineIds)) : null;
+    let geometry = renderAsGroup
+      ? getSelectionBoundary(new Set(outlineIds), { adoptPassive: featureIds.length > 0 }) : null;
     if (renderAsGroup && !geometry) {
       const merged = buildDevSelectionOverlayData(memberIds, data, true);
       if (merged !== data) geometry = merged[0].geometry;
