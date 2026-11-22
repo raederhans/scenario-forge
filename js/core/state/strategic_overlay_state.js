@@ -17,6 +17,8 @@ export function createDefaultOperationGraphicsEditorState() {
     points: [],
     kind: "attack",
     label: "",
+    labelSize: 9,
+    labelOnPath: false,
     stylePreset: "attack",
     stroke: "",
     width: 0,
@@ -44,6 +46,7 @@ export function normalizeMapLabel(raw, id) {
   const numberInRange = (value, min, max, fallback) =>
     Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
   if (!Number.isFinite(raw?.lon) || !Number.isFinite(raw?.lat)) return null;
+  const curve = numberInRange(raw.curve, -180, 180, 0);
   return {
     id,
     text: String(raw.text ?? "").trim(),
@@ -52,6 +55,7 @@ export function normalizeMapLabel(raw, id) {
     lon: numberInRange(raw.lon, -180, 180),
     lat: numberInRange(raw.lat, -90, 90),
     size: numberInRange(raw.size, 0.12, 512, 18),
+    ...(curve ? { curve } : {}),
     rotation: numberInRange(raw.rotation, -180, 180, 0),
     tracking: numberInRange(raw.tracking, 0, 1, null),
     uppercase: typeof raw.uppercase === "boolean" ? raw.uppercase : null,
@@ -110,6 +114,8 @@ export function createDefaultOperationalLineEditorState() {
     points: [],
     kind: "frontline",
     label: "",
+    labelSize: 9,
+    labelOnPath: false,
     stylePreset: "frontline",
     stroke: "",
     width: 0,

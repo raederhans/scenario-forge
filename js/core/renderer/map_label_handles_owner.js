@@ -9,7 +9,7 @@ import { commitMapLabelMove } from "./strategic_overlay_runtime/map_label_runtim
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-function makePreview(doc, label, state) {
+function makePreview(doc, label, state, placed) {
   const language = state.currentLanguage || "en";
   const country = state.scenarioCountriesByTag?.[label.countryCode];
   const name = label.text || getCountryNameOverride(state, label.countryCode) || (country ? getLocalizedScenarioCountryName(country,
@@ -17,34 +17,45 @@ function makePreview(doc, label, state) {
   const title = label.uppercase == null ? displayText(name, language)
     : label.uppercase ? name.toLocaleUpperCase("en") : name;
   const chinese = label.text ? /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(name) : language.startsWith("zh");
-  const font = chinese ? CHINESE_FONT : ENGLISH_FONT;
-  const preview = doc.createElementNS(SVG_NS, "text");
+  const font = placed.font ?? (chinese ? CHINESE_FONT : ENGLISH_FONT);
+  const size = placed.fontSize ?? label.size;
+  const preview = doc.createElementNS(SVG_NS, placed.glyphs ? "g" : "text");
   preview.setAttribute("font-family", font);
-  preview.setAttribute("font-weight", fontWeight(font));
-  preview.setAttribute("font-size", label.size);
-  preview.setAttribute("letter-spacing", (label.tracking ?? COUNTRY_LABEL_TRACKING[chinese ? "chinese" : "latin"].tracking) * label.size);
+  preview.setAttribute("font-weight", label.weight ?? fontWeight(font));
+  preview.setAttribute("font-style", label.italic ? "italic" : "normal");
+  preview.setAttribute("font-size", size);
+  preview.setAttribute("letter-spacing", placed.glyphs ? 0 : (label.tracking ?? COUNTRY_LABEL_TRACKING[chinese ? "chinese" : "latin"].tracking) * size);
   preview.setAttribute("text-anchor", "middle");
   preview.setAttribute("dominant-baseline", "central");
   preview.setAttribute("pointer-events", "none");
   preview.setAttribute("fill", label.colorMode === "light" ? LIGHT_LABEL_COLORS.fill : DARK_LABEL_COLORS.fill);
+  if (placed.glyphs) {
+    for (const glyph of placed.glyphs) {
+      const text = doc.createElementNS(SVG_NS, "text");
+      text.setAttribute("transform", `translate(${glyph.x} ${glyph.y}) rotate(${glyph.angle * 180 / Math.PI})`);
+      text.textContent = glyph.text;
+      preview.appendChild(text);
+    }
+    return preview;
+  }
   const lines = (title || t("Enter name", "ui")).split(/\r?\n/);
   lines.forEach((line, index) => {
     const span = doc.createElementNS(SVG_NS, "tspan");
     span.setAttribute("x", 0);
-    span.setAttribute("y", (index - (lines.length - 1) / 2) * label.size * 1.2);
+    span.setAttribute("y", (index - (lines.length - 1) / 2) * size * 1.2);
     span.textContent = line;
     preview.appendChild(span);
   });
   return preview;
 }
 
-function beginLabelDrag(event, { rect, group, state, label, projection, pointer }) {
+function beginLabelDrag(event, { rect, group, state, label, placed, projection, pointer }) {
   if (event.button !== 0 || state.mapLabelEditor.active || state.mapLabelEditor.draggingId) return;
   event.stopPropagation();
   const { pointerId, clientX, clientY } = event;
   const doc = group.ownerDocument;
   if (doc.activeElement?.matches("#mapLabelSection textarea")) doc.activeElement.blur();
-  const preview = makePreview(doc, label, state);
+  const preview = makePreview(doc, label, state, placed);
   const position = ([x, y]) => preview.setAttribute("transform", `translate(${x} ${y}) rotate(${label.rotation})`);
   const anchor = projection([label.lon, label.lat]);
   const [startX, startY] = pointer(event, group);
@@ -107,7 +118,8 @@ export function renderMapLabelHandles({ group, state, placed, k, projection, han
   if (!group || state.mapLabelEditor.draggingId) return;
   const doc = group.ownerDocument;
   const remaining = new Map(Array.from(group.children, rect => [rect.dataset.labelId, rect]));
-  for (const [index, { id, bounds, text, countryCode }] of placed.entries()) {
+  for (const [index, placement] of placed.entries()) {
+    const { id, bounds, text, countryCode } = placement;
     const label = state.mapLabels[index];
     let box;
     if (bounds) {
@@ -127,7 +139,7 @@ export function renderMapLabelHandles({ group, state, placed, k, projection, han
     rect.setAttribute("stroke-dasharray", "4 3");
     rect.setAttribute("vector-effect", "non-scaling-stroke");
     rect.style.touchAction = "none";
-    rect.onpointerdown = event => beginLabelDrag(event, { rect, group, state, label, projection, pointer });
+    rect.onpointerdown = event => beginLabelDrag(event, { rect, group, state, label, placed: placement, projection, pointer });
     rect.onclick = event => {
       event.stopPropagation();
       if (state.mapLabelEditor.active) return handleClick(event);
