@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools.rasterize_landing_assets import ALL_RASTER_TARGETS
 from tools.runtime_json_packing import pack_published_runtime_data
 from apps.hgo.tools.build_app import build_app as build_hgo_app
 from tools.app_entry_resolver import (
@@ -185,8 +186,11 @@ SCENARIO_PUBLISHED_DERIVED_RELATIVE_FILES = {
     Path("tno_1962") / "derived" / "atlantropa_donor_ledger.json",
     Path("tno_1962") / "derived" / "geometry_drop_audit.json",
 }
+SHARED_STARTUP_BUNDLE_SCENARIOS = {"hoi4_1936", "hoi4_1939", "tno_1962"}
 SCENARIO_EXCLUDED_FILE_NAMES = {"audit.json"}
 SCENARIO_EXCLUDED_RELATIVE_FILES = {
+    *(Path(scenario) / filename for scenario in SHARED_STARTUP_BUNDLE_SCENARIOS
+      for filename in ("startup.bundle.zh.json", "startup.bundle.zh.json.gz")),
     Path("hoi4_1939/startup.runtime_shell.topo.json"),
     *(Path("tno_1962") / name for name in (
         "capital_defaults.partial.json", "city_assets.partial.json",
@@ -470,6 +474,8 @@ PAGES_DYNAMIC_IMPORT_REGISTRY = (
     },
 )
 
+LANDING_SOURCE_ONLY_IMAGES = {Path("assets") / source for source, *_ in ALL_RASTER_TARGETS}
+
 LANDING_PRODUCT_ASSET_PATHS = (
     "assets/favicon.png",
     "assets/favicon.svg",
@@ -477,7 +483,6 @@ LANDING_PRODUCT_ASSET_PATHS = (
     "assets/product-workspace.webp",
     "assets/sample-runs.json",
     "assets/social-preview.png",
-    "assets/social-preview.svg",
 )
 
 DEVELOPER_PRODUCT_MODULE_PATHS = (
@@ -982,7 +987,7 @@ def copy_root_public_assets() -> None:
 def build_landing_dist(landing_entry: Path) -> None:
     copy_root_public_assets()
     if landing_entry.parent != ROOT:
-        copy_tree_contents(landing_entry.parent, DIST_ROOT)
+        copy_tree_filtered(landing_entry.parent, DIST_ROOT, lambda relative, _: relative not in LANDING_SOURCE_ONLY_IMAGES)
     shutil.copy2(landing_entry, DIST_ROOT / "index.html")
 
 
@@ -1116,6 +1121,9 @@ def strip_scenario_publish_audit_urls(scenarios_dir: Path) -> None:
 
     def strip_unpublished_manifest_urls(payload: dict) -> bool:
         changed = False
+        if payload.get("scenario_id") in SHARED_STARTUP_BUNDLE_SCENARIOS and payload.get("startup_bundle_url_en"):
+            payload["startup_bundle_url_zh"] = payload["startup_bundle_url_en"]
+            changed = True
         if "audit_url" in payload:
             payload.pop("audit_url", None)
             changed = True

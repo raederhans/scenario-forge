@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { initLongAnimationFrameObserver, waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
+import { getStartupBundleUrl, initLongAnimationFrameObserver, waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
 import { state as runtimeState } from "../js/core/state.js";
 
 import {
@@ -10,6 +10,18 @@ import {
 import {
   replaceRenderPerfMetricsState,
 } from "../js/core/state/actions/renderer_diagnostics_actions.js";
+
+test("both UI languages resolve the shared Pages startup bundle with and without a manifest", () => {
+  const url = "data/scenarios/tno_1962/startup.bundle.en.json";
+  for (const language of ["en", "zh"]) {
+    assert.equal(getStartupBundleUrl("tno_1962", language), url);
+    assert.equal(getStartupBundleUrl("tno_1962", language, {
+      startup_bundle_url_en: url,
+      startup_bundle_url_zh: url,
+    }), url);
+    assert.equal(getStartupBundleUrl("modern_world", language, {}), "");
+  }
+});
 
 function restoreGlobalProperty(name, hadProperty, value) {
   if (hadProperty) {

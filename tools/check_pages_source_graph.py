@@ -49,7 +49,7 @@ def build_source_inventory(root: Path) -> dict[str, Path]:
         if path.suffix.lower() in pages.ROOT_PUBLIC_FILE_SUFFIXES:
             add(path, path.name)
     if landing.parent != root:
-        tree(landing.parent, "")
+        tree(landing.parent, "", lambda path: path.relative_to(landing.parent) not in pages.LANDING_SOURCE_ONLY_IMAGES)
     add(landing, "index.html")
     if editor.parent != root:
         tree(editor.parent, "app")

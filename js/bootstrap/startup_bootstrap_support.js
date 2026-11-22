@@ -8,6 +8,7 @@ import {
 } from "../core/state/content_state.js";
 import { hasScenarioRuntimeShellContract } from "../core/scenario/scenario_resources.js";
 import {
+  SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS,
   getScenarioStartupBundleFilename,
   normalizeScenarioLocaleLanguage,
 } from "../core/scenario/locale_asset_contract.js";
@@ -324,12 +325,16 @@ export function getStartupBundleLanguage() {
   return normalizeScenarioLocaleLanguage(getBootLanguage());
 }
 
-export function getStartupBundleUrl(scenarioId, language = getStartupBundleLanguage()) {
+export function getStartupBundleUrl(scenarioId, language = getStartupBundleLanguage(), manifest = null) {
+  if (manifest) {
+    const field = SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS[normalizeScenarioLocaleLanguage(language)];
+    return String(manifest[field] || manifest.startup_bundle_url || "").trim();
+  }
   const normalizedScenarioId = String(scenarioId || "").trim();
   if (!normalizedScenarioId) {
     return "";
   }
-  return `data/scenarios/${normalizedScenarioId}/${getScenarioStartupBundleFilename(language)}`;
+  return `data/scenarios/${normalizedScenarioId}/${getScenarioStartupBundleFilename("en")}`;
 }
 
 export function getStartupScenarioSupportUrl(scenarioId, filename) {
