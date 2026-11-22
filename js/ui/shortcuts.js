@@ -15,6 +15,7 @@ import { t } from "./i18n.js";
 import { shortcuts, keyboardChord } from "./command_palette.js";
 import { getActiveModal } from "./ui_contract.js";
 import {
+  cancelMapPointPick,
   clearDevSelection,
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
@@ -134,7 +135,12 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
   }
 
   window.addEventListener("keydown", (event) => {
-    if (event.defaultPrevented || getActiveModal()) return;
+    if (event.defaultPrevented) return;
+    if (event.key === "Escape" && cancelMapPointPick()) {
+      event.preventDefault();
+      return;
+    }
+    if (getActiveModal()) return;
     const key = String(event.key || "");
     const modifier = event.metaKey || event.ctrlKey;
     const editableTarget = isEditableTarget(event.target);

@@ -74,6 +74,7 @@ import { pageResourceBudget } from "./runtime_resource_budget.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
 import { createBorderMeshWorkerClient } from "./border_mesh_worker_client.js";
 import { getProjectionGeometryGeneration } from "./renderer/projection_geometry_identity.js";
+import { cancelMapPointPick, isMapPointPickActive } from "./map_point_picker.js";
 import { isBrushPanGesture, createBrushInteractionSessionOwner } from "./renderer/brush_interaction_session_owner.js";
 import { createPhysicalIntensityPreviewOwner } from "./renderer/physical_intensity_preview_owner.js";
 import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
@@ -2944,6 +2945,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
       startupReadonly: runtimeState.startupReadonly,
       unitCounterEditor: runtimeState.unitCounterEditor,
       mapLabelEditor: runtimeState.mapLabelEditor,
+      mapPointPicker: runtimeState.mapPointPicker,
       waterRegionsById: runtimeState.waterRegionsById,
       waterRegionsData: runtimeState.waterRegionsData,
     }),
@@ -2996,6 +2998,7 @@ const getClickSelectionTransactionOwner = lazyOwner(() => createClickSelectionTr
     handleRiverPaintClick: (hit, options) => getRiverPaintEditorOwner().handleClick(hit, options),
     getFeaturePaintColor,
     getHitFromEvent,
+    getMapLonLatFromEvent,
     getHoveredFacilityEntryFromEvent: getFacilityInteractionRuntime().getHoveredFacilityEntryFromEvent,
     getIntensityFieldTool,
     getSafeCanvasColor,
@@ -3041,7 +3044,7 @@ const getMapInteractionEventBindingOwner = lazyOwner(() => createMapInteractionE
     getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
     getWindow: () => window,
     getInteractionRectNode: () => rendererSurfaceHost.getInteractionRect()?.node?.(),
-    isTouchBrushEnabled: () => runtimeState.brushModeEnabled || getIntensityFieldTool().active,
+    isTouchBrushEnabled: () => !isMapPointPickActive(runtimeState) && (runtimeState.brushModeEnabled || getIntensityFieldTool().active),
     hasMouseBrushDrag: () => !!brushSession || getStrategicOverlayRuntimeOwner().hasSpecialZoneMembershipDragSession(),
   },
   handlers: {
@@ -4391,6 +4394,7 @@ function getIntensityFieldTool() {
 function setIntensityFieldTool(next = {}) {
   runtimeState.intensityFieldTool = normalizeIntensityFieldToolState(next);
   if (runtimeState.intensityFieldTool.active) {
+    cancelMapPointPick();
     runtimeState.currentTool = "physical-intensity-field";
     runtimeState.brushModeEnabled = false;
     if (runtimeState.specialZoneEditor && typeof runtimeState.specialZoneEditor === "object") {
@@ -4402,6 +4406,13 @@ function setIntensityFieldTool(next = {}) {
 }
 
 registerRuntimeHook(runtimeState, "setIntensityFieldToolFn", setIntensityFieldTool);
+registerRuntimeHook(runtimeState, "syncMapPointPickModeFn", () => {
+  if (isMapPointPickActive(runtimeState)) {
+    getStrategicOverlayRuntimeOwner().prepareMapPointPick();
+    if (runtimeState.intensityFieldTool?.active) setIntensityFieldTool({ active: false });
+  }
+  getMapHoverInteractionOwner().setMapInteractionCursor();
+});
 
 function isBootInteractionReady() {
   return String(runtimeState.bootPhase || "").trim().toLowerCase() === "ready" && !runtimeState.bootBlocking;

@@ -1,8 +1,9 @@
+import { isMapPointPickActive } from "../map_point_picker.js";
 import { applyFeaturePaintState } from "../state/color_state.js";
 import { restoreRiverPaintOverridesState } from "../state/actions/river_paint_actions.js";
 
 export function isBrushPanGesture(state, event) {
-  return !!(state.brushModeEnabled && (event?.shiftKey || state.brushPanModifierActive));
+  return !!(state.brushModeEnabled && (isMapPointPickActive(state) || event?.shiftKey || state.brushPanModifierActive));
 }
 
 export function createBrushInteractionSessionOwner(runtimeState, {
@@ -154,6 +155,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
   }
 
   function handleBrushPointerDown(event) {
+    if (isMapPointPickActive(runtimeState)) return;
     if (runtimeState.startupReadonly) {
       if (event?.preventDefault) event.preventDefault();
       blockStartupReadonlyInteraction();
@@ -174,7 +176,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
   }
 
   function handleBrushPointerMove(event) {
-    if (runtimeState.startupReadonly) {
+    if (isMapPointPickActive(runtimeState) || runtimeState.startupReadonly) {
       return;
     }
     const current = getBrushSession();

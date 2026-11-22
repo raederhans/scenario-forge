@@ -1,3 +1,4 @@
+import { completeMapPointPick, isMapPointPickActive } from "../map_point_picker.js";
 import { setClickSelectedColorState } from "../state/actions/renderer_interaction_actions.js";
 
 export function createPickedColorHandler(state, { selectTool, notifyPicked }) {
@@ -182,14 +183,24 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     pickingGesture = false;
     if (state.startupReadonly && (state.currentTool !== "select"
       || state.specialZoneEditor?.active || state.operationalLineEditor?.active
-      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active || state.mapLabelEditor?.active)) {
+      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active || state.mapLabelEditor?.active || isMapPointPickActive(state))) {
       if (event?.preventDefault) event.preventDefault();
       blockStartupReadonlyInteraction();
       return;
     }
     const actionStart = nowMs();
-    if (!state.landData && !state.waterRegionsData && !state.scenarioSpecialRegionsData) return;
+    const pointPickActive = isMapPointPickActive(state);
+    if (!pointPickActive && !state.landData && !state.waterRegionsData && !state.scenarioSpecialRegionsData) return;
     if (consumeSuppressedBrushClick()) return;
+    if (pointPickActive) {
+      pickingGesture = true;
+      const point = services.getMapLonLatFromEvent(event);
+      if (point) {
+        const hit = getHitFromEvent(event, { enableSnap: false, snapPx: 0, eventType: "click" });
+        completeMapPointPick({ lon: point[0], lat: point[1], hostFeatureId: hit?.targetType === "land" ? hit.id || "" : "" });
+      }
+      return;
+    }
     dismissOnboardingHint();
     if (getIntensityFieldTool().active) {
       return;
