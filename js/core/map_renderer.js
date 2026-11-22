@@ -273,7 +273,8 @@ import {
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
 import { resolveEffectiveWaterRegionFeatures, getScenarioWaterYear, isLakeRegion, isLakeInteractionEnabled } from "./renderer/effective_water_regions.js";
 import { drawRegionalUrbanLayer, getRegionalLandMaskInfo, getRegionalLayerFilter } from "./renderer/regional_layer_filter.js";
-import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
+import { createOceanRenderOwner, usesOceanBathymetry, usesOceanSurfacePattern } from "./renderer/ocean_render_owner.js";
+import { hidesRegionalBackdrop } from "./scenario/scenario_region.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
 import { resolveContourLodRequest } from "./renderer/physical_contour_lod_policy.js";
 import { resolvePhysicalAtlasCollection, shouldRequestPhysicalAtlasDetail, PHYSICAL_ATLAS_DETAIL_LAYER, getPhysicalPresentationLayerRequests } from "./renderer/physical_atlas_lod_policy.js";
@@ -286,7 +287,7 @@ import { createTransportOverviewRenderOwner } from "./renderer/transport_overvie
 import { createBorderMeshOwner } from "./renderer/border_mesh_owner.js";
 import {
   clipOceanOutsideLand, getOceanMaskMode, getPoliticalBorderSources,
-  getRegionalBackdrop, OCEAN_MASK_MODE_SPHERE_MINUS_LAND,
+  drawRegionalLandEffect, getRegionalBackgroundColor, getRegionalOceanLandMask, OCEAN_MASK_MODE_SPHERE_MINUS_LAND,
 } from "./renderer/regional_backdrop.js";
 import {
   getLatitudeAdjustedSimplifyEpsilon,
@@ -1636,7 +1637,7 @@ function syncBathymetryTextureScenario() {
 }
 
 function isWaterPatternSourceReady() {
-  if (!doesOceanStyleRequireBathymetry() && !runtimeState.intensityFields?.channels?.oceanDepth?.enabled) return false;
+  if (!usesOceanSurfacePattern(runtimeState, getOceanStyleConfig())) return false;
   return !!getRenderPassCacheState().canvases?.background && !!getPassReferenceTransform("background");
 }
 
@@ -2220,7 +2221,8 @@ function getBorderDrawOwner() {
       isUsableMesh,
       getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),
       getClassifiedBorderMeshes,
-      getPaintContourCoastMesh: () => getPaintContourRuntimeOwner().getCoastMesh(),
+      getPaintContourCoastMesh: () => hidesRegionalBackdrop(runtimeState.activeScenarioManifest)
+        ? null : getPaintContourRuntimeOwner().getCoastMesh(),
       drawRiverInternalContours: options => getRiverContourRenderOwner().draw(options),
       getPoliticalBorderMeshes: () => {
         const classification = getClassifiedBorderMeshes();
@@ -9084,7 +9086,8 @@ function getOceanStyleConfig() {
 }
 
 function getOceanBaseFillColor() {
-  return getSafeCanvasColor(runtimeState.styleConfig?.ocean?.fillColor, OCEAN_FILL_COLOR) || OCEAN_FILL_COLOR;
+  const ocean = getSafeCanvasColor(runtimeState.styleConfig?.ocean?.fillColor, OCEAN_FILL_COLOR) || OCEAN_FILL_COLOR;
+  return getRegionalBackgroundColor(runtimeState.activeScenarioManifest, ocean);
 }
 
 function getLakeStyleConfig() {
@@ -9095,7 +9098,7 @@ function getLakeStyleConfig() {
 
 function getLakeBaseFillColor() {
   const lakeStyle = getLakeStyleConfig();
-  if (lakeStyle.linkedToOcean) {
+  if (lakeStyle.linkedToOcean || hidesRegionalBackdrop(runtimeState.activeScenarioManifest)) {
     return getOceanBaseFillColor();
   }
   return getSafeCanvasColor(lakeStyle.fillColor, getOceanBaseFillColor()) || getOceanBaseFillColor();
@@ -9138,10 +9141,7 @@ function getBoundsArea(bounds) {
 }
 
 function doesOceanStyleRequireBathymetry(oceanStyle = getOceanStyleConfig()) {
-  return !!(
-    oceanStyle?.experimentalAdvancedStyles
-    && String(oceanStyle?.preset || "flat").trim().toLowerCase() !== "flat"
-  );
+  return usesOceanBathymetry(runtimeState, oceanStyle);
 }
 
 function publishBathymetryDiagnostic(name, summary) {
@@ -9237,7 +9237,7 @@ function resolveOceanMask() {
 
 function applyOceanClipMask(maskMode) {
   const startedAt = nowMs();
-  const backdrop = getRegionalBackdrop(runtimeState);
+  const backdrop = getRegionalOceanLandMask(runtimeState);
   if (backdrop) maskMode = OCEAN_MASK_MODE_SPHERE_MINUS_LAND;
   rendererSurfaceHost.getContext().beginPath();
   if (maskMode === OCEAN_MASK_MODE_TOPOLOGY && runtimeState.oceanData) {
@@ -10304,6 +10304,7 @@ function getScenarioRegionOverlayRenderOwner() {
   if (!scenarioRegionOverlayRenderOwner) {
     scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner(runtimeState, {
       applyOceanClipMask,
+      applyPhysicalLandClipMask,
       rendererSurfaceHost,
       scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
       getScenarioWaterRasterLayout: () => !exportRenderInProgress && isTnoRasterSceneSelected()
@@ -10363,8 +10364,7 @@ function getScenarioRegionOverlayRenderOwner() {
       computeProjectedGeoBounds,
       getWaterRegionColor,
       getOceanSurfacePattern: () => {
-        const depthChannel = runtimeState.intensityFields?.channels?.oceanDepth;
-        if (!doesOceanStyleRequireBathymetry() && !depthChannel?.enabled) return null;
+        if (!isWaterPatternSourceReady()) return null;
         const cache = getRenderPassCacheState();
         return createOceanSurfacePattern(
           rendererSurfaceHost.getContext(), cache.canvases?.background,
@@ -10412,15 +10412,18 @@ function drawScenarioRegionOverlaysPass(k) {
 }
 
 function drawEffectsPass(k, options = undefined) {
-  return getVisualEffectsPassOwner().drawEffectsPass(k, options);
+  return drawRegionalLandEffect(runtimeState, rendererSurfaceHost, applyPhysicalLandClipMask,
+    () => getVisualEffectsPassOwner().drawEffectsPass(k, options));
 }
 
 function drawLineEffectsPass(k, options = undefined) {
-  return getVisualEffectsPassOwner().drawLineEffectsPass(k, options);
+  return drawRegionalLandEffect(runtimeState, rendererSurfaceHost, applyPhysicalLandClipMask,
+    () => getVisualEffectsPassOwner().drawLineEffectsPass(k, options));
 }
 
 function drawTextureLabelEffectsPass(k) {
-  return recordLabelPass("textureLabels", () => getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k));
+  return recordLabelPass("textureLabels", () => drawRegionalLandEffect(runtimeState, rendererSurfaceHost,
+    applyPhysicalLandClipMask, () => getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k)));
 }
 
 function drawContextBasePass(k, options = undefined) {
@@ -10440,7 +10443,8 @@ function drawContextScenarioPass(k, options = undefined) {
 }
 
 function drawDayNightPass(k, options = undefined) {
-  return getVisualEffectsPassOwner().drawDayNightPass(k, options);
+  return drawRegionalLandEffect(runtimeState, rendererSurfaceHost, applyPhysicalLandClipMask,
+    () => getVisualEffectsPassOwner().drawDayNightPass(k, options));
 }
 
 function drawBordersPass(k, { interactive = false } = {}) {
@@ -10951,7 +10955,7 @@ function composeRenderPassesToTarget(
 let exportRenderInProgress = false;
 
 async function ensureBathymetryReadyForExport(passNames, pixelRatio = null) {
-  if (!passNames.includes("background")) return;
+  if (!passNames.includes("background") || hidesRegionalBackdrop(runtimeState.activeScenarioManifest)) return;
   const { k = 1, x = 0, y = 0 } = runtimeState.zoomTransform || {};
   const targetDpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
   // Exports either reuse the visible background pass or redraw it with export overscan;
@@ -10990,8 +10994,8 @@ function getExportRenderBytes(passNames, pixelRatio) {
     height: runtimeState.height,
     pixelRatio: targetDpr,
     passNames,
-    bathymetryCoverage: !!runtimeState.styleConfig?.ocean?.experimentalAdvancedStyles
-      && runtimeState.styleConfig.ocean.preset !== "flat",
+    bathymetryCoverage: !hidesRegionalBackdrop(runtimeState.activeScenarioManifest)
+      && !!runtimeState.styleConfig?.ocean?.experimentalAdvancedStyles && runtimeState.styleConfig.ocean.preset !== "flat",
     physicalIntensity: !!runtimeState.showPhysical && ["physicalAtlas", "physicalContour"].some((id) => runtimeState.intensityFields?.channels?.[id]?.enabled),
     riverInternalContours: hasVisibleRiverPartitions(),
   });
