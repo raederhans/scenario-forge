@@ -53,6 +53,12 @@ function getDisplayCache(state) {
   return cache;
 }
 
+function getDisplayAlliance(state, id) {
+  const option = getAllianceOption(state, id);
+  const color = getPoliticalPayload(state)?.alliances?.[id]?.color_hex;
+  return color ? { ...option, color } : option;
+}
+
 export function resolvePoliticalDisplayColor(state, ownerTag) {
   if (!isPoliticalDisplayModeActive(state)) return null;
   if (!ownerTag || ownerTag.startsWith("color:")) return NO_DATA_COLOR;
@@ -60,7 +66,7 @@ export function resolvePoliticalDisplayColor(state, ownerTag) {
   if (!colors.has(ownerTag)) {
     const { alliance, ideology } = getPoliticalIdentity(state, ownerTag);
     const color = state.politicalDisplayMode === "government" ? governmentColor(ideology)
-      : alliance ? getAllianceOption(state, alliance).color : unalignedColor(ideology);
+      : alliance ? getDisplayAlliance(state, alliance).color : unalignedColor(ideology);
     colors.set(ownerTag, color);
   }
   return colors.get(ownerTag);
@@ -81,7 +87,7 @@ function buildPoliticalDisplayLegend(state, owners, zh) {
       const { color, label } = getIdeologyOption(id, zh);
       return { color, label: id === "other" ? (zh ? "其他" : "Other") : label };
     }
-    const { color, label } = getAllianceOption(state, id);
+    const { color, label } = getDisplayAlliance(state, id);
     return { color, label: zh ? `${label}（${count} 国）` : `${label} (${count} countries)` };
   });
   entries.push({ color: NO_DATA_COLOR, label: zh ? "无数据" : "No data" });

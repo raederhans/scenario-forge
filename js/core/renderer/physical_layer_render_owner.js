@@ -1,4 +1,5 @@
 import { claimScreenLabelPlacement } from "./screen_label_placement.js";
+import { getRegionalLayerFilter } from "./regional_layer_filter.js";
 
 export function createPhysicalLayerRenderOwner({
   state = {},
@@ -460,9 +461,11 @@ export function createPhysicalLayerRenderOwner({
     context.lineWidth = 1.6 / k;
     context.strokeStyle = "rgba(255,255,255,0.85)";
     context.fillStyle = "#405048";
+    const region = getRegionalLayerFilter(runtimeState);
     for (const feature of features) {
       const props = feature.properties || {};
       if (k < props.min_zoom || Number(props.rank || 1) > maxRank || cfg.atlasClassVisibility?.[props.atlas_class] === false || !pathBoundsInScreen(feature)) continue;
+      if (region && !region.hostAt(feature.geometry.coordinates)) continue;
       const position = projection(feature.geometry.coordinates);
       if (!position?.every(Number.isFinite)) continue;
       const text = runtimeState.currentLanguage === "zh" ? props.name_zh || props.name_en : props.name_en;

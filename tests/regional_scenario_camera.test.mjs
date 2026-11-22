@@ -290,13 +290,15 @@ test("global camera and opening behavior persist through full refresh, clear and
   const container = f.surface.setMapContainer({ style: {} });
   f.state.activeScenarioManifest = manifest;
   refresh();
-  f.fit.syncRegionalFrameClip(f.state.zoomTransform);
+  f.fit.syncRegionalFrameClip(f.state.zoomTransform, "#3b4a55");
   assert.ok(layers.every(layer => /^inset\(/.test(layer.style.clipPath)));
-  assert.equal(container.style.backgroundColor, "#b9b7b2");
+  assert.equal(container.style.backgroundColor, "#3b4a55");
+  f.fit.syncRegionalFrameClip(f.state.zoomTransform, "#aadaff");
+  assert.equal(container.style.backgroundColor, "#aadaff");
   f.state.activeScenarioManifest = null;
   refresh();
   assert.equal(f.read.getProjectionRenderSignature(), original);
-  f.fit.syncRegionalFrameClip(f.state.zoomTransform);
+  f.fit.syncRegionalFrameClip(f.state.zoomTransform, "#aadaff");
   assert.ok(layers.every(layer => layer.style.clipPath === ""));
   assert.equal(container.style.backgroundColor, "");
   const generation = getProjectionGeometryGeneration(f.projection);

@@ -1,3 +1,5 @@
+import { getScenarioRegion } from "../scenario/scenario_region.js";
+
 const RIVER_LOW_MAX_SCALERANK = 5;
 const RIVER_MID_MAX_SCALERANK = 7;
 const RIVER_HIGH_MAX_SCALERANK = 8;
@@ -72,6 +74,7 @@ export function createRiverLayerRenderOwner({
 } = {}) {
   const runtimeState = state;
   const {
+    applyPhysicalLandClipMask,
     clamp,
     collectContextMetric,
     getCachedStrokePath = () => null,
@@ -240,6 +243,7 @@ export function createRiverLayerRenderOwner({
 
     context.save();
     try {
+      if (getScenarioRegion(runtimeState.activeScenarioManifest)) applyPhysicalLandClipMask();
 
       if (outlineWidth > 0) {
         context.strokeStyle = outlineColor;

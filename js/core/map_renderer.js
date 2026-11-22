@@ -271,7 +271,8 @@ import {
   shouldBlockUnderlyingMapSelectionForFacility,
 } from "./renderer/facility_surface.js";
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
-import { resolveEffectiveWaterRegionFeatures, isLakeRegion, isLakeInteractionEnabled } from "./renderer/effective_water_regions.js";
+import { resolveEffectiveWaterRegionFeatures, getScenarioWaterYear, isLakeRegion, isLakeInteractionEnabled } from "./renderer/effective_water_regions.js";
+import { drawRegionalUrbanLayer, getRegionalLandMaskInfo, getRegionalLayerFilter } from "./renderer/regional_layer_filter.js";
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
 import { resolveContourLodRequest } from "./renderer/physical_contour_lod_policy.js";
@@ -1540,6 +1541,7 @@ const getFacilitySurfaceOwner = lazyOwner(() => createFacilitySurfaceOwner({
 const getRiverLayerRenderOwner = lazyOwner(() => createRiverLayerRenderOwner({
   state,
   helpers: {
+    applyPhysicalLandClipMask,
     clamp,
     collectContextMetric,
     getContext: () => rendererSurfaceHost.getContext(),
@@ -2485,6 +2487,7 @@ const getSpatialIndexRuntimeOwner = lazyOwner(() => createSpatialIndexRuntimeOwn
       runtimeState.waterRegionsData?.features, runtimeState.scenarioWaterRegionsData?.features,
       runtimeState.scenarioAtlantropaData?.features, runtimeState.scenarioSpecialRegionsData?.features,
       runtimeState.contextLayerExternalDataByName?.lakes?.features, runtimeState.activeScenarioManifest,
+      getRegionalLayerFilter(runtimeState),
       runtimeState.topologyRevision, runtimeState.dataGeneration, runtimeState.contextLayerRevision,
       runtimeState.showScenarioAtlantropa,
     ],
@@ -3196,7 +3199,8 @@ const getContextPassOrchestratorOwner = lazyOwner(() => createContextPassOrchest
     recordRenderPerfMetric,
     recordDeferredRiversLayerMetric,
     drawPhysicalContourLayer,
-    drawUrbanLayer: labelsRuntime.drawUrbanLayer,
+    drawUrbanLayer: (k, options) => drawRegionalUrbanLayer(runtimeState, rendererSurfaceHost, applyPhysicalLandClipMask,
+      labelsRuntime.drawUrbanLayer, k, options),
     drawRiversLayer,
     drawRoadsLayer: (k, options) => getTransportOverviewRenderOwner().drawRoadsLayer(k, options),
     drawRailwaysLayer: (k, options) =>
@@ -3884,7 +3888,7 @@ const getDrawCanvasOrchestrationOwner = lazyOwner(() => createDrawCanvasOrchestr
       };
       if (presented) {
         getRendererViewportUpdateOwner().applyViewportTransform(transform);
-        getRendererFitProjectionOwner().syncRegionalFrameClip(transform);
+        getRendererFitProjectionOwner().syncRegionalFrameClip(transform, getOceanBaseFillColor());
       }
     },
   },
@@ -5393,12 +5397,6 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection, { pu
 
 let frameEffectiveWater = null;
 
-function getActiveScenarioYear() {
-  if (!runtimeState.activeScenarioId) return null;
-  const year = Number(String(runtimeState.activeScenarioManifest?.bookmark_date).split(".")[0]);
-  return Number.isInteger(year) && year > 0 ? year : null;
-}
-
 function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   const manifest = runtimeState.activeScenarioManifest;
   const baseFeatures = runtimeState.waterRegionsData?.features;
@@ -5406,7 +5404,7 @@ function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
   return [
     baseFeatures, baseFeatures?.length, scenarioWaterFeatures, scenarioWaterFeatures?.length,
     lakeFeatures, lakeFeatures?.length, runtimeState.activeScenarioId || "", isScenarioWaterTopologyExclusiveMode(),
-    getActiveScenarioYear(),
+    getScenarioWaterYear(runtimeState), getRegionalLayerFilter(runtimeState),
     manifest?.excluded_water_region_ids, manifest?.excluded_water_region_groups, runtimeState.contextLayerRevision,
     ...atlantropaWater,
   ];
@@ -5438,7 +5436,8 @@ function resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scen
     baseFeatures: runtimeState.waterRegionsData?.features || [],
     scenarioFeatures,
     globalLakeFeatures: runtimeState.contextLayerExternalDataByName?.lakes?.features || [],
-    scenarioYear: getActiveScenarioYear(),
+    scenarioYear: getScenarioWaterYear(runtimeState),
+    regionFilter: getRegionalLayerFilter(runtimeState),
     activeScenarioId: runtimeState.activeScenarioId || "",
     exclusive: isScenarioWaterTopologyExclusiveMode(),
     isExcluded: (feature) => isWaterRegionExcludedByScenario(feature, exclusions),
@@ -9591,6 +9590,8 @@ function getFirstUsablePhysicalLandMaskInfo(candidates = []) {
 }
 
 function getPhysicalLandMaskInfo() {
+  const regionalMask = getRegionalLandMaskInfo(runtimeState);
+  if (regionalMask) return createPhysicalLandMaskInfo(regionalMask);
   const primaryTopology = runtimeState.topologyPrimary || runtimeState.topology;
   const detailTopology = runtimeState.topologyDetail;
   const landSource = String(runtimeState.contextLayerSourceByName?.land || "").trim().toLowerCase();
