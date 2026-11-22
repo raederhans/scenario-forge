@@ -265,3 +265,13 @@ test("scenario context controller can be constructed without DOM dependencies", 
   assert.equal(typeof controller.refreshScenarioContextBar, "function");
   assert.doesNotThrow(() => controller.refreshWorkspaceStatus());
 });
+
+test("scenario context bar names a project country by its registered name and full tag", () => {
+  const { controller, nodes, runtimeState } = createHarness();
+  runtimeState.activeSovereignCode = "P01";
+  runtimeState.scenarioCountriesByTag = {
+    P01: { tag: "P01", display_name: "Galicia", display_name_en: "Galicia", display_name_zh: "Galicia", project_country: true },
+  };
+  controller.refreshScenarioContextBar();
+  assert.equal(nodes.scenarioContextActiveText.textContent, "Galicia (P01)");
+});
