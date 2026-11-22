@@ -4,6 +4,7 @@ import { projectEditor } from "./hgo_project_routing.js";
 import { captureImportDocumentIdentity, getDocumentEditGate } from "./interaction_funnel.js";
 import { prepareProjectImportFile } from "./project_package_io.js";
 import { applyProjectPaintMerge, loadScenarioReferenceData, planProjectPaintMerge } from "./project_paint_merge.js";
+import { verifyApprovedRiverPack } from "./river_paint/pilot_loader.js";
 import { state } from "./state.js";
 
 function assertDocumentEditable() {
@@ -19,6 +20,15 @@ function assertDocumentEditable() {
   }
 }
 
+async function getVerifiedSourcePack(pack, scenario) {
+  if (!pack || pack.sceneId !== scenario?.id || pack.source?.baselineHash !== scenario?.baselineHash) return null;
+  try {
+    return await verifyApprovedRiverPack(pack);
+  } catch {
+    return null;
+  }
+}
+
 export async function prepareProjectMergeFile(file, { loadReference = loadScenarioReferenceData } = {}) {
   assertDocumentEditable();
   const prepared = await prepareProjectImportFile(file, { materializeFile: false });
@@ -29,7 +39,9 @@ export async function prepareProjectMergeFile(file, { loadReference = loadScenar
   const riverPaint = payload?.riverPaint;
   if (riverPaint != null) delete payload.riverPaint;
   const source = FileManager.normalizeImportedProjectData(payload);
-  source.riverPaint = riverPaint;
+  if (riverPaint) {
+    source.riverPaint = { pack: await getVerifiedSourcePack(riverPaint.pack, source.scenario), overrides: riverPaint.overrides };
+  }
   const invalidLabels = Object.keys(payload.legendLabels || {}).filter(key => !normalizeHexColor(key));
   const sourceReference = await loadReference(source.scenario?.id || "");
 

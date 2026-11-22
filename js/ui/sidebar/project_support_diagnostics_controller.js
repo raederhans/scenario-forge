@@ -30,6 +30,7 @@ export async function confirmDiscardDirtyWork(state, showAppDialog, options) {
 
 function showProjectMergeReport({ documentRef, state, t, showToast, mapRenderer, fileName, preview, checkImport }) {
   const dialog = documentRef.createElement("dialog");
+  dialog.setAttribute("aria-modal", "true");
   dialog.className = "app-dialog";
   const element = (tag, text) => {
     const node = documentRef.createElement(tag);

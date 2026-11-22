@@ -140,6 +140,57 @@ test("matching countries reuse their tags and reservations protect references le
   assert.equal(patch.visualOverrides.B, "#0000ff");
 });
 
+test("overwriting a painted parent clears old cells while retaining explicit source cells", async () => {
+  const { pack, cells, state: fixture } = await makeFixture();
+  const current = { ...target(), ...fixture, runtimeFeatureIds: ["P"], visualOverrides: { P: "#aabbcc" } };
+  const [first, second] = cells.map(cell => cell.id);
+  current.riverPaint.overrides = { [first]: "#123456", [second]: "#654321" };
+  const source = { scenario: { id: pack.sceneId, baselineHash: pack.source.baselineHash },
+    visualOverrides: { P: "#abc" }, riverPaint: { pack, overrides: { [second]: "#654321" } } };
+  assert.deepEqual(plan(source, current).patch.riverPaintOverrides, {});
+  const overwrite = () => plan(source, current, { mode: "overwrite" });
+  const { patch, report } = overwrite();
+  assert.deepEqual(patch.riverPaintOverrides, { [first]: null });
+  assert.equal(report.writtenCount, 1);
+  assert.equal(report.skippedCount, 1);
+  source.riverPaint.overrides[second] = "#fff";
+  current.visualOverrides.P = "#111111";
+  const changed = overwrite();
+  assert.deepEqual(changed.patch.visualOverrides, { P: "#aabbcc" });
+  assert.deepEqual(changed.patch.riverPaintOverrides, { [first]: null, [second]: "#ffffff" });
+  assert.equal(changed.report.writtenCount, 2);
+});
+
+test("legend-only colors cannot label another country or inflate paint diagnostics", () => {
+  const current = target();
+  current.visualOverrides.A = "#111111";
+  const source = { visualOverrides: { A: "#800" }, sovereignBaseColors: { ITA: "#800", GER: "#456" },
+    legendLabels: { "#800": "Italy", "#456": "Germany", "#abc": "Free color" } };
+  const sourceReference = { countries: { ITA: {}, GER: {} } };
+  for (const colorPolicy of ["current-base", "keep-original"]) {
+    const { patch, report } = plan(source, current, { sourceReference, colorPolicy });
+    const germanColor = colorPolicy === "current-base" ? "#112233" : "#445566";
+    assert.deepEqual(patch.legendLabels, { [germanColor]: "Germany", "#aabbcc": "Free color" });
+    assert.deepEqual(report.colorChanges, []);
+    assert.deepEqual(report.missingColors, []);
+  }
+});
+
+test("same-scenario paint follows the explicit baseline crosswalk and rejects unresolved parcels", () => {
+  const current = { ...target(), scenarioBaselineHash: "new", runtimeFeatureIds: ["US_A", "US_B", "US_UNRESOLVED"] };
+  current.activeScenarioManifest = { scenario_id: "target", baseline_hash: "new", project_feature_migration: {
+    version: 1, scenario_id: "target", source_baseline_hash: "old", target_baseline_hash: "new",
+    feature_id_prefixes: ["US_"], crosswalk: { US_A: ["US_B"] }, unresolved_ids: ["US_UNRESOLVED"],
+  } };
+  const source = { scenario: { id: "target", baselineHash: "old" }, visualOverrides: { US_A: "#abc" } };
+  const { patch, report } = plan(source, current);
+  assert.deepEqual(patch.visualOverrides, { US_B: "#aabbcc" });
+  assert.equal(report.migratedCount, 1);
+  source.visualOverrides.US_UNRESOLVED = "#abc";
+  assert.throws(() => plan(source, current), { code: "PROJECT_FEATURE_MIGRATION_REVIEW_REQUIRED" });
+  assert.deepEqual(current.visualOverrides, {});
+});
+
 test("one merge commits only the sparse paint, country and missing legend fields and round-trips through history", async t => {
   const { pack, cells, state: fixture } = await makeFixture();
   const initial = { ...target(), ...fixture, historyPast: [], historyFuture: [], isDirty: false, dirtyRevision: 0, lastDirtyReason: "",

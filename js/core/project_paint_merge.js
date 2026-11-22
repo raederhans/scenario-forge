@@ -5,6 +5,8 @@ import { getCurrentScenarioValidFeatureIds } from "./interaction_funnel/import_t
 import {
   allocateProjectCountryTag, normalizeProjectCountriesPayload, registerProjectCountryState, remapProjectCountryNames,
 } from "./project_countries.js";
+import { planProjectFeatureMigration } from "./project_feature_migration.js";
+import { getScenarioReleasableCountries } from "./releasable_manager.js";
 import { createBorderIdentityResolver } from "./renderer/border_identity.js";
 import { getActiveRiverPack, getRiverPartitionIndex } from "./river_paint/partition_model.js";
 import { loadFeatureMergeLineage, loadFeatureMigrationMap, migrateScenarioPaintEntries } from "./sovereignty_manager.js";
@@ -20,7 +22,9 @@ export async function loadScenarioReferenceData(scenarioId) {
     scenarioId ? loadScenarioBundle(scenarioId, { bundleLevel: "bootstrap" }) : null,
     loadFeatureMergeLineage(), loadFeatureMigrationMap(),
   ]);
-  return { countries: bundle?.countriesPayload?.countries || {}, manifest: bundle?.manifest,
+  const baseCountries = bundle?.countriesPayload?.countries || {};
+  const countries = { ...baseCountries, ...getScenarioReleasableCountries(scenarioId, { excludeTags: Object.keys(baseCountries) }) };
+  return { countries, manifest: bundle?.manifest,
     ownersByFeatureId: bundle?.ownersPayload?.owners || {}, lineage, migrationMap };
 }
 
@@ -109,11 +113,12 @@ export function planProjectPaintMerge(source, current, {
   const missing = new Set();
   const changes = new Map();
   const legendDestinations = new Map();
+  const currentBase = tag => normalizeHexColor(current.scenarioCountriesByTag?.[tag] && current.sovereignBaseColors?.[tag]);
   function resolveColor(color, srcTag, targetId) {
     if (destinations.has(srcTag)) return destinations.get(srcTag).color;
     const owner = current.scenarioBaselineOwnersByFeatureId?.[targetId];
     const hit = currentTag(color, owner);
-    const base = normalizeHexColor(current.scenarioCountriesByTag?.[srcTag] && current.sovereignBaseColors?.[srcTag]);
+    const base = currentBase(srcTag);
     if (base === color && (!hit || hit === srcTag)) return color;
     if (!base && !hit) {
       missing.add(color);
@@ -143,7 +148,7 @@ export function planProjectPaintMerge(source, current, {
     }
     return valid;
   }
-  function write(table, id, color, previous, { occupied = previous, originals = [id], targetId = id } = {}) {
+  function write(table, id, color, previous, { occupied = previous, originals = [id], targetId = id, clearCells = [] } = {}) {
     if (mode === "fill-blanks" && occupied) { report.skippedCount++; return; }
     const sourceTags = new Set(originals.map(original => sourceTag(color, sourceOwners?.[original])));
     const replacements = new Set([...sourceTags].map(tag => resolveColor(color, tag, targetId)));
@@ -154,8 +159,9 @@ export function planProjectPaintMerge(source, current, {
     const [next] = replacements;
     if (!legendDestinations.has(color)) legendDestinations.set(color, new Set());
     legendDestinations.get(color).add(next);
-    if (normalizeHexColor(previous) === next) { report.skippedCount++; return; }
-    table[id] = next;
+    if (normalizeHexColor(previous) !== next) table[id] = next;
+    else if (!clearCells.length) { report.skippedCount++; return; }
+    for (const cell of clearCells) patch.riverPaintOverrides[cell.id] = null;
     report.writtenCount++;
   }
   const land = normalizeEntries("visualOverrides", source.visualOverrides);
@@ -198,22 +204,39 @@ export function planProjectPaintMerge(source, current, {
   function discardLand(id) {
     for (const saved of downgraded.get(id) || [id]) discard(saved, land.get(id), id);
   }
-  const migrated = migrateScenarioPaintEntries(Object.fromEntries(land), {
+  const entries = Object.fromEntries(land);
+  const manifest = current.activeScenarioManifest;
+  const explicit = source.scenario?.id === current.activeScenarioId
+    ? planProjectFeatureMigration({ scenario: source.scenario, visualOverrides: entries }, { manifest, validFeatureIds })
+    : null;
+  const explicitOrigins = new Map();
+  if (explicit) {
+    for (const [original, targets] of Object.entries(manifest.project_feature_migration.crosswalk)) {
+      if (!land.has(original)) continue;
+      for (const id of targets) {
+        if (!explicitOrigins.has(id)) explicitOrigins.set(id, []);
+        explicitOrigins.get(id).push(original);
+      }
+    }
+  }
+  const originalsOf = id => explicitOrigins.get(id) || [id];
+  const migrated = migrateScenarioPaintEntries(explicit?.data.visualOverrides || entries, {
     sourceScenarioId: source.scenario?.id, lineageScenarioId: current.activeScenarioId,
     sourceManifest: sourceReference.manifest, scenarioManifest: current.activeScenarioManifest,
     lineage: sourceReference.lineage, migrationMap: sourceReference.migrationMap, validFeatureIds,
-    onDiscard: discardLand,
+    onDiscard: id => originalsOf(id).forEach(discardLand),
   });
   const moved = new Set();
   for (const [id, color] of Object.entries(migrated.visualOverrides)) {
-    const originals = migrated.originsOf(id);
+    const originals = [...new Set(migrated.originsOf(id).flatMap(originalsOf))];
     for (const original of originals) {
       if (downgraded.has(original)) downgraded.get(original).forEach(cell => moved.add(cell));
       else if (original !== id) moved.add(original);
     }
     const previous = current.visualOverrides?.[id];
-    const occupied = previous || targetRiver?.parents.get(id)?.cells.some(cell => current.riverPaint.overrides[cell.id]);
-    write(patch.visualOverrides, id, color, previous, { occupied, originals });
+    const paintedCells = targetRiver?.parents.get(id)?.cells.filter(cell => current.riverPaint.overrides[cell.id]) || [];
+    const clearCells = mode === "overwrite" ? paintedCells.filter(cell => !(samePack && river.has(cell.id))) : [];
+    write(patch.visualOverrides, id, color, previous, { occupied: previous || paintedCells.length, originals, clearCells });
   }
   for (const [id, color] of normalizeEntries("waterRegionOverrides", source.waterRegionOverrides)) {
     if (!current.waterRegionsById?.has(id)) { discard(id, color); continue; }
@@ -223,7 +246,14 @@ export function planProjectPaintMerge(source, current, {
   for (const [key, label] of Object.entries(source.legendLabels || {})) {
     const color = normalizeHexColor(key);
     if (!color) { report.invalidColors.push({ field: "legendLabels", id: key }); continue; }
-    for (const next of legendDestinations.get(color) || [resolveColor(color, sourceTag(color))]) {
+    let colors = legendDestinations.get(color);
+    if (!colors) {
+      const tag = sourceTag(color);
+      const hit = currentTag(color);
+      if (hit && hit !== tag) continue;
+      colors = [destinations.get(tag)?.color || (colorPolicy === "current-base" && currentBase(tag)) || color];
+    }
+    for (const next of colors) {
       if (!Object.hasOwn(current.legendLabels || {}, next) && !Object.hasOwn(patch.legendLabels, next)) {
         patch.legendLabels[next] = label;
       }
