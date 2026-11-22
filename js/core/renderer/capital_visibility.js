@@ -5,16 +5,19 @@ import { getParentMergedParents as readMergedParents } from "./parent_merged_pre
 
 export function resolveCityHostId(landIndex, hostId, coordinates) {
   if (hostId && landIndex?.has(hostId)) return hostId;
-  for (const [id, feature] of landIndex || []) {
-    if (feature.geometry && globalThis.d3.geoContains(feature, coordinates)) return id;
+  // 宿主地块缺失（如地块编号迁移）时按坐标反查当前宿主；反查不到就保留原 id，按参考归属判定。
+  if (Array.isArray(coordinates) && coordinates.every(Number.isFinite)) {
+    for (const [id, feature] of landIndex || []) {
+      if (feature.geometry && globalThis.d3.geoContains(feature, coordinates)) return id;
+    }
   }
-  return "";
+  return hostId || "";
 }
 
 export function getCityTerritoryHostId(state, city) {
   const hostId = city.properties.__city_host_feature_id;
   if (!hostId && city.properties.__city_source !== "project") return "";
-  return resolveCityHostId(state.landIndex, hostId, city.geometry.coordinates);
+  return resolveCityHostId(state.landIndex, hostId, city.geometry?.coordinates);
 }
 
 export function createCityTerritoryQuery({
@@ -40,7 +43,7 @@ export function createCityTerritoryQuery({
 
   return function inTerritory(city, tag, hostId = getCityTerritoryHostId(state, city)) {
     if (!hostId) return false;
-    const host = state.landIndex.get(hostId);
+    const host = state.landIndex?.get(hostId);
     const cells = cellsFor(hostId, host);
     const hits = cells?.filter(cell => globalThis.d3.geoContains(cell.geometry, city.geometry.coordinates));
     return matches(tag, hostId, host, hits?.length === 1 ? hits[0] : null);

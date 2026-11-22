@@ -248,7 +248,7 @@ test("scenario rollback authority key sets are pairwise disjoint and cover the e
   }
 
   const authorityKeys = authorityEntries.flatMap(([, keys]) => keys);
-  assert.equal(authorityKeys.length, 114);
+  assert.equal(authorityKeys.length, 115);
 });
 
 test("scenario rollback supplemental authority has an exact frozen phase handoff", () => {
