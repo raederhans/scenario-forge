@@ -327,8 +327,10 @@ def split_features(topology, shapes, owners, historical, modern, rules, ownershi
             cid = f"{fid}__RCW_{suffix}"
             if cid in shapes:
                 raise ValueError(f"Duplicate child ID: {cid}")
-            district = max(((surface_area(part), p["unit_key"], p) for p, part in districts.overlaps(child)
-                            if part.area > 0), default=None)
+            # Clipping noise can leave a sliver of a few square millimetres inside a neighbouring district.
+            min_overlap = surface_area(child) * 1e-6
+            district = max(((area, p["unit_key"], p) for p, part in districts.overlaps(child)
+                            if (area := surface_area(part)) > min_overlap), default=None)
             if district:
                 p = district[2]
                 owner = ownership["districts"].get(p["unit_key"], ownership["provinces"].get(p["prov_ENG"]))

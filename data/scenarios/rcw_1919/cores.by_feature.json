@@ -2,7 +2,7 @@
   "version": 1,
   "scenario_id": "rcw_1919",
   "generated_at": "2026-11-22T00:00:00Z",
-  "baseline_hash": "f592c9df471d1e6bf16cf13b938a5fb2246359b78bc23bfd5aa801cb13e9433e",
+  "baseline_hash": "d7a8ecddfd1e6023a9510176cb4c989e8f0c5435eca549ce00202b3ce7c61a61",
   "cores": {
     "ARM-1553": [
       "ARM"
@@ -15020,7 +15020,7 @@
       "FRGN"
     ],
     "TJK-366__RCW_TJK_16282066B70033230103640__REMAINDER": [
-      "BKH"
+      "FRGN"
     ],
     "TJK-366__RCW_TJK_16282066B75905457590964__Bukhara_Bukhara": [
       "BKH"

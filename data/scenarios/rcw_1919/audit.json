@@ -7,7 +7,7 @@
     "owner_count": 59,
     "shell_feature_count": 2088
   },
-  "snapshot_fingerprint": "a9aa4146c0c8aaabb6e105b03fa56a863529c90755745a61882fd3c5eeba7ebb",
+  "snapshot_fingerprint": "580ea4e3c6d3316c2afef009b408378d953424a5b0f5bcc8fcc79a5d71872eeb",
   "dropped_shell_ids": [
     "RU_ARCTIC_FB_009",
     "RU_ARCTIC_FB_016",
@@ -2997,6 +2997,11 @@
         "owner": "FRGN",
         "area_km2": 792.0972056286186
       },
+      "TJK-366__RCW_TJK_16282066B70033230103640__REMAINDER": {
+        "parent_id": "TJK-366",
+        "owner": "FRGN",
+        "area_km2": 752.1772141521213
+      },
       "TJK-366__RCW_TJK_16282066B75905457590964__REMAINDER": {
         "parent_id": "TJK-366",
         "owner": "FRGN",
@@ -3027,6 +3032,11 @@
         "owner": "TUC",
         "area_km2": 51.221237198209764
       },
+      "TKM-351__RCW_TKM_10190150B33098588070062__REMAINDER": {
+        "parent_id": "TKM-351",
+        "owner": "TUC",
+        "area_km2": 690.3797687701522
+      },
       "TKM-352__RCW_TKM_10190150B40000077655635__REMAINDER": {
         "parent_id": "TKM-352",
         "owner": "TSAR",
@@ -3041,6 +3051,11 @@
         "parent_id": "TKM-352",
         "owner": "TSAR",
         "area_km2": 3186.5473801721882
+      },
+      "TKM-352__RCW_TKM_10190150B96789976776616__REMAINDER": {
+        "parent_id": "TKM-352",
+        "owner": "TSAR",
+        "area_km2": 1579.2673769207267
       },
       "TKM-359__RCW_TKM_10190150B64529450546528__REMAINDER": {
         "parent_id": "TKM-359",
@@ -3091,6 +3106,11 @@
         "parent_id": "LT027__SPLIT_REST",
         "owner": "LIT",
         "area_km2": 0.37331665403074027
+      },
+      "LT027__SPLIT_REST__RCW_LTU_59024439B45555642099427__REMAINDER": {
+        "parent_id": "LT027__SPLIT_REST",
+        "owner": "LIT",
+        "area_km2": 195.391294062447
       },
       "LT027__SPLIT_REST__RCW_LTU_59024439B72227806621488": {
         "parent_id": "LT027__SPLIT_REST",
