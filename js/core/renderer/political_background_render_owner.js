@@ -1,5 +1,7 @@
 import { requireFunction } from "./require_function.js";
 import { drawWorldFrame } from "./world_frame_render.js";
+import { getRegionalBackdrop } from "./regional_backdrop.js";
+import { isRegionalScenario } from "../scenario/scenario_region.js";
 import {
   addRetainedPoliticalPath,
   advanceDeferredPoliticalBackgroundBuild,
@@ -1336,6 +1338,14 @@ export function createPoliticalBackgroundRenderOwner({
     // this same color. Reprojecting the coastline here adds no visible layer.
     drawOceanStyle();
     drawOceanDepthMaskLayer();
+    const backdrop = getRegionalBackdrop(getRuntimeState(), platform.topojson);
+    if (backdrop?.collection) {
+      const context = surface.getContext();
+      context.beginPath();
+      surface.getPathCanvas()(backdrop.collection);
+      context.fillStyle = backdrop.fill;
+      context.fill();
+    }
   }
 
   function drawPoliticalBackgroundFills(options = {}) {
@@ -1343,7 +1353,7 @@ export function createPoliticalBackgroundRenderOwner({
       if (shouldUseScenarioPoliticalBackgroundMerge()) {
         return drawScenarioPoliticalBackgroundFills(options);
       }
-      drawAdmin0BackgroundFills(options);
+      if (!isRegionalScenario(state.activeScenarioManifest)) drawAdmin0BackgroundFills(options);
     }
     return options.returnSummary
       ? {

@@ -1,5 +1,6 @@
 import { SCENARIO_PRESENTATION_FEATURES, scenarioHasPresentationFeature } from "../scenario/presentation_hint_helpers.js";
 import { resolveTopVisibleRiverCandidate } from "../river_paint/visibility.js";
+import { isRegionalMarineHitOnLand } from "../renderer/regional_backdrop.js";
 import {
   collectSpatialGridCandidates,
   createHitResult,
@@ -195,7 +196,8 @@ export function createHitTestingOwner({ state: runtimeState, deps }) {
     return lon >= minLon && lon <= maxLon && lat >= minLat && lat <= maxLat;
   }
 
-  function shouldSuppressOpenOceanHit(candidate, pointer) {
+  function shouldSuppressWaterHit(candidate, pointer) {
+    if (isRegionalMarineHitOnLand(runtimeState, candidate?.item?.feature, pointer.lonLat)) return true;
     if (!candidate?.item?.feature || !isOpenOceanWaterRegion(candidate.item.feature)) return false;
     return isPointerInsideMediterraneanAtlantropaBounds(pointer);
   }
@@ -912,7 +914,7 @@ export function createHitTestingOwner({ state: runtimeState, deps }) {
       const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "water" });
       if (!strictHoverHit) return createHitResult();
       if (isMacroOceanWaterRegion(strictHoverHit.item?.feature)) return createHitResult();
-      if (shouldSuppressOpenOceanHit(strictHoverHit, pointer)) return createHitResult();
+      if (shouldSuppressWaterHit(strictHoverHit, pointer)) return createHitResult();
       return toHitResult(strictHoverHit, {
         viaSnap: false,
         strict: true,
@@ -926,7 +928,7 @@ export function createHitTestingOwner({ state: runtimeState, deps }) {
       if (eventType === "hover" && isMacroOceanWaterRegion(strictHit.item?.feature)) {
         return createHitResult();
       }
-      if (shouldSuppressOpenOceanHit(strictHit, pointer)) {
+      if (shouldSuppressWaterHit(strictHit, pointer)) {
         return createHitResult();
       }
       return toHitResult(strictHit, {
@@ -953,7 +955,7 @@ export function createHitTestingOwner({ state: runtimeState, deps }) {
     if (eventType === "hover" && isMacroOceanWaterRegion(chosen.item?.feature)) {
       return createHitResult();
     }
-    if (shouldSuppressOpenOceanHit(chosen, pointer)) {
+    if (shouldSuppressWaterHit(chosen, pointer)) {
       return createHitResult();
     }
     return toHitResult(chosen, {

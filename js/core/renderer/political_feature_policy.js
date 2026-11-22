@@ -1,3 +1,52 @@
+import { getCountryCode, getFeatureId } from "../feature_identity.js";
+
+export function getAtlantropaRenderLayer(feature) {
+  return String(feature?.properties?.atl_render_layer || "").trim().toLowerCase();
+}
+
+export function getAtlantropaColorRule(feature) {
+  return String(feature?.properties?.atl_color_rule || "").trim().toLowerCase();
+}
+
+export function isAtlantropaFieldDrivenFeature(feature) {
+  return !!(getAtlantropaRenderLayer(feature) || getAtlantropaColorRule(feature));
+}
+
+export function isBaseGeographyScenarioFeature(feature) {
+  return feature?.properties?.render_as_base_geography === true;
+}
+
+function getAtlantropaGeometryRole(feature) {
+  return String(feature?.properties?.atl_geometry_role || "").trim().toLowerCase();
+}
+
+function getAtlantropaJoinMode(feature) {
+  return String(feature?.properties?.atl_join_mode || "").trim().toLowerCase();
+}
+
+function isBooleanWeldIsland(feature, featureId = null) {
+  const candidate = String(
+    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
+  ).trim().toUpperCase();
+  if (!candidate.startsWith("ATLISL_")) {
+    return false;
+  }
+  return getAtlantropaGeometryRole(feature) === "donor_island"
+    && getAtlantropaJoinMode(feature) === "boolean_weld";
+}
+
+export function createRuntimePoliticalFeaturePolicy(state, renderHelpers) {
+  return createPoliticalFeaturePolicy(state, {
+    getFeatureId,
+    getFeatureCountryCodeNormalized: getCountryCode,
+    isAtlantropaFieldDrivenFeature,
+    isInteractiveAtlantropaBooleanWeldIslandFeature: isBooleanWeldIsland,
+    isScenarioAtlantropaVisible: () => state.showScenarioAtlantropa !== false,
+    isBaseGeographyScenarioFeature,
+    ...renderHelpers,
+  });
+}
+
 // Political visibility, interaction eligibility, and stable paint-layer ordering.
 // Runtime fields and cache references are read when each rule runs.
 export function createPoliticalFeaturePolicy(runtimeState, {
@@ -151,14 +200,6 @@ export function createPoliticalFeaturePolicy(runtimeState, {
       return false;
     }
     return isRuntimeOnlyShellFallbackPoliticalFeature(feature, featureId);
-  }
-
-  function getAtlantropaGeometryRole(feature) {
-    return String(feature?.properties?.atl_geometry_role || "").trim().toLowerCase();
-  }
-
-  function getAtlantropaJoinMode(feature) {
-    return String(feature?.properties?.atl_join_mode || "").trim().toLowerCase();
   }
 
   function isAntarcticSectorFeature(feature, featureId = null) {

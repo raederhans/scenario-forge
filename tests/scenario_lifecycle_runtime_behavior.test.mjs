@@ -2366,6 +2366,34 @@ test("resetToScenarioBaseline restores ownership before UI refresh side effects"
   assert.deepEqual(runtimeState.sovereigntyByFeatureId, { A: "FR", B: "DE" });
 });
 
+test("regional data health compares runtime IDs and eligible interactive IDs independently", () => withAppStateRestored(() => {
+  const manifest = { region: { bounds: [0, 0, 10, 10] }, summary: { feature_count: 999 } };
+  const members = createFeatures(40);
+  const visualOnly = { properties: { id: "visual", interactive: false } };
+  const shell = { properties: { id: "shell", scenario_helper_kind: "shell_fallback", render_as_base_geography: false } };
+  const full = [...members, visualOnly];
+  Object.assign(appState, {
+    activeScenarioManifest: manifest, mapSemanticMode: "political",
+    scenarioRuntimeTopologyData: { objects: { political: { geometries: [...full, shell] } } },
+    landDataFull: { features: full }, landData: { features: members },
+    interactionInfrastructureReady: true, landIndex: new Map(members.map(f => [f.id, f])),
+  });
+  const check = () => evaluateScenarioDataHealth(manifest);
+  assert.equal(check().expectedFeatureCount, 41);
+  assert.equal(check().warning, "");
+  appState.landDataFull = { features: [...members, { id: "outside" }] };
+  assert.equal(check().severity, "error");
+  appState.landDataFull = { features: full };
+  appState.landData = { features: members.slice(1) };
+  assert.equal(check().severity, "error");
+  appState.landData = { features: members };
+  appState.landIndex.delete(members[0].id);
+  assert.equal(check().severity, "error");
+  appState.landDataFull = appState.landData = { features: members.slice(0, 2) };
+  assert.equal(check().runtimeFeatureCount, 2);
+  assert.equal(check().severity, "error");
+}));
+
 test("scenario data health uses chunked political payload as the expected feature count", () => {
   const health = withAppStatePatch({
     activeScenarioManifest: {

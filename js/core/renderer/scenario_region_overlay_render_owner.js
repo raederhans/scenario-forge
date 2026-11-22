@@ -1,6 +1,7 @@
 // Scenario water, special-region and Atlantropa overlays share one pass and cache lifecycle.
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
 import { isLakeRegion } from "./effective_water_regions.js";
+import { usesRegionalMarineMask } from "./regional_backdrop.js";
 import { shouldDrawLakeOutline } from "./lake_outline_style.js";
 import { normalizeLakeStyleConfig } from "../state_defaults.js";
 import { createWaterHighlightDisplay } from "./water_highlight_display.js";
@@ -22,6 +23,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   computeProjectedGeoBounds,
   getWaterRegionColor,
   getOceanSurfacePattern = () => null,
+  applyOceanClipMask,
   getEffectiveAtlantropaFeatures,
   getLogicalCanvasDimensions,
   shouldExcludePoliticalVisualFeature,
@@ -435,6 +437,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       if (!(fillOpacity > 0)) return;
       const id = getSharedFeatureId(feature) || `water-${index}`;
       rendererSurfaceHost.getContext().save();
+      if (usesRegionalMarineMask(runtimeState, feature)) applyOceanClipMask();
       rendererSurfaceHost.getContext().globalAlpha = fillOpacity;
       const hasColorOverride = (!isMacroOceanWaterRegion(feature) || runtimeState.allowOpenOceanPaint)
         && !!getSafeCanvasColor(runtimeState.waterRegionOverrides?.[id], null);
@@ -818,6 +821,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         const display = waterHighlightDisplay.get(safeGeometry.geometry, projection, k);
         if (display) {
           context.save();
+          if (usesRegionalMarineMask(runtimeState, feature)) applyOceanClipMask();
           context.globalAlpha = isMacroOcean ? 0.92 : 1;
           context.strokeStyle = "#f1c40f";
           context.lineWidth = (isMacroOcean ? 1.05 : 0.9) / Math.max(0.0001, k);
@@ -831,6 +835,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         }
       }
 
+      context.save();
+      if (usesRegionalMarineMask(runtimeState, feature)) applyOceanClipMask();
       context.beginPath();
       let visiblePartCount = 0;
       visibleParts.forEach((part) => {
@@ -838,8 +844,10 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         rendererSurfaceHost.getPathCanvas()(part);
         visiblePartCount += 1;
       });
-      if (!visiblePartCount) return;
-      context.save();
+      if (!visiblePartCount) {
+        context.restore();
+        return;
+      }
       context.globalAlpha = isMacroOcean ? 0.92 : 1;
       context.strokeStyle = "#f1c40f";
       context.lineWidth = (isMacroOcean ? 1.15 : 0.9) / Math.max(0.0001, k);
