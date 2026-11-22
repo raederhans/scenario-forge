@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   migrateMergedFeatureProjectData,
@@ -21,6 +22,33 @@ test("lineage resolves every level to the final feature of the scenario", () => 
   const hoi4 = resolveFeatureMergeLineage(lineage, "hoi4_1936");
   assert.equal(hoi4.resolve("RU_D"), "RU_D");
   assert.equal(hoi4.isMerged("RU_D"), false);
+});
+
+test("a HOI4 merged Indian parcel expands and regroups under the TNO lineage", async () => {
+  const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?cross-scenario");
+  const read = file => JSON.parse(readFileSync(new URL("../data/" + file, import.meta.url), "utf8"));
+  const owners = read("scenarios/tno_1962/owners.by_feature.json").owners;
+  const summaries = [], discarded = [];
+  const result = await migrate({ scenario: { id: "hoi4_1936" }, visualOverrides: { IN_MRG_169df8d18d42: "#abcdef" } }, {
+    sourceScenarioId: "hoi4_1936", lineageScenarioId: "tno_1962", validFeatureIds: new Set(Object.keys(owners)),
+    sourceManifest: read("scenarios/hoi4_1936/manifest.json"), scenarioManifest: read("scenarios/tno_1962/manifest.json"),
+    fetchImpl: async url => ({ ok: true, json: () => read("feature-migrations/" + url.split("/").at(-1)) }),
+    onDiscard: id => discarded.push(id), onMigration: summary => summaries.push(summary),
+  });
+  assert.deepEqual(result.visualOverrides, { IN_ADM2_76128533B24861976740713: "#abcdef", IN_MRG_6c3faeb50bb6: "#abcdef" });
+  assert.deepEqual(summaries, [{ migratedEntries: 1, ignoredEntries: 0 }]);
+  assert.deepEqual(discarded, []);
+});
+
+test("migration discard reporting omits fallback shells and Antarctic IDs", async () => {
+  const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?ignored-ids");
+  const discarded = [];
+  const result = await migrate({ visualOverrides: { LOST: "red", DE_FB_DE: "red", AQ_A: "red", SAVED: "blue" } }, {
+    validFeatureIds: ["SAVED"], fetchImpl: async () => ({ ok: true, json: () => ({}) }),
+    onDiscard: id => discarded.push(id),
+  });
+  assert.deepEqual(result.visualOverrides, { SAVED: "blue" });
+  assert.deepEqual(discarded, ["LOST"]);
 });
 
 test("a merged feature takes a value only when every member carried that same value", () => {

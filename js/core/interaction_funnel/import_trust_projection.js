@@ -1,5 +1,9 @@
 import { getFeatureId } from "../sovereignty_manager.js";
 
+export function getCurrentScenarioValidFeatureIds(state) {
+  return new Set([...Object.keys(state.scenarioBaselineOwnersByFeatureId || {}), ...(state.runtimeFeatureIds || [])]);
+}
+
 // Borrow geometry only while collecting identities. The result contains new
 // string values, never topology objects or runtime feature payloads.
 export function getScenarioImportValidFeatureIds(target, preparedScenario) {
