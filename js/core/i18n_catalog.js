@@ -1460,6 +1460,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "修改 {country} 颜色",
     "en": "Change color of {country}"
   },
+  "Change {name} color": {
+    "zh": "更改 {name} 的颜色",
+    "en": "Change {name} color"
+  },
   "Changes to this order stay in the workbench.": {
     "zh": "此顺序的更改仅保留在工作台中。",
     "en": "Changes to this order stay in the workbench."
@@ -6551,6 +6555,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "新组标签",
     "en": "New Group Label"
   },
+  "New country {n}": {
+    "zh": "新国家 {n}",
+    "en": "New country {n}"
+  },
   "New layer": {
     "zh": "新建图层",
     "en": "New layer"
@@ -8086,6 +8094,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "项目面板",
     "en": "Project controls"
   },
+  "Project countries": {
+    "zh": "项目国家",
+    "en": "Project countries"
+  },
+  "Project countries without a base color were skipped: {tags}": {
+    "zh": "已跳过缺少底色的项目国家：{tags}",
+    "en": "Project countries without a base color were skipped: {tags}"
+  },
   "Project data": {
     "zh": "项目数据",
     "en": "Project data"
@@ -8530,6 +8546,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "注册",
     "en": "Register"
   },
+  "Register as new country": {
+    "zh": "登记为新国家",
+    "en": "Register as new country"
+  },
+  "Register new country {name}": {
+    "zh": "登记新国家 {name}",
+    "en": "Register new country {name}"
+  },
   "Regulatory quality": {
     "zh": "监管质量",
     "en": "Regulatory quality"
@@ -8597,6 +8621,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Rename country": {
     "zh": "重命名国家",
     "en": "Rename country"
+  },
+  "Rename country to {name}": {
+    "zh": "将国家改名为 {name}",
+    "en": "Rename country to {name}"
   },
   "Rename zone layer": {
     "zh": "重命名特殊区域图层",
@@ -11145,6 +11173,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "当前浏览器无法读取项目压缩包，请打开其中可编辑的 JSON 文件。",
     "en": "This browser cannot read the project ZIP. Open the editable JSON file instead."
   },
+  "This color is already used by another country.": {
+    "zh": "已有其他国家使用此颜色。",
+    "en": "This color is already used by another country."
+  },
   "This family has not exposed extra manifest or audit cards in the current shell.": {
     "zh": "这个 family 目前还没有在这个 shell 里暴露额外的 manifest 或 audit 卡片。",
     "en": "This family has not exposed extra manifest or audit cards in the current shell."
@@ -11664,6 +11696,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Unnamed facility": {
     "zh": "未命名设施",
     "en": "Unnamed facility"
+  },
+  "Unregister country": {
+    "zh": "取消登记国家",
+    "en": "Unregister country"
+  },
+  "Unregister {name}": {
+    "zh": "取消登记 {name}",
+    "en": "Unregister {name}"
   },
   "Unregistered color {color}": {
     "zh": "未登记颜色 {color}",

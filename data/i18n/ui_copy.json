@@ -1,4 +1,44 @@
 {
+  "Project countries": {
+    "en": "Project countries",
+    "zh": "项目国家"
+  },
+  "Register as new country": {
+    "en": "Register as new country",
+    "zh": "登记为新国家"
+  },
+  "Unregister country": {
+    "en": "Unregister country",
+    "zh": "取消登记国家"
+  },
+  "New country {n}": {
+    "en": "New country {n}",
+    "zh": "新国家 {n}"
+  },
+  "Register new country {name}": {
+    "en": "Register new country {name}",
+    "zh": "登记新国家 {name}"
+  },
+  "Unregister {name}": {
+    "en": "Unregister {name}",
+    "zh": "取消登记 {name}"
+  },
+  "Change {name} color": {
+    "en": "Change {name} color",
+    "zh": "更改 {name} 的颜色"
+  },
+  "Rename country to {name}": {
+    "en": "Rename country to {name}",
+    "zh": "将国家改名为 {name}"
+  },
+  "This color is already used by another country.": {
+    "en": "This color is already used by another country.",
+    "zh": "已有其他国家使用此颜色。"
+  },
+  "Project countries without a base color were skipped: {tags}": {
+    "en": "Project countries without a base color were skipped: {tags}",
+    "zh": "已跳过缺少底色的项目国家：{tags}"
+  },
   "Autosave": {
     "en": "Autosave",
     "zh": "自动保存"

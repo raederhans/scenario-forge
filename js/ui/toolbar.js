@@ -4,6 +4,7 @@ import { createRiverPaintControls } from "./river_paint_controls.js";
 import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
 import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
+import { getProjectCountryBaseColors } from "../core/project_countries.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
 // Toolbar UI (Phase 13)
 import {
@@ -2114,7 +2115,7 @@ function initToolbar({ render } = {}) {
       runtimeState.colors = {};
       runtimeState.visualOverrides = {};
       clearAllRiverPaintOverridesState(runtimeState);
-      runtimeState.sovereignBaseColors = {};
+      runtimeState.sovereignBaseColors = getProjectCountryBaseColors(runtimeState);
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();

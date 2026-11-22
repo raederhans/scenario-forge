@@ -1,3 +1,4 @@
+import { isProjectCountry } from "./project_countries.js";
 import { commitFeaturePaint } from "./feature_paint_commands.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { resolveCatalogEntryForTag, resolvePresetFeatureIds } from "./releasable_manager.js";
@@ -12,13 +13,20 @@ export function getCountryMemberIds(source, code) {
     : reference.getGeographicCountryFeatureIds(code);
 }
 
+function projectCountryPaintIds(source, code) {
+  return Object.keys(source.visualOverrides || {}).filter(id =>
+    callRuntimeHook(source, "resolveBorderIdentityFn", id, source.landIndex?.get(id)) === code);
+}
+
 export function getCountryOverrideIds(source, code) {
+  if (isProjectCountry(source, code)) return projectCountryPaintIds(source, code);
   const riverParents = new Set(getEditedRiverParentIds(source.riverPaint));
   return getCountryMemberIds(source, code).filter((id) =>
     Object.hasOwn(source.visualOverrides || {}, id) || riverParents.has(id));
 }
 
 export function getCountryLocateIds(source, code) {
+  if (isProjectCountry(source, code)) return projectCountryPaintIds(source, code);
   const members = getCountryMemberIds(source, code);
   if (!source.activeScenarioId || !source.scenarioCountriesByTag?.[code]?.releasable) return members;
   const entry = resolveCatalogEntryForTag(code, source.activeScenarioId);
