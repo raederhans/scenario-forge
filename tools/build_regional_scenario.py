@@ -35,6 +35,10 @@ SCENARIOS = ROOT / "data/scenarios"
 GEOD = Geod(ellps="WGS84")
 
 
+# Only the largest enclosed land holes are filled; the rest stay listed in the audit.
+MAX_LAND_HOLE_FILLS = 20
+
+
 def read(path):
     return json.loads(path.read_bytes())
 
@@ -103,7 +107,7 @@ def near_frontier(polygon, index, km):
     return bool(shapely.dwithin(local, neighbors, km * 1000).any())
 
 
-def select_members(topology, base_owners, units, membership, rules, occupied=None, assigned=None):
+def select_members(topology, base_owners, units, membership, rules, occupied=None, assigned=None, preserved=None):
     excluded = set(membership["excluded_districts"]) | set(rules["excluded_districts"])
     units = [f for f in units["features"] if f["properties"]["unit_key"] not in excluded]
     districts = [f["properties"] for f in units]
@@ -112,6 +116,9 @@ def select_members(topology, base_owners, units, membership, rules, occupied=Non
     west, south, east, north = shapely.total_bounds(index.geometries)
     envelopes = [box(west + offset, south, east + offset, north) for offset in (-360, 0, 360)]
     exclusions = {tag: box(*bounds) for tag, bounds in membership["neighbor_exclusion_bounds"].items()}
+    regions = {tag: box(*rule["bounds"]) if "bounds" in rule else None
+               for tag, rule in membership.get("base_owner_regions", {}).items()}
+    candidate_tags = set(membership["neighbor_tags"]) | set(membership["border_tags"]) | regions.keys()
     absolute = _absolute_topology(topology) if "transform" in topology else topology
     owners, shapes, dropped = {}, {}, []
     missing = defaultdict(list)
@@ -129,7 +136,7 @@ def select_members(topology, base_owners, units, membership, rules, occupied=Non
             points = [point for ref in _geometry_arc_refs(row)
                       for point in absolute["arcs"][ref if ref >= 0 else ~ref]]
             geometry = MultiPoint(points).envelope
-            if (tag in membership["neighbor_tags"] or tag in membership["border_tags"]
+            if (tag in candidate_tags
                     or len(index.query(regional_longitudes(geometry, meridian)))):
                 raise ValueError(f"Unreadable candidate geometry: {fid}")
             continue
@@ -142,19 +149,24 @@ def select_members(topology, base_owners, units, membership, rules, occupied=Non
         if shell and not valid:
             dropped.append(fid)
             continue
-        if (tag not in membership["neighbor_tags"] and tag not in membership["border_tags"]
+        if (tag not in candidate_tags
                 and not any(bounds.intersects(geometry.envelope) for bounds in envelopes)):
             continue
         polygon = regional_longitudes(geometry, meridian)
         whole = tag in membership["neighbor_tags"] and not (
             tag in exclusions and exclusions[tag].covers(polygon.representative_point()))
+        keep_base = tag in regions and (regions[tag] is None or regions[tag].covers(polygon.representative_point()))
         border = tag in membership["border_tags"]
         if not valid:
-            if whole or border or len(index.query(polygon)):
+            if keep_base or whole or border or len(index.query(polygon)):
                 raise ValueError(f"Invalid candidate geometry: {fid}")
             continue
-        district = majority_district(polygon, districts, index, membership["majority_threshold"])
-        if district:
+        district = None if keep_base else majority_district(polygon, districts, index, membership["majority_threshold"])
+        if keep_base:
+            owner = rules["neighbor_owner_map"].get(tag)
+            if preserved is not None:
+                preserved.add(fid)
+        elif district:
             owner = rules["districts"].get(district["unit_key"], rules["provinces"].get(district["prov_ENG"]))
         elif whole or (border and near_frontier(polygon, index, membership["border_distance_km"])):
             owner = rules["neighbor_owner_map"].get(tag)
@@ -285,7 +297,7 @@ def strip_intersections(groups, districts):
     return sorted(strips, key=lambda s: (-s["area_km2"], s["adm2"], s["province"]))[:20]
 
 
-def split_features(topology, shapes, owners, historical, modern, rules, ownership, assigned=None):
+def split_features(topology, shapes, owners, historical, modern, rules, ownership, assigned=None, preserved=()):
     districts = CuttingUnits(historical["features"])
     groups = [(g, CuttingUnits(f for f in modern["features"] if f["properties"]["shapeGroup"] in g["countries"]))
               for g in rules["adm2_partitions"]]
@@ -296,7 +308,7 @@ def split_features(topology, shapes, owners, historical, modern, rules, ownershi
     merged = 0
     for row in topology["objects"]["political"]["geometries"]:
         fid = _feature_id(row)
-        if "_FB_" in fid or fid in rules["subtract"].values():
+        if fid in preserved or "_FB_" in fid or fid in rules["subtract"].values():
             continue
         g = shapes[fid]
         if fid in rules["subtract"]:
@@ -417,12 +429,12 @@ def find_fills(shapes, land, nonmembers, districts, water=None):
         for row, geom in pieces:
             fid = "RCW_FILL_" + re.sub(r"[^A-Za-z0-9]+", "_", row["unit_key"]).strip("_")
             ids.append(fid)
-            if i < 10:
+            if i < MAX_LAND_HOLE_FILLS:
                 parts[fid].append(geom)
                 names[fid] = row["Name_ENG"]
         records.append({"area_km2": area / 1e6, "location": list(patch.representative_point().coords[0]),
-                        "districts": [r["unit_key"] for r, _ in pieces], "feature_ids": ids if i < 10 else [],
-                        "filled": i < 10})
+                        "districts": [r["unit_key"] for r, _ in pieces], "feature_ids": ids if i < MAX_LAND_HOLE_FILLS else [],
+                        "filled": i < MAX_LAND_HOLE_FILLS})
     return [(fid, names[fid], shapely.union_all(parts[fid])) for fid in sorted(parts)], records
 
 
@@ -496,7 +508,7 @@ def apply_masks(masks, shapes, owners, districts, assigned, ownership, rules, re
     return audit
 
 
-def rebuild_split_topology(topology, replacements, fills=(), seam_audit=None):
+def rebuild_split_topology(topology, replacements, fills=(), seam_audit=None, preserved=()):
     base = _absolute_topology(topology) if "transform" in topology else topology
     paths = [tuple(map(tuple, arc)) for arc in base["arcs"]]
     original_count = len(paths)
@@ -540,6 +552,11 @@ def rebuild_split_topology(topology, replacements, fills=(), seam_audit=None):
     inserts = {}
     original_vertices = {v for path in paths[:original_count] for v in path}
     changed_vertices = {v for path in paths[original_count:] for v in path}
+    # Included base regions can have vertices partway along a neighboring base arc.
+    for row, _ in templates:
+        if _feature_id(row) in preserved:
+            for ref in _geometry_arc_refs(row):
+                changed_vertices.update(paths[ref if ref >= 0 else ~ref])
     all_vertices = changed_vertices | original_vertices
     # Intersections computed on an original edge may differ from that edge by a few ULPs.
     # Only test new vertices on old edges, and existing vertices on new edges.
@@ -658,7 +675,7 @@ def rebuild_split_topology(topology, replacements, fills=(), seam_audit=None):
             child for fid in base["political_precision_feature_ids"]
             for child in ([r[0] for r in replacements[fid]] if fid in replacements else [fid])]
     new_ids = {cid for parent, leaves in replacements.items() for cid, _, _ in leaves if cid != parent}
-    repair_shared_boundaries(result, new_ids | {cid for cid, _, _ in fills}, seam_audit)
+    repair_shared_boundaries(result, new_ids.union(preserved, (cid for cid, _, _ in fills)), seam_audit)
     return result
 
 
@@ -892,6 +909,12 @@ def resolve_capitals(factions, cities, shapes, owners, meridian):
         props = city["properties"]
         if city is custom:
             additions[city_id] = {**props, "add_city": True, "display_name": {"en": name, "zh": coord["name_zh"]}}
+            replace_ids = sorted({public["properties"]["city_id"]
+                                  for label in [name, *coord.get("aliases", [])]
+                                  for public in names.get(city_key(label), [])
+                                  if GEOD.inv(props["lon"], props["lat"], *public["geometry"]["coordinates"])[2] <= 30_000})
+            if replace_ids:
+                additions[city_id]["replace_ids"] = replace_ids
         lon, lat = city["geometry"]["coordinates"]
         hints[tag] = {
             "tag": tag, "city_id": city_id, "stable_key": props["stable_key"], "city_name": name,
@@ -1021,9 +1044,9 @@ def hierarchy_overrides(base, members, children):
 def build(output, base, base_owners, units, membership, ownership, bookmark, cities, generated_at, world_sha,
           reference_countries, split_rules, adm2, city_names=None, public_land=None, base_hierarchy=None, *,
           public_water=None, historic_water=None):
-    occupied, assigned = {}, {}
+    occupied, assigned, preserved = {}, {}, set()
     owners, shapes, dropped = select_members(base, base_owners, units, membership, ownership,
-                                             occupied if public_land is not None else None, assigned)
+                                             occupied if public_land is not None else None, assigned, preserved)
     shoreline = {}
     if historic_water is not None:
         for fid, polygon in list(shapes.items()):
@@ -1042,7 +1065,7 @@ def build(output, base, base_owners, units, membership, ownership, bookmark, cit
         if historic_water is not None:
             other.append(historic_water)
         fills, holes = find_fills(shapes, public_land, shapely.STRtree(other), districts, public_water)
-    replacements, split_audit = split_features(topology, shapes, owners, units, adm2, split_rules, ownership, assigned)
+    replacements, split_audit = split_features(topology, shapes, owners, units, adm2, split_rules, ownership, assigned, preserved)
     for fid, _, g in fills:
         district = winning_district(g, districts)
         assigned[fid] = district
@@ -1057,10 +1080,10 @@ def build(output, base, base_owners, units, membership, ownership, bookmark, cit
     fills = [leaf for fid, name, g in fills for leaf in replacements.pop(fid, [(fid, name, g)])]
     split_audit["children_by_parent"].update({fid: [c for c, _, _ in leaves] for fid, leaves in replacements.items()
                                              if len(leaves) > 1})
-    if replacements or fills:
+    if replacements or fills or preserved:
         old = topology
         split_audit["shared_arc_shortfalls"] = []
-        topology = rebuild_split_topology(old, replacements, fills, split_audit["shared_arc_shortfalls"])
+        topology = rebuild_split_topology(old, replacements, fills, split_audit["shared_arc_shortfalls"], preserved)
         original = {_feature_id(row): row for row in old["objects"]["political"]["geometries"]}
         noded, output_shapes = {}, {}
         max_neighbor_delta = 0.0
@@ -1123,6 +1146,8 @@ def build(output, base, base_owners, units, membership, ownership, bookmark, cit
         "hierarchy_overrides": hierarchy_overrides(base_hierarchy, set(owners), split_audit["children_by_parent"]),
     }
     output.mkdir(parents=True, exist_ok=True)
+    if "backdrop" in membership:
+        manifest["region"]["backdrop"] = membership["backdrop"]
     if historic_water is not None and "historic_water" in membership:
         manifest["water_regions_url"] = prefix + "water_regions.geojson"
         water_properties = dict(membership["historic_water"]["properties"], scenario_id=scenario_id)

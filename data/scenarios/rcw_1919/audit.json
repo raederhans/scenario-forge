@@ -3,11 +3,11 @@
   "scenario_id": "rcw_1919",
   "generated_at": "2026-11-22T00:00:00Z",
   "summary": {
-    "feature_count": 5515,
-    "owner_count": 62,
-    "shell_feature_count": 2088
+    "feature_count": 5696,
+    "owner_count": 64,
+    "shell_feature_count": 2118
   },
-  "snapshot_fingerprint": "db2a4db4a931ae48d6377d096a625944e045b5dcf9d212bf5d505994e42a1236",
+  "snapshot_fingerprint": "472aa4c20527f58b4e622eb925b61e5dcdc3bee4c06183852ea490ca207a3fdc",
   "dropped_shell_ids": [
     "RU_ARCTIC_FB_009",
     "RU_ARCTIC_FB_016",
@@ -3228,10 +3228,114 @@
     "shared_arc_shortfalls": [
       {
         "features": [
+          "CN_CITY_17275852B28125474199098",
+          "MNG-3208"
+        ],
+        "before_km": 6.039183755885399,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B28778137217024",
+          "KGZ-1117__RCW_KGZ_92254566B94070763969745"
+        ],
+        "before_km": 19.01613113859652,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B30377041544199",
+          "MNG-3319__SPLIT_REST"
+        ],
+        "before_km": 0.00010366920581841576,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B30377041544199",
+          "MNG-3320__SPLIT_REST"
+        ],
+        "before_km": 26.644645633593125,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B33058780855929",
+          "MNG-3208"
+        ],
+        "before_km": 7.750188944208114,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B37724859432078",
+          "MNG-3208"
+        ],
+        "before_km": 9.437338262692478,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B37724859432078",
+          "RU_RAY_50074027B11056050899621"
+        ],
+        "before_km": 0.5264678493174706,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B50829513875986",
+          "MNG-3319__SPLIT_REST"
+        ],
+        "before_km": 9.925532935641641,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B51760047756920",
+          "MNG-3320__SPLIT_REST"
+        ],
+        "before_km": 2.232740195027843,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B68969533729005",
+          "RCW_FILL_Semirechye_region_Kopalskii"
+        ],
+        "before_km": 2.0224509200965266,
+        "after_km": 0
+      },
+      {
+        "features": [
           "CN_CITY_17275852B82946568901730",
           "RCW_FILL_Amur_region_Amurskaia"
         ],
         "before_km": 3.7146260346449194,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B8889121757377",
+          "MNG-3320__SPLIT_REST"
+        ],
+        "before_km": 3.793869097671912,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B94643602360979",
+          "MNG-3208"
+        ],
+        "before_km": 6.200648020193617,
+        "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B9631287381162",
+          "RU_RAY_50074027B11056050899621"
+        ],
+        "before_km": 0.7004314671819993,
         "after_km": 0
       },
       {
@@ -3300,6 +3404,14 @@
       },
       {
         "features": [
+          "LT024__RCW_LTU_59024439B94579919059328",
+          "RU_RAY_50074027B43921475786516"
+        ],
+        "before_km": 6.554670682969341,
+        "after_km": 0
+      },
+      {
+        "features": [
           "RU_RAY_50074027B90298108562486",
           "KAZ-3195__SPLIT_REST__RCW_KAZ_9891525B45366613377645"
         ],
@@ -3328,14 +3440,6 @@
           "RCW_FILL_Amur_region_Amurskaia"
         ],
         "before_km": 2.6536553118665087,
-        "after_km": 0
-      },
-      {
-        "features": [
-          "RU_RAY_50074027B6450887110855",
-          "RCW_FILL_Transbaikal_region_Nerchinskii_Zavodskii"
-        ],
-        "before_km": 4.334878209578321,
         "after_km": 0
       },
       {
@@ -3385,13 +3489,73 @@
         ],
         "before_km": 0.2401719321175383,
         "after_km": 0
+      },
+      {
+        "features": [
+          "CN_CITY_17275852B14447575237215__SPLIT_REST",
+          "CN_CITY_17275852B82973388541806__SPLIT_REST"
+        ],
+        "before_km": 28.50007435081353,
+        "after_km": 28.50007435081353
       }
     ],
     "inserted_vertices_by_neighbor": {
+      "CN_CITY_17275852B11647586732977": 1,
+      "CN_CITY_17275852B1331930628057": 14,
+      "CN_CITY_17275852B1462759834152": 2,
+      "CN_CITY_17275852B17496009208379": 3,
+      "CN_CITY_17275852B20720560043260": 6,
       "CN_CITY_17275852B26831530446211": 6,
+      "CN_CITY_17275852B28125474199098": 3,
+      "CN_CITY_17275852B28778137217024": 10,
+      "CN_CITY_17275852B30377041544199": 6,
+      "CN_CITY_17275852B33058780855929": 5,
+      "CN_CITY_17275852B34916500668662": 1,
+      "CN_CITY_17275852B37374270123703": 3,
+      "CN_CITY_17275852B37724859432078": 9,
       "CN_CITY_17275852B40864949822732": 5,
+      "CN_CITY_17275852B41724533604601": 2,
+      "CN_CITY_17275852B43936626539686": 1,
+      "CN_CITY_17275852B50829513875986": 1,
+      "CN_CITY_17275852B51178591084361": 2,
+      "CN_CITY_17275852B51760047756920": 1,
+      "CN_CITY_17275852B5244686228582": 8,
+      "CN_CITY_17275852B52793743110999": 19,
+      "CN_CITY_17275852B53133838096937": 3,
+      "CN_CITY_17275852B5867719674470": 4,
+      "CN_CITY_17275852B60193722471131": 3,
+      "CN_CITY_17275852B61297794416649": 1,
+      "CN_CITY_17275852B62165589707618": 1,
+      "CN_CITY_17275852B62331342060318": 1,
+      "CN_CITY_17275852B65284596069119": 2,
       "CN_CITY_17275852B65388914557323": 3,
+      "CN_CITY_17275852B65393579518201": 1,
+      "CN_CITY_17275852B65931377787385": 6,
+      "CN_CITY_17275852B66735617717919": 1,
+      "CN_CITY_17275852B68969533729005": 14,
+      "CN_CITY_17275852B69139155184623": 11,
+      "CN_CITY_17275852B723995182906": 13,
+      "CN_CITY_17275852B73402209651960": 1,
+      "CN_CITY_17275852B73975880118601": 3,
+      "CN_CITY_17275852B77510638235800": 1,
+      "CN_CITY_17275852B79135697753229": 6,
       "CN_CITY_17275852B82946568901730": 10,
+      "CN_CITY_17275852B84983521751099": 2,
+      "CN_CITY_17275852B85233502536199": 2,
+      "CN_CITY_17275852B85415819267910": 2,
+      "CN_CITY_17275852B87724179019272": 1,
+      "CN_CITY_17275852B8889121757377": 1,
+      "CN_CITY_17275852B89914758736867": 3,
+      "CN_CITY_17275852B90369139050224": 8,
+      "CN_CITY_17275852B91248766779193": 1,
+      "CN_CITY_17275852B91471974013893": 3,
+      "CN_CITY_17275852B94095617750624": 1,
+      "CN_CITY_17275852B94643602360979": 2,
+      "CN_CITY_17275852B94946930956337": 4,
+      "CN_CITY_17275852B9631287381162": 7,
+      "CN_CITY_17275852B96647560142369": 4,
+      "CN_CITY_17275852B98393646664938": 1,
+      "CN_CITY_17275852B99352197075157": 10,
       "EE00A": 4,
       "FI1D3": 2,
       "FI1D8": 11,
@@ -3402,7 +3566,11 @@
       "KAZ-4830": 8,
       "KGZ-1115": 10,
       "LV006": 1,
+      "MNG-3208": 27,
+      "PL_POW_0406": 1,
       "PL_POW_2012": 5,
+      "PL_POW_2801": 1,
+      "PL_POW_2819": 3,
       "TJK-5491": 1,
       "UZB-4828": 10,
       "BY_HIST_POL_VITEBSK_WEST": 2,
@@ -3418,8 +3586,21 @@
       "RU_RAY_50074027B35283992627642": 3,
       "RU_RAY_50074027B85690776295658": 4,
       "RU_MRG_d1f63e4e9c78": 2,
+      "RU_RAY_50074027B66676359272188": 4,
+      "RU_RAY_50074027B18775873271761": 4,
+      "RU_RAY_50074027B15782484108203": 12,
+      "RU_RAY_50074027B43921475786516": 13,
+      "RU_RAY_50074027B10994626105324": 1,
+      "RU_MRG_742985642ff9": 13,
+      "RU_RAY_50074027B27880509956465": 11,
+      "RU_RAY_50074027B31742107079052": 7,
+      "RU_RAY_50074027B4169206169632": 1,
+      "RU_RAY_50074027B93803510078780": 3,
+      "RU_RAY_50074027B78200612798540": 1,
+      "RU_RAY_50074027B14538200684789": 6,
+      "RU_RAY_50074027B93509676978918": 2,
       "RU_RAY_50074027B42733914964900": 3,
-      "RU_RAY_50074027B11056050899621": 6,
+      "RU_RAY_50074027B11056050899621": 7,
       "RU_RAY_50074027B36737161681879": 20,
       "RU_RAY_50074027B92064145614684": 5,
       "RU_MRG_8c032ccba409": 4,
@@ -3446,7 +3627,7 @@
       "RU_RAY_50074027B15396054994341": 18,
       "RU_RAY_50074027B73257379170390": 7,
       "RU_RAY_50074027B52585131638206": 3,
-      "RU_RAY_50074027B6450887110855": 6,
+      "RU_RAY_50074027B6450887110855": 5,
       "RU_RAY_50074027B13114681801765": 12,
       "RU_RAY_50074027B41938053987638": 14,
       "RU_RAY_50074027B42091681257278": 6,
@@ -3494,8 +3675,21 @@
       "RU_RAY_50074027B76249175703521": 8,
       "RU_CITY_VOLGOGRAD": 75,
       "RU_CITY_ARKHANGELSK": 57,
+      "RU_ARCTIC_FB_007": 1,
+      "RU_ARCTIC_FB_008": 3,
+      "RU_ARCTIC_FB_013": 1,
+      "RU_ARCTIC_FB_019": 1,
+      "RU_ARCTIC_FB_022": 1,
+      "RU_ARCTIC_FB_023": 1,
+      "RU_ARCTIC_FB_024": 1,
+      "RU_ARCTIC_FB_025": 2,
+      "RU_ARCTIC_FB_026": 2,
+      "RU_ARCTIC_FB_028": 1,
+      "RU_ARCTIC_FB_032": 1,
+      "RU_ARCTIC_FB_034": 2,
+      "RU_ARCTIC_FB_036": 1,
       "RU_ARCTIC_FB_039": 2,
-      "RU_ARCTIC_FB_041": 1,
+      "RU_ARCTIC_FB_041": 2,
       "RU_ARCTIC_FB_093": 3,
       "RU_ARCTIC_FB_098": 1,
       "RU_ARCTIC_FB_106": 2,
@@ -3554,19 +3748,25 @@
       "RU_ARCTIC_FB_6617": 3,
       "RU_ARCTIC_FB_6783": 1,
       "RU_ARCTIC_FB_8119": 1,
+      "PL_POW_2210__SPLIT_REST": 1,
       "LT011__SPLIT_WILNO": 6,
       "LT011__SPLIT_REST": 51,
-      "LT023__SPLIT_MEMEL": 151,
-      "LT027__SPLIT_POGEGEN": 52,
+      "LT023__SPLIT_MEMEL": 153,
+      "LT027__SPLIT_POGEGEN": 53,
       "LT021__SPLIT_REST": 28,
       "RU_RAY_50074027B55571784565288__SPLIT_SALLA": 2,
       "RU_RAY_50074027B39999494546000__SPLIT_REST": 5,
       "LT029__SPLIT_POLISH": 3,
       "RU_RAY_50074027B90555869339870__SPLIT_PETSERI": 5,
+      "CN_CITY_17275852B14447575237215__SPLIT_REST": 2,
+      "CN_CITY_17275852B47937532060975__SPLIT_REST": 1,
       "IRN-3245__SPLIT_REST": 27,
+      "MNG-3319__SPLIT_REST": 8,
+      "MNG-3320__SPLIT_REST": 7,
       "RU_MRG_cb7ab64b43b7__SPLIT_REST": 3,
       "RU_RAY_50074027B88958089507858__SPLIT_REST": 4,
       "RU_RAY_50074027B97827439207559__SPLIT_REST": 1,
+      "PL_POW_2817__SPLIT_MAZURIA": 1,
       "LV005__SPLIT_ZEMGALE": 6,
       "LV005__SPLIT_SKRUDALIENA": 2,
       "LV005__SPLIT_DAUGAVPILS": 4,
@@ -3640,6 +3840,54 @@
       "filled": true
     },
     {
+      "area_km2": 616.3573749920276,
+      "location": [
+        80.5255195409097,
+        43.85758078480784
+      ],
+      "districts": [
+        "Semirechye region/Dzharkentskii",
+        "Semirechye region/Vernenskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Semirechye_region_Dzharkentskii",
+        "RCW_FILL_Semirechye_region_Vernenskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 423.96774852097604,
+      "location": [
+        80.1716165792688,
+        42.625135550355495
+      ],
+      "districts": [
+        "Semirechye region/Przhevalskii",
+        "Semirechye region/Vernenskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Semirechye_region_Przhevalskii",
+        "RCW_FILL_Semirechye_region_Vernenskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 276.51085434186933,
+      "location": [
+        83.48586117440124,
+        47.07929677796777
+      ],
+      "districts": [
+        "Semipalatinsk region/Zaisanskii",
+        "Semirechye region/Lepsinskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Semipalatinsk_region_Zaisanskii",
+        "RCW_FILL_Semirechye_region_Lepsinskii"
+      ],
+      "filled": true
+    },
+    {
       "area_km2": 185.41828493646415,
       "location": [
         130.85032850328503,
@@ -3686,6 +3934,20 @@
       "filled": true
     },
     {
+      "area_km2": 131.69966753232657,
+      "location": [
+        85.59910268706213,
+        47.55752024570246
+      ],
+      "districts": [
+        "Semipalatinsk region/Zaisanskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Semipalatinsk_region_Zaisanskii"
+      ],
+      "filled": true
+    },
+    {
       "area_km2": 128.70509617195327,
       "location": [
         124.44099581964825,
@@ -3714,7 +3976,35 @@
       "filled": true
     },
     {
-      "area_km2": 111.99310547009746,
+      "area_km2": 119.6211606274975,
+      "location": [
+        79.8761118045963,
+        44.89734796147961
+      ],
+      "districts": [
+        "Semirechye region/Kopalskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Semirechye_region_Kopalskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 112.63455026760865,
+      "location": [
+        74.79707700302811,
+        38.1839931104311
+      ],
+      "districts": [
+        "Fergana region/Oshskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Fergana_region_Oshskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 111.99310547011272,
       "location": [
         121.62473065260826,
         53.35348452434525
@@ -3726,6 +4016,20 @@
       "feature_ids": [
         "RCW_FILL_Amur_region_Amurskaia",
         "RCW_FILL_Transbaikal_region_Nerchinskii_Zavodskii"
+      ],
+      "filled": true
+    },
+    {
+      "area_km2": 103.45234215709304,
+      "location": [
+        78.92943929439295,
+        41.62702849428493
+      ],
+      "districts": [
+        "Semirechye region/Przhevalskii"
+      ],
+      "feature_ids": [
+        "RCW_FILL_Semirechye_region_Przhevalskii"
       ],
       "filled": true
     }

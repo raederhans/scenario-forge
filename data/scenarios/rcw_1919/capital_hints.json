@@ -899,9 +899,39 @@
       "lat": 45.75,
       "capital_kind": "country_capital",
       "resolution_method": "owned_city"
+    },
+    {
+      "tag": "GER",
+      "city_id": "CITY::ne::1159149527",
+      "stable_key": "id::CITY::ne::1159149527",
+      "city_name": "Königsberg",
+      "name_ascii": "Kaliningrad",
+      "country_code": "RU",
+      "display_name": "German Reich",
+      "host_feature_id": "RU_MRG_742985642ff9",
+      "lon": 20.511,
+      "lat": 54.7064,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "柯尼斯堡"
+    },
+    {
+      "tag": "SIK",
+      "city_id": "CITY::ne::1159151531",
+      "stable_key": "id::CITY::ne::1159151531",
+      "city_name": "Tihwa",
+      "name_ascii": "UEruemqi",
+      "country_code": "CN",
+      "display_name": "Xinjiang Province",
+      "host_feature_id": "CN_CITY_17275852B35279738214019",
+      "lon": 87.6005,
+      "lat": 43.801,
+      "capital_kind": "country_capital",
+      "resolution_method": "owned_city",
+      "city_name_zh": "迪化"
     }
   ],
-  "entry_count": 62,
+  "entry_count": 64,
   "missing_tags": [
     "AFSR"
   ],
