@@ -703,5 +703,107 @@
     "rebuild_command": "python tools/prepare_rcw_sources.py",
     "provenance_sidecar": "data/scenario-rules/rcw.sources/units_1897.provenance.json",
     "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_kaz_adm2_rcw",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KAZ/ADM2/geoBoundaries-KAZ-ADM2.geojson",
+    "license": "Open Data Commons Open Database License 1.0",
+    "citation": "OpenStreetMap, Wambacher",
+    "local_path": "data/scenario-rules/rcw.sources/adm2_units.geojson",
+    "origin_kind": "manual_import",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "7060070f2504e6f13145d98203cbbc25d4e119528894c8469a16685cfd8281c5",
+    "consumers": [
+      "tools/build_regional_scenario.py"
+    ],
+    "rebuild_command": "python tools/prepare_rcw_sources.py",
+    "provenance_sidecar": "data/scenario-rules/rcw.sources/adm2_units.provenance.json",
+    "status": "frozen_verified",
+    "local_presence": "required"
+  },
+  {
+    "source_id": "gb_kgz_adm2_rcw",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KGZ/ADM2/geoBoundaries-KGZ-ADM2.geojson",
+    "license": "CC BY-SA 3.0 Unported",
+    "citation": "geoBoundaries, Wikipedia, Districts of Kyrgyzstan",
+    "local_path": "data/scenario-rules/rcw.sources/adm2_units.geojson",
+    "origin_kind": "manual_import",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "7060070f2504e6f13145d98203cbbc25d4e119528894c8469a16685cfd8281c5",
+    "consumers": [
+      "tools/build_regional_scenario.py"
+    ],
+    "rebuild_command": "python tools/prepare_rcw_sources.py",
+    "provenance_sidecar": "data/scenario-rules/rcw.sources/adm2_units.provenance.json",
+    "status": "frozen_verified",
+    "local_presence": "required"
+  },
+  {
+    "source_id": "gb_ltu_adm2_rcw",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LTU/ADM2/geoBoundaries-LTU-ADM2.geojson",
+    "license": "Open Data Commons Open Database License 1.0",
+    "citation": "OpenStreetMap, Wambacher",
+    "local_path": "data/scenario-rules/rcw.sources/adm2_units.geojson",
+    "origin_kind": "manual_import",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "7060070f2504e6f13145d98203cbbc25d4e119528894c8469a16685cfd8281c5",
+    "consumers": [
+      "tools/build_regional_scenario.py"
+    ],
+    "rebuild_command": "python tools/prepare_rcw_sources.py",
+    "provenance_sidecar": "data/scenario-rules/rcw.sources/adm2_units.provenance.json",
+    "status": "frozen_verified",
+    "local_presence": "required"
+  },
+  {
+    "source_id": "gb_tjk_adm2_rcw",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TJK/ADM2/geoBoundaries-TJK-ADM2.geojson",
+    "license": "Open Data Commons Open Database License 1.0",
+    "citation": "OpenStreetMap, Wambacher",
+    "local_path": "data/scenario-rules/rcw.sources/adm2_units.geojson",
+    "origin_kind": "manual_import",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "7060070f2504e6f13145d98203cbbc25d4e119528894c8469a16685cfd8281c5",
+    "consumers": [
+      "tools/build_regional_scenario.py"
+    ],
+    "rebuild_command": "python tools/prepare_rcw_sources.py",
+    "provenance_sidecar": "data/scenario-rules/rcw.sources/adm2_units.provenance.json",
+    "status": "frozen_verified",
+    "local_presence": "required"
+  },
+  {
+    "source_id": "gb_tkm_adm2_rcw",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TKM/ADM2/geoBoundaries-TKM-ADM2.geojson",
+    "license": "CC BY-SA 3.0 Unported",
+    "citation": "CIESIN",
+    "local_path": "data/scenario-rules/rcw.sources/adm2_units.geojson",
+    "origin_kind": "manual_import",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "7060070f2504e6f13145d98203cbbc25d4e119528894c8469a16685cfd8281c5",
+    "consumers": [
+      "tools/build_regional_scenario.py"
+    ],
+    "rebuild_command": "python tools/prepare_rcw_sources.py",
+    "provenance_sidecar": "data/scenario-rules/rcw.sources/adm2_units.provenance.json",
+    "status": "frozen_verified",
+    "local_presence": "required"
+  },
+  {
+    "source_id": "gb_uzb_adm2_rcw",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UZB/ADM2/geoBoundaries-UZB-ADM2.geojson",
+    "license": "CC BY 3.0 IGO",
+    "citation": "OCHA ROCCA",
+    "local_path": "data/scenario-rules/rcw.sources/adm2_units.geojson",
+    "origin_kind": "manual_import",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "7060070f2504e6f13145d98203cbbc25d4e119528894c8469a16685cfd8281c5",
+    "consumers": [
+      "tools/build_regional_scenario.py"
+    ],
+    "rebuild_command": "python tools/prepare_rcw_sources.py",
+    "provenance_sidecar": "data/scenario-rules/rcw.sources/adm2_units.provenance.json",
+    "status": "frozen_verified",
+    "local_presence": "required"
   }
 ]

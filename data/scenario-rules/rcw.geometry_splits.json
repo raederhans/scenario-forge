@@ -1,0 +1,22 @@
+{
+  "adm2_source": "rcw.sources/adm2_units.geojson",
+  "subtract": {
+    "RU_RAY_50074027B61241799946425": "RU_CITY_VOLGOGRAD",
+    "RU_RAY_50074027B29183274260449": "RU_CITY_ARKHANGELSK"
+  },
+  "adm2_partitions": [
+    {
+      "countries": ["KAZ", "KGZ", "TJK", "TKM", "UZB"],
+      "provinces": ["Ural region", "Turgay region", "Akmola region", "Semipalatinsk region", "Semirechye region", "Syr-Darya region", "Samarkand region", "Fergana region", "Transcaspian region", "Bukhara", "Khiva"],
+      "districts": []
+    },
+    {
+      "countries": ["LTU"],
+      "provinces": ["Kovno governorate"],
+      "districts": ["Suwałki governorate/Kalvariiskii", "Suwałki governorate/Mariampolskii", "Suwałki governorate/Vladislavovskii", "Suwałki governorate/Volkovyshskii"]
+    }
+  ],
+  "district_partitions": ["Kurland governorate", "Livonia governorate", "Estonia governorate", "Arkhangelsk governorate", "Olonets governorate"],
+  "min_area_km2": 150,
+  "min_area_fraction": 0.02
+}

@@ -44,9 +44,9 @@
       "fillColor": "#3b4a55"
     }
   },
-  "baseline_hash": "52507663f4452702b7702198179914f72a2c5541f7103e104721031ceaba216c",
+  "baseline_hash": "e73016cde409b77f8620659f3e1de422fa2b3d1a5156fdfbfc9e37ffc09ce02d",
   "summary": {
-    "feature_count": 4673,
+    "feature_count": 5551,
     "owner_count": 59,
     "shell_feature_count": 2088
   },
@@ -54,7 +54,7 @@
     "base_scenario": "hoi4_1936",
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "base_scenario_runtime_topology_sha256": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326",
-    "runtime_topology_sha256": "282624779e90d3398a0bbacb302771efbcec809da7a66a9cc3c046c7d4150aab"
+    "runtime_topology_sha256": "9340f5673ff96a61282468feeacfcb6547f0a4736c8c3c715dd13f9d0fd09491"
   },
   "runtime_topology_url": "data/scenarios/rcw_1919/runtime_topology.topo.json",
   "countries_url": "data/scenarios/rcw_1919/countries.json",

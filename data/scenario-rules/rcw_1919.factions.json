@@ -581,7 +581,7 @@
    "parent": "",
    "parent_merged": false,
    "alliance": "rcw_national",
-   "capital_city": "Semey",
+   "capital_city": ["Zaysan", "Karkaraly", "Karkaralinsk", "Oiyl", "Temir"],
    "ruling_ideology": "neutrality",
    "base_iso2": "KZ"
   },
