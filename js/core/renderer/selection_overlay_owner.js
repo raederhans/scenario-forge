@@ -52,12 +52,15 @@ export function createSelectionOverlayOwner({
   }
 
   function getDevSelectionOverlaySignature() {
-    return JSON.stringify([
+    const ids = getDevSelectionIds();
+    return [
       getOverlayProjectionSignature(),
-      normalizeIds(getDevSelectionIds()),
+      ids,
+      ids?.length || 0,
       Number(getTopologyRevision() || 0),
       getLandFeatures()?.length || 0,
-    ]);
+      ids?.length > 50 ? getSelectionBoundaryRevision() : 0,
+    ];
   }
 
   function buildDevSelectionOverlayData(orderedIds, fallbackFeatures, requireAllMembers = false) {
@@ -106,7 +109,20 @@ export function createSelectionOverlayOwner({
     const data = orderedIds
       .map((featureId) => getLandIndex()?.get(featureId) || null)
       .filter(Boolean);
-    const overlayData = buildDevSelectionOverlayData(orderedIds, data);
+    const outlineOnly = orderedIds.length > 50;
+    let overlayData;
+    if (outlineOnly) {
+      const geometry = getSelectionBoundary(new Set(orderedIds), { adoptPassive: true });
+      if (geometry) {
+        overlayData = [true, false].map(halo => ({ type: "Feature", geometry, halo,
+          devSelectionKey: halo ? "boundary-halo" : "boundary" }));
+      } else {
+        const [[x0, y0], [x1, y1]] = getPath().bounds({ type: "FeatureCollection", features: data });
+        overlayData = Number.isFinite(x0) ? [{ devSelectionKey: "bounds", path: `M${x0},${y0}H${x1}V${y1}H${x0}Z` }] : [];
+      }
+    } else {
+      overlayData = buildDevSelectionOverlayData(orderedIds, data);
+    }
 
     const selection = getDevGroup()
       .selectAll("path.dev-selected-feature")
@@ -120,10 +136,10 @@ export function createSelectionOverlayOwner({
       .attr("aria-hidden", "true")
       .attr("vector-effect", "non-scaling-stroke")
       .merge(selection)
-      .attr("d", getPath())
-      .attr("fill", "rgba(14, 165, 233, 0.14)")
-      .attr("stroke", "rgba(14, 165, 233, 0.94)")
-      .attr("stroke-width", 1.35);
+      .attr("d", outlineOnly ? d => d.path ?? getPath()(d) : getPath())
+      .attr("fill", outlineOnly ? "none" : "rgba(14, 165, 233, 0.14)")
+      .attr("stroke", d => d.halo ? "rgba(255, 255, 255, 0.55)" : "rgba(14, 165, 233, 0.94)")
+      .attr("stroke-width", d => d.halo ? 3.85 : 1.35);
 
     selection.exit().remove();
     getDevGroup()
@@ -204,7 +220,8 @@ export function createSelectionOverlayOwner({
     const path = getPath();
     if (!group || !path) return;
     const signature = getDevSelectionOverlaySignature();
-    if (!force && !isDevDirty() && signature === lastDevSignature && group === lastDevGroup && path === lastDevPath) return;
+    if (!force && !isDevDirty() && group === lastDevGroup && path === lastDevPath
+      && signature.every((value, index) => value === lastDevSignature[index])) return;
     renderDevSelectionOverlay();
     markDevClean();
     lastDevSignature = signature;

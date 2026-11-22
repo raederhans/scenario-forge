@@ -41,6 +41,9 @@ export function createToolGuidance({ documentRef = document, state, t }) {
     hide();
     active = entry;
     label.textContent = t(entry.key, "ui");
+    if (entry.button.id === "toolSelectBtn") {
+      label.append(documentRef.createElement("br"), t("Ctrl/⌘ + drag: box select · Ctrl/⌘ + Shift + drag: lasso", "ui"));
+    }
     if (entry.button.id === "toolFillBtn" || entry.button.id === "toolEraserBtn") {
       label.append(documentRef.createElement("br"), t("Hold Alt and click to sample a color", "ui"));
     }

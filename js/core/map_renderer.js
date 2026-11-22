@@ -860,8 +860,7 @@ const getSelectionOverlayOwner = lazyOwner(() => createSelectionOverlayOwner({
   getSelectionBoundaryRevision: () => getPaintContourRuntimeOwner().getRevision(),
   getZoomScale: () => runtimeState.zoomTransform?.k || 1,
   getTopologyRevision: () => Number(runtimeState.topologyRevision || 0),
-  getDevSelectionIds: () => Array.isArray(runtimeState.devSelectionOrder)
-    ? Array.from(runtimeState.devSelectionOrder, (id) => String(id || "").trim()).filter(Boolean) : [],
+  getDevSelectionIds: () => runtimeState.devSelectionOrder,
   getInspectorSelection: () => ({
     featureIds: Array.isArray(runtimeState.inspectorHighlightFeatureIds)
       ? Array.from(runtimeState.inspectorHighlightFeatureIds, (id) => String(id || "").trim()).filter(Boolean) : [],

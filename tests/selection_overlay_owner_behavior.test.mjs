@@ -71,6 +71,35 @@ test("equal geometry counts cannot merge a different selection", () => {
   assert.deepEqual(h.devGroup.rows, h.features);
 });
 
+test("large selections draw only a halo and boundary or the projected bounds, and reset on import", () => {
+  const h = harness();
+  h.ids = Array.from({ length: 2000 }, (_, i) => String(i));
+  h.features = h.ids.map(id => feature(id));
+  h.index = new Map(h.features.map(parcel => [parcel.id, parcel]));
+  h.boundary = { type: "MultiLineString", coordinates: [[[0, 0], [1, 1]]] };
+  h.owner.renderDevSelectionOverlayIfNeeded();
+  const { rows, pathAttrs } = h.devGroup;
+  assert.deepEqual(rows.map(row => row.geometry), [h.boundary, h.boundary]);
+  assert.deepEqual(rows.map(row => row.halo), [true, false]);
+  assert.equal(pathAttrs.fill, "none");
+  h.owner.renderDevSelectionOverlayIfNeeded();
+  assert.equal(h.devGroup.renders, 1);
+  h.ids.pop();
+  h.boundary = null;
+  h.path.bounds = collection => {
+    assert.equal(collection.features.length, 1999);
+    return [[1, 2], [3, 4]];
+  };
+  h.owner.renderDevSelectionOverlayIfNeeded();
+  assert.equal(h.devGroup.rows.length, 1);
+  assert.equal(h.devGroup.pathAttrs.d(h.devGroup.rows[0]), "M1,2H3V4H1Z");
+  assert.deepEqual(h.merged, []);
+  h.ids = [];
+  h.owner.renderDevSelectionOverlayIfNeeded();
+  assert.deepEqual(h.devGroup.rows, []);
+  assert.equal(h.devGroup.attrs["aria-hidden"], "true");
+});
+
 test("merge matches actual fallback IDs and preserves selection order", () => {
   const h = harness();
   h.ids = ["b", "a", "missing"];

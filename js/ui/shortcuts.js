@@ -16,6 +16,7 @@ import { shortcuts, keyboardChord } from "./command_palette.js";
 import { getActiveModal } from "./ui_contract.js";
 import {
   cancelMapPointPick,
+  cancelSelectionMarquee,
   clearDevSelection,
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
@@ -124,7 +125,7 @@ async function saveProject(saveAs) {
   }
 }
 
-function initShortcuts({ pan = panMapByPixels } = {}) {
+function initShortcuts({ pan = panMapByPixels, cancelMarquee = cancelSelectionMarquee } = {}) {
   if (document.body?.dataset.shortcutsBound === "true") return;
 
   let spaceHeld = false;
@@ -136,7 +137,7 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
 
   window.addEventListener("keydown", (event) => {
     if (event.defaultPrevented) return;
-    if (event.key === "Escape" && cancelMapPointPick()) {
+    if (event.key === "Escape" && (cancelMarquee() || cancelMapPointPick())) {
       event.preventDefault();
       return;
     }
@@ -308,6 +309,7 @@ function initShortcuts({ pan = panMapByPixels } = {}) {
   });
 
   window.addEventListener("blur", () => {
+    cancelMarquee();
     releaseAltCursor();
     spaceHeld = false;
     setBrushPanModifier(false);

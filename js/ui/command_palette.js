@@ -50,6 +50,7 @@ export const shortcuts = [
     ["fillCountry", "Quick fill whole country", "Shift+Double-click"],
     ["fillParent", "Quick fill parent region", "Space+Double-click"],
     ["toggleSelection", "Toggle parcel selection", "Mod+Click", "Shift+Click"],
+    ["marqueeSelection", "Ctrl/⌘ + drag: box select · Ctrl/⌘ + Shift + drag: lasso", "Mod+Drag", "Mod+Shift+Drag"],
     ["placeMoreText", "Place another map label", "Shift+Click"],
     ["copyLabel", "Duplicate selected map label", "Ctrl+D"],
     ["nudgeLabel", "Nudge selected map label", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
