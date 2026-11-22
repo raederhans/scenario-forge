@@ -84,6 +84,9 @@ def build_source_inventory(root: Path) -> dict[str, Path]:
         tree(root / "data/hgo_catalogs/flags_png" / tier, f"app/data/hgo_catalogs/flags_png/{tier}")
     for name in ("scenarios", "transport_layers"):
         tree(root / "data" / name, f"app/data/{name}", lambda path: policy.allows(path.relative_to(root)) and not (path.match("startup.bundle.*.json") and path.with_suffix(".json.gz").is_file()))
+    water_path = f"app/{pages.TNO_WATER_REGIONS_URL}"
+    if water_path in inventory:
+        inventory[water_path + ".gz"] = inventory.pop(water_path)
     return inventory
 
 

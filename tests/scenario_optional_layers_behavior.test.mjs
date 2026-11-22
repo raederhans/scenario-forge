@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { gzipSync } from "node:zlib";
 
 import { state } from "../js/core/state.js";
 import {
@@ -74,6 +75,29 @@ test("required scenario resources validate payloads while optional resources ret
   t.mock.method(console, "warn", () => {});
   const failed = await loadOptionalScenarioResource(async () => { throw new Error("offline"); }, {}, "owners.json", options);
   assert.deepEqual(failed, { ok: false, value: null, metrics: null, reason: "load_error", errorMessage: "offline" });
+});
+
+test("standalone scenario water retains its features and full coordinate precision through gzip", async (t) => {
+  const water = { type: "FeatureCollection", features: [{
+    type: "Feature", id: "water-a", properties: { name: "海域", fill: "#123456" },
+    geometry: { type: "Polygon", coordinates: [[[1.0123456789, 2], [3, 2], [3, 4], [1.0123456789, 2]]] },
+  }] };
+  const json = JSON.stringify(water);
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (url) => {
+    const path = new URL(url, "https://example.test").pathname;
+    requests.push(path);
+    return new Response(path.endsWith(".gz") ? gzipSync(json) : json);
+  });
+  for (const filename of ["water_regions.geojson", "water_regions.geojson.gz"]) {
+    const url = `data/scenarios/tno_1962/${filename}`;
+    const bundle = { manifest: { scenario_id: "tno_1962", water_regions_url: url } };
+    const payload = await loadScenarioOptionalLayerPayload(bundle, "water", { d3Client: { json: assert.fail } });
+    assert.deepEqual(payload, water);
+    assert.equal(bundle.waterRegionsPayload, payload);
+    assert.equal(requests.at(-1), "/" + url);
+  }
+  assert.equal(requests.length, 2);
 });
 
 test("visibility sync skips stale optional layer writes after scenario apply request changes", async (t) => {

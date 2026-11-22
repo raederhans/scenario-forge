@@ -20,7 +20,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.rasterize_landing_assets import ALL_RASTER_TARGETS
-from tools.runtime_json_packing import pack_published_runtime_data
+from tools.runtime_json_packing import gzip_published_json, pack_published_runtime_data
 from apps.hgo.tools.build_app import build_app as build_hgo_app
 from tools.app_entry_resolver import (
     repo_display_path,
@@ -187,6 +187,7 @@ SCENARIO_PUBLISHED_DERIVED_RELATIVE_FILES = {
     Path("tno_1962") / "derived" / "geometry_drop_audit.json",
 }
 SHARED_STARTUP_BUNDLE_SCENARIOS = {"hoi4_1936", "hoi4_1939", "tno_1962"}
+TNO_WATER_REGIONS_URL = "data/scenarios/tno_1962/water_regions.geojson"
 SCENARIO_EXCLUDED_FILE_NAMES = {"audit.json"}
 SCENARIO_EXCLUDED_RELATIVE_FILES = {
     *(Path(scenario) / filename for scenario in SHARED_STARTUP_BUNDLE_SCENARIOS
@@ -1097,6 +1098,9 @@ def copy_scenario_runtime_data() -> None:
         )
 
     copy_tree_filtered(source_dir, destination_dir, should_copy_file)
+    water_path = APP_DIST_ROOT / TNO_WATER_REGIONS_URL
+    if water_path.is_file():
+        gzip_published_json(water_path)
     strip_scenario_publish_audit_urls(destination_dir)
 
 
@@ -1121,6 +1125,9 @@ def strip_scenario_publish_audit_urls(scenarios_dir: Path) -> None:
 
     def strip_unpublished_manifest_urls(payload: dict) -> bool:
         changed = False
+        if payload.get("water_regions_url") == TNO_WATER_REGIONS_URL:
+            payload["water_regions_url"] = TNO_WATER_REGIONS_URL + ".gz"
+            changed = True
         if payload.get("scenario_id") in SHARED_STARTUP_BUNDLE_SCENARIOS and payload.get("startup_bundle_url_en"):
             payload["startup_bundle_url_zh"] = payload["startup_bundle_url_en"]
             changed = True

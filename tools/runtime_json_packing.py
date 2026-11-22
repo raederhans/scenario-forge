@@ -56,7 +56,7 @@ def _local_data_path(app_root: Path, url: str) -> Path:
     return path
 
 
-def _gzip_published_json(path: Path) -> tuple[int, bytes]:
+def gzip_published_json(path: Path) -> tuple[int, bytes]:
     decoded = path.read_bytes()
     encoded = portable_gzip_bytes(decoded)
     path.with_suffix(path.suffix + ".gz").write_bytes(encoded)
@@ -78,7 +78,7 @@ def _pack_population_detail_tiles(app_root: Path) -> set[str]:
             raise ValueError(f"Population detail URL is outside its tiles directory: {url}")
         if path.suffix == ".gz":
             continue
-        _, encoded = _gzip_published_json(path)
+        _, encoded = gzip_published_json(path)
         tile.update(url=url + ".gz", byte_size=len(encoded), sha256=hashlib.sha256(encoded).hexdigest())
         packed_urls.add(url)
     if packed_urls:
@@ -264,7 +264,7 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
                 continue
             if path.suffix not in _JSON_SUFFIXES or not path.is_file():
                 raise ValueError(f"Missing or unsupported published chunk: {url}")
-            decoded_size, encoded = _gzip_published_json(path)
+            decoded_size, encoded = gzip_published_json(path)
             encoded_path = path.with_name(path.name + ".gz")
             chunk.update(
                 url=url + ".gz", encoding="gzip", byte_size=len(encoded),
