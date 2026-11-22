@@ -167,6 +167,21 @@ test("wrapped regions find members on both sides of the dateline and drop replac
   assert.equal(getRegionalLayerFilter(state).hostAt([-179, 5]), "");
 });
 
+test("water membership follows the great-circle edges of long parcel borders", t => {
+  const state = setup(t);
+  state.activeScenarioManifest = { region: { bounds: [-10, 30, 40, 70] } };
+  state.landData = collection(polygon("wide", [ring(0, 40, 30, 60)]));
+  const filter = getRegionalLayerFilter(state);
+  // The northern edge bows poleward to about 60.85° at mid-span.
+  assert.equal(filter.hostAt([15, 60.4]), "wide");
+  assert.equal(filter.includesWater(polygon("inner-lake", [ring(14, 60.3, 16, 60.5)])), true);
+  assert.equal(filter.hostAt([15, 61.5]), "");
+  assert.equal(filter.includesWater(polygon("outer-lake", [ring(14, 61.4, 16, 61.6)])), false);
+  // The southern edge bows poleward too, so a lake just above 40° at mid-span lies outside.
+  assert.equal(filter.hostAt([15, 40.3]), "");
+  assert.equal(filter.includesWater(polygon("south-lake", [ring(14.5, 40.2, 15.5, 40.4)])), false);
+});
+
 test("scenario refresh publishes only selectable regional waters and clears a foreign selection", t => {
   setup(t);
   const saved = Object.getOwnPropertyDescriptors(mapState);

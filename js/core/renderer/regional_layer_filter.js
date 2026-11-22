@@ -11,25 +11,41 @@ function polygons(geometry) {
   return geometry?.type === "MultiPolygon" ? geometry.coordinates : [];
 }
 
-// Keep rings continuous across the dateline. Most parcels need no coordinate copies.
+// Keep rings continuous across the dateline, and follow the great-circle edges the
+// projection draws: an edge spanning more than a degree of longitude gets intermediate
+// points, so the planar tests below agree with d3.geoContains. Most parcels need no copies.
+const maxEdgeSpan = 1;
+
 function polygonPart(rings) {
   let west = Infinity, south = Infinity, east = -Infinity, north = -Infinity;
   const origin = rings[0][0][0];
+  const track = (x, lat) => {
+    west = Math.min(west, x); east = Math.max(east, x);
+    south = Math.min(south, lat); north = Math.max(north, lat);
+  };
   const continuous = rings.map(ring => {
-    let previous = origin;
-    let unwrapped = ring;
+    let previous = origin, previousLat = 0;
+    let out = null;
     for (let i = 0; i < ring.length; i++) {
       const [lon, lat] = ring[i];
       const x = lon + 360 * Math.round((previous - lon) / 360);
-      if (x !== lon) {
-        if (unwrapped === ring) unwrapped = ring.slice();
-        unwrapped[i] = [x, lat];
+      const steps = i ? Math.ceil(Math.abs(x - previous) / maxEdgeSpan) : 1;
+      if (steps > 1) {
+        out ||= ring.slice(0, i);
+        const along = globalThis.d3.geoInterpolate([previous, previousLat], [x, lat]);
+        for (let step = 1; step < steps; step++) {
+          const [midLon, midLat] = along(step / steps);
+          const midX = midLon + 360 * Math.round((previous - midLon) / 360);
+          out.push([midX, midLat]);
+          track(midX, midLat);
+        }
       }
-      previous = x;
-      west = Math.min(west, x); east = Math.max(east, x);
-      south = Math.min(south, lat); north = Math.max(north, lat);
+      if (x !== lon) out ||= ring.slice(0, i);
+      if (out) out.push(x === lon ? ring[i] : [x, lat]);
+      track(x, lat);
+      previous = x; previousLat = lat;
     }
-    return unwrapped;
+    return out || ring;
   });
   return { rings: continuous, west, south, east, north };
 }
