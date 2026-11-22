@@ -1,0 +1,67 @@
+{
+  "version": 2,
+  "scenario_id": "rcw_1919",
+  "generated_at": "2026-11-22T00:00:00Z",
+  "scenario_contract_profile": "lightweight_base",
+  "display_name": "Russian Civil War, October 1919",
+  "bookmark_name": "Mid-October 1919",
+  "bookmark_description": "Military control during the Russian Civil War, approximated on whole map features.",
+  "bookmark_date": "1919-10-15",
+  "default_country": "SOV",
+  "featured_tags": [
+    "SOV",
+    "RUS",
+    "DON",
+    "POL",
+    "FIN",
+    "UNRP",
+    "YDNC",
+    "MILL"
+  ],
+  "region": {
+    "bounds": [
+      15.787957879578812,
+      32.74995112951129,
+      -169.739897398974,
+      81.8550621431373
+    ],
+    "central_meridian": 90
+  },
+  "opening_view": {
+    "bounds": [
+      18,
+      36,
+      112,
+      72
+    ]
+  },
+  "palette_id": "hoi4_vanilla",
+  "performance_hints": {
+    "render_profile_default": "balanced"
+  },
+  "style_defaults": {
+    "ocean": {
+      "fillColor": "#3b4a55"
+    }
+  },
+  "baseline_hash": "52507663f4452702b7702198179914f72a2c5541f7103e104721031ceaba216c",
+  "summary": {
+    "feature_count": 4673,
+    "owner_count": 59,
+    "shell_feature_count": 2088
+  },
+  "source": {
+    "base_scenario": "hoi4_1936",
+    "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
+    "base_scenario_runtime_topology_sha256": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326",
+    "runtime_topology_sha256": "282624779e90d3398a0bbacb302771efbcec809da7a66a9cc3c046c7d4150aab"
+  },
+  "runtime_topology_url": "data/scenarios/rcw_1919/runtime_topology.topo.json",
+  "countries_url": "data/scenarios/rcw_1919/countries.json",
+  "owners_url": "data/scenarios/rcw_1919/owners.by_feature.json",
+  "cores_url": "data/scenarios/rcw_1919/cores.by_feature.json",
+  "city_overrides_url": "data/scenarios/rcw_1919/city_overrides.json",
+  "capital_hints_url": "data/scenarios/rcw_1919/capital_hints.json",
+  "audit_url": "data/scenarios/rcw_1919/audit.json",
+  "special_zone_layers_url": "data/scenarios/rcw_1919/special_zone_layers.json"
+}
