@@ -1,4 +1,5 @@
 import { renderViewportMapTitles } from "./renderer/map_title_render_owner.js";
+import { requiresPublicLeafDetail, resolvePoliticalCollectionSource } from "./renderer/political_collection_source.js";
 import { getProjectCountryBaseColors } from "./project_countries.js";
 import { getScenarioCountryTags, uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
 import { createLabelsRuntime } from "./map_renderer/labels_runtime.js";
@@ -6456,10 +6457,8 @@ function rebuildPoliticalLandCollections() {
   const primaryTopology = runtimeState.topologyPrimary || runtimeState.topology;
   const detailTopology = runtimeState.topologyBundleMode === "composite" ? runtimeState.topologyDetail : null;
   const overrideCollection = runtimeState.topologyBundleMode === "composite" ? runtimeState.ruCityOverrides : null;
-  const runtimeTopology = runtimeState.topologyBundleMode === "composite"
-    ? (runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology)
-    : null;
-  const scenarioPoliticalChunkCollection = Array.isArray(runtimeState.scenarioPoliticalChunkData?.features)
+  const { regional, runtimeTopology } = resolvePoliticalCollectionSource(runtimeState);
+  const scenarioPoliticalChunkCollection = !regional && Array.isArray(runtimeState.scenarioPoliticalChunkData?.features)
     ? runtimeState.scenarioPoliticalChunkData
     : null;
   const scenarioPoliticalVisibleChunkCollection = Array.isArray(runtimeState.scenarioPoliticalVisibleChunkData?.features)
@@ -6477,7 +6476,7 @@ function rebuildPoliticalLandCollections() {
     && !!runtimeTopology?.objects?.political;
   if (runtimeBaseCollection) {
     fullCollection = runtimeBaseCollection;
-  } else if (hasScenarioRuntimePoliticalSource) {
+  } else if (regional || hasScenarioRuntimePoliticalSource) {
     fullCollection = { type: "FeatureCollection", features: [] };
   } else if (primaryTopology?.objects?.political && globalThis.topojson) {
     const composeStartedAt = nowMs();
@@ -6494,7 +6493,7 @@ function rebuildPoliticalLandCollections() {
   const atlantropaStartedAt = nowMs();
   fullCollection = appendUniqueFeatureCollections(
     fullCollection,
-    buildAtlantropaLandLikeFeatureCollection()
+    regional ? null : buildAtlantropaLandLikeFeatureCollection()
   );
   atlantropaMs = nowMs() - atlantropaStartedAt;
 
@@ -12093,9 +12092,7 @@ function getCountryInteractionPolicy(countryCode) {
 }
 
 function shouldRequireLeafDetail(countryCode) {
-  const policy = getCountryInteractionPolicy(countryCode);
-  if (!policy?.requiresComposite) return false;
-  return runtimeState.interactionGranularity !== "country";
+  return requiresPublicLeafDetail(runtimeState, getCountryInteractionPolicy(countryCode));
 }
 
 function hasLeafDetailReady(countryCode) {

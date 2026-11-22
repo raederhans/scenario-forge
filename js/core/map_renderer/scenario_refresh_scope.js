@@ -1,11 +1,13 @@
+import { resolvePoliticalCollectionSource } from "../renderer/political_collection_source.js";
+
 // Capture references/revisions, not geometry copies. Only the explicit deferred
 // detail transaction may use this scope. Ordinary scenario applies stay full.
 const equal = (a, b) => a.length === b.length && a.every((value, i) => Object.is(value, b[i]));
 export function captureScenarioRefreshState(state, projectionIdentity = 0) {
   const composite = state.topologyBundleMode === "composite";
   const primary = state.topologyPrimary || state.topology;
-  const runtime = composite ? (state.scenarioRuntimeTopologyData || state.runtimePoliticalTopology) : null;
-  const usesRuntime = !!runtime?.objects?.political;
+  const { regional, runtimeTopology } = resolvePoliticalCollectionSource(state);
+  const usesRuntime = regional || !!runtimeTopology?.objects?.political;
   return Object.freeze({
     scene: Object.freeze([String(state.activeScenarioId || ""), state.sceneGeneration, state.currentScenarioApplyRequestId, state.renderTransactionDiagnostics?.scenarioApplyEpoch]),
     projection: Object.freeze([projectionIdentity, state.width, state.height]),
@@ -13,10 +15,10 @@ export function captureScenarioRefreshState(state, projectionIdentity = 0) {
     // This mirrors rebuildPoliticalLandCollections: when runtime political
     // authority exists, loading the default detail topology does not replace it.
     political: Object.freeze([
-      usesRuntime ? runtime : primary,
+      usesRuntime ? runtimeTopology : primary,
       usesRuntime ? null : (composite ? state.topologyDetail : null),
       usesRuntime ? null : (composite ? state.ruCityOverrides : null),
-      state.scenarioPoliticalChunkData, state.scenarioPoliticalVisibleChunkData,
+      regional ? null : state.scenarioPoliticalChunkData, regional ? null : state.scenarioPoliticalVisibleChunkData,
       state.runtimePoliticalMetaSeed, state.mapSemanticMode, state.sovereigntyRevision,
       state.topologyRevision, state.landDataFull, state.landIndex,
       state.scenarioShellOverlayRevision, state.showScenarioAtlantropa,

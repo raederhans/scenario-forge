@@ -1,4 +1,5 @@
 import { countryNames, createDefaultScenarioReleasableIndex, defaultCountryPalette, normalizeMapSemanticMode, state as runtimeState } from "./state.js";
+import { isRegionalScenario } from "./scenario/scenario_region.js";
 import {
   beginScenarioApplyRequestState,
   clearActiveScenarioApplyRequestState,
@@ -428,7 +429,8 @@ async function prepareScenarioDetailTopologyState({
     });
     const runtimeFallback =
       runtimePoliticalTopology
-      || targetState.runtimePoliticalTopology
+      || (isRegionalScenario(targetState.activeScenarioManifest)
+        ? targetState.defaultRuntimePoliticalTopology : targetState.runtimePoliticalTopology)
       || null;
     const resolvedDetail = hasUsableTopology(topologyDetail)
       ? topologyDetail

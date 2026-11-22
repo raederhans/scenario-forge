@@ -3,6 +3,7 @@ import {
   getStartupContextCollection,
 } from "../state/context_layer_revision.js";
 import { requestRuntimeHookAfterPaint } from "../state/index.js";
+import { isRegionalScenario } from "../scenario/scenario_region.js";
 import { appendScenarioUrbanOverlay, getActiveScenarioUrbanOverlay } from "./scenario_urban_overlay.js";
 
 export function createContextLayerResolverOwner({
@@ -491,7 +492,9 @@ export function createContextLayerResolverOwner({
     const politicalChunkFeatureCount = Array.isArray(runtimeState.scenarioPoliticalChunkData?.features)
       ? runtimeState.scenarioPoliticalChunkData.features.length
       : 0;
+    const regional = isRegionalScenario(runtimeState.activeScenarioManifest);
     const politicalStamp = [
+      regional, regional ? runtimeState.scenarioRuntimeTopologyData : null,
       primaryTopology, primaryTopology.objects?.political,
       politicalChunkFeatureCount,
       Array.isArray(runtimeState.landDataFull?.features) ? runtimeState.landDataFull.features.length : 0,
@@ -580,7 +583,7 @@ export function createContextLayerResolverOwner({
     );
     if (
       runtimeState.topologyBundleMode !== "composite"
-      && primaryTopology?.objects?.political
+      && !regional && primaryTopology?.objects?.political
       && !hasActiveScenarioPoliticalChunkAuthority
     ) {
       const expectedCount = Array.isArray(primaryTopology.objects.political.geometries)
@@ -600,6 +603,7 @@ export function createContextLayerResolverOwner({
     }
 
     politicalSourceStamp = [
+      regional, regional ? runtimeState.scenarioRuntimeTopologyData : null,
       primaryTopology, primaryTopology.objects?.political,
       politicalChunkFeatureCount,
       Array.isArray(runtimeState.landDataFull?.features) ? runtimeState.landDataFull.features.length : 0,
