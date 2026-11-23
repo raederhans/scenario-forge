@@ -91,6 +91,8 @@ jobs:
           key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Install Playwright Chromium
         run: npx playwright install chromium
+      - name: Install political geometry dependency
+        run: python -m pip install --constraint requirements-dev.lock.txt shapely
       - name: Build the Pages artifact
         run: python tools/build_pages_dist.py --output-root "$SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"
       - name: Run the TNO raster release stages

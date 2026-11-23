@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 from map_builder.json_source import portable_gzip_bytes
-from tools.published_geometry_normalization import normalize_published_geometry
+from tools.published_geometry_normalization import normalize_published_geometry, round_published_political_chunks
 from tools.political_detail_partition import (
     feature_bounds, geometry_coordinates, geometry_part_count,
     partition_political_detail_features, political_detail_chunk_ids,
@@ -250,6 +250,9 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
     for manifest_path in sorted((data_root / "scenarios").glob("*/detail_chunks.manifest.json")):
         manifest = json.loads(manifest_path.read_bytes())
         _partition_published_details(app_root, manifest_path, manifest, source_sizes)
+        rounding = round_published_political_chunks(app_root, manifest_path, manifest, excluded)
+        if rounding:
+            geometry_normalization.append(rounding)
         chunks_dir = (manifest_path.parent / "chunks").resolve()
         referenced_paths = set()
         for chunk in manifest.get("chunks", []):
