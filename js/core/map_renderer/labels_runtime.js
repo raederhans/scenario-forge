@@ -613,9 +613,12 @@ export function createLabelsRuntime({
   }
 
   function prepareCountryLabelsPass() {
-    if (isExportRenderInProgress() || !isPrivateSceneActive()
-      || runtimeState.isInteracting || runtimeState.styleConfig?.countryLabels?.enabled === false) {
+    if (isExportRenderInProgress() || runtimeState.isInteracting || runtimeState.styleConfig?.countryLabels?.enabled === false) {
       countryLabelRenderOwner?.cancelPreparation();
+      return null;
+    }
+    if (!isPrivateSceneActive()) {
+      countryLabelRenderOwner?.cancelPrivatePreparation();
       return null;
     }
     const source = getCountryLabelSourceOwner();
