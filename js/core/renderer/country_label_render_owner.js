@@ -963,23 +963,14 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const transform = getTransform() || { k: 1, x: 0, y: 0 };
     const viewport = getViewportSize();
     const paintBounds = getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height };
-    return geometryCache.entries.reduce((count, entry) => {
-      if (isCountryLabelSuppressed(entry.countryCode)) return count;
-      const text = countryTitle(records.get(entry.countryCode)?.name, language);
-      if (!text) return count;
-      if (!entry.polygons) return count + 1;
-      if (!entry.bounds) return count;
-      const box = screenBox(entry.bounds, transform, 0);
-      if (box.x + box.w < paintBounds.minX + 2 || box.y + box.h < paintBounds.minY + 2 || box.x > paintBounds.maxX - 2 || box.y > paintBounds.maxY - 2) return count;
-      if (isCountryLabelDefinitelyInvisible(entry, transform, paintBounds)) return count;
-      return count + Number(!entry.fits.has(getFitKey(text, language, font)));
-    }, 0);
+    return collectPendingFits({ geometry: geometryCache, records, language, font, transform, paintBounds }).length;
   }
 
   return {
     drawCountryLabels,
     requestChineseTextGlyphs,
     prepareCurrentView,
+    cancelPrivatePreparation,
     cancelPreparation() {
       deferredPreparation = null;
       cancelPrivatePreparation();
