@@ -44,7 +44,9 @@ test("regional reset keeps newly visible country fits queued across vector pass 
   setGlobal(t, "requestIdleCallback", callback => idle.push(callback));
   const ctx = { save() {}, restore() {}, translate() {}, rotate() {}, fillText() {}, strokeText() {},
     measureText: () => ({ width: 60 }) };
-  const sourcePublished = Promise.withResolvers();
+  // CI runs Node 20, which has no Promise.withResolvers.
+  const sourcePublished = {};
+  sourcePublished.promise = new Promise((resolve) => { sourcePublished.resolve = resolve; });
   let repaint = false;
   const runtime = createLabelsRuntime({
     runtimeState: state, rendererSurfaceHost: { getContext: () => ctx, getProjection: () => projection,
