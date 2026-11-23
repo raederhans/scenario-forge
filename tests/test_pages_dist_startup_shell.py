@@ -2118,8 +2118,9 @@ class PagesDistStartupShellTest(unittest.TestCase):
         scenario_ids = [entry.get("scenario_id") for entry in scenario_index.get("scenarios", [])]
 
         self.assertEqual(scenario_index.get("public_baseline_ids"), public_baseline_ids)
-        self.assertEqual(scenario_index.get("developer_preview_ids"), [])
-        self.assertEqual(sorted(scenario_ids), sorted(public_baseline_ids))
+        self.assertEqual(scenario_index["default_scenario_id"], "tno_1962")
+        self.assertEqual(scenario_index.get("developer_preview_ids"), ["rcw_1919"])
+        self.assertEqual(sorted(scenario_ids), sorted([*public_baseline_ids, "rcw_1919"]))
         self.assertNotIn("hgo_1936", scenario_ids)
         self.assertEqual(
             scenario_index.get("pages_dist_policy", {}).get("local_preview_scenario_ids"),
@@ -2129,6 +2130,24 @@ class PagesDistStartupShellTest(unittest.TestCase):
             manifest_url = entry.get("manifest_url")
             with self.subTest(scenario_id=entry.get("scenario_id")):
                 self.assertIn(f"app/{manifest_url}", dist_paths)
+        regional = next(entry for entry in scenario_index["scenarios"] if entry["scenario_id"] == "rcw_1919")
+        app = PAGES_DIST_ROOT / "app"
+        manifest = json.loads((app / regional["manifest_url"]).read_bytes())
+        source = REPO_ROOT / "data/scenarios/rcw_1919"
+        self.assertEqual(manifest["display_name"], regional["display_name"])
+        self.assertEqual(manifest["bookmark_name"], regional["presentation"]["title"])
+        self.assertEqual(manifest["bookmark_description"], regional["presentation"]["intro"])
+        # Audit files are build diagnostics and are not published for any scenario.
+        self.assertNotIn("audit_url", regional)
+        self.assertNotIn("audit_url", manifest)
+        self.assertNotIn("app/data/scenarios/rcw_1919/audit.json", dist_paths)
+        for path in source.iterdir():
+            if path.name != "audit.json":
+                self.assertIn(f"app/data/scenarios/rcw_1919/{path.name}", dist_paths)
+        for key, url in json.loads((source / "manifest.json").read_bytes()).items():
+            if key.endswith("_url") and key != "audit_url":
+                self.assertEqual(manifest[key], url)
+                self.assertIsInstance(json.loads((app / url).read_bytes()), dict)
 
     def test_dist_manifest_keeps_japan_point_workbench_full_pack_targets(self) -> None:
         if not DIST_MANIFEST.exists():

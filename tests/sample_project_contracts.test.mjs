@@ -93,6 +93,7 @@ function readLandingUrlJson(url) {
 function assertNoDeveloperPreviewId(value, context) {
   const serialized = JSON.stringify(value);
   assert.equal(serialized.includes("hgo_1936"), false, `${context} must stay outside developer preview assets`);
+  assert.equal(serialized.includes("rcw_1919"), false, `${context} must stay outside developer preview assets`);
 }
 
 function resolveMarkerPath(value, expression) {
@@ -275,6 +276,7 @@ test("sample runs manifest exposes only public scenario project downloads", () =
 
   assert.deepEqual(scenarioIndex.public_baseline_ids, PUBLIC_SCENARIO_IDS);
   assert.deepEqual(manifest.public_scenario_ids, PUBLIC_SCENARIO_IDS);
+  assert.deepEqual(scenarioIndex.developer_preview_ids, ["rcw_1919"]);
   assert.deepEqual(manifest.developer_preview_exclusions, scenarioIndex.developer_preview_ids);
   assert.equal(manifest.sample_projects.length, PUBLIC_SCENARIO_IDS.length);
   assert.equal(new Set(sampleProjectIds).size, sampleProjectIds.length);

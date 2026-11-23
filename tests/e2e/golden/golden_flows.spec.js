@@ -26,7 +26,7 @@ const FILLED = 0.35;
 const UNFILLED = 0.05;
 
 async function paintProbe(page, scenarioId) {
-  const point = await zoomTo(page, undefined, { scenarioId });
+  const point = await zoomTo(page, scenarioId === "rcw_1919" ? [91, 62] : undefined, { scenarioId });
   expect(await colorShareAround(page, point, FILL), "probe already has the fill color").toBeLessThan(UNFILLED);
   await selectFillTool(page, FILL);
   const changed = await fillAt(page, point, { scenarioId });
@@ -74,6 +74,14 @@ for (const scenarioId of SCENARIO_IDS) {
     expect(errors).toEqual([]);
   });
 }
+
+test("the regional scenario opens directly with its introduction available", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.goto("/app/?default_scenario=rcw_1919", { waitUntil: "domcontentloaded" });
+  await waitForSettled(page, { scenarioId: "rcw_1919" });
+  await expect(page.locator("#scenarioSelect")).toHaveValue("rcw_1919");
+  await expect(page.locator("#scenarioIntroButton")).toBeEnabled();
+});
 
 test("starting on blank_base keeps scenario switching after full data arrives", async ({ page }) => {
   test.setTimeout(240_000);

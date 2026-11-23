@@ -44,7 +44,7 @@ jobs:
         run: |
           mkdir -p .runtime/reports/generated
           status=0
-          for scenario in blank_base modern_world tno_1962 hoi4_1936 hoi4_1939; do
+          for scenario in blank_base modern_world tno_1962 hoi4_1936 hoi4_1939 rcw_1919; do
             echo "::group::$scenario"
             python tools/check_scenario_contracts.py --strict --scenario-dir "data/scenarios/$scenario" \
               --report-path ".runtime/reports/generated/$scenario.strict_contract_report.json" || status=1
