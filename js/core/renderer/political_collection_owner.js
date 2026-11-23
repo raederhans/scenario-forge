@@ -3,6 +3,17 @@ import { isRiverPaintSourceCompatible } from "../river_paint/pilot_manifest.js";
 import { inheritContourCoordinatePrecision } from "../paint_contour_source.js";
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "../political_geometry_store.js";
 
+export const INTERACTIVE_AGGREGATE_TIER_FILTERS = {
+  GB: new Set(["nuts1_basic"]),
+  GR: new Set(["adm1_basic"]),
+};
+
+export function getDetailTier(entity) {
+  const value = entity?.properties?.detail_tier;
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+}
+
 export function createPoliticalCollectionOwner({
   state,
   constants = {},

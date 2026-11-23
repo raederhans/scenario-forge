@@ -48,6 +48,24 @@ test("TNO ideologies use their specified palette", () => {
   assert.equal(getPoliticalDisplayLegend(state, { presentOwners: new Set(Object.keys(countries)) }).entries.length, 12);
 });
 
+test("scenario alliance colors agree across country fills and legend entries", () => {
+  const colors = { rcw_red: "#c43345", rcw_white: "#689dce", rcw_national: "#c68e1e",
+    rcw_neighbor: "#598f61", rcw_intervention: "#84569c", rcw_guerrilla: "#318b91" };
+  const alliances = {}, countries = {};
+  for (const [id, color] of Object.entries(colors)) {
+    countries[id.slice(4).toUpperCase()] = { alliance: id, ruling_ideology: "neutrality" };
+    alliances[id] = { name_en: id.slice(4), color_hex: color };
+  }
+  const state = { activeScenarioId: "rcw_1919", politicalDisplayMode: "alliance",
+    scenarioBundleCacheById: { rcw_1919: { countriesPayload: { alliances, countries } } } };
+  const legend = getPoliticalDisplayLegend(state, { presentOwners: Object.keys(countries) });
+  for (const [id, color] of Object.entries(colors)) {
+    assert.equal(resolvePoliticalDisplayColor(state, id.slice(4).toUpperCase()), color);
+    assert.deepEqual(legend.entries.find(entry => entry.label === id.slice(4) + " (1 countries)"),
+      { color, label: id.slice(4) + " (1 countries)" });
+  }
+});
+
 test("signature tracks mode, scenario and payload identity and suspends during apply", () => {
   const state = fixture();
   assert.equal(getPoliticalDisplayModeSignature(state), "");

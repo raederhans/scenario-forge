@@ -2,7 +2,7 @@ import { state as runtimeState } from "../core/state.js";
 import { clearHistory } from "../core/history_manager.js";
 import { confirmDiscardDirtyWork } from "./sidebar/project_support_diagnostics_controller.js";
 import { showAppDialog } from "./components/app_dialog.js";
-import { applyScenarioOpeningView } from "../core/scenario/presentation_opening_view.js";
+import { applyGlobalScenarioOpeningView } from "../core/scenario/presentation_opening_view.js";
 import { callRuntimeHook, registerOwnedRuntimeHook } from "../core/state/index.js";
 import {
   clearActiveScenarioCommand,
@@ -277,7 +277,7 @@ export function initScenarioControls({ applyScenario = applyScenarioByIdCommand 
           showToastOnComplete: true,
         });
         if (normalizeScenarioId(state.activeScenarioId) === scenarioId) clearPreviousProject();
-        applyScenarioOpeningView(runtimeState.activeScenarioManifest, { animate: true });
+        applyGlobalScenarioOpeningView(runtimeState.activeScenarioManifest, { animate: true });
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
         if (!events.signal.aborted && pendingScenarioId === scenarioId) showActiveIntroduction();

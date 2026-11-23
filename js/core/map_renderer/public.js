@@ -92,6 +92,7 @@ export {
   rebuildStaticMeshes,
   isExportRenderOverBudget,
   getOceanBaseFillColor,
+  getMapExportFrame,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
   ensureBathymetryReadyForExport,

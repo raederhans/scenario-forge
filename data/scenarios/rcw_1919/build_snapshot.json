@@ -1,0 +1,25 @@
+{
+  "scenario_id": "rcw_1919",
+  "profile": "lightweight_base",
+  "contract_version": "2026-05-01.v1",
+  "builder_version": "scenario-data-governance-v1",
+  "input_sha": {
+    "capital_hints.json": "8fa3871edb3a15053ee116407fa0784fd3059f4a01c3d7c46d423072e2b26578",
+    "city_overrides.json": "2b713cc808b743dd05830bc00ea84e1e370e59f522cd866161e469c6ff2762fb",
+    "cores.by_feature.json": "6430b5a2eb32bdd00d1cbb54996b6cf08b71e68a74437d3e4e09353e030e4b3d",
+    "countries.json": "0a90a738abf127cd874d09c3d814766d925b00a5d49d51d26ee52336e85ca4f4",
+    "owners.by_feature.json": "27c74537416dba18628e3c4394ba9d23e03a8a46e9c69306f8768aa9df26744c",
+    "runtime_topology.topo.json": "227adedd24db8cb91802816c8e8ae192fe66872c42a5e3f6f3393ba355b4d63a",
+    "special_zone_layers.json": "915ed0a69d732475d2ebc2eeb22da6908a73d26ce928f405300431cf488c2e4a",
+    "water_regions.geojson": "25c6ecfb28d090cde89c26fb6a38bdcd12bb99398ba0635bca1181714129cfdb"
+  },
+  "output_sha": {},
+  "feature_count": 5696,
+  "water_count": 1,
+  "chunk_count": 0,
+  "snapshot_fingerprint": "472aa4c20527f58b4e622eb925b61e5dcdc3bee4c06183852ea490ca207a3fdc",
+  "generated_at": "2026-11-22T00:00:00Z",
+  "environment": {},
+  "durations": {},
+  "report_paths": {}
+}

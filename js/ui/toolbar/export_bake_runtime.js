@@ -1,7 +1,8 @@
 import {
-  drawMapTitles, drawThematicWgiExportLegend, drawPopulationExportLegend,
+  getMapExportFrame, drawMapTitles, drawThematicWgiExportLegend, drawPopulationExportLegend,
   drawPoliticalExportLegend, getPoliticalExportLegend,
 } from "../../core/map_renderer/public.js";
+import { createMapExportCanvas, getCanvasExportFrame } from "../../core/renderer/regional_camera.js";
 import { ensurePopulationData } from "../../core/thematic/population_spatial_runtime.js";
 import { isPopulationActive, getPopulationSignature, getPopulationViewModel } from "../../core/thematic/population_spatial_view_model.js";
 import { ensureThematicWgiData } from "../../core/thematic/thematic_wgi_runtime.js";
@@ -28,6 +29,7 @@ export function createExportBakeRuntime({
   document,
   ensureExportWorkbenchUiState,
   renderPassNames: RENDER_PASS_NAMES,
+  getExportFrame = getMapExportFrame,
   renderExportPassesToCanvas,
   assertPopulationHeatmapReadyForExport,
   ensurePopulationHeatmapReadyForExport,
@@ -300,6 +302,8 @@ export function createExportBakeRuntime({
     const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
     const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
     const dependencies = getLayerDependencyRevision(normalizedLayerId, exportUi);
+    const frame = getExportFrame();
+    if (frame) dependencies.push(JSON.stringify(frame));
     const hash = computeBakeHash([normalizedLayerId, `${width}x${height}`, ...dependencies]);
     const cacheEntry = exportBakeCache.get(normalizedLayerId);
     if (
@@ -312,9 +316,7 @@ export function createExportBakeRuntime({
       writeBakeArtifactMeta(normalizedLayerId, dependencies, cacheEntry.canvas, false);
       return cacheEntry.canvas;
     }
-    const bakeCanvas = document.createElement("canvas");
-    bakeCanvas.width = width;
-    bakeCanvas.height = height;
+    const bakeCanvas = createMapExportCanvas(document, width, height, frame);
     const bakeCtx = bakeCanvas.getContext("2d");
     if (!bakeCtx) {
       throw new Error("Canvas bake context unavailable.");
@@ -363,9 +365,7 @@ export function createExportBakeRuntime({
     }
     const targetWidth = Math.max(1, Math.round(Number(width) || 0));
     const targetHeight = Math.max(1, Math.round(Number(height) || 0));
-    const adjustedCanvas = document.createElement("canvas");
-    adjustedCanvas.width = targetWidth;
-    adjustedCanvas.height = targetHeight;
+    const adjustedCanvas = createMapExportCanvas(document, targetWidth, targetHeight, getCanvasExportFrame(sourceCanvas));
     const adjustedCtx = adjustedCanvas.getContext("2d");
     if (!adjustedCtx) {
       throw createExportError("invalid-params", "Canvas export context unavailable.");
@@ -384,9 +384,7 @@ export function createExportBakeRuntime({
     if (!(width > 0) || !(height > 0)) {
       throw createExportError("invalid-params", "SVG annotation canvas unavailable.");
     }
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+    const canvas = createMapExportCanvas(document, width, height, getExportFrame());
     const ctx = canvas.getContext("2d");
     if (!ctx) {
       throw createExportError("invalid-params", "SVG annotation context unavailable.");
@@ -458,9 +456,10 @@ export function createExportBakeRuntime({
     }
     await ensurePaintContoursReady();
     if (normalizedSourceId === "map-titles" || normalizedSourceId === "legend") {
-      const canvas = document.createElement("canvas");
-      canvas.width = dimensions?.width ?? runtimeState.colorCanvas.width;
-      canvas.height = dimensions?.height ?? runtimeState.colorCanvas.height;
+      const canvas = createMapExportCanvas(
+        document, dimensions?.width ?? runtimeState.colorCanvas.width,
+        dimensions?.height ?? runtimeState.colorCanvas.height, getExportFrame(),
+      );
       if (normalizedSourceId === "map-titles") drawMapTitles(canvas, exportUi.mapTitles, dimensions?.pixelRatio ?? (runtimeState.dpr || 1));
       else if (exportUi.textVisibility?.legend) drawPoliticalExportLegend(canvas, runtimeState, dimensions?.pixelRatio);
       return canvas;

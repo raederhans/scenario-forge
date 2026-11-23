@@ -1,0 +1,60 @@
+{
+  "sha256": "7060070f2504e6f13145d98203cbbc25d4e119528894c8469a16685cfd8281c5",
+  "immutable_ref": "9469f09",
+  "sources": [
+    {
+      "source_id": "gb_kaz_adm2_rcw",
+      "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KAZ/ADM2/geoBoundaries-KAZ-ADM2.geojson",
+      "license": "Open Data Commons Open Database License 1.0",
+      "citation": "OpenStreetMap, Wambacher",
+      "country": "KAZ",
+      "feature_count": 174,
+      "raw_sha256": "b69520a12a7e3642c3ee48d6b2fcae0776c70fe5f757d6235beca3e9710833ae"
+    },
+    {
+      "source_id": "gb_kgz_adm2_rcw",
+      "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KGZ/ADM2/geoBoundaries-KGZ-ADM2.geojson",
+      "license": "CC BY-SA 3.0 Unported",
+      "citation": "geoBoundaries, Wikipedia, Districts of Kyrgyzstan",
+      "country": "KGZ",
+      "feature_count": 41,
+      "raw_sha256": "86317da436648698a37f0802ccfffb405ef1332a7a4c3f2b60b3991e0adedc77"
+    },
+    {
+      "source_id": "gb_ltu_adm2_rcw",
+      "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LTU/ADM2/geoBoundaries-LTU-ADM2.geojson",
+      "license": "Open Data Commons Open Database License 1.0",
+      "citation": "OpenStreetMap, Wambacher",
+      "country": "LTU",
+      "feature_count": 60,
+      "raw_sha256": "c37a3de985674a90b3dc9381996193d52b96ce82eb488c99588dbb2f06b0ac97"
+    },
+    {
+      "source_id": "gb_tjk_adm2_rcw",
+      "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TJK/ADM2/geoBoundaries-TJK-ADM2.geojson",
+      "license": "Open Data Commons Open Database License 1.0",
+      "citation": "OpenStreetMap, Wambacher",
+      "country": "TJK",
+      "feature_count": 58,
+      "raw_sha256": "86fd6d7ec19f607e6d29adabba3ab9bde7a947950d8348504a934e911fb74e2d"
+    },
+    {
+      "source_id": "gb_tkm_adm2_rcw",
+      "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TKM/ADM2/geoBoundaries-TKM-ADM2.geojson",
+      "license": "CC BY-SA 3.0 Unported",
+      "citation": "CIESIN",
+      "country": "TKM",
+      "feature_count": 59,
+      "raw_sha256": "0d0b3745e275bfadb1d0137fbca014b56f2ed72cb83b0a98dd0e2f0632e7c507"
+    },
+    {
+      "source_id": "gb_uzb_adm2_rcw",
+      "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UZB/ADM2/geoBoundaries-UZB-ADM2.geojson",
+      "license": "CC BY 3.0 IGO",
+      "citation": "OCHA ROCCA",
+      "country": "UZB",
+      "feature_count": 199,
+      "raw_sha256": "b7ffa2f946cd0274052548f196115055af77519552a3155d4ccc12d9e297033f"
+    }
+  ]
+}

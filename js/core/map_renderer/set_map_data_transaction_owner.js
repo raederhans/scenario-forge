@@ -86,7 +86,10 @@ export function createSetMapDataTransactionOwner({
   );
 
   function runSetMapDataTransaction(options = {}) {
-    const normalizedOptions = normalizeSetMapDataOptions(options);
+    const cameraChanged = getters.needsScenarioRefit?.();
+    const normalizedOptions = normalizeSetMapDataOptions(cameraChanged
+      ? { ...options, refitProjection: true }
+      : options);
     const {
       refitProjection,
       resetZoom,
@@ -165,6 +168,7 @@ export function createSetMapDataTransactionOwner({
       runEffect("resetZoomToFit");
       runEffect("enforceZoomConstraints", { suppressRender });
     } else {
+      if (cameraChanged) runEffect("enforceZoomConstraints", { suppressRender });
       runEffect("setHitCanvasDirty", true);
     }
 

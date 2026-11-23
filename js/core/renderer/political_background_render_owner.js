@@ -1,5 +1,7 @@
 import { requireFunction } from "./require_function.js";
 import { drawWorldFrame } from "./world_frame_render.js";
+import { getRegionalBackdrop } from "./regional_backdrop.js";
+import { hidesRegionalBackdrop, isRegionalScenario } from "../scenario/scenario_region.js";
 import {
   addRetainedPoliticalPath,
   advanceDeferredPoliticalBackgroundBuild,
@@ -1330,12 +1332,31 @@ export function createPoliticalBackgroundRenderOwner({
   }
 
   function drawBackgroundPass() {
-    drawWorldFrame(surface, getRuntimeState(), getOceanBaseFillColor());
+    const fill = getOceanBaseFillColor();
+    if (hidesRegionalBackdrop(state.activeScenarioManifest)) {
+      const context = surface.getContext();
+      context.save();
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.fillStyle = fill;
+      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+      context.restore();
+      drawOceanStyle();
+      return;
+    }
+    drawWorldFrame(surface, getRuntimeState(), fill);
 
     // The opaque sphere already covers every projected ocean polygon with
     // this same color. Reprojecting the coastline here adds no visible layer.
     drawOceanStyle();
     drawOceanDepthMaskLayer();
+    const backdrop = getRegionalBackdrop(getRuntimeState(), platform.topojson);
+    if (backdrop?.collection) {
+      const context = surface.getContext();
+      context.beginPath();
+      surface.getPathCanvas()(backdrop.collection);
+      context.fillStyle = backdrop.fill;
+      context.fill();
+    }
   }
 
   function drawPoliticalBackgroundFills(options = {}) {
@@ -1343,7 +1364,7 @@ export function createPoliticalBackgroundRenderOwner({
       if (shouldUseScenarioPoliticalBackgroundMerge()) {
         return drawScenarioPoliticalBackgroundFills(options);
       }
-      drawAdmin0BackgroundFills(options);
+      if (!isRegionalScenario(state.activeScenarioManifest)) drawAdmin0BackgroundFills(options);
     }
     return options.returnSummary
       ? {

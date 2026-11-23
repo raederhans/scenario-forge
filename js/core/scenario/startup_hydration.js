@@ -28,6 +28,9 @@ import {
   hydrateScenarioReleasableCatalogState,
   setScenarioAuditState,
 } from "../state_catalog.js";
+import { evaluateRegionalPoliticalMembership } from "./scenario_data_health.js";
+
+const REGIONAL_FEATURE_MISMATCH = "regional-feature-mismatch";
 
 function createScenarioStartupHydrationController({
   state,
@@ -659,23 +662,20 @@ function createScenarioStartupHydrationController({
     const hasOwnershipModel = !!baselineOwners
       && typeof baselineOwners === "object"
       && Object.keys(baselineOwners).length > 0;
+    const awaitingCollections = phase === "startup" && !state.landDataFull && !state.landData;
+    const membership = awaitingCollections ? null : evaluateRegionalPoliticalMembership(state);
+    const membershipMismatch = membership?.healthy === false;
+    const ownerCoverageHealthy = (!hasOwnershipModel && !forcedMismatch)
+      || (phase === "startup" ? renderedFeatureCount === 0 : renderedFeatureCount < ownerFeatureCoverageMinFeatures)
+      || effectiveOverlapRatio >= ownerFeatureCoverageMinRatio;
     return {
       renderedFeatureCount,
       ownerFeatureCount,
       overlapCount: effectiveOverlapCount,
       overlapRatio: effectiveOverlapRatio,
       hasOwnershipModel,
-      healthy:
-        (!hasOwnershipModel && !forcedMismatch)
-        || (
-          phase === "startup"
-            ? (renderedFeatureCount === 0 || effectiveOverlapRatio >= ownerFeatureCoverageMinRatio)
-            : (
-              renderedFeatureCount < ownerFeatureCoverageMinFeatures
-              || effectiveOverlapRatio >= ownerFeatureCoverageMinRatio
-            )
-        ),
-      reason: forcedMismatch
+      healthy: !membershipMismatch && ownerCoverageHealthy,
+      reason: membershipMismatch ? REGIONAL_FEATURE_MISMATCH : forcedMismatch
         ? SCENARIO_HYDRATION_HEALTH_REASONS.ownerFeatureMismatch
         : SCENARIO_HYDRATION_HEALTH_REASONS.ok,
     };
@@ -853,14 +853,15 @@ function createScenarioStartupHydrationController({
     }
     if (!report.healthy) {
       const problemParts = [
-        `Hydration owner overlap dropped to ${report.overlapCount}/${report.renderedFeatureCount} (${report.overlapRatio.toFixed(3)}).`,
+        report.reason === REGIONAL_FEATURE_MISMATCH ? "Regional political feature IDs differ from the runtime topology."
+          : `Hydration owner overlap dropped to ${report.overlapCount}/${report.renderedFeatureCount} (${report.overlapRatio.toFixed(3)}).`,
       ];
       if (waterConsistency?.reason && waterConsistency.reason !== "ok") {
         problemParts.push(`Overlay consistency also failed: ${waterConsistency.reason}.`);
       }
       setScenarioHydrationHealthGateState(state, normalizeScenarioHydrationHealthGateState({
         status: "degraded",
-        reason: SCENARIO_HYDRATION_HEALTH_REASONS.ownerFeatureMismatch,
+        reason: report.reason === REGIONAL_FEATURE_MISMATCH ? report.reason : SCENARIO_HYDRATION_HEALTH_REASONS.ownerFeatureMismatch,
         checkedAt: Date.now(),
         attemptedRetry,
         ownerFeatureOverlapRatio: report.overlapRatio,

@@ -16,22 +16,29 @@ export function isLakeVisibleInScenarioYear(feature, scenarioYear) {
   return !(year_built > scenarioYear || year_removed <= scenarioYear);
 }
 
+export function getScenarioWaterYear(state) {
+  if (!state.activeScenarioId) return null;
+  const year = Number(String(state.activeScenarioManifest?.bookmark_date).split(/[.-]/)[0]);
+  return Number.isInteger(year) && year > 0 ? year : null;
+}
+
 export function resolveEffectiveWaterRegionFeatures({
   baseFeatures = [],
   scenarioFeatures = [],
   globalLakeFeatures = [],
   activeScenarioId = "",
   scenarioYear = null,
+  regionFilter = null,
   exclusive = false,
   isExcluded = () => false,
 } = {}) {
-  const lakesById = new Map(globalLakeFeatures.map((feature) => [feature.properties.id, feature]));
   const result = new Map();
   const add = (feature) => {
     const props = feature?.properties || {};
     const id = props.id || feature?.id;
     if (!id || (props.scenario_id && props.scenario_id !== activeScenarioId)) return;
     if (id === "congo_lake" && activeScenarioId !== "tno_1962") return;
+    if (regionFilter && isLakeRegion(feature) && !isLakeVisibleInScenarioYear(feature, scenarioYear)) return;
     if (isExcluded(feature)) return;
     result.set(id, feature);
   };
@@ -39,12 +46,22 @@ export function resolveEffectiveWaterRegionFeatures({
   scenarioFeatures.forEach(add);
   // The existing TNO exclusions prevent duplicate clones. They must not hide
   // the common lake collection, which now replaces those clones by stable ID.
+  const lakesById = new Map();
+  for (const feature of globalLakeFeatures) {
+    const id = feature.properties.id;
+    if (id === "congo_lake" || feature.properties.scenario_id) continue;
+    if (isLakeVisibleInScenarioYear(feature, scenarioYear)) lakesById.set(id, feature);
+    else if (!lakesById.has(id)) lakesById.set(id, null);
+  }
   for (const [id, feature] of lakesById) {
-    if (!isLakeVisibleInScenarioYear(feature, scenarioYear)) {
-      result.delete(id);
-      continue;
+    if (feature) result.set(id, feature);
+    else result.delete(id);
+  }
+  if (regionFilter) {
+    for (const feature of scenarioFeatures) {
+      if (isLakeRegion(feature) && lakesById.get(feature.properties.id) !== null) add(feature);
     }
-    if (id !== "congo_lake" && !feature.properties.scenario_id) result.set(id, feature);
+    return [...result.values()].filter(regionFilter.includesWater);
   }
   return [...result.values()];
 }

@@ -1,3 +1,4 @@
+import { isRegionalScenario, isValidScenarioBounds } from "./scenario_region.js";
 import {
   focusGeoBounds as rendererFocusGeoBounds,
   resetZoomToFit as rendererResetZoomToFit,
@@ -5,6 +6,7 @@ import {
 
 export function applyScenarioOpeningView(manifest, {
   animate = false,
+  suppressRender = false,
   focusGeoBounds = rendererFocusGeoBounds,
   resetZoomToFit = rendererResetZoomToFit,
 } = {}) {
@@ -12,8 +14,10 @@ export function applyScenarioOpeningView(manifest, {
     return resetZoomToFit({ animate });
   }
   const bounds = manifest.opening_view?.bounds;
-  if (!Array.isArray(bounds) || bounds.length !== 4 || !bounds.every(Number.isFinite)) return;
-  const [west, south, east, north] = bounds;
-  if (west < -180 || east > 180 || south < -90 || north > 90 || west >= east || south >= north) return;
-  return focusGeoBounds(bounds, { animate });
+  if (!isValidScenarioBounds(bounds, isRegionalScenario(manifest))) return;
+  return focusGeoBounds(bounds, suppressRender ? { animate, suppressRender } : { animate });
+}
+
+export function applyGlobalScenarioOpeningView(manifest, options) {
+  if (!isRegionalScenario(manifest)) return applyScenarioOpeningView(manifest, options);
 }

@@ -1,3 +1,16 @@
+import { getOceanMaskMode } from "./regional_backdrop.js";
+import { hidesRegionalBackdrop } from "../scenario/scenario_region.js";
+
+export function usesOceanBathymetry(state, style) {
+  return !hidesRegionalBackdrop(state.activeScenarioManifest) && !!style?.experimentalAdvancedStyles
+    && String(style.preset || "flat").trim().toLowerCase() !== "flat";
+}
+
+export function usesOceanSurfacePattern(state, style) {
+  return !hidesRegionalBackdrop(state.activeScenarioManifest)
+    && (usesOceanBathymetry(state, style) || !!state.intensityFields?.channels?.oceanDepth?.enabled);
+}
+
 export function createOceanRenderOwner({
   state = {},
   constants = {},
@@ -104,7 +117,7 @@ export function createOceanRenderOwner({
 
   function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
     const context = getContext();
-    if (!context || !isScenarioCoastalAccentEnabled()) return;
+    if (!context || hidesRegionalBackdrop(runtimeState.activeScenarioManifest) || !isScenarioCoastalAccentEnabled()) return;
     const coastlineDecision = resolveCoastlineTopologySource();
     const usesScenarioCoastlineSource = coastlineDecision?.source === "scenario";
     if (!usesScenarioCoastlineSource) {
@@ -119,9 +132,9 @@ export function createOceanRenderOwner({
     const oceanStyle = getOceanStyleConfig();
     const visibility = { status: "off", lod: "overview", backend: null, missingTileCount: 0,
       loadedTileCount: 0, globalVisibleCount: 0, scenarioVisibleCount: 0, visibleCount: 0 };
-    runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
+    runtimeState.oceanMaskMode = getOceanMaskMode(runtimeState, OCEAN_MASK_MODE_TOPOLOGY);
     runtimeState.oceanMaskQuality = 0;
-    if (!oceanStyle.experimentalAdvancedStyles || oceanStyle.preset === "flat") {
+    if (!usesOceanBathymetry(runtimeState, oceanStyle)) {
       publishBathymetryVisibility(visibility);
       return;
     }
@@ -136,7 +149,7 @@ export function createOceanRenderOwner({
     context.restore();
     const ready = result.status === "ready";
     if (ready) {
-      runtimeState.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY;
+      runtimeState.oceanMaskMode = getOceanMaskMode(runtimeState, OCEAN_MASK_MODE_BATHYMETRY);
       runtimeState.oceanMaskQuality = 1;
     }
     publishBathymetryVisibility({
