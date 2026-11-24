@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createPoliticalPatchPreviewBudget } from "../js/core/renderer/political_patch_preview_budget.js";
+import { createPoliticalPatchPreview } from "../js/core/renderer/political_patch_single_target.js";
 import { createContextLayerRenderScheduler } from "../js/core/renderer/context_layer_render_scheduler.js";
 const pointFeature = (count = 5) => ({ geometry: { type: "Polygon", coordinates: [Array.from({ length: count }, (_, i) => [i, 0])] } });
 
@@ -29,6 +30,25 @@ test("structurally huge empty multipolygons cannot monopolize the estimator", ()
   const budget = createPoliticalPatchPreviewBudget({ now: () => 0 });
   const entries = [{ feature: { geometry: { type: "MultiPolygon", coordinates: new Array(100000).fill([]) } } }];
   assert.equal(budget.inspect(entries).reason, "structure-budget");
+});
+
+test("brush, batch and multi-target edits keep the cold path budget", () => {
+  const owner = createPoliticalPatchPreview({
+    now: () => 0, getPathSignature: () => "scene",
+    getPathEntry: (_, { allowBuild }) => {
+      assert.equal(allowBuild, false);
+      return null;
+    },
+  });
+  for (const [inputLabel, currentIds] of [
+    ["brush-fill-feature-color", ["a"]], ["brush-fill-feature-color", undefined],
+    ["fill-country-color", ["a"]], ["fill-feature-color", ["a", "b"]],
+  ]) {
+    const entries = (currentIds || ["a"]).map(id => ({ id, feature: pointFeature(2500) }));
+    const result = owner.prepare(entries, { inputLabel, currentIds, matchesPublishedColor: () => false });
+    assert.equal(result.reason, "cold-path-budget");
+    assert.equal(owner.isDeferred(), true);
+  }
 });
 test("inspection and between-feature time limits are independent of frame scheduling", () => {
   let clock = 0;
