@@ -41,7 +41,7 @@ import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCoun
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
 import { normalizeStrategicValuesStyle } from "./thematic/strategic_values_view_model.js";
-import { createPoliticalPatchPreview } from "./renderer/political_patch_single_target.js";
+import { createPoliticalPatchPreview, orderPoliticalPatchFeatures } from "./renderer/political_patch_single_target.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
 import { createFillTargetPolicy } from './renderer/fill_target_policy.js';
 import { getObjectIdentityToken } from "./renderer/object_identity.js";
@@ -7133,7 +7133,8 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
   try {
     const k = prepareTargetContext(context, transform);
     withRenderTarget(context, () => {
-      processedCount = politicalPatchPreviewBudget.draw(preview, orderPoliticalShellUnderlayFirst, startedAt,
+      processedCount = politicalPatchPreviewBudget.draw(preview, entries => orderPoliticalPatchFeatures(entries,
+        runtimeState.landData?.features || [], runtimeState.landDataFull?.features || [], orderPoliticalShellUnderlayFirst), startedAt,
         (feature, index, path, isClickTarget) => drawPoliticalFeature(feature, index, {
           k, canvasWidth, canvasHeight, transform, path, skipScreenCheck: isClickTarget,
           useCachedPath: true, allowBuildPath: !isClickTarget, countPathBuild: false, metricsCollector,

@@ -1,9 +1,18 @@
-import { isPoliticalFeaturePathEntryCurrent } from "./political_path_cache_owner.js";
 import { createPoliticalPatchPreviewBudget } from "./political_patch_preview_budget.js";
+
+export function orderPoliticalPatchFeatures(entries, interactive, full, orderPoliticalShellUnderlayFirst) {
+  if (entries.length < 2) return entries;
+  // The raster emits full-only support first, then the interactive collection in source order.
+  const ranked = entries.map(entry => {
+    const index = interactive.indexOf(entry.feature);
+    return { entry, rank: index >= 0 ? index : full.indexOf(entry.feature) - full.length };
+  });
+  return orderPoliticalShellUnderlayFirst(ranked.sort((a, b) => a.rank - b.rank).map(({ entry }) => entry));
+}
 
 export function createPoliticalPatchPreview({ now, getPathEntry, getPathSignature, isVisible }) {
   const budget = createPoliticalPatchPreviewBudget({ now });
-  const paintedPaths = new Map();
+  const paintedIds = new Set();
   let signature;
 
   function prepare(entries, { currentIds, inputLabel, matchesPublishedColor }) {
@@ -12,17 +21,12 @@ export function createPoliticalPatchPreview({ now, getPathEntry, getPathSignatur
       && (inputLabel === "fill-feature-color" || inputLabel === "erase-feature-color")
       ? currentIds[0] : null;
     const nextSignature = getPathSignature();
-    if (signature !== nextSignature) paintedPaths.clear();
+    if (signature !== nextSignature) paintedIds.clear();
     signature = nextSignature;
 
     if (targetId) {
       budget.reset();
-      const replay = [];
-      for (const entry of features) {
-        const previous = paintedPaths.get(entry.id);
-        if (isPoliticalFeaturePathEntryCurrent(previous, entry.feature)) replay.push({ ...entry, pathEntry: previous });
-        else if (entry.id === targetId) replay.push(entry);
-      }
+      const replay = features.filter(({ id }) => id === targetId || paintedIds.has(id));
       return { features: replay, targetId };
     }
     const decision = budget.inspect(features, ({ id, feature }) =>
@@ -31,19 +35,19 @@ export function createPoliticalPatchPreview({ now, getPathEntry, getPathSignatur
   }
 
   function draw(preview, orderFeatures, startedAt, drawFeature) {
-    paintedPaths.clear();
+    paintedIds.clear();
     let processed = 0;
-    for (const { id, feature, pathEntry } of orderFeatures(preview.features)) {
+    for (const { id, feature } of orderFeatures(preview.features)) {
       if (!preview.targetId && !budget.timeRemaining(startedAt)) {
         budget.defer();
         break;
       }
       const clicked = preview.targetId === id;
       if (clicked && !isVisible(feature)) continue;
-      const entry = pathEntry || (clicked && getPathEntry(feature, { featureId: id, allowBuild: true }));
+      const entry = preview.targetId && getPathEntry(feature, { featureId: id, allowBuild: clicked });
+      if (preview.targetId && !clicked && !entry) continue;
       if (drawFeature(feature, processed++, entry?.path, clicked)) {
-        const painted = entry || getPathEntry(feature, { featureId: id, allowBuild: false });
-        if (painted) paintedPaths.set(id, painted);
+        paintedIds.add(id);
       }
     }
     return processed;
@@ -51,7 +55,7 @@ export function createPoliticalPatchPreview({ now, getPathEntry, getPathSignatur
 
   return {
     ...budget, prepare, draw,
-    defer() { paintedPaths.clear(); budget.defer(); },
-    reset() { paintedPaths.clear(); budget.reset(); },
+    defer() { paintedIds.clear(); budget.defer(); },
+    reset() { paintedIds.clear(); budget.reset(); },
   };
 }
