@@ -292,6 +292,7 @@ export function createPoliticalFeaturePolicy(runtimeState, {
 
   return Object.freeze({
     isScenarioShellFeature,
+    isPoliticalUnderlayFeature,
     hasVisiblePoliticalForegroundColorOverride,
     orderPoliticalShellUnderlayFirst,
     getStablePoliticalDrawRank,

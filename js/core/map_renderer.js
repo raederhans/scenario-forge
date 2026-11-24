@@ -3385,7 +3385,9 @@ function getPoliticalIdRasterRuntimeOwner() {
           }
         }
         await yieldControl();
-        return orderPoliticalShellUnderlayFirst(entries).map(entry => entry.feature);
+        if (hasVisibleRiverPartitions()) return orderPoliticalShellUnderlayFirst(entries).map(entry => entry.feature);
+        return { features: entries.map(entry => entry.feature), originalIndices: entries.map(entry => entry.drawOrder),
+          isUnderlay: composePoliticalFeaturePolicy().isPoliticalUnderlayFeature };
       },
       getFeatures: () => {
         const layout = getRenderPassLayout("political");
@@ -3401,13 +3403,15 @@ function getPoliticalIdRasterRuntimeOwner() {
         const layout = getRenderPassLayout("political");
         const foreground = new Set(Object.keys(runtimeState.visualOverrides || {})
           .filter(id => !!getSafeCanvasColor(runtimeState.visualOverrides[id], null)));
-        if (hasPendingPoliticalColorEdit()) {
-          for (const id of getRenderPassCacheState().pendingPoliticalColorEditIds || []) foreground.add(id);
+        const pending = hasPendingPoliticalColorEdit() && getRenderPassCacheState().pendingPoliticalColorEditIds;
+        if (pending instanceof Set) {
+          for (const id of pending) foreground.add(id);
         }
+        const foregroundKey = JSON.stringify([...foreground].sort());
         const geometryContentVersion = [getObjectIdentityToken(runtimeState.landData?.features),
           isPoliticalIdRasterPrimary() ? getObjectIdentityToken(runtimeState.landDataFull?.features) : "fine",
           runtimeState.topologyRevision, runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision,
-          layout.paddedWidth, layout.paddedHeight].join(":");
+          isScenarioAtlantropaVisible(), hasVisibleRiverPartitions(), layout.paddedWidth, layout.paddedHeight].join(":");
         return {
           directFrameKey: getPoliticalDirectFrameKey(),
           sceneKey: [runtimeState.activeScenarioId, runtimeState.sceneGeneration].join(":"),
@@ -3415,7 +3419,8 @@ function getPoliticalIdRasterRuntimeOwner() {
           coverageKey: [runtimeState.mapSemanticMode,
             runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
           geometryContentVersion,
-          version: `${geometryContentVersion}:${[...foreground].sort().join(",")}`,
+          foregroundKey,
+          version: `${geometryContentVersion}:${foregroundKey}`,
           colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
           colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
         };
