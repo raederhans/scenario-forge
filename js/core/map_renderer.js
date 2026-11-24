@@ -41,7 +41,7 @@ import { clearInspectorSelectionState, pushRecentColorState, selectInspectorCoun
 import { commitChange } from "./state/changes.js";
 import { scheduleAfterPaint } from "./after_paint.js";
 import { normalizeStrategicValuesStyle } from "./thematic/strategic_values_view_model.js";
-import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
+import { createPoliticalPatchPreview, orderPoliticalPatchFeatures } from "./renderer/political_patch_single_target.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
 import { createFillTargetPolicy } from './renderer/fill_target_policy.js';
 import { getObjectIdentityToken } from "./renderer/object_identity.js";
@@ -3385,7 +3385,9 @@ function getPoliticalIdRasterRuntimeOwner() {
           }
         }
         await yieldControl();
-        return orderPoliticalShellUnderlayFirst(entries).map(entry => entry.feature);
+        if (hasVisibleRiverPartitions()) return orderPoliticalShellUnderlayFirst(entries).map(entry => entry.feature);
+        return { features: entries.map(entry => entry.feature), originalIndices: entries.map(entry => entry.drawOrder),
+          isUnderlay: composePoliticalFeaturePolicy().isPoliticalUnderlayFeature };
       },
       getFeatures: () => {
         const layout = getRenderPassLayout("political");
@@ -3401,13 +3403,15 @@ function getPoliticalIdRasterRuntimeOwner() {
         const layout = getRenderPassLayout("political");
         const foreground = new Set(Object.keys(runtimeState.visualOverrides || {})
           .filter(id => !!getSafeCanvasColor(runtimeState.visualOverrides[id], null)));
-        if (hasPendingPoliticalColorEdit()) {
-          for (const id of getRenderPassCacheState().pendingPoliticalColorEditIds || []) foreground.add(id);
+        const pending = hasPendingPoliticalColorEdit() && getRenderPassCacheState().pendingPoliticalColorEditIds;
+        if (pending instanceof Set) {
+          for (const id of pending) foreground.add(id);
         }
+        const foregroundKey = JSON.stringify([...foreground].sort());
         const geometryContentVersion = [getObjectIdentityToken(runtimeState.landData?.features),
           isPoliticalIdRasterPrimary() ? getObjectIdentityToken(runtimeState.landDataFull?.features) : "fine",
           runtimeState.topologyRevision, runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision,
-          layout.paddedWidth, layout.paddedHeight].join(":");
+          isScenarioAtlantropaVisible(), hasVisibleRiverPartitions(), layout.paddedWidth, layout.paddedHeight].join(":");
         return {
           directFrameKey: getPoliticalDirectFrameKey(),
           sceneKey: [runtimeState.activeScenarioId, runtimeState.sceneGeneration].join(":"),
@@ -3415,7 +3419,8 @@ function getPoliticalIdRasterRuntimeOwner() {
           coverageKey: [runtimeState.mapSemanticMode,
             runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
           geometryContentVersion,
-          version: `${geometryContentVersion}:${[...foreground].sort().join(",")}`,
+          foregroundKey,
+          version: `${geometryContentVersion}:${foregroundKey}`,
           colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
           colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor(), getAtlantropaSeaFillColor(), getPoliticalDisplayModeSignature(runtimeState)].join(":"),
         };
@@ -7039,7 +7044,10 @@ function clearPoliticalPatchOverlayIfStale(reason = "stale-overlay") {
   return clearPoliticalPatchOverlay(reason);
 }
 
-const politicalPatchPreviewBudget = createPoliticalPatchPreviewBudget({ now: nowMs });
+const politicalPatchPreviewBudget = createPoliticalPatchPreview({
+  now: nowMs, getPathEntry: getPoliticalFeaturePathEntry, getPathSignature: getPoliticalPathCacheSignature,
+  isVisible: pathBoundsInScreen,
+});
 let brushPatchPreviewFrame = null;
 let brushPatchPreviewCancel = null;
 let brushPatchPreviewSession = null;
@@ -7079,7 +7087,7 @@ function scheduleBrushPatchPreview() {
   brushPatchPreviewFrame = request(() => flushScheduledBrushPatchPreview(session), 0);
 }
 
-function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-colors" } = {}) {
+function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-colors", currentIds } = {}) {
   const ids = normalizePoliticalColorEditIds(featureIds);
   const startedAt = nowMs();
   const deferPreview = (reason, candidateFeatureCount = 0) => {
@@ -7103,17 +7111,17 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
   const resolvedFeatures = ids.map((id) => ({ id, feature: findResolvedColorFeatureById(id) })).filter((entry) => entry.feature?.geometry);
   if (!resolvedFeatures.length) return deferPreview("no-preview-features");
   const retainedScene = tnoRasterSceneOwner?.getPresentationState();
-  const features = retainedScene?.active ? resolvedFeatures.filter(({ id }) =>
-    !politicalIdRasterRuntimeOwner?.matchesPublishedColor(id, { overview: retainedScene.usingOverview })) : resolvedFeatures;
+  const preview = politicalPatchPreviewBudget.prepare(resolvedFeatures, {
+    currentIds, inputLabel, matchesPublishedColor: (id) => retainedScene?.active
+      && politicalIdRasterRuntimeOwner?.matchesPublishedColor(id, { overview: retainedScene.usingOverview }),
+  });
+  const { features } = preview;
+  if (preview.reason) return deferPreview(preview.reason, features.length);
   if (!features.length) {
     politicalPatchPreviewBudget.reset();
     clearPoliticalPatchOverlay("published-colors-restored");
     return true;
   }
-  const decision = politicalPatchPreviewBudget.inspect(features, ({ id, feature }) => !!getPoliticalFeaturePathEntry(feature, {
-    featureId: id, allowBuild: false,
-  }));
-  if (!decision.allowed) return deferPreview(decision.reason, features.length);
   clearPoliticalPatchOverlay("pending-edit-repaint");
   const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
   const transformSignature = getTransformSignature(transform);
@@ -7125,18 +7133,12 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
   try {
     const k = prepareTargetContext(context, transform);
     withRenderTarget(context, () => {
-      for (const { feature } of orderPoliticalShellUnderlayFirst(features)) {
-        // Path2D streaming itself is synchronous; preflight bounds cold work,
-        // and this limit stops the next feature rather than claiming preemption.
-        if (!politicalPatchPreviewBudget.timeRemaining(startedAt)) {
-          politicalPatchPreviewBudget.defer();
-          break;
-        }
-        drawPoliticalFeature(feature, processedCount++, {
-          k, canvasWidth, canvasHeight, transform, skipScreenCheck: false,
-          useCachedPath: true, allowBuildPath: true, countPathBuild: false, metricsCollector,
-        });
-      }
+      processedCount = politicalPatchPreviewBudget.draw(preview, entries => orderPoliticalPatchFeatures(entries,
+        runtimeState.landData?.features || [], runtimeState.landDataFull?.features || [], orderPoliticalShellUnderlayFirst), startedAt,
+        (feature, index, path, isClickTarget) => drawPoliticalFeature(feature, index, {
+          k, canvasWidth, canvasHeight, transform, path, skipScreenCheck: isClickTarget,
+          useCachedPath: true, allowBuildPath: !isClickTarget, countPathBuild: false, metricsCollector,
+        }));
       getScenarioRegionOverlayRenderOwner().maskLakesFromPoliticalPatch(k);
     });
   } finally { context.restore(); }
@@ -7289,6 +7291,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
       cancelScheduledBrushPatchPreview();
       paintPoliticalPatchOverlayForIds(pendingRenderIds, {
         inputLabel: inputLabel || "refresh-colors",
+        currentIds: !coalescePatchPreview && isPoliticalIdRasterSelected() ? ids : null,
       });
     }
   }

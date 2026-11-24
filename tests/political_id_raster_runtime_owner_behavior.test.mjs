@@ -739,6 +739,7 @@ function fixture({
   autoPublish = true,
   commitPublishedColorEdit = undefined,
   requestRenderEffect = null,
+  projection = {},
 } = {}) {
   const state = { zoomTransform: { ...transform }, dpr: 1 };
   const identity = { sceneKey: "scene-a", projectionKey: "projection-a", coverageKey: "coverage-a", version: 1, colorVersion: 0 };
@@ -762,7 +763,7 @@ function fixture({
   };
   const owner = createPoliticalIdRasterRuntimeOwner({
     state,
-    surface: { getProjection: () => ({}), getContext: () => context },
+    surface: { getProjection: () => projection, getContext: () => context },
     helpers: h,
     effects: {
       commitPublishedColorEdit,
@@ -2431,38 +2432,96 @@ test("retained direct scene stays editable while source preparation waits and di
   assert.equal(f.owner.getPendingWorkCount(), 0);
 });
 
-test("a first paint that changes foreground order still updates the retained palette by its dirty IDs only", async (t) => {
-  const resolved = [];
-  const bounds = { minX: -160, minY: -160, maxX: -140, maxY: -140 };
-  const f = fixture({ directPresentation: true, displayMode: "raster",
-    features: [feature("a", bounds), feature("b", bounds)],
-    resolveColor: item => { resolved.push(item.id); return item.color; } });
+test("an indexed source recollects features when membership or geometry cannot be certified", async t => {
+  let scale = 1, collections = 0;
+  const f = fixture({ directPresentation: true, displayMode: "raster", projection: { scale: () => scale } });
   t.after(() => f.owner.dispose());
+  f.h.yieldSourcePreparation = tick;
+  f.h.prepareFeatures = async () => { collections++; return { features: f.features, isUnderlay: () => false }; };
+  f.identity.foregroundKey = "[]";
+  f.identity.geometryContentVersion = "geometry-1";
+  const changes = [
+    () => { f.identity.foregroundKey = '["unknown"]'; f.identity.version++; },
+    () => { f.identity.geometryContentVersion = "geometry-2"; },
+    () => { f.identity.sceneKey = "scene-b"; },
+    () => { f.identity.projectionKey = "projection-b"; },
+    () => { f.identity.coverageKey = "coverage-b"; },
+    () => { scale++; },
+    () => { f.layout.pixelWidth++; },
+  ];
+  await f.owner.prepareSource(); await resolveAll(f);
+  for (const change of changes) {
+    const before = collections;
+    change();
+    await f.owner.prepareSource(); await resolveAll(f);
+    assert.equal(collections, before + 1);
+  }
+});
+
+test("first paint reorders both stroke tiles, repaints the retained frame and keeps the distant tile", async t => {
+  const resolved = [];
+  const bounds = { minX: 508, minY: 50, maxX: 511.9, maxY: 60 };
+  let consumePending = false;
+  const f = fixture({ directPresentation: true, displayMode: "raster", width: 1450, transform: { x: -10, y: -10, k: 1 },
+    features: [feature("a", bounds), feature("b", { ...bounds, maxX: 516 }),
+      feature("far", { ...bounds, minX: 1200, maxX: 1210 })],
+    resolveColor: item => { resolved.push(item.id); return item.color; },
+    commitPublishedColorEdit() {
+      if (consumePending) { setForeground([]); consumePending = false; }
+    } });
+  t.after(() => f.owner.dispose());
+  function setForeground(ids) {
+    f.identity.foregroundKey = JSON.stringify(ids);
+    f.identity.version = f.identity.foregroundKey;
+  }
+  let boundsReads = 0, collections = 0;
+  f.h.getBounds = item => { boundsReads++; return item.bounds; };
+  f.h.prepareFeatures = async () => { collections++; return { features: f.features, isUnderlay: item => item.id === "a" }; };
+  f.h.yieldSourcePreparation = tick;
+  f.identity.geometryContentVersion = "geometry";
   f.identity.colorScope = "table-1";
   f.h.getChangedColorIds = () => ["a"];
-  f.owner.draw(); await resolveAll(f); f.owner.draw();
-  const oldFrame = f.owner.getDirectFrame();
-  const gates = [];
-  f.h.yieldSourcePreparation = () => new Promise(resolve => gates.push(resolve));
-  f.h.prepareFeatures = async () => [...f.features];
-
-  // A first override promotes "a" into the foreground: the source version changes
-  // together with its color, so a background source preparation must start.
-  resolved.length = 0;
-  f.features[0].color = "#ff0000";
-  f.identity.version++;
-  f.identity.colorVersion++;
-  assert.equal(typeof f.owner.prepareSource().then, "function", "the order change still prepares a new source");
+  setForeground([]);
+  await f.owner.prepareSource(); await resolveAll(f); f.owner.draw();
+  const oldFrame = f.owner.getDirectFrame(), initialRequests = f.requests.length;
+  const farKey = f.requests.find(r => r.packet.coreRect.minX === 1024).packet.key;
+  const farTile = f.cache.peek(farKey);
+  assert.ok(farTile);
+  boundsReads = 0; resolved.length = 0;
+  f.features[0].color = "#ff0000"; f.identity.colorVersion++; setForeground(["a"]);
+  f.owner.prepareSource();
   assert.equal(f.owner.getDirectFrame(), oldFrame);
-  // The current source and the retained frame each resolve the dirty ID once.
-  assert.deepEqual([...new Set(resolved)], ["a"], "the click frame resolves only the painted feature, not every entry");
+  assert.equal(f.owner.queryPoint({ x: 510, y: 55 }).reason, "stale-frame");
+  assert.deepEqual([...new Set(resolved)], ["a"]);
   assert.deepEqual([...f.gpus[0].palettes.at(-1).bytes.slice(4, 8)], [255, 0, 0, 255]);
-
-  for (let guard = 0; f.owner.isSourcePreparing() && guard < 10; guard++) {
-    for (const resume of gates.splice(0)) resume();
-    await tick();
+  assert.equal(f.cache.peek(farKey), farTile);
+  await resolveAll(f); f.owner.draw();
+  const rebuilt = f.requests.slice(initialRequests);
+  assert.deepEqual(rebuilt.map(r => r.packet.coreRect.minX), [0, 512]);
+  for (const { packet } of rebuilt) {
+    assert.deepEqual(packet.entries.map(e => [e.id, e.code, e.strokeCode]), [["b", 2, 2], ["a", 1, 1]]);
   }
-  assert.equal(f.owner.getDiagnostics().sourcePreparation.committed, 1, "the foreground order is still committed");
+  // Erasing the override retains its foreground slot until the pending edit is published.
+  const promotedRequests = f.requests.length;
+  f.features[0].color = "#123456"; f.identity.colorVersion++; consumePending = true;
+  f.owner.draw();
+  assert.equal(f.requests.length, promotedRequests);
+  await tick();
+  assert.ok(f.renders.includes("political-id-raster-published-edit"));
+  f.owner.prepareSource();
+  const stale = f.requests.at(-1);
+  assert.deepEqual(stale.packet.entries.map(e => e.id), ["a", "b"]);
+  // Redo before the demoted tile returns. The old worker must not replace either tile.
+  f.features[0].color = "#ff0000"; f.identity.colorVersion++; setForeground(["a"]);
+  f.owner.prepareSource();
+  assert.equal(stale.signal.aborted, true);
+  stale.resolve(makeTile(stale.packet, "stale-order"));
+  await resolveAll(f); f.owner.draw();
+  assert.deepEqual(f.requests.at(-1).packet.entries.map(e => e.id), ["b", "a"]);
+  assert.ok(f.cache.entries().every(([, tile]) => tile.marker !== "stale-order"));
+  assert.equal(f.cache.peek(farKey), farTile);
+  assert.equal(boundsReads, 0);
+  assert.equal(collections, 1);
 });
 
 

@@ -473,8 +473,8 @@ export function createPoliticalIdRasterRuntimeOwner({
       && fittedProjectionKey === nextFitKey && sourceLayoutKey === nextLayoutKey
       && raw.projectionKey === rawIdentity?.projectionKey
       && raw.geometryContentVersion != null && raw.geometryContentVersion === rawIdentity?.geometryContentVersion;
-    const changed = changedNamespace || sourceVersion !== identity.version || fittedProjectionKey !== nextFitKey
-      || sourceLayoutKey !== nextLayoutKey || raw.geometryContentVersion !== rawIdentity?.geometryContentVersion;
+    const changed = changedNamespace || hardInvalidation || sourceVersion !== identity.version
+      || raw.geometryContentVersion !== rawIdentity?.geometryContentVersion;
     if (sourcePreparation && (!sameIdentity(sourcePreparation.raw, raw)
       || sourcePreparation.fitKey !== nextFitKey || sourcePreparation.layoutKey !== nextLayoutKey || previewOrder)) {
       cancelSourcePreparation();
@@ -489,9 +489,23 @@ export function createPoliticalIdRasterRuntimeOwner({
       account();
       return true;
     }
-    // A first override changes foreground order, so a new source must still be
-    // prepared. Its colors are already known: record them on the current source so
-    // the retained frame updates by dirty IDs instead of re-resolving every entry.
+    const order = raw.foregroundKey != null && raw.geometryContentVersion != null ? {
+      foregroundIds: JSON.parse(raw.foregroundKey),
+      orderContext: JSON.stringify([raw.sceneKey, raw.projectionKey, raw.coverageKey, raw.geometryContentVersion,
+        nextFitKey, nextLayoutKey]),
+    } : null;
+    const previousRevision = snapshot?.geometryRevision;
+    if (order && !changedNamespace && !hardInvalidation && updateSourceColors(identity, order)) {
+      if (snapshot.geometryRevision !== previousRevision) {
+        epoch++; cancel();
+        stats.geometryInvalidations += cache.invalidate(snapshot.dirtyBounds).length;
+        attempted.clear(); planKey = "";
+      }
+      sourceVersion = identity.version; rawIdentity = raw;
+      deferredForegroundOrder = false; foregroundSyncRequested = false;
+      account();
+      return true;
+    }
     if (snapshot && !changedNamespace && !hardInvalidation && paletteVersion !== identity.colorVersion) {
       updateSourceColors(identity);
     }
@@ -518,7 +532,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const preparationOptions = { signal: controller.signal, yieldControl, timeBudgetMs: 3, workBatch: 2048 };
       const collection = await h.prepareFeatures(preparationOptions);
       check();
-      const candidate = await source.prepare({ collection, ...identity, colorRevision: identity.colorVersion }, {
+      const candidate = await source.prepare({ collection, ...identity, ...order, colorRevision: identity.colorVersion }, {
         ...preparationOptions,
         getBounds: (feature, id) => {
           const bounds = h.getBounds(feature, id);
@@ -1076,7 +1090,8 @@ export function createPoliticalIdRasterRuntimeOwner({
     const sampling = storage ? { ...descriptor, originX: storage.minX, originY: storage.minY,
       width: storage.maxX - storage.minX, height: storage.maxY - storage.minY } : descriptor;
     const entries = snapshot.entries.filter(entry => intersectsTile(entry.bounds, sampling, 4 + state.dpr))
-      .map(entry => ({ ...entry, strokeCode: h.hasStroke?.(entry.feature) === false ? 0 : entry.code }));
+      .map(({ id, feature, code, bounds, geometryVersion, drawOrder }) => ({ id, feature, code, bounds, geometryVersion,
+        drawOrder, strokeCode: h.hasStroke?.(feature) === false ? 0 : code }));
     // Bound D3's resampling error in physical raster pixels at every LOD.
     // The worker scales base-space precision by density when rebuilding paths.
     const options = coordinates ? { ...coordinates.projectionOptions,
@@ -1436,10 +1451,15 @@ export function createPoliticalIdRasterRuntimeOwner({
   // Only a caller-owned complete dirty set in the same palette namespace
   // may narrow color resolution. Table replacement/ocean/style changes fall
   // back to a full palette refresh even if an older local dirty set exists.
-  function updateSourceColors(identity) {
-    const changedIds = identity.colorScope != null && identity.colorScope === colorScope
+  function updateSourceColors(identity, order = null) {
+    const samePalette = paletteVersion === identity.colorVersion && colorScope === identity.colorScope;
+    const changedIds = samePalette ? [] : identity.colorScope != null && identity.colorScope === colorScope
       ? h.getChangedColorIds?.() ?? null : null;
-    snapshot = source.updateColors(changedIds, { colorRevision: identity.colorVersion });
+    const options = { colorRevision: identity.colorVersion };
+    const next = order ? source.updateForeground(order, changedIds, options) : source.updateColors(changedIds, options);
+    if (!next) return false;
+    snapshot = next;
+    if (samePalette) return true;
     if (Array.isArray(changedIds)) {
       colorDeltas.push({ from: paletteVersion, to: identity.colorVersion, ids: changedIds.slice() });
       if (colorDeltas.length > MAX_COLOR_DELTAS) colorDeltas.shift();
@@ -1447,6 +1467,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       colorDeltas = [];
     }
     paletteVersion = identity.colorVersion; colorScope = identity.colorScope;
+    return true;
   }
 
   function currentColorState(colorVersion) {

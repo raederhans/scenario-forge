@@ -1,4 +1,5 @@
 import { getFeatureId } from "../feature_identity.js";
+import { createPoliticalIdRasterOrderIndex, orderPoliticalIdRasterEntries, updatePoliticalIdRasterOrder } from "./political_id_raster_order_index.js";
 
 const EMPTY_BOUNDS = null;
 
@@ -236,6 +237,8 @@ export function createPoliticalIdRasterSource({
   let hasPublished = false;
   let currentSnapshot = null;
   let currentEntryById = new Map();
+  let currentOrderIndex = null;
+  let currentOrderContext;
   let currentGeometryById = new Map();
   let idsByCode = new Map();
   let nextCode = 1;
@@ -256,7 +259,8 @@ export function createPoliticalIdRasterSource({
   let preparedCandidates = new WeakMap();
   const knownCandidates = new WeakSet();
 
-  function* prepareSteps({ collection, sceneKey, projectionKey, coverageKey = "", colorRevision = 0 } = {}, boundsForFeature = getBounds) {
+  function* prepareSteps({ collection, sceneKey, projectionKey, coverageKey = "", colorRevision = 0,
+    foregroundIds, orderContext } = {}, boundsForFeature = getBounds) {
     assertOpen();
     if (typeof boundsForFeature !== "function") throw new TypeError("[political_id_raster_source] getBounds must be a function.");
     const baselineEpoch = publicationEpoch;
@@ -267,7 +271,9 @@ export function createPoliticalIdRasterSource({
     const normalizedProjectionKey = normalizeKey(projectionKey);
     const normalizedCoverageKey = normalizeKey(coverageKey);
     const revisionKey = stableSerialize(colorRevision);
-    const candidates = [], ids = new Set();
+    const indexed = !!collection.isUnderlay && orderContext != null && foregroundIds != null;
+    const foreground = indexed ? new Set(foregroundIds) : null;
+    const original = [], ids = new Set();
     for (let drawOrder = 0; drawOrder < features.length; drawOrder++) {
       const feature = features[drawOrder];
       if (!feature || typeof feature !== "object") {
@@ -280,10 +286,12 @@ export function createPoliticalIdRasterSource({
       const geometry = feature.geometry;
       const bounds = normalizeBounds(boundsForFeature(feature, id), id);
       const color = normalizeColor(resolveColor(feature, id), id);
-      candidates.push({ id, feature, geometry, bounds, color, drawOrder });
+      original.push({ id, feature, geometry, bounds, color, originalIndex: collection.originalIndices?.[drawOrder] ?? drawOrder,
+        baseTier: indexed && collection.isUnderlay(feature, id) ? 0 : 1 });
       yield "validation";
     }
 
+    const candidates = indexed ? orderPoliticalIdRasterEntries(original, foreground) : original;
     const oldEntries = baseline?.entries || [];
     const sceneChanged = !hasPublished || normalizedSceneKey !== baseline.sceneKey;
     const projectionChanged = !hasPublished || normalizedProjectionKey !== baseline.projectionKey;
@@ -330,7 +338,8 @@ export function createPoliticalIdRasterSource({
     const nextEntries = [], nextById = new Map(), nextGeometryById = new Map();
     for (const candidate of candidates) {
       const entry = Object.freeze({ id: candidate.id, code: nextIdsByCode.get(candidate.id),
-        feature: candidate.feature, bounds: candidate.bounds, drawOrder: candidate.drawOrder,
+        feature: candidate.feature, bounds: candidate.bounds, drawOrder: nextEntries.length,
+        ...(indexed ? { originalIndex: candidate.originalIndex, baseTier: candidate.baseTier } : {}),
         geometryVersion: yield* geometryVersionOf(candidate) });
       nextEntries.push(entry); nextById.set(entry.id, entry); nextGeometryById.set(entry.id, candidate.geometry);
       yield "entries";
@@ -388,7 +397,8 @@ export function createPoliticalIdRasterSource({
     for (let offset = 0; offset < nextPalette.length; offset += 4096) {
       publicPalette.set(nextPalette.subarray(offset, offset + 4096), offset); yield "public-palette";
     }
-    return { baselineEpoch, snapshot, publicSnapshot: makePublicSnapshot(snapshot, publicPalette),
+    const orderIndex = indexed ? createPoliticalIdRasterOrderIndex(original, nextById, foreground) : null;
+    return { baselineEpoch, snapshot, orderIndex, orderContext, publicSnapshot: makePublicSnapshot(snapshot, publicPalette),
       nextById, nextGeometryById, nextIdsByCode, candidateNextCode, candidateNextGeometryVersion, versionAssignments, revisionKey };
   }
 
@@ -422,6 +432,8 @@ export function createPoliticalIdRasterSource({
     }
     nextGeometryVersion = prepared.candidateNextGeometryVersion;
     currentSnapshot = prepared.snapshot;
+    currentOrderIndex = prepared.orderIndex;
+    currentOrderContext = prepared.orderContext;
     currentEntryById = prepared.nextById; currentGeometryById = prepared.nextGeometryById;
     idsByCode = prepared.nextIdsByCode;
     nextCode = prepared.candidateNextCode; colorRevisionKey = prepared.revisionKey;
@@ -436,7 +448,18 @@ export function createPoliticalIdRasterSource({
     return commitPrepared(rememberCandidate(drainSteps(prepareSteps(input))));
   }
 
+  function updateForeground({ orderContext, foregroundIds }, featureIds, options) {
+    assertOpen();
+    if (!currentOrderIndex || orderContext !== currentOrderContext || foregroundIds == null) return null;
+    const order = updatePoliticalIdRasterOrder(currentOrderIndex, new Set(foregroundIds));
+    return order && publishColors(featureIds, options, order);
+  }
+
   function updateColors(featureIds = null, options = {}) {
+    return publishColors(featureIds, options);
+  }
+
+  function publishColors(featureIds = null, options = {}, order = null) {
     assertOpen();
     if (!currentSnapshot) throw new Error("[political_id_raster_source] publish must succeed before updateColors.");
     if (!options || typeof options !== "object" || Array.isArray(options)) {
@@ -460,7 +483,7 @@ export function createPoliticalIdRasterSource({
       if (!entry) continue;
       resolved.push({ entry, color: normalizeColor(resolveColor(entry.feature, id), id) });
     }
-    const nextPalette = currentSnapshot.palette.slice();
+    const nextPalette = resolved.length ? currentSnapshot.palette.slice() : currentSnapshot.palette;
     let bytesChanged = false;
     for (const { entry, color } of resolved) {
       const offset = entry.code * 4;
@@ -478,8 +501,16 @@ export function createPoliticalIdRasterSource({
       colorRevisionKey = nextRevisionKey;
       hasColorRevision = true;
     }
+    if (order) {
+      currentOrderIndex = order.index;
+      currentEntryById = order.index.entryById;
+      if (order.dirtyBounds.length) geometryRevision++;
+    }
     currentSnapshot = {
       ...currentSnapshot,
+      ...(order && { geometryRevision, entries: order.entries || currentSnapshot.entries,
+        dirtyBounds: Object.freeze(order.dirtyBounds), changedIds: Object.freeze(order.dirtyBounds.map(item => item.id)),
+        removedIds: Object.freeze([]) }),
       paletteRevision,
       palette: nextPalette,
     };
@@ -527,6 +558,7 @@ export function createPoliticalIdRasterSource({
     disposed = true;
     publicationEpoch++; preparedCandidates = new WeakMap();
     currentSnapshot = null;
+    currentOrderIndex = null;
     currentEntryById = new Map();
     currentGeometryById = new Map();
     idsByCode = new Map();
@@ -535,7 +567,7 @@ export function createPoliticalIdRasterSource({
     primitiveGeometryVersions.clear();
   }
 
-  return Object.freeze({ publish, prepare, commitPrepared, updateColors, getSnapshot, captureFrame, isFrameCurrent, dispose });
+  return Object.freeze({ publish, prepare, commitPrepared, updateColors, updateForeground, getSnapshot, captureFrame, isFrameCurrent, dispose });
 }
 
 // Full/fine views can wrap equal geometry, or deliberately prune tiny visual
