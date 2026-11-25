@@ -67,29 +67,33 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     const mediterraneanViewport = [8, 32, 28, 46];
     const focusCountries = ["ITA", "GRE", "TUR", "CRO", "SPR", ""];
 
+    const select = (focusCountry, zoom) => selectScenarioChunks({
+      scenarioId: "tno_1962",
+      chunkRegistry,
+      contextLodManifest: null,
+      zoom,
+      viewportBbox: mediterraneanViewport,
+      focusCountry,
+      renderBudgetHints: manifest.render_budget_hints,
+      visibleLayers: ["political", "scenario_atlantropa"],
+      loadedChunkIds: [],
+    }).requiredChunks.map((chunk) => chunk.id);
     focusCountries.forEach((focusCountry) => {
-      const selection = selectScenarioChunks({
-        scenarioId: "tno_1962",
-        chunkRegistry,
-        contextLodManifest: null,
-        zoom: 2.5,
-        viewportBbox: mediterraneanViewport,
-        focusCountry,
-        renderBudgetHints: manifest.render_budget_hints,
-        visibleLayers: ["political", "scenario_atlantropa"],
-        loadedChunkIds: [],
-      });
-      const requiredIds = selection.requiredChunks.map((chunk) => chunk.id);
-      assert.ok(
-        requiredIds.some((id) => id.startsWith("scenario_atlantropa.detail.")),
-        `focus=${focusCountry || "(none)"} required=${requiredIds.join(",")}`,
-      );
-      assert.equal(
-        requiredIds.includes("political.detail.country.atl"),
-        false,
-        `focus=${focusCountry || "(none)"} should use scenario_atlantropa chunks instead of the old ATL political chunk`,
-      );
-      assert.ok(requiredIds.length > 6, "TNO Mediterranean detail view needs wider political chunk coverage than the old 6 chunk cap");
+      // Atlantropa detail chunks repeat the coarse geometry, so the coarse chunk serves every zoom.
+      for (const zoom of [2.5, 3.5]) {
+        const requiredIds = select(focusCountry, zoom);
+        assert.ok(
+          requiredIds.includes("scenario_atlantropa.coarse.r0c0"),
+          `focus=${focusCountry || "(none)"} zoom=${zoom} required=${requiredIds.join(",")}`,
+        );
+        assert.equal(
+          requiredIds.includes("political.detail.country.atl"),
+          false,
+          `focus=${focusCountry || "(none)"} should use scenario_atlantropa chunks instead of the old ATL political chunk`,
+        );
+      }
+      // Political detail starts at k=3; once it does, the view still needs more than the old 6 chunk cap.
+      assert.ok(select(focusCountry, 3.5).length > 6, "TNO Mediterranean detail view needs wider political chunk coverage than the old 6 chunk cap");
     });
   });
 
