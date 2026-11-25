@@ -9,6 +9,7 @@ from typing import Any
 
 from map_builder.contracts import normalize_scenario_contract_tag, sha256_path
 from map_builder.io.writers import write_json_atomic
+from map_builder.json_source import read_json_source
 from shapely import STRtree, coverage_invalid_edges, coverage_is_valid, coverage_simplify, make_valid, orient_polygons
 from shapely.errors import GEOSException
 from shapely.geometry import LineString, MultiLineString, mapping, shape
@@ -43,6 +44,8 @@ LOD_SPECS = (
 POLITICAL_COARSE_LOD_SPECS = (
     {"lod": "coarse", "cols": 1, "rows": 1, "min_zoom": 0.0, "max_zoom": 1.35, "global_coverage": True},
 )
+
+POLITICAL_DETAIL_MIN_ZOOM_BY_SCENARIO = {"tno_1962": 3.0}
 
 POLITICAL_COARSE_LOD_DIAGNOSTIC_TIER = "political-coarse-simplified-v1"
 POLITICAL_COARSE_SIMPLIFY_TOLERANCE = 0.01
@@ -617,6 +620,57 @@ def _layer_payload_to_feature_collection(layer_key: str, payload: dict[str, Any]
                 "features": feature_collection.get("features") or [],
             }
     return None
+
+
+def _political_detail_min_zoom(scenario_id: str) -> float:
+    return POLITICAL_DETAIL_MIN_ZOOM_BY_SCENARIO.get(scenario_id, POLITICAL_COARSE_LOD_SPECS[0]["max_zoom"])
+
+
+def _chunk_geometries(scenario_dir: Path, chunks: list[dict[str, Any]]):
+    for chunk in chunks:
+        path = scenario_dir / "chunks" / Path(chunk["url"]).name
+        payload = read_json_source(path)
+        if payload.get("type") == "Topology":
+            payload = decode_political_chunk(payload)
+        collection = _layer_payload_to_feature_collection(chunk["layer"], payload)
+        for feature in collection["features"]:
+            feature_id = _feature_properties(feature).get("id")
+            if feature_id is None:
+                feature_id = feature.get("id")
+            yield str(feature_id).strip() if feature_id is not None else "", feature["geometry"]
+
+
+def _same_chunk_geometries(scenario_dir: Path, coarse: list, detail: list) -> bool:
+    geometries = {}
+    for feature_id, geometry in _chunk_geometries(scenario_dir, coarse):
+        if not feature_id or geometries.setdefault(feature_id, geometry) != geometry:
+            return False
+    seen = set()
+    for feature_id, geometry in _chunk_geometries(scenario_dir, detail):
+        if feature_id not in geometries or geometry != geometries[feature_id]:
+            return False
+        seen.add(feature_id)
+    return bool(seen) and seen == geometries.keys()
+
+
+def apply_chunk_lod_policy(scenario_dir: Path, detail_manifest: dict, context_manifest: dict) -> None:
+    chunks_by_layer = defaultdict(list)
+    for chunk in detail_manifest["chunks"]:
+        chunks_by_layer[chunk["layer"]].append(chunk)
+    for layer, chunks in chunks_by_layer.items():
+        coarse = [chunk for chunk in chunks if chunk["lod"] == "coarse"]
+        detail = [chunk for chunk in chunks if chunk["lod"] == "detail"]
+        if coarse and detail and _same_chunk_geometries(scenario_dir, coarse, detail):
+            threshold = 99.0
+        elif layer == "political" and detail_manifest["scenario_id"] in POLITICAL_DETAIL_MIN_ZOOM_BY_SCENARIO:
+            threshold = _political_detail_min_zoom(detail_manifest["scenario_id"])
+        else:
+            continue
+        for entry in [*chunks, *context_manifest["layers"][layer]]:
+            if entry["lod"] == "coarse":
+                entry["max_zoom"] = threshold
+            elif entry["lod"] == "detail":
+                entry["min_zoom"] = threshold
 
 
 def _topology_object_to_feature_collection(topology_payload: dict[str, Any] | None, object_name: str) -> dict[str, Any] | None:
@@ -1780,6 +1834,7 @@ def _build_political_chunk_payloads(
             for feature_id, _feature, _bounds in shard:
                 feature_shard_buckets[feature_id] = chunk_id
 
+    detail_min_zoom = _political_detail_min_zoom(scenario_id)
     if coarse_feature_collection:
         chunks, lod_entries = _build_chunk_payloads_for_feature_collection(
             scenario_id=scenario_id,
@@ -1787,7 +1842,7 @@ def _build_political_chunk_payloads(
             layer_key="political",
             feature_collection=coarse_feature_collection,
             payload_factory=lambda selected_feature_ids: _slice_feature_collection(coarse_feature_collection, selected_feature_ids),
-            chunk_specs=POLITICAL_COARSE_LOD_SPECS,
+            chunk_specs=({**POLITICAL_COARSE_LOD_SPECS[0], "max_zoom": detail_min_zoom},),
             precision_source_countries=precision_source_countries,
             political_precision_feature_ids=political_precision_feature_ids,
             owner_buckets_by_feature_id={
@@ -1824,12 +1879,12 @@ def _build_political_chunk_payloads(
                 )
             ):
                 for reusable_chunk in reusable_entries:
-                    reused = dict(reusable_chunk)
+                    reused = {**reusable_chunk, "min_zoom": detail_min_zoom}
                     reused.setdefault("owner_code", owner_bucket)
                     all_chunks.append(reused)
                     lod_layers["political"].append({
                         "lod": "detail",
-                        "min_zoom": reusable_chunk["min_zoom"],
+                        "min_zoom": detail_min_zoom,
                         "max_zoom": reusable_chunk["max_zoom"],
                         "chunk_ids": [reusable_chunk["id"]],
                     })
@@ -1860,7 +1915,7 @@ def _build_political_chunk_payloads(
                     "layer": "political",
                     "lod": "detail",
                     "url": f"data/scenarios/{scenario_id}/chunks/{chunk_filename}",
-                    "min_zoom": 1.35,
+                    "min_zoom": detail_min_zoom,
                     "max_zoom": 99.0,
                     "bounds": bounds,
                     "priority": 95,
@@ -1874,7 +1929,7 @@ def _build_political_chunk_payloads(
                 })
                 lod_layers["political"].append({
                     "lod": "detail",
-                    "min_zoom": 1.35,
+                    "min_zoom": detail_min_zoom,
                     "max_zoom": 99.0,
                     "chunk_ids": [chunk_id],
                 })
@@ -1985,6 +2040,7 @@ def build_and_write_scenario_chunk_assets(
         "generated_at": generated_at,
         "layers": lod_layers,
     }
+    apply_chunk_lod_policy(scenario_dir, detail_chunk_manifest, context_lod_manifest)
     runtime_meta_payload = {
         "version": 1,
         "scenario_id": scenario_id,

@@ -895,7 +895,7 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                     feature_collection,
                     selected_feature_ids,
                 ),
-                chunk_specs=scenario_chunk_assets.POLITICAL_COARSE_LOD_SPECS,
+                chunk_specs=scenario_chunk_assets.LOD_SPECS[:1],
             )
 
             coarse_chunk = next(chunk for chunk in chunks if chunk["id"] == "political.coarse.r0c0")
