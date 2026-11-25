@@ -41,6 +41,10 @@ LOD_SPECS = (
     {"lod": "detail", "cols": 4, "rows": 2, "min_zoom": 1.7, "max_zoom": 99.0, "global_coverage": False},
 )
 
+POLITICAL_COARSE_LOD_SPECS = (
+    {"lod": "coarse", "cols": 1, "rows": 1, "min_zoom": 0.0, "max_zoom": 1.35, "global_coverage": True},
+)
+
 POLITICAL_DETAIL_MIN_ZOOM_BY_SCENARIO = {"tno_1962": 3.0}
 
 POLITICAL_COARSE_LOD_DIAGNOSTIC_TIER = "political-coarse-simplified-v1"
@@ -619,7 +623,7 @@ def _layer_payload_to_feature_collection(layer_key: str, payload: dict[str, Any]
 
 
 def _political_detail_min_zoom(scenario_id: str) -> float:
-    return POLITICAL_DETAIL_MIN_ZOOM_BY_SCENARIO.get(scenario_id, 1.35)
+    return POLITICAL_DETAIL_MIN_ZOOM_BY_SCENARIO.get(scenario_id, POLITICAL_COARSE_LOD_SPECS[0]["max_zoom"])
 
 
 def _chunk_geometries(scenario_dir: Path, chunks: list[dict[str, Any]]):
@@ -1838,7 +1842,7 @@ def _build_political_chunk_payloads(
             layer_key="political",
             feature_collection=coarse_feature_collection,
             payload_factory=lambda selected_feature_ids: _slice_feature_collection(coarse_feature_collection, selected_feature_ids),
-            chunk_specs=({**LOD_SPECS[0], "max_zoom": detail_min_zoom},),
+            chunk_specs=({**POLITICAL_COARSE_LOD_SPECS[0], "max_zoom": detail_min_zoom},),
             precision_source_countries=precision_source_countries,
             political_precision_feature_ids=political_precision_feature_ids,
             owner_buckets_by_feature_id={
