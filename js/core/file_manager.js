@@ -584,7 +584,7 @@ class FileManager {
         cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
         countryLabels: normalizeCountryLabelStyle(appState.styleConfig?.countryLabels),
         strategicValues: normalizeStrategicValuesStyle(appState.styleConfig?.strategicValues),
-        thematic: normalizeThematicWgiStyle(appState.styleConfig?.thematic),
+        thematic: normalizeThematicWgiStyle(appState.styleConfig?.thematic, appState.activeScenarioId),
         population: normalizePopulationStyle(appState.styleConfig?.population),
         urban: normalizeUrbanStyleConfig(appState.styleConfig?.urban),
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
@@ -813,7 +813,7 @@ class FileManager {
     data.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig.lakes);
     data.styleConfig.cityPoints = normalizeCityLayerStyleConfig(data.styleConfig.cityPoints);
     data.styleConfig.strategicValues = normalizeStrategicValuesStyle(data.styleConfig.strategicValues);
-    data.styleConfig.thematic = normalizeThematicWgiStyle(data.styleConfig.thematic);
+    data.styleConfig.thematic = normalizeThematicWgiStyle(data.styleConfig.thematic, data.scenario?.id);
     data.styleConfig.population = normalizePopulationStyle(data.styleConfig.population);
     data.styleConfig.urban = normalizeUrbanStyleConfig(data.styleConfig.urban);
     data.styleConfig.physical = normalizePhysicalStyleConfig(data.styleConfig.physical);

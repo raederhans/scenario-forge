@@ -482,7 +482,8 @@ function getTooltipText(feature) {
     const referenceNote = thematic.referenceMapping
       ? `\n${getThematicReferenceNote(runtimeState)}` : "";
     const scopeLabel = zh ? "国家／经济体指标" : metric.family === "wgi" ? "Country/economy score" : "Country/economy indicator";
-    return `${base}\n${zh ? metric.labelZh : metric.labelEn} · ${metric.year}: ${value}${uncertainty}${referenceCountry}${referenceNote}\n${scopeLabel} · ${metric.source}`;
+    const data = runtimeState.thematicWgiRuntime.data;
+    return `${base}\n${zh ? metric.labelZh : metric.labelEn} · ${metric.year ?? data.year}: ${value}${uncertainty}${referenceCountry}${referenceNote}\n${scopeLabel} · ${metric.source ?? data.source}`;
   }
   const strategic = getStrategicFeatureInspection(runtimeState, getSharedFeatureId(feature));
   if (!strategic) return base;

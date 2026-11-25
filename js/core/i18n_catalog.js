@@ -1776,6 +1776,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "民用工厂",
     "en": "Civilian Factories"
   },
+  "Civilian factories": {
+    "zh": "民用工厂",
+    "en": "Civilian factories"
+  },
   "Claim / dispute": {
     "zh": "主张/争议",
     "en": "Claim / dispute"
@@ -2526,6 +2530,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Core territory already matches current ownership.": {
     "zh": "核心领土已经与当前所有权相匹配。",
     "en": "Core territory already matches current ownership."
+  },
+  "Core territory share": {
+    "zh": "本国核心领土占比",
+    "en": "Core territory share"
   },
   "Core territory was not applied.": {
     "zh": "核心领土未适用。",
@@ -4106,6 +4114,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "设施范围",
     "en": "Facility Scope"
   },
+  "Factories": {
+    "zh": "工厂总数",
+    "en": "Factories"
+  },
+  "Factories per million people": {
+    "zh": "每百万人工厂数",
+    "en": "Factories per million people"
+  },
   "Failed to import project.": {
     "zh": "项目导入失败。",
     "en": "Failed to import project."
@@ -4317,6 +4333,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Five muted presets tuned for political maps, atlas views, and historical overlays.": {
     "zh": "五套偏克制的预设，适合政治地图、图集视图和历史覆盖层。",
     "en": "Five muted presets tuned for political maps, atlas views, and historical overlays."
+  },
+  "Fixed cartographic intervals": {
+    "zh": "固定制图区间",
+    "en": "Fixed cartographic intervals"
   },
   "Flag option": {
     "zh": "旗帜选项",
@@ -5432,6 +5452,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "查看湖泊交互设置",
     "en": "Lake interaction settings"
   },
+  "Land area": {
+    "zh": "陆地面积",
+    "en": "Land area"
+  },
   "Land cover": {
     "zh": "地表覆被",
     "en": "Land cover"
@@ -6411,6 +6435,14 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "军用工厂",
     "en": "Military Factories"
   },
+  "Military factories": {
+    "zh": "军用工厂",
+    "en": "Military factories"
+  },
+  "Military factory share": {
+    "zh": "军工占比",
+    "en": "Military factory share"
+  },
   "Min Area (px)": {
     "zh": "最小面积（像素）",
     "en": "Min Area (px)"
@@ -6514,6 +6546,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Modern administrative regions": {
     "zh": "现代行政区",
     "en": "Modern administrative regions"
+  },
+  "Modern reference (2023/2024)": {
+    "zh": "现代参考（2023/2024）",
+    "en": "Modern reference (2023/2024)"
   },
   "Monarchism": {
     "zh": "君主制",
@@ -7965,6 +8001,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Political stability and absence of violence": {
     "zh": "政治稳定与免于暴力",
     "en": "Political stability and absence of violence"
+  },
+  "Population (scenario start)": {
+    "zh": "人口（剧本开局）",
+    "en": "Population (scenario start)"
   },
   "Population / City Boost (Modern only)": {
     "zh": "人口亮度增强（仅限现代）",
@@ -9546,6 +9586,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "剧本数据",
     "en": "Scenario data"
   },
+  "Scenario data (start)": {
+    "zh": "剧本数据（开局）",
+    "en": "Scenario data (start)"
+  },
   "Scenario default": {
     "zh": "剧本默认",
     "en": "Scenario default"
@@ -9665,6 +9709,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Scenario special zone layers saved.": {
     "zh": "场景特殊区域图层已保存。",
     "en": "Scenario special zone layers saved."
+  },
+  "Scenario start data, grouped by baseline ownership and unaffected by painting.": {
+    "zh": "剧本开局数据，按基线归属汇总，不随涂色变化。",
+    "en": "Scenario start data, grouped by baseline ownership and unaffected by painting."
   },
   "Scenario state is inconsistent. Reload the page before continuing.": {
     "zh": "场景状态不一致。在继续之前重新加载页面。",
@@ -10877,6 +10925,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "战略资源",
     "en": "Strategic resources"
   },
+  "Strategic resources total": {
+    "zh": "战略资源合计",
+    "en": "Strategic resources total"
+  },
   "Stratocracy": {
     "zh": "军政体制",
     "en": "Stratocracy"
@@ -11964,6 +12016,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Unassigned": {
     "zh": "未分配",
     "en": "Unassigned"
+  },
+  "Unavailable": {
+    "zh": "不可用",
+    "en": "Unavailable"
   },
   "Unavailable saved metric": {
     "zh": "已保存的指标不可用",

@@ -39,7 +39,8 @@ const NODE_IDS = [
   "toggleThematicWgi", "thematicWgiStatus", "thematicWgiRetry",
   "thematicWgiLegend", "thematicWgiCoverage", "thematicWgiMetric", "thematicWgiReferenceNote",
 ];
-const METRIC_IDS = THEMATIC_INDICATORS.map((metric) => metric.id);
+const MODERN_INDICATORS = THEMATIC_INDICATORS.filter((metric) => metric.family !== "scenario");
+const METRIC_IDS = MODERN_INDICATORS.map((metric) => metric.id);
 const [GE, RL] = METRIC_IDS;
 const HISTORICAL_SCENARIOS = ["hoi4_1936", "hoi4_1939", "tno_1962"];
 const flush = async () => { await Promise.resolve(); await Promise.resolve(); };
@@ -116,7 +117,7 @@ test("WGI checkbox enables via state actions and preserves base paint", async ()
 
 test("all supported historical scenarios enable and label their modern reference coverage", async () => {
   for (const activeScenarioId of HISTORICAL_SCENARIOS) {
-    const h = createHarness({ activeScenarioId,
+    const h = createHarness({ activeScenarioId, styleConfig: { thematic: normalizeThematicWgiStyle({ metricId: GE }) },
       landData: { features: [{ type: "Feature", id: "sample", properties: { ISO_A3: "FRA" } }] },
       scenarioBaselineOwnersByFeatureId: { sample: "GER" },
       scenarioCountriesByTag: { GER: { base_iso2: "DE" } },
@@ -357,7 +358,7 @@ test("metric select offers all official metrics", () => {
   h.owner.render();
   assert.equal(h.nodes.thematicWgiMetric.value, GE);
   assert.deepEqual(h.nodes.thematicWgiMetric.children.map((option) => [option.value, option.textContent]),
-    THEMATIC_INDICATORS.map((metric) => [metric.id, metric.labelEn]));
+    MODERN_INDICATORS.map((metric) => [metric.id, metric.labelEn]));
 });
 
 test("switching enabled metrics hides old data and loads the selected metric with one persisted dirty change", async () => {
@@ -410,7 +411,7 @@ test("disabled metric change stays lazy and enabling preserves the selected indi
 
 test("UNDP and population indicators switch families, stay lazy while off, and restore their layer identity", async () => {
   const wgiLayerId = getThematicIndicator(GE).layerId;
-  const otherMetrics = THEMATIC_INDICATORS.filter((metric) => metric.layerId !== wgiLayerId);
+  const otherMetrics = MODERN_INDICATORS.filter((metric) => metric.layerId !== wgiLayerId);
   assert.equal(otherMetrics.length, 10);
   for (const descriptor of otherMetrics) {
     const h = createHarness();
@@ -497,7 +498,7 @@ test("unknown saved metric is visible and unchanged until an explicit supported 
   h.nodes.thematicWgiMetric.dispatch("change");
   await flush();
   assert.deepEqual(h.state.styleConfig.thematic, normalizeThematicWgiStyle({ enabled: true, metricId: RL }));
-  assert.equal(h.nodes.thematicWgiMetric.children.length, THEMATIC_INDICATORS.length);
+  assert.equal(h.nodes.thematicWgiMetric.children.length, MODERN_INDICATORS.length);
   assert.equal(h.loads.length, 1);
   assert.equal(h.loads[0].metricId, RL);
   assert.deepEqual(h.dirty, ["select-thematic-wgi-metric"]);
@@ -585,7 +586,7 @@ test("WGI new strings agree across manual/catalog translations and option langua
   for (const key of ["Country indicators", "Indicator", "Show thematic shading",
     "Country indicators · Scenario reference", "UNDP human development · Scenario reference",
     "WDI population · Scenario reference",
-    ...THEMATIC_INDICATORS.map((metric) => metric.labelEn), "Unavailable saved metric",
+    ...MODERN_INDICATORS.map((metric) => metric.labelEn), "Unavailable saved metric",
     "Saved indicator is unavailable. Choose a supported indicator.",
     "Country indicators are not supported on the current basemap.", "Scenario countries mapped", "Reference country",
     "2024 reference mapping, not a measurement for the scenario year.",
@@ -607,7 +608,7 @@ test("WGI new strings agree across manual/catalog translations and option langua
   h.state.currentLanguage = "zh";
   h.owner.render();
   assert.deepEqual(h.nodes.thematicWgiMetric.children.map((option) => option.textContent),
-    THEMATIC_INDICATORS.map((metric) => metric.labelZh));
+    MODERN_INDICATORS.map((metric) => metric.labelZh));
   assert.equal(h.nodes.thematicWgiMetric.value, RL);
   assert.strictEqual(h.state.styleConfig.thematic, selection);
   assert.equal(h.loads.length, 0);

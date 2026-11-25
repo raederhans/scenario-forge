@@ -10,6 +10,7 @@ import {
   normalizeThematicWgiStyle,
   isThematicWgiSelectionSupported,
 } from "../../core/thematic/thematic_wgi_view_model.js";
+import { SCENARIO_STATS_IDS, loadScenarioStatsDocument } from "../../core/thematic/thematic_scenario_stats_data.js";
 import { LegendManager } from "../../core/legend_manager.js";
 import { syncStyledSelect } from "../styled_selects.js";
 
@@ -35,6 +36,7 @@ export function createThematicWgiOwner({
   markDirty = () => {},
   documentRef = globalThis.document,
   ensureData = ensureThematicWgiData,
+  loadScenarioDocument = loadScenarioStatsDocument,
   getViewModel = getThematicWgiViewModel,
   getLegend = getThematicWgiLegend,
   showLegend = (state) => LegendManager.showControl(state),
@@ -44,6 +46,8 @@ export function createThematicWgiOwner({
   let bound = false;
   let legendSignature;
   let metricOptionsSignature;
+  let scenarioOptionsKey;
+  let scenarioMetrics;
   const text = (key) => t(key, "ui");
   const setText = (id, value) => { if (nodes[id]) nodes[id].textContent = value; };
   const refresh = () => {
@@ -107,18 +111,52 @@ export function createThematicWgiOwner({
     const metricSupported = !!getThematicIndicator(view.metricId);
     const select = nodes.thematicWgiMetric;
     if (select) {
-      const options = THEMATIC_INDICATORS.map((metric) => ({ value: metric.id, label: text(metric.labelEn) }));
+      const scenarioId = runtimeState.activeScenarioId;
+      const historical = SCENARIO_STATS_IDS.includes(scenarioId);
+      const baselineHash = runtimeState.scenarioBaselineHash;
+      const key = historical ? JSON.stringify([scenarioId, baselineHash]) : "";
+      if (key !== scenarioOptionsKey) {
+        scenarioOptionsKey = key;
+        scenarioMetrics = null;
+        if (historical) loadScenarioDocument({ scenarioId, baselineHash }).then((doc) => {
+          if (key === scenarioOptionsKey) {
+            scenarioMetrics = doc.metrics;
+            render();
+          }
+        }, () => {});
+      }
+      const data = runtimeState.thematicWgiRuntime?.data;
+      const metrics = data?.metrics && data.supportedScenarios.includes(scenarioId)
+        && (!baselineHash || data.baselineHash === baselineHash) ? data.metrics : scenarioMetrics;
+      const options = THEMATIC_INDICATORS.filter((metric) => historical || metric.family !== "scenario").map((metric) => {
+        const native = metric.family === "scenario";
+        const disabled = native && metrics?.[metric.id]?.available === false;
+        const label = native && runtimeState.currentLanguage === "zh" ? metric.labelZh : text(metric.labelEn);
+        const group = historical ? text(native ? "Scenario data (start)" : "Modern reference (2023/2024)") : "";
+        return { value: metric.id, label: disabled ? `${label} (${text("Unavailable")})` : label, disabled, group };
+      });
       if (!metricSupported) options.unshift({ value: view.metricId, label: text("Unavailable saved metric"), disabled: true });
       const signature = JSON.stringify(options);
       if (signature !== metricOptionsSignature) {
         metricOptionsSignature = signature;
-        select.replaceChildren(...options.map(({ value, label, disabled = false }) => {
+        const children = [];
+        const groups = new Map();
+        for (const { value, label, disabled = false, group } of options) {
           const option = documentRef.createElement("option");
           option.value = value;
           option.textContent = label;
           option.disabled = disabled;
-          return option;
-        }));
+          if (group) {
+            if (!groups.has(group)) {
+              const node = documentRef.createElement("optgroup");
+              node.label = group;
+              groups.set(group, node);
+              children.push(node);
+            }
+            groups.get(group).appendChild(option);
+          } else children.push(option);
+        }
+        select.replaceChildren(...children);
       }
       select.value = view.metricId;
       syncStyledSelect(select);
@@ -159,9 +197,10 @@ export function createThematicWgiOwner({
     nodes.toggleThematicWgi?.addEventListener("change", (event) => {
       const enabled = !!event.target.checked;
       if (enabled && !getViewModel(runtimeState).supported) { render(); return; }
-      const previous = normalizeThematicWgiStyle(runtimeState.styleConfig?.thematic);
-      const style = enabled ? normalizeThematicWgiStyle({ enabled: true,
-        metricId: getThematicIndicator(previous.metricId) ? previous.metricId : undefined })
+      const previous = normalizeThematicWgiStyle(runtimeState.styleConfig?.thematic, runtimeState.activeScenarioId);
+      const metric = getThematicIndicator(previous.metricId);
+      const selectable = metric && (metric.family !== "scenario" || SCENARIO_STATS_IDS.includes(runtimeState.activeScenarioId));
+      const style = enabled ? normalizeThematicWgiStyle({ enabled, metricId: selectable ? metric.id : undefined }, runtimeState.activeScenarioId)
         : { ...previous, enabled: false };
       setThematicWgiStyleState(runtimeState, style);
       if (enabled) {
@@ -176,7 +215,7 @@ export function createThematicWgiOwner({
     nodes.thematicWgiMetric?.addEventListener("change", (event) => {
       const metricId = event.target.value;
       if (!getThematicIndicator(metricId)) { render(); return; }
-      const previous = normalizeThematicWgiStyle(runtimeState.styleConfig?.thematic);
+      const previous = normalizeThematicWgiStyle(runtimeState.styleConfig?.thematic, runtimeState.activeScenarioId);
       if (previous.metricId === metricId && isThematicWgiSelectionSupported(previous)) return;
       const style = normalizeThematicWgiStyle({ enabled: previous.enabled, metricId });
       setThematicWgiStyleState(runtimeState, style);

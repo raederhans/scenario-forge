@@ -11,6 +11,8 @@ import {
   loadThematicPopulationData,
 } from "./thematic_population_data.js";
 
+import { SCENARIO_STATS_METRICS, loadScenarioStatsData } from "./thematic_scenario_stats_data.js";
+
 const WGI_COLORS = Object.freeze(["#edf8fb", "#b2e2e2", "#66c2a4", "#2ca25f", "#006d2c"]);
 const HDI_COLORS = Object.freeze(["#f2f0f7", "#cbc9e2", "#9e9ac8", "#6a51a3"]);
 const COMPONENT_COLORS = Object.freeze(["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#6a51a3"]);
@@ -32,6 +34,7 @@ const HDI_SCALES = {
 };
 
 export const THEMATIC_INDICATORS = Object.freeze([
+  ...SCENARIO_STATS_METRICS,
   ...THEMATIC_WGI_METRICS.map((metric) => Object.freeze({ ...metric,
     family: "wgi", layerId: THEMATIC_WGI_LAYER_ID, dataVersion: THEMATIC_WGI_DATA_VERSION,
     year: 2024, unit: "score_0_100", source: "World Bank WGI",
@@ -60,6 +63,7 @@ export function getThematicIndicator(metricId) { return BY_ID.get(metricId); }
 export function loadThematicIndicatorData(options) {
   const metric = getThematicIndicator(options?.metricId);
   if (!metric) return Promise.reject(new RangeError(`Unsupported thematic indicator: ${options?.metricId}`));
+  if (metric.family === "scenario") return loadScenarioStatsData(options);
   if (metric.family === "wdi-population") return loadThematicPopulationData(options);
   return metric.family === "undp" ? loadThematicHdiData(options) : loadThematicWgiData(options);
 }
@@ -68,6 +72,10 @@ export function formatThematicIndicatorValue(metric, value, language = "en") {
   const locale = language === "zh" ? "zh-CN" : "en-US";
   if (metric.unit === "persons") return `${value.toLocaleString(locale, { maximumFractionDigits: 0 })} ${language === "zh" ? "人" : "people"}`;
   if (metric.unit === "persons_per_km2") return `${value.toLocaleString(locale, { maximumFractionDigits: 1 })} ${language === "zh" ? "人/平方公里" : "people/km²"}`;
+  if (metric.unit === "km2") return `${value.toLocaleString(locale, { maximumFractionDigits: 0 })} km²`;
+  if (metric.unit === "factories") return `${value.toLocaleString(locale)} ${language === "zh" ? "座工厂" : "factories"}`;
+  if (metric.unit === "factories_per_million") return `${value.toFixed(1)} ${language === "zh" ? "座/百万人" : "factories/million people"}`;
+  if (metric.unit === "resource_points") return `${value.toLocaleString(locale)} ${language === "zh" ? "资源点" : "resource points"}`;
   if (metric.unit === "percent") return `${value.toFixed(1)}%`;
   if (metric.unit === "births_per_woman") return `${value.toFixed(2)} ${language === "zh" ? "出生数/妇女" : "births/woman"}`;
   if (metric.unit === "index_0_1") return value.toFixed(3);
@@ -80,6 +88,7 @@ export function formatThematicIndicatorValue(metric, value, language = "en") {
 
 export function getThematicIndicatorNote(metric, language = "en") {
   const zh = language === "zh";
+  if (metric.family === "scenario") return zh ? "固定制图区间" : "Fixed cartographic intervals";
   if (metric.family === "wgi") return zh ? "国家／经济体指标 · 0–100 分，越高越强" : "Country/economy score · 0–100, higher is stronger";
   if (metric.family === "wdi-population") {
     if (metric.unit === "persons") return zh ? "国家／经济体总人口 · M = 百万人" : "Country/economy total · M = million people";
