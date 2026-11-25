@@ -7,7 +7,7 @@ export function selectPoliticalIdTileBatch(tiles, size, needsTile) {
   return batch;
 }
 
-export function createPoliticalIdTileFeed(descriptors, peek, tileToken, signal) {
+export function createPoliticalIdTileFeed(descriptors, peek, tileToken, signal, isProducing) {
   const remaining = new Set(descriptors.map(tile => tile.key));
   const delivered = new Map();
   let wake;
@@ -26,6 +26,7 @@ export function createPoliticalIdTileFeed(descriptors, peek, tileToken, signal) 
         remaining.delete(key);
         return tile;
       }
+      if (!isProducing()) throw new DOMException("CPU coverage was evicted before upload.", "AbortError");
       await new Promise(resolve => { wake = resolve; });
     }
   }

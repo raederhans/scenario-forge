@@ -15,7 +15,7 @@ const packet = (entries = [entry()], geometryNamespace = "scene") => ({ entries,
 
 function harness(options = {}) {
   const workers = [], inputs = [];
-  const client = createPoliticalIdRasterWorkerClient({ isSupported: () => true, createWorker: () => {
+  const client = createPoliticalIdRasterWorkerClient({ workerCount: options.workerCount, isSupported: () => true, createWorker: () => {
     const worker = { messages: [], transfers: [], terminated: false,
       postMessage(message, transfer = []) {
         this.transfers.push(transfer.length);
@@ -61,6 +61,19 @@ test("resident upload transfers binary once; warm tiles and recolor send only re
     await h.client.clearGeometry();
     assert.equal(h.client.getStats().residentGeometryBytes, 0);
   } finally { h.client.dispose(); }
+});
+
+test("serial production in a new namespace releases all three old geometry working sets", async t => {
+  const h = harness({ workerCount: 3 });
+  t.after(() => h.client.dispose());
+  await Promise.all(["a", "b", "c"].map(id => h.client.request(packet([entry(id)], "old"))));
+  assert.equal(h.workers.length, 3);
+  assert.ok(h.workers.every(worker => worker.runtime.getGeometryStats().residentGeometryBytes > 0));
+  await h.client.request(packet([], "new"));
+  assert.deepEqual(h.workers.map(worker => worker.runtime.getGeometryStats().residentGeometryBytes), [0, 0, 0]);
+  assert.equal(h.client.getStats().residentGeometryBytes, 0);
+  await h.client.request(packet([entry("d")], "new"));
+  assert.equal(h.client.getStats().residentGeometryBytes, h.workers[0].runtime.getGeometryStats().residentGeometryBytes);
 });
 
 test("replacement, deletion, scene changes and crashed worker reupload correct geometry", async () => {

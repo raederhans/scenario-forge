@@ -195,7 +195,13 @@ export function createPoliticalIdRasterRuntimeOwner({
   let gpu = null, active = null, plan = null, disposed = false, failed = "";
   let gpuTiles = [];
   let renderedCoverage = null;
-  let epoch = 0, planKey = "", attempted = new Set();
+  let epoch = 0, planKey = "";
+  const attempts = new Map();
+  function needsAttempt(key) { return !attempts.has(key) || attempts.get(key) === "retry"; }
+  function allowRetry(key, cancelled = false) {
+    if (attempts.get(key) === "attempted") attempts.set(key, "retry");
+    else if (cancelled && attempts.get(key) === "retried") attempts.set(key, "cancelled");
+  }
   let navigationDemand = null, navigationProducing = false, navigationTask = null;
   let navigationUpload = null, navigationUploadAvailable = false;
   let navigationRevision = 0;
@@ -322,7 +328,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         + (assets?.memoryBytes || 0) + (presentation?.paletteSnapshotBytes || 0) + dependencyBytes,
       gpuTextures: graphics?.gpuTextureBytes || 0,
       workerSurfaces: (directPresentation ? 0 : graphics?.outputSurfaceBytesEstimate || 0) + (presentation?.retainedSurfaceBytes || 0)
-        + (active?.tasks.reduce((sum, { descriptor }) => sum + (descriptor.width + 2 * (gutter + Number(directPresentation)))
+        + (active?.tasks.reduce((sum, { descriptor, finished }) => finished ? sum : sum + (descriptor.width + 2 * (gutter + Number(directPresentation)))
           * (descriptor.height + 2 * (gutter + Number(directPresentation))) * 4, 0) || 0),
       workerGeometry: workerStats?.residentGeometryBytes ?? (active ? null : 0),
       decodeTransient: assets?.pendingBytes || 0,
@@ -399,7 +405,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (!ensureGpu() || (partial && !gpu.prepareFrame)) return false;
       const job = { key, gpu, controller: new AbortController(), status: "pending", handle: null };
       if (partial) {
-        job.feed = createPoliticalIdTileFeed(plan.tiles, cache.peek, gpuTileToken, job.controller.signal);
+        job.feed = createPoliticalIdTileFeed(plan.tiles, cache.peek, gpuTileToken, job.controller.signal, () => !!active);
       }
       gpuPreparation = job;
       if (typeof gpu.prepareFrame !== "function") {
@@ -439,6 +445,9 @@ export function createPoliticalIdRasterRuntimeOwner({
         if (gpuPreparation !== job || job.controller.signal.aborted) return;
         gpuPreparation = null;
         if (error?.name !== "AbortError") failProducer(error);
+        else if (job.feed && !active && job.key === gpuCandidateKey(false)) {
+          for (const { key } of plan.tiles) if (!cache.peek(key)) allowRetry(key);
+        }
         account(); e.requestRender("political-id-gpu-preparation-finished");
       });
       return true;
@@ -517,7 +526,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (snapshot.geometryRevision !== previousRevision) {
         epoch++; cancel();
         stats.geometryInvalidations += cache.invalidate(snapshot.dirtyBounds).length;
-        attempted.clear(); planKey = "";
+        attempts.clear(); planKey = "";
       }
       sourceVersion = identity.version; rawIdentity = raw;
       deferredForegroundOrder = false; foregroundSyncRequested = false;
@@ -529,7 +538,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     }
     if (sourcePreparation) return false;
     cancel(); // No obsolete producer can accept a tile while preparation waits.
-    attempted.clear();
+    attempts.clear();
     const controller = new AbortController();
     const task = { controller, raw, fitKey: nextFitKey, layoutKey: nextLayoutKey };
     sourcePreparation = task;
@@ -567,7 +576,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         epoch++; cancel();
         if (changedNamespace) cache.clear();
         else stats.geometryInvalidations += cache.invalidate(next.dirtyBounds).length;
-        attempted.clear(); planKey = "";
+        attempts.clear(); planKey = "";
       }
       coordinates = nextCoordinates; snapshot = next; sourceGeneration++; colorDeltas = [];
       codeToId = new Map(next.entries.map(entry => [entry.code, entry.id]));
@@ -655,7 +664,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         }
       }
       if (changedNamespace || next.geometryRevision !== snapshot?.geometryRevision) {
-        attempted.clear();
+        attempts.clear();
         planKey = "";
       }
       snapshot = next; sourceGeneration++; colorDeltas = [];
@@ -693,7 +702,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       }
     }
     const key = plan?.tiles.map(tile => tile.key).join("|") || "";
-    if (key !== planKey) { cancelGpuPreparation(); attempted = new Set(); planKey = key; }
+    if (key !== planKey) { cancelGpuPreparation(); attempts.clear(); planKey = key; }
     syncTileRecords();
     // Only the in-flight batch can finish for an obsolete view.
     return plan;
@@ -1095,7 +1104,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   function pump(probeCovered = false) {
     if (!usable() || sourcePreparation || active || !plan || !snapshot) return;
     const descriptors = selectPoliticalIdTileBatch(navigationProducing ? navigationTiles() : plan.tiles,
-      navigationProducing ? 1 : worker.workerCount || 1, tile => !cache.peek(tile.key) && !attempted.has(tile.key)
+      navigationProducing ? 1 : worker.workerCount || 1, tile => !cache.peek(tile.key) && needsAttempt(tile.key)
         && (!navigationProducing || !tileRecords.get(tile.key)?.gpuHandle));
     let existingTile = null;
     if (!descriptors.length && probeCovered && consecutiveAssetTimeouts >= 3 && coveredAssetProbes < 2
@@ -1111,8 +1120,14 @@ export function createPoliticalIdRasterRuntimeOwner({
     active = batch;
     account();
     batch.promise = Promise.all(tasks.map(task => produceTile(task, batch).catch(error => {
+      task.finished = true;
       if (controller.signal.aborted) return;
-      if (error?.name === "AbortError") { stats.staleResults++; return; }
+      if (error?.name === "AbortError") {
+        stats.staleResults++;
+        if (epoch === task.epoch && demandedTileKeys.has(task.descriptor.key)) allowRetry(task.descriptor.key, true);
+        account();
+        return;
+      }
       failProducer(error);
       e.requestRender("political-id-raster-producer-fallback");
     }))).finally(() => {
@@ -1139,7 +1154,7 @@ export function createPoliticalIdRasterRuntimeOwner({
 
   async function produceTile(task, batch) {
     const { controller, descriptor } = task;
-    attempted.add(descriptor.key);
+    attempts.set(descriptor.key, attempts.has(descriptor.key) ? "retried" : "attempted");
     if (tileEventsEnabled) {
       task.tileEventId = ++nextTileEventId;
       tileEvents.set(task.tileEventId, { id: task.tileEventId, ...descriptor, namespace, epoch,
@@ -1165,6 +1180,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       idToCode: new Map(entries.map(entry => [entry.id, entry.code])),
     };
     const { tile, built, identity, reused } = await resolveTile(packet, task, maps, batch);
+    task.finished = true;
     if (task.navigation || navigationProducing) await new Promise(resolve => setTimeout(resolve, 0));
     if (disposed || controller.signal.aborted || reused) return;
     // Re-read live geometry identity before accepting asynchronous data. Color
@@ -1293,9 +1309,11 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (tiles.some(tile => !tile)) {
         // Actual edge coverage can exceed the CPU budget even when the pixel
         // plan fits. Exhausted coverage must not remain permanently preparing.
-        const exhausted = !active && plan.tiles.every(tile => cache.peek(tile.key) || attempted.has(tile.key));
+        const exhausted = !active && plan.tiles.every(tile => cache.peek(tile.key) || !needsAttempt(tile.key));
         stats.fallbacks++; displayState = exhausted ? "fallback" : "preparing";
-        reason = exhausted ? "cpu-budget" : "awaiting-coverage";
+        reason = "awaiting-coverage";
+        if (exhausted) reason = plan.tiles.some(tile => !cache.peek(tile.key) && attempts.get(tile.key) === "cancelled")
+          ? "tile-cancelled" : "cpu-budget";
         if (!exhausted) { pump(); prepareGpuFrame(); }
         return retainPublishedFrame();
       }
@@ -1767,6 +1785,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         tileEventsEnabled = enabled;
         if (!enabled) { tileEvents.clear(); tileEventIds = new WeakMap(); }
       }
+      const workerStats = worker.getStats?.();
       return { displayMode, persistent, directPresentation, ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
       stageTimingsEnabled, stageTimings: structuredClone(stageTimings), snapshotBuilds, tileRecordUpdates,
       compression: cache.getCompressionStats(),
@@ -1775,7 +1794,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         storageRect: { ...record.storageRect }, worldRect: { ...record.worldRect } })),
       cpuTransient: cache.getTransientStats(),
       tileEventsEnabled, tileEventLimit: TILE_EVENT_LIMIT, tileEvents: [...tileEvents.values()].map(event => ({ ...event })),
-      worker: worker.getStats?.() || null,
+      worker: workerStats || null,
       pending: Number(!!active) + Number(!!sourcePreparation) + Number(gpuPreparation?.status === "pending")
         + Number(!!navigationTask) + Number(!!navigationUpload),
       gpuPreparation: { ...gpuPreparationStats, pending: gpuPreparation?.status === "pending", ready: gpuPreparation?.status === "ready" },
@@ -1802,7 +1821,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         state: consecutiveAssetTimeouts < 3 ? "ready" : active?.tasks.some(task => task.assetProbe) ? "probing" : "cooldown",
         scheduled: assetRecoveryTimer !== null, coveredProbes: coveredAssetProbes,
         retryInMs: Math.max(0, nextAssetProbeAt - performance.now()) },
-      pathCacheEstimatedBytes, canonicalCoordinates: !!coordinates, gutter,
+      pathCacheEstimatedBytes: workerStats?.pathBytes ?? pathCacheEstimatedBytes, canonicalCoordinates: !!coordinates, gutter,
       accounting: "typed-array-texture-and-surface-estimates-excludes-JS-and-driver" };
     },
     loseContextForValidation: () => gpu?.loseContextForValidation(),

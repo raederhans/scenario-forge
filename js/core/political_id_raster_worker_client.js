@@ -40,6 +40,7 @@ export function createPoliticalIdRasterWorkerClient({
   const capacity = taskClient ? 1 : Math.max(1, Math.floor(workerCount));
   const slots = [createWorkerSlot(taskClient || makeTaskClient(), lifetime)];
   const client = slots[0].client;
+  let poolNamespace = null;
 
   function available() {
     return !disposed && !!isSupported();
@@ -56,9 +57,28 @@ export function createPoliticalIdRasterWorkerClient({
       slot = createWorkerSlot(makeTaskClient(), lifetime);
       slots.push(slot);
     }
+    const cleanup = [];
+    if (packet.geometryNamespace != null && poolNamespace !== packet.geometryNamespace) {
+      poolNamespace = packet.geometryNamespace;
+      for (const peer of slots) {
+        if (peer !== slot && !peer.pending && peer.namespace !== poolNamespace && peer.namespace != null) {
+          cleanup.push(peer.clearGeometry());
+        }
+      }
+    }
     slot.pending++;
-    try { return await slot.request(packet, requestSignal); }
-    finally { slot.pending--; }
+    try {
+      const result = slot.request(packet, requestSignal);
+      if (!cleanup.length) return await result;
+      const [tile] = await Promise.all([result, ...cleanup]);
+      return tile;
+    }
+    finally {
+      slot.pending--;
+      if (!disposed && !slot.pending && slot.namespace != null && slot.namespace !== poolNamespace) {
+        await slot.clearGeometry();
+      }
+    }
   }
 
   function prepare() {
@@ -221,5 +241,6 @@ function createWorkerSlot(client, lifetime) {
     resident.clear(); geometryWorker = null; geometryNamespace = null;
     geometryStats.residentGeometryBytes = 0; geometryStats.pathBytes = 0;
   }
-  return { client, request, releaseGeometry, clearGeometry, dispose, geometryStats, pending: 0 };
+  return { client, request, releaseGeometry, clearGeometry, dispose, geometryStats, pending: 0,
+    get namespace() { return geometryNamespace; } };
 }

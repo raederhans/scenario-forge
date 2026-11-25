@@ -505,20 +505,110 @@ test("exact tiles upload out of order during CPU production and publish together
   assert.equal(gpu.getStats().tileUploads - uploads, frame.plan.tiles.length);
 });
 
-test("one cancelled batch member leaves its siblings eligible for CPU admission", async t => {
-  const f = fixture({ width: 1000, height: 100, workerCount: 3 });
+test("upload eviction after production releases the candidate and the same plan can publish", async t => {
+  const cache = createPoliticalIdRasterCache({ maxBytes: 3_300_000 });
+  const release = cache.reserveTransient(200_000);
+  const f = fixture({ width: 1000, height: 100, cache, workerCount: 3, directPresentation: true,
+    autoPublish: false, createGpu: measuredGpu });
+  t.after(() => f.owner.dispose());
+  const gates = [];
+  f.h.yieldGpuPreparation = () => new Promise(resolve => gates.push(resolve));
+  const batch = f.owner.prepareSource();
+  assert.equal(f.requests.length, 3);
+  const complete = request => {
+    const tile = makeTile(request.packet);
+    tile.codes = new Uint32Array(tile.width * tile.height);
+    if (request.packet.key !== f.requests[0].packet.key) {
+      for (let i = 1; i < tile.codes.length; i += 2) tile.codes[i] = 1;
+    }
+    request.resolve(tile);
+  };
+  f.requests.forEach(complete);
+  await batch;
+  const candidate = f.owner.prepareSource();
+  assert.ok(candidate instanceof Promise);
+  assert.equal(f.owner.getDiagnostics().tileCount, 3);
+  gates.shift()();
+  await tick();
+  assert.ok(f.owner.getDiagnostics().gpu.pendingTextureBytes > 0);
+  assert.equal(f.owner.getDiagnostics().tileCount, 2);
+  gates.shift()();
+  await tick();
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+  await candidate;
+  assert.equal(f.owner.getDiagnostics().gpu.pendingTextureBytes, 0);
+  assert.equal(f.owner.publishDirectFrame(), false);
+  release();
+  f.h.yieldGpuPreparation = tick;
+  const repair = f.owner.prepareSource();
+  assert.equal(f.requests.length, 4);
+  assert.equal(f.requests[3].packet.key, f.requests[1].packet.key);
+  complete(f.requests[3]);
+  await repair;
+  await f.owner.prepareSource();
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+});
+
+for (const abortAgain of [false, true]) test(`one cancelled tile gets a single same-view retry (second abort: ${abortAgain})`, async t => {
+  const f = fixture({ width: 1000, height: 100, workerCount: 3, directPresentation: true });
   t.after(() => f.owner.dispose());
   f.owner.draw();
   const [first, cancelled, last] = f.requests;
-  cancelled.reject(new DOMException("Superseded tile", "AbortError"));
+  const abort = new DOMException("Superseded tile", "AbortError");
+  cancelled.reject(abort);
   first.resolve(makeTile(first.packet));
   last.resolve(makeTile(last.packet));
   await tick();
   assert.equal(f.owner.getDiagnostics().staleResults, 1);
-  assert.equal(f.cache.peek(cancelled.packet.key), undefined);
   assert.ok(f.cache.peek(first.packet.key));
   assert.ok(f.cache.peek(last.packet.key));
-  assert.equal(f.owner.getDiagnostics().failed, "");
+  const retry = f.requests[3];
+  assert.equal(retry.packet.key, cancelled.packet.key);
+  if (abortAgain) retry.reject(abort);
+  else retry.resolve(makeTile(retry.packet));
+  await tick();
+  if (abortAgain) {
+    assert.equal(f.owner.draw(), null);
+    assert.equal(f.owner.getDiagnostics().reason, "tile-cancelled");
+  } else {
+    assert.ok(f.owner.draw().staged);
+    assert.ok(f.owner.getDirectFrame());
+  }
+  assert.equal(f.requests.length, 4);
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+});
+
+test("surface estimates follow the unfinished tiles in a batch", async t => {
+  let bytes;
+  const f = fixture({ width: 1000, height: 100, workerCount: 3, directPresentation: true,
+    resourceBudget: { update(_owner, values) { bytes = values.workerSurfaces; }, release() {} } });
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  const [first, second, third] = f.requests;
+  const canvasBytes = third.packet.width * third.packet.height * 4;
+  assert.equal(bytes, 3 * canvasBytes);
+  for (const [request, remaining] of [[first, 2], [second, 1], [third, 0]]) {
+    request.resolve(makeTile(request.packet));
+    await tick();
+    assert.equal(bytes, remaining * canvasBytes);
+  }
+});
+
+test("diagnostics report live pooled path bytes and retain the single-tile estimate for uninstrumented clients", async t => {
+  const f = fixture();
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  const request = f.requests[0], tile = makeTile(request.packet);
+  tile.stats = { pathCacheEstimatedBytes: 320 };
+  request.resolve(tile);
+  await tick();
+  assert.equal(f.owner.getDiagnostics().pathCacheEstimatedBytes, 320);
+  let pathBytes = 960;
+  f.client.getStats = () => ({ pathBytes });
+  assert.equal(f.owner.getDiagnostics().pathCacheEstimatedBytes, 960);
+  pathBytes = 0;
+  assert.equal(f.owner.getDiagnostics().pathCacheEstimatedBytes, 0);
 });
 
 test("replacing a partially uploaded plan releases its private textures while production is in flight", async t => {
