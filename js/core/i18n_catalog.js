@@ -3143,6 +3143,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "深度图例与来源",
     "en": "Depth legend and sources"
   },
+  "Derived from scenario state data and parcel area": {
+    "zh": "由剧本州数据与地块面积计算",
+    "en": "Derived from scenario state data and parcel area"
+  },
   "Desert & Bare": {
     "zh": "荒漠与裸地",
     "en": "Desert & Bare"
@@ -4647,6 +4651,14 @@ export const UI_COPY_CATALOG = Object.freeze({
   "HGO unavailable": {
     "zh": "HGO 不可用",
     "en": "HGO unavailable"
+  },
+  "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area": {
+    "zh": "HOI4 1936 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
+    "en": "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area"
+  },
+  "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area": {
+    "zh": "HOI4 1939 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
+    "en": "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area"
   },
   "HOI4 Library": {
     "zh": "HOI4 图标库",
@@ -9578,6 +9590,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "场景控件将被锁定，直到页面重新加载。",
     "en": "Scenario controls are locked until the page reloads."
   },
+  "Scenario cores × parcel area": {
+    "zh": "剧本核心归属 × 地块面积",
+    "en": "Scenario cores × parcel area"
+  },
   "Scenario countries mapped": {
     "zh": "场景国家已匹配",
     "en": "Scenario countries mapped"
@@ -9657,6 +9673,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Scenario overlays degraded": {
     "zh": "场景覆盖层已降级",
     "en": "Scenario overlays degraded"
+  },
+  "Scenario parcel geometry area (GHSL 2020 companion)": {
+    "zh": "剧本地块几何面积（GHSL 2020 配套）",
+    "en": "Scenario parcel geometry area (GHSL 2020 companion)"
   },
   "Scenario recovery failed": {
     "zh": "场景恢复失败",
@@ -11092,6 +11112,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "System status": {
     "zh": "系统状态",
     "en": "System status"
+  },
+  "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area": {
+    "zh": "TNO 1962 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
+    "en": "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area"
   },
   "Tag": {
     "zh": "标签",
@@ -13122,29 +13146,5 @@ export const UI_COPY_CATALOG = Object.freeze({
   "面积模式优先现代大国排序": {
     "zh": "面积模式优先现代大国排序",
     "en": "Prefer modern major-power order for area modes"
-  },
-  "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area": {
-    "zh": "HOI4 1936 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
-    "en": "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area"
-  },
-  "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area": {
-    "zh": "HOI4 1939 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
-    "en": "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area"
-  },
-  "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area": {
-    "zh": "TNO 1962 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
-    "en": "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area"
-  },
-  "Scenario parcel geometry area (GHSL 2020 companion)": {
-    "zh": "剧本地块几何面积（GHSL 2020 配套）",
-    "en": "Scenario parcel geometry area (GHSL 2020 companion)"
-  },
-  "Derived from scenario state data and parcel area": {
-    "zh": "由剧本州数据与地块面积计算",
-    "en": "Derived from scenario state data and parcel area"
-  },
-  "Scenario cores × parcel area": {
-    "zh": "剧本核心归属 × 地块面积",
-    "en": "Scenario cores × parcel area"
   }
 });
