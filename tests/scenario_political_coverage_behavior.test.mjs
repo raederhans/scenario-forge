@@ -41,7 +41,8 @@ for (const scenarioId of ["tno_1962", "hoi4_1936", "hoi4_1939"]) {
         }
         const details = selection.requiredChunks.filter((chunk) => !isScenarioPoliticalBaseChunk(chunk));
         assert.ok(details.length <= 1, "only detail consumes the count budget");
-        if (zoom >= 1.35) assert.equal(details.length, 1, "base must not consume the minimum detail allowance");
+        const expectedDetails = scenarioId === "tno_1962" && zoom >= 3 ? 1 : 0;
+        assert.equal(details.length, expectedDetails, "one detail slot is available once the layer admits detail");
         loadedChunkIds = selection.requiredChunks.map((chunk) => chunk.id);
       }
     }

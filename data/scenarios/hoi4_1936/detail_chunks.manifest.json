@@ -9,7 +9,7 @@
       "lod": "coarse",
       "url": "data/scenarios/hoi4_1936/chunks/political.coarse.r0c0.json",
       "min_zoom": 0.0,
-      "max_zoom": 1.35,
+      "max_zoom": 99.0,
       "bounds": [
         -180.0,
         -90.0,
@@ -92656,7 +92656,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.aat.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         44.98784987849879,
@@ -92698,7 +92698,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.abd.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         51.575915759157596,
@@ -92782,7 +92782,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.aby.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         45.0958509585096,
@@ -92818,7 +92818,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.aef.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         8.695886958869607,
@@ -93220,7 +93220,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.afa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         39.67419674196742,
@@ -93256,7 +93256,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.afg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         60.46800468004682,
@@ -93502,7 +93502,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ahi.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -3.097830978309787,
@@ -93550,7 +93550,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ajm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.4279542795428,
@@ -93586,7 +93586,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.alb.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         19.315993159931594,
@@ -93706,7 +93706,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.alg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -8.695886958869579,
@@ -94000,7 +94000,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.alk.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -179.14679146791468,
@@ -94066,7 +94066,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.alw.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         35.732157321573226,
@@ -94108,7 +94108,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.and.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         1.405814058140578,
@@ -94180,7 +94180,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ang.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         11.669516695166948,
@@ -94312,7 +94312,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.aof.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -17.53757537575376,
@@ -95074,7 +95074,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.arg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -73.56853568535685,
@@ -95308,7 +95308,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ast.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         112.92052920529204,
@@ -95410,7 +95410,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ata.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -150.0081000810008,
@@ -95458,7 +95458,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.aus.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         9.523895238952406,
@@ -95770,7 +95770,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bah.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         50.45990459904601,
@@ -95830,7 +95830,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bas.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         27.002070020700216,
@@ -95920,7 +95920,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bda.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         72.78012780127801,
@@ -95956,7 +95956,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bea.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         33.89253892538926,
@@ -96034,7 +96034,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bei.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         114.00054000540007,
@@ -96088,7 +96088,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bel.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         2.5398253982539813,
@@ -96316,7 +96316,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bgu.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -61.39681396813968,
@@ -96406,7 +96406,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bhm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -78.97218972189721,
@@ -96442,7 +96442,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bho.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -89.23589235892359,
@@ -96508,7 +96508,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bhu.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         88.73188731887319,
@@ -96658,7 +96658,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bhw.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         69.86254516622857,
@@ -96694,7 +96694,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.blr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         26.210062100621002,
@@ -96862,7 +96862,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bol.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -69.6660966609666,
@@ -96964,7 +96964,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bor.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         108.84168841688415,
@@ -97024,7 +97024,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bot.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         19.978399783997844,
@@ -97150,7 +97150,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bpl.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         77.17217172171723,
@@ -97186,7 +97186,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bra.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -74.01854018540185,
@@ -97468,7 +97468,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bsh.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         53.159931599315996,
@@ -98836,7 +98836,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bul.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         22.340023400234003,
@@ -99070,7 +99070,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bwa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         2.705427054270558,
@@ -99106,7 +99106,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.bya.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         98.63198631986319,
@@ -99604,7 +99604,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cab.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         12.007920079200801,
@@ -99640,7 +99640,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cam.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         102.30402304023039,
@@ -99814,7 +99814,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.can.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -139.05319053190533,
@@ -101488,7 +101488,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cay.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -54.59994599945999,
@@ -101524,7 +101524,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cde.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         114.14814148141483,
@@ -101578,7 +101578,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cdx.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         103.96003960039599,
@@ -101626,7 +101626,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cel.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         118.75978759787597,
@@ -101692,7 +101692,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cey.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         79.69219692196924,
@@ -101872,7 +101872,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.chb.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         88.73188731887319,
@@ -101908,7 +101908,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.che.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         44.48024480244803,
@@ -102280,7 +102280,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.chi.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         100.82800828008283,
@@ -106570,7 +106570,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.chl.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -109.45369453694536,
@@ -106708,7 +106708,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.chu.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         99.53199531995318,
@@ -107668,7 +107668,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cih.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         99.96399963999642,
@@ -107716,7 +107716,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.coc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         75.93241180471243,
@@ -107752,7 +107752,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.col.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -81.72261722617226,
@@ -107986,7 +107986,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cos.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -85.94545945459454,
@@ -108058,7 +108058,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cpv.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -25.360453604536048,
@@ -108220,7 +108220,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cqt.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         16.525965259652594,
@@ -108256,7 +108256,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.crm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         32.52092520925211,
@@ -108400,7 +108400,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.csz.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         104.28404284042841,
@@ -108454,7 +108454,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cub.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -84.87984879848798,
@@ -108490,7 +108490,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cvs.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         45.90945909459094,
@@ -108670,7 +108670,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cyp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         32.27612276122761,
@@ -108706,7 +108706,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cys.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         106.12006120061204,
@@ -108766,7 +108766,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cze.part.0.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         12.079920799207997,
@@ -109582,7 +109582,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.cze.part.1.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         16.835568355683563,
@@ -110398,7 +110398,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dag.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         45.1030510305103,
@@ -111172,7 +111172,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dee.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         98.19998199982001,
@@ -111208,7 +111208,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.den.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         8.119881198811981,
@@ -111316,7 +111316,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dji.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         41.747817478174795,
@@ -111382,7 +111382,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dmc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         111.08811088110883,
@@ -111418,7 +111418,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dnz.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         18.29,
@@ -111478,7 +111478,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dod.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         26.260462604626042,
@@ -111520,7 +111520,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dom.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -72.00972009720097,
@@ -111742,7 +111742,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.dub.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.03195031950321,
@@ -111778,7 +111778,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ecu.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -91.66951669516695,
@@ -111952,7 +111952,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.egy.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         24.680046800468006,
@@ -112258,7 +112258,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ehc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         116.27216272162724,
@@ -112444,7 +112444,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.els.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -90.09990099900999,
@@ -112558,7 +112558,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.eng.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -8.155881558815594,
@@ -115246,7 +115246,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.eri.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         36.42336423364233,
@@ -115312,7 +115312,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.est.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         21.872018720187214,
@@ -115396,7 +115396,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.eth.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         32.9889298892989,
@@ -115486,7 +115486,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.fcm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         9.333093330933309,
@@ -115570,7 +115570,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.fin.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         19.53199531995321,
@@ -116044,7 +116044,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.flk.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -79.98379983799838,
@@ -116110,7 +116110,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.fnd.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         75.51615516155164,
@@ -116164,7 +116164,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.fra.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -4.807848078480788,
@@ -118276,7 +118276,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.fro.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -7.435874358743575,
@@ -118312,7 +118312,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.fuj.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.96795967959682,
@@ -118348,7 +118348,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gam.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -16.752767527675275,
@@ -118384,7 +118384,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gdl.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -61.80001800018,
@@ -118420,7 +118420,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gem.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         98.81198811988122,
@@ -118456,7 +118456,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ger.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         5.851858518585203,
@@ -122074,7 +122074,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ggy.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -2.64782647826479,
@@ -122110,7 +122110,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gld.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -3.2598325983259713,
@@ -122182,7 +122182,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.glg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         96.93996939969401,
@@ -122248,7 +122248,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gma.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         92.79992799927999,
@@ -122416,7 +122416,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gmp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -16.828368283682835,
@@ -122476,7 +122476,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gnh.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -2.9322293222932103,
@@ -122530,7 +122530,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.goa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         70.87210872108722,
@@ -122590,7 +122590,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gre.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         19.625596255962563,
@@ -123178,7 +123178,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.grn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -72.81612816128161,
@@ -123214,7 +123214,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gsg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         102.88002880028802,
@@ -123256,7 +123256,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gua.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -92.24552245522455,
@@ -123418,7 +123418,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gwa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         75.12015120151202,
@@ -123466,7 +123466,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.gxc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         104.8240482404824,
@@ -123820,7 +123820,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hai.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -74.49014490144901,
@@ -123910,7 +123910,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.haw.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -178.3331833318333,
@@ -123970,7 +123970,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hbc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         113.4281342813428,
@@ -124618,7 +124618,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hdm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         46.355863558635605,
@@ -124654,7 +124654,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hkg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         113.83853838538386,
@@ -124792,7 +124792,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hnn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         108.78408784087844,
@@ -125236,7 +125236,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hol.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         3.3678336783367797,
@@ -125452,7 +125452,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hon.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -89.3618936189362,
@@ -125590,7 +125590,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hrd.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         73.24813248132483,
@@ -125626,7 +125626,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hsl.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -13.300333003330024,
@@ -125674,7 +125674,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hty.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         35.76815768157681,
@@ -125716,7 +125716,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hun.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         16.11196111961121,
@@ -125968,7 +125968,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.hyd.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         74.61614616146161,
@@ -126088,7 +126088,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ica.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         74.04014040140402,
@@ -126160,7 +126160,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ice.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -24.320043200431996,
@@ -126202,7 +126202,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ida.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         74.50330890481487,
@@ -126238,7 +126238,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.iea.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         80.23580235802359,
@@ -126298,7 +126298,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ifa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         71.16011160111603,
@@ -126334,7 +126334,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ifn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -10.477269046792706,
@@ -126376,7 +126376,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.iha.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         75.80415804158042,
@@ -126436,7 +126436,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ika.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         90.89190891908919,
@@ -126472,7 +126472,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.imo.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.1759517595176,
@@ -126514,7 +126514,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.inr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         75.44415444154441,
@@ -126550,7 +126550,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ins.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         105.10125101251015,
@@ -126610,7 +126610,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.iom.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -4.771847718477176,
@@ -126646,7 +126646,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ipa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         74.25614256142563,
@@ -126688,7 +126688,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ira.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         69.50409504095043,
@@ -126826,7 +126826,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ire.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -10.387903879038788,
@@ -126934,7 +126934,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.irq.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         38.79218792187922,
@@ -127252,7 +127252,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ita.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         6.643866438664389,
@@ -128182,7 +128182,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.iwa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         68.9280892808928,
@@ -128242,7 +128242,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.jam.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -78.32418324183242,
@@ -128278,7 +128278,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.jap.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         123.65583655836559,
@@ -128782,7 +128782,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.jeb.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         36.344163441634436,
@@ -128818,7 +128818,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.jey.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -2.2518225182251683,
@@ -128854,7 +128854,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.joh.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         102.48402484024842,
@@ -128890,7 +128890,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.jor.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         34.94014940149401,
@@ -129100,7 +129100,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kal.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         41.63621636216362,
@@ -129214,7 +129214,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kas.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         73.39213392133922,
@@ -129382,7 +129382,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kaz.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         46.49986499865,
@@ -129610,7 +129610,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kba.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         42.39582395823959,
@@ -129664,7 +129664,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ked.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         99.63999639996399,
@@ -129700,7 +129700,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kel.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         101.36801368013681,
@@ -129736,7 +129736,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.khm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         76.20016200162001,
@@ -129820,7 +129820,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.khp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         73.68013680136804,
@@ -129856,7 +129856,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kiv.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         24.44964449644496,
@@ -129904,7 +129904,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kkp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.96795967959682,
@@ -129982,7 +129982,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kla.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         61.51372067882983,
@@ -130030,7 +130030,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kom.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         45.39825398253984,
@@ -130180,7 +130180,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kor.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         124.30384303843039,
@@ -130378,7 +130378,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kpu.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         68.4,
@@ -130414,7 +130414,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.krf.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         141.81081810818108,
@@ -130612,7 +130612,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.krl.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         29.30969309693097,
@@ -130900,7 +130900,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.krn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         96.8319683196832,
@@ -130936,7 +130936,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ktg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         21.75321753217534,
@@ -130972,7 +130972,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kut.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         68.1720817208172,
@@ -131014,7 +131014,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kuw.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         46.53586535865358,
@@ -131080,7 +131080,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kwt.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         121.06381063810642,
@@ -131116,7 +131116,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kww.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         110.24080837224182,
@@ -131164,7 +131164,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.kyr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         69.21609216092162,
@@ -131242,7 +131242,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lao.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         100.10800108001081,
@@ -131374,7 +131374,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lat.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         20.97200972009722,
@@ -131548,7 +131548,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lba.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         9.307893078930789,
@@ -132196,7 +132196,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.leb.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         35.120151201512016,
@@ -132262,7 +132262,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lhj.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         43.5118351183512,
@@ -132298,7 +132298,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lib.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -11.475114751147515,
@@ -132418,7 +132418,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lie.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         9.487894878948794,
@@ -132514,7 +132514,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lit.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         20.97200972009722,
@@ -132622,7 +132622,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lol.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         102.73602736027362,
@@ -132670,7 +132670,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lsi.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         114.43254432544325,
@@ -132718,7 +132718,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lsp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         19.69039690396906,
@@ -132760,7 +132760,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.luq.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         114.76014760147604,
@@ -133456,7 +133456,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.lux.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         5.743857438574395,
@@ -133504,7 +133504,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mad.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         43.21663216632166,
@@ -133702,7 +133702,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mal.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         100.36000360003601,
@@ -133768,7 +133768,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.man.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         115.48015480154805,
@@ -135226,7 +135226,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mco.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         7.418992945642839,
@@ -135262,7 +135262,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mcu.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         113.46413464134645,
@@ -135298,7 +135298,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.men.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         111.37611376113762,
@@ -135442,7 +135442,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mex.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -118.39978399783998,
@@ -137314,7 +137314,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mha.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         50.1719017190172,
@@ -137350,7 +137350,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mld.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         73.46413464134642,
@@ -137386,7 +137386,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mlk.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         124.33624336243366,
@@ -137428,7 +137428,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mln.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         99.17199171991723,
@@ -137464,7 +137464,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mlt.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         14.1679416794168,
@@ -137506,7 +137506,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mnp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         92.94392943929438,
@@ -137584,7 +137584,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mon.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         87.75987759877597,
@@ -137782,7 +137782,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mor.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -10.177069990941703,
@@ -137884,7 +137884,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mrd.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         42.165421654216544,
@@ -138016,7 +138016,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mre.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         45.62505625056252,
@@ -138160,7 +138160,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mtq.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -61.22401224012239,
@@ -138196,7 +138196,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mul.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         100.18000180001803,
@@ -138232,7 +138232,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mur.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         57.29997299973002,
@@ -138274,7 +138274,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mys.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         74.61614616146161,
@@ -138346,7 +138346,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.mzb.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         30.21330213302133,
@@ -138448,7 +138448,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nbo.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         115.37215372153725,
@@ -138484,7 +138484,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ncm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         10.8,
@@ -138538,7 +138538,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nea.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         106.37206372063724,
@@ -138586,7 +138586,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nep.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         80.05580055800561,
@@ -138700,7 +138700,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nfl.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -67.81927819278192,
@@ -138778,7 +138778,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ngn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         140.97560975609758,
@@ -138886,7 +138886,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nic.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -87.68427684276843,
@@ -139018,7 +139018,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nni.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         2.72342723427235,
@@ -139186,7 +139186,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nor.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -9.091890918909172,
@@ -139420,7 +139420,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nos.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         43.364233642336444,
@@ -139564,7 +139564,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nrh.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         21.980019800198022,
@@ -139660,7 +139660,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ntr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         129.0018900189002,
@@ -139696,7 +139696,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nwa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         105.50805508055083,
@@ -139876,7 +139876,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nwt.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -136.83556835568356,
@@ -139918,7 +139918,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nys.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         32.664926649266505,
@@ -139966,7 +139966,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.nzl.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -176.85356853568535,
@@ -140098,7 +140098,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.oma.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         51.97191971919719,
@@ -140182,7 +140182,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pal.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         34.22014220142202,
@@ -140302,7 +140302,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pan.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -83.0510305103051,
@@ -140404,7 +140404,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pap.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         140.84960849608495,
@@ -140476,7 +140476,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.par.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -62.64962649626496,
@@ -140626,7 +140626,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pcz.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -80.08,
@@ -140668,7 +140668,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.per.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         44.0158401584016,
@@ -141136,7 +141136,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pgu.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -16.727567275672754,
@@ -141220,7 +141220,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.phi.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         116.95616956169562,
@@ -141946,7 +141946,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pls.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         100.10800108001081,
@@ -141982,7 +141982,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pol.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         15.787957879578812,
@@ -143980,7 +143980,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.por.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -9.487894878948794,
@@ -144148,7 +144148,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.prc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         102.2680226802268,
@@ -144286,7 +144286,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pru.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -81.33741337413373,
@@ -144472,7 +144472,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.pue.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -67.27207272072721,
@@ -144508,7 +144508,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.qat.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         50.7479074790748,
@@ -144580,7 +144580,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.qma.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         89.66789667896683,
@@ -144784,7 +144784,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.raj.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         44.411844118441195,
@@ -146554,7 +146554,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.rak.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.7519575195752,
@@ -146590,7 +146590,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.rcg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         12.209522095220962,
@@ -146638,7 +146638,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.rdo.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -17.0839708397084,
@@ -146674,7 +146674,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.re.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.2479524795248,
@@ -146710,7 +146710,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.rho.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         25.22005220052202,
@@ -146812,7 +146812,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.rmp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         78.82818828188283,
@@ -146848,7 +146848,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.rom.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         20.2520025200252,
@@ -147778,7 +147778,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ros.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -180.0,
@@ -147814,7 +147814,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.rua.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         28.859688596885974,
@@ -147976,7 +147976,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.saf.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         16.468364683646854,
@@ -148060,7 +148060,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sau.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         34.58014580145803,
@@ -148360,7 +148360,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.scm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         8.508685086850875,
@@ -148402,7 +148402,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sey.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.39195391953919,
@@ -148438,7 +148438,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sgn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         5.610656106561066,
@@ -148510,7 +148510,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sha.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         96.14796147961482,
@@ -148546,7 +148546,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.shj.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.319953199531994,
@@ -148582,7 +148582,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.shm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -12.043920439204385,
@@ -148618,7 +148618,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.shw.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         45.527855278552806,
@@ -148654,7 +148654,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.shx.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         105.1840518405184,
@@ -149278,7 +149278,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sia.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         97.3359733597336,
@@ -149770,7 +149770,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sic.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         97.3359733597336,
@@ -149878,7 +149878,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sie.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -13.285932859328597,
@@ -149914,7 +149914,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sik.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         73.46413464134642,
@@ -150436,7 +150436,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.skm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         88.01188011880117,
@@ -150490,7 +150490,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sml.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         42.70902709027092,
@@ -150550,7 +150550,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.smn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         12.385923859238602,
@@ -150640,7 +150640,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.smr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -12.583925839258399,
@@ -150754,7 +150754,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sni.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         2.67302673026731,
@@ -150880,7 +150880,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.som.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         40.98820988209883,
@@ -150988,7 +150988,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sov.part.0.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -180.0,
@@ -155932,7 +155932,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sov.part.1.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         35.5269552695527,
@@ -160918,7 +160918,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sov.part.2.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         43.29943299432995,
@@ -165904,7 +165904,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sov.part.3.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         76.14027234601369,
@@ -170878,7 +170878,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.spm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -56.39996399963999,
@@ -170914,7 +170914,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.spr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -9.271892718927177,
@@ -171268,7 +171268,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.srw.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         109.54009540095404,
@@ -171304,7 +171304,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ssh.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -17.011970119701203,
@@ -171346,7 +171346,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sth.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -14.419944199442,
@@ -171382,7 +171382,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.stn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         22.289622896228963,
@@ -171418,7 +171418,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.stp.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         6.471064710647113,
@@ -171460,7 +171460,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.str.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         100.18000180001803,
@@ -171544,7 +171544,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sub.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         120.19980199802,
@@ -171580,7 +171580,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sud.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         21.81081810818108,
@@ -171784,7 +171784,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sum.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         95.01035010350103,
@@ -171874,7 +171874,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.sur.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -58.06678066780667,
@@ -171970,7 +171970,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.swa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         11.716317163171652,
@@ -172084,7 +172084,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.swe.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         11.107911079110806,
@@ -172288,7 +172288,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.swi.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         5.959859598595983,
@@ -172474,7 +172474,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.swz.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         30.782107821078228,
@@ -172528,7 +172528,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.syr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         35.76815768157681,
@@ -172894,7 +172894,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tai.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         118.28818288182885,
@@ -173050,7 +173050,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.taj.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         67.3440734407344,
@@ -173110,7 +173110,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tan.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         88.79308793087932,
@@ -173554,7 +173554,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tat.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         47.23787237872381,
@@ -174574,7 +174574,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tga.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         102.37602376023762,
@@ -174610,7 +174610,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tgn.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         29.320493204932063,
@@ -174790,7 +174790,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tgr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -5.960694578016507,
@@ -174826,7 +174826,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tib.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         78.43218432184324,
@@ -175324,7 +175324,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tmr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         124.03024030240306,
@@ -175432,7 +175432,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tms.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         52.439924399244006,
@@ -175492,7 +175492,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tog.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -0.16740167401673034,
@@ -175552,7 +175552,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tpa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         91.14391143911439,
@@ -175630,7 +175630,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.trh.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         99.13599135991359,
@@ -175678,7 +175678,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tri.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -61.9080190801908,
@@ -175714,7 +175714,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tru.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.96795967959682,
@@ -175756,7 +175756,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tsc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         39.980199801998026,
@@ -176410,7 +176410,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tun.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         7.471874718747188,
@@ -176608,7 +176608,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tur.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         25.652056520565225,
@@ -177376,7 +177376,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.tvc.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         76.16416164161643,
@@ -177430,7 +177430,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.uaq.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         55.49995499955,
@@ -177466,7 +177466,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.udm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         51.1259112591126,
@@ -177628,7 +177628,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.uga.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         29.572495724957264,
@@ -177682,7 +177682,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ukr.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         22.124021240212414,
@@ -180094,7 +180094,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.urg.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -58.437584375843755,
@@ -180256,7 +180256,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.usa.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -124.76464764647646,
@@ -185254,7 +185254,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.uzb.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         60.03600036000361,
@@ -185362,7 +185362,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ven.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -73.39213392133921,
@@ -185554,7 +185554,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.vin.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         102.12402124021241,
@@ -185962,7 +185962,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.wng.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         129.72189721897217,
@@ -186004,7 +186004,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.wto.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -0.5,
@@ -186064,7 +186064,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.xsm.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         97.19197191971921,
@@ -186202,7 +186202,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.yak.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         105.50805508055083,
@@ -187918,7 +187918,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.yem.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         42.53982539825398,
@@ -188038,7 +188038,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.yog.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         110.00450004500044,
@@ -188074,7 +188074,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.ysh.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         89.41589415894163,
@@ -188140,7 +188140,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.yue.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         107.4880748807488,
@@ -188878,7 +188878,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.yug.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         13.69993699937001,
@@ -190066,7 +190066,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.yuk.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         -141.00081000810007,
@@ -190102,7 +190102,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.yun.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         97.55197551975522,
@@ -190858,7 +190858,7 @@
       "layer": "political",
       "lod": "detail",
       "url": "data/scenarios/hoi4_1936/chunks/political.detail.country.zan.json",
-      "min_zoom": 1.35,
+      "min_zoom": 99.0,
       "max_zoom": 99.0,
       "bounds": [
         39.17739177391775,
