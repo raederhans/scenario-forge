@@ -1,4 +1,5 @@
 import { resolveDataUrl } from "../data_base_url.js";
+import { UI_COPY_CATALOG } from "../i18n_catalog.js";
 
 const BASE_PATH = "data/thematic_layers/scenario/country_stats_v1/";
 export const SCENARIO_STATS_LAYER_ID = "scenario_country_stats_v1";
@@ -38,6 +39,29 @@ function matchesVersion(doc) {
   return doc?.schema_version === 1 && doc.layer_id === SCENARIO_STATS_LAYER_ID && doc.data_version === SCENARIO_STATS_VERSION;
 }
 
+function isPlainObject(value) {
+  if (value === null || typeof value !== "object") return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function validateDocument(doc, declaredMetrics) {
+  if (!isPlainObject(doc.metrics)
+    || !declaredMetrics.every((id) => Object.hasOwn(doc.metrics, id))
+    || !Object.values(doc.metrics).every((metric) => typeof metric?.available === "boolean")) {
+    throw new Error("Invalid scenario statistics metrics");
+  }
+  const ids = Object.keys(doc.metrics);
+  if (!isPlainObject(doc.countries) || !Object.values(doc.countries).every((row) => isPlainObject(row)
+    && ids.every((id) => row[id] === null || Number.isFinite(row[id])))) {
+    throw new Error("Invalid scenario statistics countries");
+  }
+  if (Object.hasOwn(doc, "non_political_tags") && !(Array.isArray(doc.non_political_tags)
+    && doc.non_political_tags.every((tag) => typeof tag === "string"))) {
+    throw new Error("Invalid scenario statistics non-political tags");
+  }
+}
+
 const documentsByFetcher = new WeakMap();
 export async function loadScenarioStatsDocument({ scenarioId, baselineHash, fetchJson = defaultFetchJson }) {
   if (!SCENARIO_STATS_IDS.includes(scenarioId)) throw new RangeError(`Unsupported scenario: ${scenarioId}`);
@@ -57,12 +81,28 @@ export async function loadScenarioStatsDocument({ scenarioId, baselineHash, fetc
       if (!matchesVersion(doc) || doc.scenario_id !== scenarioId || doc.baseline_hash !== entry.baseline_hash) {
         throw new Error("Invalid scenario statistics identity or baseline");
       }
+      validateDocument(doc, manifest.metric_ids);
       return doc;
     })();
     cache.set(key, request);
     request.catch(() => cache.delete(key));
   }
   return cache.get(key);
+}
+
+function scenarioSource(metricId, scenarioId) {
+  switch (metricId) {
+    case "scenario_land_area_km2": return "Scenario parcel geometry area (GHSL 2020 companion)";
+    case "scenario_core_share": return "Scenario cores × parcel area";
+    case "scenario_population_density":
+    case "scenario_factories_per_million":
+    case "scenario_military_factory_share": return "Derived from scenario state data and parcel area";
+    default: return `${scenarioId.toUpperCase().replace("_", " ")} state data · scenario start · split states apportioned by 2020 population or area`;
+  }
+}
+
+export function getScenarioStatsSource(data, language) {
+  return UI_COPY_CATALOG[data.source][language === "zh" ? "zh" : "en"];
 }
 
 export async function loadScenarioStatsData(options) {
@@ -73,7 +113,7 @@ export async function loadScenarioStatsData(options) {
   return {
     layerId: SCENARIO_STATS_LAYER_ID, dataVersion: SCENARIO_STATS_VERSION, metricId,
     supportedScenarios: [scenarioId], baselineHash: doc.baseline_hash, metrics: doc.metrics, countries: doc.countries,
-    year, source: `${scenarioId.split("_")[0].toUpperCase()} ${year} state data · scenario start`,
+    nonPoliticalTags: doc.non_political_tags ?? [], year, source: scenarioSource(metricId, scenarioId),
   };
 }
 

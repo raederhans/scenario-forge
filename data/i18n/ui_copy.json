@@ -13120,5 +13120,29 @@
   "Fixed cartographic intervals": {
     "en": "Fixed cartographic intervals",
     "zh": "固定制图区间"
+  },
+  "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area": {
+    "en": "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area",
+    "zh": "HOI4 1936 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+  },
+  "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area": {
+    "en": "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area",
+    "zh": "HOI4 1939 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+  },
+  "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area": {
+    "en": "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area",
+    "zh": "TNO 1962 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+  },
+  "Scenario parcel geometry area (GHSL 2020 companion)": {
+    "en": "Scenario parcel geometry area (GHSL 2020 companion)",
+    "zh": "剧本地块几何面积（GHSL 2020 配套）"
+  },
+  "Derived from scenario state data and parcel area": {
+    "en": "Derived from scenario state data and parcel area",
+    "zh": "由剧本州数据与地块面积计算"
+  },
+  "Scenario cores × parcel area": {
+    "en": "Scenario cores × parcel area",
+    "zh": "剧本核心归属 × 地块面积"
   }
 }

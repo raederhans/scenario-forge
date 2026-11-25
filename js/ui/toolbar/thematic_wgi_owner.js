@@ -108,11 +108,12 @@ export function createThematicWgiOwner({
 
   const render = () => {
     const view = getViewModel(runtimeState);
-    const metricSupported = !!getThematicIndicator(view.metricId);
+    const historical = SCENARIO_STATS_IDS.includes(runtimeState.activeScenarioId);
+    const selected = getThematicIndicator(view.metricId);
+    const metricSupported = selected && (historical || selected.family !== "scenario");
     const select = nodes.thematicWgiMetric;
     if (select) {
       const scenarioId = runtimeState.activeScenarioId;
-      const historical = SCENARIO_STATS_IDS.includes(scenarioId);
       const baselineHash = runtimeState.scenarioBaselineHash;
       const key = historical ? JSON.stringify([scenarioId, baselineHash]) : "";
       if (key !== scenarioOptionsKey) {
@@ -123,14 +124,16 @@ export function createThematicWgiOwner({
             scenarioMetrics = doc.metrics;
             render();
           }
-        }, () => {});
+        }, () => {
+          if (key === scenarioOptionsKey) scenarioOptionsKey = undefined;
+        });
       }
       const data = runtimeState.thematicWgiRuntime?.data;
       const metrics = data?.metrics && data.supportedScenarios.includes(scenarioId)
         && (!baselineHash || data.baselineHash === baselineHash) ? data.metrics : scenarioMetrics;
       const options = THEMATIC_INDICATORS.filter((metric) => historical || metric.family !== "scenario").map((metric) => {
         const native = metric.family === "scenario";
-        const disabled = native && metrics?.[metric.id]?.available === false;
+        const disabled = native && (metrics ? metrics[metric.id]?.available !== true : metric.id !== view.metricId);
         const label = native && runtimeState.currentLanguage === "zh" ? metric.labelZh : text(metric.labelEn);
         const group = historical ? text(native ? "Scenario data (start)" : "Modern reference (2023/2024)") : "";
         return { value: metric.id, label: disabled ? `${label} (${text("Unavailable")})` : label, disabled, group };

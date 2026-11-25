@@ -4,7 +4,7 @@ import {
   resolveThematicWgiJoinKey, getThematicWgiObservation,
 } from "./thematic_wgi_data.js";
 import { getThematicIndicator, getThematicIndicatorNote } from "./thematic_indicator_catalog.js";
-import { getScenarioStatsObservation, SCENARIO_STATS_IDS } from "./thematic_scenario_stats_data.js";
+import { getScenarioStatsObservation, getScenarioStatsSource, SCENARIO_STATS_IDS } from "./thematic_scenario_stats_data.js";
 import { getMapDataBoundary } from "../map_data_boundary.js";
 import { getObjectIdentityToken } from "../renderer/object_identity.js";
 
@@ -136,7 +136,8 @@ export function getThematicWgiLegend(state) {
   return {
     title: `${zh ? metric.labelZh : metric.labelEn} · ${metric.year ?? state.thematicWgiRuntime.data.year}`,
     note: getThematicIndicatorNote(metric, state.currentLanguage),
-    source: metric.attribution ?? state.thematicWgiRuntime.data.source,
+    source: metric.family === "scenario" ? getScenarioStatsSource(state.thematicWgiRuntime.data, state.currentLanguage)
+      : metric.attribution ?? state.thematicWgiRuntime.data.source,
     binCount: metric.colors.length,
     referenceNote: getThematicReferenceNote(state),
     entries: [
@@ -164,6 +165,7 @@ function getCoverage(state) {
     const reference = getMapDataBoundary(state).reference;
     for (const id of Object.keys(reference.getScenarioAssignments())) {
       const tag = reference.getScenarioGroupCode(id);
+      if (payload.nonPoliticalTags.includes(tag)) continue;
       groups[getScenarioStatsObservation(payload, tag).status].add(tag);
     }
   } else {

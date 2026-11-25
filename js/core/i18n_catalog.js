@@ -13122,5 +13122,29 @@ export const UI_COPY_CATALOG = Object.freeze({
   "面积模式优先现代大国排序": {
     "zh": "面积模式优先现代大国排序",
     "en": "Prefer modern major-power order for area modes"
+  },
+  "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area": {
+    "zh": "HOI4 1936 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
+    "en": "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area"
+  },
+  "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area": {
+    "zh": "HOI4 1939 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
+    "en": "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area"
+  },
+  "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area": {
+    "zh": "TNO 1962 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分",
+    "en": "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area"
+  },
+  "Scenario parcel geometry area (GHSL 2020 companion)": {
+    "zh": "剧本地块几何面积（GHSL 2020 配套）",
+    "en": "Scenario parcel geometry area (GHSL 2020 companion)"
+  },
+  "Derived from scenario state data and parcel area": {
+    "zh": "由剧本州数据与地块面积计算",
+    "en": "Derived from scenario state data and parcel area"
+  },
+  "Scenario cores × parcel area": {
+    "zh": "剧本核心归属 × 地块面积",
+    "en": "Scenario cores × parcel area"
   }
 });
