@@ -1,0 +1,301 @@
+{
+  "scenarios": {
+    "hoi4_1936": {
+      "metrics": {
+        "manpower": {
+          "source_total": 2075053129.0,
+          "allocated_total": 2075053129.0,
+          "unallocated_total": 0
+        },
+        "factories_total": {
+          "source_total": 1121.0,
+          "allocated_total": 1121.0,
+          "unallocated_total": 0
+        },
+        "civilian_factories": {
+          "source_total": 804.0,
+          "allocated_total": 804.0,
+          "unallocated_total": 0
+        },
+        "military_factories": {
+          "source_total": 317.0,
+          "allocated_total": 317.0,
+          "unallocated_total": 0
+        },
+        "steel": {
+          "source_total": 2591.0,
+          "allocated_total": 2591.0,
+          "unallocated_total": 0
+        },
+        "oil": {
+          "source_total": 1209.0,
+          "allocated_total": 1209.0,
+          "unallocated_total": 0
+        },
+        "aluminium": {
+          "source_total": 1201.0,
+          "allocated_total": 1201.0,
+          "unallocated_total": 0
+        },
+        "rubber": {
+          "source_total": 1032.0,
+          "allocated_total": 1032.0,
+          "unallocated_total": 0
+        },
+        "tungsten": {
+          "source_total": 1346.0,
+          "allocated_total": 1346.0,
+          "unallocated_total": 0
+        },
+        "chromium": {
+          "source_total": 1345.0,
+          "allocated_total": 1345.0,
+          "unallocated_total": 0
+        },
+        "coal": {
+          "source_total": 1463.0,
+          "allocated_total": 1463.0,
+          "unallocated_total": 0
+        },
+        "resources_total": {
+          "source_total": 10187.0,
+          "allocated_total": 10187.0,
+          "unallocated_total": 0
+        },
+        "land_area_km2": {
+          "source_total": 133271220.32875004,
+          "allocated_total": 133271220.32875052,
+          "unallocated_total": 0
+        }
+      },
+      "unallocated_buckets": [],
+      "cross_country_buckets": 254,
+      "geometry_version": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326"
+    },
+    "hoi4_1939": {
+      "metrics": {
+        "manpower": {
+          "source_total": 2075053129.0,
+          "allocated_total": 2075053129.0,
+          "unallocated_total": 0
+        },
+        "factories_total": {
+          "source_total": 1293.0,
+          "allocated_total": 1293.0,
+          "unallocated_total": 0
+        },
+        "civilian_factories": {
+          "source_total": 909.0,
+          "allocated_total": 909.0,
+          "unallocated_total": 0
+        },
+        "military_factories": {
+          "source_total": 384.0,
+          "allocated_total": 384.0,
+          "unallocated_total": 0
+        },
+        "steel": {
+          "source_total": 2591.0,
+          "allocated_total": 2591.0,
+          "unallocated_total": 0
+        },
+        "oil": {
+          "source_total": 1209.0,
+          "allocated_total": 1209.0,
+          "unallocated_total": 0
+        },
+        "aluminium": {
+          "source_total": 1201.0,
+          "allocated_total": 1201.0,
+          "unallocated_total": 0
+        },
+        "rubber": {
+          "source_total": 1032.0,
+          "allocated_total": 1032.0,
+          "unallocated_total": 0
+        },
+        "tungsten": {
+          "source_total": 1346.0,
+          "allocated_total": 1346.0,
+          "unallocated_total": 0
+        },
+        "chromium": {
+          "source_total": 1345.0,
+          "allocated_total": 1345.0,
+          "unallocated_total": 0
+        },
+        "coal": {
+          "source_total": 1463.0,
+          "allocated_total": 1463.0,
+          "unallocated_total": 0
+        },
+        "resources_total": {
+          "source_total": 10187.0,
+          "allocated_total": 10187.0,
+          "unallocated_total": 0
+        },
+        "land_area_km2": {
+          "source_total": 133271220.32875004,
+          "allocated_total": 133271220.32875052,
+          "unallocated_total": 0
+        }
+      },
+      "unallocated_buckets": [],
+      "cross_country_buckets": 271,
+      "geometry_version": "9ff6743894a24b34f22d166dc5f9a6bb1d09ded3521cf3d3736a0ce201f51f5f"
+    },
+    "tno_1962": {
+      "metrics": {
+        "manpower": {
+          "source_total": 3110913022.0,
+          "allocated_total": 3109426077.0,
+          "unallocated_total": 1486945.0
+        },
+        "factories_total": {
+          "source_total": 0.0,
+          "allocated_total": 0.0,
+          "unallocated_total": 0.0
+        },
+        "civilian_factories": {
+          "source_total": 0.0,
+          "allocated_total": 0.0,
+          "unallocated_total": 0.0
+        },
+        "military_factories": {
+          "source_total": 0.0,
+          "allocated_total": 0.0,
+          "unallocated_total": 0.0
+        },
+        "steel": {
+          "source_total": 6236.0,
+          "allocated_total": 6236.0,
+          "unallocated_total": 0.0
+        },
+        "oil": {
+          "source_total": 4131.0,
+          "allocated_total": 4131.0,
+          "unallocated_total": 0.0
+        },
+        "aluminium": {
+          "source_total": 2391.0,
+          "allocated_total": 2391.0,
+          "unallocated_total": 0.0
+        },
+        "rubber": {
+          "source_total": 1435.0,
+          "allocated_total": 1435.0,
+          "unallocated_total": 0.0
+        },
+        "tungsten": {
+          "source_total": 1741.0,
+          "allocated_total": 1741.0,
+          "unallocated_total": 0.0
+        },
+        "chromium": {
+          "source_total": 1987.0,
+          "allocated_total": 1987.0,
+          "unallocated_total": 0.0
+        },
+        "coal": {
+          "source_total": 0.0,
+          "allocated_total": 0.0,
+          "unallocated_total": 0.0
+        },
+        "resources_total": {
+          "source_total": 17921.0,
+          "allocated_total": 17921.0,
+          "unallocated_total": 0.0
+        },
+        "land_area_km2": {
+          "source_total": 132479624.43667822,
+          "allocated_total": 132479624.43667842,
+          "unallocated_total": 0
+        }
+      },
+      "unallocated_buckets": [
+        {
+          "id": "pool:AAA",
+          "owner_tag": "AAA",
+          "manpower": 43.0
+        },
+        {
+          "id": "pool:AAB",
+          "owner_tag": "AAB",
+          "manpower": 1.0
+        },
+        {
+          "id": "pool:AAC",
+          "owner_tag": "AAC",
+          "manpower": 7.0
+        },
+        {
+          "id": "pool:AAG",
+          "owner_tag": "AAG",
+          "manpower": 9.0
+        },
+        {
+          "id": "pool:AAJ",
+          "owner_tag": "AAJ",
+          "manpower": 5.0
+        },
+        {
+          "id": "pool:AAN",
+          "owner_tag": "AAN",
+          "manpower": 13.0
+        },
+        {
+          "id": "pool:AAO",
+          "owner_tag": "AAO",
+          "manpower": 20.0
+        },
+        {
+          "id": "pool:ADN",
+          "owner_tag": "ADN",
+          "manpower": 14.0
+        },
+        {
+          "id": "pool:BRB",
+          "owner_tag": "BRB",
+          "manpower": 234547.0
+        },
+        {
+          "id": "pool:CME",
+          "owner_tag": "CME",
+          "manpower": 14.0
+        },
+        {
+          "id": "pool:FIJ",
+          "owner_tag": "FIJ",
+          "manpower": 180000.0
+        },
+        {
+          "id": "pool:FWI",
+          "owner_tag": "FWI",
+          "manpower": 598127.0
+        },
+        {
+          "id": "pool:PKT",
+          "owner_tag": "PKT",
+          "manpower": 14.0
+        },
+        {
+          "id": "pool:SKN",
+          "owner_tag": "SKN",
+          "manpower": 136145.0
+        },
+        {
+          "id": "pool:SVI",
+          "owner_tag": "SVI",
+          "manpower": 337882.0
+        },
+        {
+          "id": "pool:ZZZ",
+          "owner_tag": "ZZZ",
+          "manpower": 104.0
+        }
+      ],
+      "cross_country_buckets": 293,
+      "geometry_version": "2f15c4b5ac44871b5294f3dff9148963bb531df889808940a2c98fd4ee8a793d"
+    }
+  }
+}
