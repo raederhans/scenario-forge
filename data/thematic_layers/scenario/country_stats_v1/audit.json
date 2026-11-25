@@ -4,23 +4,23 @@
       "metrics": {
         "manpower": {
           "source_total": 2075053129.0,
-          "allocated_total": 2075053129.0,
-          "unallocated_total": 0
+          "allocated_total": 2074793829.0,
+          "unallocated_total": 259300.0
         },
         "factories_total": {
           "source_total": 1121.0,
           "allocated_total": 1121.0,
-          "unallocated_total": 0
+          "unallocated_total": 0.0
         },
         "civilian_factories": {
           "source_total": 804.0,
           "allocated_total": 804.0,
-          "unallocated_total": 0
+          "unallocated_total": 0.0
         },
         "military_factories": {
           "source_total": 317.0,
           "allocated_total": 317.0,
-          "unallocated_total": 0
+          "unallocated_total": 0.0
         },
         "steel": {
           "source_total": 2591.0,
@@ -63,36 +63,48 @@
           "unallocated_total": 0
         },
         "land_area_km2": {
-          "source_total": 133271220.32875004,
-          "allocated_total": 133271220.32875052,
+          "source_total": 145388019.49016732,
+          "allocated_total": 145388019.49016756,
           "unallocated_total": 0
         }
       },
-      "unallocated_buckets": [],
+      "unallocated_buckets": [
+        {
+          "id": "s281",
+          "owner_tag": "ENG",
+          "manpower": 79300.0
+        },
+        {
+          "id": "s636",
+          "owner_tag": "ENG",
+          "manpower": 180000.0
+        }
+      ],
       "cross_country_buckets": 254,
+      "unallocated_manpower_zero_population_weight": 259300.0,
       "geometry_version": "f212dc2bab9df88b7abd0bb23e83a70a9efca8cc62cf94764503b98bb2bf4326"
     },
     "hoi4_1939": {
       "metrics": {
         "manpower": {
           "source_total": 2075053129.0,
-          "allocated_total": 2075053129.0,
-          "unallocated_total": 0
+          "allocated_total": 2074793828.9999998,
+          "unallocated_total": 259300.0
         },
         "factories_total": {
           "source_total": 1293.0,
           "allocated_total": 1293.0,
-          "unallocated_total": 0
+          "unallocated_total": 0.0
         },
         "civilian_factories": {
           "source_total": 909.0,
           "allocated_total": 909.0,
-          "unallocated_total": 0
+          "unallocated_total": 0.0
         },
         "military_factories": {
           "source_total": 384.0,
           "allocated_total": 384.0,
-          "unallocated_total": 0
+          "unallocated_total": 0.0
         },
         "steel": {
           "source_total": 2591.0,
@@ -135,21 +147,33 @@
           "unallocated_total": 0
         },
         "land_area_km2": {
-          "source_total": 133271220.32875004,
-          "allocated_total": 133271220.32875052,
+          "source_total": 145388019.49016732,
+          "allocated_total": 145388019.49016756,
           "unallocated_total": 0
         }
       },
-      "unallocated_buckets": [],
+      "unallocated_buckets": [
+        {
+          "id": "s281",
+          "owner_tag": "ENG",
+          "manpower": 79300.0
+        },
+        {
+          "id": "s636",
+          "owner_tag": "ENG",
+          "manpower": 180000.0
+        }
+      ],
       "cross_country_buckets": 271,
+      "unallocated_manpower_zero_population_weight": 259300.0,
       "geometry_version": "9ff6743894a24b34f22d166dc5f9a6bb1d09ded3521cf3d3736a0ce201f51f5f"
     },
     "tno_1962": {
       "metrics": {
         "manpower": {
           "source_total": 3110913022.0,
-          "allocated_total": 3109426077.0,
-          "unallocated_total": 1486945.0
+          "allocated_total": 3099498089.0,
+          "unallocated_total": 11414933.0
         },
         "factories_total": {
           "source_total": 0.0,
@@ -207,8 +231,8 @@
           "unallocated_total": 0.0
         },
         "land_area_km2": {
-          "source_total": 132479624.43667822,
-          "allocated_total": 132479624.43667842,
+          "source_total": 144481734.31352428,
+          "allocated_total": 144481734.313524,
           "unallocated_total": 0
         }
       },
@@ -227,6 +251,11 @@
           "id": "pool:AAC",
           "owner_tag": "AAC",
           "manpower": 7.0
+        },
+        {
+          "id": "pool:AAF",
+          "owner_tag": "AAF",
+          "manpower": 152.0
         },
         {
           "id": "pool:AAG",
@@ -254,14 +283,44 @@
           "manpower": 14.0
         },
         {
+          "id": "pool:ALB",
+          "owner_tag": "ALB",
+          "manpower": 335393.0
+        },
+        {
+          "id": "pool:AQ",
+          "owner_tag": "AQ",
+          "manpower": 0.0
+        },
+        {
+          "id": "pool:ATL",
+          "owner_tag": "ATL",
+          "manpower": 0.0
+        },
+        {
           "id": "pool:BRB",
           "owner_tag": "BRB",
           "manpower": 234547.0
         },
         {
+          "id": "pool:BUL",
+          "owner_tag": "BUL",
+          "manpower": 413442.0
+        },
+        {
           "id": "pool:CME",
           "owner_tag": "CME",
           "manpower": 14.0
+        },
+        {
+          "id": "pool:CRO",
+          "owner_tag": "CRO",
+          "manpower": 791667.0
+        },
+        {
+          "id": "pool:EGY",
+          "owner_tag": "EGY",
+          "manpower": 1299968.0
         },
         {
           "id": "pool:FIJ",
@@ -274,9 +333,49 @@
           "manpower": 598127.0
         },
         {
+          "id": "pool:GRE",
+          "owner_tag": "GRE",
+          "manpower": 1372944.0
+        },
+        {
+          "id": "pool:IAL",
+          "owner_tag": "IAL",
+          "manpower": 0.0
+        },
+        {
+          "id": "pool:IBR",
+          "owner_tag": "IBR",
+          "manpower": 2016208.0
+        },
+        {
+          "id": "pool:IME",
+          "owner_tag": "IME",
+          "manpower": 204206.0
+        },
+        {
+          "id": "pool:ITA",
+          "owner_tag": "ITA",
+          "manpower": 2738312.0
+        },
+        {
+          "id": "pool:LBA",
+          "owner_tag": "LBA",
+          "manpower": 0.0
+        },
+        {
+          "id": "pool:LEB",
+          "owner_tag": "LEB",
+          "manpower": 0.0
+        },
+        {
           "id": "pool:PKT",
           "owner_tag": "PKT",
           "manpower": 14.0
+        },
+        {
+          "id": "pool:RFA",
+          "owner_tag": "RFA",
+          "manpower": 0.0
         },
         {
           "id": "pool:SKN",
@@ -284,9 +383,24 @@
           "manpower": 136145.0
         },
         {
+          "id": "pool:SNS",
+          "owner_tag": "SNS",
+          "manpower": 70236.0
+        },
+        {
           "id": "pool:SVI",
           "owner_tag": "SVI",
           "manpower": 337882.0
+        },
+        {
+          "id": "pool:TUN",
+          "owner_tag": "TUN",
+          "manpower": 0.0
+        },
+        {
+          "id": "pool:TUR",
+          "owner_tag": "TUR",
+          "manpower": 685460.0
         },
         {
           "id": "pool:ZZZ",
@@ -295,6 +409,7 @@
         }
       ],
       "cross_country_buckets": 293,
+      "unallocated_manpower_zero_population_weight": 9927988.0,
       "geometry_version": "2f15c4b5ac44871b5294f3dff9148963bb531df889808940a2c98fd4ee8a793d"
     }
   }

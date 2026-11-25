@@ -2,7 +2,7 @@
 import argparse
 import json
 from collections import Counter, defaultdict
-from math import isclose
+from math import isclose, isfinite
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parents[1] / "data"
@@ -32,20 +32,31 @@ def balance(source, allocated, unallocated):
     return {"source_total": source, "allocated_total": allocated, "unallocated_total": unallocated}
 
 
+def land_area(row):
+    size = row.get("land_area_km2")
+    if row.get("status") != "water_not_applicable" and size is not None and isfinite(size):
+        return size
+    return None
+
+
 def allocate(strategic, owners, features):
     buckets = strategic["buckets"]
     population = defaultdict(Counter)
     area = defaultdict(Counter)
     counts = defaultdict(Counter)
     source_area = defaultdict(Counter)
+    source_population = defaultdict(Counter)
     for fid, bid in strategic["bucket_by_feature"].items():
         tag = owners[fid]
         row = features.get(fid, {})
-        size = row.get("land_area_km2") or 0
+        size = land_area(row) or 0
+        people = row.get("population") or 0
+        source = buckets[bid]["owner_tag"]
         counts[bid][tag] += 1
-        population[bid][tag] += row.get("population") or 0
+        population[bid][tag] += people
         area[bid][tag] += size
-        source_area[buckets[bid]["owner_tag"]][tag] += size
+        source_area[source][tag] += size
+        source_population[source][tag] += people
 
     hosts = defaultdict(Counter)
     for point in strategic["victory_points"]:
@@ -56,24 +67,30 @@ def allocate(strategic, owners, features):
     totals = {tag: Counter() for tag in sorted(set(owners.values()))}
     missing = Counter()
     unallocated = []
+    unallocated_zero_population = 0
     shared = 0
     for bid, bucket in buckets.items():
         source = bucket["owner_tag"]
         if bid in counts:
             resource_weights = +area[bid] or counts[bid]
-            people_weights = +population[bid] or resource_weights
+            people_weights = +population[bid]
+        elif +hosts[bid]:
+            resource_weights = people_weights = +hosts[bid]
+        elif source in source_area:
+            resource_weights = +source_area[source] or ({source: 1} if source in totals else {})
+            people_weights = +source_population[source]
         else:
-            weights = +hosts[bid] or +source_area[source]
-            if not weights and source in totals:
-                weights = {source: 1}
-            resource_weights = people_weights = weights
+            resource_weights = people_weights = {source: 1} if source in totals else {}
         if not people_weights:
             unallocated.append({"id": bid, "owner_tag": source, "manpower": bucket["manpower"]})
-            missing.update({key: bucket[key] for key in ADDITIVE})
-            continue
+            if bid in counts or source in source_area:
+                unallocated_zero_population += bucket["manpower"]
         if len(people_weights.keys() | resource_weights.keys()) > 1:
             shared += 1
         for keys, weights in ((("manpower", *FACTORIES), people_weights), (RESOURCES, resource_weights)):
+            if not weights:
+                missing.update({key: bucket[key] for key in keys})
+                continue
             denominator = sum(weights.values())
             for tag, weight in weights.items():
                 for key in keys:
@@ -84,7 +101,8 @@ def allocate(strategic, owners, features):
     audit["resources_total"] = balance(sum(b[k] for b in buckets.values() for k in RESOURCES),
                                        sum(t[k] for t in totals.values() for k in RESOURCES),
                                        sum(missing[k] for k in RESOURCES))
-    return totals, {"metrics": audit, "unallocated_buckets": unallocated, "cross_country_buckets": shared}
+    return totals, {"metrics": audit, "unallocated_buckets": unallocated, "cross_country_buckets": shared,
+                    "unallocated_manpower_zero_population_weight": unallocated_zero_population}
 
 
 def ratio(numerator, denominator):
@@ -102,26 +120,28 @@ def build_scenario(scenario, geometry_version):
     features = ghsl["features"]
     totals, audit = allocate(strategic, owners, features)
     audit["geometry_version"] = geometry_version
-    holdings = defaultdict(list)
     land = Counter()
+    core_land = Counter()
+    political = set()
     source_land = 0
     for fid, tag in owners.items():
-        holdings[tag].append(fid)
         row = features.get(fid, {})
-        if row.get("status") in ("ok", "partial_coverage") and row.get("land_area_km2") is not None:
-            land[tag] += row["land_area_km2"]
-            source_land += row["land_area_km2"]
+        if fid in features and row["status"] not in ("water_not_applicable", "unestimated_scenario_land"):
+            political.add(tag)
+        size = land_area(row)
+        if size is not None:
+            land[tag] += size
+            source_land += size
+            if tag in cores.get(fid, []):
+                core_land[tag] += size
     audit["metrics"]["land_area_km2"] = balance(source_land, sum(land.values()), 0)
     unavailable = (*FACTORIES, "factories_per_million", "military_factory_share") if scenario == "tno_1962" else ()
     metrics = {f"scenario_{key}": {"unit": unit, "available": key not in unavailable}
                for key, unit in UNITS.items()}
     countries = {}
     for tag, t in totals.items():
-        fids = holdings[tag]
-        sizes = [features.get(fid, {}).get("land_area_km2") or 0 for fid in fids]
-        if not sum(sizes):
-            sizes = [1] * len(fids)
-        core_area = sum(size for fid, size in zip(fids, sizes) if tag in cores.get(fid, []))
+        if tag not in political:
+            continue
         values = {
             "population": round(t["manpower"]),
             "land_area_km2": round(land[tag], 1) if tag in land else None,
@@ -131,11 +151,15 @@ def build_scenario(scenario, geometry_version):
             "military_factory_share": ratio(100 * t["military_factories"], t["factories_total"]),
             "steel": round(t["steel"], 2), "oil": round(t["oil"], 2),
             "resources_total": round(sum(t[k] for k in RESOURCES), 2),
-            "core_share": ratio(100 * core_area, sum(sizes)),
+            "core_share": ratio(100 * core_land[tag], land[tag]),
         }
-        countries[tag] = {f"scenario_{k}": None if k in unavailable else v for k, v in values.items()}
+        for key in values:
+            if key in unavailable or (not t["manpower"] and key not in ("land_area_km2", "core_share")):
+                values[key] = None
+        countries[tag] = {f"scenario_{k}": v for k, v in values.items()}
     metadata = {"baseline_hash": read(root / "manifest.json")["baseline_hash"], "as_of_date": strategic["as_of_date"]}
-    return {**HEADER, "scenario_id": scenario, **metadata, "metrics": metrics, "countries": countries}, metadata, audit
+    return {**HEADER, "scenario_id": scenario, **metadata, "metrics": metrics,
+            "non_political_tags": sorted(totals.keys() - political), "countries": countries}, metadata, audit
 
 
 def main():
@@ -146,7 +170,7 @@ def main():
                 "metric_ids": [f"scenario_{key}" for key in UNITS],
                 "limitations": [
                     "州人口与工厂按现代人口空间分布拆分，资源按面积拆分。 State splits use 2020 population or land area.",
-                    "缺测地块可能低估国土面积。 Missing coverage can understate land area.",
+                    "缺少几何面积的地块可能低估国土面积。 Missing geometry areas can understate land area.",
                     "TNO 建筑体系缺少可比工厂数据。 Comparable TNO factory counts are unavailable.",
                 ]}
     outputs = {}

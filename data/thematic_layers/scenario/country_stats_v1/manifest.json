@@ -37,7 +37,7 @@
   ],
   "limitations": [
     "州人口与工厂按现代人口空间分布拆分，资源按面积拆分。 State splits use 2020 population or land area.",
-    "缺测地块可能低估国土面积。 Missing coverage can understate land area.",
+    "缺少几何面积的地块可能低估国土面积。 Missing geometry areas can understate land area.",
     "TNO 建筑体系缺少可比工厂数据。 Comparable TNO factory counts are unavailable."
   ]
 }
