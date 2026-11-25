@@ -8,6 +8,7 @@ import { createPoliticalIdRasterCoordinateSpace } from "./political_id_raster_co
 import { createPoliticalIdRasterIdentityBuilder } from "./political_id_raster_identity.js";
 import { createPoliticalIdRasterAssetStore, encodePoliticalIdRasterAsset } from "./political_id_raster_assets.js";
 import { queryPoliticalIdRasterCandidates } from "./political_id_raster_pick.js";
+import { selectPoliticalIdTileBatch, createPoliticalIdTileFeed } from "./political_id_raster_tile_batch.js";
 import { yieldToBackground } from "../background_yield.js";
 
 const GPU_LIMIT = 80 * 1024 * 1024;
@@ -37,7 +38,7 @@ function intersectsTile(bounds, tile, padding = 4) {
 /** Derived display and advisory picking. Canonical edits/export retain their owners. */
 export function createPoliticalIdRasterRuntimeOwner({
   state, surface, helpers: h, effects: e,
-  client = null, cache = createPoliticalIdRasterCache(),
+  client = null, workerCount, cache = createPoliticalIdRasterCache(),
   createGpu = createPoliticalIdRasterGpu, resourceBudget = null,
   createDisplayCache = createPoliticalIdRasterDisplayCache,
   assetStore = undefined,
@@ -81,7 +82,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     const record = tileRecords.get(key);
     if (record) record.uploadSubmittedAt = uploadSubmittedAt;
   }
-  const worker = client || createPoliticalIdRasterWorkerClient();
+  const worker = client || createPoliticalIdRasterWorkerClient({ workerCount });
   if (assetStore === undefined) assetStore = globalThis.indexedDB
     ? worker.assetStore || createPoliticalIdRasterAssetStore() : null;
   let coordinates = null, fittedProjectionKey = "", rawIdentity = null;
@@ -206,12 +207,12 @@ export function createPoliticalIdRasterRuntimeOwner({
     assetSavesDropped: 0, assetSaveTimeouts: 0, assetSaveErrors: 0,
     renderedCoverageScans: 0, renderedCoverageCacheHits: 0 };
 
-  function recordAssetFailure(error, operation, probe = false) {
+  function recordAssetFailure(error, operation, probe = false, task = null) {
     assetFailureKind = error.name === "TimeoutError" ? "timeout" : "error";
     assetFailureOperation = operation;
     assetError = String(error.message || error);
-    lastAssetFailure = { kind: assetFailureKind, operation, phase: active?.assetPhase || operation,
-      durationMs: performance.now() - (active?.assetOperationStartedAt || performance.now()) };
+    lastAssetFailure = { kind: assetFailureKind, operation, phase: task?.assetPhase || operation,
+      durationMs: performance.now() - (task?.assetOperationStartedAt || performance.now()) };
     if (assetFailureKind === "timeout") {
       assetTimeout = true;
       stats.assetTimeouts++;
@@ -321,8 +322,8 @@ export function createPoliticalIdRasterRuntimeOwner({
         + (assets?.memoryBytes || 0) + (presentation?.paletteSnapshotBytes || 0) + dependencyBytes,
       gpuTextures: graphics?.gpuTextureBytes || 0,
       workerSurfaces: (directPresentation ? 0 : graphics?.outputSurfaceBytesEstimate || 0) + (presentation?.retainedSurfaceBytes || 0)
-        + (active ? (active.descriptor.width + 2 * (gutter + Number(directPresentation)))
-          * (active.descriptor.height + 2 * (gutter + Number(directPresentation))) * 4 : 0),
+        + (active?.tasks.reduce((sum, { descriptor }) => sum + (descriptor.width + 2 * (gutter + Number(directPresentation)))
+          * (descriptor.height + 2 * (gutter + Number(directPresentation))) * 4, 0) || 0),
       workerGeometry: workerStats?.residentGeometryBytes ?? (active ? null : 0),
       decodeTransient: assets?.pendingBytes || 0,
       projectedPaths: workerStats?.pathBytes ?? pathCacheEstimatedBytes });
@@ -356,18 +357,21 @@ export function createPoliticalIdRasterRuntimeOwner({
     for (const key of tileRecords.keys()) dirtyTileKeys.add(key);
     gpuPreparationStats.cancelled++;
   }
-  function gpuCandidateKey() {
-    const tiles = plan?.tiles.map(descriptor => {
-      const tile = cache.peek(descriptor.key);
-      if (!tile) return 0;
-      if (!gpuTileTokens.has(tile)) gpuTileTokens.set(tile, ++nextGpuTileToken);
-      return gpuTileTokens.get(tile);
-    });
+  function gpuTileToken(tile) {
+    if (!tile) return 0;
+    if (!gpuTileTokens.has(tile)) gpuTileTokens.set(tile, ++nextGpuTileToken);
+    return gpuTileTokens.get(tile);
+  }
+  function gpuCandidateKey(includeTiles = true) {
+    const tiles = includeTiles ? plan?.tiles.map(descriptor => gpuTileToken(cache.peek(descriptor.key))) : null;
     return JSON.stringify([namespace, sourceVersion, epoch, state.dpr, fittedProjectionKey, sourceLayoutKey, planKey, tiles]);
+  }
+  function gpuTilesCurrent(job) {
+    return job.key === gpuCandidateKey(!job.feed) && (!job.feed || job.feed.current());
   }
   function gpuCandidateCurrent(job) {
     if (!usable() || sourcePreparation || gpuPreparation !== job || gpu !== job.gpu
-      || job.controller.signal.aborted || !gpu.isAvailable() || gpuCandidateKey() !== job.key
+      || job.controller.signal.aborted || !gpu.isAvailable() || !gpuTilesCurrent(job)
       || sourceLayoutKey !== layoutKey() || fittedProjectionKey !== JSON.stringify(projectionOptions())) return false;
     const current = h.getSourceIdentity();
     // Palette-only edits may arrive while textures prepare. Geometry keeps its
@@ -377,15 +381,26 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
   function prepareGpuFrame() {
     try {
-      if (!usable() || !directPresentation || navigationProducing || !plan || !snapshot || sourcePreparation || active) return false;
-      const key = gpuCandidateKey();
-      if (gpuAcceptedKey === key) { cancelGpuPreparation(); return false; }
-      if (gpuPreparation?.key === key) return gpuPreparation.status === "pending";
-      cancelGpuPreparation();
+      if (!usable() || !directPresentation || navigationProducing || !plan || !snapshot || sourcePreparation) {
+        if (gpuPreparation?.feed) cancelGpuPreparation();
+        return false;
+      }
       const tiles = plan.tiles.map(tile => cache.peek(tile.key));
-      if (tiles.some(tile => !tile)) return false;
-      if (!ensureGpu()) return false;
+      const partial = tiles.some(tile => !tile);
+      const key = gpuCandidateKey(!partial);
+      if (key === gpuAcceptedKey) { cancelGpuPreparation(); return false; }
+      if (partial && !active) { cancelGpuPreparation(); return false; }
+      if (gpuPreparation && gpuTilesCurrent(gpuPreparation)) {
+        gpuPreparation.feed?.notify();
+        return gpuPreparation.status === "pending";
+      }
+      cancelGpuPreparation();
+      if (partial && !tiles.some(Boolean)) return false;
+      if (!ensureGpu() || (partial && !gpu.prepareFrame)) return false;
       const job = { key, gpu, controller: new AbortController(), status: "pending", handle: null };
+      if (partial) {
+        job.feed = createPoliticalIdTileFeed(plan.tiles, cache.peek, gpuTileToken, job.controller.signal);
+      }
       gpuPreparation = job;
       if (typeof gpu.prepareFrame !== "function") {
         job.status = "fallback"; gpuPreparationStats.unsupportedFallbacks++;
@@ -394,7 +409,8 @@ export function createPoliticalIdRasterRuntimeOwner({
       }
       const startedAt = performance.now();
       gpuPreparationStats.started++; gpuPreparationStats.lastPath = "preparing";
-      job.promise = gpu.prepareFrame({ tiles, palette: snapshot.palette, signal: job.controller.signal,
+      job.promise = gpu.prepareFrame({ tiles: partial ? plan.tiles : tiles, takeTile: job.feed?.takeTile,
+        palette: snapshot.palette, signal: job.controller.signal,
         onTileUploadSubmitted: recordTileUpload,
         onTileTiming: (tile, ms, taskKind) => recordStage("upload", ms, taskKind, tileRecordKeys.get(tile)),
         isCurrent: () => gpuCandidateCurrent(job), onProgress: account,
@@ -407,6 +423,8 @@ export function createPoliticalIdRasterRuntimeOwner({
         }
         gpuPreparationStats.lastMs = performance.now() - startedAt;
         if (handle) {
+          job.key = gpuCandidateKey();
+          job.feed = null;
           job.handle = handle; job.status = "ready";
           for (const descriptor of plan.tiles) dirtyTileKeys.add(descriptor.key);
           gpuPreparationStats.lastPath = "asynchronous-ready";
@@ -675,10 +693,9 @@ export function createPoliticalIdRasterRuntimeOwner({
       }
     }
     const key = plan?.tiles.map(tile => tile.key).join("|") || "";
-    if (key !== planKey) { attempted = new Set(); planKey = key; }
+    if (key !== planKey) { cancelGpuPreparation(); attempted = new Set(); planKey = key; }
     syncTileRecords();
-    // An obsolete view can finish only its current tile. There is no old-view
-    // queue, and a return to that region can reuse the accepted geometry tile.
+    // Only the in-flight batch can finish for an obsolete view.
     return plan;
   }
 
@@ -996,13 +1013,13 @@ export function createPoliticalIdRasterRuntimeOwner({
         layout.paddedHeight, layout.offsetX, layout.offsetY, state.dpr]);
   }
 
-  async function resolveTile(packet, task, maps) {
+  async function lookupTile(packet, task, maps) {
+    task.controller.signal.throwIfAborted();
     const probe = consecutiveAssetTimeouts >= 3;
-    if (!assetStore || (probe && performance.now() < nextAssetProbeAt)) {
-      if (assetStore) stats.assetBypasses++;
-      return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true };
+    if (probe && performance.now() < nextAssetProbeAt) {
+      stats.assetBypasses++;
+      return {};
     }
-    // Both demand and bounded idle probes use the same serial pump.
     if (probe) { task.assetProbe = true; stats.assetProbes++; }
     let identity = null;
     try {
@@ -1057,29 +1074,72 @@ export function createPoliticalIdRasterRuntimeOwner({
         // Keep a real earlier error visible until a validated asset is admitted.
         consecutiveAssetTimeouts = 0; nextAssetProbeAt = 0; cancelAssetRecovery();
       } finally { stats.assetLookupMs += performance.now() - lookupStarted; }
-    } catch (error) { if (!task.controller.signal.aborted) recordAssetFailure(error, "load", probe); }
+    } catch (error) { if (!task.controller.signal.aborted) recordAssetFailure(error, "load", probe, task); }
     if (task.controller.signal.aborted) throw new DOMException('Aborted', 'AbortError');
     if (task.existingTile) return { tile: task.existingTile, reused: true };
-    return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true, identity };
+    return { identity };
+  }
+
+  async function resolveTile(packet, task, maps, batch) {
+    let asset;
+    if (assetStore) {
+      const lookup = batch.assetQueue.then(() => lookupTile(packet, task, maps));
+      batch.assetQueue = lookup.catch(() => {});
+      asset = await lookup;
+      if (asset.tile) return asset;
+    }
+    const tile = await worker.request(packet, { signal: task.controller.signal });
+    return { tile, built: true, identity: asset?.identity };
   }
 
   function pump(probeCovered = false) {
     if (!usable() || sourcePreparation || active || !plan || !snapshot) return;
-    let descriptor = (navigationProducing ? navigationTiles() : plan.tiles)
-      .find(tile => !cache.peek(tile.key) && !attempted.has(tile.key)
+    const descriptors = selectPoliticalIdTileBatch(navigationProducing ? navigationTiles() : plan.tiles,
+      navigationProducing ? 1 : worker.workerCount || 1, tile => !cache.peek(tile.key) && !attempted.has(tile.key)
         && (!navigationProducing || !tileRecords.get(tile.key)?.gpuHandle));
     let existingTile = null;
-    if (!descriptor && probeCovered && consecutiveAssetTimeouts >= 3 && coveredAssetProbes < 2
+    if (!descriptors.length && probeCovered && consecutiveAssetTimeouts >= 3 && coveredAssetProbes < 2
       && performance.now() >= nextAssetProbeAt) {
-      descriptor = plan.tiles.find(tile => cache.peek(tile.key));
-      if (descriptor) { existingTile = cache.peek(descriptor.key); coveredAssetProbes++; }
+      const descriptor = plan.tiles.find(tile => cache.peek(tile.key));
+      if (descriptor) { descriptors.push(descriptor); existingTile = cache.peek(descriptor.key); coveredAssetProbes++; }
     }
-    if (!descriptor) { scheduleCoveredAssetRecovery(); return; }
-    // Abort the physical IDB transaction before a new producer dispatches I/O.
+    if (!descriptors.length) { scheduleCoveredAssetRecovery(); return; }
     cancelAssetSave(); assetPublishedViewKey = "";
-    attempted.add(descriptor.key);
     const controller = new AbortController();
-    const task = { controller, epoch, descriptor, existingTile, navigation: navigationProducing };
+    const tasks = descriptors.map(descriptor => ({ controller, epoch, descriptor, existingTile, navigation: navigationProducing }));
+    const batch = { tasks, controller, navigation: navigationProducing, assetQueue: Promise.resolve() };
+    active = batch;
+    account();
+    batch.promise = Promise.all(tasks.map(task => produceTile(task, batch).catch(error => {
+      if (controller.signal.aborted) return;
+      if (error?.name === "AbortError") { stats.staleResults++; return; }
+      failProducer(error);
+      e.requestRender("political-id-raster-producer-fallback");
+    }))).finally(() => {
+      if (active && active !== batch) return;
+      active = null;
+      if (disposed || failed) return;
+      account();
+      if (navigationProducing) { scheduleNavigationWork(); return; }
+      if (batch.navigation && !navigationDemand && !batch.resumeExact) return;
+      // Complete one latest viewport before requesting a repaint, avoiding a
+      // full vector redraw for every tile that becomes available.
+      pump();
+      if (!active) {
+        prepareGpuFrame();
+        const current = h.getSourceIdentity();
+        const alreadyExact = plan && rawIdentity && !failed && !assetError && !tasks.some(task => task.assetProbe)
+          && refinedViewKey === getViewIdentity()
+          && fittedProjectionKey === JSON.stringify(projectionOptions())
+          && ["sceneKey", "projectionKey", "coverageKey", "version", "colorVersion"].every(key => current[key] === rawIdentity[key]);
+        if (!alreadyExact) e.requestRender("political-id-raster-ready");
+      }
+    });
+  }
+
+  async function produceTile(task, batch) {
+    const { controller, descriptor } = task;
+    attempted.add(descriptor.key);
     if (tileEventsEnabled) {
       task.tileEventId = ++nextTileEventId;
       tileEvents.set(task.tileEventId, { id: task.tileEventId, ...descriptor, namespace, epoch,
@@ -1104,73 +1164,47 @@ export function createPoliticalIdRasterRuntimeOwner({
       codeToId: new Map(entries.map(entry => [entry.code, entry.id])),
       idToCode: new Map(entries.map(entry => [entry.id, entry.code])),
     };
-    active = task;
-    account();
-    task.promise = resolveTile(packet, task, maps).then(async ({ tile, built, identity, reused }) => {
-      if (task.navigation || navigationProducing) await new Promise(resolve => setTimeout(resolve, 0));
-      if (disposed || controller.signal.aborted || reused) return;
-      // Re-read live geometry identity before accepting asynchronous data. Color
-      // edits need not cancel a geometry build: the latest palette is used at draw.
-      if (!sourceStillCurrent() && !syncSource()) { stats.staleResults++; return; }
-      if (controller.signal.aborted || epoch !== task.epoch) { stats.staleResults++; return; }
-      if (!matchesTileRegion(tile, descriptor)) {
-        throw new Error("Political ID tile response does not match its requested region.");
+    const { tile, built, identity, reused } = await resolveTile(packet, task, maps, batch);
+    if (task.navigation || navigationProducing) await new Promise(resolve => setTimeout(resolve, 0));
+    if (disposed || controller.signal.aborted || reused) return;
+    // Re-read live geometry identity before accepting asynchronous data. Color
+    // edits need not cancel a geometry build: the latest palette is used at draw.
+    if (!sourceStillCurrent() && !syncSource()) { stats.staleResults++; return; }
+    if (controller.signal.aborted || epoch !== task.epoch) { stats.staleResults++; return; }
+    if (!matchesTileRegion(tile, descriptor)) {
+      throw new Error("Political ID tile response does not match its requested region.");
+    }
+    if (descriptor.coreRect) {
+      tile.coreRect = { ...descriptor.coreRect };
+      tile.storageRect = { ...descriptor.storageRect };
+    }
+    const admissionStarted = stageTimingsEnabled ? performance.now() : 0;
+    const cached = cache.set(descriptor.key, tile, descriptor, navigationProducing ? { compressionBudget: 1 } : undefined);
+    const event = tileEvents.get(task.tileEventId);
+    if (cached && event) {
+      event.cpuReadyAt = performance.now();
+      tileEventIds.set(tile, task.tileEventId);
+    }
+    if (stageTimingsEnabled) recordStage("admission", performance.now() - admissionStarted,
+      task.navigation || navigationProducing ? "host-task" : "tile-completion", descriptor.key);
+    // Conservative contributor set from the validated build/asset identity.
+    // It includes fill and stroke contributors, never a second ID namespace.
+    if (displayCache) tileDependencies.set(tile, Uint32Array.from(entries, entry => entry.code));
+    if (built) {
+      stats.builds++;
+      stats.coldBuildMs += Number(tile.stats?.buildMs || 0);
+      stats.pathBuilds += Number(tile.stats?.pathBuilds || 0);
+      stats.pathCacheHits += Number(tile.stats?.pathCacheHits || 0);
+      pathCacheEstimatedBytes = Number(tile.stats?.pathCacheEstimatedBytes || 0);
+    } else stats.assetHits++;
+    if (identity) {
+      tileIdentities.set(tile, identity);
+      if (built && consecutiveAssetTimeouts === 0) {
+        retainSaveCandidate(descriptor.key, identity, tile, maps.codeToId);
       }
-      if (descriptor.coreRect) {
-        tile.coreRect = { ...descriptor.coreRect };
-        tile.storageRect = { ...descriptor.storageRect };
-      }
-      const admissionStarted = stageTimingsEnabled ? performance.now() : 0;
-      const cached = cache.set(descriptor.key, tile, descriptor, navigationProducing ? { compressionBudget: 1 } : undefined);
-      const event = tileEvents.get(task.tileEventId);
-      if (cached && event) {
-        event.cpuReadyAt = performance.now();
-        tileEventIds.set(tile, task.tileEventId);
-      }
-      if (stageTimingsEnabled) recordStage("admission", performance.now() - admissionStarted,
-        task.navigation || navigationProducing ? "host-task" : "tile-completion", descriptor.key);
-      // Conservative contributor set from the validated build/asset identity.
-      // It includes fill and stroke contributors, never a second ID namespace.
-      if (displayCache) tileDependencies.set(tile, Uint32Array.from(entries, entry => entry.code));
-      if (built) {
-        stats.builds++;
-        stats.coldBuildMs += Number(tile.stats?.buildMs || 0);
-        stats.pathBuilds += Number(tile.stats?.pathBuilds || 0);
-        stats.pathCacheHits += Number(tile.stats?.pathCacheHits || 0);
-        pathCacheEstimatedBytes = Number(tile.stats?.pathCacheEstimatedBytes || 0);
-      } else stats.assetHits++;
-      if (identity) {
-        tileIdentities.set(tile, identity);
-        if (built && consecutiveAssetTimeouts === 0) {
-          retainSaveCandidate(descriptor.key, identity, tile, maps.codeToId);
-        }
-      }
-      account(task.navigation || navigationProducing ? "host-task" : "tile-completion");
-    }).catch(error => {
-      if (disposed || controller.signal.aborted) return;
-      failed = String(error?.message || error);
-      cache.clear();
-      releaseGpu();
-      account();
-    }).finally(() => {
-      if (active === task) active = null;
-      if (disposed) return;
-      account();
-      if (navigationProducing) { scheduleNavigationWork(); return; }
-      if (task.navigation && !navigationDemand && !task.resumeExact) return;
-      // Complete one latest viewport before requesting a repaint, avoiding a
-      // full vector redraw for every tile that becomes available.
-      pump();
-      if (!active) {
-        prepareGpuFrame();
-        const current = h.getSourceIdentity();
-        const alreadyExact = plan && rawIdentity && !failed && !assetError && !task.assetProbe
-          && refinedViewKey === getViewIdentity()
-          && fittedProjectionKey === JSON.stringify(projectionOptions())
-          && ["sceneKey", "projectionKey", "coverageKey", "version", "colorVersion"].every(key => current[key] === rawIdentity[key]);
-        if (!alreadyExact) e.requestRender("political-id-raster-ready");
-      }
-    });
+    }
+    account(task.navigation || navigationProducing ? "host-task" : "tile-completion");
+    if (cached && !task.navigation) prepareGpuFrame();
   }
 
   function ensureGpu() {
@@ -1224,6 +1258,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       // Start the same bounded producer without repainting a still-current
       // native frame. The ready callback requests the first accelerated draw.
       pump();
+      if (active) prepareGpuFrame();
       if (!active && plan.tiles.every(tile => cache.peek(tile.key))) {
         e.requestRender("political-id-raster-ready");
       }
@@ -1261,7 +1296,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         const exhausted = !active && plan.tiles.every(tile => cache.peek(tile.key) || attempted.has(tile.key));
         stats.fallbacks++; displayState = exhausted ? "fallback" : "preparing";
         reason = exhausted ? "cpu-budget" : "awaiting-coverage";
-        if (!exhausted) pump();
+        if (!exhausted) { pump(); prepareGpuFrame(); }
         return retainPublishedFrame();
       }
       if (prepareGpuFrame()) {
@@ -1764,7 +1799,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       lastAssetFailure: lastAssetFailure && { ...lastAssetFailure },
       assetFailureKind, assetFailureOperation,
       assetRecovery: { consecutiveTimeouts: consecutiveAssetTimeouts,
-        state: consecutiveAssetTimeouts < 3 ? "ready" : active?.assetProbe ? "probing" : "cooldown",
+        state: consecutiveAssetTimeouts < 3 ? "ready" : active?.tasks.some(task => task.assetProbe) ? "probing" : "cooldown",
         scheduled: assetRecoveryTimer !== null, coveredProbes: coveredAssetProbes,
         retryInMs: Math.max(0, nextAssetProbeAt - performance.now()) },
       pathCacheEstimatedBytes, canonicalCoordinates: !!coordinates, gutter,

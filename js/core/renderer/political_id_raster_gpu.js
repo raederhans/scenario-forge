@@ -393,7 +393,7 @@ export function createPoliticalIdRasterGpu({
       } finally { for (const plan of plans) plan.release?.(); }
     }
     async function prepareFrame({ tiles, palette, signal, isCurrent = () => true, onProgress = () => {}, onTileUploadSubmitted,
-      retainResidency = false, onTileTiming,
+      retainResidency = false, onTileTiming, takeTile,
       yieldTask = () => new Promise(resolve => setTimeout(resolve, 0)) }) {
       assertAvailable();
       if (!(palette instanceof Uint8Array) || palette.length < 4 || palette.length % 4) throw new TypeError("Palette must contain packed RGBA bytes.");
@@ -412,7 +412,8 @@ export function createPoliticalIdRasterGpu({
         const nextPaletteShape = dimensions(palette.length / 4);
         const paletteReservation = Math.max(paletteBytes, nextPaletteShape.width * nextPaletteShape.height * 4);
         let sliceStartedAt = -Infinity;
-        for (const tile of tiles) {
+        for (const requested of tiles) {
+          const tile = takeTile ? await takeTile() : requested;
           // One bounded upload per real host task. Never keep padded CPU arrays
           // for a whole frame or make pending textures visible to drawLayer.
           // Resident tiles only rebind a texture: they share a task until the

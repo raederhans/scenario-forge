@@ -298,6 +298,8 @@ test("continuous navigation closes visible gaps and preserves coverage through e
   }
   assert.equal(f.owner.getDiagnostics().gpuPreparation.pending, true);
   for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    const request = f.requests.find(value => !value.settled);
+    if (request) completeNavigationTile(request);
     gates.shift()?.();
     await tick();
     checkWaitingCoverage();
@@ -465,6 +467,93 @@ test("cross-density navigation keeps the complete-frame path", async t => {
   assert.equal(f.owner.getNavigationSnapshot(), null);
   assert.equal(f.requests.length, count);
   assert.deepEqual(f.renders, []);
+});
+
+test("exact tiles upload out of order during CPU production and publish together", async t => {
+  const f = await navigationFixture(t, { workerCount: 3 });
+  const published = f.owner.getDirectFrame(), gpu = published.gpu;
+  f.owner.getDiagnostics({ tileEvents: true });
+  const uploads = gpu.getStats().tileUploads;
+  f.state.zoomTransform = { ...f.state.zoomTransform, k: 2 };
+  const before = f.requests.length;
+  f.owner.prepareSource();
+  const batch = f.requests.slice(before);
+  assert.equal(batch.length, 3);
+  assert.equal(f.owner.getPendingWorkCount(), 1);
+  completeNavigationTile(batch[2]);
+  await waitForNavigation(() => gpu.getStats().tileUploads > uploads);
+  const tile = f.cache.peek(batch[2].packet.key);
+  assert.ok(tile);
+  assert.equal(gpu.getTileHandle(tile), null);
+  assert.equal(f.owner.getDirectFrame(), published);
+  assert.equal(f.owner.draw().staged, undefined);
+  assert.equal(f.owner.publishDirectFrame(), false);
+  assert.equal(f.cache.peek(batch[0].packet.key), undefined);
+  assert.equal(f.requests.length, before + 3);
+  assert.ok(f.owner.getDiagnostics().tileEvents.find(event => event.key === batch[2].packet.key).uploadSubmittedAt !== null);
+  for (let guard = 0; guard < 100 && f.owner.getPendingWorkCount(); guard++) {
+    const request = f.requests.findLast(value => !value.settled);
+    if (request) completeNavigationTile(request);
+    await tick();
+  }
+  assert.equal(f.owner.getDirectFrame(), published);
+  assert.ok(f.owner.draw().staged);
+  assert.equal(f.owner.publishDirectFrame(), true);
+  const frame = f.owner.getDirectFrame();
+  assert.notEqual(frame, published);
+  assert.deepEqual(frame.drawTiles, frame.plan.tiles.map(item => gpu.getTileHandle(f.cache.peek(item.key))));
+  assert.equal(gpu.getStats().tileUploads - uploads, frame.plan.tiles.length);
+});
+
+test("one cancelled batch member leaves its siblings eligible for CPU admission", async t => {
+  const f = fixture({ width: 1000, height: 100, workerCount: 3 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  const [first, cancelled, last] = f.requests;
+  cancelled.reject(new DOMException("Superseded tile", "AbortError"));
+  first.resolve(makeTile(first.packet));
+  last.resolve(makeTile(last.packet));
+  await tick();
+  assert.equal(f.owner.getDiagnostics().staleResults, 1);
+  assert.equal(f.cache.peek(cancelled.packet.key), undefined);
+  assert.ok(f.cache.peek(first.packet.key));
+  assert.ok(f.cache.peek(last.packet.key));
+  assert.equal(f.owner.getDiagnostics().failed, "");
+});
+
+test("replacing a partially uploaded plan releases its private textures while production is in flight", async t => {
+  const f = await navigationFixture(t, { workerCount: 3 });
+  const published = f.owner.getDirectFrame(), gpu = published.gpu;
+  f.state.zoomTransform = { ...f.state.zoomTransform, k: 2 };
+  f.owner.prepareSource();
+  const first = f.requests.find(item => !item.settled);
+  completeNavigationTile(first);
+  await waitForNavigation(() => gpu.getStats().pendingTextureBytes > 0);
+  f.state.zoomTransform = { ...f.state.zoomTransform, x: -8000 };
+  f.owner.prepareSource();
+  assert.equal(gpu.getStats().pendingTextureBytes, 0);
+  assert.equal(f.owner.getDirectFrame(), published);
+  assert.equal(f.owner.publishDirectFrame(), false);
+});
+
+test("a failed batch switches to fallback and ignores late siblings", async t => {
+  const f = fixture({ width: 1000, height: 100, workerCount: 3, directPresentation: true,
+    autoPublish: false, createGpu: measuredGpu });
+  t.after(() => f.owner.dispose());
+  f.h.yieldGpuPreparation = tick;
+  f.owner.draw();
+  const [first, broken, late] = f.requests;
+  completeNavigationTile(first);
+  await tick();
+  broken.reject(new Error("worker crashed"));
+  await tick();
+  completeNavigationTile(late);
+  await tick();
+  assert.match(f.owner.getDiagnostics().failed, /worker crashed/);
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+  assert.equal(f.owner.getDiagnostics().tileCount, 0);
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.publishDirectFrame(), false);
 });
 
 test("palette edits during a navigation upload preserve geometry and publish current colors without edit confirmation", async t => {
@@ -737,6 +826,7 @@ function fixture({
   displayMode = "hybrid",
   directPresentation = false,
   autoPublish = true,
+  workerCount = 1,
   commitPublishedColorEdit = undefined,
   requestRenderEffect = null,
   projection = {},
@@ -745,6 +835,7 @@ function fixture({
   const identity = { sceneKey: "scene-a", projectionKey: "projection-a", coverageKey: "coverage-a", version: 1, colorVersion: 0 };
   const requests = [], metrics = [], renders = [], blits = [];
   const client = makeClient();
+  client.workerCount = workerCount;
   const context = {
     save() {}, restore() {}, setTransform() {},
     drawImage(image, ...args) { blits.push({ image, args }); },
@@ -811,14 +902,18 @@ function asyncGpuFixture({ autoPublish = true } = {}) {
   const preparations = [];
   const factory = makeGpuFactory({ prepareFrame(gpu, options) {
     return new Promise(resolve => preparations.push({ gpu, options, cancelled: 0,
-      ready() {
-        const request = this;
+      async ready() {
+        const request = this, tiles = [];
+        for (const tile of options.tiles) {
+          if (options.signal.aborted) break;
+          tiles.push(options.takeTile ? await options.takeTile() : tile);
+        }
         resolve({ stats: { maxTaskMs: 2, uploadedTiles: options.tiles.length },
           cancel() { request.cancelled++; },
           commit({ palette, revision }) {
             assert.equal(options.isCurrent(), true);
             if (request.commitError) throw request.commitError;
-            gpu.setPalette(palette, revision); gpu.setTiles(options.tiles);
+            gpu.setPalette(palette, revision); gpu.setTiles(tiles);
             return { planningMs: 0, paletteUploadMs: 1, tileBindingMs: 1 };
           } });
       }, capacityRejected() { resolve(null); } }));
