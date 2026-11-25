@@ -9,19 +9,20 @@ import {
   setThematicWgiRuntimeState,
 } from "../state/actions/thematic_wgi_actions.js";
 
-// The original WGI state key and entrypoint now serve both admitted families.
+// The original WGI state key and entrypoint serve the country indicator families.
 // Request ownership is transient and never becomes part of the saved project.
 const requests = new WeakMap();
 
 function captureSelection(state) {
-  const value = normalizeThematicWgiStyle(state.styleConfig?.thematic);
+  const value = normalizeThematicWgiStyle(state.styleConfig?.thematic, state.activeScenarioId);
   return {
     styleConfig: state.styleConfig,
     style: state.styleConfig?.thematic,
     value,
     scenarioId: state.activeScenarioId,
+    baselineHash: state.scenarioBaselineHash,
     key: JSON.stringify([
-      value, state.activeScenarioId,
+      value, state.activeScenarioId, state.scenarioBaselineHash,
       state.latestScenarioApplyRequestId, state.currentScenarioApplyRequestId,
       state.activeScenarioChunks?.scenarioApplyEpoch,
       state.activeScenarioChunks?.scenarioApplyRequestId,
@@ -41,7 +42,7 @@ export function ensureThematicWgiData(state, {
 } = {}) {
   if (!state || typeof state !== "object") return Promise.resolve(null);
   const eligible = isThematicWgiRequested(state)
-    && isThematicWgiSelectionSupported(state.styleConfig.thematic)
+    && isThematicWgiSelectionSupported(state.styleConfig.thematic, state.activeScenarioId)
     && !state.scenarioApplyInFlight;
   let request = requests.get(state);
   if (!eligible || (request && !matchesSelection(state, request.selection))) {
@@ -81,6 +82,7 @@ export function ensureThematicWgiData(state, {
   };
   request.promise = Promise.resolve().then(() => loadData({
     metricId: request.selection.value.metricId, scenarioId: request.selection.scenarioId,
+    ...(request.selection.baselineHash ? { baselineHash: request.selection.baselineHash } : {}),
   })).then((data) => {
     const selection = request.selection.value;
     if (!data || data.layerId !== selection.layerId || data.metricId !== selection.metricId

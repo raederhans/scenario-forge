@@ -9149,6 +9149,54 @@
         "source_resolution_m": 1000,
         "load_policy": "on_demand_viewport"
       }
+    },
+    "scenario_country_stats_manifest": {
+      "url": "data/thematic_layers/scenario/country_stats_v1/manifest.json",
+      "role": "scenario_country_stats_manifest",
+      "schema_ref": "map_builder/schemas/scenario_country_stats_manifest.schema.json",
+      "metadata": {
+        "layer_id": "scenario_country_stats_v1",
+        "data_version": "scenario-country-stats-v1",
+        "scenario_id": null,
+        "load_policy": "on_demand",
+        "source_policy": "scenario_derived"
+      }
+    },
+    "scenario_country_stats:hoi4_1936": {
+      "url": "data/thematic_layers/scenario/country_stats_v1/hoi4_1936.json",
+      "role": "scenario_country_stats",
+      "schema_ref": "map_builder/schemas/scenario_country_stats.schema.json",
+      "metadata": {
+        "layer_id": "scenario_country_stats_v1",
+        "data_version": "scenario-country-stats-v1",
+        "scenario_id": "hoi4_1936",
+        "load_policy": "on_demand",
+        "source_policy": "scenario_derived"
+      }
+    },
+    "scenario_country_stats:hoi4_1939": {
+      "url": "data/thematic_layers/scenario/country_stats_v1/hoi4_1939.json",
+      "role": "scenario_country_stats",
+      "schema_ref": "map_builder/schemas/scenario_country_stats.schema.json",
+      "metadata": {
+        "layer_id": "scenario_country_stats_v1",
+        "data_version": "scenario-country-stats-v1",
+        "scenario_id": "hoi4_1939",
+        "load_policy": "on_demand",
+        "source_policy": "scenario_derived"
+      }
+    },
+    "scenario_country_stats:tno_1962": {
+      "url": "data/thematic_layers/scenario/country_stats_v1/tno_1962.json",
+      "role": "scenario_country_stats",
+      "schema_ref": "map_builder/schemas/scenario_country_stats.schema.json",
+      "metadata": {
+        "layer_id": "scenario_country_stats_v1",
+        "data_version": "scenario-country-stats-v1",
+        "scenario_id": "tno_1962",
+        "load_policy": "on_demand",
+        "source_policy": "scenario_derived"
+      }
     }
   },
   "scenario_registry_key": "scenario_registry",

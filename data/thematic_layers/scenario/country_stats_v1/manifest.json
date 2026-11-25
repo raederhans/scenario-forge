@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "layer_id": "scenario_country_stats_v1",
+  "data_version": "scenario-country-stats-v1",
+  "status": "experimental",
+  "source_policy": "scenario_derived",
+  "scenarios": {
+    "hoi4_1936": {
+      "path": "hoi4_1936.json",
+      "baseline_hash": "7253e394f32f4564a73b5c7a21608fda3a3874384c3c2e9ea26f93d9e7ba401a",
+      "as_of_date": "1936.1.1.12"
+    },
+    "hoi4_1939": {
+      "path": "hoi4_1939.json",
+      "baseline_hash": "3c3f592ec12c121fa3697dfb6393cfe5a9180064a24849ff3cc203ec6989bff0",
+      "as_of_date": "1939.8.14.12"
+    },
+    "tno_1962": {
+      "path": "tno_1962.json",
+      "baseline_hash": "341a183adbadb30ed71c8a19b9c1bd076b8ee39bdf49d8aff8362d1cf46935a5",
+      "as_of_date": "1962-01-01"
+    }
+  },
+  "metric_ids": [
+    "scenario_population",
+    "scenario_land_area_km2",
+    "scenario_population_density",
+    "scenario_factories_total",
+    "scenario_civilian_factories",
+    "scenario_military_factories",
+    "scenario_factories_per_million",
+    "scenario_military_factory_share",
+    "scenario_steel",
+    "scenario_oil",
+    "scenario_resources_total",
+    "scenario_core_share"
+  ],
+  "limitations": [
+    "州人口与工厂按现代人口空间分布拆分，资源按面积拆分。 State splits use 2020 population or land area.",
+    "缺少几何面积的地块可能低估国土面积。 Missing geometry areas can understate land area.",
+    "TNO 建筑体系缺少可比工厂数据。 Comparable TNO factory counts are unavailable."
+  ]
+}

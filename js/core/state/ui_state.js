@@ -220,7 +220,7 @@ export function createDefaultStyleConfig() {
       ...createDefaultCityLayerStyleConfig(),
     },
     strategicValues: normalizeStrategicValuesStyle(),
-    thematic: normalizeThematicWgiStyle(),
+    thematic: { enabled: false },
     population: normalizePopulationStyle(),
     urban: createDefaultUrbanStyleConfig(),
     physical: {
@@ -507,7 +507,7 @@ export function restoreImportedStyleConfigState(
   target.styleConfig = {
     ...currentStyleConfig,
     rendering: normalizeRenderingStyleConfig(imported.rendering),
-    thematic: normalizeThematicWgiStyle(imported.thematic),
+    thematic: normalizeThematicWgiStyle(imported.thematic, target.activeScenarioId),
     population: normalizePopulationStyle(imported.population),
     internalBorders: {
       ...defaults.internalBorders,

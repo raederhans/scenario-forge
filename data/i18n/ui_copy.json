@@ -13064,5 +13064,85 @@
   "Project country {from} → {to}": {
     "en": "Project country {from} → {to}",
     "zh": "项目国家 {from} → {to}"
+  },
+  "Population (scenario start)": {
+    "en": "Population (scenario start)",
+    "zh": "人口（剧本开局）"
+  },
+  "Land area": {
+    "en": "Land area",
+    "zh": "陆地面积"
+  },
+  "Factories": {
+    "en": "Factories",
+    "zh": "工厂总数"
+  },
+  "Civilian factories": {
+    "en": "Civilian factories",
+    "zh": "民用工厂"
+  },
+  "Military factories": {
+    "en": "Military factories",
+    "zh": "军用工厂"
+  },
+  "Factories per million people": {
+    "en": "Factories per million people",
+    "zh": "每百万人工厂数"
+  },
+  "Military factory share": {
+    "en": "Military factory share",
+    "zh": "军工占比"
+  },
+  "Strategic resources total": {
+    "en": "Strategic resources total",
+    "zh": "战略资源合计"
+  },
+  "Core territory share": {
+    "en": "Core territory share",
+    "zh": "本国核心领土占比"
+  },
+  "Scenario data (start)": {
+    "en": "Scenario data (start)",
+    "zh": "剧本数据（开局）"
+  },
+  "Modern reference (2023/2024)": {
+    "en": "Modern reference (2023/2024)",
+    "zh": "现代参考（2023/2024）"
+  },
+  "Unavailable": {
+    "en": "Unavailable",
+    "zh": "不可用"
+  },
+  "Scenario start data, grouped by baseline ownership and unaffected by painting.": {
+    "en": "Scenario start data, grouped by baseline ownership and unaffected by painting.",
+    "zh": "剧本开局数据，按基线归属汇总，不随涂色变化。"
+  },
+  "Fixed cartographic intervals": {
+    "en": "Fixed cartographic intervals",
+    "zh": "固定制图区间"
+  },
+  "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area": {
+    "en": "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area",
+    "zh": "HOI4 1936 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+  },
+  "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area": {
+    "en": "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area",
+    "zh": "HOI4 1939 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+  },
+  "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area": {
+    "en": "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area",
+    "zh": "TNO 1962 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+  },
+  "Scenario parcel geometry area (GHSL 2020 companion)": {
+    "en": "Scenario parcel geometry area (GHSL 2020 companion)",
+    "zh": "剧本地块几何面积（GHSL 2020 配套）"
+  },
+  "Derived from scenario state data and parcel area": {
+    "en": "Derived from scenario state data and parcel area",
+    "zh": "由剧本州数据与地块面积计算"
+  },
+  "Scenario cores × parcel area": {
+    "en": "Scenario cores × parcel area",
+    "zh": "剧本核心归属 × 地块面积"
   }
 }

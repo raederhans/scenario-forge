@@ -2,6 +2,7 @@ import { getCountryNameOverride } from "./country_name_overrides.js";
 import { getThematicWgiFeatureInspection, getThematicReferenceNote } from "./thematic/thematic_wgi_view_model.js";
 import { getPopulationTooltipLines } from "./thematic/population_spatial_presentation.js";
 import { getThematicIndicator, formatThematicIndicatorValue } from "./thematic/thematic_indicator_catalog.js";
+import { getScenarioStatsSource } from "./thematic/thematic_scenario_stats_data.js";
 import { getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES } from "./thematic/strategic_values_view_model.js";
 // Translation helpers (Phase 13)
 import { state as runtimeState } from "./state.js";
@@ -482,7 +483,9 @@ function getTooltipText(feature) {
     const referenceNote = thematic.referenceMapping
       ? `\n${getThematicReferenceNote(runtimeState)}` : "";
     const scopeLabel = zh ? "国家／经济体指标" : metric.family === "wgi" ? "Country/economy score" : "Country/economy indicator";
-    return `${base}\n${zh ? metric.labelZh : metric.labelEn} · ${metric.year}: ${value}${uncertainty}${referenceCountry}${referenceNote}\n${scopeLabel} · ${metric.source}`;
+    const data = runtimeState.thematicWgiRuntime.data;
+    const source = metric.family === "scenario" ? getScenarioStatsSource(data, runtimeState.currentLanguage) : metric.source ?? data.source;
+    return `${base}\n${zh ? metric.labelZh : metric.labelEn} · ${metric.year ?? data.year}: ${value}${uncertainty}${referenceCountry}${referenceNote}\n${scopeLabel} · ${source}`;
   }
   const strategic = getStrategicFeatureInspection(runtimeState, getSharedFeatureId(feature));
   if (!strategic) return base;

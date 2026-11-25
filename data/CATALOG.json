@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-11-08T02:57:05Z",
   "counts": {
-    "entries": 1381,
+    "entries": 1385,
     "by_role": {
       "bathymetry_texture_manifest": 1,
       "build_manifest": 1,
@@ -50,6 +50,8 @@
       "river_partitions": 6,
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
+      "scenario_country_stats": 3,
+      "scenario_country_stats_manifest": 1,
       "scenario_registry": 1,
       "source_ledger_asset": 8,
       "special_zones": 1,
@@ -76,11 +78,11 @@
     "by_format": {
       "geojson": 157,
       "javascript": 2,
-      "json": 1050,
+      "json": 1054,
       "topojson": 172
     },
     "by_read_mode": {
-      "json": 1379,
+      "json": 1383,
       "module": 2
     }
   },
@@ -11575,6 +11577,58 @@
       "aliases": [
         "manifest_output:thematic_layers/population/wdi_population_v1/metrics.admin0.json"
       ]
+    },
+    {
+      "key": "scenario_country_stats:hoi4_1936",
+      "url": "data/thematic_layers/scenario/country_stats_v1/hoi4_1936.json",
+      "role": "scenario_country_stats",
+      "format": "json",
+      "schemaRef": "map_builder/schemas/scenario_country_stats.schema.json",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.scenario_country_stats:hoi4_1936",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "scenario_country_stats:hoi4_1939",
+      "url": "data/thematic_layers/scenario/country_stats_v1/hoi4_1939.json",
+      "role": "scenario_country_stats",
+      "format": "json",
+      "schemaRef": "map_builder/schemas/scenario_country_stats.schema.json",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.scenario_country_stats:hoi4_1939",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "scenario_country_stats_manifest",
+      "url": "data/thematic_layers/scenario/country_stats_v1/manifest.json",
+      "role": "scenario_country_stats_manifest",
+      "format": "json",
+      "schemaRef": "map_builder/schemas/scenario_country_stats_manifest.schema.json",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.scenario_country_stats_manifest",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "scenario_country_stats:tno_1962",
+      "url": "data/thematic_layers/scenario/country_stats_v1/tno_1962.json",
+      "role": "scenario_country_stats",
+      "format": "json",
+      "schemaRef": "map_builder/schemas/scenario_country_stats.schema.json",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.scenario_country_stats:tno_1962",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
     },
     {
       "key": "manifest_output:thematic_layers/social/human_development_demo/build_audit.json",

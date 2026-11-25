@@ -2,7 +2,7 @@
 
 - generated_at: 2026-11-08T02:57:05Z
 - version: 1
-- entries: 1381
+- entries: 1385
 
 ## Counts by role
 
@@ -54,6 +54,8 @@
 | river_partitions | 6 |
 | runtime_asset_registry | 1 |
 | runtime_political_topology | 1 |
+| scenario_country_stats | 3 |
+| scenario_country_stats_manifest | 1 |
 | scenario_registry | 1 |
 | source_ledger_asset | 8 |
 | special_zones | 1 |
@@ -855,6 +857,10 @@
 | manifest_output:thematic_layers/population/wdi_population_v1/build_audit.json | data/thematic_layers/population/wdi_population_v1/build_audit.json | thematic_build_audit | json | json | schema://thematic/build_audit/v1 | data/manifest.json::outputs::thematic_layers/population/wdi_population_v1/build_audit.json::sha256 | no-cache | tools.build_thematic_layers |  |
 | manifest_output:thematic_layers/population/wdi_population_v1/manifest.json | data/thematic_layers/population/wdi_population_v1/manifest.json | thematic_layer_manifest | json | json | schema://thematic/layer_manifest/v1 | data/manifest.json::outputs::thematic_layers/population/wdi_population_v1/manifest.json::sha256 | no-cache | tools.build_thematic_layers |  |
 | thematic_population_metrics | data/thematic_layers/population/wdi_population_v1/metrics.admin0.json | thematic_admin_metrics | json | json | map_builder/schemas/thematic_admin_metrics.schema.json | data/manifest.json::outputs::thematic_layers/population/wdi_population_v1/metrics.admin0.json::sha256 | default | tools.build_thematic_layers |  |
+| scenario_country_stats:hoi4_1936 | data/thematic_layers/scenario/country_stats_v1/hoi4_1936.json | scenario_country_stats | json | json | map_builder/schemas/scenario_country_stats.schema.json |  | default | runtime_asset_registry.assets.scenario_country_stats:hoi4_1936 |  |
+| scenario_country_stats:hoi4_1939 | data/thematic_layers/scenario/country_stats_v1/hoi4_1939.json | scenario_country_stats | json | json | map_builder/schemas/scenario_country_stats.schema.json |  | default | runtime_asset_registry.assets.scenario_country_stats:hoi4_1939 |  |
+| scenario_country_stats_manifest | data/thematic_layers/scenario/country_stats_v1/manifest.json | scenario_country_stats_manifest | json | json | map_builder/schemas/scenario_country_stats_manifest.schema.json |  | no-cache | runtime_asset_registry.assets.scenario_country_stats_manifest |  |
+| scenario_country_stats:tno_1962 | data/thematic_layers/scenario/country_stats_v1/tno_1962.json | scenario_country_stats | json | json | map_builder/schemas/scenario_country_stats.schema.json |  | default | runtime_asset_registry.assets.scenario_country_stats:tno_1962 |  |
 | manifest_output:thematic_layers/social/human_development_demo/build_audit.json | data/thematic_layers/social/human_development_demo/build_audit.json | thematic_build_audit | json | json | schema://thematic/build_audit/v1 | data/manifest.json::outputs::thematic_layers/social/human_development_demo/build_audit.json::sha256 | no-cache | tools.build_thematic_layers |  |
 | manifest_output:thematic_layers/social/human_development_demo/manifest.json | data/thematic_layers/social/human_development_demo/manifest.json | thematic_layer_manifest | json | json | schema://thematic/layer_manifest/v1 | data/manifest.json::outputs::thematic_layers/social/human_development_demo/manifest.json::sha256 | no-cache | tools.build_thematic_layers |  |
 | manifest_output:thematic_layers/social/human_development_demo/metrics.admin0.json | data/thematic_layers/social/human_development_demo/metrics.admin0.json | thematic_admin_metrics | json | json | schema://thematic/admin_metrics/v1 | data/manifest.json::outputs::thematic_layers/social/human_development_demo/metrics.admin0.json::sha256 | default | tools.build_thematic_layers |  |

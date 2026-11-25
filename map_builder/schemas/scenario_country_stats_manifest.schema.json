@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "layer_id",
+    "data_version",
+    "status",
+    "source_policy",
+    "scenarios",
+    "metric_ids",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "layer_id": {
+      "const": "scenario_country_stats_v1"
+    },
+    "data_version": {
+      "const": "scenario-country-stats-v1"
+    },
+    "status": {
+      "type": "string"
+    },
+    "source_policy": {
+      "const": "scenario_derived"
+    },
+    "scenarios": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "path",
+          "baseline_hash",
+          "as_of_date"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "baseline_hash": {
+            "type": "string"
+          },
+          "as_of_date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "metric_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
