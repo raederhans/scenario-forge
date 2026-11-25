@@ -63,6 +63,22 @@ test("worker errors reject the request and dispose terminates the worker", async
   assert.equal(client.available(), false);
 });
 
+test("cancelling one pooled request rejects its late reply and leaves its sibling running", async t => {
+  const { workers, createWorker } = makeWorkerHarness();
+  const client = createPoliticalIdRasterWorkerClient({ createWorker, isSupported: () => true, workerCount: 2 });
+  t.after(() => client.dispose());
+  const controller = new AbortController();
+  const stale = client.request({ entries: [] }, { signal: controller.signal });
+  const live = client.request({ entries: [] });
+  await new Promise(resolve => setImmediate(resolve));
+  controller.abort();
+  await assert.rejects(stale, { name: "AbortError" });
+  assert.deepEqual(workers.map(worker => worker.messages.at(-1).type), ["CANCEL_TASK", "BUILD_POLITICAL_ID_TILE"]);
+  workers[0].reply({ taskId: workers[0].messages[0].taskId, tile: "late" });
+  workers[1].reply({ taskId: workers[1].messages[0].taskId, tile: "current" });
+  assert.equal(await live, "current");
+});
+
 test("dispose in the request tick prevents deferred worker creation", async () => {
   const harness = makeWorkerHarness();
   const client = createPoliticalIdRasterWorkerClient({ createWorker: harness.createWorker, isSupported: () => true });
@@ -94,6 +110,43 @@ function projectionHarness() {
   ]));
   return { values, api: { geoEqualEarth: () => projection } };
 }
+
+test("parallel builds synchronize only geometry missing from their own worker", async t => {
+  const { workers, createWorker } = makeWorkerHarness();
+  const client = createPoliticalIdRasterWorkerClient({ createWorker, isSupported: () => true, workerCount: 2 });
+  t.after(() => client.dispose());
+  const packet = { geometryNamespace: "scene", entries: [{ id: "a", geometryVersion: 1,
+    feature: { type: "Point", coordinates: [0, 0] } }] };
+  const tick = () => new Promise(resolve => setImmediate(resolve));
+  const reply = (worker, data) => worker.reply({ type: "RESULT", taskId: worker.messages.at(-1).taskId, ...data });
+  const first = client.request(packet), second = client.request(packet);
+  await tick();
+  assert.equal(workers.length, 2);
+  for (const worker of workers) {
+    assert.equal(worker.messages[0].type, "SYNC_POLITICAL_ID_GEOMETRY");
+    reply(worker, { value: { resident: [["a", 1]], residentGeometryBytes: 64, pathBytes: 0 } });
+  }
+  await tick();
+  assert.ok(workers.every(worker => worker.messages.at(-1).type === "BUILD_POLITICAL_ID_TILE"));
+  reply(workers[1], { tile: "second" });
+  assert.equal(await second, "second");
+  const warm = client.request(packet);
+  await tick();
+  assert.deepEqual(workers[1].messages.map(item => item.type),
+    ["SYNC_POLITICAL_ID_GEOMETRY", "BUILD_POLITICAL_ID_TILE", "BUILD_POLITICAL_ID_TILE"]);
+  reply(workers[1], { tile: "warm" });
+  reply(workers[0], { tile: "first" });
+  assert.deepEqual(await Promise.all([first, warm]), ["first", "warm"]);
+  assert.equal(client.getStats().residentGeometryBytes, 128);
+  const clearing = client.clearGeometry();
+  await tick();
+  for (const worker of workers) {
+    assert.deepEqual(worker.messages.at(-1).deletedIds, ["a"]);
+    reply(worker, { value: { resident: [], residentGeometryBytes: 0, pathBytes: 0 } });
+  }
+  await clearing;
+  assert.equal(client.getStats().residentGeometryBytes, 0);
+});
 
 test("preparation starts one reusable worker without dispatching an asset or build", async () => {
   const harness = makeWorkerHarness();

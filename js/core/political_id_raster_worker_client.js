@@ -10,6 +10,7 @@ export function createPoliticalIdRasterWorkerClient({
   isSupported = () => typeof Worker === "function"
     && typeof OffscreenCanvas === "function" && typeof Path2D === "function",
   taskClient = null,
+  workerCount = Math.min(3, Math.max(1, (globalThis.navigator?.hardwareConcurrency || 1) - 2)),
 } = {}) {
   let disposed = false;
   const lifetime = new AbortController();
@@ -17,11 +18,7 @@ export function createPoliticalIdRasterWorkerClient({
   let manifest = null, manifestRevision = 0, assetStats = manifestValidator.stats();
   let assetReads = 0, assetWrites = 0, copiedTileBytes = 0;
   let maxAssetServiceMs = 0, maxAssetDeliveryMs = 0;
-  let geometryWorker = null, geometryNamespace = null, resident = new Map();
-  let geometryQueue = Promise.resolve();
-  const geometryStats = { geometryUploads: 0, geometryUploadBytes: 0, geometryReuses: 0,
-    residentGeometryBytes: 0, pathBytes: 0 };
-  const client = taskClient || createWorkerTaskClient({
+  const makeTaskClient = () => createWorkerTaskClient({
     createWorker: () => {
       // The shared task client creates its worker in a later microtask.
       if (disposed) throw new Error("Political ID raster worker client is disposed.");
@@ -40,15 +37,115 @@ export function createPoliticalIdRasterWorkerClient({
     createMessageError: (message) => Object.assign(new Error(message.message || message.errorCode || "Political ID raster worker failed."), { name: message.name || "Error" }),
   });
 
+  const capacity = taskClient ? 1 : Math.max(1, Math.floor(workerCount));
+  const slots = [createWorkerSlot(taskClient || makeTaskClient(), lifetime)];
+  const client = slots[0].client;
+  let poolNamespace = null;
+
   function available() {
     return !disposed && !!isSupported();
   }
 
-  function request(packet, { signal } = {}) {
-    if (disposed) return Promise.reject(new Error("Political ID raster worker client is disposed."));
-    if (!available()) return Promise.reject(new Error("Political ID raster worker is unavailable."));
-    if (!packet || typeof packet !== "object") return Promise.reject(new TypeError("Political ID raster packet is required."));
+  async function request(packet, { signal } = {}) {
+    if (disposed) throw new Error("Political ID raster worker client is disposed.");
+    if (!available()) throw new Error("Political ID raster worker is unavailable.");
+    if (!packet || typeof packet !== "object") throw new TypeError("Political ID raster packet is required.");
     const requestSignal = signal ? AbortSignal.any([signal, lifetime.signal]) : lifetime.signal;
+
+    let slot = slots.reduce((best, item) => item.pending < best.pending ? item : best);
+    if (slot.pending && slots.length < capacity) {
+      slot = createWorkerSlot(makeTaskClient(), lifetime);
+      slots.push(slot);
+    }
+    const cleanup = [];
+    if (packet.geometryNamespace != null && poolNamespace !== packet.geometryNamespace) {
+      poolNamespace = packet.geometryNamespace;
+      for (const peer of slots) {
+        if (peer !== slot && !peer.pending && peer.namespace !== poolNamespace && peer.namespace != null) {
+          cleanup.push(peer.clearGeometry());
+        }
+      }
+    }
+    slot.pending++;
+    try {
+      const result = slot.request(packet, requestSignal);
+      if (!cleanup.length) return await result;
+      const [tile] = await Promise.all([result, ...cleanup]);
+      return tile;
+    }
+    finally {
+      slot.pending--;
+      if (!disposed && !slot.pending && slot.namespace != null && slot.namespace !== poolNamespace) {
+        await slot.clearGeometry();
+      }
+    }
+  }
+
+  function prepare() {
+    if (!available()) return Promise.reject(new Error("Political ID raster worker is unavailable."));
+    return client.ensureWorker();
+  }
+
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    for (const slot of slots) slot.dispose();
+    lifetime.abort();
+    manifestValidator.dispose(); manifest = null;
+  }
+
+  async function assetRequest(type, payload, signal) {
+    if (disposed) throw new Error("Political ID raster worker client is disposed.");
+    const requestSignal = signal ? AbortSignal.any([signal, lifetime.signal]) : lifetime.signal;
+    return client.dispatchTask(type, { ...payload, manifest, manifestRevision,
+      assetStartedAt: performance.timeOrigin + performance.now() }, { signal: requestSignal });
+  }
+  const assetStore = {
+    registerManifest(value) {
+      const count = manifestValidator.registerManifest(value);
+      manifest = value; manifestRevision++;
+      return count;
+    },
+    async load(identity, { idToCode, signal, cacheMode = "normal" } = {}) {
+      assetReads++;
+      try { return await assetRequest("LOAD_POLITICAL_ID_ASSET", { identity, idToCode, cacheMode }, signal); }
+      finally { assetReads--; }
+    },
+    async save(identity, tile, { codeToId, signal } = {}) {
+      // Persistence is optional. Admit at most one bounded caller-preserving
+      // structured clone, even when callers produce tiles faster than disk I/O.
+      const bytes = tile.codes.byteLength + tile.edgeIds.byteLength + tile.edgeWeights.byteLength;
+      if (assetWrites || bytes > POLITICAL_ID_ASSET_SAVE_MAX_BYTES) return false;
+      signal?.throwIfAborted();
+      assetWrites++; copiedTileBytes += bytes;
+      try { return await assetRequest("SAVE_POLITICAL_ID_ASSET", { identity, tile, codeToId }, signal); }
+      finally { assetWrites--; copiedTileBytes -= bytes; }
+    },
+    stats: () => ({ ...assetStats, pendingReads: disposed ? 0 : assetReads,
+      pendingWrites: disposed ? 0 : Math.max(assetWrites, assetStats.pendingWrites),
+      pendingBytes: disposed ? 0 : assetStats.pendingBytes + copiedTileBytes,
+      memoryBytes: disposed ? 0 : assetStats.memoryBytes, maxAssetServiceMs, maxAssetDeliveryMs, disposed }),
+    dispose,
+  };
+  function getStats() {
+    const totals = {};
+    for (const { geometryStats } of slots) {
+      for (const [key, value] of Object.entries(geometryStats)) totals[key] = (totals[key] || 0) + value;
+    }
+    return totals;
+  }
+  return Object.freeze({ available, prepare, request, dispose, assetStore, workerCount: capacity, getStats,
+    releaseGeometry: async ids => { await Promise.all(slots.map(slot => slot.releaseGeometry(ids))); },
+    clearGeometry: async () => { await Promise.all(slots.map(slot => slot.clearGeometry())); },
+  });
+}
+
+function createWorkerSlot(client, lifetime) {
+  let geometryWorker = null, geometryNamespace = null, resident = new Map();
+  let geometryQueue = Promise.resolve();
+  const geometryStats = { geometryUploads: 0, geometryUploadBytes: 0, geometryReuses: 0,
+    residentGeometryBytes: 0, pathBytes: 0 };
+  function request(packet, requestSignal) {
     const token = value => (typeof value === "string" && value.length > 0)
       || (typeof value === "number" && Number.isFinite(value));
     if (!token(packet.geometryNamespace) || !(packet.entries || []).every(entry => token(entry.id) && token(entry.geometryVersion))) {
@@ -84,7 +181,7 @@ export function createPoliticalIdRasterWorkerClient({
   }
 
   async function ensureGeometryWorker() {
-    if (disposed) throw new Error("Political ID raster worker client is disposed.");
+    if (lifetime.signal.aborted) throw new Error("Political ID raster worker client is disposed.");
     const worker = await client.ensureWorker();
     if (geometryWorker !== worker) {
       geometryWorker = worker; geometryNamespace = null; resident.clear();
@@ -139,54 +236,11 @@ export function createPoliticalIdRasterWorkerClient({
     });
   }
 
-  function prepare() {
-    if (!available()) return Promise.reject(new Error("Political ID raster worker is unavailable."));
-    return client.ensureWorker();
-  }
-
   function dispose() {
-    if (disposed) return;
-    disposed = true;
     client.terminate(new Error("Political ID raster worker client disposed."));
-    lifetime.abort();
-    manifestValidator.dispose(); manifest = null;
     resident.clear(); geometryWorker = null; geometryNamespace = null;
     geometryStats.residentGeometryBytes = 0; geometryStats.pathBytes = 0;
   }
-
-  async function assetRequest(type, payload, signal) {
-    if (disposed) throw new Error("Political ID raster worker client is disposed.");
-    const requestSignal = signal ? AbortSignal.any([signal, lifetime.signal]) : lifetime.signal;
-    return client.dispatchTask(type, { ...payload, manifest, manifestRevision,
-      assetStartedAt: performance.timeOrigin + performance.now() }, { signal: requestSignal });
-  }
-  const assetStore = {
-    registerManifest(value) {
-      const count = manifestValidator.registerManifest(value);
-      manifest = value; manifestRevision++;
-      return count;
-    },
-    async load(identity, { idToCode, signal, cacheMode = "normal" } = {}) {
-      assetReads++;
-      try { return await assetRequest("LOAD_POLITICAL_ID_ASSET", { identity, idToCode, cacheMode }, signal); }
-      finally { assetReads--; }
-    },
-    async save(identity, tile, { codeToId, signal } = {}) {
-      // Persistence is optional. Admit at most one bounded caller-preserving
-      // structured clone, even when callers produce tiles faster than disk I/O.
-      const bytes = tile.codes.byteLength + tile.edgeIds.byteLength + tile.edgeWeights.byteLength;
-      if (assetWrites || bytes > POLITICAL_ID_ASSET_SAVE_MAX_BYTES) return false;
-      signal?.throwIfAborted();
-      assetWrites++; copiedTileBytes += bytes;
-      try { return await assetRequest("SAVE_POLITICAL_ID_ASSET", { identity, tile, codeToId }, signal); }
-      finally { assetWrites--; copiedTileBytes -= bytes; }
-    },
-    stats: () => ({ ...assetStats, pendingReads: disposed ? 0 : assetReads,
-      pendingWrites: disposed ? 0 : Math.max(assetWrites, assetStats.pendingWrites),
-      pendingBytes: disposed ? 0 : assetStats.pendingBytes + copiedTileBytes,
-      memoryBytes: disposed ? 0 : assetStats.memoryBytes, maxAssetServiceMs, maxAssetDeliveryMs, disposed }),
-    dispose,
-  };
-  return Object.freeze({ available, prepare, request, dispose, assetStore,
-    releaseGeometry, clearGeometry, getStats: () => ({ ...geometryStats }) });
+  return { client, request, releaseGeometry, clearGeometry, dispose, geometryStats, pending: 0,
+    get namespace() { return geometryNamespace; } };
 }
