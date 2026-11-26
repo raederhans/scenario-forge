@@ -95,11 +95,11 @@ test("close and Escape hide the card, and show replaces content and omits empty 
   assert.notEqual(find(card, "scenario-intro-title").textContent, presentation.title);
 });
 
-test("public and editor preview scenarios have presentation copy with Chinese translations", () => {
-  const publicIds = ["blank_base", "modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"];
+test("public scenarios have presentation copy with Chinese translations", () => {
+  const publicIds = ["blank_base", "modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", "rcw_1919"];
   assert.deepEqual(registry.public_baseline_ids, publicIds);
-  assert.deepEqual(registry.developer_preview_ids, ["rcw_1919"]);
-  assert.deepEqual(registry.scenarios.map((entry) => entry.scenario_id).sort(), [...publicIds, "rcw_1919"].sort());
+  assert.deepEqual(registry.developer_preview_ids, []);
+  assert.deepEqual(registry.scenarios.map((entry) => entry.scenario_id).sort(), publicIds.toSorted());
   const civilWar = registry.scenarios.find((entry) => entry.scenario_id === "rcw_1919");
   assert.equal(civilWar.display_name, "Russian Civil War 1919");
   assert.equal(civilWar.presentation.year, 1919);

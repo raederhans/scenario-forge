@@ -14,7 +14,7 @@ if (explicitArtifactRoot) {
   assert.ok(relative && !relative.startsWith("..") && !path.isAbsolute(relative));
 }
 const PAGES_DIST_RELATIVE = path.relative(REPO_ROOT, pagesRoot).replaceAll("\\", "/");
-const PUBLIC_SCENARIO_IDS = ["blank_base", "modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"];
+const PUBLIC_SCENARIO_IDS = ["blank_base", "modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", "rcw_1919"];
 
 // Page-level behaviour (assets load, links, world picker, language switch) is covered by
 // tests/e2e/golden/landing_flows.spec.js in a real browser.

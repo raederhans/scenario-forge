@@ -94,6 +94,9 @@ h1, h2 { font-weight: 400; }
 }
 /* Each fading group is its own SVG layer: opacity changes composite, they never repaint. */
 .stage__layer { will-change: opacity; transition: opacity .6s, visibility .6s; }
+.stage__rcw { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; visibility: hidden; pointer-events: none; }
+.story[data-active-world="rcw"]:is([data-mode="worlds"], [data-mode="outro"]) .stage__rcw { opacity: 1; visibility: visible; }
+.story[data-active-world="rcw"]:is([data-mode="worlds"], [data-mode="outro"]) [data-i18n="stageMark"] { visibility: hidden; }
 .stage__vignette {
   position: absolute; inset: 0; pointer-events: none; transition: opacity .8s;
   background:
@@ -210,9 +213,9 @@ h1, h2 { font-weight: 400; }
 .segmented button[aria-checked="true"] { background: var(--copper); color: var(--ink); }
 
 .worlds { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
-.world { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; transition: background .3s; }
+.world { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; transition: background .3s; }
 .world.is-active { background: rgba(224, 166, 106, .12); }
-.world__pick { all: unset; cursor: pointer; display: grid; grid-template-columns: 26px 1fr; column-gap: 8px; }
+.world__pick { all: unset; cursor: pointer; display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 8px; overflow-wrap: anywhere; }
 .world__pick:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 4px; border-radius: 4px; }
 .world__index { grid-row: span 2; font: 500 .68rem var(--font-mono); color: var(--copper); padding-top: 4px; }
 .world__pick b { font: 400 1.25rem/1.15 var(--font-display); }
@@ -251,6 +254,14 @@ h1, h2 { font-weight: 400; }
 .hgo__counters dd { margin: 0; font: 400 clamp(1.8rem, 3vw, 2.8rem)/1 var(--font-display); font-variant-numeric: tabular-nums; }
 
 /* ---------- Closing ---------- */
+.showcase { max-width: 1500px; margin: 0 auto; padding: clamp(72px, 8vw, 120px) var(--gutter) 0; }
+.showcase h2 { margin: 0 0 32px; font: 400 clamp(2rem, 4vw, 3.4rem)/1.1 var(--font-display); }
+.showcase__grid { display: grid; grid-template-columns: 1.645fr 1fr 1fr; gap: clamp(20px, 3vw, 44px); }
+.showcase figure { margin: 0; }
+.showcase img { display: block; width: 100%; height: auto; }
+.showcase figcaption { margin-top: 16px; color: var(--paper-dim); }
+.showcase a { display: block; width: fit-content; margin-top: 8px; color: var(--copper); text-underline-offset: 3px; }
+
 /* The closing rises out of the HGO plate's ink: a faint graticule and two glows, so
    the end of the page still reads as a map table rather than an empty black page. */
 .closing { position: relative; isolation: isolate; overflow: hidden; padding: clamp(96px, 11vw, 160px) var(--gutter) clamp(72px, 8vw, 120px); }
@@ -306,7 +317,13 @@ html:lang(zh) body { line-height: 1.6; }
 :lang(zh) :is(.caption--hero h1, .caption h2, .world__pick b, .hgo__step h2, .closing h2, .closing__faq h3) { line-height: 1.2; }
 :lang(zh) .caption--hero h1 em { font-style: normal; }
 
+@media (min-width: 761px) {
+  .hgo { height: 250vh; }
+  [data-chapter="worlds"] .caption--sticky { max-height: calc(100svh - max(96px, 16svh) - 16px); overflow-y: auto; }
+}
+
 @media (max-width: 760px) {
+  .showcase__grid { grid-template-columns: 1fr; }
   .nav { gap: 10px; }
   .nav__brand span, .nav__cta, .nav__github span { display: none; }
   .nav__github { padding: 8px; }

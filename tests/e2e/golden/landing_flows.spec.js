@@ -1,7 +1,7 @@
 // Golden flows for the landing page: a first visit, read through the DOM only.
 const { test, expect } = require("@playwright/test");
 
-const WORLDS = ["blank", "modern", "1936", "1939", "1962"];
+const WORLDS = ["blank", "modern", "1936", "1939", "1962", "rcw"];
 
 async function openLanding(page) {
   const problems = [];
@@ -68,12 +68,18 @@ test("picking a starting world shows that world on the map", async ({ page }) =>
   await openLanding(page);
   const copy = await readLanding(page);
   const date = page.locator("[data-state-date]");
+  const rcwMap = page.locator('.stage img[src="./assets/world-rcw-1919.webp"]');
   for (const [index, world] of WORLDS.entries()) {
     const pick = page.locator(".world__pick").nth(index);
     await pick.click();
     await expect(pick).toHaveAttribute("aria-pressed", "true");
     await expect(date).toHaveText(copy.en.stateDates[world]);
+    await expect(rcwMap).toHaveCSS("opacity", world === "rcw" ? "1" : "0");
   }
+  await expect(rcwMap).toBeVisible();
+  await page.locator('[data-world="1962"] .world__pick').click();
+  await expect(page.locator('.world[data-world="rcw"] .world__pick')).toHaveAttribute("aria-pressed", "false");
+  await expect(rcwMap).toBeHidden();
 });
 
 test("with reduced motion the map camera moves without animating", async ({ page }) => {
@@ -186,5 +192,8 @@ test("switching to Chinese translates every labelled element", async ({ page }) 
     return misses;
   }, Object.fromEntries(Object.entries(copy.zh).filter(([, value]) => typeof value === "string")));
   expect(untranslated).toEqual([]);
+  await expect(page.locator('.world[data-world="rcw"] b')).toHaveText("俄国内战 · 1919");
+  await expect(page.locator("#showcase h2")).toHaveText("编辑器实景");
+  await expect(page.locator("#showcase img")).toHaveCount(3);
   await expect(page).toHaveTitle(copy.zh.metaTitle);
 });

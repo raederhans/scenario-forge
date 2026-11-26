@@ -1716,6 +1716,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "assets/sample-projects/hoi4-1936-europe-briefing.project.json",
             "assets/sample-projects/hoi4-1939-europe-switch.project.json",
             "assets/sample-projects/tno-1962-atlantropa-briefing.project.json",
+            "assets/sample-projects/rcw-1919-civil-war-briefing.project.json",
             "assets/japan-preview-transport.webp",
             "assets/japan-preview-cities.webp",
             "assets/japan-preview-terrain.webp",
@@ -2114,13 +2115,13 @@ class PagesDistStartupShellTest(unittest.TestCase):
         dist_paths = {record["path"] for record in payload["files"]}
         index_path = PAGES_DIST_ROOT / "app" / "data" / "scenarios" / "index.json"
         scenario_index = json.loads(index_path.read_text(encoding="utf-8"))
-        public_baseline_ids = ["blank_base", "modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"]
+        public_baseline_ids = ["blank_base", "modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", "rcw_1919"]
         scenario_ids = [entry.get("scenario_id") for entry in scenario_index.get("scenarios", [])]
 
         self.assertEqual(scenario_index.get("public_baseline_ids"), public_baseline_ids)
         self.assertEqual(scenario_index["default_scenario_id"], "tno_1962")
-        self.assertEqual(scenario_index.get("developer_preview_ids"), ["rcw_1919"])
-        self.assertEqual(sorted(scenario_ids), sorted([*public_baseline_ids, "rcw_1919"]))
+        self.assertEqual(scenario_index.get("developer_preview_ids"), [])
+        self.assertEqual(sorted(scenario_ids), sorted(public_baseline_ids))
         self.assertNotIn("hgo_1936", scenario_ids)
         self.assertEqual(
             scenario_index.get("pages_dist_policy", {}).get("local_preview_scenario_ids"),

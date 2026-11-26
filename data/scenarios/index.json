@@ -6,11 +6,10 @@
     "modern_world",
     "hoi4_1936",
     "hoi4_1939",
-    "tno_1962"
-  ],
-  "developer_preview_ids": [
+    "tno_1962",
     "rcw_1919"
   ],
+  "developer_preview_ids": [],
   "scenarios": [
     {
       "scenario_id": "blank_base",

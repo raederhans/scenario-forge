@@ -356,7 +356,7 @@ test("sample guide default route shows starter choices without sample state", as
     await expect(page.locator("[data-sample-guide-open-export]")).toBeHidden();
     await expect(page.locator("[data-sample-guide-download-original]")).toBeHidden();
     await expect(page.locator("[data-sample-guide-choices]")).toHaveAttribute("role", "group");
-    await expect(page.locator("[data-sample-guide-choice]")).toHaveCount(5, { timeout: 30000 });
+    await expect(page.locator("[data-sample-guide-choice]")).toHaveCount(6, { timeout: 30000 });
     await expect(page.locator("[data-sample-guide-choice*='hgo']")).toHaveCount(0);
   } catch (error) {
     await writeSampleGuideFailureArtifact(page, testInfo);
@@ -397,7 +397,7 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
     );
 
     const sampleChoices = page.locator("[data-sample-guide-choice]");
-    await expect(sampleChoices).toHaveCount(5, { timeout: 30000 });
+    await expect(sampleChoices).toHaveCount(6, { timeout: 30000 });
     await expect(page.locator("[data-sample-guide-choice='hgo-1936-atlas-preview']")).toHaveCount(0);
     await expect(page.locator("[data-sample-guide-choice='tno-1962-atlantropa-briefing']")).toHaveAttribute(
       "aria-current",
@@ -540,7 +540,7 @@ test("sample guide remains usable across public mobile and desktop widths", asyn
       await page.setViewportSize(viewport);
       await ensureGuideVisible(page);
       await expect(page.locator("[data-sample-guide-helper]")).toBeVisible({ timeout: 30000 });
-      await expect(page.locator("[data-sample-guide-choice]")).toHaveCount(5, { timeout: 30000 });
+      await expect(page.locator("[data-sample-guide-choice]")).toHaveCount(6, { timeout: 30000 });
       await expect(page.locator("[data-sample-guide-open-export]")).toBeVisible();
       await expectNoHorizontalOverflow(page, [
         "[data-sample-guide-helper]",
@@ -598,7 +598,7 @@ test("sample guide and export context localize on the Chinese TNO path", async (
     await expect(page.locator("[data-sample-guide-recommendation]")).toContainText(/推荐导出/);
     await expect(page.locator(".scenario-guide-sample-card__switcher-title")).toContainText(/公开起步示例/);
     await expect(page.locator("[data-sample-guide-open-export]")).toContainText(/打开导出/);
-    await expect(page.locator("[data-sample-guide-choice]")).toHaveCount(5, { timeout: 30000 });
+    await expect(page.locator("[data-sample-guide-choice]")).toHaveCount(6, { timeout: 30000 });
     await expect(page.locator("[data-sample-guide-choice*='hgo']")).toHaveCount(0);
 
     await page.locator("[data-sample-guide-open-export]").click();

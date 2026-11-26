@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 22,
+  "scenario": {
+    "id": "rcw_1919",
+    "version": 2,
+    "baselineHash": "6f3824cf11dcdab195d2b3c4902d2b14f9c10bd2dc9f590e3287cb5de350520f",
+    "viewMode": "ownership"
+  },
+  "mapSemanticMode": "political",
+  "paintMode": "visual",
+  "interactionGranularity": "subdivision",
+  "batchFillScope": "parent",
+  "activePaletteId": "hoi4_vanilla",
+  "layerVisibility": {
+    "showWaterRegions": true,
+    "showScenarioSpecialRegions": false,
+    "showScenarioAtlantropa": false,
+    "showScenarioReliefOverlays": false,
+    "showCityPoints": true,
+    "showUrban": false,
+    "showPhysical": false,
+    "showRivers": false,
+    "showTransport": false,
+    "showSpecialZones": false
+  },
+  "styleConfig": {
+    "ocean": {
+      "fillColor": "#3b4a55"
+    }
+  },
+  "exportWorkbenchUi": {
+    "target": "composite",
+    "format": "png",
+    "scale": "2",
+    "previewMode": "main"
+  }
+}

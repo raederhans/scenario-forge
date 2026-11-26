@@ -16,6 +16,8 @@ const order = JSON.parse(fs.readFileSync(path.join(planDir, "apply_order.json"),
 const plans = order.map(name => JSON.parse(fs.readFileSync(path.join(planDir, name), "utf8")));
 const groups = plans.flatMap(plan => plan.groups);
 const scenarios = ["blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"];
+// Regional scenarios carry their own political parcels, so no merge plan touches them.
+const regionalScenarios = ["rcw_1919"];
 const appliesTo = (plan, scenario) => !plan.scenarios || plan.scenarios.includes(scenario);
 const scenarioGroups = scenario => plans.filter(plan => appliesTo(plan, scenario)).flatMap(plan => plan.groups);
 const globalMembers = plans.filter(plan => !plan.scenarios).flatMap(plan => plan.groups.flatMap(group => group.member_ids));
@@ -109,7 +111,7 @@ test("saved-project merge lineage matches the applied plans in order", () => {
 });
 
 test("runtime assets contain no merged-away political feature IDs", () => {
-  assert.ok(sampleProjects.length && sampleProjects.every(sample => scenarios.includes(sample.scenario)));
+  assert.ok(sampleProjects.length && sampleProjects.every(sample => scenarios.includes(sample.scenario) || regionalScenarios.includes(sample.scenario)));
   const stale = [
     ...staleIds(globalAssets.flatMap(name => listJson(path.join(root, "data", name))), globalMembers),
     ...scenarios.flatMap(scenarioStaleIds),

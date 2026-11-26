@@ -45,6 +45,7 @@ const PUBLIC_SCENARIO_IDS = [
   "hoi4_1936",
   "hoi4_1939",
   "tno_1962",
+  "rcw_1919",
 ];
 
 function readJson(relativePath) {
@@ -93,7 +94,6 @@ function readLandingUrlJson(url) {
 function assertNoDeveloperPreviewId(value, context) {
   const serialized = JSON.stringify(value);
   assert.equal(serialized.includes("hgo_1936"), false, `${context} must stay outside developer preview assets`);
-  assert.equal(serialized.includes("rcw_1919"), false, `${context} must stay outside developer preview assets`);
 }
 
 function resolveMarkerPath(value, expression) {
@@ -276,7 +276,7 @@ test("sample runs manifest exposes only public scenario project downloads", () =
 
   assert.deepEqual(scenarioIndex.public_baseline_ids, PUBLIC_SCENARIO_IDS);
   assert.deepEqual(manifest.public_scenario_ids, PUBLIC_SCENARIO_IDS);
-  assert.deepEqual(scenarioIndex.developer_preview_ids, ["rcw_1919"]);
+  assert.deepEqual(scenarioIndex.developer_preview_ids, []);
   assert.deepEqual(manifest.developer_preview_exclusions, scenarioIndex.developer_preview_ids);
   assert.equal(manifest.sample_projects.length, PUBLIC_SCENARIO_IDS.length);
   assert.equal(new Set(sampleProjectIds).size, sampleProjectIds.length);
@@ -403,7 +403,8 @@ test("public sample list resolver keeps manifest validation separate from public
   const manifest = readJson(SAMPLE_RUNS_PATH);
   const publicList = resolvePublicSampleProjectListFromManifest(manifest);
 
-  assert.equal(publicList.length, 5);
+  assert.equal(publicList.length, 6);
+  assert.equal(publicList.at(-1).id, "rcw-1919-civil-war-briefing");
   assert.deepEqual(publicList.map((entry) => entry.id), manifest.sample_projects.map((entry) => entry.id));
   assert.equal(publicList.find((entry) => entry.id === "modern-world-japan-corridor").scenarioId, "modern_world");
   assert.deepEqual(
