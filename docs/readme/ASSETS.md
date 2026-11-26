@@ -23,7 +23,7 @@ All editor shots were captured on 2026-11-26 from the local editor at `/app/` wi
 - `showcase-scenario-data.webp`: HOI4 1936 sample with Country indicators on `scenario_factories_total`, `{center: [16, 50], k: 7.5}`, cropped to 1600 × 1000.
 - `world-rcw-1919.webp` (landing stage, Russian Civil War sample): the RCW 1919 scenario at its own opening view, padded to 1600 × 1000.
 - `docs/readme/hgo-atlas.webp` (README): the HGO Atlas editor in English, 1600 × 900.
-- `social-preview.svg|png`: the link-preview artwork; its embedded image is `product-workspace.webp` at 1600 × 900. Rebuild the PNG with `python tools/rasterize_landing_assets.py --source social-preview.svg`.
+- `social-preview.svg|png`: the link-preview artwork; its embedded image is the same workspace capture as a 3200 × 1800 PNG. Rebuild the PNG with `python tools/rasterize_landing_assets.py --source social-preview.svg`.
 
 HOI4 and TNO illustrations represent their game settings, including alternate-history geography. Geographic assets keep their dataset terms; consult the JSON companions and `data/source_ledger.json`.
 
