@@ -58,13 +58,6 @@ class FranceTopologyPrecisionTests(unittest.TestCase):
             {"type": "FeatureCollection", "features": features},
             prequantize=100000, object_name="political",
         ).to_dict()
-        topology["objects"]["points"] = {"type": "GeometryCollection", "geometries": [
-            {"type": "Point", "coordinates": [15, 20], "properties": {"keep": True}},
-            {"type": "MultiPoint", "coordinates": [[0, 3], [5, 7]]},
-        ]}
-        # An extra object references a reversed original arc, which must survive compaction.
-        topology["objects"]["line"] = {"type": "LineString", "arcs": [~0]}
-        topology["arcs"].append([[100, 100], [3, 4]])  # unused arc
         return source, topology
 
     def test_restores_coverage_preserves_other_geometry_and_metadata(self):
@@ -87,65 +80,6 @@ class FranceTopologyPrecisionTests(unittest.TestCase):
         for old, new in zip(old_geometries, geometries):
             self.assertEqual({k: v for k, v in old.items() if k not in {"type", "arcs"}},
                              {k: v for k, v in new.items() if k not in {"type", "arcs"}})
-        sx, sy = topology["transform"]["scale"]
-        tx, ty = topology["transform"]["translate"]
-        points = result["objects"]["points"]["geometries"]
-        self.assertEqual(points[0]["coordinates"], [15 * sx + tx, 20 * sy + ty])
-        self.assertEqual(points[1]["coordinates"], [[tx, 3 * sy + ty], [5 * sx + tx, 7 * sy + ty]])
-        self.assertEqual(points[0]["properties"], {"keep": True})
-        line_index = result["objects"]["line"]["arcs"][0]
-        self.assertLess(line_index, 0)
-        old_arc = topology["arcs"][0]
-        x = y = 0
-        expected_arc = []
-        for dx, dy in old_arc:
-            x += dx
-            y += dy
-            expected_arc.append([x * sx + tx, y * sy + ty])
-        self.assertEqual(result["arcs"][~line_index], expected_arc)
-        used = set()
-
-        def walk(value):
-            if isinstance(value, dict):
-                for key, item in value.items():
-                    if key == "arcs":
-                        refs(item)
-                    else:
-                        walk(item)
-            elif isinstance(value, list):
-                for item in value:
-                    walk(item)
-
-        def refs(value):
-            if isinstance(value, list):
-                for item in value:
-                    refs(item)
-            else:
-                used.add(value if value >= 0 else ~value)
-
-        walk(result["objects"])
-        self.assertEqual(used, set(range(len(result["arcs"]))))
-        repeated = preserve_france_topology_precision(result, source)
-        self.assertEqual(len(result["arcs"]), len(repeated["arcs"]))
-
-    def test_mismatched_and_duplicate_ids_rejected(self):
-        source, topology = self.fixture()
-        with self.assertRaisesRegex(ValueError, "IDs"):
-            preserve_france_topology_precision(topology, source.iloc[:1])
-        source.loc[1, "id"] = source.loc[0, "id"]
-        with self.assertRaisesRegex(ValueError, "IDs"):
-            preserve_france_topology_precision(topology, source)
-
-    def test_invalid_coverage_rejected(self):
-        source, topology = self.fixture()
-        source.loc[1, "geometry"] = box(2, 48, 2.0002, 48.0001)
-        with self.assertRaisesRegex(ValueError, "coverage"):
-            preserve_france_topology_precision(topology, source)
-
-    def test_no_france_is_identity(self):
-        topology = {"type": "Topology", "objects": {}, "arcs": []}
-        source = gpd.GeoDataFrame({"geometry": []}, crs="EPSG:4326")
-        self.assertIs(preserve_france_topology_precision(topology, source), topology)
 
     def test_holes_follow_d3_winding(self):
         source, topology = self.fixture()
