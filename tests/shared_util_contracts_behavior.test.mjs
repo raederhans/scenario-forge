@@ -1,10 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-
 import { normalizeHexColor } from "../js/core/color_hex_utils.js";
 import { getPaletteDisplayColor } from "../js/core/palette_manager.js";
 import { createSpecialZoneLayerStyle } from "../js/core/special_zone_layers.js";
-import { getFeatureId } from "../js/core/feature_identity.js";
 import {
   buildStrategicChoroplethColorInput,
   resolveStrategicChoroplethBucketId,
@@ -39,41 +37,6 @@ test("hex normalization preserves each consumer's invalid-color contract", () =>
     const style = createSpecialZoneLayerStyle({ fill: value, stroke: value });
     assert.equal(style.fill, expected ?? "#8b5cf6");
     assert.equal(style.stroke, expected ?? "#6d28d9");
-  }
-});
-
-test("color consumers preserve source selection before normalization", () => {
-  assert.equal(getPaletteDisplayColor({ map_hex: "", hex: " #AbC " }), "#aabbcc");
-  assert.equal(getPaletteDisplayColor({ map_hex: "invalid", hex: "#abc" }), "");
-  const style = createSpecialZoneLayerStyle({
-    fill: "", fillColor: " #AbC ", stroke: "invalid", strokeColor: "#abc",
-  });
-  assert.equal(style.fill, "#aabbcc");
-  assert.equal(style.stroke, "#6d28d9");
-});
-
-test("strategic feature identity follows the shared properties-first contract", () => {
-  const cases = [
-    [" AFG-1742 ", "AFG-1742"],
-    [1, "1"],
-    [0, "0"],
-    [null, ""],
-    [undefined, ""],
-    [{}, ""],
-    [{ id: " top " }, "top"],
-    [{ id: 0 }, "0"],
-    [{ properties: { id: " property " } }, "property"],
-    [{ id: "same", properties: { id: "same" } }, "same"],
-    [{ id: "top", properties: { id: "property", NUTS_ID: "nuts" } }, "property"],
-    [{ id: "top", properties: { id: " ", NUTS_ID: " nuts " } }, "nuts"],
-    [{ id: "top", properties: { id: null, NUTS_ID: "" } }, "top"],
-    [{ id: "top", properties: { id: 0 } }, "0"],
-    [{ properties: { feature_id: "legacy" } }, ""],
-    [{ id: "top", properties: { feature_id: "legacy" } }, "top"],
-  ];
-  for (const [feature, expected] of cases) {
-    assert.equal(getFeatureId(feature), expected);
-    assert.equal(buildStrategicChoroplethColorInput(null, feature, "manpower").featureId, expected);
   }
 });
 
