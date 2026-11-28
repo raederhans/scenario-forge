@@ -367,9 +367,7 @@ export function buildTextureDiagnostic(state = {}, { translate } = {}) {
     label: contract?.label || "Texture",
     enabled,
     severity: enabled ? STATUS_SEVERITY.ACTIVE : STATUS_SEVERITY.MUTED,
-    summary: sanitizeLayerStatusText(enabled
-      ? joinStatusParts(translateUi(translate, "Enabled"), translateUi(translate, mode))
-      : translateUi(translate, "Hidden")),
+    summary: sanitizeLayerStatusText(translateUi(translate, enabled ? "Enabled" : "Hidden")),
   };
 }
 

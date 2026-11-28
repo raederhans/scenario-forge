@@ -13,10 +13,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "0 种颜色",
     "en": "0 colors"
   },
-  "0 presets": {
-    "zh": "0 个预设",
-    "en": "0 presets"
-  },
   "0–200 m shelf": {
     "zh": "0–200 米 陆架",
     "en": "0–200 m shelf"
@@ -54,8 +50,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "14 August 1939 · On the eve of war"
   },
   "1930s Electrification Proxy": {
-    "zh": "1930年代电气化代理",
-    "en": "1930s Electrification Proxy"
+    "zh": "1930 年代",
+    "en": "1930s"
   },
   "1962 · Alternate history after an Axis victory": {
     "zh": "1962 年 · 轴心国胜利后的架空世界",
@@ -245,6 +241,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "自适应色彩倾向",
     "en": "Adaptive Tint"
   },
+  "Adaptive mode is unavailable for this map.": {
+    "zh": "此地图暂不支持自适应模式。",
+    "en": "Adaptive mode is unavailable for this map."
+  },
   "Add": {
     "zh": "添加",
     "en": "Add"
@@ -266,8 +266,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Add current tile"
   },
   "Add dev selection": {
-    "zh": "添加当前开发选择",
-    "en": "Add dev selection"
+    "zh": "添加已选地块",
+    "en": "Add selected parcels"
   },
   "Add imported ids": {
     "zh": "添加导入 ID",
@@ -541,10 +541,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "阿尔卑斯 DEM 阴影",
     "en": "Alps DEM shading"
   },
-  "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.": {
-    "zh": "400% 缩放启用阿尔卑斯覆被细节；参考年份为 2019，其他地区沿用概览。",
-    "en": "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere."
-  },
   "Alps terrain shading": {
     "zh": "阿尔卑斯山地形阴影",
     "en": "Alps terrain shading"
@@ -571,10 +567,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Aluminium": {
     "zh": "铝",
     "en": "Aluminium"
-  },
-  "Ambiguous identity": {
-    "zh": "身份存在歧义",
-    "en": "Ambiguous identity"
   },
   "An alternate 1962 in which Germany won the Second World War. The Greater Germanic Reich rules Europe up to the Arkhangelsk–Astrakhan line through its Reichskommissariats, Japan leads the Co-Prosperity Sphere in Asia, and the United States heads the OFN. East of the line, Russia has collapsed into rival warlord states.": {
     "zh": "德国赢得第二次世界大战后的架空 1962 年。大日耳曼帝国通过各帝国专员辖区统治欧洲，直至阿尔汉格尔斯克—阿斯特拉罕一线；日本主导亚洲的共荣圈，美国领导自由国家组织（OFN）。这条线以东，俄罗斯已分裂为互相争斗的军阀政权。",
@@ -1200,14 +1192,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "边界与线条效果",
     "en": "Borders and line effects"
   },
-  "Borders need recalculation": {
-    "zh": "边界需要重算",
-    "en": "Borders need recalculation"
-  },
-  "Borders up to date": {
-    "zh": "边界已更新",
-    "en": "Borders up to date"
-  },
   "Bottom left": {
     "zh": "左下",
     "en": "Bottom left"
@@ -1809,8 +1793,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Clear All"
   },
   "Clear Channel": {
-    "zh": "清空通道",
-    "en": "Clear Channel"
+    "zh": "清除全部调整",
+    "en": "Clear all adjustments"
   },
   "Clear Core Territory Visual Overrides": {
     "zh": "清除核心领土视觉覆盖",
@@ -2114,10 +2098,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Colonial Government": {
     "zh": "殖民政府",
     "en": "Colonial Government"
-  },
-  "Colonial predecessor": {
-    "zh": "殖民前身实体",
-    "en": "Colonial predecessor"
   },
   "Colony": {
     "zh": "殖民地",
@@ -2516,8 +2496,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Core"
   },
   "Core Sharpness (Modern only)": {
-    "zh": "核心锐度（仅现代）",
-    "en": "Core Sharpness (Modern only)"
+    "zh": "核心锐度",
+    "en": "Core Sharpness"
   },
   "Core Territory": {
     "zh": "核心领土",
@@ -2544,8 +2524,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Corridor"
   },
   "Corridor Strength (Modern only)": {
-    "zh": "通道强度（仅现代）",
-    "en": "Corridor Strength (Modern only)"
+    "zh": "通道强度",
+    "en": "Corridor Strength"
   },
   "Could not copy image. Check clipboard permissions or download the snapshot.": {
     "zh": "无法复制图片。请检查剪贴板权限，或下载快照。",
@@ -2715,14 +2695,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "覆盖缺口",
     "en": "Coverage gaps"
   },
-  "Coverage loading": {
-    "zh": "覆盖数据加载中",
-    "en": "Coverage loading"
-  },
-  "Coverage report unavailable": {
-    "zh": "覆盖报告不可用",
-    "en": "Coverage report unavailable"
-  },
   "Coverage scope": {
     "zh": "覆盖范围",
     "en": "Coverage scope"
@@ -2750,10 +2722,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff.": {
     "zh": "创建作战线、行动图形和单位计数器，作为项目内的战略标注用于导出和交接。",
     "en": "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff."
-  },
-  "Create visible layers to preview a story sequence.": {
-    "zh": "创建可见图层来预览故事序列。",
-    "en": "Create visible layers to preview a story sequence."
   },
   "Critical checks": {
     "zh": "关键检查",
@@ -2787,10 +2755,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "当前场景",
     "en": "Current Scenario"
   },
-  "Current Scope": {
-    "zh": "当前范围",
-    "en": "Current Scope"
-  },
   "Current Selection": {
     "zh": "当前选中对象",
     "en": "Current Selection"
@@ -2798,10 +2762,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Current Session": {
     "zh": "当前会话",
     "en": "Current Session"
-  },
-  "Current Threshold": {
-    "zh": "当前阈值",
-    "en": "Current Threshold"
   },
   "Current Tool": {
     "zh": "当前工具",
@@ -2916,7 +2876,7 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Dash"
   },
   "Dash Style": {
-    "zh": "破折号样式",
+    "zh": "线型",
     "en": "Dash Style"
   },
   "Dashed": {
@@ -3512,20 +3472,12 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Duplicate zone layer"
   },
   "Dynamic / Runtime": {
-    "zh": "动态 / 运行时",
-    "en": "Dynamic / Runtime"
+    "zh": "动态国家",
+    "en": "Dynamic tags"
   },
   "Dynamic Borders": {
     "zh": "动态边界",
     "en": "Dynamic Borders"
-  },
-  "Dynamic borders disabled": {
-    "zh": "动态边界已禁用",
-    "en": "Dynamic borders disabled"
-  },
-  "Dynamic tag": {
-    "zh": "动态 tag",
-    "en": "Dynamic tag"
   },
   "Dynamic thresholds decide when aggregation should take over.": {
     "zh": "动态阈值决定聚合何时应接管。",
@@ -3692,8 +3644,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Enable Bathymetry to use depth presets."
   },
   "Enable Channel": {
-    "zh": "启用通道",
-    "en": "Enable Channel"
+    "zh": "启用局部调整",
+    "en": "Enable local adjustments"
   },
   "Enable Day / Night Cycle": {
     "zh": "启用昼夜循环",
@@ -4169,10 +4121,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Ferry service": {
     "zh": "渡轮服务",
     "en": "Ferry service"
-  },
-  "Fictional / alt-history": {
-    "zh": "虚构或架空历史",
-    "en": "Fictional / alt-history"
   },
   "File": {
     "zh": "文件",
@@ -4800,10 +4748,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "仅历史模式",
     "en": "Historical only"
   },
-  "Historical predecessor": {
-    "zh": "历史前身实体",
-    "en": "Historical predecessor"
-  },
   "Historical transfer already matches current ownership.": {
     "zh": "历史转让已经与当前所有权相匹配。",
     "en": "Historical transfer already matches current ownership."
@@ -4967,14 +4911,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Indicator data could not be loaded. Retry.": {
     "zh": "指标数据加载失败，请重试。",
     "en": "Indicator data could not be loaded. Retry."
-  },
-  "Indicator data is ready to load.": {
-    "zh": "指标数据待加载。",
-    "en": "Indicator data is ready to load."
-  },
-  "Indicator data loaded.": {
-    "zh": "指标数据已加载。",
-    "en": "Indicator data loaded."
   },
   "Industrial Land": {
     "zh": "工业用地",
@@ -5729,8 +5665,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Link Lakes To Ocean"
   },
   "Link Scope To Reach": {
-    "zh": "链接范围达到",
-    "en": "Link Scope To Reach"
+    "zh": "范围随覆盖度联动",
+    "en": "Scope follows reach"
   },
   "Link copied.": {
     "zh": "已复制链接。",
@@ -6117,7 +6053,7 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Major Minimum Elevation (m)"
   },
   "Major Opacity": {
-    "zh": "主要不透明度",
+    "zh": "主线不透明度",
     "en": "Major Opacity"
   },
   "Major Stations": {
@@ -6315,18 +6251,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "地图缩放控件",
     "en": "Map zoom controls"
   },
-  "Mapped": {
-    "zh": "已匹配",
-    "en": "Mapped"
-  },
-  "Mapped parcels": {
-    "zh": "有数值地块",
-    "en": "Mapped parcels"
-  },
-  "Mapped to": {
-    "zh": "映射到",
-    "en": "Mapped to"
-  },
   "Marker Scale": {
     "zh": "标记缩放",
     "en": "Marker Scale"
@@ -6508,7 +6432,7 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Minor Minimum Elevation (m)"
   },
   "Minor Opacity": {
-    "zh": "轻微不透明度",
+    "zh": "次线不透明度",
     "en": "Minor Opacity"
   },
   "Minor Step": {
@@ -6558,6 +6482,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Modern administrative regions": {
     "zh": "现代行政区",
     "en": "Modern administrative regions"
+  },
+  "Modern only": {
+    "zh": "仅现代模式",
+    "en": "Modern only"
   },
   "Modern reference (2023/2024)": {
     "zh": "现代参考（2023/2024）",
@@ -6692,8 +6620,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Names from 200% zoom; DEM shading from 400%. Current geography reference."
   },
   "Names from 200% zoom; terrain shading from 400%. Current geography reference.": {
-    "zh": "放大至 200% 显示名称，400% 显示地形阴影。以现今地理为参考。",
-    "en": "Names from 200% zoom; terrain shading from 400%. Current geography reference."
+    "zh": "放大至 200% 显示地貌名称，400% 显示阿尔卑斯细节与地形阴影。以现今地理为参考。",
+    "en": "At 200% zoom, landform names appear. At 400%, Alpine details and terrain shading appear. Based on present-day geography."
   },
   "National": {
     "zh": "国家的",
@@ -6932,8 +6860,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "No manual zones"
   },
   "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.": {
-    "zh": "没有匹配颜色。清空搜索，或尝试国家名称、ISO-2 代码、来源代码。",
-    "en": "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag."
+    "zh": "没有匹配的颜色。",
+    "en": "No matching colors."
   },
   "No matching commands": {
     "zh": "没有匹配的命令",
@@ -7084,8 +7012,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "No strategic annotations currently visible"
   },
   "No supported countries in current dataset.": {
-    "zh": "当前数据集中没有受支持的国家。",
-    "en": "No supported countries in current dataset."
+    "zh": "当前地图没有可用的国家。",
+    "en": "No countries available on this map."
   },
   "No symbols match the current filter.": {
     "zh": "没有符号与当前过滤器匹配。",
@@ -7850,10 +7778,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "地貌区域名称",
     "en": "Physical region names"
   },
-  "Pick a city marker style, then tune marker density and label density for the current map scale.": {
-    "zh": "先选一种城市点位样式，再按当前地图比例调整标记密度和标签密度。",
-    "en": "Pick a city marker style, then tune marker density and label density for the current map scale."
-  },
   "Pick the target and the owner before painting.": {
     "zh": "绘制前先选目标和归属方。",
     "en": "Pick the target and the owner before painting."
@@ -8019,32 +7943,20 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Population (scenario start)"
   },
   "Population / City Boost (Modern only)": {
-    "zh": "人口亮度增强（仅限现代）",
-    "en": "Population / City Boost (Modern only)"
+    "zh": "人口亮度增强",
+    "en": "Population / City Boost"
   },
   "Population Boost Strength (Modern only)": {
-    "zh": "人口增强强度（仅限现代）",
-    "en": "Population Boost Strength (Modern only)"
+    "zh": "人口增强强度",
+    "en": "Population Boost Strength"
   },
   "Population aged 65 and above": {
     "zh": "65岁及以上人口占比",
     "en": "Population aged 65 and above"
   },
-  "Population coverage": {
-    "zh": "人口数据覆盖率",
-    "en": "Population coverage"
-  },
   "Population data could not be loaded. Retry.": {
     "zh": "人口数据加载失败，请重试。",
     "en": "Population data could not be loaded. Retry."
-  },
-  "Population data is ready to load.": {
-    "zh": "人口数据待加载。",
-    "en": "Population data is ready to load."
-  },
-  "Population data loaded.": {
-    "zh": "人口数据已加载。",
-    "en": "Population data loaded."
   },
   "Population density": {
     "zh": "人口密度",
@@ -8065,10 +7977,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Population is unavailable on this basemap.": {
     "zh": "当前底图不支持人口空间图层。",
     "en": "Population is unavailable on this basemap."
-  },
-  "Population layer is off.": {
-    "zh": "人口图层已关闭。",
-    "en": "Population layer is off."
   },
   "Population statistics": {
     "zh": "人口统计",
@@ -8951,8 +8859,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Replace color"
   },
   "Replace with dev selection": {
-    "zh": "用开发选择替换",
-    "en": "Replace with dev selection"
+    "zh": "用已选地块替换",
+    "en": "Replace with selected parcels"
   },
   "Replace with imported ids": {
     "zh": "用导入 ID 替换",
@@ -9586,17 +9494,9 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "剧本已退出。",
     "en": "Scenario cleared."
   },
-  "Scenario controls are locked until the page reloads.": {
-    "zh": "场景控件将被锁定，直到页面重新加载。",
-    "en": "Scenario controls are locked until the page reloads."
-  },
   "Scenario cores × parcel area": {
     "zh": "剧本核心归属 × 地块面积",
     "en": "Scenario cores × parcel area"
-  },
-  "Scenario countries mapped": {
-    "zh": "场景国家已匹配",
-    "en": "Scenario countries mapped"
   },
   "Scenario data": {
     "zh": "剧本数据",
@@ -10335,8 +10235,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Show Parent Borders By Country"
   },
   "Show Parent Unit Borders": {
-    "zh": "显示父单元边框",
-    "en": "Show Parent Unit Borders"
+    "zh": "显示",
+    "en": "Show"
   },
   "Show Port Labels": {
     "zh": "显示港口标签",
@@ -10609,9 +10509,17 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "部分国家仍在加载细节，将只为已加载的地块填色。",
     "en": "Some countries are still loading details. Only loaded parcels will be filled."
   },
+  "Some countries have no data.": {
+    "zh": "部分国家无数据。",
+    "en": "Some countries have no data."
+  },
   "Some data failed to load": {
     "zh": "部分数据加载失败",
     "en": "Some data failed to load"
+  },
+  "Some parcels have no population data.": {
+    "zh": "部分地块无人口数据。",
+    "en": "Some parcels have no population data."
   },
   "Some parcels still need detail loading.": {
     "zh": "部分地块的细节尚未加载。",
@@ -10832,10 +10740,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Split": {
     "zh": "分裂",
     "en": "Split"
-  },
-  "Split state": {
-    "zh": "分裂态国家",
-    "en": "Split state"
   },
   "Square grid": {
     "zh": "方格",
@@ -11222,8 +11126,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Texture"
   },
   "Texture Opacity (Modern only)": {
-    "zh": "背景夜光不透明度（仅现代）",
-    "en": "Background Light Opacity (Modern only)"
+    "zh": "背景夜光不透明度",
+    "en": "Background Light Opacity"
   },
   "Texture Overlay": {
     "zh": "纹理覆盖",
@@ -11501,10 +11405,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "专题图层目录不可用",
     "en": "Thematic catalog unavailable"
   },
-  "Thematic layer is off.": {
-    "zh": "专题图层已关闭。",
-    "en": "Thematic layer is off."
-  },
   "Theocracy": {
     "zh": "神权政治",
     "en": "Theocracy"
@@ -11680,6 +11580,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "This scenario has no preset regions.": {
     "zh": "当前剧本没有预设区域",
     "en": "This scenario has no preset regions."
+  },
+  "This scenario has no strategic data.": {
+    "zh": "此剧本没有战略数据。",
+    "en": "This scenario has no strategic data."
   },
   "This scenario has no visible special regions. Check the visibility settings on the left.": {
     "zh": "当前剧本没有可见的特殊区域，可检查左侧的显示设置。",
@@ -11872,10 +11776,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Transport Visual Mode": {
     "zh": "交通显示模式",
     "en": "Transport Visual Mode"
-  },
-  "Transport Workbench": {
-    "zh": "交通工作台",
-    "en": "Transport Workbench"
   },
   "Transport actions": {
     "zh": "交通操作",
@@ -12109,10 +12009,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "未映射",
     "en": "Unmapped"
   },
-  "Unmatched": {
-    "zh": "未匹配",
-    "en": "Unmatched"
-  },
   "Unmatched map regions": {
     "zh": "无法对应的地块",
     "en": "Unmatched map regions"
@@ -12137,10 +12033,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "未登记颜色 {color}",
     "en": "Unregistered color {color}"
   },
-  "Unreviewed": {
-    "zh": "未审核",
-    "en": "Unreviewed"
-  },
   "Unsaved changes": {
     "zh": "有未保存的修改",
     "en": "Unsaved changes"
@@ -12152,10 +12044,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Unsaved project changes.": {
     "zh": "项目有未保存改动。",
     "en": "Unsaved project changes."
-  },
-  "Unsupported runtime country": {
-    "zh": "运行时国家未收录",
-    "en": "Unsupported runtime country"
   },
   "Untitled project": {
     "zh": "未命名项目",
@@ -12397,10 +12285,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "正在使用兼容显示",
     "en": "Using compatible display"
   },
-  "Using the scenario's original borders.": {
-    "zh": "使用剧本原始归属。",
-    "en": "Using the scenario's original borders."
-  },
   "Utilities": {
     "zh": "实用工具",
     "en": "Utilities"
@@ -12580,10 +12464,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Waiting for the active industrial land pack manifest": {
     "zh": "等待当前工业用地包清单",
     "en": "Waiting for the active industrial land pack manifest"
-  },
-  "Warlord / regional tag": {
-    "zh": "军阀或地区性 tag",
-    "en": "Warlord / regional tag"
   },
   "Warmth": {
     "zh": "暖色度",
@@ -12933,14 +12813,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "港口",
     "en": "ports"
   },
-  "preset": {
-    "zh": "个预设",
-    "en": "preset"
-  },
-  "presets": {
-    "zh": "个预设",
-    "en": "presets"
-  },
   "presets moved to Releasable Countries.": {
     "zh": "个预设已移动到“可释放国家”中。",
     "en": "presets moved to Releasable Countries."
@@ -13022,8 +12894,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "workbench board"
   },
   "{a} and {b} · ΔE {distance}": {
-    "zh": "{a} 与 {b} · ΔE {distance}",
-    "en": "{a} and {b} · ΔE {distance}"
+    "zh": "{a} 与 {b} 颜色过近",
+    "en": "{a} and {b} look too similar"
   },
   "{color} · disconnected fragment ({count} regions)": {
     "zh": "{color} · 不相连的小碎片（{count} 块）",

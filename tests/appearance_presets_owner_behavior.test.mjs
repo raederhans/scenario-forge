@@ -55,8 +55,6 @@ function createHarness({ t = (value) => value } = {}) {
     exportButton: new TestElement(),
     importButton: new TestElement(),
     importInput: new TestElement(),
-    summary: new TestElement(),
-    list: new TestElement(),
   };
   const dirtyReasons = [];
   const afterApplyCalls = [];
@@ -102,25 +100,20 @@ function createHarness({ t = (value) => value } = {}) {
 
 test("appearance presets owner localizes empty state and dynamic list state", () => {
   const labels = {
-    preset: "个预设",
-    presets: "个预设",
     "No appearance presets saved": "暂无外观预设",
   };
   const harness = createHarness({ t: (value) => labels[value] || value });
 
   harness.owner.renderAppearancePresetsUi();
 
-  assert.equal(harness.nodes.summary.textContent, "0 个预设");
-  assert.equal(harness.nodes.list.textContent, "暂无外观预设");
-  assert.equal(harness.nodes.list.dataset.presetCount, "0");
+  assert.equal(harness.nodes.select.children[0].textContent, "暂无外观预设");
+  assert.equal(harness.nodes.select.children[0].disabled, true);
   assert.equal(harness.nodes.select.disabled, true);
 
   harness.nodes.nameInput.value = "Glow";
   harness.owner.saveCurrentAppearancePreset();
 
-  assert.equal(harness.nodes.summary.textContent, "1 个预设");
-  assert.equal(harness.nodes.list.textContent, "Glow");
-  assert.equal(harness.nodes.list.dataset.presetCount, "1");
+  assert.equal(harness.nodes.select.children[0].textContent, "Glow");
   assert.equal(harness.nodes.select.disabled, false);
 });
 

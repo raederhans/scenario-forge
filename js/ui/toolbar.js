@@ -26,7 +26,6 @@ import {
   refreshColorState,
   refreshResolvedColorsForFeatures,
   resetZoomToFit,
-  recomputeDynamicBordersNow,
   zoomByStep,
   setZoomPercent,
   RENDER_PASS_NAMES,
@@ -248,7 +247,6 @@ function initToolbar({ render } = {}) {
   const scenarioContextCollapseBtn = document.getElementById("scenarioContextCollapseBtn");
   const scenarioContextSelectionItem = document.getElementById("scenarioContextSelectionItem");
   const scenarioContextScenarioText = document.getElementById("scenarioContextScenarioText");
-  const scenarioContextModeText = document.getElementById("scenarioContextModeText");
   const scenarioContextActiveText = document.getElementById("scenarioContextActiveText");
   const scenarioContextSelectionText = document.getElementById("scenarioContextSelectionText");
   const scenarioTransportWorkbenchBtn = document.getElementById("scenarioTransportWorkbenchBtn");
@@ -330,8 +328,6 @@ function initToolbar({ render } = {}) {
   const dockQuickFillHint = document.getElementById("dockQuickFillHint");
   const paintModeVisualBtn = document.getElementById("paintModeVisualBtn");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
-  const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
-  const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
   const oceanFillColor = document.getElementById("oceanFillColor");
   const oceanRegionNamesToggle = document.getElementById("oceanRegionNamesToggle");
   const lakeLinkToOcean = document.getElementById("lakeLinkToOcean");
@@ -1000,7 +996,6 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "refreshTransportWorkbenchUiFn", renderTransportWorkbenchUi);
   initializeTransportWorkbenchRuntime();
 
-  const getPaintModeLabel = () => t("Visual Color", "ui");
 
   const getPrimaryActionLabel = () => t("Auto-Fill Visuals", "ui");
 
@@ -1042,7 +1037,6 @@ function initToolbar({ render } = {}) {
     scenarioContextBar,
     scenarioContextCollapseBtn,
     scenarioContextScenarioText,
-    scenarioContextModeText,
     scenarioContextActiveText,
     scenarioContextSelectionItem,
     scenarioContextSelectionText,
@@ -1050,7 +1044,6 @@ function initToolbar({ render } = {}) {
     scenarioGuidePopover,
     mapContainer,
     zoomControls,
-    getPaintModeLabel,
     getWorkspaceSelectionLabel,
     syncScenarioGuideTriggerButtons,
     updateLanguageToggleUi,
@@ -1070,8 +1063,6 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "triggerScenarioGuideFn", triggerScenarioGuide);
 
   const refreshPaintControlsLayout = () => {
-    const isScenarioMode = !!runtimeState.activeScenarioId;
-    const showBorderMaintenance = isScenarioMode;
     const primaryActionLabel = getPrimaryActionLabel();
 
     if (document.getElementById("labelPresetPolitical")) {
@@ -1080,14 +1071,6 @@ function initToolbar({ render } = {}) {
     if (presetPolitical) {
       presetPolitical.setAttribute("aria-label", primaryActionLabel);
       presetPolitical.setAttribute("title", primaryActionLabel);
-    }
-
-    if (recalculateBordersBtn) {
-      recalculateBordersBtn.classList.toggle("hidden", !showBorderMaintenance);
-    }
-
-    if (dynamicBorderStatus) {
-      dynamicBorderStatus.classList.toggle("hidden", !showBorderMaintenance);
     }
 
     if (protectPaint) protectPaint.checked = runtimeState.onlyUnpainted;
@@ -1263,21 +1246,6 @@ function initToolbar({ render } = {}) {
     refreshWorkspaceStatus();
     callRuntimeHook(runtimeState, "renderPresetTreeFn");
   };
-  const refreshDynamicBorderStatus = () => {
-    if (dynamicBorderStatus) {
-      if (!runtimeState.runtimePoliticalTopology?.objects?.political) {
-        dynamicBorderStatus.textContent = t("Dynamic borders disabled", "ui");
-      } else if (runtimeState.dynamicBordersDirty) {
-        dynamicBorderStatus.textContent = t("Borders need recalculation", "ui");
-      } else {
-        dynamicBorderStatus.textContent = t("Borders up to date", "ui");
-      }
-    }
-    if (recalculateBordersBtn) {
-      recalculateBordersBtn.disabled = !runtimeState.dynamicBordersDirty;
-    }
-  };
-  registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
   const riverCellPicker = createRiverCellPicker({
     state: runtimeState,
     panel: document.getElementById("riverCellPicker"),
@@ -1318,7 +1286,6 @@ function initToolbar({ render } = {}) {
     riverPaintControls.sync();
     refreshPaintControlsLayout();
     refreshActiveSovereignLabel();
-    refreshDynamicBorderStatus();
     refreshWorkspaceStatus();
     updateDockCollapsedUi();
   };
@@ -2083,12 +2050,6 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  if (recalculateBordersBtn) {
-    recalculateBordersBtn.addEventListener("click", () => {
-      recomputeDynamicBordersNow({ renderNow: true, reason: "manual-toolbar" });
-    });
-  }
-
   if (presetClear && !presetClear.dataset.bound) {
     presetClear.addEventListener("click", async () => {
       const confirmed = await showAppDialog({
@@ -2120,7 +2081,6 @@ function initToolbar({ render } = {}) {
       runtimeState.sovereignBaseColors = getProjectCountryBaseColors(runtimeState);
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();
-      refreshDynamicBorderStatus();
       markDirty("clear-map");
       const clearEntry = pushHistoryEntry({
         kind: "clear-map",

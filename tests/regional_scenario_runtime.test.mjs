@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import test from "node:test";
 import { createStartupDataPipelineOwner } from "../js/bootstrap/startup_data_pipeline.js";
 import { createDeferredDetailPromotionOwner } from "../js/bootstrap/deferred_detail_promotion.js";
+import { importProjectTextThroughFunnel } from "../js/core/interaction_funnel.js";
 import { state } from "../js/core/state.js";
 import { applyScenarioBundle, clearActiveScenario, prepareScenarioDetailTopologyState } from "../js/core/scenario_manager.js";
 import { getScenarioRegion, isRegionalScenario } from "../js/core/scenario/scenario_region.js";
@@ -301,3 +302,28 @@ for (const startRegional of [false, true]) {
     assert.equal(urls.filter(url => url === detailUrl).length, 1);
   });
 }
+
+test("project import skips a second rebuild when scenario recovery cleared dirty borders", async t => {
+  setupResources(t);
+  Object.assign(state, { topology: primary, topologyPrimary: primary, bootBlocking: false,
+    scenarioBundleCacheById: { [local.manifest.scenario_id]: local } });
+  const previous = readRegisteredRuntimeHookSource(state, "recomputeDynamicBordersNowFn");
+  t.after(() => registerRuntimeHook(state, "recomputeDynamicBordersNowFn", previous));
+  const rebuild = t.mock.fn();
+  registerRuntimeHook(state, "recomputeDynamicBordersNowFn", rebuild);
+  const project = {
+    schemaVersion: 21,
+    scenario: { id: local.manifest.scenario_id, baselineHash: local.manifest.baseline_hash },
+    dynamicBordersDirty: true,
+    layerVisibility: { showTransport: false, showCityPoints: false, showUrban: false, showPhysical: false, showRivers: false },
+  };
+  const result = await importProjectTextThroughFunnel(JSON.stringify(project), {
+    ui: { t: key => key, showToast() {}, showAppDialog: async () => true },
+    hooks: { refreshColorState() {} },
+  });
+  await result.completion;
+  assert.equal(result.getRecoveryState().tasks["scenario-runtime"], "complete");
+  assert.equal(state.activeScenarioId, local.manifest.scenario_id);
+  assert.equal(state.dynamicBordersDirty, false);
+  assert.equal(rebuild.mock.callCount(), 0);
+});

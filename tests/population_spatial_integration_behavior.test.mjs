@@ -57,7 +57,7 @@ function harness({ fail = false, enabled = false } = {}) {
 
 test("population UI toggles through owners, keeps base paint and changes mode/opacity without reloading statistics", async () => {
   const h = harness(); const paint = h.state.visualOverrides;
-  h.owner.render(); assert.equal(h.nodes.populationStatus.textContent, "Population layer is off.");
+  h.owner.render(); assert.equal(h.nodes.populationStatus.textContent, "");
   h.nodes.togglePopulation.checked = true; h.nodes.togglePopulation.dispatch("change");
   assert.equal(h.state.styleConfig.thematic.enabled, false); assert.equal(h.state.strategicChoroplethMetric, "");
   assert.equal(h.nodes.populationStatus.textContent, "Loading population data…");
@@ -92,9 +92,10 @@ test("enabling a saved unavailable population version selects the pinned source 
 
 test("CSV keeps zero, null, epoch, geometry and immutable baseline groups; selection summary deduplicates", async () => {
   const h = harness({ enabled: true }); h.owner.render(); await flush();
+  assert.match(h.nodes.populationSummary.textContent, /Some parcels have no population data/);
   h.nodes.populationSummarizeSelection.dispatch("click");
   assert.match(h.nodes.populationSummary.textContent, /Estimated population: 60/);
-  assert.match(h.nodes.populationSummary.textContent, /Mapped parcels: 2\/2/);
+  assert.doesNotMatch(h.nodes.populationSummary.textContent, /Some parcels have no population data/);
   const csv = buildPopulationStatsCsv(h.state);
   assert.match(csv, /"A","AA","0","1","0","1","","ok","2020","1000"/);
   assert.match(csv, /"C","BB","","2","","0","","no_data","2020","1000"/);

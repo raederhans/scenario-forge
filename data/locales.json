@@ -293742,10 +293742,6 @@
       "en": "0 colors",
       "zh": "0 种颜色"
     },
-    "0 presets": {
-      "en": "0 presets",
-      "zh": "0 个预设"
-    },
     "0–200 m shelf": {
       "en": "0–200 m shelf",
       "zh": "0–200 米 陆架"
@@ -293783,8 +293779,8 @@
       "zh": "1939 年 8 月 14 日 · 大战前夜"
     },
     "1930s Electrification Proxy": {
-      "en": "1930s Electrification Proxy",
-      "zh": "1930年代电气化代理"
+      "en": "1930s",
+      "zh": "1930 年代"
     },
     "1962 · Alternate history after an Axis victory": {
       "en": "1962 · Alternate history after an Axis victory",
@@ -293797,6 +293793,10 @@
     "2. Artifact Hunter (Red Giants)": {
       "en": "2. Artifact Hunter (Red Giants)",
       "zh": "2. 伪影猎人（红色巨物）"
+    },
+    "2. Pick the receiving country’s color": {
+      "en": "2. Pick the receiving country’s color",
+      "zh": "2. 取接收国的底色"
     },
     "2. Select the target country in Inspector": {
       "en": "2. Select the target country in Inspector",
@@ -293834,6 +293834,10 @@
       "en": "3. Set the active owner",
       "zh": "3. 设置当前归属方"
     },
+    "3. Transfer a border province": {
+      "en": "3. Transfer a border province",
+      "zh": "3. 把边境省划给邻国"
+    },
     "4 presets": {
       "en": "4 presets",
       "zh": "4 个预设"
@@ -293845,6 +293849,10 @@
     "4. ID Stability": {
       "en": "4. ID Stability",
       "zh": "4. ID 稳定性"
+    },
+    "4. Label the map": {
+      "en": "4. Label the map",
+      "zh": "4. 标注地图"
     },
     "4. Set the active owner": {
       "en": "4. Set the active owner",
@@ -293865,6 +293873,10 @@
     "5. Edit, style, then save": {
       "en": "5. Edit, style, then save",
       "zh": "5. 编辑、调整样式并保存"
+    },
+    "5. Save the project and export an image": {
+      "en": "5. Save the project and export an image",
+      "zh": "5. 保存项目并导出图片"
     },
     "A country needs a specific HGO display name, flag variant, or ideology label before export.": {
       "en": "A country needs a specific HGO display name, flag variant, or ideology label before export.",
@@ -293958,6 +293970,10 @@
       "en": "Adaptive Tint",
       "zh": "自适应色彩倾向"
     },
+    "Adaptive mode is unavailable for this map.": {
+      "en": "Adaptive mode is unavailable for this map.",
+      "zh": "此地图暂不支持自适应模式。"
+    },
     "Add": {
       "en": "Add",
       "zh": "添加"
@@ -293979,12 +293995,16 @@
       "zh": "添加当前地块"
     },
     "Add dev selection": {
-      "en": "Add dev selection",
-      "zh": "添加当前开发选择"
+      "en": "Add selected parcels",
+      "zh": "添加已选地块"
     },
     "Add imported ids": {
       "en": "Add imported ids",
       "zh": "添加导入 ID"
+    },
+    "Add map text": {
+      "en": "Add map text",
+      "zh": "添加地图文字"
     },
     "Add more vertices before switching this graphic to a closed style.": {
       "en": "Add more vertices before switching this graphic to a closed style.",
@@ -294006,9 +294026,25 @@
       "en": "Add selected group",
       "zh": "加入当前选中分组"
     },
+    "Add zone layer": {
+      "en": "Add zone layer",
+      "zh": "添加特殊区域图层"
+    },
+    "Add zone members": {
+      "en": "Add zone members",
+      "zh": "添加特殊区域成员"
+    },
     "Added {count} defense lines": {
       "en": "Added {count} defense lines",
       "zh": "已添加 {count} 条防线"
+    },
+    "Adjacency unavailable. Filling matching parcels in the current view.": {
+      "en": "Adjacency unavailable. Filling matching parcels in the current view.",
+      "zh": "缺少邻接数据，将填充当前视图内的同色地块。"
+    },
+    "Adjust settings": {
+      "en": "Adjust settings",
+      "zh": "调整设置"
     },
     "Adjust the road rules on the left, then select a road or route label to inspect it.": {
       "en": "Adjust the road rules on the left, then select a road or route label to inspect it.",
@@ -294021,6 +294057,10 @@
     "Advanced Label Placement": {
       "en": "Advanced Label Placement",
       "zh": "高级标签放置"
+    },
+    "Advanced actions": {
+      "en": "Advanced actions",
+      "zh": "进阶动作"
     },
     "Advanced contour settings": {
       "en": "Advanced contour settings",
@@ -294142,6 +294182,10 @@
       "en": "All Types",
       "zh": "所有类型"
     },
+    "All caps": {
+      "en": "All caps",
+      "zh": "全大写"
+    },
     "All mapped parcels": {
       "en": "All mapped parcels",
       "zh": "全部映射地块"
@@ -294153,6 +294197,26 @@
     "All member ids": {
       "en": "All member ids",
       "zh": "全部成员 ID"
+    },
+    "All selected parcels were skipped.": {
+      "en": "All selected parcels were skipped.",
+      "zh": "已跳过所有选中的地块。"
+    },
+    "Alliance": {
+      "en": "Alliance",
+      "zh": "阵营"
+    },
+    "Alliance color": {
+      "en": "Alliance color",
+      "zh": "阵营颜色"
+    },
+    "Alliance name": {
+      "en": "Alliance name",
+      "zh": "阵营名称"
+    },
+    "Alliance view: Reds, Whites, national governments, neighbours, intervention, partisans": {
+      "en": "Alliance view: Reds, Whites, national governments, neighbours, intervention, partisans",
+      "zh": "阵营视图：红方、白方、民族政权、邻国、干涉与占领、游击与起义"
     },
     "Alliances": {
       "en": "Alliances",
@@ -294194,13 +294258,17 @@
       "en": "Allow primary refs at high zoom",
       "zh": "允许高变焦时的主要参考"
     },
+    "Along line": {
+      "en": "Along line",
+      "zh": "沿线排字"
+    },
+    "Along line is only available for open lines.": {
+      "en": "Along line is only available for open lines.",
+      "zh": "只有开放线条支持沿线排字。"
+    },
     "Alps DEM shading": {
       "en": "Alps DEM shading",
       "zh": "阿尔卑斯 DEM 阴影"
-    },
-    "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.": {
-      "en": "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.",
-      "zh": "400% 缩放启用阿尔卑斯覆被细节；参考年份为 2019，其他地区沿用概览。"
     },
     "Alps terrain shading": {
       "en": "Alps terrain shading",
@@ -294214,13 +294282,20 @@
       "en": "Already using this boundary variant.",
       "zh": "已经在使用这个边界变体。"
     },
+    "Also update {count} regions painted in {country}'s old color?": {
+      "en": {
+        "one": "Also update {count} region painted in {country}'s old color?",
+        "other": "Also update {count} regions painted in {country}'s old color?"
+      },
+      "zh": "同时更新涂成 {country} 旧颜色的 {count} 个地块？"
+    },
+    "Alt+Click": {
+      "en": "Alt+Click",
+      "zh": "Alt+单击"
+    },
     "Aluminium": {
       "en": "Aluminium",
       "zh": "铝"
-    },
-    "Ambiguous identity": {
-      "en": "Ambiguous identity",
-      "zh": "身份存在歧义"
     },
     "An alternate 1962 in which Germany won the Second World War. The Greater Germanic Reich rules Europe up to the Arkhangelsk–Astrakhan line through its Reichskommissariats, Japan leads the Co-Prosperity Sphere in Asia, and the United States heads the OFN. East of the line, Russia has collapsed into rival warlord states.": {
       "en": "An alternate 1962 in which Germany won the Second World War. The Greater Germanic Reich rules Europe up to the Arkhangelsk–Astrakhan line through its Reichskommissariats, Japan leads the Co-Prosperity Sphere in Asia, and the United States heads the OFN. East of the line, Russia has collapsed into rival warlord states.",
@@ -294249,6 +294324,22 @@
     "Anchor: Province / Free": {
       "en": "Anchor: Province / Free",
       "zh": "锚点：省份 / 自由"
+    },
+    "Annexation and country colors": {
+      "en": "Annexation and country colors",
+      "zh": "吞并与国家改色"
+    },
+    "Annexed": {
+      "en": "Annexed",
+      "zh": "已吞并"
+    },
+    "Annexed (all regions painted in other countries’ colors)": {
+      "en": "Annexed (all regions painted in other countries’ colors)",
+      "zh": "已被吞并（全部地块涂成他国颜色）"
+    },
+    "Annotation visibility": {
+      "en": "Annotation visibility",
+      "zh": "注记显示"
     },
     "Antarctica": {
       "en": "Antarctica",
@@ -294334,6 +294425,10 @@
       "en": "Apply a symbol, then return to the map to continue placement or edit the selected counter live.",
       "zh": "应用符号，然后返回地图以继续放置或实时编辑所选计数器。"
     },
+    "Apply appearance preset": {
+      "en": "Apply appearance preset",
+      "zh": "应用外观预设"
+    },
     "Apply current tool": {
       "en": "Apply current tool",
       "zh": "应用当前工具"
@@ -294341,6 +294436,10 @@
     "Apply failed": {
       "en": "Apply failed",
       "zh": "申请失败"
+    },
+    "Apply label text": {
+      "en": "Apply label text",
+      "zh": "确认文字内容"
     },
     "Apply territory": {
       "en": "Apply territory",
@@ -294361,6 +294460,10 @@
     "Apply to Selection": {
       "en": "Apply to Selection",
       "zh": "应用到当前选择"
+    },
+    "Apply to labels with this style": {
+      "en": "Apply to labels with this style",
+      "zh": "应用到所有同预设文字"
     },
     "Approximate": {
       "en": "Approximate",
@@ -294410,6 +294513,10 @@
       "en": "Attack",
       "zh": "进攻"
     },
+    "Attribution": {
+      "en": "Attribution",
+      "zh": "署名"
+    },
     "Audit and manifest stay read-only here so tuning and source truth do not get mixed.": {
       "en": "Audit and manifest stay read-only here so tuning and source truth do not get mixed.",
       "zh": "审计和清单在这里保持只读状态，因此调整和源事实不会混淆。"
@@ -294450,13 +294557,37 @@
       "en": "Auto-Fill Visuals",
       "zh": "自动填充视觉色"
     },
+    "Auto-fill also resets the ocean color. You can undo this from history.": {
+      "en": "Auto-fill also resets the ocean color. You can undo this from history.",
+      "zh": "自动填色还会重设海洋颜色。可从历史记录撤销。"
+    },
+    "Auto-fill map": {
+      "en": "Auto-fill map",
+      "zh": "自动填色"
+    },
+    "Auto-fill regions": {
+      "en": "Auto-fill regions",
+      "zh": "按区域自动填色"
+    },
+    "Automatic": {
+      "en": "Automatic",
+      "zh": "自动"
+    },
     "Automatic (raster for TNO)": {
       "en": "Automatic (raster for TNO)",
       "zh": "自动（TNO 优先栅格）"
     },
+    "Automatic country name": {
+      "en": "Automatic country name",
+      "zh": "自动国名"
+    },
     "Autonomous Region": {
       "en": "Autonomous Region",
       "zh": "自治区域"
+    },
+    "Autosave": {
+      "en": "Autosave",
+      "zh": "自动保存"
     },
     "Availability": {
       "en": "Availability",
@@ -294730,6 +294861,10 @@
       "en": "Belarus hybrid",
       "zh": "白俄罗斯混合拓扑"
     },
+    "Below screen resolution": {
+      "en": "Below screen resolution",
+      "zh": "低于屏幕清晰度"
+    },
     "Berlin": {
       "en": "Berlin",
       "zh": "柏林"
@@ -294786,13 +294921,17 @@
       "en": "Borders and line effects",
       "zh": "边界与线条效果"
     },
-    "Borders need recalculation": {
-      "en": "Borders need recalculation",
-      "zh": "边界需要重算"
+    "Bottom left": {
+      "en": "Bottom left",
+      "zh": "左下"
     },
-    "Borders up to date": {
-      "en": "Borders up to date",
-      "zh": "边界已更新"
+    "Bottom right": {
+      "en": "Bottom right",
+      "zh": "右下"
+    },
+    "Bound country": {
+      "en": "Bound country",
+      "zh": "绑定国家"
     },
     "Boundary Variants": {
       "en": "Boundary Variants",
@@ -294870,6 +295009,10 @@
       "en": "Brush On · Shift+Drag to pan",
       "zh": "笔刷开启 · 按住 Shift 拖动画布"
     },
+    "Brush intensity field": {
+      "en": "Brush intensity field",
+      "zh": "涂绘强度场"
+    },
     "Brush select": {
       "en": "Brush select",
       "zh": "笔刷选择"
@@ -294946,6 +295089,10 @@
       "en": "Cancel Import",
       "zh": "取消导入"
     },
+    "Cancel stroke or exit current mode": {
+      "en": "Cancel stroke or exit current mode",
+      "zh": "取消笔画或逐级退出当前模式"
+    },
     "Candidate": {
       "en": "Candidate",
       "zh": "候选人"
@@ -294990,6 +295137,74 @@
       "en": "Centrist republic",
       "zh": "中间派共和制"
     },
+    "Change annotation visibility": {
+      "en": "Change annotation visibility",
+      "zh": "修改注记可见性"
+    },
+    "Change drafting grid": {
+      "en": "Change drafting grid",
+      "zh": "更改制图网格"
+    },
+    "Change graticule style": {
+      "en": "Change graticule style",
+      "zh": "更改经纬网样式"
+    },
+    "Change lake color link": {
+      "en": "Change lake color link",
+      "zh": "更改湖泊颜色联动"
+    },
+    "Change lake fill": {
+      "en": "Change lake fill",
+      "zh": "更改湖泊填色"
+    },
+    "Change lake outline": {
+      "en": "Change lake outline",
+      "zh": "更改湖泊轮廓"
+    },
+    "Change legend appearance": {
+      "en": "Change legend appearance",
+      "zh": "修改图例外观"
+    },
+    "Change ocean region names display": {
+      "en": "Change ocean region names display",
+      "zh": "更改海域名称显示"
+    },
+    "Change paper texture": {
+      "en": "Change paper texture",
+      "zh": "更改纸张纹理"
+    },
+    "Change texture opacity": {
+      "en": "Change texture opacity",
+      "zh": "更改纹理不透明度"
+    },
+    "Change texture style": {
+      "en": "Change texture style",
+      "zh": "更改纹理样式"
+    },
+    "Change zone category": {
+      "en": "Change zone category",
+      "zh": "更改特殊区域类别"
+    },
+    "Change zone legend visibility": {
+      "en": "Change zone legend visibility",
+      "zh": "更改特殊区域图例可见性"
+    },
+    "Change zone style": {
+      "en": "Change zone style",
+      "zh": "更改特殊区域样式"
+    },
+    "Change zone visibility": {
+      "en": "Change zone visibility",
+      "zh": "更改特殊区域可见性"
+    },
+    "Change {country} color": {
+      "en": "Change color of {country}",
+      "zh": "修改 {country} 颜色"
+    },
+    "Change {name} color": {
+      "en": "Change {name} color",
+      "zh": "更改 {name} 的颜色"
+    },
     "Changes to this order stay in the workbench.": {
       "en": "Changes to this order stay in the workbench.",
       "zh": "此顺序的更改仅保留在工作台中。"
@@ -295005,6 +295220,10 @@
     "Check rendering state, debug views, and project diagnostics when something looks off.": {
       "en": "Check rendering state, debug views, and project diagnostics when something looks off.",
       "zh": "当画面异常时，检查渲染状态、调试视图和项目诊断。"
+    },
+    "Check the border, country name and legend after painting.": {
+      "en": "Check the border, country name and legend after painting.",
+      "zh": "填色后查看边界、国名和图例，确认地块归入了预期的国家。"
     },
     "Check the current layer order here.": {
       "en": "Check the current layer order here.",
@@ -295050,6 +295269,10 @@
       "en": "Choose a city marker treatment first, then tune how many point markers and labels are allowed to surface.",
       "zh": "先选一种城市点位表现方式，再调整允许显示的点标记和标签数量。"
     },
+    "Choose a city within this country": {
+      "en": "Choose a city within this country",
+      "zh": "请选择本国境内的城市"
+    },
     "Choose a country above to edit its color, active sovereign state, groups, and presets.": {
       "en": "Choose a country above to edit its color, active owner state, groups, and presets.",
       "zh": "在上方选择一个国家，以编辑其颜色、当前主权状态、分组和预设。"
@@ -295082,6 +295305,14 @@
       "en": "Choose a pack for this layer",
       "zh": "请选择此图层的数据包"
     },
+    "Choose a quick color": {
+      "en": "Choose a quick color",
+      "zh": "选择快捷色"
+    },
+    "Choose a scenario with two neighboring countries and apply it.": {
+      "en": "Choose a scenario with two neighboring countries and apply it.",
+      "zh": "选择一个包含相邻两国的剧本，点击应用。"
+    },
     "Choose a sea or strait from the map or list. To select lakes, first enable lake interaction in settings.": {
       "en": "Choose a sea or strait from the map or list. To select lakes, first enable lake interaction in settings.",
       "zh": "从地图或列表选择海域或海峡。要选择湖泊，请先在设置中开启湖泊交互。"
@@ -295101,6 +295332,10 @@
     "Choose another checked-in public starter sample.": {
       "en": "Choose another checked-in public starter sample.",
       "zh": "选择另一个已入库的公开起步示例。"
+    },
+    "Choose country": {
+      "en": "Choose country",
+      "zh": "选择国家"
     },
     "Choose how dense port points should be summarized.": {
       "en": "Choose how dense port points should be summarized.",
@@ -295210,6 +295445,10 @@
       "en": "Chromium",
       "zh": "铬"
     },
+    "Cities in this country": {
+      "en": "Cities in this country",
+      "zh": "本国城市"
+    },
     "City Lights": {
       "en": "City Lights",
       "zh": "城市灯光"
@@ -295222,9 +295461,21 @@
       "en": "City and map labels from the labels pass",
       "zh": "来自 labels pass 的城市与地图标签"
     },
+    "City display name": {
+      "en": "City display name",
+      "zh": "城市显示名"
+    },
     "City hierarchy": {
       "en": "City hierarchy",
       "zh": "城市层级"
+    },
+    "City names as of 1919": {
+      "en": "City names as of 1919",
+      "zh": "1919 年的城市地名"
+    },
+    "City points": {
+      "en": "City points",
+      "zh": "城市点"
     },
     "City points help": {
       "en": "City points help",
@@ -295236,6 +295487,10 @@
     },
     "Civilian Factories": {
       "en": "Civilian Factories",
+      "zh": "民用工厂"
+    },
+    "Civilian factories": {
+      "en": "Civilian factories",
       "zh": "民用工厂"
     },
     "Claim / dispute": {
@@ -295267,8 +295522,8 @@
       "zh": "全部清除"
     },
     "Clear Channel": {
-      "en": "Clear Channel",
-      "zh": "清空通道"
+      "en": "Clear all adjustments",
+      "zh": "清除全部调整"
     },
     "Clear Core Territory Visual Overrides": {
       "en": "Clear Core Territory Visual Overrides",
@@ -295314,6 +295569,10 @@
       "en": "Clear baked cache",
       "zh": "清空烘焙缓存"
     },
+    "Clear capital": {
+      "en": "Clear capital",
+      "zh": "清除首都"
+    },
     "Clear color search": {
       "en": "Clear color search",
       "zh": "清空颜色搜索"
@@ -295329,6 +295588,17 @@
     "Clear the current map?": {
       "en": "Clear the current map?",
       "zh": "清空当前地图吗？"
+    },
+    "Clear zone members": {
+      "en": "Clear zone members",
+      "zh": "清空特殊区域成员"
+    },
+    "Clear {count} manually painted regions and reset country colors?": {
+      "en": {
+        "one": "Clear {count} manually painted region and reset country colors?",
+        "other": "Clear {count} manually painted regions and reset country colors?"
+      },
+      "zh": "将清除 {count} 块手涂颜色并重设国家配色，是否继续？"
     },
     "Cleared": {
       "en": "Cleared",
@@ -295406,6 +295676,10 @@
       "en": "Click parcels to add or remove; press Esc to finish.",
       "zh": "点击地块加入或移除，按 Esc 结束"
     },
+    "Click the map to place the capital. Press Esc to cancel.": {
+      "en": "Click the map to place the capital. Press Esc to cancel.",
+      "zh": "在地图上点击放置首都，Esc 取消"
+    },
     "Click the map to place vertices. Double-click or press Finish to commit the line.": {
       "en": "Click the map to place vertices. Double-click or press Finish to commit the line.",
       "zh": "单击地图以放置折点。双击或按“完成”以提交该行。"
@@ -295413,6 +295687,10 @@
     "Click the map to place vertices. Double-click or press Finish to commit the operational line.": {
       "en": "Click the map to place vertices. Double-click or press Finish to commit the operational line.",
       "zh": "单击地图放置顶点。双击或按“完成”以提交作战线。"
+    },
+    "Click the map to place · Esc to cancel": {
+      "en": "Click the map to place · Esc to cancel",
+      "zh": "单击地图放置 · Esc 取消"
     },
     "Click to inspect a region or country. Press F to switch to fill before painting.": {
       "en": "Click to inspect a region or country. Press F to switch to fill before painting.",
@@ -295473,6 +295751,10 @@
     "Close scenario introduction": {
       "en": "Close scenario introduction",
       "zh": "关闭剧本简介"
+    },
+    "Close to {country}'s color. Painting will create a border.": {
+      "en": "Close to {country}'s color. Painting will create a border.",
+      "zh": "接近{country}颜色，涂上会形成国界"
     },
     "Close transport workbench": {
       "en": "Close transport workbench",
@@ -295546,10 +295828,6 @@
       "en": "Colonial Government",
       "zh": "殖民政府"
     },
-    "Colonial predecessor": {
-      "en": "Colonial predecessor",
-      "zh": "殖民前身实体"
-    },
     "Colony": {
       "en": "Colony",
       "zh": "殖民地"
@@ -295582,9 +295860,29 @@
       "en": "Color bake",
       "zh": "颜色烘焙"
     },
+    "Color health check": {
+      "en": "Color health check",
+      "zh": "颜色体检"
+    },
+    "Color palette": {
+      "en": "Color palette",
+      "zh": "调色板"
+    },
+    "Color picked": {
+      "en": "Color picked",
+      "zh": "已取色"
+    },
     "Color scale": {
       "en": "Color scale",
       "zh": "色带"
+    },
+    "Colors": {
+      "en": "Colors",
+      "zh": "颜色"
+    },
+    "Colors not in this scenario: {count}": {
+      "en": "Colors not in this scenario: {count}",
+      "zh": "当前剧本没有的颜色：{count}"
     },
     "Colors reset": {
       "en": "Colors reset",
@@ -295678,6 +295976,10 @@
       "en": "Congo Lake",
       "zh": "刚果湖"
     },
+    "Connected parcels of the same color": {
+      "en": "Connected parcels of the same color",
+      "zh": "当前颜色相同且相连的地块"
+    },
     "Conservative constitutionalism": {
       "en": "Conservative constitutionalism",
       "zh": "保守宪政"
@@ -295749,6 +296051,10 @@
     "Continue without scenario": {
       "en": "Continue without scenario",
       "zh": "无剧本继续"
+    },
+    "Continuing will discard unsaved changes to the current map.": {
+      "en": "Continuing will discard unsaved changes to the current map.",
+      "zh": "继续操作将丢弃当前地图尚未保存的更改。"
     },
     "Continuous Cycle": {
       "en": "Continuous Cycle",
@@ -295862,6 +296168,10 @@
       "en": "Controls the lowest station importance that survives.",
       "zh": "控制存活的最低重要性站。"
     },
+    "Convert to editable text": {
+      "en": "Convert to editable text",
+      "zh": "转为可编辑文字"
+    },
     "Copied": {
       "en": "Copied",
       "zh": "已复制"
@@ -295878,6 +296188,10 @@
       "en": "Copy ID",
       "zh": "复制 ID"
     },
+    "Copy IDs": {
+      "en": "Copy IDs",
+      "zh": "复制编号"
+    },
     "Copy Names": {
       "en": "Copy Names",
       "zh": "复制名称"
@@ -295885,6 +296199,14 @@
     "Copy Names + ID": {
       "en": "Copy Names + ID",
       "zh": "复制名称 + ID"
+    },
+    "Copy as text": {
+      "en": "Copy as text",
+      "zh": "复制为文字"
+    },
+    "Copy image": {
+      "en": "Copy image",
+      "zh": "复制图片"
     },
     "Copy members from layer": {
       "en": "Copy members from layer",
@@ -295894,13 +296216,17 @@
       "en": "Copy the selected feature's tag into the owner input",
       "zh": "将所选地块的标签填入归属输入框"
     },
+    "Copy zone members": {
+      "en": "Copy zone members",
+      "zh": "复制特殊区域成员"
+    },
     "Core": {
       "en": "Core",
       "zh": "核"
     },
     "Core Sharpness (Modern only)": {
-      "en": "Core Sharpness (Modern only)",
-      "zh": "核心锐度（仅现代）"
+      "en": "Core Sharpness",
+      "zh": "核心锐度"
     },
     "Core Territory": {
       "en": "Core Territory",
@@ -295914,6 +296240,10 @@
       "en": "Core territory already matches current ownership.",
       "zh": "核心领土已经与当前所有权相匹配。"
     },
+    "Core territory share": {
+      "en": "Core territory share",
+      "zh": "本国核心领土占比"
+    },
     "Core territory was not applied.": {
       "en": "Core territory was not applied.",
       "zh": "核心领土未适用。"
@@ -295923,8 +296253,24 @@
       "zh": "走廊"
     },
     "Corridor Strength (Modern only)": {
-      "en": "Corridor Strength (Modern only)",
-      "zh": "通道强度（仅现代）"
+      "en": "Corridor Strength",
+      "zh": "通道强度"
+    },
+    "Could not copy image. Check clipboard permissions or download the snapshot.": {
+      "en": "Could not copy image. Check clipboard permissions or download the snapshot.",
+      "zh": "无法复制图片。请检查剪贴板权限，或下载快照。"
+    },
+    "Could not download the project file.": {
+      "en": "Could not download the project file.",
+      "zh": "无法下载项目文件。"
+    },
+    "Could not import the project.": {
+      "en": "Could not import the project.",
+      "zh": "无法导入项目。"
+    },
+    "Could not restore {resource}.": {
+      "en": "Could not restore {resource}.",
+      "zh": "未能恢复{resource}。"
     },
     "Counter Editor": {
       "en": "Counter Editor",
@@ -295994,6 +296340,10 @@
       "en": "Country Visuals",
       "zh": "国家视觉"
     },
+    "Country color": {
+      "en": "Country color",
+      "zh": "国家颜色"
+    },
     "Country colors were reset.": {
       "en": "Country colors were reset.",
       "zh": "国家颜色已重置。"
@@ -296001,6 +296351,10 @@
     "Country colors were restored.": {
       "en": "Country colors were restored.",
       "zh": "国家颜色已恢复。"
+    },
+    "Country display name": {
+      "en": "Country display name",
+      "zh": "国家显示名称"
     },
     "Country file": {
       "en": "Country file",
@@ -296022,9 +296376,41 @@
       "en": "Country indicators · Scenario reference",
       "zh": "国家统计专题 · 剧本参考"
     },
+    "Country name": {
+      "en": "Country name",
+      "zh": "国名"
+    },
+    "Country name not displayed. Use manual map text.": {
+      "en": "Country name not displayed. Use manual map text.",
+      "zh": "国名尚未显示，可使用手动地图文字。"
+    },
+    "Country name opacity": {
+      "en": "Country name opacity",
+      "zh": "国名不透明度"
+    },
+    "Country name size": {
+      "en": "Country name size",
+      "zh": "国名字号倍率"
+    },
     "Country names": {
       "en": "Country names",
       "zh": "国家名称"
+    },
+    "Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key.": {
+      "en": "Country names and legend entries follow the painted colors. Use Map lettering to place a note and Legend to edit the key.",
+      "zh": "国名和图例条目会随地块颜色更新。用「地图文字」放置注记，再到「图例」编辑条目。"
+    },
+    "Country names are off": {
+      "en": "Country names are off",
+      "zh": "国名已关闭"
+    },
+    "Country ownership": {
+      "en": "Country ownership",
+      "zh": "国家归属"
+    },
+    "Country transport overlays": {
+      "en": "Country transport overlays",
+      "zh": "各国交通叠加层"
     },
     "Coverage": {
       "en": "Coverage",
@@ -296037,14 +296423,6 @@
     "Coverage gaps": {
       "en": "Coverage gaps",
       "zh": "覆盖缺口"
-    },
-    "Coverage loading": {
-      "en": "Coverage loading",
-      "zh": "覆盖数据加载中"
-    },
-    "Coverage report unavailable": {
-      "en": "Coverage report unavailable",
-      "zh": "覆盖报告不可用"
     },
     "Coverage scope": {
       "en": "Coverage scope",
@@ -296066,13 +296444,13 @@
       "en": "Create a preset or custom layer to start editing map membership.",
       "zh": "创建预设或自定义图层后开始编辑地图成员。"
     },
+    "Create operational line": {
+      "en": "Create operational line",
+      "zh": "绘制作战线"
+    },
     "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff.": {
       "en": "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff.",
       "zh": "创建作战线、行动图形和单位计数器，作为项目内的战略标注用于导出和交接。"
-    },
-    "Create visible layers to preview a story sequence.": {
-      "en": "Create visible layers to preview a story sequence.",
-      "zh": "创建可见图层来预览故事序列。"
     },
     "Critical checks": {
       "en": "Critical checks",
@@ -296081,6 +296459,10 @@
     "Cross hatch": {
       "en": "Cross hatch",
       "zh": "交叉斜线"
+    },
+    "Ctrl/⌘ + drag: box select · Ctrl/⌘ + Shift + drag: lasso": {
+      "en": "Ctrl/⌘ + drag: box select · Ctrl/⌘ + Shift + drag: lasso",
+      "zh": "Ctrl/⌘ + 拖动：框选 · Ctrl/⌘ + Shift + 拖动：套索"
     },
     "Current Candidate": {
       "en": "Current Candidate",
@@ -296102,10 +296484,6 @@
       "en": "Current Scenario",
       "zh": "当前场景"
     },
-    "Current Scope": {
-      "en": "Current Scope",
-      "zh": "当前范围"
-    },
     "Current Selection": {
       "en": "Current Selection",
       "zh": "当前选中对象"
@@ -296113,10 +296491,6 @@
     "Current Session": {
       "en": "Current Session",
       "zh": "当前会话"
-    },
-    "Current Threshold": {
-      "en": "Current Threshold",
-      "zh": "当前阈值"
     },
     "Current Tool": {
       "en": "Current Tool",
@@ -296170,6 +296544,14 @@
       "en": "Current working state",
       "zh": "当前工作状态"
     },
+    "Current: {action}": {
+      "en": "Current: {action}",
+      "zh": "当前：{action}"
+    },
+    "Curve": {
+      "en": "Curve",
+      "zh": "弯度"
+    },
     "Custom": {
       "en": "Custom",
       "zh": "自定义"
@@ -296206,9 +296588,17 @@
       "en": "Cycle Speed",
       "zh": "循环速度"
     },
+    "Cycle quick fill level": {
+      "en": "Cycle quick fill level",
+      "zh": "切换快填层级"
+    },
     "Dam": {
       "en": "Dam",
       "zh": "大坝"
+    },
+    "Dark": {
+      "en": "Dark",
+      "zh": "深色"
     },
     "Dash": {
       "en": "Dash",
@@ -296216,7 +296606,7 @@
     },
     "Dash Style": {
       "en": "Dash Style",
-      "zh": "破折号样式"
+      "zh": "线型"
     },
     "Dashed": {
       "en": "Dashed",
@@ -296302,6 +296692,10 @@
       "en": "Defensive Line",
       "zh": "防御线"
     },
+    "Deferred autosave": {
+      "en": "Deferred autosave",
+      "zh": "已延后的自动保存"
+    },
     "Delete": {
       "en": "Delete",
       "zh": "删除"
@@ -296330,9 +296724,33 @@
       "en": "Delete Zone",
       "zh": "删除区域"
     },
+    "Delete appearance preset": {
+      "en": "Delete appearance preset",
+      "zh": "删除外观预设"
+    },
+    "Delete graphic vertex": {
+      "en": "Delete graphic vertex",
+      "zh": "删除作战图形顶点"
+    },
     "Delete layer": {
       "en": "Delete layer",
       "zh": "删除图层"
+    },
+    "Delete map label": {
+      "en": "Delete map label",
+      "zh": "删除地图文字"
+    },
+    "Delete operation graphic": {
+      "en": "Delete operation graphic",
+      "zh": "删除作战图形"
+    },
+    "Delete operational line": {
+      "en": "Delete operational line",
+      "zh": "删除作战线"
+    },
+    "Delete project city": {
+      "en": "Delete project city",
+      "zh": "删除项目城市"
     },
     "Delete the selected operation graphic?": {
       "en": "Delete the selected operation graphic?",
@@ -296349,6 +296767,18 @@
     "Delete the selected unit counter?": {
       "en": "Delete the selected unit counter?",
       "zh": "删除所选单位计数器？"
+    },
+    "Delete this city": {
+      "en": "Delete this city",
+      "zh": "删除此城市"
+    },
+    "Delete unit counter": {
+      "en": "Delete unit counter",
+      "zh": "删除兵棋"
+    },
+    "Delete zone layer": {
+      "en": "Delete zone layer",
+      "zh": "删除特殊区域图层"
     },
     "Demilitarized / buffer": {
       "en": "Demilitarized / buffer",
@@ -296401,6 +296831,10 @@
     "Depth legend and sources": {
       "en": "Depth legend and sources",
       "zh": "深度图例与来源"
+    },
+    "Derived from scenario state data and parcel area": {
+      "en": "Derived from scenario state data and parcel area",
+      "zh": "由剧本州数据与地块面积计算"
     },
     "Desert & Bare": {
       "en": "Desert & Bare",
@@ -296498,6 +296932,10 @@
       "en": "Discard and Load",
       "zh": "丢弃并加载"
     },
+    "Discard and continue": {
+      "en": "Discard and continue",
+      "zh": "丢弃并继续"
+    },
     "Dismiss": {
       "en": "Dismiss",
       "zh": "关闭"
@@ -296538,6 +296976,10 @@
       "en": "Display quality",
       "zh": "显示画质"
     },
+    "Displayed": {
+      "en": "Displayed",
+      "zh": "已显示"
+    },
     "Disputed": {
       "en": "Disputed",
       "zh": "争议区"
@@ -296574,9 +297016,17 @@
       "en": "Disused",
       "zh": "停用"
     },
+    "Does not fit or is obscured in this view": {
+      "en": "Does not fit or is obscured in this view",
+      "zh": "当前视图放不下或被遮挡"
+    },
     "Dominion": {
       "en": "Dominion",
       "zh": "统治"
+    },
+    "Don't open": {
+      "en": "Don't open",
+      "zh": "不打开"
     },
     "Dot ring": {
       "en": "Dot ring",
@@ -296593,6 +297043,38 @@
     "Double-Click Quick Fill": {
       "en": "Double-Click Quick Fill",
       "zh": "双击快速填色"
+    },
+    "Double-click": {
+      "en": "Double-click",
+      "zh": "双击"
+    },
+    "Double-click fill: whole country (no parent) · {count} regions": {
+      "en": {
+        "one": "Double-click fill: whole country (no parent) · {count} region",
+        "other": "Double-click fill: whole country (no parent) · {count} regions"
+      },
+      "zh": "双击填充：整国（无上级区域）· {count} 个地块"
+    },
+    "Double-click fill: whole country · {count} regions": {
+      "en": {
+        "one": "Double-click fill: whole country · {count} region",
+        "other": "Double-click fill: whole country · {count} regions"
+      },
+      "zh": "双击填充：整个国家 · {count} 个地块"
+    },
+    "Double-click fill: {count} regions (parent region)": {
+      "en": {
+        "one": "Double-click fill: {count} region (parent region)",
+        "other": "Double-click fill: {count} regions (parent region)"
+      },
+      "zh": "双击填充：{count} 个地块（上级区域）"
+    },
+    "Double-click fill: {count} regions ({group})": {
+      "en": {
+        "one": "Double-click fill: {count} region ({group})",
+        "other": "Double-click fill: {count} regions ({group})"
+      },
+      "zh": "双击填充：{count} 个地块（{group}）"
     },
     "Double-click quick fill scope": {
       "en": "Double-click quick fill scope",
@@ -296621,6 +297103,10 @@
     "Download original JSON": {
       "en": "Download original JSON",
       "zh": "下载原始 JSON"
+    },
+    "Download original file": {
+      "en": "Download original file",
+      "zh": "下载原始文件"
     },
     "Download the JSON, reload it once with Load Project, then confirm the same scenario, annotations, labels, and export settings return.": {
       "en": "Download the JSON, reload it once with Load Project, then confirm the same scenario, annotations, labels, and export settings return.",
@@ -296658,6 +297144,10 @@
       "en": "Drag rows to define transport layer order. Availability follows the selected family and current runtime data.",
       "zh": "拖动各行设定交通图层顺序。可用项随所选图层族和当前运行时数据变化。"
     },
+    "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.": {
+      "en": "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.",
+      "zh": "将保存的 JSON 拖到地图上，确认剧本、注记、标签和导出设置均已恢复。"
+    },
     "Drag to reorder exported layer groups. Visibility only applies to this export session.": {
       "en": "Drag to reorder exported layer groups. Visibility only applies to this export session.",
       "zh": "拖动以重排导出图层组。可见性设置仅影响当前导出会话。"
@@ -296669,6 +297159,14 @@
     "Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.": {
       "en": "Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.",
       "zh": "拖动白色手柄以移动顶点，单击中点以插入，然后根据需要删除选定的顶点。"
+    },
+    "Drag with two fingers to pan": {
+      "en": "Drag with two fingers to pan",
+      "zh": "双指拖动平移"
+    },
+    "Draw operation graphic": {
+      "en": "Draw operation graphic",
+      "zh": "绘制作战图形"
     },
     "Drawing in progress: click map to add vertices, double-click to finish.": {
       "en": "Drawing in progress: click map to add vertices, double-click to finish.",
@@ -296682,25 +297180,33 @@
       "en": "Drawing vertices.",
       "zh": "正在绘制顶点。"
     },
+    "Drop to open project": {
+      "en": "Drop to open project",
+      "zh": "松开以打开项目"
+    },
+    "Drop to use as a reference image": {
+      "en": "Drop to use as a reference image",
+      "zh": "放下作为参考图"
+    },
     "Duplicate layer": {
       "en": "Duplicate layer",
       "zh": "复制图层"
     },
+    "Duplicate selected map label": {
+      "en": "Duplicate selected map label",
+      "zh": "复制选中的地图文字"
+    },
+    "Duplicate zone layer": {
+      "en": "Duplicate zone layer",
+      "zh": "复制特殊区域图层"
+    },
     "Dynamic / Runtime": {
-      "en": "Dynamic / Runtime",
-      "zh": "动态 / 运行时"
+      "en": "Dynamic tags",
+      "zh": "动态国家"
     },
     "Dynamic Borders": {
       "en": "Dynamic Borders",
       "zh": "动态边界"
-    },
-    "Dynamic borders disabled": {
-      "en": "Dynamic borders disabled",
-      "zh": "动态边界已禁用"
-    },
-    "Dynamic tag": {
-      "en": "Dynamic tag",
-      "zh": "动态 tag"
     },
     "Dynamic thresholds decide when aggregation should take over.": {
       "en": "Dynamic thresholds decide when aggregation should take over.",
@@ -296754,17 +297260,49 @@
       "en": "Edit country color",
       "zh": "编辑国家颜色"
     },
+    "Edit history": {
+      "en": "Edit history",
+      "zh": "编辑历史记录"
+    },
+    "Edit lake style": {
+      "en": "Edit lake style",
+      "zh": "编辑湖泊样式"
+    },
+    "Edit legend color {color}": {
+      "en": "Edit legend color {color}",
+      "zh": "编辑图例颜色 {color}"
+    },
+    "Edit map": {
+      "en": "Edit map",
+      "zh": "编辑地图"
+    },
     "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": {
       "en": "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.",
       "zh": "根据剧本参考分组编辑地图颜色。参考边界保持不变。"
+    },
+    "Edit map label": {
+      "en": "Edit map label",
+      "zh": "编辑地图文字"
     },
     "Edit map membership": {
       "en": "Edit map membership",
       "zh": "编辑地图成员"
     },
+    "Edit map title": {
+      "en": "Edit map title",
+      "zh": "编辑地图标题"
+    },
     "Edit members on map": {
       "en": "Edit members on map",
       "zh": "在地图上编辑成员"
+    },
+    "Edit operation graphic": {
+      "en": "Edit operation graphic",
+      "zh": "编辑作战图形"
+    },
+    "Edit operational line": {
+      "en": "Edit operational line",
+      "zh": "编辑作战线"
     },
     "Edit special region color": {
       "en": "Edit special region color",
@@ -296782,6 +297320,10 @@
       "en": "Edit tools",
       "zh": "编辑工具"
     },
+    "Edit unit counter": {
+      "en": "Edit unit counter",
+      "zh": "编辑兵棋"
+    },
     "Edit vertices and style.": {
       "en": "Edit vertices and style.",
       "zh": "编辑顶点和样式。"
@@ -296789,6 +297331,10 @@
     "Edit water region color": {
       "en": "Edit water region color",
       "zh": "编辑水域颜色"
+    },
+    "Edit zone layers": {
+      "en": "Edit zone layers",
+      "zh": "编辑特殊区域图层"
     },
     "Editable project JSON": {
       "en": "Editable project JSON",
@@ -296827,8 +297373,8 @@
       "zh": "启用“测深”以使用深度预设。"
     },
     "Enable Channel": {
-      "en": "Enable Channel",
-      "zh": "启用通道"
+      "en": "Enable local adjustments",
+      "zh": "启用局部调整"
     },
     "Enable Day / Night Cycle": {
       "en": "Enable Day / Night Cycle",
@@ -296878,6 +297424,10 @@
       "en": "Encirclement",
       "zh": "包围"
     },
+    "Encoding image…": {
+      "en": "Encoding image…",
+      "zh": "正在编码…"
+    },
     "Energy Facilities": {
       "en": "Energy Facilities",
       "zh": "能源设施"
@@ -296922,6 +297472,10 @@
       "en": "Enter a short code such as HQ, ARM or INF.",
       "zh": "输入简短代码，例如 HQ、ARM 或 INF。"
     },
+    "Enter name": {
+      "en": "Enter name",
+      "zh": "输入名称"
+    },
     "Enter owner tag (e.g. GER, FRA, BRA)": {
       "en": "Enter owner tag (e.g. GER, FRA, BRA)",
       "zh": "输入归属标签（如 GER、FRA、BRA）"
@@ -296937,6 +297491,13 @@
     "Erase": {
       "en": "Erase",
       "zh": "擦除"
+    },
+    "Erase paint from {count} regions": {
+      "en": {
+        "one": "Erase paint from {count} region",
+        "other": "Erase paint from {count} regions"
+      },
+      "zh": "擦除 {count} 个地块的填色"
     },
     "Eraser": {
       "en": "Eraser",
@@ -296965,6 +297526,14 @@
     "Every province of the present-day world with no owner assigned. Paint your own alternate history from scratch: countries, borders and colours are entirely up to you.": {
       "en": "Every province of the present-day world with no owner assigned. Paint your own alternate history from scratch: countries, borders and colours are entirely up to you.",
       "zh": "当代世界的全部地块，没有任何预设归属。适合从零开始绘制自己的架空历史：国家、疆界和配色完全由你决定。"
+    },
+    "Exceeds 8K limit": {
+      "en": "Exceeds 8K limit",
+      "zh": "超出 8K 上限"
+    },
+    "Exceeds render budget": {
+      "en": "Exceeds render budget",
+      "zh": "超出渲染内存预算"
     },
     "Exclude *_link": {
       "en": "Exclude *_link",
@@ -297038,9 +297607,17 @@
       "en": "Explain rule intent only. Do not fabricate pack statistics.",
       "zh": "仅解释规则意图。不要伪造包统计数据。"
     },
+    "Explicitly no capital": {
+      "en": "Explicitly no capital",
+      "zh": "已设为无首都"
+    },
     "Export": {
       "en": "Export",
       "zh": "导出"
+    },
+    "Export CSV": {
+      "en": "Export CSV",
+      "zh": "导出 CSV"
     },
     "Export Map": {
       "en": "Export Map",
@@ -297130,6 +297707,10 @@
       "en": "Export tools",
       "zh": "导出工具"
     },
+    "Export with last settings": {
+      "en": "Export with last settings",
+      "zh": "按上次设置导出"
+    },
     "Export workbench": {
       "en": "Export workbench",
       "zh": "导出工作台"
@@ -297145,6 +297726,10 @@
     "Exporting sample": {
       "en": "Exporting sample",
       "zh": "正在导出示例"
+    },
+    "Exporting…": {
+      "en": "Exporting…",
+      "zh": "正在导出…"
     },
     "Expose OSM versus N06 conflicts instead of hiding them.": {
       "en": "Expose OSM versus N06 conflicts instead of hiding them.",
@@ -297214,6 +297799,14 @@
       "en": "Facility Scope",
       "zh": "设施范围"
     },
+    "Factories": {
+      "en": "Factories",
+      "zh": "工厂总数"
+    },
+    "Factories per million people": {
+      "en": "Factories per million people",
+      "zh": "每百万人工厂数"
+    },
     "Failed to import project.": {
       "en": "Failed to import project.",
       "zh": "项目导入失败。"
@@ -297258,9 +297851,13 @@
       "en": "Ferry service",
       "zh": "渡轮服务"
     },
-    "Fictional / alt-history": {
-      "en": "Fictional / alt-history",
-      "zh": "虚构或架空历史"
+    "File": {
+      "en": "File",
+      "zh": "文件"
+    },
+    "File access was not granted.": {
+      "en": "File access was not granted.",
+      "zh": "未获得文件读写权限。"
     },
     "File type": {
       "en": "File type",
@@ -297294,6 +297891,14 @@
       "en": "Fill Parent Group",
       "zh": "填充父级分组"
     },
+    "Fill blank parcels only": {
+      "en": "Fill blank parcels only",
+      "zh": "仅填色未涂色的地块"
+    },
+    "Fill country name": {
+      "en": "Fill country name",
+      "zh": "填入国名"
+    },
     "Fill opacity": {
       "en": "Fill opacity",
       "zh": "填充不透明度"
@@ -297301,6 +297906,10 @@
     "Fill tool": {
       "en": "Fill tool",
       "zh": "填充工具"
+    },
+    "Fill with current color": {
+      "en": "Fill with current color",
+      "zh": "用当前色填充"
     },
     "Filter airport points by type, status, and importance.": {
       "en": "Filter airport points by type, status, and importance.",
@@ -297362,6 +297971,10 @@
       "en": "Final handoff check",
       "zh": "最终交付检查"
     },
+    "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.": {
+      "en": "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.",
+      "zh": "在调色板的国家列表找到乙国，选中它的底色。使用填充工具时，也可以按住 Alt 单击地图上的乙国取色。"
+    },
     "Find region": {
       "en": "Find region",
       "zh": "查找地块"
@@ -297402,6 +298015,10 @@
       "en": "Five muted presets tuned for political maps, atlas views, and historical overlays.",
       "zh": "五套偏克制的预设，适合政治地图、图集视图和历史覆盖层。"
     },
+    "Fixed cartographic intervals": {
+      "en": "Fixed cartographic intervals",
+      "zh": "固定制图区间"
+    },
     "Flag option": {
       "en": "Flag option",
       "zh": "旗帜选项"
@@ -297414,9 +298031,29 @@
       "en": "Flat Blue keeps the ocean fill clean with no bathymetry overlay.",
       "zh": "纯蓝模式仅保留干净的海洋底色，不叠加测深效果。"
     },
+    "Follow style": {
+      "en": "Follow style",
+      "zh": "跟随"
+    },
+    "Font size": {
+      "en": "Font size",
+      "zh": "字号"
+    },
+    "Font weight": {
+      "en": "Font weight",
+      "zh": "字重"
+    },
     "For 1936, 1939 and TNO. Detail is restored after navigation.": {
       "en": "For 1936, 1939 and TNO. Detail is restored after navigation.",
       "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。"
+    },
+    "For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.": {
+      "en": "For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.",
+      "zh": "要手动添加注记，打开「地图文字」，选择「放置标签」，点击地图上的目标位置，再编辑文字。导出前在预览中检查文字和图例。"
+    },
+    "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.": {
+      "en": "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.",
+      "zh": "进阶操作中，若剧本动作明确使用「当前归属方」，请在执行前核对当前国家。"
     },
     "Forbidden": {
       "en": "Forbidden",
@@ -297429,6 +298066,28 @@
     "Format": {
       "en": "Format",
       "zh": "格式"
+    },
+    "Found unsaved work from {count} minutes ago ({scenario}).": {
+      "en": {
+        "one": "Found unsaved work from {count} minute ago ({scenario}).",
+        "other": "Found unsaved work from {count} minutes ago ({scenario})."
+      },
+      "zh": "发现 {count} 分钟前未保存的工作（{scenario}）。"
+    },
+    "Found {count} unsaved projects.": {
+      "en": {
+        "one": "Found {count} unsaved project.",
+        "other": "Found {count} unsaved projects."
+      },
+      "zh": "发现 {count} 份未保存的工作。"
+    },
+    "Freeze visible country names": {
+      "en": "Freeze visible country names",
+      "zh": "固定当前视图所有国名"
+    },
+    "From {countries}": {
+      "en": "From {countries}",
+      "zh": "来源：{countries}"
     },
     "Frontline": {
       "en": "Frontline",
@@ -297494,6 +298153,10 @@
       "en": "Game renderer uses short codes like HQ or ARM. MILSTD expects a SIDC string.",
       "zh": "游戏渲染器使用 HQ 或 ARM 等短代码。 MILSTD 需要一个 SIDC 字符串。"
     },
+    "Generate and copy link": {
+      "en": "Generate and copy link",
+      "zh": "生成并复制链接"
+    },
     "Generated": {
       "en": "Generated",
       "zh": "生成时间"
@@ -297514,6 +298177,10 @@
       "en": "Geometry source",
       "zh": "几何来源"
     },
+    "Gestures": {
+      "en": "Gestures",
+      "zh": "手势"
+    },
     "Global oceans": {
       "en": "Global oceans",
       "zh": "全球海洋"
@@ -297521,6 +298188,10 @@
     "Global oceans · raster-derived bathymetry": {
       "en": "Global oceans · raster-derived bathymetry",
       "zh": "全球海洋 · 栅格推导测深"
+    },
+    "Global recolor": {
+      "en": "Global recolor",
+      "zh": "全局换色"
     },
     "Glow": {
       "en": "Glow",
@@ -297537,6 +298208,10 @@
     "Go to country list": {
       "en": "Go to country list",
       "zh": "前往国家列表"
+    },
+    "Government": {
+      "en": "Government",
+      "zh": "政体"
     },
     "Government effectiveness": {
       "en": "Government effectiveness",
@@ -297654,6 +298329,14 @@
       "en": "HGO unavailable",
       "zh": "HGO 不可用"
     },
+    "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area": {
+      "en": "HOI4 1936 state data · scenario start · split states apportioned by 2020 population or area",
+      "zh": "HOI4 1936 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+    },
+    "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area": {
+      "en": "HOI4 1939 state data · scenario start · split states apportioned by 2020 population or area",
+      "zh": "HOI4 1939 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+    },
     "HOI4 Library": {
       "en": "HOI4 Library",
       "zh": "HOI4 图标库"
@@ -297693,6 +298376,10 @@
     "Hide Details": {
       "en": "Hide Details",
       "zh": "隐藏详细信息"
+    },
+    "Hide city": {
+      "en": "Hide city",
+      "zh": "隐藏城市"
     },
     "Hide development workspace": {
       "en": "Hide development workspace",
@@ -297790,10 +298477,6 @@
       "en": "Historical only",
       "zh": "仅历史模式"
     },
-    "Historical predecessor": {
-      "en": "Historical predecessor",
-      "zh": "历史前身实体"
-    },
     "Historical transfer already matches current ownership.": {
       "en": "Historical transfer already matches current ownership.",
       "zh": "历史转让已经与当前所有权相匹配。"
@@ -297825,6 +298508,14 @@
     "Hit Source": {
       "en": "Hit Source",
       "zh": "命中来源"
+    },
+    "Hold Alt and click to sample a color": {
+      "en": "Hold Alt and click to sample a color",
+      "zh": "按住 Alt 点击取色"
+    },
+    "Hold and drag to pan": {
+      "en": "Hold and drag to pan",
+      "zh": "按住并拖动以平移地图"
     },
     "Hold to Compare Baseline": {
       "en": "Hold to Compare Baseline",
@@ -297890,9 +298581,25 @@
       "en": "Ignored {count} entries that are not valid for this map.",
       "zh": "已忽略 {count} 条不适用于当前地图的记录。"
     },
+    "Image clipboard unavailable": {
+      "en": "Image clipboard unavailable",
+      "zh": "此浏览器不支持复制图片"
+    },
+    "Image copied. Paste it into a chat.": {
+      "en": "Image copied. Paste it into a chat.",
+      "zh": "已复制，可直接粘贴到聊天。"
+    },
+    "Images can be used as a reference map": {
+      "en": "Images can be used as a reference map",
+      "zh": "图片可作为参考图"
+    },
     "Import": {
       "en": "Import",
       "zh": "导入"
+    },
+    "Import appearance preset": {
+      "en": "Import appearance preset",
+      "zh": "导入外观预设"
     },
     "Import cancelled": {
       "en": "Import cancelled",
@@ -297909,6 +298616,10 @@
     "Important": {
       "en": "Important",
       "zh": "重要的"
+    },
+    "In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map.": {
+      "en": "In visual coloring mode, a subdivision painted in a country’s base color belongs to that country on the map.",
+      "zh": "在视觉上色模式下，把地块涂成哪个国家的底色，它在图上就属于哪个国家。"
     },
     "Inactive fade strength": {
       "en": "Inactive fade strength",
@@ -297929,14 +298640,6 @@
     "Indicator data could not be loaded. Retry.": {
       "en": "Indicator data could not be loaded. Retry.",
       "zh": "指标数据加载失败，请重试。"
-    },
-    "Indicator data is ready to load.": {
-      "en": "Indicator data is ready to load.",
-      "zh": "指标数据待加载。"
-    },
-    "Indicator data loaded.": {
-      "en": "Indicator data loaded.",
-      "zh": "指标数据已加载。"
     },
     "Industrial Land": {
       "en": "Industrial Land",
@@ -298006,9 +298709,17 @@
       "en": "Infrastructure",
       "zh": "基础设施"
     },
+    "Inherited from parent ({value})": {
+      "en": "Inherited from parent ({value})",
+      "zh": "继承自母国（{value}）"
+    },
     "Inland": {
       "en": "Inland",
       "zh": "内陆"
+    },
+    "Insert graphic vertex": {
+      "en": "Insert graphic vertex",
+      "zh": "插入作战图形顶点"
     },
     "Inspect": {
       "en": "Inspect",
@@ -298082,6 +298793,10 @@
       "en": "Intensity Field",
       "zh": "强度场"
     },
+    "Intensity field": {
+      "en": "Intensity field",
+      "zh": "强度场"
+    },
     "Interaction": {
       "en": "Interaction",
       "zh": "交互"
@@ -298130,6 +298845,14 @@
       "en": "Intersect layer",
       "zh": "与图层交集"
     },
+    "Intersect zone members": {
+      "en": "Intersect zone members",
+      "zh": "取特殊区域成员交集"
+    },
+    "Invalid colors: {count}": {
+      "en": "Invalid colors: {count}",
+      "zh": "无效颜色：{count}"
+    },
     "Invalid project file. Please select a valid map_project.json.": {
       "en": "Invalid project file. Please select a valid map_project.json.",
       "zh": "项目文件无效，请选择有效的 map_project.json。"
@@ -298142,9 +298865,17 @@
       "en": "Isolated industrial site",
       "zh": "孤立的工业场地"
     },
+    "Italic": {
+      "en": "Italic",
+      "zh": "斜体"
+    },
     "Ivory Night": {
       "en": "Ivory Night",
       "zh": "夜色象牙"
+    },
+    "JPG uses the ocean color behind transparent areas.": {
+      "en": "JPG uses the ocean color behind transparent areas.",
+      "zh": "JPG 会在透明区域铺上海洋底色。"
     },
     "Japan": {
       "en": "Japan",
@@ -298253,6 +298984,10 @@
     "Keep only the industrial land types you want to inspect.": {
       "en": "Keep only the industrial land types you want to inspect.",
       "zh": "仅保留您想要检查的工业用地类型。"
+    },
+    "Keep original colors": {
+      "en": "Keep original colors",
+      "zh": "保留原色"
     },
     "Keep pack scope, visible site count, and source governance visible during review.": {
       "en": "Keep pack scope, visible site count, and source governance visible during review.",
@@ -298366,6 +299101,14 @@
       "en": "Label separation",
       "zh": "标签分离"
     },
+    "Label size": {
+      "en": "Label size",
+      "zh": "标签字号"
+    },
+    "Label text": {
+      "en": "Label text",
+      "zh": "文字内容"
+    },
     "Labels": {
       "en": "Labels",
       "zh": "标签"
@@ -298385,6 +299128,10 @@
     "Lake interaction settings": {
       "en": "Lake interaction settings",
       "zh": "查看湖泊交互设置"
+    },
+    "Land area": {
+      "en": "Land area",
+      "zh": "陆地面积"
     },
     "Land cover": {
       "en": "Land cover",
@@ -298522,6 +299269,10 @@
       "en": "Layers exported",
       "zh": "图层已导出"
     },
+    "Layout text": {
+      "en": "Layout text",
+      "zh": "版式文字"
+    },
     "Lease / condominium / treaty port": {
       "en": "Lease / condominium / treaty port",
       "zh": "租借/共管/条约港"
@@ -298546,6 +299297,14 @@
       "en": "Legend Editor",
       "zh": "图例编辑器"
     },
+    "Legend background": {
+      "en": "Legend background",
+      "zh": "图例背景"
+    },
+    "Legend title": {
+      "en": "Legend title",
+      "zh": "图例标题"
+    },
     "Lens": {
       "en": "Lens",
       "zh": "视图"
@@ -298553,6 +299312,14 @@
     "Less fields": {
       "en": "Less fields",
       "zh": "收起字段"
+    },
+    "Letter case": {
+      "en": "Letter case",
+      "zh": "大小写"
+    },
+    "Letter spacing": {
+      "en": "Letter spacing",
+      "zh": "字距"
     },
     "Level 1 region": {
       "en": "Level 1 region",
@@ -298627,8 +299394,12 @@
       "zh": "将湖泊连通到海洋"
     },
     "Link Scope To Reach": {
-      "en": "Link Scope To Reach",
-      "zh": "链接范围达到"
+      "en": "Scope follows reach",
+      "zh": "范围随覆盖度联动"
+    },
+    "Link copied.": {
+      "en": "Link copied.",
+      "zh": "已复制链接。"
     },
     "Linked to the current ocean fill color.": {
       "en": "Linked to the current ocean fill color.",
@@ -298717,6 +299488,10 @@
     "Loaded classes:": {
       "en": "Loaded classes:",
       "zh": "已加载类别："
+    },
+    "Loaded regions only": {
+      "en": "Loaded regions only",
+      "zh": "仅统计已加载地块"
     },
     "Loaded rows": {
       "en": "Loaded rows",
@@ -298818,6 +299593,14 @@
       "en": "Local connector",
       "zh": "本地连接器"
     },
+    "Local history": {
+      "en": "Local history",
+      "zh": "本地历史"
+    },
+    "Local history unavailable.": {
+      "en": "Local history unavailable.",
+      "zh": "无法访问本地历史。"
+    },
     "Local layer board": {
       "en": "Local layer board",
       "zh": "本地图层排序板"
@@ -298838,6 +299621,10 @@
       "en": "Localized name",
       "zh": "本地化名称"
     },
+    "Locate": {
+      "en": "Locate",
+      "zh": "定位"
+    },
     "Locate and zoom": {
       "en": "Locate and zoom",
       "zh": "定位并放大"
@@ -298849,6 +299636,10 @@
     "Location context": {
       "en": "Location context",
       "zh": "位置背景"
+    },
+    "Location unavailable on this map": {
+      "en": "Location unavailable on this map",
+      "zh": "当前地图没有该地块的位置"
     },
     "Lock what enters the Japan rail pack before render style.": {
       "en": "Lock what enters the Japan rail pack before render style.",
@@ -298992,7 +299783,7 @@
     },
     "Major Opacity": {
       "en": "Major Opacity",
-      "zh": "主要不透明度"
+      "zh": "主线不透明度"
     },
     "Major Stations": {
       "en": "Major Stations",
@@ -299066,6 +299857,17 @@
       "en": "Manual Zones",
       "zh": "手动区域"
     },
+    "Manual colors will be cleared from {count} regions": {
+      "en": {
+        "one": "Manual colors will be cleared from {count} region",
+        "other": "Manual colors will be cleared from {count} regions"
+      },
+      "zh": "将清除 {count} 个地块的手动颜色"
+    },
+    "Manual snapshot": {
+      "en": "Manual snapshot",
+      "zh": "手动快照"
+    },
     "Manual-reviewed": {
       "en": "Manual-reviewed",
       "zh": "人工校审"
@@ -299094,6 +299896,10 @@
       "en": "Map appearance",
       "zh": "地图外观"
     },
+    "Map auto-filled.": {
+      "en": "Map auto-filled.",
+      "zh": "已自动填色。"
+    },
     "Map cleared. Undo is available from history.": {
       "en": "Map cleared. Undo is available from history.",
       "zh": "地图已清空。可通过历史记录撤销。"
@@ -299114,13 +299920,33 @@
       "en": "Map detail",
       "zh": "地图详细程度"
     },
+    "Map display": {
+      "en": "Map display",
+      "zh": "地图显示"
+    },
+    "Map index is not ready yet.": {
+      "en": "Map index is not ready yet.",
+      "zh": "地图索引尚未就绪。"
+    },
+    "Map index is not ready.": {
+      "en": "Map index is not ready.",
+      "zh": "地图索引尚未就绪。"
+    },
     "Map labels": {
       "en": "Map labels",
       "zh": "地图标签"
     },
+    "Map lettering": {
+      "en": "Map lettering",
+      "zh": "地图文字"
+    },
     "Map mode": {
       "en": "Map mode",
       "zh": "地图模式"
+    },
+    "Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.": {
+      "en": "Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.",
+      "zh": "地图模式只改变地图的显示方式。在检查器中设置的阵营和政体会随项目保存。"
     },
     "Map modes only change how the map is shown; edits and saves are unaffected.": {
       "en": "Map modes only change how the map is shown; edits and saves are unaffected.",
@@ -299138,6 +299964,14 @@
       "en": "Map style",
       "zh": "地图样式"
     },
+    "Map title": {
+      "en": "Map title",
+      "zh": "地图标题"
+    },
+    "Map view": {
+      "en": "Map view",
+      "zh": "地图视角"
+    },
     "Map workspace": {
       "en": "Map workspace",
       "zh": "地图工作区"
@@ -299145,18 +299979,6 @@
     "Map zoom controls": {
       "en": "Map zoom controls",
       "zh": "地图缩放控件"
-    },
-    "Mapped": {
-      "en": "Mapped",
-      "zh": "已匹配"
-    },
-    "Mapped parcels": {
-      "en": "Mapped parcels",
-      "zh": "有数值地块"
-    },
-    "Mapped to": {
-      "en": "Mapped to",
-      "zh": "映射到"
     },
     "Marker Scale": {
       "en": "Marker Scale",
@@ -299169,6 +299991,10 @@
     "Matches": {
       "en": "Matches",
       "zh": "匹配数"
+    },
+    "Matching parcels in view": {
+      "en": "Matching parcels in view",
+      "zh": "当前视图内的同色地块"
     },
     "Matching regions": {
       "en": "Matching regions",
@@ -299206,6 +300032,10 @@
       "en": "Mediterranean supplement",
       "zh": "地中海补充数据"
     },
+    "Medium": {
+      "en": "Medium",
+      "zh": "中"
+    },
     "Medium city": {
       "en": "Medium city",
       "zh": "中型城市"
@@ -299230,9 +300060,25 @@
       "en": "Merge contiguous segments",
       "zh": "合并连续的段"
     },
+    "Merge into country…": {
+      "en": "Merge into country…",
+      "zh": "并入某国…"
+    },
+    "Merge into current map…": {
+      "en": "Merge into current map…",
+      "zh": "合并到当前地图…"
+    },
+    "Merge project paint: {name}": {
+      "en": "Merge project paint: {name}",
+      "zh": "合并项目涂色：{name}"
+    },
     "Metropolis": {
       "en": "Metropolis",
       "zh": "大都会"
+    },
+    "Mid-October 1919. Denikin's Volunteer Army has taken Orel and stands some 350 km from Moscow; Yudenich's North-Western Army is at the gates of Petrograd; Kolchak still holds Siberia behind the Tobol. Around the collapsing empire, Finland, the Baltic states, Poland, Ukraine and the Caucasus republics fight for their own borders, while Makhno's insurgents cut through the White rear. This is a regional scenario: only the former Russian Empire and its neighbours are included, in finer detail than the world maps.": {
+      "en": "Mid-October 1919. Denikin's Volunteer Army has taken Orel and stands some 350 km from Moscow; Yudenich's North-Western Army is at the gates of Petrograd; Kolchak still holds Siberia behind the Tobol. Around the collapsing empire, Finland, the Baltic states, Poland, Ukraine and the Caucasus republics fight for their own borders, while Makhno's insurgents cut through the White rear. This is a regional scenario: only the former Russian Empire and its neighbours are included, in finer detail than the world maps.",
+      "zh": "1919 年 10 月中旬。邓尼金的志愿军攻下奥廖尔，距莫斯科约 350 公里；尤登尼奇的西北军兵临彼得格勒；高尔察克仍据有托博尔河以东的西伯利亚。在崩解的帝国周围，芬兰、波罗的海三国、波兰、乌克兰和高加索诸共和国各自为疆界而战，马赫诺的起义军在白军后方纵横。这是一个区域剧本：只包含前俄罗斯帝国及其邻国，地块比世界剧本更细。"
     },
     "Mid-depth Fill Exit": {
       "en": "Mid-depth Fill Exit",
@@ -299242,9 +300088,25 @@
       "en": "Middle East",
       "zh": "中东"
     },
+    "Migrated parcels: {count}": {
+      "en": "Migrated parcels: {count}",
+      "zh": "已迁移的地块：{count}"
+    },
+    "Migrated {updated} entries. Could not match {count} regions.": {
+      "en": "Migrated {updated} entries. Could not match {count} regions.",
+      "zh": "已迁移 {updated} 处记录，{count} 个地块无法对应。"
+    },
     "Military Factories": {
       "en": "Military Factories",
       "zh": "军用工厂"
+    },
+    "Military factories": {
+      "en": "Military factories",
+      "zh": "军用工厂"
+    },
+    "Military factory share": {
+      "en": "Military factory share",
+      "zh": "军工占比"
     },
     "Min Area (px)": {
       "en": "Min Area (px)",
@@ -299300,7 +300162,7 @@
     },
     "Minor Opacity": {
       "en": "Minor Opacity",
-      "zh": "轻微不透明度"
+      "zh": "次线不透明度"
     },
     "Minor Step": {
       "en": "Minor Step",
@@ -299349,6 +300211,14 @@
     "Modern administrative regions": {
       "en": "Modern administrative regions",
       "zh": "现代行政区"
+    },
+    "Modern only": {
+      "en": "Modern only",
+      "zh": "仅现代模式"
+    },
+    "Modern reference (2023/2024)": {
+      "en": "Modern reference (2023/2024)",
+      "zh": "现代参考（2023/2024）"
     },
     "Monarchism": {
       "en": "Monarchism",
@@ -299405,6 +300275,18 @@
     "Move down": {
       "en": "Move down",
       "zh": "下移"
+    },
+    "Move graphic vertex": {
+      "en": "Move graphic vertex",
+      "zh": "移动作战图形顶点"
+    },
+    "Move map label": {
+      "en": "Move map label",
+      "zh": "移动地图文字"
+    },
+    "Move unit counter": {
+      "en": "Move unit counter",
+      "zh": "移动兵棋"
     },
     "Move up": {
       "en": "Move up",
@@ -299467,8 +300349,8 @@
       "zh": "名称从 200% 缩放显示，DEM 阴影从 400% 显示，均为现实地理参考。"
     },
     "Names from 200% zoom; terrain shading from 400%. Current geography reference.": {
-      "en": "Names from 200% zoom; terrain shading from 400%. Current geography reference.",
-      "zh": "放大至 200% 显示名称，400% 显示地形阴影。以现今地理为参考。"
+      "en": "At 200% zoom, landform names appear. At 400%, Alpine details and terrain shading appear. Based on present-day geography.",
+      "zh": "放大至 200% 显示地貌名称，400% 显示阿尔卑斯细节与地形阴影。以现今地理为参考。"
     },
     "National": {
       "en": "National",
@@ -299530,6 +300412,18 @@
       "en": "New Group Label",
       "zh": "新组标签"
     },
+    "New alliance…": {
+      "en": "New alliance…",
+      "zh": "新建阵营…"
+    },
+    "New capital city name": {
+      "en": "New capital city name",
+      "zh": "新首都城市名"
+    },
+    "New country {n}": {
+      "en": "New country {n}",
+      "zh": "新国家 {n}"
+    },
     "New layer": {
       "en": "New layer",
       "zh": "新建图层"
@@ -299537,6 +300431,10 @@
     "New region": {
       "en": "New region",
       "zh": "新建区域"
+    },
+    "Newer edits prevent undoing auto-fill.": {
+      "en": "Newer edits prevent undoing auto-fill.",
+      "zh": "已有后续编辑，无法直接撤销这次自动填色。"
     },
     "Next page": {
       "en": "Next page",
@@ -299586,9 +300484,17 @@
       "en": "No bathymetry coverage in this view",
       "zh": "当前视图无测深覆盖"
     },
+    "No capital": {
+      "en": "No capital",
+      "zh": "无首都"
+    },
     "No changes": {
       "en": "No changes",
       "zh": "没有变化"
+    },
+    "No color conflicts or fragments found.": {
+      "en": "No color conflicts or fragments found.",
+      "zh": "未发现近色冲突或同色碎片。"
     },
     "No community saves yet": {
       "en": "No community saves yet",
@@ -299639,8 +300545,8 @@
       "zh": "暂时没有可用的 facility 详情。"
     },
     "No file selected": {
-      "en": "No file selected",
-      "zh": "未选择文件"
+      "en": "Open a project file or drop a project file onto the map.",
+      "zh": "打开项目文件，或将文件拖到地图上。"
     },
     "No frontline control split in current scenario.": {
       "en": "No frontline control split in current scenario.",
@@ -299649,6 +300555,10 @@
     "No hierarchy groups": {
       "en": "No hierarchy groups",
       "zh": "没有可用层级分组"
+    },
+    "No history yet": {
+      "en": "No history yet",
+      "zh": "暂无历史记录"
     },
     "No industrial polygon selected": {
       "en": "No industrial polygon selected",
@@ -299666,6 +300576,10 @@
       "en": "No layers to copy from",
       "zh": "没有可复制图层"
     },
+    "No local history yet.": {
+      "en": "No local history yet.",
+      "zh": "暂无本地历史。"
+    },
     "No logistics hub selected": {
       "en": "No logistics hub selected",
       "zh": "未选择物流中心"
@@ -299675,8 +300589,8 @@
       "zh": "无手动区域"
     },
     "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.": {
-      "en": "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.",
-      "zh": "没有匹配颜色。清空搜索，或尝试国家名称、ISO-2 代码、来源代码。"
+      "en": "No matching colors.",
+      "zh": "没有匹配的颜色。"
     },
     "No matching commands": {
       "en": "No matching commands",
@@ -299746,6 +300660,10 @@
       "en": "No palette suggestions",
       "zh": "暂无色板建议"
     },
+    "No parcels changed: all were already painted.": {
+      "en": "No parcels changed: all were already painted.",
+      "zh": "所有选中地块都已涂色，没有更改。"
+    },
     "No parent group is available for this feature.": {
       "en": "No parent group is available for this feature.",
       "zh": "这个地块没有可用的父级分组。"
@@ -299769,6 +300687,14 @@
     "No reference regions were recolored.": {
       "en": "No reference regions were recolored.",
       "zh": "没有参考区域被重新着色。"
+    },
+    "No reference territory.": {
+      "en": "No reference territory.",
+      "zh": "无参考领土。"
+    },
+    "No reference territory. Release to generate a country name.": {
+      "en": "No reference territory. Release to generate a country name.",
+      "zh": "无参考版图，释放后生成国名。"
     },
     "No regional presets": {
       "en": "No regional presets",
@@ -299815,12 +300741,16 @@
       "zh": "当前没有可见战略标注"
     },
     "No supported countries in current dataset.": {
-      "en": "No supported countries in current dataset.",
-      "zh": "当前数据集中没有受支持的国家。"
+      "en": "No countries available on this map.",
+      "zh": "当前地图没有可用的国家。"
     },
     "No symbols match the current filter.": {
       "en": "No symbols match the current filter.",
       "zh": "没有符号与当前过滤器匹配。"
+    },
+    "No territory changes.": {
+      "en": "No territory changes.",
+      "zh": "领土归属没有变化。"
     },
     "No transport schema loaded yet": {
       "en": "No transport schema loaded yet",
@@ -299874,9 +300804,21 @@
       "en": "Not in current view",
       "zh": "当前视野内没有要素"
     },
+    "Not now": {
+      "en": "Not now",
+      "zh": "暂不恢复"
+    },
     "Not saved yet": {
       "en": "Not saved yet",
       "zh": "尚未保存"
+    },
+    "Not set": {
+      "en": "Not set",
+      "zh": "未设定"
+    },
+    "Note": {
+      "en": "Note",
+      "zh": "注释"
     },
     "Notes": {
       "en": "Notes",
@@ -299885,6 +300827,10 @@
     "Notes and sources": {
       "en": "Notes and sources",
       "zh": "说明与来源"
+    },
+    "Nudge selected map label": {
+      "en": "Nudge selected map label",
+      "zh": "微调选中地图文字的位置"
     },
     "ORG": {
       "en": "ORG",
@@ -299918,9 +300864,17 @@
       "en": "Ocean",
       "zh": "海洋"
     },
+    "Ocean depth field": {
+      "en": "Ocean depth field",
+      "zh": "海洋深度场"
+    },
     "Oceania": {
       "en": "Oceania",
       "zh": "大洋洲"
+    },
+    "October 1919 · The Whites at their furthest advance": {
+      "en": "October 1919 · The Whites at their furthest advance",
+      "zh": "1919 年 10 月 · 白军推进最远之时"
     },
     "Off": {
       "en": "Off",
@@ -299994,6 +300948,14 @@
       "en": "One click should affect a group, a region, a frontline, or a planned operation.",
       "zh": "一次点击需要影响一个组、一个区域、一条前线或一项计划行动时使用。"
     },
+    "Only .json/.zip project files can be opened": {
+      "en": "Only .json/.zip project files can be opened",
+      "zh": "只能打开 .json/.zip 项目文件"
+    },
+    "Only HTTPS project links are supported.": {
+      "en": "Only HTTPS project links are supported.",
+      "zh": "项目链接仅支持 HTTPS。"
+    },
     "Only approved local subtypes enter the live energy pack.": {
       "en": "Only approved local subtypes enter the live energy pack.",
       "zh": "只有经过批准的本地子类型才能进入实时能量包。"
@@ -300009,6 +300971,14 @@
     "Opacity": {
       "en": "Opacity",
       "zh": "不透明度"
+    },
+    "Opaque on export": {
+      "en": "Opaque on export",
+      "zh": "导出时不透明"
+    },
+    "Open": {
+      "en": "Open",
+      "zh": "打开"
     },
     "Open HGO editor": {
       "en": "Open HGO editor",
@@ -300054,6 +301024,10 @@
       "en": "Open grid",
       "zh": "稀疏方格"
     },
+    "Open project": {
+      "en": "Open project",
+      "zh": "打开项目"
+    },
     "Open reference tools, export utilities, language toggle, and development workspace access.": {
       "en": "Open reference tools, export utilities, language toggle, and development workspace access.",
       "zh": "打开参考工具、导出功能、语言切换和开发工作区入口。"
@@ -300061,6 +301035,10 @@
     "Open section help": {
       "en": "Open section help",
       "zh": "打开部分帮助"
+    },
+    "Open shared project?": {
+      "en": "Open shared project?",
+      "zh": "打开共享项目？"
     },
     "Open the Transport workbench to review family context on the left, preview or reorder in the center, and tune or verify rules in the inspector tabs on the right.": {
       "en": "Open the Transport workbench to review family context on the left, preview or reorder in the center, and tune or verify rules in the inspector tabs on the right.",
@@ -300097,6 +301075,10 @@
     "Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.": {
       "en": "Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.",
       "zh": "打开交通工作台，查看交通预览、图层顺序、诊断和应用到地图控制。"
+    },
+    "Open this HGO project in the HGO editor.": {
+      "en": "Open this HGO project in the HGO editor.",
+      "zh": "请在 HGO 编辑器中打开此项目。"
     },
     "Open transport workbench": {
       "en": "Open transport workbench",
@@ -300149,6 +301131,10 @@
     "Organization": {
       "en": "Organization",
       "zh": "组织"
+    },
+    "Original case": {
+      "en": "Original case",
+      "zh": "原样"
     },
     "Other": {
       "en": "Other",
@@ -300254,6 +301240,10 @@
       "en": "Overrides Only",
       "zh": "仅显示覆盖"
     },
+    "Overwrite painted parcels": {
+      "en": "Overwrite painted parcels",
+      "zh": "覆盖已涂色的地块"
+    },
     "Owner": {
       "en": "Owner",
       "zh": "所有方"
@@ -300338,6 +301328,10 @@
       "en": "Color",
       "zh": "着色"
     },
+    "Paint only unpainted regions": {
+      "en": "Paint only unpainted regions",
+      "zh": "只涂未涂过的地块"
+    },
     "Paint regions to generate a legend.": {
       "en": "Paint regions to generate a legend.",
       "zh": "为区域上色以生成图例。"
@@ -300353,6 +301347,17 @@
     "Paint water regions to create an override list.": {
       "en": "Paint water regions to create an override list.",
       "zh": "绘制水域以创建覆盖列表。"
+    },
+    "Paint with country colors": {
+      "en": "Paint with country colors",
+      "zh": "用国家底色填图"
+    },
+    "Paint {count} regions": {
+      "en": {
+        "one": "Paint {count} region",
+        "other": "Paint {count} regions"
+      },
+      "zh": "填色 {count} 个地块"
     },
     "Paints with this country's current color; can be undone.": {
       "en": "Paints with this country's current color; can be undone.",
@@ -300385,6 +301390,22 @@
     "Palette restore skipped": {
       "en": "Palette restore skipped",
       "zh": "调色板恢复已跳过"
+    },
+    "Pan down on focused map (Shift for larger steps)": {
+      "en": "Pan down on focused map (Shift for larger steps)",
+      "zh": "地图获得焦点时向下平移（按住 Shift 加大步长）"
+    },
+    "Pan left on focused map (Shift for larger steps)": {
+      "en": "Pan left on focused map (Shift for larger steps)",
+      "zh": "地图获得焦点时向左平移（按住 Shift 加大步长）"
+    },
+    "Pan right on focused map (Shift for larger steps)": {
+      "en": "Pan right on focused map (Shift for larger steps)",
+      "zh": "地图获得焦点时向右平移（按住 Shift 加大步长）"
+    },
+    "Pan up on focused map (Shift for larger steps)": {
+      "en": "Pan up on focused map (Shift for larger steps)",
+      "zh": "地图获得焦点时向上平移（按住 Shift 加大步长）"
     },
     "Panels": {
       "en": "Panels",
@@ -300478,13 +301499,13 @@
       "en": "Physical Regions",
       "zh": "地貌区域"
     },
+    "Physical intensity field": {
+      "en": "Physical intensity field",
+      "zh": "地形强度场"
+    },
     "Physical region names": {
       "en": "Physical region names",
       "zh": "地貌区域名称"
-    },
-    "Pick a city marker style, then tune marker density and label density for the current map scale.": {
-      "en": "Pick a city marker style, then tune marker density and label density for the current map scale.",
-      "zh": "先选一种城市点位样式，再按当前地图比例调整标记密度和标签密度。"
     },
     "Pick the target and the owner before painting.": {
       "en": "Pick the target and the owner before painting.",
@@ -300497,6 +301518,42 @@
     "Pilot scope stays on motorway, trunk, and primary.": {
       "en": "Pilot scope stays on motorway, trunk, and primary.",
       "zh": "试点范围停留在高速公路、主干道和主干道上。"
+    },
+    "Place a label to start lettering the map.": {
+      "en": "Place a label to start lettering the map.",
+      "zh": "点击「放置文字」添加第一条地图文字。"
+    },
+    "Place another map label": {
+      "en": "Place another map label",
+      "zh": "连续放置地图文字"
+    },
+    "Place capital": {
+      "en": "Place capital",
+      "zh": "放置首都"
+    },
+    "Place capital on map…": {
+      "en": "Place capital on map…",
+      "zh": "在地图上放置首都…"
+    },
+    "Place intensity point": {
+      "en": "Place intensity point",
+      "zh": "添加强度点"
+    },
+    "Place label": {
+      "en": "Place label",
+      "zh": "放置文字"
+    },
+    "Place map label": {
+      "en": "Place map label",
+      "zh": "添加地图文字"
+    },
+    "Place map text": {
+      "en": "Place map text",
+      "zh": "放置地图文字"
+    },
+    "Place unit counter": {
+      "en": "Place unit counter",
+      "zh": "放置兵棋"
     },
     "Placed Counters": {
       "en": "Placed Counters",
@@ -300610,33 +301667,25 @@
       "en": "Political stability and absence of violence",
       "zh": "政治稳定与免于暴力"
     },
+    "Population (scenario start)": {
+      "en": "Population (scenario start)",
+      "zh": "人口（剧本开局）"
+    },
     "Population / City Boost (Modern only)": {
-      "en": "Population / City Boost (Modern only)",
-      "zh": "人口亮度增强（仅限现代）"
+      "en": "Population / City Boost",
+      "zh": "人口亮度增强"
     },
     "Population Boost Strength (Modern only)": {
-      "en": "Population Boost Strength (Modern only)",
-      "zh": "人口增强强度（仅限现代）"
+      "en": "Population Boost Strength",
+      "zh": "人口增强强度"
     },
     "Population aged 65 and above": {
       "en": "Population aged 65 and above",
       "zh": "65岁及以上人口占比"
     },
-    "Population coverage": {
-      "en": "Population coverage",
-      "zh": "人口数据覆盖率"
-    },
     "Population data could not be loaded. Retry.": {
       "en": "Population data could not be loaded. Retry.",
       "zh": "人口数据加载失败，请重试。"
-    },
-    "Population data is ready to load.": {
-      "en": "Population data is ready to load.",
-      "zh": "人口数据待加载。"
-    },
-    "Population data loaded.": {
-      "en": "Population data loaded.",
-      "zh": "人口数据已加载。"
     },
     "Population density": {
       "en": "Population density",
@@ -300657,10 +301706,6 @@
     "Population is unavailable on this basemap.": {
       "en": "Population is unavailable on this basemap.",
       "zh": "当前底图不支持人口空间图层。"
-    },
-    "Population layer is off.": {
-      "en": "Population layer is off.",
-      "zh": "人口图层已关闭。"
     },
     "Population statistics": {
       "en": "Population statistics",
@@ -300698,6 +301743,10 @@
       "en": "Port workbench",
       "zh": "港口工作台"
     },
+    "Position": {
+      "en": "Position",
+      "zh": "位置"
+    },
     "Precise display restored": {
       "en": "Precise display restored",
       "zh": "已恢复精确显示"
@@ -300729,6 +301778,10 @@
     "Preparing default scenario": {
       "en": "Preparing default scenario",
       "zh": "正在准备默认剧本"
+    },
+    "Preparing export data…": {
+      "en": "Preparing export data…",
+      "zh": "正在准备导出数据…"
     },
     "Preparing preview…": {
       "en": "Preparing preview…",
@@ -300801,6 +301854,10 @@
     "Presets": {
       "en": "Presets",
       "zh": "预设"
+    },
+    "Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map.": {
+      "en": "Press Ctrl+S to save the editable project JSON. Choose Export image, check the preview, then download the map.",
+      "zh": "按 Ctrl+S 保存可继续编辑的项目 JSON。点击「导出图片」，检查预览后下载地图。"
     },
     "Preview available": {
       "en": "Preview available",
@@ -300930,6 +301987,26 @@
       "en": "Project ZIP package downloaded.",
       "zh": "项目 ZIP 包已下载。"
     },
+    "Project controls": {
+      "en": "Project controls",
+      "zh": "项目面板"
+    },
+    "Project countries": {
+      "en": "Project countries",
+      "zh": "项目国家"
+    },
+    "Project countries without a base color were skipped: {tags}": {
+      "en": "Project countries without a base color were skipped: {tags}",
+      "zh": "已跳过缺少底色的项目国家：{tags}"
+    },
+    "Project country {from} → {to}": {
+      "en": "Project country {from} → {to}",
+      "zh": "项目国家 {from} → {to}"
+    },
+    "Project data": {
+      "en": "Project data",
+      "zh": "项目数据"
+    },
     "Project downloaded": {
       "en": "Project downloaded",
       "zh": "项目已下载"
@@ -301006,6 +302083,14 @@
       "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.",
       "zh": "已导入项目：{scenario}。已恢复 {colors} 条上色记录和 {owners} 条归属记录。"
     },
+    "Project imported: {scenario}. Restored {colors} color entries.": {
+      "en": "Project imported: {scenario}. Restored {colors} color entries.",
+      "zh": "已导入项目：{scenario}。已恢复 {colors} 条颜色记录。"
+    },
+    "Project name (optional)": {
+      "en": "Project name (optional)",
+      "zh": "项目名（可选）"
+    },
     "Project only": {
       "en": "Project only",
       "zh": "仅项目"
@@ -301021,6 +302106,10 @@
     "Project saved": {
       "en": "Project saved",
       "zh": "项目已保存"
+    },
+    "Project setting": {
+      "en": "Project setting",
+      "zh": "项目设定"
     },
     "Project tools": {
       "en": "Project tools",
@@ -301085,6 +302174,18 @@
     "Quick edit dock": {
       "en": "Quick edit dock",
       "zh": "快捷编辑栏"
+    },
+    "Quick fill": {
+      "en": "Quick fill",
+      "zh": "快速填色"
+    },
+    "Quick fill parent region": {
+      "en": "Quick fill parent region",
+      "zh": "快填上级区域"
+    },
+    "Quick fill whole country": {
+      "en": "Quick fill whole country",
+      "zh": "快填整个国家"
     },
     "Quick path": {
       "en": "Quick path",
@@ -301166,6 +302267,10 @@
       "en": "Raster trial is off",
       "zh": "栅格试用已关闭"
     },
+    "Raw file URL": {
+      "en": "Raw file URL",
+      "zh": "原始文件地址"
+    },
     "Read-only scenario asset": {
       "en": "Read-only scenario asset",
       "zh": "只读场景资产"
@@ -301214,6 +302319,10 @@
       "en": "Recent colors",
       "zh": "最近颜色"
     },
+    "Recent projects": {
+      "en": "Recent projects",
+      "zh": "最近项目"
+    },
     "Recent scenario tag colors": {
       "en": "Recent scenario tag colors",
       "zh": "最近使用的剧本标签颜色"
@@ -301237,6 +302346,10 @@
     "Redo": {
       "en": "Redo",
       "zh": "重做"
+    },
+    "Redo: {action}": {
+      "en": "Redo: {action}",
+      "zh": "重做：{action}"
     },
     "Reduce the visible hub set while keeping the logistics layer point-based.": {
       "en": "Reduce the visible hub set while keeping the logistics layer point-based.",
@@ -301342,6 +302455,14 @@
       "en": "Register",
       "zh": "注册"
     },
+    "Register as new country": {
+      "en": "Register as new country",
+      "zh": "登记为新国家"
+    },
+    "Register new country {name}": {
+      "en": "Register new country {name}",
+      "zh": "登记新国家 {name}"
+    },
     "Regulatory quality": {
       "en": "Regulatory quality",
       "zh": "监管质量"
@@ -301398,6 +302519,26 @@
       "en": "Remove member",
       "zh": "移除成员"
     },
+    "Remove zone members": {
+      "en": "Remove zone members",
+      "zh": "移除特殊区域成员"
+    },
+    "Rename city": {
+      "en": "Rename city",
+      "zh": "重命名城市"
+    },
+    "Rename country": {
+      "en": "Rename country",
+      "zh": "重命名国家"
+    },
+    "Rename country to {name}": {
+      "en": "Rename country to {name}",
+      "zh": "将国家改名为 {name}"
+    },
+    "Rename zone layer": {
+      "en": "Rename zone layer",
+      "zh": "重命名特殊区域图层"
+    },
     "Render Profile": {
       "en": "Render Profile",
       "zh": "渲染档位"
@@ -301422,6 +302563,10 @@
       "en": "Rendering export preview…",
       "zh": "正在渲染导出预览…"
     },
+    "Rendering map…": {
+      "en": "Rendering map…",
+      "zh": "正在渲染地图…"
+    },
     "Reorder the 8 transport families in the center board. This order currently stays local to the Transport workbench.": {
       "en": "Reorder the 8 transport families in the center board. This order currently stays local to the Transport workbench.",
       "zh": "在中间面板调整 8 个交通图层族的顺序。此顺序目前只保存在交通工作台内。"
@@ -301430,13 +302575,33 @@
       "en": "Reorder transport layers",
       "zh": "调整交通图层顺序"
     },
+    "Reorder zone layers": {
+      "en": "Reorder zone layers",
+      "zh": "调整特殊区域图层顺序"
+    },
+    "Replace automatic country name": {
+      "en": "Replace automatic country name",
+      "zh": "作为国名替代"
+    },
+    "Replace color": {
+      "en": "Replace color",
+      "zh": "替换颜色"
+    },
     "Replace with dev selection": {
-      "en": "Replace with dev selection",
-      "zh": "用开发选择替换"
+      "en": "Replace with selected parcels",
+      "zh": "用已选地块替换"
     },
     "Replace with imported ids": {
       "en": "Replace with imported ids",
       "zh": "用导入 ID 替换"
+    },
+    "Replace zone members": {
+      "en": "Replace zone members",
+      "zh": "替换特殊区域成员"
+    },
+    "Replaced by manual map text": {
+      "en": "Replaced by manual map text",
+      "zh": "有手动地图文字代替"
     },
     "Report": {
       "en": "Report",
@@ -301478,6 +302643,10 @@
       "en": "Reset all country colors and clear visual overrides?",
       "zh": "重置所有国家颜色并清除视觉覆盖吗？"
     },
+    "Reset country overrides": {
+      "en": "Reset country overrides",
+      "zh": "重置国家局部配色"
+    },
     "Reset zoom": {
       "en": "Reset zoom",
       "zh": "重置缩放"
@@ -301485,6 +302654,18 @@
     "Resource type": {
       "en": "Resource type",
       "zh": "资源种类"
+    },
+    "Restore": {
+      "en": "Restore",
+      "zh": "恢复"
+    },
+    "Restore original country color": {
+      "en": "Restore original country color",
+      "zh": "恢复本国原色"
+    },
+    "Restore scenario capital": {
+      "en": "Restore scenario capital",
+      "zh": "恢复剧本首都"
     },
     "Restored": {
       "en": "Restored",
@@ -301513,6 +302694,10 @@
     "Return to": {
       "en": "Return to",
       "zh": "返回"
+    },
+    "Return to: {action}": {
+      "en": "Return to: {action}",
+      "zh": "回到：{action}"
     },
     "Review": {
       "en": "Review",
@@ -301606,6 +302791,10 @@
       "en": "Risky fixes",
       "zh": "风险修复"
     },
+    "River / terrain": {
+      "en": "River / terrain",
+      "zh": "河流/地形"
+    },
     "River Stroke": {
       "en": "River Stroke",
       "zh": "河流描边"
@@ -301678,6 +302867,10 @@
       "en": "Rotate preview 90 degrees",
       "zh": "将预览旋转 90 度"
     },
+    "Rotation": {
+      "en": "Rotation",
+      "zh": "旋转"
+    },
     "Royal Violet": {
       "en": "Royal Violet",
       "zh": "王室紫标"
@@ -301722,6 +302915,10 @@
       "en": "Russia Region",
       "zh": "俄罗斯区域"
     },
+    "Russian Civil War": {
+      "en": "Russian Civil War",
+      "zh": "俄国内战"
+    },
     "SIDC (e.g. 130310001412110000000000000000)": {
       "en": "SIDC (e.g. 130310001412110000000000000000)",
       "zh": "SIDC（例如 130310001412110000000000000000）"
@@ -301761,6 +302958,10 @@
     "Sample Selected": {
       "en": "Sample Selected",
       "zh": "已选样品"
+    },
+    "Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools.": {
+      "en": "Sample a country with the Eyedropper, then switch to Fill. While using Fill, Alt-click samples a color without switching tools.",
+      "zh": "用吸管在地图上取一个国家的颜色，再切回填充。使用填充工具时，按住 Alt 单击即可直接取色。"
     },
     "Sample guide actions": {
       "en": "Sample guide actions",
@@ -301834,9 +303035,33 @@
       "en": "Save Preset",
       "zh": "保存预设"
     },
+    "Save a copy to keep editing.": {
+      "en": "Save a copy to keep editing.",
+      "zh": "另存为副本后可继续编辑。"
+    },
+    "Save a copy…": {
+      "en": "Save a copy…",
+      "zh": "另存为副本…"
+    },
+    "Save a snapshot now": {
+      "en": "Save a snapshot now",
+      "zh": "立即存一份快照"
+    },
     "Save and restore the complete working state.": {
       "en": "Save and restore the complete working state.",
       "zh": "保存和恢复完整工作状态。"
+    },
+    "Save appearance preset": {
+      "en": "Save appearance preset",
+      "zh": "保存外观预设"
+    },
+    "Save as copy": {
+      "en": "Save as copy",
+      "zh": "另存为副本"
+    },
+    "Save first": {
+      "en": "Save first",
+      "zh": "先保存"
     },
     "Save or load your map state as a project file.": {
       "en": "Save or load your map state as a project file.",
@@ -301846,9 +303071,21 @@
       "en": "Save project",
       "zh": "保存项目"
     },
+    "Save project downloads the editable map, including its colors, annotations and export settings.": {
+      "en": "Save project downloads the editable map, including its colors, annotations and export settings.",
+      "zh": "点击「保存项目」即可下载可编辑的地图，保留地块颜色、注记和导出设置。"
+    },
     "Save scenario layer asset": {
       "en": "Save scenario layer asset",
       "zh": "保存场景图层资产"
+    },
+    "Save status": {
+      "en": "Save status",
+      "zh": "保存状态"
+    },
+    "Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings.": {
+      "en": "Save the current project with Ctrl+S before opening another file. Opening a project replaces the map and its settings.",
+      "zh": "打开其他文件前，先按 Ctrl+S 保存当前项目。打开项目会替换当前地图及其设置。"
     },
     "Save title": {
       "en": "Save title",
@@ -301877,6 +303114,10 @@
     "Saved population data version is unavailable.": {
       "en": "Saved population data version is unavailable.",
       "zh": "保存的人口数据版本不可用。"
+    },
+    "Saved to {file}": {
+      "en": "Saved to {file}",
+      "zh": "已保存到 {file}"
     },
     "Saving scenario special zone layers…": {
       "en": "Saving scenario special zone layers…",
@@ -301982,13 +303223,25 @@
       "en": "Scenario cleared.",
       "zh": "剧本已退出。"
     },
-    "Scenario controls are locked until the page reloads.": {
-      "en": "Scenario controls are locked until the page reloads.",
-      "zh": "场景控件将被锁定，直到页面重新加载。"
+    "Scenario cores × parcel area": {
+      "en": "Scenario cores × parcel area",
+      "zh": "剧本核心归属 × 地块面积"
     },
-    "Scenario countries mapped": {
-      "en": "Scenario countries mapped",
-      "zh": "场景国家已匹配"
+    "Scenario data": {
+      "en": "Scenario data",
+      "zh": "剧本数据"
+    },
+    "Scenario data (start)": {
+      "en": "Scenario data (start)",
+      "zh": "剧本数据（开局）"
+    },
+    "Scenario default": {
+      "en": "Scenario default",
+      "zh": "剧本默认"
+    },
+    "Scenario default ({value})": {
+      "en": "Scenario default ({value})",
+      "zh": "剧本默认（{value}）"
     },
     "Scenario depth is schematic": {
       "en": "Scenario depth is schematic",
@@ -302050,6 +303303,10 @@
       "en": "Scenario overlays degraded",
       "zh": "场景覆盖层已降级"
     },
+    "Scenario parcel geometry area (GHSL 2020 companion)": {
+      "en": "Scenario parcel geometry area (GHSL 2020 companion)",
+      "zh": "剧本地块几何面积（GHSL 2020 配套）"
+    },
     "Scenario recovery failed": {
       "en": "Scenario recovery failed",
       "zh": "场景恢复失败"
@@ -302101,6 +303358,10 @@
     "Scenario special zone layers saved.": {
       "en": "Scenario special zone layers saved.",
       "zh": "场景特殊区域图层已保存。"
+    },
+    "Scenario start data, grouped by baseline ownership and unaffected by painting.": {
+      "en": "Scenario start data, grouped by baseline ownership and unaffected by painting.",
+      "zh": "剧本开局数据，按基线归属汇总，不随涂色变化。"
     },
     "Scenario state is inconsistent. Reload the page before continuing.": {
       "en": "Scenario state is inconsistent. Reload the page before continuing.",
@@ -302221,6 +303482,10 @@
     "Search layers": {
       "en": "Search layers",
       "zh": "搜索图层"
+    },
+    "Search legend or country name": {
+      "en": "Search legend or country name",
+      "zh": "搜索图例名称或国家名"
     },
     "Search options": {
       "en": "Search options",
@@ -302402,6 +303667,10 @@
       "en": "Select anchor region",
       "zh": "选择锚定区域"
     },
+    "Select appearance preset": {
+      "en": "Select appearance preset",
+      "zh": "选择外观预设"
+    },
     "Select country": {
       "en": "Select country",
       "zh": "选择国家"
@@ -302430,6 +303699,10 @@
       "en": "Select source layer",
       "zh": "选择来源图层"
     },
+    "Select the country in the country list, then click its color swatch in the Inspector to change its base color.": {
+      "en": "Select the country in the country list, then click its color swatch in the Inspector to change its base color.",
+      "zh": "要给国家换色，先在国家列表中选中它，再点击检查器中的色块修改底色。"
+    },
     "Select the country, enable the HGO identity view in Inspector, pick the intended identity option, then review the map label and flag preview.": {
       "en": "Select the country, enable the HGO identity view in Inspector, pick the intended identity option, then review the map label and flag preview.",
       "zh": "选中国家，在检查器中启用 HGO 身份视图，选择目标身份选项，然后检查地图标签和旗帜预览。"
@@ -302449,6 +303722,10 @@
     "Select which official port legal classes remain visible.": {
       "en": "Select which official port legal classes remain visible.",
       "zh": "选择哪些官方港口法律类别保持可见。"
+    },
+    "Select zone layer": {
+      "en": "Select zone layer",
+      "zh": "选择特殊区域图层"
     },
     "Selected": {
       "en": "Selected",
@@ -302538,6 +303815,10 @@
       "en": "Selection copied",
       "zh": "多选已复制"
     },
+    "Selection limit reached ({limit}).": {
+      "en": "Selection limit reached ({limit}).",
+      "zh": "已达到多选上限（{limit} 块）。"
+    },
     "Separate official and public sources": {
       "en": "Separate official and public sources",
       "zh": "官方与公开来源分开"
@@ -302574,13 +303855,25 @@
       "en": "Set Inactive",
       "zh": "取消当前"
     },
+    "Set as capital": {
+      "en": "Set as capital",
+      "zh": "设为首都"
+    },
     "Set base borders and water first, add physical or day-night layers, then adjust labels, textures, and presets.": {
       "en": "Set base borders and water first, add physical or day-night layers, then adjust labels, textures, and presets.",
       "zh": "先设置基础边界和水域，再加入物理或昼夜图层，最后调整标签、纹理和预设。"
     },
+    "Set capital to {name}": {
+      "en": "Set capital to {name}",
+      "zh": "设定首都 {name}"
+    },
     "Set the owner tag for all selected features": {
       "en": "Set the owner tag for all selected features",
       "zh": "为所有选中地块设置归属标签"
+    },
+    "Set to country": {
+      "en": "Set to country",
+      "zh": "设为某国颜色"
     },
     "Sets motorway, trunk, and primary emphasis.": {
       "en": "Sets motorway, trunk, and primary emphasis.",
@@ -302602,6 +303895,10 @@
       "en": "Shallow Scenario Contour Exit",
       "zh": "浅层场景等高线退出"
     },
+    "Share link": {
+      "en": "Share link",
+      "zh": "分享链接"
+    },
     "Shared": {
       "en": "Shared",
       "zh": "共享"
@@ -302613,6 +303910,10 @@
     "Shelter / special-use": {
       "en": "Shelter / special-use",
       "zh": "庇护所/特殊用途"
+    },
+    "Shift + double-click: country. Space + double-click: parent. G: next level.": {
+      "en": "Shift + double-click: country. Space + double-click: parent. G: next level.",
+      "zh": "Shift + 双击填整国，空格 + 双击填上级区域，G 切换层级。"
     },
     "Shift / Space + drag to pan": {
       "en": "Shift / Space + drag to pan",
@@ -302663,8 +303964,8 @@
       "zh": "按国家显示上级边界"
     },
     "Show Parent Unit Borders": {
-      "en": "Show Parent Unit Borders",
-      "zh": "显示父单元边框"
+      "en": "Show",
+      "zh": "显示"
     },
     "Show Port Labels": {
       "en": "Show Port Labels",
@@ -302846,9 +304147,32 @@
       "en": "Single-click: one subdivision | Double-click: province batch",
       "zh": "单击：单个地块 | 双击：按省级批量"
     },
+    "Size in this view (px)": {
+      "en": "Size in this view (px)",
+      "zh": "当前视图字号（px）"
+    },
     "Skip to map workspace": {
       "en": "Skip to map workspace",
       "zh": "跳转到地图工作区"
+    },
+    "Skipped": {
+      "en": "Skipped",
+      "zh": "已跳过"
+    },
+    "Skipped parcels: {count}": {
+      "en": "Skipped parcels: {count}",
+      "zh": "跳过的地块：{count}"
+    },
+    "Skipped {count} already painted parcels.": {
+      "en": "Skipped {count} already painted parcels.",
+      "zh": "已跳过 {count} 个已涂色的地块。"
+    },
+    "Skipping {count} painted regions": {
+      "en": {
+        "one": "Skipping {count} painted region",
+        "other": "Skipping {count} painted regions"
+      },
+      "zh": "将跳过 {count} 块已涂地块"
     },
     "Small": {
       "en": "Small",
@@ -302882,6 +304206,10 @@
       "en": "Snapshot failed",
       "zh": "快照失败"
     },
+    "Snapshot note (optional)": {
+      "en": "Snapshot note (optional)",
+      "zh": "快照备注（可选）"
+    },
     "Socialism ideology": {
       "en": "Socialism ideology",
       "zh": "社会主义意识形态"
@@ -302906,9 +304234,29 @@
       "en": "Some bathymetry sources failed to load",
       "zh": "部分测深数据源加载失败"
     },
+    "Some countries are still loading details. Only loaded parcels will be filled.": {
+      "en": "Some countries are still loading details. Only loaded parcels will be filled.",
+      "zh": "部分国家仍在加载细节，将只为已加载的地块填色。"
+    },
+    "Some countries have no data.": {
+      "en": "Some countries have no data.",
+      "zh": "部分国家无数据。"
+    },
     "Some data failed to load": {
       "en": "Some data failed to load",
       "zh": "部分数据加载失败"
+    },
+    "Some parcels have no population data.": {
+      "en": "Some parcels have no population data.",
+      "zh": "部分地块无人口数据。"
+    },
+    "Some parcels still need detail loading.": {
+      "en": "Some parcels still need detail loading.",
+      "zh": "部分地块的细节尚未加载。"
+    },
+    "Some saved regions could not be matched safely. Open the project with its original map data.": {
+      "en": "Some saved regions could not be matched safely. Open the project with its original map data.",
+      "zh": "部分存档地块无法可靠匹配，请使用原版本的地图数据打开项目。"
     },
     "Sort": {
       "en": "Sort",
@@ -302990,6 +304338,10 @@
       "en": "Source:",
       "zh": "来源："
     },
+    "Source: {host}": {
+      "en": "Source: {host}",
+      "zh": "来源：{host}"
+    },
     "South America": {
       "en": "South America",
       "zh": "南美"
@@ -303001,6 +304353,10 @@
     "Sovereignty painting will now assign regions to the selected releasable country.": {
       "en": "Sovereignty painting will now assign regions to the selected releasable country.",
       "zh": "后续主权绘制将把区域分配给当前选中的可释放国家。"
+    },
+    "Space": {
+      "en": "Space",
+      "zh": "空格"
     },
     "Sparse": {
       "en": "Sparse",
@@ -303114,10 +304470,6 @@
       "en": "Split",
       "zh": "分裂"
     },
-    "Split state": {
-      "en": "Split state",
-      "zh": "分裂态国家"
-    },
     "Square grid": {
       "en": "Square grid",
       "zh": "方格"
@@ -303222,6 +304574,14 @@
       "en": "Strategic annotations",
       "zh": "战略标注"
     },
+    "Strategic resources": {
+      "en": "Strategic resources",
+      "zh": "战略资源"
+    },
+    "Strategic resources total": {
+      "en": "Strategic resources total",
+      "zh": "战略资源合计"
+    },
     "Stratocracy": {
       "en": "Stratocracy",
       "zh": "军政体制"
@@ -303301,6 +304661,10 @@
     "Subject Governments": {
       "en": "Subject Governments",
       "zh": "附属政府"
+    },
+    "Subtitle": {
+      "en": "Subtitle",
+      "zh": "副标题"
     },
     "Subtract layer": {
       "en": "Subtract layer",
@@ -303382,6 +304746,10 @@
       "en": "System status",
       "zh": "系统状态"
     },
+    "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area": {
+      "en": "TNO 1962 state data · scenario start · split states apportioned by 2020 population or area",
+      "zh": "TNO 1962 州数据 · 剧本开局 · 跨国州按 2020 人口或面积拆分"
+    },
     "Tag": {
       "en": "Tag",
       "zh": "标签"
@@ -303417,6 +304785,10 @@
     "Temperate Forest": {
       "en": "Temperate Forest",
       "zh": "温带森林"
+    },
+    "Terrain": {
+      "en": "Terrain",
+      "zh": "地形"
     },
     "Terrain + ownership": {
       "en": "Terrain + ownership",
@@ -303454,9 +304826,17 @@
       "en": "Territory",
       "zh": "领土"
     },
+    "Territory change summary": {
+      "en": "Territory change summary",
+      "zh": "本图改动摘要"
+    },
     "Tertiary": {
       "en": "Tertiary",
       "zh": "第三"
+    },
+    "Text": {
+      "en": "Text",
+      "zh": "文字"
     },
     "Text and annotations": {
       "en": "Text and annotations",
@@ -303475,8 +304855,8 @@
       "zh": "纹理"
     },
     "Texture Opacity (Modern only)": {
-      "en": "Background Light Opacity (Modern only)",
-      "zh": "背景夜光不透明度（仅现代）"
+      "en": "Background Light Opacity",
+      "zh": "背景夜光不透明度"
     },
     "Texture Overlay": {
       "en": "Texture Overlay",
@@ -303517,6 +304897,18 @@
     "The active track determines which sites appear in the preview.": {
       "en": "The active track determines which sites appear in the preview.",
       "zh": "当前来源类别决定预览中显示哪些地点。"
+    },
+    "The app does not upload anything. Use a public file URL that supports CORS, such as a Gist Raw URL or a raw.githubusercontent.com URL. Anyone with the link can view the file. File size limits apply.": {
+      "en": "The app does not upload anything. Use a public file URL that supports CORS, such as a Gist Raw URL or a raw.githubusercontent.com URL. Anyone with the link can view the file. File size limits apply.",
+      "zh": "应用不会上传任何内容。请使用支持 CORS 的公开文件地址，例如 Gist Raw 或 raw.githubusercontent.com。链接公开可见，任何获得链接的人都可以查看文件。项目文件有大小上限。"
+    },
+    "The capital is outside this country (its map star is hidden)": {
+      "en": "The capital is outside this country (its map star is hidden)",
+      "zh": "首都不在本国境内（地图上不显示星标）"
+    },
+    "The capital must be placed inside this country's territory": {
+      "en": "The capital must be placed inside this country's territory",
+      "zh": "首都只能放在本国实际版图内"
     },
     "The carrier now renders one variant at a time. Internal stays the default review track, while the open variant stays source-separated and opt-in.": {
       "en": "The carrier now renders one variant at a time. Internal stays the default review track, while the open variant stays source-separated and opt-in.",
@@ -303570,6 +304962,10 @@
       "en": "The complete reference group must be loaded before filling it.",
       "zh": "请先加载完整参考分组，再进行填色。"
     },
+    "The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color.": {
+      "en": "The context bar shows the scenario, active country, selection and mode. Before painting, check the scenario and your current color.",
+      "zh": "上下文栏显示剧本、当前国家、选中对象和模式。上色前，确认剧本和当前选色即可。"
+    },
     "The control deck now binds the new display schema on the right side while the left column stays contextual.": {
       "en": "The control deck now binds the new display schema on the right side while the left column stays contextual.",
       "zh": "控制面板现在将新的显示模式绑定在右侧，而左列保持上下文状态。"
@@ -303618,6 +305014,10 @@
       "en": "The live slice stays on motorway, trunk, primary, and dedicated reference labels. Links are carried for review but stay filtered by default.",
       "zh": "当前 live 预览聚焦高速公路、主干道、一级道路和独立参考标签。连接线会保留给审查使用，但默认继续过滤。"
     },
+    "The map changed. Review the updated merge report.": {
+      "en": "The map changed. Review the updated merge report.",
+      "zh": "地图已更改，请重新核对合并报告。"
+    },
     "The map is ready for a composite image, per-layer PNG set, or bake pack handoff.": {
       "en": "The map is ready for a composite image, per-layer PNG set, or bake pack handoff.",
       "zh": "地图已经准备好输出为合成图片、分层 PNG 或 bake pack 交接包时使用。"
@@ -303637,6 +305037,26 @@
     "The political map of 2026, including occupied and de facto independent areas such as Russian-held eastern Ukraine, Northern Cyprus and divided Kashmir.": {
       "en": "The political map of 2026, including occupied and de facto independent areas such as Russian-held eastern Ukraine, Northern Cyprus and divided Kashmir.",
       "zh": "2026 年的世界政治格局，包含占领区与事实独立地区，如俄控乌克兰东部、北塞浦路斯与分治的克什米尔。"
+    },
+    "The project ZIP could not be opened. Ask the sender to export it again.": {
+      "en": "The project ZIP could not be opened. Ask the sender to export it again.",
+      "zh": "无法打开项目压缩包，请让发送方重新导出。"
+    },
+    "The project contains unsafe fields.": {
+      "en": "The project contains unsafe fields.",
+      "zh": "项目包含不安全的字段。"
+    },
+    "The project download timed out.": {
+      "en": "The project download timed out.",
+      "zh": "下载项目文件超时。"
+    },
+    "The project file is too large.": {
+      "en": "The project file is too large.",
+      "zh": "项目文件过大。"
+    },
+    "The project link is invalid.": {
+      "en": "The project link is invalid.",
+      "zh": "项目链接无效。"
     },
     "The project was imported, but editing is paused until map recovery succeeds.": {
       "en": "The project was imported, but editing is paused until map recovery succeeds.",
@@ -303662,6 +305082,14 @@
       "en": "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.",
       "zh": "该保存项目基于不同的剧本基线创建。只有在你接受按当前资源加载它时，才继续。"
     },
+    "The saved river regions require the original version of the map.": {
+      "en": "The saved river regions require the original version of the map.",
+      "zh": "存档中的河流分区需要使用原版本的地图数据。"
+    },
+    "The saved scenario is unavailable in this version of the map.": {
+      "en": "The saved scenario is unavailable in this version of the map.",
+      "zh": "当前地图版本未提供存档使用的剧本。"
+    },
     "The selected country, owner tag, and visible boundary should describe the same place before you edit.": {
       "en": "The selected country, owner tag, and visible boundary should describe the same place before you edit.",
       "zh": "编辑前，选中国家、归属标签和可见边界应指向同一个地方。"
@@ -303673,6 +305101,10 @@
     "The selected sample project could not be opened.": {
       "en": "The selected sample project could not be opened.",
       "zh": "所选示例项目无法打开。"
+    },
+    "The server does not allow this app to read the file across origins (CORS).": {
+      "en": "The server does not allow this app to read the file across origins (CORS).",
+      "zh": "对方服务器不允许此应用跨站读取文件（CORS）。"
     },
     "The top chips and Inspector should agree on mode, selected target, active owner, and split status.": {
       "en": "The top chips and Inspector should agree on mode, selected target, active owner, and split status.",
@@ -303701,10 +305133,6 @@
     "Thematic catalog unavailable": {
       "en": "Thematic catalog unavailable",
       "zh": "专题图层目录不可用"
-    },
-    "Thematic layer is off.": {
-      "en": "Thematic layer is off.",
-      "zh": "专题图层已关闭。"
     },
     "Theocracy": {
       "en": "Theocracy",
@@ -303766,6 +305194,22 @@
       "en": "This board controls future draw order across the eight transport families instead of hard-coding one fixed stacking rule.",
       "zh": "这个排序板控制八个 transport families 的未来绘制顺序，避免写死单一堆叠规则。"
     },
+    "This browser cannot read the project ZIP. Open the editable JSON file instead.": {
+      "en": "This browser cannot read the project ZIP. Open the editable JSON file instead.",
+      "zh": "当前浏览器无法读取项目压缩包，请打开其中可编辑的 JSON 文件。"
+    },
+    "This color already belongs to another country. Use “Merge into country”.": {
+      "en": "This color already belongs to another country. Use “Merge into country”.",
+      "zh": "该颜色已属于其他国家，可用“合并到国家”"
+    },
+    "This color is already used by another country.": {
+      "en": "This color is already used by another country.",
+      "zh": "已有其他国家使用此颜色。"
+    },
+    "This color is already used.": {
+      "en": "This color is already used.",
+      "zh": "此颜色已被使用。"
+    },
     "This family has not exposed extra manifest or audit cards in the current shell.": {
       "en": "This family has not exposed extra manifest or audit cards in the current shell.",
       "zh": "这个 family 目前还没有在这个 shell 里暴露额外的 manifest 或 audit 卡片。"
@@ -303777,6 +305221,10 @@
     "This family stays live in the workbench, and its main-map bridge follows its current capability.": {
       "en": "This family stays live in the workbench, and its main-map bridge follows its current capability.",
       "zh": "这个 family 会继续在工作台中保持 live，主地图桥接能力则按当前 capability 决定。"
+    },
+    "This file is not a project file.": {
+      "en": "This file is not a project file.",
+      "zh": "此文件不是项目文件。"
     },
     "This filter only applies to the internal official variant.": {
       "en": "This filter only applies to the internal official variant.",
@@ -303794,9 +305242,21 @@
       "en": "This layer can't be added to the main map yet.",
       "zh": "此图层暂时无法添加到主地图。"
     },
+    "This link redirects elsewhere. Use the final raw file link.": {
+      "en": "This link redirects elsewhere. Use the final raw file link.",
+      "zh": "这个链接会跳转到其他地址，请使用最终的原始文件链接（raw 地址）。"
+    },
     "This only removes the selected project-local strategic line.": {
       "en": "This only removes the selected project-local strategic line.",
       "zh": "这只会移除当前项目中的所选战略线。"
+    },
+    "This project ZIP exceeds the import limit. Export the project as JSON instead.": {
+      "en": "This project ZIP exceeds the import limit. Export the project as JSON instead.",
+      "zh": "项目压缩包超出导入限制，请改为导出项目 JSON 文件。"
+    },
+    "This project uses different map data. Colors will be migrated. {count} regions could not be matched.": {
+      "en": "This project uses different map data. Colors will be migrated. {count} regions could not be matched.",
+      "zh": "项目使用的地图数据已更新。继续打开会将颜色迁移到新地块，有 {count} 个地块无法对应，可能需要重新涂色。"
     },
     "This removes current paint overrides and, in political mode, restores ownership to its baseline. You can undo the clear from history.": {
       "en": "This removes current paint overrides and, in political mode, restores ownership to its baseline. You can undo the clear from history.",
@@ -303817,6 +305277,10 @@
     "This removes the selected project-local counter from the map.": {
       "en": "This removes the selected project-local counter from the map.",
       "zh": "这会从地图中移除当前项目中的所选计数器。"
+    },
+    "This replaces the current map. Nothing of yours is uploaded. Only open links you trust.": {
+      "en": "This replaces the current map. Nothing of yours is uploaded. Only open links you trust.",
+      "zh": "打开后将替换当前地图。应用不会上传你的任何内容。请只打开你信任的链接。"
     },
     "This sample link is not valid.": {
       "en": "This sample link is not valid.",
@@ -303845,6 +305309,10 @@
     "This scenario has no preset regions.": {
       "en": "This scenario has no preset regions.",
       "zh": "当前剧本没有预设区域"
+    },
+    "This scenario has no strategic data.": {
+      "en": "This scenario has no strategic data.",
+      "zh": "此剧本没有战略数据。"
     },
     "This scenario has no visible special regions. Check the visibility settings on the left.": {
       "en": "This scenario has no visible special regions. Check the visibility settings on the left.",
@@ -303894,6 +305362,22 @@
       "en": "Tint Strength",
       "zh": "倾向强度"
     },
+    "To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.": {
+      "en": "To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.",
+      "zh": "要把甲国并入乙国，先选乙国底色，再填满甲国领土，检查是否还有保留甲国原色的地块。"
+    },
+    "To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision.": {
+      "en": "To fill a group, choose the default parent, an available regional level or the whole country in Quick Fill, then double-click a subdivision.",
+      "zh": "需要成组填色时，在快填中选择默认上级、本地可用的区域层级或全国，再双击一个地块。"
+    },
+    "To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits.": {
+      "en": "To reopen a saved project, drag its JSON file onto the map. If the browser finds an autosaved draft when you return, choose Restore to recover your edits.",
+      "zh": "把已保存的项目 JSON 拖到地图上即可重新打开。下次打开编辑器时，如果浏览器找到自动保存的草稿，点击「恢复」即可继续编辑。"
+    },
+    "To {countries}": {
+      "en": "To {countries}",
+      "zh": "去向：{countries}"
+    },
     "Toggle Atlantropa-style scenario regions without affecting the base map.": {
       "en": "Toggle Atlantropa-style scenario regions without affecting the base map.",
       "zh": "切换 Atlantropa 风格的剧本区域而不影响基础地图。"
@@ -303902,6 +305386,10 @@
       "en": "Toggle Selected",
       "zh": "切换所选"
     },
+    "Toggle bottom dock": {
+      "en": "Toggle bottom dock",
+      "zh": "开关底栏"
+    },
     "Toggle current tile": {
       "en": "Toggle current tile",
       "zh": "切换当前地块"
@@ -303909,6 +305397,10 @@
     "Toggle details": {
       "en": "Toggle details",
       "zh": "切换详细信息"
+    },
+    "Toggle developer mode": {
+      "en": "Toggle developer mode",
+      "zh": "开关开发者模式"
     },
     "Toggle development workspace": {
       "en": "Toggle development workspace",
@@ -303922,6 +305414,10 @@
       "en": "Toggle legal ownership vs frontline control.",
       "zh": "切换合法所有权与一线控制权。"
     },
+    "Toggle parcel selection": {
+      "en": "Toggle parcel selection",
+      "zh": "选中或取消选中地块"
+    },
     "Toggle right panel": {
       "en": "Toggle right panel",
       "zh": "切换右侧面板"
@@ -303934,6 +305430,10 @@
       "en": "Toggle shoreline, basin contour, and texture overlays for the active scenario.",
       "zh": "切换活动场景的海岸线、盆地轮廓和纹理叠加。"
     },
+    "Toggle zone membership": {
+      "en": "Toggle zone membership",
+      "zh": "切换特殊区域成员资格"
+    },
     "Tone Bias": {
       "en": "Tone Bias",
       "zh": "色调偏差"
@@ -303941,6 +305441,18 @@
     "Tools": {
       "en": "Tools",
       "zh": "工具"
+    },
+    "Top center": {
+      "en": "Top center",
+      "zh": "上方居中"
+    },
+    "Top left": {
+      "en": "Top left",
+      "zh": "左上"
+    },
+    "Top right": {
+      "en": "Top right",
+      "zh": "右上"
     },
     "Topology Summary": {
       "en": "Topology Summary",
@@ -303978,6 +305490,14 @@
       "en": "Transfer not applied",
       "zh": "未申请转移"
     },
+    "Transfer territory or change a country’s base color.": {
+      "en": "Transfer territory or change a country’s base color.",
+      "zh": "划转领土，或调整一个国家的底色。"
+    },
+    "Transparent background": {
+      "en": "Transparent background",
+      "zh": "透明背景"
+    },
     "Transport": {
       "en": "Transport",
       "zh": "交通"
@@ -303985,10 +305505,6 @@
     "Transport Visual Mode": {
       "en": "Transport Visual Mode",
       "zh": "交通显示模式"
-    },
-    "Transport Workbench": {
-      "en": "Transport Workbench",
-      "zh": "交通工作台"
     },
     "Transport actions": {
       "en": "Transport actions",
@@ -304009,6 +305525,10 @@
     "Transport layer order": {
       "en": "Transport layer order",
       "zh": "交通图层顺序"
+    },
+    "Transport overview": {
+      "en": "Transport overview",
+      "zh": "交通概览"
     },
     "Transport pack": {
       "en": "Transport pack",
@@ -304057,6 +305577,10 @@
     "Turn it on when you want to derive conflict lines from the active scenario.": {
       "en": "Turn it on when you want to derive conflict lines from the active scenario.",
       "zh": "当你想从当前剧本派生冲突线时再打开它。"
+    },
+    "Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke.": {
+      "en": "Turn on Brush and drag across the subdivisions you want to paint. Press Ctrl+Z to undo a stroke.",
+      "zh": "开启刷子，拖过要上色的地块。按 Ctrl+Z 可撤销这一笔。"
     },
     "Turn on Show Transport Overview, choose Distribution, Network, or Coverage, then tune each family visibility, labels, and scope.": {
       "en": "Turn on Show Transport Overview, choose Distribution, Network, or Coverage, then tune each family visibility, labels, and scope.",
@@ -304126,13 +305650,29 @@
       "en": "Unable to load diagnostics",
       "zh": "无法加载诊断"
     },
+    "Unable to open the file. Check file access and try again.": {
+      "en": "Unable to open the file. Check file access and try again.",
+      "zh": "无法打开文件，请检查文件权限后重试。"
+    },
     "Unable to read the selected file.": {
       "en": "Unable to read the selected file.",
       "zh": "无法读取所选文件。"
     },
+    "Unable to save the project file. Check the destination and write permission.": {
+      "en": "Unable to save the project file. Check the destination and write permission.",
+      "zh": "无法保存项目文件。请检查目标位置和写入权限。"
+    },
+    "Unaligned": {
+      "en": "Unaligned",
+      "zh": "不结盟"
+    },
     "Unassigned": {
       "en": "Unassigned",
       "zh": "未分配"
+    },
+    "Unavailable": {
+      "en": "Unavailable",
+      "zh": "不可用"
     },
     "Unavailable saved metric": {
       "en": "Unavailable saved metric",
@@ -304157,6 +305697,10 @@
     "Undo applied": {
       "en": "Undo applied",
       "zh": "已撤销"
+    },
+    "Undo: {action}": {
+      "en": "Undo: {action}",
+      "zh": "撤销：{action}"
     },
     "Union with layer": {
       "en": "Union with layer",
@@ -304194,33 +305738,53 @@
       "en": "Unmapped",
       "zh": "未映射"
     },
-    "Unmatched": {
-      "en": "Unmatched",
-      "zh": "未匹配"
+    "Unmatched map regions": {
+      "en": "Unmatched map regions",
+      "zh": "无法对应的地块"
+    },
+    "Unmatched parcels: {count}": {
+      "en": "Unmatched parcels: {count}",
+      "zh": "无法对应的地块：{count}"
     },
     "Unnamed facility": {
       "en": "Unnamed facility",
       "zh": "未命名设施"
     },
-    "Unreviewed": {
-      "en": "Unreviewed",
-      "zh": "未审核"
+    "Unregister country": {
+      "en": "Unregister country",
+      "zh": "取消登记国家"
+    },
+    "Unregister {name}": {
+      "en": "Unregister {name}",
+      "zh": "取消登记 {name}"
+    },
+    "Unregistered color {color}": {
+      "en": "Unregistered color {color}",
+      "zh": "未登记颜色 {color}"
     },
     "Unsaved changes": {
       "en": "Unsaved changes",
       "zh": "有未保存的修改"
     },
+    "Unsaved changes will be discarded.": {
+      "en": "Unsaved changes will be discarded.",
+      "zh": "未保存的更改将被丢弃。"
+    },
     "Unsaved project changes.": {
       "en": "Unsaved project changes.",
       "zh": "项目有未保存改动。"
     },
-    "Unsupported runtime country": {
-      "en": "Unsupported runtime country",
-      "zh": "运行时国家未收录"
+    "Untitled project": {
+      "en": "Untitled project",
+      "zh": "未命名项目"
     },
     "Updated {count} entries to the current map regions.": {
       "en": "Updated {count} entries to the current map regions.",
       "zh": "已将 {count} 条记录更新到当前地图区域。"
+    },
+    "Updated {updated} regions. Preserved {preserved} belonging to other countries or custom colors.": {
+      "en": "Updated {updated} regions. Preserved {preserved} belonging to other countries or custom colors.",
+      "zh": "已更新 {updated} 块，保留 {preserved} 块已归他国或自定义颜色的地块。"
     },
     "Upland Plateaus": {
       "en": "Upland Plateaus",
@@ -304238,6 +305802,10 @@
       "en": "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets.",
       "zh": "上传图像，先调透明度保证可读，再调缩放，最后微调水平和垂直偏移。"
     },
+    "Uppercase English country names": {
+      "en": "Uppercase English country names",
+      "zh": "英文国名全大写"
+    },
     "Upsert District": {
       "en": "Upsert District",
       "zh": "新增或更新分区"
@@ -304245,6 +305813,14 @@
     "Urban Areas": {
       "en": "Urban Areas",
       "zh": "城市区域"
+    },
+    "Urban areas": {
+      "en": "Urban areas",
+      "zh": "城区"
+    },
+    "Urban intensity field": {
+      "en": "Urban intensity field",
+      "zh": "城市强度场"
     },
     "Urban population share": {
       "en": "Urban population share",
@@ -304274,6 +305850,10 @@
       "en": "Use Download Project to save the current editable state: scenario choice, ownership edits, appearance, transport, strategic annotations, reference alignment values, and export settings.",
       "zh": "使用“下载项目”保存当前可编辑状态：场景选择、归属修改、外观、交通、战略标注、参考图对齐参数和导出设置。"
     },
+    "Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke.": {
+      "en": "Use Fill for individual subdivisions, Quick Fill for groups and Brush for a continuous stroke.",
+      "zh": "用填充工具单击地块，用快填一次处理一组地块，或用刷子连续上色。"
+    },
     "Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters.": {
       "en": "Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters.",
       "zh": "先应用场景，再使用 Frontline。这个区块同时管理 derived conflict overlay 和 project-local strategic workspace，用于 operational lines、graphics 和 unit counters。"
@@ -304293,6 +305873,10 @@
     "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.": {
       "en": "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.",
       "zh": "把项目工具当成发布检查清单：先保存项目，再补战略信息、对齐参考图，最后导出。"
+    },
+    "Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.": {
+      "en": "Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.",
+      "zh": "点击「保存项目」下载可编辑的 JSON 文件。将文件拖回地图即可重新打开。"
     },
     "Use Selection Country": {
       "en": "Use Selection Country",
@@ -304318,6 +305902,10 @@
       "en": "Use broad edits and strategic marks deliberately.",
       "zh": "谨慎使用大范围编辑和战略标记。"
     },
+    "Use current base colors": {
+      "en": "Use current base colors",
+      "zh": "使用当前底色"
+    },
     "Use diagnostics to inspect geometry and artifact behavior.": {
       "en": "Use diagnostics to inspect geometry and artifact behavior.",
       "zh": "使用诊断视图检查几何与异常行为。"
@@ -304334,6 +305922,10 @@
       "en": "Use geographic anchors and dominant logistics function, then merge labels when corridor density spikes.",
       "zh": "使用地理锚点和主导物流功能，然后在走廊密度激增时合并标签。"
     },
+    "Use largest city": {
+      "en": "Use largest city",
+      "zh": "用最大城市"
+    },
     "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.": {
       "en": "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.",
       "zh": "用线型和淡化效果区分铁路状态，干线比支线和作业线更醒目。"
@@ -304349,6 +305941,10 @@
     "Use official road names and route numbers where available.": {
       "en": "Use official road names and route numbers where available.",
       "zh": "有官方道路名称和路线编号时优先使用。"
+    },
+    "Use project name": {
+      "en": "Use project name",
+      "zh": "填入项目名"
     },
     "Use short intent lines and quiet captions so arrows support the frontline instead of overpowering it.": {
       "en": "Use short intent lines and quiet captions so arrows support the frontline instead of overpowering it.",
@@ -304402,6 +305998,10 @@
       "en": "Use when",
       "zh": "使用场景"
     },
+    "Use {country}'s color": {
+      "en": "Use {country}'s color",
+      "zh": "改用{country}颜色"
+    },
     "User guide": {
       "en": "User guide",
       "zh": "使用指南"
@@ -304413,10 +306013,6 @@
     "Using compatible display": {
       "en": "Using compatible display",
       "zh": "正在使用兼容显示"
-    },
-    "Using the scenario's original borders.": {
-      "en": "Using the scenario's original borders.",
-      "zh": "使用剧本原始归属。"
     },
     "Utilities": {
       "en": "Utilities",
@@ -304457,6 +306053,14 @@
     "View all": {
       "en": "View all",
       "zh": "查看全部"
+    },
+    "View details": {
+      "en": "View details",
+      "zh": "查看详情"
+    },
+    "Viewing a shared project (from {host})": {
+      "en": "Viewing a shared project (from {host})",
+      "zh": "正在查看他人的项目（来自 {host}）"
     },
     "Viewport controls": {
       "en": "Viewport controls",
@@ -304550,6 +306154,10 @@
       "en": "WGI thematic layer is off.",
       "zh": "WGI 图层已关闭。"
     },
+    "Wait for the scenario to finish loading.": {
+      "en": "Wait for the scenario to finish loading.",
+      "zh": "请等待剧本加载完成。"
+    },
     "Waiting for airports Japan pack": {
       "en": "Waiting for airports Japan pack",
       "zh": "等待机场日本包"
@@ -304585,10 +306193,6 @@
     "Waiting for the active industrial land pack manifest": {
       "en": "Waiting for the active industrial land pack manifest",
       "zh": "等待当前工业用地包清单"
-    },
-    "Warlord / regional tag": {
-      "en": "Warlord / regional tag",
-      "zh": "军阀或地区性 tag"
     },
     "Warmth": {
       "en": "Warmth",
@@ -304681,6 +306285,22 @@
     "Width": {
       "en": "Width",
       "zh": "宽度"
+    },
+    "Will merge into {country}": {
+      "en": "Will merge into {country}",
+      "zh": "将并入{country}"
+    },
+    "Will write {count} parcels": {
+      "en": "Will write {count} parcels",
+      "zh": "将为 {count} 个地块写入涂色"
+    },
+    "With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it.": {
+      "en": "With country B’s color selected, click a border subdivision in country A and watch the border move. To transfer a whole province, choose its quick-fill level and double-click inside it.",
+      "zh": "选好乙国底色后，单击甲国的一个边境地块，观察边界变化。要划出整个省，选好对应的快填层级，再双击省内的地块。"
+    },
+    "With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.": {
+      "en": "With the Select tool, Ctrl/Cmd-click or Shift-click parcels to select them.",
+      "zh": "使用选择工具，按住 Ctrl/Cmd 或 Shift 单击地块即可多选。"
     },
     "Workbench inspector tabs": {
       "en": "Workbench inspector tabs",
@@ -304882,6 +306502,10 @@
       "en": "major stations Phase B",
       "zh": "主要车站 Phase B"
     },
+    "map labels": {
+      "en": "map labels",
+      "zh": "文字"
+    },
     "members in current layer": {
       "en": "members in current layer",
       "zh": "当前图层成员"
@@ -304917,14 +306541,6 @@
     "ports": {
       "en": "ports",
       "zh": "港口"
-    },
-    "preset": {
-      "en": "preset",
-      "zh": "个预设"
-    },
-    "presets": {
-      "en": "presets",
-      "zh": "个预设"
     },
     "presets moved to Releasable Countries.": {
       "en": "presets moved to Releasable Countries.",
@@ -305006,6 +306622,14 @@
       "en": "workbench board",
       "zh": "工作台排序板"
     },
+    "{a} and {b} · ΔE {distance}": {
+      "en": "{a} and {b} look too similar",
+      "zh": "{a} 与 {b} 颜色过近"
+    },
+    "{color} · disconnected fragment ({count} regions)": {
+      "en": "{color} · disconnected fragment ({count} regions)",
+      "zh": "{color} · 不相连的小碎片（{count} 块）"
+    },
     "{count} features selected.": {
       "en": "{count} features selected.",
       "zh": "已选择 {count} 个地块。"
@@ -305018,6 +306642,13 @@
       "en": "{count} parcels",
       "zh": "{count} 个地块"
     },
+    "{count} parcels selected": {
+      "en": {
+        "one": "{count} parcel selected",
+        "other": "{count} parcels selected"
+      },
+      "zh": "已选 {count} 块"
+    },
     "{count} preset lines; {present} already on map": {
       "en": "{count} preset lines; {present} already on map",
       "zh": "{count} 条预置防线；{present} 条已在地图上"
@@ -305026,9 +306657,40 @@
       "en": "{count} regions affected",
       "zh": "影响 {count} 个区域"
     },
+    "{count} regions · Only regions still belonging to this country will change.": {
+      "en": "{count} regions · Only regions still belonging to this country will change.",
+      "zh": "共 {count} 块，仅更改仍属本国的地块。"
+    },
+    "{count} regions · approx. {area} km² · gained {gained} / lost {lost}": {
+      "en": "{count} regions · approx. {area} km² · gained {gained} / lost {lost}",
+      "zh": "实际 {count} 块 · 约 {area} km² · 获得 {gained} 块 / 失去 {lost} 块"
+    },
+    "{name} (originally {origin})": {
+      "en": "{name} (originally {origin})",
+      "zh": "{name}（原属{origin}）"
+    },
+    "{name} (outside territory)": {
+      "en": "{name} (outside territory)",
+      "zh": "{name}（境外）"
+    },
+    "{name} ({code})": {
+      "en": "{name} ({code})",
+      "zh": "{name}（{code}）"
+    },
+    "{name} shares this color with {other}; ownership may not change.": {
+      "en": "{name} shares this color with {other}; ownership may not change.",
+      "zh": "{name} 与 {other} 使用相同颜色，地块归属可能不会改变。"
+    },
     "{seconds}s / day": {
       "en": "{seconds}s / day",
       "zh": "{seconds} 秒 / 天"
+    },
+    "{to} gained {count} parcels from {from} ({examples}).": {
+      "en": {
+        "one": "{to} gained {count} parcel from {from} ({examples}).",
+        "other": "{to} gained {count} parcels from {from} ({examples})."
+      },
+      "zh": "{to}从{from}获得 {count} 块（{examples}）。"
     },
     "≈ {km} km": {
       "en": "≈ {km} km",

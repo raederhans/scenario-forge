@@ -43,12 +43,11 @@ test("owner binds strategic controls, keeps zero distinct and shows real load re
   const owner = createStrategicValuesOwner({ runtimeState, documentRef: doc, renderDirty: (reason) => calls.push(reason),
     ensureActiveScenarioOptionalLayerLoaded: async () => { runtimeState.scenarioStrategicValuesData = payload(); return runtimeState.scenarioStrategicValuesData; } });
   owner.bindEvents();
-  assert.match(doc.getElementById("strategicValuesStatus").textContent, /available/);
+  assert.equal(doc.getElementById("strategicValuesStatus").textContent, "");
   doc.getElementById("strategicChoroplethMetric").dispatch("change", "steel");
   await tick();
   assert.equal(runtimeState.strategicChoroplethMetric, "steel");
   assert.match(doc.getElementById("strategicValuesStatus").textContent, /zero/);
-  assert.match(doc.getElementById("strategicValuesCoverage").textContent, /1\/1/);
   doc.getElementById("strategicValuesInspect").dispatch("change", "s1");
   assert.match(doc.getElementById("strategicValuesInspectValue").textContent, /Steel: 0/);
   doc.getElementById("strategicValuesOpacity").dispatch("input", "40");
@@ -78,7 +77,7 @@ test("null load is retryable and stale scenario completion cannot change current
   owner.render();
   resolveOld(null);
   await tick();
-  assert.match(doc.getElementById("strategicValuesStatus").textContent, /not connected/);
+  assert.match(doc.getElementById("strategicValuesStatus").textContent, /no strategic data/);
   assert.equal(doc.getElementById("strategicValuesSource").textContent, "");
   assert.equal(doc.controls.hidden, true);
   assert.equal(doc.controls.style.display, "none");
@@ -87,7 +86,7 @@ test("null load is retryable and stale scenario completion cannot change current
   assert.equal(doc.getElementById("strategicChoroplethMetric").disabled, true);
   runtimeState.activeScenarioId = "hoi4_1936";
   owner.render();
-  assert.match(doc.getElementById("strategicValuesStatus").textContent, /available/);
+  assert.equal(doc.getElementById("strategicValuesStatus").textContent, "");
   assert.equal(doc.controls.hidden, false);
   assert.equal(doc.controls.style.display, "");
   assert.equal(doc.getElementById("strategicValuesLoad").hidden, false);
@@ -142,5 +141,5 @@ test("chunk scheduling with a null immediate result is not reported as a load fa
   owner.bindEvents();
   doc.getElementById("strategicValuesLoad").dispatch("click");
   await tick();
-  assert.match(doc.getElementById("strategicValuesStatus").textContent, /available/);
+  assert.equal(doc.getElementById("strategicValuesStatus").textContent, "");
 });

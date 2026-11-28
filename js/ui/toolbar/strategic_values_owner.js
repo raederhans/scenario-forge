@@ -18,7 +18,7 @@ const IDS = [
   "strategicValuesStatus", "strategicValuesSource", "toggleStrategicResourceMarkers",
   "strategicChoroplethMetric", "strategicValuesLoad", "strategicValuesLegend",
   "strategicValuesLegendRamp", "strategicValuesLegendMin", "strategicValuesLegendMax",
-  "strategicValuesLegendNote", "strategicValuesCoverage", "strategicValuesInspect",
+  "strategicValuesLegendNote", "strategicValuesInspect",
   "strategicValuesInspectValue", "strategicValuesOpacity", "strategicValuesOpacityValue",
   "strategicValuesPalette", "strategicResourceFilter",
   "strategicValuesSearch",
@@ -134,8 +134,8 @@ export function createStrategicValuesOwner({
     if (nodes.strategicValuesOpacity) nodes.strategicValuesOpacity.value = String(Math.round(style.opacity * 100));
     setText("strategicValuesOpacityValue", `${Math.round(style.opacity * 100)}%`);
     const statusCopy = {
-      unsupported: say("Strategic mapping is not connected for this scenario yet.", "此剧本尚未接入战略数值映射。"),
-      "not-loaded": say("Strategic values are available to load.", "可加载战略数值。"),
+      unsupported: t("This scenario has no strategic data.", "ui"),
+      "not-loaded": "",
       loading: say("Loading strategic values…", "正在加载战略数值…"),
       failed: say("Strategic values could not be loaded. Retry.", "战略数值加载失败，请重试。"),
       ready: view.bucketIds.length === 0
@@ -146,9 +146,10 @@ export function createStrategicValuesOwner({
             ? say("Loaded; mapped regions have no values for this metric.", "已加载；已映射区域没有该指标数值。")
           : view.allZero && metric
             ? say("Loaded; all mapped values for this metric are zero.", "已加载；该指标的映射区域数值均为零。")
-            : say("Strategic values ready.", "战略数值已就绪。"),
+            : "",
     };
     setText("strategicValuesStatus", statusCopy[status]);
+    if (nodes.strategicValuesStatus) nodes.strategicValuesStatus.hidden = !statusCopy[status];
     const source = view.scenarioName || view.scenarioId;
     setText("strategicValuesSource", unsupported
       ? ""
@@ -159,11 +160,6 @@ export function createStrategicValuesOwner({
       nodes.strategicValuesLoad.textContent = status === "failed" ? say("Retry load", "重试加载")
         : status === "loading" ? say("Loading…", "加载中…") : say("Load values", "加载数值");
     }
-    const coverage = view.coverage;
-    setText("strategicValuesCoverage", status === "ready"
-      ? say(`Mapped regions: ${coverage.mapped}/${coverage.total}${metric ? ` · ${coverage.valued} with ${metricName(metric)} values` : ""}`,
-        `已映射区域：${coverage.mapped}/${coverage.total}${metric ? ` · ${coverage.valued} 个有${metricName(metric)}数值` : ""}`)
-      : "");
     if (nodes.strategicValuesLegend) nodes.strategicValuesLegend.hidden = status !== "ready" || !metric;
     if (view.domain && metric) {
       const [low, high] = getStrategicValuesColorStops(style.palette, view.metric.family);

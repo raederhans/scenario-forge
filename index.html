@@ -71,7 +71,6 @@
             <summary id="lblScenario" class="section-header" data-i18n="Scenario">Scenario</summary>
             <div class="sidebar-details-body">
               <div id="scenarioStatus" class="body-text visually-hidden">No scenario active</div>
-              <div id="scenarioAuditHint" class="body-text visually-hidden hidden">Coverage report unavailable</div>
               <label id="lblScenarioSelect" class="visually-hidden" for="scenarioSelect" data-i18n="Scenario">Scenario</label>
               <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" hidden aria-hidden="true" tabindex="-1">
                 <option id="optScenarioNone" value="" data-i18n="None">None</option>
@@ -98,10 +97,6 @@
                 <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled data-i18n="Reset Changes To Baseline">Reset</button>
                 <button id="clearScenarioBtn" type="button" class="btn-secondary hidden" disabled data-i18n="Exit Scenario">Exit Scenario</button>
               </div>
-              <label id="blankFeatureLabelsToggleRow" class="toggle-label mt-3 hidden">
-                <input id="toggleBlankFeatureLabels" type="checkbox" class="checkbox-input" />
-                <span id="lblBlankFeatureLabels" data-i18n="Parcel Names">Parcel Names</span>
-              </label>
               <a id="hgoEditorLink" class="editor-scenario-link" href="apps/hgo/index.html"><span data-i18n="Open HGO editor">Open HGO editor</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-external-link"><path d="M14 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 13v6H5V7h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
             </div>
           </details>
@@ -200,22 +195,17 @@
                 aria-labelledby="appearanceTabBorders"
               >
                 <h2 id="lblBordersPanel" class="section-header" data-i18n="Borders">Borders</h2>
-                <div class="mt-3">
-                  <label class="toggle-label">
-                    <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
-                    <span data-i18n="Show country names">Show country names</span>
-                  </label>
-                </div>
-                <div class="border-control-body mt-3">
-                  <label class="range-label" for="countryLabelSizeScale" data-i18n="Country name size">Country name size</label>
-                  <input id="countryLabelSizeScale" type="range" min="0.6" max="1.6" step="0.05" value="1" class="range-input" />
-                  <label class="toggle-label">
-                    <input id="countryLabelUppercase" type="checkbox" class="checkbox-input" checked />
-                    <span data-i18n="Uppercase English country names">Uppercase English country names</span>
-                  </label>
-                  <label class="range-label" for="countryLabelOpacity" data-i18n="Country name opacity">Country name opacity</label>
-                  <input id="countryLabelOpacity" type="range" min="0.3" max="1" step="0.05" value="1" class="range-input" />
-                </div>
+                <section id="politicalDisplayModePanel" class="appearance-control-card" aria-labelledby="politicalDisplayModeTitle">
+                  <h3 id="politicalDisplayModeTitle" data-i18n="Map mode">Map mode</h3>
+                  <select id="politicalDisplayMode" class="select-input" aria-labelledby="politicalDisplayModeTitle" aria-describedby="politicalDisplayModeStatus">
+                    <option value="country" data-i18n="Countries">Countries</option>
+                    <option value="alliance" data-i18n="Alliances">Alliances</option>
+                    <option value="government" data-i18n="Government type">Government type</option>
+                  </select>
+                  <p id="politicalDisplayModeStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <div id="politicalDisplayModeLegend" class="thematic-wgi-legend" hidden></div>
+                  <p data-page-note class="sidebar-tool-hint" data-i18n="Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.">Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.</p>
+                </section>
                 <div class="border-control-row mt-3">
                   <label class="range-label" for="displayQuality" data-i18n="Display quality">Display quality</label>
                   <select id="displayQuality" class="select-input">
@@ -344,8 +334,29 @@
                         </div>
                         <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
                       </details>
-                      <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button" data-i18n="Recalculate Borders">Recalculate Borders</button>
-                      <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
+                    </div>
+                  </details>
+                  <details class="appearance-mini-section">
+                    <summary class="section-header" data-i18n="Country names">Country names</summary>
+                    <div class="mt-3">
+                      <label class="toggle-label">
+                        <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
+                        <span data-i18n="Show country names">Show country names</span>
+                      </label>
+                      <label id="blankFeatureLabelsToggleRow" class="toggle-label mt-3 hidden">
+                        <input id="toggleBlankFeatureLabels" type="checkbox" class="checkbox-input" />
+                        <span id="lblBlankFeatureLabels" data-i18n="Parcel Names">Parcel Names</span>
+                      </label>
+                    </div>
+                    <div class="border-control-body mt-3">
+                      <label class="range-label" for="countryLabelSizeScale" data-i18n="Country name size">Country name size</label>
+                      <input id="countryLabelSizeScale" type="range" min="0.6" max="1.6" step="0.05" value="1" class="range-input" />
+                      <label class="toggle-label">
+                        <input id="countryLabelUppercase" type="checkbox" class="checkbox-input" checked />
+                        <span data-i18n="Uppercase English country names">Uppercase English country names</span>
+                      </label>
+                      <label class="range-label" for="countryLabelOpacity" data-i18n="Country name opacity">Country name opacity</label>
+                      <input id="countryLabelOpacity" type="range" min="0.3" max="1" step="0.05" value="1" class="range-input" />
                     </div>
                   </details>
                 </div>
@@ -395,7 +406,6 @@
                   <details id="physicalAtlasSection" class="physical-disclosure" >
                   <summary id="lblTerrainAtlasPanel" data-i18n="Terrain Atlas">Terrain Atlas</summary>
                   <div class="physical-section-body">
-                  <p data-page-note class="physical-hint" data-i18n="Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.">Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.</p>
                   <div>
                   <div class="range-row">
                   <label class="range-label" for="physicalLandformIntensity" data-i18n="Landform strength">Landform strength</label>
@@ -430,51 +440,51 @@
 <fieldset id="physicalLandformClasses" class="physical-class-group"><legend data-i18n="Landforms">Landforms</legend>
                   <label class="toggle-label">
                   <input id="physicalClassMountain" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassMountain" data-i18n="High Relief Mountains">High Relief Mountains</span><span id="physicalClassMountainCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassMountain" data-i18n="High Relief Mountains">High Relief Mountains</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassMountainHills" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassMountainHills" data-i18n="Mountain Hills">Mountain Hills</span><span id="physicalClassMountainHillsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassMountainHills" data-i18n="Mountain Hills">Mountain Hills</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassPlateau" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassPlateau" data-i18n="Upland Plateaus">Upland Plateaus</span><span id="physicalClassPlateauCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassPlateau" data-i18n="Upland Plateaus">Upland Plateaus</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassBadlands" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassBadlands" data-i18n="Badlands & Canyon">Badlands &amp; Canyon</span><span id="physicalClassBadlandsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassBadlands" data-i18n="Badlands & Canyon">Badlands &amp; Canyon</span>
                   </label>
                   <label class="toggle-label physical-atlas-group-start">
                   <input id="physicalClassPlains" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassPlains" data-i18n="Plains Lowlands">Plains Lowlands</span><span id="physicalClassPlainsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassPlains" data-i18n="Plains Lowlands">Plains Lowlands</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassBasin" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassBasin" data-i18n="Basins & Valleys">Basins &amp; Valleys</span><span id="physicalClassBasinCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassBasin" data-i18n="Basins & Valleys">Basins &amp; Valleys</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassWetlands" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassWetlands" data-i18n="Wetlands & Delta">Wetlands &amp; Delta</span><span id="physicalClassWetlandsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassWetlands" data-i18n="Wetlands & Delta">Wetlands &amp; Delta</span>
                   </label>
                   </fieldset><fieldset id="physicalCoverClasses" class="physical-class-group"><legend data-i18n="Land cover">Land cover</legend><label class="toggle-label physical-atlas-group-start">
                   <input id="physicalClassForestTemperate" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassForestTemperate" data-i18n="Other forests">Other forests</span><span id="physicalClassForestTemperateCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassForestTemperate" data-i18n="Other forests">Other forests</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassRainforestTropical" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassRainforestTropical" data-i18n="Tropical Rainforest">Tropical Rainforest</span><span id="physicalClassRainforestTropicalCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassRainforestTropical" data-i18n="Tropical Rainforest">Tropical Rainforest</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassGrassland" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassGrassland" data-i18n="Grassland & Steppe">Grassland &amp; Steppe</span><span id="physicalClassGrasslandCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassGrassland" data-i18n="Grassland & Steppe">Grassland &amp; Steppe</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassDesert" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassDesert" data-i18n="Desert & Bare">Desert &amp; Bare</span><span id="physicalClassDesertCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassDesert" data-i18n="Desert & Bare">Desert &amp; Bare</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassTundra" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassTundra" data-i18n="Tundra & Ice">Tundra &amp; Ice</span><span id="physicalClassTundraCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassTundra" data-i18n="Tundra & Ice">Tundra &amp; Ice</span>
                   </label></fieldset>
                   </div>
                   </div>
@@ -501,6 +511,50 @@
                   <span id="lblPhysicalMinorContours" data-i18n="Show Minor Contours">Show Minor Contours</span>
                   </label>
 
+                  <details id="physicalContourAdvanced" class="physical-disclosure">
+                  <summary id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</summary>
+                  <div class="physical-section-body">
+                  <div class="flex items-center justify-between gap-3">
+                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor" data-i18n="Contour Color">Contour Color</label>
+                  <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth" data-i18n="Major Width">Major Width</label>
+                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
+                  </div>
+                  <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth" data-i18n="Minor Width">Minor Width</label>
+                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
+                  </div>
+                  <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval" data-i18n="Minor Interval (m)">Minor Interval (m)</label>
+                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
+                  </div>
+                  <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Minimum Elevation (m)">Major Minimum Elevation (m)</label>
+                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
+                  </div>
+                  <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="200" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Minimum Elevation (m)">Minor Minimum Elevation (m)</label>
+                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
+                  </div>
+                  <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="280" class="range-input" />
+                  </div>
+                  </div>
+                  </details>
                   </div>
                   </details>
                   <details id="physicalLocalSection" class="physical-disclosure" >
@@ -576,50 +630,6 @@
                   </select>
                   </div>
                   </div>
-                  <section id="physicalContourAdvanced" class="appearance-prop-group" >
-                  <h3 class="appearance-prop-heading" id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</h3>
-                  <div class="physical-section-body">
-                  <div class="flex items-center justify-between gap-3">
-                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor" data-i18n="Contour Color">Contour Color</label>
-                  <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth" data-i18n="Major Width">Major Width</label>
-                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
-                  </div>
-                  <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth" data-i18n="Minor Width">Minor Width</label>
-                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
-                  </div>
-                  <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval" data-i18n="Minor Interval (m)">Minor Interval (m)</label>
-                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
-                  </div>
-                  <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Minimum Elevation (m)">Major Minimum Elevation (m)</label>
-                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
-                  </div>
-                  <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="200" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Minimum Elevation (m)">Minor Minimum Elevation (m)</label>
-                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
-                  </div>
-                  <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="280" class="range-input" />
-                  </div>
-                  </div>
-                  </section>
                   </details>
                   </div>
                   </details>
@@ -774,7 +784,6 @@
                             <input id="toggleCityPoints" type="checkbox" class="checkbox-input" checked />
                             <span id="lblCityPointsLayer" data-i18n="City Points">City Points</span>
                           </label>
-                          <p data-page-note id="cityPointsHelpTooltip" class="city-points-advanced-hint" data-i18n="Pick a city marker style, then tune marker density and label density for the current map scale.">Pick a city marker style, then tune marker density and label density for the current map scale.</p>
                         </div>
                         <div class="city-points-panel-stack">
                           <section class="appearance-control-card city-hierarchy-card" aria-labelledby="cityHierarchyTitle">
@@ -807,7 +816,6 @@
                                 <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
                                 <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
                               </div>
-                              <p data-page-note id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
                             </details>
                           </section>
 
@@ -900,15 +908,10 @@
                     <div class="mt-3 rivers-panel">
                       <div class="rivers-panel-body ml-5">
                         <div class="rivers-panel-stack">
-                          <section class="appearance-control-card rivers-visibility-card" aria-labelledby="lblRiversVisibilityGroup">
-                            <h3 id="lblRiversVisibilityGroup" class="appearance-control-card-title" data-i18n="Visibility">Visibility</h3>
-                            <div class="appearance-control-card-stack">
-                              <label class="toggle-label rivers-toggle-card">
-                                <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
-                                <span id="lblRiversLayer" data-i18n="Rivers">Rivers</span>
-                              </label>
-                            </div>
-                          </section>
+                          <label class="toggle-label rivers-toggle-card">
+                            <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblRiversLayer" data-i18n="Show">Show</span>
+                          </label>
 
                           <section class="appearance-control-card rivers-stroke-card" aria-labelledby="lblRiversStrokeGroup">
                             <h3 id="lblRiversStrokeGroup" class="appearance-control-card-title" data-i18n="River Stroke">River Stroke</h3>
@@ -1060,6 +1063,21 @@
                     <div class="space-y-2 mt-3">
                       <div>
                         <div class="range-row">
+                          <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity" data-i18n="Shadow Opacity">Shadow Opacity</label>
+                          <span id="dayNightShadowOpacityValue" class="range-value">38%</span>
+                        </div>
+                        <input id="dayNightShadowOpacity" type="range" min="0" max="85" value="38" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblDayNightTwilightWidth" class="range-label" for="dayNightTwilightWidth" data-i18n="Twilight Width">Twilight Width</label>
+                          <span id="dayNightTwilightWidthValue" class="range-value">10°</span>
+                        </div>
+                        <input id="dayNightTwilightWidth" type="range" min="2" max="28" value="10" class="range-input" />
+                      </div>
+                      <div class="section-header-block mt-3" data-i18n="Modern only">Modern only</div>
+                      <div>
+                        <div class="range-row">
                           <label
                             id="lblDayNightTextureOpacity"
                             class="range-label"
@@ -1184,20 +1202,6 @@
                           value="46"
                           class="range-input"
                         />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity" data-i18n="Shadow Opacity">Shadow Opacity</label>
-                          <span id="dayNightShadowOpacityValue" class="range-value">38%</span>
-                        </div>
-                        <input id="dayNightShadowOpacity" type="range" min="0" max="85" value="38" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblDayNightTwilightWidth" class="range-label" for="dayNightTwilightWidth" data-i18n="Twilight Width">Twilight Width</label>
-                          <span id="dayNightTwilightWidthValue" class="range-value">10°</span>
-                        </div>
-                        <input id="dayNightTwilightWidth" type="range" min="2" max="28" value="10" class="range-input" />
                       </div>
                     </div>
                   </details>
@@ -1557,14 +1561,6 @@
                               <input id="airportScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblAirportScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="airportScopeResolved" class="transport-readout-value">Major Civil</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="airportThresholdResolved" class="transport-readout-value">Secondary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblAirportScope" class="range-label" for="airportScope" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="airportScope" class="select-input">
@@ -1679,14 +1675,6 @@
                               <input id="portScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblPortScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="portScopeResolved" class="transport-readout-value">Regional</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="portThresholdResolved" class="transport-readout-value">Secondary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblPortTier" class="range-label" for="portTier" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="portTier" class="select-input">
@@ -1783,14 +1771,6 @@
                               <input id="railScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblRailScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="railScopeResolved" class="transport-readout-value">Mainline Only</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="railThresholdResolved" class="transport-readout-value">Primary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblRailScope" class="range-label" for="railScope" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="railScope" class="select-input">
@@ -1882,14 +1862,6 @@
                               <input id="roadScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblRoadScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="roadScopeResolved" class="transport-readout-value">Motorway Only</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="roadThresholdResolved" class="transport-readout-value">Primary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblRoadScope" class="range-label" for="roadScope" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="roadScope" class="select-input">
@@ -1913,7 +1885,6 @@
 
                   <section id="transportProjectSection" class="appearance-prop-group transport-workbench-reminder-card">
                     <div class="space-y-2">
-                      <h3 id="lblTransportWorkbenchReminder" class="appearance-prop-heading" data-i18n="Transport Workbench">Transport Workbench</h3>
                       <button
                         id="scenarioTransportWorkbenchBtn"
                         type="button"
@@ -1921,10 +1892,10 @@
                         aria-haspopup="dialog"
                         aria-controls="transportWorkbenchOverlay"
                         aria-expanded="false"
-                        data-transport-entry-label="Open workbench"
-                        data-i18n="Open workbench"
+                        data-transport-entry-label="Open transport workbench"
+                        data-i18n="Open transport workbench"
                       >
-                        Open workbench
+                        Open transport workbench
                       </button>
                     </div>
                   </section>
@@ -1957,8 +1928,6 @@
                         <label id="lblAppearancePresetSelect" class="range-label" for="appearancePresetSelect" data-i18n="Preset">Preset</label>
                         <select id="appearancePresetSelect" class="select-input mt-2"></select>
                       </div>
-                      <p id="appearancePresetSummary" class="panel-hint" data-i18n="0 presets">0 presets</p>
-                      <p id="appearancePresetList" class="appearance-preset-list" data-preset-count="0" data-i18n="No appearance presets saved">No appearance presets saved</p>
                       <div class="preset-library-actions">
                         <button id="appearancePresetApplyBtn" type="button" class="btn-primary" disabled data-i18n="Apply">Apply</button>
                         <button id="appearancePresetDeleteBtn" type="button" class="btn-secondary preset-delete-action" disabled data-i18n="Delete">Delete</button>
@@ -2084,17 +2053,6 @@
                     <button id="populationExportStats" type="button" class="btn-secondary" data-i18n="Export parcel statistics (CSV)">Export parcel statistics (CSV)</button>
                   </details>
                 </section>
-                <section id="politicalDisplayModePanel" class="appearance-control-card" aria-labelledby="politicalDisplayModeTitle">
-                  <h3 id="politicalDisplayModeTitle" data-i18n="Map mode">Map mode</h3>
-                  <select id="politicalDisplayMode" class="select-input" aria-labelledby="politicalDisplayModeTitle" aria-describedby="politicalDisplayModeStatus">
-                    <option value="country" data-i18n="Countries">Countries</option>
-                    <option value="alliance" data-i18n="Alliances">Alliances</option>
-                    <option value="government" data-i18n="Government type">Government type</option>
-                  </select>
-                  <p id="politicalDisplayModeStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
-                  <div id="politicalDisplayModeLegend" class="thematic-wgi-legend" hidden></div>
-                  <p class="sidebar-tool-hint" data-i18n="Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.">Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.</p>
-                </section>
                 <section id="thematicWgiPanel" class="appearance-control-card" aria-labelledby="thematicWgiTitle">
                   <h3 id="thematicWgiTitle" data-i18n="Country indicators">Country indicators</h3>
                   <label for="thematicWgiMetric" class="range-label" data-i18n="Indicator">Indicator</label>
@@ -2107,11 +2065,8 @@
                   <button id="thematicWgiRetry" type="button" class="btn-secondary" hidden data-i18n="Retry">Retry</button>
                   <div id="thematicWgiLegend" class="thematic-wgi-legend" hidden></div>
                   <p id="thematicWgiCoverage" class="city-points-advanced-hint"></p>
-                  <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Notes">Notes</summary>
-                    <p id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
-                    <p class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
-                  </details>
+                  <p data-page-note id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
+                  <p data-page-note class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
                 </section>
                 <section id="strategicValuesPanel" class="appearance-control-card strategic-values-panel" aria-labelledby="strategicValuesTitle">
                   <div class="strategic-values-heading"><h3 id="strategicValuesTitle" data-i18n="Scenario strategic data">Scenario strategic data</h3><button id="strategicValuesLoad" type="button" class="btn-secondary" data-i18n="Load data">Load data</button></div>
@@ -2145,7 +2100,6 @@
                         <label for="strategicValuesInspect" class="range-label" data-i18n="Source region">Source region</label>
                         <select id="strategicValuesInspect" class="select-input" data-app-select-skip="true"></select>
                         <output id="strategicValuesInspectValue" class="strategic-values-inspection" aria-live="polite"></output>
-                        <p id="strategicValuesCoverage" class="city-points-advanced-hint"></p>
                       </div>
                     </details>
                   </div>
@@ -2237,10 +2191,6 @@
             <div id="scenarioContextSelectionItem" class="scenario-context-item hidden">
               <span class="scenario-context-separator" aria-hidden="true">›</span>
               <span id="scenarioContextSelectionText" class="u-truncate" data-i18n="No selection">No selection</span>
-            </div>
-            <div id="scenarioContextModeItem" class="scenario-context-item">
-              <span class="scenario-context-label" data-i18n="Mode">Mode</span>
-              <span id="scenarioContextModeText" class="u-truncate">Mode: Visual Color</span>
             </div>
             <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-up"><path d="m6 15 6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <button id="scenarioGuideBtn" type="button" class="scenario-context-action-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide" data-i18n="Guide">Guide</button>

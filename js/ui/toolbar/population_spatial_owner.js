@@ -10,8 +10,8 @@ import { syncStyledSelect } from "../styled_selects.js";
 const IDS = ["togglePopulation", "populationMode", "populationOpacity", "populationOpacityValue",
   "populationStatus", "populationRetry", "populationReferenceNote", "populationLegend", "populationSummaryScope",
   "populationSummary", "populationSummarizeSelection", "populationExportStats", "populationSourceNote"];
-const STATUS_COPY = { off: "Population layer is off.", unsupported: "Population is unavailable on this basemap.",
-  idle: "Population data is ready to load.", loading: "Loading population data…", ready: "Population data loaded.",
+const STATUS_COPY = { unsupported: "Population is unavailable on this basemap.",
+  loading: "Loading population data…",
   failed: "Population data could not be loaded. Retry.", "version-unavailable": "Saved population data version is unavailable." };
 
 export function buildPopulationStatsCsv(state) {
@@ -67,12 +67,17 @@ export function createPopulationSpatialOwner({ runtimeState, t = (key) => key, m
     if (nodes.populationMode) { nodes.populationMode.value = view.mode; syncStyledSelect(nodes.populationMode); }
     if (nodes.populationOpacity) nodes.populationOpacity.value = String(Math.round(view.opacity * 100));
     setText("populationOpacityValue", `${Math.round(view.opacity * 100)}%`);
-    setText("populationStatus", text(needsHeatmap && (heatmap.status === "failed" || heatmap.refinementStatus === "failed")
+    const statusKey = needsHeatmap && (heatmap.status === "failed" || heatmap.refinementStatus === "failed")
       ? "Population heatmap could not be loaded. Retry."
       : needsHeatmap && heatmap.status !== "ready" ? "Loading population heatmap…"
         : needsHeatmap && heatmap.refinementStatus === "loading" ? "Showing overview; refining this view…"
-          : STATUS_COPY[view.status] || STATUS_COPY.off));
-    if (nodes.populationStatus) { nodes.populationStatus.title = view.error; nodes.populationStatus.dataset.statusTone = ready ? "active" : view.status === "failed" ? "warning" : "muted"; }
+          : STATUS_COPY[view.status];
+    setText("populationStatus", statusKey ? text(statusKey) : "");
+    if (nodes.populationStatus) {
+      nodes.populationStatus.hidden = !statusKey;
+      nodes.populationStatus.title = view.error;
+      nodes.populationStatus.dataset.statusTone = ready ? "active" : view.status === "failed" ? "warning" : "muted";
+    }
     if (nodes.populationRetry) nodes.populationRetry.hidden = view.status !== "failed" && !(needsHeatmap && (heatmap.status === "failed" || heatmap.refinementStatus === "failed"));
     setText("populationReferenceNote", view.referenceNote);
     if (nodes.populationReferenceNote) nodes.populationReferenceNote.hidden = !view.referenceNote || !view.enabled;
@@ -123,9 +128,8 @@ export function createPopulationSpatialOwner({ runtimeState, t = (key) => key, m
     setText("populationSummary", summary ? [
       `${text(summary.complete ? "Estimated population" : "Known population (incomplete)")}: ${format(summary.population)}`,
       `${text("Population density")}: ${format(summary.density, 1)} ${text("persons/km²")}`,
-      `${text("Mapped parcels")}: ${summary.counts.observed + summary.counts.partial}/${summary.counts.features}`,
-      `${text("Population coverage")}: ${format(summary.coverageFraction === null ? null : summary.coverageFraction * 100, 1)}%`,
-    ].join(" · ") : "");
+      !summary.complete && summary.counts.features ? text("Some parcels have no population data.") : "",
+    ].filter(Boolean).join(" · ") : "");
     for (const id of ["populationExportStats", "populationSummarizeSelection"]) if (nodes[id]) nodes[id].disabled = !ready;
     if (view.status === "idle" && view.enabled && view.supported) load();
     if (needsHeatmap && heatmap.status === "idle" && !loadingHeatmap) {

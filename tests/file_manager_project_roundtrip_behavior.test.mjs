@@ -444,6 +444,23 @@ async function importProjectThroughFunnelPayload(
   }
 }
 
+test("project import recomputes borders once only when the restored document is dirty", async () => {
+  const previous = readRegisteredRuntimeHookSource(state, "recomputeDynamicBordersNowFn");
+  const calls = [];
+  registerRuntimeHook(state, "recomputeDynamicBordersNowFn", () => {
+    calls.push(getInteractionFunnelDebugState().importRecovery.tasks["scenario-runtime"]);
+  });
+  try {
+    for (const dirty of [true, false]) {
+      calls.length = 0;
+      await importProjectThroughFunnelPayload({ ...createTransportOverviewImportPayload(), dynamicBordersDirty: dirty });
+      assert.deepEqual(calls, dirty ? ["complete"] : []);
+    }
+  } finally {
+    registerRuntimeHook(state, "recomputeDynamicBordersNowFn", previous);
+  }
+});
+
 test("project import through funnel clears toolbar-owned export bake cache once", async () => {
   const result = await importProjectThroughFunnelPayload(
     createTransportOverviewImportPayload(),
