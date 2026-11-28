@@ -7178,7 +7178,8 @@ body.counter-editor-modal-open {
 .bottom-dock.is-collapsed .dock-group-mode,
 .bottom-dock.is-collapsed .dock-group-config,
 .bottom-dock.is-collapsed .dock-group-map-actions,
-.bottom-dock.is-collapsed .dock-group-history-colors {
+.bottom-dock.is-collapsed .dock-group-history-colors,
+.bottom-dock.is-collapsed .dock-group-options {
   display: none !important;
 }
 
