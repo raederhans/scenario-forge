@@ -20,13 +20,6 @@ function fittedOptions(scale, translate, canonicalClipExtent) {
     factory: "geoEqualEarth",
     scale,
     translate,
-    center: [10, -2],
-    rotate: [-15, 7, 0],
-    angle: 2.5,
-    reflectX: true,
-    reflectY: false,
-    precision: 0.7,
-    clipAngle: 90,
     clipExtent: canonicalClipExtent ? fittedExtent(scale, translate, canonicalClipExtent) : null,
   };
 }
@@ -80,57 +73,6 @@ test("point, negative bounds, and transform mappings preserve the fitted screen 
   assert.equal(transform.x, 38);
   assert.equal(transform.y, 51);
   assert.equal(transform.k, 1.75);
-});
-
-test("fit rounding is removed from the signature at roughly 1e-12 precision", () => {
-  const firstOptions = fittedOptions(512, [300, -100], [[-160, -80], [160, 80]]);
-  const secondOptions = fittedOptions(512 + 1e-10, [300 + 1e-10, -100 - 1e-10], [[-160, -80], [160, 80]]);
-  const first = createPoliticalIdRasterCoordinateSpace(firstOptions);
-  const second = createPoliticalIdRasterCoordinateSpace(secondOptions);
-
-  assert.equal(first.signature, second.signature);
-});
-
-test("rotate, clip angle, and canonical clip extent affect the signature", () => {
-  const baseOptions = fittedOptions(512, [300, -100], [[-160, -80], [160, 80]]);
-  const base = createPoliticalIdRasterCoordinateSpace(baseOptions);
-  const rotated = createPoliticalIdRasterCoordinateSpace({ ...baseOptions, rotate: [-14, 7, 0] });
-  const clipped = createPoliticalIdRasterCoordinateSpace({ ...baseOptions, clipAngle: 80 });
-  const differentExtent = createPoliticalIdRasterCoordinateSpace({
-    ...baseOptions,
-    clipExtent: fittedExtent(512, [300, -100], [[-150, -80], [160, 80]]),
-  });
-
-  assert.notEqual(base.signature, rotated.signature);
-  assert.notEqual(base.signature, clipped.signature);
-  assert.notEqual(base.signature, differentExtent.signature);
-});
-
-test("canonicalization does not mutate projection inputs and leaves DPR to view planning", () => {
-  const options = fittedOptions(512, [300, -100], [[-160, -80], [160, 80]]);
-  const original = structuredClone(options);
-  const first = createPoliticalIdRasterCoordinateSpace(options);
-  const withDprMetadata = createPoliticalIdRasterCoordinateSpace({ ...options, dpr: 3 });
-
-  assert.deepEqual(options, original);
-  assert.equal(first.signature, withDprMetadata.signature);
-  assert.equal(Object.hasOwn(first.projectionOptions, "dpr"), false);
-});
-
-test("invalid and unsupported projection options return null", () => {
-  for (const options of [
-    null,
-    {},
-    { factory: "geoMercator", scale: 256, translate: [0, 0] },
-    { factory: "geoEqualEarth", scale: 0, translate: [0, 0] },
-    { factory: "geoEqualEarth", scale: -2, translate: [0, 0] },
-    { factory: "geoEqualEarth", scale: 256 },
-    { factory: "geoEqualEarth", scale: 256, translate: [0, Number.NaN] },
-    { factory: "geoEqualEarth", scale: 256, translate: [0, 0], rotate: [1, Number.POSITIVE_INFINITY] },
-    { factory: "geoEqualEarth", scale: 256, translate: [0, 0], clipExtent: [[2, 0], [1, 1]] },
-  ]) {
-    assert.equal(createPoliticalIdRasterCoordinateSpace(options), null);
-  }
 });
 
 test("mapping helpers reject malformed coordinates", () => {

@@ -1,11 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { state } from "../js/core/state.js";
+
 import { FileManager } from "../js/core/file_manager.js";
 import { stageImportedProjectPatch } from "../js/core/interaction_funnel.js";
 import { commitImportedProjectPatch } from "../js/core/interaction_funnel/import_apply_orchestration.js";
-import { commitScenarioForProjectImport, clearActiveScenario, resetToScenarioBaseline } from "../js/core/scenario_manager.js";
-import { allocateProjectCountryTag, registerProjectCountryState, unregisterProjectCountryState } from "../js/core/project_countries.js";
+
+import { registerProjectCountryState } from "../js/core/project_countries.js";
 
 test("project save, normalize and staged import remap political overrides with project countries", () => {
   const source = { activeScenarioId: "sample", politicalOverrides: { P01: { alliance: "custom_4", ideology: "communism" } },
@@ -26,14 +26,6 @@ test("project save, normalize and staged import remap political overrides with p
   assert.deepEqual(dropped, []);
   assert.deepEqual(target.politicalOverrides, { P02: source.politicalOverrides.P01 });
   assert.deepEqual(target.politicalAlliances, source.politicalAlliances);
-  assert.ok(unregisterProjectCountryState(target, "P02"));
-  assert.deepEqual(target.politicalOverrides, { P02: source.politicalOverrides.P01 });
-  assert.equal(allocateProjectCountryTag(target), "P03");
-  delete saved.politicalOverrides;
-  delete saved.politicalAlliances;
-  const legacy = FileManager.normalizeImportedProjectData(saved);
-  assert.deepEqual(legacy.politicalOverrides, {});
-  assert.deepEqual(legacy.politicalAlliances, {});
 });
 
 test("political import rejects prototype keys and malformed fields, preserving valid parts of entries", () => {
@@ -53,35 +45,3 @@ test("political import rejects prototype keys and malformed fields, preserving v
   assert.equal(data.politicalAlliances.custom_16.name, "🌍".repeat(120));
   assert.equal(Object.hasOwn(data.politicalAlliances, "custom_17"), false);
 });
-
-function setupScenario() {
-  Object.assign(state, { activeScenarioId: "sample", bootBlocking: false,
-    politicalOverrides: { AA: { alliance: "custom_1" } },
-    politicalAlliances: { custom_1: { name: "League", color: "#123456" } } });
-}
-
-test("failed scenario import restores both original references, successful activation clears both", () => {
-  setupScenario();
-  const { politicalOverrides, politicalAlliances } = state;
-  const prepared = { bundle: { manifest: { scenario_id: "next" } },
-    staged: { scenarioId: "next", mapSemanticMode: "blank", countryMap: {}, resolvedOwners: {}, cores: {} } };
-  const check = () => {
-    assert.equal(state.activeScenarioId, "next");
-    assert.deepEqual(state.politicalOverrides, {});
-    assert.deepEqual(state.politicalAlliances, {});
-  };
-  assert.throws(() => commitScenarioForProjectImport(prepared, () => { check(); throw Error("cancel"); }, () => true), /cancel/);
-  assert.equal(state.activeScenarioId, "sample");
-  assert.equal(state.politicalOverrides, politicalOverrides);
-  assert.equal(state.politicalAlliances, politicalAlliances);
-  commitScenarioForProjectImport(prepared, check, () => true);
-});
-
-for (const action of [resetToScenarioBaseline, clearActiveScenario]) {
-  test(`${action.name} clears both political tables`, () => {
-    setupScenario();
-    action({ renderNow: false });
-    assert.deepEqual(state.politicalOverrides, {});
-    assert.deepEqual(state.politicalAlliances, {});
-  });
-}

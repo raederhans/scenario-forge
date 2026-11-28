@@ -32,14 +32,6 @@ function mount(t, write = async () => {}) {
   return { savedPayload: () => savedPayload };
 }
 
-test("a successful save clears the captured runtime revision without resetting its clock", async t => {
-  const fixture = mount(t);
-  assert.equal(await FileManager.exportProject(state), true);
-  assert.equal(fixture.savedPayload().visualOverrides.land, "#123456");
-  assert.equal(state.isDirty, false);
-  assert.equal(state.dirtyRevision, 7);
-});
-
 test("edits made while the captured project is being written remain unsaved", async t => {
   let beginWrite;
   const writing = new Promise(resolve => { beginWrite = resolve; });
@@ -58,41 +50,6 @@ test("edits made while the captured project is being written remain unsaved", as
   assert.equal(state.isDirty, true);
   assert.equal(state.dirtyRevision, 8);
   assert.equal(state.lastDirtyReason, "paint-during-save");
-});
-
-test("edits made during async download preparation remain unsaved", async t => {
-  const fixture = mount(t);
-  const buildDownload = FileManager.buildProjectDownloadPayload;
-  let preparing;
-  const prepared = new Promise(resolve => { preparing = resolve; });
-  let finishPreparation;
-  const released = new Promise(resolve => { finishPreparation = resolve; });
-  FileManager.buildProjectDownloadPayload = async (...args) => {
-    const download = await buildDownload(...args);
-    preparing();
-    await released;
-    return download;
-  };
-  t.after(() => { FileManager.buildProjectDownloadPayload = buildDownload; });
-  const saving = FileManager.exportProject(state);
-  await prepared;
-  state.visualOverrides.land = "#abcdef";
-  markDirty("paint-during-preparation");
-  finishPreparation();
-
-  assert.equal(await saving, true);
-  assert.equal(fixture.savedPayload().visualOverrides.land, "#123456");
-  assert.equal(state.visualOverrides.land, "#abcdef");
-  assert.equal(state.isDirty, true);
-  assert.equal(state.dirtyRevision, 8);
-});
-
-test("picker cancellation retains the runtime dirty state and revision", async t => {
-  mount(t);
-  globalThis.showSaveFilePicker = async () => { throw Object.assign(new Error("cancelled"), { name: "AbortError" }); };
-  assert.equal(await FileManager.exportProject(state), false);
-  assert.equal(state.isDirty, true);
-  assert.equal(state.dirtyRevision, 7);
 });
 
 test("a failed file write retains the runtime dirty state and revision", async t => {

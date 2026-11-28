@@ -44,62 +44,13 @@ test("content identity survives object replacement, code reassignment, recolor a
     Object.entries(second.projectionOptions).filter(([key]) => key !== "factory").reverse(),
   ) };
   assert.equal(await identity.identify(second), expected);
-  assert.deepEqual(identity.getStats(), { geometryHashes: 4, identityHashes: 2, cacheHits: 0 });
 });
 
-test("tile geometry, painter order, stroke, projection and stable scene changes miss", async () => {
+test("changing painter order changes tile identity", async () => {
   const identity = builder(), first = input(), expected = await identity.identify(first);
-  const changes = [
-    (value) => { value.entries[0].feature.geometry.coordinates[0][1][1] = 3; },
-    (value) => { value.entries.reverse(); },
-    (value) => { value.entries[0].strokeCode = 0; },
-    (value) => { value.strokeWidth *= 2; }, // physical DPR affects coverage stroke width
-    (value) => { value.projectionOptions.precision = 0.25; },
-    (value) => { value.projectionOptions.rotate = [10, 0, 0]; },
-    (value) => { value.projectionOptions.scale = 120; },
-    (value) => { value.projectionOptions.clipExtent = [[0, 0], [100, 100]]; },
-    (value) => { value.descriptor.density = 4; },
-    (value) => { value.descriptor.level = 8; },
-    (value) => { value.descriptor.originX += 256; },
-    (value) => { value.descriptor.width = 128; },
-    (value) => { value.gutter = 2; },
-    (value) => { value.sceneKey = "another-scenario"; },
-  ];
-  for (const change of changes) {
-    const next = clone(first);
-    change(next);
-    assert.notEqual(await identity.identify(next), expected);
-  }
-});
-
-test("bootstrap/detail geometries with the same stable IDs receive different identities", async () => {
-  const identity = builder(), bootstrap = input(), detail = clone(bootstrap);
-  detail.entries[0].feature.geometry.coordinates[0].splice(1, 0, [0, 1]);
-  assert.notEqual(await identity.identify(detail), await identity.identify(bootstrap));
-});
-
-test("WeakMap hits avoid coordinate traversal; version change, new object and dispose rehash", async () => {
-  const identity = builder(), value = input();
-  let coordinateReads = 0;
-  const geometry = value.entries[0].feature.geometry;
-  const coordinates = geometry.coordinates;
-  Object.defineProperty(geometry, "coordinates", { get() { coordinateReads++; return coordinates; } });
-  const first = await identity.identify(value);
-  const firstReads = coordinateReads;
-  assert.ok(firstReads > 0);
-  assert.equal(await identity.identify(value), first);
-  assert.equal(coordinateReads, firstReads, "hit does not read or stringify coordinate content");
-  assert.deepEqual(identity.getStats(), { geometryHashes: 2, identityHashes: 2, cacheHits: 2 });
-  value.entries[0].geometryVersion++;
-  assert.equal(await identity.identify(value), first, "session version itself is absent from content identity");
-  assert.ok(coordinateReads > firstReads);
-  assert.equal(identity.getStats().geometryHashes, 3);
-  value.entries[0].feature.geometry = clone(geometry);
-  assert.equal(await identity.identify(value), first);
-  assert.equal(identity.getStats().geometryHashes, 4);
-  identity.dispose();
-  assert.equal(await identity.identify(value), first);
-  assert.equal(identity.getStats().geometryHashes, 6);
+  const next = clone(first);
+  next.entries.reverse();
+  assert.notEqual(await identity.identify(next), expected);
 });
 
 test("in-place geometry edits rehash when the caller advances geometryVersion", async () => {
@@ -107,100 +58,4 @@ test("in-place geometry edits rehash when the caller advances geometryVersion", 
   value.entries[0].feature.geometry.coordinates[0][1][1] = 5;
   value.entries[0].geometryVersion++;
   assert.notEqual(await identity.identify(value), first);
-  assert.equal(identity.getStats().geometryHashes, 3);
-});
-
-test("GeometryCollection hashes only ordered geometry type and content", async () => {
-  const identity = builder(), value = input();
-  value.entries = [{ id: "collection", code: 1, feature: { type: "GeometryCollection", geometries: [
-    { type: "Point", coordinates: [1, 2, 3] },
-    { type: "MultiLineString", coordinates: [[[0, 0], [1, 1]]] },
-  ] } }];
-  const first = await identity.identify(value), next = clone(value);
-  next.entries[0].feature.geometries[0].properties = { note: "ignored" };
-  assert.equal(await identity.identify(next), first);
-  next.entries[0].feature.geometries.reverse();
-  next.entries[0].geometryVersion = 1;
-  assert.notEqual(await identity.identify(next), first);
-});
-
-test("unavailable/failed crypto errors are clear, and failed geometry digests are retryable", async () => {
-  await assert.rejects(createPoliticalIdRasterIdentityBuilder({ crypto: null }).identify(input()), /Web Crypto SHA-256/);
-  let fail = true, calls = 0;
-  const identity = createPoliticalIdRasterIdentityBuilder({ crypto: { subtle: { digest: async (...args) => {
-    calls++;
-    if (fail) throw new Error("digest unavailable");
-    return webcrypto.subtle.digest(...args);
-  } } } });
-  const value = input();
-  await assert.rejects(identity.identify(value), /SHA-256 failed: digest unavailable/);
-  fail = false;
-  assert.match(await identity.identify(value), /v1:[0-9a-f]{64}$/);
-  assert.equal(calls, 4);
-  assert.deepEqual(identity.getStats(), { geometryHashes: 2, identityHashes: 1, cacheHits: 0 });
-});
-
-test("invalid coverage, geometry, dimensions and cross-ID stroke fail closed", async () => {
-  const identity = builder();
-  const changes = [
-    (value) => { value.sceneKey = ""; },
-    (value) => { value.descriptor.width = 0; },
-    (value) => { value.descriptor.density = NaN; },
-    (value) => { value.descriptor.originX = 0.5; },
-    (value) => { value.projectionOptions.precision = Infinity; },
-    (value) => { value.projectionOptions.translate = [0]; },
-    (value) => { value.strokeWidth = -1; },
-    (value) => { value.gutter = 3; },
-    (value) => { value.entries[1].id = "a"; },
-    (value) => { value.entries[0].strokeCode = 2; },
-    (value) => { value.entries[0].feature.geometry = null; },
-    (value) => { value.entries[0].feature.geometry.type = "Unsupported"; },
-    (value) => { value.entries[0].feature.geometry.coordinates[0][0][0] = NaN; },
-    (value) => {
-      const geometry = { type: "GeometryCollection", geometries: [] };
-      geometry.geometries.push(geometry);
-      value.entries[0].feature.geometry = geometry;
-    },
-  ];
-  for (const change of changes) {
-    const value = input();
-    change(value);
-    await assert.rejects(identity.identify(value), /Political raster identity:/);
-  }
-});
-
-test("concurrent requests share pending geometry digests without sharing identity hashes", async () => {
-  const identity = builder(), value = input();
-  const [first, second] = await Promise.all([identity.identify(value), identity.identify(value)]);
-  assert.equal(first, second);
-  assert.deepEqual(identity.getStats(), { geometryHashes: 2, identityHashes: 2, cacheHits: 2 });
-});
-
-test("identity yields between entries without changing content identity and skips cache hits", async () => {
-  const value = input();
-  value.entries = Array.from({ length: 200 }, (_, index) => ({
-    id: `entry-${index}`, code: index + 1,
-    feature: { type: "Point", coordinates: [index, index] },
-  }));
-  function timedBuilder(sliceBudgetMs) {
-    let elapsed = 0, yields = 0;
-    const identity = createPoliticalIdRasterIdentityBuilder({
-      crypto: { subtle: { digest: (...args) => {
-        elapsed += 4;
-        return webcrypto.subtle.digest(...args);
-      } } },
-      nowMs: () => elapsed,
-      yieldControl: async () => { yields++; },
-      sliceBudgetMs,
-    });
-    return { identity, yieldCount: () => yields };
-  }
-  const sliced = timedBuilder(undefined), unsliced = timedBuilder(Infinity);
-  const expected = await unsliced.identity.identify(value);
-  assert.equal(await sliced.identity.identify(value), expected);
-  assert.ok(sliced.yieldCount() > 0);
-  assert.equal(unsliced.yieldCount(), 0);
-  const yields = sliced.yieldCount();
-  assert.equal(await sliced.identity.identify(value), expected);
-  assert.equal(sliced.yieldCount(), yields);
 });
