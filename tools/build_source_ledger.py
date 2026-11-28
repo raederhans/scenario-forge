@@ -1,7 +1,6 @@
 """Backfill source provenance and build the checked-in source ledger."""
 from __future__ import annotations
 
-import hashlib
 import sys
 from pathlib import Path
 
@@ -19,21 +18,12 @@ from map_builder.io.fetch import (
     fetch_or_cache_binary,
 )
 from map_builder.io.writers import write_json_atomic
+from tools.precision_build_support import sha256_file as _sha256_path
 from tools.source_governance_catalog import LEDGER_SOURCE_SPECS
 
 
 DATA_DIR = PROJECT_ROOT / "data"
 LEDGER_PATH = DATA_DIR / "source_ledger.json"
-
-
-def _sha256_path(path: Path) -> str:
-    digest = hashlib.sha256()
-    with open(path, "rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            if not chunk:
-                break
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _ensure_governance_provenance(spec: dict[str, object]) -> Path:

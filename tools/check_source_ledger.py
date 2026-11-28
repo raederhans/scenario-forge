@@ -1,13 +1,18 @@
 """Validate the checked-in source ledger against local files and sidecars."""
 from __future__ import annotations
 
-import hashlib
 import json
 import sys
 from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from tools.precision_build_support import sha256_file as _sha256_path
+
+
 DATA_DIR = PROJECT_ROOT / "data"
 LEDGER_PATH = DATA_DIR / "source_ledger.json"
 
@@ -32,14 +37,8 @@ REQUIRED_FIELDS = {
 }
 
 
-def _sha256_path(path: Path) -> str:
-    digest = hashlib.sha256()
-    with open(path, "rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            if not chunk:
-                break
-            digest.update(chunk)
-    return digest.hexdigest()
+def _read_json(path: Path):
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def validate_source_ledger_entries(payload: list[object], *, project_root: Path) -> dict[str, object]:
@@ -98,7 +97,7 @@ def validate_source_ledger_entries(payload: list[object], *, project_root: Path)
         if not provenance_path.exists():
             failures.append(f"[{source_id}] missing provenance_sidecar={provenance_path}")
         else:
-            provenance_payload = json.loads(provenance_path.read_text(encoding="utf-8"))
+            provenance_payload = _read_json(provenance_path)
             if str(provenance_payload.get("sha256") or "") != local_sha:
                 failures.append(
                     f"[{source_id}] provenance sha256 mismatch: "
@@ -117,7 +116,7 @@ def validate_source_ledger_entries(payload: list[object], *, project_root: Path)
 def main() -> None:
     if not LEDGER_PATH.exists():
         raise SystemExit(f"Missing source ledger: {LEDGER_PATH}")
-    payload = json.loads(LEDGER_PATH.read_text(encoding="utf-8"))
+    payload = _read_json(LEDGER_PATH)
     if not isinstance(payload, list) or not payload:
         raise SystemExit("source_ledger.json must contain a non-empty list.")
 
