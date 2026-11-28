@@ -270,9 +270,16 @@ export function buildTransportWorkbenchInspectorModel({
   // 这样 family-specific 诊断逻辑可以单测，也方便后续继续拆分大分支。
   const familyId = family?.id || "";
   const stateCards = [];
+  const selected = previewSnapshot?.selected;
+  const selectedProps = selected?.properties || {};
   let rows;
-  if (familyId === "road" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
+  if (previewSnapshot?.status === "error"
+    && ["road", "rail", "airport", "port", "mineral_resources", "energy_facilities"].includes(familyId)) {
+    rows = [
+      ["Error", previewSnapshot.error || "Unknown error"],
+      ["Source and use", dataContract?.governance || "—"],
+    ];
+  } else if (familyId === "road" && previewSnapshot?.status === "ready") {
     rows = [
       ["Loaded roads", String(previewSnapshot.stats?.totalRoads || 0)],
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
@@ -297,17 +304,11 @@ export function buildTransportWorkbenchInspectorModel({
         ["Visibility", selected.visible ? "Visible" : formatTransportWorkbenchRoadHiddenReason(selected.hiddenReason)],
       );
     }
-  } else if (familyId === "road" && previewSnapshot?.status === "error") {
-    rows = [
-      ["Error", previewSnapshot.error || "Unknown error"],
-      ["Source and use", dataContract?.governance || "—"],
-    ];
   } else if (familyId === "road") {
     rows = [
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "rail" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
     rows = [
       ["Loaded lines", String(previewSnapshot.stats?.totalLines || 0)],
       ["Visible lines", String(previewSnapshot.stats?.visibleLines || 0)],
@@ -333,11 +334,6 @@ export function buildTransportWorkbenchInspectorModel({
         ["Visibility", selected.visible ? "Visible" : "Hidden by threshold"],
       );
     }
-  } else if (familyId === "rail" && previewSnapshot?.status === "error") {
-    rows = [
-      ["Error", previewSnapshot.error || "Unknown error"],
-      ["Source and use", dataContract?.governance || "—"],
-    ];
   } else if (familyId === "rail") {
     rows = [
       ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
@@ -346,8 +342,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "airport" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
-    const selectedProps = selected?.properties || {};
     rows = [
       ["Loaded airports", String(previewSnapshot.stats?.totalFeatures || 0)],
       ["Visible airports", String(previewSnapshot.stats?.visibleFeatures || 0)],
@@ -370,11 +364,6 @@ export function buildTransportWorkbenchInspectorModel({
         ["ICAO", selectedProps.icao || "—"],
       );
     }
-  } else if (familyId === "airport" && previewSnapshot?.status === "error") {
-    rows = [
-      ["Error", previewSnapshot.error || "Unknown error"],
-      ["Source and use", dataContract?.governance || "—"],
-    ];
   } else if (familyId === "airport") {
     rows = [
       ["Airport types", formatTransportWorkbenchOptionLabels(config.airportTypes, AIRPORT_TYPE_OPTIONS)],
@@ -383,8 +372,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "port" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
-    const selectedProps = selected?.properties || {};
     rows = [
       ["Release policy", previewSnapshot.manifest?.release_policy || "unknown"],
       ["Loaded ports", String(previewSnapshot.stats?.totalFeatures || 0)],
@@ -406,11 +393,6 @@ export function buildTransportWorkbenchInspectorModel({
         ["Agencies", selectedProps.agency_labels || "—"],
       );
     }
-  } else if (familyId === "port" && previewSnapshot?.status === "error") {
-    rows = [
-      ["Error", previewSnapshot.error || "Unknown error"],
-      ["Source and use", dataContract?.governance || "—"],
-    ];
   } else if (familyId === "port") {
     rows = [
       ["Coverage tier", config.coverageTier || "core"],
@@ -420,8 +402,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "mineral_resources" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
-    const selectedProps = selected?.properties || {};
     rows = [
       ["Loaded sites", String(previewSnapshot.stats?.totalFeatures || 0)],
       ["Visible sites", String(previewSnapshot.stats?.visibleFeatures || 0)],
@@ -440,19 +420,12 @@ export function buildTransportWorkbenchInspectorModel({
         ["Source", selectedProps.source || "--"],
       );
     }
-  } else if (familyId === "mineral_resources" && previewSnapshot?.status === "error") {
-    rows = [
-      ["Error", previewSnapshot.error || "Unknown error"],
-      ["Source and use", dataContract?.governance || "—"],
-    ];
   } else if (familyId === "mineral_resources") {
     rows = [
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "energy_facilities" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
-    const selectedProps = selected?.properties || {};
     const subtypeOptions = buildEnergyFacilitySubtypeControlOptions(previewSnapshot);
     const selectedSubtypeValues = Array.isArray(config.facilitySubtypes) && config.facilitySubtypes.length > 0
       ? config.facilitySubtypes
@@ -481,11 +454,6 @@ export function buildTransportWorkbenchInspectorModel({
         ["Source", selectedProps.source || "--"],
       );
     }
-  } else if (familyId === "energy_facilities" && previewSnapshot?.status === "error") {
-    rows = [
-      ["Error", previewSnapshot.error || "Unknown error"],
-      ["Source and use", dataContract?.governance || "—"],
-    ];
   } else if (familyId === "energy_facilities") {
     rows = [
       ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, ENERGY_STATUS_OPTIONS)],
@@ -493,8 +461,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "industrial_zones" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
-    const selectedProps = selected?.properties || {};
     const activeVariant = previewSnapshot.activeVariant
       || config.variant
       || getTransportWorkbenchManifestDefaultVariantId(previewSnapshot.manifest, "industrial_zones");
@@ -562,8 +528,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "logistics_hubs" && previewSnapshot?.status === "ready") {
-    const selected = previewSnapshot.selected;
-    const selectedProps = selected?.properties || {};
     const totalFeatures = Number(previewSnapshot.stats?.totalFeatures || 0);
     const visibleFeatures = Number(previewSnapshot.stats?.visibleFeatures || 0);
     const filteredFeatures = Number(previewSnapshot.stats?.filteredFeatures || 0);

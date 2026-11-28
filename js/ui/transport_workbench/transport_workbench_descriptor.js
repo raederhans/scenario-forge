@@ -538,6 +538,54 @@ export const RAIL_IMPORTANCE_OPTIONS = [
   { value: "broad_major", label: "Broad major" },
 ];
 
+function displayModeSection(subject, presetDescription, description) {
+  return {
+    key: "display_mode",
+    title: "Display Mode",
+    ...(description && { description }),
+    controls: [
+      { type: "select", key: "displayMode", label: "Mode", description: `Choose the current view language for ${subject}.`, options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
+      { type: "select", key: "displayPreset", label: "Preset", description: presetDescription, options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
+    ],
+  };
+}
+
+function aggregationSection(algorithmDescription, algorithms, description) {
+  return {
+    key: "aggregation_mode",
+    title: "Aggregation",
+    ...(description && { description }),
+    controls: [
+      { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: algorithmDescription, options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => algorithms.includes(option.value)) },
+    ],
+  };
+}
+
+function labelStrategySection(levelDescription, budgetDescription, separationDescription = "Higher values increase spacing between labels.", description) {
+  return {
+    key: "label_strategy",
+    title: "Label Strategy",
+    ...(description && { description }),
+    controls: [
+      { type: "select", key: "labelLevel", label: "Label level", description: levelDescription, options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
+      { type: "range", key: "labelBudget", label: "Label budget", description: budgetDescription, min: 3, max: 18, step: 1 },
+      { type: "range", key: "labelSeparation", label: "Label separation", description: separationDescription, min: 0.7, max: 1.8, step: 0.05 },
+    ],
+  };
+}
+
+function labelVisibilitySection(toggleDescription, densityDescription, title = "Labels", description) {
+  return {
+    key: "visibility",
+    title,
+    ...(description && { description }),
+    controls: [
+      { type: "toggle", key: "showLabels", label: "Show labels", description: toggleDescription },
+      { type: "select", key: "labelDensityPreset", label: "Label density", description: densityDescription, options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
+    ],
+  };
+}
+
 export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
   road: [
     {
@@ -681,33 +729,22 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     },
   ],
   port: [
-    {
-      key: "display_mode",
-      title: "Display Mode",
-      description: "Choose individual sites, grouped sites, or a density view.",
-      controls: [
-        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for ports.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
-        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds, not fixed counts.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
-      ],
-    },
-    {
-      key: "aggregation_mode",
-      title: "Aggregation",
-      description: "Aggregation stays dynamic and only steps in when the current view becomes dense.",
-      controls: [
-        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how dense port points should be summarized.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
-      ],
-    },
-    {
-      key: "label_strategy",
-      title: "Label Strategy",
-      description: "Labels use geographic anchors first, then category when the map can carry it.",
-      controls: [
-        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
-        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels to keep on screen before label aggregation kicks in.", min: 3, max: 18, step: 1 },
-        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values spread labels further apart.", min: 0.7, max: 1.8, step: 0.05 },
-      ],
-    },
+    displayModeSection(
+      "ports",
+      "Dynamic thresholds, not fixed counts.",
+      "Choose individual sites, grouped sites, or a density view.",
+    ),
+    aggregationSection(
+      "Choose how dense port points should be summarized.",
+      ["cluster", "square", "density_surface"],
+      "Aggregation stays dynamic and only steps in when the current view becomes dense.",
+    ),
+    labelStrategySection(
+      "Choose how descriptive aggregated labels should be.",
+      "Maximum labels to keep on screen before label aggregation kicks in.",
+      "Higher values spread labels further apart.",
+      "Labels use geographic anchors first, then category when the map can carry it.",
+    ),
     {
       key: "facility_scope",
       title: "Facility Scope",
@@ -721,15 +758,12 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
         ] },
       ],
     },
-    {
-      key: "visibility",
-      title: "Visibility",
-      description: "Keep port names gated by the current zoom and importance.",
-      controls: [
-        { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose port names only when the current zoom can carry them cleanly." },
-        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively port names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
-      ],
-    },
+    labelVisibilitySection(
+      "Expose port names only when the current zoom can carry them cleanly.",
+      "Controls how aggressively port names are kept on screen.",
+      "Visibility",
+      "Keep port names gated by the current zoom and importance.",
+    ),
     {
       key: "style",
       title: "Style",
@@ -739,38 +773,22 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     },
   ],
   mineral_resources: [
-    {
-      key: "display_mode",
-      title: "Display Mode",
-      controls: [
-        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for mineral resources.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
-        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds drive when inspect, aggregate, or density takes over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
-      ],
-    },
-    {
-      key: "aggregation_mode",
-      title: "Aggregation",
-      controls: [
-        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how mineral points should be aggregated.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["hex", "square", "density_surface"].includes(option.value)) },
-      ],
-    },
-    {
-      key: "label_strategy",
-      title: "Label Strategy",
-      controls: [
-        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated mineral labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
-        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels kept before geographic label merge takes over.", min: 3, max: 18, step: 1 },
-        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
-      ],
-    },
-    {
-      key: "visibility",
-      title: "Labels",
-      controls: [
-        { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose mineral labels only during closer review." },
-        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively mineral labels are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
-      ],
-    },
+    displayModeSection(
+      "mineral resources",
+      "Dynamic thresholds drive when inspect, aggregate, or density takes over.",
+    ),
+    aggregationSection(
+      "Choose how mineral points should be aggregated.",
+      ["hex", "square", "density_surface"],
+    ),
+    labelStrategySection(
+      "Choose how descriptive aggregated mineral labels should be.",
+      "Maximum labels kept before geographic label merge takes over.",
+    ),
+    labelVisibilitySection(
+      "Expose mineral labels only during closer review.",
+      "Controls how aggressively mineral labels are kept on screen.",
+    ),
     {
       key: "style",
       title: "Appearance",
@@ -781,30 +799,18 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     },
   ],
   energy_facilities: [
-    {
-      key: "display_mode",
-      title: "Display Mode",
-      controls: [
-        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for energy facilities.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
-        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when aggregation should take over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
-      ],
-    },
-    {
-      key: "aggregation_mode",
-      title: "Aggregation",
-      controls: [
-        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how energy facilities should summarize at lower zooms.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
-      ],
-    },
-    {
-      key: "label_strategy",
-      title: "Label Strategy",
-      controls: [
-        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated energy labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
-        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels kept before label merge kicks in.", min: 3, max: 18, step: 1 },
-        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
-      ],
-    },
+    displayModeSection(
+      "energy facilities",
+      "Dynamic thresholds decide when aggregation should take over.",
+    ),
+    aggregationSection(
+      "Choose how energy facilities should summarize at lower zooms.",
+      ["cluster", "square", "density_surface"],
+    ),
+    labelStrategySection(
+      "Choose how descriptive aggregated energy labels should be.",
+      "Maximum labels kept before label merge kicks in.",
+    ),
     {
       key: "facility_scope",
       title: "Facility Scope",
@@ -820,14 +826,10 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
         { type: "multi", key: "statuses", label: "Statuses", options: ENERGY_STATUS_OPTIONS, description: "Filter energy facilities by normalized source status." },
       ],
     },
-    {
-      key: "visibility",
-      title: "Labels",
-      controls: [
-        { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose energy facility labels during closer review." },
-        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively facility names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
-      ],
-    },
+    labelVisibilitySection(
+      "Expose energy facility labels during closer review.",
+      "Controls how aggressively facility names are kept on screen.",
+    ),
     {
       key: "style",
       title: "Appearance",
@@ -838,30 +840,18 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     },
   ],
   industrial_zones: [
-    {
-      key: "display_mode",
-      title: "Display Mode",
-      controls: [
-        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for industrial land.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
-        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when polygons collapse into pattern views.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
-      ],
-    },
-    {
-      key: "aggregation_mode",
-      title: "Aggregation",
-      controls: [
-        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how industrial land should summarize at lower zooms.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["square", "hex", "density_surface"].includes(option.value)) },
-      ],
-    },
-    {
-      key: "label_strategy",
-      title: "Label Strategy",
-      controls: [
-        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive industrial labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
-        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum industrial labels kept before merge and downgrade.", min: 3, max: 18, step: 1 },
-        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
-      ],
-    },
+    displayModeSection(
+      "industrial land",
+      "Dynamic thresholds decide when polygons collapse into pattern views.",
+    ),
+    aggregationSection(
+      "Choose how industrial land should summarize at lower zooms.",
+      ["square", "hex", "density_surface"],
+    ),
+    labelStrategySection(
+      "Choose how descriptive industrial labels should be.",
+      "Maximum industrial labels kept before merge and downgrade.",
+    ),
     {
       key: "data_variant",
       title: "Source Track",
@@ -884,14 +874,10 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
         },
       ],
     },
-    {
-      key: "visibility",
-      title: "Labels",
-      controls: [
-        { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose polygon names only when you want name-led review." },
-        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively polygon names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
-      ],
-    },
+    labelVisibilitySection(
+      "Expose polygon names only when you want name-led review.",
+      "Controls how aggressively polygon names are kept on screen.",
+    ),
     {
       key: "style",
       title: "Appearance",
@@ -902,30 +888,18 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     },
   ],
   logistics_hubs: [
-    {
-      key: "display_mode",
-      title: "Display Mode",
-      controls: [
-        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for logistics hubs.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
-        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when the layer moves between inspect, aggregate, and density.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
-      ],
-    },
-    {
-      key: "aggregation_mode",
-      title: "Aggregation",
-      controls: [
-        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how logistics hubs should summarize when dense.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
-      ],
-    },
-    {
-      key: "label_strategy",
-      title: "Label Strategy",
-      controls: [
-        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive logistics labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
-        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum logistics labels kept before merge.", min: 3, max: 18, step: 1 },
-        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
-      ],
-    },
+    displayModeSection(
+      "logistics hubs",
+      "Dynamic thresholds decide when the layer moves between inspect, aggregate, and density.",
+    ),
+    aggregationSection(
+      "Choose how logistics hubs should summarize when dense.",
+      ["cluster", "square", "density_surface"],
+    ),
+    labelStrategySection(
+      "Choose how descriptive logistics labels should be.",
+      "Maximum logistics labels kept before merge.",
+    ),
     {
       key: "facility_scope",
       title: "Hub Scope",
@@ -934,14 +908,10 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
         { type: "multi", key: "operatorClassifications", label: "Operator type", options: LOGISTICS_OPERATOR_CLASSIFICATION_OPTIONS, description: "Filter hubs by operator type." },
       ],
     },
-    {
-      key: "visibility",
-      title: "Labels",
-      controls: [
-        { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose logistics hub labels only during closer review." },
-        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively hub names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
-      ],
-    },
+    labelVisibilitySection(
+      "Expose logistics hub labels only during closer review.",
+      "Controls how aggressively hub names are kept on screen.",
+    ),
     {
       key: "style",
       title: "Appearance",
