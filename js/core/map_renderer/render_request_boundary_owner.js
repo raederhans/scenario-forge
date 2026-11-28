@@ -1,3 +1,4 @@
+import { normalizeReason } from "../value_normalization.js";
 import { requireFunction } from "../renderer/require_named_function.js";
 const REQUIRED_EFFECT_NAMES = Object.freeze([
   "requestRender",
@@ -8,11 +9,6 @@ const REQUIRED_EFFECT_NAMES = Object.freeze([
 const REQUIRED_GETTER_NAMES = Object.freeze([
   "hasInteractionRenderContext",
 ]);
-
-function normalizeReason(reason, defaultReason) {
-  const normalized = String(reason || "").trim();
-  return normalized || defaultReason;
-}
 
 function createSummary({
   reason,

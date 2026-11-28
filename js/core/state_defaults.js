@@ -1,3 +1,4 @@
+import { clamp } from "./value_normalization.js";
 import { hasMapTitles, normalizeMapTitles } from "./renderer/map_title_render_owner.js";
 // Centralized app state (Phase 13 scaffold)
 
@@ -91,10 +92,6 @@ const VALID_PHYSICAL_BLEND_MODES = new Set([
   "soft-light",
   "overlay",
 ]);
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
 
 function toFiniteNumber(value, fallback) {
   const parsed = Number(value);

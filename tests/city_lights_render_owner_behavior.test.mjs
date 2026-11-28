@@ -131,14 +131,6 @@ function createModernDrawHarness({
     helpers: {
       buildNightHemisphereFeature: () => ({ type: "Feature" }),
       clamp,
-      ColorManager: {
-        normalizeHexColor: (color) => (/^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : null),
-        hexToRgb: (hex) => ({
-          r: Number.parseInt(hex.slice(1, 3), 16),
-          g: Number.parseInt(hex.slice(3, 5), 16),
-          b: Number.parseInt(hex.slice(5, 7), 16),
-        }),
-      },
       createCanvas: (width, height) => {
         canvasIndex += 1;
         counters.canvases += 1;
@@ -157,7 +149,6 @@ function createModernDrawHarness({
         getUrbanFeatureIndex: () => new Map(),
         getCityUrbanRuntimeInfo: () => ({ hasUrbanMatch: false }),
       }),
-      normalizeDayNightStyleConfig,
       normalizeIntensityFieldsState: (fields) => fields,
       normalizeLongitude: (value) => value,
       now: () => {
@@ -253,14 +244,6 @@ function createOwner(overrides = {}) {
     },
     helpers: {
       clamp,
-      ColorManager: {
-        normalizeHexColor: (color) => (/^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : null),
-        hexToRgb: (hex) => ({
-          r: Number.parseInt(hex.slice(1, 3), 16),
-          g: Number.parseInt(hex.slice(3, 5), 16),
-          b: Number.parseInt(hex.slice(5, 7), 16),
-        }),
-      },
       createCanvas: (width, height, targetContext) => (
         targetContext?.canvas?.ownerDocument?.createElement?.("canvas") || createCanvasContext(width, height).canvas
       ),
@@ -270,7 +253,6 @@ function createOwner(overrides = {}) {
       getEffectiveCityCollection: () => cityCollection,
       getTransformSignature: (transform) => `${transform.x}:${transform.y}:${transform.k}`,
       getUrbanCityPolicyOwner: () => policyOwner,
-      normalizeDayNightStyleConfig,
       normalizeIntensityFieldsState: (fields) => fields,
       normalizeLongitude: (value) => value,
       stableJson,

@@ -1,3 +1,4 @@
+import { clamp as clampNumber } from "../value_normalization.js";
 import {
   INTENSITY_FIELD_GRID,
   normalizeIntensityFieldsState,
@@ -9,10 +10,6 @@ const DEFAULT_MASK_GRAY_MAP = Object.freeze({
   max: 224,
 });
 const MASK_NEUTRAL_EPSILON = 1 / 255;
-
-function clampNumber(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
 
 function toFiniteNumber(value, fallback) {
   const numeric = Number(value);

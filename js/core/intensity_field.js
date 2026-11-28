@@ -1,3 +1,4 @@
+import { clamp as clampNumber } from "./value_normalization.js";
 export const INTENSITY_FIELD_GRID = Object.freeze({
   bounds: Object.freeze([-180, -90, 180, 90]),
   columns: 720,
@@ -43,10 +44,6 @@ export function getIntensityFieldTargetPasses(channelId) {
   if (!channel) return [];
   if (Array.isArray(channel.targetPasses)) return [...channel.targetPasses];
   return channel.targetPass ? [channel.targetPass] : [];
-}
-
-function clampNumber(value, min, max) {
-  return Math.min(max, Math.max(min, value));
 }
 
 function toFiniteNumber(value, fallback) {

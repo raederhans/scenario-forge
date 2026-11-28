@@ -1,20 +1,23 @@
-// Owns the operation-graphic editor preview and keyed SVG handles.
-// Persistent state changes stay with the host and strategic runtime effects.
-export function createOperationGraphicsEditorRenderOwner(runtimeState, {
-  rendererSurfaceHost,
-  ensureOperationGraphicsEditorState,
-  getOperationGraphicById,
+import {
   DEFAULT_OPERATION_GRAPHIC_KIND,
   normalizeOperationGraphicStylePreset,
   normalizeOperationGraphicStroke,
   normalizeOperationGraphicWidth,
   normalizeOperationGraphicOpacity,
   getOperationGraphicPreset,
+  getOperationGraphicEditorMidpoints,
+} from "./operation_graphic_geometry.js";
+
+// Owns the operation-graphic editor preview and keyed SVG handles.
+// Persistent state changes stay with the host and strategic runtime effects.
+export function createOperationGraphicsEditorRenderOwner(runtimeState, {
+  rendererSurfaceHost,
+  ensureOperationGraphicsEditorState,
+  getOperationGraphicById,
   createOperationGraphicPath,
   getProjectedPoint,
   getStrategicOverlayRuntimeOwner,
   getMapLonLatFromEvent,
-  getOperationGraphicEditorMidpoints,
 }) {
   function getOperationGraphicEditorModel() {
     ensureOperationGraphicsEditorState();

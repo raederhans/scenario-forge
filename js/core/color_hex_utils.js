@@ -1,6 +1,4 @@
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
+import { clamp } from "./value_normalization.js";
 
 export function normalizeHexColor(value) {
   const input = String(value || "").trim().toLowerCase();
