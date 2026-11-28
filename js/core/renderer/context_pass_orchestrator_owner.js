@@ -1,4 +1,4 @@
-import { requireFunction } from "./require_function.js";
+import { requireFunctionFrom } from "./require_function.js";
 function createDeferredMetricPayload(featureCount) {
   return {
     featureCount,
@@ -14,71 +14,30 @@ export function createContextPassOrchestratorOwner({
   helpers = {},
   effects = {},
 } = {}) {
-  const getDeferContextBasePass = requireFunction(
-    getters.getDeferContextBasePass,
-    "getters.getDeferContextBasePass",
-  );
-  const resolveContextBaseDeferredSnapshot = requireFunction(
-    resolvers.resolveContextBaseDeferredSnapshot,
-    "resolvers.resolveContextBaseDeferredSnapshot",
-  );
-  const resolveContextMarkersDeferredSnapshot = requireFunction(
-    resolvers.resolveContextMarkersDeferredSnapshot,
-    "resolvers.resolveContextMarkersDeferredSnapshot",
-  );
-  const nowMs = requireFunction(helpers.nowMs, "helpers.nowMs");
-  const beginContextMetricSession = requireFunction(
-    effects.beginContextMetricSession,
-    "effects.beginContextMetricSession",
-  );
-  const endContextMetricSession = requireFunction(
-    effects.endContextMetricSession,
-    "effects.endContextMetricSession",
-  );
-  const collectContextMetric = requireFunction(
-    effects.collectContextMetric,
-    "effects.collectContextMetric",
-  );
-  const recordRenderPerfMetric = requireFunction(
-    effects.recordRenderPerfMetric,
-    "effects.recordRenderPerfMetric",
-  );
-  const recordDeferredRiversLayerMetric = requireFunction(
-    effects.recordDeferredRiversLayerMetric,
-    "effects.recordDeferredRiversLayerMetric",
-  );
-  const drawPhysicalContourLayer = requireFunction(
-    effects.drawPhysicalContourLayer,
-    "effects.drawPhysicalContourLayer",
-  );
-  const drawUrbanLayer = requireFunction(effects.drawUrbanLayer, "effects.drawUrbanLayer");
-  const drawRiversLayer = requireFunction(effects.drawRiversLayer, "effects.drawRiversLayer");
-  const drawRoadsLayer = requireFunction(effects.drawRoadsLayer, "effects.drawRoadsLayer");
-  const drawRailwaysLayer = requireFunction(
-    effects.drawRailwaysLayer,
-    "effects.drawRailwaysLayer",
-  );
-  const drawAirportsLayer = requireFunction(
-    effects.drawAirportsLayer,
-    "effects.drawAirportsLayer",
-  );
-  const drawPortsLayer = requireFunction(effects.drawPortsLayer, "effects.drawPortsLayer");
-  const drawStrategicResourceMarkersLayer = requireFunction(
-    effects.drawStrategicResourceMarkersLayer,
-    "effects.drawStrategicResourceMarkersLayer",
-  );
-  const drawCityPointsLayer = requireFunction(
-    effects.drawCityPointsLayer,
-    "effects.drawCityPointsLayer",
-  );
-  const drawScenarioRegionOverlaysPass = requireFunction(
-    effects.drawScenarioRegionOverlaysPass,
-    "effects.drawScenarioRegionOverlaysPass",
-  );
-  const drawScenarioReliefOverlaysPass = requireFunction(
-    effects.drawScenarioReliefOverlaysPass,
-    "effects.drawScenarioReliefOverlaysPass",
-  );
+  const requireGetter = requireFunctionFrom(getters, "getters");
+  const getDeferContextBasePass = requireGetter("getDeferContextBasePass");
+  const requireResolver = requireFunctionFrom(resolvers, "resolvers");
+  const resolveContextBaseDeferredSnapshot = requireResolver("resolveContextBaseDeferredSnapshot");
+  const resolveContextMarkersDeferredSnapshot = requireResolver("resolveContextMarkersDeferredSnapshot");
+  const requireHelper = requireFunctionFrom(helpers, "helpers");
+  const nowMs = requireHelper("nowMs");
+  const requireEffect = requireFunctionFrom(effects, "effects");
+  const beginContextMetricSession = requireEffect("beginContextMetricSession");
+  const endContextMetricSession = requireEffect("endContextMetricSession");
+  const collectContextMetric = requireEffect("collectContextMetric");
+  const recordRenderPerfMetric = requireEffect("recordRenderPerfMetric");
+  const recordDeferredRiversLayerMetric = requireEffect("recordDeferredRiversLayerMetric");
+  const drawPhysicalContourLayer = requireEffect("drawPhysicalContourLayer");
+  const drawUrbanLayer = requireEffect("drawUrbanLayer");
+  const drawRiversLayer = requireEffect("drawRiversLayer");
+  const drawRoadsLayer = requireEffect("drawRoadsLayer");
+  const drawRailwaysLayer = requireEffect("drawRailwaysLayer");
+  const drawAirportsLayer = requireEffect("drawAirportsLayer");
+  const drawPortsLayer = requireEffect("drawPortsLayer");
+  const drawStrategicResourceMarkersLayer = requireEffect("drawStrategicResourceMarkersLayer");
+  const drawCityPointsLayer = requireEffect("drawCityPointsLayer");
+  const drawScenarioRegionOverlaysPass = requireEffect("drawScenarioRegionOverlaysPass");
+  const drawScenarioReliefOverlaysPass = requireEffect("drawScenarioReliefOverlaysPass");
 
   function drawContextBasePass(k, { interactive = false } = {}) {
     const startedAt = nowMs();

@@ -1,3 +1,4 @@
+import { requireFunctionFrom } from "./require_function.js";
 import { createDayNightMask } from "./day_night_mask.js";
 
 function requireFunction(value, label) {
@@ -20,54 +21,27 @@ export function createDayNightRuntimeOwner({
   }
   const clockIntervalMs = Number(constants.clockIntervalMs) || 15_000;
   const cycleFrameIntervalMs = Number(constants.cycleFrameIntervalMs) || (1000 / 30);
-  const getDayNightStyleConfigState = requireFunction(
-    getters.getDayNightStyleConfigState,
-    "getters.getDayNightStyleConfigState",
-  );
-  const isRenderPhaseIdle = requireFunction(
-    getters.isRenderPhaseIdle,
-    "getters.isRenderPhaseIdle",
-  );
-  const isBootInteractionReady = requireFunction(
-    getters.isBootInteractionReady,
-    "getters.isBootInteractionReady",
-  );
-  const clamp = requireFunction(helpers.clamp, "helpers.clamp");
-  const normalizeLongitude = requireFunction(
-    helpers.normalizeLongitude,
-    "helpers.normalizeLongitude",
-  );
-  const normalizeDayNightStyleConfig = requireFunction(
-    helpers.normalizeDayNightStyleConfig,
-    "helpers.normalizeDayNightStyleConfig",
-  );
+  const requireGetter = requireFunctionFrom(getters, "getters", requireFunction);
+  const getDayNightStyleConfigState = requireGetter("getDayNightStyleConfigState");
+  const isRenderPhaseIdle = requireGetter("isRenderPhaseIdle");
+  const isBootInteractionReady = requireGetter("isBootInteractionReady");
+  const requireHelper = requireFunctionFrom(helpers, "helpers", requireFunction);
+  const clamp = requireHelper("clamp");
+  const normalizeLongitude = requireHelper("normalizeLongitude");
+  const normalizeDayNightStyleConfig = requireHelper("normalizeDayNightStyleConfig");
   const createDate = typeof helpers.createDate === "function" ? helpers.createDate : () => new Date();
   const getCityLayerRevision = getters.getCityLayerRevision || (() => 0);
   const ensureCityLightsData = effects.ensureCityLightsData || (() => {});
-  const nowMs = requireFunction(helpers.nowMs, "helpers.nowMs");
-  const stableJson = requireFunction(helpers.stableJson, "helpers.stableJson");
-  const drawNightLightsLayer = requireFunction(
-    effects.drawNightLightsLayer,
-    "effects.drawNightLightsLayer",
-  );
-  const invalidateRenderPasses = requireFunction(
-    effects.invalidateRenderPasses,
-    "effects.invalidateRenderPasses",
-  );
-  const requestRender = requireFunction(effects.requestRender, "effects.requestRender");
-  const renderFallback = requireFunction(effects.renderFallback, "effects.renderFallback");
-  const setDayNightStyleConfig = requireFunction(
-    effects.setDayNightStyleConfig,
-    "effects.setDayNightStyleConfig",
-  );
-  const setPendingDayNightRefresh = requireFunction(
-    effects.setPendingDayNightRefresh,
-    "effects.setPendingDayNightRefresh",
-  );
-  const updateToolbarInputs = requireFunction(
-    effects.updateToolbarInputs,
-    "effects.updateToolbarInputs",
-  );
+  const nowMs = requireHelper("nowMs");
+  const stableJson = requireHelper("stableJson");
+  const requireEffect = requireFunctionFrom(effects, "effects", requireFunction);
+  const drawNightLightsLayer = requireEffect("drawNightLightsLayer");
+  const invalidateRenderPasses = requireEffect("invalidateRenderPasses");
+  const requestRender = requireEffect("requestRender");
+  const renderFallback = requireEffect("renderFallback");
+  const setDayNightStyleConfig = requireEffect("setDayNightStyleConfig");
+  const setPendingDayNightRefresh = requireEffect("setPendingDayNightRefresh");
+  const updateToolbarInputs = requireEffect("updateToolbarInputs");
   let clockTimerId = null;
   let clockFrameHandle = null;
   let lastClockToken = "";
