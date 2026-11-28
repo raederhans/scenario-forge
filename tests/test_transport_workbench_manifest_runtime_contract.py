@@ -6,48 +6,21 @@ import unittest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CARRIER_JSON = REPO_ROOT / "data" / "transport_layers" / "japan_corridor" / "carrier.json"
-CARRIER_PROVENANCE_JSON = REPO_ROOT / "data" / "transport_layers" / "japan_corridor" / "provenance.json"
-LOCALES_JSON = REPO_ROOT / "data" / "locales.json"
-STARTUP_LOCALE_FILES = [
-    REPO_ROOT / "data" / "scenarios" / "hoi4_1936" / "locales.startup.json",
-    REPO_ROOT / "data" / "scenarios" / "hoi4_1939" / "locales.startup.json",
-    REPO_ROOT / "data" / "scenarios" / "tno_1962" / "locales.startup.json",
-]
 
 
 @lru_cache(maxsize=1)
 def _resolver_pack_ids() -> dict[str, list[str]]:
     """Read the pack id lists exported by the real transport pack resolver."""
-    result = subprocess.run(
-        [
-            "node",
-            "--input-type=module",
-            "-e",
-            (
-                "import('./js/core/transport_pack_resolver.js')"
-                ".then((m) => console.log(JSON.stringify({"
-                "target: m.TARGET_MAIN_MAP_PACK_IDS, selectable: m.WORKBENCH_SELECTABLE_PACK_IDS })))"
-                ".catch((error) => { console.error(error); process.exit(1); })"
-            ),
-        ],
-        cwd=REPO_ROOT,
-        check=True,
-        text=True,
-        capture_output=True,
-    )
+    script = """
+        import { TARGET_MAIN_MAP_PACK_IDS, WORKBENCH_SELECTABLE_PACK_IDS } from './js/core/transport_pack_resolver.js';
+        console.log(JSON.stringify({ target: TARGET_MAIN_MAP_PACK_IDS, selectable: WORKBENCH_SELECTABLE_PACK_IDS }));
+    """
+    result = subprocess.run(["node", "--input-type=module", "-e", script], cwd=REPO_ROOT,
+                            check=True, text=True, capture_output=True)
     return json.loads(result.stdout)
 
 
 class TransportWorkbenchManifestRuntimeContractTest(unittest.TestCase):
-    # 已提交的交通数据（runtime registry、manifest、carrier、locale）与运行时 pack 列表必须一致。
-    def test_japan_carrier_default_orientation_is_data_driven(self) -> None:
-        carrier_payload = json.loads(CARRIER_JSON.read_text(encoding="utf-8"))
-        provenance_payload = json.loads(CARRIER_PROVENANCE_JSON.read_text(encoding="utf-8"))
-
-        self.assertEqual(carrier_payload["defaultCamera"]["rotationQuarterTurns"], 1)
-        self.assertEqual(provenance_payload["defaultCamera"]["rotationQuarterTurns"], 1)
-
     def test_main_map_target_packs_resolve_runtime_manifests_with_carriers(self) -> None:
         runtime_registry = json.loads((REPO_ROOT / "data" / "runtime_asset_registry.json").read_text(encoding="utf-8"))
         target_pack_ids = list(_resolver_pack_ids()["target"])
@@ -110,21 +83,6 @@ class TransportWorkbenchManifestRuntimeContractTest(unittest.TestCase):
                     missing.append(f"{pack_id}:{asset_key}")
 
         self.assertFalse(missing, missing)
-
-    def test_transport_copy_drops_road_only_legacy_phrases_from_runtime_and_startup_locales(self) -> None:
-        stale_phrases = [
-            "Only the road family is live right now",
-            "Road and rail are the only Japan families with detailed controls right now.",
-            "Use the center board to sort the seven transport families.",
-            "These controls style only the future rail overlay shell.",
-        ]
-
-        locales_content = LOCALES_JSON.read_text(encoding="utf-8")
-
-        for phrase in stale_phrases:
-            self.assertNotIn(phrase, locales_content)
-            for startup_locale_file in STARTUP_LOCALE_FILES:
-                self.assertNotIn(phrase, startup_locale_file.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

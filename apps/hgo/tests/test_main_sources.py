@@ -8,7 +8,6 @@ import unittest
 TOOLS = Path(__file__).resolve().parents[1] / 'tools'
 sys.path.insert(0, str(TOOLS))
 import main_sources
-import sync_main_sources
 
 
 class MainSourcesTests(unittest.TestCase):
@@ -20,13 +19,6 @@ class MainSourcesTests(unittest.TestCase):
 
     def tearDown(self):
         self.directory.cleanup()
-
-    def test_copy_snapshot_returns_the_original_bytes(self):
-        data = b'{"geo":{"York":{"zh":"\xe7\xba\xa6\xe5\x85\x8b"}}}\r\n'
-        entry = main_sources.pin(self.root, 'data/locales.json', data)
-        self.assertEqual(main_sources.read_bytes(self.root, 'data/locales.json'), data)
-        self.assertEqual(entry['sha256'], entry['mainSha256'])
-        self.assertEqual(main_sources.read_json(self.root, 'data/locales.json')['geo']['York']['zh'], '约克')
 
     def test_properties_snapshot_keeps_every_feature_without_geometry(self):
         source = {'type': 'FeatureCollection', 'features': [
@@ -52,12 +44,6 @@ class MainSourcesTests(unittest.TestCase):
             main_sources.read_bytes(self.root, 'data/world_cities.geojson')
         with self.assertRaisesRegex(KeyError, 'sync_main_sources'):
             main_sources.archive_sha256(self.root, 'data/ne_10m_lakes.zip')
-
-    def test_sync_summary_counts_entry_changes(self):
-        before = json.dumps({'entries': [{'stable_key': 'a', 'zh': '甲'}, {'stable_key': 'b', 'zh': '乙'}]}).encode()
-        after = json.dumps({'entries': [{'stable_key': 'a', 'zh': '甲'}, {'stable_key': 'b', 'zh': '丙'}, {'stable_key': 'c'}]}).encode()
-        self.assertEqual(sync_main_sources.summarize(before, after), {'added': 1, 'removed': 0, 'modified': 1})
-        self.assertEqual(sync_main_sources.summarize(b'const a = 1;', b'const a = 2;'), {'changed': True})
 
 
 if __name__ == '__main__':

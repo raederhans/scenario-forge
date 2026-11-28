@@ -15,7 +15,6 @@ function createScenarioContextBarController({
   scenarioContextBar = null,
   scenarioContextCollapseBtn = null,
   scenarioContextScenarioText = null,
-  scenarioContextModeText = null,
   scenarioContextActiveText = null,
   scenarioContextSelectionItem = null,
   scenarioContextSelectionText = null,
@@ -23,7 +22,6 @@ function createScenarioContextBarController({
   scenarioGuidePopover = null,
   mapContainer = null,
   zoomControls = null,
-  getPaintModeLabel = () => "",
   getWorkspaceSelectionLabel = () => "",
   syncScenarioGuideTriggerButtons = () => {},
   updateLanguageToggleUi = () => {},
@@ -41,7 +39,6 @@ function createScenarioContextBarController({
     scenarioContextScenarioText?.parentElement,
     scenarioContextActiveText?.parentElement,
     scenarioContextSelectionItem,
-    scenarioContextModeText?.parentElement,
     scenarioContextCollapseBtn,
   ]) {
     if (item) scenarioContextBar?.appendChild(item);
@@ -116,7 +113,6 @@ function createScenarioContextBarController({
     const activeScenario = String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "").trim();
     const activeCode = String(runtimeState.activeSovereignCode || "").trim().toUpperCase();
     const activeLabel = activeCode ? getCountryLabel(activeCode) : translateUi("None");
-    const modeLabel = getPaintModeLabel();
     const activeValue = activeCode ? `${activeLabel} (${activeCode})` : translateUi("None");
     scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);
     scenarioContextBar.classList.toggle("is-collapsed", !!runtimeState.ui.scenarioBarCollapsed);
@@ -124,10 +120,6 @@ function createScenarioContextBarController({
       const scenarioValue = activeScenario || translateUi("None");
       scenarioContextScenarioText.textContent = scenarioValue;
       scenarioContextScenarioText.setAttribute("title", `${translateUi("Scenario")}: ${scenarioValue}`);
-    }
-    if (scenarioContextModeText) {
-      scenarioContextModeText.textContent = modeLabel;
-      scenarioContextModeText.setAttribute("title", `${translateUi("Mode")}: ${modeLabel}`);
     }
     if (scenarioContextActiveText) {
       scenarioContextActiveText.textContent = activeValue;

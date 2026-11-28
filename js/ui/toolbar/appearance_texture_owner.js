@@ -431,30 +431,32 @@ export function createAppearanceTextureOwner({
         texture.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.88, 0, 1);
       }, { historyKind: "texture-opacity", commitHistory: commit, renderReason });
     });
-    bindTextureRange(nodes.texturePaperScale, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.paper.scale = clamp(Number.isFinite(value) ? value / 100 : 1, 0.55, 2.4);
-      }, { historyKind: "texture-paper-scale", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.texturePaperWarmth, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.paper.warmth = clamp(Number.isFinite(value) ? value / 100 : 0.62, 0, 1);
-      }, { historyKind: "texture-paper-warmth", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.texturePaperGrain, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.paper.grain = clamp(Number.isFinite(value) ? value / 100 : 0.34, 0, 1);
-      }, { historyKind: "texture-paper-grain", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.texturePaperWear, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.paper.wear = clamp(Number.isFinite(value) ? value / 100 : 0.26, 0, 1);
-      }, { historyKind: "texture-paper-wear", commitHistory: commit, renderReason });
-    });
+    const percent = (value) => value / 100;
+    const identity = (value) => value;
+    for (const [control, group, key, convert, fallback, min, max, historyKind] of [
+      [nodes.texturePaperScale, "paper", "scale", percent, 1, 0.55, 2.4, "texture-paper-scale"],
+      [nodes.texturePaperWarmth, "paper", "warmth", percent, 0.62, 0, 1, "texture-paper-warmth"],
+      [nodes.texturePaperGrain, "paper", "grain", percent, 0.34, 0, 1, "texture-paper-grain"],
+      [nodes.texturePaperWear, "paper", "wear", percent, 0.26, 0, 1, "texture-paper-wear"],
+      [nodes.textureGraticuleLabelSize, "graticule", "labelSize", Math.round, 12, 9, 24, "texture-graticule-label-size"],
+      [nodes.textureGraticuleMajorWidth, "graticule", "majorWidth", identity, 1.2, 0.2, 4, "texture-graticule-major-width"],
+      [nodes.textureGraticuleMinorWidth, "graticule", "minorWidth", identity, 0.7, 0.1, 3, "texture-graticule-minor-width"],
+      [nodes.textureGraticuleMajorOpacity, "graticule", "majorOpacity", percent, 0.34, 0, 1, "texture-graticule-major-opacity"],
+      [nodes.textureGraticuleMinorOpacity, "graticule", "minorOpacity", percent, 0.14, 0, 1, "texture-graticule-minor-opacity"],
+      [nodes.textureDraftLonOffset, "draftGrid", "lonOffset", identity, 0, -180, 180, "texture-draft-longitude"],
+      [nodes.textureDraftLatOffset, "draftGrid", "latOffset", identity, 12, -80, 80, "texture-draft-latitude"],
+      [nodes.textureDraftRoll, "draftGrid", "roll", identity, -18, -180, 180, "texture-draft-roll"],
+      [nodes.textureDraftWidth, "draftGrid", "width", identity, 1.1, 0.2, 4, "texture-draft-width"],
+      [nodes.textureDraftMajorOpacity, "draftGrid", "majorOpacity", percent, 0.28, 0, 1, "texture-draft-major-opacity"],
+      [nodes.textureDraftMinorOpacity, "draftGrid", "minorOpacity", percent, 0.14, 0, 1, "texture-draft-minor-opacity"],
+    ]) {
+      bindTextureRange(control, (event, commitHistory, renderReason) => {
+        const value = Number(event.target.value);
+        updateTextureStyle((texture) => {
+          texture[group][key] = clamp(Number.isFinite(value) ? convert(value) : fallback, min, max);
+        }, { historyKind, commitHistory, renderReason });
+      });
+    }
     bindTextureRange(nodes.textureGraticuleMajorStep, (event, commit, renderReason) => {
       const value = Number(event.target.value);
       updateTextureStyle((texture) => {
@@ -485,36 +487,6 @@ export function createAppearanceTextureOwner({
         texture.graticule.labelColor = normalizeOceanFillColor(event.target.value);
       }, { historyKind: "texture-graticule-label-color", commitHistory: commit, renderReason });
     });
-    bindTextureRange(nodes.textureGraticuleLabelSize, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.graticule.labelSize = clamp(Math.round(Number.isFinite(value) ? value : 12), 9, 24);
-      }, { historyKind: "texture-graticule-label-size", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureGraticuleMajorWidth, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.graticule.majorWidth = clamp(Number.isFinite(value) ? value : 1.2, 0.2, 4);
-      }, { historyKind: "texture-graticule-major-width", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureGraticuleMinorWidth, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.graticule.minorWidth = clamp(Number.isFinite(value) ? value : 0.7, 0.1, 3);
-      }, { historyKind: "texture-graticule-minor-width", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureGraticuleMajorOpacity, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.graticule.majorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.34, 0, 1);
-      }, { historyKind: "texture-graticule-major-opacity", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureGraticuleMinorOpacity, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.graticule.minorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.14, 0, 1);
-      }, { historyKind: "texture-graticule-minor-opacity", commitHistory: commit, renderReason });
-    });
     bindTextureRange(nodes.textureDraftMajorStep, (event, commit, renderReason) => {
       const value = Number(event.target.value);
       updateTextureStyle((texture) => {
@@ -528,46 +500,10 @@ export function createAppearanceTextureOwner({
         texture.draftGrid.minorStep = clamp(Number.isFinite(value) ? value : 12, 4, texture.draftGrid.majorStep);
       }, { historyKind: "texture-draft-minor", commitHistory: commit, renderReason });
     });
-    bindTextureRange(nodes.textureDraftLonOffset, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.draftGrid.lonOffset = clamp(Number.isFinite(value) ? value : 0, -180, 180);
-      }, { historyKind: "texture-draft-longitude", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureDraftLatOffset, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.draftGrid.latOffset = clamp(Number.isFinite(value) ? value : 12, -80, 80);
-      }, { historyKind: "texture-draft-latitude", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureDraftRoll, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.draftGrid.roll = clamp(Number.isFinite(value) ? value : -18, -180, 180);
-      }, { historyKind: "texture-draft-roll", commitHistory: commit, renderReason });
-    });
     bindTextureRange(nodes.textureDraftColor, (event, commit, renderReason) => {
       updateTextureStyle((texture) => {
         texture.draftGrid.color = normalizeOceanFillColor(event.target.value);
       }, { historyKind: "texture-draft-color", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureDraftWidth, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.draftGrid.width = clamp(Number.isFinite(value) ? value : 1.1, 0.2, 4);
-      }, { historyKind: "texture-draft-width", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureDraftMajorOpacity, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.draftGrid.majorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.28, 0, 1);
-      }, { historyKind: "texture-draft-major-opacity", commitHistory: commit, renderReason });
-    });
-    bindTextureRange(nodes.textureDraftMinorOpacity, (event, commit, renderReason) => {
-      const value = Number(event.target.value);
-      updateTextureStyle((texture) => {
-        texture.draftGrid.minorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.14, 0, 1);
-      }, { historyKind: "texture-draft-minor-opacity", commitHistory: commit, renderReason });
     });
     if (nodes.textureDraftDash && nodes.textureDraftDash.dataset.bound !== "true") {
       nodes.textureDraftDash.addEventListener("change", (event) => {
@@ -594,24 +530,27 @@ export function createAppearanceTextureOwner({
         draft.mode = mode === "utc" || mode === "cycle" ? mode : "manual";
       });
     }, "day-night-mode");
-    bindDayNightInput(nodes.dayNightManualTime, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.mode = "manual";
-        draft.manualUtcMinutes = clamp(Number.isFinite(value) ? value : 12 * 60, 0, 24 * 60 - 1);
-      });
-    }, "day-night-time");
-    bindDayNightInput(nodes.dayNightCycleSpeed, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.mode = "cycle";
-        draft.cycleSecondsPerDay = clamp(
-          Number.isFinite(value) ? value : defaultDayNight.cycleSecondsPerDay,
-          10,
-          600
-        );
-      });
-    }, "day-night-cycle-speed");
+    for (const [control, key, divisor, fallback, min, max, reason, mode] of [
+      [nodes.dayNightManualTime, "manualUtcMinutes", 1, 12 * 60, 0, 24 * 60 - 1, "day-night-time", "manual"],
+      [nodes.dayNightCycleSpeed, "cycleSecondsPerDay", 1, defaultDayNight.cycleSecondsPerDay, 10, 600, "day-night-cycle-speed", "cycle"],
+      [nodes.dayNightCityLightsIntensity, "cityLightsIntensity", 100, defaultDayNight.cityLightsIntensity, 0, 1.8, "day-night-city-lights-intensity"],
+      [nodes.dayNightCityLightsTextureOpacity, "cityLightsTextureOpacity", 100, defaultDayNight.cityLightsTextureOpacity, 0, 1, "day-night-city-lights-texture-opacity"],
+      [nodes.dayNightCityLightsCorridorStrength, "cityLightsCorridorStrength", 100, defaultDayNight.cityLightsCorridorStrength, 0, 1, "day-night-city-lights-corridor-strength"],
+      [nodes.dayNightCityLightsCoreSharpness, "cityLightsCoreSharpness", 100, defaultDayNight.cityLightsCoreSharpness, 0, 1, "day-night-city-lights-core-sharpness"],
+      [nodes.dayNightCityLightsPopulationBoostStrength, "cityLightsPopulationBoostStrength", 100, defaultDayNight.cityLightsPopulationBoostStrength, 0, 1.5, "day-night-city-lights-population-boost-strength"],
+      [nodes.dayNightHistoricalCityLightsDensity, "historicalCityLightsDensity", 100, 1.25, 0.75, 2, "day-night-historical-city-lights-density"],
+      [nodes.dayNightHistoricalCityLightsSecondaryRetention, "historicalCityLightsSecondaryRetention", 100, 0.55, 0, 1, "day-night-historical-city-lights-secondary-retention"],
+      [nodes.dayNightShadowOpacity, "shadowOpacity", 100, defaultDayNight.shadowOpacity, 0, 0.85, "day-night-shadow-opacity"],
+      [nodes.dayNightTwilightWidth, "twilightWidthDeg", 1, 10, 2, 28, "day-night-twilight-width"],
+    ]) {
+      bindDayNightInput(control, (event) => {
+        const value = Number(event.target.value);
+        updateDayNightConfig((draft) => {
+          if (mode) draft.mode = mode;
+          draft[key] = clamp(Number.isFinite(value) ? value / divisor : fallback, min, max);
+        });
+      }, reason);
+    }
     if (nodes.dayNightSyncComputerUtcBtn && nodes.dayNightSyncComputerUtcBtn.dataset.bound !== "true") {
       nodes.dayNightSyncComputerUtcBtn.addEventListener("click", () => {
         updateDayNightConfig((draft) => {
@@ -633,89 +572,11 @@ export function createAppearanceTextureOwner({
         draft.cityLightsStyle = String(event.target.value || "modern");
       });
     }, "day-night-city-lights-style");
-    bindDayNightInput(nodes.dayNightCityLightsIntensity, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.cityLightsIntensity = clamp(
-          Number.isFinite(value) ? value / 100 : defaultDayNight.cityLightsIntensity,
-          0,
-          1.8
-        );
-      });
-    }, "day-night-city-lights-intensity");
-    bindDayNightInput(nodes.dayNightCityLightsTextureOpacity, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.cityLightsTextureOpacity = clamp(
-          Number.isFinite(value) ? value / 100 : defaultDayNight.cityLightsTextureOpacity,
-          0,
-          1
-        );
-      });
-    }, "day-night-city-lights-texture-opacity");
-    bindDayNightInput(nodes.dayNightCityLightsCorridorStrength, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.cityLightsCorridorStrength = clamp(
-          Number.isFinite(value) ? value / 100 : defaultDayNight.cityLightsCorridorStrength,
-          0,
-          1
-        );
-      });
-    }, "day-night-city-lights-corridor-strength");
-    bindDayNightInput(nodes.dayNightCityLightsCoreSharpness, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.cityLightsCoreSharpness = clamp(
-          Number.isFinite(value) ? value / 100 : defaultDayNight.cityLightsCoreSharpness,
-          0,
-          1
-        );
-      });
-    }, "day-night-city-lights-core-sharpness");
     bindDayNightChange(nodes.dayNightCityLightsPopulationBoostEnabled, (event) => {
       updateDayNightConfig((draft) => {
         draft.cityLightsPopulationBoostEnabled = !!event.target.checked;
       });
     }, "day-night-city-lights-population-boost-enabled");
-    bindDayNightInput(nodes.dayNightCityLightsPopulationBoostStrength, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.cityLightsPopulationBoostStrength = clamp(
-          Number.isFinite(value) ? value / 100 : defaultDayNight.cityLightsPopulationBoostStrength,
-          0,
-          1.5
-        );
-      });
-    }, "day-night-city-lights-population-boost-strength");
-    bindDayNightInput(nodes.dayNightHistoricalCityLightsDensity, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.historicalCityLightsDensity = clamp(Number.isFinite(value) ? value / 100 : 1.25, 0.75, 2);
-      });
-    }, "day-night-historical-city-lights-density");
-    bindDayNightInput(nodes.dayNightHistoricalCityLightsSecondaryRetention, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.historicalCityLightsSecondaryRetention = clamp(Number.isFinite(value) ? value / 100 : 0.55, 0, 1);
-      });
-    }, "day-night-historical-city-lights-secondary-retention");
-    bindDayNightInput(nodes.dayNightShadowOpacity, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.shadowOpacity = clamp(
-          Number.isFinite(value) ? value / 100 : defaultDayNight.shadowOpacity,
-          0,
-          0.85
-        );
-      });
-    }, "day-night-shadow-opacity");
-    bindDayNightInput(nodes.dayNightTwilightWidth, (event) => {
-      const value = Number(event.target.value);
-      updateDayNightConfig((draft) => {
-        draft.twilightWidthDeg = clamp(Number.isFinite(value) ? value : 10, 2, 28);
-      });
-    }, "day-night-twilight-width");
   };
 
   return {

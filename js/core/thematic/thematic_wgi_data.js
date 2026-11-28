@@ -1,3 +1,4 @@
+import { createThematicDataLoader } from "./thematic_data_loader.js";
 import { frozenCopy } from "./frozen_copy.js";
 import { resolveDataUrl } from "../data_base_url.js";
 import countryCodeMapping from "../../../data/thematic_layers/wgi_country_code_mapping.json" with { type: "json" };
@@ -28,7 +29,7 @@ export function isThematicWgiMetricSupported(metricId) {
 const YEAR = 2024;
 const BASE_PATH = "data/thematic_layers/political/wgi_state_capacity_v1/";
 const ISO_A2_TO_A3 = Object.freeze({ ...countryCodeMapping.by_iso_a2 });
-const requestsByFetcher = new WeakMap();
+const loadPayload = createThematicDataLoader(BASE_PATH, normalizePayload, requireCondition);
 
 async function defaultFetchJson(url) {
   const response = await fetch(resolveDataUrl(url));
@@ -103,33 +104,7 @@ export async function loadThematicWgiData({ metricId = THEMATIC_WGI_METRIC_ID, s
   if (typeof fetchJson !== "function") throw new TypeError("WGI fetchJson must be a function");
   if (!isThematicWgiMetricSupported(metricId)) throw new RangeError(`Unsupported WGI metric: ${metricId}`);
   if (!isThematicWgiScenarioSupported(scenarioId)) throw new RangeError(`Unsupported WGI scenario: ${scenarioId}`);
-  let cache = requestsByFetcher.get(fetchJson);
-  if (!cache) {
-    cache = { documents: null, payloads: new Map() };
-    cache.documents = Promise.all([
-      fetchJson(`${BASE_PATH}manifest.json`),
-      fetchJson(`${BASE_PATH}metrics.admin0.json`),
-    ]).then((documents) => documents.map(frozenCopy));
-    requestsByFetcher.set(fetchJson, cache);
-    cache.documents.catch(() => {
-      if (requestsByFetcher.get(fetchJson) === cache) requestsByFetcher.delete(fetchJson);
-    });
-  }
-  let request = cache.payloads.get(metricId);
-  if (!request) {
-    request = cache.documents.then(([manifest, metrics]) => normalizePayload(manifest, metrics, metricId));
-    cache.payloads.set(metricId, request);
-    request.catch(() => {
-      if (cache.payloads.get(metricId) === request) cache.payloads.delete(metricId);
-      if (requestsByFetcher.get(fetchJson) === cache) requestsByFetcher.delete(fetchJson);
-    });
-  }
-  const payload = await request;
-  if (!payload.supportedScenarios.includes(scenarioId) && requestsByFetcher.get(fetchJson) === cache) {
-    requestsByFetcher.delete(fetchJson);
-  }
-  requireCondition(payload.supportedScenarios.includes(scenarioId), "requested scenario is not advertised");
-  return payload;
+  return loadPayload(fetchJson, metricId, scenarioId);
 }
 
 function normalizeCode(value) {

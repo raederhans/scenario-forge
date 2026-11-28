@@ -19,13 +19,10 @@ const IDS = [
   "thematicWgiLegend", "thematicWgiCoverage", "thematicWgiMetric", "thematicWgiReferenceNote",
 ];
 const STATUS_COPY = {
-  off: "Thematic layer is off.",
   unsupported: "Country indicators are not supported on the current basemap.",
   "version-unavailable": "Saved indicator data version is unavailable.",
   "metric-unavailable": "Saved indicator is unavailable. Choose a supported indicator.",
-  idle: "Indicator data is ready to load.",
   loading: "Loading indicator data…",
-  ready: "Indicator data loaded.",
   failed: "Indicator data could not be loaded. Retry.",
 };
 
@@ -170,8 +167,9 @@ export function createThematicWgiOwner({
       nodes.toggleThematicWgi.disabled = !view.supported && !view.enabled;
     }
     const status = view.supported && !metricSupported ? "metric-unavailable" : view.status;
-    setText("thematicWgiStatus", text(STATUS_COPY[status] || STATUS_COPY.off));
+    setText("thematicWgiStatus", STATUS_COPY[status] ? text(STATUS_COPY[status]) : "");
     if (nodes.thematicWgiStatus) {
+      nodes.thematicWgiStatus.hidden = !STATUS_COPY[status];
       nodes.thematicWgiStatus.dataset.statusTone = status === "ready" ? "active"
         : ["failed", "version-unavailable", "metric-unavailable"].includes(status) ? "warning"
           : status === "loading" ? "pending" : "muted";
@@ -185,10 +183,9 @@ export function createThematicWgiOwner({
     setText("thematicWgiReferenceNote", view.referenceNote || "");
     if (nodes.thematicWgiReferenceNote) nodes.thematicWgiReferenceNote.hidden = !view.referenceNote;
     const coverage = view.coverage;
-    setText("thematicWgiCoverage", ready && coverage
-      ? `${text(view.historicalReference ? "Scenario countries mapped" : "Mapped")}: ${coverage.matched} · ${text("Source missing")}: ${coverage.missing} · ${text("Unmatched")}: ${coverage.unmatched}`
-      : "");
-    if (nodes.thematicWgiCoverage) nodes.thematicWgiCoverage.hidden = !ready;
+    const hasMissingCountries = ready && (coverage?.missing > 0 || coverage?.unmatched > 0);
+    setText("thematicWgiCoverage", hasMissingCountries ? text("Some countries have no data.") : "");
+    if (nodes.thematicWgiCoverage) nodes.thematicWgiCoverage.hidden = !hasMissingCountries;
     renderLegend(ready ? getLegend(runtimeState) : null);
     if (view.enabled && view.supported && view.status === "idle") void load();
     return view;

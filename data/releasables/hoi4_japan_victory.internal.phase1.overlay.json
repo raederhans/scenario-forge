@@ -35,7 +35,8 @@
           "CN_CITY_17275852B93800386737284"
         ]
       },
-      "notes": "Japanese victory releasable for the Nanjing-centered central Chinese client government."
+      "notes": "Japanese victory releasable for the Nanjing-centered central Chinese client government.",
+      "display_name_zh": "南京中国"
     },
     {
       "tag": "MAN",
@@ -100,7 +101,8 @@
           "CN_CITY_17275852B20323770219280"
         ]
       },
-      "notes": "Japanese victory releasable restoring the Manchukuo owner footprint."
+      "notes": "Japanese victory releasable restoring the Manchukuo owner footprint.",
+      "display_name_zh": "满洲国"
     },
     {
       "tag": "MEN",
@@ -132,7 +134,8 @@
           "CN_CITY_17275852B97301454350730"
         ]
       },
-      "notes": "Japanese victory releasable restoring the Mengjiang owner footprint."
+      "notes": "Japanese victory releasable restoring the Mengjiang owner footprint.",
+      "display_name_zh": "蒙疆"
     },
     {
       "tag": "NCP",
@@ -161,7 +164,8 @@
           "CN_CITY_17275852B83634722552305"
         ]
       },
-      "notes": "Japanese victory releasable for the North China Political Council covering the North China coastal plain."
+      "notes": "Japanese victory releasable for the North China Political Council covering the North China coastal plain.",
+      "display_name_zh": "华北政务委员会"
     },
     {
       "tag": "RGC",
@@ -178,7 +182,8 @@
           "CN_Shanghai"
         ]
       },
-      "notes": "Japanese victory releasable for the lower Yangtze and southeast-coast collaboration regime."
+      "notes": "Japanese victory releasable for the lower Yangtze and southeast-coast collaboration regime.",
+      "display_name_zh": "中华民国维新政府"
     },
     {
       "tag": "GNG",
@@ -194,7 +199,8 @@
           "CN_Hainan"
         ]
       },
-      "notes": "Japanese victory releasable for the Guangdong-Hainan south-coast client state."
+      "notes": "Japanese victory releasable for the Guangdong-Hainan south-coast client state.",
+      "display_name_zh": "广东国民政府"
     },
     {
       "tag": "YUN",
@@ -210,7 +216,8 @@
           "CN_Guizhou"
         ]
       },
-      "notes": "Japanese victory releasable for the southwestern Yunnan sphere including Guizhou."
+      "notes": "Japanese victory releasable for the southwestern Yunnan sphere including Guizhou.",
+      "display_name_zh": "云南"
     },
     {
       "tag": "GXC",
@@ -225,7 +232,8 @@
           "CN_Guangxi"
         ]
       },
-      "notes": "Japanese victory releasable for the Guangxi client clique."
+      "notes": "Japanese victory releasable for the Guangxi client clique.",
+      "display_name_zh": "桂系"
     },
     {
       "tag": "SHX",
@@ -273,7 +281,8 @@
           "CN_CITY_17275852B97961566945863"
         ]
       },
-      "notes": "Japanese victory releasable for the northern inland Shanxi-Shaanxi collaboration regime."
+      "notes": "Japanese victory releasable for the northern inland Shanxi-Shaanxi collaboration regime.",
+      "display_name_zh": "山西"
     },
     {
       "tag": "SIC",
@@ -339,7 +348,8 @@
           "CN_CITY_17275852B92852559512567"
         ]
       },
-      "notes": "Japanese victory releasable for the Gansu-Ningxia Ma sphere after retiring XSM."
+      "notes": "Japanese victory releasable for the Gansu-Ningxia Ma sphere after retiring XSM.",
+      "display_name_zh": "甘肃马家军"
     },
     {
       "tag": "QMA",
@@ -354,7 +364,8 @@
           "CN_Qinghai"
         ]
       },
-      "notes": "Japanese victory releasable for the Qinghai Ma sphere."
+      "notes": "Japanese victory releasable for the Qinghai Ma sphere.",
+      "display_name_zh": "青海马家军"
     },
     {
       "tag": "XIN",
@@ -369,7 +380,8 @@
           "CN_Xinjiang"
         ]
       },
-      "notes": "Japanese victory releasable for the fragmented Xinjiang client regime."
+      "notes": "Japanese victory releasable for the fragmented Xinjiang client regime.",
+      "display_name_zh": "新疆"
     },
     {
       "tag": "PHI",
@@ -500,7 +512,8 @@
           "PHL-5560"
         ]
       },
-      "notes": "Japanese victory releasable for the Philippine client republic."
+      "notes": "Japanese victory releasable for the Philippine client republic.",
+      "display_name_zh": "菲律宾"
     },
     {
       "tag": "INS",
@@ -548,7 +561,8 @@
           "ID_ADM1_65028918B99918739720671"
         ]
       },
-      "notes": "Japanese victory releasable for the Indonesian archipelago client state."
+      "notes": "Japanese victory releasable for the Indonesian archipelago client state.",
+      "display_name_zh": "印度尼西亚"
     },
     {
       "tag": "MAL",
@@ -587,7 +601,8 @@
           "SGP-4875"
         ]
       },
-      "notes": "Japanese victory releasable for Malaya and its attached dependencies."
+      "notes": "Japanese victory releasable for Malaya and its attached dependencies.",
+      "display_name_zh": "马来亚"
     },
     {
       "tag": "BRM",
@@ -692,7 +707,8 @@
           "VNM-5483"
         ]
       },
-      "notes": "Japanese victory releasable for Vietnam after separating Laos and Cambodia."
+      "notes": "Japanese victory releasable for Vietnam after separating Laos and Cambodia.",
+      "display_name_zh": "越南"
     },
     {
       "tag": "LAO",
@@ -723,7 +739,8 @@
           "LAO-3295"
         ]
       },
-      "notes": "Japanese victory releasable for Laos split from the Indochina block."
+      "notes": "Japanese victory releasable for Laos split from the Indochina block.",
+      "display_name_zh": "老挝"
     },
     {
       "tag": "CAM",
@@ -761,7 +778,8 @@
           "KHM-1802"
         ]
       },
-      "notes": "Japanese victory releasable for Cambodia split from the Indochina block."
+      "notes": "Japanese victory releasable for Cambodia split from the Indochina block.",
+      "display_name_zh": "柬埔寨"
     }
   ],
   "excluded": []

@@ -1,3 +1,4 @@
+import { normalizeReason } from "../value_normalization.js";
 import { requireFunction } from "./require_named_function.js";
 import { setFirstVisibleFramePaintedState } from "../state/actions/renderer_diagnostics_actions.js";
 
@@ -26,11 +27,6 @@ const STATUS_COUNTER_NAMES = Object.freeze({
   missing: "visibleFrameMissingCount",
   blocked: "visibleFrameBlockedCount",
 });
-
-function normalizeReason(reason, defaultReason) {
-  const normalized = String(reason || "").trim();
-  return normalized || defaultReason;
-}
 
 function normalizeStatus(status) {
   return String(status || "").trim() || "unknown";

@@ -1,3 +1,5 @@
+import { restoreScenarioFields, validateScenarioSnapshot } from "./scenario_snapshot.js";
+
 // Canonical scenario readiness state authority.
 // Transaction ordering, async work, observers, and recovery stay in scenario composition roots.
 
@@ -33,38 +35,8 @@ function validateCompletePatch(patch) {
 }
 
 function validateSnapshot(snapshot) {
-  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
-    throw new TypeError("[scenario_readiness_actions] snapshot must be an object");
-  }
-  const values = snapshot.values;
-  if (!values || typeof values !== "object" || Array.isArray(values)) {
-    throw new TypeError("[scenario_readiness_actions] snapshot.values must be an object");
-  }
-  for (const key of SCENARIO_READINESS_STATE_KEYS) {
-    if (!hasOwn(values, key)) {
-      throw new Error(
-        `[scenario_readiness_actions] restoreScenarioReadinessState missing snapshot key: ${key}`,
-      );
-    }
-  }
-  if (
-    !Array.isArray(snapshot.presentKeys)
-    && !(snapshot.presentKeys instanceof Set)
-  ) {
-    throw new TypeError(
-      "[scenario_readiness_actions] snapshot.presentKeys must be an array or Set",
-    );
-  }
-  const presentKeys = Array.from(snapshot.presentKeys);
-  const allowedKeys = new Set(SCENARIO_READINESS_STATE_KEYS);
-  for (const key of presentKeys) {
-    if (!allowedKeys.has(key)) {
-      throw new Error(
-        `[scenario_readiness_actions] restoreScenarioReadinessState contains unknown present key: ${key}`,
-      );
-    }
-  }
-  return { values, presentKeys: new Set(presentKeys) };
+  return validateScenarioSnapshot(snapshot, SCENARIO_READINESS_STATE_KEYS,
+    "scenario_readiness_actions", "restoreScenarioReadinessState");
 }
 
 export function captureScenarioReadinessState(target) {
@@ -96,35 +68,6 @@ export function commitScenarioReadinessState(target, patch) {
 export function restoreScenarioReadinessState(target, snapshot) {
   assertStateTarget(target);
   const { values, presentKeys } = validateSnapshot(snapshot);
-  if (presentKeys.has("topologyDetail")) {
-    target.topologyDetail = values.topologyDetail;
-  } else {
-    delete target.topologyDetail;
-  }
-  if (presentKeys.has("topologyBundleMode")) {
-    target.topologyBundleMode = values.topologyBundleMode;
-  } else {
-    delete target.topologyBundleMode;
-  }
-  if (presentKeys.has("detailDeferred")) {
-    target.detailDeferred = values.detailDeferred;
-  } else {
-    delete target.detailDeferred;
-  }
-  if (presentKeys.has("detailPromotionCompleted")) {
-    target.detailPromotionCompleted = values.detailPromotionCompleted;
-  } else {
-    delete target.detailPromotionCompleted;
-  }
-  if (presentKeys.has("detailPromotionInFlight")) {
-    target.detailPromotionInFlight = values.detailPromotionInFlight;
-  } else {
-    delete target.detailPromotionInFlight;
-  }
-  if (presentKeys.has("detailSourceRequested")) {
-    target.detailSourceRequested = values.detailSourceRequested;
-  } else {
-    delete target.detailSourceRequested;
-  }
+  restoreScenarioFields(target, values, presentKeys, SCENARIO_READINESS_STATE_KEYS);
   return true;
 }

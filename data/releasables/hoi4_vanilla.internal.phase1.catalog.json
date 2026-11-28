@@ -37,7 +37,8 @@
       "scenario_only": true,
       "tag": "BAY",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "巴伐利亚"
     },
     {
       "allow_manual_overlay": false,
@@ -73,7 +74,8 @@
       "scenario_only": true,
       "tag": "SAX",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "萨克森"
     },
     {
       "allow_manual_overlay": false,
@@ -110,7 +112,8 @@
       "scenario_only": true,
       "tag": "SHL",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "石勒苏益格"
     },
     {
       "allow_manual_overlay": true,
@@ -188,7 +191,8 @@
       "scenario_only": true,
       "tag": "BOM",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "波希米亚和摩拉维亚保护国"
     },
     {
       "allow_manual_overlay": false,
@@ -228,7 +232,8 @@
       "scenario_only": true,
       "tag": "SCO",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "苏格兰"
     },
     {
       "allow_manual_overlay": false,
@@ -264,7 +269,8 @@
       "scenario_only": true,
       "tag": "WLS",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "威尔士"
     },
     {
       "allow_manual_overlay": false,
@@ -300,7 +306,8 @@
       "scenario_only": true,
       "tag": "NIR",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "北爱尔兰"
     },
     {
       "allow_manual_overlay": false,
@@ -336,7 +343,8 @@
       "scenario_only": true,
       "tag": "BRI",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "布列塔尼"
     },
     {
       "allow_manual_overlay": false,
@@ -374,7 +382,8 @@
       "scenario_only": true,
       "tag": "BYA",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "布里亚特-蒙古自治共和国"
     },
     {
       "allow_manual_overlay": false,
@@ -412,7 +421,8 @@
       "scenario_only": true,
       "tag": "TAT",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "鞑靼自治共和国"
     },
     {
       "allow_manual_overlay": false,
@@ -450,7 +460,8 @@
       "scenario_only": true,
       "tag": "DAG",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "达吉斯坦自治共和国"
     },
     {
       "allow_manual_overlay": false,
@@ -488,7 +499,8 @@
       "scenario_only": true,
       "tag": "KAL",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "卡尔梅克自治共和国"
     },
     {
       "allow_manual_overlay": false,
@@ -528,7 +540,8 @@
       "scenario_only": true,
       "tag": "KOM",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "科米自治州"
     },
     {
       "allow_manual_overlay": false,
@@ -566,7 +579,8 @@
       "scenario_only": true,
       "tag": "NEN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "涅涅茨"
     },
     {
       "allow_manual_overlay": false,
@@ -605,7 +619,8 @@
       "scenario_only": true,
       "tag": "CKK",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "楚科奇"
     },
     {
       "allow_manual_overlay": false,
@@ -646,7 +661,8 @@
       "scenario_only": true,
       "tag": "YAK",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "雅库特自治共和国"
     },
     {
       "allow_manual_overlay": false,
@@ -685,7 +701,8 @@
       "scenario_only": true,
       "tag": "YAM",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "亚马尔"
     },
     {
       "allow_manual_overlay": true,
@@ -747,7 +764,8 @@
       "scenario_only": true,
       "tag": "RKN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "尼德兰专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -816,7 +834,8 @@
       "scenario_only": true,
       "tag": "RKB",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "比利时—北法兰西专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -1160,7 +1179,8 @@
       "scenario_only": true,
       "tag": "BRG",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "勃艮第骑士团国"
     },
     {
       "allow_manual_overlay": true,
@@ -1557,7 +1577,8 @@
       "scenario_only": true,
       "tag": "RKP",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "波兰专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -2243,7 +2264,8 @@
       "scenario_only": true,
       "tag": "RKU",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "乌克兰专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -2535,7 +2557,8 @@
       "scenario_only": true,
       "tag": "RKO",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "东方专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -3759,7 +3782,8 @@
       "scenario_only": true,
       "tag": "RKM",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "莫斯科专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -3979,7 +4003,8 @@
       "scenario_only": true,
       "tag": "RKK",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "高加索专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -4024,7 +4049,8 @@
       "scenario_only": true,
       "tag": "RKNO",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "挪威专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -4071,7 +4097,8 @@
       "scenario_only": true,
       "tag": "NCP",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "华北政务委员会"
     },
     {
       "allow_manual_overlay": true,
@@ -4107,7 +4134,8 @@
       "scenario_only": true,
       "tag": "RGC",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "中华民国维新政府"
     },
     {
       "allow_manual_overlay": true,
@@ -4212,7 +4240,8 @@
       "scenario_only": true,
       "tag": "CRO",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "克罗地亚独立国"
     },
     {
       "allow_manual_overlay": true,
@@ -4338,7 +4367,8 @@
       "scenario_only": true,
       "tag": "SER",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "塞尔维亚行政当局"
     },
     {
       "allow_manual_overlay": true,
@@ -4470,7 +4500,8 @@
       "scenario_only": true,
       "tag": "GRE",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "希腊保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -4564,7 +4595,8 @@
       "scenario_only": true,
       "tag": "EGY",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "意属埃及"
     },
     {
       "allow_manual_overlay": true,
@@ -4609,7 +4641,8 @@
       "scenario_only": true,
       "tag": "PAL",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "巴勒斯坦托管地"
     },
     {
       "allow_manual_overlay": true,
@@ -4658,7 +4691,8 @@
       "scenario_only": true,
       "tag": "JOR",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "意属外约旦"
     },
     {
       "allow_manual_overlay": true,
@@ -4719,7 +4753,8 @@
       "scenario_only": true,
       "tag": "TUN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "突尼斯保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -4773,7 +4808,8 @@
       "scenario_only": true,
       "tag": "SYR",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "法属叙利亚托管地"
     },
     {
       "allow_manual_overlay": true,
@@ -4816,7 +4852,8 @@
       "scenario_only": true,
       "tag": "LEB",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "黎巴嫩保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -4958,7 +4995,8 @@
       "scenario_only": true,
       "tag": "CHI",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "南京中国"
     },
     {
       "allow_manual_overlay": true,
@@ -5053,7 +5091,8 @@
       "scenario_only": true,
       "tag": "MAN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "满洲国"
     },
     {
       "allow_manual_overlay": true,
@@ -5115,7 +5154,8 @@
       "scenario_only": true,
       "tag": "MEN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "蒙疆"
     },
     {
       "allow_manual_overlay": true,
@@ -5150,7 +5190,8 @@
       "scenario_only": true,
       "tag": "GNG",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "广东国民政府"
     },
     {
       "allow_manual_overlay": true,
@@ -5190,7 +5231,8 @@
       "scenario_only": true,
       "tag": "YUN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "云南"
     },
     {
       "allow_manual_overlay": true,
@@ -5233,7 +5275,8 @@
       "scenario_only": true,
       "tag": "GXC",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "桂系"
     },
     {
       "allow_manual_overlay": true,
@@ -5307,7 +5350,8 @@
       "scenario_only": true,
       "tag": "SHX",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "山西"
     },
     {
       "allow_manual_overlay": true,
@@ -5350,7 +5394,8 @@
       "scenario_only": true,
       "tag": "SIC",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "西康建省委员会"
     },
     {
       "allow_manual_overlay": true,
@@ -5409,7 +5454,8 @@
       "scenario_only": true,
       "tag": "GMA",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "甘肃马家军"
     },
     {
       "allow_manual_overlay": true,
@@ -5443,7 +5489,8 @@
       "scenario_only": true,
       "tag": "QMA",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "青海马家军"
     },
     {
       "allow_manual_overlay": true,
@@ -5477,7 +5524,8 @@
       "scenario_only": true,
       "tag": "XIN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "新疆"
     },
     {
       "allow_manual_overlay": true,
@@ -5640,7 +5688,8 @@
       "scenario_only": true,
       "tag": "PHI",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "菲律宾"
     },
     {
       "allow_manual_overlay": true,
@@ -5719,7 +5768,8 @@
       "scenario_only": true,
       "tag": "INS",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "印度尼西亚"
     },
     {
       "allow_manual_overlay": true,
@@ -5786,7 +5836,8 @@
       "scenario_only": true,
       "tag": "MAL",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "马来亚"
     },
     {
       "allow_manual_overlay": true,
@@ -5845,7 +5896,8 @@
       "scenario_only": true,
       "tag": "BRM",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "英属缅甸"
     },
     {
       "allow_manual_overlay": true,
@@ -5947,7 +5999,8 @@
       "scenario_only": true,
       "tag": "VIN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "越南"
     },
     {
       "allow_manual_overlay": true,
@@ -6001,7 +6054,8 @@
       "scenario_only": true,
       "tag": "LAO",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "老挝"
     },
     {
       "allow_manual_overlay": true,
@@ -6062,7 +6116,8 @@
       "scenario_only": true,
       "tag": "CAM",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "柬埔寨"
     }
   ],
   "excluded": [

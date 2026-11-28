@@ -909,10 +909,7 @@ function initDevWorkspace() {
   scenarioTextEditorsController.bindEvents();
   districtEditorController.bindEvents();
   bindButtonAction(devQuickRebuildBordersBtn, () => {
-    const toolbarRebuildBtn = document.getElementById("recalculateBordersBtn");
-    if (toolbarRebuildBtn instanceof HTMLButtonElement) {
-      toolbarRebuildBtn.click();
-    }
+    runtimeState.recomputeDynamicBordersNowFn?.({ renderNow: true, reason: "manual-dev" });
   });
   bindButtonAction(panel.querySelector("#devCopyNamesBtn"), () => {
     copySelectionToClipboard("names", selectionPreview);

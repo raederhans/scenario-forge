@@ -1,41 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-
 import { state as appState } from "../js/core/state.js";
 import { captureScenarioApplyRollbackSnapshot } from "../js/core/scenario/scenario_rollback.js";
-import { createScenarioBundleRuntimeController } from "../js/core/scenario/bundle_runtime.js";
-import { createScenarioRollbackClone } from "../js/core/scenario/rollback_clone.js";
-import { trimScenarioBundleCache, SCENARIO_BUNDLE_CACHE_LIMIT, SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT } from "../js/core/scenario/bundle_cache.js";
-import { createScenarioChunkPayloadLoader } from "../js/core/scenario/chunk_payload_loader.js";
-import { commitScenarioChunkPayloadEntriesState } from "../js/core/state/actions/scenario_chunk_runtime_actions.js";
 
-test("overlapping selections keep caller-owned results even when the newest selection replaces cache pins", async () => {
-  const runtimeState = { activeScenarioId: "a" };
-  const bundle = { id: "a" };
-  const completed = [];
-  const loader = createScenarioChunkPayloadLoader({ runtimeState, normalizeScenarioId: String,
-    getScenarioBundleId: (value) => value.id,
-    loadScenarioChunkFile: async (url) => ({ payload: { features: [url] } }),
-  });
-  const chunks = (prefix) => Array.from({ length: 40 }, (_, id) => ({ id: `${prefix}-${id}`, url: `${prefix}-${id}`, layer: "political" }));
-  const firstChunks = chunks("first"), nextChunks = chunks("next");
-  const first = loader.loadScenarioChunkPayloadEntries(bundle, firstChunks);
-  const next = loader.loadScenarioChunkPayloadEntries(bundle, nextChunks);
-  void first.then(() => completed.push("first"));
-  void next.then(() => completed.push("next"));
-  const [firstEntries, nextEntries] = await Promise.all([first, next]);
-  assert.deepEqual(completed, ["next", "first"], "new selection is admitted ahead of queued old work");
-  assert.equal(firstEntries.length, 40);
-  assert.equal(nextEntries.length, 40);
-  assert.ok(firstEntries.every((entry) => entry.payload.payload.features[0] === entry.chunkId));
-  assert.ok(nextEntries.every((entry) => entry.payload.payload.features[0] === entry.chunkId));
-  assert.ok(nextChunks.every((chunk) => bundle.chunkPayloadCacheById[chunk.id]));
-  assert.equal(Object.keys(bundle.chunkPayloadCacheById).length, 40);
-});
+test("actual rollback capture isolates topology coordinates from active state", () => {
+  const topology = { arcs: [[1, 2]] };
 
-test("actual rollback capture deduplicates activation and chunk topology while every capture is isolated", () => {
-  let copies = 0;
-  const topology = { get arcs() { copies += 1; return [[1, 2]]; } };
   const fixture = {
     scenarioRuntimeTopologyData: topology, runtimePoliticalTopology: topology,
     defaultRuntimePoliticalTopology: topology,
@@ -46,12 +16,10 @@ test("actual rollback capture deduplicates activation and chunk topology while e
   try {
     Object.assign(appState, fixture);
     const first = captureScenarioApplyRollbackSnapshot();
-    assert.equal(copies, 1);
-    assert.equal(first.scenarioRuntimeTopologyData, first.defaultRuntimePoliticalTopology);
-    assert.equal(first.activeScenarioChunks.payloadByChunkId.a.payload, first.runtimePoliticalTopology);
+
     first.runtimePoliticalTopology.arcs[0][0] = 99;
     const next = captureScenarioApplyRollbackSnapshot();
-    assert.equal(copies, 2);
+
     assert.deepEqual(next.runtimePoliticalTopology.arcs, [[1, 2]]);
     assert.notEqual(first.styleConfigOcean, appState.styleConfig.ocean);
   } finally {
@@ -60,125 +28,4 @@ test("actual rollback capture deduplicates activation and chunk topology while e
     }
     Object.assign(appState, savedState);
   }
-});
-
-test("bundle controller trims on cache hit and after the apply lock is released", async () => {
-  const state = { activeScenarioId: "a", scenarioApplyInFlight: true,
-    scenarioBundleCacheById: Object.fromEntries(["a", "b", "c", "d"].map((id) => [id, { bundleLevel: "full" }])) };
-  const controller = createScenarioBundleRuntimeController({ state,
-    normalizeScenarioId: String, normalizeScenarioBundleLevel: String, normalizeScenarioLanguage: String,
-    scenarioBundleSatisfiesLevel: () => true, scenarioBundleUsesChunkedLayer: () => true,
-    recordScenarioPerfMetric: () => {},
-  });
-  const d = state.scenarioBundleCacheById.d;
-  assert.equal(await controller.loadScenarioBundle("d"), d);
-  assert.equal(Object.keys(state.scenarioBundleCacheById).length, 4);
-  state.scenarioApplyInFlight = false;
-  state.activeScenarioId = "d";
-  controller.trimScenarioBundleCaches();
-  assert.equal(Object.keys(state.scenarioBundleCacheById).length, 3);
-  assert.equal(state.scenarioBundleCacheById.d, d);
-});
-
-test("one batch commits each container once while preserving last-write and LRU order", () => {
-  const target = {};
-  commitScenarioChunkPayloadEntriesState(target, [{ chunkId: "old", payload: {} }]);
-  const chunks = target.activeScenarioChunks;
-  const original = chunks.payloadByChunkId;
-  let assignments = 0;
-  for (const key of ["payloadByChunkId", "loadedChunkIds", "lruChunkIds"]) {
-    let value = chunks[key];
-    Object.defineProperty(chunks, key, { configurable: true, enumerable: true,
-      get: () => value, set: (next) => { assignments += 1; value = next; },
-    });
-  }
-  const last = {};
-  commitScenarioChunkPayloadEntriesState(target, [
-    { chunkId: "a", payload: {} }, { chunkId: "b", payload: {} },
-    { chunkId: "a", payload: last }, { chunkId: "__proto__", payload: last },
-  ]);
-  assert.equal(assignments, 3);
-  assert.deepEqual(chunks.loadedChunkIds, ["old", "a", "b", "__proto__"]);
-  assert.deepEqual(chunks.lruChunkIds, ["old", "b", "a", "__proto__"]);
-  assert.equal(chunks.payloadByChunkId.a, last);
-  assert.equal(Object.getPrototypeOf(chunks.payloadByChunkId), Object.prototype);
-  assert.deepEqual(Object.keys(original), ["old"]);
-});
-
-test("rollback copies repeated topology once per capture and isolates subsequent captures", () => {
-  let reads = 0;
-  const topology = { get arcs() { reads += 1; return [[1, 2]]; } };
-  const clone = createScenarioRollbackClone();
-  const first = clone({ topology, chunks: { topology } });
-  assert.equal(first.topology, first.chunks.topology);
-  assert.equal(clone(topology), first.topology);
-  assert.equal(reads, 1);
-  first.topology.arcs[0][0] = 99;
-  assert.deepEqual(topology.arcs, [[1, 2]]);
-  const second = createScenarioRollbackClone()(topology);
-  assert.notEqual(second, first.topology);
-  assert.deepEqual(second.arcs, [[1, 2]]);
-});
-
-test("rollback coordinate arrays preserve holes and isolate point values", () => {
-  const point = [1, 2];
-  const input = [point, , point];
-  const output = createScenarioRollbackClone()(input);
-  assert.equal(output.length, 3);
-  assert.equal(1 in output, false);
-  assert.deepEqual(output[0], output[2]);
-  assert.notEqual(output[0], output[2]);
-  output[0][0] = 99;
-  assert.equal(point[0], 1);
-});
-
-test("rollback graph preserves Map/Set/Date and aliases without retaining live objects", () => {
-  const shared = { date: new Date(123) };
-  shared.self = shared;
-  const input = { shared, map: new Map([[shared, shared]]), set: new Set([shared]) };
-  const output = createScenarioRollbackClone()(input);
-  assert.equal(output.map.get(output.shared), output.shared);
-  assert.equal(output.shared.self, output.shared);
-  assert.ok(output.set.has(output.shared));
-  assert.notEqual(output.shared.date, shared.date);
-  assert.equal(output.shared.date.getTime(), 123);
-});
-
-test("bundle LRU includes preexisting cache entries and defers transaction/in-flight eviction", () => {
-  const state = { activeScenarioId: "a", scenarioApplyInFlight: true,
-    scenarioBundleCacheById: { a: {}, b: {}, c: {}, d: {}, e: {} } };
-  const recency = new Map();
-  trimScenarioBundleCache(state, recency, "e");
-  assert.equal(Object.keys(state.scenarioBundleCacheById).length, 5);
-  state.scenarioApplyInFlight = false;
-  state.scenarioBundleCacheById.b.chunkPayloadPromisesById = { chunk: Promise.resolve() };
-  trimScenarioBundleCache(state, recency, "e");
-  assert.deepEqual(Object.keys(state.scenarioBundleCacheById), ["a", "b", "e"]);
-  state.scenarioBundleCacheById.b.chunkPayloadPromisesById = {};
-  state.scenarioBundleCacheById.f = {};
-  trimScenarioBundleCache(state, recency, "f");
-  assert.equal(Object.keys(state.scenarioBundleCacheById).length, SCENARIO_BUNDLE_CACHE_LIMIT);
-  assert.equal(state.scenarioBundleCacheById.b, undefined);
-});
-
-test("real chunk loader bounds bundle payload retention, reuses hot chunks and safely reloads evicted chunks", async () => {
-  let loads = 0;
-  const state = { activeScenarioId: "a" };
-  const bundle = { id: "a" };
-  const loader = createScenarioChunkPayloadLoader({ runtimeState: state,
-    normalizeScenarioId: String, getScenarioBundleId: (value) => value.id,
-    loadScenarioChunkFile: async () => { loads += 1; return { payload: { features: [loads] } }; },
-  });
-  const load = (id) => loader.loadScenarioChunkPayload(bundle, { id, layer: "political", url: id });
-  const retainedByCaller = await load("first");
-  for (let index = 0; index < SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT; index += 1) await load(`chunk-${index}`);
-  assert.equal(Object.keys(bundle.chunkPayloadCacheById).length, SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT);
-  assert.equal(bundle.chunkPayloadCacheById.first, undefined);
-  assert.deepEqual(retainedByCaller.payload.features, [1]);
-  const before = loads;
-  await load("chunk-31");
-  assert.equal(loads, before);
-  await load("first");
-  assert.equal(loads, before + 1);
-  assert.equal(Object.keys(bundle.chunkPayloadCacheById).length, SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT);
 });

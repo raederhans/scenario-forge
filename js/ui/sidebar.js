@@ -14,7 +14,7 @@ import {
   defaultCountryPalette,
   normalizeAnnotationView,
 } from "../core/state.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { STATE_BUS_EVENTS, callRuntimeHook, registerRuntimeHook, subscribeStateBusEvent } from "../core/state/index.js";
 import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { pushRecentColorState } from "../core/state/actions/editor_input_actions.js";
 import { ColorManager } from "../core/color_manager.js";
@@ -635,6 +635,7 @@ function initSidebar({ render } = {}) {
   const waterInspectorDetailHint = document.getElementById("waterInspectorDetailHint");
   const waterInspectorLocateBtn = document.getElementById("waterInspectorLocateBtn");
   const waterInspectorMetaSection = document.getElementById("waterInspectorMetaSection");
+  const waterInspectorMoreMetaList = document.getElementById("waterInspectorMoreMetaList");
   const waterInspectorMetaList = document.getElementById("waterInspectorMetaList");
   const waterInspectorHierarchySection = document.getElementById("waterInspectorHierarchySection");
   const waterInspectorBreadcrumb = document.getElementById("waterInspectorBreadcrumb");
@@ -1151,7 +1152,7 @@ function initSidebar({ render } = {}) {
     focusGeoBounds,
     selectLandFeatureById,
   });
-  regionSearchController.mount(searchInput.closest(".inspector-search-shell"));
+  regionSearchController.mount(searchInput.closest(".inspector-search-shell"), { input: searchInput });
 
   const renamedPlacesCache = { features: null, hasAny: false };
   const countryInspectorController = createCountryInspectorController({
@@ -1237,6 +1238,8 @@ function initSidebar({ render } = {}) {
       render();
     },
   });
+  // 地图上选中、换选或清空地块时，「选中地块国家」卡片要跟着变，不能等国家列表重绘。
+  subscribeStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI, () => countryInspectorController.refreshSelectedLandCountryQuickTab());
   const {
     bindEvents: bindCountryInspectorEvents,
     closeCountryInspectorColorPicker,
@@ -1671,6 +1674,7 @@ function initSidebar({ render } = {}) {
       waterInspectorTypeFilter,
       waterInspectorGroupFilter,
       waterInspectorSourceFilter,
+      waterInspectorSourceFilterCount: document.getElementById("waterInspectorSourceFilterCount"),
       waterInspectorSortSelect,
       waterInspectorResultCount,
       waterSearchInput,
@@ -1682,6 +1686,7 @@ function initSidebar({ render } = {}) {
       waterInspectorLocateBtn,
       waterInspectorMetaSection,
       waterInspectorMetaList,
+      waterInspectorMoreMetaList,
       waterInspectorHierarchySection,
       waterInspectorBreadcrumb,
       waterInspectorJumpToParentBtn,

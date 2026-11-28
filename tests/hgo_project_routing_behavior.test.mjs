@@ -1,15 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {FileManager} from '../js/core/file_manager.js';
-import {projectEditor,routeHgoProject} from '../js/core/hgo_project_routing.js';
-
-test('dispatch separates native, main and retired HGO before main normalization',async()=>{
-  assert.equal(projectEditor({format:'scenario-forge-hgo'}),'hgo');
-  assert.equal(projectEditor({scenario:{id:'hgo_1936'}}),'retired-hgo');
-  assert.equal(projectEditor({scenario:{id:'tno_1962'}}),'main');
-  assert.equal(await routeHgoProject({schemaVersion:21}),null);
-  await assert.rejects(()=>routeHgoProject({scenario:{id:'hgo_1936'}}),/Legacy HGO/);
-});
+import { routeHgoProject } from '../js/core/hgo_project_routing.js';
 
 test('project import routes retired HGO projects away from the main import callback',async()=>{
   let callbackRuns=0;

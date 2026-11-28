@@ -318,30 +318,24 @@ function createExportWorkbenchController({
 
   const getExportTextLayerEntries = () => {
     const mapSvg = document.getElementById("map-svg");
-    const specialZoneCount = mapSvg ? mapSvg.querySelectorAll(".special-zones-layer .special-zone").length : 0;
-    const renderPassMetrics = state.renderPassCache?.metrics?.labels || null;
     const annotationSummary = getExportAnnotationCountSummary(mapSvg);
-    const legend = getPoliticalExportLegend(state);
     return [
       {
         ...EXPORT_TEXT_LAYER_MODEL_BY_ID.get("render-labels"),
         name: "Map labels",
         summary: "City and map labels from the labels pass",
-        count: Math.max(0, Number(renderPassMetrics?.labelCount || 0)),
       },
       {
         ...EXPORT_TEXT_LAYER_MODEL_BY_ID.get("special-zones"),
         name: "Special zone notes",
-        count: specialZoneCount,
       },
       {
         ...EXPORT_TEXT_LAYER_MODEL_BY_ID.get("svg-annotations"),
         name: "Strategic annotations",
         summary: annotationSummary.summary,
-        count: annotationSummary.count,
         familyCounts: annotationSummary.counts,
       },
-      { ...EXPORT_TEXT_LAYER_MODEL_BY_ID.get("legend"), count: legend.colors.length + legend.zones.length },
+      EXPORT_TEXT_LAYER_MODEL_BY_ID.get("legend"),
     ].filter((entry) => !!entry?.id);
   };
 
@@ -521,7 +515,7 @@ function createExportWorkbenchController({
         .join(" · ");
       return summary || t("No strategic annotations currently visible", "ui");
     };
-    getExportTextLayerEntries().forEach((entry, index) => {
+    getExportTextLayerEntries().forEach((entry) => {
       const item = document.createElement("div");
       item.className = "export-workbench-layer-item";
       item.dataset.exportTextLayerId = entry.id;
@@ -530,11 +524,6 @@ function createExportWorkbenchController({
         setExportPreviewState(state, { layerId: entry.id });
         renderExportWorkbenchUi(true);
       });
-
-      const order = document.createElement("span");
-      order.className = "export-workbench-layer-order";
-      order.textContent = `T${index + 1}`;
-      item.appendChild(order);
 
       const name = document.createElement("span");
       name.className = "export-workbench-layer-name";
@@ -551,11 +540,6 @@ function createExportWorkbenchController({
 
       const controls = document.createElement("div");
       controls.className = "export-workbench-layer-controls";
-
-      const badge = document.createElement("span");
-      badge.className = "export-workbench-layer-badge";
-      badge.textContent = `${entry.count} ${t("nodes", "ui")}`;
-      controls.appendChild(badge);
 
       const toggle = document.createElement("label");
       toggle.className = "export-workbench-layer-toggle";
@@ -598,6 +582,9 @@ function createExportWorkbenchController({
   const renderExportWorkbenchBakeArtifactList = () => {
     if (!exportWorkbenchBakeArtifactList) return;
     const exportUi = getExportUi();
+    const bakeShell = exportWorkbenchBakeArtifactList.closest(".export-workbench-bake-shell");
+    bakeShell.hidden = exportUi.target !== "bake-pack";
+    if (bakeShell.hidden) return;
     exportWorkbenchBakeArtifactList.replaceChildren();
     EXPORT_BAKE_OUTPUT_MODELS.forEach((model) => {
       const artifact = Array.isArray(exportUi.bakeArtifacts)
@@ -671,13 +658,13 @@ function createExportWorkbenchController({
         const adjustedPreview = applyExportAdjustmentsToCanvas(previewSource, exportUi);
         adjustedPreview.classList.add("export-workbench-preview-render");
         exportWorkbenchPreviewStage.replaceChildren(adjustedPreview);
-        exportWorkbenchPreviewState.textContent = exportUi.previewMode === "layer"
-          ? t("Single layer preview ready", "ui")
-          : t("Main image preview ready", "ui");
+        exportWorkbenchPreviewState.textContent = "";
+        exportWorkbenchPreviewState.hidden = true;
       } catch (error) {
         if (token !== exportWorkbenchPreviewRenderToken) continue;
         console.error("[export-workbench] Failed to render preview.", error);
         exportWorkbenchPreviewStage.replaceChildren();
+        exportWorkbenchPreviewState.hidden = exportJobsInFlight > 0;
         exportWorkbenchPreviewState.textContent = t("Preview unavailable. Export settings remain editable.", "ui");
       }
     }
@@ -700,6 +687,7 @@ function createExportWorkbenchController({
       exportUi: getExportUi(),
       session: previewSession,
     };
+    exportWorkbenchPreviewState.hidden = exportJobsInFlight > 0;
     exportWorkbenchPreviewState.textContent = t("Rendering export preview…", "ui");
     return startPreviewWork();
   };
@@ -837,6 +825,7 @@ function createExportWorkbenchController({
       renderExportWorkbenchContents(false);
       return;
     }
+    exportWorkbenchPreviewState.hidden = exportJobsInFlight > 0;
     exportWorkbenchPreviewState.textContent = t("Preparing preview…", "ui");
     requestPreviewFrame(() => requestPreviewFrame(() => {
       if (token === openRenderToken) renderExportWorkbenchContents(true);
@@ -906,7 +895,7 @@ function createExportWorkbenchController({
     } finally {
       exportJobsInFlight--;
       if (exportJobStatus) exportJobStatus.hidden = true;
-      if (exportWorkbenchPreviewState) exportWorkbenchPreviewState.hidden = false;
+      if (exportWorkbenchPreviewState) exportWorkbenchPreviewState.hidden = exportJobsInFlight > 0 || !exportWorkbenchPreviewState.textContent;
       syncExportSectionSummary();
     }
   };

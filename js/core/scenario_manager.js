@@ -1504,21 +1504,10 @@ function formatScenarioStatusText() {
   return warning ? `${displayName} · ${warning}` : displayName;
 }
 
-function formatScenarioAuditText() {
-  if (getScenarioFatalRecoveryState()) {
-    return t("Scenario controls are locked until the page reloads.", "ui");
-  }
-  if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
-    return "";
-  }
-  return t("Using the scenario's original borders.", "ui");
-}
-
 export {
   applyScenarioBundle,
   applyScenarioById,
   clearActiveScenario,
-  formatScenarioAuditText,
   formatScenarioStatusText,
   getDefaultScenarioId,
   getScenarioDisplayName,

@@ -598,15 +598,13 @@ function buildScenarioRegionalPresetOverlays() {
       .filter((preset) => preset.name && preset.ids.length);
 
     if (normalizedPresets.length) {
-      [
-        code,
-        entry?.preset_lookup_code,
-        entry?.presetLookupCode,
-        entry?.lookup_iso2,
-        entry?.lookupIso2,
-        entry?.base_iso2,
-        entry?.baseIso2,
-      ].forEach((candidate) => assignOverlayPresets(candidate, normalizedPresets));
+      // 显式写了 preset_lookup_code 的国家拥有自己的预设键：只挂在本国与该键上，
+      // 不再挂到 ISO 代码，否则同一 ISO 下的其他剧本国家（如 TNO 里各个 RU 国家）都会看到这套预设。
+      const explicitPresetKey = entry?.preset_lookup_code || entry?.presetLookupCode;
+      const candidates = explicitPresetKey
+        ? [code, explicitPresetKey]
+        : [code, entry?.lookup_iso2, entry?.lookupIso2, entry?.base_iso2, entry?.baseIso2];
+      candidates.forEach((candidate) => assignOverlayPresets(candidate, normalizedPresets));
     }
   });
 

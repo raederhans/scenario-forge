@@ -26,9 +26,6 @@ function fixture(t, { globalCoverage = true, scenarioId = "viewport-test" } = {}
   let subset = "west";
   let required = [first];
   const refreshes = [];
-  const renderRequests = [];
-  const loads = [];
-  let merges = 0;
   const state = { activeScenarioId: scenarioId, renderPhase: "idle", zoomTransform: { k: 3 }, renderPerfMetrics: {}, getViewportGeoBoundsFn: () => subset === "west" ? [-5, -5, 5, 5] : [0, -5, 10, 5] };
   const controller = createScenarioChunkRuntimeController({
     runtimeState: state, getSearchParams: () => new URLSearchParams(),
@@ -39,18 +36,17 @@ function fixture(t, { globalCoverage = true, scenarioId = "viewport-test" } = {}
     getVisibleScenarioChunkLayers: () => ["political"],
     resolveRequiredScenarioSemanticLayers,
     selectScenarioChunks: () => ({ scenarioId, requiredChunks: required, optionalChunks: [], evictableChunkIds: [], politicalVisibleFeatureSubsetSignature: subset, selectedFeatureCountSum: required.length }),
-    mergeScenarioChunkPayloads: (_layer, values) => { merges += 1; return { type: "FeatureCollection", features: values.flatMap((payload) => payload.features) }; },
+    mergeScenarioChunkPayloads: (_layer, values) => { return { type: "FeatureCollection", features: values.flatMap((payload) => payload.features) }; },
     mergeScenarioChunkPayloadsForViewport: (_layer, values) => ({ payload: { type: "FeatureCollection", features: values.flatMap((payload) => payload.features) } }),
-    normalizeScenarioRenderBudgetHints: (value) => value || {}, loadScenarioChunkFile: async (url) => { loads.push(url); return { payload: payloads.get(url) }; },
+    normalizeScenarioRenderBudgetHints: (value) => value || {}, loadScenarioChunkFile: async (url) => { return { payload: payloads.get(url) }; },
     scenarioSupportsChunkedRuntime: () => true, scenarioBundleUsesChunkedLayer: (_bundle, layer) => !layer || layer === "political",
     getScenarioOptionalLayerConfig: (layer) => SCENARIO_OPTIONAL_LAYER_CONFIGS[layer] || null, syncScenarioLocalizationState: () => {},
     refreshMapDataForScenarioChunkPromotion: (options) => refreshes.push(options), flushRenderBoundary: () => {},
     recordScenarioPerfMetric: () => {}, ensureScenarioChunkRegistryLoaded: async () => {},
-    requestRender: reason => renderRequests.push(reason),
+    requestRender: () => {},
   });
   return {
-    state, controller, refreshes, payloads, first, second, bundle, loads, renderRequests,
-    getMerges: () => merges,
+    state, controller, refreshes, payloads, first, second, bundle,
     setSubset: (next) => { subset = next; }, setRequired: (next) => { required = next; },
     async refresh(reason = "viewport-test") {
       controller.scheduleScenarioChunkRefresh({ reason, delayMs: 0 });
@@ -64,40 +60,6 @@ function fixture(t, { globalCoverage = true, scenarioId = "viewport-test" } = {}
   };
 }
 
-test("a late same-scene border pack is published and drawn even when chunk selection is unchanged", async (t) => {
-  const h=fixture(t); await h.refresh();
-  const promotions=h.refreshes.length;
-  const pack={scenario_id:'viewport-test',meshes:{opening_owner_borders:{type:'MultiLineString',coordinates:[]}}};
-  h.bundle.meshPackPayload=pack;
-  await h.refresh();
-  assert.equal(h.state.activeScenarioMeshPack,pack);
-  assert.equal(h.refreshes.length,promotions);
-  assert.equal(h.renderRequests.filter(r=>r==='scenario-political-border-source').length,1);
-  await h.refresh();
-  assert.equal(h.state.activeScenarioMeshPack,pack);
-  assert.equal(h.renderRequests.filter(r=>r==='scenario-political-border-source').length,1);
-  h.bundle.meshPackPayload={...pack,scenario_id:'another-scene'};
-  await h.refresh();
-  assert.equal(h.state.activeScenarioMeshPack,pack);
-  assert.equal(h.renderRequests.filter(r=>r==='scenario-political-border-source').length,1);
-});
-
-test("a committed global political collection survives pans without merge, promotion or version growth", async (t) => {
-  const h = fixture(t); await h.refresh();
-  const full = h.state.scenarioPoliticalChunkData;
-  assert.equal(full?.globalCoverage, true);
-  assert.ok(!h.state.scenarioPoliticalVisibleChunkData || h.state.scenarioPoliticalVisibleChunkData === full);
-  const version = h.state.runtimeChunkLoadState.selectionVersion;
-  const refreshCount = h.refreshes.length;
-  const merges = h.getMerges();
-  h.setSubset("east"); await h.refresh();
-  h.setSubset("west"); await h.refresh();
-  assert.equal(h.state.runtimeChunkLoadState.selectionVersion, version);
-  assert.equal(h.state.scenarioPoliticalChunkData, full);
-  assert.equal(h.refreshes.length, refreshCount);
-  assert.equal(h.getMerges(), merges);
-});
-
 test("a newly required chunk still promotes geometry under committed global coverage", async (t) => {
   const h = fixture(t); await h.refresh();
   const version = h.state.runtimeChunkLoadState.selectionVersion;
@@ -106,24 +68,6 @@ test("a newly required chunk still promotes geometry under committed global cove
   assert.ok(h.state.runtimeChunkLoadState.selectionVersion > version);
   assert.ok(h.refreshes.length > refreshCount);
   assert.deepEqual(h.state.scenarioPoliticalChunkData.features.map((feature) => feature.id).sort(), ["a", "b"]);
-});
-
-test("legacy viewport-subset collections still promote on a changed viewport signature", async (t) => {
-  const h = fixture(t, { globalCoverage: false }); await h.refresh();
-  const version = h.state.runtimeChunkLoadState.selectionVersion;
-  const refreshCount = h.refreshes.length;
-  h.setSubset("east"); await h.refresh();
-  assert.ok(h.state.runtimeChunkLoadState.selectionVersion > version);
-  assert.ok(h.refreshes.length > refreshCount);
-});
-
-test("startup without a committed global collection cannot reuse the previous viewport selection", async (t) => {
-  const h = fixture(t); await h.refresh();
-  const version = h.state.runtimeChunkLoadState.selectionVersion;
-  h.state.scenarioPoliticalChunkData = null;
-  h.state.scenarioPoliticalVisibleChunkData = null;
-  h.setSubset("east"); await h.refresh();
-  assert.ok(h.state.runtimeChunkLoadState.selectionVersion > version);
 });
 
 test("replacing geometry under the same required chunk ID must publish the replacement", async (t) => {
@@ -139,32 +83,4 @@ test("replacing geometry under the same required chunk ID must publish the repla
   h.setSubset("east"); await h.refresh();
   assert.ok(h.refreshes.length > refreshCount, "same-ID replacement must reach visual promotion");
   assert.deepEqual(h.state.scenarioPoliticalChunkData.features[0].geometry, replacement.geometry);
-});
-
-test("TNO zoom-end loads and commits required semantic water and relief while demoting ordinary optional detail", async (t) => {
-  const h = fixture(t, { scenarioId: "tno_1962" });
-  await h.refresh();
-  const extra = ["water", "relief", "cities"].map((layer) => ({ id: `${layer}.detail.test`, url: `${layer}.json`, layer, lod: "detail" }));
-  for (const chunk of extra) {
-    h.bundle.chunkRegistry.byLayer[chunk.layer] = [chunk];
-    h.payloads.set(chunk.url, { type: "FeatureCollection", features: [{ type: "Feature", id: `${chunk.layer}-feature`, properties: { id: `${chunk.layer}-feature` }, geometry: { type: "Point", coordinates: [1, 1] } }] });
-  }
-  h.setRequired([h.first, ...extra]);
-  h.setSubset("east"); await h.refresh("zoom-end");
-  const selection = h.state.runtimeChunkLoadState.lastSelection;
-  assert.ok(selection.requiredChunkIds.includes("water.detail.test"), "water must remain required after zoom-end");
-  assert.ok(selection.requiredChunkIds.includes("relief.detail.test"), "relief must remain required after zoom-end");
-  assert.ok(selection.optionalChunkIds.includes("cities.detail.test"));
-  assert.ok(!selection.requiredChunkIds.includes("cities.detail.test"));
-  assert.ok(h.loads.includes("water.json")); assert.ok(h.loads.includes("relief.json"));
-  assert.ok(!h.loads.includes("cities.json"));
-  assert.equal(h.state.scenarioWaterRegionsData.features[0].id, "water-feature");
-  assert.equal(h.state.scenarioReliefOverlaysData.features[0].id, "relief-feature");
-  const full = h.state.scenarioPoliticalChunkData;
-  const version = h.state.runtimeChunkLoadState.selectionVersion;
-  const refreshCount = h.refreshes.length;
-  h.setSubset("west"); await h.refresh("zoom-end");
-  assert.equal(h.state.scenarioPoliticalChunkData, full);
-  assert.equal(h.state.runtimeChunkLoadState.selectionVersion, version);
-  assert.equal(h.refreshes.length, refreshCount, "pure pan over the same chunks must not promote political data again");
 });

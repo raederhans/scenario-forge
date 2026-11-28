@@ -1,8 +1,5 @@
+import { clamp as clampNumber } from "../value_normalization.js";
 import { getSpatialBucketKey } from "./spatial_index_runtime_builders.js";
-
-function clampNumber(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
 
 function normalizeGlobals(globals) {
   if (Array.isArray(globals)) return globals;

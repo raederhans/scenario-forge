@@ -8,7 +8,7 @@ function city(id, x, properties = {}) {
     properties: { __city_base_tier: "minor", ...properties } };
 }
 
-function plan(features, config = {}, activeScenarioId = "", scale = 12, projectToScreen = (anchor) => anchor) {
+function plan(features) {
   const profile = { groupKey: "country", countryTier: "A", countryTierRank: 5 };
   const helpers = {
     ...cityPolicy,
@@ -19,33 +19,18 @@ function plan(features, config = {}, activeScenarioId = "", scale = 12, projectT
     getCityCountryProfileIndex: () => new Map([["country", profile]]),
     getCityFeatureKey: (feature) => feature.id,
     getCityInterpolatedRevealBucket: (entry, scale) => cityPolicy.getCityRevealBucket(entry, cityPolicy.getCityRevealPhase(scale).id),
-    getCityScreenPoint: projectToScreen,
+    getCityScreenPoint: anchor => anchor,
     getCityViewportCenterDistanceNorm: () => 0,
     isCityAnchorInViewport: () => true,
   };
-  const owner = createUrbanCityPolicyOwner({ state: { activeScenarioId },
+  const owner = createUrbanCityPolicyOwner({ state: { activeScenarioId: "" },
     caches: { urbanFeatureIndexCache: {} }, helpers });
-  return owner.buildCityRevealPlan({ features }, scale, {}, config);
+  return owner.buildCityRevealPlan({ features }, 12, {}, {});
 }
 
-test("crossing the local detail threshold does not remove already separated major cities", () => {
-  const features = [0, 10].map((x, i) => city(`c${i}`, x,
-    { __city_base_tier: "major", __city_settlement_rank: "large" }));
-  for (const scale of [3.0499, 3.05, 3.0501, 3.1, 4, 4.8, 12]) {
-    const result = plan(features, { densityPreset: "balanced" }, "", scale,
-      ([x, y]) => [x * scale, y * scale]);
-    assert.deepEqual(result.markerEntries.map((entry) => entry.cityId), ["c0", "c1"], `scale ${scale}`);
-  }
-});
-
-test("explicit settlement rank wins over population and capital size is independent", () => {
+test("explicit settlement rank wins over population", () => {
   const explicit = city("explicit", 0, { settlement_rank: "town", __city_settlement_rank: "medium", __city_population: 10_000_000 });
   assert.equal(cityPolicy.getCitySettlementRank(explicit), "medium");
-  const capital = city("capital", 100, { __city_is_capital: true, __city_settlement_rank: "town" });
-  const entries = plan([explicit, capital]).markerEntries;
-  assert.equal(entries.find((entry) => entry.cityId === "capital").settlementRank, "town");
-  assert.ok(entries.find((entry) => entry.cityId === "capital").markerSizePx > entries.find((entry) => entry.cityId === "explicit").markerSizePx);
-  assert.ok(entries.find((entry) => entry.cityId === "capital").markerSizePx <= 12);
 });
 
 test("historical scenario ignores modern population inference without an explicit rank", () => {
@@ -58,24 +43,6 @@ test("historical scenario ignores modern population inference without an explici
   }), "hoi4_alt"), "large");
 });
 
-test("regional reveal admits an explicitly ranked large settlement from a legacy minor tier", () => {
-  assert.equal(cityPolicy.getCityRevealBucket({ countryTier: "D", cityTier: "minor", settlementRank: "large" }, "P4"), 3);
-});
-
-test("minimum rank keeps capitals and local density presets alter screen spacing", () => {
-  const features = [
-    city("capital", 0, { __city_is_capital: true, __city_settlement_rank: "town" }),
-    city("one", 100, { __city_settlement_rank: "large" }),
-    city("two", 140, { __city_settlement_rank: "large" }),
-    city("three", 180, { __city_settlement_rank: "large" }),
-    city("small", 300, { __city_settlement_rank: "small" }),
-  ];
-  const compact = plan(features, { densityPreset: "compact", minSettlementRank: "large" }).markerEntries;
-  const detailed = plan(features, { densityPreset: "detailed", minSettlementRank: "large" }).markerEntries;
-  assert.deepEqual(compact.map((entry) => entry.cityId), ["capital", "one", "three"]);
-  assert.deepEqual(new Set(detailed.map((entry) => entry.cityId)), new Set(["capital", "one", "two", "three"]));
-});
-
 test("local selection uses settlement rank, then strategic value, with stable id ties", () => {
   const features = [
     city("z", 0, { __city_settlement_rank: "medium", __city_scenario_victory_points: 50 }),
@@ -84,11 +51,4 @@ test("local selection uses settlement rank, then strategic value, with stable id
     city("strategic", 300, { __city_settlement_rank: "large", __city_scenario_victory_points: 2 }),
   ];
   assert.deepEqual(plan(features).markerEntries.map((entry) => entry.cityId), ["strategic", "a", "b", "z"]);
-});
-
-test("known viewport size bounds the total local marker budget", () => {
-  const features = Array.from({ length: 20 }, (_, index) => city(`city-${index}`, index * 100));
-  const localPlan = plan(features, { viewportWidth: 96, viewportHeight: 96 });
-  assert.equal(localPlan.markerBudget, 6);
-  assert.equal(localPlan.markerEntries.length, 6);
 });

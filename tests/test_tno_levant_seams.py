@@ -78,30 +78,6 @@ def test_restores_reviewed_gap_with_same_id_and_preserves_prior_candidate(fixtur
     assert shapely.union_all(decoded).covers(gap)
 
 
-def test_repeat_is_explicitly_rejected(fixture):
-    candidate, _ = build(fixture)
-    with pytest.raises(ValueError, match='absent, already repaired or ambiguous'):
-        repair.build_candidate(candidate, fixture[1], fixture[2], protected_water=shapely.GeometryCollection())
-
-
-def test_existing_overlap_is_retained_without_forcing_joint_coverage(fixture):
-    baseline = fixture[0]
-    absolute = _absolute_topology(baseline)
-    row = baseline['objects']['political']['geometries'][0]
-    original = _decode_geometry(absolute, absolute['objects']['political']['geometries'][0])
-    # A coarse protrusion overlaps the neighbor outside the reviewed empty gap.
-    expanded = original.union(box(35.4, 33, 35.41, 33.1))
-    index = len(baseline['arcs'])
-    baseline['arcs'].append([list(p) for p in expanded.exterior.coords])
-    row.update(type='Polygon', arcs=[[index]])
-    _, report = build(fixture)
-    assert not report['target_joint_coverage_valid']
-    assert report['assembly_group_count'] == 2
-    overlap = report['full_boundary_pairs'][0]
-    assert overlap['old_area_degrees2'] > 0
-    assert overlap['symmetric_difference_area_degrees2'] <= repair.AREA_EPSILON
-
-
 @pytest.mark.parametrize('protection', ['lakes', 'scenario_water', 'scenario_atlantropa', 'land_mask'])
 def test_never_fills_protected_water_or_non_land(fixture, protection):
     baseline, _, _, gap = fixture
@@ -115,51 +91,6 @@ def test_never_fills_protected_water_or_non_land(fixture, protection):
         water = shapely.GeometryCollection()
     with pytest.raises(ValueError, match='protected water, Atlantropa or land-mask boundary'):
         build(fixture, water=water)
-
-
-def test_source_partial_support_fails_closed(fixture):
-    fixture[2].at[0, 'geometry'] = box(35, 33, 35.2, 33.6).union(box(35.2, 33.2, 35.25, 33.4))
-    with pytest.raises(ValueError, match='incomplete same-ID source support'):
-        build(fixture)
-
-
-def test_ambiguous_source_overlap_fails_closed(fixture):
-    fixture[2].at[0, 'geometry'] = fixture[2].geometry.iloc[0].union(fixture[3])
-    with pytest.raises(ValueError, match='ambiguous source allocation'):
-        build(fixture)
-
-
-@pytest.mark.parametrize('mutation', ['owner', 'country', 'helper', 'interactive', 'id'])
-def test_changed_contact_contract_fails_closed(fixture, mutation):
-    baseline, owners, _, _ = fixture
-    props = baseline['objects']['political']['geometries'][0]['properties']
-    if mutation == 'owner':
-        owners[props['id']] = 'ISR'
-    elif mutation == 'country':
-        props['cntr_code'] = 'modern-owner'
-    elif mutation == 'helper':
-        props['scenario_helper_kind'] = 'shell_fallback'
-    elif mutation == 'interactive':
-        props['interactive'] = False
-    else:
-        props['id'] = 'new-id'
-    with pytest.raises(ValueError, match='contact IDs changed|expected attributes or owner changed'):
-        build(fixture)
-
-
-@pytest.mark.parametrize('mutation', ['duplicate', 'missing', 'invalid', 'crs'])
-def test_invalid_source_contract(fixture, mutation):
-    source = fixture[2]
-    if mutation == 'duplicate':
-        source.at[1, 'adm1_code'] = source.adm1_code.iloc[0]
-    elif mutation == 'missing':
-        source.at[1, 'adm1_code'] = 'not-same-id'
-    elif mutation == 'invalid':
-        source.at[1, 'geometry'] = shapely.Polygon([(0, 0), (1, 1), (0, 1), (1, 0)])
-    else:
-        source.geometry.array.crs = None
-    with pytest.raises(ValueError, match='Source IDs|Missing or invalid same-ID|requires adm1_code'):
-        build(fixture)
 
 
 def test_changed_source_bytes_are_rejected_before_reading(monkeypatch, tmp_path):

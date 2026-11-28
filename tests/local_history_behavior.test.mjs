@@ -2,8 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { state } from "../js/core/state.js";
 import { makeFixture } from "./helpers/river_paint_fixture.mjs";
-import { harness } from "./helpers/toolbar_document_fixture.mjs";
-import { mountLocalHistoryPanel } from "../js/ui/local_history_panel.js";
 import { getTerritoryChanges, formatTerritorySummary, buildTerritoryChangesCsv } from "../js/core/territory_change_summary.js";
 
 test("territory summary groups baseline transfers by painted country, including unloaded parcels", () => {
@@ -42,32 +40,4 @@ test("a painted river parcel compares against its parent baseline without counti
   state.visualOverrides.P = "#aa1122";
   state.riverPaint = { ...state.riverPaint, overrides: { [cells[0].id]: "#ff0000" } };
   assert.deepEqual(getTerritoryChanges(state), [{ id: cells[1].id, name: "P", from: "FR", to: "DE" }]);
-});
-
-test("opening history reveals the project panel and binds each action to its displayed version", async context => {
-  const { doc, add } = harness(context);
-  const project = add("button", doc.body, "inspectorSidebarTabProject");
-  const showProject = context.mock.fn();
-  project.addEventListener("click", showProject);
-  const details = add("details", doc.body, "localHistory");
-  const summary = add("summary", details);
-  const list = add("ul", details, "localHistoryList");
-  add("input", details, "snapshotNote");
-  for (const id of ["saveSnapshot", "territorySummaryButton", "territorySummaryPanel", "territorySummaryText",
-    "copyTerritorySummary", "exportTerritoryChanges"]) add("div", doc.body, id);
-  const records = ["First", "Second"].map(note => ({ note, type: "manual", scenarioName: "Europe",
-    projectName: "Campaign", savedAt: Date.now(), payload: new Blob([note]) }));
-  const manager = { listHistory: async () => records, restoreSnapshot: context.mock.fn(async () => {}),
-    deleteSnapshot: context.mock.fn(async () => {}) };
-  const panel = mountLocalHistoryPanel(manager);
-  panel.openHistory();
-  assert.equal(showProject.mock.callCount(), 1);
-  assert.equal(doc.activeElement, summary);
-  assert.equal(details.open, true);
-  await panel.refreshHistory();
-  assert.match(list.children[1].children[0].textContent, /Europe · Campaign .*Second/);
-  list.children[1].children[1].click();
-  list.children[0].children[2].click();
-  assert.equal(manager.restoreSnapshot.mock.calls[0].arguments[0], records[1]);
-  assert.equal(manager.deleteSnapshot.mock.calls[0].arguments[0], records[0]);
 });

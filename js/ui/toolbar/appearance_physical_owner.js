@@ -142,14 +142,7 @@ export function createAppearancePhysicalOwner({
       const row = input.closest?.("label");
       const swatch = row?.querySelector(".physical-class-swatch");
       if (swatch) swatch.style.backgroundColor = PHYSICAL_ATLAS_PALETTE[key];
-      const coverage = documentRef.getElementById(`${PHYSICAL_CLASS_TOGGLE_IDS[key]}Coverage`);
-      if (coverage) {
-        const parts = [];
-        if (count) parts.push(`${count.toLocaleString()} ${t("regions", "ui")}`);
-        if (nameCount) parts.push(`${nameCount.toLocaleString()} ${t("Labels", "ui")}`);
-        coverage.textContent = parts.length ? parts.join(" · ")
-          : t(coverageKnown ? "No coverage in current data" : "Coverage loading", "ui");
-      }
+      if (row) row.title = input.disabled ? t("No coverage in current data", "ui") : "";
     }
   };
 
@@ -340,68 +333,34 @@ export function createAppearancePhysicalOwner({
       });
       nodes.physicalHillshadeOpacity.dataset.loadBound = "true";
     }
-    bindPhysicalInput(nodes.physicalOpacity, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const opacity = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);
-      if (nodes.physicalOpacityValue) nodes.physicalOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
-      return { opacity };
-    }, "physical-opacity");
-    bindPhysicalInput(nodes.physicalAtlasIntensity, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const atlasIntensity = clamp(Number.isFinite(value) ? value / 100 : 0.9, 0.2, 1.4);
-      if (nodes.physicalAtlasIntensityValue) nodes.physicalAtlasIntensityValue.textContent = `${Math.round(atlasIntensity * 100)}%`;
-      return { atlasIntensity };
-    }, "physical-atlas-intensity");
-    bindPhysicalInput(nodes.physicalRainforestEmphasis, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const rainforestEmphasis = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0, 1);
-      if (nodes.physicalRainforestEmphasisValue) nodes.physicalRainforestEmphasisValue.textContent = `${Math.round(rainforestEmphasis * 100)}%`;
-      return { rainforestEmphasis };
-    }, "physical-rainforest-emphasis");
+    const percent = (value) => value / 100;
+    const identity = (value) => value;
+    const roundTo = (step) => (value) => Math.round(value / step) * step;
+    const percentLabel = (value) => Math.round(value * 100) + "%";
+    const integerLabel = (value) => String(Math.round(value));
+    const widthLabel = (value) => Number(value).toFixed(2);
+    for (const [id, key, convert, fallback, min, max, format, reason] of [
+      ["physicalOpacity", "opacity", percent, 0.5, 0, 1, percentLabel, "opacity"],
+      ["physicalAtlasIntensity", "atlasIntensity", percent, 0.9, 0.2, 1.4, percentLabel, "atlas-intensity"],
+      ["physicalRainforestEmphasis", "rainforestEmphasis", percent, 0.72, 0, 1, percentLabel, "rainforest-emphasis"],
+      ["physicalContourOpacity", "contourOpacity", percent, 0.34, 0, 1, percentLabel, "contour-opacity"],
+      ["physicalContourMajorWidth", "contourMajorWidth", identity, 0.8, 0.2, 3, widthLabel, "contour-major-width"],
+      ["physicalContourMinorWidth", "contourMinorWidth", identity, 0.45, 0.1, 2, widthLabel, "contour-minor-width"],
+      ["physicalContourMajorInterval", "contourMajorIntervalM", roundTo(500), 500, 500, 2000, integerLabel, "contour-major-interval"],
+      ["physicalContourMinorInterval", "contourMinorIntervalM", roundTo(100), 100, 100, 1000, integerLabel, "contour-minor-interval"],
+      ["physicalContourMajorLowReliefCutoff", "contourMajorLowReliefCutoffM", Math.round, 200, 0, 2000, integerLabel, "contour-major-low-relief-cutoff"],
+      ["physicalContourMinorLowReliefCutoff", "contourMinorLowReliefCutoffM", Math.round, 280, 0, 2000, integerLabel, "contour-minor-low-relief-cutoff"],
+    ]) {
+      bindPhysicalInput(nodes[id], (_cfg, event) => {
+        const raw = Number(event.target.value);
+        const value = clamp(Number.isFinite(raw) ? convert(raw) : fallback, min, max);
+        const output = nodes[id + "Value"];
+        if (output) output.textContent = format(value);
+        return { [key]: value };
+      }, "physical-" + reason);
+    }
     bindPhysicalInput(nodes.physicalContourColor, (_cfg, event) => ({ contourColor: normalizeOceanFillColor(event.target.value) }), "physical-contour-color");
-    bindPhysicalInput(nodes.physicalContourOpacity, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const contourOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.34, 0, 1);
-      if (nodes.physicalContourOpacityValue) nodes.physicalContourOpacityValue.textContent = `${Math.round(contourOpacity * 100)}%`;
-      return { contourOpacity };
-    }, "physical-contour-opacity");
     bindPhysicalChange(nodes.physicalMinorContours, (_cfg, event) => ({ contourMinorVisible: !!event.target.checked }), "physical-contour-minor-toggle");
-    bindPhysicalInput(nodes.physicalContourMajorWidth, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const contourMajorWidth = clamp(Number.isFinite(value) ? value : 0.8, 0.2, 3);
-      if (nodes.physicalContourMajorWidthValue) nodes.physicalContourMajorWidthValue.textContent = Number(contourMajorWidth).toFixed(2);
-      return { contourMajorWidth };
-    }, "physical-contour-major-width");
-    bindPhysicalInput(nodes.physicalContourMinorWidth, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const contourMinorWidth = clamp(Number.isFinite(value) ? value : 0.45, 0.1, 2);
-      if (nodes.physicalContourMinorWidthValue) nodes.physicalContourMinorWidthValue.textContent = Number(contourMinorWidth).toFixed(2);
-      return { contourMinorWidth };
-    }, "physical-contour-minor-width");
-    bindPhysicalInput(nodes.physicalContourMajorInterval, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const contourMajorIntervalM = clamp(Number.isFinite(value) ? Math.round(value / 500) * 500 : 500, 500, 2000);
-      if (nodes.physicalContourMajorIntervalValue) nodes.physicalContourMajorIntervalValue.textContent = `${Math.round(contourMajorIntervalM)}`;
-      return { contourMajorIntervalM };
-    }, "physical-contour-major-interval");
-    bindPhysicalInput(nodes.physicalContourMinorInterval, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const contourMinorIntervalM = clamp(Number.isFinite(value) ? Math.round(value / 100) * 100 : 100, 100, 1000);
-      if (nodes.physicalContourMinorIntervalValue) nodes.physicalContourMinorIntervalValue.textContent = `${Math.round(contourMinorIntervalM)}`;
-      return { contourMinorIntervalM };
-    }, "physical-contour-minor-interval");
-    bindPhysicalInput(nodes.physicalContourMajorLowReliefCutoff, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const contourMajorLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 200, 0, 2000);
-      if (nodes.physicalContourMajorLowReliefCutoffValue) nodes.physicalContourMajorLowReliefCutoffValue.textContent = `${Math.round(contourMajorLowReliefCutoffM)}`;
-      return { contourMajorLowReliefCutoffM };
-    }, "physical-contour-major-low-relief-cutoff");
-    bindPhysicalInput(nodes.physicalContourMinorLowReliefCutoff, (_cfg, event) => {
-      const value = Number(event.target.value);
-      const contourMinorLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 280, 0, 2000);
-      if (nodes.physicalContourMinorLowReliefCutoffValue) nodes.physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(contourMinorLowReliefCutoffM)}`;
-      return { contourMinorLowReliefCutoffM };
-    }, "physical-contour-minor-low-relief-cutoff");
     bindPhysicalChange(nodes.physicalBlendMode, (_cfg, event) => ({ blendMode: String(event.target.value || "source-over") }), "physical-blend");
 
     intensityFieldEditor.bindEvents();

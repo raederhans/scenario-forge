@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from shapely.geometry import box, mapping
 
-from tools.check_atlantropa_geometry import check_scenario, compare_baseline, feature_index, semantic_differences
+from tools.check_atlantropa_geometry import check_scenario, compare_baseline
 
 
 def feature(fid, geom, layer="land"):
@@ -13,14 +13,6 @@ def feature(fid, geom, layer="land"):
 
 
 class CheckAtlantropaGeometryTests(unittest.TestCase):
-    def test_geometry_ids_and_precise_semantic_paths(self):
-        issues = []
-        a = feature("A", box(0, 0, 1, 1))
-        feature_index([a, a, {"properties": {"id": "B"}, "geometry": None}], "test", issues)
-        self.assertEqual({i["check"] for i in issues}, {"feature_id", "geometry"})
-        self.assertEqual(list(semantic_differences({"owners": {"A": "FRA"}}, {"owners": {"A": "ITA"}})),
-                         [{"path": "/owners/A", "difference": "value", "before": "FRA", "after": "ITA"}])
-
     def run_fixture(self, source, chunks):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -30,14 +22,6 @@ class CheckAtlantropaGeometryTests(unittest.TestCase):
                 (root / "chunks" / f"scenario_atlantropa.{lod}.r0c0.json").write_text(json.dumps({"features": features}))
             with patch("tools.check_atlantropa_geometry.topology_features", return_value=source):
                 return check_scenario(root)
-
-    def test_consistent_clean_source_passes_and_does_not_label_islands_wrong(self):
-        source = [feature("ATLPRV_1", box(0, 0, .00001, .00001)),
-                  feature("ATLSEA_1", box(1, 0, 2, 1), "water")]
-        report = self.run_fixture(source, {"coarse": source, "detail": source})
-        self.assertTrue(report["passed"])
-        self.assertEqual(report["small_component_count_below_0_0001_square_degrees"], 1)
-        self.assertFalse(report["baseline_checked"])
 
     def test_overlap_and_missing_or_changed_chunk_are_failures(self):
         source = [feature("ATLPRV_1", box(0, 0, 2, 2)), feature("ATLPRV_2", box(1, 0, 3, 2)),

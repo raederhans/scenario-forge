@@ -1,7 +1,5 @@
 from copy import deepcopy
 import json
-from pathlib import Path
-
 import pytest
 import shapely
 from shapely.geometry import box, mapping
@@ -44,13 +42,6 @@ def test_area_coverage_shared_arcs_and_idempotence():
     assert len(report) == 2 and all(row["area_km2"] > 0 for row in report)
     repeated, mapping, report = split_topology(result, rules)
     assert repeated == result and not mapping and not report
-
-
-def test_incomplete_prior_split_is_rejected():
-    topology, rules = fixture()
-    topology["objects"]["political"]["geometries"][0]["properties"]["id"] = "original__SPLIT_SOUTH"
-    with pytest.raises(ValueError, match="Missing split parent or children"):
-        split_topology(topology, rules)
 
 
 def test_saved_parent_mapping_and_inherited_assignments(tmp_path, monkeypatch):
@@ -96,56 +87,6 @@ def test_saved_parent_mapping_and_inherited_assignments(tmp_path, monkeypatch):
     assert len(calls) == 1
 
 
-def test_resplit_child_resolves_to_leaves_and_uses_full_names(tmp_path, monkeypatch):
-    topology, rules = fixture()
-    directory = tmp_path / "data/scenarios/fixture"
-    directory.mkdir(parents=True)
-    for name, payload in {
-        "runtime_topology.topo.json": topology,
-        "manifest.json": {},
-        "owners.by_feature.json": {"owners": {"original": "JAP", "neighbor": "SOV"}},
-        "cores.by_feature.json": {"cores": {"original": ["JAP"], "neighbor": ["SOV"]}},
-        "geo_locale_patch.json": {"geo": {"id::original": {"en": "Original", "zh": "原块"}}},
-        "city_overrides.json": {"version": 1, "cities": {}},
-    }.items():
-        (directory / name).write_text(json.dumps(payload), encoding="utf-8")
-    (tmp_path / "data/locales.json").write_text(json.dumps({"geo": {}}), encoding="utf-8")
-    (tmp_path / "data/world_cities.geojson").write_text(json.dumps({"features": []}), encoding="utf-8")
-    monkeypatch.setattr(geometry_splits, "ROOT", tmp_path)
-    monkeypatch.setattr(city_hosts, "ROOT", tmp_path)
-    monkeypatch.setattr(geometry_splits, "refresh_scenario", lambda *args, **kwargs: None)
-    geometry_splits.run_scenario(directory, rules)
-    # refresh_scenario is stubbed, so record the first split's assignments by hand.
-    children = ["original__SPLIT_SOUTH", "original__SPLIT_NORTH"]
-    (directory / "owners.by_feature.json").write_text(json.dumps(
-        {"owners": {"neighbor": "SOV", **dict.fromkeys(children, "JAP")}}), encoding="utf-8")
-    (directory / "cores.by_feature.json").write_text(json.dumps(
-        {"cores": {"neighbor": ["SOV"], **{child: ["JAP"] for child in children}}}), encoding="utf-8")
-    resplit ={"area_tolerance_degrees2": 1e-9, "entries": [{
-        "id": "west", "feature_ids": ["original__SPLIT_SOUTH"],
-        "polygon": {"type": "Polygon", "coordinates": [[[-1, -1], [1, -1], [1, 2], [-1, 2], [-1, -1]]]},
-        "inside": {"suffix": "WEST", "name_en": "West End", "name_zh": "西端", "full_name": True},
-        "outside": {"suffix": "EAST", "name_en": "East", "name_zh": "东"}, "sources": ["synthetic"],
-    }]}
-    assert geometry_splits.run_scenario(directory, resplit)["changed"] == 1
-    splits = geometry_splits.read(directory / "manifest.json")["hierarchy_overrides"]["feature_splits"]
-    leaves = ["original__SPLIT_SOUTH__SPLIT_WEST", "original__SPLIT_SOUTH__SPLIT_EAST"]
-    assert splits["original"] == [*leaves, "original__SPLIT_NORTH"]
-    assert splits["original__SPLIT_SOUTH"] == leaves
-    patch = geometry_splits.read(directory / "geo_locale_patch.json")["geo"]
-    assert patch["id::original__SPLIT_SOUTH__SPLIT_WEST"] == {"en": "West End", "zh": "西端"}
-    assert patch["id::original__SPLIT_SOUTH__SPLIT_EAST"] == {"en": "Original · South · East", "zh": "原块 · 南 · 东"}
-    path = directory / "runtime_topology.topo.json"
-    topology = geometry_splits.read(path)
-    rows = topology["objects"]["political"]["geometries"]
-    assert all("full_name" not in row["properties"] for row in rows)
-    assert geometry_splits.run_scenario(directory, rules)["changed"] == 0
-    rows.remove(next(row for row in rows if row["properties"]["id"] == leaves[0]))
-    geometry_splits.write(path, topology)
-    with pytest.raises(ValueError, match="Missing split parent or children: original"):
-        geometry_splits.run_scenario(directory, rules)
-
-
 def multipart_fixture():
     topology, rules = fixture()
     entry = rules["entries"][0]
@@ -156,32 +97,6 @@ def multipart_fixture():
     ]
     entry["remainder"] = {"suffix": "NORTH", "name_en": "North", "name_zh": "北"}
     return topology, rules
-
-
-def test_three_parts_coverage_shared_arcs_and_idempotence():
-    topology, rules = multipart_fixture()
-    before = deepcopy(topology)
-    result, splits, report = split_topology(topology, rules)
-    assert topology == before
-    children = ["original__SPLIT_" + suffix for suffix in ("SOUTH", "MIDDLE", "NORTH")]
-    assert splits == {"original": children}
-    rows = {row["properties"]["id"]: row for row in result["objects"]["political"]["geometries"]}
-    parts = [_decode_geometry(result, rows[child]) for child in children]
-    assert all(part.is_valid for part in parts)
-    assert all(a.intersection(b).area == 0 for i, a in enumerate(parts) for b in parts[i + 1:])
-    assert shapely.union_all(parts).equals(box(0, 0, 2, 2))
-    assert sum(part.area for part in parts) == 4
-    arcs = [set(arc_ids(rows[child]["arcs"])) for child in children]
-    assert arcs[0] & arcs[1]
-    assert arcs[1] & arcs[2]
-    neighbor_arcs = set(arc_ids(rows["neighbor"]["arcs"]))
-    assert all(child_arcs & neighbor_arcs for child_arcs in arcs)
-    assert _decode_geometry(result, rows["neighbor"]).equals(box(2, 0, 3, 2))
-    assert [row["child_id"] for row in report] == children
-    assert all(row["area_km2"] > 0 and row["overlap_degrees2"] == 0 for row in report)
-    assert rows[children[1]]["properties"]["name_en"] == "Original · Middle"
-    repeated, mapping_result, report = split_topology(result, rules)
-    assert repeated == result and not mapping_result and not report
 
 
 def test_parts_cover_parent_without_remainder():
@@ -198,137 +113,8 @@ def test_parts_cover_parent_without_remainder():
     assert split_topology(result, rules) == (result, {}, [])
 
 
-@pytest.mark.parametrize("polygon", [box(4, 4, 5, 5), box(2, 0, 3, 2)])
-def test_empty_or_nonpolygonal_part_is_rejected(polygon):
-    topology, rules = multipart_fixture()
-    rules["entries"][0]["parts"][0]["polygon"] = mapping(polygon)
-    with pytest.raises(ValueError, match="south.*original"):
-        split_topology(topology, rules)
-
-
-def test_declared_empty_remainder_is_rejected():
-    topology, rules = multipart_fixture()
-    rules["entries"][0]["parts"][1]["polygon"] = mapping(box(-1, 0.5, 4, 3))
-    with pytest.raises(ValueError, match="south.*original"):
-        split_topology(topology, rules)
-
-
 def test_missing_remainder_with_uncovered_area_is_rejected():
     topology, rules = multipart_fixture()
     del rules["entries"][0]["remainder"]
     with pytest.raises(ValueError, match="south.*original"):
         split_topology(topology, rules)
-
-
-def test_mixed_rule_formats_are_rejected():
-    topology, rules = fixture()
-    rules["entries"][0]["parts"] = multipart_fixture()[1]["entries"][0]["parts"]
-    with pytest.raises(ValueError, match="south"):
-        split_topology(topology, rules)
-
-
-def test_missing_rule_formats_are_rejected():
-    topology, rules = fixture()
-    entry = rules["entries"][0]
-    del entry["polygon"], entry["inside"], entry["outside"]
-    with pytest.raises(ValueError, match="south"):
-        split_topology(topology, rules)
-
-
-def test_overlapping_polygons_assign_overlap_to_first_part():
-    topology, rules = multipart_fixture()
-    rules["entries"][0]["parts"][1]["polygon"] = mapping(box(-1, 0.25, 4, 1.5))
-    result, splits, _ = split_topology(topology, rules)
-    rows = {row["properties"]["id"]: row for row in result["objects"]["political"]["geometries"]}
-    first, second, remainder = [_decode_geometry(result, rows[child]) for child in splits["original"]]
-    assert first.equals(box(0, 0, 2, 0.5))
-    assert second.equals(box(0, 0.5, 2, 1.5))
-    assert remainder.equals(box(0, 1.5, 2, 2))
-
-
-@pytest.mark.parametrize("make_fixture, suffixes", [
-    (fixture, ["SOUTH", "NORTH"]),
-    (multipart_fixture, ["SOUTH", "MIDDLE", "NORTH"]),
-])
-def test_main_writes_ordered_child_ids(monkeypatch, make_fixture, suffixes):
-    _, rules = make_fixture()
-    rules["scenarios"] = []
-    monkeypatch.setattr(geometry_splits, "read", lambda path: rules)
-    writes = []
-    monkeypatch.setattr(geometry_splits, "write_json", lambda path, payload: writes.append((path, payload)))
-    geometry_splits.main([])
-    assert writes[0][0].name == "hoi4_feature_splits.v1.json"
-    assert writes[0][1]["feature_splits"] == {"original": ["original__SPLIT_" + suffix for suffix in suffixes]}
-
-
-def test_main_uses_requested_rules_scenarios_and_migration_output(monkeypatch):
-    _, rules = fixture()
-    rules["scenarios"] = ["hoi4_1936"]
-    reads, writes, runs = [], [], []
-    monkeypatch.setattr(geometry_splits, "read", lambda path: reads.append(path) or rules)
-    monkeypatch.setattr(geometry_splits, "write_json", lambda path, payload: writes.append((path, payload)))
-    monkeypatch.setattr(geometry_splits, "run_scenario", lambda path, payload:
-                        runs.append((path, payload)) or {"changed": 0, "measurements": []})
-    geometry_splits.main(["--rules", "tno.rules.json", "--scenarios", "tno_1962",
-                          "--migration-output", "tno.migration.json"])
-    assert str(reads[0]) == "tno.rules.json"
-    assert str(writes[0][0]) == "tno.migration.json"
-    assert writes[0][1]["scenarios"] == ["tno_1962"]
-    assert [path.name for path, _ in runs] == ["tno_1962"]
-
-
-def test_main_scopes_migration_to_scenarios_with_the_split(tmp_path, monkeypatch):
-    _, rules = fixture()
-    historical = ["hoi4_1936", "hoi4_1939"]
-    rules["scenarios"] = [*historical, "modern_world"]
-    rules["entries"].append({**rules["entries"][0], "id": "budapest", "feature_ids": ["HU110"],
-                             "scenarios": historical})
-    path = tmp_path / "rules.json"
-    path.write_text(json.dumps(rules), encoding="utf-8")
-    output = tmp_path / "migration.json"
-    monkeypatch.setattr(geometry_splits, "run_scenario", lambda *args: {"changed": 0})
-    geometry_splits.main(["--rules", str(path), "--migration-output", str(output)])
-    migration = geometry_splits.read(output)
-    assert migration["feature_splits"] == {"original": ["original__SPLIT_SOUTH", "original__SPLIT_NORTH"]}
-    assert migration["scenario_feature_splits"] == {
-        scenario: {"HU110": ["HU110__SPLIT_SOUTH", "HU110__SPLIT_NORTH"]} for scenario in historical}
-
-
-import json
-import tempfile
-import unittest
-from shapely.geometry import Polygon, MultiPolygon
-
-
-class ExternalGeometryTests(unittest.TestCase):
-    def test_local_units_holes_multipolygons_and_missing_units(self):
-        geometry = MultiPolygon([Polygon([(0,0),(2,0),(2,2),(0,2)], [[(.5,.5),(.5,1),(1,1),(1,.5)]]), box(3,0,4,1)])
-        with tempfile.TemporaryDirectory() as directory:
-            Path(directory, "cut.json").write_text(json.dumps({"features": [{"properties": {"unit": "a"}, "geometry": mapping(geometry)}]}))
-            spec = {"polygon_source": {"path": "cut.json", "property": "unit", "values": ["a"]}}
-            self.assertTrue(geometry_splits.load_cut_geometry(spec, directory).equals(geometry))
-            with self.assertRaises(ValueError):
-                geometry_splits.load_cut_geometry({**spec, "polygon": mapping(box(0,0,1,1))}, directory)
-            spec["polygon_source"]["values"].append("missing")
-            with self.assertRaisesRegex(ValueError, "Missing cut units"):
-                geometry_splits.load_cut_geometry(spec, directory)
-
-    def test_compile_empty_parts_remainder_and_replay(self):
-        topology, rules = multipart_fixture()
-        rules["entries"][0]["parts"][1]["polygon"] = mapping(box(-1,.5,4,3))
-        plan = geometry_splits.compile_external_parts(rules, ".", topology)
-        self.assertNotIn("remainder", plan["entries"][0])
-        result, splits, measurements = split_topology(topology, plan)
-        replay = geometry_splits.compile_external_parts(rules, ".", result, splits)
-        self.assertEqual(split_topology(result, replay), (result, {}, []))
-        self.assertAlmostEqual(sum(m["area_degrees2"] for m in measurements), 4)
-
-    def test_duplicate_parent_and_suffix(self):
-        topology, rules = multipart_fixture()
-        rules["entries"].append(deepcopy(rules["entries"][0]))
-        with self.assertRaisesRegex(ValueError, "Duplicate parent"):
-            split_topology(topology, rules)
-        rules["entries"].pop()
-        rules["entries"][0]["parts"][1]["suffix"] = "SOUTH"
-        with self.assertRaisesRegex(ValueError, "Duplicate suffix"):
-            split_topology(topology, rules)

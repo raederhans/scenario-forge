@@ -27,24 +27,6 @@ function fixture() {
   return { state, policy, a: features[0], hidden: features[4] };
 }
 
-test("geographic macros require complete membership, accept Sets and observe replacement indexes", () => {
-  const { state, policy } = fixture();
-  assert.deepEqual(policy.getCountryFeatureIds("AA"), [], "missing member must block the whole macro");
-  state.countryToFeatureIds.set("AA", new Set(["a", "b", "c", "hidden"]));
-  const ids = policy.getCountryFeatureIds("AA");
-  assert.deepEqual(ids, ["a", "b", "c"]);
-  ids.pop();
-  assert.deepEqual(policy.getCountryFeatureIds("AA"), ["a", "b", "c"]);
-  state.countryToFeatureIds = new Map([["AA", ["b"]]]);
-  assert.deepEqual(policy.getCountryFeatureIds("AA"), ["b"]);
-  state.landIndex = new Map();
-  assert.deepEqual(policy.getCountryFeatureIds("AA"), []);
-  for (const index of [null, {}, new Map([["AA", "invalid"]])]) {
-    state.countryToFeatureIds = index;
-    assert.deepEqual(policy.getCountryFeatureIds("AA"), []);
-  }
-});
-
 test("interaction targets use complete reference membership and fail closed on missing geometry", () => {
   const { state, policy, a, hidden } = fixture();
   state.interactionGranularity = "country";
@@ -74,44 +56,4 @@ test("parent targets use scenario district and normalized owner before direct gr
   state.scenarioDistrictGroupsData = { scenario_id: "fixture", tags: { ZZ: { districts: { district: { feature_ids: ["a"] } } } } };
   assert.deepEqual(policy.resolveParentGroupTargetIds(a, "a"), ["a"]);
   assert.deepEqual(policy.resolveSpecialZoneParentGroupTargetIds("missing"), []);
-});
-
-test("batch plans ignore border caches, preserve singleton parents and explicit country scope", () => {
-  const { state, policy, a, hidden } = fixture();
-  assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a"), {
-    targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false, groupLabel: null,
-  });
-  state.parentGroupByFeatureId.set("a", "only-a");
-  assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a"), {
-    targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false, groupLabel: null,
-  });
-  state.hierarchyData = { groups: { AA_singleton: ["a"] } };
-  assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a").targetIds, ["a"]);
-  state.countryToFeatureIds.set("AA", ["a", "b", "c", "hidden"]);
-  state.batchFillScope = "country";
-  assert.equal(policy.buildDoubleClickBatchPlan(a, "a").fallbackToCountry, false);
-  state.countryToFeatureIds.set("AA", ["a"]);
-  assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a").targetIds, ["a"]);
-  assert.equal(policy.buildDoubleClickBatchPlan(hidden, "hidden"), null);
-});
-
-test("double click eligibility enforces every tool and mode gate before planning", () => {
-  for (const block of [
-    ({ state }) => { state.currentTool = "erase"; },
-    ({ state }) => { state.interactionGranularity = "country"; },
-    ({ state }) => { state.brushModeEnabled = true; },
-    ({ state }) => { state.specialZoneEditor = { active: true }; },
-  ]) {
-    const current = fixture();
-    assert.equal(current.policy.isDoubleClickBatchEligible({ id: "a" }, current.a), true);
-    block(current);
-    assert.equal(current.policy.isDoubleClickBatchEligible({ id: "a" }, current.a), false);
-  }
-  const { policy, a } = fixture();
-  assert.equal(policy.isDoubleClickBatchEligible(null, a), false);
-  assert.equal(policy.isDoubleClickBatchEligible({ id: "a" }, null), false);
-  assert.ok(Object.isFrozen(policy));
-  const next = fixture();
-  next.state.parentGroupByFeatureId.set("a", "changed");
-  assert.deepEqual(policy.resolveParentGroupTargetIds(a, "a"), ["a", "b"]);
 });

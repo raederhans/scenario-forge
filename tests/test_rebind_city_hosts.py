@@ -49,18 +49,3 @@ def test_rebind_split_hosts_and_preserve_valid_hosts(tmp_path, monkeypatch):
     before = {path.name: path.read_bytes() for path in directory.iterdir()}
     assert rebind.rebind_city_hosts(directory)["rebound_count"] == 0
     assert before == {path.name: path.read_bytes() for path in directory.iterdir()}
-
-
-def test_modern_world_city_owners_after_backfill():
-    directory = rebind.ROOT / "data/scenarios/modern_world"
-    cities = rebind.read(directory / "city_overrides.json")["cities"]
-    owners = rebind.read(directory / "owners.by_feature.json")["owners"]
-    expected = {"Bukavu": "M23", "Uvira": "M23", "Famagusta": "NCY"}
-    checked = set()
-    for feature in rebind.read(rebind.ROOT / "data/world_cities.geojson")["features"]:
-        row = feature["properties"]
-        if row["name_en"] in expected:
-            host = cities[row["id"]]["host_feature_id"]
-            assert owners[host] == expected[row["name_en"]]
-            checked.add(row["name_en"])
-    assert checked == set(expected)

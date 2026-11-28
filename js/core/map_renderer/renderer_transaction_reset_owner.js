@@ -1,3 +1,4 @@
+import { normalizeReason } from "../value_normalization.js";
 import { requireFunction } from "../renderer/require_named_function.js";
 const DEFAULT_REASON = "renderer-transaction-reset";
 const REFRESH_RESET_REASON = "renderer-refresh-reset";
@@ -28,11 +29,6 @@ const REQUIRED_EFFECT_NAMES = Object.freeze([
   "setHitCanvasDirty",
   "resetHitCanvasTopologyRevision",
 ]);
-
-function normalizeReason(reason, defaultReason) {
-  const normalized = String(reason || "").trim();
-  return normalized || defaultReason;
-}
 
 function createTrace() {
   return {

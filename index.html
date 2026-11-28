@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="css/editor-workspace.css" />
     <link rel="stylesheet" href="css/editor-shell.css" />
     <link rel="stylesheet" href="css/editor-tool-guidance.css" />
+    <link rel="stylesheet" href="css/dev-workspace.css" />
     <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
     <link rel="modulepreload" href="js/main.js" />
   </head>
@@ -71,7 +72,6 @@
             <summary id="lblScenario" class="section-header" data-i18n="Scenario">Scenario</summary>
             <div class="sidebar-details-body">
               <div id="scenarioStatus" class="body-text visually-hidden">No scenario active</div>
-              <div id="scenarioAuditHint" class="body-text visually-hidden hidden">Coverage report unavailable</div>
               <label id="lblScenarioSelect" class="visually-hidden" for="scenarioSelect" data-i18n="Scenario">Scenario</label>
               <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" hidden aria-hidden="true" tabindex="-1">
                 <option id="optScenarioNone" value="" data-i18n="None">None</option>
@@ -98,10 +98,6 @@
                 <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled data-i18n="Reset Changes To Baseline">Reset</button>
                 <button id="clearScenarioBtn" type="button" class="btn-secondary hidden" disabled data-i18n="Exit Scenario">Exit Scenario</button>
               </div>
-              <label id="blankFeatureLabelsToggleRow" class="toggle-label mt-3 hidden">
-                <input id="toggleBlankFeatureLabels" type="checkbox" class="checkbox-input" />
-                <span id="lblBlankFeatureLabels" data-i18n="Parcel Names">Parcel Names</span>
-              </label>
               <a id="hgoEditorLink" class="editor-scenario-link" href="apps/hgo/index.html"><span data-i18n="Open HGO editor">Open HGO editor</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-external-link"><path d="M14 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 13v6H5V7h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
             </div>
           </details>
@@ -200,22 +196,17 @@
                 aria-labelledby="appearanceTabBorders"
               >
                 <h2 id="lblBordersPanel" class="section-header" data-i18n="Borders">Borders</h2>
-                <div class="mt-3">
-                  <label class="toggle-label">
-                    <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
-                    <span data-i18n="Show country names">Show country names</span>
-                  </label>
-                </div>
-                <div class="border-control-body mt-3">
-                  <label class="range-label" for="countryLabelSizeScale" data-i18n="Country name size">Country name size</label>
-                  <input id="countryLabelSizeScale" type="range" min="0.6" max="1.6" step="0.05" value="1" class="range-input" />
-                  <label class="toggle-label">
-                    <input id="countryLabelUppercase" type="checkbox" class="checkbox-input" checked />
-                    <span data-i18n="Uppercase English country names">Uppercase English country names</span>
-                  </label>
-                  <label class="range-label" for="countryLabelOpacity" data-i18n="Country name opacity">Country name opacity</label>
-                  <input id="countryLabelOpacity" type="range" min="0.3" max="1" step="0.05" value="1" class="range-input" />
-                </div>
+                <section id="politicalDisplayModePanel" class="appearance-control-card" aria-labelledby="politicalDisplayModeTitle">
+                  <h3 id="politicalDisplayModeTitle" data-i18n="Map mode">Map mode</h3>
+                  <select id="politicalDisplayMode" class="select-input" aria-labelledby="politicalDisplayModeTitle" aria-describedby="politicalDisplayModeStatus">
+                    <option value="country" data-i18n="Countries">Countries</option>
+                    <option value="alliance" data-i18n="Alliances">Alliances</option>
+                    <option value="government" data-i18n="Government type">Government type</option>
+                  </select>
+                  <p id="politicalDisplayModeStatus" class="sidebar-tool-hint" role="status" aria-live="polite"></p>
+                  <div id="politicalDisplayModeLegend" class="thematic-wgi-legend" hidden></div>
+                  <p data-page-note class="sidebar-tool-hint" data-i18n="Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.">Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.</p>
+                </section>
                 <div class="border-control-row mt-3">
                   <label class="range-label" for="displayQuality" data-i18n="Display quality">Display quality</label>
                   <select id="displayQuality" class="select-input">
@@ -344,8 +335,29 @@
                         </div>
                         <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
                       </details>
-                      <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button" data-i18n="Recalculate Borders">Recalculate Borders</button>
-                      <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
+                    </div>
+                  </details>
+                  <label class="toggle-label">
+                    <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
+                    <span data-i18n="Show country names">Show country names</span>
+                  </label>
+                  <details class="appearance-mini-section">
+                    <summary class="section-header" data-i18n="Country names">Country names</summary>
+                    <div class="mt-3">
+                      <label id="blankFeatureLabelsToggleRow" class="toggle-label mt-3 hidden">
+                        <input id="toggleBlankFeatureLabels" type="checkbox" class="checkbox-input" />
+                        <span id="lblBlankFeatureLabels" data-i18n="Parcel Names">Parcel Names</span>
+                      </label>
+                    </div>
+                    <div class="border-control-body mt-3">
+                      <label class="range-label" for="countryLabelSizeScale" data-i18n="Country name size">Country name size</label>
+                      <input id="countryLabelSizeScale" type="range" min="0.6" max="1.6" step="0.05" value="1" class="range-input" />
+                      <label class="toggle-label">
+                        <input id="countryLabelUppercase" type="checkbox" class="checkbox-input" checked />
+                        <span data-i18n="Uppercase English country names">Uppercase English country names</span>
+                      </label>
+                      <label class="range-label" for="countryLabelOpacity" data-i18n="Country name opacity">Country name opacity</label>
+                      <input id="countryLabelOpacity" type="range" min="0.3" max="1" step="0.05" value="1" class="range-input" />
                     </div>
                   </details>
                 </div>
@@ -395,7 +407,6 @@
                   <details id="physicalAtlasSection" class="physical-disclosure" >
                   <summary id="lblTerrainAtlasPanel" data-i18n="Terrain Atlas">Terrain Atlas</summary>
                   <div class="physical-section-body">
-                  <p data-page-note class="physical-hint" data-i18n="Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.">Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.</p>
                   <div>
                   <div class="range-row">
                   <label class="range-label" for="physicalLandformIntensity" data-i18n="Landform strength">Landform strength</label>
@@ -430,51 +441,51 @@
 <fieldset id="physicalLandformClasses" class="physical-class-group"><legend data-i18n="Landforms">Landforms</legend>
                   <label class="toggle-label">
                   <input id="physicalClassMountain" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassMountain" data-i18n="High Relief Mountains">High Relief Mountains</span><span id="physicalClassMountainCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassMountain" data-i18n="High Relief Mountains">High Relief Mountains</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassMountainHills" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassMountainHills" data-i18n="Mountain Hills">Mountain Hills</span><span id="physicalClassMountainHillsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassMountainHills" data-i18n="Mountain Hills">Mountain Hills</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassPlateau" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassPlateau" data-i18n="Upland Plateaus">Upland Plateaus</span><span id="physicalClassPlateauCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassPlateau" data-i18n="Upland Plateaus">Upland Plateaus</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassBadlands" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassBadlands" data-i18n="Badlands & Canyon">Badlands &amp; Canyon</span><span id="physicalClassBadlandsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassBadlands" data-i18n="Badlands & Canyon">Badlands &amp; Canyon</span>
                   </label>
                   <label class="toggle-label physical-atlas-group-start">
                   <input id="physicalClassPlains" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassPlains" data-i18n="Plains Lowlands">Plains Lowlands</span><span id="physicalClassPlainsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassPlains" data-i18n="Plains Lowlands">Plains Lowlands</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassBasin" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassBasin" data-i18n="Basins & Valleys">Basins &amp; Valleys</span><span id="physicalClassBasinCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassBasin" data-i18n="Basins & Valleys">Basins &amp; Valleys</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassWetlands" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassWetlands" data-i18n="Wetlands & Delta">Wetlands &amp; Delta</span><span id="physicalClassWetlandsCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassWetlands" data-i18n="Wetlands & Delta">Wetlands &amp; Delta</span>
                   </label>
                   </fieldset><fieldset id="physicalCoverClasses" class="physical-class-group"><legend data-i18n="Land cover">Land cover</legend><label class="toggle-label physical-atlas-group-start">
                   <input id="physicalClassForestTemperate" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassForestTemperate" data-i18n="Other forests">Other forests</span><span id="physicalClassForestTemperateCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassForestTemperate" data-i18n="Other forests">Other forests</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassRainforestTropical" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassRainforestTropical" data-i18n="Tropical Rainforest">Tropical Rainforest</span><span id="physicalClassRainforestTropicalCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassRainforestTropical" data-i18n="Tropical Rainforest">Tropical Rainforest</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassGrassland" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassGrassland" data-i18n="Grassland & Steppe">Grassland &amp; Steppe</span><span id="physicalClassGrasslandCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassGrassland" data-i18n="Grassland & Steppe">Grassland &amp; Steppe</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassDesert" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassDesert" data-i18n="Desert & Bare">Desert &amp; Bare</span><span id="physicalClassDesertCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassDesert" data-i18n="Desert & Bare">Desert &amp; Bare</span>
                   </label>
                   <label class="toggle-label">
                   <input id="physicalClassTundra" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
-                  <span id="lblPhysicalClassTundra" data-i18n="Tundra & Ice">Tundra &amp; Ice</span><span id="physicalClassTundraCoverage" class="physical-class-coverage"></span>
+                  <span id="lblPhysicalClassTundra" data-i18n="Tundra & Ice">Tundra &amp; Ice</span>
                   </label></fieldset>
                   </div>
                   </div>
@@ -501,6 +512,50 @@
                   <span id="lblPhysicalMinorContours" data-i18n="Show Minor Contours">Show Minor Contours</span>
                   </label>
 
+                  <details id="physicalContourAdvanced" class="physical-disclosure">
+                  <summary id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</summary>
+                  <div class="physical-section-body">
+                  <div class="flex items-center justify-between gap-3">
+                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor" data-i18n="Contour Color">Contour Color</label>
+                  <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth" data-i18n="Major Width">Major Width</label>
+                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
+                  </div>
+                  <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth" data-i18n="Minor Width">Minor Width</label>
+                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
+                  </div>
+                  <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval" data-i18n="Minor Interval (m)">Minor Interval (m)</label>
+                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
+                  </div>
+                  <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Minimum Elevation (m)">Major Minimum Elevation (m)</label>
+                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
+                  </div>
+                  <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="200" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Minimum Elevation (m)">Minor Minimum Elevation (m)</label>
+                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
+                  </div>
+                  <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="280" class="range-input" />
+                  </div>
+                  </div>
+                  </details>
                   </div>
                   </details>
                   <details id="physicalLocalSection" class="physical-disclosure" >
@@ -576,50 +631,6 @@
                   </select>
                   </div>
                   </div>
-                  <section id="physicalContourAdvanced" class="appearance-prop-group" >
-                  <h3 class="appearance-prop-heading" id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</h3>
-                  <div class="physical-section-body">
-                  <div class="flex items-center justify-between gap-3">
-                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor" data-i18n="Contour Color">Contour Color</label>
-                  <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth" data-i18n="Major Width">Major Width</label>
-                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
-                  </div>
-                  <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth" data-i18n="Minor Width">Minor Width</label>
-                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
-                  </div>
-                  <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval" data-i18n="Minor Interval (m)">Minor Interval (m)</label>
-                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
-                  </div>
-                  <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Minimum Elevation (m)">Major Minimum Elevation (m)</label>
-                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
-                  </div>
-                  <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="200" class="range-input" />
-                  </div>
-                  <div>
-                  <div class="range-row">
-                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Minimum Elevation (m)">Minor Minimum Elevation (m)</label>
-                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
-                  </div>
-                  <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="280" class="range-input" />
-                  </div>
-                  </div>
-                  </section>
                   </details>
                   </div>
                   </details>
@@ -774,7 +785,6 @@
                             <input id="toggleCityPoints" type="checkbox" class="checkbox-input" checked />
                             <span id="lblCityPointsLayer" data-i18n="City Points">City Points</span>
                           </label>
-                          <p data-page-note id="cityPointsHelpTooltip" class="city-points-advanced-hint" data-i18n="Pick a city marker style, then tune marker density and label density for the current map scale.">Pick a city marker style, then tune marker density and label density for the current map scale.</p>
                         </div>
                         <div class="city-points-panel-stack">
                           <section class="appearance-control-card city-hierarchy-card" aria-labelledby="cityHierarchyTitle">
@@ -807,7 +817,6 @@
                                 <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
                                 <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
                               </div>
-                              <p data-page-note id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
                             </details>
                           </section>
 
@@ -900,15 +909,10 @@
                     <div class="mt-3 rivers-panel">
                       <div class="rivers-panel-body ml-5">
                         <div class="rivers-panel-stack">
-                          <section class="appearance-control-card rivers-visibility-card" aria-labelledby="lblRiversVisibilityGroup">
-                            <h3 id="lblRiversVisibilityGroup" class="appearance-control-card-title" data-i18n="Visibility">Visibility</h3>
-                            <div class="appearance-control-card-stack">
-                              <label class="toggle-label rivers-toggle-card">
-                                <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
-                                <span id="lblRiversLayer" data-i18n="Rivers">Rivers</span>
-                              </label>
-                            </div>
-                          </section>
+                          <label class="toggle-label rivers-toggle-card">
+                            <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblRiversLayer" data-i18n="Show">Show</span>
+                          </label>
 
                           <section class="appearance-control-card rivers-stroke-card" aria-labelledby="lblRiversStrokeGroup">
                             <h3 id="lblRiversStrokeGroup" class="appearance-control-card-title" data-i18n="River Stroke">River Stroke</h3>
@@ -1060,6 +1064,21 @@
                     <div class="space-y-2 mt-3">
                       <div>
                         <div class="range-row">
+                          <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity" data-i18n="Shadow Opacity">Shadow Opacity</label>
+                          <span id="dayNightShadowOpacityValue" class="range-value">38%</span>
+                        </div>
+                        <input id="dayNightShadowOpacity" type="range" min="0" max="85" value="38" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblDayNightTwilightWidth" class="range-label" for="dayNightTwilightWidth" data-i18n="Twilight Width">Twilight Width</label>
+                          <span id="dayNightTwilightWidthValue" class="range-value">10°</span>
+                        </div>
+                        <input id="dayNightTwilightWidth" type="range" min="2" max="28" value="10" class="range-input" />
+                      </div>
+                      <div class="section-header-block mt-3" data-i18n="Modern only">Modern only</div>
+                      <div>
+                        <div class="range-row">
                           <label
                             id="lblDayNightTextureOpacity"
                             class="range-label"
@@ -1184,20 +1203,6 @@
                           value="46"
                           class="range-input"
                         />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity" data-i18n="Shadow Opacity">Shadow Opacity</label>
-                          <span id="dayNightShadowOpacityValue" class="range-value">38%</span>
-                        </div>
-                        <input id="dayNightShadowOpacity" type="range" min="0" max="85" value="38" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblDayNightTwilightWidth" class="range-label" for="dayNightTwilightWidth" data-i18n="Twilight Width">Twilight Width</label>
-                          <span id="dayNightTwilightWidthValue" class="range-value">10°</span>
-                        </div>
-                        <input id="dayNightTwilightWidth" type="range" min="2" max="28" value="10" class="range-input" />
                       </div>
                     </div>
                   </details>
@@ -1557,14 +1562,6 @@
                               <input id="airportScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblAirportScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="airportScopeResolved" class="transport-readout-value">Major Civil</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="airportThresholdResolved" class="transport-readout-value">Secondary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblAirportScope" class="range-label" for="airportScope" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="airportScope" class="select-input">
@@ -1679,14 +1676,6 @@
                               <input id="portScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblPortScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="portScopeResolved" class="transport-readout-value">Regional</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="portThresholdResolved" class="transport-readout-value">Secondary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblPortTier" class="range-label" for="portTier" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="portTier" class="select-input">
@@ -1783,14 +1772,6 @@
                               <input id="railScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblRailScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="railScopeResolved" class="transport-readout-value">Mainline Only</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="railThresholdResolved" class="transport-readout-value">Primary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblRailScope" class="range-label" for="railScope" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="railScope" class="select-input">
@@ -1882,14 +1863,6 @@
                               <input id="roadScopeLinked" type="checkbox" class="checkbox-input" checked />
                               <span id="lblRoadScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
                             </label>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                              <span id="roadScopeResolved" class="transport-readout-value">Motorway Only</span>
-                            </div>
-                            <div class="transport-readout-row">
-                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                              <span id="roadThresholdResolved" class="transport-readout-value">Primary</span>
-                            </div>
                             <div class="flex items-center justify-between gap-3">
                               <label id="lblRoadScope" class="range-label" for="roadScope" data-i18n="Manual Scope">Manual Scope</label>
                               <select id="roadScope" class="select-input">
@@ -1913,7 +1886,6 @@
 
                   <section id="transportProjectSection" class="appearance-prop-group transport-workbench-reminder-card">
                     <div class="space-y-2">
-                      <h3 id="lblTransportWorkbenchReminder" class="appearance-prop-heading" data-i18n="Transport Workbench">Transport Workbench</h3>
                       <button
                         id="scenarioTransportWorkbenchBtn"
                         type="button"
@@ -1921,10 +1893,10 @@
                         aria-haspopup="dialog"
                         aria-controls="transportWorkbenchOverlay"
                         aria-expanded="false"
-                        data-transport-entry-label="Open workbench"
-                        data-i18n="Open workbench"
+                        data-transport-entry-label="Open transport workbench"
+                        data-i18n="Open transport workbench"
                       >
-                        Open workbench
+                        Open transport workbench
                       </button>
                     </div>
                   </section>
@@ -1957,8 +1929,6 @@
                         <label id="lblAppearancePresetSelect" class="range-label" for="appearancePresetSelect" data-i18n="Preset">Preset</label>
                         <select id="appearancePresetSelect" class="select-input mt-2"></select>
                       </div>
-                      <p id="appearancePresetSummary" class="panel-hint" data-i18n="0 presets">0 presets</p>
-                      <p id="appearancePresetList" class="appearance-preset-list" data-preset-count="0" data-i18n="No appearance presets saved">No appearance presets saved</p>
                       <div class="preset-library-actions">
                         <button id="appearancePresetApplyBtn" type="button" class="btn-primary" disabled data-i18n="Apply">Apply</button>
                         <button id="appearancePresetDeleteBtn" type="button" class="btn-secondary preset-delete-action" disabled data-i18n="Delete">Delete</button>
@@ -2084,17 +2054,6 @@
                     <button id="populationExportStats" type="button" class="btn-secondary" data-i18n="Export parcel statistics (CSV)">Export parcel statistics (CSV)</button>
                   </details>
                 </section>
-                <section id="politicalDisplayModePanel" class="appearance-control-card" aria-labelledby="politicalDisplayModeTitle">
-                  <h3 id="politicalDisplayModeTitle" data-i18n="Map mode">Map mode</h3>
-                  <select id="politicalDisplayMode" class="select-input" aria-labelledby="politicalDisplayModeTitle" aria-describedby="politicalDisplayModeStatus">
-                    <option value="country" data-i18n="Countries">Countries</option>
-                    <option value="alliance" data-i18n="Alliances">Alliances</option>
-                    <option value="government" data-i18n="Government type">Government type</option>
-                  </select>
-                  <p id="politicalDisplayModeStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
-                  <div id="politicalDisplayModeLegend" class="thematic-wgi-legend" hidden></div>
-                  <p class="sidebar-tool-hint" data-i18n="Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.">Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.</p>
-                </section>
                 <section id="thematicWgiPanel" class="appearance-control-card" aria-labelledby="thematicWgiTitle">
                   <h3 id="thematicWgiTitle" data-i18n="Country indicators">Country indicators</h3>
                   <label for="thematicWgiMetric" class="range-label" data-i18n="Indicator">Indicator</label>
@@ -2107,11 +2066,8 @@
                   <button id="thematicWgiRetry" type="button" class="btn-secondary" hidden data-i18n="Retry">Retry</button>
                   <div id="thematicWgiLegend" class="thematic-wgi-legend" hidden></div>
                   <p id="thematicWgiCoverage" class="city-points-advanced-hint"></p>
-                  <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Notes">Notes</summary>
-                    <p id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
-                    <p class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
-                  </details>
+                  <p data-page-note id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
+                  <p data-page-note class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
                 </section>
                 <section id="strategicValuesPanel" class="appearance-control-card strategic-values-panel" aria-labelledby="strategicValuesTitle">
                   <div class="strategic-values-heading"><h3 id="strategicValuesTitle" data-i18n="Scenario strategic data">Scenario strategic data</h3><button id="strategicValuesLoad" type="button" class="btn-secondary" data-i18n="Load data">Load data</button></div>
@@ -2145,7 +2101,6 @@
                         <label for="strategicValuesInspect" class="range-label" data-i18n="Source region">Source region</label>
                         <select id="strategicValuesInspect" class="select-input" data-app-select-skip="true"></select>
                         <output id="strategicValuesInspectValue" class="strategic-values-inspection" aria-live="polite"></output>
-                        <p id="strategicValuesCoverage" class="city-points-advanced-hint"></p>
                       </div>
                     </details>
                   </div>
@@ -2238,10 +2193,6 @@
               <span class="scenario-context-separator" aria-hidden="true">›</span>
               <span id="scenarioContextSelectionText" class="u-truncate" data-i18n="No selection">No selection</span>
             </div>
-            <div id="scenarioContextModeItem" class="scenario-context-item">
-              <span class="scenario-context-label" data-i18n="Mode">Mode</span>
-              <span id="scenarioContextModeText" class="u-truncate">Mode: Visual Color</span>
-            </div>
             <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-up"><path d="m6 15 6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <button id="scenarioGuideBtn" type="button" class="scenario-context-action-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide" data-i18n="Guide">Guide</button>
           </div>
@@ -2324,7 +2275,6 @@
                     </svg>
                   </button>
                 </div>
-                <label><input type="checkbox" id="onlyUnpainted"> <span data-i18n="Paint only unpainted regions">Paint only unpainted regions</span></label>
               </div>
 
               <div class="dock-group dock-group-mode" role="group" aria-label="Mode" data-i18n-aria-label="Mode" title="Mode" data-i18n-title="Mode">
@@ -2340,7 +2290,7 @@
                   <button id="riverPaintToggleBtn" type="button" class="dock-segment-btn" aria-pressed="false" aria-describedby="riverPaintStatus">River cells</button>
                   <span id="riverPaintStatus" class="visually-hidden" role="status" aria-live="polite"></span>
                   <div id="riverPaintNavigation" role="group" aria-label="River locations" hidden>
-                    <input id="riverPaintSearchInput" type="search" autocomplete="off" spellcheck="false" aria-label="Search location name or ID" aria-controls="riverPaintLocationSelect" aria-describedby="riverPaintLocationResults" hidden disabled>
+                    <input id="riverPaintSearchInput" type="search" autocomplete="off" spellcheck="false" aria-label="Search locations" aria-controls="riverPaintLocationSelect" aria-describedby="riverPaintLocationResults" hidden disabled>
                     <select id="riverPaintRiverSelect" class="dock-select" aria-label="Filter by river" aria-controls="riverPaintLocationSelect" hidden disabled></select>
                     <div class="river-paint-location-row">
                       <select id="riverPaintLocationSelect" class="dock-select" aria-label="Go to river location" aria-describedby="riverPaintLocationResults" hidden disabled></select>
@@ -2430,6 +2380,9 @@
                   </div>
                 </div>
               </div>
+              <div class="dock-group dock-group-options">
+                <label class="dock-option-toggle"><input type="checkbox" id="onlyUnpainted"> <span data-i18n="Paint only unpainted regions">Paint only unpainted regions</span></label>
+              </div>
             </div>
             <button id="dockCollapseBtn" type="button" class="dock-handle-btn" aria-label="Collapse quick dock" data-i18n-aria-label="Collapse quick dock" title="Collapse" data-i18n-title="Collapse">
               <span id="dockHandleChevron" class="dock-handle-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-down"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
@@ -2518,29 +2471,21 @@
                           <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled data-i18n="Bathymetry Contours">Bathymetry Contours</option>
                         </select>
                       </div>
-                      <p data-page-note class="sidebar-tool-hint" data-i18n="Global oceans">Global oceans</p>
-                      <p class="sidebar-tool-hint" data-i18n="Scenario depth is schematic">Scenario depth is schematic</p>
-                      <details data-level="2" class="appearance-mini-section appearance-mini-section-subtle">
-                        <summary class="section-header" data-i18n="Depth legend and sources">Depth legend and sources</summary>
-                        <div class="sidebar-tool-hint mt-2">
-                          <p data-page-note data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
-                          <p data-page-note data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
-                          <p><span data-i18n="Regional depth bins">Regional depth bins</span>:
-                            <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
-                            <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
-                            <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
-                            <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
-                          </p>
-                          <p data-page-note data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
-                        </div>
-                      </details>
+                      <p data-page-note data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
+                      <p data-page-note data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
+                      <p data-page-note><span data-i18n="Regional depth bins">Regional depth bins</span>:
+                        <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
+                        <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
+                        <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
+                        <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
+                      </p>
+                      <p data-page-note data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
                     </div>
                   </section>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Bathymetry details">Bathymetry details</summary>
+                    <summary id="lblOceanTextureCard" class="section-header" data-i18n="Bathymetry details">Bathymetry details</summary>
                     <section class="appearance-control-card" aria-labelledby="lblOceanTextureCard">
-                      <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Bathymetry tuning">Bathymetry tuning</h3>
                       <div class="appearance-control-card-stack">
                         <div>
                           <div class="range-row">
@@ -2568,9 +2513,8 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Local adjustment: depth field">Local adjustment: depth field</summary>
+                    <summary id="lblOceanDepthFieldCard" class="section-header" data-i18n="Local adjustment: depth field">Local adjustment: depth field</summary>
                     <section class="appearance-control-card" aria-labelledby="lblOceanDepthFieldCard">
-                      <h3 id="lblOceanDepthFieldCard" class="appearance-control-card-title" data-i18n="Depth Field">Depth Field</h3>
                       <div class="appearance-control-card-stack">
                         <label class="toggle-label">
                           <input id="oceanDepthFieldEnabled" type="checkbox" class="checkbox-input" />
@@ -2682,65 +2626,74 @@
                       <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
                       <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                     </svg>
-                    <input id="countrySearch" type="text" name="country-search" autocomplete="off" spellcheck="false" placeholder="Search country or code..." class="input inspector-search-input" />
+                    <input id="countrySearch" type="text" name="country-search" autocomplete="off" spellcheck="false" placeholder="Search countries, codes or regions…" class="input inspector-search-input" />
                   </div>
                 </div>
               </div>
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
               <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
-                <div id="countryInspectorSelected" class="hidden">
-                  <label class="field-label">
-                    <span data-i18n="Country display name">Country display name</span>
-                    <input id="countryNameOverride" class="input" type="text" autocomplete="off" />
-                  </label>
-                  <div><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span>
+                <div id="countryInspectorSelected" class="inspector-country-form hidden">
+                  <div class="inspector-form-group">
+                    <label class="inspector-form-field">
+                      <span class="inspector-form-label" data-i18n="Country display name">Country display name</span>
+                      <input id="countryNameOverride" class="input" type="text" autocomplete="off" />
+                    </label>
+                    <p class="inspector-form-hint"><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span></p>
                     <button id="convertCountryLabel" type="button" class="sidebar-action-secondary" data-i18n="Convert to editable text" hidden>Convert to editable text</button>
+                    <div id="countryTerritoryStats" class="country-select-meta"></div>
                   </div>
-                  <div id="countryTerritoryStats" class="country-select-meta"></div>
-                  <div id="countryPoliticalFields" class="mt-2" hidden>
-                    <label class="field-label"><span data-i18n="Alliance">Alliance</span><select id="countryAlliance"></select></label>
+                  <div id="countryPoliticalFields" class="inspector-form-group" hidden>
+                    <label class="inspector-form-field"><span class="inspector-form-label" data-i18n="Alliance">Alliance</span><select id="countryAlliance" class="select-input"></select></label>
                     <button id="deleteCountryAlliance" type="button" class="sidebar-action-secondary" data-i18n="Delete" hidden>Delete</button>
-                    <div id="newAllianceFields" hidden>
-                      <label class="field-label"><span data-i18n="Alliance name">Alliance name</span><input id="newAllianceName" class="input" maxlength="120" /></label>
-                      <label class="field-label"><span data-i18n="Alliance color">Alliance color</span><input id="newAllianceColor" type="color" value="#008080" /></label>
-                      <span id="allianceColorConflict" class="country-select-meta" role="status" data-i18n="This color is already used." hidden>This color is already used.</span>
+                    <div id="newAllianceFields" class="inspector-form-subgroup" hidden>
+                      <label class="inspector-form-field"><span class="inspector-form-label" data-i18n="Alliance name">Alliance name</span><input id="newAllianceName" class="input" maxlength="120" /></label>
+                      <label class="inspector-form-field inspector-form-field-inline"><span class="inspector-form-label" data-i18n="Alliance color">Alliance color</span><input id="newAllianceColor" type="color" value="#008080" /></label>
+                      <span id="allianceColorConflict" class="inspector-form-hint" role="status" data-i18n="This color is already used." hidden>This color is already used.</span>
                       <button id="createCountryAlliance" type="button" class="sidebar-action-secondary" data-i18n="Create" disabled>Create</button>
                     </div>
-                    <label class="field-label"><span data-i18n="Government">Government</span><select id="countryIdeology"></select></label>
+                    <label class="inspector-form-field"><span class="inspector-form-label" data-i18n="Government">Government</span><select id="countryIdeology" class="select-input"></select></label>
                   </div>
-                  <button id="unregisterProjectCountry" type="button" class="sidebar-action-secondary mt-2" data-i18n="Unregister country" hidden>Unregister country</button>
-                  <details id="countryCities" class="mt-2" hidden>
+                  <button id="unregisterProjectCountry" type="button" class="sidebar-action-secondary" data-i18n="Unregister country" hidden>Unregister country</button>
+                  <details id="countryCities" class="inspector-form-disclosure" hidden>
                     <summary data-i18n="Cities in this country">Cities in this country</summary>
-                    <div id="inspectorCapital" class="mt-2">
-                      <strong data-i18n="Capital">Capital</strong> · <span id="capitalStatus" aria-live="polite"></span>
-                      <div id="capitalOutside" class="country-select-meta" data-i18n="The capital is outside this country (its map star is hidden)" hidden>The capital is outside this country (its map star is hidden)</div>
-                    </div>
-                    <label class="field-label">
-                      <span data-i18n="Cities in this country">Cities in this country</span>
-                      <select id="inspectorCity"></select>
-                    </label>
-                    <div id="capitalActions">
-                      <div class="flex flex-wrap gap-2">
-                        <button id="setCapital" type="button" class="sidebar-action-secondary" data-i18n="Set as capital">Set as capital</button>
-                        <button id="resetCapital" type="button" class="sidebar-action-secondary" data-i18n="Restore scenario capital">Restore scenario capital</button>
-                        <button id="clearCapital" type="button" class="sidebar-action-secondary" data-i18n="No capital">No capital</button>
-                        <button id="largestCapital" type="button" class="sidebar-action-secondary" data-i18n="Use largest city">Use largest city</button>
-                        <button id="deleteCapitalCity" type="button" class="sidebar-action-secondary" data-i18n="Delete this city" hidden>Delete this city</button>
+                    <div class="inspector-form-disclosure-body">
+                      <div id="inspectorCapital" class="inspector-form-subgroup">
+                        <p class="inspector-form-subhead" data-i18n="Capital">Capital</p>
+                        <p id="capitalStatus" class="inspector-form-value" aria-live="polite"></p>
+                        <p id="capitalOutside" class="inspector-form-hint" data-i18n="The capital is outside this country (its map star is hidden)" hidden>The capital is outside this country (its map star is hidden)</p>
                       </div>
-                      <label class="field-label">
-                        <span data-i18n="New capital city name">New capital city name</span>
-                        <input id="capitalCityName" class="input" type="text" autocomplete="off" />
-                      </label>
-                      <button id="placeCapital" type="button" class="sidebar-action-secondary" disabled></button>
-                      <div id="capitalPickHint" role="status" data-i18n="Click the map to place the capital. Press Esc to cancel." hidden>Click the map to place the capital. Press Esc to cancel.</div>
+                      <div id="capitalActions" class="inspector-form-subgroup">
+                        <div class="inspector-form-actions">
+                          <button id="resetCapital" type="button" class="sidebar-action-secondary" data-i18n="Restore scenario capital">Restore scenario capital</button>
+                          <button id="largestCapital" type="button" class="sidebar-action-secondary" data-i18n="Use largest city">Use largest city</button>
+                          <button id="clearCapital" type="button" class="sidebar-action-secondary" data-i18n="No capital">No capital</button>
+                        </div>
+                        <label class="inspector-form-field">
+                          <span class="inspector-form-label" data-i18n="New capital city name">New capital city name</span>
+                          <input id="capitalCityName" class="input" type="text" autocomplete="off" />
+                        </label>
+                        <button id="placeCapital" type="button" class="sidebar-action-secondary" disabled></button>
+                        <p id="capitalPickHint" class="inspector-form-hint" role="status" data-i18n="Click the map to place the capital. Press Esc to cancel." hidden>Click the map to place the capital. Press Esc to cancel.</p>
+                      </div>
+                      <div class="inspector-form-subgroup inspector-form-subgroup-divided">
+                        <p class="inspector-form-subhead" data-i18n="Edit city">Edit city</p>
+                        <label class="inspector-form-field">
+                          <span class="inspector-form-label" data-i18n="City">City</span>
+                          <select id="inspectorCity" class="select-input"></select>
+                        </label>
+                        <label class="inspector-form-field">
+                          <span class="inspector-form-label" data-i18n="City display name">City display name</span>
+                          <input id="cityNameOverride" class="input" type="text" autocomplete="off" />
+                        </label>
+                        <label class="inspector-form-check"><input id="inspectorCityHidden" type="checkbox" /> <span data-i18n="Hide city">Hide city</span></label>
+                        <div class="inspector-form-actions">
+                          <button id="setCapital" type="button" class="sidebar-action-secondary" data-i18n="Set as capital">Set as capital</button>
+                          <button id="deleteCapitalCity" type="button" class="sidebar-action-secondary" data-i18n="Delete this city" hidden>Delete this city</button>
+                        </div>
+                      </div>
                     </div>
-                    <label class="field-label">
-                      <span data-i18n="City display name">City display name</span>
-                      <input id="cityNameOverride" class="input" type="text" autocomplete="off" />
-                    </label>
-                    <label><input id="inspectorCityHidden" type="checkbox" /> <span data-i18n="Hide city">Hide city</span></label>
                   </details>
-                  <button id="resetCountryOverrides" type="button" class="sidebar-action-secondary mt-2" disabled>
+                  <button id="resetCountryOverrides" type="button" class="sidebar-action-secondary" disabled>
                     <span data-i18n="Restore original country color">Restore original country color</span>
                     <span data-reset-count>(0)</span>
                   </button>
@@ -2791,14 +2744,14 @@
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblScenarioSpecialRegionVisibility" class="sidebar-group-label" data-i18n="Visibility">Visibility</h3>
-                <label class="toggle-label mt-2" title="Toggle scenario-only special regions." data-i18n-title="Toggle scenario-only special regions.">
+                <label class="toggle-label mt-2">
                   <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioSpecialRegionVisibilityToggle" data-i18n="Show Scenario Special Regions">Show Scenario Special Regions</span>
                 </label>
                 <p data-page-note id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
                   Toggle Atlantropa-style scenario regions without affecting the base map.
                 </p>
-                <label class="toggle-label mt-3" title="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
+                <label class="toggle-label mt-3">
                   <input id="scenarioReliefOverlayVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioReliefOverlayVisibilityToggle" data-i18n="Show Scenario Relief Overlays">Show Scenario Relief Overlays</span>
                 </label>
@@ -2911,12 +2864,15 @@
                       <option value="" data-i18n="All Groups">All Groups</option>
                     </select>
                   </div>
-                  <div class="water-filter-field">
-                    <label id="lblWaterFilterSource" class="sidebar-field-label" for="waterInspectorSourceFilter" data-i18n="Source">Source</label>
-                    <select id="waterInspectorSourceFilter" class="select-input">
-                      <option value="" data-i18n="All Sources">All Sources</option>
-                    </select>
-                  </div>
+                  <details class="physical-disclosure">
+                    <summary><span data-i18n="More filters">More filters</span><span id="waterInspectorSourceFilterCount" hidden> (1)</span></summary>
+                    <div class="water-filter-field">
+                      <label id="lblWaterFilterSource" class="sidebar-field-label" for="waterInspectorSourceFilter" data-i18n="Source">Source</label>
+                      <select id="waterInspectorSourceFilter" class="select-input">
+                        <option value="" data-i18n="All Sources">All Sources</option>
+                      </select>
+                    </div>
+                  </details>
                   <div class="water-filter-field">
                     <label id="lblWaterSort" class="sidebar-field-label" for="waterInspectorSortSelect" data-i18n="Sort">Sort</label>
                     <select id="waterInspectorSortSelect" class="select-input">
@@ -2961,6 +2917,10 @@
                   <div id="waterInspectorMetaSection" class="inspector-detail-section mt-3 hidden">
                     <h3 id="lblWaterInspectorMeta" class="sidebar-group-label" data-i18n="Region Details">Region Details</h3>
                     <div id="waterInspectorMetaList" class="inspector-meta-list mt-2"></div>
+                    <details class="mt-2">
+                      <summary data-i18n="More fields">More details</summary>
+                      <div id="waterInspectorMoreMetaList" class="inspector-meta-list mt-2"></div>
+                    </details>
                   </div>
                   <div id="waterInspectorHierarchySection" class="inspector-detail-section mt-3 hidden">
                     <h3 id="lblWaterInspectorHierarchy" class="sidebar-group-label" data-i18n="Family">Family</h3>
@@ -3006,10 +2966,10 @@
                   </div>
                 </div>
               </div>
-              <div class="inspector-detail-section mt-3 sidebar-detail-group">
-                <h3 id="lblWaterLegend" class="sidebar-group-label" data-i18n="Water Overrides">Water Overrides</h3>
+              <details class="inspector-detail-section mt-3 sidebar-detail-group" hidden>
+                <summary id="lblWaterLegend" class="sidebar-group-label" data-i18n="Water Overrides">Recolored waters</summary>
                 <div id="waterLegendList" class="inspector-scroll mt-3"></div>
-              </div>
+              </details>
             </div>
           </details>
           </section>
@@ -3288,10 +3248,6 @@
                 </div>
                 <div class="transport-workbench-meta-strip">
                   <div class="transport-workbench-meta-pill">
-                    <span class="transport-workbench-meta-label" data-i18n="Family">Family</span>
-                    <strong id="transportWorkbenchFamilyStatus" class="transport-workbench-meta-value" data-i18n="Road">Road</strong>
-                  </div>
-                  <div class="transport-workbench-meta-pill">
                     <span class="transport-workbench-meta-label" data-i18n="Sample">Sample</span>
                     <strong id="transportWorkbenchCountryStatus" class="transport-workbench-meta-value" data-i18n="Japan">Japan</strong>
                   </div>
@@ -3299,10 +3255,6 @@
                     <span class="transport-workbench-meta-label" data-i18n="Dataset">Dataset</span>
                     <select id="transportWorkbenchPackSelect" class="transport-workbench-pack-select" aria-label="Transport pack" data-i18n-aria-label="Transport pack"></select>
                   </label>
-                  <div class="transport-workbench-meta-pill">
-                    <span class="transport-workbench-meta-label" data-i18n="Mode">Mode</span>
-                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value" data-i18n="Bounded zoom / pan">Bounded zoom / pan</strong>
-                  </div>
                 </div>
                 <div class="transport-workbench-parameter-stack">
                   <div id="transportWorkbenchLensSections" class="transport-workbench-control-sections" aria-live="polite"></div>
@@ -3458,16 +3410,14 @@
                   <input id="exportWorkbenchClarity" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
                 </label>
               </div>
-              <div class="export-workbench-bake-shell">
-                <div class="export-workbench-group-header">
-                  <span class="export-workbench-column-kicker" data-i18n="Bake outputs">Bake outputs</span>
-                </div>
+              <details class="export-workbench-bake-shell" hidden>
+                <summary class="export-workbench-column-kicker" data-i18n="Bake outputs">Advanced: bake cache</summary>
                 <div class="export-workbench-bake-actions">
                   <button id="exportWorkbenchBakeVisibleBtn" type="button" class="btn-secondary" data-i18n="Bake current pack">Bake current pack</button>
                   <button id="exportWorkbenchClearBakeBtn" type="button" class="btn-secondary" data-i18n="Clear baked cache">Clear baked cache</button>
                 </div>
                 <div id="exportWorkbenchBakeArtifactList" class="export-workbench-bake-list" role="list"></div>
-              </div>
+              </details>
             </section>
 
             <section class="export-workbench-column export-workbench-column-preview" aria-labelledby="exportWorkbenchPreviewTitle">
@@ -3485,9 +3435,7 @@
               <div id="exportWorkbenchPreviewCanvas" class="export-workbench-preview-canvas" aria-live="polite">
                 <div id="exportWorkbenchPreviewStage" class="export-workbench-preview-stage"></div>
                 <div id="exportJobStatus" class="export-workbench-preview-state" role="status" hidden></div>
-                <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state" data-i18n="Export preview ready">
-                  Export preview ready
-                </div>
+                <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state" hidden></div>
               </div>
             </section>
 
@@ -3503,7 +3451,6 @@
                 <div class="export-workbench-layer-group">
                   <div class="export-workbench-group-header">
                     <span class="export-workbench-column-kicker" data-i18n="Text elements">Text elements</span>
-                    <span class="export-workbench-group-hint" data-i18n="Text and annotations">Text and annotations</span>
                   </div>
                   <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list"></div>
                   <div id="exportMapTitleFields" role="group" aria-label="Layout text" data-i18n-aria-label="Layout text"></div>
@@ -3590,7 +3537,6 @@
       </div>
     </div>
     <div id="startupReadonlyBanner" class="startup-readonly-banner hidden" role="status" aria-live="polite" aria-busy="false">
-      <div class="startup-readonly-banner__eyebrow" data-i18n="Read-only startup">Read-only startup</div>
       <div id="startupReadonlyMessage" class="startup-readonly-banner__message" data-i18n="Detailed interactions are still loading. Pan and zoom remain available.">Detailed interactions are still loading. Pan and zoom remain available.</div>
     </div>
     <div id="scenarioGuideBackdrop" class="scenario-guide-backdrop hidden" aria-hidden="true"></div>
@@ -3618,7 +3564,6 @@
         <button id="scenarioGuideTabAppearance" type="button" class="scenario-guide-nav-btn" data-guide-section="appearance" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionAppearance" data-i18n="Appearance">Appearance</button>
         <button id="scenarioGuideTabEditing" type="button" class="scenario-guide-nav-btn" data-guide-section="editing" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionEditing" data-i18n="Edit tools">Edit tools</button>
         <button id="scenarioGuideTabTools" type="button" class="scenario-guide-nav-btn" data-guide-section="tools" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionTools" data-i18n="Project tools">Project tools</button>
-        <button id="scenarioGuideTabChecks" type="button" class="scenario-guide-nav-btn" data-guide-section="checks" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionChecks" data-i18n="Checks">Checks</button>
       </div>
       <div class="scenario-guide-manual mt-3">
         <section id="scenarioGuideSectionQuick" class="scenario-guide-manual-section" data-guide-panel="quick" role="tabpanel" aria-labelledby="scenarioGuideTabQuick scenarioGuideQuickPathTitle">
@@ -3838,7 +3783,6 @@
                 <p data-i18n="To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.">To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.</p>
                 <ul class="scenario-guide-tool-steps">
                   <li><strong data-i18n="Country color">Country color</strong><span data-guide-controls="countryList countryInspectorColorSwatch" data-i18n="Select the country in the country list, then click its color swatch in the Inspector to change its base color.">Select the country in the country list, then click its color swatch in the Inspector to change its base color.</span></li>
-                  <li><strong data-i18n="Advanced actions">Advanced actions</strong><span data-i18n="For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.">For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.</span></li>
                   <li><strong data-i18n="Map lettering">Map lettering</strong><span data-guide-controls="frontlineTabStack legendProjectSection workspaceExportBtn" data-i18n="For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.">For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.</span></li>
                 </ul>
                 <button id="scenarioGuideSelectCountryBtn" class="btn-secondary scenario-guide-step-action" type="button" data-i18n="Go to country list">Go to country list</button>
@@ -3858,11 +3802,7 @@
               </summary>
               <div class="scenario-guide-tool-body">
                 <p data-i18n="Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.">Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You are about to make broad ownership, frontline, transport, or overlay changes.">You are about to make broad ownership, frontline, transport, or overlay changes.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.">Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing.">After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing.</span></li>
-                </ul>
+                <p data-i18n="Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.">Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.</p>
               </div>
             </details>
             <details class="scenario-guide-tool-panel">
@@ -3900,60 +3840,12 @@
               </summary>
               <div class="scenario-guide-tool-body">
                 <p data-i18n="Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K.">Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K.</p>
+                <p data-i18n="Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.">Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.</p>
                 <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="The map is ready for a composite image, per-layer PNG set, or bake pack handoff.">The map is ready for a composite image, per-layer PNG set, or bake pack handoff.</span></li>
                   <li><strong data-i18n="Order">Order</strong><span data-i18n="Choose target and resolution, check the preview, confirm layer order, then run the export.">Choose target and resolution, check the preview, confirm layer order, then run the export.</span></li>
                   <li><strong data-i18n="Check">Check</strong><span data-i18n="Keep Strategic annotations enabled when frontlines, operational graphics, or unit counters must appear in the final output.">Keep Strategic annotations enabled when frontlines, operational graphics, or unit counters must appear in the final output.</span></li>
                 </ul>
-              </div>
-            </details>
-          </div>
-        </section>
-
-        <section id="scenarioGuideSectionChecks" class="scenario-guide-manual-section hidden" data-guide-panel="checks" role="tabpanel" aria-labelledby="scenarioGuideTabChecks scenarioGuideChecksTitle" hidden>
-          <h4 id="scenarioGuideChecksTitle" class="scenario-guide-manual-title" data-i18n="Success checks">Success checks</h4>
-          <p class="scenario-guide-manual-lead" data-i18n="Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package.">Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package.</p>
-          <div class="scenario-guide-tool-accordion">
-            <details class="scenario-guide-tool-panel" open>
-              <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Project JSON save">Project JSON save</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="The editable handoff file.">The editable handoff file.</span>
-              </summary>
-              <div class="scenario-guide-tool-body">
-                <p data-i18n="Save project downloads the editable map, including its colors, annotations and export settings.">Save project downloads the editable map, including its colors, annotations and export settings.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.">You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.">Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.">The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.</span></li>
-                </ul>
-              </div>
-            </details>
-            <details class="scenario-guide-tool-panel">
-              <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Export workflow">Export workflow</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="The publishable output step.">The publishable output step.</span>
-              </summary>
-              <div class="scenario-guide-tool-body">
-                <p data-i18n="Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON.">Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery.">The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export.">Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.">Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.</span></li>
-                </ul>
-              </div>
-            </details>
-            <details class="scenario-guide-tool-panel">
-              <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Final handoff check">Final handoff check</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="The last pass before sending files out.">The last pass before sending files out.</span>
-              </summary>
-              <div class="scenario-guide-tool-body">
                 <p data-i18n="Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable.">Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone.">You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Review labels, borders, strategic annotations, reference visibility, and export target before the final click.">Review labels, borders, strategic annotations, reference visibility, and export target before the final click.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.">If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.</span></li>
-                </ul>
               </div>
             </details>
           </div>

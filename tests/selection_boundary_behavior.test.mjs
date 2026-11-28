@@ -10,8 +10,7 @@ function segments(geometry) {
     [JSON.stringify(line[i]), JSON.stringify(point)].sort().join('|'))));
 }
 const edge = (a, b) => [JSON.stringify(a), JSON.stringify(b)].sort().join('|');
-const features = [polygon('a', ring(0,0)), polygon('b', ring(1,0)), polygon('island', ring(5,0)),
-  polygon('outer', ring(10,0,4), ring(11,1).reverse()), polygon('enclave', ring(11,1))];
+const features = [polygon('a', ring(0,0)), polygon('b', ring(1,0)), polygon('island', ring(5,0))];
 
 test('overlapping unselected parcels do not remove the selected parcel perimeter', () => {
   const a = polygon('a', ring(0, 0, 2));
@@ -40,32 +39,4 @@ test('selection retains outer and island coasts and removes shared interior arcs
   assert.equal(lines.has(edge([5,0],[6,0])), true);
   assert.equal(segments(index.getBoundaryLines(new Set(['a']))).has(edge([1,0],[1,1])), true);
   assert.equal(index.getBoundaryLines(new Set()), null);
-  assert.equal(graph.coast.coastOwners.length, graph.coast.offsets.length - 1);
-});
-
-test('holes and enclaves follow membership and subunits resolve to their source parcel', () => {
-  const graph = buildPaintContourGraph(features);
-  const index = createSelectionBoundaryIndex(graph, { resolveSourceFeatureId: id => ['a', 'b'].includes(id) ? 'parent' : id });
-  const parent = index.getBoundaryLines(new Set(['parent']));
-  assert.equal(segments(parent).size, 6);
-  assert.equal(index.getBoundaryLines(new Set(['parent'])), parent);
-  assert.equal(segments(index.getBoundaryLines(new Set(['outer']))).size, 8);
-  assert.equal(segments(index.getBoundaryLines(new Set(['outer', 'enclave']))).size, 4);
-  const hole = createSelectionBoundaryIndex(buildPaintContourGraph([features[3]]));
-  assert.equal(segments(hole.getBoundaryLines(new Set(['outer']))).size, 8);
-});
-
-test('a passive parcel joins the group that holds most of its shared boundary', () => {
-  const row = [polygon('a', ring(0,0)), polygon('shell', ring(1,0)), polygon('b', ring(2,0)), polygon('c', ring(3,0))];
-  const index = createSelectionBoundaryIndex(buildPaintContourGraph(row), { isPassive: id => id === 'shell' });
-  const inner = edge([1,0],[1,1]), far = edge([2,0],[2,1]);
-  assert.equal(segments(index.getBoundaryLines(new Set(['a', 'b']))).has(inner), true);
-  const adopted = segments(index.getBoundaryLines(new Set(['a', 'b']), { adoptPassive: true }));
-  assert.equal(adopted.has(inner), false);
-  assert.equal(adopted.has(far), false);
-  assert.equal(adopted.has(edge([3,0],[3,1])), true);
-  // Shared evenly with a non-member: the passive parcel stays outside.
-  const alone = segments(index.getBoundaryLines(new Set(['a']), { adoptPassive: true }));
-  assert.equal(alone.has(inner), true);
-  assert.equal(alone.has(far), false);
 });

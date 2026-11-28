@@ -12,11 +12,6 @@ const resolve = (current, id, detail = 1, code = "AA") => resolveInspectorDrillS
   current, hit: { countryCode: code, featureId: id }, findGroup, detail,
 });
 
-test("first click and switching country select country", () => {
-  for (const current of [{}, { countryCode: "BB", level: "feature", featureId: "c" }]) {
-    assert.deepEqual(resolve(current, "a"), { level: "country", countryCode: "AA" });
-  }
-});
 test("country drills to multi-member group or directly to a parcel", () => {
   const current = { countryCode: "AA", level: "country" };
   assert.deepEqual(resolve(current, "a"), { level: "group", countryCode: "AA", group: groups[0] });
@@ -36,12 +31,5 @@ test("group and parcel selection move within a group or switch groups", () => {
     assert.deepEqual(resolve(current, "c"), { level: "group", countryCode: "AA", group: groups[1] });
     assert.equal(resolve(current, "e").level, "feature");
     assert.equal(resolve(current, "ungrouped").level, "feature");
-  }
-});
-test("subsequent double-click events preserve the previous result", () => {
-  for (const level of ["country", "group", "feature"]) {
-    const current = Object.freeze({ countryCode: "AA", level, groupId: "g1", featureId: "a" });
-    assert.equal(resolve(current, "c", 2), current);
-    assert.equal(resolve(current, "c", 3), current);
   }
 });

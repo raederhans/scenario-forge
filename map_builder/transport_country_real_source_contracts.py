@@ -11,65 +11,6 @@ from typing import Any, Iterable
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE_CACHE_ROOT = PROJECT_ROOT / ".runtime" / "source-cache" / "transport"
 
-TARGET_COUNTRY_PACK_IDS = (
-    "germany_road",
-    "uk_road",
-    "usa_road",
-    "france_road",
-    "china_road",
-    "india_road",
-    "russia_road",
-    "france_rail",
-    "usa_rail",
-    "china_rail",
-    "china_energy_facilities",
-    "china_industrial_zones",
-    "china_logistics_hubs",
-    "china_mineral_resources",
-    "india_rail",
-    "india_energy_facilities",
-    "india_industrial_zones",
-    "india_logistics_hubs",
-    "india_mineral_resources",
-    "russia_rail",
-    "russia_energy_facilities",
-    "russia_industrial_zones",
-    "russia_logistics_hubs",
-    "russia_mineral_resources",
-    "usa_energy_facilities",
-    "usa_mineral_resources",
-    "usa_industrial_zones",
-    "usa_logistics_hubs",
-    "uk_energy_facilities",
-    "uk_industrial_zones",
-    "uk_logistics_hubs",
-    "uk_mineral_resources",
-    "france_energy_facilities",
-    "france_industrial_zones",
-    "france_mineral_resources",
-    "france_logistics_hubs",
-    "germany_rail",
-    "uk_rail",
-    "usa_airport",
-    "china_airport",
-    "russia_airport",
-    "india_airport",
-    "germany_airport",
-    "france_airport",
-    "uk_airport",
-    "usa_port",
-    "germany_port",
-    "france_port",
-    "uk_port",
-    "china_port",
-    "india_port",
-    "russia_port",
-    "germany_energy_facilities",
-    "germany_mineral_resources",
-    "germany_industrial_zones",
-    "germany_logistics_hubs",
-)
-
 FORBIDDEN_COUNTRY_PACK_BACKEND_TOKENS = (
     "checked_in_global_transport",
     "Natural Earth clip",
@@ -299,11 +240,52 @@ def _geofabrik_facility_gpkg_sources(
     )
 
 
-def _geofabrik_osm_gpkg_spec(
-    *,
+_COUNTRY_NAMES = {
+    "germany": "Germany",
+    "uk": "United Kingdom",
+    "usa": "United States",
+    "france": "France",
+    "china": "China",
+    "india": "India",
+    "russia": "Russia",
+}
+
+_OUTPUT_CONTRACTS = {
+    "road": ("roads.preview.topo.json", "roads.topo.json", "road_labels.preview.geojson", "road_labels.geojson"),
+    "rail": ("railways.preview.topo.json", "railways.topo.json", "rail_stations_major.preview.geojson", "rail_stations_major.geojson"),
+    "energy_facilities": ("energy_facilities.preview.geojson", "energy_facilities.geojson"),
+    "industrial_zones": ("industrial_zones.preview.geojson", "industrial_zones.geojson"),
+    "logistics_hubs": ("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
+    "mineral_resources": ("mineral_resources.preview.geojson", "mineral_resources.geojson"),
+    "airport": ("airports.preview.geojson", "airports.geojson"),
+    "port": ("ports.preview.geojson", "ports.geojson"),
+}
+
+
+def _country_spec(
     pack_id: str,
-    family: str,
-    country: str,
+    *,
+    source_truth: str,
+    geometry_truth: str,
+    sources: tuple[SourceRequirement, ...],
+    cache_subdir: str | None = None,
+) -> CountrySourceSpec:
+    country, family = pack_id.split("_", 1)
+    return CountrySourceSpec(
+        pack_id=pack_id,
+        family=family,
+        country=_COUNTRY_NAMES[country],
+        cache_subdir=cache_subdir or pack_id,
+        source_truth=source_truth,
+        geometry_truth=geometry_truth,
+        output_contract=_OUTPUT_CONTRACTS[family],
+        sources=sources,
+    )
+
+
+def _geofabrik_osm_gpkg_spec(
+    pack_id: str,
+    *,
     cache_subdir: str,
     source_truth: str,
     geometry_truth: str,
@@ -312,31 +294,21 @@ def _geofabrik_osm_gpkg_spec(
     filter_rule: str,
     notes: str,
 ) -> CountrySourceSpec:
-    return CountrySourceSpec(
-        pack_id=pack_id,
-        family=family,
-        country=country,
+    family = pack_id.split("_", 1)[1]
+    return _country_spec(
+        pack_id,
         cache_subdir=cache_subdir,
         source_truth=source_truth,
         geometry_truth=geometry_truth,
-        output_contract=(
-            ("roads.preview.topo.json", "roads.topo.json", "road_labels.preview.geojson", "road_labels.geojson")
-            if family == "road"
-            else ("railways.preview.topo.json", "railways.topo.json", "rail_stations_major.preview.geojson", "rail_stations_major.geojson")
-        ),
         sources=_geofabrik_gpkg_sources(base_path=base_path, subregions=subregions, family=family),
     )
 
 
-COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
-    "germany_road": CountrySourceSpec(
-        pack_id="germany_road",
-        family="road",
-        country="Germany",
-        cache_subdir="germany_road",
+_COUNTRY_PACKS = (
+    _country_spec(
+        "germany_road",
         source_truth="BKG DLM250 compact road/transport objects",
         geometry_truth="BKG DLM250 compact NAS_BDA or NAS_NBA archive",
-        output_contract=("roads.preview.topo.json", "roads.topo.json", "road_labels.preview.geojson", "road_labels.geojson"),
         sources=(
             _source(
                 "bkg_dlm250_compact_nas_bda",
@@ -350,14 +322,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_road": CountrySourceSpec(
-        pack_id="uk_road",
-        family="road",
-        country="United Kingdom",
-        cache_subdir="uk_road",
+    _country_spec(
+        "uk_road",
         source_truth="OS Open Roads for Great Britain plus OSNI 50K Transport Lines for Northern Ireland",
         geometry_truth="OS Open Roads GeoPackage/Shapefile and OSNI GeoJSON/Shapefile",
-        output_contract=("roads.preview.topo.json", "roads.topo.json", "road_labels.preview.geojson", "road_labels.geojson"),
         sources=(
             _source(
                 "os_open_roads_gb",
@@ -379,14 +347,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "usa_road": CountrySourceSpec(
-        pack_id="usa_road",
-        family="road",
-        country="United States",
-        cache_subdir="usa_road",
+    _country_spec(
+        "usa_road",
         source_truth="U.S. Census TIGER/Line 2024 national primary roads",
         geometry_truth="TIGER/Line 2024 Primary Roads Shapefile",
-        output_contract=("roads.preview.topo.json", "roads.topo.json", "road_labels.preview.geojson", "road_labels.geojson"),
         sources=(
             _source(
                 "census_tiger_2024_primary_roads",
@@ -400,14 +364,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "france_road": CountrySourceSpec(
-        pack_id="france_road",
-        family="road",
-        country="France",
-        cache_subdir="france_road",
+    _country_spec(
+        "france_road",
         source_truth="IGN BD CARTO 5.0 September 2025 all themes for France metropolitaine",
         geometry_truth="IGN BDCARTO GeoPackage LAMB93 France metropolitaine archive",
-        output_contract=("roads.preview.topo.json", "roads.topo.json", "road_labels.preview.geojson", "road_labels.geojson"),
         sources=(
             _source(
                 "ign_bdcarto_5_0_fxx_gpkg",
@@ -422,10 +382,8 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "china_road": _geofabrik_osm_gpkg_spec(
-        pack_id="china_road",
-        family="road",
-        country="China",
+    _geofabrik_osm_gpkg_spec(
+        "china_road",
         cache_subdir="china_osm_gpkg",
         source_truth="Geofabrik China OpenStreetMap free GeoPackage subregion extracts",
         geometry_truth="OSM road lines from Geofabrik China subregion GeoPackages clipped to the China workbench carrier",
@@ -434,10 +392,8 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
         filter_rule="Keep OSM highway motorway/trunk/primary/secondary/tertiary and link classes; clip to the China carrier scope.",
         notes="Mainland China road preview starts from the China extract; Taiwan remains a separate future sub-scope rather than being merged into this pack.",
     ),
-    "india_road": _geofabrik_osm_gpkg_spec(
-        pack_id="india_road",
-        family="road",
-        country="India",
+    _geofabrik_osm_gpkg_spec(
+        "india_road",
         cache_subdir="india_osm_gpkg",
         source_truth="Geofabrik India OpenStreetMap free GeoPackage zone extracts",
         geometry_truth="OSM road lines from Geofabrik India zone GeoPackages clipped to the India workbench carrier",
@@ -446,10 +402,8 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
         filter_rule="Keep OSM highway motorway/trunk/primary/secondary/tertiary and link classes; clip to the India carrier scope.",
         notes="The first India road pack uses OSM classes as geometry truth, with national highway references retained from OSM tags when present.",
     ),
-    "russia_road": _geofabrik_osm_gpkg_spec(
-        pack_id="russia_road",
-        family="road",
-        country="Russia",
+    _geofabrik_osm_gpkg_spec(
+        "russia_road",
         cache_subdir="russia_osm_gpkg",
         source_truth="Geofabrik Russia OpenStreetMap free GeoPackage federal-district extracts",
         geometry_truth="OSM road lines from Geofabrik Russia federal-district GeoPackages clipped to the Russia workbench carrier",
@@ -458,14 +412,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
         filter_rule="Keep OSM highway motorway/trunk/primary/secondary/tertiary and link classes; clip to the Russia carrier scope.",
         notes="Russia scope uses the national extract and carrier clipping so Kaliningrad remains in scope while foreign admin bleed is removed.",
     ),
-    "france_rail": CountrySourceSpec(
-        pack_id="france_rail",
-        family="rail",
-        country="France",
-        cache_subdir="france_rail",
+    _country_spec(
+        "france_rail",
         source_truth="SNCF RFN line shapes plus official RFN station dataset",
         geometry_truth="SNCF RFN line shapes; station points from SNCF/transport.data.gouv.fr",
-        output_contract=("railways.preview.topo.json", "railways.topo.json", "rail_stations_major.preview.geojson", "rail_stations_major.geojson"),
         sources=(
             _source(
                 "sncf_rfn_line_shapes",
@@ -487,14 +437,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "usa_rail": CountrySourceSpec(
-        pack_id="usa_rail",
-        family="rail",
-        country="United States",
-        cache_subdir="usa_rail",
+    _country_spec(
+        "usa_rail",
         source_truth="FRA/BTS NTAD North American Rail Network mainline subset plus NTAD Amtrak Stations",
         geometry_truth="FRA/BTS ArcGIS FeatureServer exports cached as GeoJSON",
-        output_contract=("railways.preview.topo.json", "railways.topo.json", "rail_stations_major.preview.geojson", "rail_stations_major.geojson"),
         sources=(
             _source(
                 "fra_ntad_narn_lines_us_mainline",
@@ -532,10 +478,8 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "china_rail": _geofabrik_osm_gpkg_spec(
-        pack_id="china_rail",
-        family="rail",
-        country="China",
+    _geofabrik_osm_gpkg_spec(
+        "china_rail",
         cache_subdir="china_osm_gpkg",
         source_truth="Geofabrik China OpenStreetMap free GeoPackage subregion extracts",
         geometry_truth="OSM rail lines and railway-station points from Geofabrik China subregion GeoPackages clipped to the China workbench carrier",
@@ -544,14 +488,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
         filter_rule="Keep OSM railway=rail/light_rail/subway/tram/narrow_gauge, remove service yard/siding/spur/crossover from preview, derive station sidecar from OSM point tags, and clip to the China carrier scope.",
         notes="Mainland China rail preview starts from the China extract; Taiwan rail remains a separate future sub-scope.",
     ),
-    "china_energy_facilities": CountrySourceSpec(
-        pack_id="china_energy_facilities",
-        family="energy_facilities",
-        country="China",
-        cache_subdir="china_energy_facilities",
+    _country_spec(
+        "china_energy_facilities",
         source_truth="WRI Global Power Plant Database global CSV",
         geometry_truth="WRI plant latitude/longitude points filtered to the China workbench carrier",
-        output_contract=("energy_facilities.preview.geojson", "energy_facilities.geojson"),
         sources=(
             _source(
                 "wri_global_power_plant_database_csv",
@@ -565,34 +505,24 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "china_industrial_zones": CountrySourceSpec(
-        pack_id="china_industrial_zones",
-        family="industrial_zones",
-        country="China",
+    _country_spec(
+        "china_industrial_zones",
         cache_subdir="china_osm_gpkg",
         source_truth="Geofabrik China OpenStreetMap free GeoPackage subregion extracts",
         geometry_truth="OSM landuse=industrial polygon representative points from Geofabrik China subregion GeoPackages clipped to the China workbench carrier",
-        output_contract=("industrial_zones.preview.geojson", "industrial_zones.geojson"),
         sources=_geofabrik_facility_gpkg_sources(base_path="asia/china", subregions=CHINA_GEOFABRIK_SUBREGIONS, family="industrial_zones"),
     ),
-    "china_logistics_hubs": CountrySourceSpec(
-        pack_id="china_logistics_hubs",
-        family="logistics_hubs",
-        country="China",
+    _country_spec(
+        "china_logistics_hubs",
         cache_subdir="china_osm_gpkg",
         source_truth="Geofabrik China OpenStreetMap free GeoPackage subregion extracts",
         geometry_truth="OSM transport terminal point and area representative points from Geofabrik China subregion GeoPackages clipped to the China workbench carrier",
-        output_contract=("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
         sources=_geofabrik_facility_gpkg_sources(base_path="asia/china", subregions=CHINA_GEOFABRIK_SUBREGIONS, family="logistics_hubs"),
     ),
-    "china_mineral_resources": CountrySourceSpec(
-        pack_id="china_mineral_resources",
-        family="mineral_resources",
-        country="China",
-        cache_subdir="china_mineral_resources",
+    _country_spec(
+        "china_mineral_resources",
         source_truth="USGS Mineral Resources Data System global point layer",
         geometry_truth="USGS MRDS point records filtered to the China workbench carrier",
-        output_contract=("mineral_resources.preview.geojson", "mineral_resources.geojson"),
         sources=(
             _source(
                 "usgs_mrds_feature_service",
@@ -613,10 +543,8 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "india_rail": _geofabrik_osm_gpkg_spec(
-        pack_id="india_rail",
-        family="rail",
-        country="India",
+    _geofabrik_osm_gpkg_spec(
+        "india_rail",
         cache_subdir="india_osm_gpkg",
         source_truth="Geofabrik India OpenStreetMap free GeoPackage zone extracts",
         geometry_truth="OSM rail lines and railway-station points from Geofabrik India zone GeoPackages clipped to the India workbench carrier",
@@ -625,14 +553,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
         filter_rule="Keep OSM railway=rail/light_rail/subway/tram/narrow_gauge, remove service yard/siding/spur/crossover from preview, derive station sidecar from OSM point tags, and clip to the India carrier scope.",
         notes="The builder keeps station ref/name/operator tags where present so later Indian Railways importance ranking can enrich the sidecar.",
     ),
-    "india_energy_facilities": CountrySourceSpec(
-        pack_id="india_energy_facilities",
-        family="energy_facilities",
-        country="India",
-        cache_subdir="india_energy_facilities",
+    _country_spec(
+        "india_energy_facilities",
         source_truth="WRI Global Power Plant Database India country CSV",
         geometry_truth="WRI plant latitude/longitude points filtered to the India workbench carrier",
-        output_contract=("energy_facilities.preview.geojson", "energy_facilities.geojson"),
         sources=(
             _source(
                 "wri_global_power_plant_database_india_csv",
@@ -646,34 +570,24 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "india_industrial_zones": CountrySourceSpec(
-        pack_id="india_industrial_zones",
-        family="industrial_zones",
-        country="India",
+    _country_spec(
+        "india_industrial_zones",
         cache_subdir="india_osm_gpkg",
         source_truth="Geofabrik India OpenStreetMap free GeoPackage zone extracts",
         geometry_truth="OSM landuse=industrial polygon representative points from Geofabrik India zone GeoPackages clipped to the India workbench carrier",
-        output_contract=("industrial_zones.preview.geojson", "industrial_zones.geojson"),
         sources=_geofabrik_facility_gpkg_sources(base_path="asia/india", subregions=INDIA_GEOFABRIK_SUBREGIONS, family="industrial_zones"),
     ),
-    "india_logistics_hubs": CountrySourceSpec(
-        pack_id="india_logistics_hubs",
-        family="logistics_hubs",
-        country="India",
+    _country_spec(
+        "india_logistics_hubs",
         cache_subdir="india_osm_gpkg",
         source_truth="Geofabrik India OpenStreetMap free GeoPackage zone extracts",
         geometry_truth="OSM transport terminal point and area representative points from Geofabrik India zone GeoPackages clipped to the India workbench carrier",
-        output_contract=("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
         sources=_geofabrik_facility_gpkg_sources(base_path="asia/india", subregions=INDIA_GEOFABRIK_SUBREGIONS, family="logistics_hubs"),
     ),
-    "india_mineral_resources": CountrySourceSpec(
-        pack_id="india_mineral_resources",
-        family="mineral_resources",
-        country="India",
-        cache_subdir="india_mineral_resources",
+    _country_spec(
+        "india_mineral_resources",
         source_truth="USGS Mineral Resources Data System global point layer",
         geometry_truth="USGS MRDS point records filtered to the India workbench carrier",
-        output_contract=("mineral_resources.preview.geojson", "mineral_resources.geojson"),
         sources=(
             _source(
                 "usgs_mrds_feature_service",
@@ -694,10 +608,8 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "russia_rail": _geofabrik_osm_gpkg_spec(
-        pack_id="russia_rail",
-        family="rail",
-        country="Russia",
+    _geofabrik_osm_gpkg_spec(
+        "russia_rail",
         cache_subdir="russia_osm_gpkg",
         source_truth="Geofabrik Russia OpenStreetMap free GeoPackage federal-district extracts",
         geometry_truth="OSM rail lines and railway-station points from Geofabrik Russia federal-district GeoPackages clipped to the Russia workbench carrier",
@@ -706,14 +618,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
         filter_rule="Keep OSM railway=rail/light_rail/subway/tram/narrow_gauge, remove service yard/siding/spur/crossover from preview, derive station sidecar from OSM point tags, and clip to the Russia carrier scope.",
         notes="Russia scope uses the national extract and carrier clipping so Kaliningrad remains in scope while foreign admin bleed is removed.",
     ),
-    "russia_energy_facilities": CountrySourceSpec(
-        pack_id="russia_energy_facilities",
-        family="energy_facilities",
-        country="Russia",
-        cache_subdir="russia_energy_facilities",
+    _country_spec(
+        "russia_energy_facilities",
         source_truth="WRI Global Power Plant Database global CSV",
         geometry_truth="WRI plant latitude/longitude points filtered to the Russia workbench carrier",
-        output_contract=("energy_facilities.preview.geojson", "energy_facilities.geojson"),
         sources=(
             _source(
                 "wri_global_power_plant_database_csv",
@@ -727,34 +635,24 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "russia_industrial_zones": CountrySourceSpec(
-        pack_id="russia_industrial_zones",
-        family="industrial_zones",
-        country="Russia",
+    _country_spec(
+        "russia_industrial_zones",
         cache_subdir="russia_osm_gpkg",
         source_truth="Geofabrik Russia OpenStreetMap free GeoPackage federal-district extracts",
         geometry_truth="OSM landuse=industrial polygon representative points from Geofabrik Russia federal-district GeoPackages clipped to the Russia workbench carrier",
-        output_contract=("industrial_zones.preview.geojson", "industrial_zones.geojson"),
         sources=_geofabrik_facility_gpkg_sources(base_path="russia", subregions=RUSSIA_GEOFABRIK_SUBREGIONS, family="industrial_zones"),
     ),
-    "russia_logistics_hubs": CountrySourceSpec(
-        pack_id="russia_logistics_hubs",
-        family="logistics_hubs",
-        country="Russia",
+    _country_spec(
+        "russia_logistics_hubs",
         cache_subdir="russia_osm_gpkg",
         source_truth="Geofabrik Russia OpenStreetMap free GeoPackage federal-district extracts",
         geometry_truth="OSM transport terminal point and area representative points from Geofabrik Russia federal-district GeoPackages clipped to the Russia workbench carrier",
-        output_contract=("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
         sources=_geofabrik_facility_gpkg_sources(base_path="russia", subregions=RUSSIA_GEOFABRIK_SUBREGIONS, family="logistics_hubs"),
     ),
-    "russia_mineral_resources": CountrySourceSpec(
-        pack_id="russia_mineral_resources",
-        family="mineral_resources",
-        country="Russia",
-        cache_subdir="russia_mineral_resources",
+    _country_spec(
+        "russia_mineral_resources",
         source_truth="USGS Mineral Resources Data System global point layer",
         geometry_truth="USGS MRDS point records filtered to the Russia workbench carrier",
-        output_contract=("mineral_resources.preview.geojson", "mineral_resources.geojson"),
         sources=(
             _source(
                 "usgs_mrds_feature_service",
@@ -775,14 +673,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "usa_energy_facilities": CountrySourceSpec(
-        pack_id="usa_energy_facilities",
-        family="energy_facilities",
-        country="United States",
-        cache_subdir="usa_energy_facilities",
+    _country_spec(
+        "usa_energy_facilities",
         source_truth="EIA Form EIA-860 final 2024 plant and generator files",
         geometry_truth="EIA-860 plant latitude/longitude fields filtered to the United States carrier scope",
-        output_contract=("energy_facilities.preview.geojson", "energy_facilities.geojson"),
         sources=(
             _source(
                 "eia_860_2024_final",
@@ -796,14 +690,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "usa_mineral_resources": CountrySourceSpec(
-        pack_id="usa_mineral_resources",
-        family="mineral_resources",
-        country="United States",
-        cache_subdir="usa_mineral_resources",
+    _country_spec(
+        "usa_mineral_resources",
         source_truth="USGS Mineral Resources Data System FeatureServer",
         geometry_truth="USGS MRDS point layer filtered to the United States carrier scope",
-        output_contract=("mineral_resources.preview.geojson", "mineral_resources.geojson"),
         sources=(
             _source(
                 "usgs_mrds_feature_service",
@@ -824,24 +714,16 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "usa_industrial_zones": CountrySourceSpec(
-        pack_id="usa_industrial_zones",
-        family="industrial_zones",
-        country="United States",
-        cache_subdir="usa_industrial_zones",
+    _country_spec(
+        "usa_industrial_zones",
         source_truth="U.S. Census TIGER/Line 2025 state area landmarks",
         geometry_truth="Census AREALM polygons filtered to MTFCC K2362 Industrial Building or Industrial Park",
-        output_contract=("industrial_zones.preview.geojson", "industrial_zones.geojson"),
         sources=_usa_arealm_sources(),
     ),
-    "usa_logistics_hubs": CountrySourceSpec(
-        pack_id="usa_logistics_hubs",
-        family="logistics_hubs",
-        country="United States",
-        cache_subdir="usa_logistics_hubs",
+    _country_spec(
+        "usa_logistics_hubs",
         source_truth="BTS NTAD Intermodal Freight Facilities FeatureServer layers",
         geometry_truth="BTS ArcGIS FeatureServer point exports for rail, air-to-truck, and pipeline-terminal intermodal facilities",
-        output_contract=("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
         sources=(
             _source(
                 "bts_intermodal_rail_tofc_cofc",
@@ -893,14 +775,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_energy_facilities": CountrySourceSpec(
-        pack_id="uk_energy_facilities",
-        family="energy_facilities",
-        country="United Kingdom",
-        cache_subdir="uk_energy_facilities",
+    _country_spec(
+        "uk_energy_facilities",
         source_truth="DESNZ Renewable Energy Planning Database April 2026 quarterly extract",
         geometry_truth="REPD British National Grid X/Y project coordinates transformed to WGS84 and clipped to the UK carrier scope",
-        output_contract=("energy_facilities.preview.geojson", "energy_facilities.geojson"),
         sources=(
             _source(
                 "desnz_repd_q1_2026_csv",
@@ -914,14 +792,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_industrial_zones": CountrySourceSpec(
-        pack_id="uk_industrial_zones",
-        family="industrial_zones",
-        country="United Kingdom",
-        cache_subdir="uk_industrial_zones",
+    _country_spec(
+        "uk_industrial_zones",
         source_truth="OpenStreetMap UK landuse=industrial polygons via Overpass API",
         geometry_truth="Overpass JSON way/relation center coordinates for landuse=industrial polygons filtered through the UK carrier scope",
-        output_contract=("industrial_zones.preview.geojson", "industrial_zones.geojson"),
         sources=(
             _source(
                 "osm_overpass_uk_industrial_landuse",
@@ -936,14 +810,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_logistics_hubs": CountrySourceSpec(
-        pack_id="uk_logistics_hubs",
-        family="logistics_hubs",
-        country="United Kingdom",
-        cache_subdir="uk_logistics_hubs",
+    _country_spec(
+        "uk_logistics_hubs",
         source_truth="OpenStreetMap UK freight yard, container terminal, loading dock, and logistics tags via Overpass API",
         geometry_truth="Overpass JSON node coordinates and way/relation centers filtered through the UK carrier scope",
-        output_contract=("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
         sources=(
             _source(
                 "osm_overpass_uk_logistics_facilities",
@@ -958,14 +828,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_mineral_resources": CountrySourceSpec(
-        pack_id="uk_mineral_resources",
-        family="mineral_resources",
-        country="United Kingdom",
-        cache_subdir="uk_mineral_resources",
+    _country_spec(
+        "uk_mineral_resources",
         source_truth="GSNI Northern Ireland Mineral Resources public GeoJSON package",
         geometry_truth="OpenDataNI GeoJSON mineral resource polygons converted to representative points and filtered through the UK carrier scope",
-        output_contract=("mineral_resources.preview.geojson", "mineral_resources.geojson"),
         sources=(
             _source(
                 "gsni_northern_ireland_mineral_resources_json",
@@ -979,14 +845,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "france_energy_facilities": CountrySourceSpec(
-        pack_id="france_energy_facilities",
-        family="energy_facilities",
-        country="France",
-        cache_subdir="france_energy_facilities",
+    _country_spec(
+        "france_energy_facilities",
         source_truth="Registre national electricity production/storage above 250 kW merged with OpenStreetMap geometry",
         geometry_truth="Osmose OSM+opendata CSV.bz2 point export with lon/lat, clipped to the France metropolitan carrier scope",
-        output_contract=("energy_facilities.preview.geojson", "energy_facilities.geojson"),
         sources=(
             _source(
                 "osmose_fr_power_register_opendata_250kw",
@@ -1000,14 +862,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "france_industrial_zones": CountrySourceSpec(
-        pack_id="france_industrial_zones",
-        family="industrial_zones",
-        country="France",
-        cache_subdir="france_industrial_zones",
+    _country_spec(
+        "france_industrial_zones",
         source_truth="IGN BD TOPO zone d'activite ou d'interet WFS",
         geometry_truth="IGN BD TOPO V3 zone_d_activite_ou_d_interet polygons filtered to industrial and commercial activity categories",
-        output_contract=("industrial_zones.preview.geojson", "industrial_zones.geojson"),
         sources=(
             _source(
                 "ign_bdtopo_zone_activite_wfs",
@@ -1030,14 +888,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "france_mineral_resources": CountrySourceSpec(
-        pack_id="france_mineral_resources",
-        family="mineral_resources",
-        country="France",
-        cache_subdir="france_mineral_resources",
+    _country_spec(
+        "france_mineral_resources",
         source_truth="Camino open French mining cadastre titles GeoJSON",
         geometry_truth="Camino title MultiPolygon perimeters converted to representative points and filtered to the metropolitan France carrier scope",
-        output_contract=("mineral_resources.preview.geojson", "mineral_resources.geojson"),
         sources=(
             _source(
                 "camino_titles_geojson",
@@ -1051,14 +905,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "france_logistics_hubs": CountrySourceSpec(
-        pack_id="france_logistics_hubs",
-        family="logistics_hubs",
-        country="France",
-        cache_subdir="france_logistics_hubs",
+    _country_spec(
+        "france_logistics_hubs",
         source_truth="Cerema ITE 3000 French freight private sidings database",
         geometry_truth="ITE 3000 GeoJSON point locations filtered to the metropolitan France carrier scope",
-        output_contract=("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
         sources=(
             _source(
                 "cerema_ite3000_geojson",
@@ -1072,14 +922,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "germany_rail": CountrySourceSpec(
-        pack_id="germany_rail",
-        family="rail",
-        country="Germany",
+    _country_spec(
+        "germany_rail",
         cache_subdir="germany_road",
         source_truth="BKG DLM250 compact railway objects",
         geometry_truth="BKG DLM250 AX_Bahnstrecke and AX_Bahnverkehrsanlage objects",
-        output_contract=("railways.preview.topo.json", "railways.topo.json", "rail_stations_major.preview.geojson", "rail_stations_major.geojson"),
         sources=(
             _source(
                 "bkg_dlm250_compact_nas_bda",
@@ -1093,14 +940,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_rail": CountrySourceSpec(
-        pack_id="uk_rail",
-        family="rail",
-        country="United Kingdom",
-        cache_subdir="uk_rail",
+    _country_spec(
+        "uk_rail",
         source_truth="Network Rail Infrastructure Network Model EIR release mirrored by openraildata",
         geometry_truth="Network Rail network-model GeoPackage VectorReferenceLines/VectorLinks",
-        output_contract=("railways.preview.topo.json", "railways.topo.json", "rail_stations_major.preview.geojson", "rail_stations_major.geojson"),
         sources=(
             _source(
                 "network_rail_inm_network_model_gpkg",
@@ -1124,14 +967,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "usa_airport": CountrySourceSpec(
-        pack_id="usa_airport",
-        family="airport",
-        country="United States",
-        cache_subdir="usa_airport",
+    _country_spec(
+        "usa_airport",
         source_truth="FAA NASR APT plus FAA passenger boarding/all-cargo statistics",
         geometry_truth="FAA NASR APT coordinates",
-        output_contract=("airports.preview.geojson", "airports.geojson"),
         sources=(
             _source(
                 "faa_nasr_current",
@@ -1153,14 +992,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "china_airport": CountrySourceSpec(
-        pack_id="china_airport",
-        family="airport",
-        country="China",
-        cache_subdir="china_airport",
+    _country_spec(
+        "china_airport",
         source_truth="CAAC annual civil transport airport bulletin plus Taiwan official/open points",
         geometry_truth="Official points where available; OSM/Geofabrik only fills coordinates for official-list airports.",
-        output_contract=("airports.preview.geojson", "airports.geojson"),
         sources=(
             _source(
                 "caac_2025_airport_bulletin",
@@ -1191,14 +1026,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "russia_airport": CountrySourceSpec(
-        pack_id="russia_airport",
-        family="airport",
-        country="Russia",
-        cache_subdir="russia_airport",
+    _country_spec(
+        "russia_airport",
         source_truth="Rosaviatsiya civil aerodrome/heliport registry",
         geometry_truth="Rosaviatsiya registry if coordinates exist; OSM/Geofabrik only fills coordinates for registered objects.",
-        output_contract=("airports.preview.geojson", "airports.geojson"),
         sources=(
             _source(
                 "rosaviatsiya_civil_aerodrome_registry",
@@ -1220,14 +1051,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "india_airport": CountrySourceSpec(
-        pack_id="india_airport",
-        family="airport",
-        country="India",
-        cache_subdir="india_airport",
+    _country_spec(
+        "india_airport",
         source_truth="AAI airport list plus AAI traffic report",
         geometry_truth="Official/AAI points where available; OSM/Geofabrik only fills coordinates for AAI-scope airports.",
-        output_contract=("airports.preview.geojson", "airports.geojson"),
         sources=(
             _source(
                 "aai_airport_list_cluster_wise_2025_26",
@@ -1258,14 +1085,10 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "germany_airport": CountrySourceSpec(
-        pack_id="germany_airport",
-        family="airport",
-        country="Germany",
-        cache_subdir="germany_airport",
+    _country_spec(
+        "germany_airport",
         source_truth="BKG POI-Open airport WFS",
         geometry_truth="BKG POI-Open flughaefen point features",
-        output_contract=("airports.preview.geojson", "airports.geojson"),
         sources=(
             _source(
                 "bkg_poi_open_airports_wfs",
@@ -1278,14 +1101,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "france_airport": CountrySourceSpec(
-        pack_id="france_airport",
-        family="airport",
-        country="France",
+    _country_spec(
+        "france_airport",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded airport entries",
         geometry_truth="UN/LOCODE coordinates for France airport-function locations",
-        output_contract=("airports.preview.geojson", "airports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1298,14 +1118,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_airport": CountrySourceSpec(
-        pack_id="uk_airport",
-        family="airport",
-        country="United Kingdom",
+    _country_spec(
+        "uk_airport",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded airport entries",
         geometry_truth="UN/LOCODE coordinates for Great Britain/Northern Ireland airport-function locations",
-        output_contract=("airports.preview.geojson", "airports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1318,14 +1135,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "usa_port": CountrySourceSpec(
-        pack_id="usa_port",
-        family="port",
-        country="United States",
+    _country_spec(
+        "usa_port",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded port entries",
         geometry_truth="UN/LOCODE coordinates for U.S. port-function locations",
-        output_contract=("ports.preview.geojson", "ports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1338,14 +1152,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "germany_port": CountrySourceSpec(
-        pack_id="germany_port",
-        family="port",
-        country="Germany",
+    _country_spec(
+        "germany_port",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded port entries",
         geometry_truth="UN/LOCODE coordinates for Germany port-function locations",
-        output_contract=("ports.preview.geojson", "ports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1358,14 +1169,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "france_port": CountrySourceSpec(
-        pack_id="france_port",
-        family="port",
-        country="France",
+    _country_spec(
+        "france_port",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded port entries",
         geometry_truth="UN/LOCODE coordinates for France port-function locations",
-        output_contract=("ports.preview.geojson", "ports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1378,14 +1186,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "uk_port": CountrySourceSpec(
-        pack_id="uk_port",
-        family="port",
-        country="United Kingdom",
+    _country_spec(
+        "uk_port",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded port entries",
         geometry_truth="UN/LOCODE coordinates for United Kingdom port-function locations",
-        output_contract=("ports.preview.geojson", "ports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1398,14 +1203,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "china_port": CountrySourceSpec(
-        pack_id="china_port",
-        family="port",
-        country="China",
+    _country_spec(
+        "china_port",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded port entries",
         geometry_truth="UN/LOCODE coordinates for China port-function locations",
-        output_contract=("ports.preview.geojson", "ports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1418,14 +1220,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "india_port": CountrySourceSpec(
-        pack_id="india_port",
-        family="port",
-        country="India",
+    _country_spec(
+        "india_port",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded port entries",
         geometry_truth="UN/LOCODE coordinates for India port-function locations",
-        output_contract=("ports.preview.geojson", "ports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1438,14 +1237,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "russia_port": CountrySourceSpec(
-        pack_id="russia_port",
-        family="port",
-        country="Russia",
+    _country_spec(
+        "russia_port",
         cache_subdir="unlocode",
         source_truth="UN/LOCODE 2025-1 function-coded port entries",
         geometry_truth="UN/LOCODE coordinates for Russia port-function locations",
-        output_contract=("ports.preview.geojson", "ports.geojson"),
         sources=(
             _source(
                 "unlocode_2025_1_release",
@@ -1458,14 +1254,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "germany_energy_facilities": CountrySourceSpec(
-        pack_id="germany_energy_facilities",
-        family="energy_facilities",
-        country="Germany",
+    _country_spec(
+        "germany_energy_facilities",
         cache_subdir="germany_road",
         source_truth="BKG DLM250 compact industry and energy facility objects",
         geometry_truth="BKG DLM250 AX_BauwerkOderAnlageFuerIndustrieUndGewerbe points",
-        output_contract=("energy_facilities.preview.geojson", "energy_facilities.geojson"),
         sources=(
             _source(
                 "bkg_dlm250_compact_nas_bda",
@@ -1478,14 +1271,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "germany_mineral_resources": CountrySourceSpec(
-        pack_id="germany_mineral_resources",
-        family="mineral_resources",
-        country="Germany",
+    _country_spec(
+        "germany_mineral_resources",
         cache_subdir="germany_road",
         source_truth="BKG DLM250 quarry and open-pit objects",
         geometry_truth="BKG DLM250 AX_TagebauGrubeSteinbruch polygons converted to representative points",
-        output_contract=("mineral_resources.preview.geojson", "mineral_resources.geojson"),
         sources=(
             _source(
                 "bkg_dlm250_compact_nas_bda",
@@ -1498,14 +1288,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "germany_industrial_zones": CountrySourceSpec(
-        pack_id="germany_industrial_zones",
-        family="industrial_zones",
-        country="Germany",
+    _country_spec(
+        "germany_industrial_zones",
         cache_subdir="germany_road",
         source_truth="BKG DLM250 industrial and commercial area objects",
         geometry_truth="BKG DLM250 AX_IndustrieUndGewerbeflaeche polygons",
-        output_contract=("industrial_zones.preview.geojson", "industrial_zones.geojson"),
         sources=(
             _source(
                 "bkg_dlm250_compact_nas_bda",
@@ -1518,14 +1305,11 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-    "germany_logistics_hubs": CountrySourceSpec(
-        pack_id="germany_logistics_hubs",
-        family="logistics_hubs",
-        country="Germany",
+    _country_spec(
+        "germany_logistics_hubs",
         cache_subdir="germany_road",
         source_truth="BKG DLM250 transport facility objects",
         geometry_truth="BKG DLM250 AX_Transportanlage geometry converted to representative points",
-        output_contract=("logistics_hubs.preview.geojson", "logistics_hubs.geojson"),
         sources=(
             _source(
                 "bkg_dlm250_compact_nas_bda",
@@ -1538,7 +1322,9 @@ COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {
             ),
         ),
     ),
-}
+)
+COUNTRY_SOURCE_SPECS: dict[str, CountrySourceSpec] = {spec.pack_id: spec for spec in _COUNTRY_PACKS}
+TARGET_COUNTRY_PACK_IDS = tuple(COUNTRY_SOURCE_SPECS)
 
 
 def repo_display_path(path_value: str | Path) -> str:

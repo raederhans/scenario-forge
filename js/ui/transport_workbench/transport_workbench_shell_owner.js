@@ -1,10 +1,6 @@
 // Transport workbench shell owner.
 // Owns shell chrome DOM synchronization and skips unchanged writes during repeated refreshes.
 
-import {
-  TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS,
-} from "./transport_workbench_descriptor.js";
-
 const toText = (value) => String(value ?? "");
 
 function syncTextContent(node, value) {
@@ -81,10 +77,8 @@ export function createTransportWorkbenchShellOwner({
   overlay = null,
   title = null,
   lensTitle = null,
-  familyStatus = null,
   countryStatus = null,
   packSelect = null,
-  previewMode = null,
   previewTitle = null,
   previewCanvas = null,
   previewControls = null,
@@ -141,21 +135,12 @@ export function createTransportWorkbenchShellOwner({
     if (syncAttribute(scenarioButton, "title", isOpen ? translate("Close transport workbench") : translate("Open transport workbench"))) updated += 1;
     if (syncTextContent(title, translate(family.title))) updated += 1;
     if (syncTextContent(lensTitle, translate(family.lensTitle))) updated += 1;
-    if (syncTextContent(familyStatus, translate(family.label))) updated += 1;
     if (syncTextContent(countryStatus, context.activePackMeta?.country || uiState.sampleCountry)) updated += 1;
     updated += syncTransportWorkbenchPackSelectOptions({
       selectNode: packSelect,
       packOptions: listPackOptions({ familyId: family.id }),
       activePackId: context.activePackId,
     }).updated;
-    const modeLabel = family.id === "layers"
-      ? translate("Layer order")
-      : TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id)
-        ? `${String(context.config?.displayMode || "inspect").replace(/_/g, " ")} · ${String(context.config?.displayPreset || "balanced").replace(/_/g, " ")}`
-        : uiState.previewMode === "bounded_zoom_pan"
-          ? translate("Zoom / pan / quarter-turn")
-          : uiState.previewMode;
-    if (syncTextContent(previewMode, modeLabel)) updated += 1;
     const previewTitleLabel = family.id === "layers"
       ? translate(family.previewTitle)
       : (uiState.sampleCountry === "Japan" ? translate("Japan preview") : `${uiState.sampleCountry} preview`);

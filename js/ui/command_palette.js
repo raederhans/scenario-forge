@@ -1,4 +1,5 @@
 import { getActiveModal } from "./ui_contract.js";
+import { isDeveloperModeEntryVisible } from "./toolbar/developer_mode_visibility.js";
 
 const bindings = (group, entries) => entries.map(([action, label, ...keys]) => ({ group, action, label, keys }));
 
@@ -129,9 +130,11 @@ export function initCommandPalette({ documentRef = document, t, getCommands }) {
     results.setAttribute("role", help ? "region" : "listbox");
     results.tabIndex = help ? 0 : -1;
     input.hidden = help;
-    const rows = help ? shortcuts : getCommands().filter(({ button, label, key }) =>
-      button && !button.disabled && `${t(label, "ui")} ${key} ${label}`.toLowerCase().includes(query)
-    ).slice(0, 50);
+    const rows = help
+      ? shortcuts.filter(row => row.action !== "toggleDeveloperModeFn" || isDeveloperModeEntryVisible())
+      : getCommands().filter(({ button, label, key }) =>
+        button && !button.disabled && `${t(label, "ui")} ${key} ${label}`.toLowerCase().includes(query)
+      ).slice(0, 50);
     results.replaceChildren();
     options = [];
     commands = [];

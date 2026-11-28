@@ -48,38 +48,17 @@ def _urban_gdf(*, owner_id: str = "TEST_COUNTRY", feature_id: str = "urban::alph
     )
 
 
-def test_build_topology_rejects_urban_without_owner_metadata(tmp_path):
-    output_path = tmp_path / "invalid_missing_owner.json"
-    invalid_urban = _urban_gdf(owner_id="")
-
-    with pytest.raises(ValueError, match="missing country_owner_id=1"):
-        build_topology(
-            political=_political_gdf(),
-            ocean=_empty_gdf(),
-            land=_empty_gdf(),
-            urban=invalid_urban,
-            physical=_empty_gdf(),
-            rivers=_empty_gdf(),
-            output_path=output_path,
-        )
-
-
-def test_build_topology_rejects_world_spanning_urban_geometry(tmp_path):
-    output_path = tmp_path / "invalid_world_bounds.json"
-    invalid_urban = _urban_gdf(
-        geometry=_polygon(-180, -90, 180, 90),
-    )
-
-    with pytest.raises(ValueError, match="corrupt world-spanning features=1"):
-        build_topology(
-            political=_political_gdf(),
-            ocean=_empty_gdf(),
-            land=_empty_gdf(),
-            urban=invalid_urban,
-            physical=_empty_gdf(),
-            rivers=_empty_gdf(),
-            output_path=output_path,
-        )
+def test_build_topology_rejects_invalid_urban(tmp_path):
+    for invalid_urban, message in (
+        (_urban_gdf(owner_id=""), "missing country_owner_id=1"),
+        (_urban_gdf(geometry=_polygon(-180, -90, 180, 90)), "corrupt world-spanning features=1"),
+    ):
+        with pytest.raises(ValueError, match=message):
+            build_topology(
+                political=_political_gdf(), ocean=_empty_gdf(), land=_empty_gdf(),
+                urban=invalid_urban, physical=_empty_gdf(), rivers=_empty_gdf(),
+                output_path=tmp_path / "invalid.json",
+            )
 
 
 def test_build_topology_preserves_urban_ids_and_owner_metadata(tmp_path):

@@ -10,7 +10,6 @@ import {
   resetScenarioToBaselineCommand,
 } from "../core/scenario_dispatcher.js";
 import {
-  formatScenarioAuditText,
   formatScenarioStatusText,
   getScenarioDisplayName,
   getScenarioRegistryEntries,
@@ -61,7 +60,6 @@ export function initScenarioControls({ applyScenario = applyScenarioByIdCommand 
   const blankFeatureLabelsToggleRow = document.getElementById("blankFeatureLabelsToggleRow");
   const toggleBlankFeatureLabels = document.getElementById("toggleBlankFeatureLabels");
   const scenarioStatus = document.getElementById("scenarioStatus");
-  const scenarioAuditHint = document.getElementById("scenarioAuditHint");
   const hgoEditorLink = document.getElementById("hgoEditorLink");
   hgoEditorLink?.parentElement.append(hgoEditorLink);
   let pendingScenarioId = "";
@@ -159,11 +157,6 @@ export function initScenarioControls({ applyScenario = applyScenarioByIdCommand 
 
     if (scenarioStatus) {
       scenarioStatus.textContent = formatScenarioStatusText();
-    }
-    if (scenarioAuditHint) {
-      const auditText = formatScenarioAuditText();
-      scenarioAuditHint.textContent = auditText;
-      scenarioAuditHint.classList.toggle("hidden", !auditText);
     }
     if (resetScenarioBtn) {
       resetScenarioBtn.textContent = t("Reset", "ui");

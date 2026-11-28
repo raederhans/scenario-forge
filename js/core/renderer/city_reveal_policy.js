@@ -1,9 +1,6 @@
+import { clamp } from "../value_normalization.js";
 // City reveal rules: tiering, phase budgets, country priority, and marker sizing.
 // Pure policy only; collection caches and viewport/runtime access stay in the renderer.
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
 
 export const CITY_COUNTRY_TIER_RANK = {
   A: 5,

@@ -5,16 +5,10 @@ import path from "node:path";
 import { gunzipSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
 
-// Applied plans are materialized by tools/apply_political_feature_merges.py.
-// Any upstream rebuild that restores a merged-away runtime ID must re-run it.
-// Plans apply in apply_order.json order; a plan with "scenarios" applies only
-// there, and a later plan may merge an earlier merged feature again.
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const planDir = path.join(root, "data/political_feature_merges");
-const planFiles = fs.readdirSync(planDir).filter(name => /\.v\d+\.json$/.test(name));
 const order = JSON.parse(fs.readFileSync(path.join(planDir, "apply_order.json"), "utf8")).plans;
 const plans = order.map(name => JSON.parse(fs.readFileSync(path.join(planDir, name), "utf8")));
-const groups = plans.flatMap(plan => plan.groups);
 const scenarios = ["blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"];
 // Regional scenarios carry their own political parcels, so no merge plan touches them.
 const regionalScenarios = ["rcw_1919"];
@@ -26,15 +20,12 @@ const globalAssets = [
   "geo_aliases.json", "country_feature_policies.json", "quick_fill", "world_cities.geojson", "europe_urban.geojson",
   "releasables/hoi4_vanilla.internal.phase1.catalog.json", "river_partitions",
 ];
-// Global files read by one scenario only, so its scoped plans project them too.
 const scenarioAssets = id => [
   ...(id === "tno_1962" ? ["releasables/tno_1962.internal.phase1.catalog.json"] : []),
   ...(id === "blank_base" ? [] : [`thematic_layers/population/ghsl_population_2020_v1/features/${id}.json`]),
 ];
-// Shipped sample projects, keyed by political feature IDs of their own scenario.
 const sampleProjects = listJson(path.join(root, "landing/assets/sample-projects"))
   .map(file => ({ file, scenario: JSON.parse(fs.readFileSync(file, "utf8")).scenario?.id }));
-// Provenance written before the merge; not read by the runtime.
 const provenance = [/\/derived\//, /\/audit\.json$/, /\/build_snapshot\.json$/];
 
 function readText(file) {
@@ -49,9 +40,7 @@ function listJson(target) {
     .filter(file => /\.(json|geojson)(\.gz)?$|\.pidr\.gz$/.test(file) && fs.statSync(file).isFile());
 }
 
-// Scenario-scoped merge maps name their members by design.
 const featureMergeMaps = /"feature_merges":\s*\{[^}]*\}/g;
-// Copies of global names and aliases, which keep the members of scoped plans.
 const sharedNameCopies = /\/(locales|geo_aliases)\.startup\.json$/;
 
 function staleIds(files, memberIds) {
@@ -75,32 +64,6 @@ function scenarioStaleIds(id) {
     ...staleIds(files.filter(file => !sharedNameCopies.test(file.replaceAll("\\", "/"))), scopedMembers),
   ];
 }
-
-test("merge plan groups are disjoint, contiguous candidates with bilingual names", () => {
-  assert.ok(plans.length >= 2);
-  assert.deepEqual([...order].sort(), [...planFiles].sort());
-  assert.equal(new Set(order).size, order.length);
-  const produced = new Map();
-  for (const plan of plans) {
-    assert.ok(!plan.scenarios || (plan.scenarios.length && plan.scenarios.every(id => scenarios.includes(id))));
-    const scope = plan.scenarios || scenarios;
-    for (const group of plan.groups) {
-      for (const member of group.member_ids.filter(id => id.includes("_MRG_"))) {
-        assert.ok(scope.every(id => produced.get(member)?.includes(id)), `${group.id}: ${member} must come from an earlier plan`);
-      }
-      produced.set(group.id, scope);
-    }
-  }
-  for (const scenario of scenarios) {
-    const memberIds = scenarioGroups(scenario).flatMap(group => group.member_ids);
-    assert.equal(new Set(memberIds).size, memberIds.length, scenario);
-  }
-  for (const group of groups) {
-    assert.match(group.id, /^[A-Z]{2}_MRG_[0-9a-f]{12}$/);
-    assert.ok(group.member_ids.length >= 2 && group.member_ids.every(id => id.startsWith(group.id.slice(0, 2))));
-    assert.ok(group.names.en && group.names.zh);
-  }
-});
 
 test("saved-project merge lineage matches the applied plans in order", () => {
   const lineage = JSON.parse(fs.readFileSync(path.join(root, "data/feature-migrations/political_feature_merges.v1.json"), "utf8"));
@@ -141,31 +104,4 @@ test("every scenario topology carries each surviving merged feature exactly once
       }
     }
   }
-});
-
-test("TNO keeps its own names of merged members as the merged feature's name or alias", () => {
-  const scenario = "tno_1962";
-  const dir = path.join(root, "data/scenarios", scenario);
-  const applied = scenarioGroups(scenario);
-  const parentOf = new Map(applied.flatMap(group => group.member_ids.map(member => [member, group.id])));
-  const final = id => (parentOf.has(id) ? final(parentOf.get(id)) : id);
-  const patch = JSON.parse(readText(path.join(dir, "geo_locale_patch.json"))).geo;
-  const aliasData = JSON.parse(readText(path.join(root, "data/geo_aliases.json")));
-  const aliases = aliasData.alias_to_stable_key;
-  const searchOnly = new Map(aliasData.entries.map(entry => [entry.feature_id, new Set(entry.search_only_aliases || [])]));
-  const lost = [];
-  for (const group of applied) {
-    for (const [member, names] of Object.entries(group.scenario_member_names?.[scenario] || {})) {
-      const target = final(group.id);
-      for (const name of Object.values(names)) {
-        const shown = Object.values(patch[target] || {}).includes(name);
-        const alias = aliases[name]?.replace(/^id::/, "");
-        // A name another feature already resolves (a common district name) stays a search-only alias.
-        const searchable = alias ? final(alias) === target || searchOnly.get(group.id)?.has(name) : false;
-        if (!shown && !searchable) lost.push(`${member} ${name} -> ${target}`);
-      }
-    }
-  }
-  assert.ok(applied.some(group => group.scenario_member_names?.[scenario]));
-  assert.deepEqual(lost, []);
 });

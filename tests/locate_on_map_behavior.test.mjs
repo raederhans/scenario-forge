@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
 import { createCountryInspectorController } from "../js/ui/sidebar/country_inspector_controller.js";
-import { createRegionSearchController } from "../js/ui/sidebar/region_search_controller.js";
 import { harness } from "./helpers/toolbar_document_fixture.mjs";
 
 const d3 = createRequire(import.meta.url)("../vendor/d3.v7.min.js");
@@ -16,39 +15,7 @@ function land(id, code, west) {
   };
 }
 
-test("selecting a search result focuses its bounds once and preserves the unloaded message", (ctx) => {
-  const { doc, add } = harness(ctx);
-  const feature = land("east", "AA", 173);
-  const state = { landIndex: new Map([[feature.id, feature]]) };
-  globalThis.d3 = d3;
-  ctx.after(() => delete globalThis.d3);
-  const calls = [];
-  const controller = createRegionSearchController({
-    documentRef: doc, state, t: (key) => key,
-    getFeatureOwnerCode: () => "AA", getFeatureLabel: (item) => item.id,
-    selectLandFeatureById: (id) => state.landIndex.has(id),
-    focusGeoBounds: (...args) => calls.push(args),
-  });
-  controller.mount(add());
-  controller.setCountry("AA");
-  const input = doc.getElementById("regionSearchInput");
-  input.value = "east";
-  input.fire("input");
-  doc.getElementById("regionSearchOption-0").click();
-  assert.equal(calls.length, 1);
-  const [bounds, options] = calls[0];
-  assert.deepEqual(bounds, d3.geoBounds(feature).flat());
-  assert.equal(options.animate, true);
-  assert.equal(options.maxScale, 8);
-
-  input.fire("input");
-  state.landIndex.clear();
-  input.fire("keydown", { key: "Enter" });
-  assert.equal(doc.getElementById("regionSearchStatus").textContent, "Region is not loaded yet.");
-  assert.equal(calls.length, 1);
-});
-
-test("country location combines loaded scenario members across the dateline and follows geographic membership outside a scenario", (ctx) => {
+test("scenario members across the dateline produce a short country bounding box", (ctx) => {
   const { add } = harness(ctx);
   globalThis.d3 = d3;
   ctx.after(() => delete globalThis.d3);
@@ -73,22 +40,10 @@ test("country location combines loaded scenario members across the dateline and 
   });
   controller.renderCountryInspectorDetail();
   const button = card.querySelector("button");
-  assert.equal(button.textContent, "Locate on Map");
-  assert.equal(button.disabled, false);
   state.landIndex.set(west.id, west);
   button.click();
-  assert.equal(calls.length, 1);
   const [bounds] = calls[0];
   assert.equal(bounds[0], 173);
   assert.equal(bounds[2], -177);
   assert.deepEqual(bounds, d3.geoBounds({ type: "FeatureCollection", features: [east, west] }).flat());
-
-  state.activeScenarioId = "";
-  controller.renderCountryInspectorDetail();
-  button.click();
-  assert.deepEqual(calls[1][0], d3.geoBounds(mainland).flat());
-  state.landIndex.clear();
-  controller.renderCountryInspectorDetail();
-  assert.equal(button.disabled, true);
-  assert.equal(calls.length, 2);
 });

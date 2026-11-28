@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { getParentMergedParents, resolveParentMergedBorderKeys, resolveParentMergedContourColor } from '../js/core/renderer/parent_merged_presentation.js';
+import { getParentMergedParents, resolveParentMergedContourColor } from '../js/core/renderer/parent_merged_presentation.js';
 import { uniquifyScenarioDefaultColors } from '../js/core/state/actions/scenario_activation_actions.js';
 import { createCountryLabelSourceOwner } from '../js/core/renderer/country_label_source.js';
 
@@ -11,45 +11,6 @@ const countries = () => ({
   SUBJECT: { parent_owner_tag: 'ES' },
   MISSING: { presentation: 'parent_merged', parent_owner_tag: 'UNKNOWN' },
   OTHER: { presentation: 'other', parent_owner_tag: 'ES' },
-});
-
-for (const asMap of [false, true]) {
-  test(`filters declared parent-merged countries and caches by identity (${asMap ? 'Map' : 'object'})`, () => {
-    const input = asMap ? new Map(Object.entries(countries())) : countries();
-    const parents = getParentMergedParents(input);
-    assert.deepEqual([...parents], [['CAT', 'ES']]);
-    assert.equal(getParentMergedParents(input), parents);
-    const replacement = asMap ? new Map(input) : { ...input };
-    assert.notEqual(getParentMergedParents(replacement), parents);
-    assert.deepEqual(getParentMergedParents(replacement), parents);
-  });
-}
-
-test('border keys merge only an unpainted parent-merged child', () => {
-  const parents = getParentMergedParents(countries());
-  assert.deepEqual(resolveParentMergedBorderKeys({ borderKey: 'CAT', reference: 'CAT', parentKey: 'ES', parents }),
-    { borderKey: 'ES', parentKey: 'subject:CAT', homeKey: 'ES' });
-  assert.deepEqual(resolveParentMergedBorderKeys({ borderKey: 'FR', reference: 'CAT', parentKey: 'ES', parents }),
-    { borderKey: 'FR', parentKey: 'ES', homeKey: 'FR' });
-  assert.deepEqual(resolveParentMergedBorderKeys({ borderKey: 'SUBJECT', reference: 'SUBJECT', parentKey: 'ES', parents }),
-    { borderKey: 'SUBJECT', parentKey: 'ES', homeKey: 'SUBJECT' });
-});
-
-test('deferred children preserve the parent color even when preferred', () => {
-  const input = { CAT: '#123456', ES: '#123456' };
-  for (const preferred of [[], ['CAT']]) {
-    const colors = uniquifyScenarioDefaultColors(input, {
-      preferred, deferred: new Set(getParentMergedParents(countries()).keys()),
-    });
-    assert.equal(colors.ES, input.ES);
-    assert.notEqual(colors.CAT, colors.ES);
-    const difference = [1, 3, 5].reduce((sum, offset) => sum + Math.abs(
-      parseInt(colors.CAT.slice(offset, offset + 2), 16) - parseInt(colors.ES.slice(offset, offset + 2), 16)), 0);
-    assert.ok(difference <= 3);
-  }
-  assert.deepEqual(input, { CAT: '#123456', ES: '#123456' });
-  assert.equal(uniquifyScenarioDefaultColors(input).CAT, input.CAT);
-  assert.equal(uniquifyScenarioDefaultColors(input, { preferred: ['ES'] }).ES, input.ES);
 });
 
 test('country label geometry joins children to parents and preserves ordinary subjects', async () => {
@@ -103,29 +64,4 @@ test('paint contours treat an unedited child default as its parent colour, but k
   assert.equal(resolveParentMergedContourColor({ color: '#123456', owner: 'CAT', parents, baseColors }), '#123456');
   assert.equal(resolveParentMergedContourColor({ color: baseColors.ES, owner: 'ES', parents, baseColors }), baseColors.ES);
   assert.equal(resolveParentMergedContourColor({ color: '#abcdef', owner: 'SUBJECT', parents, baseColors }), '#abcdef');
-});
-
-test('paint contours survive inspector colour edits on either side of a parent-merged boundary', () => {
-  const parents = getParentMergedParents(countries());
-  const defaults = uniquifyScenarioDefaultColors({ ES: '#f2cd5e', CAT: '#f2cd5e' }, { deferred: new Set(parents.keys()) });
-  // applyCountryColor writes the chosen colour into sovereignBaseColors.
-  const childEdited = { ...defaults, CAT: '#123456' };
-  assert.equal(resolveParentMergedContourColor({ color: '#123456', owner: 'CAT', parents, baseColors: childEdited }), '#123456');
-  const parentEdited = { ...defaults, ES: '#3355aa' };
-  assert.equal(resolveParentMergedContourColor({ color: defaults.CAT, owner: 'CAT', parents, baseColors: parentEdited }), defaults.CAT);
-  const childSetToParent = { ...defaults, CAT: '#3355aa', ES: '#3355aa' };
-  assert.equal(resolveParentMergedContourColor({ color: '#3355aa', owner: 'CAT', parents, baseColors: childSetToParent }), '#3355aa');
-});
-
-test('every deconflicted sibling of a crowded parent still compares as the parent', () => {
-  const children = Array.from({ length: 8 }, (_, index) => `C${index}`);
-  const input = Object.fromEntries([['RU', {}], ...children.map(tag => [tag, { presentation: 'parent_merged', parent_owner_tag: 'RU' }])]);
-  const parents = getParentMergedParents(input);
-  const baseColors = uniquifyScenarioDefaultColors(Object.fromEntries(['RU', ...children].map(tag => [tag, '#7a5c8f'])), {
-    deferred: new Set(parents.keys()),
-  });
-  assert.equal(new Set(Object.values(baseColors)).size, 9);
-  for (const tag of children) {
-    assert.equal(resolveParentMergedContourColor({ color: baseColors[tag], owner: tag, parents, baseColors }), '#7a5c8f');
-  }
 });

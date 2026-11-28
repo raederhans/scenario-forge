@@ -1,3 +1,4 @@
+import { fragmentCamouflageRules as defaultFragmentCamouflageRules } from "../country_feature_policies.js";
 import { getActiveRiverPack, getRiverPartitionIndex } from "../river_paint/partition_model.js";
 import { isRiverPaintSourceCompatible } from "../river_paint/pilot_manifest.js";
 import { inheritContourCoordinatePrecision } from "../paint_contour_source.js";
@@ -21,12 +22,12 @@ export function createPoliticalCollectionOwner({
 } = {}) {
   const {
     highFrequencyCountryDetailWhitelist = new Set(),
-    interactiveAggregateTierFilters = {},
-    fragmentCamouflageRules = [],
+    interactiveAggregateTierFilters = INTERACTIVE_AGGREGATE_TIER_FILTERS,
+    fragmentCamouflageRules = defaultFragmentCamouflageRules,
   } = constants;
 
   const {
-    getDetailTier,
+    getDetailTier: readDetailTier = getDetailTier,
     getFeatureCountryCodeNormalized,
     getFeatureId,
     isPoliticalInteractionRenderableFeature,
@@ -806,7 +807,7 @@ export function createPoliticalCollectionOwner({
         const countryCode = getFeatureCountryCodeNormalized(feature);
         const blockedTiers = interactiveAggregateTierFilters[countryCode];
         if (countryCode && blockedTiers?.size) {
-          const tier = getDetailTier(feature).toLowerCase();
+          const tier = readDetailTier(feature).toLowerCase();
           let entry = filterStateByCountry.get(countryCode);
           if (!entry) {
             entry = { blockedTiers, hasLeaf: false, hasBlocked: false };
@@ -834,7 +835,7 @@ export function createPoliticalCollectionOwner({
     let filtered = false;
     for (const feature of explicitFeatures) {
       const entry = activeFilters.size ? activeFilters.get(getFeatureCountryCodeNormalized(feature)) : null;
-      if (entry?.blockedTiers.has(getDetailTier(feature).toLowerCase())) {
+      if (entry?.blockedTiers.has(readDetailTier(feature).toLowerCase())) {
         changed = true;
         filtered = true;
       } else {

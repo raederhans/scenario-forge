@@ -1,3 +1,4 @@
+import { restoreScenarioFields, validateScenarioSnapshot } from "./scenario_snapshot.js";
 import { normalizePaintMode } from "../../map_editing_policy.js";
 import { normalizeQuickFillScope } from "../../quick_fill_hierarchy.js";
 // Canonical scenario presentation state authority.
@@ -293,38 +294,8 @@ function validateCompletePatch(patch) {
 }
 
 function validateSnapshot(snapshot) {
-  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
-    throw new TypeError("[scenario_presentation_actions] snapshot must be an object");
-  }
-  const values = snapshot.values;
-  if (!values || typeof values !== "object" || Array.isArray(values)) {
-    throw new TypeError("[scenario_presentation_actions] snapshot.values must be an object");
-  }
-  for (const key of SCENARIO_PRESENTATION_STATE_KEYS) {
-    if (!hasOwn(values, key)) {
-      throw new Error(
-        `[scenario_presentation_actions] restoreScenarioPresentationState missing snapshot key: ${key}`,
-      );
-    }
-  }
-  if (
-    !Array.isArray(snapshot.presentKeys)
-    && !(snapshot.presentKeys instanceof Set)
-  ) {
-    throw new TypeError(
-      "[scenario_presentation_actions] snapshot.presentKeys must be an array or Set",
-    );
-  }
-  const presentKeys = Array.from(snapshot.presentKeys);
-  const allowedKeys = new Set(SCENARIO_PRESENTATION_STATE_KEYS);
-  for (const key of presentKeys) {
-    if (!allowedKeys.has(key)) {
-      throw new Error(
-        `[scenario_presentation_actions] restoreScenarioPresentationState contains unknown present key: ${key}`,
-      );
-    }
-  }
-  return { values, presentKeys: new Set(presentKeys) };
+  return validateScenarioSnapshot(snapshot, SCENARIO_PRESENTATION_STATE_KEYS,
+    "scenario_presentation_actions", "restoreScenarioPresentationState");
 }
 
 export function captureScenarioPresentationState(target) {
@@ -433,23 +404,9 @@ function restoreScenarioPresentationBeforeAuditStateFromValidated(
   target,
   { values, presentKeys },
 ) {
-  if (presentKeys.has("scenarioGeoLocalePatchData")) {
-    target.scenarioGeoLocalePatchData =
-      values.scenarioGeoLocalePatchData;
-  } else {
-    delete target.scenarioGeoLocalePatchData;
-  }
-  if (presentKeys.has("scenarioCityOverridesData")) {
-    target.scenarioCityOverridesData =
-      values.scenarioCityOverridesData;
-  } else {
-    delete target.scenarioCityOverridesData;
-  }
-  if (presentKeys.has("cityLayerRevision")) {
-    target.cityLayerRevision = values.cityLayerRevision;
-  } else {
-    delete target.cityLayerRevision;
-  }
+  restoreScenarioFields(target, values, presentKeys, [
+    "scenarioGeoLocalePatchData", "scenarioCityOverridesData", "cityLayerRevision",
+  ]);
 }
 
 function restoreScenarioPresentationStateFromValidated(
@@ -457,91 +414,15 @@ function restoreScenarioPresentationStateFromValidated(
   { values, presentKeys },
   { preserveTransactionNestedState = false } = {},
 ) {
-  if (presentKeys.has("scenarioParentBorderEnabledBeforeActivate")) {
-    target.scenarioParentBorderEnabledBeforeActivate =
-      values.scenarioParentBorderEnabledBeforeActivate;
-  } else {
-    delete target.scenarioParentBorderEnabledBeforeActivate;
-  }
-  if (presentKeys.has("scenarioDisplaySettingsBeforeActivate")) {
-    target.scenarioDisplaySettingsBeforeActivate =
-      values.scenarioDisplaySettingsBeforeActivate;
-  } else {
-    delete target.scenarioDisplaySettingsBeforeActivate;
-  }
-  if (presentKeys.has("scenarioOceanFillBeforeActivate")) {
-    target.scenarioOceanFillBeforeActivate =
-      values.scenarioOceanFillBeforeActivate;
-  } else {
-    delete target.scenarioOceanFillBeforeActivate;
-  }
-  if (presentKeys.has("scenarioOceanStyleBeforeActivate")) {
-    target.scenarioOceanStyleBeforeActivate =
-      values.scenarioOceanStyleBeforeActivate;
-  } else {
-    delete target.scenarioOceanStyleBeforeActivate;
-  }
-  if (presentKeys.has("scenarioPresentationStyleBeforeActivate")) {
-    target.scenarioPresentationStyleBeforeActivate =
-      values.scenarioPresentationStyleBeforeActivate;
-  } else {
-    delete target.scenarioPresentationStyleBeforeActivate;
-  }
-  if (presentKeys.has("activeSovereignCode")) {
-    target.activeSovereignCode = values.activeSovereignCode;
-  } else {
-    delete target.activeSovereignCode;
-  }
-  if (presentKeys.has("selectedWaterRegionId")) {
-    target.selectedWaterRegionId = values.selectedWaterRegionId;
-  } else {
-    delete target.selectedWaterRegionId;
-  }
-  if (presentKeys.has("selectedSpecialRegionId")) {
-    target.selectedSpecialRegionId = values.selectedSpecialRegionId;
-  } else {
-    delete target.selectedSpecialRegionId;
-  }
-  if (presentKeys.has("hoveredWaterRegionId")) {
-    target.hoveredWaterRegionId = values.hoveredWaterRegionId;
-  } else {
-    delete target.hoveredWaterRegionId;
-  }
-  if (presentKeys.has("hoveredSpecialRegionId")) {
-    target.hoveredSpecialRegionId = values.hoveredSpecialRegionId;
-  } else {
-    delete target.hoveredSpecialRegionId;
-  }
-  if (presentKeys.has("selectedInspectorCountryCode")) {
-    target.selectedInspectorCountryCode =
-      values.selectedInspectorCountryCode;
-  } else {
-    delete target.selectedInspectorCountryCode;
-  }
-  if (presentKeys.has("inspectorHighlightCountryCode")) {
-    target.inspectorHighlightCountryCode =
-      values.inspectorHighlightCountryCode;
-  } else {
-    delete target.inspectorHighlightCountryCode;
-  }
-  if (presentKeys.has("inspectorExpansionInitialized")) {
-    target.inspectorExpansionInitialized =
-      values.inspectorExpansionInitialized;
-  } else {
-    delete target.inspectorExpansionInitialized;
-  }
-  if (presentKeys.has("expandedInspectorContinents")) {
-    target.expandedInspectorContinents =
-      values.expandedInspectorContinents;
-  } else {
-    delete target.expandedInspectorContinents;
-  }
-  if (presentKeys.has("expandedInspectorReleaseParents")) {
-    target.expandedInspectorReleaseParents =
-      values.expandedInspectorReleaseParents;
-  } else {
-    delete target.expandedInspectorReleaseParents;
-  }
+  restoreScenarioFields(target, values, presentKeys, [
+    "scenarioParentBorderEnabledBeforeActivate", "scenarioDisplaySettingsBeforeActivate",
+    "scenarioOceanFillBeforeActivate", "scenarioOceanStyleBeforeActivate",
+    "scenarioPresentationStyleBeforeActivate", "activeSovereignCode", "selectedWaterRegionId",
+    "selectedSpecialRegionId", "hoveredWaterRegionId", "hoveredSpecialRegionId",
+    "selectedInspectorCountryCode", "inspectorHighlightCountryCode",
+    "inspectorExpansionInitialized", "expandedInspectorContinents",
+    "expandedInspectorReleaseParents",
+  ]);
   if (presentKeys.has("parentBordersVisible")) {
     setAppearanceVisibilitySnapshotState(
       target,
@@ -562,27 +443,15 @@ function restoreScenarioPresentationStateFromValidated(
   } else {
     delete target.parentBorderEnabledByCountry;
   }
-  if (presentKeys.has("scenarioPaintModeBeforeActivate")) {
-    target.scenarioPaintModeBeforeActivate =
-      values.scenarioPaintModeBeforeActivate;
-  } else {
-    delete target.scenarioPaintModeBeforeActivate;
-  }
+  restoreScenarioFields(target, values, presentKeys, ["scenarioPaintModeBeforeActivate"]);
   if (presentKeys.has("paintMode")) {
     target.paintMode = normalizePaintMode(values.paintMode);
   } else {
     delete target.paintMode;
   }
-  if (presentKeys.has("interactionGranularity")) {
-    target.interactionGranularity = values.interactionGranularity;
-  } else {
-    delete target.interactionGranularity;
-  }
-  if (presentKeys.has("batchFillScope")) {
-    target.batchFillScope = values.batchFillScope;
-  } else {
-    delete target.batchFillScope;
-  }
+  restoreScenarioFields(target, values, presentKeys, [
+    "interactionGranularity", "batchFillScope",
+  ]);
   if (presentKeys.has("ui")) {
     if (preserveTransactionNestedState) {
       patchUiChromeState(
@@ -622,37 +491,15 @@ function restoreScenarioPresentationStateFromValidated(
   } else {
     delete target.styleConfig;
   }
-  if (presentKeys.has("locales")) {
-    target.locales = values.locales;
-  } else {
-    delete target.locales;
-  }
-  if (presentKeys.has("geoAliasToStableKey")) {
-    target.geoAliasToStableKey = values.geoAliasToStableKey;
-  } else {
-    delete target.geoAliasToStableKey;
-  }
+  restoreScenarioFields(target, values, presentKeys, ["locales", "geoAliasToStableKey"]);
   if (!preserveTransactionNestedState) {
     restoreScenarioPresentationBeforeAuditStateFromValidated(
       target,
       { values, presentKeys },
     );
-    if (presentKeys.has("scenarioAuditUi")) {
-      target.scenarioAuditUi = values.scenarioAuditUi;
-    } else {
-      delete target.scenarioAuditUi;
-    }
+    restoreScenarioFields(target, values, presentKeys, ["scenarioAuditUi"]);
   }
-  if (presentKeys.has("renderProfile")) {
-    target.renderProfile = values.renderProfile;
-  } else {
-    delete target.renderProfile;
-  }
-  if (presentKeys.has("dynamicBordersEnabled")) {
-    target.dynamicBordersEnabled = values.dynamicBordersEnabled;
-  } else {
-    delete target.dynamicBordersEnabled;
-  }
+  restoreScenarioFields(target, values, presentKeys, ["renderProfile", "dynamicBordersEnabled"]);
   if (presentKeys.has("showCityPoints")) {
     commitUiVisibilityState(
       target,

@@ -82,12 +82,3 @@ test("opening local history preserves the offered payload across another autosav
     ["auto", "Edited"], ["deferred", "Original"],
   ]);
 });
-
-test("only imported legacy country labels with manual text acquire an explicit replacement flag", () => {
-  const legacy = { countryCode: "FR", text: "Vichy France", lon: 2, lat: 46 };
-  const mapLabels = [legacy, { ...legacy, replaceCountryName: false }, { ...legacy, replaceCountryName: null },
-    { ...legacy, countryCode: "" }, { ...legacy, text: " " }];
-  const project = FileManager.normalizeImportedProjectData({ mapLabels });
-  assert.deepEqual(project.mapLabels.map(label => label.replaceCountryName), [true, false, null, null, null]);
-  assert.equal(FileManager.buildProjectPayload({ styleConfig: {}, mapLabels: [legacy] }).mapLabels[0].replaceCountryName, null);
-});

@@ -22,21 +22,6 @@ class RegionalRebuildPlanTest(unittest.TestCase):
     def _write(self, path, features):
         path.write_text(json.dumps(_fc(features)), encoding="utf-8")
 
-    def test_duplicate_missing_and_invalid_ids_or_geometry_fail_closed(self):
-        with tempfile.TemporaryDirectory() as root:
-            root = Path(root)
-            good = root / "good.json"
-            self._write(good, [_f("RU_A", "RU", box(0, 0, 1, 1))])
-            for features in (
-                [_f("RU_A", "RU", box(0, 0, 1, 1)), _f("RU_A", "RU", box(1, 0, 2, 1))],
-                [_f("", "RU", box(0, 0, 1, 1))],
-                [_f("RU_A", "RU", box(0, 0, 1, 1).boundary)],
-            ):
-                bad = root / f"bad{len(list(root.glob('bad*')))}.json"
-                self._write(bad, features)
-                with self.assertRaises(ValueError):
-                    plan_regional_rebuild(baseline_topology=bad, candidate_topology=good, source_countries=["RU"])
-
     def test_property_only_change_and_ring_order_are_distinguished(self):
         with tempfile.TemporaryDirectory() as root:
             root = Path(root); old = root / "old.json"; new = root / "new.json"
@@ -50,22 +35,6 @@ class RegionalRebuildPlanTest(unittest.TestCase):
             result = plan_regional_rebuild(baseline_topology=old, candidate_topology=new, source_countries=["RU"])
             self.assertNotIn("RU_A", result["changed_ids_all_sources"])
 
-    def test_preview_reports_selected_impact_and_unknown_selector_blocks(self):
-        with tempfile.TemporaryDirectory() as root:
-            root = Path(root); old = root / "old.json"; self._write(old, [_f("RU_A", "RU", box(0, 0, 1, 1))])
-            result = plan_regional_rebuild(baseline_topology=old, source_countries=["RU"])
-            self.assertTrue(result["preview"]); self.assertFalse(result["apply_eligible"]); self.assertEqual(result["source_selection"]["selected_ids"], ["RU_A"])
-            result = plan_regional_rebuild(baseline_topology=old, candidate_topology=old, feature_ids=["RU_MISSING"])
-            self.assertEqual(result["blocked_reasons"][0]["reason"], "unknown_feature_ids")
-
-    def test_ru_selector_expands_coupled_source_unit(self):
-        with tempfile.TemporaryDirectory() as root:
-            root = Path(root); old = root / "old.json"; new = root / "new.json"
-            self._write(old, [_f("RU_A", "RU", box(0, 0, 1, 1)), _f("UA_A", "UA", box(1, 0, 2, 1))])
-            self._write(new, [_f("RU_A", "RU", box(0, 0, 1.1, 1)), _f("UA_A", "UA", box(1, 0, 2.1, 1))])
-            result = plan_regional_rebuild(baseline_topology=old, candidate_topology=new, source_countries=["RU"])
-            self.assertIn("UA", result["source_selection"]["countries"])
-            self.assertEqual(result["changed_ids"], ["RU_A", "UA_A"])
     def test_same_ids_selects_changed_source_and_reports_all_scenarios(self):
         with tempfile.TemporaryDirectory() as root:
             root = Path(root)

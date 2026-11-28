@@ -29,6 +29,7 @@ export function createWaterSpecialRegionController({
     waterInspectorTypeFilter,
     waterInspectorGroupFilter,
     waterInspectorSourceFilter,
+    waterInspectorSourceFilterCount,
     waterInspectorSortSelect,
     waterInspectorResultCount,
     waterSearchInput,
@@ -40,6 +41,7 @@ export function createWaterSpecialRegionController({
     waterInspectorLocateBtn,
     waterInspectorMetaSection,
     waterInspectorMetaList,
+    waterInspectorMoreMetaList,
     waterInspectorHierarchySection,
     waterInspectorBreadcrumb,
     waterInspectorJumpToParentBtn,
@@ -583,6 +585,9 @@ export function createWaterSpecialRegionController({
       Array.from(new Set(visibleFeatures.map((feature) => getWaterFeatureSource(feature)).filter(Boolean))).sort(),
       "All Sources"
     );
+    if (waterInspectorSourceFilterCount) {
+      waterInspectorSourceFilterCount.hidden = !getWaterFilterValue(waterInspectorSourceFilter);
+    }
     snapshot.filteredFeatures = getFilteredWaterFeatures(visibleFeatures);
     snapshot.displayItems = getWaterListDisplayItems(snapshot.filteredFeatures);
     if (waterInspectorResultCount) {
@@ -611,6 +616,7 @@ export function createWaterSpecialRegionController({
       .filter(Boolean)
       .sort((a, b) => getWaterFeatureDisplayName(a.feature).localeCompare(getWaterFeatureDisplayName(b.feature)));
 
+    if (waterLegendList.parentElement) waterLegendList.parentElement.hidden = !overrideEntries.length;
     if (!overrideEntries.length) {
       return;
     }
@@ -717,41 +723,40 @@ export function createWaterSpecialRegionController({
     const scopeIds = getWaterScopeFeatureIds(selectedId, selectedScope, snapshot);
     if (waterInspectorDetailHint) {
       const meta = [
-        getWaterFeatureMeta(feature),
-        selectedIds.length > 1 ? `${selectedIds.length} ${t("fragments", "ui") || "fragments"}` : "",
-        selectedIds.some((featureId) => getWaterFeatureHasOverride(featureId))
-          ? `${t("Override active", "ui")} · ${featureColor.toUpperCase()}`
-          : `${t("Default color", "ui")} · ${defaultColor.toUpperCase()}`,
+        selectedIds.length === 1 ? t("1 fragment", "ui") : t("{count} fragments", "ui", { count: selectedIds.length }),
+        selectedIds.some(getWaterFeatureHasOverride) ? t("Recolored", "ui") : "",
       ].filter(Boolean).join(" · ");
       waterInspectorDetailHint.classList.toggle("hidden", !meta);
       waterInspectorDetailHint.textContent = meta;
     }
     if (waterInspectorMetaSection && waterInspectorMetaList) {
       waterInspectorMetaSection.classList.remove("hidden");
-      waterInspectorMetaList.replaceChildren();
       const rows = [
-        ["ID", selectedId],
-        ...(selectedIds.length > 1 ? [["Fragments", selectedIds.length]] : []),
         ["Type", t(formatWaterTokenLabel(getWaterFeatureType(feature), "Water"), "ui")],
         ["Group", t(formatWaterTokenLabel(getWaterFeatureGroup(feature)), "ui")],
-        ["Parent", featureParentId || t("None", "ui")],
-        ["Source", getWaterRowSourceLabel(getWaterFeatureSource(feature))],
-        ["Interactive", isWaterFeatureVisibleInInspector(feature) ? t("Yes", "ui") : t("No", "ui")],
-        ["Chokepoint", feature?.properties?.is_chokepoint ? t("Yes", "ui") : t("No", "ui")],
-        ["Base geography", feature?.properties?.render_as_base_geography ? t("Yes", "ui") : t("No", "ui")],
+        ["Fragments", selectedIds.length],
         ["Default color", defaultColor.toUpperCase()],
         ["Current color", featureColor.toUpperCase()],
       ];
-      rows.forEach(([label, value]) => {
-        const key = document.createElement("div");
-        key.className = "inspector-meta-label";
-        key.textContent = t(label, "ui");
-        const val = document.createElement("div");
-        val.className = "inspector-meta-value";
-        val.textContent = String(value || "");
-        waterInspectorMetaList.appendChild(key);
-        waterInspectorMetaList.appendChild(val);
-      });
+      const renderRows = (list, entries) => {
+        if (!list) return;
+        list.replaceChildren();
+        for (const [label, value] of entries) {
+          const key = document.createElement("div");
+          key.className = "inspector-meta-label";
+          key.textContent = t(label, "ui");
+          const val = document.createElement("div");
+          val.className = "inspector-meta-value";
+          val.textContent = String(value);
+          list.appendChild(key);
+          list.appendChild(val);
+        }
+      };
+      renderRows(waterInspectorMetaList, rows);
+      renderRows(waterInspectorMoreMetaList, [
+        ["ID", selectedId],
+        ["Source", getWaterRowSourceLabel(getWaterFeatureSource(feature))],
+      ]);
     }
     if (waterInspectorHierarchySection) {
       const shouldShowHierarchy = !!featureParentId || childFeatures.length > 0;
@@ -861,6 +866,97 @@ export function createWaterSpecialRegionController({
     scheduleAdaptiveInspectorHeights();
   };
 
+  // ── 水域列表分层与分页 ─────────────────────────────────────────────
+  // 亚特兰托帕地中海补块按自带的 region_id 分成几个子海区；其他同名条目过多时也收成一组。
+  const WATER_LIST_PAGE_SIZE = 40;
+  const WATER_LIST_SAME_NAME_GROUP_MIN = 8;
+  const ATLANTROPA_SEA_SOURCE = "mediterranean_template_sea_completion";
+  const ATLANTROPA_SUB_SEA_LABELS = {
+    west_med: "Western Mediterranean",
+    tyrrhenian: "Tyrrhenian Sea",
+    adriatica: "Adriatic Sea",
+    sicily_tunis: "Strait of Sicily",
+    gabes: "Gulf of Gabès",
+    aegean: "Aegean Sea",
+    libya_suez: "Libyan–Suez Sea",
+    levant: "Levantine Sea",
+    mediterranean: "Other Mediterranean waters",
+  };
+  const ATLANTROPA_SUB_SEA_ORDER = Object.keys(ATLANTROPA_SUB_SEA_LABELS);
+  const waterListView = { page: 0, filterSignature: null, revealedSelectionId: null, openGroups: new Set() };
+
+  // 补块（template 补齐）和 HGO 来源的海面碎块都带 region_id，同属一套子海区。
+  const getAtlantropaSubSea = (feature) => {
+    const props = feature?.properties || {};
+    const isAtlantropaSea = props.source_standard === ATLANTROPA_SEA_SOURCE || props.atl_surface_kind === "sea";
+    if (!isAtlantropaSea) return "";
+    return String(props.region_id || "mediterranean").trim() || "mediterranean";
+  };
+
+  const compareWaterIdsNaturally = (a, b) =>
+    String(getWaterFeatureId(a.item.feature)).localeCompare(String(getWaterFeatureId(b.item.feature)), undefined, { numeric: true });
+
+  const buildWaterListEntries = (displayItems, itemsByName) => {
+    const entries = [];
+    const groupByKey = new Map();
+    const ensureGroup = (key, label, container = entries, groups = groupByKey) => {
+      let group = groups.get(key);
+      if (!group) {
+        group = { kind: "group", key, label, count: 0, children: [], subgroups: new Map() };
+        groups.set(key, group);
+        container.push(group);
+      }
+      return group;
+    };
+    displayItems.forEach((item) => {
+      if (!item?.featureId) return;
+      const sameNameCount = (itemsByName.get(item.listName) || []).length;
+      if (sameNameCount < WATER_LIST_SAME_NAME_GROUP_MIN) {
+        entries.push({ kind: "item", item });
+        return;
+      }
+      const subSea = getAtlantropaSubSea(item.feature);
+      if (subSea) {
+        const top = ensureGroup(`name:${item.listName}`, item.listName);
+        const subLabel = t(ATLANTROPA_SUB_SEA_LABELS[subSea] || formatWaterTokenLabel(subSea), "ui");
+        const sub = ensureGroup(`name:${item.listName}|sea:${subSea}`, subLabel, top.children, top.subgroups);
+        sub.subSea = subSea;
+        sub.children.push({ kind: "item", item, subLabel });
+        sub.count += 1;
+        top.count += 1;
+        return;
+      }
+      const group = ensureGroup(`name:${item.listName}`, item.listName);
+      group.children.push({ kind: "item", item });
+      group.count += 1;
+    });
+    groupByKey.forEach((group) => {
+      if (!group.subgroups.size) return;
+      // 同名组里可能同时有子海区和普通同名水域：子海区按自西向东排在前，普通条目保持原序跟在后面。
+      const subSeas = group.children.filter((child) => child.kind === "group");
+      const plainItems = group.children.filter((child) => child.kind !== "group");
+      subSeas.sort((a, b) => ATLANTROPA_SUB_SEA_ORDER.indexOf(a.subSea) - ATLANTROPA_SUB_SEA_ORDER.indexOf(b.subSea));
+      // 碎块本身没有可读名称，按 id 自然排序后在子海区内依次编号（亚得里亚海 1、2…）。
+      subSeas.forEach((sub) => {
+        sub.children.sort(compareWaterIdsNaturally);
+        sub.children.forEach((child, index) => { child.title = `${child.subLabel} ${index + 1}`; });
+      });
+      group.children = [...subSeas, ...plainItems];
+    });
+    return entries;
+  };
+
+  const entryContainsWaterId = (entry, featureId) => entry.kind === "item"
+    ? entry.item.memberIds.includes(featureId)
+    : entry.children.some((child) => entryContainsWaterId(child, featureId));
+
+  const collectWaterEntryGroupKeys = (entry, featureId, keys = []) => {
+    if (entry.kind !== "group") return keys;
+    keys.push(entry.key);
+    const child = entry.children.find((candidate) => entryContainsWaterId(candidate, featureId));
+    return child ? collectWaterEntryGroupKeys(child, featureId, keys) : keys;
+  };
+
   const renderWaterRegionList = () => withWaterNameCache(() => {
     if (!waterRegionList) return;
     const snapshot = createWaterRenderSnapshot();
@@ -886,9 +982,9 @@ export function createWaterSpecialRegionController({
       return;
     }
 
-    displayItems.forEach((item) => {
+    const createWaterListRow = (item, title = item.listName) => {
       const { feature, featureId, memberIds, listName } = item;
-      if (!featureId) return;
+      if (!featureId) return null;
       const button = document.createElement("button");
       button.type = "button";
       button.className = "list-row inspector-item-btn";
@@ -906,11 +1002,13 @@ export function createWaterSpecialRegionController({
 
       const name = document.createElement("div");
       name.className = "country-row-title";
-      name.textContent = listName;
+      name.textContent = title;
 
       const meta = document.createElement("div");
       meta.className = "country-select-meta";
-      meta.textContent = getWaterFeatureRowMeta(feature, itemsByName.get(listName));
+      meta.textContent = title === listName
+        ? getWaterFeatureRowMeta(feature, itemsByName.get(listName))
+        : t(formatWaterTokenLabel(getWaterFeatureType(feature), "Water"), "ui");
 
       const swatch = document.createElement("span");
       swatch.className = "country-select-swatch";
@@ -933,11 +1031,101 @@ export function createWaterSpecialRegionController({
 
       button.appendChild(copy);
       button.appendChild(actions);
-      waterRegionList.appendChild(button);
       memberIds.forEach((memberId) => {
         waterRowRefsById.set(memberId, button);
       });
-    });
+      return button;
+    };
+
+    // 列表分层只影响这里的浏览方式，地图上的点选仍按单个水域地块。
+    const entries = buildWaterListEntries(displayItems, itemsByName);
+    const selectedId = runtimeState.selectedWaterRegionId;
+    const searching = !!getWaterSearchTerm();
+    const pageCount = Math.max(1, Math.ceil(entries.length / WATER_LIST_PAGE_SIZE));
+    const filterSignature = [
+      getWaterSearchTerm(),
+      getWaterFilterValue(waterInspectorTypeFilter),
+      getWaterFilterValue(waterInspectorGroupFilter),
+      getWaterFilterValue(waterInspectorSourceFilter),
+      getWaterFilterValue(waterInspectorSortSelect),
+      !!waterInspectorOverridesOnlyToggle?.checked,
+    ].join("|");
+    if (filterSignature !== waterListView.filterSignature) {
+      waterListView.filterSignature = filterSignature;
+      waterListView.page = 0;
+    }
+    // 选择被清空时忘掉上次显示过的选中项，之后重新选中同一块仍会翻页并展开所在组。
+    if (!selectedId) waterListView.revealedSelectionId = null;
+    if (selectedId && selectedId !== waterListView.revealedSelectionId) {
+      // 新选中的地块（比如在地图上点的）要能在列表里看到：翻到它所在的页、展开它所在的组。
+      waterListView.revealedSelectionId = selectedId;
+      const entryIndex = entries.findIndex((entry) => entryContainsWaterId(entry, selectedId));
+      if (entryIndex >= 0) {
+        waterListView.page = Math.floor(entryIndex / WATER_LIST_PAGE_SIZE);
+        collectWaterEntryGroupKeys(entries[entryIndex], selectedId).forEach((key) => waterListView.openGroups.add(key));
+      }
+    }
+    waterListView.page = Math.min(Math.max(0, waterListView.page), pageCount - 1);
+
+    const renderEntry = (entry, parent) => {
+      if (entry.kind === "item") {
+        const row = createWaterListRow(entry.item, entry.title);
+        if (row) parent.appendChild(row);
+        return;
+      }
+      const group = document.createElement("details");
+      group.className = "water-list-group";
+      group.dataset.groupKey = entry.key;
+      group.open = searching || waterListView.openGroups.has(entry.key);
+      group.addEventListener("toggle", () => {
+        if (group.open) waterListView.openGroups.add(entry.key);
+        else waterListView.openGroups.delete(entry.key);
+      });
+      const summary = document.createElement("summary");
+      const label = document.createElement("span");
+      label.className = "water-list-group-title";
+      label.textContent = entry.label;
+      const count = document.createElement("span");
+      count.className = "water-list-group-count";
+      count.textContent = String(entry.count);
+      summary.appendChild(label);
+      summary.appendChild(count);
+      const body = document.createElement("div");
+      body.className = "water-list-group-body";
+      entry.children.forEach((child) => renderEntry(child, body));
+      group.appendChild(summary);
+      group.appendChild(body);
+      parent.appendChild(group);
+    };
+    entries
+      .slice(waterListView.page * WATER_LIST_PAGE_SIZE, (waterListView.page + 1) * WATER_LIST_PAGE_SIZE)
+      .forEach((entry) => renderEntry(entry, waterRegionList));
+
+    if (pageCount > 1) {
+      const pager = document.createElement("div");
+      pager.className = "water-list-pager";
+      const makePagerButton = (labelKey, delta) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "sidebar-action-secondary";
+        button.textContent = t(labelKey, "ui");
+        const target = waterListView.page + delta;
+        button.disabled = target < 0 || target >= pageCount;
+        button.addEventListener("click", () => {
+          waterListView.page = target;
+          renderWaterRegionList();
+          waterRegionList.scrollTop = 0;
+        });
+        return button;
+      };
+      const status = document.createElement("span");
+      status.className = "water-list-pager-status";
+      status.textContent = `${waterListView.page + 1} / ${pageCount}`;
+      pager.appendChild(makePagerButton("Previous page", -1));
+      pager.appendChild(status);
+      pager.appendChild(makePagerButton("Next page", 1));
+      waterRegionList.appendChild(pager);
+    }
 
     waterRowRefsById.get(focusedId)?.focus({ preventScroll: true });
     renderWaterInspectorDetail(snapshot);
@@ -1135,12 +1323,7 @@ export function createWaterSpecialRegionController({
 
     const featureColor = getSpecialFeatureColor(selectedId, feature);
     if (specialRegionInspectorDetailHint) {
-      const meta = [
-        getSpecialFeatureMeta(feature),
-        `${t("ID", "ui")}: ${selectedId}`,
-        `${t("Type", "ui")}: ${feature.properties.special_type || "special_region"}`,
-        `${t("Group", "ui")}: ${feature.properties.region_group || t("None", "ui")}`,
-      ].join(" · ");
+      const meta = getSpecialFeatureMeta(feature);
       specialRegionInspectorDetailHint.classList.toggle("hidden", !meta);
       specialRegionInspectorDetailHint.textContent = meta;
     }

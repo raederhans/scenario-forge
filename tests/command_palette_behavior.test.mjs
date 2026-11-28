@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { initCommandPalette } from "../js/ui/command_palette.js";
+import { state } from "../js/core/state.js";
 
 class Element {
   constructor(tag = "div") {
@@ -171,6 +172,27 @@ test("disabled and missing buttons are omitted and ? lists shortcuts", () => {
   }
   h.press("Enter");
   assert.deepEqual(h.clicks, []);
+});
+
+test("shortcut help shows developer mode when enabled with storage blocked", context => {
+  const storage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  const previous = state.ui.developerMode;
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true, get() { throw new Error("Storage blocked"); },
+  });
+  context.after(() => {
+    if (storage) Object.defineProperty(globalThis, "localStorage", storage);
+    else delete globalThis.localStorage;
+    state.ui.developerMode = previous;
+  });
+  const h = mount();
+  h.palette.open();
+  for (const enabled of [false, true]) {
+    state.ui.developerMode = enabled;
+    h.filter("?");
+    const labels = h.get("editorCommandResults").querySelectorAll("span");
+    assert.equal(labels.some(node => node.textContent === "Toggle developer mode"), enabled);
+  }
 });
 
 test("results are capped at fifty", () => {

@@ -26,7 +26,6 @@ import {
   refreshColorState,
   refreshResolvedColorsForFeatures,
   resetZoomToFit,
-  recomputeDynamicBordersNow,
   zoomByStep,
   setZoomPercent,
   RENDER_PASS_NAMES,
@@ -99,7 +98,7 @@ import {
   TRANSPORT_WORKBENCH_INSPECTOR_TABS,
 } from "./transport_workbench/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
-import { shouldShowDeveloperModeEntry } from "./toolbar/developer_mode_visibility.js";
+import { DEVELOPER_MODE_STORAGE_KEY, isDeveloperModeEntryVisible, readStoredDeveloperMode } from "./toolbar/developer_mode_visibility.js";
 import { createExportWorkflowController } from "./toolbar/export_workflow_controller.js";
 const state = runtimeState;
 
@@ -248,7 +247,6 @@ function initToolbar({ render } = {}) {
   const scenarioContextCollapseBtn = document.getElementById("scenarioContextCollapseBtn");
   const scenarioContextSelectionItem = document.getElementById("scenarioContextSelectionItem");
   const scenarioContextScenarioText = document.getElementById("scenarioContextScenarioText");
-  const scenarioContextModeText = document.getElementById("scenarioContextModeText");
   const scenarioContextActiveText = document.getElementById("scenarioContextActiveText");
   const scenarioContextSelectionText = document.getElementById("scenarioContextSelectionText");
   const scenarioTransportWorkbenchBtn = document.getElementById("scenarioTransportWorkbenchBtn");
@@ -296,10 +294,8 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchTitle = document.getElementById("transportWorkbenchTitle");
   const transportWorkbenchLensTitle = document.getElementById("transportWorkbenchLensTitle");
   const transportWorkbenchLensSections = document.getElementById("transportWorkbenchLensSections");
-  const transportWorkbenchFamilyStatus = document.getElementById("transportWorkbenchFamilyStatus");
   const transportWorkbenchCountryStatus = document.getElementById("transportWorkbenchCountryStatus");
   const transportWorkbenchPackSelect = document.getElementById("transportWorkbenchPackSelect");
-  const transportWorkbenchPreviewMode = document.getElementById("transportWorkbenchPreviewMode");
   const transportWorkbenchPreviewTitle = document.getElementById("transportWorkbenchPreviewTitle");
   const transportWorkbenchPreviewCanvas = document.getElementById("transportWorkbenchPreviewCanvas");
   const transportWorkbenchPreviewControls = document.getElementById("transportWorkbenchPreviewControls");
@@ -330,8 +326,6 @@ function initToolbar({ render } = {}) {
   const dockQuickFillHint = document.getElementById("dockQuickFillHint");
   const paintModeVisualBtn = document.getElementById("paintModeVisualBtn");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
-  const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
-  const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
   const oceanFillColor = document.getElementById("oceanFillColor");
   const oceanRegionNamesToggle = document.getElementById("oceanRegionNamesToggle");
   const lakeLinkToOcean = document.getElementById("lakeLinkToOcean");
@@ -360,7 +354,6 @@ function initToolbar({ render } = {}) {
   const specialZonePopover = document.getElementById("specialZonePopover");
   const specialZoneEditorInline = specialZonePopover?.dataset.inlineEditor === "true";
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-  const DEVELOPER_MODE_STORAGE_KEY = "map_creator_developer_mode";
   let toolHudTimerId = null;
   const overlayFocusReturnTargets = createFocusReturnRegistry();
   const MOBILE_WORKSPACE_MAX_WIDTH = 767;
@@ -465,23 +458,9 @@ function initToolbar({ render } = {}) {
     });
   };
 
-  const readStoredDeveloperMode = () => {
-    try {
-      return globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY) ?? null;
-    } catch {
-      return null;
-    }
-  };
-
-  const isDeveloperModeEntryVisible = () => shouldShowDeveloperModeEntry({
-    hostname: globalThis.location?.hostname,
-    search: globalThis.location?.search,
-    storedDeveloperMode: readStoredDeveloperMode(),
-  });
-
   const syncDeveloperModeUi = () => {
     // 快捷键显式开启的开发者模式是内存中的 opt-in：即使存储被阻止、主机也不是本地，入口与开启态都要保留。
-    const entryVisible = isDeveloperModeEntryVisible() || !!runtimeState.ui.developerMode;
+    const entryVisible = isDeveloperModeEntryVisible();
     document.body?.classList.toggle("developer-mode", !!runtimeState.ui.developerMode);
     if (developerModeBtn) {
       // .zoom-btn 自带 display，单靠 hidden 属性压不住，同时挂全局 .hidden 类。
@@ -590,10 +569,8 @@ function initToolbar({ render } = {}) {
     transportWorkbenchTitle,
     transportWorkbenchLensTitle,
     transportWorkbenchLensSections,
-    transportWorkbenchFamilyStatus,
     transportWorkbenchCountryStatus,
     transportWorkbenchPackSelect,
-    transportWorkbenchPreviewMode,
     transportWorkbenchPreviewTitle,
     transportWorkbenchPreviewCanvas,
     transportWorkbenchPreviewControls,
@@ -1000,7 +977,6 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "refreshTransportWorkbenchUiFn", renderTransportWorkbenchUi);
   initializeTransportWorkbenchRuntime();
 
-  const getPaintModeLabel = () => t("Visual Color", "ui");
 
   const getPrimaryActionLabel = () => t("Auto-Fill Visuals", "ui");
 
@@ -1042,7 +1018,6 @@ function initToolbar({ render } = {}) {
     scenarioContextBar,
     scenarioContextCollapseBtn,
     scenarioContextScenarioText,
-    scenarioContextModeText,
     scenarioContextActiveText,
     scenarioContextSelectionItem,
     scenarioContextSelectionText,
@@ -1050,7 +1025,6 @@ function initToolbar({ render } = {}) {
     scenarioGuidePopover,
     mapContainer,
     zoomControls,
-    getPaintModeLabel,
     getWorkspaceSelectionLabel,
     syncScenarioGuideTriggerButtons,
     updateLanguageToggleUi,
@@ -1070,8 +1044,6 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "triggerScenarioGuideFn", triggerScenarioGuide);
 
   const refreshPaintControlsLayout = () => {
-    const isScenarioMode = !!runtimeState.activeScenarioId;
-    const showBorderMaintenance = isScenarioMode;
     const primaryActionLabel = getPrimaryActionLabel();
 
     if (document.getElementById("labelPresetPolitical")) {
@@ -1080,14 +1052,6 @@ function initToolbar({ render } = {}) {
     if (presetPolitical) {
       presetPolitical.setAttribute("aria-label", primaryActionLabel);
       presetPolitical.setAttribute("title", primaryActionLabel);
-    }
-
-    if (recalculateBordersBtn) {
-      recalculateBordersBtn.classList.toggle("hidden", !showBorderMaintenance);
-    }
-
-    if (dynamicBorderStatus) {
-      dynamicBorderStatus.classList.toggle("hidden", !showBorderMaintenance);
     }
 
     if (protectPaint) protectPaint.checked = runtimeState.onlyUnpainted;
@@ -1263,21 +1227,6 @@ function initToolbar({ render } = {}) {
     refreshWorkspaceStatus();
     callRuntimeHook(runtimeState, "renderPresetTreeFn");
   };
-  const refreshDynamicBorderStatus = () => {
-    if (dynamicBorderStatus) {
-      if (!runtimeState.runtimePoliticalTopology?.objects?.political) {
-        dynamicBorderStatus.textContent = t("Dynamic borders disabled", "ui");
-      } else if (runtimeState.dynamicBordersDirty) {
-        dynamicBorderStatus.textContent = t("Borders need recalculation", "ui");
-      } else {
-        dynamicBorderStatus.textContent = t("Borders up to date", "ui");
-      }
-    }
-    if (recalculateBordersBtn) {
-      recalculateBordersBtn.disabled = !runtimeState.dynamicBordersDirty;
-    }
-  };
-  registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
   const riverCellPicker = createRiverCellPicker({
     state: runtimeState,
     panel: document.getElementById("riverCellPicker"),
@@ -1318,7 +1267,6 @@ function initToolbar({ render } = {}) {
     riverPaintControls.sync();
     refreshPaintControlsLayout();
     refreshActiveSovereignLabel();
-    refreshDynamicBorderStatus();
     refreshWorkspaceStatus();
     updateDockCollapsedUi();
   };
@@ -2083,12 +2031,6 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  if (recalculateBordersBtn) {
-    recalculateBordersBtn.addEventListener("click", () => {
-      recomputeDynamicBordersNow({ renderNow: true, reason: "manual-toolbar" });
-    });
-  }
-
   if (presetClear && !presetClear.dataset.bound) {
     presetClear.addEventListener("click", async () => {
       const confirmed = await showAppDialog({
@@ -2120,7 +2062,6 @@ function initToolbar({ render } = {}) {
       runtimeState.sovereignBaseColors = getProjectCountryBaseColors(runtimeState);
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();
-      refreshDynamicBorderStatus();
       markDirty("clear-map");
       const clearEntry = pushHistoryEntry({
         kind: "clear-map",

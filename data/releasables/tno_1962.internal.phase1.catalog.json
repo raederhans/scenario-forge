@@ -54,7 +54,8 @@
       "scenario_only": true,
       "tag": "ALG",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "法属阿尔及利亚"
     },
     {
       "allow_manual_overlay": true,
@@ -397,7 +398,8 @@
       "scenario_only": true,
       "tag": "BRG",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "勃艮第骑士团国"
     },
     {
       "allow_manual_overlay": false,
@@ -432,7 +434,8 @@
       "scenario_only": true,
       "tag": "BRI",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "布列塔尼"
     },
     {
       "allow_manual_overlay": true,
@@ -536,7 +539,8 @@
       "scenario_only": true,
       "tag": "CRO",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "克罗地亚独立国"
     },
     {
       "allow_manual_overlay": true,
@@ -661,7 +665,8 @@
       "scenario_only": true,
       "tag": "SER",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "塞尔维亚行政当局"
     },
     {
       "allow_manual_overlay": true,
@@ -792,7 +797,8 @@
       "scenario_only": true,
       "tag": "GRE",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "希腊保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -885,7 +891,8 @@
       "scenario_only": true,
       "tag": "EGY",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "意属埃及"
     },
     {
       "allow_manual_overlay": true,
@@ -933,7 +940,8 @@
       "scenario_only": true,
       "tag": "JOR",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "意属外约旦"
     },
     {
       "allow_manual_overlay": true,
@@ -993,7 +1001,8 @@
       "scenario_only": true,
       "tag": "TUN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "突尼斯保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -1035,7 +1044,8 @@
       "scenario_only": true,
       "tag": "LEB",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "黎巴嫩保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -1178,7 +1188,8 @@
       "scenario_only": true,
       "tag": "CHI",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "南京中国"
     },
     {
       "allow_manual_overlay": true,
@@ -1274,7 +1285,8 @@
       "scenario_only": true,
       "tag": "MAN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "满洲国"
     },
     {
       "allow_manual_overlay": true,
@@ -1337,7 +1349,8 @@
       "scenario_only": true,
       "tag": "MEN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "蒙疆"
     },
     {
       "allow_manual_overlay": true,
@@ -1385,7 +1398,8 @@
       "scenario_only": true,
       "tag": "NCP",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "华北政务委员会"
     },
     {
       "allow_manual_overlay": true,
@@ -1422,7 +1436,8 @@
       "scenario_only": true,
       "tag": "RGC",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "中华民国维新政府"
     },
     {
       "allow_manual_overlay": true,
@@ -1458,7 +1473,8 @@
       "scenario_only": true,
       "tag": "GNG",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "广东国民政府"
     },
     {
       "allow_manual_overlay": true,
@@ -1499,7 +1515,8 @@
       "scenario_only": true,
       "tag": "YUN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "云南"
     },
     {
       "allow_manual_overlay": true,
@@ -1543,7 +1560,8 @@
       "scenario_only": true,
       "tag": "GXC",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "桂系"
     },
     {
       "allow_manual_overlay": true,
@@ -1618,7 +1636,8 @@
       "scenario_only": true,
       "tag": "SHX",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "山西"
     },
     {
       "allow_manual_overlay": true,
@@ -1662,7 +1681,8 @@
       "scenario_only": true,
       "tag": "XIK",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "西康—西藏行政区"
     },
     {
       "allow_manual_overlay": true,
@@ -1722,7 +1742,8 @@
       "scenario_only": true,
       "tag": "GMA",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "甘肃马家军"
     },
     {
       "allow_manual_overlay": true,
@@ -1757,7 +1778,8 @@
       "scenario_only": true,
       "tag": "QMA",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "青海马家军"
     },
     {
       "allow_manual_overlay": true,
@@ -1792,7 +1814,8 @@
       "scenario_only": true,
       "tag": "XIN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "新疆"
     },
     {
       "allow_manual_overlay": true,
@@ -1956,7 +1979,8 @@
       "scenario_only": true,
       "tag": "PHI",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "菲律宾"
     },
     {
       "allow_manual_overlay": true,
@@ -2036,7 +2060,8 @@
       "scenario_only": true,
       "tag": "INS",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "印度尼西亚"
     },
     {
       "allow_manual_overlay": true,
@@ -2104,7 +2129,8 @@
       "scenario_only": true,
       "tag": "MAL",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "马来亚"
     },
     {
       "allow_manual_overlay": true,
@@ -2164,7 +2190,8 @@
       "scenario_only": true,
       "tag": "BUR",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "缅甸"
     },
     {
       "allow_manual_overlay": true,
@@ -2267,7 +2294,8 @@
       "scenario_only": true,
       "tag": "VIN",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "越南"
     },
     {
       "allow_manual_overlay": true,
@@ -2322,7 +2350,8 @@
       "scenario_only": true,
       "tag": "LAO",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "老挝"
     },
     {
       "allow_manual_overlay": true,
@@ -2384,7 +2413,8 @@
       "scenario_only": true,
       "tag": "CAM",
       "validation_errors": [],
-      "validation_status": "ok"
+      "validation_status": "ok",
+      "display_name_zh": "柬埔寨"
     },
     {
       "tag": "KC00",
@@ -2425,7 +2455,8 @@
       "resolved_feature_count_hint": 9,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "高加索·格鲁吉亚总区"
     },
     {
       "tag": "KC01",
@@ -2526,7 +2557,8 @@
       "resolved_feature_count_hint": 69,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "高加索·阿塞拜疆总区"
     },
     {
       "tag": "KC02",
@@ -2575,7 +2607,8 @@
       "resolved_feature_count_hint": 17,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "高加索·库班总区"
     },
     {
       "tag": "KC03",
@@ -2627,7 +2660,8 @@
       "resolved_feature_count_hint": 20,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "高加索·斯塔夫罗波尔—捷列克总区"
     },
     {
       "tag": "KC04",
@@ -2696,7 +2730,8 @@
       "resolved_feature_count_hint": 37,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "高加索·山地民族总区"
     },
     {
       "tag": "KC05",
@@ -2749,7 +2784,8 @@
       "resolved_feature_count_hint": 21,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "高加索·卡尔梅克总区"
     },
     {
       "tag": "MS00",
@@ -2805,7 +2841,8 @@
       "resolved_feature_count_hint": 24,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·莫斯科总区"
     },
     {
       "tag": "MS01",
@@ -2847,7 +2884,8 @@
       "resolved_feature_count_hint": 10,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·英格里亚总区"
     },
     {
       "tag": "MS02",
@@ -2888,7 +2926,8 @@
       "resolved_feature_count_hint": 9,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·斯摩棱斯克总区"
     },
     {
       "tag": "MS03",
@@ -2936,7 +2975,8 @@
       "resolved_feature_count_hint": 16,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·图拉总区"
     },
     {
       "tag": "MS04",
@@ -2989,7 +3029,8 @@
       "resolved_feature_count_hint": 21,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·沃罗涅日总区"
     },
     {
       "tag": "MS05",
@@ -3030,7 +3071,8 @@
       "resolved_feature_count_hint": 9,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·雅罗斯拉夫尔总区"
     },
     {
       "tag": "MS06",
@@ -3067,7 +3109,8 @@
       "resolved_feature_count_hint": 5,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·高尔基边区"
     },
     {
       "tag": "MS07",
@@ -3117,7 +3160,8 @@
       "resolved_feature_count_hint": 18,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·萨拉托夫总区"
     },
     {
       "tag": "MS08",
@@ -3185,7 +3229,8 @@
       "resolved_feature_count_hint": 36,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "莫斯科维恩·顿河—伏尔加总区"
     },
     {
       "tag": "UK00",
@@ -3250,7 +3295,8 @@
       "resolved_feature_count_hint": 33,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·基辅总区"
     },
     {
       "tag": "UK01",
@@ -3321,7 +3367,8 @@
       "resolved_feature_count_hint": 39,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·沃里尼亚—波多利亚总区"
     },
     {
       "tag": "UK02",
@@ -3371,7 +3418,8 @@
       "resolved_feature_count_hint": 18,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·日托米尔总区"
     },
     {
       "tag": "UK03",
@@ -3446,7 +3494,8 @@
       "resolved_feature_count_hint": 43,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·切尔尼戈夫总区"
     },
     {
       "tag": "UK04",
@@ -3508,7 +3557,8 @@
       "resolved_feature_count_hint": 30,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·第聂伯罗彼得罗夫斯克总区"
     },
     {
       "tag": "UK05",
@@ -3567,7 +3617,8 @@
       "resolved_feature_count_hint": 27,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·尼古拉耶夫总区"
     },
     {
       "tag": "UK06",
@@ -3628,7 +3679,8 @@
       "resolved_feature_count_hint": 29,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·塔夫利达总区"
     },
     {
       "tag": "UK07",
@@ -3690,7 +3742,8 @@
       "resolved_feature_count_hint": 30,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·哈尔科夫总区"
     },
     {
       "tag": "UK08",
@@ -3756,7 +3809,8 @@
       "resolved_feature_count_hint": 34,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "乌克兰·顿涅茨总区"
     },
     {
       "tag": "IDAL",
@@ -3809,7 +3863,8 @@
       "resolved_feature_count_hint": 21,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "达尔马提亚默认由意大利直辖，保留分区定义。"
+      "notes": "达尔马提亚默认由意大利直辖，保留分区定义。",
+      "display_name_zh": "达尔马提亚总督区"
     },
     {
       "tag": "CG00",
@@ -3873,7 +3928,8 @@
       "resolved_feature_count_hint": 32,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属刚果·中央刚果行政区"
     },
     {
       "tag": "CGBC",
@@ -3921,7 +3977,8 @@
       "resolved_feature_count_hint": 16,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属刚果·布拉柴维尔行政区"
     },
     {
       "tag": "CGGA",
@@ -3962,7 +4019,8 @@
       "resolved_feature_count_hint": 9,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属刚果·加蓬行政区"
     },
     {
       "tag": "CGKT",
@@ -3995,7 +4053,8 @@
       "resolved_feature_count_hint": 1,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属刚果·加丹加行政区"
     },
     {
       "tag": "CGKV",
@@ -4029,7 +4088,8 @@
       "resolved_feature_count_hint": 2,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属刚果·基伍行政区"
     },
     {
       "tag": "CGUB",
@@ -4073,7 +4133,8 @@
       "resolved_feature_count_hint": 12,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属刚果·乌班吉行政区"
     },
     {
       "tag": "GEAB",
@@ -4122,7 +4183,8 @@
       "resolved_feature_count_hint": 17,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·乌隆迪行政区"
     },
     {
       "tag": "GEAM",
@@ -4165,7 +4227,8 @@
       "resolved_feature_count_hint": 11,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·莫桑比克行政区"
     },
     {
       "tag": "GEAN",
@@ -4200,7 +4263,8 @@
       "resolved_feature_count_hint": 3,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·尼亚萨兰行政区"
     },
     {
       "tag": "GEAR",
@@ -4237,7 +4301,8 @@
       "resolved_feature_count_hint": 5,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·卢旺达行政区"
     },
     {
       "tag": "GEAS",
@@ -4279,7 +4344,8 @@
       "resolved_feature_count_hint": 10,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·南罗得西亚行政区"
     },
     {
       "tag": "GEAT",
@@ -4341,7 +4407,8 @@
       "resolved_feature_count_hint": 30,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·坦噶尼喀行政区"
     },
     {
       "tag": "GEAU",
@@ -4377,7 +4444,8 @@
       "resolved_feature_count_hint": 4,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·乌干达行政区"
     },
     {
       "tag": "GEAZ",
@@ -4419,7 +4487,8 @@
       "resolved_feature_count_hint": 10,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属东非·北罗得西亚行政区"
     },
     {
       "tag": "SWAO",
@@ -4469,7 +4538,8 @@
       "resolved_feature_count_hint": 18,
       "validation_status": "ok",
       "validation_errors": [],
-      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。",
+      "display_name_zh": "德属西南非洲·安哥拉行政区"
     }
   ],
   "excluded": [],

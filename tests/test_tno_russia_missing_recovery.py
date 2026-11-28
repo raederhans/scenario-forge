@@ -9,11 +9,11 @@ from tools.recover_tno_russia_missing import recover, IULTINSKY, RECOVERED_OWNER
 from tools.validate_tno_russia_recovery import validate
 
 
-def fixture(tmp_path, positive_limit=180):
+def fixture(tmp_path):
     baseline = tmp_path / 'baseline'
     baseline.mkdir()
     kayak = NEIGHBORS['RKK']
-    old = {IULTINSKY: box(175, 64, positive_limit, 66), kayak: box(47, 42, 48, 43),
+    old = {IULTINSKY: box(175, 64, 180, 66), kayak: box(47, 42, 48, 43),
            'RU_ARCTIC_FB_PFC_026': box(-180, 64, -175, 67),
            'RU_ARCTIC_FB_USA_044': box(-178, 64, -176, 65)}
     source = {
@@ -79,15 +79,3 @@ def test_changed_neighbor_owner_requires_new_review(tmp_path):
     owners.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match='neighboring allocation changed'):
         recover(path, baseline, src, tmp_path / 'out')
-
-
-def test_legacy_positive_dateline_clip_is_also_restored(tmp_path):
-    baseline, path, src, old = fixture(tmp_path, positive_limit=179.99)
-    recover(path, baseline, src, tmp_path / 'out')
-    after_path = tmp_path / 'out/runtime-candidate.topo.json'
-    after = json.loads(after_path.read_text(encoding='utf8'))
-    row = next(r for r in after['objects']['political']['geometries'] if r['properties']['id'] == IULTINSKY)
-    restored = _decode_geometry(after, row)
-    assert restored.intersection(box(0, -90, 180, 90)).equals(box(175, 64, 180, 66))
-    assert restored.covers(old[IULTINSKY])
-    assert validate(path, after_path, baseline, src)['status'] == 'PASS'

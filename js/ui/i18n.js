@@ -120,7 +120,6 @@ function updateUIText() {
     ["resetScenarioBtn", "Reset Changes To Baseline"],
     ["clearScenarioBtn", "Exit Scenario"],
     ["scenarioStatus", "No scenario active"],
-    ["scenarioAuditHint", "Coverage report unavailable"],
     ["lblExport", "Export Map"],
     ["lblExportTarget", "Target:"],
     ["optExportTargetComposite", "Composite image"],
@@ -203,8 +202,6 @@ function updateUIText() {
     ["optPaintMeaningVisual", "Visual Color"],
     ["optPaintMeaningSovereignty", "Political Ownership"],
     ["activeSovereignLabel", "None selected"],
-    ["recalculateBordersBtn", "Recalculate Borders"],
-    ["dynamicBorderStatus", "Borders up to date"],
     ["labelAutoFillStyle", "Auto-Fill Style"],
     ["lblParentBorders", "Parent Unit Borders"],
     ["lblParentBorderColor", "Color"],
@@ -334,8 +331,7 @@ function updateUIText() {
     ["lblDayNightHistoricalCityLightsSecondaryRetention", "Secondary City Retention"],
     ["lblDayNightShadowOpacity", "Shadow Opacity"],
     ["lblDayNightTwilightWidth", "Twilight Width"],
-    ["lblRiversLayer", "Rivers"],
-    ["lblRiversVisibilityGroup", "Visibility"],
+    ["lblRiversLayer", "Show"],
     ["lblRiversColor", "Color"],
     ["lblRiversOpacity", "Opacity"],
     ["lblRiversWidth", "Width"],
@@ -443,7 +439,6 @@ function updateUIText() {
     ["lblProjectManagement", "Project Management"],
     ["downloadProjectBtn", "Download Project"],
     ["uploadProjectBtn", "Load Project"],
-    ["lblProjectFile", "Selected File"],
     ["lblLegendProject", "Legend"],
     ["lblUtilities", "Utilities"],
     ["utilitiesGuideBtn", "Guide"],
@@ -563,18 +558,6 @@ function updateUIText() {
   if (zoomPercentInput) {
     zoomPercentInput.setAttribute("aria-label", t("Zoom percentage", "ui"));
     zoomPercentInput.setAttribute("title", t("Zoom percentage", "ui"));
-  }
-
-  const projectFileName = document.getElementById("projectFileName");
-  if (
-    projectFileName
-    && (
-      !projectFileName.textContent.trim()
-      || projectFileName.dataset?.projectFileState === "empty"
-    )
-  ) {
-    if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
-    projectFileName.textContent = t("No file selected", "ui");
   }
 
   const toolHudChip = document.getElementById("toolHudChip");

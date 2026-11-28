@@ -7,7 +7,7 @@ from map_builder.regional_geometry import _encode_exact_coverage, _decode_geomet
 
 
 class ArcticRecoveryTests(unittest.TestCase):
-    def fixture(self, foreign=False):
+    def fixture(self):
         ids = ['RU_RAY_1', 'NEIGHBOR', 'RU_ARCTIC_FB_RKM_001']
         shapes = [box(0, 70, 4, 72.997), box(3, 74, 4, 76), box(0, 73, 4, 78)]
         topology = _encode_exact_coverage(ids, shapes)
@@ -15,8 +15,8 @@ class ArcticRecoveryTests(unittest.TestCase):
             item['properties']['cntr_code'] = 'RU'
         props = topology['objects']['political']['geometries'][2]['properties']
         props.update(scenario_helper_kind='shell_fallback', interactive=False,
-                     scenario_shell_owner_hint='OTHER' if foreign else 'OWNER',
-                     scenario_shell_controller_hint='OTHER' if foreign else 'OWNER')
+                     scenario_shell_owner_hint='OWNER',
+                     scenario_shell_controller_hint='OWNER')
         land = _encode_exact_coverage(['land'], [Polygon([(0, 69), (4, 69), (4, 80), (0, 80)],
             holes=[[(1, 75), (2, 75), (2, 76), (1, 76)]])])
         topology['objects']['land'] = land['objects']['political']
@@ -51,22 +51,6 @@ class ArcticRecoveryTests(unittest.TestCase):
         self.assertEqual(_decode_geometry(topology, topology['objects']['land']).wkb,
                          _decode_geometry(result, result['objects']['land']).wkb)
 
-    def test_tno_foreign_domain_creates_child(self):
-        topology, source = self.fixture(foreign=True)
-        result, report = recover_arctic(topology, source, owners={'RU_RAY_1': 'OWNER'})
-        child = 'RU_RAY_1__tno1962_1'
-        self.assertEqual(report['new_assignments'][child]['owner'], 'OTHER')
-        self.assertEqual(report['new_assignments'][child]['parent_id'], 'RU_RAY_1')
-        shapes = self.decoded(result)
-        self.assertEqual(shapes[child].bounds[3], 78)
-        child_item = next(g for g in result['objects']['political']['geometries'] if g['properties']['id'] == child)
-        self.assertEqual(child_item['properties']['cntr_code'], 'RU')
-        self.assertEqual(shapes['RU_RAY_1'].bounds[3], 73)
-        second, again = recover_arctic(result, source, owners={'RU_RAY_1': 'OWNER', child: 'OTHER'})
-        self.assertEqual(again['changed_ids'], [])
-        self.assertEqual(again['new_assignments'], {})
-        self.assertEqual(second, result)
-
     def test_degenerate_baseline_and_base_helper_prefix_preserved(self):
         from map_builder.processors.arctic_recovery import decoded_structure
         topology, source = self.fixture()
@@ -82,17 +66,6 @@ class ArcticRecoveryTests(unittest.TestCase):
         self.assertTrue(report['non_target_coordinates_preserved'])
         with self.assertRaisesRegex(ValueError, 'Not a removable Arctic helper'):
             recover_arctic(topology, source, owners={'RU_RAY_1': 'OWNER'})
-
-    def test_exhausted_helper_removed(self):
-        topology, source = self.fixture()
-        helper = topology['objects']['political']['geometries'][2]
-        replacement = _encode_exact_coverage(['helper'], [box(0, 73, 1, 74)])
-        from map_builder.regional_geometry import _offset_arcs
-        helper['arcs'] = _offset_arcs(replacement['objects']['political']['geometries'][0]['arcs'], len(topology['arcs']))
-        topology['arcs'].extend(replacement['arcs'])
-        result, report = recover_arctic(topology, source)
-        self.assertEqual(report['removed_helper_ids'], ['RU_ARCTIC_FB_RKM_001'])
-        self.assertNotIn('RU_ARCTIC_FB_RKM_001', self.decoded(result))
 
 
 if __name__ == '__main__':

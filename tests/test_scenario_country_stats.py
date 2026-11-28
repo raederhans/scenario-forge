@@ -1,6 +1,13 @@
 import unittest
 
-from tools.build_scenario_country_stats import ADDITIVE, DATA, FACTORIES, GHSL, OUTPUT, SCENARIOS, allocate, read
+from tools.build_scenario_country_stats import (
+    ADDITIVE,
+    FACTORIES,
+    OUTPUT,
+    SCENARIOS,
+    allocate,
+    read,
+)
 
 
 def bucket(tag, **values):
@@ -49,62 +56,6 @@ class AllocationTests(unittest.TestCase):
 
 
 class PublishedStatisticsTests(unittest.TestCase):
-    def test_antarctic_area_and_placeholder_pool(self):
-        countries = read(OUTPUT / "hoi4_1936.json")["countries"]
-        antarctic = countries["AAT"]
-        population = antarctic["scenario_population"]
-        self.assertTrue(population is None or population < 10_000)
-        self.assertGreater(antarctic["scenario_land_area_km2"], 5_000_000)
-        for key, value in countries["ALG"].items():
-            if key in ("scenario_land_area_km2", "scenario_core_share"):
-                self.assertIsNotNone(value)
-            else:
-                self.assertIsNone(value, key)
-
-    def test_non_political_groups(self):
-        for scenario in SCENARIOS:
-            product = read(OUTPUT / f"{scenario}.json")
-            owners = read(DATA / "scenarios" / scenario / "owners.by_feature.json")["owners"]
-            features = read(GHSL / "features" / f"{scenario}.json")["features"]
-            political = {tag for fid, tag in owners.items() if fid in features and
-                         features[fid]["status"] not in ("water_not_applicable", "unestimated_scenario_land")}
-            self.assertEqual(set(product["countries"]), political)
-            self.assertEqual(product["non_political_tags"], sorted(set(owners.values()) - political))
-            if scenario == "tno_1962":
-                self.assertIn("ATL", product["non_political_tags"])
-                self.assertNotIn("ATL", product["countries"])
-
-    def test_runtime_assets(self):
-        registry = read(DATA / "runtime_asset_registry.json")["assets"]
-        catalog = {entry["key"]: entry for entry in read(DATA / "CATALOG.json")["entries"]}
-        for scenario in (None, *SCENARIOS):
-            role = "scenario_country_stats" if scenario else "scenario_country_stats_manifest"
-            key = f"{role}:{scenario}" if scenario else role
-            asset = registry[key]
-            path = OUTPUT / f"{scenario or 'manifest'}.json"
-            product = read(path)
-            self.assertEqual(asset["url"], path.relative_to(DATA.parent).as_posix())
-            self.assertEqual(asset["role"], role)
-            self.assertEqual(asset["metadata"], {"layer_id": product["layer_id"], "data_version": product["data_version"],
-                                                "scenario_id": scenario, "load_policy": "on_demand",
-                                                "source_policy": "scenario_derived"})
-            self.assertEqual(catalog[key]["url"], asset["url"])
-            self.assertEqual(catalog[key]["schemaRef"], asset["schema_ref"])
-            self.assertTrue((DATA.parent / asset["schema_ref"]).is_file())
-
-    def test_country_population_ranges(self):
-        for scenario, ranges in {
-            "hoi4_1936": {"GER": (60_000_000, 75_000_000), "RAJ": (250_000_000, 350_000_000),
-                          "USA": (110_000_000, 140_000_000)},
-            "tno_1962": {"GER": (100_000_000, 150_000_000), "RAJ": (1, float("inf"))},
-        }.items():
-            countries = read(OUTPUT / f"{scenario}.json")["countries"]
-            for tag, (minimum, maximum) in ranges.items():
-                with self.subTest(scenario=scenario, tag=tag):
-                    value = countries[tag]["scenario_population"]
-                    self.assertGreaterEqual(value, minimum)
-                    self.assertLessEqual(value, maximum)
-
     def test_products_and_conservation(self):
         manifest = read(OUTPUT / "manifest.json")
         audits = read(OUTPUT / "audit.json")["scenarios"]

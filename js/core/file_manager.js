@@ -1,3 +1,4 @@
+import { clamp } from "./value_normalization.js";
 import { normalizeOperationLabelSize } from "./renderer/operation_graphic_geometry.js";
 import { normalizeProjectCountriesPayload, serializeProjectCountries } from "./project_countries.js";
 import { normalizePoliticalOverrides, normalizePoliticalAlliances } from "./political_overrides.js";
@@ -118,10 +119,6 @@ function showProjectReadFailure(error) {
     tone: "error",
     duration: 4200,
   });
-}
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
 }
 
 function migrateLegacyPhysicalIntensityField(intensityFields, legacyField) {

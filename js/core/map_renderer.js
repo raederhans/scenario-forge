@@ -1,3 +1,4 @@
+import { clamp } from "./value_normalization.js";
 import { renderViewportMapTitles } from "./renderer/map_title_render_owner.js";
 import { requiresPublicLeafDetail, resolvePoliticalCollectionSource } from "./renderer/political_collection_source.js";
 import { getProjectCountryBaseColors } from "./project_countries.js";
@@ -109,7 +110,6 @@ import {
   normalizeOperationGraphicStroke,
   normalizeOperationGraphicWidth,
   normalizeOperationGraphicOpacity,
-  getOperationGraphicEditorMidpoints,
   getOperationGraphicLabelAnchor,
   createProjectedOperationGraphicPath,
   projectOperationGraphicSegments,
@@ -120,7 +120,6 @@ import {
 } from "./renderer/operation_graphic_geometry.js";
 import {
   createUnitCounterDisplayModel,
-  DEFAULT_MILSTD_SIDC,
   normalizeUnitCounterStatPercent,
   normalizeUnitCounterStatsPresetId,
   normalizeUnitCounterBaseFillColor,
@@ -131,10 +130,9 @@ import {
   getUnitCounterNodeTransform,
   DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
   DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
-  DEFAULT_UNIT_COUNTER_BASE_FILL,
   DEFAULT_UNIT_COUNTER_RENDERER,
 } from "./renderer/unit_counter_display_model.js";
-import { getCityCanonicalId, getUrbanFeatureStableId, getCityCapitalScore } from "./renderer/city_reveal_policy.js";
+import { getUrbanFeatureStableId } from "./renderer/city_reveal_policy.js";
 import {
   bumpColorRevision,
   normalizeColorStateForRender, normalizeDayNightStyleConfig,
@@ -244,7 +242,6 @@ import {
 
 } from "./sovereignty_manager.js";
 import { COUNTRY_CODE_ALIASES, normalizeCountryCodeAlias } from "./country_code_aliases.js";
-import { fragmentCamouflageRules } from "./country_feature_policies.js";
 import {
   DEFAULT_UNIT_COUNTER_PRESET_ID,
   getUnitCounterIconPathById,
@@ -263,7 +260,7 @@ import { freezeCountryLabels } from "./renderer/strategic_overlay_runtime/map_la
 export { syncMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { renderMapLabelHandles } from "./renderer/map_label_handles_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
-import { createPoliticalCollectionOwner, getDetailTier, INTERACTIVE_AGGREGATE_TIER_FILTERS } from "./renderer/political_collection_owner.js";
+import { createPoliticalCollectionOwner, getDetailTier } from "./renderer/political_collection_owner.js";
 import { createContextLayerResolverOwner } from "./renderer/context_layer_resolver.js";
 import { createRendererAssetUrlPolicyOwner } from "./renderer/asset_url_policy.js";
 import {
@@ -412,7 +409,6 @@ let lastDetailToastToken = "";
 let lastDetailToastAt = 0;
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
-const MAP_PAN_PADDING_PX = 50;
 const PROJECTION_FIT_PADDING_RATIO = 0.04;
 const MIN_ZOOM_SCALE = 0.35;
 const MAX_ZOOM_SCALE = 50;
@@ -422,19 +418,6 @@ const SPECIAL_REGION_FALLBACK_FILL = "#d6c19a";
 const SPECIAL_REGION_FALLBACK_STROKE = "#8d6f47";
 const UNIFIED_WATER_STROKE_COLOR = "rgba(62, 96, 138, 0)";
 const UNIFIED_WATER_FILL_OPACITY = 1;
-const RELIEF_SALT_FILL_COLOR = "rgba(222, 203, 170, 0.22)";
-const RELIEF_SALT_STROKE_COLOR = "rgba(128, 100, 63, 0.55)";
-const RELIEF_ATLANTROPA_SALT_FILL_COLOR = "rgba(0, 0, 0, 0)";
-const RELIEF_ATLANTROPA_SALT_STROKE_COLOR = "rgba(148, 163, 184, 0.22)";
-const RELIEF_SHORELINE_COLOR = "rgba(109, 84, 50, 0.78)";
-const RELIEF_CONTOUR_COLOR = "rgba(176, 148, 103, 0.6)";
-const RELIEF_ATLANTROPA_SHORELINE_COLOR = "rgba(148, 163, 184, 0.36)";
-const RELIEF_ATLANTROPA_CONTOUR_COLOR = "rgba(148, 163, 184, 0.18)";
-const RELIEF_SWAMP_FILL_COLOR = "rgba(128, 150, 114, 0.28)";
-const RELIEF_SWAMP_STROKE_COLOR = "rgba(88, 108, 76, 0.68)";
-const RELIEF_LAKE_SHORELINE_COLOR = "rgba(214, 232, 244, 0.92)";
-const RELIEF_DAM_APPROACH_COLOR = "rgba(102, 86, 62, 0.8)";
-const TNO_COASTAL_ACCENT_COLOR = "rgba(214, 232, 244, 0.88)";
 const GIANT_FEATURE_CULL_RATIO = 0.95;
 const GIANT_FEATURE_ALLOWLIST = new Set(["RU", "CA", "CN", "US", "AQ", "ATA"]);
 const HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST = new Set(["US", "CN", "RU", "JP", "DE", "GB", "FR", "IN", "BR", "CA"]);
@@ -453,7 +436,6 @@ const COASTLINE_SIMPLIFY_MID_EPSILON = 0.04;
 const COASTLINE_SIMPLIFY_LOW_EPSILON = 0.10;
 const COASTLINE_SIMPLIFY_MID_MIN_LENGTH = 0.08;
 const COASTLINE_SIMPLIFY_LOW_MIN_LENGTH = 0.2;
-const COASTLINE_EFFECTIVE_AREA_MULTIPLIER = 0.5;
 const COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX = 1.8;
 const COASTLINE_VIEW_SIMPLIFY_MID_MIN_DISTANCE_PX = 1.1;
 const COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG = 10;
@@ -554,19 +536,14 @@ const PROVINCE_BORDERS_TRANSITION_END_ZOOM = 2.0;
 const PROVINCE_BORDERS_FAR_ALPHA = 0.10;
 const PROVINCE_BORDERS_TRANSITION_ALPHA = 0.38;
 const PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM = 1.5;
-const PROVINCE_BORDERS_FAR_WIDTH_SCALE = 0.75;
 const PROVINCE_BORDERS_NEAR_ZOOM_START = 2.2;
 const PROVINCE_BORDERS_NEAR_ALPHA_SCALE = 0.86;
 const PROVINCE_BORDERS_NEAR_WIDTH_SCALE = 0.90;
 
-const BOUNDARY_DEFAULT_LINE_JOIN = "round";
-const BOUNDARY_DEFAULT_LINE_CAP = "round";
 const BOUNDARY_DEFAULT_MITER_LIMIT = 2.4;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
-const OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
 
-const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "drawPhysicalReliefOverlayLayer",
   "drawPhysicalAtlasLayer",
@@ -590,10 +567,8 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "contextScenarioLayerCacheHit",
   "contextScenarioLayerCacheMiss",
 ]);
-const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 
-const STRATEGIC_LINE_LABEL_FONT = "\"IBM Plex Sans\", \"Segoe UI\", sans-serif";
 const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
   steel: "#64748b",
   oil: "#111827",
@@ -611,7 +586,6 @@ const PAPER_TEXTURE_ASSET_URLS = {
   paper_vintage_01: new URL("../../vendor/textures/paper_vintage_01.svg", import.meta.url).href,
 };
 // Keep this list empty by default. Polygon winding issues are repaired dynamically.
-const KNOWN_BAD_FEATURE_IDS = new Set();
 const DEBUG_MODES = new Set(["PROD", "GEOMETRY", "ARTIFACTS", "ISLANDS", "ID_HASH"]);
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
@@ -693,9 +667,6 @@ let physicalLandClipPathCache = {
   key: "",
   path: null,
 };
-const SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO = 0.02;
-const SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO = 0.25;
-const SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT = 500;
 const missingPhysicalContextWarnings = new Set();
 let scenarioRegionOverlayRenderOwner = null;
 const renderDiag = {
@@ -1394,10 +1365,6 @@ const getVisibleFrameDiagnosticsOwner = lazyOwner(() => createVisibleFrameDiagno
 
 const getStrategicOverlayHelpersOwner = lazyOwner(() => createStrategicOverlayHelpersOwner({
   state,
-  constants: {
-    defaultUnitCounterBaseFill: DEFAULT_UNIT_COUNTER_BASE_FILL,
-    strategicLineLabelFont: STRATEGIC_LINE_LABEL_FONT,
-  },
   groupGetters: {
     getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs(),
     getOperationalLinesGroup: () => rendererSurfaceHost.getOperationalLinesGroup(),
@@ -1437,10 +1404,6 @@ const getStrategicOverlayHelpersOwner = lazyOwner(() => createStrategicOverlayHe
 
 const getStrategicOverlayRenderOwner = lazyOwner(() => createStrategicOverlayRenderOwner({
   state,
-  constants: {
-    defaultUnitCounterRenderer: DEFAULT_UNIT_COUNTER_RENDERER,
-    renderPhaseIdle: RENDER_PHASE_IDLE,
-  },
   helpers: {
     getProjectionRenderSignature,
   },
@@ -1493,11 +1456,8 @@ const getPoliticalCollectionOwner = lazyOwner(() => createPoliticalCollectionOwn
   state,
   constants: {
     highFrequencyCountryDetailWhitelist: HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST,
-    interactiveAggregateTierFilters: INTERACTIVE_AGGREGATE_TIER_FILTERS,
-    fragmentCamouflageRules,
   },
   helpers: {
-    getDetailTier,
     getFeatureCountryCodeNormalized,
     getFeatureId,
     isPoliticalInteractionRenderableFeature,
@@ -1512,12 +1472,6 @@ const getContextLayerResolverOwner = lazyOwner(() => createContextLayerResolverO
   runtimeState: state,
   caches: {
     layerResolverCache,
-  },
-  constants: {
-    contextLayerMinScore: CONTEXT_LAYER_MIN_SCORE,
-    layerDiagPrefix: LAYER_DIAG_PREFIX,
-    urbanCorruptBoundsHeightDeg: URBAN_CORRUPT_BOUNDS_HEIGHT_DEG,
-    urbanCorruptBoundsWidthDeg: URBAN_CORRUPT_BOUNDS_WIDTH_DEG,
   },
   helpers: {
     clamp,
@@ -1668,9 +1622,6 @@ const getOceanRenderOwner = lazyOwner(() => createOceanRenderOwner({
     COASTLINE_ACCENT_DENSITY_WIDTH_SCALE,
     COASTLINE_LOD_LOW_ZOOM_MAX,
     COASTLINE_LOD_MID_ZOOM_MAX,
-    OCEAN_MASK_MODE_BATHYMETRY,
-    OCEAN_MASK_MODE_TOPOLOGY,
-    TNO_COASTAL_ACCENT_COLOR,
   },
   getters: {
     getContext: () => rendererSurfaceHost.getContext(),
@@ -1831,22 +1782,6 @@ function drawPopulationHeatmapPass(k) {
 const getScenarioReliefOverlayRenderOwner = lazyOwner(() => createScenarioReliefOverlayRenderOwner({
   state,
   scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
-  constants: {
-    RELIEF_ATLANTROPA_CONTOUR_COLOR,
-    RELIEF_ATLANTROPA_SALT_FILL_COLOR,
-    RELIEF_ATLANTROPA_SALT_STROKE_COLOR,
-    RELIEF_ATLANTROPA_SHORELINE_COLOR,
-    RELIEF_CONTOUR_COLOR,
-    RELIEF_DAM_APPROACH_COLOR,
-    RELIEF_LAKE_SHORELINE_COLOR,
-    RELIEF_SALT_FILL_COLOR,
-    RELIEF_SALT_STROKE_COLOR,
-    RELIEF_SHORELINE_COLOR,
-    RELIEF_SWAMP_FILL_COLOR,
-    RELIEF_SWAMP_STROKE_COLOR,
-    RENDER_PHASE_INTERACTING,
-    RENDER_PHASE_SETTLING,
-  },
   getters: {
     getContext: () => rendererSurfaceHost.getContext(),
     getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
@@ -1881,7 +1816,6 @@ const getCityLightsRenderOwner = lazyOwner(() => createCityLightsRenderOwner({
     buildNightHemisphereFeature,
     getNightMask: (config, solarState) => getDayNightRuntimeOwner().getNightMask(config, solarState),
     clamp,
-    ColorManager,
     createCanvas: (canvasWidth, canvasHeight, targetContext) => {
       const ownerDocument = targetContext?.canvas?.ownerDocument || globalThis.document;
       const canvas = typeof ownerDocument?.createElement === "function"
@@ -1891,8 +1825,6 @@ const getCityLightsRenderOwner = lazyOwner(() => createCityLightsRenderOwner({
     },
     estimateProjectedAreaPx,
     getCityAnchor: labelsRuntime.getCityAnchor,
-    getCityCanonicalId,
-    getCityCapitalScore,
     getCityGeoCoordinates: labelsRuntime.getCityGeoCoordinates,
     getCityScreenPoint: labelsRuntime.getCityScreenPoint,
     getDefaultZoomTransform: () => globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 },
@@ -1905,13 +1837,10 @@ const getCityLightsRenderOwner = lazyOwner(() => createCityLightsRenderOwner({
     getTransformSignature,
     getUrbanCityPolicyOwner: labelsRuntime.getUrbanCityPolicyOwner,
     getUrbanGlowMultiplierAt,
-    normalizeDayNightStyleConfig,
-    normalizeIntensityFieldsState,
     normalizeLongitude,
     pathBoundsInScreen,
     prepareTargetContext,
     recordRenderPerfMetric,
-    sampleIntensityField,
     stableJson,
     stringHash,
     withRenderTarget,
@@ -1987,12 +1916,6 @@ const getTransportOverviewRenderOwner = lazyOwner(() => createTransportOverviewR
 
 const getBorderMeshOwner = lazyOwner(() => createBorderMeshOwner({
   state,
-  constants: {
-    coastlineEffectiveAreaMultiplier: COASTLINE_EFFECTIVE_AREA_MULTIPLIER,
-    scenarioCoastlineMaxAreaDeltaRatio: SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO,
-    scenarioCoastlineMaxInteriorRingCount: SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT,
-    scenarioCoastlineMaxInteriorRingRatio: SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO,
-  },
   helpers: {
     asFeatureLike,
     canonicalCountryCode,
@@ -2170,11 +2093,7 @@ function getBorderDrawOwner() {
   borderDrawOwner = createBorderDrawOwner({
     state,
     constants: {
-      boundaryDefaultLineCap: BOUNDARY_DEFAULT_LINE_CAP,
-      boundaryDefaultLineJoin: BOUNDARY_DEFAULT_LINE_JOIN,
       boundaryDefaultMiterLimit: BOUNDARY_DEFAULT_MITER_LIMIT,
-      coastlineLodLowZoomMax: COASTLINE_LOD_LOW_ZOOM_MAX,
-      coastlineLodMidZoomMax: COASTLINE_LOD_MID_ZOOM_MAX,
       coastlineViewSimplifyCollinearAngleDeg: COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG,
       coastlineViewSimplifyLowMinDistancePx: COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX,
       coastlineViewSimplifyMidMinDistancePx: COASTLINE_VIEW_SIMPLIFY_MID_MIN_DISTANCE_PX,
@@ -2195,7 +2114,6 @@ function getBorderDrawOwner() {
       provinceBordersFadeStartZoom: PROVINCE_BORDERS_FADE_START_ZOOM,
       provinceBordersFarAlpha: PROVINCE_BORDERS_FAR_ALPHA,
       provinceBordersFarWidthMaxZoom: PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM,
-      provinceBordersFarWidthScale: PROVINCE_BORDERS_FAR_WIDTH_SCALE,
       provinceBordersNearAlphaScale: PROVINCE_BORDERS_NEAR_ALPHA_SCALE,
       provinceBordersNearWidthScale: PROVINCE_BORDERS_NEAR_WIDTH_SCALE,
       provinceBordersNearZoomStart: PROVINCE_BORDERS_NEAR_ZOOM_START,
@@ -2714,9 +2632,6 @@ function getViewportReadModelOwner() {
       || getProjectedFeatureBounds(feature, { featureId }));
   });
   viewportReadModelOwner = createViewportReadModelOwner({
-    constants: {
-      mapPanPaddingPx: MAP_PAN_PADDING_PX,
-    },
     getters: {
       getViewportDimensions: () => ({ width: Number(runtimeState.width), height: Number(runtimeState.height) }),
       getViewportDpr: () => Number(runtimeState.dpr || 1),
@@ -2766,10 +2681,6 @@ function getViewportReadModelOwner() {
 
 const getViewportCommandOwner = lazyOwner(() => createViewportCommandOwner({
   state: runtimeState,
-  constants: {
-    minZoomScale: MIN_ZOOM_SCALE,
-    maxZoomScale: MAX_ZOOM_SCALE,
-  },
   getters: {
     getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
     getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
@@ -2870,12 +2781,6 @@ const getScenarioWaterCachePolicyOwner = lazyOwner(() => createScenarioWaterCach
 
 const getZoomInteractionLifecycleOwner = lazyOwner(() => createZoomInteractionLifecycleOwner({
   state: runtimeState,
-  constants: {
-    minZoomScale: MIN_ZOOM_SCALE,
-    maxZoomScale: MAX_ZOOM_SCALE,
-    renderPhaseInteracting: RENDER_PHASE_INTERACTING,
-    renderPhaseSettling: RENDER_PHASE_SETTLING,
-  },
   getters: {
     getD3: () => globalThis.d3,
     getWidth: () => runtimeState.width,
@@ -3265,12 +3170,6 @@ function getTnoScenePaintOverscanPx(passName) {
   // labels pass keeps the viewport placement contract of the vector path.
   if (!["borders", "textureLabels"].includes(passName)) return 0;
   return VIEWPORT_CULL_OVERSCAN_PX;
-}
-
-function getTnoSceneLabelPaintBounds() {
-  const margin = getTnoScenePaintOverscanPx("labels");
-  return margin ? { minX: -margin, minY: -margin,
-    maxX: runtimeState.width + margin, maxY: runtimeState.height + margin } : null;
 }
 
 function getPoliticalDirectFrameKey() {
@@ -3975,15 +3874,7 @@ const getStrategicOverlayRuntimeOwner = lazyOwner(() => createStrategicOverlayRu
   state,
   constants: {
     defaultOperationGraphicKind: DEFAULT_OPERATION_GRAPHIC_KIND,
-    defaultOperationalLineKind: DEFAULT_OPERATIONAL_LINE_KIND,
-    defaultSpecialZoneType: DEFAULT_SPECIAL_ZONE_TYPE,
-    defaultCounterAttachmentKind: STRATEGIC_COUNTER_ATTACHMENT_KIND,
     defaultHitSnapRadiusClickPx: HIT_SNAP_RADIUS_CLICK_PX,
-    defaultUnitCounterEquipmentPct: DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
-    defaultUnitCounterMilstdSidc: DEFAULT_MILSTD_SIDC,
-    defaultUnitCounterOrganizationPct: DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
-    defaultUnitCounterPresetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
-    defaultUnitCounterRenderer: DEFAULT_UNIT_COUNTER_RENDERER,
   },
   helpers: {
     assignUnitCounterEditorFromCounter,
@@ -6213,11 +6104,6 @@ function getProjectedFeatureBounds(feature, { featureId = null, allowCompute = t
   return getProjectedGeometryBoundsOwner().getProjectedFeatureBounds(feature, { featureId, allowCompute });
 }
 
-function isKnownBadFeatureId(featureId) {
-  if (!featureId) return false;
-  return KNOWN_BAD_FEATURE_IDS.has(String(featureId));
-}
-
 function isAdmin0ShellFeature(feature, featureId) {
   const candidate = String(
     feature?.properties?.id ?? featureId ?? feature?.id ?? ""
@@ -6290,16 +6176,6 @@ function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = f
   }
 
   const featureId = getFeatureId(feature);
-  if (isKnownBadFeatureId(featureId)) {
-    return {
-      skip: true,
-      reason: "known_bad_id",
-      featureId,
-      countryCode: getFeatureCountryCodeNormalized(feature),
-      bounds: null,
-    };
-  }
-
   const bounds = getProjectedFeatureBounds(feature, { featureId });
   const countryCode = getFeatureCountryCodeNormalized(feature);
   if (!bounds) {
@@ -7465,9 +7341,6 @@ function getContourVisibleFeatures(collection, options = {}) {
     viewportSignature: getViewportRenderSignature(),
   });
 }
-
-const URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300;
-const URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150;
 
 const contextLayerRenderScheduler = createContextLayerRenderScheduler({
   getIdentity: () => [runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.currentScenarioApplyRequestId],
@@ -9006,10 +8879,6 @@ function getHitFromEvent(...args) {
   return getHitTestingOwner().getHitFromEvent(...args);
 }
 
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
-
 function getProjectedLineDensityStats(line) {
   const sanitized = sanitizePolyline(line);
   if (sanitized.length < 2 || !rendererSurfaceHost.getProjection()) {
@@ -9925,8 +9794,6 @@ const labelsRuntime = createLabelsRuntime({
   requestRendererRender,
   isExportRenderInProgress: () => exportRenderInProgress,
   isPrivateSceneActive: () => isTnoRasterSceneSelected() && tnoRasterSceneOwner?.isActive(),
-  getLabelPaintBounds: getTnoSceneLabelPaintBounds,
-  getLabelPaintOverscanPx: () => getTnoScenePaintOverscanPx("labels"),
   getHoverEntryHitPriority: (...args) => getFacilityInteractionRuntime().getFacilityEntryHitPriority(...args),
   getScenarioWaterPartBounds: part => getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part),
   drawPendingTransportLabels: (...args) => getTransportOverviewRenderOwner().drawPendingLabels(...args),
@@ -11607,17 +11474,10 @@ const getOperationGraphicsEditorRenderOwner = lazyOwner(() => createOperationGra
     rendererSurfaceHost,
     ensureOperationGraphicsEditorState,
     getOperationGraphicById,
-    DEFAULT_OPERATION_GRAPHIC_KIND,
-    normalizeOperationGraphicStylePreset,
-    normalizeOperationGraphicStroke,
-    normalizeOperationGraphicWidth,
-    normalizeOperationGraphicOpacity,
-    getOperationGraphicPreset,
     createOperationGraphicPath,
     getProjectedPoint,
     getStrategicOverlayRuntimeOwner,
     getMapLonLatFromEvent,
-    getOperationGraphicEditorMidpoints,
   }));
 
 function getLandFeatureIdFromEvent(event, eventType = "unit-counter-hit") {

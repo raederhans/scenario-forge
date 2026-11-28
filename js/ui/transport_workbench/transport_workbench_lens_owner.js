@@ -7,22 +7,10 @@ export function buildTransportWorkbenchLensModel({
   dataContract = null,
   rightDeckLabel = "",
   translate = (label) => label,
-  pickUiCopy = (_zh, en) => en,
   buildLensSummaryRows = () => [],
 } = {}) {
   if (family?.id === "layers") {
-    return {
-      cards: [
-        {
-          type: "empty",
-          title: translate("Future draw stack"),
-          body: pickUiCopy(
-            "拖动行以调整绘制顺序。",
-            "Drag rows to change the drawing order.",
-          ),
-        },
-      ],
-    };
+    return { cards: [] };
   }
   const summaryRows = buildLensSummaryRows({
     family,
@@ -58,7 +46,6 @@ export function createTransportWorkbenchLensOwner({
   mount = null,
   closeSectionHelpPopover = () => {},
   translate = (label) => label,
-  pickUiCopy = (_zh, en) => en,
   createRow = null,
   buildLensSummaryRows = () => [],
 } = {}) {
@@ -81,17 +68,6 @@ export function createTransportWorkbenchLensOwner({
 
   const createCardNode = (cardModel) => {
     const card = document.createElement("div");
-    if (cardModel.type === "empty") {
-      card.className = "transport-workbench-empty-card";
-      const title = document.createElement("div");
-      title.className = "transport-workbench-empty-title";
-      title.textContent = cardModel.title;
-      const body = document.createElement("p");
-      body.className = "transport-workbench-empty-text";
-      body.textContent = cardModel.body;
-      card.append(title, body);
-      return card;
-    }
     const toneClass = cardModel.tone === "emphasis"
       ? "transport-workbench-note-card-emphasis"
       : "transport-workbench-note-card-soft";
@@ -125,7 +101,6 @@ export function createTransportWorkbenchLensOwner({
       dataContract,
       rightDeckLabel,
       translate,
-      pickUiCopy,
       buildLensSummaryRows,
     });
     const signature = buildTransportWorkbenchLensRenderSignature(model);
@@ -149,7 +124,6 @@ export function createTransportWorkbenchLensOwner({
     buildModel: (input = {}) => buildTransportWorkbenchLensModel({
       ...input,
       translate,
-      pickUiCopy,
       buildLensSummaryRows,
     }),
     render,

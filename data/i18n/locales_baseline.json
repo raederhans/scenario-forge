@@ -17,8 +17,8 @@
       "zh": "1. 几何检查（粉/绿）"
     },
     "1930s Electrification Proxy": {
-      "en": "1930s Electrification Proxy",
-      "zh": "1930年代电气化代理"
+      "en": "1930s",
+      "zh": "1930 年代"
     },
     "2. Artifact Hunter (Red Giants)": {
       "en": "2. Artifact Hunter (Red Giants)",
@@ -123,10 +123,6 @@
     "Already using this boundary variant.": {
       "en": "Already using this boundary variant.",
       "zh": "已经在使用这个边界变体。"
-    },
-    "Ambiguous identity": {
-      "en": "Ambiguous identity",
-      "zh": "身份存在歧义"
     },
     "Anchor Region": {
       "en": "Anchor Region",
@@ -331,14 +327,6 @@
     "Borders Pass": {
       "en": "Borders Pass",
       "zh": "边界渲染"
-    },
-    "Borders need recalculation": {
-      "en": "Borders need recalculation",
-      "zh": "边界需要重算"
-    },
-    "Borders up to date": {
-      "en": "Borders up to date",
-      "zh": "边界已更新"
     },
     "Boundary Variants": {
       "en": "Boundary Variants",
@@ -636,10 +624,6 @@
       "en": "Colonial Government",
       "zh": "殖民政府"
     },
-    "Colonial predecessor": {
-      "en": "Colonial predecessor",
-      "zh": "殖民前身实体"
-    },
     "Colony": {
       "en": "Colony",
       "zh": "殖民地"
@@ -773,8 +757,8 @@
       "zh": "将所选地块的标签填入归属输入框"
     },
     "Core Sharpness (Modern only)": {
-      "en": "Core Sharpness (Modern only)",
-      "zh": "核心锐度（仅现代）"
+      "en": "Core Sharpness",
+      "zh": "核心锐度"
     },
     "Core Territory": {
       "en": "Core Territory",
@@ -793,8 +777,8 @@
       "zh": "核心领土未适用。"
     },
     "Corridor Strength (Modern only)": {
-      "en": "Corridor Strength (Modern only)",
-      "zh": "通道强度（仅现代）"
+      "en": "Corridor Strength",
+      "zh": "通道强度"
     },
     "Counter Editor": {
       "en": "Counter Editor",
@@ -859,10 +843,6 @@
     "Country colors were restored.": {
       "en": "Country colors were restored.",
       "zh": "国家颜色已恢复。"
-    },
-    "Coverage report unavailable": {
-      "en": "Coverage report unavailable",
-      "zh": "覆盖报告不可用"
     },
     "Create Tag": {
       "en": "Create Tag",
@@ -1157,20 +1137,12 @@
       "zh": "绘图进行中：点击地图添加顶点，双击完成。"
     },
     "Dynamic / Runtime": {
-      "en": "Dynamic / Runtime",
-      "zh": "动态 / 运行时"
+      "en": "Dynamic tags",
+      "zh": "动态国家"
     },
     "Dynamic Borders": {
       "en": "Dynamic Borders",
       "zh": "动态边界"
-    },
-    "Dynamic borders disabled": {
-      "en": "Dynamic borders disabled",
-      "zh": "动态边界已禁用"
-    },
-    "Dynamic tag": {
-      "en": "Dynamic tag",
-      "zh": "动态 tag"
     },
     "EQP": {
       "en": "EQP",
@@ -1344,10 +1316,6 @@
       "en": "Features",
       "zh": "地块数"
     },
-    "Fictional / alt-history": {
-      "en": "Fictional / alt-history",
-      "zh": "虚构或架空历史"
-    },
     "Fill": {
       "en": "Fill",
       "zh": "填充"
@@ -1503,10 +1471,6 @@
     "Historical composites built": {
       "en": "Historical composites built",
       "zh": "构建的历史合并区"
-    },
-    "Historical predecessor": {
-      "en": "Historical predecessor",
-      "zh": "历史前身实体"
     },
     "Historical transfer already matches current ownership.": {
       "en": "Historical transfer already matches current ownership.",
@@ -1832,10 +1796,6 @@
       "en": "Map zoom controls",
       "zh": "地图缩放控件"
     },
-    "Mapped to": {
-      "en": "Mapped to",
-      "zh": "映射到"
-    },
     "Marker Scale": {
       "en": "Marker Scale",
       "zh": "标记缩放"
@@ -1993,8 +1953,8 @@
       "zh": "无手动区域"
     },
     "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.": {
-      "en": "No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.",
-      "zh": "没有匹配颜色。清空搜索，或尝试国家名称、ISO-2 代码、来源标签。"
+      "en": "No matching colors.",
+      "zh": "没有匹配的颜色。"
     },
     "No matching countries": {
       "en": "No matching countries",
@@ -2065,8 +2025,8 @@
       "zh": "当前没有特殊区域"
     },
     "No supported countries in current dataset.": {
-      "en": "No supported countries in current dataset.",
-      "zh": "当前数据集中没有受支持的国家。"
+      "en": "No countries available on this map.",
+      "zh": "当前地图没有可用的国家。"
     },
     "No symbols match the current filter.": {
       "en": "No symbols match the current filter.",
@@ -2744,10 +2704,6 @@
       "en": "Scenario cleared.",
       "zh": "剧本已退出。"
     },
-    "Scenario controls are locked until the page reloads.": {
-      "en": "Scenario controls are locked until the page reloads.",
-      "zh": "Scenario controls are locked until the page reloads."
-    },
     "Scenario failed": {
       "en": "Scenario failed",
       "zh": "剧本加载失败"
@@ -3156,10 +3112,6 @@
       "en": "Split",
       "zh": "分裂"
     },
-    "Split state": {
-      "en": "Split state",
-      "zh": "分裂态国家"
-    },
     "Start Draw": {
       "en": "Start Draw",
       "zh": "开始绘制"
@@ -3285,8 +3237,8 @@
       "zh": "纹理"
     },
     "Texture Opacity (Modern only)": {
-      "en": "Texture Opacity (Modern only)",
-      "zh": "纹理不透明度（仅现代）"
+      "en": "Background Light Opacity",
+      "zh": "背景夜光不透明度"
     },
     "Texture Overlay": {
       "en": "Texture Overlay",
@@ -3468,14 +3420,6 @@
       "en": "Unmapped",
       "zh": "未映射"
     },
-    "Unreviewed": {
-      "en": "Unreviewed",
-      "zh": "未审核"
-    },
-    "Unsupported runtime country": {
-      "en": "Unsupported runtime country",
-      "zh": "运行时国家未收录"
-    },
     "Upsert District": {
       "en": "Upsert District",
       "zh": "新增或更新分区"
@@ -3579,10 +3523,6 @@
     "Surface Colors": {
       "en": "Surface Colors",
       "zh": "表面颜色"
-    },
-    "Warlord / regional tag": {
-      "en": "Warlord / regional tag",
-      "zh": "军阀或地区性 tag"
     },
     "Warmth": {
       "en": "Warmth",
@@ -3792,10 +3732,6 @@
       "en": "Overlay off.",
       "zh": "覆盖层已关闭。"
     },
-    "Pick a city marker style, then tune marker density and label density for the current map scale.": {
-      "en": "Pick a city marker style, then tune marker density and label density for the current map scale.",
-      "zh": "先选一种城市点位样式，再按当前地图比例调整标记密度和标签密度。"
-    },
     "Plan lines.": {
       "en": "Plan lines.",
       "zh": "规划线条。"
@@ -3897,8 +3833,8 @@
       "zh": "添加国家 / 属主"
     },
     "Add dev selection": {
-      "en": "Add dev selection",
-      "zh": "添加当前开发选择"
+      "en": "Add selected parcels",
+      "zh": "添加已选地块"
     },
     "Bulk actions and save": {
       "en": "Bulk actions and save",
@@ -3973,8 +3909,8 @@
       "zh": "只读场景资产"
     },
     "Replace with dev selection": {
-      "en": "Replace with dev selection",
-      "zh": "用开发选择替换"
+      "en": "Replace with selected parcels",
+      "zh": "用已选地块替换"
     },
     "Save scenario layer asset": {
       "en": "Save scenario layer asset",
@@ -4108,18 +4044,6 @@
       "en": "Save Preset",
       "zh": "保存预设"
     },
-    "0 presets": {
-      "en": "0 presets",
-      "zh": "0 个预设"
-    },
-    "preset": {
-      "en": "preset",
-      "zh": "个预设"
-    },
-    "presets": {
-      "en": "presets",
-      "zh": "个预设"
-    },
     "Appearance Preset": {
       "en": "Appearance Preset",
       "zh": "外观预设"
@@ -4151,6 +4075,74 @@
     "Interactive map line layer.": {
       "en": "Interactive map line layer.",
       "zh": "交互式地图线条图层。"
+    },
+    "Clear Channel": {
+      "en": "Clear all adjustments",
+      "zh": "清除全部调整"
+    },
+    "Dash Style": {
+      "en": "Dash Style",
+      "zh": "线型"
+    },
+    "Enable Channel": {
+      "en": "Enable local adjustments",
+      "zh": "启用局部调整"
+    },
+    "Link Scope To Reach": {
+      "en": "Scope follows reach",
+      "zh": "范围随覆盖度联动"
+    },
+    "Major Opacity": {
+      "en": "Major Opacity",
+      "zh": "主线不透明度"
+    },
+    "Minor Opacity": {
+      "en": "Minor Opacity",
+      "zh": "次线不透明度"
+    },
+    "Names from 200% zoom; terrain shading from 400%. Current geography reference.": {
+      "en": "At 200% zoom, landform names appear. At 400%, Alpine details and terrain shading appear. Based on present-day geography.",
+      "zh": "放大至 200% 显示地貌名称，400% 显示阿尔卑斯细节与地形阴影。以现今地理为参考。"
+    },
+    "Population / City Boost (Modern only)": {
+      "en": "Population / City Boost",
+      "zh": "人口亮度增强"
+    },
+    "Population Boost Strength (Modern only)": {
+      "en": "Population Boost Strength",
+      "zh": "人口增强强度"
+    },
+    "Show Parent Unit Borders": {
+      "en": "Show",
+      "zh": "显示"
+    },
+    "{a} and {b} · ΔE {distance}": {
+      "en": "{a} and {b} look too similar",
+      "zh": "{a} 与 {b} 颜色过近"
+    },
+    "Modern only": {
+      "en": "Modern only",
+      "zh": "仅现代模式"
+    },
+    "Adaptive mode is unavailable for this map.": {
+      "en": "Adaptive mode is unavailable for this map.",
+      "zh": "此地图暂不支持自适应模式。"
+    },
+    "Some countries have no data.": {
+      "en": "Some countries have no data.",
+      "zh": "部分国家无数据。"
+    },
+    "Some parcels have no population data.": {
+      "en": "Some parcels have no population data.",
+      "zh": "部分地块无人口数据。"
+    },
+    "This scenario has no strategic data.": {
+      "en": "This scenario has no strategic data.",
+      "zh": "此剧本没有战略数据。"
+    },
+    "No appearance presets saved": {
+      "en": "No appearance presets saved",
+      "zh": "暂无外观预设"
     }
   },
   "geo": {

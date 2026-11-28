@@ -34,44 +34,14 @@ function assertOwnDataPropertyWritable(target, key, value, label) {
   return descriptor;
 }
 
-function writeOwnRenderPassCacheState(target, value, descriptor) {
+function writeOwnDataProperty(target, key, value, descriptor) {
   if (descriptor && Object.hasOwn(descriptor, "value")) {
     if (!hasSameStateValue(descriptor.value, value)) {
-      target.renderPassCache = value;
+      target[key] = value;
     }
     return;
   }
-  Object.defineProperty(target, "renderPassCache", {
-    configurable: descriptor?.configurable ?? true,
-    enumerable: descriptor?.enumerable ?? true,
-    value,
-    writable: true,
-  });
-}
-
-function writeOwnProjectedBoundsCacheState(target, value, descriptor) {
-  if (descriptor && Object.hasOwn(descriptor, "value")) {
-    if (!hasSameStateValue(descriptor.value, value)) {
-      target.projectedBoundsById = value;
-    }
-    return;
-  }
-  Object.defineProperty(target, "projectedBoundsById", {
-    configurable: descriptor?.configurable ?? true,
-    enumerable: descriptor?.enumerable ?? true,
-    value,
-    writable: true,
-  });
-}
-
-function writeOwnSphericalFeatureDiagnosticsCacheState(target, value, descriptor) {
-  if (descriptor && Object.hasOwn(descriptor, "value")) {
-    if (!hasSameStateValue(descriptor.value, value)) {
-      target.sphericalFeatureDiagnosticsById = value;
-    }
-    return;
-  }
-  Object.defineProperty(target, "sphericalFeatureDiagnosticsById", {
+  Object.defineProperty(target, key, {
     configurable: descriptor?.configurable ?? true,
     enumerable: descriptor?.enumerable ?? true,
     value,
@@ -114,7 +84,7 @@ export function commitRenderPassCacheState(target, renderPassCache) {
     renderPassCache,
     "renderPassCache",
   );
-  writeOwnRenderPassCacheState(target, renderPassCache, descriptor);
+  writeOwnDataProperty(target, "renderPassCache", renderPassCache, descriptor);
   return true;
 }
 
@@ -137,16 +107,8 @@ export function commitProjectedBoundsCacheState(
     sphericalFeatureDiagnosticsById,
     "sphericalFeatureDiagnosticsById",
   );
-  writeOwnProjectedBoundsCacheState(
-    target,
-    projectedBoundsById,
-    projectedBoundsDescriptor,
-  );
-  writeOwnSphericalFeatureDiagnosticsCacheState(
-    target,
-    sphericalFeatureDiagnosticsById,
-    sphericalDiagnosticsDescriptor,
-  );
+  writeOwnDataProperty(target, "projectedBoundsById", projectedBoundsById, projectedBoundsDescriptor);
+  writeOwnDataProperty(target, "sphericalFeatureDiagnosticsById", sphericalFeatureDiagnosticsById, sphericalDiagnosticsDescriptor);
   return true;
 }
 
