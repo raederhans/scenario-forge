@@ -1054,6 +1054,8 @@ export function createWaterSpecialRegionController({
       waterListView.filterSignature = filterSignature;
       waterListView.page = 0;
     }
+    // 选择被清空时忘掉上次显示过的选中项，之后重新选中同一块仍会翻页并展开所在组。
+    if (!selectedId) waterListView.revealedSelectionId = null;
     if (selectedId && selectedId !== waterListView.revealedSelectionId) {
       // 新选中的地块（比如在地图上点的）要能在列表里看到：翻到它所在的页、展开它所在的组。
       waterListView.revealedSelectionId = selectedId;

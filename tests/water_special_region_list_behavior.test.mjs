@@ -192,6 +192,16 @@ test("Atlantropa sea fragments are grouped by sub-sea and long lists are paged w
     "selecting a region on another page turns to that page");
   assert.ok(elements.waterRegionList.children.some((row) => row.dataset.regionId === "sea-44"));
 
+  // 翻回第 1 页、清空选择，再选中同一块：仍要翻回它所在的页。
+  elements.waterRegionList.children.at(-1).children[0].click();
+  assert.equal(elements.waterRegionList.children.at(-1).children[1].textContent, "1 / 2");
+  state.selectedWaterRegionId = "";
+  controller.renderWaterRegionList();
+  state.selectedWaterRegionId = "sea-44";
+  controller.renderWaterRegionList();
+  assert.equal(elements.waterRegionList.children.at(-1).children[1].textContent, "2 / 2",
+    "reselecting the same region after clearing reveals its page again");
+
   state.selectedWaterRegionId = "ATLSEA_FILL_adriatica_10";
   controller.renderWaterRegionList();
   const revealed = elements.waterRegionList.children[0];
