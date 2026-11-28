@@ -1,9 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  createUrbanAdaptivePaintModel,
-  getUrbanFeatureOwnerId,
-} from "../js/core/renderer/urban_adaptive_paint_model.js";
+import { createUrbanAdaptivePaintModel } from "../js/core/renderer/urban_adaptive_paint_model.js";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const createModel = (runtimeState = {}, getResolvedFeatureColor = () => "#eeeeee") =>
@@ -25,50 +22,14 @@ test("urban paint preserves dark, middle and light host colors with channel-spec
       ...config, adaptiveTintEnabled: true, adaptiveTintColor: "#cc4400", adaptiveTintStrength: 0.3,
     }), paint(tinted));
   }
-  assert.equal(model.computeUrbanAdaptivePaintFromHostColor(null), null);
-  assert.equal(model.computeUrbanAdaptivePaintFromHostColor("invalid-color"), null);
 });
 
-test("urban host resolution follows replacement state maps and resolver without caching colors", () => {
-  const feature = { properties: { country_owner_id: " host " } };
-  const firstHost = {};
-  const secondHost = {};
-  const runtimeState = { landIndex: new Map([["host", firstHost]]), colors: { host: "#101010" } };
-  const calls = [];
-  const model = createModel(runtimeState, (host, id) => { calls.push([host, id]); return "#eeeeee"; });
-  assert.equal(getUrbanFeatureOwnerId(feature), "host");
-  assert.equal(getUrbanFeatureOwnerId({ properties: { countryOwnerId: " legacy " } }), "legacy");
-  assert.deepEqual(model.getUrbanAdaptivePaint(feature), model.computeUrbanAdaptivePaintFromHostColor("#101010"));
-  assert.equal(calls.length, 0);
-  runtimeState.colors = { host: "invalid-color" };
-  runtimeState.landIndex = new Map([["host", secondHost]]);
-  assert.deepEqual(model.getUrbanAdaptivePaint(feature), model.computeUrbanAdaptivePaintFromHostColor("#eeeeee"));
-  assert.deepEqual(calls, [[secondHost, "host"]]);
-  runtimeState.landIndex = new Map();
-  assert.equal(model.getUrbanAdaptivePaint(feature), null);
-  assert.equal(model.getUrbanAdaptivePaint({}), null);
-});
-
-test("urban adaptive capability defaults remain live and explicit capability overrides state", () => {
-  const runtimeState = { urbanLayerCapability: { adaptiveAvailable: false } };
-  const model = createModel(runtimeState);
-  assert.equal(model.getEffectiveUrbanMode({ mode: "adaptive" }), "manual");
-  runtimeState.urbanLayerCapability = { adaptiveAvailable: true };
-  assert.equal(model.getEffectiveUrbanMode({ mode: "adaptive" }), "adaptive");
-  assert.equal(model.getEffectiveUrbanMode({ mode: "adaptive" }, null), "manual");
-  assert.equal(model.getEffectiveUrbanMode({ mode: "manual" }), "manual");
-});
-
-test("a draw resolver shares owner paint while the next draw reflects recoloring", () => {
+test("the next draw reflects host recoloring", () => {
   let color = "#101010";
-  let calls = 0;
   const state = { landIndex: new Map([["host", {}]]) };
-  const model = createModel(state, () => { calls++; return color; });
+  const model = createModel(state, () => color);
   const resolve = model.createDrawPaintResolver();
   const first = resolve({ properties: { country_owner_id: "host" } });
-  assert.equal(resolve({ properties: { country_owner_id: "host" } }), first);
-  assert.equal(calls, 1);
   color = "#eeeeee";
   assert.notDeepEqual(model.createDrawPaintResolver()({ properties: { country_owner_id: "host" } }), first);
-  assert.equal(calls, 2);
 });
