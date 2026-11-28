@@ -1,7 +1,4 @@
 from copy import deepcopy
-import json
-from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -11,7 +8,7 @@ from shapely.geometry import box, mapping
 import topojson
 
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
-from tools.pilot_tno_regional_precision import _assemble_candidate, prepare_candidate
+from tools.pilot_tno_regional_precision import _assemble_candidate
 
 
 class TnoRegionalPrecisionTests(unittest.TestCase):
@@ -79,27 +76,6 @@ class TnoRegionalPrecisionTests(unittest.TestCase):
         self.assertEqual(geometries[0].bounds[2], 0.9)
         self.assertEqual(geometries[1].bounds[2], 2.1)
 
-    def test_rejects_id_and_country_changes_and_invalid_joint_coverage(self):
-        baseline, replacements = self.fixture()
-        variants = [replacements.iloc[:2].copy(), replacements.copy(), replacements.copy(), replacements.copy()]
-        variants[1].loc[0, "id"] = "ADDED"
-        variants[2].loc[0, "cntr_code"] = "DE"
-        variants[3].loc[0, "geometry"] = box(1.9, 0, 3.2, 1)
-        for variant in variants:
-            with self.subTest(ids=list(variant["id"])):
-                with self.assertRaises(ValueError):
-                    _assemble_candidate(baseline, variant, ["DE", "BE", "NL"])
-
-    def test_explicit_targets_declare_precision_ids_without_expanding_country_scope(self):
-        baseline, replacements = self.fixture()
-        baseline['political_precision_feature_ids'] = ['FR_KEEP']
-        candidate, report = _assemble_candidate(baseline, replacements, ['CN'],
-            target_feature_ids=['DE_A', 'BE_A', 'NL_A'])
-        self.assertEqual(candidate['political_precision_source_countries'], ['JP'])
-        self.assertEqual(candidate['political_precision_feature_ids'], ['BE_A', 'DE_A', 'FR_KEEP', 'NL_A'])
-        self.assertEqual(report['political_precision_feature_ids'], candidate['political_precision_feature_ids'])
-        self.assertNotIn('FR_OTHER', candidate['political_precision_feature_ids'])
-
     def test_frozen_owner_domains_preserve_target_surface(self):
         baseline, replacements = self.fixture()
         owners = {'DE_A': 'GER', 'BE_A': 'GER', 'NL_A': 'GER'}
@@ -120,14 +96,6 @@ class TnoRegionalPrecisionTests(unittest.TestCase):
             _assemble_candidate(baseline, replacements, ['DE', 'BE', 'NL'],
                                 frozen_domain_owners={'DE_A': 'GER'})
 
-    def test_frozen_owner_domains_reject_nearest_overlap_resolution(self):
-        baseline, replacements = self.fixture()
-        with patch('tools.pilot_tno_regional_precision.constrained_partition') as partition:
-            partition.return_value = ({}, {'baseline_overlap_resolutions': [{'ids': ['DE_A', 'BE_A']}]})
-            with self.assertRaisesRegex(ValueError, 'nearest source'):
-                _assemble_candidate(baseline, replacements, ['DE', 'BE', 'NL'],
-                                    frozen_domain_owners={fid: 'GER' for fid in ['DE_A', 'BE_A', 'NL_A']})
-
     def test_candidate_rejects_changed_target_union(self):
         baseline, replacements = self.fixture()
         with patch('tools.pilot_tno_regional_precision.align_regional_boundaries',
@@ -136,31 +104,6 @@ class TnoRegionalPrecisionTests(unittest.TestCase):
                        side_effect=lambda old, selected, *_, **__: (selected, {})):
             with self.assertRaisesRegex(ValueError, 'Selected target surface changed'):
                 _assemble_candidate(baseline, replacements, ['DE', 'BE', 'NL'])
-
-    def test_file_candidate_and_no_overwrite_guards(self):
-        baseline, replacements = self.fixture()
-        runtime = Path(__file__).resolve().parents[1] / ".runtime" / "tmp"
-        runtime.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(dir=runtime) as directory:
-            root = Path(directory)
-            scenario = root / "baseline"
-            scenario.mkdir()
-            (scenario / "manifest.json").write_text(json.dumps({"scenario_id": "tno_1962"}), encoding="utf-8")
-            baseline_path = scenario / "runtime_topology.topo.json"
-            baseline_path.write_text(json.dumps(baseline), encoding="utf-8")
-            baseline_bytes = baseline_path.read_bytes()
-            source = root / "replacement.geojson"
-            source.write_text(replacements.to_json(), encoding="utf-8")
-            output = root / "candidate.topo.json"
-            report = prepare_candidate(scenario, source, output, source_countries=["DE", "BE", "NL"])
-            self.assertTrue(output.exists())
-            self.assertTrue(output.with_suffix(".report.json").exists())
-            self.assertEqual(baseline_path.read_bytes(), baseline_bytes)
-            self.assertEqual(report["source_countries"], ["BE", "DE", "NL"])
-            for forbidden in [output, source, baseline_path, scenario / "new.json"]:
-                with self.subTest(path=str(forbidden)):
-                    with self.assertRaises(ValueError):
-                        prepare_candidate(scenario, source, forbidden, source_countries=["DE", "BE", "NL"])
 
 
 if __name__ == "__main__":

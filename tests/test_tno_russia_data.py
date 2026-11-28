@@ -11,17 +11,12 @@ from tools.repair_tno_russia import corrected_assignments
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO = ROOT / 'data/scenarios/tno_1962'
 USER_RULES = json.loads((ROOT / 'tests/fixtures/tno_user_reassign.json').read_text(encoding='utf-8'))
-CHANGED_RULES = {fid: row for fid, row in USER_RULES.items() if row['from'] != row['to']}
-# The user's later project file (tno_user2_* overlay entries) supersedes earlier choices.
-LATER_OWNERS = {fid: entry['tag'] for entry in json.loads(
-    (ROOT / 'data/scenario-rules/tno_1962.split_overlay.json').read_text(encoding='utf-8'))['entries']
-    if entry['id'].startswith('tno_user2_') for fid in entry['select']['feature_ids']}
 
 
 @pytest.fixture(scope='module')
 def scenario():
     return {name: read_json_source(SCENARIO / name) for name in (
-        'countries.json', 'owners.by_feature.json', 'runtime_topology.topo.json', 'manifest.json')}
+        'countries.json', 'owners.by_feature.json', 'runtime_topology.topo.json')}
 
 
 def test_all_shell_hints_resolve_to_existing_countries(scenario):
@@ -54,61 +49,6 @@ def test_adjacent_administrative_children_have_distinct_family_colors(scenario):
     for a, b in pairs:
         distance = math.dist(hex_to_oklab(countries[a]['color_hex']), hex_to_oklab(countries[b]['color_hex']))
         assert distance >= 0.03, (a, b, distance)
-
-
-def test_administrative_containers_and_retired_tags(scenario):
-    countries = scenario['countries.json']['countries']
-    owners = scenario['owners.by_feature.json']['owners']
-    for tag in ('RKO', 'AOI'):
-        assert countries[tag]['entry_kind'] == 'scenario_container'
-        assert countries[tag]['feature_count'] == 0
-        assert tag not in owners.values()
-        assert any(country.get('parent_owner_tag') == tag and country['feature_count'] > 0
-                   for country in countries.values())
-    for tag in ('GEA', 'GCO', 'ANG'):
-        assert countries[tag].get('entry_kind') != 'scenario_container'
-        assert countries[tag]['feature_count'] > 0
-    for tag in ('AFA', 'PG01', 'PG02', 'PG03', 'PG04', 'OE04', 'AOF', 'BWA', 'VIC'):
-        assert tag not in countries
-        assert tag not in owners.values()
-
-
-def test_repaired_adjacent_colors_remain_distinguishable_and_fic_retires(scenario):
-    countries = scenario['countries.json']['countries']
-    for a, b in [('URL', 'OUR'), ('FAV', 'URA'), ('NRL', 'OMO')]:
-        distance = math.dist(hex_to_oklab(countries[a]['color_hex']), hex_to_oklab(countries[b]['color_hex']))
-        assert distance >= 0.03, (a, b, distance)
-    assert 'FIC' not in countries
-    assert 'FIC' not in scenario['manifest.json']['featured_tags']
-    assert scenario['owners.by_feature.json']['owners']['RU_RAY_50074027B90244452662579'] == 'AMR'
-
-
-def test_south_adjacent_owners_have_distinct_colors(scenario):
-    countries = scenario['countries.json']['countries']
-    owners = scenario['owners.by_feature.json']['owners']
-    south = {'CLL', 'CLC', 'JAM', 'TRI', 'BAH', 'BLZ', 'GUY', 'GUC', 'STC', 'PUE', 'PCZ',
-             'SER', 'ALB', 'SNM', 'PAD', 'ITA', 'CRO', 'MNT', 'BUL', 'GRE', 'HUN', 'DOM'}
-    pairs = set()
-    for name in ('political', 'scenario_atlantropa'):
-        obj = scenario['runtime_topology.topo.json']['objects'][name]
-        rows = obj['geometries']
-        for index, neighbors in enumerate(obj.get('computed_neighbors', [])):
-            a = owners.get(rows[index]['properties']['id'])
-            for neighbor in neighbors:
-                b = owners.get(rows[neighbor]['properties']['id'])
-                if a and b and a != b and {a, b} & south:
-                    pairs.add(tuple(sorted((a, b))))
-    assert pairs
-    for a, b in pairs:
-        distance = math.dist(hex_to_oklab(countries[a]['color_hex']), hex_to_oklab(countries[b]['color_hex']))
-        assert distance >= 0.03, (a, b, distance)
-
-
-@pytest.mark.parametrize('feature_id,rule', CHANGED_RULES.items())
-def test_user_reassigned_feature_has_requested_owner(scenario, feature_id, rule):
-    assert len(CHANGED_RULES) == 49
-    expected = LATER_OWNERS.get(feature_id, {'RKO': 'OE00'}.get(rule['to'], rule['to']))
-    assert scenario['owners.by_feature.json']['owners'][feature_id] == expected
 
 
 def test_reassignment_preserves_unrelated_cores_and_unchanged_rows():

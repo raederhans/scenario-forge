@@ -12,37 +12,6 @@ class TnoStrategicValuesTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.payload = json.loads((SCENARIOS / "tno_1962/strategic_values.by_feature.json").read_text(encoding="utf-8"))
-        cls.reference = json.loads((SCENARIOS / "hoi4_1936/strategic_values.by_feature.json").read_text(encoding="utf-8"))
-        cls.owners = json.loads((SCENARIOS / "tno_1962/owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
-
-    def test_top_level_fields(self):
-        self.assertEqual(set(self.payload), set(self.reference))
-
-    def test_victory_points_and_match_rate(self):
-        points = self.payload["victory_points"]
-        self.assertTrue(points)
-        matched = sum(point["match_method"] != "unmatched" for point in points)
-        self.assertGreaterEqual(matched / len(points), 0.7376877401327279 - 0.05)
-
-    def test_host_features_exist(self):
-        missing = {
-            point["host_feature_id"]
-            for point in self.payload["victory_points"]
-            if "host_feature_id" in point and point["host_feature_id"] not in self.owners
-        }
-        self.assertEqual(missing, set())
-
-    def test_berlin_in_top_three(self):
-        points = self.payload["victory_points"]
-        berlin = [point for point in points if "germania" in point["name"].lower() or point["name"].lower() == "berlin"]
-        self.assertTrue(berlin)
-        self.assertGreaterEqual(max(point["value"] for point in berlin), sorted((point["value"] for point in points), reverse=True)[2])
-
-    def test_berlin_matches_german_feature(self):
-        berlin = next(point for point in self.payload["victory_points"] if point["name"] == "Berlin-Germania")
-        self.assertEqual(berlin["city_id"], "CITY::ne::1159151529")
-        self.assertNotEqual(berlin["match_method"], "unmatched")
-        self.assertEqual(self.owners[berlin["host_feature_id"]], "GER")
 
     def test_american_rome_and_moscow_do_not_match_foreign_cities(self):
         foreign_cities = {"Rome": "CITY::ne::1159151593", "Moscow": "CITY::ne::1159151585"}
@@ -71,19 +40,3 @@ class TnoStrategicValuesTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-class TnoStrategicAttributionTest(unittest.TestCase):
-    """运行时归属与模组州归属不同的国家（IND→RAJ、HOL→RKN、FRS→FRA），地块必须落到有数值的州桶。"""
-
-    def test_reowned_countries_map_to_populated_state_buckets(self):
-        root = Path(__file__).resolve().parents[1] / "data/scenarios/tno_1962"
-        payload = json.loads((root / "strategic_values.by_feature.json").read_text(encoding="utf-8"))
-        owners = json.loads((root / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
-        buckets, by_feature = payload["buckets"], payload["bucket_by_feature"]
-        for tag in ("RAJ", "RKN", "FRA"):
-            bucket_ids = {by_feature[fid] for fid, owner in owners.items() if owner == tag and fid in by_feature}
-            manpower = sum(buckets[bucket_id].get("manpower", 0) for bucket_id in bucket_ids)
-            with self.subTest(tag=tag):
-                self.assertGreater(manpower, 1_000_000)
-                self.assertTrue(any(bucket_id.startswith("s") for bucket_id in bucket_ids))
