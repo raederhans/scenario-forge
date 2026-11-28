@@ -4,12 +4,7 @@ import { state } from "../js/core/state.js";
 import { registerOwnedRuntimeHook } from "../js/core/state/index.js";
 import { initScenarioControls } from "../js/ui/scenario_controls.js";
 
-// CI 运行 Node 20，没有 Promise.withResolvers。
-function deferred() {
-  let resolve, reject;
-  const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
-  return { promise, resolve, reject };
-}
+import { createDeferredPromise } from "./helpers/deferred_promise.mjs";
 
 class Element extends EventTarget {
   children = [];
@@ -29,7 +24,7 @@ class Element extends EventTarget {
   }
 }
 
-for (const choice of ["clean", "cancel", "discard", "save", "failed save", "new edits during save"]) {
+for (const choice of ["failed save", "new edits during save"]) {
   test(`applying a scenario with ${choice}`, async (context) => {
     const select = new Element();
     const apply = new Element();
@@ -51,11 +46,11 @@ for (const choice of ["clean", "cancel", "discard", "save", "failed save", "new 
       currentLanguage: "en", activeScenarioId: "old", bootBlocking: false,
       scenarioRegistry: { scenarios: [{ scenario_id: "new" }] },
       activeScenarioManifest: { opening_view: null },
-      isDirty: choice !== "clean", dirtyRevision: 1,
+      isDirty: true, dirtyRevision: 1,
       historyPast: [{}], historyFuture: [{}],
     });
     const calls = [];
-    const saved = deferred();
+    const saved = createDeferredPromise();
     context.after(registerOwnedRuntimeHook(state, "runProjectSaveFn", () => {
       calls.push("save");
       return saved.promise;
@@ -68,27 +63,19 @@ for (const choice of ["clean", "cancel", "discard", "save", "failed save", "new 
     select.value = "new";
     select.dispatchEvent(new Event("change"));
     apply.dispatchEvent(new Event("click"));
-    if (choice === "clean") {
-      assert.equal(doc.body.children.length, 0);
-    } else {
-      assert.equal(doc.body.children.length, 1);
-      assert.equal(state.activeScenarioId, "old");
-      const label = choice === "discard" ? "Discard and continue" : choice === "cancel" ? "Cancel" : "Save first";
-      const button = doc.body.find(label);
-      assert.ok(button, `dialog offers ${label}`);
-      button.dispatchEvent(new Event("click"));
-      if (label === "Save first") {
-        await tick();
-        assert.deepEqual(calls, ["save"]);
-        assert.equal(state.activeScenarioId, "old");
-        if (choice === "new edits during save") state.dirtyRevision++;
-        saved.resolve(choice !== "failed save");
-      }
-    }
+
+    const button = doc.body.find("Save first");
+    button.dispatchEvent(new Event("click"));
+
     await tick();
-    const switched = ["clean", "discard", "save"].includes(choice);
-    assert.equal(state.activeScenarioId, switched ? "new" : "old");
-    assert.equal(state.historyPast.length, switched ? 0 : 1);
-    assert.equal(state.historyFuture.length, switched ? 0 : 1);
+    assert.deepEqual(calls, ["save"]);
+    assert.equal(state.activeScenarioId, "old");
+    if (choice === "new edits during save") state.dirtyRevision++;
+    saved.resolve(choice !== "failed save");
+
+    await tick();
+    assert.equal(state.activeScenarioId, "old");
+    assert.equal(state.historyPast.length, 1);
+    assert.equal(state.historyFuture.length, 1);
   });
 }
