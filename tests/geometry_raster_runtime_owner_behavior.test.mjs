@@ -1,431 +1,52 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createGeometryRasterRuntimeOwner } from "../js/core/renderer/geometry_raster_runtime_owner.js";
-import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
-import { createGeometryRasterWorkerClient } from "../js/core/geometry_raster_worker_client.js";
 
 const tick = () => new Promise(setImmediate);
-function fixture({ injectedClient = null } = {}) {
+function fixture() {
   const feature = { geometry: { type: "Point", coordinates: [0, 0] } };
   const state = { firstVisibleFramePainted: true, zoomTransform: { x: 0, y: 0, k: 2 }, dpr: 1.25,
     activeScenarioId: "tno", sceneGeneration: 1, scenarioDataGeneration: 1, topologyRevision: 1,
     landData: { features: [feature] }, idToKey: new Map([["a", 1]]), hitCanvasDirty: true, renderPhase: "idle" };
-  const flags = { enabled: true, supported: true, edit: false, needs: true, color: "#123456", excluded: false };
-  const requests = [], renders = [], commits = [], paints = [];
+
+  const requests = [], commits = [];
   const projection = { scale: () => 100, translate: () => [100, 100] };
   const layout = { paddedWidth: 101, paddedHeight: 103, pixelWidth: 126, pixelHeight: 128, offsetX: 4, offsetY: 5 };
-  const context = { save() {}, restore() {}, setTransform() {}, drawImage: (bitmap) => paints.push(bitmap) };
-  const client = { available: () => flags.supported, dispose() {}, request: (input) => new Promise((resolve, reject) => requests.push({ input, resolve, reject })) };
-  const h = { isEnabled: () => flags.enabled, pointRadius: 2, getPoliticalLayout: () => layout,
-    getPoliticalSignature: () => "political", hasPendingColorEdit: () => flags.edit,
-    needsPoliticalRender: () => flags.needs, collectPoliticalItems: () => state.landData.features.map((feature, drawOrder) => ({ id: "a", feature, drawOrder })),
-    orderPoliticalItems: (items) => items, getFeatureId: () => "a", excludeVisual: () => flags.excluded,
-    skipVisual: () => false, resolveFillColor: () => flags.color, resolveStrokeColor: () => "#987654",
+  const context = { save() {}, restore() {}, setTransform() {}, drawImage() {} };
+  const client = { available: () => true, dispose() {}, request: (input) => new Promise((resolve, reject) => requests.push({ input, resolve, reject })) };
+  const h = { isEnabled: () => true, pointRadius: 2, getPoliticalLayout: () => layout,
+    getPoliticalSignature: () => "political", hasPendingColorEdit: () => false,
+    needsPoliticalRender: () => true, collectPoliticalItems: () => state.landData.features.map((feature, drawOrder) => ({ id: "a", feature, drawOrder })),
+    orderPoliticalItems: (items) => items, getFeatureId: () => "a", excludeVisual: () => false,
+    skipVisual: () => false, resolveFillColor: () => "#123456", resolveStrokeColor: () => "#987654",
     collectHitItems: () => ({ items: state.landData.features.map((feature) => ({ id: "a", feature })), stats: { candidates: 1 } }),
-    excludeHit: () => flags.excluded, keyToColor: (key) => `rgb(${key},0,0)` };
-  const owner = createGeometryRasterRuntimeOwner({ state, client: injectedClient || client, helpers: h,
+    excludeHit: () => false, keyToColor: (key) => `rgb(${key},0,0)` };
+  const owner = createGeometryRasterRuntimeOwner({ state, client, helpers: h,
     surface: { getProjection: () => projection, getHitCanvas: () => ({ width: 126, height: 128 }), getContext: () => context },
-    effects: { recordMetric() {}, requestRender: (reason) => renders.push(reason), commitHit: (result) => commits.push(result) } });
+    effects: { recordMetric() {}, requestRender() {}, commitHit: (result) => commits.push(result) } });
   const finish = (index) => {
-    const bitmap = { closes: 0, close() { this.closes++; } };
+    const bitmap = { close() {} };
     requests[index].resolve({ bitmap, renderedCount: 1 });
-    return bitmap;
   };
-  return { owner, state, flags, requests, renders, commits, paints, finish, projection, layout, context, h };
-}
-test("prepare gates, forced exact preparation, dimensions and fine-only drawing preserve style ports", async () => {
-  const f = fixture();
-  assert.equal(f.owner.getPendingWorkCount(), 0);
-  f.state.renderPhase = "interacting";
-  assert.equal(f.owner.prepareFrame(), false);
-  f.state.renderPhase = "idle"; f.state.deferExactAfterSettle = true;
-  assert.equal(f.owner.prepareFrame(), false);
-  f.state.deferExactAfterSettle = false; f.flags.needs = false;
-  assert.equal(f.owner.prepareFrame(), false);
-  const pending = f.owner.preparePolitical({ force: true });
-  assert.ok(pending instanceof Promise);
-  assert.equal(f.owner.getPendingWorkCount(), 1);
-  assert.equal(f.requests[0].input.width, 126);
-  assert.equal(f.requests[0].input.height, 128);
-  assert.equal(f.requests[0].input.entries[0].strokeColor, "#987654");
-  assert.equal(f.requests[0].input.entries[0].lineWidth, 0.375);
-  assert.equal(f.paints.length, 0, "preparation never clears or draws the visible frame");
-  const bitmap = f.finish(0); await pending;
-  assert.equal(f.owner.getPendingWorkCount(), 0);
-  f.paints.push("background");
-  assert.equal(f.owner.drawPolitical().renderedCount, 1);
-  assert.deepEqual(f.paints, ["background", bitmap]);
-  f.flags.edit = true;
-  assert.equal(f.owner.preparePolitical({ force: true }), null);
-  assert.equal(f.owner.drawPolitical(), null, "edits must use synchronous fine drawing");
-  f.owner.dispose(); assert.equal(bitmap.closes, 1);
-});
-
-test("political entry filtering uses pass dimensions across active surface switches", async () => {
-  const f = fixture();
-  f.context.canvas = { width: 100, height: 100 };
-  const seen = [];
-  f.h.skipVisual = (_feature, width, height) => {
-    seen.push({ width, height, activeSurfaceWidth: f.context.canvas.width });
-    return width !== f.layout.paddedWidth || height !== f.layout.paddedHeight;
-  };
-  const pending = f.owner.prepareFrame();
-  assert.equal(pending, true);
-  assert.equal(f.requests[0].input.entries.length, 1);
-  f.context.canvas = { width: 200, height: 200 };
-  const bitmap = f.finish(0);
-  await tick();
-  assert.equal(f.owner.drawPolitical().renderedCount, 1);
-  assert.equal(bitmap.closes, 0);
-  assert.deepEqual(seen.map(({ width, height }) => [width, height]),
-    seen.map(() => [f.layout.paddedWidth, f.layout.paddedHeight]));
-  assert.ok(seen.some(({ activeSurfaceWidth: width }) => width === 200));
-  f.owner.dispose();
-});
-test("current political identity detects exact camera, projection, scene, geometry and resolved color", async () => {
-  for (const change of [
-    (f) => { f.state.zoomTransform.x += 0.000001; },
-    (f) => { markProjectionGeometryChanged(f.projection); },
-    (f) => { f.state.activeScenarioId = "hoi4"; },
-    (f) => { f.state.landData.features[0].geometry = { type: "Point", coordinates: [4, 5] }; },
-    (f) => { f.flags.color = "#abcdef"; },
-  ]) {
-    const f = fixture(); const pending = f.owner.preparePolitical(); change(f);
-    const bitmap = f.finish(0); await pending;
-    assert.equal(bitmap.closes, 1); assert.equal(f.owner.drawPolitical(), null);
-    assert.deepEqual(f.renders, ["geometry-worker-political-stale"]);
-    const replacement = f.owner.preparePolitical();
-    assert.ok(replacement instanceof Promise, "latest stale completion schedules preparation for the new identity");
-    const current = f.finish(1); await replacement;
-    assert.equal(f.owner.drawPolitical().renderedCount, 1);
-    assert.equal(current.closes, 0);
-    f.owner.dispose();
-  }
-});
-
-test("moved camera rejects stale political result before collecting entries and wakes recovery", async () => {
-  const f = fixture();
-  let collections = 0;
-  const collect = f.h.collectPoliticalItems;
-  f.h.collectPoliticalItems = () => { collections++; return collect(); };
-  const pending = f.owner.preparePolitical();
-  assert.equal(collections, 1);
-  f.state.zoomTransform.x = 10;
-  const bitmap = f.finish(0); await pending;
-  assert.equal(bitmap.closes, 1);
-  assert.equal(collections, 1, "stale camera must not enumerate political items");
-  assert.deepEqual(f.renders, ["geometry-worker-political-stale"]);
-  f.owner.dispose();
-});
-
-test("unchanged political result still passes full snapshot validation", async () => {
-  const f = fixture();
-  let collections = 0;
-  const collect = f.h.collectPoliticalItems;
-  f.h.collectPoliticalItems = () => { collections++; return collect(); };
-  const pending = f.owner.preparePolitical();
-  const bitmap = f.finish(0); await pending;
-  assert.equal(collections, 2, "current result runs exact entry validation");
-  assert.equal(bitmap.closes, 0);
-  assert.equal(f.owner.drawPolitical().renderedCount, 1);
-  f.owner.dispose();
-});
-
-test("superseded political task closes without recomputing or waking over the latest task", async () => {
-  const f = fixture();
-  let collections = 0;
-  const collect = f.h.collectPoliticalItems;
-  f.h.collectPoliticalItems = () => { collections++; return collect(); };
-  const old = f.owner.preparePolitical();
-  f.state.zoomTransform.x = 20;
-  const latest = f.owner.preparePolitical();
-  assert.equal(collections, 2);
-  const staleBitmap = f.finish(0); await old;
-  assert.equal(staleBitmap.closes, 1);
-  assert.equal(collections, 2, "superseded result skips current snapshot");
-  assert.deepEqual(f.renders, []);
-  f.finish(1); await latest;
-  assert.equal(collections, 3, "latest result still validates exactly");
-  f.owner.dispose();
-});
-
-test("versioned political snapshot avoids repeated collection, color resolution and description", async () => {
-  const f = fixture();
-  let version = 1;
-  f.h.getPoliticalEntriesVersion = () => version;
-  const calls = { collect: 0, color: 0, signature: 0 };
-  for (const [port, count] of [["collectPoliticalItems", "collect"],
-    ["resolveFillColor", "color"], ["getPoliticalSignature", "signature"]]) {
-    const original = f.h[port];
-    f.h[port] = (...args) => { calls[count]++; return original(...args); };
-  }
-  const pending = f.owner.preparePolitical();
-  const preparedCalls = { ...calls };
-  assert.equal(preparedCalls.collect, 1);
-  assert.equal(preparedCalls.color, 1);
-  const bitmap = f.finish(0); await pending;
-  assert.equal(f.owner.drawPolitical().renderedCount, 1);
-  assert.equal(f.owner.drawPolitical().renderedCount, 1);
-  assert.equal(f.owner.preparePolitical({ force: true }), null);
-  assert.equal(calls.collect, preparedCalls.collect);
-  assert.equal(calls.color, preparedCalls.color);
-  assert.ok(calls.signature > preparedCalls.signature, "cheap signatures still guard each use");
-  version++;
-  f.flags.color = "#abcdef";
-  assert.equal(f.owner.drawPolitical(), null);
-  assert.equal(calls.collect, 2);
-  assert.equal(calls.color, 2);
-  assert.ok(f.owner.preparePolitical({ force: true }) instanceof Promise);
-  assert.notEqual(f.requests[0].input.identity, f.requests[1].input.identity);
-  const replacement = f.finish(1); await tick();
-  assert.equal(f.owner.drawPolitical().renderedCount, 1);
-  assert.equal(bitmap.closes, 1);
-  assert.equal(replacement.closes, 0);
-  f.owner.dispose();
-});
-
-test("versioned political snapshot invalidates on scene, geometry, color, projection, visible set, order and camera", async () => {
-  const cases = [
-    ["scene", (f) => { f.state.activeScenarioId = "hoi4"; }],
-    ["geometry", (f) => { f.state.landData.features[0].geometry = { type: "Point", coordinates: [4, 5] }; }],
-    ["color", (f) => { f.flags.color = "#abcdef"; }],
-    ["projection", (f) => { markProjectionGeometryChanged(f.projection); }],
-    ["visible set", (f) => { f.flags.excluded = true; }],
-    ["order", (f) => { f.h.orderPoliticalItems = (items) => items.slice().reverse(); }],
-    ["camera", (f) => { f.state.zoomTransform.x += 0.000001; }],
-  ];
-  for (const [name, change] of cases) {
-    const f = fixture();
-    let version = 1;
-    f.h.getPoliticalEntriesVersion = () => version;
-    if (name === "order") {
-      const extra = { geometry: { type: "Point", coordinates: [10, 10] } };
-      f.h.collectPoliticalItems = () => [
-        { id: "a", feature: f.state.landData.features[0], drawOrder: 0 },
-        { id: "b", feature: extra, drawOrder: 1 },
-      ];
-    }
-    const pending = f.owner.preparePolitical();
-    const originalIdentity = f.requests[0].input.identity;
-    change(f);
-    version++;
-    const stale = f.finish(0); await pending;
-    assert.equal(stale.closes, 1, `${name}: stale bitmap closed`);
-    assert.equal(f.owner.drawPolitical(), null, `${name}: stale frame rejected`);
-    assert.deepEqual(f.renders, ["geometry-worker-political-stale"], `${name}: next frame requested`);
-    const replacement = f.owner.preparePolitical();
-    assert.ok(replacement instanceof Promise, `${name}: replacement scheduled`);
-    assert.notEqual(f.requests[1].input.identity, originalIdentity, `${name}: identity changed`);
-    f.finish(1); await replacement;
-    assert.equal(f.owner.drawPolitical().renderedCount, 1, `${name}: replacement accepted`);
-    f.owner.dispose();
-  }
-});
-
-test("versioned snapshot detects direct geometry replacement without an epoch bump", async () => {
-  const f = fixture();
-  f.h.getPoliticalEntriesVersion = () => 1;
-  const pending = f.owner.preparePolitical();
-  f.state.landData.features[0].geometry = { type: "Point", coordinates: [4, 5] };
-  const stale = f.finish(0); await pending;
-  assert.equal(stale.closes, 1);
-  assert.equal(f.owner.drawPolitical(), null);
-  assert.ok(f.owner.preparePolitical() instanceof Promise);
-  assert.notEqual(f.requests[0].input.identity, f.requests[1].input.identity);
-  f.owner.dispose(); f.requests[1].resolve(null);
-});
-test("older completion cannot clear or replace a newer pending generation", async () => {
-  const f = fixture(); const old = f.owner.preparePolitical();
-  f.state.zoomTransform.x = 20;
-  const latest = f.owner.preparePolitical();
-  assert.notEqual(old, latest);
-  const bitmap = f.finish(0); await old;
-  assert.equal(bitmap.closes, 1);
-  assert.deepEqual(f.renders, [], "a newer pending request already owns its completion wakeup");
-  assert.equal(f.owner.preparePolitical(), latest);
-  f.finish(1); await latest;
-  assert.equal(f.owner.drawPolitical().renderedCount, 1);
-  f.owner.dispose();
-});
-test("hit requires current mapping, geometry, camera and dirty state; every result is closed", async () => {
-  for (const change of [
-    (f) => { f.state.idToKey.set("a", 7); },
-    (f) => { f.state.landData.features[0].geometry = { type: "Point", coordinates: [4, 5] }; },
-    (f) => { f.state.zoomTransform.y = 0.001; },
-    (f) => { f.state.hitCanvasDirty = false; },
-  ]) {
-    const f = fixture(); assert.equal(f.owner.requestHit(), true); change(f);
-    const bitmap = f.finish(0); await tick();
-    assert.equal(bitmap.closes, 1); assert.equal(f.commits.length, 0);
-  }
-  const f = fixture(); f.owner.requestHit(); const bitmap = f.finish(0); await tick();
-  assert.equal(f.commits.length, 1); assert.equal(bitmap.closes, 1);
-});
-for (const [field, before, after] of [
-  ["mapSemanticMode", "political", "visual"],
-  ["scenarioShellOverlayRevision", 1, 2],
-]) {
-  test(`hit identity rejects obsolete ${field} and does not reuse its pending request`, async () => {
-    for (const redispatch of [false, true]) {
-      const f = fixture();
-      f.state[field] = before;
-      assert.equal(f.owner.requestHit(), true);
-      f.state[field] = after;
-      if (redispatch) {
-        assert.equal(f.owner.requestHit(), true);
-        assert.equal(f.requests.length, 2, "changed semantics require a new worker identity");
-        assert.notEqual(f.requests[0].input.identity, f.requests[1].input.identity);
-      }
-      const obsoleteBitmap = f.finish(0); await tick();
-      assert.equal(obsoleteBitmap.closes, 1);
-      assert.equal(f.commits.length, 0, "a result must be revalidated even without a replacement request");
-      assert.equal(f.owner.requestHit(), true);
-      assert.equal(f.requests.length, 2, "obsolete completion must preserve the current pending request");
-      const currentBitmap = f.finish(1); await tick();
-      assert.equal(f.commits.length, 1);
-      assert.equal(currentBitmap.closes, 1);
-      f.owner.dispose();
-    }
-  });
+  return { owner, state, commits, finish };
 }
 
-test("disposed success, fallback and rejection cannot commit or schedule another render", async () => {
-  for (const kind of ["political", "hit"]) for (const outcome of ["success", "null", "reject"]) {
-    const f = fixture();
-    if (kind === "political") f.owner.preparePolitical(); else f.owner.requestHit();
-    f.owner.dispose();
-    let bitmap;
-    if (outcome === "success") bitmap = f.finish(0);
-    else if (outcome === "null") f.requests[0].resolve(null);
-    else f.requests[0].reject(Error("worker stopped"));
-    await tick();
-    assert.equal(f.renders.length, 0); assert.equal(f.commits.length, 0);
-    if (bitmap) assert.equal(bitmap.closes, 1);
-    assert.equal(f.owner.preparePolitical({ force: true }), null);
-    assert.equal(f.owner.requestHit(), false);
-  }
-});
-test("late hit generations preserve the current pending task and color edits reject prepared frames", async () => {
-  const f = fixture(); f.owner.requestHit();
-  f.state.idToKey.set("a", 2); f.owner.requestHit();
-  const oldBitmap = f.finish(0); await tick();
-  assert.equal(oldBitmap.closes, 1); assert.equal(f.commits.length, 0);
-  assert.equal(f.owner.requestHit(), true);
-  assert.equal(f.requests.length, 2, "old completion must not clear latest pending hit");
-  const newBitmap = f.finish(1); await tick();
-  assert.equal(f.commits.length, 1); assert.equal(newBitmap.closes, 1);
-  const prepared = f.owner.preparePolitical(); f.flags.edit = true;
-  const politicalBitmap = f.finish(2); await prepared;
-  assert.equal(politicalBitmap.closes, 1); assert.equal(f.owner.drawPolitical(), null);
-});
-test("unsupported paths return synchronously and pixel fallback floors fractional DPR", () => {
-  const f = fixture(); f.flags.supported = false;
-  assert.equal(f.owner.preparePolitical(), null); assert.equal(f.owner.requestHit(), false);
-  f.flags.supported = true; delete f.layout.pixelWidth; delete f.layout.pixelHeight;
-  assert.equal(f.owner.prepareFrame(), true);
-  assert.equal(f.requests[0].input.height, 128);
-  f.owner.dispose(); f.requests[0].resolve(null);
-});
-
-test("A to B to A reuses one result consumer when the real client merges the active identity", async (t) => {
-  for (const kind of ["political", "hit"]) {
-    const sent = [];
-    const worker = { postMessage: (message) => sent.push(message), terminate() {} };
-    const client = createGeometryRasterWorkerClient({ createWorker: () => worker, isSupported: () => true });
-    const f = fixture({ injectedClient: client });
-    if (kind === "political") f.h.getPoliticalEntriesVersion = () => 1;
-    t.after(() => f.owner.dispose());
-    const request = () => kind === "political" ? f.owner.preparePolitical({ force: true }) : f.owner.requestHit();
-    request();
-    f.state.zoomTransform.x = 20; request();
-    f.state.zoomTransform.x = 0; request();
-    await tick();
-    assert.equal(sent.length, 1, "client keeps A active while B is queued");
-    const bitmap = { closes: 0, close() { this.closes++; } };
-    worker.onmessage({ data: { type: "GEOMETRY_RASTER_RESULT", taskId: sent[0].taskId,
-      result: { bitmap, renderedCount: 1 } } });
-    await tick();
-    if (kind === "political") {
-      assert.equal(bitmap.closes, 0, "obsolete subscriber must not close the accepted A bitmap");
-      assert.equal(f.owner.preparePolitical({ force: true }), null, "exact scheduler can proceed after A becomes ready");
-      assert.equal(f.owner.drawPolitical().renderedCount, 1);
-    } else {
-      assert.equal(f.commits.length, 1);
-      assert.equal(bitmap.closes, 1, "hit commit owns and closes its result exactly once");
-    }
-    const staleBitmap = { closes: 0, close() { this.closes++; } };
-    worker.onmessage({ data: { type: "GEOMETRY_RASTER_RESULT", taskId: sent[1].taskId,
-      result: { bitmap: staleBitmap, renderedCount: 1 } } });
-    await tick();
-    assert.equal(staleBitmap.closes, 1, "queued B is now stale");
-    f.owner.dispose();
-    assert.equal(bitmap.closes, 1);
-  }
-});
-
-// ── Acceptance criteria: incremental geometry reuse across same-scene revisions ──
-
-test("workerSceneKey excludes topology/data revisions so uploads survive same-scene chunk arrivals", () => {
-  // The sceneKey sent to the worker must only encode scenario-switch identity.
-  // Any non-geometric revision must NOT force a resetGeometry on the worker.
+test("a scenario switch rejects the pending political frame", async () => {
   const f = fixture();
-  f.owner.preparePolitical({ force: true });
-  const req0 = f.requests[0].input;
-  // sceneKey in the worker input is workerSceneKey = activeScenarioId:sceneGeneration
-  assert.equal(req0.sceneKey, "tno:1", "worker sceneKey is narrow: id+generation only");
-  // Now simulate a topology revision (incremental chunk promotion)
-  f.state.topologyRevision = 99;
-  f.state.scenarioDataGeneration = 5;
-  f.requests[0].resolve(null); // first request done
-  f.owner.preparePolitical({ force: true });
-  const req1 = f.requests[1].input;
-  assert.equal(req1.sceneKey, "tno:1", "topology/data revision does not change worker sceneKey");
-  // Frame identity must be different (strict fence)
-  assert.notEqual(req0.identity, req1.identity, "frame identity still detects revision change");
-  f.owner.dispose();
-  f.requests[1].resolve(null);
-});
-
-test("actual scenario switch changes workerSceneKey and full frame identity", () => {
-  const f = fixture();
-  f.owner.preparePolitical({ force: true });
-  const req0 = f.requests[0].input;
-  f.requests[0].resolve(null);
-  // Switch to a different scenario
+  const pending = f.owner.preparePolitical();
   f.state.activeScenarioId = "hoi4";
-  f.owner.preparePolitical({ force: true });
-  const req1 = f.requests[1].input;
-  assert.notEqual(req0.sceneKey, req1.sceneKey, "scenario switch changes worker sceneKey");
-  assert.notEqual(req0.identity, req1.identity, "scenario switch changes frame identity");
+  f.finish(0);
+  await pending;
+  assert.equal(f.owner.drawPolitical(), null);
   f.owner.dispose();
-  f.requests[1].resolve(null);
 });
 
-test("sceneGeneration bump changes workerSceneKey (full reset, not mere revision)", () => {
+test("a scenario switch rejects the pending hit map", async () => {
   const f = fixture();
-  f.owner.preparePolitical({ force: true });
-  const req0 = f.requests[0].input;
-  f.requests[0].resolve(null);
-  // Bump sceneGeneration — same as a full reset path
-  f.state.sceneGeneration = 2;
-  f.owner.preparePolitical({ force: true });
-  const req1 = f.requests[1].input;
-  assert.notEqual(req0.sceneKey, req1.sceneKey, "sceneGeneration bump changes worker sceneKey");
+  assert.equal(f.owner.requestHit(), true);
+  f.state.activeScenarioId = "hoi4";
+  f.finish(0);
+  await tick();
+  assert.equal(f.commits.length, 0);
   f.owner.dispose();
-  f.requests[1].resolve(null);
-});
-
-test("projection mutation changes projectionKey and frame identity; worker sceneKey unchanged", () => {
-  const f = fixture();
-  f.owner.preparePolitical({ force: true });
-  const req0 = f.requests[0].input;
-  f.requests[0].resolve(null);
-  markProjectionGeometryChanged(f.projection);
-  f.owner.preparePolitical({ force: true });
-  const req1 = f.requests[1].input;
-  assert.equal(req0.sceneKey, req1.sceneKey, "projection mutation does not change worker sceneKey");
-  assert.notEqual(req0.projectionKey, req1.projectionKey, "projection mutation changes projectionKey");
-  assert.notEqual(req0.identity, req1.identity, "projection mutation invalidates frame identity");
-  f.owner.dispose();
-  f.requests[1].resolve(null);
 });

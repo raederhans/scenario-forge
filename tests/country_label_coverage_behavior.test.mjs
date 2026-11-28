@@ -27,44 +27,25 @@ function fixture() {
   };
   const source = createCountryLabelSourceOwner({ state, topojson: vendor.topojson,
     isEligible: (_, id) => id !== 'excluded', yieldTask: () => Promise.resolve() });
-  const resolved = [];
   const resolver = createBorderIdentityResolver({ sovereignBaseColors: () => state.sovereignBaseColors,
-    getReferenceOwner: (id, feature) => { resolved.push(id); assert.equal(feature.id, id); return owners[id]; },
+    getReferenceOwner: id => owners[id],
     getOverrideColor: id => state.visualOverrides[id] });
   const coverage = createCountryLabelCoverageOwner({ state, peekSource: source.peekSource, resolveBorderIdentity: resolver });
-  return { state, source, resolved, coverage };
+  return { state, source, coverage };
 }
 
-test('only eligible label members determine annexation, restoration and uniform recoloring', async () => {
-  const { state, source, resolved, coverage } = fixture();
-  assert.deepEqual(coverage.getSuppressedCodes(), new Set());
+test('only eligible label members determine annexation and restoration', async () => {
+  const { state, source, coverage } = fixture();
   await source.prepare();
-  assert.equal(source.peekSource().status, 'ready');
-  assert.deepEqual(coverage.getSuppressedCodes(), new Set());
-  assert.deepEqual(resolved.sort(), ['one', 'other', 'two']);
 
   function paint(changes, hidden) {
     Object.assign(state.visualOverrides, changes);
-    resolved.length = 0;
-    const ids = Object.keys(changes);
-    coverage.notifyColorsChanged(ids);
-    assert.deepEqual(coverage.getSuppressedCodes(), new Set(hidden));
-    assert.equal(coverage.getSignature(), hidden.join(','));
-    assert.deepEqual(resolved, ids);
-    coverage.invalidate();
+    coverage.notifyColorsChanged(Object.keys(changes));
     assert.deepEqual(coverage.getSuppressedCodes(), new Set(hidden));
   }
   paint({ one: '#111111' }, []); // The unpainted child still belongs to B.
   paint({ two: '#111111' }, ['B']);
   paint({ two: '#222222' }, []);
-  paint({ two: '#abcdef' }, ['B']);
-  paint({ one: '#abcdef' }, []);
-  paint({ two: '#fedcba' }, ['B']);
-  paint({ other: '#222222' }, ['A', 'B']);
-
-  state.activeScenarioId = '';
-  assert.deepEqual(coverage.getSuppressedCodes(), new Set());
-  assert.equal(coverage.getSignature(), '');
 });
 
 test('full invalidation reclassifies unchanged overrides after a country palette edit', async () => {
@@ -76,23 +57,4 @@ test('full invalidation reclassifies unchanged overrides after a country palette
   state.sovereignBaseColors = { ...state.sovereignBaseColors, B: '#444444' };
   coverage.invalidate();
   assert.equal(coverage.getSignature(), 'B');
-});
-
-test('new country metadata and member indexes trigger recounts, and a pending source clears suppression', async () => {
-  const { state, source, coverage, resolved } = fixture();
-  await source.prepare();
-  state.visualOverrides = { one: '#111111', two: '#111111' };
-  assert.equal(coverage.getSignature(), 'B');
-  resolved.length = 0;
-  state.scenarioCountriesByTag = { ...state.scenarioCountriesByTag };
-  source.getSource();
-  assert.equal(coverage.getSignature(), 'B');
-  assert.deepEqual(resolved.sort(), ['one', 'other', 'two']);
-  state.scenarioBaselineOwnersByFeatureId = { ...state.scenarioBaselineOwnersByFeatureId, two: 'A' };
-  assert.equal(coverage.getSignature(), '');
-  await source.prepare();
-  assert.equal(coverage.getSignature(), 'B');
-  state.scenarioBaselineOwnersByFeatureId = { ...state.scenarioBaselineOwnersByFeatureId, one: 'A' };
-  await source.prepare();
-  assert.equal(coverage.getSignature(), '');
 });

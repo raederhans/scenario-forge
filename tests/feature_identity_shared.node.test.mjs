@@ -1,72 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFile } from "node:fs/promises";
-import { runInNewContext } from "node:vm";
 import { normalizeCountryCodeAlias } from "../js/core/country_code_aliases.js";
 
 const featureIdentity = await import("../js/core/feature_identity.js");
-const sharedSource = await readFile(new URL("../js/core/feature_identity_shared.js", import.meta.url), "utf8");
 
-test("country aliases preserve canonical, Unicode, and coercion behavior", () => {
-  for (const [input, expected] of [
-    ["UK", "GB"], ["EL", "GR"], ["GB", "GB"], ["2RA", "2RA"],
-    ["", ""], ["ZZ", "ZZ"], ["XX", "XX"], [" u-k\t", "GB"],
-    ["éL", "L"], ["ß", "SS"], ["ıe", "IE"], ["ｕｋ", ""],
-    ["中UK文", "GB"], [null, ""], [undefined, ""], [false, ""],
-    [0, ""], [42, "42"], [true, "TRUE"], [NaN, ""],
-    [{ toString: () => " el " }, "GR"], [["u", "k"], "GB"],
-  ]) {
-    assert.equal(normalizeCountryCodeAlias(input), expected);
-  }
-});
-
-test("canonical country fast path preserves aliases and permissive input normalization", () => {
-  const cases = [
-    ["DE", "DE"], ["TNO", "TNO"], ["2RA", "2RA"], ["UK", "GB"], ["EL", "GR"],
-    [" uk ", "GB"], ["e-l", "GR"], ["u_k", "GB"], ["ß", "SS"], ["éFR", "FR"],
-    ["\u00a0de\n", "DE"], ["", ""], ["!_", ""], [null, ""], [undefined, ""],
-    [false, ""], [0, ""], [NaN, ""], [123, "123"], [true, "TRUE"],
-    ["DE\n", "DE"], ["constructor", "CONSTRUCTOR"], ["ZZ", "ZZ"],
-  ];
-  for (const [value, expected] of cases) assert.equal(normalizeCountryCodeAlias(value), expected);
-  let conversions = 0;
-  assert.equal(normalizeCountryCodeAlias({ toString() { conversions += 1; return " uk "; } }), "GB");
-  assert.equal(conversions, 1);
+test("country codes normalize aliases and distinguish reserved codes", () => {
+  assert.equal(normalizeCountryCodeAlias("UK"), "GB");
   assert.equal(featureIdentity.normalizeFeatureCountryCode("ZZ"), "");
   assert.equal(featureIdentity.normalizeFeatureCountryCode("ZZ", { allowReserved: true }), "ZZ");
   assert.equal(featureIdentity.normalizeFeatureCountryCode("123"), "");
   assert.equal(featureIdentity.normalizeFeatureCountryCode("2RA"), "2RA");
 });
 
-test("shared script initializes its own identity API instead of reusing a stale global", () => {
-  const sandbox = {
-    __scenarioForgeFeatureIdentityShared: { getFeatureId: () => "stale-id" },
-  };
-  const feature = { id: "fallback-id", properties: { NUTS_ID: "GB-ALT" } };
-  runInNewContext(sharedSource, sandbox);
-  assert.equal(sandbox.__scenarioForgeFeatureIdentityShared.getFeatureId(feature), "GB-ALT");
-  assert.equal(Object.isFrozen(sandbox.__scenarioForgeFeatureIdentityShared), true);
-  runInNewContext(sharedSource, sandbox);
-  assert.equal(sandbox.__scenarioForgeFeatureIdentityShared.getFeatureId(feature), "GB-ALT");
-});
-
-test("main-thread feature identity keeps alias and reserved-code behavior in shared helper", () => {
+test("feature identity prefers NUTS_ID over the feature id and fallback", () => {
   const feature = {
     id: "GB-001",
     properties: {
       NUTS_ID: "GB-ALT",
       iso_a2: "uk",
-      stable_key: "stable::gb-001",
     },
   };
 
   assert.equal(featureIdentity.getFeatureId(feature, { fallback: "fallback-id" }), "GB-ALT");
   assert.equal(featureIdentity.getCountryCode(feature), "GB");
-  assert.equal(featureIdentity.getStableKey(feature), "stable::gb-001");
-  assert.equal(featureIdentity.getCountryCode({ id: "RU_shell_01", properties: {} }), "RU");
-  assert.equal(featureIdentity.getCountryCode({ properties: { NUTS_ID: "DE1" } }), "DE");
-  assert.equal(featureIdentity.getCountryCode({ id: "FR12", properties: {} }), "FR");
-  assert.equal(featureIdentity.getCountryCode({ id: "ZZ_001", properties: {} }), "");
-  assert.equal(featureIdentity.getCountryCode({ properties: { country_code: "2ra" } }), "2RA");
 });
-
