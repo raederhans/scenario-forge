@@ -1,11 +1,8 @@
+import { clamp as clampNumber } from "../value_normalization.js";
 const DEFAULT_HIT_GRID_TARGET_COLS = 24;
 const DEFAULT_HIT_GRID_MIN_CELL_PX = 32;
 const DEFAULT_HIT_GRID_MAX_CELL_PX = 96;
 const DEFAULT_HIT_MAX_CELLS_PER_ITEM = 400;
-
-function clampNumber(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
 
 export function getSpatialBucketKey(col, row) {
   return `${col},${row}`;

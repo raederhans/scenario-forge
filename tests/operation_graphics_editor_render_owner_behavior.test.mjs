@@ -64,7 +64,7 @@ function fixture(t) {
   const h = {
     group: new Selection([new SvgNode()]), interaction: new Selection([new SvgNode("rect")]),
     state: { operationGraphicsEditor: { active: false, mode: "edit", selectedId: "g", points: [[0, 0], [5, 5]], selectedVertexIndex: 1 } },
-    graphic: { id: "g", kind: "open", points: [[0, 0], [5, 5]], stroke: "blue", width: 3, opacity: 0.7 },
+    graphic: { id: "g", kind: "attack", points: [[0, 0], [5, 5]], stroke: "#0000ff", width: 3, opacity: 0.7 },
     ensured: 0, dragsCreated: 0, calls: [], pathCalls: [], clicked: [],
   };
   globalThis.d3 = {
@@ -90,18 +90,10 @@ function fixture(t) {
     rendererSurfaceHost: { getOperationGraphicsEditorGroup: () => h.group, getInteractionRect: () => h.interaction },
     ensureOperationGraphicsEditorState: () => { h.ensured++; },
     getOperationGraphicById: (id) => id === h.graphic?.id ? h.graphic : null,
-    DEFAULT_OPERATION_GRAPHIC_KIND: "open",
-    normalizeOperationGraphicStylePreset: (value, kind) => value || kind,
-    normalizeOperationGraphicStroke: (value) => value || "red",
-    normalizeOperationGraphicWidth: (value) => value || 2,
-    normalizeOperationGraphicOpacity: (value) => value ?? 1,
-    getOperationGraphicPreset: (kind) => ({ closed: kind === "closed", stroke: "black", width: 1, opacity: 0.5 }),
     createOperationGraphicPath: (points, options) => { h.pathCalls.push([points, options]); return points.length ? `M${points.length}` : ""; },
     getProjectedPoint: (coord) => h.project(coord),
     getStrategicOverlayRuntimeOwner: () => h.runtime,
     getMapLonLatFromEvent: (event) => event.coord,
-    getOperationGraphicEditorMidpoints: (points, { closed }) => points.slice(0, closed ? points.length : -1)
-      .map((point, index) => ({ id: `mid-${index}`, insertIndex: index + 1, coord: point })),
   });
   h.render = () => h.owner.renderOperationGraphicsEditorOverlay((event, datum, points) => {
     event.stopPropagation(); h.clicked.push([datum.index, points]);
@@ -124,7 +116,7 @@ test("keyed handles reuse nodes, refresh coordinates and selection, remove exits
   const drag = second.drag;
   h.project = () => [99, 42];
   h.graphic.points = [[1, 1], [2, 2], [3, 3]];
-  h.graphic.kind = "closed";
+  h.graphic.kind = "encirclement";
   h.render();
   assert.equal(h.nodes("point")[0], first);
   assert.equal(h.nodes("point")[1], second);
@@ -146,12 +138,12 @@ test("keyed handles reuse nodes, refresh coordinates and selection, remove exits
 
 test("drawing uses current editor settings; empty or missing graphics clears preview and restores pointer events", (t) => {
   const h = fixture(t);
-  h.state.operationGraphicsEditor = { active: true, kind: "closed", points: [[1, 1], [2, 2], [3, 3]], stroke: "green" };
+  h.state.operationGraphicsEditor = { active: true, kind: "encirclement", points: [[1, 1], [2, 2], [3, 3]], stroke: "#008000" };
   h.render();
   assert.equal(h.nodes("point")[0].styles.cursor, "default");
   assert.equal(h.dragsCreated, 0);
   assert.equal(h.nodes("midpoint").length, 0);
-  assert.equal(h.group.selectAll("path.operation-graphics-editor-path").nodes[0].attrs.stroke, "green");
+  assert.equal(h.group.selectAll("path.operation-graphics-editor-path").nodes[0].attrs.stroke, "#008000");
   assert.equal(h.interaction.nodes[0].styles["pointer-events"], "all");
   h.state.operationGraphicsEditor = { active: false, selectedId: "missing" };
   h.render();
@@ -182,7 +174,9 @@ test("drag uses current runtime and event coordinates; click delegates current p
 });
 
 test("midpoint pointerdown inserts once and suppresses its following click while later clicks still insert", (t) => {
-  const h = fixture(t); h.render();
+  const h = fixture(t);
+  h.graphic.points = [[-5, -5], [5, 5]];
+  h.render();
   const node = h.nodes("midpoint")[0], down = event();
   node.handlers.pointerdown.call(node, down, node.datum);
   assert.equal(down.stopped, 1); assert.equal(down.prevented, 1);

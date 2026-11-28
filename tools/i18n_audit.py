@@ -14,6 +14,7 @@ try:
         is_shell_fallback_name,
         load_tooltip_admin_names,
         load_scenario_localizable_strings,
+        parse_ui_copy_catalog,
         should_track_geo_missing_like,
     )
     from tools.i18n_key_extractor import iter_transport_config_ui_strings
@@ -26,6 +27,7 @@ except ImportError:
         is_shell_fallback_name,
         load_tooltip_admin_names,
         load_scenario_localizable_strings,
+        parse_ui_copy_catalog,
         should_track_geo_missing_like,
     )
     from i18n_key_extractor import iter_transport_config_ui_strings
@@ -37,12 +39,6 @@ UI_MAP_ENTRY_RE = re.compile(
     r"""\[\s*"[^"]+"\s*,\s*"(?P<text>(?:\\.|[^"])*)"\s*\]""",
     re.DOTALL,
 )
-UI_COPY_CATALOG_BLOCK_RE = re.compile(
-    r"""export\s+const\s+UI_COPY_CATALOG\s*=\s*Object\.freeze\(\{(?P<body>.*?)\n\}\);""",
-    re.DOTALL,
-)
-UI_COPY_CATALOG_QUOTED_KEY_RE = re.compile(r"""^  "(?P<text>(?:\\.|[^"])*)"\s*:\s*\{""", re.MULTILINE)
-UI_COPY_CATALOG_IDENTIFIER_KEY_RE = re.compile(r"""^\s*(?P<text>[A-Za-z][A-Za-z0-9_]*)\s*:\s*\{""", re.MULTILINE)
 TEXT_ASSIGN_LITERAL_RE = re.compile(
     r"""\b(?:textContent|innerText)\s*=\s*(['\"])(?P<text>(?:\\.|(?!\1).)*)\1""",
     re.DOTALL,
@@ -354,10 +350,10 @@ def build_localization_ownership_audit(
 ) -> dict:
     ui_locale = locales.get("ui") or {}
     geo_locale = locales.get("geo") or {}
-    ui_copy_path = repo_root / "data" / "i18n" / "ui_copy.json"
     manual_geo_path = repo_root / "data" / "i18n" / "manual_geo_overrides.json"
     baseline_path = repo_root / "data" / "i18n" / "locales_baseline.json"
     catalog_path = repo_root / "js" / "core" / "i18n_catalog.js"
+    catalog_entry_count = len(code_strings["catalog_ui_keys"])
     runtime_i18n_path = repo_root / "js" / "core" / "i18n.js"
     dist_root = repo_root / "dist" / "app"
 
@@ -421,8 +417,8 @@ def build_localization_ownership_audit(
     return {
         "summary": {
             "ui_locale_entries": len(ui_locale),
-            "ui_copy_entries": json_mapping_count(ui_copy_path),
-            "catalog_ui_entries": len(code_strings["catalog_ui_keys"]),
+            "ui_copy_entries": catalog_entry_count,
+            "catalog_ui_entries": catalog_entry_count,
             "geo_locale_entries": len(geo_locale),
             "manual_geo_entries": json_mapping_count(manual_geo_path),
             "baseline_ui_entries": json_mapping_count(baseline_path, "ui"),
@@ -439,12 +435,12 @@ def build_localization_ownership_audit(
                 "entry_count": len(ui_locale),
             },
             "ui_copy": {
-                **file_audit_entry(ui_copy_path, repo_root),
-                "entry_count": json_mapping_count(ui_copy_path),
+                **file_audit_entry(catalog_path, repo_root),
+                "entry_count": catalog_entry_count,
             },
             "runtime_catalog": {
                 **file_audit_entry(catalog_path, repo_root),
-                "entry_count": len(code_strings["catalog_ui_keys"]),
+                "entry_count": catalog_entry_count,
             },
             "runtime_i18n": file_audit_entry(runtime_i18n_path, repo_root),
             "code_buckets": {
@@ -538,14 +534,8 @@ def collect_code_strings(repo_root: Path) -> dict:
             if value:
                 ui_t_keys.add(value)
 
-        if path.name == "i18n_catalog.js":
-            for block_match in UI_COPY_CATALOG_BLOCK_RE.finditer(content):
-                block_body = block_match.group("body")
-                for pattern in (UI_COPY_CATALOG_QUOTED_KEY_RE, UI_COPY_CATALOG_IDENTIFIER_KEY_RE):
-                    for match in pattern.finditer(block_body):
-                        value = decode_js_string(match.group("text"))
-                        if value:
-                            inline_ui_keys.add(value)
+        if path == repo_root / "js/core/i18n_catalog.js":
+            inline_ui_keys.update(parse_ui_copy_catalog(content))
 
         if path.name == "i18n.js":
             for match in UI_MAP_ENTRY_RE.finditer(content):

@@ -1,9 +1,8 @@
+import { ColorManager } from "../color_manager.js";
+import { normalizeDayNightStyleConfig } from "../state_defaults.js";
+import { normalizeIntensityFieldsState as normalizeFields } from "../state/intensity_field_state.js";
+import { getCityCanonicalId as cityCanonicalId, getCityCapitalScore as cityCapitalScore } from "./city_reveal_policy.js";
 import { createLightTextureTileCache } from "./light_texture_tile_cache.js";
-
-const defaultColorManager = {
-  normalizeHexColor: () => null,
-  hexToRgb: () => null,
-};
 
 export function createCityLightsRenderOwner({
   state = {}, assets = {}, assetProvider = null, getters = {}, helpers = {}, effects = {},
@@ -32,12 +31,11 @@ export function createCityLightsRenderOwner({
     buildNightHemisphereFeature = () => null,
     getNightMask = () => null,
     clamp = (value, min, max) => Math.max(min, Math.min(max, value)),
-    ColorManager = defaultColorManager,
     createCanvas = () => null,
     estimateProjectedAreaPx = () => 0,
     getCityAnchor = () => null,
-    getCityCanonicalId = () => '',
-    getCityCapitalScore = () => 0,
+    getCityCanonicalId = cityCanonicalId,
+    getCityCapitalScore = cityCapitalScore,
     getCityGeoCoordinates = () => null,
     getCityScreenPoint = () => null,
     getDefaultZoomTransform = () => ({ x: 0, y: 0, k: 1 }),
@@ -50,14 +48,12 @@ export function createCityLightsRenderOwner({
     getTransformSignature = () => '',
     getUrbanCityPolicyOwner = () => null,
     getUrbanGlowMultiplierAt = () => 1,
-    normalizeDayNightStyleConfig = (config) => config || {},
-    normalizeIntensityFieldsState = (fields) => fields || {},
+    normalizeIntensityFieldsState = normalizeFields,
     normalizeLongitude = (value) => value,
     now = () => globalThis.performance?.now?.() ?? Date.now(),
     pathBoundsInScreen = () => false,
     prepareTargetContext = () => null,
     recordRenderPerfMetric = () => {},
-    sampleIntensityField = () => null,
     stableJson = (value) => JSON.stringify(value),
     stringHash = (value) => {
       let hash = 0;

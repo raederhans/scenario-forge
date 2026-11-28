@@ -1,3 +1,4 @@
+import { normalizeReason } from "../value_normalization.js";
 import { requireFunction } from "../renderer/require_named_function.js";
 const DEFAULT_RENDER_PHASE_IDLE = "idle";
 const DEFAULT_IDLE_TIMEOUT_MS = 0;
@@ -17,11 +18,6 @@ const REQUIRED_GETTER_NAMES = Object.freeze([
   "getScheduledHitCanvasBuildHandle",
   "getActiveScenarioId",
 ]);
-
-function normalizeReason(reason, defaultReason) {
-  const normalized = String(reason || "").trim();
-  return normalized || defaultReason;
-}
 
 function createTrace() {
   return {

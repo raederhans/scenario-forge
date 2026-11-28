@@ -1,4 +1,4 @@
-import { requireFunction } from "./require_function.js";
+import { requireFunctionFrom } from "./require_function.js";
 import { getSurfaceCoverage, intersectCoverage, transformCoverage } from "./cached_surface_coverage.js";
 
 function requirePassNames(candidate) {
@@ -10,40 +10,19 @@ function requirePassNames(candidate) {
 
 export function createCachedPassCompositorOwner({ constants = {}, getters = {}, helpers = {}, effects = {} } = {}) {
   const renderPassNames = requirePassNames(constants.renderPassNames);
-  const getActiveTargetContext = requireFunction(
-    getters.getActiveTargetContext,
-    "getters.getActiveTargetContext",
-  );
-  const getRenderPassCacheSnapshot = requireFunction(
-    getters.getRenderPassCacheSnapshot,
-    "getters.getRenderPassCacheSnapshot",
-  );
-  const getPassReferenceTransform = requireFunction(
-    getters.getPassReferenceTransform,
-    "getters.getPassReferenceTransform",
-  );
-  const getRenderPassLayout = requireFunction(
-    getters.getRenderPassLayout,
-    "getters.getRenderPassLayout",
-  );
-  const getDpr = requireFunction(getters.getDpr, "getters.getDpr");
-  const getRenderPhase = requireFunction(getters.getRenderPhase, "getters.getRenderPhase");
-  const isRenderDiagnosticsEnabled = requireFunction(
-    getters.isRenderDiagnosticsEnabled,
-    "getters.isRenderDiagnosticsEnabled",
-  );
-  const cloneZoomTransform = requireFunction(
-    helpers.cloneZoomTransform,
-    "helpers.cloneZoomTransform",
-  );
-  const areZoomTransformsEquivalent = requireFunction(
-    helpers.areZoomTransformsEquivalent,
-    "helpers.areZoomTransformsEquivalent",
-  );
-  const recordTransformedPassDiagnostics = requireFunction(
-    effects.recordTransformedPassDiagnostics,
-    "effects.recordTransformedPassDiagnostics",
-  );
+  const requireGetter = requireFunctionFrom(getters, "getters");
+  const getActiveTargetContext = requireGetter("getActiveTargetContext");
+  const getRenderPassCacheSnapshot = requireGetter("getRenderPassCacheSnapshot");
+  const getPassReferenceTransform = requireGetter("getPassReferenceTransform");
+  const getRenderPassLayout = requireGetter("getRenderPassLayout");
+  const getDpr = requireGetter("getDpr");
+  const getRenderPhase = requireGetter("getRenderPhase");
+  const isRenderDiagnosticsEnabled = requireGetter("isRenderDiagnosticsEnabled");
+  const requireHelper = requireFunctionFrom(helpers, "helpers");
+  const cloneZoomTransform = requireHelper("cloneZoomTransform");
+  const areZoomTransformsEquivalent = requireHelper("areZoomTransformsEquivalent");
+  const requireEffect = requireFunctionFrom(effects, "effects");
+  const recordTransformedPassDiagnostics = requireEffect("recordTransformedPassDiagnostics");
 
   function recordTransformedPassIfEnabled(
     passName,

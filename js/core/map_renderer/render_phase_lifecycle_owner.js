@@ -1,3 +1,4 @@
+import { normalizeReason } from "../value_normalization.js";
 import { requireFunction } from "../renderer/require_named_function.js";
 const DEFAULT_RENDER_PHASE_IDLE = "idle";
 const DEFAULT_RENDER_PHASE_INTERACTING = "interacting";
@@ -40,11 +41,6 @@ const PROMOTION_ACTIVE_STATUSES = Object.freeze([
   "promotion-scheduled",
   "refresh-started",
 ]);
-
-function normalizeReason(reason, defaultReason) {
-  const normalized = String(reason || "").trim();
-  return normalized || defaultReason;
-}
 
 export function createRenderPhaseLifecycleOwner({ state = {}, effects = {}, getters = {} } = {}) {
   const renderPhaseIdle = String(state.renderPhaseIdle || DEFAULT_RENDER_PHASE_IDLE);

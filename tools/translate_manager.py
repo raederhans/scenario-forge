@@ -447,8 +447,23 @@ def collect_ui_keys(repo_root: Path) -> list[str]:
     return sorted(keys)
 
 
+def parse_ui_copy_catalog(content: str) -> dict:
+    match = re.fullmatch(
+        r"(?:\s*//[^\n]*\n)*\s*export const UI_COPY_CATALOG = Object\.freeze\(\s*(\{.*\})\s*\);\s*",
+        content,
+        re.DOTALL,
+    )
+    if not match:
+        raise ValueError("i18n_catalog.js 缺少 UI_COPY_CATALOG 导出或 Object.freeze 外壳")
+
+    def reject_constant(token: str) -> None:
+        raise ValueError(f"UI_COPY_CATALOG 包含非法 JSON 常量 {token}")
+
+    return json.loads(match[1], parse_constant=reject_constant)
+
+
 def load_ui_copy(repo_root: Path) -> dict:
-    source = json.loads((repo_root / "data" / "i18n" / "ui_copy.json").read_text(encoding="utf-8"))
+    source = parse_ui_copy_catalog((repo_root / "js/core/i18n_catalog.js").read_text(encoding="utf-8"))
     return {key: {"en": source[key]["en"], "zh": source[key]["zh"]} for key in sorted(source)}
 
 
@@ -1304,7 +1319,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--ui-only",
         action="store_true",
-        help="Sync UI translations from ui_copy.json without changing geo data or using the network.",
+        help="Sync UI translations from i18n_catalog.js without changing geo data or using the network.",
     )
     parser.add_argument(
         "--topology",

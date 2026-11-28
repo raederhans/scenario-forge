@@ -4,3 +4,7 @@ export function requireFunction(candidate, label) {
   }
   return candidate;
 }
+
+export function requireFunctionFrom(source, label, validate = requireFunction) {
+  return (name) => validate(source[name], `${label}.${name}`);
+}

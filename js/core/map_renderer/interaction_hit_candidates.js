@@ -1,6 +1,4 @@
-function clampToRange(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
+import { clamp as clampToRange } from "../value_normalization.js";
 
 function createHitResult(overrides = {}) {
   return {

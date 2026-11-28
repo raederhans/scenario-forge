@@ -256,12 +256,12 @@ const translations = {
     def test_load_ui_copy_preserves_display_values_and_plural_forms(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            self._write_repo_file(repo_root, "data/i18n/ui_copy.json", """
-{
+            self._write_repo_file(repo_root, "js/core/i18n_catalog.js", """
+export const UI_COPY_CATALOG = Object.freeze({
   "Atlas Ink": {"zh": "图集墨蓝", "en": "Atlas Ink", "note": "色板"},
   "Guide": {"zh": "指南", "en": "Display guide"},
   "Count": {"zh": "{count} 项", "en": {"one": "{count} item", "other": "{count} items"}}
-}
+});
 """)
             translations = load_ui_copy(repo_root)
             self.assertEqual(translations["Atlas Ink"], {"zh": "图集墨蓝", "en": "Atlas Ink"})

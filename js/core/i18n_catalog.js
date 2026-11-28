@@ -1,4 +1,4 @@
-// 由 tools/build_ui_copy.mjs 生成，勿手改
+// 界面文案的唯一人工维护来源。Object.freeze( 后须使用严格 JSON 对象。
 
 export const UI_COPY_CATALOG = Object.freeze({
   "--- Presets ---": {

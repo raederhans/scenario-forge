@@ -1,4 +1,4 @@
-import { requireFunction } from "../renderer/require_function.js";
+import { requireFunctionFrom } from "../renderer/require_function.js";
 function requireString(candidate, label) {
   const value = String(candidate || "").trim();
   if (!value) {
@@ -33,113 +33,41 @@ export function createTransformedFrameCompositorOwner({
     "constants.renderPhaseSettling",
   );
 
-  const getCurrentTransform = requireFunction(
-    getters.getCurrentTransform,
-    "getters.getCurrentTransform",
-  );
-  const getRenderPassCacheSnapshot = requireFunction(
-    getters.getRenderPassCacheSnapshot,
-    "getters.getRenderPassCacheSnapshot",
-  );
-  const getActiveTransformedFramePassNames = requireFunction(
-    getters.getActiveTransformedFramePassNames,
-    "getters.getActiveTransformedFramePassNames",
-  );
-  const getRenderPhase = requireFunction(getters.getRenderPhase, "getters.getRenderPhase");
-  const getDeferExactAfterSettle = requireFunction(
-    getters.getDeferExactAfterSettle,
-    "getters.getDeferExactAfterSettle",
-  );
-  const getActiveScenarioId = requireFunction(
-    getters.getActiveScenarioId,
-    "getters.getActiveScenarioId",
-  );
-  const getPendingExactPoliticalFastFrame = requireFunction(
-    getters.getPendingExactPoliticalFastFrame,
-    "getters.getPendingExactPoliticalFastFrame",
-  );
-  const getZoomGestureScaleDelta = requireFunction(
-    getters.getZoomGestureScaleDelta,
-    "getters.getZoomGestureScaleDelta",
-  );
-  const getZoomGestureEndedAt = requireFunction(
-    getters.getZoomGestureEndedAt,
-    "getters.getZoomGestureEndedAt",
-  );
-  const getDpr = requireFunction(getters.getDpr, "getters.getDpr");
+  const requireGetter = requireFunctionFrom(getters, "getters");
+  const getCurrentTransform = requireGetter("getCurrentTransform");
+  const getRenderPassCacheSnapshot = requireGetter("getRenderPassCacheSnapshot");
+  const getActiveTransformedFramePassNames = requireGetter("getActiveTransformedFramePassNames");
+  const getRenderPhase = requireGetter("getRenderPhase");
+  const getDeferExactAfterSettle = requireGetter("getDeferExactAfterSettle");
+  const getActiveScenarioId = requireGetter("getActiveScenarioId");
+  const getPendingExactPoliticalFastFrame = requireGetter("getPendingExactPoliticalFastFrame");
+  const getZoomGestureScaleDelta = requireGetter("getZoomGestureScaleDelta");
+  const getZoomGestureEndedAt = requireGetter("getZoomGestureEndedAt");
+  const getDpr = requireGetter("getDpr");
 
-  const nowMs = requireFunction(helpers.nowMs, "helpers.nowMs");
-  const canDrawTransformedPass = requireFunction(
-    helpers.canDrawTransformedPass,
-    "helpers.canDrawTransformedPass",
-  );
-  const getInteractionCompositeReuseDecision = requireFunction(
-    helpers.getInteractionCompositeReuseDecision,
-    "helpers.getInteractionCompositeReuseDecision",
-  );
+  const requireHelper = requireFunctionFrom(helpers, "helpers");
+  const nowMs = requireHelper("nowMs");
+  const canDrawTransformedPass = requireHelper("canDrawTransformedPass");
+  const getInteractionCompositeReuseDecision = requireHelper("getInteractionCompositeReuseDecision");
 
-  const ensureCompositeBufferCanvas = requireFunction(
-    effects.ensureCompositeBufferCanvas,
-    "effects.ensureCompositeBufferCanvas",
-  );
-  const resetCanvasContext = requireFunction(
-    effects.resetCanvasContext,
-    "effects.resetCanvasContext",
-  );
-  const withRenderTarget = requireFunction(effects.withRenderTarget, "effects.withRenderTarget");
-  const drawInteractionComposite = requireFunction(
-    effects.drawInteractionComposite,
-    "effects.drawInteractionComposite",
-  );
-  const composeRenderPassesToTarget = requireFunction(
-    effects.composeRenderPassesToTarget,
-    "effects.composeRenderPassesToTarget",
-  );
-  const drawTransformedPass = requireFunction(
-    effects.drawTransformedPass,
-    "effects.drawTransformedPass",
-  );
-  const drawInteractionBorderSnapshot = requireFunction(
-    effects.drawInteractionBorderSnapshot,
-    "effects.drawInteractionBorderSnapshot",
-  );
-  const drawBordersPass = requireFunction(effects.drawBordersPass, "effects.drawBordersPass");
-  const blitCompositeBufferToMain = requireFunction(
-    effects.blitCompositeBufferToMain,
-    "effects.blitCompositeBufferToMain",
-  );
-  const setInteractionCompositeRejectedReason = requireFunction(
-    effects.setInteractionCompositeRejectedReason,
-    "effects.setInteractionCompositeRejectedReason",
-  );
-  const invalidateInteractionComposite = requireFunction(
-    effects.invalidateInteractionComposite,
-    "effects.invalidateInteractionComposite",
-  );
-  const buildInteractionComposite = requireFunction(
-    effects.buildInteractionComposite,
-    "effects.buildInteractionComposite",
-  );
-  const canDrawInteractionComposite = requireFunction(
-    effects.canDrawInteractionComposite,
-    "effects.canDrawInteractionComposite",
-  );
-  const setPendingExactPoliticalFastFrame = requireFunction(
-    effects.setPendingExactPoliticalFastFrame,
-    "effects.setPendingExactPoliticalFastFrame",
-  );
-  const recordRenderPerfMetric = requireFunction(
-    effects.recordRenderPerfMetric,
-    "effects.recordRenderPerfMetric",
-  );
-  const recordPassTiming = requireFunction(
-    effects.recordPassTiming,
-    "effects.recordPassTiming",
-  );
-  const incrementPerfCounter = requireFunction(
-    effects.incrementPerfCounter,
-    "effects.incrementPerfCounter",
-  );
+  const requireEffect = requireFunctionFrom(effects, "effects");
+  const ensureCompositeBufferCanvas = requireEffect("ensureCompositeBufferCanvas");
+  const resetCanvasContext = requireEffect("resetCanvasContext");
+  const withRenderTarget = requireEffect("withRenderTarget");
+  const drawInteractionComposite = requireEffect("drawInteractionComposite");
+  const composeRenderPassesToTarget = requireEffect("composeRenderPassesToTarget");
+  const drawTransformedPass = requireEffect("drawTransformedPass");
+  const drawInteractionBorderSnapshot = requireEffect("drawInteractionBorderSnapshot");
+  const drawBordersPass = requireEffect("drawBordersPass");
+  const blitCompositeBufferToMain = requireEffect("blitCompositeBufferToMain");
+  const setInteractionCompositeRejectedReason = requireEffect("setInteractionCompositeRejectedReason");
+  const invalidateInteractionComposite = requireEffect("invalidateInteractionComposite");
+  const buildInteractionComposite = requireEffect("buildInteractionComposite");
+  const canDrawInteractionComposite = requireEffect("canDrawInteractionComposite");
+  const setPendingExactPoliticalFastFrame = requireEffect("setPendingExactPoliticalFastFrame");
+  const recordRenderPerfMetric = requireEffect("recordRenderPerfMetric");
+  const recordPassTiming = requireEffect("recordPassTiming");
+  const incrementPerfCounter = requireEffect("incrementPerfCounter");
 
   function composeTransformedFrameToBuffer(
     currentTransform,

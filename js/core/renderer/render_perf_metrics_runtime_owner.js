@@ -1,4 +1,4 @@
-import { requireFunction } from "./require_function.js";
+import { requireFunctionFrom } from "./require_function.js";
 function requireNameSet(candidate, label) {
   if (!candidate || typeof candidate.has !== "function") {
     throw new TypeError(`${label} must provide has().`);
@@ -15,27 +15,14 @@ export function createRenderPerfMetricsRuntimeOwner({
     constants.contextBreakdownMetricNames,
     "constants.contextBreakdownMetricNames",
   );
-  const getRenderPerfContextBreakdownSnapshot = requireFunction(
-    getters.getRenderPerfContextBreakdownSnapshot,
-    "getters.getRenderPerfContextBreakdownSnapshot",
-  );
-  const getRenderPerfMetricSequence = requireFunction(
-    getters.getRenderPerfMetricSequence,
-    "getters.getRenderPerfMetricSequence",
-  );
-  const nowMs = requireFunction(getters.nowMs, "getters.nowMs");
-  const ensureRenderPerfMetricsState = requireFunction(
-    effects.ensureRenderPerfMetricsState,
-    "effects.ensureRenderPerfMetricsState",
-  );
-  const commitRenderPerfMetricState = requireFunction(
-    effects.commitRenderPerfMetricState,
-    "effects.commitRenderPerfMetricState",
-  );
-  const setRenderPerfContextBreakdownState = requireFunction(
-    effects.setRenderPerfContextBreakdownState,
-    "effects.setRenderPerfContextBreakdownState",
-  );
+  const requireGetter = requireFunctionFrom(getters, "getters");
+  const getRenderPerfContextBreakdownSnapshot = requireGetter("getRenderPerfContextBreakdownSnapshot");
+  const getRenderPerfMetricSequence = requireGetter("getRenderPerfMetricSequence");
+  const nowMs = requireGetter("nowMs");
+  const requireEffect = requireFunctionFrom(effects, "effects");
+  const ensureRenderPerfMetricsState = requireEffect("ensureRenderPerfMetricsState");
+  const commitRenderPerfMetricState = requireEffect("commitRenderPerfMetricState");
+  const setRenderPerfContextBreakdownState = requireEffect("setRenderPerfContextBreakdownState");
 
   let activeContextMetricSession = null;
 

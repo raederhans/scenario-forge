@@ -1,3 +1,4 @@
+import { createThematicDataLoader } from "./thematic_data_loader.js";
 import { frozenCopy } from "./frozen_copy.js";
 import { resolveDataUrl } from "../data_base_url.js";
 export const THEMATIC_POPULATION_LAYER_ID = "population_wdi_population_v1";
@@ -18,7 +19,7 @@ export function isThematicPopulationMetricSupported(metricId) {
 const YEAR = 2023;
 const BASE_PATH = "data/thematic_layers/population/wdi_population_v1/";
 const SUPPORTED_SCENARIOS = ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"];
-const requestsByFetcher = new WeakMap();
+const loadPayload = createThematicDataLoader(BASE_PATH, normalizePayload, requireCondition);
 
 async function defaultFetchJson(url) {
   const response = await fetch(resolveDataUrl(url));
@@ -113,31 +114,5 @@ export async function loadThematicPopulationData({ metricId = THEMATIC_POPULATIO
   if (typeof fetchJson !== "function") throw new TypeError("population fetchJson must be a function");
   if (!isThematicPopulationMetricSupported(metricId)) throw new RangeError(`Unsupported population metric: ${metricId}`);
   if (!SUPPORTED_SCENARIOS.includes(scenarioId)) throw new RangeError(`Unsupported population scenario: ${scenarioId}`);
-  let cache = requestsByFetcher.get(fetchJson);
-  if (!cache) {
-    cache = { documents: null, payloads: new Map() };
-    cache.documents = Promise.all([
-      fetchJson(`${BASE_PATH}manifest.json`),
-      fetchJson(`${BASE_PATH}metrics.admin0.json`),
-    ]).then((documents) => documents.map(frozenCopy));
-    requestsByFetcher.set(fetchJson, cache);
-    cache.documents.catch(() => {
-      if (requestsByFetcher.get(fetchJson) === cache) requestsByFetcher.delete(fetchJson);
-    });
-  }
-  let request = cache.payloads.get(metricId);
-  if (!request) {
-    request = cache.documents.then(([manifest, metrics]) => normalizePayload(manifest, metrics, metricId));
-    cache.payloads.set(metricId, request);
-    request.catch(() => {
-      if (cache.payloads.get(metricId) === request) cache.payloads.delete(metricId);
-      if (requestsByFetcher.get(fetchJson) === cache) requestsByFetcher.delete(fetchJson);
-    });
-  }
-  const payload = await request;
-  if (!payload.supportedScenarios.includes(scenarioId) && requestsByFetcher.get(fetchJson) === cache) {
-    requestsByFetcher.delete(fetchJson);
-  }
-  requireCondition(payload.supportedScenarios.includes(scenarioId), "requested scenario is not advertised");
-  return payload;
+  return loadPayload(fetchJson, metricId, scenarioId);
 }

@@ -18,7 +18,7 @@
 ### current shipped
 
 - `index.html` 已有 `Diagnostics`
-- `docs/EXPORT_QA_ACCEPTANCE_SCRIPT.md` 和 `docs/EXPORT_QA_MANUAL_CHECKLIST.md` 已定义了导出验收点
+- `docs/EXPORT_QA_ACCEPTANCE_SCRIPT.md` 已定义了导出验收点
 - `js/ui/sidebar.js` 已有诊断区壳
 - `Export workbench` 已有约束与失败提示
 

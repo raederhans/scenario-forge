@@ -579,8 +579,8 @@ test("unavailable RL version is preserved on render and explicit recovery retain
   }
 });
 
-test("WGI new strings agree across manual/catalog translations and option language refresh preserves selection", () => {
-  const manual = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL("../data/i18n/ui_copy.json", import.meta.url), "utf8"))).map(([key, entry]) => [key, entry.zh]));
+test("WGI catalog translations match the locales snapshot and option language refresh preserves selection", () => {
+  const { ui } = JSON.parse(readFileSync(new URL("../data/locales.json", import.meta.url), "utf8"));
   for (const key of ["Country indicators", "Indicator", "Show thematic shading",
     "Country indicators · Scenario reference", "UNDP human development · Scenario reference",
     "WDI population · Scenario reference",
@@ -593,7 +593,7 @@ test("WGI new strings agree across manual/catalog translations and option langua
     "Loading indicator data…",
     "Indicator data could not be loaded. Retry."]) {
     assert.equal(UI_COPY_CATALOG[key].en, key);
-    assert.equal(UI_COPY_CATALOG[key].zh, manual[key]);
+    assert.equal(UI_COPY_CATALOG[key].zh, ui[key].zh);
   }
   const selection = normalizeThematicWgiStyle({ metricId: RL });
   const h = createHarness({ currentLanguage: "en", styleConfig: { thematic: selection } }, {
