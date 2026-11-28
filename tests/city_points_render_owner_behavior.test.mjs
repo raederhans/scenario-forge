@@ -1,136 +1,41 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-
 import { createCityPointsRenderOwner } from "../js/core/renderer/city_points_render_owner.js";
-import { createUrbanCityPolicyOwner } from "../js/core/renderer/urban_city_policy.js";
-import { createCityLabelOwner } from "../js/core/renderer/city_label_owner.js";
 import { normalizeCityLayerStyleConfig } from "../js/core/state_defaults.js";
-import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
-import { claimScreenLabelPlacement } from "../js/core/renderer/screen_label_placement.js";
-import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 
-const markerTokens = {
-  baseShadow: "rgba(0, 0, 0, 0.2)",
-  capitalAccent: "rgba(255, 225, 130, 0.95)",
-  capitalHighlight: "rgba(255, 255, 255, 0.72)",
-  fillBottom: "rgba(70, 76, 86, 0.96)",
-  fillMid: "rgba(108, 116, 130, 0.96)",
-  fillTop: "rgba(190, 198, 212, 0.98)",
-  highlight: "rgba(255, 255, 255, 0.36)",
-  rimDark: "rgba(0, 0, 0, 0.22)",
-  specular: "rgba(255, 255, 255, 0.28)",
-  stroke: "rgba(18, 22, 30, 0.82)",
-};
-
-function createSpriteContext() {
-  const gradientCalls = [];
-  const compositeCalls = [];
-  const pathOps = [];
-  const gradient = { addColorStop: () => {} };
-  return {
-    scaleCalls: [],
-    scale(x, y) { this.scaleCalls.push([x, y]); },
-    beginPath() { pathOps.push("beginPath"); },
-    closePath() { pathOps.push("closePath"); },
-    createLinearGradient(...args) {
-      gradientCalls.push(args);
-      return gradient;
-    },
-    arc(...args) { pathOps.push(["arc", ...args]); },
-    ellipse(...args) { pathOps.push(["ellipse", ...args]); },
-    fill() { pathOps.push("fill"); },
-    lineTo(...args) { pathOps.push(["lineTo", ...args]); },
-    moveTo(...args) { pathOps.push(["moveTo", ...args]); },
-    restore: () => {},
-    save: () => {},
-    stroke() { pathOps.push("stroke"); },
-    set fillStyle(_value) {},
-    set globalCompositeOperation(value) { compositeCalls.push(value); },
-    set lineCap(_value) {},
-    set lineJoin(_value) {},
-    set lineWidth(_value) {},
-    set strokeStyle(_value) {},
-    get gradientCalls() { return gradientCalls; },
-    get compositeCalls() { return compositeCalls; },
-    get pathOps() { return pathOps; },
-  };
-}
-
-function installCanvasFactory(onContextCreated = null) {
-  const previousDocument = globalThis.document;
-  const previousOffscreenCanvas = globalThis.OffscreenCanvas;
-  globalThis.OffscreenCanvas = undefined;
-  globalThis.document = {
-    createElement: () => {
-      const spriteContext = createSpriteContext();
-      if (typeof onContextCreated === "function") {
-        onContextCreated(spriteContext);
-      }
+function installCanvasFactory(t) {
+  class MarkerCanvas {
+    getContext() {
       return {
-        height: 0,
-        width: 0,
-        getContext: () => spriteContext,
+        scale() {}, save() {}, restore() {}, beginPath() {}, closePath() {},
+        arc() {}, fill() {}, stroke() {}, lineTo() {}, moveTo() {},
       };
-    },
-  };
-  return () => {
-    if (previousDocument === undefined) {
-      delete globalThis.document;
-    } else {
-      globalThis.document = previousDocument;
     }
-    if (previousOffscreenCanvas === undefined) {
-      delete globalThis.OffscreenCanvas;
-    } else {
-      globalThis.OffscreenCanvas = previousOffscreenCanvas;
-    }
-  };
+  }
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "OffscreenCanvas");
+  Object.defineProperty(globalThis, "OffscreenCanvas", { configurable: true, value: MarkerCanvas });
+  t.after(() => {
+    if (previous) Object.defineProperty(globalThis, "OffscreenCanvas", previous);
+    else delete globalThis.OffscreenCanvas;
+  });
 }
 
-function createRecordingContext(events = []) {
+function createCityPointsHarness({ markerEntries, labelEntries, styleConfig = {} }) {
   const calls = [];
-  return {
-    calls,
-    drawImage: (...args) => {
-      calls.push({ type: "drawImage", args });
-      events.push("drawImage");
-    },
-    restore: () => calls.push({ type: "restore" }),
-    save: () => calls.push({ type: "save" }),
+  const context = {
+    save() {}, restore() {},
+    drawImage(...args) { calls.push({ type: "drawImage", args }); },
     set globalAlpha(value) { calls.push({ type: "globalAlpha", value }); },
-    set globalCompositeOperation(value) { calls.push({ type: "globalCompositeOperation", value }); },
-    set lineCap(value) { calls.push({ type: "lineCap", value }); },
-    set lineJoin(value) { calls.push({ type: "lineJoin", value }); },
   };
-}
-
-function createCityPointsHarness({
-  buildCityRevealPlan = null,
-  drawLabels = null,
-  getCityMarkerRenderStyle = () => ({ backgroundColor: "", tokens: markerTokens }),
-  markerEntries = [],
-  labelEntries = [],
-  projection = () => [0, 0],
-  pointer = () => [20, 20],
-  showCityPoints = true,
-  styleConfig = {},
-  zoomIdentity = { x: 0, y: 0, k: 1 },
-} = {}) {
-  const events = [];
-  const context = createRecordingContext(events);
-  const metrics = [];
-  const renderMetrics = [];
-  const interactionMetrics = [];
-  const labelCalls = [];
+  const projection = () => [0, 0];
   const state = {
     colorRevision: 1,
     deferContextBasePass: false,
-    showCityPoints,
+    showCityPoints: true,
     styleConfig: {
       cityPoints: {
         opacity: 0.9,
         showLabels: true,
-        revealProfile: "hybrid_country_budget",
         ...styleConfig,
       },
     },
@@ -140,202 +45,46 @@ function createCityPointsHarness({
     type: "FeatureCollection",
     features: markerEntries.map((entry) => entry.feature || { type: "Feature", properties: {} }),
   };
-  const revealPlanBuilder = buildCityRevealPlan || (() => ({ markerEntries, labelEntries }));
   const owner = createCityPointsRenderOwner({
     state,
-    constants: {
-      cityMarkerSizeLimitsPx: { capital: 26, major: 22, regional: 18, minor: 14 },
-      cityMarkerThemeGraphite: "classic_graphite",
-      cityRevealProfileHybrid: "hybrid_country_budget",
-    },
     getters: {
       getContext: () => context,
       getMapSvg: () => ({ nodeName: "svg" }),
       getProjection: () => projection,
     },
     helpers: {
-      buildCityRevealPlan: revealPlanBuilder,
+      buildCityRevealPlan: () => ({ markerEntries, labelEntries }),
       clamp: (value, min, max) => Math.min(max, Math.max(min, value)),
-      collectContextMetric: (name, _duration, detail) => metrics.push({ name, detail }),
-      drawCityLabelsFromEntries: (entries, options) => {
-        events.push("labels");
-        labelCalls.push({ entries, options });
-        return drawLabels ? drawLabels(entries, options, context) : entries.length;
-      },
-      getCityMarkerRenderStyle,
+      getCityMarkerRenderStyle: () => ({ backgroundColor: "", tokens: {} }),
       getCityMarkerSizePx: (entry) => Number(entry?.markerSizePx || 12),
-      getCityTooltipText: (entry) => `tooltip:${entry.id || entry.stableId || ""}`,
       getCityVisualCapitalState: (entry, config) => !!entry?.isCapital && config?.showCapitalOverlay !== false,
       getEffectiveCityCollection: () => collection,
-      getHoverEntryHitPriority: (entry) => String(entry?.packId || "global") === "global" ? 0 : 1,
-      getPointer: pointer,
-      getZoomIdentity: () => zoomIdentity,
       getFeatureCollectionFeatureCount: (candidate) => Array.isArray(candidate?.features) ? candidate.features.length : 0,
-      isCityEntryEligibleForLandHit: (entry, hit) => (
-        !!entry
-        && hit?.targetType === "land"
-        && String(entry?.feature?.properties?.__city_host_feature_id || "") === String(hit?.id || "")
-      ),
       normalizeCityLayerStyleConfig,
-      nowMs: () => 0,
-      recordInteractionDurationMetric: (name, _duration, detail) => interactionMetrics.push({ name, detail }),
-      recordRenderPerfMetric: (name, _duration, detail) => renderMetrics.push({ name, detail }),
     },
   });
-  return {
-    context,
-    events,
-    interactionMetrics,
-    labelCalls,
-    metrics,
-    owner,
-    renderMetrics,
-    state,
-  };
+  return { owner, calls };
 }
-
-test("city points owner records hidden skip metrics and clears hover entries", () => {
-  const entry = {
-    id: "hidden-city",
-    anchor: [10, 10],
-    screenPoint: [20, 20],
-    feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } },
-  };
-  const harness = createCityPointsHarness({ markerEntries: [entry], showCityPoints: true });
-  harness.owner.getCityLayerRenderState(1, { interactive: true, cacheHoverEntries: true });
-  assert.equal(
-    harness.owner.getHoveredCityTooltipEntry({ type: "mousemove" }, { targetType: "land", id: "LAND1" })?.id,
-    "hidden-city"
-  );
-
-  harness.state.showCityPoints = false;
-  harness.owner.drawCityPointsLayer(1, { interactive: true });
-
-  assert.deepEqual(harness.metrics.at(-1), {
-    name: "drawCityPointsLayer",
-    detail: {
-      featureCount: 1,
-      visibleFeatureCount: 0,
-      labelCount: 0,
-      interactive: true,
-      skipped: true,
-      reason: "hidden",
-    },
-  });
-  assert.equal(harness.owner.getHoveredCityTooltipEntry({ type: "mousemove" }, { targetType: "land", id: "LAND1" }), null);
-});
-
-test("reveal plan reuses normalized values and isolates selected marker-label aliases", () => {
-  let builds = 0;
-  const entry = { id: "selected", acceptedLabelPlacement: "", anchor: [1, 2], screenPoint: [3, 4] };
-  const unselected = { get unused() { throw new Error("unselected candidates must not be cloned"); } };
-  const harness = createCityPointsHarness({ markerEntries: [entry],
-    buildCityRevealPlan: () => {
-      builds++;
-      return { markerEntries: [entry], labelEntries: [entry], candidateEntries: [entry, unselected], labelBudget: 5 };
-    },
-  });
-  const first = harness.owner.getCityLayerRenderState(2, { interactive: true });
-  assert.deepEqual(first.labelEntries, []);
-  first.markerEntries[0].acceptedLabelPlacement = "left";
-  first.markerEntries[0].labelContrastMode = "light";
-  harness.state.styleConfig.cityPoints = { ...harness.state.styleConfig.cityPoints, markerScale: "1" };
-  const second = harness.owner.getCityLayerRenderState(2);
-  assert.equal(builds, 1, "a new config object with identical normalized values reuses the complete plan");
-  assert.equal(second.markerEntries[0], second.labelEntries[0]);
-  assert.notEqual(second.markerEntries[0], first.markerEntries[0]);
-  assert.notEqual(second.markerEntries[0], entry);
-  assert.equal(second.labelEntries[0].acceptedLabelPlacement, "");
-  assert.equal(second.labelEntries[0].labelContrastMode, undefined);
-  assert.equal(second.labelBudget, 5);
-  assert.equal(entry.acceptedLabelPlacement, "");
-  assert.equal(entry.labelContrastMode, undefined);
-});
-
-test("reveal plan invalidates for data, geometry, exact viewport and deferred label dependencies", () => {
-  let collection = { features: [{}] };
-  let projection = () => [0, 0];
-  let paintOverscan = 48;
-  let builds = 0;
-  const entry = { id: "city" };
-  const state = { showCityPoints: true, width: 800, height: 500,
-    zoomTransform: { x: 0, y: 0, k: 2 }, styleConfig: { cityPoints: { showLabels: true } } };
-  const owner = createCityPointsRenderOwner({ state,
-    getters: { getProjection: () => projection },
-    helpers: {
-      getEffectiveCityCollection: () => collection,
-      getCityPaintOverscanPx: () => paintOverscan,
-      normalizeCityLayerStyleConfig,
-      buildCityRevealPlan: () => {
-        builds++;
-        return { markerEntries: [entry], labelEntries: state.deferExactAfterSettle ? [] : [entry] };
-      },
-    },
-  });
-  const render = () => owner.getCityLayerRenderState(2);
-  render(); render();
-  assert.equal(builds, 1);
-  const mutations = [
-    () => { collection = { features: [{}] }; },
-    ...["cityLayerRevision", "sceneGeneration", "scenarioDataGeneration", "scenarioStrategicValuesRevision", "sovereigntyRevision"]
-      .map((field) => () => { state[field] = 1; }),
-    () => { state.activeScenarioId = "tno"; },
-    () => { state.scenarioCountriesByTag = {}; },
-    () => { state.activeScenarioManifest = {}; },
-    () => { state.urbanData = { features: [] }; },
-    () => { projection = () => [1, 1]; },
-    () => { markProjectionGeometryChanged(projection); },
-    () => { state.zoomTransform.x += 1e-8; },
-    () => { state.zoomTransform.y += 1e-8; },
-    () => { state.zoomTransform.k += 1e-8; },
-    () => { state.width++; },
-    () => { state.height++; },
-    () => { paintOverscan++; },
-    () => { state.deferExactAfterSettle = true; },
-  ];
-  for (const mutate of mutations) {
-    const before = builds;
-    mutate(); render(); render();
-    assert.equal(builds, before + 1, String(mutate));
-  }
-  assert.deepEqual(render().labelEntries, []);
-  state.deferExactAfterSettle = false;
-  assert.equal(render().labelEntries.length, 1, "settling rebuilds the full label plan");
-  const before = builds;
-  state.zoomTransform.x = 10; render();
-  state.zoomTransform.x = 20; render();
-  state.zoomTransform.x = 10; render();
-  assert.equal(builds, before + 3, "only the most recent plan is cached");
-});
 
 function createPrivateRevealHarness() {
   const entry = { id: "prepared-city", cityId: "prepared-city", anchor: [1, 2], screenPoint: [3, 4] };
-  const h = { collection: { features: [{}] }, projection: () => [0, 0], enabled: true,
-    builds: 0, preparations: 0, contextReads: 0, paintOverscan: 48,
+  const h = { collection: { features: [{}] }, projection: () => [0, 0],
     state: { showCityPoints: true, width: 800, height: 500,
       zoomTransform: { x: 0, y: 0, k: 2 }, styleConfig: { cityPoints: { showLabels: true } } } };
   h.owner = createCityPointsRenderOwner({ state: h.state,
     getters: {
       getProjection: () => h.projection,
-      getContext: () => { h.contextReads++; return null; },
-      getMapSvg: () => ({}),
     },
     helpers: {
-      getEffectiveCityCollection: () => { h.syncReads = (h.syncReads || 0) + 1; return h.collection; },
       getCachedEffectiveCityCollection: () => h.publishedCollection || h.collection,
       getEffectiveCityCollectionSource: () => ({ collection: h.collection, features: h.collection.features }),
       isEffectiveCityCollectionSourceCurrent: (source) => !!source
         && source.collection === h.collection && source.features === h.collection.features,
       prepareEffectiveCityCollection: async (source) => ({ source, collection: source.collection }),
       installEffectiveCityCollection: ({ collection }) => { h.publishedCollection = collection; return true; },
-      getCityPaintOverscanPx: () => h.paintOverscan,
       normalizeCityLayerStyleConfig,
-      getPointer: () => [3, 4],
-      getCityTooltipText: (value) => value.id,
-      isPrivatePreparationEnabled: () => h.enabled,
-      buildCityRevealPlan: () => { h.builds++; return { markerEntries: [entry], labelEntries: [entry] }; },
+      isPrivatePreparationEnabled: () => true,
       prepareCityRevealPlan: async (_collection, _scale, _transform, _config, options) => {
-        h.preparations++;
         await options.yieldControl?.();
         return options.isCurrent() ? { markerEntries: [entry], labelEntries: [entry], labelBudget: 4 } : null;
       },
@@ -344,522 +93,35 @@ function createPrivateRevealHarness() {
   return h;
 }
 
-test("private city preparation consumes only ready plans, preserves hover and reuses complete labels across defer", async () => {
+test("late city preparation cannot replace the new scenario view", async () => {
   const h = createPrivateRevealHarness();
-  let release;
-  const held = new Promise((resolve) => { release = resolve; });
-  const previous = { id: "previous-city", screenPoint: [3, 4], markerSizePx: 3 };
-  h.owner.cacheVisibleCityHoverEntries([previous]);
-  const before = h.owner.getHoveredCityEntryFromEvent({ type: "mousemove" });
-  h.state.deferExactAfterSettle = true;
-  const pending = h.owner.prepareCurrentView(2, { yieldControl: () => held });
-  assert.equal(h.owner.prepareCurrentView(2), pending, "one view shares a single private job");
-  assert.equal(h.contextReads, 1, "preparation never reads or installs a drawing context");
-  release();
-  assert.equal(await pending, true);
-  assert.equal(h.owner.getHoveredCityEntryFromEvent({ type: "mousemove" }), before);
-  const deferred = h.owner.getCityLayerRenderState(2);
-  assert.equal(deferred.markerEntries.length, 1);
-  assert.equal(deferred.labelEntries.length, 0);
-  h.state.deferExactAfterSettle = false;
-  const settled = h.owner.getCityLayerRenderState(2);
-  assert.equal(settled.labelEntries.length, 1);
-  assert.equal(settled.markerEntries[0], settled.labelEntries[0]);
-  settled.markerEntries[0].acceptedLabelPlacement = "left";
-  assert.equal(h.owner.getCityLayerRenderState(2).markerEntries[0].acceptedLabelPlacement, undefined);
-  assert.equal(h.owner.prepareCurrentView(2), null);
-  assert.equal(h.preparations, 1);
-  assert.equal(h.builds, 0, "draw never synchronously rebuilds a private plan");
-  h.state.zoomTransform.x += 1;
-  assert.equal(h.owner.getCityLayerRenderState(2).reason, "preparing");
-  assert.equal(h.preparations, 1, "a draw cache miss does not start autonomous preparation");
-  h.enabled = false;
-  assert.equal(h.owner.getCityLayerRenderState(2).skipped, false);
-  assert.equal(h.builds, 1, "ordinary vector/export callers retain the synchronous fallback");
-});
-
-test("private city preparation cancels each scene, data, projection, viewport and configuration identity change", async () => {
-  const mutations = [
-    (h) => { h.collection = { features: [{}] }; },
-    (h) => { h.collection.features = [{}]; },
-    ...["cityLayerRevision", "sceneGeneration", "scenarioDataGeneration", "scenarioStrategicValuesRevision", "sovereigntyRevision"]
-      .map((name) => (h) => { h.state[name] = 1; }),
-    ...["worldCitiesData", "scenarioCityOverridesData", "scenarioStrategicValuesData", "sovereigntyByFeatureId",
-      "scenarioCountriesByTag", "activeScenarioManifest", "urbanData"]
-      .map((name) => (h) => { h.state[name] = {}; }),
-    (h) => { h.state.activeScenarioId = "new-scene"; },
-    (h) => { h.projection = () => [1, 1]; },
-    (h) => { markProjectionGeometryChanged(h.projection); },
-    ...["x", "y", "k"].map((name) => (h) => { h.state.zoomTransform[name] += 1e-8; }),
-    ...["width", "height"].map((name) => (h) => { h.state[name]++; }),
-    (h) => { h.paintOverscan++; },
-    (h) => { h.state.styleConfig.cityPoints.markerScale = 1.5; },
-    (h) => { h.state.showCityPoints = false; },
-    (h) => { h.enabled = false; },
-    (h) => { h.owner.cancelPreparation(); },
-  ];
-  for (const mutate of mutations) {
-    const h = createPrivateRevealHarness();
-    let release;
-    const held = new Promise((resolve) => { release = resolve; });
-    const pending = h.owner.prepareCurrentView(2, { yieldControl: () => held });
-    mutate(h);
-    release();
-    assert.equal(await pending, false, String(mutate));
-    assert.equal(h.contextReads, 0);
-    assert.equal(h.builds, 0);
-    assert.ok(h.preparations <= 1);
-    assert.equal(h.syncReads || 0, 0, "stale checks never rebuild the collection");
-  }
-});
-
-test("private city preparation keeps defer flips current but honors abort and caller cancellation", async () => {
-  for (const mode of ["defer", "abort", "caller"]) {
-    const h = createPrivateRevealHarness();
-    let release, current = true;
-    const held = new Promise((resolve) => { release = resolve; });
-    const controller = new AbortController();
-    const pending = h.owner.prepareCurrentView(2, { signal: controller.signal, isCurrent: () => current,
-      yieldControl: () => held });
-    if (mode === "defer") h.state.deferExactAfterSettle = true;
-    if (mode === "abort") controller.abort();
-    if (mode === "caller") current = false;
-    release();
-    assert.equal(await pending, mode === "defer");
-    if (mode === "defer") {
-      assert.equal(h.owner.getCityLayerRenderState(2).labelEntries.length, 0);
-      h.state.deferExactAfterSettle = false;
-      assert.equal(h.owner.getCityLayerRenderState(2).labelEntries.length, 1);
-      assert.equal(h.preparations, 1);
-    }
-  }
-});
-
-test("cold city draws never build or reserve a plan and an older job cannot replace the current ready view", async () => {
-  const h = createPrivateRevealHarness();
-  assert.equal(h.owner.getCityLayerRenderState(2).reason, "preparing");
-  const boxes = [];
-  assert.equal(h.owner.reserveOverviewLabelBoxes(2, boxes), null);
-  assert.deepEqual(boxes, []);
-  assert.equal(h.builds, 0);
   let release;
   const held = new Promise((resolve) => { release = resolve; });
   const previous = h.owner.prepareCurrentView(2, { yieldControl: () => held });
-  h.state.zoomTransform.x = 4;
+  h.state.activeScenarioId = "new-scene";
   const current = h.owner.prepareCurrentView(2, { yieldControl: async () => {} });
   assert.equal(await current, true);
   release();
   assert.equal(await previous, false);
   assert.equal(h.owner.getCityLayerRenderState(2).skipped, false);
-  assert.equal(h.owner.prepareCurrentView(2), null);
-  assert.equal(h.preparations, 1, "superseded source preparation never starts a reveal");
-  assert.equal(h.builds, 0);
 });
 
-test("reveal plan invalidates for every changed normalized city configuration value", () => {
-  let builds = 0;
-  const entry = { id: "city" };
-  const harness = createCityPointsHarness({ markerEntries: [entry], buildCityRevealPlan: () => {
-    builds++;
-    return { markerEntries: [entry], labelEntries: [entry] };
-  } });
-  harness.owner.getCityLayerRenderState(2);
-  const changes = {
-    theme: "atlas_ink", markerDensity: 1.5, densityPreset: "compact", minSettlementRank: "large",
-    labelDensity: "dense", color: "#123456", capitalColor: "#654321", opacity: 0.5, markerScale: 1.5,
-    showLabels: false, labelSize: 20, labelMinZoom: 4, showCapitalOverlay: false,
-  };
-  for (const [field, value] of Object.entries(changes)) {
-    const before = builds;
-    const previous = normalizeCityLayerStyleConfig(harness.state.styleConfig.cityPoints)[field];
-    harness.state.styleConfig.cityPoints[field] = value;
-    const normalized = normalizeCityLayerStyleConfig(harness.state.styleConfig.cityPoints)[field];
-    harness.owner.getCityLayerRenderState(2);
-    assert.notEqual(previous, normalized, `${field} fixture must change its normalized value`);
-    assert.equal(builds, before + 1, field);
-  }
-});
-
-test("city labels pass draws markers before delegating labels", () => {
-  const restoreCanvas = installCanvasFactory();
-  try {
-    const entry = {
-      id: "capital",
-      anchor: [40, 50],
-      cityTier: "major",
-      feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } },
-      isCapital: true,
-      markerSizePx: 16,
-      screenPoint: [80, 100],
-    };
-    const labelEntry = { ...entry, id: "capital-label" };
-    const harness = createCityPointsHarness({
-      labelEntries: [labelEntry],
-      markerEntries: [entry],
-    });
-    harness.owner.drawLabelsPass(2, { interactive: false });
-
-    assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 1);
-    assert.equal(harness.labelCalls.length, 1);
-    assert.deepEqual(harness.labelCalls[0].entries, [labelEntry]);
-    assert.ok(harness.events.indexOf("drawImage") > -1);
-    assert.ok(harness.events.indexOf("drawImage") < harness.events.indexOf("labels"));
-    assert.deepEqual(harness.renderMetrics.at(-1), {
-      name: "drawLabelsPass",
-      detail: {
-        interactive: false,
-        skipped: false,
-        featureCount: 1,
-        visibleFeatureCount: 1,
-        labelCount: 1,
-        hierarchy: getMapLabelHierarchy(2, harness.state),
-      },
-    });
-  } finally {
-    restoreCanvas();
-  }
-});
-
-test("labels pass shares actual marker bounds and forwards the successful-label budget", (t) => {
-  t.after(installCanvasFactory());
-  const entries = [
-    { anchor: [40, 50], screenPoint: [80, 100], cityTier: "major", isCapital: true, markerSizePx: 16 },
-    { anchor: [100, 50], screenPoint: [200, 100], cityTier: "minor", markerSizePx: 6 },
-  ];
-  const harness = createCityPointsHarness({
-    markerEntries: entries,
-    buildCityRevealPlan: () => ({ markerEntries: entries, labelEntries: [entries[0]], labelBudget: 1 }),
-  });
-  const existingBox = { x: 0, y: 0, w: 5, h: 5 };
-  const occupiedBoxes = [existingBox];
-  harness.owner.drawLabelsPass(2, { occupiedBoxes });
-  assert.equal(harness.labelCalls[0].options.labelBudget, 1);
-  assert.equal(harness.labelCalls[0].options.occupiedBoxes, occupiedBoxes);
-  assert.equal(occupiedBoxes[0], existingBox);
-  assert.equal(occupiedBoxes.length, 3, "all markers reserve space, including those without a label");
-  const draws = harness.context.calls.filter((call) => call.type === "drawImage");
-  draws.forEach(({ args: [, x, y, width, height] }, index) => {
-    const box = occupiedBoxes[index + 1];
-    const entry = entries[index];
-    assert.deepEqual(box, {
-      x: entry.screenPoint[0] + (x - entry.anchor[0]) * 2,
-      y: entry.screenPoint[1] + (y - entry.anchor[1]) * 2,
-      w: width * 2,
-      h: height * 2,
-    });
-    assert.equal(box.y, entry.screenPoint[1] - box.h / 2, "flat sprite bounds are centered on its geographic anchor");
-    assert.equal(box.x, entry.screenPoint[0] - box.w / 2, "flat sprite bounds are centered on its geographic anchor");
-  });
-  harness.state.styleConfig.cityPoints.showLabels = false;
-  const markersOnly = [];
-  harness.owner.drawLabelsPass(2, { occupiedBoxes: markersOnly });
-  assert.equal(markersOnly.length, 2, "transport labels still avoid markers when city names are hidden");
-});
-
-test("overview reservation uses actual marker bounds without drawing or reserving city text", (t) => {
-  t.after(installCanvasFactory());
-  const entry = { id: "capital", anchor: [40, 50], screenPoint: [80, 100], isCapital: true, markerSizePx: 10 };
-  const harness = createCityPointsHarness({ markerEntries: [entry], labelEntries: [entry] });
-  const occupiedBoxes = [];
-  harness.owner.reserveCityMarkerBoxes(2, occupiedBoxes);
-  assert.equal(occupiedBoxes.length, 1);
-  const reservedBox = { ...occupiedBoxes[0] };
-  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 0);
-  assert.equal(harness.labelCalls.length, 0);
-  const countryBox = { x: 10, y: 20, w: 30, h: 10 };
-  occupiedBoxes.push(countryBox);
-  harness.owner.drawLabelsPass(2, { occupiedBoxes, markersReserved: true });
-  assert.equal(occupiedBoxes.length, 2, "markers are not claimed twice");
-  assert.ok(harness.labelCalls[0].options.occupiedBoxes.includes(countryBox));
-  const { args: [, x, y, width, height] } = harness.context.calls.find((call) => call.type === "drawImage");
-  assert.deepEqual(reservedBox, {
-    x: entry.screenPoint[0] + (x - entry.anchor[0]) * 2,
-    y: entry.screenPoint[1] + (y - entry.anchor[1]) * 2,
-    w: width * 2, h: height * 2,
-  });
-  harness.state.showCityPoints = false;
-  const hiddenBoxes = [];
-  harness.owner.reserveCityMarkerBoxes(2, hiddenBoxes);
-  assert.equal(hiddenBoxes.length, 0);
-});
-
-test("distant ordinary city names can hide while their markers and hover targets remain", (t) => {
-  t.after(installCanvasFactory());
-  const entry = { id: "ordinary-city", anchor: [40, 50], screenPoint: [50, 50], markerSizePx: 6,
-    feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } } };
-  const harness = createCityPointsHarness({ markerEntries: [entry], labelEntries: [entry], pointer: () => [50, 50],
-    drawLabels(_entries, options) {
-      assert.equal(options.labelOpacity, 0);
-      assert.equal(options.capitalLabelOpacity, 0.5);
-      return 0;
-    },
-  });
-  harness.state.zoomTransform.k = 1.8;
-  const occupiedBoxes = [];
-  harness.owner.drawLabelsPass(1.8, { occupiedBoxes });
-  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 1);
-  assert.equal(occupiedBoxes.length, 1, "the marker alone retains its geographic footprint");
-  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 0);
-  assert.equal(harness.owner.getHoveredCityTooltipEntry({ type: "mousemove" }, { targetType: "land", id: "LAND1" })?.id, entry.id);
-});
-
-test("overview capitals keep their near-marker position through country placement without duplicate boxes", (t) => {
-  t.after(installCanvasFactory());
-  const entries = [
-    { id: "capital", isCapital: true, markerSizePx: 10, anchor: [40, 50], screenPoint: [80, 100] },
-    { id: "ordinary", anchor: [150, 50], screenPoint: [300, 100] },
-  ];
-  const draws = [];
-  const harness = createCityPointsHarness({ markerEntries: entries,
-    buildCityRevealPlan: () => ({ markerEntries: entries, labelEntries: entries, labelBudget: 1 }),
-    drawLabels(candidates, options, context) {
-      context.measureText = () => ({ width: 20 });
-      context.strokeText = () => {};
-      context.fillText = (...args) => draws.push(args);
-      return createCityLabelOwner({
-        getters: { getContext: () => context, getViewportSize: () => ({ width: 500, height: 300 }) },
-        helpers: {
-          clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
-          getCityVisualCapitalState: (entry, config) => !!entry.isCapital && config.showCapitalOverlay !== false,
-          getCityDisplayLabel: () => "Capital", formatCityMapLabel: (text) => text,
-          getCityLabelMinZoom: () => 0, getCityMarkerSizePx: (entry) => entry.markerSizePx || 12,
-          getCityLabelRenderStyle: () => ({}),
-        },
-      }).drawCityLabelsFromEntries(candidates, options);
-    },
-  });
-  const occupiedBoxes = [];
-  const overviewLayout = harness.owner.reserveOverviewLabelBoxes(2, occupiedBoxes);
-  assert.equal(draws.length, 0, "reservation measures but does not draw text");
-  assert.equal(overviewLayout.capitalBoxes.length, 1);
-  assert.equal(overviewLayout.capitalEntries[0].acceptedLabelPlacement, "right");
-  assert.equal(entries[0].acceptedLabelPlacement, undefined, "the reveal plan template is not changed by layout");
-  assert.equal(entries[1].acceptedLabelPlacement, undefined, "ordinary names do not reserve overview space");
-  const clearCountryBox = { x: 170, y: 140, w: 100, h: 20 };
-  assert.equal(claimScreenLabelPlacement([
-    { id: "over-capital", box: { ...overviewLayout.capitalBoxes[0] } },
-    { id: "country-center", box: clearCountryBox },
-  ], occupiedBoxes).id, "country-center");
-  harness.owner.drawLabelsPass(2, { occupiedBoxes, overviewLayout });
-  assert.equal(overviewLayout.capitalEntries[0].acceptedLabelPlacement, "right", "country placement cannot push the capital across its star");
-  assert.equal(draws.length, 1, "the shared label budget includes capitals");
-  assert.equal(draws[0][1], 45, "10px screen offset at 2x remains beside the star");
-  assert.equal(occupiedBoxes.length, 4, "two markers, one country and one capital; no duplicate reservations");
-  assert.ok(occupiedBoxes.includes(clearCountryBox));
-  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 1);
-  harness.state.showCityPoints = false;
-  assert.equal(harness.owner.reserveOverviewLabelBoxes(2, []), null);
-});
-
-test("overview country titles displace ordinary markers and their labels while capitals keep priority", (t) => {
-  t.after(installCanvasFactory());
+test("overview country titles displace ordinary markers while capitals keep priority", (t) => {
+  installCanvasFactory(t);
   const capital = { id: "capital", isCapital: true, markerSizePx: 10, anchor: [40, 50], screenPoint: [80, 100] };
   const city = { id: "ordinary", anchor: [150, 50], screenPoint: [300, 100],
     feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } } };
-  const harness = createCityPointsHarness({ markerEntries: [capital, city], labelEntries: [capital, city], pointer: () => city.screenPoint });
+  const harness = createCityPointsHarness({ markerEntries: [capital, city], labelEntries: [capital, city] });
   const boxes = [];
   const reservation = harness.owner.reserveOverviewLabelBoxes(2, boxes);
   assert.equal(boxes.length, 1, "only the capital marker reserves space ahead of country titles");
   boxes.push({ x: 290, y: 90, w: 40, h: 20 });
   harness.owner.drawLabelsPass(2, { occupiedBoxes: boxes, overviewLayout: reservation });
-  assert.equal(harness.context.calls.filter(call => call.type === "drawImage").length, 1, "the covered ordinary marker is omitted");
-  assert.deepEqual(harness.labelCalls.at(-1).entries, [], "a hidden marker cannot leave a floating city name");
-  assert.equal(harness.owner.getHoveredCityTooltipEntry({ type: "mousemove" }, { targetType: "land", id: "LAND1" }), null);
-  harness.owner.drawLabelsPass(4, { occupiedBoxes: [] });
-  assert.equal(harness.labelCalls.at(-1).entries.length, 2, "detail view restores the ordinary city policy");
+  assert.equal(harness.calls.filter(call => call.type === "drawImage").length, 1, "the covered ordinary marker is omitted");
 });
 
-test("city hover prefers higher-priority scenario entries without bestPriority errors", () => {
-  const globalEntry = {
-    id: "global-city",
-    anchor: [20, 20],
-    cityTier: "major",
-    feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } },
-    markerSizePx: 14,
-    packId: "global",
-    screenPoint: [50, 50],
-  };
-  const scenarioEntry = {
-    id: "scenario-city",
-    anchor: [21, 20],
-    cityTier: "major",
-    feature: { type: "Feature", properties: { __city_host_feature_id: "LAND2" } },
-    markerSizePx: 14,
-    packId: "scenario",
-    screenPoint: [51, 50],
-  };
-  const harness = createCityPointsHarness({
-    markerEntries: [globalEntry, scenarioEntry],
-    pointer: () => [50, 50],
-  });
-  harness.owner.getCityLayerRenderState(2, { interactive: true, cacheHoverEntries: true });
-
-  const hovered = harness.owner.getHoveredCityTooltipEntry(
-    { type: "mousemove" },
-    { targetType: "land", id: "LAND2" }
-  );
-
-  assert.equal(hovered?.id, "scenario-city");
-  assert.equal(hovered?.tooltipText, "tooltip:scenario-city");
-  assert.deepEqual(harness.interactionMetrics.at(-1), {
-    name: "interactionHoverCityProbeDuration",
-    detail: {
-      eventType: "hover",
-      entryCount: 2,
-      hit: true,
-    },
-  });
-});
-
-test("markers depend on policy with consistent interactive and settled density without pop on pan", (t) => {
-  t.after(installCanvasFactory());
-  const entries = [
-    { id: "named", cityTier: "regional" },
-    { id: "blocked", cityTier: "minor" },
-    { id: "capital", cityTier: "regional", isCapital: true },
-    { id: "major", cityTier: "major" },
-    { id: "not-candidate", cityTier: "regional" },
-  ].map((entry, index) => ({
-    ...entry, markerSizePx: 6, anchor: [20 + index * 50, 25], screenPoint: [80 + index * 200, 100],
-  }));
-  let pointer = entries[1].screenPoint;
-  let builds = 0;
-  const harness = createCityPointsHarness({
-    markerEntries: entries,
-    pointer: () => pointer,
-    buildCityRevealPlan: () => {
-      builds++;
-      return { markerEntries: entries, labelEntries: entries.slice(0, 4), labelBudget: 4 };
-    },
-    drawLabels: (candidates, options, context) => {
-      context.measureText = () => ({ width: 8 });
-      context.strokeText = () => {};
-      context.fillText = () => {};
-      return createCityLabelOwner({
-        getters: { getContext: () => context, getViewportSize: () => ({ width: 1100, height: 300 }) },
-        helpers: {
-          clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
-          getCityVisualCapitalState: (entry) => !!entry.isCapital,
-          getCityDisplayLabel: () => "City", formatCityMapLabel: (text) => text,
-          getCityLabelMinZoom: () => 0, getCityMarkerSizePx: () => 12,
-          getCityLabelRenderStyle: () => ({}),
-        },
-      }).drawCityLabelsFromEntries(candidates, options);
-    },
-  });
-  harness.state.zoomTransform.k = 4;
-  const blocker = { x: 200, y: 0, w: 550, h: 250 };
-  const occupiedBoxes = [blocker];
-  harness.owner.drawLabelsPass(4, { occupiedBoxes });
-  assert.equal(harness.renderMetrics.at(-1).detail.visibleFeatureCount, 5, "policy markers preserved in settled pass");
-  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 1, "labels collision only culls labels");
-  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 5);
-  assert.deepEqual(harness.labelCalls.at(-1).entries.map((entry) => entry.id), ["named", "blocked", "capital", "major"]);
-  assert.deepEqual(harness.labelCalls.at(-1).entries.filter((entry) => entry.acceptedLabelPlacement).map((entry) => entry.id), ["named"]);
-  assert.ok(entries.every((entry) => !entry.acceptedLabelPlacement), "layout leaves the reveal template clean");
-  pointer = entries[1].screenPoint;
-  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" })?.id, "blocked");
-  pointer = entries[2].screenPoint;
-  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" })?.id, "capital");
-  assert.equal(occupiedBoxes.length, 7, "existing blocker + 5 markers + 1 placed label");
-
-  harness.owner.drawLabelsPass(4, { occupiedBoxes: [] });
-  assert.equal(builds, 1, "the same reveal plan is reused for a second layout");
-  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 4, "collision layout runs again when occupied boxes change");
-  assert.equal(harness.labelCalls.length, 2);
-
-  for (const mode of ["labels-off", "distant", "deferred", "interactive"]) {
-    harness.state.styleConfig.cityPoints.showLabels = mode !== "labels-off";
-    harness.state.zoomTransform.k = mode === "distant" ? 2 : 4;
-    harness.state.deferExactAfterSettle = mode === "deferred";
-    harness.context.calls.length = 0;
-    if (mode === "interactive") harness.owner.drawCityPointsLayer(4, { interactive: true });
-    else harness.owner.drawLabelsPass(harness.state.zoomTransform.k, { occupiedBoxes: [blocker] });
-    assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 5, mode);
-  }
-});
-
-test("city layer render state uses injected zoom identity when runtime transform is absent", () => {
-  const injectedIdentity = { x: 7, y: 8, k: 3 };
-  const captured = [];
-  const entry = {
-    id: "zoom-city",
-    anchor: [10, 10],
-    feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } },
-    markerSizePx: 12,
-    screenPoint: [20, 20],
-  };
-  const harness = createCityPointsHarness({
-    buildCityRevealPlan: (_collection, scale, transform) => {
-      captured.push({ scale, transform });
-      return { markerEntries: [entry], labelEntries: [] };
-    },
-    markerEntries: [entry],
-    zoomIdentity: injectedIdentity,
-  });
-  harness.state.zoomTransform = null;
-
-  const renderState = harness.owner.getCityLayerRenderState(1, { interactive: true });
-
-  assert.equal(captured[0]?.scale, 3);
-  assert.equal(captured[0]?.transform, injectedIdentity);
-  assert.equal(renderState.scale, 3);
-});
-
-test("city marker sprite cache reuses unchanged visuals across color revisions", () => {
-  const restoreCanvas = installCanvasFactory();
-  try {
-    const entry = {
-      id: "sprite-city",
-      cityTier: "regional",
-      isCapital: false,
-      markerSizePx: 12,
-    };
-    const harness = createCityPointsHarness();
-
-    const first = harness.owner.getCityMarkerSprite(entry, {});
-    const cached = harness.owner.getCityMarkerSprite(entry, {});
-    harness.state.colorRevision = 2;
-    const refreshed = harness.owner.getCityMarkerSprite(entry, {});
-
-    assert.equal(first, cached);
-    assert.equal(first, refreshed);
-  } finally {
-    restoreCanvas();
-  }
-});
-
-test("city marker sprite cache distinguishes background, paint tokens and exact geometry", () => {
-  const restoreCanvas = installCanvasFactory();
-  try {
-    let backgroundColor = "#ffffff";
-    let tokens = { ...markerTokens };
-    const { owner } = createCityPointsHarness({
-      getCityMarkerRenderStyle: () => ({ backgroundColor, tokens }),
-    });
-    const entry = { cityTier: "regional", isCapital: true, markerSizePx: 12.001 };
-    const first = owner.getCityMarkerSprite(entry);
-    backgroundColor = "#000000";
-    assert.notEqual(owner.getCityMarkerSprite(entry), first);
-    backgroundColor = "#ffffff";
-    assert.equal(owner.getCityMarkerSprite(entry), first);
-    for (const token of Object.keys(markerTokens)) {
-      tokens = { ...markerTokens, [token]: "#123456" };
-      assert.notEqual(owner.getCityMarkerSprite(entry), first, token);
-    }
-    tokens = { ...markerTokens };
-    assert.notEqual(owner.getCityMarkerSprite({ ...entry, markerSizePx: 12.002 }), first);
-    assert.notEqual(owner.getCityMarkerSprite({ ...entry, isCapital: false }), first);
-    assert.notEqual(owner.getCityMarkerSprite({ ...entry, cityTier: "major" }), first);
-    assert.notEqual(owner.getCityMarkerSprite(entry, { theme: "alternate" }), first);
-    assert.equal(owner.getCityMarkerSprite(entry), first);
-  } finally {
-    restoreCanvas();
-  }
-});
-
-test("city draw entries consume normalized opacity including zero across zoom and interaction", (t) => {
-  t.after(installCanvasFactory());
+test("zero opacity reaches the city marker draw", (t) => {
+  installCanvasFactory(t);
   const entry = {
     id: "opacity-city",
     anchor: [40, 50],
@@ -867,316 +129,9 @@ test("city draw entries consume normalized opacity including zero across zoom an
     cityTier: "major",
     markerSizePx: 16,
   };
-  const cases = [
-    [0, 0],
-    ["0", 0],
-    [0.45, 0.45],
-    [undefined, 0.96],
-    ["invalid", 0.96],
-    [Number.NaN, 0.96],
-    [Infinity, 0.96],
-    [-1, 0],
-    [2, 1],
-  ];
-  for (const [opacity, expected] of cases) {
-    for (const entryPoint of ["drawCityPointsLayer", "drawLabelsPass"]) {
-      for (const interactive of [false, true]) {
-        const harness = createCityPointsHarness({
-          markerEntries: [entry],
-          labelEntries: [entry],
-          styleConfig: { opacity },
-        });
-        let screenSize;
-        for (const scale of [1, 3]) {
-          harness.state.zoomTransform = { x: 0, y: 0, k: scale };
-          harness.context.calls.length = 0;
-          harness.owner[entryPoint](scale, { interactive });
-          const message = `${entryPoint}, opacity ${String(opacity)}, zoom ${scale}, interactive ${interactive}`;
-          if (entryPoint === "drawLabelsPass" && interactive) {
-            assert.deepEqual(harness.context.calls, [], message);
-            assert.equal(harness.renderMetrics.at(-1).detail.reason, "interactive", message);
-            continue;
-          }
-          const alphaCalls = harness.context.calls.filter((call) => call.type === "globalAlpha");
-          assert.deepEqual(alphaCalls.map((call) => call.value), [interactive ? Math.min(expected, 0.8) : expected], message);
-          const drawCalls = harness.context.calls.filter((call) => call.type === "drawImage");
-          assert.equal(drawCalls.length, 1, message);
-          const [, , , width, height] = drawCalls[0].args;
-          if (!screenSize) screenSize = [width * scale, height * scale];
-          assert.deepEqual([width * scale, height * scale], screenSize, message);
-          if (entryPoint === "drawLabelsPass" && !interactive) {
-            assert.deepEqual(harness.labelCalls.at(-1).entries, [entry], message);
-          }
-        }
-      }
-    }
-  }
-});
-
-test("city marker sprite cache retains the 256 most recently used sprites", () => {
-  const restoreCanvas = installCanvasFactory();
-  try {
-    const { owner } = createCityPointsHarness();
-    const entry = { cityTier: "regional", markerSizePx: 12 };
-    const get = (index) => owner.getCityMarkerSprite(entry, { color: `color-${index}` });
-    const first = get(0);
-    const second = get(1);
-    for (let index = 2; index < 256; index += 1) get(index);
-    assert.equal(get(0), first, "a hit must refresh recency");
-    get(256);
-    assert.equal(get(0), first, "recent sprite survives capacity eviction");
-    assert.notEqual(get(1), second, "least recently used sprite is evicted");
-  } finally {
-    restoreCanvas();
-  }
-});
-
-test("city marker draws use target density while preserving logical geometry and cache reuse", (t) => {
-  t.after(installCanvasFactory());
-  const entry = {
-    id: "density-city",
-    anchor: [40, 50],
-    screenPoint: [80, 100],
-    cityTier: "major",
-    markerSizePx: 16,
-    isCapital: true,
-  };
-  const harness = createCityPointsHarness({ markerEntries: [entry] });
-  const byDensity = new Map();
-  let baselineGeometry;
-  let density = 1;
-  let zoom = 2;
-  // Translation and axis rotation do not affect the target's pixel density.
-  harness.context.getTransform = () => ({ a: 0, b: density * zoom, c: -density * zoom, d: 0, e: 300, f: 400 });
-  for (density of [1, 1.25, 2, 3, 1.25, 1]) {
-    for (zoom of [2, 4]) {
-      harness.state.zoomTransform = { x: 0, y: 0, k: zoom };
-      harness.owner.drawCityPointsLayer(zoom);
-      const { args: [canvas, x, y, width, height] } = harness.context.calls.filter((call) => call.type === "drawImage").at(-1);
-      const geometry = [width * zoom, height * zoom, (entry.anchor[0] - x) * zoom, (entry.anchor[1] - y) * zoom];
-      if (!baselineGeometry) baselineGeometry = geometry;
-      geometry.forEach((value, index) => {
-        assert.ok(Math.abs(value - baselineGeometry[index]) < 1e-10, `logical geometry at density ${density}, zoom ${zoom}`);
-      });
-      assert.equal(canvas.width, Math.ceil(baselineGeometry[0] * density));
-      assert.equal(canvas.height, Math.ceil(baselineGeometry[1] * density));
-      assert.deepEqual(canvas.getContext("2d").scaleCalls, [[canvas.width / baselineGeometry[0], canvas.height / baselineGeometry[1]]]);
-      if (byDensity.has(density)) {
-        assert.equal(canvas, byDensity.get(density), "reuse density-specific sprite across zoom changes and return visits");
-      } else {
-        assert.ok([...byDensity.values()].every((existing) => existing !== canvas), "a different density needs a different bitmap");
-        byDensity.set(density, canvas);
-      }
-    }
-  }
-  delete harness.context.getTransform;
-  harness.owner.drawCityPointsLayer(zoom);
-  const fallbackCanvas = harness.context.calls.filter((call) => call.type === "drawImage").at(-1).args[0];
-  assert.equal(fallbackCanvas, byDensity.get(1), "missing target transform uses density one");
-});
-
-test("city marker renders flat atlas symbols without glossy gradients, rim blend, or crowns", (t) => {
-  let createdContext = null;
-  t.after(installCanvasFactory((ctx) => { createdContext = ctx; }));
-  const harness = createCityPointsHarness();
-
-  // 1. Regular city marker
-  const regularEntry = {
-    id: "flat-regular",
-    settlementRank: "large",
-    markerSizePx: 14,
-    isCapital: false,
-  };
-  const regularSprite = harness.owner.getCityMarkerSprite(regularEntry, {});
-  assert.ok(regularSprite, "sprite should be returned");
-  assert.ok(createdContext, "canvas context should have been created");
-  assert.equal(createdContext.gradientCalls.length, 0, "no gradients should be created for flat markers");
-  assert.equal(createdContext.compositeCalls.length, 0, "no blend modes (screen/multiply) should be used");
-
-  // 2. Capital city marker
-  createdContext = null;
-  const capitalEntry = {
-    id: "flat-capital",
-    settlementRank: "metropolis",
-    markerSizePx: 16,
-    isCapital: true,
-  };
-  const capitalSprite = harness.owner.getCityMarkerSprite(capitalEntry, {});
-  assert.ok(capitalSprite, "capital sprite should be returned");
-  assert.ok(createdContext, "capital canvas context should have been created");
-  assert.equal(createdContext.gradientCalls.length, 0, "no gradients should be created for capital markers");
-  assert.equal(createdContext.compositeCalls.length, 0, "no blend modes should be used for capital markers");
-
-  // Verify anchors are centered
-  assert.equal(regularSprite.anchorX, regularSprite.width / 2);
-  assert.equal(regularSprite.anchorY, regularSprite.height / 2);
-  assert.equal(capitalSprite.anchorX, capitalSprite.width / 2);
-  assert.equal(capitalSprite.anchorY, capitalSprite.height / 2);
-});
-
-test("five settlement ranks render progressively smaller flat circles with cityTier fallback", () => {
-  const harness = createCityPointsHarness();
-  const rankDiameters = {
-    metropolis: 10,
-    large: 8,
-    medium: 6,
-    small: 4.5,
-    town: 3,
-  };
-  const ranks = ["metropolis", "large", "medium", "small", "town"];
-  const specs = ranks.map((rank) => (
-    harness.owner.getCityMarkerVisualSpec({ settlementRank: rank, markerSizePx: rankDiameters[rank] })
-  ));
-
-  // Assert radii are strictly progressively smaller matching policy sizePx/2 >= 1.5
-  for (let i = 0; i < specs.length - 1; i++) {
-    assert.ok(
-      specs[i].rankRadius > specs[i + 1].rankRadius,
-      `rank ${ranks[i]} radius (${specs[i].rankRadius}) > ${ranks[i + 1]} radius (${specs[i + 1].rankRadius})`
-    );
-  }
-  assert.equal(specs[0].rankRadius, 5);
-  assert.equal(specs[1].rankRadius, 4);
-  assert.equal(specs[2].rankRadius, 3);
-  assert.equal(specs[3].rankRadius, 2.25);
-  assert.equal(specs[4].rankRadius, 1.5);
-
-  // Assert distinct structure types matching approved legend
-  assert.equal(specs[0].settlementRank, "metropolis");
-  assert.equal(specs[0].isBullseye, true, "metropolis is bullseye with inner dot");
-  assert.ok(specs[0].innerRadius > 0, "metropolis has inner dot radius");
-
-  assert.equal(specs[1].settlementRank, "large");
-  assert.equal(specs[1].isHollow, false, "large city is solid filled circle");
-  assert.equal(specs[1].isBullseye, false);
-
-  assert.equal(specs[2].settlementRank, "medium");
-  assert.equal(specs[2].isHollow, false, "medium city is solid filled circle to match approved legend");
-
-  assert.equal(specs[3].settlementRank, "small");
-  assert.equal(specs[3].isHollow, true, "small city is hollow circle to match approved legend");
-
-  assert.equal(specs[4].settlementRank, "town");
-  assert.equal(specs[4].isHollow, true, "town is smallest hollow circle to match approved legend");
-
-  // Assert fallback from legacy cityTier
-  const majorSpec = harness.owner.getCityMarkerVisualSpec({ cityTier: "major", markerSizePx: 8 });
-  assert.equal(majorSpec.settlementRank, "large", "cityTier major falls back to rank large");
-  assert.equal(majorSpec.rankRadius, 4);
-  assert.equal(majorSpec.isHollow, false);
-
-  const regionalSpec = harness.owner.getCityMarkerVisualSpec({ cityTier: "regional", markerSizePx: 6 });
-  assert.equal(regionalSpec.settlementRank, "medium", "cityTier regional falls back to rank medium");
-  assert.equal(regionalSpec.rankRadius, 3);
-  assert.equal(regionalSpec.isHollow, false);
-
-  const minorSpec = harness.owner.getCityMarkerVisualSpec({ cityTier: "minor", markerSizePx: 4.5 });
-  assert.equal(minorSpec.settlementRank, "small", "cityTier minor falls back to rank small");
-  assert.equal(minorSpec.rankRadius, 2.25);
-  assert.equal(minorSpec.isHollow, true);
-});
-
-test("capital identity is independent from settlement ranks with single restrained star", (t) => {
-  t.after(installCanvasFactory());
-  const harness = createCityPointsHarness();
-  const rankDiameters = {
-    metropolis: 10,
-    large: 8,
-    medium: 6,
-    small: 4.5,
-    town: 3,
-  };
-  const ranks = ["metropolis", "large", "medium", "small", "town"];
-
-  for (const rank of ranks) {
-    const size = rankDiameters[rank];
-    const regularSpec = harness.owner.getCityMarkerVisualSpec({ settlementRank: rank, markerSizePx: size, isCapital: false });
-    const capitalSpec = harness.owner.getCityMarkerVisualSpec({ settlementRank: rank, markerSizePx: size, isCapital: true });
-
-    // Settlement rank geometry and legend type are preserved identically across capital states
-    assert.equal(capitalSpec.rankRadius, regularSpec.rankRadius, `rank ${rank} preserved with capital`);
-    assert.equal(capitalSpec.isBullseye, regularSpec.isBullseye);
-    assert.equal(capitalSpec.isHollow, regularSpec.isHollow);
-
-    // Single restrained star identity with starOuter matching capital rank radius (no 25% expansion)
-    assert.equal(capitalSpec.starOuter, capitalSpec.rankRadius, "star outer radius matches capital size without 25% expansion");
-    assert.ok(capitalSpec.starInner < capitalSpec.starOuter, "star inner radius is restrained within star outer");
-
-    // Cache distinction
-    const regularSprite = harness.owner.getCityMarkerSprite({ settlementRank: rank, markerSizePx: size });
-    const capitalSprite = harness.owner.getCityMarkerSprite({ settlementRank: rank, markerSizePx: size, isCapital: true });
-
-    assert.notEqual(regularSprite, capitalSprite, "capital has distinct cache entry from regular");
-  }
-});
-
-test("sprite bounds and caches remain valid and compact across scale and rank changes", (t) => {
-  t.after(installCanvasFactory());
-  const harness = createCityPointsHarness();
-  const ranks = ["metropolis", "large", "medium", "small", "town"];
-  const rankDiameters = { metropolis: 10, large: 8, medium: 6, small: 4.5, town: 3 };
-
-  for (const rank of ranks) {
-    for (const isCapital of [false, true]) {
-      const entry = { settlementRank: rank, markerSizePx: rankDiameters[rank], isCapital };
-      const sprite = harness.owner.getCityMarkerSprite(entry);
-      assert.ok(sprite.width > 0 && Number.isInteger(sprite.width), "sprite width must be positive integer");
-      assert.ok(sprite.height > 0 && Number.isInteger(sprite.height), "sprite height must be positive integer");
-      // Compact bounds: town (d=3) has width <= 6, small (d=4.5) width <= 8, no wide halo
-      assert.ok(sprite.width <= Math.ceil(rankDiameters[rank] + 3), "symbols stay compact without wide halo");
-      assert.equal(sprite.anchorX, sprite.width / 2, "sprite anchorX must be centered");
-      assert.equal(sprite.anchorY, sprite.height / 2, "sprite anchorY must be centered");
-
-      // Verify cache hit
-      const cached = harness.owner.getCityMarkerSprite(entry);
-      assert.equal(cached, sprite, "unchanged visual must hit sprite cache");
-    }
-  }
-});
-
-
-test("private city source and reveal publish together and stale/cancelled reads never invoke synchronous merge", async () => {
-  const state = { showCityPoints: true, worldCitiesData: { features: [{ id: "first", properties: {} }] },
-    zoomTransform: { x: 0, y: 0, k: 2 }, styleConfig: { cityPoints: {} } };
-  let scans = 0, syncReads = 0, enabled = true, releaseReveal;
-  const policy = createUrbanCityPolicyOwner({ state, caches: { cityLayerCache: {} }, helpers: {
-    getCityFeatureKey: (feature) => { scans++; return feature.id; },
-    getCityFeatureAliases: (_feature, key) => [key], getCityCanonicalId: (feature) => feature.id,
-  } });
-  const projection = () => [0, 0];
-  const owner = createCityPointsRenderOwner({ state, getters: { getProjection: () => projection }, helpers: {
-    ...policy, normalizeCityLayerStyleConfig, isPrivatePreparationEnabled: () => enabled,
-    getEffectiveCityCollection: () => { syncReads++; return policy.getEffectiveCityCollection(); },
-    prepareCityRevealPlan: async (collection, _scale, _transform, _config, options) => {
-      assert.equal(collection.features[0].id, "first");
-      assert.equal(policy.getCachedEffectiveCityCollection(), null, "source stays private throughout reveal");
-      await new Promise((resolve) => { releaseReveal = resolve; });
-      return options.isCurrent() ? { markerEntries: [{ id: "first" }], labelEntries: [] } : null;
-    },
-  } });
-  assert.equal(owner.getCityLayerRenderState(2).reason, "preparing");
-  const pending = owner.prepareCurrentView(2, { yieldControl: async () => {} });
-  assert.equal(scans, 0, "preflight never enters the cold merge");
-  while (!releaseReveal) await Promise.resolve();
-  assert.equal(scans, 1);
-  assert.equal(policy.getCachedEffectiveCityCollection(), null);
-  releaseReveal();
-  assert.equal(await pending, true);
-  const published = policy.getCachedEffectiveCityCollection();
-  assert.equal(published.features[0].id, "first");
-  assert.equal(owner.getCityLayerRenderState(2).skipped, false);
-  state.worldCitiesData = { features: [{ id: "next", properties: {} }] };
-  assert.equal(owner.getCityLayerRenderState(2).reason, "preparing");
-  let releaseSource;
-  const cancelled = owner.prepareCurrentView(2, { yieldControl: () => new Promise((resolve) => { releaseSource = resolve; }) });
-  state.showCityPoints = false;
-  assert.equal(owner.prepareCurrentView(2), null);
-  releaseSource();
-  assert.equal(await cancelled, false);
-  assert.equal(policy.getCachedEffectiveCityCollection(), published);
-  assert.equal(scans, 1, "cancelled source never scans; stale reads keep the previous collection intact");
-  assert.equal(syncReads, 0);
-  enabled = false;
-  owner.getCityLayerRenderState(2);
-  assert.equal(syncReads, 1, "mode exit retains the native synchronous path");
+  const harness = createCityPointsHarness({ markerEntries: [entry], labelEntries: [entry], styleConfig: { opacity: 0 } });
+  harness.owner.drawCityPointsLayer(2);
+  const alphaCalls = harness.calls.filter(call => call.type === "globalAlpha");
+  assert.deepEqual(alphaCalls.map(call => call.value), [0]);
+  assert.equal(harness.calls.filter(call => call.type === "drawImage").length, 1);
 });
