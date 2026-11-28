@@ -20,6 +20,7 @@ export function createDevWorkspacePanel(bottomDock) {
   section.className = "dev-workspace-dock is-hidden";
   section.innerHTML = `
     <div class="dev-workspace-category-strip">
+      <span class="dev-quickbar-badge" aria-hidden="true">DEV</span>
       <div class="dev-workspace-category-tabs" role="tablist" aria-label="Development workspace sections" data-i18n-aria-label="Development workspace sections">
         <button id="devWorkspaceTabSelection" type="button" class="dev-workspace-category-tab is-active" data-dev-workspace-category="selection" role="tab" aria-selected="true" data-i18n="Selection">
           Selection
@@ -252,6 +253,13 @@ function updateToggleButton(toggleBtn) {
 function syncDockState(bottomDock, expanded) {
   if (!bottomDock) return;
   bottomDock.classList.toggle("dev-workspace-mode", expanded);
+  // 开发者栏与普通填色栏互斥：开发者模式下普通栏整块隐藏并移出焦点顺序，
+  // 只是隐藏不重建，工具、颜色等状态在切回时原样保留。
+  const dockPrimary = bottomDock.querySelector(".bottom-dock-primary");
+  if (dockPrimary) {
+    dockPrimary.hidden = expanded;
+    dockPrimary.inert = expanded;
+  }
   if (!expanded) return;
 
   runtimeState.ui.dockCollapsed = false;
