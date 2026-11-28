@@ -228,7 +228,6 @@ export function createContextLayerResolverOwner({
       && capability.hasOwnerMeta
       && !capability.hasCorruptBounds;
     capability.unavailableReason = getUrbanCapabilityUnavailableReason(capability);
-    if (capability.unavailableReason) console.warn(capability.unavailableReason);
     if (boundsComplete) cached.urbanCapability = capability;
     return capability;
   }
