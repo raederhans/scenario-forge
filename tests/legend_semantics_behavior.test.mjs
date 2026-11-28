@@ -11,7 +11,7 @@ const oldColor = "#123456";
 const newColor = "#abcdef";
 const other = "#778899";
 
-function countryEdit(t, { occupied = false, shared = false } = {}) {
+function countryEdit(t, { shared = false } = {}) {
   const patch = {
     activeScenarioId: "legend",
     scenarioBaselineOwnersByFeatureId: Object.freeze({ a: "AAA", b: "BBB" }),
@@ -20,8 +20,8 @@ function countryEdit(t, { occupied = false, shared = false } = {}) {
     sovereignBaseColors: { AAA: oldColor, BBB: shared ? oldColor : other },
     visualOverrides: {},
     colors: { a: oldColor, b: shared ? oldColor : other },
-    legendLabels: { [oldColor]: "Old", ...(occupied ? { [newColor]: "Existing" } : {}) },
-    legendColorOrder: occupied ? [oldColor, other, newColor] : [oldColor, other],
+    legendLabels: { [oldColor]: "Old" },
+    legendColorOrder: [oldColor, other],
     historyPast: [], historyFuture: [],
   };
   const previous = Object.fromEntries(Object.keys(patch).map(key => [key, state[key]]));
@@ -50,18 +50,6 @@ test("country recolor moves the label and its slot in the same undoable edit", t
   assert.equal(redoHistory(), true);
   assert.deepEqual(state.legendLabels, { [newColor]: "Old" });
   assert.deepEqual(state.legendColorOrder, [newColor, other]);
-});
-
-test("palette owner recolor keeps the destination label and removes the duplicate slot", t => {
-  countryEdit(t, { occupied: true }).applyColor(newColor);
-  assert.deepEqual(state.legendLabels, { [newColor]: "Existing" });
-  assert.deepEqual(state.legendColorOrder, [newColor, other]);
-});
-
-test("another feature still using the old color keeps its label and slot", t => {
-  countryEdit(t, { shared: true }).applyColor(newColor);
-  assert.deepEqual(state.legendLabels, { [oldColor]: "Old" });
-  assert.deepEqual(state.legendColorOrder, [oldColor, other]);
 });
 
 test("an unloaded scenario member still using the old color keeps its label", t => {

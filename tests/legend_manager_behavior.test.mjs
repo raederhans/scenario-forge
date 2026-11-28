@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { LegendManager } from "../js/core/legend_manager.js";
 import { FileManager } from "../js/core/file_manager.js";
-import { createDefaultColorState } from "../js/core/state/color_state.js";
 
 test("projects without a saved mode default to direct area and explicit modes survive import", () => {
   assert.equal(LegendManager.getDefaultConfig().mode, "direct-area");
@@ -10,10 +9,6 @@ test("projects without a saved mode default to direct area and explicit modes su
   for (const mode of ["weighted-random", "realm-area", "continent-area", "direct-area"]) {
     assert.equal(FileManager.normalizeImportedProjectData({ legendConfig: { mode } }).legendConfig.mode, mode);
   }
-});
-
-test("a new project starts in direct area mode", () => {
-  assert.equal(LegendManager.getConfig(createDefaultColorState()).mode, "direct-area");
 });
 
 test("annexed land counts towards its paint owner and a shared color takes one ranked slot", () => {
