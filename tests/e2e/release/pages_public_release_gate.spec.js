@@ -350,19 +350,18 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
       "hoi4-1936-europe-briefing",
       "hoi4-1939-europe-switch",
       "tno-1962-atlantropa-briefing",
+      "rcw-1919-civil-war-briefing",
     ],
     overflow: [],
   });
   const landingSampleState = await readLandingSampleDownloadState(page);
   expect(landingSampleState.cardIds.some((id) => /hgo/i.test(id))).toBe(false);
-  expect(landingSampleState.openHrefs).toHaveLength(5);
-  expect(landingSampleState.downloadHrefs).toHaveLength(5);
-  for (const href of landingSampleState.openHrefs) {
-    expect(href).toMatch(/\.\/app\/\?sample=[a-z0-9-]+&view=guide$/);
-  }
-  for (const href of landingSampleState.downloadHrefs) {
-    expect(href).toMatch(/\.\/assets\/sample-projects\/[a-z0-9-]+\.project\.json$/);
-  }
+  expect(landingSampleState.openHrefs).toHaveLength(6);
+  expect(landingSampleState.downloadHrefs).toHaveLength(6);
+  landingSampleState.cardIds.forEach((id, index) => {
+    expect(landingSampleState.openHrefs[index]).toBe(`./app/?sample=${id}&view=guide`);
+    expect(landingSampleState.downloadHrefs[index]).toBe(`./assets/sample-projects/${id}.project.json`);
+  });
 
   await withReleaseSmokePhase(RELEASE_SMOKE_PHASES.SHELL_READY, async () => {
     await page.setViewportSize({ width: 1366, height: 900 });
@@ -415,7 +414,8 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
     /\.\.\/assets\/sample-projects\/tno-1962-atlantropa-briefing\.project\.json$/,
   );
   const sampleChoices = page.locator("[data-sample-guide-choice]");
-  await expect(sampleChoices).toHaveCount(5, { timeout: 30000 });
+  await expect(sampleChoices).toHaveCount(6, { timeout: 30000 });
+  await expect(page.locator("[data-sample-guide-choice='rcw-1919-civil-war-briefing']")).toBeVisible();
   await expect(page.locator("[data-sample-guide-choice='tno-1962-atlantropa-briefing']")).toHaveAttribute(
     "aria-current",
     "true",

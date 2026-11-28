@@ -14,6 +14,7 @@ const EXPECTED_PUBLIC_SAMPLE_PROJECT_IDS = Object.freeze([
   "hoi4-1936-europe-briefing",
   "hoi4-1939-europe-switch",
   "tno-1962-atlantropa-briefing",
+  "rcw-1919-civil-war-briefing",
 ]);
 
 const RETRYABLE_PHASES = new Set([

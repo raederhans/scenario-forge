@@ -48,9 +48,9 @@ const PAINT_COLOURS = ["#c8412d", "#e0a66a", "#d6b978", "#87977a", "#3f6f72", "#
 const BLANK_RGB = hexToRgb("#8d998f");
 const PAPER_RGB = hexToRgb("#ece3cf");
 const INK_RGB = hexToRgb("#141c19");
-const WORLD_STATE = { blank: null, modern: 3, 1936: 0, 1939: 1, 1962: 2 };
+const WORLD_STATE = { blank: null, modern: 3, 1936: 0, 1939: 1, 1962: 2, rcw: null };
 const STYLES = ["game", "atlas", "ink"];
-const WORLDS = ["blank", "modern", "1936", "1939", "1962"];
+const WORLDS = ["blank", "modern", "1936", "1939", "1962", "rcw"];
 // Width of the recolour sweep line, in viewBox units.
 const FRONT_WIDTH = 120;
 // Timed effects stay well under the time a reader takes to scroll through a chapter,
@@ -463,6 +463,7 @@ function initStage(data) {
     setWorld(world) {
       if (world === view.world) return;
       view.world = world;
+      story.dataset.activeWorld = world;
       if (view.mode === "worlds" || view.mode === "outro") {
         retarget(TIMING.recolour);
         render();

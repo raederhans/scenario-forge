@@ -64,6 +64,7 @@
             <path class="map-coast" data-coast />
           </svg>
           </div>
+          <img class="stage__rcw stage__layer" src="./assets/world-rcw-1919.webp" width="1600" height="1000" alt="" />
           <div class="stage__vignette" aria-hidden="true"></div>
           <div class="stage-mark stage-mark--tl" aria-hidden="true"><span>Scenario Forge</span><span data-i18n="stageMark">Europe · LAEA 52°N 10°E</span></div>
           <div class="stage-mark stage-mark--tr" aria-hidden="true"><span data-state-family>HOI4</span><span data-state-date>1 January 1936</span></div>
@@ -71,7 +72,7 @@
           <div class="stage__tip" data-paint-tip hidden></div>
 
           <div class="scrubber" data-scrubber>
-            <button class="scrubber__play" type="button" data-play aria-label="Pause history">
+            <button class="scrubber__play" type="button" data-play aria-label="Pause scenario comparison">
               <span class="scrubber__icon" aria-hidden="true"></span>
             </button>
             <div class="scrubber__track" data-track role="slider" tabindex="0" aria-label="Year" data-i18n-aria-label="yearLabel" aria-valuemin="1936" aria-valuemax="1962" aria-valuenow="1936" aria-valuetext="1936">
@@ -92,7 +93,7 @@
                 <span data-i18n="heroTitle">Every world</span>
                 <em data-i18n="heroAccent">starts with a map.</em>
               </h1>
-              <p data-i18n="heroBody">Drag through the years. Then scroll on — the whole editor unfolds on this one map.</p>
+              <p data-i18n="heroBody">Drag the year slider to compare Europe’s borders at three scenario starts. Scroll down to try painting the map.</p>
               <div class="actions">
                 <a class="btn btn--copper" href="./app/?view=guide" data-i18n="heroCta">Start creating</a>
                 <a class="btn btn--ghost" href="#edit" data-i18n="heroScroll">Scroll to explore ↓</a>
@@ -104,14 +105,14 @@
             <div class="caption">
               <p class="caption__index" data-i18n="editIndex">01 · Borders &amp; ownership</p>
               <h2 data-i18n="editTitle">Paint it. Right here.</h2>
-              <p data-i18n="editBody">Pick a colour and click a country. In the editor you can go down to single provinces, with presets, quick fill and 80 steps of undo.</p>
+              <p data-i18n="editBody">Pick a colour and click a country. In the editor, paint individual provinces to change ownership. You can undo and redo your edits.</p>
               <div class="palette" role="radiogroup" aria-label="Paint colours" data-i18n-aria-label="paintPalette" data-swatches></div>
               <div class="paint-tools">
                 <button type="button" class="chip-button" data-paint-undo disabled data-i18n="paintUndo">Undo</button>
                 <button type="button" class="chip-button" data-paint-reset disabled data-i18n="paintReset">Reset</button>
                 <span class="paint-count" data-paint-count aria-live="polite">0 countries repainted</span>
               </div>
-              <ul class="feature-list" data-i18n-list="editItems"><li>Ownership &amp; control</li><li>Quick fill by admin level</li><li>Frontlines &amp; strategic marks</li><li>Special zones</li><li>Releasable countries</li><li>Regional presets</li></ul>
+              <ul class="feature-list" data-i18n-list="editItems"><li>Province ownership</li><li>Quick fill by admin level</li><li>Register new countries and capitals</li><li>Releasable country borders</li><li>Preset defensive lines</li><li>Box and lasso selection</li></ul>
             </div>
           </article>
 
@@ -125,7 +126,7 @@
                 <button type="button" role="radio" aria-checked="false" data-style-option="atlas" data-i18n="styleAtlas">Printed atlas</button>
                 <button type="button" role="radio" aria-checked="false" data-style-option="ink" data-i18n="styleInk">Night ink</button>
               </div>
-              <ul class="feature-list" data-i18n-list="styleItems"><li>Palette library</li><li>Borders &amp; coastlines</li><li>City labels</li><li>Legends</li><li>Relief, oceans &amp; lakes</li><li>River painting</li><li>Unit counters</li></ul>
+              <ul class="feature-list" data-i18n-list="styleItems"><li>Palettes and borders</li><li>Map text and curved text</li><li>Labels along lines</li><li>Historical and modern place names</li><li>Automatic country names</li><li>Terrain and legends</li></ul>
             </div>
           </article>
 
@@ -133,16 +134,16 @@
             <div class="caption caption--sticky">
               <p class="caption__index" data-i18n="contextIndex">03 · Context &amp; data</p>
               <h2 data-i18n="contextTitle">Real networks under your story.</h2>
-              <p data-i18n="contextBody">Detailed roads, rail and resources for China, France, Germany, India, Japan, Russia, the UK and the US; transport networks worldwide; and thematic layers to map.</p>
-              <ul class="feature-list" data-i18n-list="contextItems"><li>Roads</li><li>Rail</li><li>Airports</li><li>Ports</li><li>Energy</li><li>Industrial zones</li><li>Logistics hubs</li><li>Mineral resources</li><li>Population heatmap</li><li>Human development</li><li>Governance indicators</li><li>Night lights, 1930 &amp; today</li><li>Ocean depth</li></ul>
+              <p data-i18n="contextBody">Explore roads, rail and resources in China, France, Germany, India, Japan, Russia, the UK and the US. In historical scenarios, colour the map by starting population, factories or resources.</p>
+              <ul class="feature-list" data-i18n-list="contextItems"><li>Roads</li><li>Rail</li><li>Airports</li><li>Ports</li><li>Energy</li><li>Industrial zones</li><li>Logistics hubs</li><li>Mineral resources</li><li>Population heatmap</li><li>Human development</li><li>Governance indicators</li><li>Night lights, 1930s and 2016</li><li>Ocean depth</li></ul>
               <p class="caption__note" data-i18n="contextNote">Shown here: Europe's main railways and largest cities.</p>
             </div>
           </article>
 
-          <article class="chapter chapter--steps" data-chapter="worlds" style="--steps:5">
+          <article class="chapter chapter--steps" data-chapter="worlds" style="--steps:6">
             <div class="caption caption--sticky">
               <p class="caption__index" data-i18n="worldsIndex">04 · Starting worlds</p>
-              <h2 data-i18n="worldsTitle">Start from history. Or from nothing.</h2>
+              <h2 data-i18n="worldsTitle">Start with these six sample projects.</h2>
               <p data-i18n="worldsBody">Each one opens as a ready project: keep editing, or export PNG or JPG at up to 4× resolution.</p>
               <ol class="worlds" aria-label="Starting worlds" data-i18n-aria-label="worldsPicker">
                 <li class="world" data-world="blank" data-sample-project-id="blank-base-starter" data-sample-scenario="blank_base">
@@ -150,7 +151,7 @@
                   <span class="world__links"><a href="./app/?sample=blank-base-starter&view=guide" data-sample-project-open-link data-i18n="worldOpen">Open</a><a href="./assets/sample-projects/blank-base-starter.project.json" download data-sample-project-list-link data-sample-scenario="blank_base" data-i18n="worldDownload">Download</a></span>
                 </li>
                 <li class="world" data-world="modern" data-sample-project-id="modern-world-japan-corridor" data-sample-scenario="modern_world">
-                  <button type="button" class="world__pick"><span class="world__index">02</span><b data-i18n="worldModernName">Modern World</b><small data-i18n="worldModernBody">Today's borders, with a sample transport corridor in Japan.</small></button>
+                  <button type="button" class="world__pick"><span class="world__index">02</span><b data-i18n="worldModernName">Modern World · 2026</b><small data-i18n="worldModernBody">Today's borders, with a sample transport corridor in Japan.</small></button>
                   <span class="world__links"><a href="./app/?sample=modern-world-japan-corridor&view=guide" data-sample-project-open-link data-i18n="worldOpen">Open</a><a href="./assets/sample-projects/modern-world-japan-corridor.project.json" download data-sample-project-list-link data-sample-scenario="modern_world" data-i18n="worldDownload">Download</a></span>
                 </li>
                 <li class="world" data-world="1936" data-sample-project-id="hoi4-1936-europe-briefing" data-sample-scenario="hoi4_1936">
@@ -164,6 +165,10 @@
                 <li class="world" data-world="1962" data-sample-project-id="tno-1962-atlantropa-briefing" data-sample-scenario="tno_1962">
                   <button type="button" class="world__pick"><span class="world__index">05</span><b data-i18n="world1962Name">TNO · 1962</b><small data-i18n="world1962Body">The New Order, and a Mediterranean half drained by Atlantropa.</small></button>
                   <span class="world__links"><a href="./app/?sample=tno-1962-atlantropa-briefing&view=guide" data-sample-project-open-link data-i18n="worldOpen">Open</a><a href="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" download data-sample-project-list-link data-sample-scenario="tno_1962" data-i18n="worldDownload">Download</a></span>
+                </li>
+                <li class="world" data-world="rcw" data-sample-project-id="rcw-1919-civil-war-briefing" data-sample-scenario="rcw_1919">
+                  <button type="button" class="world__pick"><span class="world__index">06</span><b data-i18n="worldRcwName">Russian Civil War · 1919</b><small data-i18n="worldRcwBody">At the height of the White advance in October 1919, this regional scenario covers only the former Russian Empire and its neighbours.</small></button>
+                  <span class="world__links"><a href="./app/?sample=rcw-1919-civil-war-briefing&view=guide" data-sample-project-open-link data-i18n="worldOpen">Open</a><a href="./assets/sample-projects/rcw-1919-civil-war-briefing.project.json" download data-sample-project-list-link data-sample-scenario="rcw_1919" data-i18n="worldDownload">Download</a></span>
                 </li>
               </ol>
             </div>
@@ -188,7 +193,7 @@
           <div class="hgo__copy">
             <article class="hgo__step is-active" data-step="0">
               <h2 data-i18n="hgoTitle1">One mod. One enormous map.</h2>
-              <p data-i18n="hgoBody1">A dedicated editor for the 1936 world of the Historic Geographic Overhaul mod: repaint states, shift ownership and cores, rename regions, export the full map.</p>
+              <p data-i18n="hgoBody1">A dedicated editor for the 1936 world of the Historic Geographical Overhaul mod: repaint states, shift ownership and cores, rename regions, export the full map.</p>
             </article>
             <article class="hgo__step" data-step="1">
               <h2 data-i18n="hgoTitle2">Down to the pixel.</h2>
@@ -202,6 +207,33 @@
             <div><dt data-i18n="hgoProvinces">provinces</dt><dd data-count="provinces">20,782</dd></div>
           </dl>
           <div class="hgo__veil" data-hgo-veil aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section id="showcase" class="showcase">
+        <h2 data-i18n="showcaseTitle">Inside the editor</h2>
+        <div class="showcase__grid">
+          <figure>
+            <img src="./assets/showcase-map-modes.webp" width="2000" height="760" loading="lazy" alt="Two views of the same part of Europe in HOI4 1939, coloured by country and by faction." data-i18n-alt="mapModesAlt" />
+            <figcaption>
+              <span data-i18n="mapModesCaption">Switch between countries and factions in HOI4 1939. Only the display changes.</span>
+              <a href="./app/?sample=hoi4-1939-europe-switch&amp;view=guide" data-i18n="open1939">Open the 1939 sample</a>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/showcase-labels-lines.webp" width="1600" height="1000" loading="lazy" alt="Europe on the eve of war in HOI4 1939, with the Maginot and Stalin lines and curved map lettering." data-i18n-alt="labelsLinesAlt" />
+            <figcaption>
+              <span data-i18n="labelsLinesCaption">Add the scenario’s preset defensive lines, then letter the map with your own curved text.</span>
+              <a href="./app/?sample=hoi4-1939-europe-switch&amp;view=guide" data-i18n="open1939">Open the 1939 sample</a>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/showcase-scenario-data.webp" width="1600" height="1000" loading="lazy" alt="A HOI4 1936 map shaded by starting factory count, with a legend for the colour scale." data-i18n-alt="scenarioDataAlt" />
+            <figcaption>
+              <span data-i18n="scenarioDataCaption">Compare factory counts at the start of HOI4 1936 using the colours in the legend.</span>
+              <a href="./app/?sample=hoi4-1936-europe-briefing&amp;view=guide" data-i18n="open1936">Open the 1936 sample</a>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -220,17 +252,17 @@
           <div class="closing__faq" data-reveal>
             <h2 data-i18n="faqTitle">Good to know.</h2>
             <article>
-              <h3 data-i18n="faqOneQuestion">Do I need to install anything?</h3>
-              <p data-i18n="faqOneAnswer">No. Both editors run in a modern browser, and your projects are saved as files on your own computer.</p>
+              <h3 data-i18n="faqOneQuestion">Where are my projects saved?</h3>
+              <p data-i18n="faqOneAnswer">Project files are saved on your computer. You can also recover an autosaved draft in your browser.</p>
+            </article>
+            <article>
+              <h3 data-i18n="faqThreeQuestion">How do I share a map or project?</h3>
+              <p><span data-i18n="faqThreeAnswer">Export a PNG or JPG at up to 4× resolution. To share an editable project, host its file at a public HTTPS address, then generate a share link. Map data comes from open sources including Natural Earth, geoBoundaries and OpenStreetMap. Credit them as their licences require. Mod assets follow their respective terms.</span>
+                <a href="https://github.com/raederhans/scenario-forge/blob/main/data/source_ledger.json" target="_blank" rel="noreferrer" data-i18n="faqSourcesLink">See all data sources</a></p>
             </article>
             <article>
               <h3 data-i18n="faqTwoQuestion">How are the two editors different?</h3>
-              <p data-i18n="faqTwoAnswer">Scenario Forge does everything shown above, across five starting worlds. HGO Atlas works directly on one mod's own pixel map, state by state. Their project files are not interchangeable.</p>
-            </article>
-            <article>
-              <h3 data-i18n="faqThreeQuestion">Can I share the maps I make?</h3>
-              <p><span data-i18n="faqThreeAnswer">Yes. Map data comes from open sources such as Natural Earth, geoBoundaries and OpenStreetMap; credit them as their licences ask when you share.</span>
-                <a href="https://github.com/raederhans/scenario-forge/blob/main/data/source_ledger.json" target="_blank" rel="noreferrer" data-i18n="faqSourcesLink">See all data sources</a></p>
+              <p data-i18n="faqTwoAnswer">Scenario Forge edits maps across different scenarios. HGO Atlas edits the mod’s pixel map state by state and requires a browser with WebGL 2 support. Each editor uses its own project file format.</p>
             </article>
           </div>
         </div>

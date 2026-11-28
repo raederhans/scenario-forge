@@ -15,9 +15,15 @@ The landing page draws its maps live from generated data; the README shows a few
 
 ## Screenshots
 
-- `product-workspace.webp` (README): captured on 2026-09-23 from the local editor at `/app/` with the TNO 1962 scenario, 3200 × 1800 at DPR 2. Appearance was adjusted in the editor; geometry and ownership were not retouched.
+All editor shots were captured on 2026-11-26 from the local editor at `/app/` with headless Chromium at DPR 2, by opening a project file with a fixed `viewState` (`{center, k}`) and the side panels collapsed for map-only shots. Geometry and ownership were not retouched.
+
+- `product-workspace.webp` (README, landing page footer, social preview): TNO 1962 sample, `viewState {center: [17, 46], k: 5}`, Germany selected, 1600 × 900 viewport → 3200 × 1800.
+- `showcase-map-modes.webp` (README, landing "Inside the editor"): HOI4 1939 sample, `{center: [17, 50.5], k: 8.5}`, Map mode set to Countries and to Alliances; two 2000 × 1100 viewports cropped side by side to 2000 × 760.
+- `showcase-labels-lines.webp`: HOI4 1939 sample with the Maginot, Siegfried, Mannerheim and Stalin preset defensive lines (labels off) and four curved map labels, `{center: [18, 52.5], k: 10}`, cropped to 1600 × 1000.
+- `showcase-scenario-data.webp`: HOI4 1936 sample with Country indicators on `scenario_factories_total`, `{center: [16, 50], k: 7.5}`, cropped to 1600 × 1000.
+- `world-rcw-1919.webp` (landing stage, Russian Civil War sample): the RCW 1919 scenario at its own opening view, padded to 1600 × 1000.
 - `docs/readme/hgo-atlas.webp` (README): the HGO Atlas editor in English, 1600 × 900.
-- `social-preview.svg|png`: the link-preview artwork.
+- `social-preview.svg|png`: the link-preview artwork; its embedded image is the same workspace capture as a 3200 × 1800 PNG. Rebuild the PNG with `python tools/rasterize_landing_assets.py --source social-preview.svg`.
 
 HOI4 and TNO illustrations represent their game settings, including alternate-history geography. Geographic assets keep their dataset terms; consult the JSON companions and `data/source_ledger.json`.
 

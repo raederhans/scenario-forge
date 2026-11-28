@@ -245,18 +245,18 @@ test("release smoke validates the public sample manifest baseline", () => {
 
 test("release smoke treats sample manifest count and HGO exposure as final failures", () => {
   const wrongCount = validateReleaseSmokeSampleManifest(sampleManifest({
-    sample_projects: EXPECTED_PUBLIC_SAMPLE_PROJECT_IDS.slice(0, 4).map((id) => ({ id })),
+    sample_projects: EXPECTED_PUBLIC_SAMPLE_PROJECT_IDS.slice(0, -1).map((id) => ({ id })),
   }));
   const hgoExposed = validateReleaseSmokeSampleManifest(sampleManifest({
     public_scenario_ids: ["blank_base", "hgo_1936"],
     sample_projects: [
-      ...EXPECTED_PUBLIC_SAMPLE_PROJECT_IDS.slice(0, 4).map((id) => ({ id })),
+      ...EXPECTED_PUBLIC_SAMPLE_PROJECT_IDS.slice(0, -1).map((id) => ({ id })),
       { id: "hgo-1936-preview" },
     ],
   }));
 
   assert.equal(wrongCount.ok, false);
-  assert.match(wrongCount.reason, /expected 5 public sample projects/);
+  assert.match(wrongCount.reason, /expected 6 public sample projects/);
   assert.equal(hgoExposed.ok, false);
   assert.match(hgoExposed.reason, /HGO preview content/);
 });
