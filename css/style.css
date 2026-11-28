@@ -13015,7 +13015,7 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
 :where(.editor-project-bar button:is([aria-pressed="true"], [aria-expanded="true"])) { background: var(--accent-soft); color: var(--accent); }
 :where(.editor-project-bar #workspaceSaveBtn) { background: var(--accent); color: var(--surface-raised); }
 :where(.editor-project-bar #workspaceSaveBtn:hover) { background: var(--accent-hover); }
-:where(.zoom-controls button, .bottom-dock button:not(.color-swatch):not(.dock-segment-btn), .scenario-context-bar button:not(.scenario-context-action-btn), .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn):not(:where(.editor-project-bar *)) {
+:where(.zoom-controls button, .bottom-dock-primary button:not(.color-swatch):not(.dock-segment-btn), .scenario-context-bar button:not(.scenario-context-action-btn), .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn):not(:where(.editor-project-bar *)) {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -13033,7 +13033,7 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   box-shadow: none;
   cursor: pointer;
 }
-:where(.zoom-controls button, .bottom-dock button:not(.color-swatch):not(.dock-segment-btn), .scenario-context-bar button:not(.scenario-context-action-btn), .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn):where(:hover:not(:disabled):not([aria-disabled="true"])):not(:where(.editor-project-bar *)) {
+:where(.zoom-controls button, .bottom-dock-primary button:not(.color-swatch):not(.dock-segment-btn), .scenario-context-bar button:not(.scenario-context-action-btn), .zoom-btn, .dock-icon-btn, .dock-tool-btn, .dock-handle-btn, .dock-action-icon-btn, .scenario-context-icon-btn):where(:hover:not(:disabled):not([aria-disabled="true"])):not(:where(.editor-project-bar *)) {
   background: var(--surface-raised);
   border-color: var(--line-2);
   box-shadow: none;
@@ -13045,7 +13045,7 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
 }
 :where(.dock-action-icon-btn-primary) { background: var(--accent); color: var(--surface-raised); }
 :where(.dock-action-icon-btn-primary:hover) { background: var(--accent-hover); }
-:where(.zoom-controls button svg, .bottom-dock button svg, .scenario-context-bar button svg):not(:where(.editor-project-bar *)) { width: 16px; height: 16px; }
+:where(.zoom-controls button svg, .bottom-dock-primary button svg, .scenario-context-bar button svg):not(:where(.editor-project-bar *)) { width: 16px; height: 16px; }
 :where(.editor-disclosure > summary, .editor-property-panel details > summary, .palette-library-section > summary, details[data-level="2"] > summary) {
   display: flex;
   align-items: center;

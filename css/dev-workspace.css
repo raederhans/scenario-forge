@@ -1,0 +1,140 @@
+/* 开发者工具栏（#devWorkspacePanel / #devWorkspaceQuickbar）。
+   开发者模式开启时它整块替换普通填色栏，占同一个位置；关闭时普通栏原样回来。
+   普通栏里「底栏按钮都是 36px 方形图标」的规则只作用于 .bottom-dock-primary，这里给开发者栏自己的文字按钮外观。
+   放在 overrides 层，压过 style.css 里旧的开发者工作区窄屏规则。 */
+@layer overrides {
+
+/* 互斥：JS 已给普通栏加 hidden + inert，这里兜住任何给它设 display 的布局规则。 */
+#bottomDock.dev-workspace-mode > .bottom-dock-primary { display: none !important; }
+
+/* 展开态铺满地图区宽度（左右各留 12px），高度封顶，内容区自己滚动。 */
+.editor-workspace #bottomDock.dev-workspace-mode:not(.is-collapsed) {
+  left: 12px;
+  right: 12px;
+  width: auto;
+  max-width: none;
+  transform: none;
+  max-height: min(48vh, 440px);
+  padding: 10px 12px 12px;
+  gap: 8px;
+  overflow: hidden;
+}
+.editor-workspace #bottomDock.dev-workspace-mode .dev-workspace-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow: hidden;
+  padding: 0;
+}
+.editor-workspace #bottomDock.dev-workspace-mode .dev-workspace-dock.is-hidden { display: none; }
+
+/* 顶栏：DEV 标记 + 横排页签，右侧给收起按钮留位。 */
+.editor-workspace #bottomDock .dev-workspace-category-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding-right: 48px;
+}
+.editor-workspace #bottomDock .dev-workspace-category-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.editor-workspace #bottomDock .dev-workspace-category-tab {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  height: var(--control-compact, 32px);
+  min-height: 0;
+  padding: 0 12px;
+  border: 1px solid var(--line-1);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+  transform: none;
+}
+.editor-workspace #bottomDock .dev-workspace-category-tab:hover { background: var(--surface-sunken); color: var(--text-primary); transform: none; }
+.editor-workspace #bottomDock .dev-workspace-category-tab.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* 面板网格：每块至少 280px，放不下就自动换行；整块网格在栏内滚动。 */
+.editor-workspace #bottomDock .dev-workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  align-items: start;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+}
+.editor-workspace #bottomDock .dev-workspace-panel {
+  gap: 6px;
+  padding: 10px;
+  min-width: 0;
+}
+.editor-workspace #bottomDock .dev-workspace-panel.hidden { display: none; }
+
+/* 检查器键值行：键按内容宽，值占剩余宽度。 */
+.editor-workspace #bottomDock .dev-workspace-meta-row {
+  grid-template-columns: minmax(56px, max-content) minmax(0, 1fr);
+  gap: 4px 12px;
+}
+.editor-workspace #bottomDock .dev-workspace-meta-value { overflow-wrap: anywhere; word-break: normal; }
+
+/* 文字按钮：单行、按内容宽，一行放不下整颗换到下一行。 */
+.editor-workspace #bottomDock :is(.dev-workspace-dock, .dev-workspace-quickbar) :is(.btn-primary, .btn-secondary) {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: var(--control-compact, 32px);
+  padding: 4px 10px;
+  font-size: var(--fs-xs);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.editor-workspace #bottomDock .dev-workspace-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.editor-workspace #bottomDock .dev-workspace-actions > :is(label, .dev-workspace-note) { flex: 0 0 auto; }
+.editor-workspace #bottomDock .dev-workspace-actions > select { flex: 1 1 140px; width: auto; min-width: 0; }
+.editor-workspace #bottomDock .dev-workspace-input,
+.editor-workspace #bottomDock .dev-workspace-select { width: 100%; min-width: 0; min-height: var(--control-compact, 32px); }
+.editor-workspace #bottomDock .dev-selection-preview { min-height: 64px; max-height: 120px; }
+
+/* 收起态：一行摘要（选中数、标签、归属 + 两个快捷操作）。 */
+.editor-workspace #bottomDock.dev-workspace-mode.is-collapsed {
+  width: min(760px, calc(100% - 24px));
+  height: auto;
+  padding: 8px 56px 8px 10px;
+}
+.editor-workspace #bottomDock .dev-workspace-quickbar {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.editor-workspace #bottomDock .dev-workspace-quick-meta { grid-template-columns: repeat(3, minmax(0, 1fr)); flex: 1 1 300px; }
+.editor-workspace #bottomDock .dev-workspace-quick-owner,
+.editor-workspace #bottomDock .dev-workspace-quick-secondary { flex: 0 0 auto; width: auto; padding-top: 0; border-top: 0; }
+.editor-workspace #bottomDock .dev-workspace-quick-owner > .dev-quick-label { display: none; }
+.editor-workspace #bottomDock .dev-workspace-quick-owner-row,
+.editor-workspace #bottomDock .dev-workspace-quick-owner-controls { display: flex; }
+
+} /* end @layer overrides */

@@ -9,7 +9,7 @@
    直接降到 components 层会让那些死声明复活。各面板迁到组件时删掉其中被压住的声明，全部清完后再改成 :where() 并移到 components 层。 */
 @layer overrides {
 
-body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) {
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -32,7 +32,7 @@ body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary,
   letter-spacing: 0;
   transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) {
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) {
   height: var(--control-compact);
   min-height: var(--control-compact);
   padding: 0 var(--space-2);
@@ -42,34 +42,34 @@ body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--
   box-shadow: none;
   font-weight: 500;
 }
-body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--surface-sunken); border-color: var(--line-2); box-shadow: none; }
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--surface-sunken); border-color: var(--line-2); }
-body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):active:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-soft); transform: none; box-shadow: none; }
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):active:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-soft); }
-body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(.btn--primary, .legend-generator-apply, .app-dialog-btn-primary):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) {
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--surface-sunken); border-color: var(--line-2); box-shadow: none; }
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--surface-sunken); border-color: var(--line-2); }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):active:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-soft); transform: none; box-shadow: none; }
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):active:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-soft); }
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(.btn--primary, .legend-generator-apply, .app-dialog-btn-primary):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) {
   background: var(--accent);
   color: var(--surface-raised);
   font-weight: 600;
 }
-body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(.btn--primary, .legend-generator-apply, .app-dialog-btn-primary):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-hover); }
-body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent); color: var(--surface-raised); }
-body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-hover); }
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(.btn--primary, .legend-generator-apply, .app-dialog-btn-primary):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-hover); }
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent); color: var(--surface-raised); }
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-hover); }
 /* 侧栏的默认与悬停规则带 ID，修饰类在侧栏里要同等特异性才能生效。 */
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .legend-generator-apply):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent); color: var(--surface-raised); font-weight: 600; }
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .legend-generator-apply):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-hover); }
-body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) {
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .legend-generator-apply):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent); color: var(--surface-raised); font-weight: 600; }
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .legend-generator-apply):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--accent-hover); }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) {
   background: transparent;
   color: var(--danger);
   border-color: var(--line-1);
 }
-body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { background: var(--danger-soft); }
-body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):focus-visible:not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button, .list-row, .list-row *, [role="menuitem"], [role="option"])) { outline: 2px solid var(--accent); outline-offset: 2px; }
-body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(:disabled, [aria-disabled="true"]):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(:disabled, [aria-disabled="true"]):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) {
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(.btn--danger, .danger-btn, .is-danger):hover:not(:disabled):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { background: var(--danger-soft); }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):focus-visible:not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button, .list-row, .list-row *, [role="menuitem"], [role="option"])) { outline: 2px solid var(--accent); outline-offset: 2px; }
+body :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(:disabled, [aria-disabled="true"]):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--danger, .btn--icon, .btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .legend-generator-apply):is(:disabled, [aria-disabled="true"]):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) {
   background: var(--surface-sunken);
   color: var(--ink-400);
   border-color: var(--line-1);
@@ -79,14 +79,14 @@ body :is(#leftSidebar, #rightSidebar) :is(.btn--primary, .btn--secondary, .btn--
 }
 
 
-body :is(.app-dialog--warning, .app-dialog--error) .app-dialog-btn-primary:not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) {
+body :is(.app-dialog--warning, .app-dialog--error) .app-dialog-btn-primary:not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) {
   background: var(--danger);
   color: var(--surface-raised);
   border-color: var(--danger);
   box-shadow: none;
 }
-body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn, .btn--primary, .legend-generator-apply, .app-dialog-btn-primary):is(:disabled, [aria-disabled="true"]):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled:not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) {
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn, .btn--primary, .legend-generator-apply, .app-dialog-btn-primary):is(:disabled, [aria-disabled="true"]):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled:not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) {
   background: var(--surface-sunken);
   color: var(--ink-400);
   border-color: var(--line-1);
@@ -94,11 +94,11 @@ body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled:not(:wh
 }
 
 /* 尺寸修饰（现有别名不使用）。 */
-body :is(.btn--sm):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { height: var(--control-compact); min-height: var(--control-compact); padding: 0 var(--space-2); }
-body :is(.btn--lg):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(#leftSidebar, #rightSidebar) .btn--lg:not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { height: 44px; min-height: 44px; }
-body :is(.btn--icon):not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)),
-body :is(#leftSidebar, #rightSidebar) .btn--icon:not(:where(.editor-project-bar *, .bottom-dock button, .zoom-controls button, .scenario-context-bar button)) { width: auto; min-width: max(var(--hit-min), var(--control-md)); padding: 0; aspect-ratio: 1; }
+body :is(.btn--sm):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { height: var(--control-compact); min-height: var(--control-compact); padding: 0 var(--space-2); }
+body :is(.btn--lg):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(#leftSidebar, #rightSidebar) .btn--lg:not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { height: 44px; min-height: 44px; }
+body :is(.btn--icon):not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)),
+body :is(#leftSidebar, #rightSidebar) .btn--icon:not(:where(.editor-project-bar *, .bottom-dock-primary button, .zoom-controls button, .scenario-context-bar button)) { width: auto; min-width: max(var(--hit-min), var(--control-md)); padding: 0; aspect-ratio: 1; }
 
 
 
