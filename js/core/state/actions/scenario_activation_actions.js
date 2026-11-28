@@ -1,3 +1,4 @@
+import { restoreScenarioFields, validateScenarioSnapshot } from "./scenario_snapshot.js";
 import { normalizeRiverPaintState } from "../../river_paint/partition_model.js";
 import { applyFeaturePaintState } from "../color_state.js";
 import { createReadonlyReferenceAssignments } from "../../map_data_boundary.js";
@@ -240,65 +241,20 @@ function getOptionalLayerConfig(layerKey) {
   return { layerKey: normalizedLayerKey, config };
 }
 
-function readOptionalLayerValue(target, layerKey) {
-  switch (layerKey) {
-    case "water": return target.scenarioWaterRegionsData;
-    case "special": return target.scenarioSpecialRegionsData;
-    case "scenario_atlantropa": return target.scenarioAtlantropaData;
-    case "specialzonelayers": return target.specialZoneLayers;
-    case "relief": return target.scenarioReliefOverlaysData;
-    case "erarailways": return target.scenarioEraRailwaysData;
-    case "cities": return target.scenarioCityOverridesData;
-    case "strategicvalues": return target.scenarioStrategicValuesData;
-  }
-}
-
-function hasOptionalLayerValue(target, layerKey) {
-  switch (layerKey) {
-    case "water": return hasOwn(target, "scenarioWaterRegionsData");
-    case "special": return hasOwn(target, "scenarioSpecialRegionsData");
-    case "scenario_atlantropa": return hasOwn(target, "scenarioAtlantropaData");
-    case "specialzonelayers": return hasOwn(target, "specialZoneLayers");
-    case "relief": return hasOwn(target, "scenarioReliefOverlaysData");
-    case "erarailways": return hasOwn(target, "scenarioEraRailwaysData");
-    case "cities": return hasOwn(target, "scenarioCityOverridesData");
-    case "strategicvalues": return hasOwn(target, "scenarioStrategicValuesData");
-  }
-}
-
-function readOptionalLayerRevision(target, layerKey) {
-  switch (layerKey) {
-    case "scenario_atlantropa": return target.scenarioAtlantropaRevision;
-    case "relief": return target.scenarioReliefOverlayRevision;
-    case "erarailways": return target.scenarioEraRailwaysRevision;
-    case "cities": return target.cityLayerRevision;
-    case "strategicvalues": return target.scenarioStrategicValuesRevision;
-  }
-}
-
-function hasOptionalLayerRevision(target, layerKey) {
-  switch (layerKey) {
-    case "scenario_atlantropa": return hasOwn(target, "scenarioAtlantropaRevision");
-    case "relief": return hasOwn(target, "scenarioReliefOverlayRevision");
-    case "erarailways": return hasOwn(target, "scenarioEraRailwaysRevision");
-    case "cities": return hasOwn(target, "cityLayerRevision");
-    case "strategicvalues": return hasOwn(target, "scenarioStrategicValuesRevision");
-    default: return false;
-  }
-}
-
 export function getScenarioChunkOptionalLayerState(target, layerKey) {
   assertStateTarget(target);
-  const { layerKey: normalizedLayerKey } = getOptionalLayerConfig(layerKey);
-  return readOptionalLayerValue(target, normalizedLayerKey);
+  const { config: { stateField } } = getOptionalLayerConfig(layerKey);
+  return stateField ? target[stateField] : undefined;
 }
 
 export function applyScenarioChunkOptionalLayerState(target, layerKey, payload) {
   assertStateTarget(target);
-  const { layerKey: normalizedLayerKey } = getOptionalLayerConfig(layerKey);
+  const { layerKey: normalizedLayerKey, config } = getOptionalLayerConfig(layerKey);
+  const { stateField, revisionField } = config;
+  const changed = !!stateField && target[stateField] !== payload;
   if (normalizedLayerKey === "cities") {
     return {
-      changed: target.scenarioCityOverridesData !== payload,
+      changed,
       externalEffect: {
         type: "scenario-city-overrides",
         payload,
@@ -306,56 +262,15 @@ export function applyScenarioChunkOptionalLayerState(target, layerKey, payload) 
       },
     };
   }
-  let changed = false;
-  switch (normalizedLayerKey) {
-    case "water":
-      changed = target.scenarioWaterRegionsData !== payload;
-      if (!changed) break;
-      target.scenarioWaterRegionsData = payload;
-      break;
-    case "special":
-      changed = target.scenarioSpecialRegionsData !== payload;
-      if (!changed) break;
-      target.scenarioSpecialRegionsData = payload;
-      break;
-    case "scenario_atlantropa":
-      changed = target.scenarioAtlantropaData !== payload;
-      if (!changed) break;
-      target.scenarioAtlantropaData = payload;
-      target.scenarioAtlantropaRevision =
-        Math.max(0, Number(target.scenarioAtlantropaRevision) || 0) + 1;
-      break;
-    case "specialzonelayers":
-      changed = target.specialZoneLayers !== payload;
-      if (!changed) break;
-      commitSpecialZoneLayersState(
-        target,
-        payload,
-        {},
-        { markDirty: false, preserveIdentity: true },
-      );
-      break;
-    case "relief":
-      changed = target.scenarioReliefOverlaysData !== payload;
-      if (!changed) break;
-      target.scenarioReliefOverlaysData = payload;
-      target.scenarioReliefOverlayRevision =
-        Math.max(0, Number(target.scenarioReliefOverlayRevision) || 0) + 1;
-      break;
-    case "erarailways":
-      changed = target.scenarioEraRailwaysData !== payload;
-      if (!changed) break;
-      target.scenarioEraRailwaysData = payload;
-      target.scenarioEraRailwaysRevision =
-        Math.max(0, Number(target.scenarioEraRailwaysRevision) || 0) + 1;
-      break;
-    case "strategicvalues":
-      changed = target.scenarioStrategicValuesData !== payload;
-      if (!changed) break;
-      target.scenarioStrategicValuesData = payload;
-      target.scenarioStrategicValuesRevision =
-        Math.max(0, Number(target.scenarioStrategicValuesRevision) || 0) + 1;
-      break;
+  if (changed) {
+    if (normalizedLayerKey === "specialzonelayers") {
+      commitSpecialZoneLayersState(target, payload, {}, { markDirty: false, preserveIdentity: true });
+    } else {
+      target[stateField] = payload;
+      if (revisionField) {
+        target[revisionField] = Math.max(0, Number(target[revisionField]) || 0) + 1;
+      }
+    }
   }
   return { changed, externalEffect: null };
 }
@@ -367,24 +282,26 @@ export function captureScenarioChunkPromotionState(target, layerKeys = []) {
   const capturesSpecialZoneLayers = requestedLayers.some(
     ({ layerKey }) => layerKey === "specialzonelayers",
   );
+  const specialZoneField = SCENARIO_CHUNK_OPTIONAL_LAYER_STATE_CONFIGS.specialzonelayers.stateField;
   const specialZoneLayersReferencePresent = capturesSpecialZoneLayers
-    && hasOptionalLayerValue(target, "specialzonelayers");
+    && hasOwn(target, specialZoneField);
   const specialZoneLayersReference = capturesSpecialZoneLayers
-    ? readOptionalLayerValue(target, "specialzonelayers")
+    ? target[specialZoneField]
     : undefined;
   const entries = requestedLayers.map(({ layerKey: normalizedLayerKey, config }) => {
+    const { stateField, revisionField } = config;
     const statePresent = normalizedLayerKey === "specialzonelayers"
       ? specialZoneLayersReferencePresent
-      : hasOptionalLayerValue(target, normalizedLayerKey);
+      : stateField && hasOwn(target, stateField);
     const stateValue = normalizedLayerKey === "specialzonelayers"
       ? specialZoneLayersReference
-      : readOptionalLayerValue(target, normalizedLayerKey);
+      : stateField && target[stateField];
     const entry = {
       layerKey: normalizedLayerKey,
       statePresent,
       stateValue,
-      revisionPresent: !!config.revisionField && hasOptionalLayerRevision(target, normalizedLayerKey),
-      revisionValue: config.revisionField ? readOptionalLayerRevision(target, normalizedLayerKey) : undefined,
+      revisionPresent: !!revisionField && hasOwn(target, revisionField),
+      revisionValue: revisionField ? target[revisionField] : undefined,
     };
     Object.defineProperties(entry, {
       specialZoneLayersReference: {
@@ -421,61 +338,25 @@ export function restoreScenarioChunkPromotionState(target, snapshot) {
       };
       continue;
     }
-    switch (layerKey) {
-      case "water":
-        if (entry.statePresent) target.scenarioWaterRegionsData = entry.stateValue;
-        else delete target.scenarioWaterRegionsData;
-        break;
-      case "special":
-        if (entry.statePresent) target.scenarioSpecialRegionsData = entry.stateValue;
-        else delete target.scenarioSpecialRegionsData;
-        break;
-      case "scenario_atlantropa":
-        if (entry.statePresent) target.scenarioAtlantropaData = entry.stateValue;
-        else delete target.scenarioAtlantropaData;
-        if (entry.revisionPresent) target.scenarioAtlantropaRevision = entry.revisionValue;
-        else delete target.scenarioAtlantropaRevision;
-        break;
-      case "specialzonelayers":
-        if (entry.statePresent) {
-          if (specialZoneLayersReferencePresent) {
-            commitSpecialZoneLayersState(
-              target,
-              specialZoneLayersReference,
-              {},
-              { markDirty: false, preserveIdentity: true },
-            );
-          } else {
-            commitSpecialZoneLayersState(
-              target,
-              structuredClone(entry.stateValue),
-              {},
-              { markDirty: false, preserveIdentity: true },
-            );
-          }
-        }
-        else delete target.specialZoneLayers;
-        break;
-      case "relief":
-        if (entry.statePresent) target.scenarioReliefOverlaysData = entry.stateValue;
-        else delete target.scenarioReliefOverlaysData;
-        if (entry.revisionPresent) target.scenarioReliefOverlayRevision = entry.revisionValue;
-        else delete target.scenarioReliefOverlayRevision;
-        break;
-      case "erarailways":
-        if (entry.statePresent) target.scenarioEraRailwaysData = entry.stateValue;
-        else delete target.scenarioEraRailwaysData;
-        if (entry.revisionPresent) target.scenarioEraRailwaysRevision = entry.revisionValue;
-        else delete target.scenarioEraRailwaysRevision;
-        break;
-      case "strategicvalues":
-        if (entry.statePresent) target.scenarioStrategicValuesData = entry.stateValue;
-        else delete target.scenarioStrategicValuesData;
-        if (entry.revisionPresent) target.scenarioStrategicValuesRevision = entry.revisionValue;
-        else delete target.scenarioStrategicValuesRevision;
-        break;
-      default:
-        throw new Error(`unknown scenario chunk optional layer: ${layerKey || ""}`);
+    if (typeof layerKey !== "string" || !hasOwn(SCENARIO_CHUNK_OPTIONAL_LAYER_STATE_CONFIGS, layerKey)) {
+      throw new Error(`unknown scenario chunk optional layer: ${layerKey || ""}`);
+    }
+    const { stateField, revisionField } = SCENARIO_CHUNK_OPTIONAL_LAYER_STATE_CONFIGS[layerKey];
+    if (!entry.statePresent) {
+      delete target[stateField];
+    } else if (layerKey === "specialzonelayers") {
+      commitSpecialZoneLayersState(
+        target,
+        specialZoneLayersReferencePresent ? specialZoneLayersReference : structuredClone(entry.stateValue),
+        {},
+        { markDirty: false, preserveIdentity: true },
+      );
+    } else {
+      target[stateField] = entry.stateValue;
+    }
+    if (revisionField) {
+      if (entry.revisionPresent) target[revisionField] = entry.revisionValue;
+      else delete target[revisionField];
     }
   }
   return { externalEffects };
@@ -505,38 +386,8 @@ function validateCompletePatch(patch) {
 }
 
 function validateSnapshot(snapshot) {
-  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
-    throw new TypeError("[scenario_activation_actions] snapshot must be an object");
-  }
-  const values = snapshot.values;
-  if (!values || typeof values !== "object" || Array.isArray(values)) {
-    throw new TypeError("[scenario_activation_actions] snapshot.values must be an object");
-  }
-  for (const key of SCENARIO_ACTIVATION_STATE_KEYS) {
-    if (!hasOwn(values, key)) {
-      throw new Error(
-        `[scenario_activation_actions] restoreScenarioActivationState missing snapshot key: ${key}`,
-      );
-    }
-  }
-  if (
-    !Array.isArray(snapshot.presentKeys)
-    && !(snapshot.presentKeys instanceof Set)
-  ) {
-    throw new TypeError(
-      "[scenario_activation_actions] snapshot.presentKeys must be an array or Set",
-    );
-  }
-  const presentKeys = Array.from(snapshot.presentKeys);
-  const allowedKeys = new Set(SCENARIO_ACTIVATION_STATE_KEYS);
-  for (const key of presentKeys) {
-    if (!allowedKeys.has(key)) {
-      throw new Error(
-        `[scenario_activation_actions] restoreScenarioActivationState contains unknown present key: ${key}`,
-      );
-    }
-  }
-  return { values, presentKeys: new Set(presentKeys) };
+  return validateScenarioSnapshot(snapshot, SCENARIO_ACTIVATION_STATE_KEYS,
+    "scenario_activation_actions", "restoreScenarioActivationState");
 }
 
 export function captureScenarioActivationState(target) {
@@ -640,251 +491,35 @@ function restoreScenarioActivationBeforeAuditStateFromValidated(
   target,
   { values, presentKeys },
 ) {
-  if (presentKeys.has("activeScenarioId")) {
-    target.activeScenarioId = values.activeScenarioId;
-  } else {
-    delete target.activeScenarioId;
-  }
-  if (presentKeys.has("scenarioBorderMode")) {
-    target.scenarioBorderMode = values.scenarioBorderMode;
-  } else {
-    delete target.scenarioBorderMode;
-  }
-  if (presentKeys.has("activeScenarioManifest")) {
-    target.activeScenarioManifest = values.activeScenarioManifest;
-  } else {
-    delete target.activeScenarioManifest;
-  }
-  if (presentKeys.has("scenarioCountriesByTag")) {
-    target.scenarioCountriesByTag = values.scenarioCountriesByTag;
-  } else {
-    delete target.scenarioCountriesByTag;
-  }
-  if (presentKeys.has("activeScenarioMeshPack")) {
-    target.activeScenarioMeshPack = values.activeScenarioMeshPack;
-  } else {
-    delete target.activeScenarioMeshPack;
-  }
-  if (presentKeys.has("scenarioRuntimeTopologyData")) {
-    target.scenarioRuntimeTopologyData = values.scenarioRuntimeTopologyData;
-  } else {
-    delete target.scenarioRuntimeTopologyData;
-  }
-  if (presentKeys.has("runtimePoliticalTopology")) {
-    target.runtimePoliticalTopology = values.runtimePoliticalTopology;
-  } else {
-    delete target.runtimePoliticalTopology;
-  }
-  if (presentKeys.has("runtimePoliticalMetaSeed")) {
-    target.runtimePoliticalMetaSeed = values.runtimePoliticalMetaSeed;
-  } else {
-    delete target.runtimePoliticalMetaSeed;
-  }
-  if (presentKeys.has("runtimePoliticalFeatureCollectionSeed")) {
-    target.runtimePoliticalFeatureCollectionSeed =
-      values.runtimePoliticalFeatureCollectionSeed;
-  } else {
-    delete target.runtimePoliticalFeatureCollectionSeed;
-  }
-  if (presentKeys.has("scenarioLandMaskData")) {
-    target.scenarioLandMaskData = values.scenarioLandMaskData;
-  } else {
-    delete target.scenarioLandMaskData;
-  }
-  if (presentKeys.has("scenarioContextLandMaskData")) {
-    target.scenarioContextLandMaskData = values.scenarioContextLandMaskData;
-  } else {
-    delete target.scenarioContextLandMaskData;
-  }
-  if (presentKeys.has("scenarioWaterRegionsData")) {
-    target.scenarioWaterRegionsData = values.scenarioWaterRegionsData;
-  } else {
-    delete target.scenarioWaterRegionsData;
-  }
-  if (presentKeys.has("scenarioAtlantropaData")) {
-    target.scenarioAtlantropaData = values.scenarioAtlantropaData;
-  } else {
-    delete target.scenarioAtlantropaData;
-  }
-  if (presentKeys.has("scenarioRuntimeTopologyVersionTag")) {
-    target.scenarioRuntimeTopologyVersionTag =
-      values.scenarioRuntimeTopologyVersionTag;
-  } else {
-    delete target.scenarioRuntimeTopologyVersionTag;
-  }
-  if (presentKeys.has("scenarioLandMaskVersionTag")) {
-    target.scenarioLandMaskVersionTag = values.scenarioLandMaskVersionTag;
-  } else {
-    delete target.scenarioLandMaskVersionTag;
-  }
-  if (presentKeys.has("scenarioContextLandMaskVersionTag")) {
-    target.scenarioContextLandMaskVersionTag =
-      values.scenarioContextLandMaskVersionTag;
-  } else {
-    delete target.scenarioContextLandMaskVersionTag;
-  }
-  if (presentKeys.has("scenarioWaterOverlayVersionTag")) {
-    target.scenarioWaterOverlayVersionTag =
-      values.scenarioWaterOverlayVersionTag;
-  } else {
-    delete target.scenarioWaterOverlayVersionTag;
-  }
-  if (presentKeys.has("scenarioSpecialRegionsData")) {
-    target.scenarioSpecialRegionsData = values.scenarioSpecialRegionsData;
-  } else {
-    delete target.scenarioSpecialRegionsData;
-  }
-  if (presentKeys.has("scenarioReliefOverlaysData")) {
-    target.scenarioReliefOverlaysData = values.scenarioReliefOverlaysData;
-  } else {
-    delete target.scenarioReliefOverlaysData;
-  }
-  if (presentKeys.has("scenarioEraRailwaysData")) {
-    target.scenarioEraRailwaysData = values.scenarioEraRailwaysData;
-  } else {
-    delete target.scenarioEraRailwaysData;
-  }
-  if (presentKeys.has("scenarioReliefOverlayRevision")) {
-    target.scenarioReliefOverlayRevision =
-      values.scenarioReliefOverlayRevision;
-  } else {
-    delete target.scenarioReliefOverlayRevision;
-  }
-  if (presentKeys.has("scenarioEraRailwaysRevision")) {
-    target.scenarioEraRailwaysRevision =
-      values.scenarioEraRailwaysRevision;
-  } else {
-    delete target.scenarioEraRailwaysRevision;
-  }
-  if (presentKeys.has("scenarioStrategicValuesData")) {
-    target.scenarioStrategicValuesData = values.scenarioStrategicValuesData;
-  } else {
-    delete target.scenarioStrategicValuesData;
-  }
-  if (presentKeys.has("scenarioStrategicValuesRevision")) {
-    target.scenarioStrategicValuesRevision =
-      values.scenarioStrategicValuesRevision;
-  } else {
-    delete target.scenarioStrategicValuesRevision;
-  }
-  if (presentKeys.has("scenarioDistrictGroupsData")) {
-    target.scenarioDistrictGroupsData = values.scenarioDistrictGroupsData;
-  } else {
-    delete target.scenarioDistrictGroupsData;
-  }
-  if (presentKeys.has("scenarioDistrictGroupByFeatureId")) {
-    target.scenarioDistrictGroupByFeatureId =
-      values.scenarioDistrictGroupByFeatureId;
-  } else {
-    delete target.scenarioDistrictGroupByFeatureId;
-  }
-  if (presentKeys.has("releasableCatalog")) {
-    target.releasableCatalog = values.releasableCatalog;
-  } else {
-    delete target.releasableCatalog;
-  }
-  if (presentKeys.has("scenarioReleasableIndex")) {
-    target.scenarioReleasableIndex = values.scenarioReleasableIndex;
-  } else {
-    delete target.scenarioReleasableIndex;
-  }
-  if (presentKeys.has("scenarioAudit")) {
-    target.scenarioAudit = values.scenarioAudit;
-  } else {
-    delete target.scenarioAudit;
-  }
-  if (presentKeys.has("scenarioGeneratedColorTags")) {
-    target.scenarioGeneratedColorTags = values.scenarioGeneratedColorTags;
-  } else {
-    delete target.scenarioGeneratedColorTags;
-  }
-  if (presentKeys.has("scenarioFixedOwnerColors")) {
-    target.scenarioFixedOwnerColors = values.scenarioFixedOwnerColors;
-  } else {
-    delete target.scenarioFixedOwnerColors;
-  }
+  restoreScenarioFields(target, values, presentKeys, [
+    "activeScenarioId", "scenarioBorderMode", "activeScenarioManifest",
+    "scenarioCountriesByTag", "activeScenarioMeshPack", "scenarioRuntimeTopologyData",
+    "runtimePoliticalTopology", "runtimePoliticalMetaSeed",
+    "runtimePoliticalFeatureCollectionSeed", "scenarioLandMaskData",
+    "scenarioContextLandMaskData", "scenarioWaterRegionsData", "scenarioAtlantropaData",
+    "scenarioRuntimeTopologyVersionTag", "scenarioLandMaskVersionTag",
+    "scenarioContextLandMaskVersionTag", "scenarioWaterOverlayVersionTag",
+    "scenarioSpecialRegionsData", "scenarioReliefOverlaysData", "scenarioEraRailwaysData",
+    "scenarioReliefOverlayRevision", "scenarioEraRailwaysRevision",
+    "scenarioStrategicValuesData", "scenarioStrategicValuesRevision",
+    "scenarioDistrictGroupsData", "scenarioDistrictGroupByFeatureId", "releasableCatalog",
+    "scenarioReleasableIndex", "scenarioAudit", "scenarioGeneratedColorTags",
+    "scenarioFixedOwnerColors",
+  ]);
 }
 
 function restoreScenarioActivationBeforeColorDirtyStateFromValidated(
   target,
   { values, presentKeys },
 ) {
-  if (presentKeys.has("mapSemanticMode")) {
-    target.mapSemanticMode = values.mapSemanticMode;
-  } else {
-    delete target.mapSemanticMode;
-  }
-  if (presentKeys.has("scenarioImportAudit")) {
-    target.scenarioImportAudit = values.scenarioImportAudit;
-  } else {
-    delete target.scenarioImportAudit;
-  }
-  if (presentKeys.has("scenarioBaselineHash")) {
-    target.scenarioBaselineHash = values.scenarioBaselineHash;
-  } else {
-    delete target.scenarioBaselineHash;
-  }
-  if (presentKeys.has("scenarioBaselineOwnersByFeatureId")) {
-    target.scenarioBaselineOwnersByFeatureId =
-      values.scenarioBaselineOwnersByFeatureId;
-  } else {
-    delete target.scenarioBaselineOwnersByFeatureId;
-  }
-  if (presentKeys.has("scenarioAutoShellOwnerByFeatureId")) {
-    target.scenarioAutoShellOwnerByFeatureId =
-      values.scenarioAutoShellOwnerByFeatureId;
-  } else {
-    delete target.scenarioAutoShellOwnerByFeatureId;
-  }
-  if (presentKeys.has("scenarioBaselineCoresByFeatureId")) {
-    target.scenarioBaselineCoresByFeatureId =
-      values.scenarioBaselineCoresByFeatureId;
-  } else {
-    delete target.scenarioBaselineCoresByFeatureId;
-  }
-  if (presentKeys.has("scenarioShellOverlayRevision")) {
-    target.scenarioShellOverlayRevision =
-      values.scenarioShellOverlayRevision;
-  } else {
-    delete target.scenarioShellOverlayRevision;
-  }
-  if (presentKeys.has("countryNames")) {
-    target.countryNames = values.countryNames;
-  } else {
-    delete target.countryNames;
-  }
-  if (presentKeys.has("sovereigntyByFeatureId")) {
-    target.sovereigntyByFeatureId = values.sovereigntyByFeatureId;
-  } else {
-    delete target.sovereigntyByFeatureId;
-  }
-  if (presentKeys.has("sovereigntyInitialized")) {
-    target.sovereigntyInitialized = values.sovereigntyInitialized;
-  } else {
-    delete target.sovereigntyInitialized;
-  }
-  if (presentKeys.has("capitalOverrides")) target.capitalOverrides = values.capitalOverrides;
-  else delete target.capitalOverrides;
-  if (presentKeys.has("politicalOverrides")) target.politicalOverrides = values.politicalOverrides;
-  else delete target.politicalOverrides;
-  if (presentKeys.has("politicalAlliances")) target.politicalAlliances = values.politicalAlliances;
-  else delete target.politicalAlliances;
-  if (presentKeys.has("projectCities")) target.projectCities = values.projectCities;
-  else delete target.projectCities;
-  if (presentKeys.has("cityNameOverrides")) target.cityNameOverrides = values.cityNameOverrides;
-  else delete target.cityNameOverrides;
-  if (presentKeys.has("riverPaint")) target.riverPaint = values.riverPaint;
-  else delete target.riverPaint;
-  if (presentKeys.has("visualOverrides")) {
-    target.visualOverrides = values.visualOverrides;
-  } else {
-    delete target.visualOverrides;
-  }
-  if (presentKeys.has("sovereignBaseColors")) {
-    target.sovereignBaseColors = values.sovereignBaseColors;
-  } else {
-    delete target.sovereignBaseColors;
-  }
+  restoreScenarioFields(target, values, presentKeys, [
+    "mapSemanticMode", "scenarioImportAudit", "scenarioBaselineHash",
+    "scenarioBaselineOwnersByFeatureId", "scenarioAutoShellOwnerByFeatureId",
+    "scenarioBaselineCoresByFeatureId", "scenarioShellOverlayRevision", "countryNames",
+    "sovereigntyByFeatureId", "sovereigntyInitialized", "capitalOverrides",
+    "politicalOverrides", "politicalAlliances", "projectCities", "cityNameOverrides",
+    "riverPaint", "visualOverrides", "sovereignBaseColors",
+  ]);
 }
 
 export function restoreScenarioActivationBeforeAuditState(target, snapshot) {
