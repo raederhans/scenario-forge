@@ -1,3 +1,4 @@
+import { createDeferredPromise } from "./helpers/deferred_promise.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createTransportWorkbenchLinePackRuntime } from "../js/ui/transport_workbench/transport_workbench_line_runtime_shared.js";
@@ -11,7 +12,7 @@ function createRuntime(getAsset) {
 }
 
 test("pack switch keeps the new generation and rejects old results", async () => {
-  const held = Promise.withResolvers();
+  const held = createDeferredPromise();
   let first = true;
   const runtime = createRuntime((path) => {
     if (path.endsWith("manifest.json")) return { paths: {} };

@@ -1,3 +1,4 @@
+import { createDeferredPromise } from "./helpers/deferred_promise.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
@@ -183,7 +184,7 @@ test("asset I/O maps only tile contributors while preserving edge IDs and global
 });
 
 test("a late asset tile is rejected after geometry changes while the new request proceeds", async (t) => {
-  const oldLoad = Promise.withResolvers();
+  const oldLoad = createDeferredPromise();
   let loadCount = 0;
   const f = fixture({ load: async (_identity, options) => {
     loadCount += 1;

@@ -1,3 +1,4 @@
+import { createDeferredPromise } from "./helpers/deferred_promise.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createTnoRasterSceneOwner } from "../js/core/renderer/tno_raster_scene_owner.js";
@@ -17,7 +18,7 @@ function coverageHarness(dpr = 2) {
 
 test("failed candidate preparation preserves the published frame", async () => {
   const h = coverageHarness();
-  const pending = Promise.withResolvers();
+  const pending = createDeferredPromise();
   h.helpers.getPreparationIdentity = () => "candidate";
   h.helpers.getSceneIdentity = () => "scene";
   h.helpers.getCurrentTransform = () => h.transform;
