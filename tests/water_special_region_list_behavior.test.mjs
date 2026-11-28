@@ -144,3 +144,67 @@ test("special region finite labels translate, unknown tokens fall back, details 
   assert.equal(elements.specialRegionList.children[1].querySelector(".country-select-meta").textContent, "future type · future group");
   assert.equal(elements.specialRegionInspectorDetailHint.textContent, "[Salt flat] · [Atlantropa core]");
 });
+
+test("Atlantropa sea fragments are grouped by sub-sea and long lists are paged with the selection revealed", context => {
+  const { elements, state, controller } = fixture(context);
+  const atl = (id, regionId) => [id, { properties: {
+    id, name: "Mediterranean", water_type: "sea", region_group: "atl", region_id: regionId,
+    source_standard: "mediterranean_template_sea_completion",
+  } }];
+  const seas = Array.from({ length: 45 }, (_, i) => {
+    const id = `sea-${String(i).padStart(2, "0")}`;
+    return [id, { properties: { id, name: `Sea ${String(i).padStart(2, "0")}`, water_type: "sea", region_group: "marine_macro" } }];
+  });
+  state.waterRegionsById = new Map([
+    atl("ATLSEA_FILL_tyrrhenian_2", "tyrrhenian"),
+    atl("ATLSEA_FILL_adriatica_10", "adriatica"),
+    atl("ATLSEA_FILL_adriatica_2", "adriatica"),
+    ...Array.from({ length: 6 }, (_, i) => atl(`ATLSEA_FILL_tyrrhenian_${10 + i}`, "tyrrhenian")),
+    ["med-hgo", { properties: { id: "med-hgo", name: "Mediterranean", water_type: "sea", region_group: "hgo" } }],
+    ...seas,
+  ]);
+  state.selectedWaterRegionId = "sea-00";
+  controller.renderWaterRegionList();
+
+  const list = elements.waterRegionList.children;
+  const med = list[0];
+  assert.equal(med.className, "water-list-group", "the fragments collapse into one top-level entry");
+  const [, medBody] = med.children;
+  assert.deepEqual(medBody.children.slice(0, 2).map((sub) => sub.children[0].children[0].textContent),
+    ["Tyrrhenian Sea", "Adriatic Sea"], "sub-seas follow west-to-east order");
+  assert.equal(medBody.children[2].dataset.regionId, "med-hgo",
+    "an ordinary water body with the same name follows the sub-seas");
+  assert.equal(med.children[0].children[1].textContent, "10", "the group shows how many entries it holds");
+  const adriatic = medBody.children[1].children[1].children;
+  assert.deepEqual(adriatic.map((row) => row.children[0].children[0].textContent),
+    ["Adriatic Sea 1", "Adriatic Sea 2"], "fragments are numbered within their sub-sea in natural id order");
+  assert.deepEqual(adriatic.map((row) => row.dataset.regionId), ["ATLSEA_FILL_adriatica_2", "ATLSEA_FILL_adriatica_10"]);
+
+  // 46 top-level entries → 40 on the first page plus a pager.
+  const pager = list.at(-1);
+  assert.equal(pager.className, "water-list-pager");
+  assert.equal(list.length, 41);
+  assert.equal(pager.children[1].textContent, "1 / 2");
+
+  state.selectedWaterRegionId = "sea-44";
+  controller.renderWaterRegionList();
+  assert.equal(elements.waterRegionList.children.at(-1).children[1].textContent, "2 / 2",
+    "selecting a region on another page turns to that page");
+  assert.ok(elements.waterRegionList.children.some((row) => row.dataset.regionId === "sea-44"));
+
+  // 翻回第 1 页、清空选择，再选中同一块：仍要翻回它所在的页。
+  elements.waterRegionList.children.at(-1).children[0].click();
+  assert.equal(elements.waterRegionList.children.at(-1).children[1].textContent, "1 / 2");
+  state.selectedWaterRegionId = "";
+  controller.renderWaterRegionList();
+  state.selectedWaterRegionId = "sea-44";
+  controller.renderWaterRegionList();
+  assert.equal(elements.waterRegionList.children.at(-1).children[1].textContent, "2 / 2",
+    "reselecting the same region after clearing reveals its page again");
+
+  state.selectedWaterRegionId = "ATLSEA_FILL_adriatica_10";
+  controller.renderWaterRegionList();
+  const revealed = elements.waterRegionList.children[0];
+  assert.equal(revealed.open, true, "the group holding the selection opens");
+  assert.equal(revealed.children[1].children[1].open, true, "and so does its sub-sea");
+});

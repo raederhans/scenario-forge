@@ -325,6 +325,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "在左侧调整道路规则，再选择道路或路线编号查看详情。",
     "en": "Adjust the road rules on the left, then select a road or route label to inspect it."
   },
+  "Adriatic Sea": {
+    "zh": "亚得里亚海",
+    "en": "Adriatic Sea"
+  },
   "Advanced": {
     "zh": "高级",
     "en": "Advanced"
@@ -348,6 +352,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Advanced settings": {
     "zh": "高级设置",
     "en": "Advanced settings"
+  },
+  "Aegean Sea": {
+    "zh": "爱琴海",
+    "en": "Aegean Sea"
   },
   "Africa": {
     "zh": "非洲",
@@ -1702,6 +1710,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Cities in this country": {
     "zh": "本国城市",
     "en": "Cities in this country"
+  },
+  "City": {
+    "zh": "城市",
+    "en": "City"
   },
   "City Lights": {
     "zh": "城市灯光",
@@ -3486,6 +3498,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "编辑标注",
     "en": "Edit annotations"
   },
+  "Edit city": {
+    "zh": "编辑城市",
+    "en": "Edit city"
+  },
   "Edit country color": {
     "zh": "编辑国家颜色",
     "en": "Edit country color"
@@ -4478,6 +4494,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Gulf": {
     "zh": "海湾（Gulf）",
     "en": "Gulf"
+  },
+  "Gulf of Gabès": {
+    "zh": "加贝斯湾",
+    "en": "Gulf of Gabès"
   },
   "HGO": {
     "zh": "HGO",
@@ -5475,6 +5495,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "字距",
     "en": "Letter spacing"
   },
+  "Levantine Sea": {
+    "zh": "黎凡特海",
+    "en": "Levantine Sea"
+  },
   "Level 1 region": {
     "zh": "1级区域",
     "en": "Level 1 region"
@@ -5490,6 +5514,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Liberal republic": {
     "zh": "自由共和制",
     "en": "Liberal republic"
+  },
+  "Libyan–Suez Sea": {
+    "zh": "利比亚—苏伊士海域",
+    "en": "Libyan–Suez Sea"
   },
   "License tier": {
     "zh": "许可级别",
@@ -7281,6 +7309,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Other": {
     "zh": "其他",
     "en": "Other"
+  },
+  "Other Mediterranean waters": {
+    "zh": "地中海其他水域",
+    "en": "Other Mediterranean waters"
   },
   "Other forests": {
     "zh": "其他森林",
@@ -10635,6 +10667,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "海峡",
     "en": "Strait"
   },
+  "Strait of Sicily": {
+    "zh": "西西里海峡",
+    "en": "Strait of Sicily"
+  },
   "Strategic Annotations": {
     "zh": "战略标注",
     "en": "Strategic Annotations"
@@ -11647,6 +11683,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "类型",
     "en": "Type"
   },
+  "Tyrrhenian Sea": {
+    "zh": "第勒尼安海",
+    "en": "Tyrrhenian Sea"
+  },
   "UI": {
     "zh": "界面",
     "en": "UI"
@@ -12266,6 +12306,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Wear": {
     "zh": "磨损",
     "en": "Wear"
+  },
+  "Western Mediterranean": {
+    "zh": "西地中海",
+    "en": "Western Mediterranean"
   },
   "Wetlands & Delta": {
     "zh": "湿地与三角洲",

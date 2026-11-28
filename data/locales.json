@@ -294054,6 +294054,10 @@
       "en": "Adjust the road rules on the left, then select a road or route label to inspect it.",
       "zh": "在左侧调整道路规则，再选择道路或路线编号查看详情。"
     },
+    "Adriatic Sea": {
+      "en": "Adriatic Sea",
+      "zh": "亚得里亚海"
+    },
     "Advanced": {
       "en": "Advanced",
       "zh": "高级"
@@ -294077,6 +294081,10 @@
     "Advanced settings": {
       "en": "Advanced settings",
       "zh": "高级设置"
+    },
+    "Aegean Sea": {
+      "en": "Aegean Sea",
+      "zh": "爱琴海"
     },
     "Africa": {
       "en": "Africa",
@@ -295431,6 +295439,10 @@
     "Cities in this country": {
       "en": "Cities in this country",
       "zh": "本国城市"
+    },
+    "City": {
+      "en": "City",
+      "zh": "城市"
     },
     "City Lights": {
       "en": "City Lights",
@@ -297215,6 +297227,10 @@
       "en": "Edit annotations",
       "zh": "编辑标注"
     },
+    "Edit city": {
+      "en": "Edit city",
+      "zh": "编辑城市"
+    },
     "Edit country color": {
       "en": "Edit country color",
       "zh": "编辑国家颜色"
@@ -298207,6 +298223,10 @@
     "Gulf": {
       "en": "Gulf",
       "zh": "海湾（Gulf）"
+    },
+    "Gulf of Gabès": {
+      "en": "Gulf of Gabès",
+      "zh": "加贝斯湾"
     },
     "HGO": {
       "en": "HGO",
@@ -299204,6 +299224,10 @@
       "en": "Letter spacing",
       "zh": "字距"
     },
+    "Levantine Sea": {
+      "en": "Levantine Sea",
+      "zh": "黎凡特海"
+    },
     "Level 1 region": {
       "en": "Level 1 region",
       "zh": "1级区域"
@@ -299219,6 +299243,10 @@
     "Liberal republic": {
       "en": "Liberal republic",
       "zh": "自由共和制"
+    },
+    "Libyan–Suez Sea": {
+      "en": "Libyan–Suez Sea",
+      "zh": "利比亚—苏伊士海域"
     },
     "License tier": {
       "en": "License tier",
@@ -301010,6 +301038,10 @@
     "Other": {
       "en": "Other",
       "zh": "其他"
+    },
+    "Other Mediterranean waters": {
+      "en": "Other Mediterranean waters",
+      "zh": "地中海其他水域"
     },
     "Other forests": {
       "en": "Other forests",
@@ -304364,6 +304396,10 @@
       "en": "Strait",
       "zh": "海峡"
     },
+    "Strait of Sicily": {
+      "en": "Strait of Sicily",
+      "zh": "西西里海峡"
+    },
     "Strategic Annotations": {
       "en": "Strategic Annotations",
       "zh": "战略标注"
@@ -305376,6 +305412,10 @@
       "en": "Type",
       "zh": "类型"
     },
+    "Tyrrhenian Sea": {
+      "en": "Tyrrhenian Sea",
+      "zh": "第勒尼安海"
+    },
     "UI": {
       "en": "UI",
       "zh": "界面"
@@ -305995,6 +306035,10 @@
     "Wear": {
       "en": "Wear",
       "zh": "磨损"
+    },
+    "Western Mediterranean": {
+      "en": "Western Mediterranean",
+      "zh": "西地中海"
     },
     "Wetlands & Delta": {
       "en": "Wetlands & Delta",

@@ -12746,5 +12746,49 @@
   "Source differences": {
     "en": "Source differences",
     "zh": "来源差异"
+  },
+  "Edit city": {
+    "en": "Edit city",
+    "zh": "编辑城市"
+  },
+  "City": {
+    "en": "City",
+    "zh": "城市"
+  },
+  "Western Mediterranean": {
+    "en": "Western Mediterranean",
+    "zh": "西地中海"
+  },
+  "Tyrrhenian Sea": {
+    "en": "Tyrrhenian Sea",
+    "zh": "第勒尼安海"
+  },
+  "Adriatic Sea": {
+    "en": "Adriatic Sea",
+    "zh": "亚得里亚海"
+  },
+  "Strait of Sicily": {
+    "en": "Strait of Sicily",
+    "zh": "西西里海峡"
+  },
+  "Gulf of Gabès": {
+    "en": "Gulf of Gabès",
+    "zh": "加贝斯湾"
+  },
+  "Aegean Sea": {
+    "en": "Aegean Sea",
+    "zh": "爱琴海"
+  },
+  "Libyan–Suez Sea": {
+    "en": "Libyan–Suez Sea",
+    "zh": "利比亚—苏伊士海域"
+  },
+  "Levantine Sea": {
+    "en": "Levantine Sea",
+    "zh": "黎凡特海"
+  },
+  "Other Mediterranean waters": {
+    "en": "Other Mediterranean waters",
+    "zh": "地中海其他水域"
   }
 }

@@ -7178,7 +7178,8 @@ body.counter-editor-modal-open {
 .bottom-dock.is-collapsed .dock-group-mode,
 .bottom-dock.is-collapsed .dock-group-config,
 .bottom-dock.is-collapsed .dock-group-map-actions,
-.bottom-dock.is-collapsed .dock-group-history-colors {
+.bottom-dock.is-collapsed .dock-group-history-colors,
+.bottom-dock.is-collapsed .dock-group-options {
   display: none !important;
 }
 
@@ -9888,8 +9889,10 @@ select.select-input:hover:not(:disabled),
 .special-zone-workbench-field select:hover:not(:disabled),
 .special-zone-workbench-card select:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--accent) 24%, transparent);
-  background: var(--surface-sunken);
+  /* 只换底色，不用 background 简写：简写会把 repeat 重置为平铺，箭头图会铺满整个下拉框。 */
+  background-color: var(--surface-sunken);
   background-image: var(--app-select-chevron-muted);
+  background-repeat: no-repeat;
   box-shadow: var(--shadow-1);
 }
 
@@ -9914,6 +9917,7 @@ select.select-input:focus-visible,
   border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   background-color: var(--surface-raised);
   background-image: var(--app-select-chevron-active);
+  background-repeat: no-repeat;
   box-shadow: var(--shadow-1);
   outline: 2px solid var(--accent); outline-offset: 2px;
 }

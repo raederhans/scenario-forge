@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "description": "TNO 1962 区域预设：用剧本大区（district_groups.manual.json，按 name_en 引用）或现存国家标签拼成的架空历史方案。由 tools/apply_tno_regional_presets.py 解析为地块 id 写入 countries.json 与启动包；own_preset_key 为 true 的国家只显示自己的剧本预设，不再继承同一 ISO 查找代码下的现代静态预设。",
+  "countries": {
+    "ENG": {
+      "own_preset_key": true,
+      "presets": [
+        { "name": "七国古地·诺森布里亚", "districts": ["North East", "Yorkshire & Humber", "North West"] },
+        { "name": "七国古地·麦西亚", "districts": ["West Midlands", "East Midlands"] },
+        { "name": "七国古地·东盎格利亚", "districts": ["East of England"] },
+        { "name": "七国古地·威塞克斯", "districts": ["South West", "South East"] },
+        { "name": "七国古地·伦敦", "districts": ["London"] },
+        { "name": "南北分治·北方抵抗区", "districts": ["North East", "North West", "Yorkshire & Humber"] },
+        { "name": "南北分治·中部缓冲区", "districts": ["West Midlands", "East Midlands"] },
+        { "name": "南北分治·南方占领区", "districts": ["London", "South East", "South West", "East of England"] },
+        { "name": "海外剥离·英格兰本土", "districts": ["North East", "North West", "Yorkshire & Humber", "West Midlands", "East Midlands", "East of England", "London", "South East", "South West"] },
+        { "name": "海外剥离·印度洋属地", "districts": ["Indian Ocean Territories"] }
+      ]
+    },
+    "BRG": {
+      "own_preset_key": true,
+      "presets": [
+        { "name": "按民族·佛兰德斯地区", "districts": ["Flanders", "Kalen", "Brüssel"] },
+        { "name": "按民族·瓦隆地区", "districts": ["Wallonien", "Ardennen-Maas"] },
+        { "name": "按民族·法语西南", "districts": ["Champagne", "Picardy", "Somme", "Freigrafschaft"] },
+        { "name": "历史勃艮第·勃艮第尼德兰", "districts": ["Flanders", "Kalen", "Brüssel", "Wallonien", "Ardennen-Maas", "Picardy", "Somme"] },
+        { "name": "历史勃艮第·自由伯国", "districts": ["Freigrafschaft"] },
+        { "name": "历史勃艮第·香槟走廊", "districts": ["Champagne"] },
+        { "name": "战后瓜分·比利时复国", "owner_tags": ["BRG"], "cntr_codes": ["BE"] },
+        { "name": "战后瓜分·法国收复", "owner_tags": ["BRG"], "cntr_codes": ["FR"] }
+      ]
+    },
+    "RKM": {
+      "own_preset_key": true,
+      "presets": [
+        { "name": "军阀割据·北方", "districts": ["Generalbezirk Ingermanland", "Generalbezirk Jaroslawl", "Generalbezirk Gorki"] },
+        { "name": "军阀割据·中央", "districts": ["Generalbezirk Moskau", "Generalbezirk Tula", "Generalbezirk Smolensk"] },
+        { "name": "军阀割据·南方", "districts": ["Generalbezirk Woronesch", "Generalbezirk Saratow", "Generalbezirk Don-Wolga"] },
+        { "name": "历史公国·莫斯科大公国", "districts": ["Generalbezirk Moskau", "Generalbezirk Tula", "Generalbezirk Jaroslawl", "Generalbezirk Gorki"] },
+        { "name": "历史公国·诺夫哥罗德", "districts": ["Generalbezirk Ingermanland"] },
+        { "name": "历史公国·斯摩棱斯克", "districts": ["Generalbezirk Smolensk"] },
+        { "name": "历史公国·伏尔加—黑土地", "districts": ["Generalbezirk Woronesch", "Generalbezirk Saratow"] },
+        { "name": "历史公国·顿河哥萨克地", "districts": ["Generalbezirk Don-Wolga"] },
+        { "name": "两线·西部占领带", "districts": ["Generalbezirk Ingermanland", "Generalbezirk Smolensk", "Generalbezirk Moskau", "Generalbezirk Tula", "Generalbezirk Woronesch"] },
+        { "name": "两线·东部前线区", "districts": ["Generalbezirk Jaroslawl", "Generalbezirk Gorki", "Generalbezirk Saratow", "Generalbezirk Don-Wolga"] }
+      ]
+    },
+    "RKO": {
+      "own_preset_key": true,
+      "presets": [
+        { "name": "波罗的海复国·爱沙尼亚", "owner_tags": ["OE01"] },
+        { "name": "波罗的海复国·拉脱维亚", "owner_tags": ["OE00"] },
+        { "name": "波罗的海复国·立陶宛", "owner_tags": ["OE02"] },
+        { "name": "波罗的海复国·白鲁塞尼亚", "owner_tags": ["OE03"] },
+        { "name": "立陶宛大公国复兴", "owner_tags": ["OE02", "OE03"] },
+        { "name": "利沃尼亚", "owner_tags": ["OE00", "OE01"] },
+        { "name": "1918 式·波罗的海联合", "owner_tags": ["OE00", "OE01", "OE02"] },
+        { "name": "1918 式·白俄罗斯人民共和国", "owner_tags": ["OE03"] }
+      ]
+    },
+    "GER": {
+      "own_preset_key": false,
+      "presets": [
+        { "name": "邦国复辟·普鲁士", "districts": ["Gau East Prussia", "Reichsgau Danzig-West Prussia", "Gau Pomerania", "Gau March of Brandenburg & Germania", "Gau Lower Silesia", "Gau Upper Silesia", "Gau Magdeburg-Anhalt & Halle-Merseburg", "Gau Westphalia", "Gau Rhineland (Düsseldorf & Cologne-Aachen)", "Gau Schleswig-Holstein & Hamburg", "Gau Hanover & Weser-Ems", "Gau Hesse-Nassau & Electoral Hesse", "Reichsgau Wartheland"] },
+        { "name": "邦国复辟·巴伐利亚", "districts": ["Gau Munich-Upper Bavaria & Swabia", "Gau Bayreuth (Bavarian Ostmark)", "Gau Franconia & Main-Franconia", "Gau Westmark"] },
+        { "name": "邦国复辟·萨克森与图林根", "districts": ["Gau Saxony", "Gau Thuringia"] },
+        { "name": "邦国复辟·西南德意志", "districts": ["Gau Württemberg-Hohenzollern", "Gau Baden-Alsace"] },
+        { "name": "邦国复辟·梅克伦堡", "districts": ["Gau Mecklenburg"] },
+        { "name": "邦国复辟·奥地利", "districts": ["Reichsgau Upper Danube", "Reichsgau Vienna & Lower Danube", "Reichsgau Salzburg", "Reichsgau Styria", "Reichsgau Tyrol-Vorarlberg", "Reichsgau Carinthia & Carniola"] },
+        { "name": "邦国复辟·波希米亚—摩拉维亚", "districts": ["Protectorate of Bohemia and Moravia", "Reichsgau Sudetenland"] },
+        { "name": "四区占领·美占区", "districts": ["Gau Munich-Upper Bavaria & Swabia", "Gau Bayreuth (Bavarian Ostmark)", "Gau Franconia & Main-Franconia", "Gau Hesse-Nassau & Electoral Hesse", "Gau Württemberg-Hohenzollern"] },
+        { "name": "四区占领·英占区", "districts": ["Gau Schleswig-Holstein & Hamburg", "Gau Hanover & Weser-Ems", "Gau Westphalia", "Gau Rhineland (Düsseldorf & Cologne-Aachen)"] },
+        { "name": "四区占领·法占区", "districts": ["Gau Baden-Alsace", "Gau Westmark", "Gau Moselland"] },
+        { "name": "四区占领·苏占区", "districts": ["Gau Mecklenburg", "Gau Magdeburg-Anhalt & Halle-Merseburg", "Gau Saxony", "Gau Thuringia", "Gau March of Brandenburg & Germania"] },
+        { "name": "四区占领·奥得—尼斯线以东", "districts": ["Gau East Prussia", "Reichsgau Danzig-West Prussia", "Gau Pomerania", "Gau Lower Silesia", "Gau Upper Silesia", "Reichsgau Wartheland"] },
+        { "name": "内战派系（推演）·施佩尔：工业西部", "districts": ["Gau Rhineland (Düsseldorf & Cologne-Aachen)", "Gau Westphalia", "Gau Westmark", "Gau Moselland", "Gau Hesse-Nassau & Electoral Hesse", "Gau Baden-Alsace", "Gau Württemberg-Hohenzollern"] },
+        { "name": "内战派系（推演）·鲍曼：党务中枢", "districts": ["Gau March of Brandenburg & Germania", "Gau Magdeburg-Anhalt & Halle-Merseburg", "Gau Saxony", "Gau Thuringia", "Gau Mecklenburg"] },
+        { "name": "内战派系（推演）·戈林：北部与东普鲁士", "districts": ["Gau Schleswig-Holstein & Hamburg", "Gau Hanover & Weser-Ems", "Gau Pomerania", "Gau East Prussia", "Reichsgau Danzig-West Prussia"] },
+        { "name": "内战派系（推演）·国防军：南德与奥地利", "districts": ["Gau Munich-Upper Bavaria & Swabia", "Gau Bayreuth (Bavarian Ostmark)", "Gau Franconia & Main-Franconia", "Reichsgau Upper Danube", "Reichsgau Vienna & Lower Danube", "Reichsgau Salzburg", "Reichsgau Styria", "Reichsgau Tyrol-Vorarlberg", "Reichsgau Carinthia & Carniola", "Protectorate of Bohemia and Moravia", "Reichsgau Sudetenland"] }
+      ]
+    }
+  }
+}
