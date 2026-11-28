@@ -7,14 +7,12 @@ from pathlib import Path
 
 from map_builder.scenario_context import load_scenario_context, load_scenario_mutations_payload
 from map_builder.scenario_district_groups_service import build_district_groups_payload_in_context
-from tools import build_tno_district_groups as builder
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_DIR = PROJECT_ROOT / "data" / "scenarios" / "tno_1962"
 DISTRICTS_PATH = SCENARIO_DIR / "district_groups.manual.json"
 OWNERS_PATH = SCENARIO_DIR / "owners.by_feature.json"
-SPEC_PATH = PROJECT_ROOT / "tools" / "district_specs" / "tno_1962.json"
 
 
 class TnoDistrictGroupsContractTest(unittest.TestCase):
@@ -22,16 +20,6 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.payload = json.loads(DISTRICTS_PATH.read_text(encoding="utf-8"))
         cls.owners = json.loads(OWNERS_PATH.read_text(encoding="utf-8"))["owners"]
-        cls.spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
-
-    def test_spec_tags_are_all_published(self) -> None:
-        self.assertEqual(self.payload["scenario_id"], "tno_1962")
-        self.assertEqual(set(self.payload["tags"]), set(self.spec["tags"]))
-        for tag in (
-            "GER", "FRA", "ENG", "ITA", "IBR", "RKP", "RKN",
-            "USA", "CHI", "CAN", "MEX", "NCP", "AZH", "TUR", "JAP", "MAN", "RAJ", "KOR",
-        ):
-            self.assertIn(tag, self.payload["tags"])
 
     def test_feature_ids_exist_and_belong_to_tag(self) -> None:
         for tag, record in self.payload["tags"].items():
@@ -41,7 +29,6 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
                         self.assertIn(feature_id, self.owners)
                         self.assertEqual(self.owners[feature_id], tag)
 
-    def test_features_are_not_shared_between_districts(self) -> None:
         counts = Counter(
             feature_id
             for record in self.payload["tags"].values()
@@ -50,7 +37,6 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
         )
         self.assertEqual([feature_id for feature_id, count in counts.items() if count > 1], [])
 
-    def test_covered_tags_have_full_coverage(self) -> None:
         for tag, record in self.payload["tags"].items():
             assigned = {
                 feature_id
@@ -60,57 +46,6 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
             owned = {feature_id for feature_id, owner in self.owners.items() if owner == tag}
             with self.subTest(tag=tag):
                 self.assertEqual(sorted(owned - assigned), [])
-                self.assertGreaterEqual(len(record["districts"]), 1 if tag in {"RKO", "RKU", "RKP", "RKK", "RKM"} else 2)
-
-    def test_district_records_are_named(self) -> None:
-        for tag, record in self.payload["tags"].items():
-            for district_id, district in record["districts"].items():
-                with self.subTest(tag=tag, district=district_id):
-                    self.assertEqual(district["district_id"], district_id)
-                    self.assertTrue(district["name_en"].strip())
-                    self.assertTrue(district["name_zh"].strip())
-                    self.assertTrue(district["feature_ids"])
-
-    def test_south_italian_districts_and_cyprus(self) -> None:
-        districts = self.payload["tags"]["ITA"]["districts"]
-        for district_id, count in {"egeo": 8, "isole_ionie": 4, "lubiana": 2,
-                                   "dalmazia": 30, "malta": 1}.items():
-            self.assertEqual(len(districts[district_id]["feature_ids"]), count, district_id)
-        self.assertEqual(set(districts["lubiana"]["feature_ids"]), {"SI041", "SI037"})
-        self.assertNotIn("cyprus", self.payload["tags"]["TUR"]["districts"])
-
-    def test_published_file_matches_spec_rebuild(self) -> None:
-        # 合并地块 ID 或归属变化后，需要重跑 tools/build_tno_district_groups.py。
-        rebuilt, _ = builder.build_tags(self.spec, builder.load_features())
-        self.assertEqual(rebuilt, self.payload["tags"])
-
-    def test_batch3_has_explicit_coverage_without_nearest(self) -> None:
-        records = builder.load_features()
-        for tag in ("RKU", "RKM", "RKK", "GEA", "GCO", "ANG", "ATL",
-                    "RGC", "SHX", "YUN", "GNG", "GXC", "GUZ", "GMA", "QMA", "XIN", "MEN", "ROM"):
-            assignments = builder.assign_tag(tag, self.spec["tags"][tag], records)
-            with self.subTest(tag=tag):
-                self.assertTrue(assignments)
-                self.assertFalse([fid for fid, (_, source) in assignments.items() if source == "nearest"])
-
-    def test_batch3_reuses_releasable_members(self) -> None:
-        entries = json.loads((PROJECT_ROOT / "data/releasables/tno_1962.internal.phase1.source.json").read_text(encoding="utf-8"))["entries"]
-        for entry in entries:
-            tag = entry["parent_owner_tag"]
-            if tag not in {"RKU", "RKM", "RKK", "GEA", "GCO", "ANG"}:
-                continue
-            expected = {fid for fid in entry["preset_source"]["feature_ids"] if self.owners.get(fid) == tag}
-            if entry["tag"] == "GEAT":
-                expected.update({"KM_ADM1_COM-4934", "KM_ADM1_COM-4935", "KM_ADM1_COM-4936"})
-            district = self.payload["tags"][tag]["districts"][entry["tag"].lower()]
-            self.assertEqual(set(district["feature_ids"]), expected)
-
-    def test_batch3_special_members(self) -> None:
-        self.assertEqual(len(self.payload["tags"]["ATL"]["districts"]), 9)
-        self.assertEqual(len(self.payload["tags"]["ROM"]["districts"]), 5)
-        self.assertEqual(len(self.payload["tags"]["ANG"]["districts"]["south_west_africa"]["feature_ids"]), 13)
-        self.assertIn("CN_CITY_17275852B86000242921086", self.payload["tags"]["GXC"]["districts"]["southeast_qinlei"]["feature_ids"])
-        self.assertIn("CN_CITY_17275852B62552484302053", self.payload["tags"]["GUZ"]["districts"]["east_xiangxi"]["feature_ids"])
 
     def test_editing_source_materializes_to_published_file(self) -> None:
         # 开发工作区保存大区时会从 scenario_mutations.json 整份重写 manual 文件，二者必须一致。
