@@ -3905,6 +3905,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "导出队列已满",
     "en": "Export queue is full"
   },
+  "Export size exceeds the 8K limit. Lower the export scale and try again.": {
+    "zh": "导出尺寸超过 8K 上限，请降低导出倍率后重试。",
+    "en": "Export size exceeds the 8K limit. Lower the export scale and try again."
+  },
   "Export summary": {
     "zh": "导出摘要",
     "en": "Export summary"

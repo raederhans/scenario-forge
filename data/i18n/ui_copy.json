@@ -7224,6 +7224,10 @@
     "en": "Up to 8K, keeps map aspect ratio",
     "zh": "最高 8K，按地图比例导出"
   },
+  "Export size exceeds the 8K limit. Lower the export scale and try again.": {
+    "en": "Export size exceeds the 8K limit. Lower the export scale and try again.",
+    "zh": "导出尺寸超过 8K 上限，请降低导出倍率后重试。"
+  },
   "Preview source": {
     "en": "Preview source",
     "zh": "预览来源"
