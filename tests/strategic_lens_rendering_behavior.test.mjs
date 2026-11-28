@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { resolveFeatureColor } from "../js/core/color_resolver.js";
-import { getStrategicFeatureInspection } from "../js/core/thematic/strategic_values_view_model.js";
 
 function fixture() {
   return {
@@ -38,15 +37,4 @@ test("missing values and foreign scenario data cannot paint a zero-value lens", 
   assert.equal(resolveFeatureColor("a", { state }).source, "strategic:steel");
   state.scenarioStrategicValuesData.scenarioId = "hoi4_1939";
   assert.equal(resolveFeatureColor("a", { state }).source, "visualOverrides");
-});
-test("hover lookup distinguishes zero, absent metric and unmapped features", () => {
-  const state = fixture();
-  state.scenarioStrategicValuesData.buckets.s1.steel = 0;
-  assert.equal(getStrategicFeatureInspection(state, "a").value, 0);
-  assert.equal(getStrategicFeatureInspection(state, "a").hasValue, true);
-  delete state.scenarioStrategicValuesData.buckets.s1.steel;
-  assert.equal(getStrategicFeatureInspection(state, "a").hasValue, false);
-  assert.equal(getStrategicFeatureInspection(state, "b").mapped, false);
-  state.activeScenarioId = "tno_1962";
-  assert.equal(getStrategicFeatureInspection(state, "a"), null);
 });

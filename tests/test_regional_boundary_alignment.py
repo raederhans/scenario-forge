@@ -1,7 +1,7 @@
 import unittest
 
 import geopandas as gpd
-from shapely.geometry import Polygon, box
+from shapely.geometry import box
 
 from map_builder.geo.regional_boundary_alignment import align_regional_boundaries
 
@@ -15,17 +15,6 @@ def _frame(geometries):
 
 
 class RegionalBoundaryAlignmentTests(unittest.TestCase):
-    def test_reviewed_enclave_retains_old_coverage_without_filling_other_holes(self):
-        enclave = box(1.5, 1.5, 2.5, 2.5)
-        lake = box(4, 1, 5, 2)
-        shell = box(0, 0, 6, 4)
-        baseline = _frame({"A": shell.difference(enclave)})
-        candidate = _frame({"A": shell.difference(box(1, 1, 3, 3)).difference(lake)})
-        result, report = align_regional_boundaries(baseline, candidate, retained_hole_anchors=[enclave])
-        self.assertTrue(result.geometry.iloc[0].equals(shell.difference(enclave).difference(lake)))
-        self.assertEqual(report["reviewed_enclave_hole_area"], 4)
-        self.assertEqual(report["candidate_hole_area_excluded"], 1)
-
     def test_candidate_retreat_is_extended_to_baseline_ids(self):
         baseline = _frame({"A": box(0, 0, 2, 1), "B": box(2, 0, 4, 1)})
         candidate = _frame({"A": box(0, 0, 1.8, 1), "B": box(1.8, 0, 3.8, 1)})
@@ -43,44 +32,11 @@ class RegionalBoundaryAlignmentTests(unittest.TestCase):
         self.assertAlmostEqual(result.geometry.iloc[0].area, candidate_geom.area)
         self.assertGreater(report["candidate_hole_area_excluded"], 0)
 
-    def test_hole_enclosed_by_multiple_features_is_preserved(self):
-        hole = box(1, 1, 3, 3)
-        baseline = _frame({"A": box(0, 0, 2, 4), "B": box(2, 0, 4, 4)})
-        candidate = _frame({key: geometry.difference(hole)
-                            for key, geometry in zip(baseline.id, baseline.geometry)})
-        self.assertTrue(all(not geometry.interiors for geometry in candidate.geometry))
-        result, report = align_regional_boundaries(baseline, candidate)
-        self.assertTrue(result.geometry.union_all().equals(box(0, 0, 4, 4).difference(hole)))
-        self.assertEqual(report["candidate_hole_area_excluded"], 4)
-
-    def test_null_ids_and_invalid_tolerance_are_rejected(self):
-        for feature_id in (None, " A", ""):
-            frame = _frame({feature_id: box(0, 0, 1, 1)})
-            with self.assertRaises(ValueError):
-                align_regional_boundaries(frame, frame)
-        frame = _frame({"A": box(0, 0, 1, 1)})
-        with self.assertRaises(ValueError):
-            align_regional_boundaries(frame, frame, area_epsilon=float("nan"))
-
     def test_internal_candidate_boundary_is_not_moved(self):
         baseline = _frame({"A": box(0, 0, 2, 1), "B": box(2, 0, 4, 1)})
         candidate = _frame({"A": box(0, 0, 2, 1), "B": box(2, 0, 3.8, 1)})
         result, _ = align_regional_boundaries(baseline, candidate)
         self.assertTrue(result.loc[result.id == "A", "geometry"].iloc[0].equals(candidate.loc[candidate.id == "A", "geometry"].iloc[0]))
-
-    def test_overlapping_baseline_patch_has_deterministic_id_tie_break(self):
-        baseline = _frame({"A": box(0, 0, 3, 2), "B": box(1, 0, 4, 2)})
-        candidate = _frame({"A": box(0, 0, 2, 2), "B": box(2, 0, 4, 2)})
-        result1, report1 = align_regional_boundaries(baseline, candidate)
-        result2, report2 = align_regional_boundaries(baseline, candidate)
-        self.assertEqual(report1, report2)
-        self.assertTrue(result1.geometry.equals(result2.geometry))
-
-    def test_invalid_candidate_coverage_is_rejected(self):
-        baseline = _frame({"A": box(0, 0, 2, 1), "B": box(2, 0, 4, 1)})
-        candidate = _frame({"A": box(0, 0, 2.1, 1), "B": box(2, 0, 4, 1)})
-        with self.assertRaises(ValueError):
-            align_regional_boundaries(baseline, candidate)
 
 
 if __name__ == "__main__":

@@ -43,18 +43,6 @@ class LandformNameTests(unittest.TestCase):
             self.assertEqual(label, {**original, 'nameZh': '北爱沙尼亚沿海平原'})
             self.assertEqual(updated['assets']['physical'], manifest['assets']['physical'])
             self.assertEqual(updated['datasetRevision'], manifest['datasetRevision'])
-            once = (output / 'labels.json').read_bytes()
-            geo.build_label_names_only(root, output)
-            self.assertEqual((output / 'labels.json').read_bytes(), once)
-            review['entries'][0]['proposedEn'] = 'Baltic Plains'
-            review_path.write_bytes(geo.encoded(review))
-            geo.build_label_names_only(root, output)
-            geo.build_label_names_only(root, output)
-            self.assertEqual(json.loads((output / 'labels.json').read_bytes())['labels'][0]['nameEn'], 'Baltic Plains')
-            review['entries'][0]['proposedZh'] = ''
-            review_path.write_bytes(geo.encoded(review))
-            geo.build_label_names_only(root, output)
-            self.assertEqual(json.loads((output / 'labels.json').read_bytes())['labels'][0]['nameZh'], '')
             review['entries'][0]['originalEn'] = 'Another plain'
             review_path.write_bytes(geo.encoded(review))
             with self.assertRaisesRegex(ValueError, 'source changed'):

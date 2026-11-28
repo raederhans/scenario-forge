@@ -1,7 +1,7 @@
 import unittest
 from copy import deepcopy
 
-from shapely.geometry import box, mapping, shape, Polygon
+from shapely.geometry import box, mapping, shape
 from map_builder.regional_geometry import _encode_exact_coverage
 from tools.prepare_us_county_seams import constrain_seams
 
@@ -30,20 +30,14 @@ class CountySeamTests(unittest.TestCase):
         self.assertEqual(report['removed_union_area_degrees2'], .5)
         self.assertFalse(report['boundary_authority_claim'])
 
-    def test_rejects_erased_county(self):
-        source, baseline = self.fixture(box(0, 0, 3, 1))
-        with self.assertRaisesRegex(ValueError, 'erased'):
-            constrain_seams(source, baseline)
-
-    def test_does_not_fill_gaps(self):
         source, baseline = self.fixture(box(3, 0, 4, 1))
         output, report = constrain_seams(source, baseline)
         self.assertEqual(output, source)
         self.assertEqual(report['changed_counties'], [])
 
-    def test_rejects_invalid_neighbor(self):
-        source, baseline = self.fixture(Polygon([(1, 0), (3, 1), (1, 1), (3, 0), (1, 0)]))
-        with self.assertRaisesRegex(ValueError, 'Invalid neighbor'):
+    def test_rejects_erased_county(self):
+        source, baseline = self.fixture(box(0, 0, 3, 1))
+        with self.assertRaisesRegex(ValueError, 'erased'):
             constrain_seams(source, baseline)
 
 

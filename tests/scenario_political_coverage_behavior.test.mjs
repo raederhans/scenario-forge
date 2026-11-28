@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
-import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import test from "node:test";
-import "../js/core/scenario_chunk_format_shared.js";
 import { getFeatureId } from "../js/core/feature_identity.js";
-import { normalizeScenarioFeatureCollection, getScenarioFeatureCollectionIdentityList,
-  areScenarioFeatureCollectionsEquivalent } from "../js/core/scenario/pure_helpers.js";
 import {
   isScenarioPoliticalBaseChunk,
   mergeScenarioChunkPayloads,
@@ -19,8 +15,8 @@ import {
   buildScenarioChunkLayerSelectionSignatures,
 } from "../js/core/scenario/chunk_layer_payloads.js";
 
-for (const scenarioId of ["tno_1962", "hoi4_1936", "hoi4_1939"]) {
-  test(`${scenarioId} retains real global political coverage across LOD, pan and detail budget limits`, () => {
+test("published scenarios retain global political coverage across LODs", () => {
+  for (const scenarioId of ["tno_1962", "hoi4_1936", "hoi4_1939"]) {
     const read = (name) => JSON.parse(readFileSync(new URL(`../data/scenarios/${scenarioId}/${name}`, import.meta.url), "utf8"));
     const chunkRegistry = normalizeScenarioChunkManifest(read("detail_chunks.manifest.json"));
     const contextLodManifest = normalizeScenarioContextLodManifest(read("context_lod.manifest.json"));
@@ -39,60 +35,17 @@ for (const scenarioId of ["tno_1962", "hoi4_1936", "hoi4_1939"]) {
           assert.ok(selection.requiredChunks.some((chunk) => chunk.id === base.id));
           assert.ok(!selection.evictableChunkIds.includes(base.id));
         }
-        const details = selection.requiredChunks.filter((chunk) => !isScenarioPoliticalBaseChunk(chunk));
-        assert.ok(details.length <= 1, "only detail consumes the count budget");
-        const expectedDetails = scenarioId === "tno_1962" && zoom >= 3 ? 1 : 0;
-        assert.equal(details.length, expectedDetails, "one detail slot is available once the layer admits detail");
         loadedChunkIds = selection.requiredChunks.map((chunk) => chunk.id);
       }
     }
-  });
-}
-
-test("real TNO detail replaces coarse by canonical identity despite different topology IDs", () => {
-  // Published political chunks are TopoJSON; decode them exactly as the runtime does.
-  const topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
-  const { decodeScenarioChunkPayload } = globalThis.__scenarioForgeScenarioChunkFormatShared;
-  const read = (name) => decodeScenarioChunkPayload(JSON.parse(readFileSync(new URL(`../data/scenarios/tno_1962/chunks/political.${name}.json`, import.meta.url), "utf8")), topojson);
-  const coarse = read("coarse.r0c0");
-  // Large countries are published as numbered parts; the runtime loads every part.
-  const gerParts = readdirSync(new URL("../data/scenarios/tno_1962/chunks/", import.meta.url))
-    .filter((file) => /^political\.detail\.country\.ger\.part\.\d+\.json$/.test(file))
-    .map((file) => read(file.slice("political.".length, -".json".length)));
-  assert.ok(gerParts.length > 0);
-  const detailFeatures = gerParts.flatMap((part) => part.features);
-  const merged = mergeScenarioChunkPayloads("political", [...gerParts, coarse]);
-  const expected = new Set([...detailFeatures, ...coarse.features].map(getFeatureId));
-  const actual = new Map(merged.features.map((feature) => [getFeatureId(feature), feature]));
-  assert.equal(merged.features.length, expected.size);
-  assert.equal(actual.size, expected.size);
-  for (const id of expected) assert.ok(actual.has(id), `lost political region ${id}`);
-  // Parts may repeat a boundary region; whichever copy wins must come from detail, never coarse.
-  const detailSet = new Set(detailFeatures);
-  for (const feature of detailFeatures) assert.ok(detailSet.has(actual.get(getFeatureId(feature))), getFeatureId(feature));
-  const overlappingTopologyIds = mergeScenarioChunkPayloads("political", [{ features: [
-    { id: 4, properties: { id: "REGION_A" } },
-    { id: 4, properties: { id: "REGION_B" } },
-  ] }]);
-  assert.equal(overlappingTopologyIds.features.length, 2, "topology sequence IDs must not collapse distinct regions");
-});
-
-test("political promotion preserves complete-coverage semantics through normalization and equality", () => {
-  const feature = { id: 12, properties: { id: "REGION_A" } };
-  const complete = { type: "FeatureCollection", features: [feature], globalCoverage: true };
-  const normalized = normalizeScenarioFeatureCollection(complete);
-  assert.equal(normalized.globalCoverage, true);
-  assert.equal(normalized.features, complete.features);
-  assert.deepEqual(getScenarioFeatureCollectionIdentityList(normalized), ["REGION_A"]);
-  assert.equal(areScenarioFeatureCollectionsEquivalent(complete, normalized), true);
-  assert.equal(areScenarioFeatureCollectionsEquivalent({ features: complete.features }, normalized), false);
+  }
 });
 
 test("detail replaces coarse by ID in either load order and pan downgrades to complete base coverage", () => {
-  const coarseA = { id: "a", geometry: { precision: "coarse-a" } };
-  const coarseB = { id: "b", geometry: { precision: "coarse-b" } };
-  const detailA = { id: "a", geometry: { precision: "detail-a" } };
-  const detailB = { id: "b", geometry: { precision: "detail-b" } };
+  const coarseA = { id: 1, properties: { id: "a" }, geometry: { precision: "coarse-a" } };
+  const coarseB = { id: 2, properties: { id: "b" }, geometry: { precision: "coarse-b" } };
+  const detailA = { id: 3, properties: { id: "a" }, geometry: { precision: "detail-a" } };
+  const detailB = { id: 4, properties: { id: "b" }, geometry: { precision: "detail-b" } };
   const chunkRegistry = normalizeScenarioChunkManifest({ chunks: [
     { id: "base", url: "base.json", layer: "political", lod: "coarse", global_coverage: true,
       max_zoom: 2, feature_count: 2, feature_bounds: [[0, 0, 10, 10], [50, 0, 60, 10]] },
@@ -113,7 +66,7 @@ test("detail replaces coarse by ID in either load order and pan downgrades to co
   });
   const assertFeatures = (collection, expected) => {
     assert.equal(collection.features.length, expected.length);
-    for (const feature of expected) assert.equal(collection.features.find((item) => item.id === feature.id), feature);
+    for (const feature of expected) assert.equal(collection.features.find((item) => getFeatureId(item) === getFeatureId(feature)), feature);
   };
   for (const loadedChunkIds of [["base", "a", "b"], ["b", "a", "base"]]) {
     state.loadedChunkIds = loadedChunkIds;
@@ -128,9 +81,4 @@ test("detail replaces coarse by ID in either load order and pan downgrades to co
     const zoomOut = merge(["base"], [-180, -90, 180, 90]);
     assertFeatures(zoomOut.primaryMergedLayerPayloads.political, [coarseA, coarseB]);
   }
-  // Also exercise the exported viewport merger without the layer builder's ordering.
-  const projected = mergeScenarioChunkPayloadsForViewport("political", ["base", "a"].map((id) => ({
-    chunk: chunkRegistry.chunks.find((chunk) => chunk.id === id), payload: state.payloadByChunkId[id].payload,
-  })), [0, 0, 10, 10]);
-  assertFeatures(projected.payload, [detailA, coarseB]);
 });

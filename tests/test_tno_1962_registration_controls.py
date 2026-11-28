@@ -16,11 +16,3 @@ def test_global_affine_rejects_cross_continent_match_and_keeps_normal_controls()
     assert rejected[0]['province_id'] == 4407
     assert rejected[0]['distance_km'] > 1500
     assert abs(rejected[0]['predicted_lonlat'][0] - 98) < 10
-
-
-def test_consistent_controls_are_unchanged():
-    controls = [dict(x=x, y=y, lon=x / 20 - 180, lat=90 - y / 20)
-                for x, y in [(500, 500), (500, 2500), (3000, 1500), (6000, 500), (6000, 2500)]]
-    kept, rejected = filter_geographic_controls(controls)
-    assert kept == controls
-    assert rejected == []

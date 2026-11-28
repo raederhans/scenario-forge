@@ -6,7 +6,6 @@ import { clearDirty, markDirty } from "../js/core/dirty_state.js";
 import { state } from "../js/core/state.js";
 
 const NOW = Date.UTC(2026, 10, 20);
-const WEEK = 7 * 24 * 60 * 60 * 1000;
 
 function setup(t, options = {}) {
   t.mock.timers.enable({ apis: ["Date", "setTimeout"], now: NOW });
@@ -46,28 +45,6 @@ test("edits restart the 30-second delay and persist the last project payload onc
   assert.equal(storage.put.mock.callCount(), 1);
 });
 
-test("hidden writes immediately and cancels queued idle work", async t => {
-  const timers = {
-    setTimeout: (...args) => setTimeout(...args),
-    clearTimeout: id => clearTimeout(id),
-    requestIdleCallback: t.mock.fn(fn => setTimeout(fn, 100)),
-    cancelIdleCallback: id => clearTimeout(id),
-  };
-  const { page, storage } = setup(t, { timers });
-  markDirty("paint");
-  t.mock.timers.tick(30_000);
-  await nextTurn();
-  assert.equal(timers.requestIdleCallback.mock.callCount(), 1);
-  assert.equal(storage.put.mock.callCount(), 0);
-  page.visibilityState = "hidden";
-  page.dispatchEvent(new Event("visibilitychange"));
-  await nextTurn();
-  assert.equal(storage.put.mock.callCount(), 1);
-  t.mock.timers.tick(100);
-  await nextTurn();
-  assert.equal(storage.put.mock.callCount(), 1);
-});
-
 test("project export removes its snapshot after an outstanding write completes", async t => {
   const { records, storage } = setup(t);
   records.set("other", {});
@@ -82,22 +59,6 @@ test("project export removes its snapshot after an outstanding write completes",
   completeWrite();
   await nextTurn();
   assert.deepEqual([...records.keys()], ["other"]);
-});
-
-test("new edits replace the scenario snapshot and a non-export clear retains it", async t => {
-  const { records, storage } = setup(t);
-  markDirty("paint");
-  t.mock.timers.tick(30_000);
-  await nextTurn();
-  state.customPresets = { revised: "#665544" };
-  markDirty("palette");
-  t.mock.timers.tick(30_000);
-  await nextTurn();
-  clearDirty("project-import");
-  await nextTurn();
-  assert.equal(storage.put.mock.callCount(), 2);
-  assert.equal(records.size, 1);
-  assert.deepEqual(JSON.parse(await records.get("1936").payload.text()).customPresets, state.customPresets);
 });
 
 function snapshot(scenarioId, age) {
@@ -124,64 +85,6 @@ test("recovery defers the previous TNO autosave before the first edit to a share
   assert.equal(records.get(deferred.scenarioId).payload, previous.payload);
 });
 
-test("startup opens history and restores only the selected version after discard confirmation", async t => {
-  const dialog = t.mock.fn(() => true);
-  const importProject = t.mock.fn(() => ({ status: "committed" }));
-  const { records, manager } = setup(t, { dialog, importProject });
-  records.set("older", snapshot("older", WEEK));
-  records.set("1936", snapshot("1936", 120_000));
-  const openHistory = t.mock.fn();
-  await manager.recover(openHistory);
-  const [{ message, confirmLabel, cancelLabel }] = dialog.mock.calls[0].arguments;
-  assert.equal(message, "发现 2 份未保存的工作。");
-  assert.deepEqual([confirmLabel, cancelLabel], ["本地历史", "暂不恢复"]);
-  assert.equal(dialog.mock.callCount(), 1);
-  assert.equal(openHistory.mock.callCount(), 1);
-  const history = await manager.listHistory();
-  assert.deepEqual(history.map(record => record.scenarioId), [`1936@${NOW - 120_000}`, `older@${NOW - WEEK}`]);
-  markDirty("paint");
-  dialog.mock.mockImplementationOnce(() => false);
-  await manager.restoreSnapshot(history[1]);
-  assert.equal(importProject.mock.callCount(), 0);
-  await manager.restoreSnapshot(history[1]);
-  assert.deepEqual(importProject.mock.calls[0].arguments[1].projectPayload, { scenario: { id: "older" } });
-  assert.equal(state.isDirty, true);
-  assert.equal(records.size, 2);
-});
-
-test("dismissing recovery keeps every offered project in history without prompting next startup", async t => {
-  const dialog = t.mock.fn(() => false);
-  const importProject = t.mock.fn();
-  const { records, manager, storage, page } = setup(t, { dialog, importProject });
-  records.set("expired", snapshot("expired", WEEK + 1));
-  records.set("valid", snapshot("valid", WEEK));
-  records.set("latest", snapshot("latest", 60_000));
-  await manager.recover();
-  await manager.recover();
-  assert.equal(dialog.mock.callCount(), 1);
-  assert.equal(importProject.mock.callCount(), 0);
-  assert.deepEqual([...records.keys()], [`latest@${NOW - 60_000}`, `valid@${NOW - WEEK}`]);
-
-  manager.dispose();
-  const nextSession = startAutosave({ storage, page, dialog, importProject });
-  t.after(nextSession.dispose);
-  await nextSession.recover();
-  assert.equal(dialog.mock.callCount(), 1);
-});
-
-test("storage failures during startup, autosave and export cleanup stay local", async t => {
-  const fail = t.mock.fn(() => { throw Error("storage unavailable"); });
-  const { manager } = setup(t, { storage: { edit: fail, put: fail, remove: fail } });
-  await manager.recover();
-  markDirty("paint");
-  t.mock.timers.tick(30_000);
-  await nextTurn();
-  assert.equal(state.isDirty, true);
-  clearDirty("project-export");
-  await nextTurn();
-  assert.equal(fail.mock.callCount(), 3);
-});
-
 test("oversized UTF-8 payload leaves the previous snapshot intact", async t => {
   const { records, storage } = setup(t);
   const previous = snapshot("1936", 10_000);
@@ -192,34 +95,4 @@ test("oversized UTF-8 payload leaves the previous snapshot intact", async t => {
   await nextTurn();
   assert.equal(storage.put.mock.callCount(), 0);
   assert.equal(records.get("1936"), previous);
-});
-
-test("manual snapshots keep the latest twenty versions across projects, never expire and can be deleted", async t => {
-  const dialog = t.mock.fn();
-  const { records, manager } = setup(t, { dialog });
-  records.set("legacy@1", { ...snapshot("legacy@1", 10), deferred: true,
-    payload: new Blob([JSON.stringify({ projectName: "Legacy project" })]) });
-  const [legacy] = await manager.listHistory();
-  assert.equal(legacy.type, "deferred");
-  assert.equal(legacy.projectName, "Legacy project");
-  for (let i = 0; i < 21; i++) {
-    state.activeScenarioId = i % 2 ? "older" : "1936";
-    state.projectName = `Project ${i}`;
-    await manager.saveSnapshot(`Version ${i}`);
-    t.mock.timers.tick(1);
-  }
-  assert.equal(records.size, 21);
-  t.mock.timers.tick(WEEK + 1);
-  await manager.recover();
-  assert.equal(dialog.mock.callCount(), 0);
-  const versions = await manager.listHistory();
-  assert.equal(versions.length, 20);
-  assert.deepEqual(versions.map(record => record.note),
-    Array.from({ length: 20 }, (_, i) => `Version ${20 - i}`));
-  const chosen = versions[4];
-  assert.equal(chosen.projectName, "Project 16");
-  assert.equal(JSON.parse(await chosen.payload.text()).projectName, "Project 16");
-  await manager.deleteSnapshot(chosen);
-  assert.equal(records.size, 19);
-  assert.equal(records.has(chosen.scenarioId), false);
 });

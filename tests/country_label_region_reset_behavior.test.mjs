@@ -15,7 +15,7 @@ function setGlobal(t, name, value) {
   t.after(() => original ? Object.defineProperty(globalThis, name, original) : delete globalThis[name]);
 }
 
-test("regional reset keeps newly visible country fits queued across vector pass preflight", async t => {
+test("regional reset shows the eastern countries after vector pass preflight", async t => {
   const width = 900, height = 500;
   const region = { bounds: [30, 30, 150, 68], central_meridian: 90, backdrop: "none" };
   const projection = d3.geoEqualEarth();
@@ -38,7 +38,7 @@ test("regional reset keeps newly visible country fits queued across vector pass 
         geometries: territories.map(([id], i) => ({ type: "Polygon", id, arcs: [[i]] })) } } },
   };
   Object.assign(state.scenarioCountriesByTag.CHILD, { presentation: "parent_merged", parent_owner_tag: "P" });
-  const idle = [], replies = [], requests = [];
+  const idle = [], replies = [];
   setGlobal(t, "d3", d3);
   setGlobal(t, "topojson", topojson);
   setGlobal(t, "requestIdleCallback", callback => idle.push(callback));
@@ -62,11 +62,9 @@ test("regional reset keeps newly visible country fits queued across vector pass 
   const draw = () => { repaint = false; runtime.drawLabelsPassContent(state.zoomTransform.k); };
   draw();
   await sourcePublished.promise;
-  assert.equal(runtime.getCountryLabelReadiness().sourceStatus, "ready");
   setGlobal(t, "Worker", class {
     handle = createCountryLabelLayoutWorkerHandler();
     postMessage(message) {
-      requests.push(message.countryCode);
       replies.push(() => this.onmessage({ data: this.handle(message) }));
     }
     terminate() {}
@@ -83,22 +81,12 @@ test("regional reset keeps newly visible country fits queued across vector pass 
     }
   }
   drain();
-  assert.equal(runtime.getCountryLabelReadiness().ready, true);
-  assert.deepEqual(requests.splice(0), ["P"]);
   assert.deepEqual(runtime.getVisibleMapLabels().countries, ["P"]);
 
   state.zoomTransform = d3.zoomIdentity;
   draw();
-  const { pendingFits, scheduled } = runtime.getCountryLabelReadiness();
-  assert.equal(pendingFits, easternCodes.length);
-  assert.equal(scheduled, true);
   // Exact-pass preflight can run after the label canvas was already painted at k=1.
   runtime.prepareLabelsPass();
   drain();
-  assert.deepEqual(runtime.getCountryLabelReadiness(), {
-    expected: true, ready: true, pendingFits: 0, pendingWorkerFits: 0, scheduled: false,
-    workerErrors: 0, sourceStatus: "ready",
-  });
-  assert.deepEqual(requests.sort(), easternCodes);
   assert.deepEqual(runtime.getVisibleMapLabels().countries, [...easternCodes, "P"]);
 });

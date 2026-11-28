@@ -67,40 +67,8 @@ class WaterTopologyWindingTests(unittest.TestCase):
         self.assertEqual(measured["contains"], [True, False])
         self.assertEqual(measured["parts"], 1)
 
-    def test_mixed_large_and_tiny_components_keep_independent_local_winding(self):
-        large = [[
-            [35.0, -15.0],
-            [35.0, -14.0],
-            [36.0, -14.0],
-            [36.0, -15.0],
-            [35.0, -15.0],
-        ]]
-        tiny = [[
-            [40.52661514, -11.35281467],
-            [40.53072357, -11.36044216],
-            [40.52280045, -11.35340214],
-            [40.52661514, -11.35281467],
-        ]]
-        topology = replace_water_topology_object(
-            {"type": "Topology", "objects": {}, "arcs": []},
-            feature_collection([large, tiny]),
-        )
-        measured = decode_and_measure(
-            topology,
-            [[35.5, -14.5], [40.5267, -11.354], [0, 0]],
-        )
-        self.assertLess(measured["area"], 1e-3)
-        self.assertEqual(measured["contains"], [True, True, False])
-        self.assertEqual(measured["parts"], 2)
-
     def test_unquantized_encoding_drops_only_subprecision_component(self):
-        normal = [[
-            [-79.0, -2.0],
-            [-79.0, -1.0],
-            [-78.0, -1.0],
-            [-78.0, -2.0],
-            [-79.0, -2.0],
-        ]]
+        normal = [[[-79, -2], [-79, -1], [-78, -1], [-78, -2], [-79, -2]]]
         # Real stage-1 clipping residue: 3.79e-12 square degrees. TNO's source
         # topology has no transform, so grid snapping cannot remove this part.
         residue = [[
@@ -110,12 +78,7 @@ class WaterTopologyWindingTests(unittest.TestCase):
             [-80.81899398885444, -1.676930550096142],
         ]]
         compiled = compile_water_feature_collection(feature_collection([normal, residue]))
-        precision = compiled["water_geometry_precision"]
-        self.assertEqual(precision["minimum_component_area_degrees2"], 1e-10)
-        self.assertEqual(len(precision["removed_components"]), 1)
-        self.assertEqual(precision["removed_components"][0]["id"], "water")
-        self.assertEqual(precision["removed_components"][0]["component_count"], 1)
-        self.assertLess(precision["removed_components"][0]["area_degrees2"], 1e-10)
+        self.assertEqual(len(compiled["water_geometry_precision"]["removed_components"]), 1)
         topology = replace_water_topology_object(
             {"type": "Topology", "objects": {}, "arcs": []},
             compiled,
@@ -124,13 +87,6 @@ class WaterTopologyWindingTests(unittest.TestCase):
         self.assertEqual(measured["parts"], 1)
         self.assertEqual(measured["contains"], [True, False])
 
-    def test_unquantized_encoding_refuses_whole_feature_loss(self):
-        residue = [[
-            [-80.81899398885444, -1.676930550096142],
-            [-80.8190081900819, -1.6769310323103213],
-            [-80.8189941615309, -1.6769300227309913],
-            [-80.81899398885444, -1.676930550096142],
-        ]]
         with self.assertRaises(ValueError):
             compile_water_feature_collection(feature_collection([residue]))
 

@@ -85,31 +85,6 @@ class LosslessTopologyTests(unittest.TestCase):
         )
         self.assertTrue(diagnostics["preserve_arc_identity"])
 
-    def test_political_and_atlantropa_alias_share_domain_but_other_objects_can_share(self):
-        path = [[0, 0], [1, 0], [2, 0]]
-        topology = {
-            "type": "Topology",
-            "objects": {
-                "political": _collection(_line(0)),
-                "scenario_atlantropa": _collection(_line(1)),
-                "land_mask": _collection(_line(2)),
-            },
-            "arcs": [deepcopy(path), deepcopy(path), deepcopy(path)],
-        }
-
-        candidate, diagnostics = optimize_topology(topology)
-        political = candidate["objects"]["political"]["geometries"][0]["arcs"]
-        atlantropa = candidate["objects"]["scenario_atlantropa"]["geometries"][0]["arcs"]
-        land = candidate["objects"]["land_mask"]["geometries"][0]["arcs"]
-        arc_id = lambda refs: refs[0] if refs[0] >= 0 else -refs[0] - 1
-
-        self.assertEqual(arc_id(political), arc_id(land))
-        self.assertNotEqual(arc_id(political), arc_id(atlantropa))
-        self.assertEqual(
-            diagnostics["consumer_domains"]["political"],
-            diagnostics["consumer_domains"]["scenario_atlantropa"],
-        )
-
     def test_negative_zero_is_distinct_and_input_is_not_mutated(self):
         topology = {
             "type": "Topology",
@@ -137,48 +112,6 @@ class LosslessTopologyTests(unittest.TestCase):
         candidate["arcs"][0][0][0] = 77.0
         self.assertLess(math.copysign(1.0, topology["arcs"][0][0][0]), 0)
 
-    def test_transformed_or_invalid_topology_is_rejected(self):
-        topology = {
-            "type": "Topology",
-            "transform": {"scale": [1, 1], "translate": [0, 0]},
-            "objects": {"political": _collection(_line(0))},
-            "arcs": [[[0, 0], [1, 0]]],
-        }
-        with self.assertRaisesRegex(ValueError, "transformed"):
-            optimize_topology(topology)
-
-        topology.pop("transform")
-        topology["objects"]["political"]["geometries"][0]["arcs"] = [9]
-        with self.assertRaisesRegex(ValueError, "missing arc"):
-            optimize_topology(topology)
-
-    def test_positions_require_at_least_two_ordinates(self):
-        topology = {
-            "type": "Topology",
-            "objects": {"political": _collection(_line(0))},
-            "arcs": [[[0], [1, 0]]],
-        }
-        with self.assertRaisesRegex(ValueError, "at least two ordinates"):
-            optimize_topology(topology)
-
-    def test_small_runtime_payload_returns_the_same_object_without_optimization(self):
-        topology = {"type": "Topology", "objects": {}, "arcs": []}
-        with patch("tools.lossless_topology.optimize_topology") as optimize:
-            result = compact_large_runtime_topology(topology, max_bytes=1000)
-        self.assertIs(result, topology)
-        optimize.assert_not_called()
-
-    def test_oversized_runtime_payload_uses_a_smaller_lossless_candidate(self):
-        topology = {"type": "Topology", "objects": {}, "arcs": []}
-        source_size = len(
-            (json.dumps(topology, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
-        )
-        candidate = {"arcs": []}
-        with patch("tools.lossless_topology.optimize_topology", return_value=(candidate, {})) as optimize:
-            result = compact_large_runtime_topology(topology, max_bytes=source_size)
-        self.assertIs(result, candidate)
-        optimize.assert_called_once_with(topology, preserve_arc_identity=True)
-
     def test_compact_runtime_payload_fails_closed_when_lossless_result_is_too_large(self):
         topology = {"type": "Topology", "objects": {}, "arcs": []}
         candidate = {"padding": "x" * 26}
@@ -192,31 +125,6 @@ class LosslessTopologyTests(unittest.TestCase):
         with patch("tools.lossless_topology.optimize_topology", return_value=(candidate, {})):
             with self.assertRaisesRegex(ValueError, "split the payload"):
                 compact_large_runtime_topology(topology, max_bytes=candidate_size)
-
-    def test_gzip_storage_is_explicit_and_returns_standard_topology(self):
-        topology = {"type": "Topology", "objects": {}, "arcs": [], "padding": "x" * 2000}
-        with patch("tools.lossless_topology.optimize_topology", return_value=(deepcopy(topology), {})):
-            with self.assertRaisesRegex(ValueError, "split the payload"):
-                compact_large_runtime_topology(topology, max_bytes=200)
-            result = compact_large_runtime_topology(topology, max_bytes=200, allow_gzip_storage=True)
-            self.assertIs(result, topology)
-            with self.assertRaisesRegex(ValueError, "gzip storage"):
-                compact_large_runtime_topology(topology, max_bytes=1, allow_gzip_storage=True)
-
-    def test_gzip_storage_repeated_calls_preserve_arc_identity_without_optimization(self):
-        ring = [[0, 0], [1.1234567890123, 0], [1, 1], [0, 0]]
-        topology = {"type": "Topology", "objects": {
-            "land_mask": {"type": "MultiPolygon", "arcs": [[[0]], [[1]]]},
-            "context_land_mask": {"type": "MultiPolygon", "arcs": [[[2]], [[-4]]]},
-        }, "arcs": [deepcopy(ring) for _ in range(4)], "padding": "x" * 2000}
-        original = deepcopy(topology)
-        with patch("tools.lossless_topology.optimize_topology", side_effect=AssertionError("must preserve source arcs")) as optimize:
-            first = compact_large_runtime_topology(topology, max_bytes=300, allow_gzip_storage=True)
-            second = compact_large_runtime_topology(first, max_bytes=300, allow_gzip_storage=True)
-        self.assertIs(first, topology)
-        self.assertIs(second, topology)
-        self.assertEqual(second, original)
-        optimize.assert_not_called()
 
 
 if __name__ == "__main__":

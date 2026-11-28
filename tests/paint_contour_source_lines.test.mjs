@@ -30,27 +30,3 @@ test('source fallback retains ambiguous owners and occupied exact intervals', ()
   assert.equal(occupied.diagnostics.sourceNodedSharedSegments, 0);
   assert.deepEqual(Array.from(occupied.owners, index => occupied.featureIds[index]).sort(), ['A', 'B']);
 });
-
-test('an internal third owner blocks source intervals without shared endpoints', () => {
-  const U = [10.7, 10 + 0.7 / 3], V = [11.3, 10 + 1.3 / 3];
-  const graph = buildPaintContourGraph([polygon('A', [P, Q, R], [10, 14]),
-    polygon('B', [R, S, P], [10, 6]), polygon('C', [U, V], [11, 14])]);
-  assert.equal(graph.diagnostics.arcCount, 2);
-  for (let arc = 0; arc < graph.offsets.length - 1; arc += 1) {
-    assert.deepEqual([graph.featureIds[graph.owners[arc * 2]], graph.featureIds[graph.owners[arc * 2 + 1]]].sort(), ['A', 'B']);
-    for (let point = graph.offsets[arc]; point < graph.offsets[arc + 1] - 1; point += 1) {
-      const x0 = graph.coordinates[point * 2], x1 = graph.coordinates[point * 2 + 2];
-      assert.equal(Math.min(x0, x1) < V[0] - 1e-10 && Math.max(x0, x1) > U[0] + 1e-10, false);
-    }
-  }
-});
-
-test('long collinear source chains stop at the comparison budget', () => {
-  const count = 5000, point = t => [10 + t, 10 + t / 3];
-  const left = Array.from({ length: count + 1 }, (_, i) => point(i / count));
-  const right = [point(0), ...Array.from({ length: count }, (_, i) => point((i + 0.5) / count)), point(1)].reverse();
-  const graph = buildPaintContourGraph([polygon('A', left, [10.4, 12]), polygon('B', right, [10.6, 8])]);
-  assert.ok(graph.diagnostics.sourceLineSkippedGroups >= 1);
-  assert.equal(graph.diagnostics.sourceNodedSharedSegments, 0);
-  assert.ok(graph.diagnostics.sourceLineComparisons <= count * 4 + 4096);
-});

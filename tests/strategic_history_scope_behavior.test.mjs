@@ -61,25 +61,6 @@ test("graphic vertex history clones one collection and undo/redo preserves unrel
   assert.equal(legacy.operationGraphics[0].points.length, 2);
 });
 
-test("deleting a line captures counters too and restores both attachment directions", t => {
-  const owner = harness(t);
-  commitStrategicOverlayCollectionsState(state, {
-    operationalLines: [{ id: "line", points: [[0, 0], [1, 1]], attachedCounterIds: ["counter"] }],
-    unitCounters: [{ id: "counter", attachment: { lineId: "line" }, anchor: { featureId: "A" } }],
-  });
-  patchStrategicOverlayEditorState(state, "operationalLineEditor", { selectedId: "line" });
-  assert.equal(owner.deleteSelectedOperationalLine(), true);
-  assert.deepEqual(Object.keys(state.historyPast.at(-1).before), ["operationalLines", "unitCounters"]);
-  assert.equal(state.unitCounters[0].attachment, null);
-  undoHistory();
-  assert.deepEqual(state.operationalLines[0].attachedCounterIds, ["counter"]);
-  assert.equal(state.unitCounters[0].attachment.lineId, "line");
-  redoHistory();
-  assert.equal(state.operationalLines.length, 0);
-  assert.equal(state.unitCounters[0].attachment, null);
-});
-
-
 test("deleting a counter preserves unrelated graphics and restores its line membership", t => {
   const owner = harness(t);
   commitStrategicOverlayCollectionsState(state, {

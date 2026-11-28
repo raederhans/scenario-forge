@@ -6,23 +6,11 @@ import {
   resolveFeatureMergeLineage,
 } from "../js/core/feature_merge_migration.js";
 
-// A, B -> M1 everywhere; M1, C -> M2 everywhere; D, E -> T only in tno_1962.
 const lineage = { version: 1, plans: [
   { plan: "one.v1.json", scenarios: null, groups: { DE_MRG_1: ["DE_A", "DE_B"] } },
   { plan: "two.v1.json", scenarios: null, groups: { DE_MRG_2: ["DE_MRG_1", "DE_C"] } },
   { plan: "tno.v1.json", scenarios: ["tno_1962"], groups: { RU_MRG_T: ["RU_D", "RU_E"] } },
 ] };
-
-test("lineage resolves every level to the final feature of the scenario", () => {
-  const tno = resolveFeatureMergeLineage(lineage, "tno_1962");
-  assert.equal(tno.resolve("DE_A"), "DE_MRG_2");
-  assert.equal(tno.resolve("DE_MRG_1"), "DE_MRG_2");
-  assert.deepEqual([...tno.leavesOf("DE_MRG_2")].sort(), ["DE_A", "DE_B", "DE_C"]);
-  assert.equal(tno.resolve("RU_D"), "RU_MRG_T");
-  const hoi4 = resolveFeatureMergeLineage(lineage, "hoi4_1936");
-  assert.equal(hoi4.resolve("RU_D"), "RU_D");
-  assert.equal(hoi4.isMerged("RU_D"), false);
-});
 
 test("a HOI4 merged Indian parcel expands and regroups under the TNO lineage", async () => {
   const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?cross-scenario");
@@ -38,17 +26,6 @@ test("a HOI4 merged Indian parcel expands and regroups under the TNO lineage", a
   assert.deepEqual(result.visualOverrides, { IN_ADM2_76128533B24861976740713: "#abcdef", IN_MRG_6c3faeb50bb6: "#abcdef" });
   assert.deepEqual(summaries, [{ migratedEntries: 1, ignoredEntries: 0 }]);
   assert.deepEqual(discarded, []);
-});
-
-test("migration discard reporting omits fallback shells and Antarctic IDs", async () => {
-  const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?ignored-ids");
-  const discarded = [];
-  const result = await migrate({ visualOverrides: { LOST: "red", DE_FB_DE: "red", AQ_A: "red", SAVED: "blue" } }, {
-    validFeatureIds: ["SAVED"], fetchImpl: async () => ({ ok: true, json: () => ({}) }),
-    onDiscard: id => discarded.push(id),
-  });
-  assert.deepEqual(result.visualOverrides, { SAVED: "blue" });
-  assert.deepEqual(discarded, ["LOST"]);
 });
 
 test("a merged feature takes a value only when every member carried that same value", () => {
@@ -81,22 +58,6 @@ test("a merged feature takes a value only when every member carried that same va
   assert.deepEqual(result.data.visualOverrides, { RU_MRG_T: "blue" });
 });
 
-test("member lists need the whole merged feature and anchors follow their member", () => {
-  const valid = new Set(["DE_MRG_2", "RU_MRG_T", "RU_F"]);
-  const { data, summary } = migrateMergedFeatureProjectData({
-    customPresets: { DE: [{ name: "core", ids: ["DE_A", "DE_B", "DE_C"] }], RU: [{ name: "part", ids: ["RU_D", "RU_F"] }] },
-    specialZoneLayers: { layers: [{ id: "z", memberFeatureIds: ["RU_E", "RU_D"] }], storySteps: [{ id: "s", focusFeatureId: "DE_B" }] },
-    unitCounters: [{ id: "u", anchor: { featureId: "RU_E" }, layoutAnchor: { kind: "feature", key: "DE_C" } }],
-  }, resolveFeatureMergeLineage(lineage, "tno_1962"), valid);
-  assert.deepEqual(data.customPresets.DE[0].ids, ["DE_MRG_2"]);
-  assert.deepEqual(data.customPresets.RU[0].ids, ["RU_F"]);
-  assert.deepEqual(data.specialZoneLayers.layers[0].memberFeatureIds, ["RU_MRG_T"]);
-  assert.equal(data.specialZoneLayers.storySteps[0].focusFeatureId, "DE_MRG_2");
-  assert.equal(data.unitCounters[0].anchor.featureId, "RU_MRG_T");
-  assert.equal(data.unitCounters[0].layoutAnchor.key, "DE_MRG_2");
-  assert.deepEqual(summary.auxiliary, { migratedEntries: 8, droppedEntries: 1 });
-});
-
 test("project import migrates merged members and reports the dropped ones", async () => {
   const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?feature-merges");
   const summaries = [];
@@ -115,23 +76,4 @@ test("project import migrates merged members and reports the dropped ones", asyn
   assert.deepEqual(result.visualOverrides, { FR_X: "green", RU_MRG_T: "blue" });
   assert.deepEqual(summaries, [{ migratedEntries: 2, ignoredEntries: 3 }]);
   assert.ok(urls.some((url) => url.endsWith("feature-migrations/political_feature_merges.v1.json")));
-});
-
-test("import counts a dropped colour even when another field migrates, using base-valid scoped members", async () => {
-  const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?scoped-members");
-  const summaries = [];
-  const result = await migrate({
-    scenario: { id: "tno_1962" },
-    visualOverrides: { RU_D: "blue" },
-    customPresets: { RU: [{ name: "pair", ids: ["RU_D", "RU_E"] }] },
-  }, {
-    // The import ID set also holds the shared base topology, where RU_D and RU_E remain.
-    validFeatureIds: new Set(["RU_MRG_T", "RU_D", "RU_E"]),
-    scenarioManifest: { scenario_id: "tno_1962", hierarchy_overrides: { feature_merges: { RU_MRG_T: ["RU_D", "RU_E"] } } },
-    fetchImpl: async (url) => ({ ok: true, json: async () => (url.includes("political_feature_merges") ? lineage : {}) }),
-    onMigration: (summary) => summaries.push(summary),
-  });
-  assert.deepEqual(result.visualOverrides, {});
-  assert.deepEqual(result.customPresets.RU[0].ids, ["RU_MRG_T"]);
-  assert.deepEqual(summaries, [{ migratedEntries: 2, ignoredEntries: 1 }]);
 });

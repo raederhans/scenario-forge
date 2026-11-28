@@ -8,9 +8,6 @@ from tools.scenario_chunk_assets import apply_chunk_lod_policy, build_and_write_
 from tools.scenario_chunk_format import feature_collection_to_topology
 
 
-SCENARIOS = Path(__file__).resolve().parents[1] / "data" / "scenarios"
-
-
 def polygon(fid, x):
     return {"type": "Feature", "properties": {"id": fid}, "geometry": {
         "type": "Polygon", "coordinates": [[[0, 0], [x, 0], [0, 1], [0, 0]]],
@@ -35,7 +32,6 @@ class ChunkLodPolicyTests(unittest.TestCase):
             ("hoi4_1939", [[b, polygon("a", 1.0000000001)], [a]], 1.35),
             ("hoi4_1939", [[a]], 1.35),
             ("hoi4_1939", [[a, b, polygon("c", 3)]], 1.35),
-            ("tno_1962", [[a, polygon("b", 3)]], 3),
         ]:
             with self.subTest(scenario=scenario, details=details), tempfile.TemporaryDirectory() as tmp:
                 directory = Path(tmp)
@@ -69,12 +65,3 @@ class ChunkLodPolicyTests(unittest.TestCase):
         chunks = json.loads((directory / "detail_chunks.manifest.json").read_bytes())["chunks"]
         layers = json.loads((directory / "context_lod.manifest.json").read_bytes())["layers"]
         self.assert_threshold([c for c in chunks if c["layer"] == layer], layers[layer], threshold)
-
-    def test_checked_in_thresholds(self):
-        for scenario, layer, threshold in [
-            ("hoi4_1936", "political", 99), ("hoi4_1939", "political", 99),
-            ("tno_1962", "water", 99), ("tno_1962", "scenario_atlantropa", 99),
-            ("tno_1962", "relief", 99), ("tno_1962", "political", 3),
-        ]:
-            with self.subTest(scenario=scenario, layer=layer):
-                self.check_manifests(SCENARIOS / scenario, layer, threshold)

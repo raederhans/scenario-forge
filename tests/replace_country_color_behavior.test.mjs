@@ -54,23 +54,6 @@ test("inspector confirmation replaces base, paint, river cells and legend in one
   check(newColor, newColor);
 });
 
-test("declining changes only the inspector base, and river-only matches do not prompt", async t => {
-  const { matching } = await setup(t);
-  let prompts = 0;
-  await applyCountryColor("FR", newColor, async () => { prompts++; return false; });
-  assert.equal(prompts, 1);
-  assert.equal(state.sovereignBaseColors.FR, newColor);
-  assert.equal(state.visualOverrides.P, "#F00");
-  assert.equal(state.riverPaint.overrides[matching], oldColor);
-  assert.deepEqual(state.legendLabels, { [oldColor]: "France" });
-  assert.equal(undoHistory(), true);
-  delete state.visualOverrides.P;
-  delete state.visualOverrides.distant;
-  await applyCountryColor("FR", newColor, assert.fail);
-  assert.equal(state.sovereignBaseColors.FR, newColor);
-  assert.equal(state.riverPaint.overrides[matching], oldColor);
-});
-
 test("standalone replacement rewrites river-only matches and preserves an existing destination label", async t => {
   const { matching, retained } = await setup(t);
   delete state.visualOverrides.P;

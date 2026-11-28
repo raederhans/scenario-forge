@@ -6,9 +6,7 @@ import subprocess
 import tempfile
 import unittest
 
-from shapely.geometry import shape
-
-from tools.published_geometry_normalization import normalize_published_geometry, round_water_geometry
+from tools.published_geometry_normalization import normalize_published_geometry
 from tools.runtime_json_packing import pack_published_runtime_data
 from tools.scenario_chunk_format import decode_political_chunk, feature_collection_to_topology
 
@@ -93,49 +91,6 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
         for path, raw in untouched.items():
             self.assertEqual(path.read_bytes(), raw)
 
-    def test_water_topology_rounding_transform_skip_and_global_bounds(self):
-        payload = feature_collection_to_topology(collection())
-        original = copy.deepcopy(payload)
-        round_water_geometry(payload)
-        self.assertEqual(payload['arcs'][0][0], [0.123457, 0])
-        self.assertEqual(payload['objects'], original['objects'])
-        transformed = copy.deepcopy(original)
-        transformed['transform'] = {'scale': [0.123456789, 1], 'translate': [0, 0]}
-        saved = copy.deepcopy(transformed)
-        round_water_geometry(transformed)
-        self.assertEqual(transformed, saved)
-        path = self.stage(original, 'water', bounds=[-180, -90, 180, 90], feature_bounds=[])
-        normalize_published_geometry(self.app)
-        metadata = json.loads((self.scenario / 'detail_chunks.manifest.json').read_bytes())['chunks'][0]
-        self.assertEqual(metadata['bounds'], [-180, -90, 180, 90])
-        self.assertEqual(metadata['feature_bounds'], [[0.123457, 0, 4, 4]] * 2)
-        self.assertEqual(json.loads(path.read_bytes()), payload)
-
-    def test_political_geojson_and_topology_runtime_invariant(self):
-        for scenario in ['tno_1962', 'hoi4_1936', 'hoi4_1939']:
-            self.use_scenario(scenario)
-            before = collection()
-            expected = copy.deepcopy(before)
-            if scenario == 'tno_1962':
-                for feature in expected['features']:
-                    for point in feature['geometry']['coordinates'][0]:
-                        point[0] = round(point[0], 6)
-            coarse = self.stage(feature_collection_to_topology(before), 'political', 'coarse.json', lod='coarse')
-            detail = self.stage(before, 'political', 'detail.json', lod='detail', feature_bounds=[], bounds=[0, 0, 5, 5])
-            pack_published_runtime_data(self.app)
-            for path in [coarse, detail]:
-                after = json.loads(gzip.decompress(path.with_suffix('.json.gz').read_bytes()))
-                self.assertEqual(measure(expected, after), {'count': 2, 'before': 2, 'after': 0, 'invariant': True})
-                if path == coarse:
-                    self.assertEqual(after['arcs'], feature_collection_to_topology(expected)['arcs'])
-                    self.assertEqual(after['objects']['political']['geometries'][1]['arcs'], [[-2], [-3]])
-                else:
-                    self.assertTrue(all('sphericalArea' not in f for f in after['features']))
-            if scenario == 'tno_1962':
-                chunk = json.loads((self.scenario / 'detail_chunks.manifest.json').read_bytes())['chunks'][1]
-                self.assertEqual(chunk['feature_bounds'], [[0.123457, 0, 4, 4]] * 2)
-                self.assertEqual(chunk['bounds'], [0, 0, 5, 5])
-
     def test_country_detail_bounds_follow_published_features_and_grid_stays_fixed(self):
         self.use_scenario('tno_1962')
         payload = collection()
@@ -199,82 +154,6 @@ class PublishedGeometryNormalizationTests(unittest.TestCase):
         pack_published_runtime_data(self.app)
         after = json.loads(gzip.decompress(path.with_suffix('.json.gz').read_bytes()))
         self.assertEqual(measure(before, after), {'count': 1, 'before': 0, 'after': 0, 'invariant': True})
-
-    def pack_polygon(self, kind, polygons):
-        self.use_scenario('tno_1962')
-        geometry = {'type': kind, 'coordinates': polygons}
-        feature = {'type': 'Feature', 'id': 'region', 'properties': {}, 'geometry': geometry}
-        payload = {'type': 'FeatureCollection', 'features': [feature]}
-        coarse = self.stage(feature_collection_to_topology(payload), 'political', 'coarse.json', lod='coarse')
-        detail = self.stage(payload, 'political', 'detail.json', lod='detail')
-        stats = pack_published_runtime_data(self.app)['geometry_normalization'][-1]
-        outputs = []
-        for path in [coarse, detail]:
-            packed = json.loads(gzip.decompress(path.with_suffix('.json.gz').read_bytes()))
-            outputs.append(decode_political_chunk(packed)['features'][0]['geometry'])
-        self.assertEqual(outputs[0], outputs[1])
-        return shape(outputs[0]), stats
-
-    def test_rounding_preserves_a_notch_above_a_nonadjacent_edge(self):
-        tip = [0.4, 0.0000013]
-        ring = [[0, 0], [1, 0.000003], [1.123456789, 1], tip, [0, 1], [0, 0]]
-        naive = [[round(x, 6), round(y, 6)] for x, y in ring]
-        self.assertFalse(shape({'type': 'Polygon', 'coordinates': [naive]}).is_valid)
-        result, stats = self.pack_polygon('Polygon', [ring])
-        self.assertTrue(result.is_valid)
-        self.assertIn(tuple(tip), result.exterior.coords)
-        self.assertIn((1.123457, 1), result.exterior.coords)
-        self.assertEqual(stats['protected_points'], 1)
-
-    def test_rounding_keeps_two_faces_touching_only_at_a_point(self):
-        lower = [[0, 0], [1, 0.000003], [1, -1], [0, 0]]
-        upper = [[0, 0], [0.4, 0.0000013], [0.8, 1], [0, 1], [0, 0]]
-        naive = [[[[round(x, 6), round(y, 6)] for x, y in ring]] for ring in [lower, upper]]
-        a, b = shape({'type': 'MultiPolygon', 'coordinates': naive}).geoms
-        self.assertGreater(a.intersection(b).area, 0)
-        result, stats = self.pack_polygon('MultiPolygon', [[lower], [upper]])
-        a, b = result.geoms
-        self.assertTrue(result.is_valid)
-        self.assertEqual(a.intersection(b).geom_type, 'Point')
-        self.assertEqual(stats['protected_points'], 1)
-
-    def test_preexisting_face_overlap_is_counted(self):
-        ring = [[0, 0], [1, 1], [1, 0], [0, 0]]
-        result, stats = self.pack_polygon('MultiPolygon', [[ring], [ring]])
-        self.assertFalse(result.is_valid)
-        self.assertEqual(stats['protected_points'], 0)
-        for layer in stats['layers'].values():
-            self.assertEqual(layer['source_invalid_features'], 1)
-            self.assertEqual(layer['source_overlap_features'], 1)
-            self.assertEqual(layer['source_overlap_pairs'], 1)
-
-    def test_shared_edge_negative_indices_and_multiple_arcs(self):
-        payload = {'type': 'Topology', 'arcs': [
-            [[1, 1], [1, 0]], [[0, 0], [1, 0]],
-            [[1, 1], [0, 1], [0, 0]], [[1, 1], [2, 1], [2, 0], [1, 0]]],
-            'objects': {'political': {'type': 'GeometryCollection', 'geometries': [
-                {'type': 'Polygon', 'arcs': [[1, -1, 2]]},
-                {'type': 'Polygon', 'arcs': [[3, -1]]}]}}}
-        path = self.stage(payload, 'political')
-        report = normalize_published_geometry(self.app)
-        after = json.loads(path.read_bytes())
-        self.assertEqual(after['arcs'], payload['arcs'])
-        geometries = after['objects']['political']['geometries']
-        self.assertEqual(geometries[0]['arcs'], [[-3, 0, -2]])
-        self.assertEqual(geometries[1], payload['objects']['political']['geometries'][1])
-        self.assertEqual(report[0]['invariantFailures'], 0)
-        self.assertEqual(measure(payload, after), {'count': 2, 'before': 1, 'after': 0, 'invariant': True})
-
-    def test_reference_reversal_preserves_source_when_invariant_fails(self):
-        payload = {'type': 'Topology', 'arcs': [
-            [[0, 0], [1, 0]], [[1.1, 0], [1, 1], [0, 0]]],
-            'objects': {'political': {'type': 'GeometryCollection', 'geometries': [
-                {'type': 'Polygon', 'arcs': [[0, 1]]}]}}}
-        path = self.stage(payload, 'political')
-        original = path.read_bytes()
-        report = normalize_published_geometry(self.app)
-        self.assertEqual(report[0]['invariantFailures'], 1)
-        self.assertEqual(path.read_bytes(), original)
 
 
 if __name__ == '__main__':

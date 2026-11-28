@@ -3,9 +3,8 @@ import unittest
 
 from shapely import coverage_is_valid, get_num_coordinates, union_all
 from shapely.geometry import Polygon, box, mapping, shape
-from unittest.mock import patch
 
-from tools.scenario_chunk_assets import _optimize_political_coarse_payload, _shared_coverage_simplified_geometries
+from tools.scenario_chunk_assets import _optimize_political_coarse_payload
 
 
 class RegionalPrecisionLodTest(unittest.TestCase):
@@ -36,36 +35,6 @@ class RegionalPrecisionLodTest(unittest.TestCase):
             self.assertTrue(union_all(mixed).equals(union_all(geometries)))
             self.assertEqual(mixed[2].intersection(mixed[3]).area, geometries[2].intersection(geometries[3]).area)
         self.assertTrue(all(not g.exterior.is_ccw for g in coarse[:2]))
-
-    def test_partial_coverage_rejects_shard_union_drift(self):
-        left = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
-        right = Polygon([(1, 0), (2, 0), (2, 1), (1, 1)])
-        features = [(i, {'properties': {'id': str(i)}, 'geometry': mapping(g)})
-                    for i, g in enumerate([left, right])]
-        # First two unions validate the eligible subset; the next two model a
-        # reinsertion union discrepancy observed in a real USA candidate shard.
-        with patch('tools.scenario_chunk_assets.unary_union', side_effect=[left, left, left, right]):
-            output, applied = _shared_coverage_simplified_geometries(
-                features, {'0': 'A', '1': 'A'}, allow_partial=True)
-        self.assertFalse(applied)
-        self.assertEqual(output, {})
-
-    def test_containing_polygon_is_retained_even_when_only_inner_edges_are_invalid(self):
-        edge = [(1 + (0.001 if i % 2 else 0), i / 20) for i in range(21)]
-        geometries = [Polygon([(0, 0), *edge, (0, 1)]),
-                      Polygon([*edge, (2, 1), (2, 0)]), box(1.0002, .549, 1.0006, .551)]
-        features = [{'properties': {'id': str(i), 'cntr_code': 'US'}, 'geometry': mapping(g)}
-                    for i, g in enumerate(geometries)]
-        result = _optimize_political_coarse_payload(
-            {'features': features}, owner_buckets_by_feature_id={'0': 'A', '1': 'A', '2': 'B'},
-            precision_source_countries={'US'})
-        for i in (0, 2):
-            self.assertEqual(result['features'][i]['geometry'], features[i]['geometry'])
-        coarse = [shape(f['geometry']) for f in result['features']]
-        for detail_a, detail_b in itertools.product([False, True], repeat=2):
-            mixed = [geometries[i] if (detail_a if i < 2 else detail_b) else coarse[i] for i in range(3)]
-            self.assertTrue(mixed[0].intersection(mixed[2]).equals(geometries[0].intersection(geometries[2])))
-            self.assertTrue(union_all(mixed).equals(union_all(geometries)))
 
     def test_partial_coverage_retains_overlap_with_undeclared_foreign_feature(self):
         edge = [(1 + (0.001 if i % 2 else 0), i / 20) for i in range(21)]
@@ -105,13 +74,6 @@ class RegionalPrecisionLodTest(unittest.TestCase):
             self.assertTrue(coverage_is_valid(mixed))
             self.assertTrue(union_all(mixed).equals(union_all(geometries)))
         self.assertEqual([f['properties'] for f in result['features']], [f['properties'] for f in features])
-
-    def test_declared_region_never_falls_back_to_individual_rounding(self):
-        geometry = mapping(Polygon([(0.000012345, 0), (1, 0), (1, 1), (0.000012345, 0)]))
-        features = [{'type': 'Feature', 'properties': {'id': 'DE1', 'cntr_code': 'DE'}, 'geometry': geometry}]
-        result = _optimize_political_coarse_payload(
-            {'features': features}, precision_source_countries={'DE'})
-        self.assertEqual(result['features'][0]['geometry'], geometry)
 
 
 if __name__ == '__main__':

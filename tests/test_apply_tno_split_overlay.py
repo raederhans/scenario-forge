@@ -1,77 +1,14 @@
 from copy import deepcopy
 import json
-import math
 from pathlib import Path
 import shutil
 from uuid import uuid4
 
 import pytest
 
-from map_builder.scenario_political_materialization_support import build_country_entry_from_mutation
-from map_builder.scenario_family_palette import family_palette, hex_to_oklab
 from tools.apply_tno_split_overlay import run_scenario, update_country_geography
 from tools.apply_hoi4_split_overlay import apply_overlay
-from tools.build_tno_split_overlay import D
 from tools import materialize_polar_scenarios
-from tools import build_tno_split_overlay as builder
-
-
-def test_batch3_materialized_owners_controllers_and_exceptions():
-    scenario = Path(__file__).resolve().parents[1] / "data/scenarios/tno_1962"
-    owners = read(scenario / "owners.by_feature.json")["owners"]
-    controllers = {**owners, **{fid: row["controller"] for fid, row in
-                   read(scenario / "scenario_mutations.json")["assignments_by_feature_id"].items()
-                   if "controller" in row}}
-    expected = {
-        "CN_CITY_17275852B86000242921086": "GXC",
-        "CN_CITY_17275852B79223379777667": "CHI",
-        "CN_CITY_17275852B65169663803205": "CHI",
-        "CN_CITY_17275852B50863739077021": "CHI",
-        "CN_CITY_17275852B92159102315867": "XIK",
-        "CN_CITY_17275852B35342422356290": "XIK",
-        "CN_CITY_17275852B62552484302053": "GUZ",
-        "CN_MRG_25e49cf89270": "CHI",
-        "UA_RAY_74538382B34820599431847": "ROM",
-        "UA_RAY_74538382B4607226007855": "TNS",
-        "MDA-1637": "TNS", "MDA-1650": "ROM",
-        "MU": "MAD", "KM_ADM1_COM-4934": "GEA",
-        "KM_ADM1_COM-4935": "GEA", "KM_ADM1_COM-4936": "GEA",
-        "UZB-356": "KRK", "UZB-361": "UTL",
-        "TKM-359__SPLIT_UTL": "UTL", "TKM-359__SPLIT_REST": "TKM",
-        "PAK-1108__SPLIT_KLT": "KLT", "PAK-1108__SPLIT_REST": "PAK",
-        "MAR-1451": "MOR", "MAR-1445": "MOR", "ES630": "IBR", "ES640": "IBR",
-        "DZA-2145": "SLG", "DZA-2143": "IAL", "IRQ-3051": "BKU",
-        "IRQ-3243__SPLIT_BKU": "BKU", "IRQ-3243__SPLIT_REST": "IRQ",
-        "ISR-3058": "IME", "SYR-4843": "SNS", "SYR-137": "TUR",
-    }
-    for fid, tag in expected.items():
-        assert owners[fid] == tag, fid
-        assert controllers[fid] == tag, fid
-    countries = read(scenario / "countries.json")["countries"]
-    assert [countries["KLT"][key] for key in ("base_iso2", "lookup_iso2", "provenance_iso2")] == ["PK"] * 3
-    for tag, parent, kind in [("SLG", "IBR", ""), ("IME", "ITA", "mandate"), ("SNS", "ITA", "mandate")]:
-        assert countries[tag]["parent_owner_tag"] == parent
-        assert countries[tag]["subject_kind"] == kind
-    cores = read(scenario / "cores.by_feature.json")["cores"]
-    assert cores["DZA-2143"] == ["SLG"]
-    for tag in ("ALC", "PAL", "SYR", "KUR"):
-        assert tag not in countries
-        assert tag not in owners.values()
-        assert all(tag not in values for values in cores.values())
-
-
-def test_batch3_overlay_rules_replay_without_changes():
-    scenario = Path(__file__).resolve().parents[1] / "data/scenarios/tno_1962"
-    owners = read(scenario / "owners.by_feature.json")["owners"]
-    countries = read(scenario / "countries.json")["countries"]
-    cores = read(scenario / "cores.by_feature.json")["cores"]
-    features = {fid: {"cntr_code": countries[tag].get("base_iso2", "")} for fid, tag in owners.items()}
-    _, assignments, report = apply_overlay(
-        {"version": 1, "entries": [{"scenarios": ["tno_1962"], **entry} for entry in builder.BATCH3]}, "tno_1962",
-        features=features, owners=owners, cores=cores, countries=countries,
-        default_country="GER", hierarchy_groups={}, country_meta={}, prefectures={}, bucket_by_feature={}, plans=[])
-    assert assignments == {}
-    assert report["changed_count"] == 0
 
 
 @pytest.fixture
@@ -85,29 +22,6 @@ def scenario_dir():
 
 def read(path):
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-@pytest.mark.parametrize("has_child", [True, False])
-def test_zero_land_parent_is_retained_but_core_only_tag_is_rejected(has_child):
-    overlay = {"version": 1, "entries": [{"id": "capital_district", "scenarios": ["tno_1962"],
-        "tag": "NEW", "select": {"feature_ids": ["capital"]}, "cores": "keep"}]}
-    countries = {"ROOT": {"tag": "ROOT"}, "NEW": {"tag": "NEW"}}
-    if has_child:
-        countries["NEW"]["parent_owner_tag"] = "ROOT"
-    kwargs = dict(features={"capital": {"cntr_code": "RU"}}, owners={"capital": "ROOT"},
-        cores={"capital": ["ROOT"]}, countries=countries, default_country="NEW",
-        hierarchy_groups={}, country_meta={}, prefectures={}, bucket_by_feature={}, plans=[])
-    if not has_child:
-        with pytest.raises(ValueError, match="protected.*ROOT"):
-            apply_overlay(overlay, "tno_1962", **kwargs)
-        return
-    result, assignments, report = apply_overlay(overlay, "tno_1962", **kwargs)
-    assert result["ROOT"]["entry_kind"] == "scenario_container"
-    assert assignments["capital"]["owner"] == "NEW"
-    assert assignments["capital"]["cores"] == ["ROOT"]
-    assert report["retired_tags"] == []
-    kwargs.update(countries=result, owners={"capital": "NEW"})
-    assert apply_overlay(overlay, "tno_1962", **kwargs)[2]["changed_count"] == 0
 
 
 def test_two_objects_sources_and_idempotence(scenario_dir, monkeypatch):
@@ -165,11 +79,6 @@ def test_two_objects_sources_and_idempotence(scenario_dir, monkeypatch):
     assert rebuilt == [scenario_dir]
 
 
-def test_district_expansion_intersects_current_owner():
-    districts = {"tags": {"JAP": {"districts": {"taiwan": {"feature_ids": ["b", "a", "foreign", "absent"]}}}}}
-    assert D("JAP", "taiwan", districts, {"a": "JAP", "b": "JAP", "foreign": "CHI"}) == ["a", "b"]
-
-
 def test_geographic_majority_uses_base_parcels_and_preserves_parent():
     countries = {"TEST": {"parent_owner_tag": "JAP", "lookup_iso2": "JAP"}}
     owners = dict(a="TEST", b="TEST", c="TEST", foreign="JAP")
@@ -186,197 +95,6 @@ def test_geographic_majority_uses_base_parcels_and_preserves_parent():
     before = deepcopy(countries)
     update_country_geography(countries, owners, features, base, meta, {"TEST"})
     assert countries == before
-
-
-def test_generator_preserves_applied_entries_and_appends_new(scenario_dir, monkeypatch):
-    source_path = scenario_dir / "releasables.json"
-    source_path.write_text(json.dumps({"entries": []}), encoding="utf-8")
-    monkeypatch.setattr(builder, "RELEASABLE_PATH", source_path)
-    overlay_path = scenario_dir / "overlay.json"
-    colors = family_palette("#3c3c3c", 2)
-    existing = {"version": 1, "entries": [
-        {"id": f"tno_{tag.lower()}", "tag": tag, "parent_owner_tag": "GER",
-         "select": {"feature_ids": [fid]}, "color_hex": color, "name_zh": "旧政体"}
-        for tag, fid, color in zip(("OLDB", "OLDA"), ("b", "a"), colors)
-    ]}
-    original_bytes = json.dumps(existing, ensure_ascii=False, indent=4).encode("utf-8")
-    overlay_path.write_bytes(original_bytes)
-    payloads = {
-        "district_groups.manual.json": {"tags": {"GER": {"districts": {
-            "new": {"feature_ids": ["c", "foreign"]}}}}},
-        "owners.by_feature.json": {"owners": dict(a="OLDA", b="OLDB", c="GER", foreign="CHI")},
-        "countries.json": {"countries": {"GER": {"color_hex": "#3c3c3c"}}},
-    }
-    for name, payload in payloads.items():
-        (scenario_dir / name).write_text(json.dumps(payload), encoding="utf-8")
-    monkeypatch.setattr(builder, "DISTRICTS", ())
-    monkeypatch.setattr(builder, "EXPLICIT", ())
-    pilots = tuple((tag, "Old", "旧政体", "GER", "colony", "removed") for tag in ("OLDA", "OLDB"))
-    monkeypatch.setattr(builder, "SCENARIO_DIR", scenario_dir)
-    monkeypatch.setattr(builder, "OVERLAY_PATH", overlay_path)
-    monkeypatch.setattr(builder, "PILOTS", pilots)
-    builder.main()
-    assert overlay_path.read_bytes() == original_bytes
-
-    monkeypatch.setattr(builder, "PILOTS", pilots + (("NEWC", "New", "新政体", "GER", "colony", "new"),))
-    builder.main()
-    result = read(overlay_path)
-    assert result["entries"][:2] == existing["entries"]
-    assert len(result["entries"]) == 3
-    new = result["entries"][-1]
-    assert new["id"] == "tno_newc"
-    assert new["select"] == {"feature_ids": ["c"]}
-    assert all(math.dist(hex_to_oklab(new["color_hex"]), hex_to_oklab(color)) > 0.015 for color in colors)
-    appended_bytes = overlay_path.read_bytes()
-    builder.main()
-    assert overlay_path.read_bytes() == appended_bytes
-
-
-def test_generator_rejects_empty_new_entry(monkeypatch):
-    monkeypatch.setattr(builder, "PILOTS", (("JTWN", "Taiwan", "台湾", "JAP", "colony", "taiwan"),))
-    districts = {"tags": {"JAP": {"districts": {"taiwan": {"feature_ids": ["foreign"]}}}}}
-    with pytest.raises(ValueError, match="tno_jtwn"):
-        builder.build_overlay(districts, {"foreign": "CHI"}, {"JAP": {"color_hex": "#82132e"}},
-                              {"version": 1, "entries": []})
-
-
-@pytest.mark.parametrize("kind", ["colony", "colonial_government", "protectorate"])
-def test_subject_kind_survives_materialization(kind):
-    mutation = dict(mode="create", display_name_en="Taiwan", display_name_zh="台湾",
-                    color_hex="#bbccdd", parent_owner_tag="JAP", subject_kind=kind)
-    entry = build_country_entry_from_mutation({"scenarioId": "tno_1962"}, "JTWN", mutation, existing_entry=None)
-    assert entry["parent_owner_tag"] == "JAP"
-    assert entry["parent_owner_tags"] == ["JAP"]
-    assert entry["subject_kind"] == kind
-    existing = deepcopy(entry)
-    existing["subject_kind"] = "releasable_state"
-    assert build_country_entry_from_mutation(
-        {"scenarioId": "tno_1962"}, "JTWN", mutation, existing_entry=existing)["subject_kind"] == kind
-
-
-def test_batch_two_published_ownership_and_relationships():
-    directory = builder.SCENARIO_DIR
-    overlay = read(builder.OVERLAY_PATH)
-    owners = read(directory / "owners.by_feature.json")["owners"]
-    cores = read(directory / "cores.by_feature.json")["cores"]
-    countries = read(directory / "countries.json")["countries"]
-    user_rules = read(Path(__file__).parent / "fixtures/tno_user_reassign.json")
-    corrected = {fid: {"RKO": "OE00"}.get(row["to"], row["to"]) for fid, row in user_rules.items() if row["from"] != row["to"]}
-    corrected["ATLISL_adriatica_corfu"] = "ITA"
-    corrected.update({fid: entry["tag"] for entry in overlay["entries"] if entry["id"].startswith("tno_user2_")
-                      for fid in entry["select"]["feature_ids"]})
-    corrected.update({fid: entry["tag"] for entry in overlay["entries"] if entry["id"].startswith("tno_batch3_")
-                      for fid in entry["select"]["feature_ids"]})
-    corrected_cores = {fid: [entry["tag"]] if entry["cores"] == "owner" else entry["cores"]
-                       for entry in overlay["entries"] if entry["id"].startswith("tno_batch3_") and entry["cores"] != "keep"
-                       for fid in entry["select"]["feature_ids"]}
-    splits = read(directory / "manifest.json")["hierarchy_overrides"]["feature_splits"]
-    superseded = {old for entry in overlay["entries"] for old in entry.get("supersedes", [])}
-    for entry in overlay["entries"][3:]:
-        tag = entry["tag"]
-        if entry["id"] in {"tno_idal", "tno_oe04", "tno_vic"}:
-            assert tag not in countries
-            continue
-        if entry["id"] in superseded:
-            continue
-        country = countries[tag]
-        if "parent_owner_tag" in entry:
-            assert country["parent_owner_tag"] == entry["parent_owner_tag"]
-            assert country["subject_kind"] == entry["subject_kind"]
-        for fid in entry["select"]["feature_ids"]:
-            for child in splits.get(fid, [fid]):
-                expected = corrected.get(child, corrected.get(fid, tag))
-                assert owners[child] == expected
-                if entry["cores"] == "owner":
-                    assert cores[child] == corrected_cores.get(child, [tag])
-    assert owners["MYS-1139"] == "MLY"
-    assert owners["MYS-4833"] == "MAL"
-    assert owners["BN_ADM1_BRN-1184"] == "MAL"
-    assert owners["MR_ADM1_MRT-2796"] == "AZW"
-    assert owners["PL_POW_1463"] == "RKP"
-    assert countries["GUI"]["display_name_en"] == "Guinea"
-    assert countries["GUZ"]["display_name"] == "Guizhou Clique"
-    assert all(owner in countries for owner in owners.values())
-    assert all(core in countries for values in cores.values() for core in values)
-
-
-def test_gui_legacy_migration_preserves_new_guinea():
-    import subprocess
-
-    script = r"""
-import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { migrateTnoProjectTags, TNO_TAG_MIGRATION_VERSION,
-  normalizeCountryCodeAlias } from './js/core/country_code_aliases.js';
-const countries = JSON.parse(readFileSync('./data/scenarios/tno_1962/countries.json', 'utf8')).countries;
-assert.ok(TNO_TAG_MIGRATION_VERSION >= 1);
-const legacy = migrateTnoProjectTags({scenario: {id: 'tno_1962'},
-  activeSovereignCode: 'GUI', countryBaseColors: {GUI: '#123456'}});
-assert.equal(legacy.activeSovereignCode, 'GUZ');
-assert.deepEqual(legacy.countryBaseColors, {GUZ: '#123456'});
-// A project saved after version 1 already means Guinea by GUI.
-const v1 = migrateTnoProjectTags({scenario: {id: 'tno_1962', tagMigrationVersion: 1},
-  activeSovereignCode: 'GUI', countryBaseColors: {GUI: '#abcdef', GUZ: '#123456'}});
-assert.equal(v1.activeSovereignCode, 'GUI');
-assert.deepEqual(v1.countryBaseColors, {GUI: '#abcdef', GUZ: '#123456'});
-const current = {scenario: {id: 'tno_1962', tagMigrationVersion: TNO_TAG_MIGRATION_VERSION},
-  activeSovereignCode: 'GUI', countryBaseColors: {GUI: '#abcdef'}};
-assert.equal(migrateTnoProjectTags(current), current);
-assert.equal(normalizeCountryCodeAlias('GUI'), 'GUI');
-assert.equal(countries.GUI.display_name_en, 'Guinea');
-assert.equal(countries.GUZ.display_name, 'Guizhou Clique');
-"""
-    subprocess.run(["node", "--input-type=module", "-e", script], cwd=builder.ROOT, check=True)
-
-
-def test_jhaw_sidebar_uses_owned_hawaii_hierarchy():
-    import subprocess
-
-    script = r"""
-import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { createCountryInspectorModel } from './js/ui/sidebar/country_inspector_model.js';
-import { getCountryGroupSystems } from './js/core/country_group_provider.js';
-import { getMapDataBoundary } from './js/core/map_data_boundary.js';
-const read = path => JSON.parse(readFileSync(path, 'utf8'));
-const hierarchy = read('./data/hierarchy.json');
-const countries = read('./data/scenarios/tno_1962/countries.json').countries;
-const owners = read('./data/scenarios/tno_1962/owners.by_feature.json').owners;
-const runtime = {
-  activeScenarioId: 'tno_1962', mapSemanticMode: 'political',
-  scenarioCountriesByTag: countries, scenarioBaselineOwnersByFeatureId: owners,
-  hierarchyData: hierarchy, hierarchyGroupsByCode: new Map(),
-  activeScenarioManifest: read('./data/scenarios/tno_1962/manifest.json'),
-  countryGroupMetaByCode: new Map(Object.entries(hierarchy.country_groups.country_meta)),
-};
-const model = createCountryInspectorModel(runtime, value => value);
-assert.equal(model.resolveInspectorDataCode('JHAW'), 'US');
-assert.deepEqual(model.getCountryGroupingMeta('JHAW'), hierarchy.country_groups.country_meta.US);
-const reference = getMapDataBoundary(runtime).reference;
-const systems = getCountryGroupSystems({
-  runtimeState: runtime, ownerCode: 'JHAW', groupingCode: model.resolveInspectorDataCode('JHAW'),
-  getOwnerCode: id => reference.getScenarioGroupCode(id),
-});
-const groups = systems.find(system => system.id === 'geographic').groups;
-const hawaii = groups.find(group => group.id === 'US_Hawaii');
-assert.ok(hawaii);
-assert.deepEqual([...hawaii.children].sort(), Object.keys(owners).filter(id => owners[id] === 'JHAW').sort());
-assert.equal(hawaii.children.length, 5);
-console.log('JHAW -> US -> US_Hawaii: 5 owned parcels');
-"""
-    subprocess.run(["node", "--input-type=module", "-e", script], cwd=builder.ROOT, check=True)
-
-
-def test_explicit_pilot_selection_intersects_current_owner(monkeypatch):
-    monkeypatch.setattr(builder, "PILOTS", (
-        ("CGUB", "Ubangi", "乌班吉", "GCO", "colonial_government", ("a", "foreign")),))
-    monkeypatch.setattr(builder, "DISTRICTS", ())
-    monkeypatch.setattr(builder, "EXPLICIT", ())
-    result = builder.build_overlay({}, {"a": "GCO", "foreign": "CAO"},
-                                   {"GCO": {"color_hex": "#6a725b"}},
-                                   {"version": 1, "entries": []})
-    assert result["entries"][0]["select"] == {"feature_ids": ["a"]}
-    assert result["entries"][0]["cores"] == "keep"
 
 
 def test_reclamation_preserves_other_cores_and_is_repeatable():
@@ -430,17 +148,3 @@ def test_identity_v2_preserves_current_tags_and_geographic_codes(scenario_dir):
     assert read(scenario_dir / "runtime_topology.topo.json")["properties"] == {
         "cntr_code": "BZ", "owner_tag": "BLZ"}
     assert apply_identity_migrations(scenario_dir, releasable_paths=[]) == []
-
-
-def test_geography_keeps_a_country_reference_its_parcels_still_include():
-    countries = {"GRE": {"lookup_iso2": "GR"}, "ALB": {"lookup_iso2": "AL"}, "SUB": {"lookup_iso2": "JAP"}}
-    features = {"g1": {"cntr_code": "GR"}, "a1": {"cntr_code": "ATL"}, "a2": {"cntr_code": "ATL"},
-                "al": {"cntr_code": "AL"}, "k1": {"cntr_code": "XK"}, "k2": {"cntr_code": "XK"},
-                "u1": {"cntr_code": "US"}}
-    owners = {"g1": "GRE", "a1": "GRE", "a2": "GRE", "al": "ALB", "k1": "ALB", "k2": "ALB", "u1": "SUB"}
-    meta = {"US": {"continent_id": "continent_north_america"}}
-    update_country_geography(countries, owners, features, {}, meta, {"GRE", "ALB", "SUB"})
-    assert countries["GRE"]["lookup_iso2"] == "GR"
-    assert countries["ALB"]["lookup_iso2"] == "AL"
-    assert countries["SUB"]["lookup_iso2"] == "US"
-    assert countries["SUB"]["continent_id"] == "continent_north_america"

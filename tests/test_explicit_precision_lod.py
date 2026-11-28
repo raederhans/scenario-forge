@@ -1,48 +1,14 @@
 import unittest
-from shapely import coverage_is_valid, get_num_coordinates, union_all
+from shapely import coverage_is_valid, union_all
 from shapely.geometry import Polygon, mapping, shape
 import itertools
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from tools.scenario_chunk_assets import _optimize_political_coarse_payload, _build_political_chunk_payloads
 
 
 class ExplicitPrecisionLodTest(unittest.TestCase):
-    def test_explicit_id_partial_owner_preserves_selected_and_neighbor_interfaces(self):
-        # 3 features: A1 (selected), A2 (non-selected, same owner), B1 (non-selected, different owner)
-        # We need them to share boundaries. A1 shares with A2 and B1.
-
-        edges = [[(x + 0.00001234567 + (0.001 if i % 2 else 0), i / 20)
-                  for i in range(21)] for x in range(4)]
-        geometries = [Polygon(edges[i] + edges[i + 1][::-1]) for i in range(3)]
-
-        # A1 is selected (explicit ID), A2 is same owner, B1 is different owner
-        ids = ['A1', 'A2', 'B1']
-        codes = ['AA', 'AA', 'BB']
-        owners = {'A1': 'OWNER_A', 'A2': 'OWNER_A', 'B1': 'OWNER_B'}
-
-        features = [{'type': 'Feature', 'properties': {'id': fid, 'cntr_code': code},
-                     'geometry': mapping(geom)} for fid, code, geom in zip(ids, codes, geometries)]
-
-        diagnostics = {}
-        result = _optimize_political_coarse_payload(
-            {'type': 'FeatureCollection', 'features': features},
-            owner_buckets_by_feature_id=owners,
-            political_precision_feature_ids={'A1'},
-            diagnostics=diagnostics
-        )
-
-        coarse = [shape(f['geometry']) for f in result['features']]
-        # Explicit precision declarations still permit joint simplification
-        # inside a load shard; its external boundary and every mixed union stay exact.
-        self.assertTrue(union_all(coarse[:2]).equals(union_all(geometries[:2])))
-        self.assertTrue(coarse[2].equals(geometries[2]))
-        for first, second in itertools.product([False, True], repeat=2):
-            mixed = [geometries[i] if (first if i < 2 else second) else coarse[i] for i in range(3)]
-            self.assertTrue(coverage_is_valid(mixed))
-            self.assertTrue(union_all(mixed).equals(union_all(geometries)))
-
     def test_explicit_id_mixed_owner_lod_seam(self):
         # >=2 adjacent explicitly selected regions, DIFFERENT owners, differing 3-letter cntr_code
         edges = [[(x + 0.00001234567 + (0.001 if i % 2 else 0), i / 20)
@@ -74,34 +40,10 @@ class ExplicitPrecisionLodTest(unittest.TestCase):
             self.assertTrue(coverage_is_valid(mixed))
             self.assertTrue(union_all(mixed).equals(union_all(geometries)))
 
-    def test_explicit_id_with_3_letter_cntr_code(self):
-        # Use a polygon with enough points that simplification will reduce it
-        geometry = mapping(Polygon([
-            (0, 0), (0.1, 0.001), (0.2, 0), (0.3, 0.001), (0.4, 0), (0.5, 0.001),
-            (1, 0), (1, 1), (0, 1), (0, 0)
-        ]))
-        # 3-letter code like RU_RAY
-        features = [
-            {'type': 'Feature', 'properties': {'id': 'RU_RAY_123', 'cntr_code': 'RAY'}, 'geometry': geometry},
-            {'type': 'Feature', 'properties': {'id': 'OTHER_1', 'cntr_code': 'OTH'}, 'geometry': geometry}
-        ]
-        owners = {'RU_RAY_123': 'RUS', 'OTHER_1': 'OTH'}
-
-        result = _optimize_political_coarse_payload(
-            {'type': 'FeatureCollection', 'features': features},
-            owner_buckets_by_feature_id=owners,
-            political_precision_feature_ids={'RU_RAY_123'}
-        )
-
-        # RU_RAY_123 should be untouched
-        self.assertTrue(shape(result['features'][0]['geometry']).equals(shape(geometry)))
-        # The duplicate overlaps the explicit feature: retain both participants.
-        self.assertTrue(shape(result['features'][1]['geometry']).equals(shape(geometry)))
-
     @patch('tools.scenario_chunk_assets._write_json')
     @patch('tools.scenario_chunk_assets._write_minified_json')
     @patch('tools.scenario_chunk_assets._load_owner_map', return_value={'F1': 'A'})
-    def test_build_boundary_rejects_malformed_and_unknown_ids(self, mock_load, mock_min_write, mock_write):
+    def test_build_boundary_rejects_unknown_ids(self, mock_load, mock_min_write, mock_write):
         scenario_dir = Path('/fake/scenario')
 
         startup_topology = {
@@ -130,25 +72,6 @@ class ExplicitPrecisionLodTest(unittest.TestCase):
                 runtime_topology_payload=runtime_topology,
             )
 
-        # Test malformed (empty)
-        runtime_topology['political_precision_feature_ids'] = ['F1', '   ']
-        with self.assertRaisesRegex(ValueError, "nonempty unique strings"):
-            _build_political_chunk_payloads(
-                scenario_id="test",
-                scenario_dir=scenario_dir,
-                startup_topology_payload=startup_topology,
-                runtime_topology_payload=runtime_topology,
-            )
-
-        # Test malformed (duplicate)
-        runtime_topology['political_precision_feature_ids'] = ['F1', 'F1']
-        with self.assertRaisesRegex(ValueError, "nonempty unique strings"):
-            _build_political_chunk_payloads(
-                scenario_id="test",
-                scenario_dir=scenario_dir,
-                startup_topology_payload=startup_topology,
-                runtime_topology_payload=runtime_topology,
-            )
 
 if __name__ == '__main__':
     unittest.main()

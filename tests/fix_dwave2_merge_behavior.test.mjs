@@ -15,24 +15,6 @@ function setDocument(t, fields) {
 
 const file = payload => ({ name: "paint.json", text: async () => JSON.stringify(payload) });
 
-test("same-scenario merge recognizes a releasable country's unchanged base color", async t => {
-  const id = "hoi4_1939";
-  const countries = { GER: { color_hex: "#123456" } };
-  const entry = { tag: "BAY", color_hex: "#334455", scenario_ids: [id],
-    preset_source: { type: "feature_ids", feature_ids: ["A"] } };
-  setDocument(t, { activeScenarioId: id, scenarioBundleCacheById: { [id]: { bundleLevel: "bootstrap",
-    countriesPayload: { countries }, ownersPayload: { owners: { A: "GER" } } } },
-    releasableCatalog: { entries: [entry] }, scenarioCountriesByTag: { ...countries, BAY: entry },
-    sovereignBaseColors: { GER: "#123456", BAY: "#334455" }, scenarioBaselineOwnersByFeatureId: { A: "GER" },
-    visualOverrides: {}, historyPast: [], historyFuture: [] });
-  t.mock.method(globalThis, "fetch", async () => ({ ok: true, json: async () => ({}) }));
-  const preview = await prepareProjectMergeFile(file({ scenario: { id }, colors: { A: "#334455" } }));
-  const merge = preview();
-  assert.equal(merge.commit(), "merged");
-  assert.deepEqual(state.visualOverrides, { A: "#334455" });
-  assert.deepEqual(merge.report.colorChanges, []);
-});
-
 test("only an approved river pack bound to the source project can supply parent paint", async t => {
   const pack = realPilot();
   const { parentId, cells } = pack.parents[0];

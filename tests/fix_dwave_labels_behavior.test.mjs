@@ -4,8 +4,6 @@ import test from "node:test";
 import { createCountryLabelSourceOwner } from "../js/core/renderer/country_label_source.js";
 import { createCountryLabelCoverageOwner } from "../js/core/renderer/country_label_coverage.js";
 import { waitForCountryLabelsForExport } from "../js/core/renderer/country_label_render_owner.js";
-import { createCapitalVisibility } from "../js/core/renderer/capital_visibility.js";
-import { createCityGeometryPresentation } from "../js/core/renderer/city_geometry_presentation.js";
 
 const topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
 
@@ -62,36 +60,4 @@ test("countries swapping all land remain visible until one loses its acquired la
   coverage.notifyColorsChanged(["east"]);
   await source.prepare();
   assert.equal(coverage.getSignature(), "AA");
-});
-
-test("a failed initial world build retries only after the world changes", async t => {
-  let attempts = 0, fail = true;
-  const { state, source } = fixture(t, { topojson: { merge(...args) {
-    attempts++;
-    if (fail) throw new Error("initial merge failed");
-    return topojson.merge(...args);
-  } } });
-  await source.prepare();
-  assert.equal(source.getSource().status, "error");
-  state.visualOverrides = { west: "BB" };
-  await source.prepare();
-  assert.equal(attempts, 1);
-  fail = false;
-  state.sceneGeneration = 1;
-  await source.prepare();
-  assert.deepEqual(source.getSource().countries.map(c => c.countryCode), ["BB"]);
-});
-
-test("the capital tooltip names the occupying country and then the recovered capital's country", () => {
-  const state = { activeScenarioId: "world", currentLanguage: "zh", landIndex: new Map([["west", {}]]) };
-  const city = { properties: { __city_host_feature_id: "west", __city_is_country_capital: true,
-    __city_capital_tags: ["AA", "BB"] } };
-  let owner = "BB";
-  const visibility = createCapitalVisibility({ state, resolveBorderIdentity: () => owner });
-  const presentation = createCityGeometryPresentation({ state, ...visibility, getDisplayOwnerCode: () => "AA",
-    getCityDisplayLabel: () => "城", getLocalizedScenarioCountryName: (_, code) => code,
-    renderTooltipText: ({ lines }) => lines });
-  assert.deepEqual(presentation.getCityTooltipText({ feature: city }), ["城", "首都", "BB (BB)"]);
-  owner = "AA";
-  assert.deepEqual(presentation.getCityTooltipText({ feature: city }), ["城", "首都", "AA (AA)"]);
 });

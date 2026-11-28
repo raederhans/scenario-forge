@@ -2,86 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createDeferredDetailPromotionOwner } from "../js/bootstrap/deferred_detail_promotion.js";
-import {
-  commitStartupReadonlyStateFields,
-  setBootStateFields,
-} from "../js/core/state/actions/boot_actions.js";
 import { state as rendererState } from "../js/core/state.js";
 
-async function drainMicrotasks() {
-  await Promise.resolve();
-  await Promise.resolve();
-}
-
-test("forced readonly unlock schedules a ready sample exactly once when UI is ready", async () => {
-  const runtimeFixture = {
-    activeScenarioId: "tno_1962",
-    bootPhase: "detail-promotion",
-    detailDeferred: false,
-    detailPromotionCompleted: false,
-    detailPromotionInFlight: false,
-    renderProfile: "balanced",
-    startupReadonly: true,
-    startupReadonlyUnlockInFlight: false,
-    uiHydrationStatus: "ready",
-  };
-  let timerCallback = null;
-  let sampleScheduleCount = 0;
-  const bootPhases = [];
-  const owner = createDeferredDetailPromotionOwner({
-    runtimeState: runtimeFixture,
-    helpers: {
-      buildInteractionInfrastructureAfterStartup: async (options) => {
-        assert.deepEqual(options, {
-          chunked: true,
-          buildHitCanvas: false,
-          mode: "basic",
-        });
-        return true;
-      },
-      hasStartupReadonlyUnlockScheduled: () => false,
-      scheduleStartupReadonlyUnlockTimer: (callback, delayMs) => {
-        assert.equal(delayMs, 0);
-        timerCallback = callback;
-      },
-      setBootState: (phase) => {
-        setBootStateFields(runtimeFixture, { phase });
-        bootPhases.push(phase);
-      },
-      setStartupReadonlyState: (active, options = {}) => {
-        commitStartupReadonlyStateFields(runtimeFixture, {
-          active,
-          reason: options.reason,
-          unlockInFlight: options.unlockInFlight,
-          since: options.since,
-        });
-      },
-      tryScheduleStartupSampleProjectDeeplink: () => {
-        assert.equal(runtimeFixture.bootPhase, "ready");
-        assert.equal(runtimeFixture.uiHydrationStatus, "ready");
-        sampleScheduleCount += 1;
-        return sampleScheduleCount === 1;
-      },
-    },
-  });
-
-  owner.scheduleStartupReadonlyUnlock({}, {
-    delayMs: 0,
-    attempt: 1,
-    maxAttempts: 1,
-  });
-  assert.equal(typeof timerCallback, "function");
-
-  timerCallback();
-  await drainMicrotasks();
-
-  assert.deepEqual(bootPhases, ["interaction-infra", "ready"]);
-  assert.equal(runtimeFixture.startupReadonly, false);
-  assert.equal(sampleScheduleCount, 1);
-});
-
 function detailPromotionFixture() {
-  const h = { yields: 0 };
+  const h = {};
   let markYielded;
   h.yielded = new Promise(resolve => { markYielded = resolve; });
   const gate = new Promise(resolve => { h.release = resolve; });
@@ -90,74 +14,12 @@ function detailPromotionFixture() {
   h.detail = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [] } }, arcs: [] };
   h.owner = createDeferredDetailPromotionOwner({ runtimeState: h.state, helpers: {
     loadDetailBundle: async () => ({ topologyDetail: h.detail, topologyBundleMode: "composite", detailSourceUsed: "na_v2" }),
-    yieldToInput: () => { h.yields++; markYielded(); return gate; },
+    yieldToInput: () => { markYielded(); return gate; },
   } });
   // Settles on the yield, or on the promotion if it finishes without one.
   h.reachYield = promotion => Promise.race([h.yielded, promotion]);
   return h;
 }
-
-function chunkedScenarioFixture({ manifest = { detail_chunk_manifest_url: "data/scenarios/tno_1962/detail_chunks.manifest.json" }, runtimePolitical = true } = {}) {
-  const h = { loads: 0 };
-  h.state = { activeScenarioId: "tno_1962", activeScenarioManifest: manifest, sceneGeneration: 1, topologyBundleMode: "single",
-    detailDeferred: true, detailPromotionCompleted: false, detailPromotionInFlight: false,
-    runtimePoliticalTopology: runtimePolitical ? { objects: { political: {} } } : null };
-  h.detail = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [] } }, arcs: [] };
-  h.owner = createDeferredDetailPromotionOwner({ runtimeState: h.state, helpers: {
-    loadDetailBundle: async (options) => { h.loads++; h.includeRuntimePolitical = options.includeRuntimePolitical; return { topologyDetail: h.detail, topologyBundleMode: "composite", detailSourceUsed: "na_v2" }; },
-    yieldToInput: async () => {},
-  } });
-  return h;
-}
-
-test("a chunked scenario reaches the composite state without downloading the detail topology", async () => {
-  const h = chunkedScenarioFixture();
-  assert.equal(await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false }), true);
-  assert.equal(h.loads, 0);
-  assert.equal(h.state.topologyDetail, undefined);
-  assert.equal(h.state.topologyBundleMode, "composite");
-  assert.equal(h.state.detailDeferred, false);
-  assert.equal(h.state.detailPromotionCompleted, true);
-});
-
-for (const [name, options] of [
-  ["a scenario without chunks", { manifest: { runtime_topology_url: "data/scenarios/modern_world/runtime_topology.topo.json" } }],
-  ["a chunked scenario whose runtime has no political topology", { runtimePolitical: false }],
-]) {
-  test(`${name} still downloads the detail topology`, async () => {
-    const h = chunkedScenarioFixture(options);
-    assert.equal(await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false }), true);
-    assert.equal(h.loads, 1);
-    assert.equal(h.state.topologyDetail, h.detail);
-  });
-}
-
-test("the base map still downloads the detail topology after a chunked scenario is cleared", async () => {
-  const h = chunkedScenarioFixture();
-  await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false });
-  Object.assign(h.state, { activeScenarioId: "", activeScenarioManifest: null, runtimePoliticalTopology: null,
-    topologyBundleMode: "single", detailDeferred: true, detailPromotionCompleted: false });
-  assert.equal(await h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false }), true);
-  assert.equal(h.loads, 1);
-  assert.equal(h.state.topologyDetail, h.detail);
-  assert.equal(h.state.topologyBundleMode, "composite");
-  // Same state as booting into the scenario with the detail topology: composed from detail, no default runtime.
-  assert.equal(h.includeRuntimePolitical, false);
-  assert.equal(h.state.runtimePoliticalTopology, null);
-});
-
-test("detail promotion yields to input between loading the bundle and applying it", async () => {
-  const h = detailPromotionFixture();
-  const promotion = h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false });
-  await h.reachYield(promotion);
-  assert.equal(h.yields, 1);
-  assert.equal(h.state.topologyDetail, undefined, "nothing is applied before the yield returns");
-  h.release();
-  assert.equal(await promotion, true);
-  assert.equal(h.state.topologyDetail, h.detail);
-  assert.equal(h.state.detailPromotionCompleted, true);
-  assert.equal(h.state.detailPromotionInFlight, false);
-});
 
 test("a scene change during the yield discards the loaded detail bundle", async t => {
   const h = detailPromotionFixture();

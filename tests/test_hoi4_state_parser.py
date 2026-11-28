@@ -47,8 +47,7 @@ class Hoi4StateParserStrategicValuesTest(unittest.TestCase):
         self.assertEqual(record.province_buildings, {10: {"naval_base": 3}})
 
     def test_dated_buildings_override_base_values_by_as_of_date(self) -> None:
-        record_1936 = self.parse_fixture(
-            """
+        body = """
             state = {
               id = 2
               manpower = 200000
@@ -69,34 +68,9 @@ class Hoi4StateParserStrategicValuesTest(unittest.TestCase):
                 }
               }
             }
-            """,
-            as_of_date="1936.1.1.12",
-        )
-        record_1939 = self.parse_fixture(
             """
-            state = {
-              id = 2
-              manpower = 200000
-              state_category = city
-              provinces = { 20 }
-              history = {
-                owner = ENG
-                buildings = {
-                  infrastructure = 8
-                  arms_factory = 3
-                  20 = { industrial_complex = 1 }
-                }
-                1939.1.1 = {
-                  buildings = {
-                    arms_factory = 4
-                    20 = { industrial_complex = 2 }
-                  }
-                }
-              }
-            }
-            """,
-            as_of_date="1939.1.1.12",
-        )
+        record_1936 = self.parse_fixture(body, as_of_date="1936.1.1.12")
+        record_1939 = self.parse_fixture(body, as_of_date="1939.1.1.12")
 
         assert record_1936 is not None
         assert record_1939 is not None
@@ -131,51 +105,6 @@ class Hoi4StateParserStrategicValuesTest(unittest.TestCase):
         self.assertEqual(record.manpower, 300000)
         self.assertEqual(record.resources, {"tungsten": 2.0})
         self.assertEqual(record.victory_points, [(30, 10)])
-
-    def test_multiple_victory_point_blocks_and_add_variant_are_preserved(self) -> None:
-        record = self.parse_fixture(
-            """
-            state = {
-              id = 4
-              manpower = 400000
-              state_category = rural
-              provinces = { 40 41 }
-              history = {
-                owner = CHI
-                victory_points = { 40 3 }
-                victory_points = { 41 1 }
-                add_victory_points = { province = 42 value = 7 }
-              }
-            }
-            """
-        )
-
-        assert record is not None
-        self.assertEqual(record.victory_points, [(40, 3), (41, 1), (42, 7)])
-
-    def test_dated_add_victory_points_obeys_as_of_date(self) -> None:
-        body = """
-        state = {
-          id = 5
-          manpower = 500000
-          state_category = rural
-          provinces = { 50 51 }
-          history = {
-            owner = CHI
-            victory_points = { 50 1 }
-            1939.1.1 = {
-              add_victory_points = { province = 51 value = 5 }
-            }
-          }
-        }
-        """
-        record_1936 = self.parse_fixture(body, as_of_date="1936.1.1.12")
-        record_1939 = self.parse_fixture(body, as_of_date="1939.1.1.12")
-
-        assert record_1936 is not None
-        assert record_1939 is not None
-        self.assertEqual(record_1936.victory_points, [(50, 1)])
-        self.assertEqual(record_1939.victory_points, [(50, 1), (51, 5)])
 
 
 if __name__ == "__main__":

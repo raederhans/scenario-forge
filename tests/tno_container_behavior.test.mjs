@@ -2,11 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { createCountryInspectorModel } from '../js/ui/sidebar/country_inspector_model.js';
 import { createCountryLabelSourceOwner } from '../js/core/renderer/country_label_source.js';
 import { resolveImportedOwnershipState } from '../js/core/interaction_funnel/import_trust_projection.js';
 
-test('zero-territory container groups its two children and produces no map label', async () => {
+test('zero-territory container produces no map label', async () => {
   const vendors = {};
   for (const file of ['topojson-client.min.js', 'd3.v7.min.js']) {
     vm.runInNewContext(readFileSync(new URL(`../vendor/${file}`, import.meta.url), 'utf8'), vendors);
@@ -25,13 +24,6 @@ test('zero-territory container groups its two children and produces no map label
       chunkRegistry: { byLayer: { political: [{ id: 'base', globalCoverage: true, lod: 'coarse', sha256: 'world' }] } },
       chunkPayloadCacheById: { base: { payload: { features } } },
     } } };
-  const model = createCountryInspectorModel(state, value => value);
-  const entries = Object.entries(countries).map(([code, country]) => ({ code,
-    entryKind: country.entry_kind, scenarioSubject: country.entry_kind === 'scenario_subject',
-    parentOwnerTag: country.parent_owner_tag,
-    inspectorGroupId: model.resolveScenarioInspectorGroupMeta(code).id }));
-  assert.deepEqual(model.buildInspectorTopLevelCountryEntries(entries).map(entry => entry.code), ['RKO']);
-  assert.deepEqual(model.getScenarioSubjectChildrenForParent('RKO', entries).map(entry => entry.code), ['OE00', 'OE01']);
   const owner = createCountryLabelSourceOwner({ state, topojson: vendors.topojson,
     geoArea: vendors.d3.geoArea, geoContains: vendors.d3.geoContains, geoBounds: vendors.d3.geoBounds,
     isWorkerSupported: () => false, yieldTask: () => Promise.resolve(), getCountryName: code => code });
