@@ -795,9 +795,10 @@
 }
 /* ── 底部填色栏：两行网格，每行左右都有内容 ───────────────────────────
    第一行：工具 ………… 模式｜地图操作；第二行：历史｜颜色（单行横排）………… 只涂未涂过的地块。
-   原来分组按 flex 折行，历史/颜色掉到第二行左侧，第一行右侧和第二行右侧都空着。 */
+   原来分组按 flex 折行，历史/颜色掉到第二行左侧，第一行右侧和第二行右侧都空着。
+   开发者模式下底栏右侧被开发者面板挤窄，仍沿用原来的折行布局。 */
 @media (min-width: 768px) {
-  .editor-workspace .bottom-dock-primary {
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     grid-template-areas:
@@ -808,14 +809,14 @@
     column-gap: 10px;
     row-gap: 8px;
   }
-  .editor-workspace .bottom-dock-primary > .dock-group-tools { grid-area: tools; }
-  .editor-workspace .bottom-dock-primary > .dock-group-mode { grid-area: mode; }
-  .editor-workspace .bottom-dock-primary > .dock-group-map-actions { grid-area: actions; }
-  .editor-workspace .bottom-dock-primary > .dock-group-history-colors { grid-area: history; justify-self: start; }
-  .editor-workspace .bottom-dock-primary > .dock-group-options { grid-area: options; justify-self: end; }
-  .editor-workspace .bottom-dock-primary > .editor-brush-pan-hint { grid-area: hint; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .dock-group-tools { grid-area: tools; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .dock-group-mode { grid-area: mode; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .dock-group-map-actions { grid-area: actions; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .dock-group-history-colors { grid-area: history; justify-self: start; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .dock-group-options { grid-area: options; justify-self: end; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .editor-brush-pan-hint { grid-area: hint; }
   /* 网格里每行的第一个分组不需要左侧分隔线；第二行与第一行之间用一条横线分开。 */
-  .editor-workspace .bottom-dock-primary > :is(.dock-group-history-colors, .dock-group-options) {
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > :is(.dock-group-history-colors, .dock-group-options) {
     padding-left: 0;
     border-left: 0;
     padding-top: 8px;
@@ -824,15 +825,15 @@
     display: flex;
     align-items: center;
   }
-  .editor-workspace .bottom-dock-primary > .dock-group-options { justify-self: stretch; justify-content: flex-end; }
-  .editor-workspace .bottom-dock-primary > .dock-group-history-colors { justify-self: stretch; }
-  .editor-workspace .dock-color-stack {
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .dock-group-options { justify-self: stretch; justify-content: flex-end; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .bottom-dock-primary > .dock-group-history-colors { justify-self: stretch; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .dock-color-stack {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 8px;
   }
-  .editor-workspace .dock-color-stack > #paletteGrid { margin: 0; }
+  .editor-workspace #bottomDock:not(.dev-workspace-mode) .dock-color-stack > #paletteGrid { margin: 0; }
 }
 .editor-workspace .dock-option-toggle {
   display: inline-flex;
