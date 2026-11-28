@@ -399,6 +399,18 @@ export function createCountryInspectorController({
     return getLatestCountryStatesByCode().get(selectedLandCode) || null;
   };
 
+  // 卡片跟随地图上的地块选择；选择事件在悬停时也会触发，只有归属国家或未登记颜色变了才重画。
+  let lastQuickTabKey = null;
+  const getSelectedLandQuickTabKey = (countryState, identity) =>
+    countryState ? `country:${countryState.code}` : (identity ? `identity:${identity}` : "empty");
+
+  const refreshSelectedLandCountryQuickTab = () => {
+    const countryState = resolveSelectedLandInspectorCountryState();
+    const identity = !countryState && getSelectedLandColorIdentity?.();
+    if (getSelectedLandQuickTabKey(countryState, identity) === lastQuickTabKey) return;
+    renderSelectedLandCountryQuickTab();
+  };
+
   const renderSelectedLandCountryQuickTab = () => {
     const host = list?.parentElement;
     if (!host) return;
@@ -415,6 +427,7 @@ export function createCountryInspectorController({
 
     const countryState = resolveSelectedLandInspectorCountryState();
     const identity = !countryState && getSelectedLandColorIdentity?.();
+    lastQuickTabKey = getSelectedLandQuickTabKey(countryState, identity);
     tab.classList.toggle("is-empty", !countryState && !identity);
     tab.replaceChildren();
     if (identity) {
@@ -1296,7 +1309,8 @@ export function createCountryInspectorController({
     const features = collection?.features || [];
     const previous = picker.value;
     const scenario = !!runtimeState.activeScenarioId;
-    capitalRow.hidden = capitalActions.hidden = !scenario;
+    // 「设为首都」挪进了「编辑城市」组，不再随首都操作区一起隐藏，这里单独跟随剧本状态。
+    capitalRow.hidden = capitalActions.hidden = setCapital.hidden = !scenario;
     let entries;
     let capital;
     if (scenario) {
@@ -1892,6 +1906,7 @@ export function createCountryInspectorController({
     closeCountryInspectorColorPicker,
     ensureSelectedInspectorCountry,
     refreshCountryRows,
+    refreshSelectedLandCountryQuickTab,
     renderCountryInspectorDetail,
     renderCountrySelectRow,
     renderList,

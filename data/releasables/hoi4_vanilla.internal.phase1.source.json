@@ -9,7 +9,8 @@
         "type": "legacy_preset_name"
       },
       "release_lookup_iso2": "DE",
-      "tag": "BAY"
+      "tag": "BAY",
+      "display_name_zh": "巴伐利亚"
     },
     {
       "notes": "German internal releasable. Runtime geometry reuses the existing Saxony preset.",
@@ -19,7 +20,8 @@
         "type": "legacy_preset_name"
       },
       "release_lookup_iso2": "DE",
-      "tag": "SAX"
+      "tag": "SAX",
+      "display_name_zh": "萨克森"
     },
     {
       "notes": "German internal releasable. Runtime geometry reuses the existing Schleswig-Holstein preset.",
@@ -29,7 +31,8 @@
         "type": "legacy_preset_name"
       },
       "release_lookup_iso2": "DE",
-      "tag": "SHL"
+      "tag": "SHL",
+      "display_name_zh": "石勒苏益格"
     },
     {
       "allow_manual_overlay": true,
@@ -88,7 +91,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "CZ",
-      "tag": "BOM"
+      "tag": "BOM",
+      "display_name_zh": "波希米亚和摩拉维亚保护国"
     },
     {
       "notes": "British internal releasable. Runtime geometry reuses the existing Scotland preset.",
@@ -98,7 +102,8 @@
         "type": "legacy_preset_name"
       },
       "release_lookup_iso2": "GB",
-      "tag": "SCO"
+      "tag": "SCO",
+      "display_name_zh": "苏格兰"
     },
     {
       "notes": "British internal releasable. Runtime geometry reuses the existing Wales preset.",
@@ -108,7 +113,8 @@
         "type": "legacy_preset_name"
       },
       "release_lookup_iso2": "GB",
-      "tag": "WLS"
+      "tag": "WLS",
+      "display_name_zh": "威尔士"
     },
     {
       "notes": "British internal releasable. Runtime geometry reuses the existing Northern Ireland preset.",
@@ -118,7 +124,8 @@
         "type": "legacy_preset_name"
       },
       "release_lookup_iso2": "GB",
-      "tag": "NIR"
+      "tag": "NIR",
+      "display_name_zh": "北爱尔兰"
     },
     {
       "notes": "French internal releasable. Runtime geometry reuses the existing Brittany preset.",
@@ -132,7 +139,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "BRI"
+      "tag": "BRI",
+      "display_name_zh": "布列塔尼"
     },
     {
       "notes": "Soviet internal releasable mapped from the Republic of Buryatia hierarchy group.",
@@ -144,7 +152,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "BYA"
+      "tag": "BYA",
+      "display_name_zh": "布里亚特-蒙古自治共和国"
     },
     {
       "notes": "Soviet internal releasable mapped from the Republic of Tatarstan hierarchy group.",
@@ -156,7 +165,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "TAT"
+      "tag": "TAT",
+      "display_name_zh": "鞑靼自治共和国"
     },
     {
       "notes": "Soviet internal releasable mapped from the Republic of Dagestan hierarchy group.",
@@ -168,7 +178,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "DAG"
+      "tag": "DAG",
+      "display_name_zh": "达吉斯坦自治共和国"
     },
     {
       "notes": "Soviet internal releasable mapped from the Republic of Kalmykia hierarchy group.",
@@ -180,7 +191,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "KAL"
+      "tag": "KAL",
+      "display_name_zh": "卡尔梅克自治共和国"
     },
     {
       "notes": "Soviet internal releasable mapped from the Komi Republic hierarchy group.",
@@ -192,7 +204,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "KOM"
+      "tag": "KOM",
+      "display_name_zh": "科米自治州"
     },
     {
       "notes": "Soviet internal releasable mapped from the Nenets Autonomous Okrug hierarchy group.",
@@ -204,7 +217,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "NEN"
+      "tag": "NEN",
+      "display_name_zh": "涅涅茨"
     },
     {
       "notes": "Soviet internal releasable mapped from the Chukotka Autonomous Okrug hierarchy group.",
@@ -216,7 +230,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "CKK"
+      "tag": "CKK",
+      "display_name_zh": "楚科奇"
     },
     {
       "notes": "Soviet internal releasable mapped from the Sakha Republic hierarchy group.",
@@ -228,7 +243,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "YAK"
+      "tag": "YAK",
+      "display_name_zh": "雅库特自治共和国"
     },
     {
       "notes": "Soviet internal releasable mapped from the Yamalo-Nenets Autonomous Okrug hierarchy group.",
@@ -240,7 +256,8 @@
         "type": "hierarchy_group_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "YAM"
+      "tag": "YAM",
+      "display_name_zh": "亚马尔"
     },
     {
       "allow_manual_overlay": true,
@@ -283,7 +300,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "NL",
-      "tag": "RKN"
+      "tag": "RKN",
+      "display_name_zh": "尼德兰专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -333,7 +351,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "BE",
-      "tag": "RKB"
+      "tag": "RKB",
+      "display_name_zh": "比利时—北法兰西专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -645,7 +664,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "BE",
-      "tag": "BRG"
+      "tag": "BRG",
+      "display_name_zh": "勃艮第骑士团国"
     },
     {
       "allow_manual_overlay": true,
@@ -1018,7 +1038,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "PL",
-      "tag": "RKP"
+      "tag": "RKP",
+      "display_name_zh": "波兰专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -1680,7 +1701,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "UA",
-      "tag": "RKU"
+      "tag": "RKU",
+      "display_name_zh": "乌克兰专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -1944,7 +1966,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "LT",
-      "tag": "RKO"
+      "tag": "RKO",
+      "display_name_zh": "东方专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -3140,7 +3163,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "RU",
-      "tag": "RKM"
+      "tag": "RKM",
+      "display_name_zh": "莫斯科专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -3341,7 +3365,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "GE",
-      "tag": "RKK"
+      "tag": "RKK",
+      "display_name_zh": "高加索专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -3367,7 +3392,8 @@
         "type": "feature_ids"
       },
       "release_lookup_iso2": "NO",
-      "tag": "RKNO"
+      "tag": "RKNO",
+      "display_name_zh": "挪威专员辖区"
     },
     {
       "allow_manual_overlay": true,
@@ -3390,7 +3416,8 @@
       "scenario_ids": [
         "hoi4_1939"
       ],
-      "tag": "NCP"
+      "tag": "NCP",
+      "display_name_zh": "华北政务委员会"
     },
     {
       "allow_manual_overlay": true,
@@ -3425,7 +3452,8 @@
       "scenario_ids": [
         "hoi4_1939"
       ],
-      "tag": "RGC"
+      "tag": "RGC",
+      "display_name_zh": "中华民国维新政府"
     },
     {
       "allow_manual_overlay": true,
@@ -3502,7 +3530,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "CRO"
+      "tag": "CRO",
+      "display_name_zh": "克罗地亚独立国"
     },
     {
       "allow_manual_overlay": true,
@@ -3604,7 +3633,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "SER"
+      "tag": "SER",
+      "display_name_zh": "塞尔维亚行政当局"
     },
     {
       "allow_manual_overlay": true,
@@ -3704,7 +3734,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "GRE"
+      "tag": "GRE",
+      "display_name_zh": "希腊保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -3767,7 +3798,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "EGY"
+      "tag": "EGY",
+      "display_name_zh": "意属埃及"
     },
     {
       "allow_manual_overlay": true,
@@ -3793,7 +3825,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "PAL"
+      "tag": "PAL",
+      "display_name_zh": "巴勒斯坦托管地"
     },
     {
       "allow_manual_overlay": true,
@@ -3823,7 +3856,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "JOR"
+      "tag": "JOR",
+      "display_name_zh": "意属外约旦"
     },
     {
       "allow_manual_overlay": true,
@@ -3864,7 +3898,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "TUN"
+      "tag": "TUN",
+      "display_name_zh": "突尼斯保护国"
     },
     {
       "allow_manual_overlay": true,
@@ -3896,7 +3931,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "SYR"
+      "tag": "SYR",
+      "display_name_zh": "法属叙利亚托管地"
     },
     {
       "allow_manual_overlay": true,
@@ -3920,7 +3956,8 @@
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "LEB"
+      "tag": "LEB",
+      "display_name_zh": "黎巴嫩保护国"
     }
   ],
   "excluded": [

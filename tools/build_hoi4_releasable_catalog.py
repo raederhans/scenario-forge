@@ -445,6 +445,8 @@ def build_catalog_entry(
     return {
         "tag": tag,
         "display_name": display_name,
+        # 中文名只来自源条目；运行时 releasable_manager 读 display_name_zh，缺省时回退英文。
+        "display_name_zh": str(raw_entry.get("display_name_zh") or "").strip(),
         "color_hex": color_hex,
         "capital_state_id": capital_state_id,
         "parent_owner_tag": parent_owner_tag,
