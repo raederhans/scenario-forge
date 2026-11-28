@@ -1152,7 +1152,7 @@ function initSidebar({ render } = {}) {
     focusGeoBounds,
     selectLandFeatureById,
   });
-  regionSearchController.mount(searchInput.closest(".inspector-search-shell"));
+  regionSearchController.mount(searchInput.closest(".inspector-search-shell"), { input: searchInput });
 
   const renamedPlacesCache = { features: null, hasAny: false };
   const countryInspectorController = createCountryInspectorController({

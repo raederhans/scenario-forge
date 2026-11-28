@@ -9573,8 +9573,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Search countries or colors"
   },
   "Search country or code...": {
-    "zh": "搜索国家或代码...",
-    "en": "Search country or code..."
+    "zh": "搜索国家、代码或地块…",
+    "en": "Search countries, codes or regions…"
   },
   "Search country, ISO-2, or source tag...": {
     "zh": "搜索国家、ISO-2 或来源 tag...",
