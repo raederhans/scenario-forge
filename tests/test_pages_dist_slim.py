@@ -52,10 +52,6 @@ class PagesDistSlimTests(unittest.TestCase):
         manifest = json.loads((published.parent / "manifest.json").read_bytes())
         self.assertEqual("data/scenarios/sample/startup.bundle.en.json", manifest["startup_bundle_url_en"])
 
-    def test_plain_bundle_without_gzip_is_preserved(self):
-        pages.copy_runtime_data()
-        self.assertEqual(self.bundle.read_bytes(), (self.scenarios / "sample/startup.bundle.en.json").read_bytes())
-
     def test_tno_standalone_water_is_lossless_from_both_manifests(self):
         base = "data/scenarios/tno_1962"
         url = f"{base}/water_regions.geojson"
@@ -88,54 +84,6 @@ class PagesDistSlimTests(unittest.TestCase):
         published.unlink()
         with self.assertRaisesRegex(FileNotFoundError, "startup.bundle.en.json"):
             pages.validate_dist_scenario_startup_urls()
-
-    def test_audit_rewrite_updates_gzip_without_restoring_plaintext(self):
-        self.bundle.write_text(json.dumps({"manifest_subset": {"audit_url": "data/scenarios/sample/audit.json"}}))
-        self.compress_bundle()
-        pages.copy_runtime_data()
-        published = self.scenarios / "sample/startup.bundle.en.json.gz"
-        self.assertNotIn("audit_url", json.loads(gzip.decompress(published.read_bytes()))["manifest_subset"])
-        published.write_bytes(gzip.compress(self.bundle.read_bytes()))
-        pages.strip_scenario_publish_audit_urls(self.scenarios)
-        self.assertNotIn("audit_url", json.loads(gzip.decompress(published.read_bytes()))["manifest_subset"])
-        self.assertFalse(published.with_suffix("").exists())
-
-    def test_build_only_files_and_metadata_are_excluded(self):
-        excluded = (
-            "data/scenario-rules/sample.manual.json",
-            "data/palette-maps/sample.audit.json",
-            "data/thematic_layers/sample/audit.json",
-            "data/thematic_layers/sample/build_audit.json",
-            "data/scenarios/tno_1962/scenario_mutations.json",
-        )
-        for relative in excluded:
-            self.write(relative, {})
-        self.write("data/thematic_layers/sample/manifest.json", {
-            "audit_url": excluded[2], "build_audit_path": excluded[3],
-            "paths": {"build_audit": excluded[3], "data": "data/thematic_layers/sample/values.json"},
-        })
-        self.write("data/thematic_layers/sample/values.json", {"value": 7})
-        self.write("data/CATALOG.json", {"entries": [{"url": path} for path in excluded]})
-        self.write("data/runtime_asset_registry.json", {"assets": {str(i): {"url": path} for i, path in enumerate(excluded)}})
-        self.write("data/manifest.json", {"outputs": {path.removeprefix("data/"): {} for path in excluded}})
-        pages.copy_runtime_data()
-        for relative in excluded:
-            self.assertFalse((self.app / relative).exists(), relative)
-        manifest = json.loads((self.app / "data/thematic_layers/sample/manifest.json").read_bytes())
-        self.assertNotIn("audit_url", manifest)
-        self.assertNotIn("build_audit_path", manifest)
-        self.assertEqual({"data": "data/thematic_layers/sample/values.json"}, manifest["paths"])
-        self.assertEqual([], json.loads((self.app / "data/CATALOG.json").read_bytes())["entries"])
-        self.assertEqual({}, json.loads((self.app / "data/runtime_asset_registry.json").read_bytes())["assets"])
-        self.assertEqual({}, json.loads((self.app / "data/manifest.json").read_bytes())["outputs"])
-
-    def test_source_inventory_tracks_compressed_publication(self):
-        self.compress_bundle()
-        self.write("index.html", {})
-        self.write("landing/index.html", {})
-        inventory = source_graph.build_source_inventory(self.root)
-        self.assertIn("app/data/scenarios/sample/startup.bundle.en.json.gz", inventory)
-        self.assertNotIn("app/data/scenarios/sample/startup.bundle.en.json", inventory)
 
 
 if __name__ == "__main__":

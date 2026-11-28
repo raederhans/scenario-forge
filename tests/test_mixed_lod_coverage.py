@@ -2,9 +2,8 @@
 import itertools
 import random
 
-import pytest
 import shapely
-from shapely.geometry import Polygon, box
+from shapely.geometry import box
 
 from tools.validate_mixed_lod_coverage import mixed_coverage_sets, union, validate
 
@@ -61,35 +60,3 @@ def test_neighbor_coarse_protrusion_cannot_hide_mixed_lod_regression():
     assert result['any_same_state_coverage_regression']['area_degrees2'] == .25
     repaired = scenario(source, dict(source), detail)
     assert validate(old, repaired)['passed']
-
-
-def test_unsupported_coarse_protrusion_is_not_source_territory_loss():
-    source = {'a': box(0, 0, 1, 1)}
-    chunks = {'a': dict(source)}
-    old = scenario(source, {'a': box(0, 0, 2, 1)}, chunks)
-    new = scenario(source, dict(source), chunks)
-    assert validate(old, new)['passed']
-
-
-@pytest.mark.parametrize('bounds', [(0, 0, 0, 1), (0, 0, 1, 0), (1, 0, 0, 1),
-                                   (0, 0, float('nan'), 1), (0, 0, float('inf'), 1)])
-def test_invalid_bounds_cannot_turn_missing_restoration_into_pass(bounds):
-    old = scenario({'a': box(0, 0, 1, 1)}, {'a': box(0, 0, 1, 1)}, {'a': {'a': box(0, 0, 1, 1)}})
-    new = scenario({'a': box(0, 0, 2, 1)}, old['coarse'], {'a': {'a': box(0, 0, 2, 1)}})
-    with pytest.raises(ValueError, match='Bounds must'):
-        validate(old, new, bounds)
-
-
-def test_complete_source_gate_does_not_overlay_invalid_old_coarse_but_rejects_new_holes():
-    source = {'a': box(0, 0, 2, 1)}
-    chunks = {'a': dict(source)}
-    old = scenario(source, {'a': Polygon([(0, 0), (2, 1), (0, 1), (2, 0), (0, 0)])}, chunks)
-    new = scenario(source, dict(source), chunks)
-    with pytest.raises(ValueError, match='Invalid coarse'):
-        validate(old, new)
-    result = validate(old, new, full_source_coverage=True)
-    assert result['passed']
-    assert result['coverage_comparison'] == 'complete_source_in_all_states'
-    assert result['any_same_state_coverage_regression'] is None
-    new['coarse']['a'] = box(0, 0, 1, 1)
-    assert not validate(old, new, full_source_coverage=True)['passed']

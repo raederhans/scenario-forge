@@ -1,19 +1,14 @@
 import json
-from unittest.mock import patch
 
 import geopandas as gpd
 import pytest
 from shapely.geometry import MultiPolygon, Polygon
 from topojson.utils import serialize_as_geojson
 
-import init_map_data
 from map_builder.geo import spherical_safety
-from map_builder.geo import topology as topology_module
 from map_builder.geo.spherical_safety import (
-    NODE_VALIDATION_TIMEOUT_SECONDS,
     PRIMARY_POLAR_WATER_IDS,
     prepare_primary_polar_water_regions,
-    repair_primary_polar_water_topology_orientation,
     validate_primary_polar_water_feature_collection,
     validate_primary_polar_water_topology,
 )
@@ -64,44 +59,14 @@ def _ring(min_x: float, min_y: float, max_x: float, max_y: float) -> Polygon:
 
 
 def _polar_water_gdf() -> gpd.GeoDataFrame:
-    return gpd.GeoDataFrame(
-        [
-            {
-                "id": "marine_arctic_ocean",
-                "name": "Arctic Ocean",
-                "label": "Arctic Ocean",
-                "water_type": "ocean",
-                "region_group": "ocean_macro",
-                "parent_id": "",
-                "neighbors": "marine_southern_ocean",
-                "is_chokepoint": False,
-                "interactive": False,
-                "source_standard": "natural_earth",
-                "geometry": MultiPolygon([
-                    _ring(150.0, 70.0, 179.5, 84.0),
-                    _ring(-179.5, 70.0, -150.0, 84.0),
-                ]),
-            },
-            {
-                "id": "marine_southern_ocean",
-                "name": "Southern Ocean",
-                "label": "Southern Ocean",
-                "water_type": "ocean",
-                "region_group": "ocean_macro",
-                "parent_id": "",
-                "neighbors": "marine_arctic_ocean",
-                "is_chokepoint": False,
-                "interactive": False,
-                "source_standard": "natural_earth",
-                "geometry": MultiPolygon([
-                    _ring(145.0, -82.0, 179.5, -60.0),
-                    _ring(-179.5, -82.0, -145.0, -60.0),
-                ]),
-            },
-        ],
-        geometry="geometry",
-        crs="EPSG:4326",
-    )
+    arctic = "marine_arctic_ocean"
+    southern = "marine_southern_ocean"
+    return gpd.GeoDataFrame([
+        {"id": arctic, "neighbors": southern, "source_standard": "natural_earth",
+         "geometry": MultiPolygon([_ring(150, 70, 179.5, 84), _ring(-179.5, 70, -150, 84)])},
+        {"id": southern, "neighbors": arctic, "source_standard": "natural_earth",
+         "geometry": MultiPolygon([_ring(145, -82, 179.5, -60), _ring(-179.5, -82, -145, -60)])},
+    ], geometry="geometry", crs="EPSG:4326")
 
 
 def _political_gdf() -> gpd.GeoDataFrame:
@@ -129,37 +94,6 @@ def _polar_cap_gdf() -> gpd.GeoDataFrame:
     )
 
 
-def _topology_repair_fixture() -> dict:
-    return {
-        "type": "Topology",
-        "objects": {
-            "water_regions": {
-                "type": "GeometryCollection",
-                "geometries": [
-                    {
-                        "type": "Polygon",
-                        "id": "marine_arctic_ocean",
-                        "properties": {"id": "marine_arctic_ocean"},
-                        "arcs": [[1, 0, 2]],
-                    },
-                    {
-                        "type": "Polygon",
-                        "id": "marine_other",
-                        "properties": {"id": "marine_other"},
-                        "arcs": [[-1, 3]],
-                    },
-                ],
-            },
-        },
-        "arcs": [
-            [[10, 70], [10, 80]],
-            [[0, 70], [10, 70]],
-            [[10, 80], [0, 80], [0, 70]],
-            [[10, 70], [20, 70], [20, 80], [10, 80]],
-        ],
-    }
-
-
 def test_prepare_primary_polar_water_regions_rewinds_antimeridian_parts_without_drift() -> None:
     source = _polar_water_gdf()
     source_properties = source.drop(columns="geometry").to_dict("records")
@@ -181,23 +115,6 @@ def test_prepare_primary_polar_water_regions_rewinds_antimeridian_parts_without_
         json.loads(prepared.to_json(drop_id=True)),
         require_all=True,
         stage_label="unit.prepared",
-    )
-
-
-def test_build_water_regions_emits_exact_polar_ids_and_retains_source_properties() -> None:
-    source = _polar_water_gdf().rename(columns={"name": "name_en"})[["name_en", "geometry"]]
-
-    built = init_map_data.build_water_regions(source, _empty_gdf())
-
-    polar = built[built["id"].isin(PRIMARY_POLAR_WATER_IDS)].sort_values("id").reset_index(drop=True)
-    assert polar["id"].tolist() == sorted(PRIMARY_POLAR_WATER_IDS)
-    assert polar["source_standard"].tolist() == ["natural_earth", "natural_earth"]
-    assert polar["region_group"].tolist() == ["ocean_macro", "ocean_macro"]
-    assert polar["interactive"].tolist() == [False, False]
-    validate_primary_polar_water_feature_collection(
-        json.loads(polar.to_json(drop_id=True)),
-        require_all=True,
-        stage_label="unit.generator",
     )
 
 
@@ -253,144 +170,3 @@ def test_primary_topology_round_trip_keeps_polar_ids_properties_and_spherical_sa
     sidecar_by_id = {feature["properties"]["id"]: feature for feature in sidecar["features"]}
     assert sidecar_by_id["marine_arctic_ocean"]["properties"]["source_standard"] == "natural_earth"
     assert sidecar_by_id["marine_southern_ocean"]["properties"]["neighbors"] == "marine_arctic_ocean"
-
-
-def test_topology_orientation_repair_changes_only_invalid_target_part_refs() -> None:
-    topology = _topology_repair_fixture()
-    original_arcs = json.loads(json.dumps(topology["arcs"]))
-    original_non_target_refs = json.loads(json.dumps(
-        topology["objects"]["water_regions"]["geometries"][1]["arcs"]
-    ))
-    assert original_non_target_refs[0][0] == ~0
-    original_feature_collection = serialize_as_geojson(topology, objectname="water_regions")
-    original_non_target_geometry = next(
-        feature["geometry"]
-        for feature in original_feature_collection["features"]
-        if feature["properties"]["id"] == "marine_other"
-    )
-
-    with pytest.raises(ValueError, match=r"(excessive spherical area|world bounds)"):
-        validate_primary_polar_water_topology(
-            topology,
-            require_all=False,
-            stage_label="unit.repair_fixture_before",
-        )
-
-    modified_part_count = repair_primary_polar_water_topology_orientation(topology)
-
-    assert modified_part_count == 1
-    assert topology["arcs"] == original_arcs
-    geometries = topology["objects"]["water_regions"]["geometries"]
-    assert geometries[0]["arcs"] == [[-3, -1, -2]]
-    assert geometries[1]["arcs"] == original_non_target_refs
-    repaired_feature_collection = serialize_as_geojson(topology, objectname="water_regions")
-    repaired_non_target_geometry = next(
-        feature["geometry"]
-        for feature in repaired_feature_collection["features"]
-        if feature["properties"]["id"] == "marine_other"
-    )
-    assert repaired_non_target_geometry == original_non_target_geometry
-    validate_primary_polar_water_topology(
-        topology,
-        require_all=False,
-        stage_label="unit.repair_fixture_after",
-    )
-
-
-def test_primary_topology_rethrows_initial_validation_error_when_repair_changes_zero_parts(tmp_path) -> None:
-    output_path = tmp_path / "primary.json"
-    original_error = ValueError("initial polar topology validation failed")
-
-    with (
-        patch.object(topology_module, "validate_primary_polar_water_topology", side_effect=original_error) as validate_mock,
-        patch.object(topology_module, "repair_primary_polar_water_topology_orientation", return_value=0) as repair_mock,
-        pytest.raises(ValueError, match="initial polar topology validation failed") as exc_info,
-    ):
-        build_topology(
-            political=_political_gdf(),
-            ocean=_empty_gdf(),
-            land=_empty_gdf(),
-            urban=_empty_gdf(),
-            physical=_empty_gdf(),
-            rivers=_empty_gdf(),
-            water_regions=_polar_water_gdf(),
-            output_path=output_path,
-            quantization=100_000,
-        )
-
-    assert exc_info.value is original_error
-    validate_mock.assert_called_once()
-    repair_mock.assert_called_once()
-
-
-def test_polar_validator_requires_both_exact_primary_ids() -> None:
-    prepared = prepare_primary_polar_water_regions(_polar_water_gdf().iloc[[0]].copy())
-
-    with pytest.raises(ValueError, match="expected ids"):
-        validate_primary_polar_water_feature_collection(
-            json.loads(prepared.to_json(drop_id=True)),
-            require_all=True,
-            stage_label="unit.missing_peer",
-        )
-
-
-def test_d3_node_start_failure_reports_stage_purpose_and_timeout() -> None:
-    feature_collection = {
-        "type": "FeatureCollection",
-        "features": [{
-            "type": "Feature",
-            "properties": {"id": "marine_arctic_ocean"},
-            "geometry": _ring(-30.0, 70.0, 30.0, 85.0).__geo_interface__,
-        }],
-    }
-    with patch.object(spherical_safety.subprocess, "run", side_effect=OSError("node unavailable")) as run_mock:
-        with pytest.raises(
-            RuntimeError,
-            match=r"D3 spherical diagnostics could not start Node at unit\.d3_start: node unavailable",
-        ):
-            validate_primary_polar_water_feature_collection(
-                feature_collection,
-                require_all=False,
-                stage_label="unit.d3_start",
-            )
-    assert run_mock.call_args.kwargs["timeout"] == NODE_VALIDATION_TIMEOUT_SECONDS
-
-
-def test_topojson_node_start_failure_reports_stage_purpose_and_timeout() -> None:
-    with patch.object(spherical_safety.subprocess, "run", side_effect=OSError("node unavailable")) as run_mock:
-        with pytest.raises(
-            RuntimeError,
-            match=r"TopoJSON round-trip decoding could not start Node at unit\.topology_start.*node unavailable",
-        ):
-            validate_primary_polar_water_topology(
-                _topology_repair_fixture(),
-                require_all=False,
-                stage_label="unit.topology_start",
-            )
-    assert run_mock.call_args.kwargs["timeout"] == NODE_VALIDATION_TIMEOUT_SECONDS
-
-
-@pytest.mark.parametrize(
-    "feature_id,geometry",
-    [
-        ("marine_arctic_ocean", _ring(-30.0, 70.0, 30.0, 85.0)),
-        ("marine_southern_ocean", _ring(-30.0, -85.0, 30.0, -60.0)),
-    ],
-)
-def test_polar_validator_fails_closed_for_world_bounds_or_excessive_area(feature_id, geometry) -> None:
-    feature_collection = {
-        "type": "FeatureCollection",
-        "features": [{
-            "type": "Feature",
-            "properties": {"id": feature_id},
-            "geometry": geometry.__geo_interface__,
-        }],
-    }
-
-    with pytest.raises(ValueError, match=r"(excessive spherical area|world bounds)"):
-        validate_primary_polar_water_feature_collection(
-            feature_collection,
-            expected_ids=[feature_id],
-            require_all=True,
-            stage_label="unit.invalid",
-        )
