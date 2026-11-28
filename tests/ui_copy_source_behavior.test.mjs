@@ -6,7 +6,7 @@ import { t, clearMissingUiKeys, getMissingUiKeys } from "../js/core/i18n.js";
 import { UI_COPY_CATALOG } from "../js/core/i18n_catalog.js";
 import { installAppTestApi } from "../js/core/app_test_api.js";
 import { updateUIText } from "../js/ui/i18n.js";
-import { buildCatalog } from "../tools/build_ui_copy.mjs";
+import { validateCatalog } from "../tools/build_ui_copy.mjs";
 
 function restoreState(context) {
   const language = state.currentLanguage;
@@ -103,14 +103,14 @@ test("legacy UI mapping resolves every key from the catalog", (context) => {
   assert.deepEqual(getMissingUiKeys(), []);
 });
 
-test("catalog generation validates translations and preserves plural forms without translator notes", () => {
-  const entry = { en: { one: "{count} item", other: "{count} items" }, zh: "{count} 项", note: "计数" };
-  assert.deepEqual(buildCatalog({ Count: entry }), { Count: { zh: entry.zh, en: entry.en } });
+test("catalog validation checks translation types, plural forms and placeholders", () => {
+  const entry = { en: { one: "{count} item", other: "{count} items" }, zh: "{count} 项" };
+  assert.doesNotThrow(() => validateCatalog({ Count: entry }));
   for (const invalid of [
     { en: "Text" }, { zh: "文字" }, { en: 1, zh: "文字" },
     { en: { one: "Text" }, zh: "文字" }, { en: { other: 1 }, zh: "文字" },
     { en: { other: "Text", invalid: "Text" }, zh: "文字" },
     { en: "{count} items", zh: "项目" },
     { en: { one: "item", other: "{count} items" }, zh: "{count} 项" },
-  ]) assert.throws(() => buildCatalog({ Invalid: invalid }), /Invalid/);
+  ]) assert.throws(() => validateCatalog({ Invalid: invalid }), /Invalid/);
 });

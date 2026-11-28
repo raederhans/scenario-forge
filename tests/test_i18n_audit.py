@@ -22,8 +22,21 @@ class I18nAuditTest(unittest.TestCase):
                 "Multiline": {"zh": "多行字段", "en": "Multiline"},
                 "Escaped": {"zh": '带引号"的字段', "en": "Escaped"},
             }
-            self._write_repo_json(root, "data/i18n/ui_copy.json", source)
+            self._write_ui_catalog(root, source)
             self.assertEqual(load_ui_copy(root), source)
+
+    def test_source_reader_requires_strict_json_inside_freeze(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            for entry in ('{"zh": "文字", "en": "Text",}', '{"zh": "文字", "en": NaN}'):
+                with self.subTest(entry=entry):
+                    self._write_repo_file(
+                        root,
+                        "js/core/i18n_catalog.js",
+                        f'export const UI_COPY_CATALOG = Object.freeze({{"Key": {entry}}});',
+                    )
+                    with self.assertRaises(ValueError):
+                        load_ui_copy(root)
 
     def test_ui_only_sync_preserves_geo_and_metadata_and_is_repeatable(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -34,7 +47,7 @@ class I18nAuditTest(unittest.TestCase):
                 "Backend": {"zh": "渲染后端", "en": "Backend"},
                 "Count": {"zh": "{count} 项", "en": {"one": "{count} item", "other": "{count} items"}},
             }
-            self._write_repo_json(root, "data/i18n/ui_copy.json", source)
+            self._write_ui_catalog(root, source)
             self._write_repo_file(root, "index.html", '<span data-i18n="Fixture UI"></span>')
             path = root / "data/locales.json"
             self._write_repo_json(root, "data/locales.json", {
@@ -64,6 +77,13 @@ class I18nAuditTest(unittest.TestCase):
             repo_root,
             relative_path,
             json.dumps(payload, ensure_ascii=False, indent=2),
+        )
+
+    def _write_ui_catalog(self, repo_root: Path, payload: dict) -> None:
+        self._write_repo_file(
+            repo_root,
+            "js/core/i18n_catalog.js",
+            f"export const UI_COPY_CATALOG = Object.freeze({json.dumps(payload, ensure_ascii=False)});\n",
         )
 
     def test_collects_legacy_and_declarative_coverage_separately(self) -> None:
@@ -256,18 +276,9 @@ showToast(`Copied ${count} region entries to the clipboard.`);
                 },
             }
             self._write_repo_json(repo_root, "data/locales.json", locales_payload)
-            self._write_repo_json(repo_root, "data/i18n/ui_copy.json", locales_payload["ui"])
+            self._write_ui_catalog(repo_root, locales_payload["ui"])
             self._write_repo_json(repo_root, "data/i18n/manual_geo_overrides.json", {"HGO 1936": "历史地理重置 1936"})
             self._write_repo_json(repo_root, "data/i18n/locales_baseline.json", locales_payload)
-            self._write_repo_file(
-                repo_root,
-                "js/core/i18n_catalog.js",
-                """
-export const UI_COPY_CATALOG = Object.freeze({
-  "Special zone diagnostics": { zh: "特殊区域诊断", en: "Special zone diagnostics" },
-});
-                """.strip(),
-            )
             self._write_repo_file(repo_root, "js/ui/i18n.js", "export function t(key) { return key; }")
             self._write_repo_file(
                 repo_root,
@@ -316,7 +327,7 @@ export const UI_COPY_CATALOG = Object.freeze({
 
             self.assertEqual(audit["summary"]["ui_locale_entries"], 1)
             self.assertEqual(audit["summary"]["ui_copy_entries"], 1)
-            self.assertEqual(audit["ui_sources"]["ui_copy"]["path"], "data/i18n/ui_copy.json")
+            self.assertEqual(audit["ui_sources"]["ui_copy"]["path"], "js/core/i18n_catalog.js")
             self.assertEqual(audit["summary"]["catalog_ui_entries"], 1)
             self.assertEqual(audit["summary"]["scenario_count"], 1)
             self.assertEqual(audit["summary"]["scenario_startup_ready_count"], 1)
@@ -455,15 +466,12 @@ gear.textContent = "\u2699";
     def test_collects_inline_ui_translation_keys_and_alt_keys(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            self._write_repo_file(
+            self._write_ui_catalog(
                 repo_root,
-                "js/core/i18n_catalog.js",
-                """
-export const UI_COPY_CATALOG = Object.freeze({
-  "Export preview ready": { zh: "导出预览已就绪", en: "Export preview ready" },
-  Override: { zh: "覆盖", en: "Override" },
-});
-                """.strip(),
+                {
+                    "Export preview ready": {"zh": "导出预览已就绪", "en": "Export preview ready"},
+                    "Override": {"zh": "覆盖", "en": "Override"},
+                },
             )
             self._write_repo_file(
                 repo_root,

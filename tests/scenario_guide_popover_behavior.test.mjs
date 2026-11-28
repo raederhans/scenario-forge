@@ -63,12 +63,12 @@ test("legacy checks deep links open Quick start on first visit and after visitin
   assert.equal(nav[0]["aria-selected"], "true");
 });
 
-test("new workspace labels agree across runtime and manual catalogs without changing generic Color", () => {
-  const manual = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL("../data/i18n/ui_copy.json", import.meta.url), "utf8"))).map(([key, entry]) => [key, entry.zh]));
+test("workspace catalog labels match the locales snapshot and distinguish paint mode from generic Color", () => {
+  const { ui } = JSON.parse(readFileSync(new URL("../data/locales.json", import.meta.url), "utf8"));
   const keys = ["Save project", "Export image", "Not saved yet", "Unsaved changes", "Project downloaded",
     "Advanced settings", "Paint mode color", "Ownership", "Close panels"];
-  for (const key of keys) assert.equal(UI_COPY_CATALOG[key].zh, manual[key], key);
-  assert.equal(manual.Color, "颜色");
+  for (const key of keys) assert.equal(UI_COPY_CATALOG[key].zh, ui[key].zh, key);
+  assert.equal(UI_COPY_CATALOG.Color.zh, "颜色");
   assert.equal(UI_COPY_CATALOG["Paint mode color"].en, "Color");
   assert.equal(UI_COPY_CATALOG["Paint mode color"].zh, "着色");
 });

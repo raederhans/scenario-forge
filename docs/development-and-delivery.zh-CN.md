@@ -50,7 +50,6 @@ TNO 严格数据合约用 `npm run verify:tno-strict-contracts`（一次输出 s
 
 保存工作到功能分支无需先追平 `main`。准备合并时再 fetch 目标分支并确认最终提交的 required check；合并后的 Pages 发布独立验收。
 
-界面文案以 `data/i18n/ui_copy.json` 为唯一编辑源；修改现有文案只改 `en`、`zh` 的值，保留键和调用点。
-新文案先在该文件添加条目，可用 `note` 说明语境，占位符写作 `{name}`，英文复数用 `one` / `other` 对象。
-编辑后运行 `npm run i18n:build`，不要手改生成的 `js/core/i18n_catalog.js`。
-运行 `python tools/translate_manager.py --ui-only` 同步 `data/locales.json` 的 UI 段；`npm run i18n:check` 检查产物一致性，也会随 `npm test` 执行。
+界面文案统一在 `js/core/i18n_catalog.js` 中维护。`Object.freeze(` 后的对象须使用严格 JSON。修改现有文案时只改 `zh`、`en` 的值，保留键和调用点。
+新增条目使用相同结构，占位符写作 `{name}`，英文复数用 `one` / `other` 对象。
+编辑后运行 `npm run i18n:check` 校验文案，再运行 `python tools/translate_manager.py --ui-only` 同步 `data/locales.json` 的 UI 段。`npm run i18n:build` 执行相同的只读校验。

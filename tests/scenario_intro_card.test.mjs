@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { UI_COPY_CATALOG } from "../js/core/i18n_catalog.js";
 import { createScenarioIntroCard } from "../js/ui/scenario_intro_card.js";
 import { state } from "../js/core/state.js";
 
@@ -25,7 +26,6 @@ class Element {
 }
 
 const registry = JSON.parse(readFileSync(new URL("../data/scenarios/index.json", import.meta.url), "utf8"));
-const translations = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL("../data/i18n/ui_copy.json", import.meta.url), "utf8"))).map(([key, entry]) => [key, entry.zh]));
 const presentation = registry.scenarios.find((entry) => entry.scenario_id === "hoi4_1936").presentation;
 function setup() {
   const document = new EventTarget();
@@ -61,8 +61,8 @@ test("renders translated presentation, current country names and colors, and lay
     assert.deepEqual(find(card, "scenario-intro-layers").children[1].children.map((node) => node.textContent), presentation.layers);
     state.currentLanguage = "zh";
     controller.show(presentation);
-    assert.equal(find(card, "scenario-intro-title").textContent, translations[presentation.title]);
-    assert.equal(find(card, "scenario-intro-description").textContent, translations[presentation.intro]);
+    assert.equal(find(card, "scenario-intro-title").textContent, UI_COPY_CATALOG[presentation.title].zh);
+    assert.equal(find(card, "scenario-intro-description").textContent, UI_COPY_CATALOG[presentation.intro].zh);
     assert.equal(find(card, "scenario-intro-powers").children[1].children[1].textContent, "德国");
     assert.equal(find(card, "scenario-intro-close").attributes["aria-label"], "关闭剧本简介");
   } finally {
@@ -103,7 +103,7 @@ test("public and editor preview scenarios have presentation copy with Chinese tr
   const civilWar = registry.scenarios.find((entry) => entry.scenario_id === "rcw_1919");
   assert.equal(civilWar.display_name, "Russian Civil War 1919");
   assert.equal(civilWar.presentation.year, 1919);
-  assert.equal(translations[civilWar.presentation.title], "俄国内战");
+  assert.equal(UI_COPY_CATALOG[civilWar.presentation.title].zh, "俄国内战");
   assert.deepEqual(civilWar.presentation.powers, ["SOV", "VOLR", "DON", "RUS", "YDNC", "MILL", "POL", "UNRP"]);
   for (const { presentation: entry } of registry.scenarios) {
     assert.ok(entry);
@@ -112,7 +112,7 @@ test("public and editor preview scenarios have presentation copy with Chinese tr
     assert.ok(Array.isArray(entry.layers));
     for (const key of [entry.title, entry.tagline, entry.intro, ...entry.layers]) {
       assert.equal(typeof key, "string");
-      assert.match(translations[key], /[\u3400-\u9fff]/u);
+      assert.match(UI_COPY_CATALOG[key].zh, /[\u3400-\u9fff]/u);
     }
   }
 });
