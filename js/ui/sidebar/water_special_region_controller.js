@@ -29,6 +29,7 @@ export function createWaterSpecialRegionController({
     waterInspectorTypeFilter,
     waterInspectorGroupFilter,
     waterInspectorSourceFilter,
+    waterInspectorSourceFilterCount,
     waterInspectorSortSelect,
     waterInspectorResultCount,
     waterSearchInput,
@@ -584,6 +585,9 @@ export function createWaterSpecialRegionController({
       Array.from(new Set(visibleFeatures.map((feature) => getWaterFeatureSource(feature)).filter(Boolean))).sort(),
       "All Sources"
     );
+    if (waterInspectorSourceFilterCount) {
+      waterInspectorSourceFilterCount.hidden = !getWaterFilterValue(waterInspectorSourceFilter);
+    }
     snapshot.filteredFeatures = getFilteredWaterFeatures(visibleFeatures);
     snapshot.displayItems = getWaterListDisplayItems(snapshot.filteredFeatures);
     if (waterInspectorResultCount) {

@@ -39,6 +39,7 @@ function fixture(context, translate = (key) => key) {
   context.after(() => { globalThis.document = previous; });
   const elements = Object.fromEntries([
     "waterRegionList", "waterInspectorEmpty", "waterInspectorSelected", "waterInspectorDetailHint",
+    "waterInspectorSourceFilter", "waterInspectorSourceFilterCount",
     "waterInspectorMetaSection", "waterInspectorMetaList", "waterInspectorMoreMetaList", "waterLegendList", "waterInspectorScopePreview", "waterInspectorScopeSelect",
     "specialRegionList", "specialRegionInspectorEmpty", "specialRegionInspectorSelected", "specialRegionInspectorDetailHint",
   ].map(key => [key, node()]));
@@ -90,6 +91,17 @@ for (const [listKey, render, selected, refresh] of [
     assert.equal(document.activeElement, external);
   });
 }
+
+test("more filters indicates an active source until all sources are shown again", context => {
+  const { elements, state, controller } = fixture(context);
+  state.waterRegionsById.get("a").properties.source_standard = "survey";
+  for (const source of ["", "survey", ""]) {
+    elements.waterInspectorSourceFilter.value = source;
+    controller.renderWaterRegionList();
+    assert.equal(elements.waterInspectorSourceFilterCount.hidden, source === "");
+    assert.equal(elements.waterRegionList.children.length, source ? 1 : 2);
+  }
+});
 
 test("water details translate labels, values, subtitle and singular/plural scope", context => {
   const { elements, controller } = fixture(context, key => `[${key}]`);

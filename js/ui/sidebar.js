@@ -1672,6 +1672,7 @@ function initSidebar({ render } = {}) {
       waterInspectorTypeFilter,
       waterInspectorGroupFilter,
       waterInspectorSourceFilter,
+      waterInspectorSourceFilterCount: document.getElementById("waterInspectorSourceFilterCount"),
       waterInspectorSortSelect,
       waterInspectorResultCount,
       waterSearchInput,
