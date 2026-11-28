@@ -1703,6 +1703,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "本国城市",
     "en": "Cities in this country"
   },
+  "City": {
+    "zh": "城市",
+    "en": "City"
+  },
   "City Lights": {
     "zh": "城市灯光",
     "en": "City Lights"
@@ -3485,6 +3489,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Edit annotations": {
     "zh": "编辑标注",
     "en": "Edit annotations"
+  },
+  "Edit city": {
+    "zh": "编辑城市",
+    "en": "Edit city"
   },
   "Edit country color": {
     "zh": "编辑国家颜色",

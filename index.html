@@ -2629,59 +2629,68 @@
               </div>
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
               <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
-                <div id="countryInspectorSelected" class="hidden">
-                  <label class="field-label">
-                    <span data-i18n="Country display name">Country display name</span>
-                    <input id="countryNameOverride" class="input" type="text" autocomplete="off" />
-                  </label>
-                  <div><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span>
+                <div id="countryInspectorSelected" class="inspector-country-form hidden">
+                  <div class="inspector-form-group">
+                    <label class="inspector-form-field">
+                      <span class="inspector-form-label" data-i18n="Country display name">Country display name</span>
+                      <input id="countryNameOverride" class="input" type="text" autocomplete="off" />
+                    </label>
+                    <p class="inspector-form-hint"><span data-i18n="Automatic country name">Automatic country name</span> · <span id="countryLabelStatus"></span></p>
                     <button id="convertCountryLabel" type="button" class="sidebar-action-secondary" data-i18n="Convert to editable text" hidden>Convert to editable text</button>
+                    <div id="countryTerritoryStats" class="country-select-meta"></div>
                   </div>
-                  <div id="countryTerritoryStats" class="country-select-meta"></div>
-                  <div id="countryPoliticalFields" class="mt-2" hidden>
-                    <label class="field-label"><span data-i18n="Alliance">Alliance</span><select id="countryAlliance"></select></label>
+                  <div id="countryPoliticalFields" class="inspector-form-group" hidden>
+                    <label class="inspector-form-field"><span class="inspector-form-label" data-i18n="Alliance">Alliance</span><select id="countryAlliance" class="select-input"></select></label>
                     <button id="deleteCountryAlliance" type="button" class="sidebar-action-secondary" data-i18n="Delete" hidden>Delete</button>
-                    <div id="newAllianceFields" hidden>
-                      <label class="field-label"><span data-i18n="Alliance name">Alliance name</span><input id="newAllianceName" class="input" maxlength="120" /></label>
-                      <label class="field-label"><span data-i18n="Alliance color">Alliance color</span><input id="newAllianceColor" type="color" value="#008080" /></label>
-                      <span id="allianceColorConflict" class="country-select-meta" role="status" data-i18n="This color is already used." hidden>This color is already used.</span>
+                    <div id="newAllianceFields" class="inspector-form-subgroup" hidden>
+                      <label class="inspector-form-field"><span class="inspector-form-label" data-i18n="Alliance name">Alliance name</span><input id="newAllianceName" class="input" maxlength="120" /></label>
+                      <label class="inspector-form-field inspector-form-field-inline"><span class="inspector-form-label" data-i18n="Alliance color">Alliance color</span><input id="newAllianceColor" type="color" value="#008080" /></label>
+                      <span id="allianceColorConflict" class="inspector-form-hint" role="status" data-i18n="This color is already used." hidden>This color is already used.</span>
                       <button id="createCountryAlliance" type="button" class="sidebar-action-secondary" data-i18n="Create" disabled>Create</button>
                     </div>
-                    <label class="field-label"><span data-i18n="Government">Government</span><select id="countryIdeology"></select></label>
+                    <label class="inspector-form-field"><span class="inspector-form-label" data-i18n="Government">Government</span><select id="countryIdeology" class="select-input"></select></label>
                   </div>
-                  <button id="unregisterProjectCountry" type="button" class="sidebar-action-secondary mt-2" data-i18n="Unregister country" hidden>Unregister country</button>
-                  <details id="countryCities" class="mt-2" hidden>
+                  <button id="unregisterProjectCountry" type="button" class="sidebar-action-secondary" data-i18n="Unregister country" hidden>Unregister country</button>
+                  <details id="countryCities" class="inspector-form-disclosure" hidden>
                     <summary data-i18n="Cities in this country">Cities in this country</summary>
-                    <div id="inspectorCapital" class="mt-2">
-                      <strong data-i18n="Capital">Capital</strong> · <span id="capitalStatus" aria-live="polite"></span>
-                      <div id="capitalOutside" class="country-select-meta" data-i18n="The capital is outside this country (its map star is hidden)" hidden>The capital is outside this country (its map star is hidden)</div>
-                    </div>
-                    <label class="field-label">
-                      <span data-i18n="Cities in this country">Cities in this country</span>
-                      <select id="inspectorCity"></select>
-                    </label>
-                    <div id="capitalActions">
-                      <div class="flex flex-wrap gap-2">
-                        <button id="setCapital" type="button" class="sidebar-action-secondary" data-i18n="Set as capital">Set as capital</button>
-                        <button id="resetCapital" type="button" class="sidebar-action-secondary" data-i18n="Restore scenario capital">Restore scenario capital</button>
-                        <button id="clearCapital" type="button" class="sidebar-action-secondary" data-i18n="No capital">No capital</button>
-                        <button id="largestCapital" type="button" class="sidebar-action-secondary" data-i18n="Use largest city">Use largest city</button>
-                        <button id="deleteCapitalCity" type="button" class="sidebar-action-secondary" data-i18n="Delete this city" hidden>Delete this city</button>
+                    <div class="inspector-form-disclosure-body">
+                      <div id="inspectorCapital" class="inspector-form-subgroup">
+                        <p class="inspector-form-subhead" data-i18n="Capital">Capital</p>
+                        <p id="capitalStatus" class="inspector-form-value" aria-live="polite"></p>
+                        <p id="capitalOutside" class="inspector-form-hint" data-i18n="The capital is outside this country (its map star is hidden)" hidden>The capital is outside this country (its map star is hidden)</p>
                       </div>
-                      <label class="field-label">
-                        <span data-i18n="New capital city name">New capital city name</span>
-                        <input id="capitalCityName" class="input" type="text" autocomplete="off" />
-                      </label>
-                      <button id="placeCapital" type="button" class="sidebar-action-secondary" disabled></button>
-                      <div id="capitalPickHint" role="status" data-i18n="Click the map to place the capital. Press Esc to cancel." hidden>Click the map to place the capital. Press Esc to cancel.</div>
+                      <div id="capitalActions" class="inspector-form-subgroup">
+                        <div class="inspector-form-actions">
+                          <button id="resetCapital" type="button" class="sidebar-action-secondary" data-i18n="Restore scenario capital">Restore scenario capital</button>
+                          <button id="largestCapital" type="button" class="sidebar-action-secondary" data-i18n="Use largest city">Use largest city</button>
+                          <button id="clearCapital" type="button" class="sidebar-action-secondary" data-i18n="No capital">No capital</button>
+                        </div>
+                        <label class="inspector-form-field">
+                          <span class="inspector-form-label" data-i18n="New capital city name">New capital city name</span>
+                          <input id="capitalCityName" class="input" type="text" autocomplete="off" />
+                        </label>
+                        <button id="placeCapital" type="button" class="sidebar-action-secondary" disabled></button>
+                        <p id="capitalPickHint" class="inspector-form-hint" role="status" data-i18n="Click the map to place the capital. Press Esc to cancel." hidden>Click the map to place the capital. Press Esc to cancel.</p>
+                      </div>
+                      <div class="inspector-form-subgroup inspector-form-subgroup-divided">
+                        <p class="inspector-form-subhead" data-i18n="Edit city">Edit city</p>
+                        <label class="inspector-form-field">
+                          <span class="inspector-form-label" data-i18n="City">City</span>
+                          <select id="inspectorCity" class="select-input"></select>
+                        </label>
+                        <label class="inspector-form-field">
+                          <span class="inspector-form-label" data-i18n="City display name">City display name</span>
+                          <input id="cityNameOverride" class="input" type="text" autocomplete="off" />
+                        </label>
+                        <label class="inspector-form-check"><input id="inspectorCityHidden" type="checkbox" /> <span data-i18n="Hide city">Hide city</span></label>
+                        <div class="inspector-form-actions">
+                          <button id="setCapital" type="button" class="sidebar-action-secondary" data-i18n="Set as capital">Set as capital</button>
+                          <button id="deleteCapitalCity" type="button" class="sidebar-action-secondary" data-i18n="Delete this city" hidden>Delete this city</button>
+                        </div>
+                      </div>
                     </div>
-                    <label class="field-label">
-                      <span data-i18n="City display name">City display name</span>
-                      <input id="cityNameOverride" class="input" type="text" autocomplete="off" />
-                    </label>
-                    <label><input id="inspectorCityHidden" type="checkbox" /> <span data-i18n="Hide city">Hide city</span></label>
                   </details>
-                  <button id="resetCountryOverrides" type="button" class="sidebar-action-secondary mt-2" disabled>
+                  <button id="resetCountryOverrides" type="button" class="sidebar-action-secondary" disabled>
                     <span data-i18n="Restore original country color">Restore original country color</span>
                     <span data-reset-count>(0)</span>
                   </button>

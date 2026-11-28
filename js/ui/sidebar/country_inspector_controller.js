@@ -1296,7 +1296,8 @@ export function createCountryInspectorController({
     const features = collection?.features || [];
     const previous = picker.value;
     const scenario = !!runtimeState.activeScenarioId;
-    capitalRow.hidden = capitalActions.hidden = !scenario;
+    // 「设为首都」挪进了「编辑城市」组，不再随首都操作区一起隐藏，这里单独跟随剧本状态。
+    capitalRow.hidden = capitalActions.hidden = setCapital.hidden = !scenario;
     let entries;
     let capital;
     if (scenario) {

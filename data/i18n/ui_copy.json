@@ -12746,5 +12746,13 @@
   "Source differences": {
     "en": "Source differences",
     "zh": "来源差异"
+  },
+  "Edit city": {
+    "en": "Edit city",
+    "zh": "编辑城市"
+  },
+  "City": {
+    "en": "City",
+    "zh": "城市"
   }
 }

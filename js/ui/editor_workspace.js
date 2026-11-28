@@ -353,7 +353,8 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       if (identity) {
         const options = make("details", "editor-disclosure", "", "editorCountryDisplayOptions");
         options.append(make("summary", "", "Names & display"), identity);
-        get("countryList")?.before(options);
+        // 显示选项是次要设置：放在列表之后，免得被读成列表表头。
+        get("countryList")?.after(options);
       }
     }
     section.addEventListener("click", (event) => {

@@ -295432,6 +295432,10 @@
       "en": "Cities in this country",
       "zh": "本国城市"
     },
+    "City": {
+      "en": "City",
+      "zh": "城市"
+    },
     "City Lights": {
       "en": "City Lights",
       "zh": "城市灯光"
@@ -297214,6 +297218,10 @@
     "Edit annotations": {
       "en": "Edit annotations",
       "zh": "编辑标注"
+    },
+    "Edit city": {
+      "en": "Edit city",
+      "zh": "编辑城市"
     },
     "Edit country color": {
       "en": "Edit country color",

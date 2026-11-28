@@ -76,7 +76,7 @@
 .editor-workspace #countryList, .editor-workspace #waterRegionList, .editor-workspace #specialRegionList, .editor-workspace #presetTree { padding: 0; gap: 0; height: auto; max-height: none; overflow: visible; }
 .editor-workspace .country-list { border: 0; padding: 0; }
 .editor-workspace .country-item { font-size: var(--fs-sm); }
-.editor-workspace #countryList .country-select-row .country-children-toggle { width: var(--control-compact); min-width: var(--control-compact); height: var(--control-compact); }
+.editor-workspace #countryList .country-select-row .country-children-toggle { width: 22px; min-width: 22px; height: 22px; background: transparent; }
 .editor-workspace #leftSidebar .inspector-item-btn {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); width: 100%; text-align: left;
 }
@@ -582,4 +582,168 @@
   padding-top: 0;
 }
 :where(.layer-status-strip:empty) { display: none; }
+}
+
+/* ── 检查器 · 国家页表单 ────────────────────────────────────────────
+   分组之间用分隔线；字段 = 标签（label 档）+ 控件；说明一律 meta 档，避免继承 body 16px。 */
+.inspector-country-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.inspector-form-group,
+.inspector-form-subgroup,
+.inspector-form-disclosure-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.inspector-country-form > .inspector-form-group + .inspector-form-group,
+.inspector-country-form > .inspector-form-disclosure {
+  border-top: 1px solid var(--line-1);
+  padding-top: 12px;
+}
+.inspector-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+.inspector-form-field-inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.inspector-form-label {
+  font-size: var(--type-label);
+  font-weight: var(--type-label-weight);
+  line-height: var(--type-label-leading);
+  color: var(--type-label-color);
+}
+.inspector-form-subhead {
+  margin: 0;
+  font-size: var(--type-eyebrow);
+  font-weight: 600;
+  line-height: var(--type-eyebrow-leading);
+  color: var(--type-eyebrow-color);
+}
+.inspector-form-value {
+  margin: 0;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
+  color: var(--type-body-color);
+}
+.inspector-form-hint {
+  margin: 0;
+  font-size: var(--type-meta);
+  line-height: var(--type-meta-leading);
+  color: var(--type-meta-color);
+}
+.inspector-form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--type-body);
+  color: var(--type-body-color);
+}
+/* flex 换行而不是 grid：隐藏的按钮不占位，剩下的按钮自动铺满整行。 */
+.inspector-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.inspector-form-actions > * {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.inspector-form-disclosure-body {
+  gap: 12px;
+  padding-top: 12px;
+}
+.inspector-form-subgroup-divided {
+  border-top: 1px solid var(--line-1);
+  padding-top: 12px;
+}
+.inspector-country-form .select-input {
+  min-height: var(--control-compact);
+  padding: 7px 30px 7px 9px;
+  font-size: var(--type-body);
+}
+
+/* ── 对象 › 国家列表层级 ──────────────────────────────────────────
+   大洲是分组栏（底色 + 计数），展开内容缩进并带引导线，避免与下一个大洲混成一列；
+   「相关国家」是父国行下的一行小字入口，不再撑高父国行。 */
+.editor-workspace #countryList > .country-explorer-group:not(.country-select-card) > .country-explorer-header {
+  min-height: 32px;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-bottom: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+}
+.editor-workspace #countryList > .country-explorer-group:not(.country-select-card) > .country-explorer-header .country-row-title {
+  font-size: var(--type-label);
+  font-weight: 600;
+  color: var(--ink-700);
+}
+.editor-workspace #countryList > .country-explorer-group:not(.country-select-card) > .country-explorer-list {
+  margin: 4px 0 8px 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line-1);
+}
+.editor-workspace #countryList .country-select-card > .country-children {
+  margin: 0 0 4px 12px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line-1);
+}
+.editor-workspace #countryList .country-children-meta {
+  margin-top: 0;
+  padding-top: 2px;
+  border-top: 0;
+  justify-content: flex-start;
+  gap: 4px;
+  color: var(--type-meta-color);
+}
+.editor-workspace #countryList .country-children-meta-label {
+  font-weight: 400;
+}
+.editor-workspace #countryList .country-children-count {
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: var(--type-meta);
+}
+.editor-workspace #editorCountryDisplayOptions {
+  margin-top: 8px;
+}
+.editor-workspace #editorCountryDisplayOptions > summary {
+  font-size: var(--type-meta);
+  font-weight: 500;
+  color: var(--type-meta-color);
+}
+/* 父国行：「N ›」放在名称与色块之间，同一行内展开附属国；文字标签只留给读屏（按钮自带 aria-label）。 */
+.editor-workspace #countryList .country-select-row.has-children {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  column-gap: 6px;
+}
+.editor-workspace #countryList .country-select-row.has-children > .country-children-meta {
+  grid-column: 2;
+  grid-row: 1;
+  padding-top: 0;
+  align-self: center;
+  gap: 2px;
+}
+.editor-workspace #countryList .country-select-row.has-children > .country-select-side {
+  grid-column: 3;
+  grid-row: 1;
+}
+.editor-workspace #countryList .country-children-meta-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
