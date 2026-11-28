@@ -474,14 +474,6 @@ body.transport-workbench-open.right-drawer-open::after {
   display: none;
 }
 
-.startup-readonly-banner__eyebrow {
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-map-accent);
-}
-
 .startup-readonly-banner__message {
   margin-top: 4px;
   font-size: var(--fs-md);
@@ -7556,13 +7548,6 @@ body.counter-editor-modal-open {
   font: 700 var(--fs-xs)/1.25 var(--font-body);
 }
 
-.scenario-guide-sample-choice__scenario {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  color: var(--text-secondary);
-  font: 600 var(--fs-xs)/1.2 var(--font-body);
-}
-
 .scenario-guide-sample-card__status {
   margin: 0;
   color: var(--text-secondary);
@@ -12297,28 +12282,6 @@ details.card:not(.editor-scenario-menu) > summary {
 
 .sidebar-tool-card-debug .sidebar-tool-title {
   color: #92400e;
-}
-
-.project-file-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-btn);
-  background: var(--bg-input);
-}
-
-.project-file-name {
-  flex: 1;
-  min-width: 0;
-  text-align: right;
-  font-size: var(--fs-xs);
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .legend-empty-state {

@@ -361,7 +361,7 @@ test("HGO identity controls stay cold until the user enables them", () => {
     assert.ok(controls);
     assert.equal(harness.runtimeState.hgoIdentity.enabled, false);
     assert.equal(harness.coverageCalls, 0);
-    assert.match(textOf(controls.querySelector(".hgo-identity-summary")), /HGO disabled/);
+    assert.equal(controls.querySelector(".hgo-identity-summary"), null);
 
     const enabledInput = controls.querySelector(".hgo-identity-toggle input");
     assert.equal(enabledInput.checked, false);

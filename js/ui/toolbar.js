@@ -98,7 +98,7 @@ import {
   TRANSPORT_WORKBENCH_INSPECTOR_TABS,
 } from "./transport_workbench/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
-import { shouldShowDeveloperModeEntry } from "./toolbar/developer_mode_visibility.js";
+import { DEVELOPER_MODE_STORAGE_KEY, isDeveloperModeEntryVisible, readStoredDeveloperMode } from "./toolbar/developer_mode_visibility.js";
 import { createExportWorkflowController } from "./toolbar/export_workflow_controller.js";
 const state = runtimeState;
 
@@ -356,7 +356,6 @@ function initToolbar({ render } = {}) {
   const specialZonePopover = document.getElementById("specialZonePopover");
   const specialZoneEditorInline = specialZonePopover?.dataset.inlineEditor === "true";
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-  const DEVELOPER_MODE_STORAGE_KEY = "map_creator_developer_mode";
   let toolHudTimerId = null;
   const overlayFocusReturnTargets = createFocusReturnRegistry();
   const MOBILE_WORKSPACE_MAX_WIDTH = 767;
@@ -460,20 +459,6 @@ function initToolbar({ render } = {}) {
       button.setAttribute("aria-label", `${t("Language", "ui")}: ${currentLangLabel}`);
     });
   };
-
-  const readStoredDeveloperMode = () => {
-    try {
-      return globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY) ?? null;
-    } catch {
-      return null;
-    }
-  };
-
-  const isDeveloperModeEntryVisible = () => shouldShowDeveloperModeEntry({
-    hostname: globalThis.location?.hostname,
-    search: globalThis.location?.search,
-    storedDeveloperMode: readStoredDeveloperMode(),
-  });
 
   const syncDeveloperModeUi = () => {
     // 快捷键显式开启的开发者模式是内存中的 opt-in：即使存储被阻止、主机也不是本地，入口与开启态都要保留。

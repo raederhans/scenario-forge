@@ -713,7 +713,7 @@ test("sample project banner view exposes success actions and public error messag
   });
   assert.equal(successView.tone, "success");
   assert.equal(successView.title, "Sample loaded: TNO 1962 Atlantropa briefing");
-  assert.match(successView.body, /Edit this starter map/);
+  assert.equal(successView.body, "");
   assert.equal(successView.canOpenExport, true);
   assert.equal(successView.canDownloadOriginal, true);
   assert.equal(

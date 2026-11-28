@@ -441,7 +441,7 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
   const sampleProjectBanner = page.locator("#sampleProjectBanner");
   await expect(sampleProjectBanner).toBeVisible({ timeout: 30000 });
   await expect(sampleProjectBanner).toContainText(/Sample loaded: TNO 1962 Atlantropa briefing/i);
-  await expect(sampleProjectBanner).toContainText(/export your own image/i);
+  await expect(sampleProjectBanner).toContainText(/open export workbench/i);
   await expect(page.locator("#sampleProjectBannerDownloadOriginalLink")).toHaveAttribute(
     "href",
     /\.\.\/assets\/sample-projects\/tno-1962-atlantropa-briefing\.project\.json$/,

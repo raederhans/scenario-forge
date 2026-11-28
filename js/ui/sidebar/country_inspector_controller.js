@@ -254,19 +254,12 @@ export function createCountryInspectorController({
     return formatHgoVariantRawLabel(raw);
   };
 
-  const getRowMetaText = (countryState, identity, { showDetails = false, showRelationMeta = false } = {}) => {
+  const getRowMetaText = (countryState, { showDetails = false, showRelationMeta = false } = {}) => {
     if (!showDetails) return "";
     const metaBits = [
       buildCountryRowMetaText(countryState, { showRelationMeta }),
       countryState?.code ? `tag ${countryState.code}` : "",
     ].filter(Boolean);
-    if (identity) {
-      metaBits.push(getHgoMatchLabel(identity.matchKind));
-      const variantCount = Number(identity.flag?.variantCount || identity.flag?.variants?.length || 0) || 0;
-      if (variantCount > 0) {
-        metaBits.push(`${variantCount} variants`);
-      }
-    }
     return metaBits.join(" · ");
   };
 
@@ -300,10 +293,8 @@ export function createCountryInspectorController({
     const coverage = settings.enabled && typeof getHgoIdentityCoverage === "function"
       ? getHgoIdentityCoverage(countryStates, { allowSuggestedAliases: settings.showSuggestedAliases })
       : null;
-    const statusText = !settings.enabled
-      ? t("HGO disabled", "ui")
-      : (status?.status === "loading" ? t("HGO loading", "ui") : t("HGO unavailable", "ui"));
-    const coverageText = coverage ? "" : statusText;
+    const coverageText = !settings.enabled || coverage ? ""
+      : t(status?.status === "loading" ? "HGO loading" : "HGO unavailable", "ui");
 
     controls.replaceChildren();
 
@@ -515,7 +506,7 @@ export function createCountryInspectorController({
       ref.title.textContent = getCountryInspectorDisplayName(countryState, identity);
     }
     if (ref.meta) {
-      ref.meta.textContent = getRowMetaText(countryState, identity, {
+      ref.meta.textContent = getRowMetaText(countryState, {
         showDetails: isCountryInspectorDetailsVisible(),
         showRelationMeta: !!ref.showRelationMeta,
       });
@@ -631,7 +622,7 @@ export function createCountryInspectorController({
 
     const meta = document.createElement("div");
     meta.className = "country-select-meta";
-    meta.textContent = getRowMetaText(countryState, identity, {
+    meta.textContent = getRowMetaText(countryState, {
       showDetails: isCountryInspectorDetailsVisible(),
       showRelationMeta,
     });

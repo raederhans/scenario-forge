@@ -40,6 +40,7 @@ export function createWaterSpecialRegionController({
     waterInspectorLocateBtn,
     waterInspectorMetaSection,
     waterInspectorMetaList,
+    waterInspectorMoreMetaList,
     waterInspectorHierarchySection,
     waterInspectorBreadcrumb,
     waterInspectorJumpToParentBtn,
@@ -611,6 +612,7 @@ export function createWaterSpecialRegionController({
       .filter(Boolean)
       .sort((a, b) => getWaterFeatureDisplayName(a.feature).localeCompare(getWaterFeatureDisplayName(b.feature)));
 
+    if (waterLegendList.parentElement) waterLegendList.parentElement.hidden = !overrideEntries.length;
     if (!overrideEntries.length) {
       return;
     }
@@ -717,41 +719,40 @@ export function createWaterSpecialRegionController({
     const scopeIds = getWaterScopeFeatureIds(selectedId, selectedScope, snapshot);
     if (waterInspectorDetailHint) {
       const meta = [
-        getWaterFeatureMeta(feature),
-        selectedIds.length > 1 ? `${selectedIds.length} ${t("fragments", "ui") || "fragments"}` : "",
-        selectedIds.some((featureId) => getWaterFeatureHasOverride(featureId))
-          ? `${t("Override active", "ui")} · ${featureColor.toUpperCase()}`
-          : `${t("Default color", "ui")} · ${defaultColor.toUpperCase()}`,
+        selectedIds.length === 1 ? t("1 fragment", "ui") : t("{count} fragments", "ui", { count: selectedIds.length }),
+        selectedIds.some(getWaterFeatureHasOverride) ? t("Recolored", "ui") : "",
       ].filter(Boolean).join(" · ");
       waterInspectorDetailHint.classList.toggle("hidden", !meta);
       waterInspectorDetailHint.textContent = meta;
     }
     if (waterInspectorMetaSection && waterInspectorMetaList) {
       waterInspectorMetaSection.classList.remove("hidden");
-      waterInspectorMetaList.replaceChildren();
       const rows = [
-        ["ID", selectedId],
-        ...(selectedIds.length > 1 ? [["Fragments", selectedIds.length]] : []),
         ["Type", t(formatWaterTokenLabel(getWaterFeatureType(feature), "Water"), "ui")],
         ["Group", t(formatWaterTokenLabel(getWaterFeatureGroup(feature)), "ui")],
-        ["Parent", featureParentId || t("None", "ui")],
-        ["Source", getWaterRowSourceLabel(getWaterFeatureSource(feature))],
-        ["Interactive", isWaterFeatureVisibleInInspector(feature) ? t("Yes", "ui") : t("No", "ui")],
-        ["Chokepoint", feature?.properties?.is_chokepoint ? t("Yes", "ui") : t("No", "ui")],
-        ["Base geography", feature?.properties?.render_as_base_geography ? t("Yes", "ui") : t("No", "ui")],
+        ["Fragments", selectedIds.length],
         ["Default color", defaultColor.toUpperCase()],
         ["Current color", featureColor.toUpperCase()],
       ];
-      rows.forEach(([label, value]) => {
-        const key = document.createElement("div");
-        key.className = "inspector-meta-label";
-        key.textContent = t(label, "ui");
-        const val = document.createElement("div");
-        val.className = "inspector-meta-value";
-        val.textContent = String(value || "");
-        waterInspectorMetaList.appendChild(key);
-        waterInspectorMetaList.appendChild(val);
-      });
+      const renderRows = (list, entries) => {
+        if (!list) return;
+        list.replaceChildren();
+        for (const [label, value] of entries) {
+          const key = document.createElement("div");
+          key.className = "inspector-meta-label";
+          key.textContent = t(label, "ui");
+          const val = document.createElement("div");
+          val.className = "inspector-meta-value";
+          val.textContent = String(value);
+          list.appendChild(key);
+          list.appendChild(val);
+        }
+      };
+      renderRows(waterInspectorMetaList, rows);
+      renderRows(waterInspectorMoreMetaList, [
+        ["ID", selectedId],
+        ["Source", getWaterRowSourceLabel(getWaterFeatureSource(feature))],
+      ]);
     }
     if (waterInspectorHierarchySection) {
       const shouldShowHierarchy = !!featureParentId || childFeatures.length > 0;
@@ -1135,12 +1136,7 @@ export function createWaterSpecialRegionController({
 
     const featureColor = getSpecialFeatureColor(selectedId, feature);
     if (specialRegionInspectorDetailHint) {
-      const meta = [
-        getSpecialFeatureMeta(feature),
-        `${t("ID", "ui")}: ${selectedId}`,
-        `${t("Type", "ui")}: ${feature.properties.special_type || "special_region"}`,
-        `${t("Group", "ui")}: ${feature.properties.region_group || t("None", "ui")}`,
-      ].join(" · ");
+      const meta = getSpecialFeatureMeta(feature);
       specialRegionInspectorDetailHint.classList.toggle("hidden", !meta);
       specialRegionInspectorDetailHint.textContent = meta;
     }

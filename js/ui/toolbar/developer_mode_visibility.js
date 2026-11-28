@@ -12,3 +12,19 @@ export function shouldShowDeveloperModeEntry({ hostname = "", search = "", store
   } catch {}
   return storedDeveloperMode === "true" || storedDeveloperMode === "false";
 }
+
+export const DEVELOPER_MODE_STORAGE_KEY = "map_creator_developer_mode";
+
+export function readStoredDeveloperMode() {
+  try {
+    return globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export const isDeveloperModeEntryVisible = () => shouldShowDeveloperModeEntry({
+  hostname: globalThis.location?.hostname,
+  search: globalThis.location?.search,
+  storedDeveloperMode: readStoredDeveloperMode(),
+});

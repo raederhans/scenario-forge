@@ -635,6 +635,7 @@ function initSidebar({ render } = {}) {
   const waterInspectorDetailHint = document.getElementById("waterInspectorDetailHint");
   const waterInspectorLocateBtn = document.getElementById("waterInspectorLocateBtn");
   const waterInspectorMetaSection = document.getElementById("waterInspectorMetaSection");
+  const waterInspectorMoreMetaList = document.getElementById("waterInspectorMoreMetaList");
   const waterInspectorMetaList = document.getElementById("waterInspectorMetaList");
   const waterInspectorHierarchySection = document.getElementById("waterInspectorHierarchySection");
   const waterInspectorBreadcrumb = document.getElementById("waterInspectorBreadcrumb");
@@ -1682,6 +1683,7 @@ function initSidebar({ render } = {}) {
       waterInspectorLocateBtn,
       waterInspectorMetaSection,
       waterInspectorMetaList,
+      waterInspectorMoreMetaList,
       waterInspectorHierarchySection,
       waterInspectorBreadcrumb,
       waterInspectorJumpToParentBtn,

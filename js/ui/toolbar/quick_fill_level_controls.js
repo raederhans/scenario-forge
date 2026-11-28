@@ -27,7 +27,7 @@ export function getQuickFillLevelModel(state) {
   const options = [{ value: "parent", label: zh ? "默认上级" : "Default parent" }];
   for (const level of levels) {
     let label = zh ? ZH[level.label] || level.label : level.label;
-    if (level.status === "partial") label += zh ? "（部分区域待核验）" : " (partly awaiting verification)";
+    if (level.status === "partial") label += zh ? "（部分覆盖）" : " (partial coverage)";
     options.push({ value: `level:${level.id}`, label, status: level.status });
   }
   options.push({ value: "country", label: state.activeScenarioId ? (zh ? "当前剧本国家" : "Current scenario owner") : (zh ? "全国" : "Country") });
@@ -37,9 +37,9 @@ export function getQuickFillLevelModel(state) {
     options.push({ value: selected, label: zh ? "此层级在当前区域不可用" : "Selected level is unavailable here", disabled: true });
   }
   return { countryCode, selected, options, explicitLevel: selected === "color" || selected.startsWith("level:"),
-    hint: zh
-      ? "单击填一块；双击按所选层级填色。地理分组不代表剧本年代行政区，缺失或待核验时不扩大填色范围。"
-      : "Single-click paints one leaf; double-click uses the selected level. Geographic groups are not historical administration. Missing or unverified groups never expand the fill scope." };
+    hint: zh ? "单击填一块，双击按所选层级填色。" : "Click to paint one parcel. Double-click to paint the selected level.",
+    note: zh ? "地理分组可能与历史行政区不同。" : "Geographic groups may differ from historical boundaries.",
+  };
 }
 
 export function getNextQuickFillLevel(state) {

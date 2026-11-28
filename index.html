@@ -2290,7 +2290,7 @@
                   <button id="riverPaintToggleBtn" type="button" class="dock-segment-btn" aria-pressed="false" aria-describedby="riverPaintStatus">River cells</button>
                   <span id="riverPaintStatus" class="visually-hidden" role="status" aria-live="polite"></span>
                   <div id="riverPaintNavigation" role="group" aria-label="River locations" hidden>
-                    <input id="riverPaintSearchInput" type="search" autocomplete="off" spellcheck="false" aria-label="Search location name or ID" aria-controls="riverPaintLocationSelect" aria-describedby="riverPaintLocationResults" hidden disabled>
+                    <input id="riverPaintSearchInput" type="search" autocomplete="off" spellcheck="false" aria-label="Search locations" aria-controls="riverPaintLocationSelect" aria-describedby="riverPaintLocationResults" hidden disabled>
                     <select id="riverPaintRiverSelect" class="dock-select" aria-label="Filter by river" aria-controls="riverPaintLocationSelect" hidden disabled></select>
                     <div class="river-paint-location-row">
                       <select id="riverPaintLocationSelect" class="dock-select" aria-label="Go to river location" aria-describedby="riverPaintLocationResults" hidden disabled></select>
@@ -2468,29 +2468,21 @@
                           <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled data-i18n="Bathymetry Contours">Bathymetry Contours</option>
                         </select>
                       </div>
-                      <p data-page-note class="sidebar-tool-hint" data-i18n="Global oceans">Global oceans</p>
-                      <p class="sidebar-tool-hint" data-i18n="Scenario depth is schematic">Scenario depth is schematic</p>
-                      <details data-level="2" class="appearance-mini-section appearance-mini-section-subtle">
-                        <summary class="section-header" data-i18n="Depth legend and sources">Depth legend and sources</summary>
-                        <div class="sidebar-tool-hint mt-2">
-                          <p data-page-note data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
-                          <p data-page-note data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
-                          <p><span data-i18n="Regional depth bins">Regional depth bins</span>:
-                            <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
-                            <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
-                            <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
-                            <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
-                          </p>
-                          <p data-page-note data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
-                        </div>
-                      </details>
+                      <p data-page-note data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
+                      <p data-page-note data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
+                      <p data-page-note><span data-i18n="Regional depth bins">Regional depth bins</span>:
+                        <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
+                        <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
+                        <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
+                        <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
+                      </p>
+                      <p data-page-note data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
                     </div>
                   </section>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Bathymetry details">Bathymetry details</summary>
+                    <summary id="lblOceanTextureCard" class="section-header" data-i18n="Bathymetry details">Bathymetry details</summary>
                     <section class="appearance-control-card" aria-labelledby="lblOceanTextureCard">
-                      <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Bathymetry tuning">Bathymetry tuning</h3>
                       <div class="appearance-control-card-stack">
                         <div>
                           <div class="range-row">
@@ -2518,9 +2510,8 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header" data-i18n="Local adjustment: depth field">Local adjustment: depth field</summary>
+                    <summary id="lblOceanDepthFieldCard" class="section-header" data-i18n="Local adjustment: depth field">Local adjustment: depth field</summary>
                     <section class="appearance-control-card" aria-labelledby="lblOceanDepthFieldCard">
-                      <h3 id="lblOceanDepthFieldCard" class="appearance-control-card-title" data-i18n="Depth Field">Depth Field</h3>
                       <div class="appearance-control-card-stack">
                         <label class="toggle-label">
                           <input id="oceanDepthFieldEnabled" type="checkbox" class="checkbox-input" />
@@ -2741,14 +2732,14 @@
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblScenarioSpecialRegionVisibility" class="sidebar-group-label" data-i18n="Visibility">Visibility</h3>
-                <label class="toggle-label mt-2" title="Toggle scenario-only special regions." data-i18n-title="Toggle scenario-only special regions.">
+                <label class="toggle-label mt-2">
                   <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioSpecialRegionVisibilityToggle" data-i18n="Show Scenario Special Regions">Show Scenario Special Regions</span>
                 </label>
                 <p data-page-note id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
                   Toggle Atlantropa-style scenario regions without affecting the base map.
                 </p>
-                <label class="toggle-label mt-3" title="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
+                <label class="toggle-label mt-3">
                   <input id="scenarioReliefOverlayVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioReliefOverlayVisibilityToggle" data-i18n="Show Scenario Relief Overlays">Show Scenario Relief Overlays</span>
                 </label>
@@ -2861,12 +2852,15 @@
                       <option value="" data-i18n="All Groups">All Groups</option>
                     </select>
                   </div>
-                  <div class="water-filter-field">
-                    <label id="lblWaterFilterSource" class="sidebar-field-label" for="waterInspectorSourceFilter" data-i18n="Source">Source</label>
-                    <select id="waterInspectorSourceFilter" class="select-input">
-                      <option value="" data-i18n="All Sources">All Sources</option>
-                    </select>
-                  </div>
+                  <details class="physical-disclosure">
+                    <summary data-i18n="More filters">More filters</summary>
+                    <div class="water-filter-field">
+                      <label id="lblWaterFilterSource" class="sidebar-field-label" for="waterInspectorSourceFilter" data-i18n="Source">Source</label>
+                      <select id="waterInspectorSourceFilter" class="select-input">
+                        <option value="" data-i18n="All Sources">All Sources</option>
+                      </select>
+                    </div>
+                  </details>
                   <div class="water-filter-field">
                     <label id="lblWaterSort" class="sidebar-field-label" for="waterInspectorSortSelect" data-i18n="Sort">Sort</label>
                     <select id="waterInspectorSortSelect" class="select-input">
@@ -2911,6 +2905,10 @@
                   <div id="waterInspectorMetaSection" class="inspector-detail-section mt-3 hidden">
                     <h3 id="lblWaterInspectorMeta" class="sidebar-group-label" data-i18n="Region Details">Region Details</h3>
                     <div id="waterInspectorMetaList" class="inspector-meta-list mt-2"></div>
+                    <details class="mt-2">
+                      <summary data-i18n="More fields">More details</summary>
+                      <div id="waterInspectorMoreMetaList" class="inspector-meta-list mt-2"></div>
+                    </details>
                   </div>
                   <div id="waterInspectorHierarchySection" class="inspector-detail-section mt-3 hidden">
                     <h3 id="lblWaterInspectorHierarchy" class="sidebar-group-label" data-i18n="Family">Family</h3>
@@ -2956,10 +2954,10 @@
                   </div>
                 </div>
               </div>
-              <div class="inspector-detail-section mt-3 sidebar-detail-group">
-                <h3 id="lblWaterLegend" class="sidebar-group-label" data-i18n="Water Overrides">Water Overrides</h3>
+              <details class="inspector-detail-section mt-3 sidebar-detail-group" hidden>
+                <summary id="lblWaterLegend" class="sidebar-group-label" data-i18n="Water Overrides">Recolored waters</summary>
                 <div id="waterLegendList" class="inspector-scroll mt-3"></div>
-              </div>
+              </details>
             </div>
           </details>
           </section>
@@ -3540,7 +3538,6 @@
       </div>
     </div>
     <div id="startupReadonlyBanner" class="startup-readonly-banner hidden" role="status" aria-live="polite" aria-busy="false">
-      <div class="startup-readonly-banner__eyebrow" data-i18n="Read-only startup">Read-only startup</div>
       <div id="startupReadonlyMessage" class="startup-readonly-banner__message" data-i18n="Detailed interactions are still loading. Pan and zoom remain available.">Detailed interactions are still loading. Pan and zoom remain available.</div>
     </div>
     <div id="scenarioGuideBackdrop" class="scenario-guide-backdrop hidden" aria-hidden="true"></div>

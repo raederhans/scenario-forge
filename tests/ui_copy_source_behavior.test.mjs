@@ -32,7 +32,7 @@ test("UI uses catalog display values in both languages regardless of runtime sna
   setCurrentLanguage(state, "en");
   assert.equal(t("Paint mode color", "ui"), "Color");
   assert.equal(t("Place"), "Place");
-  assert.equal(t("startup.readonly.pending", "ui"), "Detailed interactions are still loading. Pan and zoom remain available.");
+  assert.equal(t("startup.readonly.pending", "ui"), "Map details are loading. You can pan and zoom.");
 });
 
 test("UI interpolation retains two-argument behavior and replaces all supplied placeholders", (context) => {

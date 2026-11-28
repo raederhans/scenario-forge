@@ -81,7 +81,7 @@ test("inspector reports loaded area and transfers, distinguishes unreleased name
   state.selectedInspectorCountryCode = "FRA";
   controller.renderCountryInspectorDetail();
   const area = Math.round((d3.geoArea(features[0]) + d3.geoArea(features[2])) * 6371 ** 2).toLocaleString("zh");
-  assert.equal(stats.textContent, `实际 2 块 · 约 ${area} km² · 获得 1 块 / 失去 0 块 · 仅统计已加载地块 · 来源：德国 × 1`);
+  assert.equal(stats.textContent, `实际 2 块 · 约 ${area} km² · 获得 1 块 / 失去 0 块 · 已加载范围 · 来源：德国 × 1`);
   state.selectedInspectorCountryCode = "GER";
   controller.renderCountryInspectorDetail();
   assert.match(stats.textContent, /失去 1 块.*去向：法国 × 1/);

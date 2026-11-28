@@ -59,8 +59,10 @@ export function createScenarioTerritoryController({
       historyKind: "scenario-core-apply-visual", dirtyReason: "scenario-core-apply-visual",
     });
     if (!result.applied || !result.matchedCount) return rejectApplication(result);
-    showToast(`${t("Applied", "ui")} ${result.changed} ${t("features", "ui")} · ${companionCount} ${t("companion actions", "ui")}`, {
-      title: t("Visual color applied", "ui"), tone: "success", duration: 2800,
+    const message = [t("Painted {count} parcels", "ui", { count: result.changed })];
+    if (companionCount) message.push(t("Also painted {n} related territories", "ui", { n: companionCount, count: companionCount }));
+    showToast(message.join(" · "), {
+      title: t("Territory applied", "ui"), tone: "success", duration: 2800,
     });
     renderList();
     return result.applied;

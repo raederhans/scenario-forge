@@ -439,7 +439,6 @@ function updateUIText() {
     ["lblProjectManagement", "Project Management"],
     ["downloadProjectBtn", "Download Project"],
     ["uploadProjectBtn", "Load Project"],
-    ["lblProjectFile", "Selected File"],
     ["lblLegendProject", "Legend"],
     ["lblUtilities", "Utilities"],
     ["utilitiesGuideBtn", "Guide"],
@@ -559,18 +558,6 @@ function updateUIText() {
   if (zoomPercentInput) {
     zoomPercentInput.setAttribute("aria-label", t("Zoom percentage", "ui"));
     zoomPercentInput.setAttribute("title", t("Zoom percentage", "ui"));
-  }
-
-  const projectFileName = document.getElementById("projectFileName");
-  if (
-    projectFileName
-    && (
-      !projectFileName.textContent.trim()
-      || projectFileName.dataset?.projectFileState === "empty"
-    )
-  ) {
-    if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
-    projectFileName.textContent = t("No file selected", "ui");
   }
 
   const toolHudChip = document.getElementById("toolHudChip");

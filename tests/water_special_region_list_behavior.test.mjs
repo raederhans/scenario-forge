@@ -39,9 +39,10 @@ function fixture(context, translate = (key) => key) {
   context.after(() => { globalThis.document = previous; });
   const elements = Object.fromEntries([
     "waterRegionList", "waterInspectorEmpty", "waterInspectorSelected", "waterInspectorDetailHint",
-    "waterInspectorMetaSection", "waterInspectorMetaList", "waterInspectorScopePreview", "waterInspectorScopeSelect",
+    "waterInspectorMetaSection", "waterInspectorMetaList", "waterInspectorMoreMetaList", "waterLegendList", "waterInspectorScopePreview", "waterInspectorScopeSelect",
     "specialRegionList", "specialRegionInspectorEmpty", "specialRegionInspectorSelected", "specialRegionInspectorDetailHint",
   ].map(key => [key, node()]));
+  elements.waterLegendList.parentElement = node("details");
   const feature = (id) => ({ properties: { id, name: id, water_type: "sea", region_group: "marine_macro", special_type: "salt_flat" } });
   const state = {
     waterRegionsById: new Map(["a", "b"].map(id => [id, feature(id)])),
@@ -51,7 +52,10 @@ function fixture(context, translate = (key) => key) {
     selectedWaterRegionId: "a", selectedSpecialRegionId: "a",
   };
   const controller = createWaterSpecialRegionController({ runtimeState: state, elements, helpers: {
-    t: (key, domain) => { assert.equal(domain, "ui"); return translate(key); },
+    t: (key, domain, params) => {
+      assert.equal(domain, "ui");
+      return params ? translate(key).replace("{count}", params.count) : translate(key);
+    },
     getGeoFeatureDisplayLabel: feature => feature.properties.name,
     mapRenderer: { getWaterRegionColor: () => "#123456" },
     normalizeHexColor: value => value,
@@ -95,14 +99,30 @@ test("water details translate labels, values, subtitle and singular/plural scope
   controller.renderWaterRegionList();
   assert.match(elements.waterInspectorScopePreview.textContent, /^\[2 regions affected\]/);
   const values = elements.waterInspectorMetaList.children.map(item => item.textContent);
-  for (const key of ["ID", "Type", "Group", "Parent", "Source", "Interactive", "Chokepoint", "Base geography", "Default color", "Current color", "Sea", "Yes", "No"]) {
+  for (const key of ["Type", "Group", "Fragments", "Default color", "Current color", "Sea"]) {
     assert.ok(values.includes(`[${key}]`), key);
   }
-  assert.match(elements.waterInspectorDetailHint.textContent, /\[Sea\] · \[Marine Macro\]/);
-  assert.match(elements.waterInspectorDetailHint.textContent, /\[Default color\]/);
+  assert.deepEqual(elements.waterInspectorMoreMetaList.children.filter((_, i) => i % 2 === 0).map(item => item.textContent), ["[ID]", "[Source]"]);
+  assert.equal(elements.waterInspectorDetailHint.textContent, "[1 fragment]");
 });
 
-test("special region finite labels translate, unknown tokens fall back, raw enums remain in details", context => {
+test("mixed water selections show recolored fragments and hide the legend after clearing", context => {
+  const { elements, state, controller } = fixture(context);
+  state.waterRegionsById.get("a").properties.name = "Shared Sea 1-1";
+  state.waterRegionsById.get("b").properties.name = "Shared Sea 1-2";
+  state.waterRegionOverrides.b = "#123456";
+  controller.renderWaterRegionList();
+  assert.equal(elements.waterInspectorDetailHint.textContent, "2 fragments · Recolored");
+  assert.equal(elements.waterLegendList.parentElement.hidden, false);
+  assert.equal(elements.waterLegendList.children.length, 1);
+
+  delete state.waterRegionOverrides.b;
+  controller.renderWaterRegionList();
+  assert.equal(elements.waterInspectorDetailHint.textContent, "2 fragments");
+  assert.equal(elements.waterLegendList.parentElement.hidden, true);
+});
+
+test("special region finite labels translate, unknown tokens fall back, details use the same labels", context => {
   const { elements, state, controller } = fixture(context, key => `[${key}]`);
   state.specialRegionsById.get("a").properties.region_group = "atlantropa_core";
   state.specialRegionsById.get("b").properties.special_type = "future_type";
@@ -110,6 +130,5 @@ test("special region finite labels translate, unknown tokens fall back, raw enum
   controller.renderSpecialRegionList();
   assert.equal(elements.specialRegionList.children[0].querySelector(".country-select-meta").textContent, "[Salt flat] · [Atlantropa core]");
   assert.equal(elements.specialRegionList.children[1].querySelector(".country-select-meta").textContent, "future type · future group");
-  assert.match(elements.specialRegionInspectorDetailHint.textContent, /\[Type\]: salt_flat/);
-  assert.match(elements.specialRegionInspectorDetailHint.textContent, /\[Group\]: atlantropa_core/);
+  assert.equal(elements.specialRegionInspectorDetailHint.textContent, "[Salt flat] · [Atlantropa core]");
 });

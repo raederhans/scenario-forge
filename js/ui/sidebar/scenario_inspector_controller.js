@@ -170,16 +170,6 @@ export function createScenarioInspectorController({
     body.className = "scenario-visual-adjustments-body";
     if (countryState) renderCountryColorSyncAffordance(body, countryState);
 
-    // Color Only 面板面向视觉颜色调整，主要写入视觉颜色覆盖。
-    // 它可以复用 preset/hierarchy 的目标选择，但不得触发 owner/controller、边界或 diff 计数链。
-    const note = document.createElement("p");
-    note.className = "scenario-action-hint";
-    note.textContent = t(
-      "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.",
-      "ui"
-    );
-    body.appendChild(note);
-
     if (!countryState) {
       body.appendChild(
         createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))

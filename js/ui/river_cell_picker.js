@@ -81,7 +81,7 @@ export function createRiverCellPicker({ state, panel, select, preview, applyButt
       announce(zh() ? '请使用地块级填色、橡皮或取色工具。' : 'Use subdivision fill, eraser or eyedropper.'); return;
     }
     if (!applyCell(parentId, cellId)) {
-      announce(zh() ? '分区当前不可编辑，请重新选择试点。' : 'Cell unavailable. Choose the pilot again.');
+      announce(zh() ? '该分区暂不可编辑，请重新选择地点。' : 'This cell is unavailable. Choose a location again.');
     }
   }
   select.addEventListener('change', change); applyButton.addEventListener('click', apply);

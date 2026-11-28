@@ -293750,6 +293750,10 @@
       "en": "1 January 1936 · The gathering storm",
       "zh": "1936 年 1 月 1 日 · 风暴前夕"
     },
+    "1 fragment": {
+      "en": "1 fragment",
+      "zh": "含 1 个碎片"
+    },
     "1 matching region": {
       "en": "1 matching region",
       "zh": "1 个匹配地块"
@@ -294282,6 +294286,13 @@
       "en": "Already using this boundary variant.",
       "zh": "已经在使用这个边界变体。"
     },
+    "Also painted {n} related territories": {
+      "en": {
+        "one": "Also painted {n} related territory",
+        "other": "Also painted {n} related territories"
+      },
+      "zh": "另涂 {n} 处关联领土"
+    },
     "Also update {count} regions painted in {country}'s old color?": {
       "en": {
         "one": "Also update {count} region painted in {country}'s old color?",
@@ -294434,8 +294445,8 @@
       "zh": "应用当前工具"
     },
     "Apply failed": {
-      "en": "Apply failed",
-      "zh": "申请失败"
+      "en": "Could not apply",
+      "zh": "应用失败"
     },
     "Apply label text": {
       "en": "Apply label text",
@@ -294554,8 +294565,8 @@
       "zh": "自动填充风格"
     },
     "Auto-Fill Visuals": {
-      "en": "Auto-Fill Visuals",
-      "zh": "自动填充视觉色"
+      "en": "Auto-fill map",
+      "zh": "自动填色"
     },
     "Auto-fill also resets the ocean color. You can undo this from history.": {
       "en": "Auto-fill also resets the ocean color. You can undo this from history.",
@@ -294828,10 +294839,6 @@
     "Bathymetry opacity is zero": {
       "en": "Bathymetry opacity is zero",
       "zh": "测深效果不透明度为零"
-    },
-    "Bathymetry tuning": {
-      "en": "Bathymetry tuning",
-      "zh": "测深效果调节"
     },
     "Bay": {
       "en": "Bay",
@@ -295262,8 +295269,8 @@
       "zh": "在左侧“对象 → 国家”选择国家，再在右侧查看它的属性。"
     },
     "Choose a checked-in public starter sample to open it in the editor.": {
-      "en": "Choose a checked-in public starter sample to open it in the editor.",
-      "zh": "选择一个已入库的公开起步示例，并在编辑器中打开。"
+      "en": "Choose a sample to open in the editor.",
+      "zh": "选一个示例在编辑器中打开。"
     },
     "Choose a city marker treatment first, then tune how many point markers and labels are allowed to surface.": {
       "en": "Choose a city marker treatment first, then tune how many point markers and labels are allowed to surface.",
@@ -295542,8 +295549,8 @@
       "zh": "清除已拥有区域的视觉覆盖"
     },
     "Clear Reference Region Color Edits": {
-      "en": "Clear Reference Region Color Edits",
-      "zh": "清除参考区域的着色修改"
+      "en": "Clear country colors",
+      "zh": "清除本国涂色"
     },
     "Clear Scope Overrides": {
       "en": "Clear Scope Overrides",
@@ -295558,8 +295565,8 @@
       "zh": "清除特殊区域覆盖"
     },
     "Clear Territory Visual Overrides": {
-      "en": "Clear Territory Visual Overrides",
-      "zh": "清除领土上的视觉覆盖色"
+      "en": "Clear territory colors",
+      "zh": "清除领土涂色"
     },
     "Clear Water Override": {
       "en": "Clear Water Override",
@@ -296245,8 +296252,8 @@
       "zh": "本国核心领土占比"
     },
     "Core territory was not applied.": {
-      "en": "Core territory was not applied.",
-      "zh": "核心领土未适用。"
+      "en": "Could not apply the territory.",
+      "zh": "领土未能应用。"
     },
     "Corridor": {
       "en": "Corridor",
@@ -296496,6 +296503,10 @@
       "en": "Current Tool",
       "zh": "当前工具"
     },
+    "Current color": {
+      "en": "Current color",
+      "zh": "当前色"
+    },
     "Current context": {
       "en": "Current context",
       "zh": "当前背景"
@@ -296517,8 +296528,8 @@
       "zh": "当前地图不包含此操作的详细特征。加载详细拓扑并重试。"
     },
     "Current map does not include this preset's detail features. Load detail topology and try again.": {
-      "en": "Current map does not include this preset's detail features. Load detail topology and try again.",
-      "zh": "当前地图不包括该预设的详细功能。加载详细拓扑并重试。"
+      "en": "This map has no parcels for this preset.",
+      "zh": "当前地图上没有该预设的地块。"
     },
     "Current preview (1×)": {
       "en": "Current preview (1×)",
@@ -296693,8 +296704,8 @@
       "zh": "防御线"
     },
     "Deferred autosave": {
-      "en": "Deferred autosave",
-      "zh": "已延后的自动保存"
+      "en": "Autosave",
+      "zh": "自动保存"
     },
     "Delete": {
       "en": "Delete",
@@ -296828,10 +296839,6 @@
       "en": "Depth contrast",
       "zh": "深度对比度"
     },
-    "Depth legend and sources": {
-      "en": "Depth legend and sources",
-      "zh": "深度图例与来源"
-    },
     "Derived from scenario state data and parcel area": {
       "en": "Derived from scenario state data and parcel area",
       "zh": "由剧本州数据与地块面积计算"
@@ -296869,8 +296876,8 @@
       "zh": "未为此系列定义详细基线"
     },
     "Detailed interactions are still loading. Pan and zoom remain available.": {
-      "en": "Detailed interactions are still loading. Pan and zoom remain available.",
-      "zh": "详细交互仍在加载中，当前仍可平移和缩放。"
+      "en": "Map details are loading. You can pan and zoom.",
+      "zh": "地图细节仍在加载，暂时只能平移和缩放。"
     },
     "Details": {
       "en": "Details",
@@ -297276,10 +297283,6 @@
       "en": "Edit map",
       "zh": "编辑地图"
     },
-    "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": {
-      "en": "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.",
-      "zh": "根据剧本参考分组编辑地图颜色。参考边界保持不变。"
-    },
     "Edit map label": {
       "en": "Edit map label",
       "zh": "编辑地图文字"
@@ -297311,10 +297314,6 @@
     "Edit the small project legend list for the current working map.": {
       "en": "Edit the small project legend list for the current working map.",
       "zh": "编辑当前工作地图的小型图例列表。"
-    },
-    "Edit this starter map, then export your own image or download the original sample JSON.": {
-      "en": "Edit this starter map, then export your own image or download the original sample JSON.",
-      "zh": "编辑这个起步地图，然后导出自己的图片，或下载原始示例 JSON。"
     },
     "Edit tools": {
       "en": "Edit tools",
@@ -297720,8 +297719,8 @@
       "zh": "导出工作流"
     },
     "Exporting project file with appearance and transport settings.": {
-      "en": "Exporting project file with appearance and transport settings.",
-      "zh": "正在导出包含外观和交通设置的项目文件。"
+      "en": "Saving…",
+      "zh": "正在保存…"
     },
     "Exporting sample": {
       "en": "Exporting sample",
@@ -298081,6 +298080,10 @@
       },
       "zh": "发现 {count} 份未保存的工作。"
     },
+    "Fragments": {
+      "en": "Fragments",
+      "zh": "碎片数"
+    },
     "Freeze visible country names": {
       "en": "Freeze visible country names",
       "zh": "固定当前视图所有国名"
@@ -298180,10 +298183,6 @@
     "Gestures": {
       "en": "Gestures",
       "zh": "手势"
-    },
-    "Global oceans": {
-      "en": "Global oceans",
-      "zh": "全球海洋"
     },
     "Global oceans · raster-derived bathymetry": {
       "en": "Global oceans · raster-derived bathymetry",
@@ -298288,10 +298287,6 @@
     "HGO and identity": {
       "en": "HGO and identity",
       "zh": "HGO 与身份"
-    },
-    "HGO disabled": {
-      "en": "HGO disabled",
-      "zh": "HGO 已关闭"
     },
     "HGO editor": {
       "en": "HGO editor",
@@ -299490,8 +299485,8 @@
       "zh": "已加载类别："
     },
     "Loaded regions only": {
-      "en": "Loaded regions only",
-      "zh": "仅统计已加载地块"
+      "en": "Loaded area",
+      "zh": "已加载范围"
     },
     "Loaded rows": {
       "en": "Loaded rows",
@@ -300229,8 +300224,12 @@
       "zh": "泊位"
     },
     "More fields": {
-      "en": "More fields",
-      "zh": "更多字段"
+      "en": "More details",
+      "zh": "更多信息"
+    },
+    "More filters": {
+      "en": "More filters",
+      "zh": "更多筛选"
     },
     "More options": {
       "en": "More options",
@@ -300541,12 +300540,12 @@
       "zh": "未选择能源设施"
     },
     "No facility details available yet.": {
-      "en": "No facility details available yet.",
-      "zh": "暂时没有可用的 facility 详情。"
+      "en": "No facility details available.",
+      "zh": "暂无设施详情。"
     },
     "No file selected": {
-      "en": "Open a project file or drop a project file onto the map.",
-      "zh": "打开项目文件，或将文件拖到地图上。"
+      "en": "You can also drop a project file onto the map.",
+      "zh": "也可将项目文件拖到地图上。"
     },
     "No frontline control split in current scenario.": {
       "en": "No frontline control split in current scenario.",
@@ -300685,8 +300684,8 @@
       "zh": "未选择轨道功能"
     },
     "No reference regions were recolored.": {
-      "en": "No reference regions were recolored.",
-      "zh": "没有参考区域被重新着色。"
+      "en": "No parcels were recolored.",
+      "zh": "没有地块被重新涂色。"
     },
     "No reference territory.": {
       "en": "No reference territory.",
@@ -300761,8 +300760,8 @@
       "zh": "没有单位计数器"
     },
     "No visual overrides to clear.": {
-      "en": "No visual overrides to clear.",
-      "zh": "没有可清除的视觉覆盖。"
+      "en": "No colors to clear.",
+      "zh": "没有可清除的涂色。"
     },
     "Noise Control": {
       "en": "Noise Control",
@@ -301317,8 +301316,8 @@
       "zh": "用国家颜色重绘已拥有区域"
     },
     "Paint Reference Regions With Country Color": {
-      "en": "Paint Reference Regions With Country Color",
-      "zh": "用国家颜色填充参考区域"
+      "en": "Paint territory with country color",
+      "zh": "按本国颜色涂满领土"
     },
     "Paint mode": {
       "en": "Paint mode",
@@ -301358,6 +301357,13 @@
         "other": "Paint {count} regions"
       },
       "zh": "填色 {count} 个地块"
+    },
+    "Painted {count} parcels": {
+      "en": {
+        "one": "Painted {count} parcel",
+        "other": "Painted {count} parcels"
+      },
+      "zh": "已为 {count} 个地块涂色"
     },
     "Paints with this country's current color; can be undone.": {
       "en": "Paints with this country's current color; can be undone.",
@@ -301952,8 +301958,8 @@
       "zh": "项目与图例"
     },
     "Project + diagnostics": {
-      "en": "Project + diagnostics",
-      "zh": "项目 + 诊断"
+      "en": "Include troubleshooting report",
+      "zh": "附带排错报告"
     },
     "Project + metadata": {
       "en": "Project + metadata",
@@ -302015,10 +302021,6 @@
       "en": "Project export cancelled.",
       "zh": "项目导出已取消。"
     },
-    "Project export includes appearance and transport settings.": {
-      "en": "Project export includes appearance and transport settings.",
-      "zh": "项目导出会包含外观和交通设置。"
-    },
     "Project export preserves project layers.": {
       "en": "Project export preserves project layers.",
       "zh": "项目导出会保留项目图层。"
@@ -302036,8 +302038,8 @@
       "zh": "项目已导出。外观和交通设置已保存到 JSON 文件。"
     },
     "Project exported. Appearance and transport settings are saved in the selected project file.": {
-      "en": "Project exported. Appearance and transport settings are saved in the selected project file.",
-      "zh": "项目已导出。外观和交通设置已保存在所选项目文件中。"
+      "en": "Saved",
+      "zh": "已保存"
     },
     "Project file downloaded.": {
       "en": "Project file downloaded.",
@@ -302068,16 +302070,16 @@
       "zh": "项目正在导入，请稍候。"
     },
     "Project import started. Appearance and transport settings will be restored from the file.": {
-      "en": "Project import started. Appearance and transport settings will be restored from the file.",
-      "zh": "项目导入已开始。外观和交通设置会从文件恢复。"
+      "en": "Opening…",
+      "zh": "正在打开…"
     },
     "Project imported": {
       "en": "Project imported",
       "zh": "项目导入"
     },
     "Project imported. Appearance and transport settings were restored from the JSON file.": {
-      "en": "Project imported. Appearance and transport settings were restored from the JSON file.",
-      "zh": "项目已导入。外观和交通设置已从 JSON 文件恢复。"
+      "en": "Project opened",
+      "zh": "项目已打开"
     },
     "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.": {
       "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.",
@@ -302148,8 +302150,8 @@
       "zh": "民众"
     },
     "Public starter samples": {
-      "en": "Public starter samples",
-      "zh": "公开起步示例"
+      "en": "Sample projects",
+      "zh": "示例项目"
     },
     "Publish Latest": {
       "en": "Publish Latest",
@@ -302275,10 +302277,6 @@
       "en": "Read-only scenario asset",
       "zh": "只读场景资产"
     },
-    "Read-only startup": {
-      "en": "Read-only startup",
-      "zh": "只读启动"
-    },
     "Ready": {
       "en": "Ready",
       "zh": "已就绪"
@@ -302330,6 +302328,10 @@
     "Recipe version": {
       "en": "Recipe version",
       "zh": "构建方案版本"
+    },
+    "Recolored": {
+      "en": "Recolored",
+      "zh": "已改色"
     },
     "Recommended": {
       "en": "Recommended",
@@ -303099,6 +303101,10 @@
       "en": "Saved WGI metric is unavailable. Choose a supported metric.",
       "zh": "此项目保存的 WGI 指标不可用，请选择受支持的指标。"
     },
+    "Saved at": {
+      "en": "Saved at",
+      "zh": "保存时间"
+    },
     "Saved indicator data version is unavailable.": {
       "en": "Saved indicator data version is unavailable.",
       "zh": "已保存的指标数据版本不可用。"
@@ -303242,10 +303248,6 @@
     "Scenario default ({value})": {
       "en": "Scenario default ({value})",
       "zh": "剧本默认（{value}）"
-    },
-    "Scenario depth is schematic": {
-      "en": "Scenario depth is schematic",
-      "zh": "剧本深度为示意"
     },
     "Scenario depth shows relative nearshore and deeper water, not measured meters.": {
       "en": "Scenario depth shows relative nearshore and deeper water, not measured meters.",
@@ -303734,10 +303736,6 @@
     "Selected Country Actions": {
       "en": "Selected Country Actions",
       "zh": "当前国家动作"
-    },
-    "Selected File": {
-      "en": "Selected File",
-      "zh": "已选文件"
     },
     "Selected Object": {
       "en": "Selected Object",
@@ -304826,6 +304824,10 @@
       "en": "Territory",
       "zh": "领土"
     },
+    "Territory applied": {
+      "en": "Territory applied",
+      "zh": "已应用领土"
+    },
     "Territory change summary": {
       "en": "Territory change summary",
       "zh": "本图改动摘要"
@@ -304899,8 +304901,8 @@
       "zh": "当前来源类别决定预览中显示哪些地点。"
     },
     "The app does not upload anything. Use a public file URL that supports CORS, such as a Gist Raw URL or a raw.githubusercontent.com URL. Anyone with the link can view the file. File size limits apply.": {
-      "en": "The app does not upload anything. Use a public file URL that supports CORS, such as a Gist Raw URL or a raw.githubusercontent.com URL. Anyone with the link can view the file. File size limits apply.",
-      "zh": "应用不会上传任何内容。请使用支持 CORS 的公开文件地址，例如 Gist Raw 或 raw.githubusercontent.com。链接公开可见，任何获得链接的人都可以查看文件。项目文件有大小上限。"
+      "en": "Paste a public raw file link, such as Gist Raw. Anyone with the link can view the file.",
+      "zh": "粘贴公开的原始文件链接（如 Gist Raw），拿到链接的人都能查看。"
     },
     "The capital is outside this country (its map star is hidden)": {
       "en": "The capital is outside this country (its map star is hidden)",
@@ -305187,8 +305189,8 @@
       "zh": "这些控件会同时调整 live 铁路预览和共享铁路总览桥接。"
     },
     "This ZIP contains an editable project. Review the package summary before loading.": {
-      "en": "This ZIP contains an editable project. Review the package summary before loading.",
-      "zh": "这个 ZIP 包含一个可编辑项目。加载前请先查看包摘要。"
+      "en": "Open this project package?",
+      "zh": "打开这个项目包？"
     },
     "This board controls future draw order across the eight transport families instead of hard-coding one fixed stacking rule.": {
       "en": "This board controls future draw order across the eight transport families instead of hard-coding one fixed stacking rule.",
@@ -305421,10 +305423,6 @@
     "Toggle right panel": {
       "en": "Toggle right panel",
       "zh": "切换右侧面板"
-    },
-    "Toggle scenario-only special regions.": {
-      "en": "Toggle scenario-only special regions.",
-      "zh": "切换仅剧本特殊区域。"
     },
     "Toggle shoreline, basin contour, and texture overlays for the active scenario.": {
       "en": "Toggle shoreline, basin contour, and texture overlays for the active scenario.",
@@ -305771,8 +305769,8 @@
       "zh": "未保存的更改将被丢弃。"
     },
     "Unsaved project changes.": {
-      "en": "Unsaved project changes.",
-      "zh": "项目有未保存改动。"
+      "en": "Unsaved changes",
+      "zh": "有未保存的更改"
     },
     "Untitled project": {
       "en": "Untitled project",
@@ -306103,8 +306101,8 @@
       "zh": "视觉颜色已应用"
     },
     "Visual overrides cleared": {
-      "en": "Visual overrides cleared",
-      "zh": "视觉覆盖已清除"
+      "en": "Colors cleared",
+      "zh": "已清除涂色"
     },
     "Voice and accountability": {
       "en": "Voice and accountability",
@@ -306223,8 +306221,8 @@
       "zh": "海域层级"
     },
     "Water Overrides": {
-      "en": "Water Overrides",
-      "zh": "水域覆盖"
+      "en": "Recolored waters",
+      "zh": "已改色水域"
     },
     "Water Region": {
       "en": "Water Region",
@@ -306599,20 +306597,20 @@
       "zh": "所选示例"
     },
     "startup.readonly.failed": {
-      "en": "Detailed interactions are unavailable right now. The map stays view-only until the detail layer recovers.",
-      "zh": "细分交互暂时不可用。在细分图层恢复前，地图将保持只读。"
+      "en": "Map details could not load. You can still browse the map.",
+      "zh": "地图细节未能加载，暂时只能浏览。"
     },
     "startup.readonly.healthGate": {
-      "en": "Scenario data is being held in safe mode. The map stays view-only until startup recovery finishes.",
-      "zh": "场景数据已切换到安全模式。在启动恢复完成前，地图将保持只读。"
+      "en": "Map details could not load. You can still browse the map.",
+      "zh": "地图细节未能加载，暂时只能浏览。"
     },
     "startup.readonly.loading": {
-      "en": "Preparing detailed interactions. The map is view-only for a moment.",
-      "zh": "正在准备细分交互。当前地图暂时只读。"
+      "en": "Map details are loading. You can pan and zoom.",
+      "zh": "地图细节仍在加载，暂时只能平移和缩放。"
     },
     "startup.readonly.pending": {
-      "en": "Detailed interactions are still loading. Pan and zoom remain available.",
-      "zh": "细分交互仍在加载中。当前可平移缩放，但保持只读。"
+      "en": "Map details are loading. You can pan and zoom.",
+      "zh": "地图细节仍在加载，暂时只能平移和缩放。"
     },
     "visible": {
       "en": "visible",
@@ -306633,6 +306631,10 @@
     "{count} features selected.": {
       "en": "{count} features selected.",
       "zh": "已选择 {count} 个地块。"
+    },
+    "{count} fragments": {
+      "en": "{count} fragments",
+      "zh": "含 {count} 个碎片"
     },
     "{count} matching regions": {
       "en": "{count} matching regions",

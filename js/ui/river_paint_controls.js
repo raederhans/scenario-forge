@@ -28,6 +28,7 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     select.dataset.optionsKey = key;
     select.value = '';
   }
+  const unavailableMessage = () => zh() ? '沿河填色暂不可用，请稍后重试。' : 'River painting is unavailable. Try again later.';
   function sync() {
     if (!button || disposed) return;
     const info = runtime.diagnostics();
@@ -42,9 +43,8 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     button.textContent = label;
     const description = !supported
       ? ''
-      : info.error ? (zh() ? `沿河分区未就绪：${info.error}` : `River partitions unavailable: ${info.error}`)
-      : (zh() ? '搜索已加载的沿河地点，按河流筛选。旧项目保留原范围；关闭工具保留颜色。'
-        : 'Search loaded river locations or filter by river. Existing projects retain their coverage. Turning off the tool preserves paint.');
+      : info.error ? unavailableMessage()
+      : (zh() ? '搜索沿河地点，按河流筛选。' : 'Search river locations or filter by river.');
     button.title = description;
     button.setAttribute('aria-label', `${label}. ${description}`);
     if (statusNode) statusNode.textContent = description;
@@ -65,7 +65,7 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     }
     if (searchInput) {
       searchInput.disabled = !available;
-      const label = zh() ? '搜索地点名称或 ID' : 'Search location name or ID';
+      const label = zh() ? '搜索地点' : 'Search locations';
       searchInput.setAttribute('aria-label', label);
       searchInput.placeholder = label;
     }
@@ -143,7 +143,8 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
       announce(zh() ? '沿河填色已启用。搜索或选择地点，点击地图或使用分区预览填色。'
         : 'River cells enabled. Search or choose a location, then paint on the map or use the cell preview.');
     } catch (failure) {
-      if (!disposed) announce(zh() ? `无法启用沿河分区：${failure.message}` : `Cannot enable river partitions: ${failure.message}`);
+      console.error(failure);
+      if (!disposed) announce(unavailableMessage());
     } finally { sync(); }
   }
   if (button) button.addEventListener('click', toggle);
