@@ -747,3 +747,49 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+/* ── 对象 › 水域列表分组与分页 ── */
+.editor-workspace .water-list-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 32px;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  font-size: var(--type-label);
+  font-weight: 600;
+  color: var(--ink-700);
+  cursor: pointer;
+}
+.editor-workspace .water-list-group .water-list-group > summary {
+  background: transparent;
+  font-weight: 500;
+  border-bottom: 1px solid var(--line-1);
+  border-radius: 0;
+}
+.editor-workspace .water-list-group-count {
+  font-size: var(--type-meta);
+  font-weight: 400;
+  color: var(--type-meta-color);
+}
+.editor-workspace .water-list-group-body {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 8px 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line-1);
+}
+.editor-workspace .water-list-pager {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+.editor-workspace .water-list-pager-status {
+  font-size: var(--type-meta);
+  color: var(--type-meta-color);
+  text-align: center;
+}

@@ -14,7 +14,7 @@ import {
   defaultCountryPalette,
   normalizeAnnotationView,
 } from "../core/state.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { STATE_BUS_EVENTS, callRuntimeHook, registerRuntimeHook, subscribeStateBusEvent } from "../core/state/index.js";
 import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { pushRecentColorState } from "../core/state/actions/editor_input_actions.js";
 import { ColorManager } from "../core/color_manager.js";
@@ -1238,6 +1238,8 @@ function initSidebar({ render } = {}) {
       render();
     },
   });
+  // 地图上选中、换选或清空地块时，「选中地块国家」卡片要跟着变，不能等国家列表重绘。
+  subscribeStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI, () => countryInspectorController.refreshSelectedLandCountryQuickTab());
   const {
     bindEvents: bindCountryInspectorEvents,
     closeCountryInspectorColorPicker,
