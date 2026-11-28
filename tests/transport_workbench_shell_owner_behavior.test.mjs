@@ -128,10 +128,8 @@ function createShellHarness({ carrierViewState = { quarterTurns: 1 } } = {}) {
     overlay: new TestElement("div"),
     title: new TestElement("h2"),
     lensTitle: new TestElement("h3"),
-    familyStatus: new TestElement("div"),
     countryStatus: new TestElement("div"),
     packSelect: new TestSelect(),
-    previewMode: new TestElement("div"),
     previewTitle: new TestElement("div"),
     previewCanvas: new TestElement("canvas"),
     previewControls: new TestElement("div"),
@@ -250,7 +248,6 @@ test("transport workbench shell owner updates changed family and preview control
   assert.equal(harness.nodes.packSelect.disabled, true);
   assert.equal(harness.nodes.packSelect.value, "");
   assert.equal(harness.nodes.packSelect.replaceChildrenCallCount, 2);
-  assert.equal(harness.nodes.previewMode.textContent, "t:Layer order");
   assert.equal(harness.nodes.previewCanvas.classList.contains("is-layer-order-mode"), true);
   assert.equal(harness.nodes.carrierMount.classList.contains("hidden"), true);
   assert.equal(harness.nodes.layerOrderPanel.classList.contains("hidden"), false);

@@ -106,14 +106,15 @@ test("manifest-only rows expose error and ready pack governance", () => {
 test("diagnostic rows stay family specific", () => {
   const roadRows = buildTransportWorkbenchDiagnosticRows("road", {
     roadClass: ["motorway"],
-    motorwayIdentitySource: "osm_and_n06",
+    minProjectedSegmentPx: 6,
+    denseMetroGuard: "balanced",
     refClasses: ["primary"],
     widthScale: 110,
     noiseReduction: 35,
     showRefs: true,
   });
   assert.equal(rowValue(roadRows, "Data intake"), "Motorway only");
-  assert.equal(rowValue(roadRows, "Source recipe"), "OSM + N06 hardening");
+  assert.match(rowValue(roadRows, "Short road threshold"), /^6 px/);
   assert.equal(rowValue(roadRows, "Label scope"), "Primary refs");
 
   const hubRows = buildTransportWorkbenchDiagnosticRows("logistics_hubs", {
@@ -329,9 +330,9 @@ test("inspector model reports empty logistics filters and layer status", () => {
     isManifestOnlyRuntimeFamily: (id) => id === "energy_facilities",
   });
   assert.deepEqual(layerModel.rows, [
-    ["1", "road (live)"],
-    ["2", "energy_facilities (metadata)"],
-    ["3", "custom (reserved)"],
+    ["1", "road"],
+    ["2", "energy_facilities"],
+    ["3", "custom"],
   ]);
 });
 
@@ -386,8 +387,8 @@ test("owner factory injects layer metadata and keeps translated lens label", () 
   });
   const model = owner.buildInspectorModel({ family: { id: "layers", label: "Layers" } });
   assert.deepEqual(model.rows, [
-    ["1", "ROAD (live)"],
-    ["2", "PORT (metadata)"],
+    ["1", "ROAD"],
+    ["2", "PORT"],
   ]);
 
   const summaryRows = owner.buildLensSummaryRows({

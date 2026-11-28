@@ -266,9 +266,8 @@ test("right deck owner renders preview data rows and selects rows without mutati
 
   assert.match(textOf(mount), /Loaded Data/);
   assert.match(textOf(mount), /Loaded rows/);
-  assert.match(textOf(mount), /Table Rows/);
   const metaItems = findAllByClass(mount, "transport-workbench-data-meta-item").map((item) => textOf(item).replace(/\s+/g, " ").trim());
-  assert.deepEqual(metaItems.slice(0, 2), ["Loaded rows 20", "Table Rows 2"]);
+  assert.deepEqual(metaItems.slice(0, 2), ["Loaded rows 20", "Shown 2"]);
   assert.match(textOf(mount), /Search and sort apply to the rows listed here/);
   assert.doesNotMatch(textOf(mount), /bounded row set/);
   assert.match(textOf(mount), /Route 1/);

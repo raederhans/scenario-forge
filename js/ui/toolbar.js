@@ -294,10 +294,8 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchTitle = document.getElementById("transportWorkbenchTitle");
   const transportWorkbenchLensTitle = document.getElementById("transportWorkbenchLensTitle");
   const transportWorkbenchLensSections = document.getElementById("transportWorkbenchLensSections");
-  const transportWorkbenchFamilyStatus = document.getElementById("transportWorkbenchFamilyStatus");
   const transportWorkbenchCountryStatus = document.getElementById("transportWorkbenchCountryStatus");
   const transportWorkbenchPackSelect = document.getElementById("transportWorkbenchPackSelect");
-  const transportWorkbenchPreviewMode = document.getElementById("transportWorkbenchPreviewMode");
   const transportWorkbenchPreviewTitle = document.getElementById("transportWorkbenchPreviewTitle");
   const transportWorkbenchPreviewCanvas = document.getElementById("transportWorkbenchPreviewCanvas");
   const transportWorkbenchPreviewControls = document.getElementById("transportWorkbenchPreviewControls");
@@ -571,10 +569,8 @@ function initToolbar({ render } = {}) {
     transportWorkbenchTitle,
     transportWorkbenchLensTitle,
     transportWorkbenchLensSections,
-    transportWorkbenchFamilyStatus,
     transportWorkbenchCountryStatus,
     transportWorkbenchPackSelect,
-    transportWorkbenchPreviewMode,
     transportWorkbenchPreviewTitle,
     transportWorkbenchPreviewCanvas,
     transportWorkbenchPreviewControls,

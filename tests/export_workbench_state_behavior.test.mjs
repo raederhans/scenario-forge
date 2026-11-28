@@ -198,7 +198,7 @@ test("export failure handler exposes a construction-validated taxonomy presenter
   assert.equal(toasts[0][1].title, "Export failed · Artifact unavailable");
   assert.equal(classifyExportFailure({ exportStage: "artifact", message: "out of memory" }), EXPORT_FAILURE_KINDS.OUT_OF_MEMORY);
   assert.equal(presentFailure({ exportKind: "invalid-params", message: "Export pixel budget exceeded (7600x5000)." }), EXPORT_FAILURE_KINDS.INVALID_PARAMS);
-  assert.match(toasts[1][0], /7600x5000/);
+  assert.doesNotMatch(toasts[1][0], /pixel budget exceeded|7600x5000/);
   assert.match(toasts[1][0], /8K/);
   assert.equal(presentFailure({ exportStage: "artifact", message: "Export render budget exceeded (900 MiB estimated for 12 passes; limit 640 MiB)." }), EXPORT_FAILURE_KINDS.OUT_OF_MEMORY);
   assert.match(toasts[2][0], /Reduce export resolution/);

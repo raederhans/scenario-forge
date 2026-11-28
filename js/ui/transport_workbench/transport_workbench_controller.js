@@ -87,10 +87,8 @@ export function createTransportWorkbenchController({
   transportWorkbenchTitle = null,
   transportWorkbenchLensTitle = null,
   transportWorkbenchLensSections = null,
-  transportWorkbenchFamilyStatus = null,
   transportWorkbenchCountryStatus = null,
   transportWorkbenchPackSelect = null,
-  transportWorkbenchPreviewMode = null,
   transportWorkbenchPreviewTitle = null,
   transportWorkbenchPreviewCanvas = null,
   transportWorkbenchPreviewControls = null,
@@ -143,7 +141,6 @@ export function createTransportWorkbenchController({
   const transportWorkbenchInspectorOwner = createTransportWorkbenchInspectorOwner({
     getLayerOrder: () => runtimeState.transportWorkbenchUi?.layerOrder || [],
     getLayerFamilyMeta: (familyId) => getTransportWorkbenchLayerFamilyMeta(familyId),
-    isLivePreviewFamily: (familyId) => isTransportWorkbenchLivePreviewFamily(familyId),
     isManifestOnlyRuntimeFamily: (familyId) => isTransportWorkbenchManifestOnlyRuntimeFamily(familyId),
   });
 
@@ -186,10 +183,8 @@ export function createTransportWorkbenchController({
     overlay: transportWorkbenchOverlay,
     title: transportWorkbenchTitle,
     lensTitle: transportWorkbenchLensTitle,
-    familyStatus: transportWorkbenchFamilyStatus,
     countryStatus: transportWorkbenchCountryStatus,
     packSelect: transportWorkbenchPackSelect,
-    previewMode: transportWorkbenchPreviewMode,
     previewTitle: transportWorkbenchPreviewTitle,
     previewCanvas: transportWorkbenchPreviewCanvas,
     previewControls: transportWorkbenchPreviewControls,
@@ -216,7 +211,6 @@ export function createTransportWorkbenchController({
     mount: transportWorkbenchLensSections,
     closeSectionHelpPopover: (options) => transportWorkbenchPopoverOwner.closeSectionHelpPopover(options),
     translate: (label) => t(label, "ui"),
-    pickUiCopy,
     createRow: (label, value) => transportWorkbenchInspectorOwner.createRow(label, value),
     buildLensSummaryRows: (input) => transportWorkbenchInspectorOwner.buildLensSummaryRows(input),
   });

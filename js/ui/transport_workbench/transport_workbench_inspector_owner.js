@@ -5,8 +5,10 @@ import { state as runtimeState } from "../../core/state.js";
 
 import {
   ROAD_CLASS_OPTIONS,
+  ROAD_METRO_GUARD_OPTIONS,
   RAIL_CLASS_OPTIONS,
   RAIL_STATUS_OPTIONS,
+  RAIL_IMPORTANCE_OPTIONS,
   AIRPORT_TYPE_OPTIONS,
   AIRPORT_STATUS_OPTIONS,
   PORT_DESIGNATION_OPTIONS,
@@ -172,9 +174,8 @@ export function buildTransportWorkbenchDiagnosticRows(familyId, config) {
   if (familyId === "road") {
     return [
       ["Data intake", `${formatTransportWorkbenchOptionLabels(config.roadClass, ROAD_CLASS_OPTIONS)} only`],
-      ["Source recipe", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
       ["Label scope", config.showRefs ? `${formatTransportWorkbenchOptionLabels(config.refClasses, ROAD_CLASS_OPTIONS)} refs` : "Refs hidden"],
-      ["Noise gate", `${config.denseMetroGuard} metro guard / ${config.minProjectedSegmentPx}px min segment`],
+      ["Short road threshold", `${config.minProjectedSegmentPx} px · ${t(formatTransportWorkbenchOptionLabels([config.denseMetroGuard], ROAD_METRO_GUARD_OPTIONS), "ui")}`],
       ["Line widths", `M ${config.motorwayWidth}px / T ${config.trunkWidth}px / P ${config.primaryWidth}px`],
     ];
   }
@@ -182,8 +183,7 @@ export function buildTransportWorkbenchDiagnosticRows(familyId, config) {
     return [
       ["Network scope", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
       ["Status scope", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
-      ["Reconciliation", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
-      ["Station policy", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Major stations hidden"],
+      ["Minimum station importance", config.showMajorStations ? formatTransportWorkbenchOptionLabels([config.importanceThreshold], RAIL_IMPORTANCE_OPTIONS) : "Major stations hidden"],
     ];
   }
   if (familyId === "airport") {
@@ -264,7 +264,6 @@ export function buildTransportWorkbenchInspectorModel({
   dataContract = null,
   layerOrder = [],
   getLayerFamilyMeta = () => ({ label: "Unknown" }),
-  isLivePreviewFamily = () => false,
   isManifestOnlyRuntimeFamily = () => false,
 } = {}) {
   // 先把家族差异收口成纯 rows/stateCards，后面的 DOM owner 只负责渲染。
@@ -321,8 +320,6 @@ export function buildTransportWorkbenchInspectorModel({
       rows.push(
         ["Selected line", selected.name || "Unnamed line"],
         ["Operator", selected.operator || "--"],
-        ["Rail type code", selected.railTypeCode || "--"],
-        ["Operator type code", selected.operatorTypeCode || "--"],
         ["Status", selected.status || "--"],
         ["Class", selected.lineClass || "--"],
         ["Source", selected.source || "--"],
@@ -331,9 +328,6 @@ export function buildTransportWorkbenchInspectorModel({
     } else if (selected?.type === "station") {
       rows.push(
         ["Selected station", selected.name || "Unnamed station"],
-        ["City key", selected.cityKey || "--"],
-        ["Station code", selected.stationCode || "--"],
-        ["Group code", selected.groupCode || "--"],
         ["Importance", selected.importance || "--"],
         ["Source", selected.source || "--"],
         ["Visibility", selected.visible ? "Visible" : "Hidden by threshold"],
@@ -348,7 +342,7 @@ export function buildTransportWorkbenchInspectorModel({
     rows = [
       ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
       ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
-      ["Stations", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Hidden"],
+      ["Minimum station importance", config.showMajorStations ? formatTransportWorkbenchOptionLabels([config.importanceThreshold], RAIL_IMPORTANCE_OPTIONS) : "Major stations hidden"],
       ["Source and use", dataContract?.governance || "—"],
     ];
   } else if (familyId === "airport" && previewSnapshot?.status === "ready") {
@@ -360,7 +354,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
       ["Airport types", formatTransportWorkbenchOptionLabels(config.airportTypes, AIRPORT_TYPE_OPTIONS)],
       ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, AIRPORT_STATUS_OPTIONS)],
-      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
@@ -400,7 +393,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Coverage tier", previewSnapshot.activeVariant || config.coverageTier || getTransportWorkbenchManifestDefaultVariantId(previewSnapshot.manifest, "port")],
       ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
       ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
-      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
@@ -435,13 +427,11 @@ export function buildTransportWorkbenchInspectorModel({
       ["Visible sites", String(previewSnapshot.stats?.visibleFeatures || 0)],
       ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
       ["Labels", config.showLabels ? "Enabled" : "Hidden"],
-      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
         ["Selected site", selected.name || "Unnamed mineral site"],
         ["Resource type", selectedProps.resource_type || "--"],
-        ["Resource code", selectedProps.resource_type_code || "--"],
         ["Resource class", selectedProps.resource_class || "--"],
         ["Work status", selectedProps.work_status || "--"],
         ["Map name", selectedProps.map_name || "--"],
@@ -479,7 +469,6 @@ export function buildTransportWorkbenchInspectorModel({
       ["Local subtypes", formatTransportWorkbenchOptionLabels(selectedSubtypeValues, subtypeOptions)],
       ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, ENERGY_STATUS_OPTIONS)],
       ["Reference-only subtypes", referenceOnlySubtypes.length ? referenceOnlySubtypes.join(", ") : "none"],
-      ["Mode", previewSnapshot.packMode || "preview"],
     ];
     if (selected) {
       rows.push(
@@ -540,17 +529,10 @@ export function buildTransportWorkbenchInspectorModel({
           ["Completion year", selectedProps.completion_year ?? "--"],
           ["Industry category", selectedProps.industry_category || "--"],
         );
-      } else {
-        rows.push(
-          ["OSM id", selectedProps.osm_id || "--"],
-          ["Landuse", selectedProps.landuse || "--"],
-          ["Man made", selectedProps.man_made || "--"],
-        );
       }
     }
     rows.push(
       ["Loaded sites", String(totalFeatures)],
-      ["Mode", previewSnapshot.packMode || "preview"],
       ["Variant tier", variantMeta?.distribution_tier || "unknown"],
       ["License tier", variantMeta?.license_tier || "unknown"],
     );
@@ -612,7 +594,6 @@ export function buildTransportWorkbenchInspectorModel({
     }
     rows.push(
       ["Loaded hubs", String(totalFeatures)],
-      ["Mode", previewSnapshot.packMode || "preview"],
       ["Distribution tier", previewSnapshot.manifest?.distribution_tier || "unknown"],
     );
     if (selected) {
@@ -640,16 +621,9 @@ export function buildTransportWorkbenchInspectorModel({
   } else if (isManifestOnlyRuntimeFamily(familyId)) {
     rows = buildManifestOnlyInspectorRows(family, previewSnapshot, dataContract);
   } else if (familyId === "layers") {
-    rows = (Array.isArray(layerOrder) ? layerOrder : []).map((layerId, index) => {
-      const entry = getLayerFamilyMeta(layerId);
-      if (isLivePreviewFamily(layerId)) {
-        return [`${index + 1}`, `${entry.label} (live)`];
-      }
-      if (isManifestOnlyRuntimeFamily(layerId)) {
-        return [`${index + 1}`, `${entry.label} (metadata)`];
-      }
-      return [`${index + 1}`, `${entry.label} (reserved)`];
-    });
+    rows = (Array.isArray(layerOrder) ? layerOrder : []).map((layerId, index) => [
+      String(index + 1), getLayerFamilyMeta(layerId).label,
+    ]);
   } else {
     rows = [
     ];
@@ -698,7 +672,6 @@ export function buildTransportWorkbenchInspectorRenderSignature({
 export function createTransportWorkbenchInspectorOwner({
   getLayerOrder = () => [],
   getLayerFamilyMeta = () => ({ label: "Unknown" }),
-  isLivePreviewFamily = () => false,
   isManifestOnlyRuntimeFamily = () => false,
 } = {}) {
   let lastInspectorDetailsRender = null;
@@ -755,7 +728,6 @@ export function createTransportWorkbenchInspectorOwner({
     ...input,
     layerOrder: getLayerOrder(),
     getLayerFamilyMeta,
-    isLivePreviewFamily,
     isManifestOnlyRuntimeFamily,
   });
 

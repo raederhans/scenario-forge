@@ -5786,11 +5786,17 @@ body.counter-editor-modal-open {
 }
 
 .export-workbench-bake-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   padding-top: 8px;
   border-top: 1px solid var(--line-1);
+}
+
+.export-workbench-bake-shell > summary {
+  cursor: pointer;
+}
+
+.export-workbench-bake-actions,
+.export-workbench-bake-list {
+  margin-top: 10px;
 }
 
 .export-workbench-bake-actions {
@@ -5936,15 +5942,14 @@ body.counter-editor-modal-open {
   gap: 8px;
 }
 
-.export-workbench-group-hint {
-  font-size: var(--fs-xs);
-  color: var(--ink-500);
-}
-
 .export-workbench-layer-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.export-workbench-layer-item[data-export-text-layer-id] {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .export-workbench-layer-item {

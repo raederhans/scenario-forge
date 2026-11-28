@@ -202,7 +202,7 @@
                     <option value="alliance" data-i18n="Alliances">Alliances</option>
                     <option value="government" data-i18n="Government type">Government type</option>
                   </select>
-                  <p id="politicalDisplayModeStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <p id="politicalDisplayModeStatus" class="sidebar-tool-hint" role="status" aria-live="polite"></p>
                   <div id="politicalDisplayModeLegend" class="thematic-wgi-legend" hidden></div>
                   <p data-page-note class="sidebar-tool-hint" data-i18n="Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.">Map modes only change how the map is shown; alliance and government set in the inspector are saved with the project.</p>
                 </section>
@@ -336,13 +336,13 @@
                       </details>
                     </div>
                   </details>
+                  <label class="toggle-label">
+                    <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
+                    <span data-i18n="Show country names">Show country names</span>
+                  </label>
                   <details class="appearance-mini-section">
                     <summary class="section-header" data-i18n="Country names">Country names</summary>
                     <div class="mt-3">
-                      <label class="toggle-label">
-                        <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
-                        <span data-i18n="Show country names">Show country names</span>
-                      </label>
                       <label id="blankFeatureLabelsToggleRow" class="toggle-label mt-3 hidden">
                         <input id="toggleBlankFeatureLabels" type="checkbox" class="checkbox-input" />
                         <span id="lblBlankFeatureLabels" data-i18n="Parcel Names">Parcel Names</span>
@@ -3236,10 +3236,6 @@
                 </div>
                 <div class="transport-workbench-meta-strip">
                   <div class="transport-workbench-meta-pill">
-                    <span class="transport-workbench-meta-label" data-i18n="Family">Family</span>
-                    <strong id="transportWorkbenchFamilyStatus" class="transport-workbench-meta-value" data-i18n="Road">Road</strong>
-                  </div>
-                  <div class="transport-workbench-meta-pill">
                     <span class="transport-workbench-meta-label" data-i18n="Sample">Sample</span>
                     <strong id="transportWorkbenchCountryStatus" class="transport-workbench-meta-value" data-i18n="Japan">Japan</strong>
                   </div>
@@ -3247,10 +3243,6 @@
                     <span class="transport-workbench-meta-label" data-i18n="Dataset">Dataset</span>
                     <select id="transportWorkbenchPackSelect" class="transport-workbench-pack-select" aria-label="Transport pack" data-i18n-aria-label="Transport pack"></select>
                   </label>
-                  <div class="transport-workbench-meta-pill">
-                    <span class="transport-workbench-meta-label" data-i18n="Mode">Mode</span>
-                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value" data-i18n="Bounded zoom / pan">Bounded zoom / pan</strong>
-                  </div>
                 </div>
                 <div class="transport-workbench-parameter-stack">
                   <div id="transportWorkbenchLensSections" class="transport-workbench-control-sections" aria-live="polite"></div>
@@ -3406,16 +3398,14 @@
                   <input id="exportWorkbenchClarity" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
                 </label>
               </div>
-              <div class="export-workbench-bake-shell">
-                <div class="export-workbench-group-header">
-                  <span class="export-workbench-column-kicker" data-i18n="Bake outputs">Bake outputs</span>
-                </div>
+              <details class="export-workbench-bake-shell" hidden>
+                <summary class="export-workbench-column-kicker" data-i18n="Bake outputs">Advanced: bake cache</summary>
                 <div class="export-workbench-bake-actions">
                   <button id="exportWorkbenchBakeVisibleBtn" type="button" class="btn-secondary" data-i18n="Bake current pack">Bake current pack</button>
                   <button id="exportWorkbenchClearBakeBtn" type="button" class="btn-secondary" data-i18n="Clear baked cache">Clear baked cache</button>
                 </div>
                 <div id="exportWorkbenchBakeArtifactList" class="export-workbench-bake-list" role="list"></div>
-              </div>
+              </details>
             </section>
 
             <section class="export-workbench-column export-workbench-column-preview" aria-labelledby="exportWorkbenchPreviewTitle">
@@ -3433,9 +3423,7 @@
               <div id="exportWorkbenchPreviewCanvas" class="export-workbench-preview-canvas" aria-live="polite">
                 <div id="exportWorkbenchPreviewStage" class="export-workbench-preview-stage"></div>
                 <div id="exportJobStatus" class="export-workbench-preview-state" role="status" hidden></div>
-                <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state" data-i18n="Export preview ready">
-                  Export preview ready
-                </div>
+                <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state" hidden></div>
               </div>
             </section>
 
@@ -3451,7 +3439,6 @@
                 <div class="export-workbench-layer-group">
                   <div class="export-workbench-group-header">
                     <span class="export-workbench-column-kicker" data-i18n="Text elements">Text elements</span>
-                    <span class="export-workbench-group-hint" data-i18n="Text and annotations">Text and annotations</span>
                   </div>
                   <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list"></div>
                   <div id="exportMapTitleFields" role="group" aria-label="Layout text" data-i18n-aria-label="Layout text"></div>
@@ -3565,7 +3552,6 @@
         <button id="scenarioGuideTabAppearance" type="button" class="scenario-guide-nav-btn" data-guide-section="appearance" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionAppearance" data-i18n="Appearance">Appearance</button>
         <button id="scenarioGuideTabEditing" type="button" class="scenario-guide-nav-btn" data-guide-section="editing" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionEditing" data-i18n="Edit tools">Edit tools</button>
         <button id="scenarioGuideTabTools" type="button" class="scenario-guide-nav-btn" data-guide-section="tools" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionTools" data-i18n="Project tools">Project tools</button>
-        <button id="scenarioGuideTabChecks" type="button" class="scenario-guide-nav-btn" data-guide-section="checks" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionChecks" data-i18n="Checks">Checks</button>
       </div>
       <div class="scenario-guide-manual mt-3">
         <section id="scenarioGuideSectionQuick" class="scenario-guide-manual-section" data-guide-panel="quick" role="tabpanel" aria-labelledby="scenarioGuideTabQuick scenarioGuideQuickPathTitle">
@@ -3785,7 +3771,6 @@
                 <p data-i18n="To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.">To annex country A, pick country B’s base color and fill all of A’s territory. Check for any subdivisions still in A’s original color.</p>
                 <ul class="scenario-guide-tool-steps">
                   <li><strong data-i18n="Country color">Country color</strong><span data-guide-controls="countryList countryInspectorColorSwatch" data-i18n="Select the country in the country list, then click its color swatch in the Inspector to change its base color.">Select the country in the country list, then click its color swatch in the Inspector to change its base color.</span></li>
-                  <li><strong data-i18n="Advanced actions">Advanced actions</strong><span data-i18n="For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.">For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.</span></li>
                   <li><strong data-i18n="Map lettering">Map lettering</strong><span data-guide-controls="frontlineTabStack legendProjectSection workspaceExportBtn" data-i18n="For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.">For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview.</span></li>
                 </ul>
                 <button id="scenarioGuideSelectCountryBtn" class="btn-secondary scenario-guide-step-action" type="button" data-i18n="Go to country list">Go to country list</button>
@@ -3805,11 +3790,7 @@
               </summary>
               <div class="scenario-guide-tool-body">
                 <p data-i18n="Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.">Use Save project to download the editable JSON. Drag the saved file onto the map to open it again.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You are about to make broad ownership, frontline, transport, or overlay changes.">You are about to make broad ownership, frontline, transport, or overlay changes.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.">Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing.">After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing.</span></li>
-                </ul>
+                <p data-i18n="Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.">Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.</p>
               </div>
             </details>
             <details class="scenario-guide-tool-panel">
@@ -3847,60 +3828,12 @@
               </summary>
               <div class="scenario-guide-tool-body">
                 <p data-i18n="Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K.">Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K.</p>
+                <p data-i18n="Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.">Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.</p>
                 <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="The map is ready for a composite image, per-layer PNG set, or bake pack handoff.">The map is ready for a composite image, per-layer PNG set, or bake pack handoff.</span></li>
                   <li><strong data-i18n="Order">Order</strong><span data-i18n="Choose target and resolution, check the preview, confirm layer order, then run the export.">Choose target and resolution, check the preview, confirm layer order, then run the export.</span></li>
                   <li><strong data-i18n="Check">Check</strong><span data-i18n="Keep Strategic annotations enabled when frontlines, operational graphics, or unit counters must appear in the final output.">Keep Strategic annotations enabled when frontlines, operational graphics, or unit counters must appear in the final output.</span></li>
                 </ul>
-              </div>
-            </details>
-          </div>
-        </section>
-
-        <section id="scenarioGuideSectionChecks" class="scenario-guide-manual-section hidden" data-guide-panel="checks" role="tabpanel" aria-labelledby="scenarioGuideTabChecks scenarioGuideChecksTitle" hidden>
-          <h4 id="scenarioGuideChecksTitle" class="scenario-guide-manual-title" data-i18n="Success checks">Success checks</h4>
-          <p class="scenario-guide-manual-lead" data-i18n="Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package.">Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package.</p>
-          <div class="scenario-guide-tool-accordion">
-            <details class="scenario-guide-tool-panel" open>
-              <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Project JSON save">Project JSON save</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="The editable handoff file.">The editable handoff file.</span>
-              </summary>
-              <div class="scenario-guide-tool-body">
-                <p data-i18n="Save project downloads the editable map, including its colors, annotations and export settings.">Save project downloads the editable map, including its colors, annotations and export settings.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.">You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.">Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.">The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.</span></li>
-                </ul>
-              </div>
-            </details>
-            <details class="scenario-guide-tool-panel">
-              <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Export workflow">Export workflow</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="The publishable output step.">The publishable output step.</span>
-              </summary>
-              <div class="scenario-guide-tool-body">
-                <p data-i18n="Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON.">Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery.">The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export.">Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.">Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.</span></li>
-                </ul>
-              </div>
-            </details>
-            <details class="scenario-guide-tool-panel">
-              <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="Final handoff check">Final handoff check</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="The last pass before sending files out.">The last pass before sending files out.</span>
-              </summary>
-              <div class="scenario-guide-tool-body">
                 <p data-i18n="Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable.">Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable.</p>
-                <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone.">You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Review labels, borders, strategic annotations, reference visibility, and export target before the final click.">Review labels, borders, strategic annotations, reference visibility, and export target before the final click.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.">If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.</span></li>
-                </ul>
               </div>
             </details>
           </div>

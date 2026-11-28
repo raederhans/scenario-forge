@@ -23,16 +23,11 @@ function createScenarioGuidePopoverController({
     "appearance",
     "editing",
     "tools",
-    "checks",
   ]);
 
   const normalizeScenarioGuideSection = (value = "") => {
     const normalizedValue = String(value || "").trim().toLowerCase();
     return SCENARIO_GUIDE_SECTIONS.includes(normalizedValue) ? normalizedValue : "quick";
-  };
-  const hasScenarioGuideSectionValue = (value = "") => {
-    const normalizedValue = String(value || "").trim().toLowerCase();
-    return SCENARIO_GUIDE_SECTIONS.includes(normalizedValue);
   };
 
   const renderScenarioGuideSection = (section = "quick", { syncUrl = true } = {}) => {
@@ -85,7 +80,7 @@ function createScenarioGuidePopoverController({
   const openScenarioGuideSurface = ({ focusOverlaySurface = null } = {}) => {
     if (!scenarioGuidePopover) return;
     const urlSection = getGuideSectionFromUrl?.();
-    const nextSection = hasScenarioGuideSectionValue(urlSection)
+    const nextSection = urlSection
       ? normalizeScenarioGuideSection(urlSection)
       : scenarioGuideActiveSection;
     document.body.classList.add("scenario-guide-open");

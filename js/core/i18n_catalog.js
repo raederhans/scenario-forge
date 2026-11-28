@@ -357,10 +357,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "大范围编辑后，先检查视图、拆分、标签、前线和导出预览，再进行下一次大范围操作。",
     "en": "After a broad edit, review View, Split, labels, frontlines, and export preview before the next broad action."
   },
-  "After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing.": {
-    "zh": "导入后先确认场景基线、当前归属、战略标注和导出设置，再继续操作。",
-    "en": "After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing."
-  },
   "After loading a project, check the Inspector again. Confirm the target country and active owner, then review frontlines, reference image alignment, and export settings. When these match your plan, continue with Activate, Scenario Actions, or Export.": {
     "zh": "加载项目后，再回到检查器。确认目标国家和当前归属，然后检查前线、参考图对齐和导出设置。全部符合计划后，再使用 Activate、Scenario Actions 或 Export。",
     "en": "After loading a project, check the Inspector again. Confirm the target country and active owner, then review frontlines, reference image alignment, and export settings. When these match your plan, continue with Activate, Scenario Actions, or Export."
@@ -376,10 +372,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Aggregation": {
     "zh": "聚合",
     "en": "Aggregation"
-  },
-  "Aggregation is optional here, but the mode should still honor subtype-driven density shifts.": {
-    "zh": "聚合在这里是可选的，但该模式仍应遵循子类型驱动的密度变化。",
-    "en": "Aggregation is optional here, but the mode should still honor subtype-driven density shifts."
   },
   "Aggregation stays dynamic and only steps in when the current view becomes dense.": {
     "zh": "聚合保持动态，并且仅在当前视图变得密集时才介入。",
@@ -500,10 +492,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Allow Lake Selection and Paint": {
     "zh": "允许湖泊选择与填色",
     "en": "Allow Lake Selection and Paint"
-  },
-  "Allow OSM active gap fill": {
-    "zh": "允许 OSM 主动间隙填充",
-    "en": "Allow OSM active gap fill"
   },
   "Allow Open-Ocean Interaction": {
     "zh": "允许开放海洋交互",
@@ -944,16 +932,16 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Bake current pack"
   },
   "Bake outputs": {
-    "zh": "烘焙输出",
-    "en": "Bake outputs"
+    "zh": "高级：烘焙缓存",
+    "en": "Advanced: bake cache"
   },
   "Bake outputs updated.": {
     "zh": "烘焙输出已更新。",
     "en": "Bake outputs updated."
   },
   "Bake pack (v1.1)": {
-    "zh": "烘焙包（v1.1）",
-    "en": "Bake pack (v1.1)"
+    "zh": "烘焙包",
+    "en": "Bake pack"
   },
   "Bake pack downloaded as multiple files.": {
     "zh": "烘焙包已以多个文件形式下载。",
@@ -1020,8 +1008,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Base opacity"
   },
   "Baseline": {
-    "zh": "基线",
-    "en": "Baseline"
+    "zh": "查看详情",
+    "en": "Inspect details"
   },
   "Baseline preview": {
     "zh": "基线预览中",
@@ -1128,8 +1116,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Before export, make sure Strategic annotations are enabled and no line, label, or counter hides the country you want to show."
   },
   "Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable.": {
-    "zh": "发送文件前，保留一份可编辑项目 JSON 和一份来自同一已复查状态的导出产物。这样后续修正有迹可循。",
-    "en": "Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable."
+    "zh": "从同一版地图保存项目并导出成图。",
+    "en": "Save the project and export the map from the same version."
   },
   "Before you edit": {
     "zh": "开始前",
@@ -1222,10 +1210,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Boundary variant could not be selected.": {
     "zh": "无法选择边界变体。",
     "en": "Boundary variant could not be selected."
-  },
-  "Bounded zoom / pan": {
-    "zh": "受限缩放 / 平移",
-    "en": "Bounded zoom / pan"
   },
   "Bounded zoom/pan": {
     "zh": "有界缩放/平移",
@@ -1374,10 +1358,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Candidate": {
     "zh": "候选人",
     "en": "Candidate"
-  },
-  "Capability matrix": {
-    "zh": "能力矩阵",
-    "en": "Capability matrix"
   },
   "Capital": {
     "zh": "首都",
@@ -1655,10 +1635,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "选择如何聚合矿物点。",
     "en": "Choose how mineral points should be aggregated."
   },
-  "Choose how official and OSM railway information is combined.": {
-    "zh": "选择如何结合官方与 OSM 铁路信息。",
-    "en": "Choose how official and OSM railway information is combined."
-  },
   "Choose individual sites, grouped sites, or a density view.": {
     "zh": "选择单个地点、分组地点或密度视图。",
     "en": "Choose individual sites, grouped sites, or a density view."
@@ -1736,8 +1712,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "City Points"
   },
   "City and map labels from the labels pass": {
-    "zh": "来自 labels pass 的城市与地图标签",
-    "en": "City and map labels from the labels pass"
+    "zh": "城市与地图标签",
+    "en": "City and map labels"
   },
   "City display name": {
     "zh": "城市显示名",
@@ -2050,10 +2026,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "簇",
     "en": "Cluster"
   },
-  "Cluster and grid views are both valid here, depending on how aggressively you want to compress the point field.": {
-    "zh": "聚类和网格视图在这里都有效，具体取决于您想要压缩点场的程度。",
-    "en": "Cluster and grid views are both valid here, depending on how aggressively you want to compress the point field."
-  },
   "Coal": {
     "zh": "煤炭",
     "en": "Coal"
@@ -2170,10 +2142,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "战斗状态",
     "en": "Combat State"
   },
-  "Combine official active railway lines with OSM information for gaps and inactive lines.": {
-    "zh": "以官方运营线路为主，用 OSM 补充缺失及非运营线路。",
-    "en": "Combine official active railway lines with OSM information for gaps and inactive lines."
-  },
   "Command palette": {
     "zh": "命令面板",
     "en": "Command palette"
@@ -2223,8 +2191,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Composite image"
   },
   "Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.": {
-    "zh": "合成图片用于最终查看；分层 PNG 用于后续编辑；bake pack 用于带预期图层的打包交付。",
-    "en": "Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers."
+    "zh": "成图用于查看，分层 PNG 用于继续编辑，烘焙包用于打包交付图层。",
+    "en": "Export a composite image for viewing, separate PNG layers for editing, or a bake pack to deliver layers together."
   },
   "Concentric rings": {
     "zh": "同心环",
@@ -2287,12 +2255,12 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Contains Download Project, Load Project, selected file status, and import safety checks."
   },
   "Contains local image upload, opacity, scale, horizontal offset, and vertical offset controls. The project stores alignment values, while the image file must be uploaded again after reload.": {
-    "zh": "包含本地图像上传、透明度、缩放、水平偏移和垂直偏移。项目会保存对齐参数，重新加载后仍需要再次上传图像文件。",
-    "en": "Contains local image upload, opacity, scale, horizontal offset, and vertical offset controls. The project stores alignment values, while the image file must be uploaded again after reload."
+    "zh": "项目只保存对齐参数，重新打开后需要再上传一次图片。",
+    "en": "The project saves the alignment settings. Upload the image again after reopening."
   },
   "Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K.": {
-    "zh": "包含目标选择、格式、导出分辨率、预览、图层顺序、文字堆栈和图像调整。最终导出上限为 8K。",
-    "en": "Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K."
+    "zh": "选好输出类型和分辨率，看过预览再导出，最高 8K。",
+    "en": "Choose an output type and resolution, then preview and export at up to 8K."
   },
   "Context": {
     "zh": "上下文",
@@ -2727,8 +2695,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Create operational line"
   },
   "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff.": {
-    "zh": "创建作战线、行动图形和单位计数器，作为项目内的战略标注用于导出和交接。",
-    "en": "Create operational lines, operation graphics, and unit counters as project-local strategic annotations for export and handoff."
+    "zh": "绘制作战线、行动图形和单位计数器，随项目保存并可导出。",
+    "en": "Draw operational lines, operation graphics, and unit counters. Save them with the project or export them."
   },
   "Critical checks": {
     "zh": "关键检查",
@@ -2953,10 +2921,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Decide what enters the Japan road pack before any style rule runs.": {
     "zh": "在任何风格规则运行之前决定哪些内容会进入日本公路包。",
     "en": "Decide what enters the Japan road pack before any style rule runs."
-  },
-  "Dedup mode": {
-    "zh": "重复数据删除模式",
-    "en": "Dedup mode"
   },
   "Deep Fill Exit": {
     "zh": "深水色带退出",
@@ -3246,10 +3210,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "显示模式",
     "en": "Display Mode"
   },
-  "Display only explicit lifecycle or gap patches.": {
-    "zh": "仅显示显式生命周期或间隙补丁。",
-    "en": "Display only explicit lifecycle or gap patches."
-  },
   "Display quality": {
     "zh": "显示画质",
     "en": "Display quality"
@@ -3374,10 +3334,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "下载快照",
     "en": "Download Snapshot"
   },
-  "Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.": {
-    "zh": "先下载项目 JSON；确认当前状态可以被替换后再加载其他文件；加载后复查顶部状态条。",
-    "en": "Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips."
-  },
   "Download original JSON": {
     "zh": "下载原始 JSON",
     "en": "Download original JSON"
@@ -3410,21 +3366,17 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "在中间排序板拖动图层以调整绘制顺序。",
     "en": "Drag layers in the middle board to change their drawing order."
   },
-  "Drag rows to change the drawing order.": {
-    "zh": "拖动行以调整绘制顺序。",
-    "en": "Drag rows to change the drawing order."
-  },
   "Drag rows to define the transport layer order. Live transport families stay available here, and the board remains local to the workbench.": {
     "zh": "拖动各行设定交通图层顺序。已启用的交通图层族会一直列在这里，排序只在工作台内生效。",
     "en": "Drag rows to define the transport layer order. Live transport families stay available here, and the board remains local to the workbench."
   },
   "Drag rows to define transport layer order. Availability follows the selected family and current runtime data.": {
-    "zh": "拖动各行设定交通图层顺序。可用项随所选图层族和当前运行时数据变化。",
-    "en": "Drag rows to define transport layer order. Availability follows the selected family and current runtime data."
+    "zh": "拖动调整图层顺序。",
+    "en": "Drag to reorder layers."
   },
   "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return.": {
-    "zh": "将保存的 JSON 拖到地图上，确认剧本、注记、标签和导出设置均已恢复。",
-    "en": "Drag the saved JSON onto the map, then confirm that the scenario, annotations, labels and export settings return."
+    "zh": "重新打开后，核对剧本、标注、标签和导出设置。",
+    "en": "After reopening, check the scenario, annotations, labels, and export settings."
   },
   "Drag to reorder exported layer groups. Visibility only applies to this export session.": {
     "zh": "拖动以重排导出图层组。可见性设置仅影响当前导出会话。",
@@ -3809,10 +3761,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "排除 *_link",
     "en": "Exclude *_link"
   },
-  "Exclude service-like roads": {
-    "zh": "排除服务类道路",
-    "en": "Exclude service-like roads"
-  },
   "Existing": {
     "zh": "现存的",
     "en": "Existing"
@@ -4001,10 +3949,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "正在导出…",
     "en": "Exporting…"
   },
-  "Expose OSM versus N06 conflicts instead of hiding them.": {
-    "zh": "公开 OSM 与 N06 的冲突，而不是隐藏它们。",
-    "en": "Expose OSM versus N06 conflicts instead of hiding them."
-  },
   "Expose airport adapter intent and pack status only.": {
     "zh": "仅公开机场适配器意图和包状态。",
     "en": "Expose airport adapter intent and pack status only."
@@ -4028,10 +3972,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Expose names only for retained major stations.": {
     "zh": "只显示保留下来的主要车站名称。",
     "en": "Expose names only for retained major stations."
-  },
-  "Expose official-versus-OSM conflicts instead of hiding them.": {
-    "zh": "揭露而不是隐藏官方与 OSM 之间的冲突。",
-    "en": "Expose official-versus-OSM conflicts instead of hiding them."
   },
   "Expose polygon names only when you want name-led review.": {
     "zh": "仅当您需要以名称为主导的审查时才公开多边形名称。",
@@ -4237,10 +4177,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "筛选与交互",
     "en": "Filters & interaction"
   },
-  "Final handoff check": {
-    "zh": "最终交付检查",
-    "en": "Final handoff check"
-  },
   "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color.": {
     "zh": "在调色板的国家列表找到乙国，选中它的底色。使用填充工具时，也可以按住 Alt 单击地图上的乙国取色。",
     "en": "Find country B in the palette and select its base color. With Fill selected, you can also Alt-click country B on the map to sample its color."
@@ -4321,10 +4257,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "要手动添加注记，打开「地图文字」，选择「放置标签」，点击地图上的目标位置，再编辑文字。导出前在预览中检查文字和图例。",
     "en": "For a custom note, open Map lettering, choose Place label, click its position on the map and edit the text. Check the lettering and legend in the export preview."
   },
-  "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action.": {
-    "zh": "进阶操作中，若剧本动作明确使用「当前归属方」，请在执行前核对当前国家。",
-    "en": "For advanced scenario actions that explicitly use Active Owner, check the active country before applying the action."
-  },
   "Forbidden": {
     "zh": "禁止项",
     "en": "Forbidden"
@@ -4398,10 +4330,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Full packed export layer": {
     "zh": "完整封装导出层",
     "en": "Full packed export layer"
-  },
-  "Future draw stack": {
-    "zh": "未来绘制层叠",
-    "en": "Future draw stack"
   },
   "Future family mapping": {
     "zh": "后续类别映射",
@@ -4530,10 +4458,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Grid": {
     "zh": "网格",
     "en": "Grid"
-  },
-  "Grid-based aggregation works better than raw point carpets for dense mineral clusters.": {
-    "zh": "对于密集的矿物簇，基于网格的聚合比原始点地毯效果更好。",
-    "en": "Grid-based aggregation works better than raw point carpets for dense mineral clusters."
   },
   "Group": {
     "zh": "分组",
@@ -4839,10 +4763,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "如果结果看起来不对，先检查三件事：场景是否已应用、检查器是否聚焦到正确国家、当前归属方是否已经切到目标对象。",
     "en": "If a result looks wrong, check three things first: whether a scenario is applied, whether the Inspector is focused on the right country, and whether Active Owner already points to the target you want to write to."
   },
-  "If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.": {
-    "zh": "如果导出结果看起来不对，重新打开已保存的项目 JSON，修正可编辑状态，再从修正后的状态重新导出。",
-    "en": "If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state."
-  },
   "Ignored {count} entries that are not valid for this map.": {
     "zh": "已忽略 {count} 条不适用于当前地图的记录。",
     "en": "Ignored {count} entries that are not valid for this map."
@@ -4962,10 +4882,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Industrial landuse": {
     "zh": "工业用地",
     "en": "Industrial landuse"
-  },
-  "Industrial review needs pattern-first summarization without blending internal and open tracks.": {
-    "zh": "工业审查需要模式优先的总结，而不需要混合内部和开放轨道。",
-    "en": "Industrial review needs pattern-first summarization without blending internal and open tracks."
   },
   "Info": {
     "zh": "信息",
@@ -5147,10 +5063,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "日本",
     "en": "Japan"
   },
-  "Japan baseline defaults to OSM geometry plus N06 hardening.": {
-    "zh": "日本基线默认为 OSM 几何形状加 N06 硬化。",
-    "en": "Japan baseline defaults to OSM geometry plus N06 hardening."
-  },
   "Japan preview": {
     "zh": "日本预览",
     "en": "Japan preview"
@@ -5211,10 +5123,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "在排列不透明度、比例和偏移时，保持工作参考可见。",
     "en": "Keep a working reference visible while you line up opacity, scale, and offsets."
   },
-  "Keep facility names visible only when the current zoom can carry them cleanly.": {
-    "zh": "仅当当前缩放可以清晰地显示设施名称时，才使设施名称可见。",
-    "en": "Keep facility names visible only when the current zoom can carry them cleanly."
-  },
   "Keep label reveal simple and intentional.": {
     "zh": "保持标签显示简单且有意。",
     "en": "Keep label reveal simple and intentional."
@@ -5223,29 +5131,9 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "在审查期间保持本地子类型范围与仅参考子类型范围和包状态可见。",
     "en": "Keep local versus reference-only subtype scope and pack state visible during review."
   },
-  "Keep mineral labels opt-in so dense point fields stay readable.": {
-    "zh": "保持矿物标签选择加入，以便密集的点字段保持可读。",
-    "en": "Keep mineral labels opt-in so dense point fields stay readable."
-  },
   "Keep motorway_link, trunk_link, and primary_link out by default.": {
     "zh": "默认情况下，将 motorway_link、trunk_link 和 Primary_link 保留在外面。",
     "en": "Keep motorway_link, trunk_link, and primary_link out by default."
-  },
-  "Keep names gated so hub points stay readable over industrial land.": {
-    "zh": "保持名称门控，以便工业用地上的枢纽点保持可读性。",
-    "en": "Keep names gated so hub points stay readable over industrial land."
-  },
-  "Keep names opt-in so polygon review stays readable.": {
-    "zh": "保持名称选择加入，以便多边形评论保持可读性。",
-    "en": "Keep names opt-in so polygon review stays readable."
-  },
-  "Keep official review data separate from publicly releasable data.": {
-    "zh": "官方审阅数据与可公开发布的数据分开显示。",
-    "en": "Keep official review data separate from publicly releasable data."
-  },
-  "Keep one main station per city by default.": {
-    "zh": "默认每个城市保留一个主站。",
-    "en": "Keep one main station per city by default."
   },
   "Keep only the industrial land types you want to inspect.": {
     "zh": "仅保留您想要检查的工业用地类型。",
@@ -5266,10 +5154,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Keep ports inspect-first, but allow aggregate and density views when the official layer becomes crowded.": {
     "zh": "港口默认先按检查视图呈现；当官方图层过密时，允许切换到聚合和密度视图。",
     "en": "Keep ports inspect-first, but allow aggregate and density views when the official layer becomes crowded."
-  },
-  "Keep reconciliation strict rather than heuristic.": {
-    "zh": "保持严格的协调而不是启发式的。",
-    "en": "Keep reconciliation strict rather than heuristic."
   },
   "Keep service lines from dominating national views.": {
     "zh": "避免服务线主导全国观点。",
@@ -5472,8 +5356,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Layer Order"
   },
   "Layer and text stacks": {
-    "zh": "图层和文本堆栈",
-    "en": "Layer and text stacks"
+    "zh": "图层与文字",
+    "en": "Layers & text"
   },
   "Layer export finished.": {
     "zh": "图层导出完成。",
@@ -6015,10 +5899,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "主图",
     "en": "Main image"
   },
-  "Main image preview ready": {
-    "zh": "主图预览已就绪",
-    "en": "Main image preview ready"
-  },
   "Main layers": {
     "zh": "主要层",
     "en": "Main layers"
@@ -6066,6 +5946,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Major powers": {
     "zh": "主要势力",
     "en": "Major powers"
+  },
+  "Major stations hidden": {
+    "zh": "已隐藏主要车站",
+    "en": "Major stations hidden"
   },
   "Make a project save, choose the exact scope, run the batch action, then inspect several affected countries.": {
     "zh": "先保存项目，选择准确范围，执行批量操作，然后检查几个受影响国家。",
@@ -6322,10 +6206,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "成员工具已关闭。",
     "en": "Membership tool closed."
   },
-  "Merge contiguous segments": {
-    "zh": "合并连续的段",
-    "en": "Merge contiguous segments"
-  },
   "Merge into country…": {
     "zh": "并入某国…",
     "en": "Merge into country…"
@@ -6413,6 +6293,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Mineral review defaults to aggregation so dense mine points reveal pattern before single-site inspection.": {
     "zh": "矿物审查默认为聚合，因此密集的矿点可以在单点检查之前揭示模式。",
     "en": "Mineral review defaults to aggregation so dense mine points reveal pattern before single-site inspection."
+  },
+  "Minimum station importance": {
+    "zh": "最低车站等级",
+    "en": "Minimum station importance"
   },
   "Minor Interval (m)": {
     "zh": "次等高距（米）",
@@ -6521,10 +6405,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Motorway Only": {
     "zh": "仅高速公路",
     "en": "Motorway Only"
-  },
-  "Motorway identity source": {
-    "zh": "高速公路身份源",
-    "en": "Motorway identity source"
   },
   "Motorway width": {
     "zh": "高速公路宽度",
@@ -7106,10 +6986,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "奥格",
     "en": "ORG"
   },
-  "OSM + N06 hardening": {
-    "zh": "OSM+N06硬化",
-    "en": "OSM + N06 hardening"
-  },
   "OSM / Geofabrik Japan and N06.": {
     "zh": "来源：OSM / Geofabrik 日本数据与 N06。",
     "en": "OSM / Geofabrik Japan and N06."
@@ -7154,10 +7030,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "进攻线",
     "en": "Offensive Line"
   },
-  "Official Japan source defines active network boundaries.": {
-    "zh": "日本官方来源定义了活动网络边界。",
-    "en": "Official Japan source defines active network boundaries."
-  },
   "Official P31 logistics hub point source; internal use only, not approved for external distribution.": {
     "zh": "来源：官方物流枢纽点位数据；仅限内部使用，尚未批准对外分发。",
     "en": "Official P31 logistics hub point source; internal use only, not approved for external distribution."
@@ -7165,10 +7037,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Official active network and OSM lifecycle / gap information.": {
     "zh": "来源：官方运营铁路网络，OSM 补充状态与缺失线路。",
     "en": "Official active network and OSM lifecycle / gap information."
-  },
-  "Official active network locked": {
-    "zh": "官方活动网络锁定",
-    "en": "Official active network locked"
   },
   "Official active network stays locked. OSM only patches lifecycle and gaps.": {
     "zh": "官方活动网络保持锁定。 OSM 仅修补生命周期和差距。",
@@ -7267,8 +7135,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Open Transport Workbench"
   },
   "Open Transport Workbench when you need pack preview, layer order, diagnostics, data rows, or apply-to-map controls.": {
-    "zh": "需要资源包预览、图层顺序、诊断、数据行或应用到地图控制时，打开交通工作台。",
-    "en": "Open Transport Workbench when you need pack preview, layer order, diagnostics, data rows, or apply-to-map controls."
+    "zh": "需要更细的交通设置时，打开交通工作台。",
+    "en": "Open the transport workbench for more settings."
   },
   "Open Workspace": {
     "zh": "打开工作区",
@@ -7756,10 +7624,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "性能优先",
     "en": "Performance priority"
   },
-  "Permit OSM to fill only obvious official gaps.": {
-    "zh": "只允许 OSM 填补明显的官方空白。",
-    "en": "Permit OSM to fill only obvious official gaps."
-  },
   "Persistent raster stays raster after navigation; legacy hybrid restores native detail.": {
     "zh": "常驻栅格在导航结束后保持栅格显示；旧混合模式恢复原生细节。",
     "en": "Persistent raster stays raster after navigation; legacy hybrid restores native detail."
@@ -7787,10 +7651,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Pick the target and the owner before painting.": {
     "zh": "绘制前先选目标和归属方。",
     "en": "Pick the target and the owner before painting."
-  },
-  "Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export.": {
-    "zh": "选择目标，设置分辨率，检查预览，确认图层顺序和战略标注可见性，然后执行导出。",
-    "en": "Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export."
   },
   "Pilot scope stays on motorway, trunk, and primary.": {
     "zh": "试点范围停留在高速公路、主干道和主干道上。",
@@ -8032,18 +7892,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "州",
     "en": "Prefecture"
   },
-  "Prefer geographic anchors with dominant resource category, then back off when the map gets crowded.": {
-    "zh": "优先选择具有主导资源类别的地理锚点，然后在地图变得拥挤时退出。",
-    "en": "Prefer geographic anchors with dominant resource category, then back off when the map gets crowded."
-  },
-  "Prefer official name": {
-    "zh": "更喜欢官方名称",
-    "en": "Prefer official name"
-  },
-  "Prefer official ref": {
-    "zh": "更喜欢官方参考",
-    "en": "Prefer official ref"
-  },
   "Prepare reusable export layers": {
     "zh": "预先生成可复用的导出图层",
     "en": "Prepare reusable export layers"
@@ -8169,8 +8017,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Preview only"
   },
   "Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).": {
-    "zh": "预览渲染与最终导出分辨率相互独立。最终导出上限为 8K（7680 × 4320）。",
-    "en": "Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320)."
+    "zh": "最高 8K，按地图比例导出",
+    "en": "Up to 8K, keeps map aspect ratio"
   },
   "Preview source": {
     "zh": "预览来源",
@@ -8235,10 +8083,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Project + metadata": {
     "zh": "项目 + 元数据",
     "en": "Project + metadata"
-  },
-  "Project JSON save": {
-    "zh": "项目 JSON 保存",
-    "en": "Project JSON save"
   },
   "Project Management": {
     "zh": "项目管理",
@@ -8821,8 +8665,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Render Status"
   },
   "Render-pass labels": {
-    "zh": "渲染 pass 标签",
-    "en": "Render-pass labels"
+    "zh": "城市与地图标签",
+    "en": "City and map labels"
   },
   "Render-pass labels and SVG annotations": {
     "zh": "渲染 pass 标签与 SVG 标注",
@@ -9007,10 +8851,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Review industrial sites from the selected source track.": {
     "zh": "查看所选来源类别的工业地点。",
     "en": "Review industrial sites from the selected source track."
-  },
-  "Review labels, borders, strategic annotations, reference visibility, and export target before the final click.": {
-    "zh": "最终点击前检查标签、边界、战略标注、参考图可见性和导出目标。",
-    "en": "Review labels, borders, strategic annotations, reference visibility, and export target before the final click."
   },
   "Review lines and stations in the preview; main lines stay visually prominent.": {
     "zh": "在预览中查看线路和车站；主要线路会更醒目。",
@@ -9208,10 +9048,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "安全修复",
     "en": "Safe fixes"
   },
-  "Safely merge same-class runs before rendering.": {
-    "zh": "在渲染之前安全地合并同类运行。",
-    "en": "Safely merge same-class runs before rendering."
-  },
   "Same Group": {
     "zh": "同一分组",
     "en": "Same Group"
@@ -9343,10 +9179,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Save project": {
     "zh": "保存项目",
     "en": "Save project"
-  },
-  "Save project downloads the editable map, including its colors, annotations and export settings.": {
-    "zh": "点击「保存项目」即可下载可编辑的地图，保留地块颜色、注记和导出设置。",
-    "en": "Save project downloads the editable map, including its colors, annotations and export settings."
   },
   "Save scenario layer asset": {
     "zh": "保存场景图层资产",
@@ -10196,6 +10028,10 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "简码或 SIDC。",
     "en": "Short code or SIDC."
   },
+  "Short road threshold": {
+    "zh": "短道路隐藏阈值",
+    "en": "Short road threshold"
+  },
   "Show": {
     "zh": "显示",
     "en": "Show"
@@ -10223,10 +10059,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Show Minor Contours": {
     "zh": "显示次级等高线",
     "en": "Show Minor Contours"
-  },
-  "Show OSM patch segments": {
-    "zh": "显示 OSM 补丁段",
-    "en": "Show OSM patch segments"
   },
   "Show Parent Borders By Country": {
     "zh": "按国家显示上级边界",
@@ -10328,10 +10160,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "显示人口分布",
     "en": "Show population distribution"
   },
-  "Show reconciliation conflicts": {
-    "zh": "显示调节冲突",
-    "en": "Show reconciliation conflicts"
-  },
   "Show refs": {
     "zh": "显示参考文献",
     "en": "Show refs"
@@ -10345,8 +10173,8 @@ export const UI_COPY_CATALOG = Object.freeze({
     "en": "Show service lines"
   },
   "Show source conflicts": {
-    "zh": "显示源冲突",
-    "en": "Show source conflicts"
+    "zh": "标出来源冲突的道路",
+    "en": "Highlight roads with conflicting sources"
   },
   "Show special zones overlay": {
     "zh": "显示特殊区域叠加层",
@@ -10387,14 +10215,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Single layer": {
     "zh": "单层",
     "en": "Single layer"
-  },
-  "Single layer preview ready": {
-    "zh": "单层预览已就绪",
-    "en": "Single layer preview ready"
-  },
-  "Single primary station per city": {
-    "zh": "每个城市单个主站",
-    "en": "Single primary station per city"
   },
   "Single select": {
     "zh": "单选",
@@ -10543,21 +10363,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "来源",
     "en": "Source"
   },
-  "Source Hardening": {
-    "zh": "源头强化",
-    "en": "Source Hardening"
-  },
-  "Source Reconciliation": {
-    "zh": "来源协调",
-    "en": "Source Reconciliation"
-  },
   "Source Topology": {
     "zh": "来源拓扑",
     "en": "Source Topology"
   },
   "Source Track": {
-    "zh": "源轨道",
-    "en": "Source Track"
+    "zh": "数据来源",
+    "en": "Source"
   },
   "Source and use": {
     "zh": "来源与使用限制",
@@ -10571,13 +10383,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "来源详情",
     "en": "Source details"
   },
+  "Source differences": {
+    "zh": "来源差异",
+    "en": "Source differences"
+  },
   "Source encoding": {
     "zh": "源数据编码",
     "en": "Source encoding"
-  },
-  "Source hardening": {
-    "zh": "源头强化",
-    "en": "Source hardening"
   },
   "Source member": {
     "zh": "源文件成员",
@@ -10591,17 +10403,13 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "来源政策",
     "en": "Source policy"
   },
-  "Source reconciliation": {
-    "zh": "来源协调",
-    "en": "Source reconciliation"
-  },
   "Source region": {
     "zh": "来源区域",
     "en": "Source region"
   },
   "Source track": {
-    "zh": "源曲目",
-    "en": "Source track"
+    "zh": "数据来源",
+    "en": "Source"
   },
   "Source:": {
     "zh": "来源：",
@@ -10871,10 +10679,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "严格的",
     "en": "Strict"
   },
-  "Strict + name": {
-    "zh": "严格+名称",
-    "en": "Strict + name"
-  },
   "Strict corridor": {
     "zh": "严格的走廊",
     "en": "Strict corridor"
@@ -10938,14 +10742,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Subtract layer": {
     "zh": "减去图层",
     "en": "Subtract layer"
-  },
-  "Subtype-driven labels should stay sparse and readable instead of repeating raw facility names everywhere.": {
-    "zh": "子类型驱动的标签应该保持稀疏和可读，而不是到处重复原始设施名称。",
-    "en": "Subtype-driven labels should stay sparse and readable instead of repeating raw facility names everywhere."
-  },
-  "Success checks": {
-    "zh": "成功信号与常见漏项",
-    "en": "Success checks"
   },
   "Summarize selected parcels": {
     "zh": "汇总当前选区",
@@ -11243,10 +11039,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "控制面板现在将新的显示模式绑定在右侧，而左列保持上下文状态。",
     "en": "The control deck now binds the new display schema on the right side while the left column stays contextual."
   },
-  "The editable handoff file.": {
-    "zh": "可继续编辑的交接文件。",
-    "en": "The editable handoff file."
-  },
   "The first live airport pass stays on facility points only. Routes, terminals, and remote outer-island scope remain out of v1.": {
     "zh": "第一版 live airport pass 只覆盖设施点。航线、航站楼和偏远外岛范围暂不进入 v1。",
     "en": "The first live airport pass stays on facility points only. Routes, terminals, and remote outer-island scope remain out of v1."
@@ -11254,10 +11046,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "The first live port pass stays on major legal designations only. Harbor polygons and district boundaries remain out of v1.": {
     "zh": "第一版 live port pass 只覆盖主要法定等级。港区 polygon 和区域边界暂不进入 v1。",
     "en": "The first live port pass stays on major legal designations only. Harbor polygons and district boundaries remain out of v1."
-  },
-  "The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.": {
-    "zh": "参考图像文件不会嵌入项目；加载后需要再次上传，再检查已保存的对齐参数是否仍然贴合。",
-    "en": "The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit."
   },
   "The image is not saved with the project. Upload it again after reopening.": {
     "zh": "图片不会随项目保存，重新打开项目后需再次上传。",
@@ -11279,10 +11067,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "inspector 现已读取 live Japan road preview pack，并说明路段显示、隐藏或标记冲突的原因。",
     "en": "The inspector now reads from the live Japan road preview pack and reports why a segment is shown, hidden, or conflict-marked."
   },
-  "The last pass before sending files out.": {
-    "zh": "发送文件前的最后一轮检查。",
-    "en": "The last pass before sending files out."
-  },
   "The live slice stays on motorway, trunk, primary, and dedicated reference labels. Links are carried for review but stay filtered by default.": {
     "zh": "当前 live 预览聚焦高速公路、主干道、一级道路和独立参考标签。连接线会保留给审查使用，但默认继续过滤。",
     "en": "The live slice stays on motorway, trunk, primary, and dedicated reference labels. Links are carried for review but stay filtered by default."
@@ -11290,14 +11074,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "The map changed. Review the updated merge report.": {
     "zh": "地图已更改，请重新核对合并报告。",
     "en": "The map changed. Review the updated merge report."
-  },
-  "The map is ready for a composite image, per-layer PNG set, or bake pack handoff.": {
-    "zh": "地图已经准备好输出为合成图片、分层 PNG 或 bake pack 交接包时使用。",
-    "en": "The map is ready for a composite image, per-layer PNG set, or bake pack handoff."
-  },
-  "The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery.": {
-    "zh": "地图已经准备好用于发布、截图交接、分层编辑或 bake pack 交付时使用。",
-    "en": "The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery."
   },
   "The map needs clearer borders, softer terrain, visible cities, stronger coastlines, or a reusable visual style.": {
     "zh": "地图需要更清楚的边界、更柔和的地形、可见城市、更强海岸线或可复用视觉风格时使用。",
@@ -11334,10 +11110,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "The project was imported, but editing is paused until map recovery succeeds.": {
     "zh": "项目已导入，地图恢复成功后才能继续编辑。",
     "en": "The project was imported, but editing is paused until map recovery succeeds."
-  },
-  "The publishable output step.": {
-    "zh": "生成可发布产物的步骤。",
-    "en": "The publishable output step."
   },
   "The sample project file could not be imported.": {
     "zh": "示例项目文件无法导入。",
@@ -11811,10 +11583,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "交通工作台",
     "en": "Transport workbench"
   },
-  "Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package.": {
-    "zh": "把保存和导出当成两个独立交接步骤：先保存可继续编辑的项目，再导出可发布的图片或图层包。",
-    "en": "Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package."
-  },
   "Tropical Rainforest": {
     "zh": "热带雨林",
     "en": "Tropical Rainforest"
@@ -12135,10 +11903,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "新编辑请使用分层特殊区域。",
     "en": "Use Layer-based special zones for new edits."
   },
-  "Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON.": {
-    "zh": "使用“打开工作台”选择输出目标、格式、分辨率、图层顺序、文字堆栈和图像调整。导出会生成最终图片、分层 PNG 或 bake pack；它不会替代可编辑的项目 JSON。",
-    "en": "Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON."
-  },
   "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.": {
     "zh": "把项目工具当成发布检查清单：先保存项目，再补战略信息、对齐参考图，最后导出。",
     "en": "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export."
@@ -12183,14 +11947,6 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "使用明确的规则。不要依赖模糊的修复后清理。",
     "en": "Use explicit rules. Do not lean on fuzzy post-fix cleanup."
   },
-  "Use geographic anchors and dominant land context before falling back to fewer region labels.": {
-    "zh": "在使用较少的区域标签之前，请使用地理锚点和主要土地背景。",
-    "en": "Use geographic anchors and dominant land context before falling back to fewer region labels."
-  },
-  "Use geographic anchors and dominant logistics function, then merge labels when corridor density spikes.": {
-    "zh": "使用地理锚点和主导物流功能，然后在走廊密度激增时合并标签。",
-    "en": "Use geographic anchors and dominant logistics function, then merge labels when corridor density spikes."
-  },
   "Use largest city": {
     "zh": "用最大城市",
     "en": "Use largest city"
@@ -12198,18 +11954,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.": {
     "zh": "用线型和淡化效果区分铁路状态，干线比支线和作业线更醒目。",
     "en": "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines."
-  },
-  "Use official motorway refs when they exist.": {
-    "zh": "如果存在官方高速公路参考，请使用它们。",
-    "en": "Use official motorway refs when they exist."
-  },
-  "Use official names when source values disagree.": {
-    "zh": "当来源值不一致时使用官方名称。",
-    "en": "Use official names when source values disagree."
-  },
-  "Use official road names and route numbers where available.": {
-    "zh": "有官方道路名称和路线编号时优先使用。",
-    "en": "Use official road names and route numbers where available."
   },
   "Use project name": {
     "zh": "填入项目名",
@@ -12238,6 +11982,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Use the network and status controls to focus the review.": {
     "zh": "使用路网和状态控件缩小查看范围。",
     "en": "Use the network and status controls to focus the review."
+  },
+  "Use the wheel or +/− to zoom, 90° to rotate, and Reset View to start over.": {
+    "zh": "滚轮或 +/− 缩放，90° 旋转预览，“重置视图”复位。",
+    "en": "Use the wheel or +/− to zoom, 90° to rotate, and Reset View to start over."
   },
   "Use the workbench Display and Data tabs to review live rail visibility rules, pack status, and reconciliation notes.": {
     "zh": "在 workbench 的 Display 和 Data 页签里查看 rail 的当前可见性规则、pack 状态和 reconciliation 说明。",
@@ -12619,21 +12367,9 @@ export const UI_COPY_CATALOG = Object.freeze({
     "zh": "准备修改归属、控制方、核心、标签或任意要素级状态时使用。",
     "en": "You are about to change ownership, controller, cores, labels, or any feature-level state."
   },
-  "You are about to make broad ownership, frontline, transport, or overlay changes.": {
-    "zh": "准备大范围修改归属、前线、交通或叠加层时使用。",
-    "en": "You are about to make broad ownership, frontline, transport, or overlay changes."
-  },
-  "You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone.": {
-    "zh": "准备最终图片、把场景交给其他编辑者，或归档稳定阶段时使用。",
-    "en": "You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone."
-  },
   "You have unsaved changes. Loading a project will replace the current map.": {
     "zh": "你有未保存的更改。加载项目会覆盖当前地图。",
     "en": "You have unsaved changes. Loading a project will replace the current map."
-  },
-  "You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.": {
-    "zh": "需要恢复点、交接文件，或在大改前保留前后对照时使用。",
-    "en": "You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit."
   },
   "You need routes, hubs, ports, airports, or infrastructure density visible beside political ownership.": {
     "zh": "需要在政治归属旁边显示路线、枢纽、港口、机场或基础设施密度时使用。",
@@ -12650,10 +12386,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Zoom": {
     "zh": "缩放",
     "en": "Zoom"
-  },
-  "Zoom / pan / quarter-turn": {
-    "zh": "缩放/平移/四分之一圈",
-    "en": "Zoom / pan / quarter-turn"
   },
   "Zoom gate": {
     "zh": "变焦门",
@@ -12762,10 +12494,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "loaded": {
     "zh": "已加载",
     "en": "loaded"
-  },
-  "main map apply": {
-    "zh": "可应用到主地图",
-    "en": "main map apply"
   },
   "major stations Phase B": {
     "zh": "主要车站 Phase B",
@@ -12886,10 +12614,6 @@ export const UI_COPY_CATALOG = Object.freeze({
   "visible": {
     "zh": "个可见",
     "en": "visible"
-  },
-  "workbench board": {
-    "zh": "工作台排序板",
-    "en": "workbench board"
   },
   "{a} and {b} · ΔE {distance}": {
     "zh": "{a} 与 {b} 颜色过近",
