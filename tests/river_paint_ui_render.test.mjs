@@ -134,7 +134,7 @@ test('default 12 parents support name/ID search, empty results, cross-river filt
   assert.equal(searchInput.value, 'wroclaw'); assert.equal(riverSelect.value, 'Oder');
   assert.equal(riverSelect.children.find(option => option.value === 'Oder').textContent, '奥德河');
   assert.equal(locationSelect.children[1].textContent, '弗罗茨瓦夫 · 奥德河 · PL');
-  assert.equal(searchInput.attrs['aria-label'], '搜索地点名称或 ID');
+  assert.equal(searchInput.attrs['aria-label'], '搜索地点');
   assert.match(resultsNode.textContent, /1 \/ 12/);
   locationSelect.value = 'PL_POW_0264'; locationSelect.listeners.change();
   assert.equal(h.nodes.locationButton.disabled, false);
@@ -347,7 +347,7 @@ test('control cancellation prevents late geometry application and handles retrya
   assert.equal(state.riverPaint.pack, null); assert.equal(builds, 0); assert.equal(notices.length, 0);
   controls.dispose();
   const errorControls = createRiverPaintControls({ state, button, loadPack: async () => { throw new Error('fixture failure'); }, rebuildGeometry() {}, announce: m => notices.push(m) });
-  await errorControls.toggle(); assert.equal(notices.length, 1); assert.match(button.title, /fixture failure/);
+  await errorControls.toggle(); assert.equal(notices.length, 1); assert.match(button.title, /River painting is unavailable/);
   errorControls.dispose();
 });
 

@@ -648,9 +648,7 @@ const config = {
             "Preset Library",
             "Preset Name",
             "Save Preset",
-            "0 presets",
-            "preset",
-            "presets",
+            "No appearance presets saved",
             "Appearance Preset",
         }
 

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { createScenarioGuidePopoverController } from "../js/ui/toolbar/scenario_guide_popover.js";
+import { createUiSurfaceUrlState } from "../js/ui/ui_surface_url_state.js";
 import { UI_COPY_CATALOG } from "../js/core/i18n_catalog.js";
 
 function element(dataset = {}) {
@@ -10,6 +11,7 @@ function element(dataset = {}) {
     dataset, hidden: false, textContent: "",
     classList: {
       add(name) { classes.add(name); },
+      remove(name) { classes.delete(name); },
       toggle(name, active) { active ? classes.add(name) : classes.delete(name); },
       contains(name) { return classes.has(name); },
     },
@@ -32,6 +34,33 @@ test("HGO guidance is available in its own tab", () => {
   controller.renderScenarioGuideSection("hgo");
   assert.equal(hgoPanel.hidden, false);
   assert.equal(hgoNav["aria-selected"], "true");
+});
+
+test("legacy checks deep links open Quick start on first visit and after visiting another tab", context => {
+  const originalDocument = globalThis.document;
+  const originalLocation = globalThis.location;
+  globalThis.document = { body: element() };
+  globalThis.location = new URL("https://example.test/?view=guide&guide_section=checks");
+  context.after(() => {
+    globalThis.document = originalDocument;
+    globalThis.location = originalLocation;
+  });
+  const sections = ["quick", "tools"];
+  const panels = sections.map(guidePanel => element({ guidePanel }));
+  const nav = sections.map(guideSection => element({ guideSection }));
+  const url = createUiSurfaceUrlState({ uiUrlStateKeys: { view: "view", guideSection: "guide_section" } });
+  const guide = createScenarioGuidePopoverController({
+    state: {}, scenarioGuidePopover: element(), scenarioGuideNavButtons: nav,
+    scenarioGuidePanels: panels, getGuideSectionFromUrl: url.getScenarioGuideSectionFromUrl, t: key => key,
+  });
+  guide.openScenarioGuideSurface();
+  assert.deepEqual(panels.map(panel => panel.hidden), [false, true]);
+  guide.renderScenarioGuideSection("tools");
+  assert.deepEqual(panels.map(panel => panel.hidden), [true, false]);
+  guide.closeScenarioGuideSurface();
+  guide.openScenarioGuideSurface();
+  assert.deepEqual(panels.map(panel => panel.hidden), [false, true]);
+  assert.equal(nav[0]["aria-selected"], "true");
 });
 
 test("new workspace labels agree across runtime and manual catalogs without changing generic Color", () => {

@@ -103,7 +103,7 @@ test("WGI checkbox enables via state actions and preserves base paint", async ()
   assert.equal(h.nodes.toggleThematicWgi.checked, true);
   assert.equal(h.nodes.thematicWgiStatus.textContent, "Loading indicator data…");
   await flush();
-  assert.equal(h.nodes.thematicWgiStatus.textContent, "Indicator data loaded.");
+  assert.equal(h.nodes.thematicWgiStatus.textContent, "");
   assert.equal(h.loads.length, 1);
   assert.equal(h.legends.length, 1);
   assert.equal(h.persists(), 1);
@@ -130,10 +130,9 @@ test("all supported historical scenarios enable and label their modern reference
     h.nodes.toggleThematicWgi.checked = true;
     h.nodes.toggleThematicWgi.dispatch("change");
     await flush();
-    assert.equal(h.nodes.thematicWgiStatus.textContent, "Indicator data loaded.");
+    assert.equal(h.nodes.thematicWgiStatus.textContent, "");
     assert.equal(h.nodes.thematicWgiLegend.hidden, false);
-    assert.equal(h.nodes.thematicWgiCoverage.textContent,
-      "Scenario countries mapped: 1 · Source missing: 0 · Unmatched: 0");
+    assert.equal(h.nodes.thematicWgiCoverage.textContent, "");
     assert.equal(h.loads.length, 1);
     assert.equal(h.persists(), 1);
     assert.deepEqual(h.dirty, ["toggle-thematic-wgi"]);
@@ -185,8 +184,7 @@ test("switching between modern and historical maps refreshes coverage copy witho
     assert.equal(h.nodes.thematicWgiReferenceNote.hidden, !historical);
     assert.equal(h.nodes.thematicWgiReferenceNote.textContent,
       historical ? "2024 参考映射，非剧本年代测量值。" : "");
-    assert.equal(h.nodes.thematicWgiCoverage.textContent,
-      `${historical ? "场景国家已匹配" : "已匹配"}: 0 · 来源缺失: 0 · 未匹配: 0`);
+    assert.equal(h.nodes.thematicWgiCoverage.textContent, "");
   }
   assert.equal(h.loads.length, 1);
   assert.equal(h.persists(), 0);
@@ -237,7 +235,7 @@ test("restoring enabled Modern World selection loads once and renders score bins
   assert.deepEqual(rows.map((row) => row.children[1].textContent), [
     "0–<20", "20–<40", "40–<60", "60–<80", "80–100", "Source missing", "Unmatched / not covered",
   ]);
-  assert.equal(h.nodes.thematicWgiCoverage.textContent, "Mapped: 0 · Source missing: 0 · Unmatched: 0");
+  assert.equal(h.nodes.thematicWgiCoverage.textContent, "");
   assert.equal(h.nodes.thematicWgiRetry.hidden, true);
 });
 
@@ -291,7 +289,7 @@ test("disabling clears visible legend and preserves other settings with one even
   assert.equal(h.nodes.thematicWgiLegend.hidden, true);
   assert.deepEqual(h.nodes.thematicWgiLegend.children, []);
   assert.equal(h.nodes.thematicWgiCoverage.hidden, true);
-  assert.equal(h.nodes.thematicWgiStatus.textContent, "Thematic layer is off.");
+  assert.equal(h.nodes.thematicWgiStatus.textContent, "");
 });
 
 test("changing scenario hides legend and retry without losing enabled selection", async () => {
@@ -588,11 +586,11 @@ test("WGI new strings agree across manual/catalog translations and option langua
     "WDI population · Scenario reference",
     ...MODERN_INDICATORS.map((metric) => metric.labelEn), "Unavailable saved metric",
     "Saved indicator is unavailable. Choose a supported indicator.",
-    "Country indicators are not supported on the current basemap.", "Scenario countries mapped", "Reference country",
+    "Country indicators are not supported on the current basemap.", "Some countries have no data.", "Reference country",
     "2024 reference mapping, not a measurement for the scenario year.",
     "2023 reference mapping, not a measurement for the scenario year.",
-    "Thematic layer is off.", "Saved indicator data version is unavailable.",
-    "Indicator data is ready to load.", "Loading indicator data…", "Indicator data loaded.",
+    "Saved indicator data version is unavailable.",
+    "Loading indicator data…",
     "Indicator data could not be loaded. Retry."]) {
     assert.equal(UI_COPY_CATALOG[key].en, key);
     assert.equal(UI_COPY_CATALOG[key].zh, manual[key]);

@@ -5,7 +5,7 @@ import { importResourceLabel } from "../../core/interaction_funnel/import_recove
 import { bindProjectFileDrop } from "../project_file_drop.js";
 import { callRuntimeHook, registerRuntimeHook } from "../../core/state/index.js";
 import { createUiIcon } from "../components/ui_icons.js";
-import { getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
+import { getScenarioDisplayName, getScenarioRegistryEntries, getScenarioBlockerCount as getScenarioAuditBlockerCount } from "../../core/scenario/bundle_loader.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { markDirty } from "../../core/dirty_state.js";
@@ -233,6 +233,8 @@ export function createProjectSupportDiagnosticsController({
     uploadBtn.className = "btn-secondary";
     uploadBtn.setAttribute("data-i18n", "Load Project");
     uploadBtn.textContent = t("Load Project", "ui");
+    uploadBtn.setAttribute("data-i18n-title", "No file selected");
+    uploadBtn.title = t("No file selected", "ui");
 
     const fileInput = documentRef.createElement("input");
     fileInput.id = "projectFileInput";
@@ -241,25 +243,6 @@ export function createProjectSupportDiagnosticsController({
     fileInput.className = "hidden";
     fileInput.setAttribute("aria-label", t("Load Project", "ui"));
     fileInput.setAttribute("data-i18n-aria-label", "Load Project");
-
-    const fileMeta = documentRef.createElement("div");
-    fileMeta.id = "projectFileMeta";
-    fileMeta.className = "project-file-meta";
-
-    const fileMetaLabel = documentRef.createElement("span");
-    fileMetaLabel.id = "lblProjectFile";
-    fileMetaLabel.className = "section-header";
-    fileMetaLabel.setAttribute("data-i18n", "Selected File");
-    fileMetaLabel.textContent = t("Selected File", "ui");
-
-    const fileName = documentRef.createElement("span");
-    fileName.id = "projectFileName";
-    fileName.className = "project-file-name u-truncate";
-    fileName.dataset.projectFileState = "empty";
-    fileName.textContent = t("No file selected", "ui");
-
-    fileMeta.appendChild(fileMetaLabel);
-    fileMeta.appendChild(fileName);
 
     const projectSaveStatus = documentRef.createElement("p");
     projectSaveStatus.id = "projectSaveStatus";
@@ -314,7 +297,6 @@ export function createProjectSupportDiagnosticsController({
     });
     actions.append(mergeBtn, mergeInput);
     actions.appendChild(projectSaveStatus);
-    actions.appendChild(fileMeta);
     actions.appendChild(fileInput);
 
     if (globalThis.showOpenFilePicker && globalThis.indexedDB) {
@@ -442,53 +424,30 @@ export function createProjectSupportDiagnosticsController({
   const projectDownloadDestination = documentRef.getElementById("projectDownloadDestination");
   const projectPackageContents = documentRef.getElementById("projectPackageContents");
   const projectFileInput = documentRef.getElementById("projectFileInput");
-  const projectFileName = documentRef.getElementById("projectFileName");
   const projectSaveStatus = documentRef.getElementById("projectSaveStatus");
   const legendList = documentRef.getElementById("legendEditorList");
   const debugModeSelect = documentRef.getElementById("debug-mode-select");
-  if (
-    projectFileName
-    && (
-      !projectFileName.textContent.trim()
-      || projectFileName.dataset?.projectFileState === "empty"
-    )
-  ) {
-    if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
-    projectFileName.textContent = t("No file selected", "ui");
-  }
-
-
   const getScenarioAuditSummary = (auditPayload) => (
     auditPayload?.summary && typeof auditPayload.summary === "object" ? auditPayload.summary : {}
   );
   let lastExpandedSpecialZoneDiagnosticsKey = "";
 
-  const confirmReplaceCurrentProject = () => confirmDiscardDirtyWork(state, showAppDialog, {
+  const confirmReplaceCurrentProject = (filename) => confirmDiscardDirtyWork(state, showAppDialog, {
     title: t("Load Project", "ui"),
     message: t("You have unsaved changes. Loading a project will replace the current map.", "ui"),
-    details: t(
-      "Continue only if you are ready to discard the current working state or have already exported it.",
-      "ui"
-    ),
+    details: [filename, t("Continue only if you are ready to discard the current working state or have already exported it.", "ui")].join("\n"),
     confirmLabel: t("Discard and Load", "ui"),
     cancelLabel: t("Stay on Current Map", "ui"),
   });
 
   const formatProjectPackagePreviewDetails = (preview) => {
     if (!preview) return "";
-    const scenario = preview.scenario && typeof preview.scenario === "object"
-      ? String(preview.scenario.id || "").trim()
-      : "";
-    const project = preview.project && typeof preview.project === "object" ? preview.project : {};
-    const summary = preview.summary && typeof preview.summary === "object" ? preview.summary : {};
-    const generatedAt = String(preview.generatedAt || "").trim();
+    const id = preview.scenario?.id;
+    const scenario = getScenarioRegistryEntries(state).find(entry => entry.scenario_id === id);
     return [
-      `${t("Package", "ui")}: ${preview.filename}`,
-      `${t("Schema", "ui")}: ${project.schemaVersion || summary.schemaVersion || "-"}`,
-      `${t("Scenario", "ui")}: ${scenario || t("None", "ui")}`,
-      `${t("Entries", "ui")}: ${preview.entryCount || 0}`,
-      `${t("Export target", "ui")}: ${summary.exportTarget || "-"}`,
-      generatedAt ? `${t("Generated", "ui")}: ${generatedAt}` : "",
+      preview.filename,
+      `${t("Scenario", "ui")}: ${getScenarioDisplayName(scenario, id, t) || t("None", "ui")}`,
+      preview.generatedAt ? `${t("Saved at", "ui")}: ${preview.generatedAt}` : "",
     ].filter(Boolean).join("\n");
   };
 
@@ -651,7 +610,7 @@ export function createProjectSupportDiagnosticsController({
       return;
     }
     if (state.isDirty) {
-      setStatusMessage(`${t("Unsaved project changes.", "ui")} ${t("Project export includes appearance and transport settings.", "ui")}`);
+      setStatusMessage(t("Unsaved project changes.", "ui"));
       return;
     }
     if (lastChange === "project-export") {
@@ -1521,22 +1480,14 @@ export function createProjectSupportDiagnosticsController({
     });
 
     const importProjectFile = async (file, fileHandle = null) => {
-      if (file && !(await confirmReplaceCurrentProject())) return;
+      if (file && !(await confirmReplaceCurrentProject(file.name))) return;
       projectImportController?.abort();
       const importController = new AbortController();
       projectImportController = importController;
       if (!file) {
         projectImportController = null;
-        if (projectFileName) {
-          if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
-          projectFileName.textContent = t("No file selected", "ui");
-        }
-        refreshProjectSaveStatus(t("No file selected", "ui"));
+        refreshProjectSaveStatus();
         return;
-      }
-      if (projectFileName) {
-        if (projectFileName.dataset) projectFileName.dataset.projectFileState = "selected";
-        projectFileName.textContent = file.name;
       }
       refreshProjectSaveStatus(t("Project import started. Appearance and transport settings will be restored from the file.", "ui"));
       lastProjectImportSummary = null;

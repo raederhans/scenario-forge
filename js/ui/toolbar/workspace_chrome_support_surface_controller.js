@@ -238,6 +238,7 @@ export function createWorkspaceChromeSupportSurfaceController({
       dockQuickFillBtn.setAttribute("aria-expanded", state.activeDockPopover === "quickfill" ? "true" : "false");
     }
     if (dockQuickFillRow) {
+      dockQuickFillRow.title = levelModel.explicitLevel || isScenarioMode ? levelModel.note : "";
       const shouldShowPopover = isVisible && state.activeDockPopover === "quickfill";
       dockQuickFillRow.classList.toggle("hidden", !shouldShowPopover);
       dockQuickFillRow.setAttribute("aria-hidden", shouldShowPopover ? "false" : "true");

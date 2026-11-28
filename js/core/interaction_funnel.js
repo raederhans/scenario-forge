@@ -423,7 +423,12 @@ async function applyImportedProjectState(data, { ui, hooks, request, fileName, f
   // Scenario activation commits topology before the renderer publishes its new
   // landData. Seeding ownership earlier would copy outgoing TNO/Atlantropa/global
   // feature IDs into this document, and its next import would correctly reject them.
-  { name: "ownership-index", run: () => ensureSovereigntyState({ force: true }) }];
+  { name: "ownership-index", run: () => {
+    ensureSovereigntyState({ force: true });
+    if (state.dynamicBordersDirty) {
+      callRuntimeHook(state, "recomputeDynamicBordersNowFn", { renderNow: false, reason: "project-import" });
+    }
+  } }];
   if (data.viewState) required.push({ name: "map-view", run: () => callRuntimeHook(state, "restoreProjectViewFn", data.viewState) });
   const optional = [];
   const complete = (name, run) => optional.push({ name, run });

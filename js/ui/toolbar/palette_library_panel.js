@@ -9,8 +9,6 @@ import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.j
 import {
   buildPaletteLibraryEntries,
   getPaletteSourceOptions,
-  getSuggestedIso2,
-  getUnmappedReason,
   normalizeHexColor,
   setActivePaletteSource,
 } from "../../core/palette_manager.js";
@@ -294,25 +292,6 @@ function createPaletteLibraryPanelController({
       ].some((value) => String(value || "").toLowerCase().includes(searchTerm)));
   };
 
-  function formatPaletteReason(entry) {
-    const reason = getUnmappedReason(entry) || String(entry?.mappingReason || "").trim();
-    if (reason === "dynamic_tag_not_mapped") return t("Dynamic tag", "ui");
-    if (reason === "unsupported_runtime_country") {
-      const suggested = getSuggestedIso2(entry);
-      return suggested
-        ? `${t("Unsupported runtime country", "ui")} (${suggested})`
-        : t("Unsupported runtime country", "ui");
-    }
-    if (reason === "colonial_predecessor") return t("Colonial predecessor", "ui");
-    if (reason === "historical_union_or_predecessor") return t("Historical predecessor", "ui");
-    if (reason === "split_state") return t("Split state", "ui");
-    if (reason === "warlord_or_regional_tag") return t("Warlord / regional tag", "ui");
-    if (reason === "fictional_or_alt_history") return t("Fictional / alt-history", "ui");
-    if (reason === "ambiguous_identity") return t("Ambiguous identity", "ui");
-    if (reason === "unreviewed") return t("Unreviewed", "ui");
-    return reason || t("Unreviewed", "ui");
-  }
-
   const selectPaletteLibraryEntry = (entry) => {
     selectPalettePaintColor(runtimeState, entry.color);
     if (runtimeState.currentTool === "select") {
@@ -443,9 +422,6 @@ function createPaletteLibraryPanelController({
       entry.localizedNameZh,
       entry.sourceTag,
       entry.countryFileLabel,
-      entry.mappedIso2
-        ? `${t("Mapped to", "ui")} ${entry.mappedIso2}`
-        : `${t("Unmapped", "ui")}: ${formatPaletteReason(entry)}`,
     ].filter(Boolean).join(" · ");
 
     meta.appendChild(title);

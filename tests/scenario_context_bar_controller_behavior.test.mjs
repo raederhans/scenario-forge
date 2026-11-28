@@ -95,7 +95,6 @@ function createHarness({ collapsed = false, selectionLabel = "Berlin" } = {}) {
     scenarioContextBar: new TestElement(),
     scenarioContextCollapseBtn: new TestElement(),
     scenarioContextScenarioText: new TestElement(),
-    scenarioContextModeText: new TestElement(),
     scenarioContextActiveText: new TestElement(),
     scenarioContextSelectionItem: new TestElement(),
     scenarioContextSelectionText: new TestElement(),
@@ -104,7 +103,7 @@ function createHarness({ collapsed = false, selectionLabel = "Berlin" } = {}) {
     mapContainer: new TestElement({ rect: { left: 0, right: 800, top: 0, bottom: 400, width: 800, height: 400 } }),
     zoomControls: new TestElement({ rect: { left: 460, right: 540, top: 0, bottom: 40, width: 80, height: 40 } }),
   };
-  for (const name of ["Scenario", "Mode", "Active"]) {
+  for (const name of ["Scenario", "Active"]) {
     const item = new TestElement();
     item.appendChild(nodes[`scenarioContext${name}Text`]);
     nodes.scenarioContextBar.appendChild(item);
@@ -140,7 +139,6 @@ function createHarness({ collapsed = false, selectionLabel = "Berlin" } = {}) {
   const controller = createScenarioContextBarController({
     runtimeState,
     ...nodes,
-    getPaintModeLabel: () => "Visual Color",
     getWorkspaceSelectionLabel: () => selectionLabel,
     syncScenarioGuideTriggerButtons: (payload) => guideSyncCalls.push(payload),
     updateLanguageToggleUi: () => {
@@ -170,18 +168,14 @@ test("scenario context bar refresh owns labels, selection chip, and safe width",
     nodes.scenarioContextScenarioText.parentElement,
     nodes.scenarioContextActiveText.parentElement,
     nodes.scenarioContextSelectionItem,
-    nodes.scenarioContextModeText.parentElement,
     nodes.scenarioContextCollapseBtn,
   ]);
   assert.equal(nodes.scenarioContextScenarioText.textContent, "HGO 1936");
-  assert.equal(nodes.scenarioContextModeText.textContent, "Visual Color");
-  assert.equal(nodes.scenarioContextModeText.attributes.get("title"), "Mode: Visual Color");
   assert.equal(nodes.scenarioContextActiveText.textContent, "Alpha (ABC)");
   assert.equal(nodes.scenarioContextSelectionItem.classList.contains("hidden"), false);
   assert.equal(nodes.scenarioContextSelectionText.textContent, "Berlin");
   assert.equal(nodes.scenarioContextSelectionText.attributes.get("aria-current"), "location");
   assert.equal(nodes.scenarioContextActiveText.classList.contains("is-current"), false);
-  assert.equal(nodes.scenarioContextModeText.classList.contains("is-current"), false);
   assert.equal(nodes.scenarioContextCollapseBtn.dataset.uiIcon, "chevron-up");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.textContent, "Transport");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.attributes.get("title"), "Open transport workbench");
@@ -225,7 +219,6 @@ test("responsive chrome binding delegates resize refresh through the controller"
     runtimeState,
     scenarioContextBar: new TestElement(),
     zoomControls: new TestElement({ rect: { left: 460, right: 540, top: 0, bottom: 40, width: 80, height: 40 } }),
-    getPaintModeLabel: () => "Visual Color",
     getWorkspaceSelectionLabel: () => "No selection",
     applyResponsiveChromeDefaults: () => {
       responsiveRefreshCount += 1;

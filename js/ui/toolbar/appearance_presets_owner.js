@@ -13,11 +13,6 @@ import {
 } from "../../core/state/actions/appearance_preset_actions.js";
 import { showToast } from "../components/toast.js";
 
-function getPresetCountLabel(count, t) {
-  const label = count === 1 ? "preset" : "presets";
-  return `${count} ${typeof t === "function" ? t(label, "ui") : label}`;
-}
-
 function sanitizePresetFilename(name = "appearance-preset") {
   const slug = String(name || "appearance-preset")
     .trim()
@@ -91,24 +86,17 @@ export function createAppearancePresetsOwner({
         .filter(Boolean)
         .map((preset) => createOption(documentRef, preset.id, preset.name))
         .filter(Boolean);
+      if (!options.length) {
+        const placeholder = createOption(documentRef, "", t("No appearance presets saved", "ui"));
+        placeholder.disabled = true;
+        options.push(placeholder);
+      }
       replaceNodeChildren(nodes.select, options);
       nodes.select.value = presetState.selectedPresetId || "";
       nodes.select.disabled = presetState.order.length === 0;
     }
     if (nodes.nameInput && selectedPreset && !nodes.nameInput.value) {
       nodes.nameInput.placeholder = selectedPreset.name;
-    }
-    if (nodes.summary) {
-      nodes.summary.textContent = getPresetCountLabel(presetState.order.length, t);
-    }
-    if (nodes.list) {
-      const names = presetState.order
-        .map((presetId) => presetState.byId[presetId]?.name)
-        .filter(Boolean);
-      nodes.list.dataset.presetCount = String(names.length);
-      nodes.list.textContent = names.length > 0
-        ? names.join("\n")
-        : (typeof t === "function" ? t("No appearance presets saved", "ui") : "No appearance presets saved");
     }
     [nodes.applyButton, nodes.deleteButton, nodes.exportButton].forEach((button) => {
       if (button) button.disabled = !selectedPreset;

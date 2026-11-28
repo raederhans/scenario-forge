@@ -402,8 +402,6 @@ export function createTransportWorkbenchRightDeckOwner({
     meta.className = "transport-workbench-data-meta";
     meta.append(
       createDataMetaNode(translate("Loaded rows"), totalRows),
-      createDataMetaNode(translate("Table Rows"), rows.length),
-      createDataMetaNode(translate("Mode"), previewSnapshot.packMode || previewSnapshot.status || "idle"),
       createDataMetaNode(translate("Shown"), Math.min(visibleRows.length, viewRows.length))
     );
     header.append(title, meta);

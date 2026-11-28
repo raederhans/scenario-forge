@@ -363,10 +363,10 @@
       "geo_entry_count": 73431,
       "owner": "init_map_data.hierarchy_locales",
       "role": "locales",
-      "sha256": "19adcefa36c032f13e31a041a0e6756eabfcc637e5df0192e671c3c61a4a9455",
-      "size_bytes": 8595953,
+      "sha256": "4b6578e5290f86ecfe544143ddc888e58752dcdae911ae75ad919b8fb9f97ecf",
+      "size_bytes": 8637690,
       "type": "locales",
-      "ui_entry_count": 2839
+      "ui_entry_count": 3175
     },
     "marine_regions.refined.source.geojson": {
       "artifact_class": "derived",

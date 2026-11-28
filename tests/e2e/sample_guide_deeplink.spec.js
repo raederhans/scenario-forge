@@ -596,7 +596,7 @@ test("sample guide and export context localize on the Chinese TNO path", async (
 
     await expect(page.locator("[data-sample-guide-title]")).toContainText(/示例已加载/);
     await expect(page.locator("[data-sample-guide-recommendation]")).toContainText(/推荐导出/);
-    await expect(page.locator(".scenario-guide-sample-card__switcher-title")).toContainText(/公开起步示例/);
+    await expect(page.locator(".scenario-guide-sample-card__switcher-title")).toContainText(/示例项目/);
     await expect(page.locator("[data-sample-guide-open-export]")).toContainText(/打开导出/);
     await expect(page.locator("[data-sample-guide-choice]")).toHaveCount(5, { timeout: 30000 });
     await expect(page.locator("[data-sample-guide-choice*='hgo']")).toHaveCount(0);

@@ -185,7 +185,6 @@ export function createAppearanceControlsController({
   const setLayerStatusNode = (node, diagnostic) => {
     if (!node || !diagnostic) return;
     const summary = sanitizeLayerStatusText(diagnostic.summary);
-    node.title = diagnostic.detail ? sanitizeLayerStatusText(diagnostic.detail) : "";
     if (node.dataset.statusSummary !== summary) {
       node.textContent = summary;
       node.dataset.statusSummary = summary;
@@ -313,8 +312,6 @@ export function createAppearanceControlsController({
       exportButton: document.getElementById("appearancePresetExportBtn"),
       importButton: document.getElementById("appearancePresetImportBtn"),
       importInput: document.getElementById("appearancePresetImportFile"),
-      summary: document.getElementById("appearancePresetSummary"),
-      list: document.getElementById("appearancePresetList"),
     },
     t,
     renderDirty: scheduleLayerRenderDirty,
@@ -529,7 +526,7 @@ export function createAppearanceControlsController({
     if (capability) return capability;
     return {
       adaptiveAvailable: false,
-      unavailableReason: "Urban layer metadata is still loading.",
+      unavailableReason: "",
     };
   };
 
@@ -557,9 +554,10 @@ export function createAppearanceControlsController({
       if (adaptiveOption) adaptiveOption.disabled = !adaptiveAvailable;
     }
     if (urbanAdaptiveStatus) {
-      const statusText = adaptiveAvailable ? "" : String(capability.unavailableReason || "").trim();
-      urbanAdaptiveStatus.textContent = statusText;
-      urbanAdaptiveStatus.classList.toggle("hidden", !statusText);
+      const unavailable = !adaptiveAvailable && !!capability.unavailableReason
+        && runtimeState.contextLayerLoadStateByName?.urban !== "loading";
+      urbanAdaptiveStatus.textContent = unavailable ? t("Adaptive mode is unavailable for this map.", "ui") : "";
+      urbanAdaptiveStatus.classList.toggle("hidden", !unavailable);
     }
     if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? t("Opacity", "ui") : t("Fill Opacity", "ui");
     if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);

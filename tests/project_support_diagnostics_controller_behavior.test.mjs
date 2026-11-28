@@ -303,8 +303,8 @@ test("project support mounts panels with original defaults", () => {
     projectDownloadFormat: "json", projectDownloadDestination: "picker",
     projectPackageContents: "minimal", "debug-mode-select": "PROD",
   })) assert.equal(get(id).value, value, id);
-  assert.equal(get("projectFileName").textContent, "No file selected");
-  assert.equal(get("projectFileName").dataset.projectFileState, "empty");
+  assert.equal(get("projectFileMeta"), null);
+  assert.equal(get("uploadProjectBtn").getAttribute("data-i18n-title"), "No file selected");
   assert.equal(get("downloadProjectBtn").getAttribute("data-i18n"), "Download Project");
   assert.equal(get("projectFileInput").getAttribute("data-i18n-aria-label"), "Load Project");
   assert.equal(get("projectSaveStatus").getAttribute("aria-live"), "polite");
@@ -325,8 +325,6 @@ test("merge previews ZIP paint, copies grouped missing IDs and requires a fresh 
   const dialogs = [];
   createController(null, { ...fixture, helpers: { ...fixture.helpers, t: translate,
     showToast: message => alerts.push(message), showAppDialog: options => dialogs.push(options.title) } }).bindEvents();
-  const selected = get("projectFileName");
-  selected.textContent = "local.json";
   const input = get("mergeProjectFileInput");
   let picked = 0;
   input.click = () => { picked++; };
@@ -385,7 +383,7 @@ test("merge previews ZIP paint, copies grouped missing IDs and requires a fresh 
   assert.equal(dialog.open, false);
   assert.equal(state.visualOverrides.A, "#aabbcc");
   assert.deepEqual(dialogs, []);
-  assert.equal(selected.textContent, "local.json");
+  assert.equal(state.projectFileBinding.handle.name, "local.json");
   assert.equal(state.projectName, "Local");
   assert.equal(state.projectFileStem, "local");
   assert.equal(state.projectFileBinding, initial.projectFileBinding);
@@ -434,17 +432,9 @@ test("project support reuses mounted markup and preserves user values without du
   const { documentRef } = fixture;
   const originalNodes = collectNodes(documentRef.body, (node) => !!node.id);
   documentRef.getElementById("projectDownloadFormat").value = "zip";
-  const name = documentRef.getElementById("projectFileName");
-  name.textContent = "edited-project.zip";
-  name.dataset.projectFileState = "selected";
   createController(null, fixture);
   assert.deepEqual(collectNodes(documentRef.body, (node) => !!node.id), originalNodes);
   assert.equal(documentRef.getElementById("projectDownloadFormat").value, "zip");
-  assert.equal(name.textContent, "edited-project.zip");
-  name.textContent = "";
-  createController(null, fixture);
-  assert.equal(name.textContent, "No file selected");
-  assert.equal(name.dataset.projectFileState, "empty");
 });
 
 test("project support tolerates absent hosts and reuses an existing project section", () => {
@@ -1000,7 +990,6 @@ test("cancelled save dialog returns false to callers", async () => {
 
 test("local project zip load unwraps editable project before import funnel", async () => {
   const projectSaveStatus = createStatusNode();
-  const projectFileName = createStatusNode();
   const projectZipBytes = zipSync({
     "map_project.json": strToU8(JSON.stringify({ schemaVersion: 21, activePaletteId: "hoi4_vanilla" })),
     "map_project_manifest.json": strToU8(JSON.stringify({ artifactKind: "project-zip" })),
@@ -1019,7 +1008,6 @@ test("local project zip load unwraps editable project before import funnel", asy
     state: { isDirty: false },
     elements: {
       projectFileInput,
-      projectFileName,
     },
     helpers: {
       importProjectThroughFunnel: (file, options) => {
@@ -1038,10 +1026,8 @@ test("local project zip load unwraps editable project before import funnel", asy
   controller.bindEvents();
   await projectFileInput.listeners.change();
 
-  assert.equal(projectFileName.textContent, "map_project.zip");
-  assert.equal(projectFileName.dataset.projectFileState, "selected");
   assert.equal(dialogs[0].title, "Load Project Package");
-  assert.match(dialogs[0].details, /Package: map_project\.zip/);
+  assert.match(dialogs[0].details, /^map_project\.zip\n/);
   assert.equal(importedFile, null, "preview does not serialize a second JSON File");
   assert.deepEqual(importedOptions.projectPayload, { schemaVersion: 21, activePaletteId: "hoi4_vanilla" });
   assert.equal(importedOptions.fileName, "map_project.zip");
@@ -1088,7 +1074,6 @@ test("local project import reports restored entries and keeps cancellation disti
 
 test("local project zip preview cancel clears selected file input", async () => {
   const projectSaveStatus = createStatusNode();
-  const projectFileName = createStatusNode();
   const projectZipBytes = zipSync({
     "map_project.json": strToU8(JSON.stringify({ schemaVersion: 21, activePaletteId: "hoi4_vanilla" })),
     "map_project_manifest.json": strToU8(JSON.stringify({ artifactKind: "project-zip" })),
@@ -1105,7 +1090,6 @@ test("local project zip preview cancel clears selected file input", async () => 
     state: { isDirty: false },
     elements: {
       projectFileInput,
-      projectFileName,
     },
     helpers: {
       importProjectThroughFunnel: () => {

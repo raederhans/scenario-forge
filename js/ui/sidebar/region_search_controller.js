@@ -13,6 +13,8 @@ export function createRegionSearchController({
   const tr = (key) => t(key, "ui");
   let country = "";
   let block, input, results, status;
+  // 与国家搜索共用输入框时，国家列表靠 input 事件过滤：清空后要补发一次，选中地块也不改写查询词。
+  let sharedInput = false;
   let matches = [];
   let activeIndex = -1;
   const normalizeCode = (code) => String(code || "").trim().toUpperCase();
@@ -33,11 +35,13 @@ export function createRegionSearchController({
   }
 
   function clear() {
+    const hadValue = !!input.value;
     input.value = "";
     matches = [];
     results.replaceChildren();
     status.textContent = "";
     close();
+    if (sharedInput && hadValue) input.dispatchEvent(new Event("input"));
   }
 
   function select(index) {
@@ -46,7 +50,7 @@ export function createRegionSearchController({
       const feature = state.landIndex.get(id);
       if (feature?.geometry) focusLandFeatures([feature], focusGeoBounds);
       status.textContent = tr("Selected {name}").replace("{name}", `${label} (${id})`);
-      input.value = label;
+      if (!sharedInput) input.value = label;
       close();
     } else {
       status.textContent = tr("Region is not loaded yet.");
@@ -140,15 +144,27 @@ export function createRegionSearchController({
     }
   }
 
-  function mount(container) {
-    block = documentRef.createElement("div");
-    block.className = "card-flat inspector-search-block region-search-block";
-    const label = documentRef.createElement("label");
+  function mount(container, { input: existingInput = null } = {}) {
+    sharedInput = !!existingInput;
+    let label = null;
+    let row = null;
+    if (sharedInput) {
+      input = existingInput;
+      for (const [key, value] of Object.entries({
+        role: "combobox", "aria-autocomplete": "list",
+        "aria-expanded": "false", "aria-controls": "regionSearchResults",
+      })) input.setAttribute(key, value);
+      block = documentRef.createElement("div");
+      block.className = "region-search-block";
+    } else {
+      block = documentRef.createElement("div");
+      block.className = "card-flat inspector-search-block region-search-block";
+    label = documentRef.createElement("label");
     label.className = "visually-hidden";
     label.setAttribute("for", "regionSearchInput");
     label.setAttribute("data-i18n", "Find region");
     label.textContent = tr("Find region");
-    const row = documentRef.createElement("div");
+    row = documentRef.createElement("div");
     row.className = "inspector-search-input-row";
     row.innerHTML = '<svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>';
     input = documentRef.createElement("input");
@@ -161,6 +177,7 @@ export function createRegionSearchController({
       "data-i18n-placeholder": "Search region name or ID…", autocomplete: "off", spellcheck: "false",
     })) input.setAttribute(key, value);
     row.appendChild(input);
+    }
     results = documentRef.createElement("ul");
     results.id = "regionSearchResults";
     results.className = "region-search-results hidden";
@@ -171,7 +188,8 @@ export function createRegionSearchController({
     status.id = "regionSearchStatus";
     status.className = "visually-hidden";
     status.setAttribute("aria-live", "polite");
-    block.append(label, row, results, status);
+    if (sharedInput) block.append(results, status);
+    else block.append(label, row, results, status);
     container.appendChild(block);
     input.addEventListener("input", search);
     input.addEventListener("keydown", onKeyDown);

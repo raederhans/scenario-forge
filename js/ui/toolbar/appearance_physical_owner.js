@@ -142,14 +142,7 @@ export function createAppearancePhysicalOwner({
       const row = input.closest?.("label");
       const swatch = row?.querySelector(".physical-class-swatch");
       if (swatch) swatch.style.backgroundColor = PHYSICAL_ATLAS_PALETTE[key];
-      const coverage = documentRef.getElementById(`${PHYSICAL_CLASS_TOGGLE_IDS[key]}Coverage`);
-      if (coverage) {
-        const parts = [];
-        if (count) parts.push(`${count.toLocaleString()} ${t("regions", "ui")}`);
-        if (nameCount) parts.push(`${nameCount.toLocaleString()} ${t("Labels", "ui")}`);
-        coverage.textContent = parts.length ? parts.join(" · ")
-          : t(coverageKnown ? "No coverage in current data" : "Coverage loading", "ui");
-      }
+      if (row) row.title = input.disabled ? t("No coverage in current data", "ui") : "";
     }
   };
 

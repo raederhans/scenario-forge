@@ -33,13 +33,12 @@ export function mountLocalHistoryPanel(manager) {
       const records = await manager.listHistory();
       if (!history.open) return;
       const locale = state.currentLanguage === "zh" ? "zh-CN" : "en-US";
-      const size = new Intl.NumberFormat(locale, { style: "unit", unit: "kilobyte", maximumFractionDigits: 1 });
       const entries = records.map(record => {
         const entry = document.createElement("li");
         const description = document.createElement("p");
         description.textContent = [ui(typeLabels[record.type]), record.scenarioName,
           record.projectName || record.projectFileStem || ui("Untitled project"),
-          new Date(record.savedAt).toLocaleString(locale), size.format(record.payload.size / 1000),
+          new Date(record.savedAt).toLocaleString(locale),
           record.note].filter(Boolean).join(" · ");
         entry.append(description, action("Restore", () => manager.restoreSnapshot(record)),
           action("Delete", () => manager.deleteSnapshot(record)));

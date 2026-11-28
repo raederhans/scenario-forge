@@ -15,8 +15,6 @@ import {
 import {
   buildTransportFamilySummaryText as buildTransportFamilySummaryTextForState,
   formatTransportPercent,
-  formatTransportScopeLabel,
-  formatTransportThresholdLabel,
 } from "./appearance_transport_summary.js";
 import {
   setTransportFamilyVisibilityState,
@@ -81,8 +79,6 @@ export function createTransportAppearanceController({
   const airportCoverageReach = document.getElementById("airportCoverageReach");
   const airportCoverageReachValue = document.getElementById("airportCoverageReachValue");
   const airportScopeLinked = document.getElementById("airportScopeLinked");
-  const airportScopeResolved = document.getElementById("airportScopeResolved");
-  const airportThresholdResolved = document.getElementById("airportThresholdResolved");
   const airportScope = document.getElementById("airportScope");
   const airportImportanceThreshold = document.getElementById("airportImportanceThreshold");
 
@@ -101,8 +97,6 @@ export function createTransportAppearanceController({
   const portCoverageReach = document.getElementById("portCoverageReach");
   const portCoverageReachValue = document.getElementById("portCoverageReachValue");
   const portScopeLinked = document.getElementById("portScopeLinked");
-  const portScopeResolved = document.getElementById("portScopeResolved");
-  const portThresholdResolved = document.getElementById("portThresholdResolved");
   const portTier = document.getElementById("portTier");
   const portImportanceThreshold = document.getElementById("portImportanceThreshold");
 
@@ -116,8 +110,6 @@ export function createTransportAppearanceController({
   const railCoverageReach = document.getElementById("railCoverageReach");
   const railCoverageReachValue = document.getElementById("railCoverageReachValue");
   const railScopeLinked = document.getElementById("railScopeLinked");
-  const railScopeResolved = document.getElementById("railScopeResolved");
-  const railThresholdResolved = document.getElementById("railThresholdResolved");
   const railScope = document.getElementById("railScope");
   const railImportanceThreshold = document.getElementById("railImportanceThreshold");
 
@@ -131,8 +123,6 @@ export function createTransportAppearanceController({
   const roadCoverageReach = document.getElementById("roadCoverageReach");
   const roadCoverageReachValue = document.getElementById("roadCoverageReachValue");
   const roadScopeLinked = document.getElementById("roadScopeLinked");
-  const roadScopeResolved = document.getElementById("roadScopeResolved");
-  const roadThresholdResolved = document.getElementById("roadThresholdResolved");
   const roadScope = document.getElementById("roadScope");
   const roadImportanceThreshold = document.getElementById("roadImportanceThreshold");
 
@@ -279,10 +269,8 @@ export function createTransportAppearanceController({
     if (airportCoverageReach) airportCoverageReach.value = String(Math.round(Number(airportCoverageReachValueRaw) * 100));
     if (airportCoverageReachValue) airportCoverageReachValue.textContent = formatTransportPercent(airportCoverageReachValueRaw);
     if (airportScopeLinked) airportScopeLinked.checked = String(getTransportFamilyValue(airportConfig, airportDefaults, "scopeLinkMode", "linked")) !== "manual";
-    if (airportScopeResolved) airportScopeResolved.textContent = t(formatTransportScopeLabel(airportScopeState.scope), "ui");
-    if (airportThresholdResolved) airportThresholdResolved.textContent = t(formatTransportThresholdLabel(airportScopeState.importanceThreshold), "ui");
-    if (airportScope) airportScope.value = String(getTransportFamilyValue(airportConfig, airportDefaults, "scope", "major_civil"));
-    if (airportImportanceThreshold) airportImportanceThreshold.value = String(getTransportFamilyValue(airportConfig, airportDefaults, "importanceThreshold", "secondary"));
+    if (airportScope) airportScope.value = airportScopeState.scope;
+    if (airportImportanceThreshold) airportImportanceThreshold.value = airportScopeState.importanceThreshold;
     if (toggleAirports) toggleAirports.checked = !!runtimeState.showAirports;
     if (transportAirportSummaryMeta) {
       transportAirportSummaryMeta.textContent = buildTransportFamilySummaryText("airport", transportEnabled, !!runtimeState.showAirports, airportConfig, airportScopeState);
@@ -308,10 +296,8 @@ export function createTransportAppearanceController({
     if (portCoverageReach) portCoverageReach.value = String(Math.round(Number(portCoverageReachValueRaw) * 100));
     if (portCoverageReachValue) portCoverageReachValue.textContent = formatTransportPercent(portCoverageReachValueRaw);
     if (portScopeLinked) portScopeLinked.checked = String(getTransportFamilyValue(portConfig, portDefaults, "scopeLinkMode", "linked")) !== "manual";
-    if (portScopeResolved) portScopeResolved.textContent = t(formatTransportScopeLabel(portScopeState.scope), "ui");
-    if (portThresholdResolved) portThresholdResolved.textContent = t(formatTransportThresholdLabel(portScopeState.importanceThreshold), "ui");
-    if (portTier) portTier.value = String(getTransportFamilyValue(portConfig, portDefaults, "scope", "regional"));
-    if (portImportanceThreshold) portImportanceThreshold.value = String(getTransportFamilyValue(portConfig, portDefaults, "importanceThreshold", "secondary"));
+    if (portTier) portTier.value = portScopeState.scope;
+    if (portImportanceThreshold) portImportanceThreshold.value = portScopeState.importanceThreshold;
     if (togglePorts) togglePorts.checked = !!runtimeState.showPorts;
     if (transportPortSummaryMeta) {
       transportPortSummaryMeta.textContent = buildTransportFamilySummaryText("port", transportEnabled, !!runtimeState.showPorts, portConfig, portScopeState);
@@ -330,10 +316,8 @@ export function createTransportAppearanceController({
     if (railCoverageReach) railCoverageReach.value = String(Math.round(Number(railCoverageReachValueRaw) * 100));
     if (railCoverageReachValue) railCoverageReachValue.textContent = formatTransportPercent(railCoverageReachValueRaw);
     if (railScopeLinked) railScopeLinked.checked = String(getTransportFamilyValue(railConfig, railDefaults, "scopeLinkMode", "linked")) !== "manual";
-    if (railScopeResolved) railScopeResolved.textContent = t(formatTransportScopeLabel(railScopeState.scope), "ui");
-    if (railThresholdResolved) railThresholdResolved.textContent = t(formatTransportThresholdLabel(railScopeState.importanceThreshold), "ui");
-    if (railScope) railScope.value = String(getTransportFamilyValue(railConfig, railDefaults, "scope", "mainline_plus_regional"));
-    if (railImportanceThreshold) railImportanceThreshold.value = String(getTransportFamilyValue(railConfig, railDefaults, "importanceThreshold", "secondary"));
+    if (railScope) railScope.value = railScopeState.scope;
+    if (railImportanceThreshold) railImportanceThreshold.value = railScopeState.importanceThreshold;
     if (toggleEraRailways) toggleEraRailways.checked = runtimeState.showEraRailways !== false;
     if (eraRailwaysToggleRow) eraRailwaysToggleRow.hidden = !activeScenarioHasEraRailways();
     if (toggleRail) toggleRail.checked = !!runtimeState.showRail;
@@ -354,10 +338,8 @@ export function createTransportAppearanceController({
     if (roadCoverageReach) roadCoverageReach.value = String(Math.round(Number(roadCoverageReachValueRaw) * 100));
     if (roadCoverageReachValue) roadCoverageReachValue.textContent = formatTransportPercent(roadCoverageReachValueRaw);
     if (roadScopeLinked) roadScopeLinked.checked = String(getTransportFamilyValue(roadConfig, roadDefaults, "scopeLinkMode", "linked")) !== "manual";
-    if (roadScopeResolved) roadScopeResolved.textContent = t(formatTransportScopeLabel(roadScopeState.scope), "ui");
-    if (roadThresholdResolved) roadThresholdResolved.textContent = t(formatTransportThresholdLabel(roadScopeState.importanceThreshold), "ui");
-    if (roadScope) roadScope.value = String(getTransportFamilyValue(roadConfig, roadDefaults, "scope", "motorway_trunk"));
-    if (roadImportanceThreshold) roadImportanceThreshold.value = String(getTransportFamilyValue(roadConfig, roadDefaults, "importanceThreshold", "secondary"));
+    if (roadScope) roadScope.value = roadScopeState.scope;
+    if (roadImportanceThreshold) roadImportanceThreshold.value = roadScopeState.importanceThreshold;
     if (toggleRoad) toggleRoad.checked = !!runtimeState.showRoad;
     if (transportRoadSummaryMeta) {
       transportRoadSummaryMeta.textContent = buildTransportFamilySummaryText("road", transportEnabled, !!runtimeState.showRoad, roadConfig, roadScopeState);

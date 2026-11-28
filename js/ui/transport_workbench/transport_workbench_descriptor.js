@@ -401,7 +401,7 @@ export const TRANSPORT_WORKBENCH_BASELINE_CONFIGS = deepFreeze({
 export const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = deepFreeze({
   road: {
     inclusion: true,
-    source_hardening: true,
+    source_conflicts: false,
     noise_control: false,
     labels: false,
     style: false,
@@ -409,7 +409,6 @@ export const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = deepFreeze({
   },
   rail: {
     network_scope: true,
-    source_reconciliation: true,
     major_stations: false,
     line_presentation: false,
     style: false,
@@ -527,6 +526,18 @@ export function buildEnergyFacilitySubtypeControlOptions(previewSnapshot) {
     .filter((entry) => entry.value);
 }
 
+export const ROAD_METRO_GUARD_OPTIONS = [
+  { value: "light", label: "Light" },
+  { value: "balanced", label: "Balanced" },
+  { value: "strict", label: "Strict" },
+];
+
+export const RAIL_IMPORTANCE_OPTIONS = [
+  { value: "capital_core", label: "Capital core" },
+  { value: "regional_core", label: "Regional core" },
+  { value: "broad_major", label: "Broad major" },
+];
+
 export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
   road: [
     {
@@ -535,7 +546,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
       controls: [
         { type: "multi", key: "roadClass", label: "Road classes", options: ROAD_CLASS_OPTIONS, description: "Pilot scope stays on motorway, trunk, and primary." },
         { type: "toggle", key: "excludeLinks", label: "Exclude *_link", description: "Keep motorway_link, trunk_link, and primary_link out by default." },
-        { type: "toggle", key: "excludeServiceLike", label: "Exclude service-like roads" },
         { type: "select", key: "zoomGate", label: "Zoom gate", description: "Controls low, mid, and high-zoom reveal behavior.", options: [
           { value: "strict", label: "Strict corridor" },
           { value: "balanced", label: "Balanced" },
@@ -544,30 +554,19 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
       ],
     },
     {
-      key: "source_hardening",
-      title: "Source Hardening",
+      key: "source_conflicts",
+      title: "Source differences",
       controls: [
-        { type: "select", key: "motorwayIdentitySource", label: "Motorway identity source", description: "Japan baseline defaults to OSM geometry plus N06 hardening.", options: [
-          { value: "osm_plus_n06", label: "OSM + N06 hardening" },
-          { value: "osm_only", label: "OSM only" },
-        ] },
-        { type: "toggle", key: "preferOfficialRef", label: "Prefer official ref", description: "Use official motorway refs when they exist." },
-        { type: "toggle", key: "preferOfficialNameWhenPresent", label: "Prefer official name", description: "Use official names when source values disagree." },
-        { type: "toggle", key: "showSourceConflicts", label: "Show source conflicts", description: "Expose OSM versus N06 conflicts instead of hiding them." },
+        { type: "toggle", key: "showSourceConflicts", label: "Show source conflicts" },
       ],
     },
     {
       key: "noise_control",
       title: "Noise Control",
       controls: [
-        { type: "toggle", key: "mergeContiguousSegments", label: "Merge contiguous segments", description: "Safely merge same-class runs before rendering." },
         { type: "range", key: "minProjectedSegmentPx", label: "Min projected segment", description: "Very short projected segments drop out to reduce spark noise.", min: 2, max: 16, step: 1, unit: "px" },
         { type: "toggle", key: "suppressShortPrimarySegments", label: "Suppress short primary", description: "Hide extra-short primary stubs in the first pass." },
-        { type: "select", key: "denseMetroGuard", label: "Dense metro guard", description: "Extra denoise strength for Tokyo and Osaka density.", options: [
-          { value: "light", label: "Light" },
-          { value: "balanced", label: "Balanced" },
-          { value: "strict", label: "Strict" },
-        ] },
+        { type: "select", key: "denseMetroGuard", label: "Dense metro guard", description: "Extra denoise strength for Tokyo and Osaka density.", options: ROAD_METRO_GUARD_OPTIONS },
       ],
     },
     {
@@ -610,21 +609,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
         { type: "multi", key: "status", label: "Statuses", options: RAIL_STATUS_OPTIONS, description: "Japan rail baseline opens only active by default." },
         { type: "multi", key: "class", label: "Classes", options: RAIL_CLASS_OPTIONS, description: "Low zoom should favor high_speed and trunk." },
         { type: "toggle", key: "showServiceAtHighZoomOnly", label: "Service only at high zoom", description: "Keep service lines from dominating national views." },
-        { type: "toggle", key: "showOsmPatchSegments", label: "Show OSM patch segments", description: "Display only explicit lifecycle or gap patches." },
-      ],
-    },
-    {
-      key: "source_reconciliation",
-      title: "Source Reconciliation",
-      description: "Choose how official and OSM railway information is combined.",
-      controls: [
-        { type: "toggle", key: "officialActiveNetworkLocked", label: "Official active network locked", description: "Official Japan source defines active network boundaries." },
-        { type: "toggle", key: "allowOsmActiveGapFill", label: "Allow OSM active gap fill", description: "Permit OSM to fill only obvious official gaps." },
-        { type: "select", key: "strictDedupMode", label: "Dedup mode", description: "Keep reconciliation strict rather than heuristic.", options: [
-          { value: "strict", label: "Strict" },
-          { value: "strict_plus_name", label: "Strict + name" },
-        ] },
-        { type: "toggle", key: "showReconciliationConflicts", label: "Show reconciliation conflicts", description: "Expose official-versus-OSM conflicts instead of hiding them." },
       ],
     },
     {
@@ -633,12 +617,7 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
       description: "Choose which major stations and names appear on the map.",
       controls: [
         { type: "toggle", key: "showMajorStations", label: "Show major stations", description: "Turn the major station layer on or off." },
-        { type: "select", key: "importanceThreshold", label: "Importance threshold", description: "Controls the lowest station importance that survives.", options: [
-          { value: "capital_core", label: "Capital core" },
-          { value: "regional_core", label: "Regional core" },
-          { value: "broad_major", label: "Broad major" },
-        ] },
-        { type: "toggle", key: "singlePrimaryStationPerCity", label: "Single primary station per city", description: "Keep one main station per city by default." },
+        { type: "select", key: "importanceThreshold", label: "Importance threshold", description: "Controls the lowest station importance that survives.", options: RAIL_IMPORTANCE_OPTIONS },
         { type: "toggle", key: "showStationLabels", label: "Show station labels", description: "Expose names only for retained major stations." },
         { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively station names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
@@ -763,7 +742,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for mineral resources.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds drive when inspect, aggregate, or density takes over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -772,7 +750,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "aggregation_mode",
       title: "Aggregation",
-      description: "Grid-based aggregation works better than raw point carpets for dense mineral clusters.",
       controls: [
         { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how mineral points should be aggregated.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["hex", "square", "density_surface"].includes(option.value)) },
       ],
@@ -780,7 +757,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "label_strategy",
       title: "Label Strategy",
-      description: "Prefer geographic anchors with dominant resource category, then back off when the map gets crowded.",
       controls: [
         { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated mineral labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
         { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels kept before geographic label merge takes over.", min: 3, max: 18, step: 1 },
@@ -790,7 +766,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "visibility",
       title: "Labels",
-      description: "Keep mineral labels opt-in so dense point fields stay readable.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose mineral labels only during closer review." },
         { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively mineral labels are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
@@ -809,7 +784,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for energy facilities.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when aggregation should take over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -818,7 +792,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "aggregation_mode",
       title: "Aggregation",
-      description: "Aggregation is optional here, but the mode should still honor subtype-driven density shifts.",
       controls: [
         { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how energy facilities should summarize at lower zooms.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
       ],
@@ -826,7 +799,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "label_strategy",
       title: "Label Strategy",
-      description: "Subtype-driven labels should stay sparse and readable instead of repeating raw facility names everywhere.",
       controls: [
         { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated energy labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
         { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels kept before label merge kicks in.", min: 3, max: 18, step: 1 },
@@ -851,7 +823,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "visibility",
       title: "Labels",
-      description: "Keep facility names visible only when the current zoom can carry them cleanly.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose energy facility labels during closer review." },
         { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively facility names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
@@ -870,7 +841,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for industrial land.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when polygons collapse into pattern views.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -879,7 +849,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "aggregation_mode",
       title: "Aggregation",
-      description: "Industrial review needs pattern-first summarization without blending internal and open tracks.",
       controls: [
         { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how industrial land should summarize at lower zooms.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["square", "hex", "density_surface"].includes(option.value)) },
       ],
@@ -887,7 +856,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "label_strategy",
       title: "Label Strategy",
-      description: "Use geographic anchors and dominant land context before falling back to fewer region labels.",
       controls: [
         { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive industrial labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
         { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum industrial labels kept before merge and downgrade.", min: 3, max: 18, step: 1 },
@@ -897,7 +865,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "data_variant",
       title: "Source Track",
-      description: "Keep official review data separate from publicly releasable data.",
       controls: [
         { type: "select", key: "variant", label: "Source track", options: INDUSTRIAL_VARIANT_OPTIONS },
       ],
@@ -920,7 +887,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "visibility",
       title: "Labels",
-      description: "Keep names opt-in so polygon review stays readable.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose polygon names only when you want name-led review." },
         { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively polygon names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
@@ -939,7 +905,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "display_mode",
       title: "Display Mode",
-      description: "Choose individual sites, grouped sites, or a density view.",
       controls: [
         { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for logistics hubs.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
         { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when the layer moves between inspect, aggregate, and density.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
@@ -948,7 +913,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "aggregation_mode",
       title: "Aggregation",
-      description: "Cluster and grid views are both valid here, depending on how aggressively you want to compress the point field.",
       controls: [
         { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how logistics hubs should summarize when dense.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
       ],
@@ -956,7 +920,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "label_strategy",
       title: "Label Strategy",
-      description: "Use geographic anchors and dominant logistics function, then merge labels when corridor density spikes.",
       controls: [
         { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive logistics labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
         { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum logistics labels kept before merge.", min: 3, max: 18, step: 1 },
@@ -974,7 +937,6 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
     {
       key: "visibility",
       title: "Labels",
-      description: "Keep names gated so hub points stay readable over industrial land.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose logistics hub labels only during closer review." },
         { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively hub names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
@@ -992,26 +954,18 @@ export const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = deepFreeze({
 });
 
 export const TRANSPORT_WORKBENCH_INLINE_HELP_SECTIONS = {
-  road: new Set(["source_hardening", "noise_control"]),
-  rail: new Set(["source_reconciliation", "line_presentation"]),
+  road: new Set(["noise_control"]),
+  rail: new Set(["line_presentation"]),
 };
 
 export const TRANSPORT_WORKBENCH_INLINE_HELP_COPY = {
   road: {
-    source_hardening: {
-      title: "Source hardening",
-      body: "Use official road names and route numbers where available.",
-    },
     noise_control: {
       title: "Noise control",
       body: "Hide short or crowded road segments to keep major roads readable.",
     },
   },
   rail: {
-    source_reconciliation: {
-      title: "Source reconciliation",
-      body: "Combine official active railway lines with OSM information for gaps and inactive lines.",
-    },
     line_presentation: {
       title: "Line presentation",
       body: "Use line styles and fading to distinguish railway status. Keep main lines more prominent than branch and service lines.",
@@ -1105,11 +1059,11 @@ export const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
 export const TRANSPORT_WORKBENCH_TAB_SECTION_MAP = {
   road: {
     display: ["style", "inclusion", "noise_control", "labels"],
-    data: ["source_hardening"],
+    data: ["source_conflicts"],
   },
   rail: {
     display: ["line_presentation", "style", "network_scope", "major_stations"],
-    data: ["source_reconciliation"],
+    data: [],
   },
   airport: {
     display: ["style", "visibility"],

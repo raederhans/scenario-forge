@@ -223,3 +223,39 @@ test("ignores Enter, arrows, and Escape while an IME composition is active", () 
   assert.equal(h.input.value, "zulu");
   assert.equal(h.input.getAttribute("aria-expanded"), "true");
 });
+
+test("shares the country search input: lists regions, keeps the query on select, and re-filters countries when cleared", () => {
+  const document = { createElement: (tag) => new FakeElement(tag, document) };
+  const container = document.createElement("div");
+  const input = document.createElement("input");
+  let countryFilterRuns = 0;
+  const controller = createRegionSearchController({
+    documentRef: document,
+    state: { landIndex: new Map([["DE300", { label: "柏林", properties: { name: "Berlin" } }]]) },
+    t: (key) => key,
+    getFeatureOwnerCode: () => "GER",
+    getFeatureLabel: (feature) => feature.label,
+    selectLandFeatureById: () => true,
+    focusGeoBounds: () => {},
+  });
+  controller.mount(container, { input });
+  input.addEventListener("input", () => { countryFilterRuns += 1; });
+  const block = container.children[0];
+  const [results] = block.children;
+  assert.equal(block.children.length, 2, "only results and status are added; no second input");
+  assert.equal(input.getAttribute("role"), "combobox");
+
+  input.value = "ber";
+  input.dispatchEvent(new Event("input"));
+  assert.deepEqual(results.children.map((node) => node.getAttribute("data-feature-id")), ["DE300"]);
+
+  results.children[0].dispatchEvent(new Event("click"));
+  assert.equal(input.value, "ber", "selecting a region leaves the shared query untouched");
+
+  const runsBefore = countryFilterRuns;
+  const escape = new Event("keydown", { cancelable: true });
+  escape.key = "Escape";
+  input.dispatchEvent(escape);
+  assert.equal(input.value, "");
+  assert.equal(countryFilterRuns, runsBefore + 1, "clearing re-runs the country list filter");
+});

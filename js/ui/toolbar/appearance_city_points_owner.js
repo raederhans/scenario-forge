@@ -28,7 +28,6 @@ function collectCityPointsNodes(documentRef) {
     toggleCityPoints: documentRef.getElementById("toggleCityPoints"),
     cityPointsDensityPreset: documentRef.getElementById("cityPointsDensityPreset"),
     cityPointsMinRank: documentRef.getElementById("cityPointsMinRank"),
-    cityPointsHierarchyHint: documentRef.getElementById("cityPointsHierarchyHint"),
     cityPointsTheme: documentRef.getElementById("cityPointsTheme"),
     cityPointsMarkerScale: documentRef.getElementById("cityPointsMarkerScale"),
     cityPointsMarkerDensity: documentRef.getElementById("cityPointsMarkerDensity"),
@@ -107,9 +106,6 @@ export function createAppearanceCityPointsOwner({
     const cityPointsConfig = syncCityPointsConfig();
     if (nodes.cityPointsDensityPreset) nodes.cityPointsDensityPreset.value = cityPointsConfig.densityPreset;
     if (nodes.cityPointsMinRank) nodes.cityPointsMinRank.value = cityPointsConfig.minSettlementRank;
-    if (nodes.cityPointsHierarchyHint) nodes.cityPointsHierarchyHint.textContent = runtimeState.currentLanguage === "zh"
-      ? "首都是独立标记。历史剧本沿用已知等级，可由剧本单独覆盖。"
-      : "Capitals have a separate symbol. Historical scenarios retain known ranks and can override them.";
     ensureCityPointsThemeOptions();
     if (nodes.cityPointsTheme) nodes.cityPointsTheme.value = String(cityPointsConfig.theme || "classic_graphite");
     if (nodes.cityPointsMarkerScale) nodes.cityPointsMarkerScale.value = Number(cityPointsConfig.markerScale || 1).toFixed(2);

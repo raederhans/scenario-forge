@@ -81,7 +81,7 @@ function createExportFailureToastHandler({
     }
     if (/^Export (?:size exceeds 8K cap|pixel budget exceeded) \(\d+x\d+\)\.$/.test(String(error?.message || ""))) {
       presentToast(
-        `${translate("Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).", "ui")} ${error.message}`,
+        translate("Export size exceeds the 8K limit. Lower the export scale and try again.", "ui"),
         { title: translate("Export failed · Invalid parameters", "ui"), tone: "warning", duration: 7000 }
       );
       return failureKind;

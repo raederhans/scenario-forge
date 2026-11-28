@@ -218,7 +218,7 @@ test("historical selectors default to population and respect document availabili
   assert.equal(state.styleConfig.thematic.metricId, select.value);
   assert.equal(select.children.length, 16);
   assert.ok(select.children.every((option) => !option.value.startsWith("scenario_")));
-  assert.equal(status.textContent, "Indicator data loaded.");
+  assert.equal(status.textContent, "");
   state.activeScenarioId = "rcw_1919";
   assert.equal(owner.render().supported, false);
 });

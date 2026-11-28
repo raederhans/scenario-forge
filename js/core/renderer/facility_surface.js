@@ -127,7 +127,6 @@ export function createFacilitySurfaceOwner({
       }
       return false;
     };
-    pushRow(defaultRows, t("Tier", "ui"), String(properties.importance || "").replaceAll("_", " "));
     if (entry.familyId === "airport") {
       pushRow(defaultRows, t("Airport type", "ui"), properties.airport_type_label || properties.airport_type || properties.category);
       pushRow(defaultRows, "IATA / ICAO", [properties.iata, properties.icao].filter(Boolean).join(" / "));

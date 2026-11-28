@@ -898,7 +898,7 @@ function createSpecialZonesWorkbenchController({
     deleteBtn.disabled = !layer;
     deleteBtn.addEventListener("click", () => updateState({ action: "deleteLayer", layerId: layer.id }, "special-zone-layer-delete"));
 
-    const saveBtn = createButton(translate("Save scenario layer asset"));
+    const saveBtn = createButton(translate("Save scenario layer asset"), "secondary-btn dev-only");
     const syncScenarioSaveButtonState = () => {
       const disabledReason = runtimeState.activeScenarioId
         ? ""
@@ -965,12 +965,7 @@ function createSpecialZonesWorkbenchController({
       row.textContent = `${index + 1}. ${step.title} · ${step.layerIds.length} ${translate("layers")}`;
       storyList.appendChild(row);
     });
-    if (!storyList.children.length) {
-      const empty = document.createElement("p");
-      empty.className = "muted";
-      empty.textContent = translate("Create visible layers to preview a story sequence.");
-      storyList.appendChild(empty);
-    }
+    storyPreview.hidden = !storyList.children.length;
     storyPreview.append(storySummary, storyList);
     const advanced = document.createElement("details");
     advanced.className = "special-zone-advanced";

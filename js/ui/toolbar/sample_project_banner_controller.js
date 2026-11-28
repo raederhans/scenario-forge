@@ -99,10 +99,7 @@ export function resolveSampleProjectBannerView(sampleState, { t = identityT } = 
       sampleId,
       dismissKey: createDismissKey(sampleState),
       title: `${localize(t, "Sample loaded")}: ${sampleTitle}`,
-      body: localize(
-        t,
-        "Edit this starter map, then export your own image or download the original sample JSON.",
-      ),
+      body: "",
       openExportLabel: localize(t, "Open export workbench"),
       downloadOriginalLabel: localize(t, "Download original JSON"),
       dismissLabel: localize(t, "Dismiss sample message"),
@@ -321,6 +318,7 @@ export function createSampleProjectBannerController(runtimeState, {
       root.setAttribute("aria-live", view.tone === "error" ? "assertive" : "polite");
       if (titleNode) titleNode.textContent = view.title;
       if (bodyNode) bodyNode.textContent = view.body;
+      setElementHidden(bodyNode, !view.body);
 
       if (openExportButton && view.openExportLabel) openExportButton.textContent = view.openExportLabel;
       setActionHidden(openExportButton, !view.canOpenExport);
@@ -430,10 +428,7 @@ export function createSampleProjectGuideCardController(runtimeState, {
       const title = document.createElement("span");
       title.className = "scenario-guide-sample-choice__title";
       title.textContent = entry.title || entry.id;
-      const scenario = document.createElement("span");
-      scenario.className = "scenario-guide-sample-choice__scenario";
-      scenario.textContent = entry.scenarioId;
-      button.append(title, scenario);
+      button.appendChild(title);
       button.addEventListener("click", () => {
         if (button.disabled) return;
         if (typeof onSampleChoice === "function") {

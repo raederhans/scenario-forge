@@ -3,7 +3,7 @@ import test from "node:test";
 import { createExportWorkbenchController } from "../js/ui/toolbar/export_workbench_controller.js";
 import { normalizeExportWorkbenchUiState } from "../js/core/state_defaults.js";
 
-function mount(context) {
+function mount(context, overrides = {}) {
   const previous = globalThis.document;
   globalThis.document = { getElementById: () => null };
   context.after(() => { globalThis.document = previous; });
@@ -26,6 +26,7 @@ function mount(context) {
     buildCompositeSourceCanvas: build, buildSingleExportSourceCanvas: build,
     applyExportAdjustmentsToCanvas: source => source, bakeLayer() {}, clearBakeCache() {},
     requestPreviewFrame: callback => frames.push(callback),
+    ...overrides,
   });
   return { controller, overlay, status, stage, get builds() { return builds; },
     async frame() { frames.shift()(); await new Promise(setImmediate); },
@@ -45,8 +46,27 @@ test("opening shows the shell and preparing state before preview work", async co
   await h.frame();
   await h.frame();
   assert.equal(h.builds, 1);
-  assert.equal(h.status.textContent, "Main image preview ready");
+  assert.equal(h.status.textContent, "");
+  assert.equal(h.status.hidden, true);
   assert.equal(h.stage.children.length, 1);
+});
+
+test("the bake cache is available only for bake packs", context => {
+  const shell = { hidden: true };
+  const list = {
+    children: [], closest: () => shell,
+    replaceChildren() { this.children = []; },
+    appendChild(item) { this.children.push(item); },
+  };
+  const state = {};
+  const { controller } = mount(context, { state, exportWorkbenchBakeArtifactList: list });
+  globalThis.document.createElement = () => ({ append() {}, appendChild() {} });
+  for (const target of ["composite", "bake-pack", "per-layer"]) {
+    state.exportWorkbenchUi = { target };
+    controller.renderExportWorkbenchBakeArtifactList();
+    assert.equal(shell.hidden, target !== "bake-pack");
+    if (!shell.hidden) assert.ok(list.children.length > 0);
+  }
 });
 
 test("closing before preparation prevents deferred opening and preview work", async context => {
